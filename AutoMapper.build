@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<project name="AutoMapper" default="test" xmlns="http://nant.sf.net/schemas/nant.xsd">
+	<property name="build.dir" value="build" />
+	<property name="nant.settings.currentframework" value="net-3.5" />
+
+	<!-- User targets -->
+	<target name="clean" description="Delete Automated Build artifacts">
+		<delete dir="${build.dir}" if="${directory::exists(build.dir)}"/>
+	</target>
+
+	<target name="compile" description="Compiles using the AutomatedDebug Configuration">
+		<msbuild project="src\AutoMapper.sln">
+			<property name="Configuration" value="AutomatedDebug" />
+		</msbuild>
+	</target>
+
+	<target name="test" depends="compile, run-unit-tests" 
+		description="Compile and Run Tests" />
+		
+	<target name="full" depends="clean, test, dist"	description="Compiles, tests, and produces distributions" />
+
+	<!-- Internal targets -->
+	<target name="run-unit-tests">
+		<mkdir dir="${build.dir}\test-reports" />
+		<exec program="tools\nunit\nunit-console.exe" 
+			workingdir="${build.dir}\Debug\UnitTests">
+			<arg value="/xml &quot;..\..\test-reports\UnitTests.xml&quot;" />
+			<arg value="/nologo" />
+			<arg value="&quot;AutoMapper.UnitTests.dll&quot;" />
+		</exec>
+	</target>
+	
+	<target name="dist">
+		<copy todir="${build.dir}\dist">
+			<fileset basedir="${build.dir}\Debug\AutoMapper">
+				<include name="**\*"/>
+				<exclude name="**\*.pdb" />
+			</fileset>
+		</copy>
+		<zip zipfile="${build.dir}\AutoMapper.zip">
+			<fileset basedir="${build.dir}\dist">
+				<include name="**\*" />
+			</fileset>
+		</zip>
+	</target>
+	
+</project>
+

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NAnt.MSBuild</name>
+    </assembly>
+    <members>
+        <member name="T:NAnt.MSBuild.Functions.MSBuildFunctions">
+            <summary>
+            Functions to return information for MSBuild system.
+            </summary>
+        </member>
+        <member name="M:NAnt.MSBuild.Functions.MSBuildFunctions.#ctor(NAnt.Core.Project,NAnt.Core.PropertyDictionary)">
+            <exclude/>
+        </member>
+        <member name="M:NAnt.MSBuild.Functions.MSBuildFunctions.IsMsbuildProject(System.String)">
+            <summary>
+            Test whether project is VS2005 project and could be built using &lt;msbuild&gt;
+            </summary>
+            <param name="project">The name or path of the project file (csproj, vbproj, ...).</param>
+            <returns>
+            True, if it is msbuild project, False otherwise.
+            </returns>
+        </member>
+        <member name="M:NAnt.MSBuild.NAntLogger.Initialize(Microsoft.Build.Framework.IEventSource)">
+            <summary>
+            Initialize is guaranteed to be called by MSBuild at the start of the build
+            before any events are raised.
+            </summary>
+        </member>
+        <member name="T:NAnt.VSNet.WhidbeySolution">
+            <summary>
+            Analyses Microsoft Visual Studio .NET 2005 (Whidbey) solution files.
+            !! FOR NOW IT IS PLAIN COPY OF EVERETT (2003) !!
+            </summary>
+        </member>
+    </members>
+</doc>
