@@ -20,13 +20,13 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 			}
 
 			[Test]
 			public void Should_map_successfully()
 			{
-				ModelDto dto = AutoMapper.Map<ModelObject, ModelDto>(new ModelObject());
+				ModelDto dto = Mapper.Map<ModelObject, ModelDto>(new ModelObject());
 
 				dto.ShouldNotBeNull();
 			}
@@ -46,9 +46,9 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(null);
+				_result = Mapper.Map<ModelObject, ModelDto>(null);
 			}
 
 			[Test]
@@ -95,10 +95,10 @@ namespace AutoMapper.UnitTests
 				var model = new ModelObject();
 				model.Sub = null;
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
-				AutoMapper.CreateMap<ModelSubObject, ModelSubDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -146,14 +146,14 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				var model = new ModelObject
 				{
 					SomeValue = "Some value"
 				};
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -184,9 +184,9 @@ namespace AutoMapper.UnitTests
 					NotAString = 5
 				};
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -217,9 +217,9 @@ namespace AutoMapper.UnitTests
 			{
 				var model = new ModelObject();
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -250,9 +250,9 @@ namespace AutoMapper.UnitTests
 				var model = new ModelObject();
 				model.NullableDate = new DateTime(2007, 8, 4);
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -279,10 +279,10 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				_model = new[] { new ModelObject { SomeValue = "First" }, new ModelObject { SomeValue = "Second" } };
-				_dto = (ModelDto[])AutoMapper.Map(_model, typeof(ModelObject[]), typeof(ModelDto[]));
+				_dto = (ModelDto[])Mapper.Map(_model, typeof(ModelObject[]), typeof(ModelDto[]));
 			}
 
 			[Test]

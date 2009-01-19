@@ -51,13 +51,13 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>()
+				Mapper.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.Value, opt => opt.ResolveUsing<CustomResolver>())
 					.ForMember(dto => dto.Value2, opt => opt.ResolveUsing(new CustomResolver2()))
 					.ForMember(dto => dto.Value4, opt => opt.ResolveUsing(typeof(CustomResolver3)));
 				
 				var model = new ModelObject { Value = 42, Value2fff = 42, Value3 = 42, Value4 = 42};
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -114,7 +114,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>()
+				Mapper.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.SomeValue, opt => opt.ResolveUsing<CustomResolver>().FromMember(m => m.Sub));
 				
 				var model = new ModelObject
@@ -125,7 +125,7 @@ namespace AutoMapper.UnitTests
 					}
 				};
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]

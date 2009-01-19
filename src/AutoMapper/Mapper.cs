@@ -2,7 +2,7 @@ using System;
 
 namespace AutoMapper
 {
-	public static class AutoMapper
+	public static class Mapper
 	{
 		private static Configuration _configuration;
 		private static IMappingEngine _mappingEngine;

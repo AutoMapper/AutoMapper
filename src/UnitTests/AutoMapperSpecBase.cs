@@ -6,7 +6,7 @@ namespace AutoMapper.UnitTests
 	{
 		protected override void Cleanup()
 		{
-			AutoMapper.Reset();
+			Mapper.Reset();
 		}
 	}
 }

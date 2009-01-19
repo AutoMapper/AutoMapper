@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.Reset();
+				Mapper.Reset();
 
 				var model = new[]
             	{
@@ -40,13 +40,13 @@ namespace AutoMapper.UnitTests
 					new ModelSubObject { BaseString = "Base2", SubString = "Sub2"}
             	};
 
-				AutoMapper
+				Mapper
 					.CreateMap<ModelObject, DtoObject>()
 					.Include<ModelSubObject, DtoSubObject>();
 
-				AutoMapper.CreateMap<ModelSubObject, DtoSubObject>();
+				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
 
-				_result = (DtoObject[])AutoMapper.Map(model, typeof(ModelObject[]), typeof(DtoObject[]));
+				_result = (DtoObject[])Mapper.Map(model, typeof(ModelObject[]), typeof(DtoObject[]));
 			}
 
 			[Test]
@@ -102,7 +102,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.Reset();
+				Mapper.Reset();
 
 				var model = new ModelObject
 				{
@@ -129,8 +129,8 @@ namespace AutoMapper.UnitTests
 					}
 				};
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				Mapper.CreateMap<ModelObject, ModelDto>();
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -189,15 +189,15 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_successfully()
 			{
-				AutoMapper.Map<Source, Destination>(_source).Value.ShouldEqual("foo");
+				Mapper.Map<Source, Destination>(_source).Value.ShouldEqual("foo");
 			}
 
 			protected override void Establish_context()
 			{
 				_source = new Source {Value = "foo"};
-				AutoMapper.CreateMap<Source, Destination>()
+				Mapper.CreateMap<Source, Destination>()
 					.ForMember(x => x.Ignored, opt => opt.Ignore());
-				_allTypeMaps = AutoMapper.GetAllTypeMaps();
+				_allTypeMaps = Mapper.GetAllTypeMaps();
 			}
 		}
 
@@ -236,9 +236,9 @@ namespace AutoMapper.UnitTests
 					Sub = new ModelSubObject()
 				};
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -289,9 +289,9 @@ namespace AutoMapper.UnitTests
 					Sub = new ModelSubObject()
 				};
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -333,8 +333,8 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
-				AutoMapper.CreateMap<ModelSubObject, ModelSubDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
 
 				var model = new ModelObject
 				{
@@ -344,7 +344,7 @@ namespace AutoMapper.UnitTests
 					}
 				};
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -381,12 +381,12 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				var model = new ModelObject();
 				model.SomeValue = 46;
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -460,7 +460,7 @@ namespace AutoMapper.UnitTests
 						}
 					}
 				};
-				AutoMapper
+				Mapper
 					.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.Splorg, opt => opt.MapFrom(m => m.Blarg))
 					.ForMember(dto => dto.SomeMethod, opt => opt.MapFrom(m => m.IAmSomeMethod()))
@@ -470,7 +470,7 @@ namespace AutoMapper.UnitTests
 					.ForMember(dto => dto.GrandChildString,
 								  opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.SomeSubSubValue()));
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]

@@ -46,16 +46,16 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.AddFormatter<HardEncoder>();
-				AutoMapper.AddFormatter(new SoftEncoder());
-				AutoMapper.AddFormatter(typeof(RokkenEncoder));
-				AutoMapper.AddFormatExpression(context => context.SourceValue + " Medium");
+				Mapper.AddFormatter<HardEncoder>();
+				Mapper.AddFormatter(new SoftEncoder());
+				Mapper.AddFormatter(typeof(RokkenEncoder));
+				Mapper.AddFormatExpression(context => context.SourceValue + " Medium");
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				var modelObject = new ModelObject { Value = 14 };
 
-				_modelDto = AutoMapper.Map<ModelObject, ModelDto>(modelObject);
+				_modelDto = Mapper.Map<ModelObject, ModelDto>(modelObject);
 			}
 
 			[Test]
@@ -91,14 +91,14 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.ForSourceType<DateTime>().AddFormatter<ShortDateFormatter>();
-				AutoMapper.ForSourceType<int>().AddFormatExpression(context => ((int)context.SourceValue + 1).ToString());
+				Mapper.ForSourceType<DateTime>().AddFormatter<ShortDateFormatter>();
+				Mapper.ForSourceType<int>().AddFormatExpression(context => ((int)context.SourceValue + 1).ToString());
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				var model = new ModelObject { StartDate = new DateTime(2004, 12, 25), OtherValue = 43 };
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -130,14 +130,14 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.AddFormatExpression(context => string.Format("{0} Value", context.SourceValue));
-				AutoMapper.ForSourceType<int>().AddFormatExpression(context => ((int)context.SourceValue + 1).ToString());
+				Mapper.AddFormatExpression(context => string.Format("{0} Value", context.SourceValue));
+				Mapper.ForSourceType<int>().AddFormatExpression(context => ((int)context.SourceValue + 1).ToString());
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				var model = new ModelObject { OtherValue = 43 };
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -171,15 +171,15 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.AddFormatter<CrazyEncoder>();
+				Mapper.AddFormatter<CrazyEncoder>();
 
-				AutoMapper.Reset();
+				Mapper.Reset();
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				var modelObject = new ModelObject { Value = 14 };
 
-				_modelDto = AutoMapper.Map<ModelObject, ModelDto>(modelObject);
+				_modelDto = Mapper.Map<ModelObject, ModelDto>(modelObject);
 			}
 
 			[Test]
@@ -215,15 +215,15 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.ForSourceType<int>().AddFormatter<SampleFormatter>();
+				Mapper.ForSourceType<int>().AddFormatter<SampleFormatter>();
 
-				AutoMapper
+				Mapper
 					.CreateMap<ModelObject, ModelDto>()
 					.ForMember(d => d.ValueTwo, opt => opt.SkipFormatter<SampleFormatter>());
 
 				var model = new ModelObject { ValueOne = 24, ValueTwo = 42 };
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -263,14 +263,14 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.AddFormatter<SampleFormatter>();
-				AutoMapper.ForSourceType<int>().SkipFormatter<SampleFormatter>();
+				Mapper.AddFormatter<SampleFormatter>();
+				Mapper.ForSourceType<int>().SkipFormatter<SampleFormatter>();
 
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				var model = new ModelObject { ValueOne = 24 };
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -304,13 +304,13 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper
+				Mapper
 					.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.ValueOne, opt => opt.AddFormatter<SampleFormatter>());
 
 				var model = new ModelObject { ValueOne = 24 };
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
@@ -336,13 +336,13 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper
+				Mapper
 					.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.ValueOne, opt => opt.FormatNullValueAs("I am null"));
 				
 				var model = new ModelObject { ValueOne = null };
 
-				_result = AutoMapper.Map<ModelObject, ModelDto>(model);
+				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]

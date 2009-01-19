@@ -23,9 +23,9 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateMap<ModelObject, ModelDto>();
+				Mapper.CreateMap<ModelObject, ModelDto>();
 
-				_typeMap = AutoMapper.FindTypeMapFor<ModelObject, ModelDto>();
+				_typeMap = Mapper.FindTypeMapFor<ModelObject, ModelDto>();
 			}
 
 			[Test]
@@ -54,11 +54,11 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper
+				Mapper
 					.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
 
-				_typeMap = AutoMapper.FindTypeMapFor<ModelObject, ModelDto>();
+				_typeMap = Mapper.FindTypeMapFor<ModelObject, ModelDto>();
 			}
 
 			[Test]

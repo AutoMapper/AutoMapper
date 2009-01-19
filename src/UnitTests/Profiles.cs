@@ -29,16 +29,16 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.AddFormatter<Formatter>();
+				Mapper.AddFormatter<Formatter>();
 
-				AutoMapper.CreateProfile("Custom");
+				Mapper.CreateProfile("Custom");
 
-				AutoMapper.CreateMap<Model, Dto>().WithProfile("Custom");
+				Mapper.CreateMap<Model, Dto>().WithProfile("Custom");
 			}
 
 			protected override void Because_of()
 			{
-				_result = AutoMapper.Map<Model, Dto>(new Model {Value = 5});
+				_result = Mapper.Map<Model, Dto>(new Model {Value = 5});
 			}
 
 			[Test]
@@ -75,14 +75,14 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.CreateProfile("Custom1", x => x.CreateMap<Model1, Dto1>());
-				AutoMapper.CreateProfile("Custom2").CreateMap<Model2, Dto2>();
+				Mapper.CreateProfile("Custom1", x => x.CreateMap<Model1, Dto1>());
+				Mapper.CreateProfile("Custom2").CreateMap<Model2, Dto2>();
 			}
 
 			protected override void Because_of()
 			{
-				_typeMap1 = AutoMapper.FindTypeMapFor<Model1, Dto1>();
-				_typeMap2 = AutoMapper.FindTypeMapFor<Model2, Dto2>();
+				_typeMap1 = Mapper.FindTypeMapFor<Model1, Dto1>();
+				_typeMap2 = Mapper.FindTypeMapFor<Model2, Dto2>();
 			}
 
 			[Test]
@@ -158,13 +158,13 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				AutoMapper.AddProfile(new CustomProfile1());
-				AutoMapper.AddProfile<CustomProfile2>();
+				Mapper.AddProfile(new CustomProfile1());
+				Mapper.AddProfile<CustomProfile2>();
 			}
 
 			protected override void Because_of()
 			{
-				_result = AutoMapper.Map<Model, Dto>(new Model { Value = 5 });
+				_result = Mapper.Map<Model, Dto>(new Model { Value = 5 });
 			}
 
 			[Test]
@@ -176,8 +176,8 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_assign_the_correct_profile_to_each_configured_type_map()
 			{
-				AutoMapper.FindTypeMapFor<Model, Dto>().Profile.ShouldEqual("Custom1");
-				AutoMapper.FindTypeMapFor<Model, Dto2>().Profile.ShouldEqual("Custom2");
+				Mapper.FindTypeMapFor<Model, Dto>().Profile.ShouldEqual("Custom1");
+				Mapper.FindTypeMapFor<Model, Dto2>().Profile.ShouldEqual("Custom2");
 			}
 		}
 
