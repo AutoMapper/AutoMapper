@@ -40,6 +40,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NBehave.Spec.Framework, Version=0.4.0.0, Culture=neutral, PublicKeyToken=d421feca0f4a05f6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\NBehave.Spec.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="NBehave.Spec.NUnit, Version=0.4.0.0, Culture=neutral, PublicKeyToken=d421feca0f4a05f6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\NBehave.Spec.NUnit.dll</HintPath>
+    </Reference>
     <Reference Include="NUnit.framework">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NUnit.framework.dll</HintPath>
@@ -53,7 +61,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Test1.cs" />
+    <Compile Include="AutoMapperSpecBase.cs" />
+    <Compile Include="AutoMapperTester.cs" />
+    <Compile Include="ConfigurationResolution.cs" />
+    <Compile Include="CustomFormatters.cs" />
+    <Compile Include="CustomMapping.cs" />
+    <Compile Include="General.cs" />
+    <Compile Include="Initialization.cs" />
+    <Compile Include="MemberResolution.cs" />
+    <Compile Include="Profiles.cs" />
+    <Compile Include="TesterExtensions.cs" />
+    <Compile Include="Testing.cs" />
+    <Compile Include="ResolutionContextTester.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
+      <Project>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</Project>
+      <Name>AutoMapper</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

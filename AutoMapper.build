@@ -10,6 +10,7 @@
 
 	<target name="compile" description="Compiles using the AutomatedDebug Configuration">
 		<msbuild project="src\AutoMapper.sln">
+			<property name="verbosity" value="Quiet" />
 			<property name="Configuration" value="AutomatedDebug" />
 		</msbuild>
 	</target>
