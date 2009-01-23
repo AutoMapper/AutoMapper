@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace AutoMapper
 {
@@ -23,5 +24,6 @@ namespace AutoMapper
 		void CreateProfile(string profileName, Action<IProfileExpression> initializationExpression);
 		void AddProfile(Profile profile);
 		void AddProfile<TProfile>() where TProfile : Profile, new();
+		void SelfConfigure(Assembly assembly);
 	}
 }

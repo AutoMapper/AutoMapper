@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ISelfProfiler.cs" />
     <Compile Include="AutoMapperConfigurationException.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Configuration.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="PropertyMember.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="ResolutionContext.cs" />
+    <Compile Include="SelfProfiler.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="TypeMapFactory.cs" />
     <Compile Include="TypeMember.cs" />

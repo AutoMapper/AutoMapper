@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace AutoMapper
 {
@@ -39,6 +40,13 @@ namespace AutoMapper
 		public void AddProfile<TProfile>() where TProfile : Profile, new()
 		{
 			AddProfile(new TProfile());
+		}
+
+		public void SelfConfigure(Assembly assembly)
+		{
+			IEnumerable<Type> selfProfiles = GetSelfProfilers(assembly);
+
+			selfProfiles.ForEach(SelfProfile);
 		}
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
@@ -91,17 +99,17 @@ namespace AutoMapper
 
 		TypeMap IConfiguration.FindTypeMapFor(Type sourceType, Type destinationType)
 		{
-			var typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+			TypeMap typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
 
 			if ((typeMap == null) && sourceType.BaseType != null)
-				return  ((IConfiguration) this).FindTypeMapFor(sourceType.BaseType, destinationType);
+				return ((IConfiguration)this).FindTypeMapFor(sourceType.BaseType, destinationType);
 
 			return typeMap;
 		}
 
 		TypeMap IConfiguration.FindTypeMapFor<TSource, TDestination>()
 		{
-			return ((IConfiguration) this).FindTypeMapFor(typeof(TSource), typeof(TDestination));
+			return ((IConfiguration)this).FindTypeMapFor(typeof(TSource), typeof(TDestination));
 		}
 
 		IValueFormatter IConfiguration.GetValueFormatter()
@@ -128,6 +136,21 @@ namespace AutoMapper
 			{
 				throw new AutoMapperConfigurationException(firstBadTypeMap.typeMap, firstBadTypeMap.unmappedPropertyNames);
 			}
+		}
+
+		private void SelfProfile(Type type)
+		{
+			var selfProfiler = (ISelfProfiler)Activator.CreateInstance(type, true);
+			Profile profile = selfProfiler.GetProfile();
+
+			AddProfile(profile);
+		}
+
+		private static IEnumerable<Type> GetSelfProfilers(Assembly assembly)
+		{
+			return from t in assembly.GetTypes()
+				   where typeof(ISelfProfiler).IsAssignableFrom(t) && !t.IsAbstract
+				   select t;
 		}
 
 		internal FormatterExpression GetProfile(string profileName)

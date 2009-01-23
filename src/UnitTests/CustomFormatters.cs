@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
@@ -85,7 +86,7 @@ namespace AutoMapper.UnitTests
 			{
 				public string FormatValue(ResolutionContext context)
 				{
-					return ((DateTime)context.SourceValue).ToString("MM/dd/yyyy");
+					return ((DateTime)context.SourceValue).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
 				}
 			}
 

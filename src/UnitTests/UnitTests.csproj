@@ -70,6 +70,7 @@
     <Compile Include="Initialization.cs" />
     <Compile Include="MemberResolution.cs" />
     <Compile Include="Profiles.cs" />
+    <Compile Include="SelfConfiguration.cs" />
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="Testing.cs" />
     <Compile Include="ResolutionContextTester.cs" />

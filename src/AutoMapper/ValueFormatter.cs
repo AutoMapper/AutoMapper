@@ -60,7 +60,7 @@ namespace AutoMapper
 			return formattedValue;
 		}
 
-		private bool CheckTypeSpecificSkipList(IFormatterConfiguration valueFormatter, Type formatterType)
+		private static bool CheckTypeSpecificSkipList(IFormatterConfiguration valueFormatter, Type formatterType)
 		{
 			if (valueFormatter == null)
 			{
@@ -70,7 +70,7 @@ namespace AutoMapper
 			return !valueFormatter.GetFormattersToSkip().Contains(formatterType);
 		}
 
-		private bool CheckPropertyMapSkipList(ResolutionContext context, Type formatterType)
+		private static bool CheckPropertyMapSkipList(ResolutionContext context, Type formatterType)
 		{
 			return !context.PropertyMap.FormattersToSkipContains(formatterType);
 		}
