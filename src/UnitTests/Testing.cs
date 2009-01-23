@@ -34,6 +34,12 @@ namespace AutoMapper.UnitTests
 				_typeMap.GetUnmappedPropertyNames().Length.ShouldEqual(1);
 				_typeMap.GetUnmappedPropertyNames()[0].ShouldEqual("Bar");
 			}
+
+			[Test]
+			public void Should_fail_a_configuration_check()
+			{
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
 		}
 
 		public class When_testing_a_dto_with_fully_mapped_and_custom_matchers : AutoMapperSpecBase

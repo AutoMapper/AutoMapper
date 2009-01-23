@@ -94,6 +94,11 @@ namespace AutoMapper
 			return Configuration.GetAllTypeMaps();
 		}
 
+		public static void AssertConfigurationIsValid()
+		{
+			Configuration.AssertConfigurationIsValid();
+		}
+
 		public static void Reset()
 		{
 			lock (typeof(IConfiguration))

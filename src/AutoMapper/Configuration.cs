@@ -114,6 +114,22 @@ namespace AutoMapper
 			return new ValueFormatter(GetProfile(profileName));
 		}
 
+		void IConfiguration.AssertConfigurationIsValid()
+		{
+			var badTypeMaps =
+				from typeMap in _typeMaps
+				let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
+				where unmappedPropertyNames.Length > 0
+				select new {typeMap, unmappedPropertyNames};
+
+			var firstBadTypeMap = badTypeMaps.FirstOrDefault();
+
+			if (firstBadTypeMap != null)
+			{
+				throw new AutoMapperConfigurationException(firstBadTypeMap.typeMap, firstBadTypeMap.unmappedPropertyNames);
+			}
+		}
+
 		internal FormatterExpression GetProfile(string profileName)
 		{
 			if (!_formatters.ContainsKey(profileName))

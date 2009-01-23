@@ -9,6 +9,7 @@ namespace AutoMapper
 		TypeMap FindTypeMapFor<TSource, TDestination>();
 		IValueFormatter GetValueFormatter();
 		IValueFormatter GetValueFormatter(string profileName);
+		void AssertConfigurationIsValid();
 	}
 
 }
