@@ -247,18 +247,16 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				var model = new ModelObject();
-				model.NullableDate = new DateTime(2007, 8, 4);
-
 				Mapper.CreateMap<ModelObject, ModelDto>();
-
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
 			[Test]
-			public void Should_ignore_mapping_and_assign_default()
+			public void Should_throw_a_mapping_exception()
 			{
-				_result.NullableDate.ShouldEqual(DateTime.MinValue);
+				var model = new ModelObject();
+				model.NullableDate = new DateTime(2007, 8, 4);
+				
+				typeof(AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<ModelObject, ModelDto>(model));
 			}
 		}
 

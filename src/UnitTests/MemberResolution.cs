@@ -403,6 +403,13 @@ namespace AutoMapper.UnitTests
 			private class ModelObject
 			{
 				public int Blarg { get; set; }
+				public string MoreBlarg { get; set; }
+
+				public int SomeMethodToGetMoreBlarg()
+				{
+					return 45;
+				}
+
 				public string SomeValue { get; set; }
 				public ModelSubObject SomeWeirdSubObject { get; set; }
 
@@ -443,6 +450,7 @@ namespace AutoMapper.UnitTests
 				public int GrandChildInt { get; set; }
 				public string GrandChildString { get; set; }
 				public string BlargBucks { get; set; }
+				public int MoreBlarg { get; set; }
 			}
 
 			protected override void Establish_context()
@@ -458,7 +466,8 @@ namespace AutoMapper.UnitTests
 						{
 							Norf = 15
 						}
-					}
+					},
+					MoreBlarg = "adsfdsaf"
 				};
 				Mapper
 					.CreateMap<ModelObject, ModelDto>()
@@ -467,8 +476,9 @@ namespace AutoMapper.UnitTests
 					.ForMember(dto => dto.SubNarf, opt => opt.MapFrom(m => m.SomeWeirdSubObject.Narf))
 					.ForMember(dto => dto.SubValue, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SomeSubValue()))
 					.ForMember(dto => dto.GrandChildInt, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.Norf))
-					.ForMember(dto => dto.GrandChildString,
-								  opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.SomeSubSubValue()));
+					.ForMember(dto => dto.GrandChildString, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.SomeSubSubValue()))
+					.ForMember(dto => dto.MoreBlarg, opt => opt.MapFrom(m => m.SomeMethodToGetMoreBlarg()));
+
 
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
@@ -513,6 +523,12 @@ namespace AutoMapper.UnitTests
 			public void Should_map_grandchildren_methods()
 			{
 				_result.GrandChildString.ShouldEqual("I am some sub sub value");
+			}
+
+			[Test]
+			public void Should_override_existing_matches_for_new_mappings()
+			{
+				_result.MoreBlarg.ShouldEqual(45);
 			}
 		}
 	}

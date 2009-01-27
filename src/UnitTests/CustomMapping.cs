@@ -134,6 +134,51 @@ namespace AutoMapper.UnitTests
 				_result.SomeValue.ShouldEqual(47);
 			}
 		}
+
+		public class When_reseting_a_mapping_to_use_a_resolver_to_a_different_member : AutoMapperSpecBase
+		{
+			private Dest _result;
+
+			private class Source
+			{
+				public int SomeValue { get; set; }
+				public int SomeOtherValue { get; set; }
+			}
+
+			private class Dest
+			{
+				public int SomeValue { get; set; }
+			}
+
+			private class CustomResolver : IValueResolver
+			{
+				public object Resolve(object model)
+				{
+					return ((int) model) + 5;
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Dest>()
+					.ForMember(dto => dto.SomeValue, opt => opt.ResolveUsing<CustomResolver>().FromMember(m => m.SomeOtherValue));
+
+				var model = new Source
+					{
+						SomeValue = 36,
+						SomeOtherValue = 53
+					};
+
+				_result = Mapper.Map<Source, Dest>(model);
+			}
+
+			[Test]
+			public void Should_override_the_existing_match_to_the_new_custom_resolved_member()
+			{
+				_result.SomeValue.ShouldEqual(58);
+			}
+		}
+
 	}
 
 }

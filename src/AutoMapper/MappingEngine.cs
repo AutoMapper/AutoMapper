@@ -33,7 +33,14 @@ namespace AutoMapper
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
 
-			return Map(context);
+			try
+			{
+				return Map(context);
+			}
+			catch (Exception ex)
+			{
+				throw new AutoMapperMappingException(context, ex);
+			}
 		}
 
 		private object Map(ResolutionContext context)
@@ -66,7 +73,7 @@ namespace AutoMapper
 			}
 			else
 			{
-				valueToAssign = CreateNullOrDefaultObject(context);
+				throw new AutoMapperMappingException(context);
 			}
 
 			return valueToAssign;

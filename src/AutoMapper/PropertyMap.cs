@@ -65,6 +65,7 @@ namespace AutoMapper
 
 		public void ChainTypeMembers(IEnumerable<TypeMember> typeMembers)
 		{
+			_sourceMemberChain.Clear();
 			typeMembers.ForEach(ChainTypeMember);
 		}
 

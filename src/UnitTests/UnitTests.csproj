@@ -68,6 +68,7 @@
     <Compile Include="CustomMapping.cs" />
     <Compile Include="General.cs" />
     <Compile Include="Initialization.cs" />
+    <Compile Include="MappingExceptions.cs" />
     <Compile Include="MemberResolution.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="SelfConfiguration.cs" />
