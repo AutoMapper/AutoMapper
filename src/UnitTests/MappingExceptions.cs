@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using NBehave.Spec.NUnit;
 
@@ -29,7 +30,25 @@ namespace AutoMapper.UnitTests
 				var source = new Source {Value = "adsf"};
 				typeof(AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<Source, Dest>(source));
 			}
-		}
 
+			[Test]
+			public void Should_have_contextual_mapping_information()
+			{
+				var source = new Source { Value = "adsf" };
+				AutoMapperMappingException thrown = null;
+				try
+				{
+					Mapper.Map<Source, Dest>(source);
+				}
+				catch (AutoMapperMappingException ex)
+				{
+					thrown = ex;
+				}
+				thrown.ShouldNotBeNull();
+				thrown.InnerException.ShouldNotBeNull();
+				thrown.InnerException.ShouldBeInstanceOf<AutoMapperMappingException>();
+				((AutoMapperMappingException) thrown.InnerException).Context.PropertyMap.ShouldNotBeNull();
+			}
+		}
 	}
 }

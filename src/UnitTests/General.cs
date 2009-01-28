@@ -233,8 +233,6 @@ namespace AutoMapper.UnitTests
 
 		public class When_mapping_a_dto_with_mismatched_property_types : AutoMapperSpecBase
 		{
-			private ModelDto _result;
-
 			private class ModelObject
 			{
 				public DateTime? NullableDate { get; set; }

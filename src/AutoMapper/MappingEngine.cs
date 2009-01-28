@@ -33,50 +33,50 @@ namespace AutoMapper
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
 
+			return Map(context);
+		}
+
+		private object Map(ResolutionContext context)
+		{
 			try
 			{
-				return Map(context);
+				object valueToAssign;
+
+				if (context.SourceValueTypeMap != null)
+				{
+					valueToAssign = CreateMappedObject(context);
+				}
+				else if (context.DestinationType == typeof(bool) && context.SourceType == typeof(bool?))
+				{
+					valueToAssign = context.SourceValue ?? false;
+				}
+				else if (context.SourceValue == null)
+				{
+					valueToAssign = CreateNullOrDefaultObject(context);
+				}
+				else if (context.DestinationType.Equals(typeof(string)))
+				{
+					valueToAssign = FormatDataElement(context);
+				}
+				else if (context.DestinationType.IsAssignableFrom(context.SourceType))
+				{
+					valueToAssign = context.SourceValue;
+				}
+				else if ((context.DestinationType.IsArray) && (context.SourceValue is IEnumerable))
+				{
+					valueToAssign = CreateArrayObject(context);
+				}
+				else
+				{
+					throw new AutoMapperMappingException(context);
+				}
+
+				return valueToAssign;
 			}
 			catch (Exception ex)
 			{
 				throw new AutoMapperMappingException(context, ex);
 			}
-		}
-
-		private object Map(ResolutionContext context)
-		{
-			object valueToAssign;
-
-			if (context.SourceValueTypeMap != null)
-			{
-				valueToAssign = CreateMappedObject(context);
-			}
-			else if (context.DestinationType == typeof(bool) && context.SourceType == typeof(bool?))
-			{
-				valueToAssign = context.SourceValue ?? false;
-			}
-			else if (context.SourceValue == null)
-			{
-				valueToAssign = CreateNullOrDefaultObject(context);
-			}
-			else if (context.DestinationType.Equals(typeof(string)))
-			{
-				valueToAssign = FormatDataElement(context);
-			}
-			else if (context.DestinationType.IsAssignableFrom(context.SourceType))
-			{
-				valueToAssign = context.SourceValue;
-			}
-			else if ((context.DestinationType.IsArray) && (context.SourceValue is IEnumerable))
-			{
-				valueToAssign = CreateArrayObject(context);
-			}
-			else
-			{
-				throw new AutoMapperMappingException(context);
-			}
-
-			return valueToAssign;
 		}
 
 		private object CreateMappedObject(ResolutionContext context)

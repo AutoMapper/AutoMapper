@@ -179,6 +179,48 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_reseting_a_mapping_from_a_property_to_a_method : AutoMapperSpecBase
+		{
+			private Dest _result;
+
+			private class Source
+			{
+				public int Type { get; set; }
+			}
+
+			private class Dest
+			{
+				public int Type { get; set; }
+			}
+
+			private class CustomResolver : IValueResolver
+			{
+				public object Resolve(object model)
+				{
+					return ((int)model) + 5;
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Dest>()
+					.ForMember(dto => dto.Type, opt => opt.MapFrom(m => m.Type));
+
+				var model = new Source
+				{
+					Type = 5 
+				};
+
+				_result = Mapper.Map<Source, Dest>(model);
+			}
+
+			[Test]
+			public void Should_override_the_existing_match_to_the_new_custom_resolved_member()
+			{
+				_result.Type.ShouldEqual(5);
+			}
+		}
+
 	}
 
 }
