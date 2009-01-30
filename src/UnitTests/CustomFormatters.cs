@@ -353,6 +353,73 @@ namespace AutoMapper.UnitTests
 			}
 		}
 	
+		public class When_using_a_custom_contruction_method_for_formatters : AutoMapperSpecBase
+		{
+			private Dest _result;
+
+			public class Source { public int Value { get; set; } }
+			public class Dest { public string Value { get; set; } }
+
+			public class CustomFormatter : IValueFormatter
+			{
+				private int _toAdd;
+
+				public CustomFormatter()
+				{
+					_toAdd = 7;
+				}
+
+				public CustomFormatter(int toAdd)
+				{
+					_toAdd = toAdd;
+				}
+
+				public string FormatValue(ResolutionContext context)
+				{
+					return (((int) context.SourceValue) + _toAdd).ToString();
+				}
+			}
+
+			public class OtherCustomFormatter : IValueFormatter
+			{
+				private string _toAppend;
+
+				public OtherCustomFormatter()
+				{
+					_toAppend = " Blarg";
+				}
+
+				public OtherCustomFormatter(string toAppend)
+				{
+					_toAppend = toAppend;
+				}
+
+				public string FormatValue(ResolutionContext context)
+				{
+					return context.SourceValue + _toAppend;
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Dest>();
+				Mapper.AddFormatter<CustomFormatter>().ConstructedBy(() => new CustomFormatter(10));
+				Mapper.AddFormatter(typeof(OtherCustomFormatter)).ConstructedBy(() => new OtherCustomFormatter(" Splorg"));
+			}
+
+			protected override void Because_of()
+			{
+				var source = new Source { Value = 10};
+				_result = Mapper.Map<Source, Dest>(source);
+			}
+
+			[Test]
+			public void Should_apply_the_constructor_specified()
+			{
+				_result.Value.ShouldEqual("20 Splorg");
+			}
+		}
+
 	}
 
 }

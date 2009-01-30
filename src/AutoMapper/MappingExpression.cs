@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	internal class MappingExpression<TModel, TDto> : IMappingExpression<TModel, TDto>, IFormattingExpression<TModel>
+	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IFormattingExpression<TSource>
 	{
 		private readonly TypeMap _typeMap;
 		private PropertyMap _propertyMap;
@@ -15,28 +15,28 @@ namespace AutoMapper
 			_typeMap = typeMap;
 		}
 
-		public IMappingExpression<TModel, TDto> ForMember(Expression<Func<TDto, object>> destinationMember,
-		                                                  Action<IFormattingExpression<TModel>> memberOptions)
+		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
+		                                                  Action<IFormattingExpression<TSource>> memberOptions)
 		{
-			PropertyInfo dtoProperty = ReflectionHelper.FindProperty(destinationMember);
-			ForDtoMember(dtoProperty, memberOptions);
-			return new MappingExpression<TModel, TDto>(_typeMap);
+			PropertyInfo destProperty = ReflectionHelper.FindProperty(destinationMember);
+			ForDestinationMember(destProperty, memberOptions);
+			return new MappingExpression<TSource, TDestination>(_typeMap);
 		}
 
-		public void ForAllMembers(Action<IFormattingExpression<TModel>> memberOptions)
+		public void ForAllMembers(Action<IFormattingExpression<TSource>> memberOptions)
 		{
-			_typeMap.GetPropertyMaps().ForEach(x => ForDtoMember(x.DestinationProperty, memberOptions));
+			_typeMap.GetPropertyMaps().ForEach(x => ForDestinationMember(x.DestinationProperty, memberOptions));
 		}
 
-		public IMappingExpression<TModel, TDto> Include<TOtherSource, TOtherDestination>() where TOtherSource : TModel
-			where TOtherDestination : TDto
+		public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>() where TOtherSource : TSource
+			where TOtherDestination : TDestination
 		{
 			_typeMap.IncludeDerivedTypes(typeof(TOtherSource), typeof(TOtherDestination));
 
 			return this;
 		}
 
-		public IMappingExpression<TModel, TDto> WithProfile(string profileName)
+		public IMappingExpression<TSource, TDestination> WithProfile(string profileName)
 		{
 			_typeMap.Profile = profileName;
 
@@ -70,26 +70,26 @@ namespace AutoMapper
 			_propertyMap.FormatNullValueAs(nullSubstitute);
 		}
 
-		public IResolutionExpression<TModel> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
+		public IResolutionExpression<TSource> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
 		{
 			return ResolveUsing(typeof(TValueResolver));
 		}
 
-		public IResolutionExpression<TModel> ResolveUsing(Type valueResolverType)
+		public IResolutionExpression<TSource> ResolveUsing(Type valueResolverType)
 		{
 			var resolver = (IValueResolver)Activator.CreateInstance(valueResolverType, true);
 
 			return ResolveUsing(resolver);
 		}
 
-		public IResolutionExpression<TModel> ResolveUsing(IValueResolver valueResolver)
+		public IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver)
 		{
 			_propertyMap.AssignCustomValueResolver(valueResolver);
 
-			return new ResolutionExpression<TModel>(_propertyMap);
+			return new ResolutionExpression<TSource>(_propertyMap);
 		}
 
-		public void MapFrom(Expression<Func<TModel, object>> sourceMember)
+		public void MapFrom(Expression<Func<TSource, object>> sourceMember)
 		{
 			TypeMember[] modelTypeMembers = BuildModelTypeMembers(sourceMember);
 
@@ -101,10 +101,9 @@ namespace AutoMapper
 			_propertyMap.Ignore();
 		}
 
-		private void ForDtoMember(PropertyInfo dtoProperty,
-		                          Action<IFormattingExpression<TModel>> memberOptions)
+		private void ForDestinationMember(PropertyInfo destinationProperty, Action<IFormattingExpression<TSource>> memberOptions)
 		{
-			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(dtoProperty);
+			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
 
 			memberOptions(this);
 		}

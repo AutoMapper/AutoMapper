@@ -52,9 +52,9 @@ namespace AutoMapper
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
 			Type modelType = typeof(TSource);
-			Type dtoType = typeof(TDestination);
+			Type destinationType = typeof(TDestination);
 
-			var typeMapFactory = new TypeMapFactory(modelType, dtoType);
+			var typeMapFactory = new TypeMapFactory(modelType, destinationType);
 			TypeMap typeMap = typeMapFactory.CreateTypeMap();
 
 			_typeMaps.Add(typeMap);
@@ -62,14 +62,14 @@ namespace AutoMapper
 			return new MappingExpression<TSource, TDestination>(typeMap);
 		}
 
-		public void AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			GetProfile(DefaultProfileName).AddFormatter<TValueFormatter>();
+			return GetProfile(DefaultProfileName).AddFormatter<TValueFormatter>();
 		}
 
-		public void AddFormatter(Type valueFormatterType)
+		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			GetProfile(DefaultProfileName).AddFormatter(valueFormatterType);
+			return GetProfile(DefaultProfileName).AddFormatter(valueFormatterType);
 		}
 
 		public void AddFormatter(IValueFormatter formatter)

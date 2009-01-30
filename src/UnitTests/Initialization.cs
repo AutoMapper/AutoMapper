@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.CreateMap<Model1, Dto1>();
 
-				Mapper.Initalize(x => x.CreateMap<Model2, Dto2>());
+				Mapper.Initialize(x => x.CreateMap<Model2, Dto2>());
 			}
 
 			[Test]

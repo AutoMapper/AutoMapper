@@ -4,22 +4,29 @@ using System.Linq;
 
 namespace AutoMapper
 {
+
 	public class FormatterExpression : IFormatterExpression, IFormatterConfiguration
 	{
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
 
-		public void AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			AddFormatter(typeof(TValueFormatter));
-		}
-
-		public void AddFormatter(Type valueFormatterType)
-		{
-			var formatter = (IValueFormatter)Activator.CreateInstance(valueFormatterType, true);
+			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)Activator.CreateInstance(typeof(TValueFormatter), true));
 
 			AddFormatter(formatter);
+
+			return new FormatterCtorExpression<TValueFormatter>(this);
+		}
+
+		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
+		{
+			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter) Activator.CreateInstance(valueFormatterType, true));
+
+			AddFormatter(formatter);
+
+			return new FormatterCtorExpression(valueFormatterType, this);
 		}
 
 		public void AddFormatter(IValueFormatter valueFormatter)
@@ -29,7 +36,7 @@ namespace AutoMapper
 
 		public void AddFormatExpression(Func<ResolutionContext, string> formatExpression)
 		{
-			_formatters.Add(new ValueFormatterUsingExpression(formatExpression));
+			_formatters.Add(new ExpressionValueFormatter(formatExpression));
 		}
 
 		public void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
@@ -56,25 +63,15 @@ namespace AutoMapper
 			return new Dictionary<Type, IFormatterConfiguration>(_typeSpecificFormatters);
 		}
 
-		public Type[] GetFormattersToSkip()
+		public Type[] GetFormatterTypesToSkip()
 		{
 			return _formattersToSkip.ToArray();
 		}
 
-		private class ValueFormatterUsingExpression : IValueFormatter
+		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
 		{
-			private readonly Func<ResolutionContext, string> _valueFormatterExpression;
-
-			public ValueFormatterUsingExpression(Func<ResolutionContext, string> valueFormatterExpression)
-			{
-				_valueFormatterExpression = valueFormatterExpression;
-			}
-
-			public string FormatValue(ResolutionContext context)
-			{
-				return _valueFormatterExpression(context);
-			}
+			_formatters.RemoveAt(_formatters.Count - 1);
+			_formatters.Add(new DeferredInstantiatedFormatter(instantiator));
 		}
-
 	}
 }

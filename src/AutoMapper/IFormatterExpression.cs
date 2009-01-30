@@ -5,13 +5,25 @@ namespace AutoMapper
 {
 	public interface IFormatterExpression
 	{
-		void AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
-		void AddFormatter(Type valueFormatterType);
+		IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
+		IFormatterCtorExpression AddFormatter(Type valueFormatterType);
 		void AddFormatter(IValueFormatter formatter);
 		void AddFormatExpression(Func<ResolutionContext, string> formatExpression);
 		void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
 		IFormatterExpression ForSourceType<TSource>();
 	}
+
+	public interface IFormatterCtorExpression
+	{
+		void ConstructedBy(Func<IValueFormatter> constructor);
+	}
+
+	public interface IFormatterCtorExpression<TValueFormatter>
+		where TValueFormatter : IValueFormatter
+	{
+		void ConstructedBy(Func<TValueFormatter> constructor);
+	}
+
 
 	public interface IProfileExpression : IFormatterExpression
 	{

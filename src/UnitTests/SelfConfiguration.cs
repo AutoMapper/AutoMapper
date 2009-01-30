@@ -14,7 +14,7 @@ namespace AutoMapper.UnitTests
 			{
 				Assembly assembly = typeof(Destination).Assembly;
 
-				Mapper.Initalize(x => x.SelfConfigure(assembly));
+				Mapper.Initialize(x => x.SelfConfigure(assembly));
 
 				var source = new Source { Property = "Test" };
 

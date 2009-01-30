@@ -31,14 +31,14 @@ namespace AutoMapper
 			_configurator = configurator;
 		}
 
-		public void AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			_configurator.GetProfile(ProfileName).AddFormatter<TValueFormatter>();
+			return _configurator.GetProfile(ProfileName).AddFormatter<TValueFormatter>();
 		}
 
-		public void AddFormatter(Type valueFormatterType)
+		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			_configurator.GetProfile(ProfileName).AddFormatter(valueFormatterType);
+			return _configurator.GetProfile(ProfileName).AddFormatter(valueFormatterType);
 		}
 
 		public void AddFormatter(IValueFormatter formatter)

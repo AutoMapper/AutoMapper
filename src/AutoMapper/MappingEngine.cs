@@ -22,9 +22,9 @@ namespace AutoMapper
 		public TDestination Map<TSource, TDestination>(TSource source)
 		{
 			Type modelType = typeof(TSource);
-			Type dtoType = typeof(TDestination);
+			Type destinationType = typeof(TDestination);
 
-			return (TDestination)Map(source, modelType, dtoType);
+			return (TDestination)Map(source, modelType, destinationType);
 		}
 
 		public object Map(object source, Type sourceType, Type destinationType)
@@ -81,7 +81,7 @@ namespace AutoMapper
 
 		private object CreateMappedObject(ResolutionContext context)
 		{
-			object dto = CreateObject(context.DestinationType);
+			object mappedObject = CreateObject(context.DestinationType);
 
 			foreach (PropertyMap propertyMap in context.SourceValueTypeMap.GetPropertyMaps())
 			{
@@ -118,10 +118,10 @@ namespace AutoMapper
 
 				object propertyValueToAssign = Map(newContext);
 
-				propertyMap.DestinationProperty.SetValue(dto, propertyValueToAssign, new object[0]);
+				propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign, new object[0]);
 			}
 
-			return dto;
+			return mappedObject;
 		}
 
 		private object CreateArrayObject(ResolutionContext context)
@@ -131,7 +131,7 @@ namespace AutoMapper
 			Type sourceElementType = GetElementType(context.SourceType);
 			Type destElementType = context.DestinationType.GetElementType();
 
-			Array dtoArrayValue = Array.CreateInstance(destElementType, enumerableValue.Count());
+			Array destArray = Array.CreateInstance(destElementType, enumerableValue.Count());
 
 			int i = 0;
 			foreach (object item in enumerableValue)
@@ -153,12 +153,12 @@ namespace AutoMapper
 
 				object mappedValue = Map(newContext);
 
-				dtoArrayValue.SetValue(mappedValue, i);
+				destArray.SetValue(mappedValue, i);
 
 				i++;
 			}
 
-			object valueToAssign = dtoArrayValue;
+			object valueToAssign = destArray;
 			return valueToAssign;
 		}
 
@@ -186,13 +186,7 @@ namespace AutoMapper
 			}
 			else
 			{
-				try
-				{
-					valueToAssign = Activator.CreateInstance(context.DestinationType, true);
-				} catch (Exception e)
-				{
-					throw new Exception("Problem instantiating object of type "+context.DestinationType, e);
-				}
+				valueToAssign = Activator.CreateInstance(context.DestinationType, true);
 			}
 
 			return valueToAssign;

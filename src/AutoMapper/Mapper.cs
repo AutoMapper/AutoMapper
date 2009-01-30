@@ -17,21 +17,21 @@ namespace AutoMapper
 			return Engine.Map(source, sourceType, destinationType);
 		}
 
-		public static void Initalize(Action<IConfigurationExpression> action)
+		public static void Initialize(Action<IConfigurationExpression> action)
 		{
 			Reset();
 
 			action(ConfigurationExpression);
 		}
 
-		public static void AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+		public static IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			ConfigurationExpression.AddFormatter<TValueFormatter>();
+			return ConfigurationExpression.AddFormatter<TValueFormatter>();
 		}
 
-		public static void AddFormatter(Type valueFormatterType)
+		public static IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			ConfigurationExpression.AddFormatter(valueFormatterType);
+			return ConfigurationExpression.AddFormatter(valueFormatterType);
 		}
 
 		public static void AddFormatter(IValueFormatter formatter)

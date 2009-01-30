@@ -43,12 +43,12 @@ namespace AutoMapper
 							.ToArray();
 		}
 
-		public PropertyMap FindOrCreatePropertyMapFor(PropertyInfo dtoProperty)
+		public PropertyMap FindOrCreatePropertyMapFor(PropertyInfo destinationProperty)
 		{
-			var propertyMap = _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(dtoProperty.Name));
+			var propertyMap = _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
 			if (propertyMap == null)
 			{
-				propertyMap = new PropertyMap(dtoProperty);
+				propertyMap = new PropertyMap(destinationProperty);
 				AddPropertyMap(propertyMap);
 			}
 
