@@ -66,6 +66,9 @@
     <Compile Include="ConfigurationResolution.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
+    <Compile Include="EnumMappingFixture.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="General.cs" />
     <Compile Include="Initialization.cs" />
     <Compile Include="MappingExceptions.cs" />

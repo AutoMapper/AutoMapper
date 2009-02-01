@@ -34,7 +34,7 @@ namespace AutoMapper
 
 		public string[] GetUnmappedPropertyNames()
 		{
-			var autoMappedProperties = _propertyMaps.Where(pm => pm.HasSourceMember() || pm.HasCustomValueResolver() || pm.Ignored)
+			var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
 				.Select(pm => pm.DestinationProperty.Name);
 
 			return DestinationType.GetPublicGetProperties()

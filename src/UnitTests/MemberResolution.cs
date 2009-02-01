@@ -64,6 +64,130 @@ namespace AutoMapper.UnitTests
 				_result[1].ShouldBeInstanceOfType(typeof(DtoSubObject));
 			}
 		}
+		
+		public class When_mapping_derived_classes_from_intefaces_to_abstract : AutoMapperSpecBase
+		{
+			private DtoObject[] _result;
+
+			public interface IModelObject
+			{
+				string BaseString { get; set; }
+			}
+
+			public class ModelSubObject : IModelObject
+			{
+				public string SubString { get; set; }
+				public string BaseString { get; set; }
+			}
+
+			public abstract class DtoObject
+			{
+				public virtual string BaseString { get; set; }
+			}
+
+			public class DtoSubObject : DtoObject
+			{
+				public string SubString { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Reset();
+
+				var model = new IModelObject[]
+            	{
+					new ModelSubObject { BaseString = "Base2", SubString = "Sub2"}
+            	};
+
+				Mapper.CreateMap<IModelObject, DtoObject>()
+					.Include<ModelSubObject, DtoSubObject>();
+
+				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+
+				_result = (DtoObject[])Mapper.Map(model, typeof(IModelObject[]), typeof(DtoObject[]));
+			}
+
+			[Test]
+			public void Should_map_both_the_base_and_sub_objects()
+			{
+				_result.Length.ShouldEqual(1);
+				_result[0].BaseString.ShouldEqual("Base2");
+			}
+
+			[Test]
+			public void Should_map_to_the_correct_respective_dto_types()
+			{
+				_result[0].ShouldBeInstanceOfType(typeof(DtoSubObject));
+				((DtoSubObject) _result[0]).SubString.ShouldEqual("Sub2");
+			}
+		}
+
+		public class When_mapping_derived_classes_as_property_of_top_object : AutoMapperSpecBase
+		{
+			private DtoModel _result;
+
+			public class Model
+			{
+				public IModelObject Object { get; set; }
+			}
+
+			public interface IModelObject
+			{
+				string BaseString { get; set; }
+			}
+
+			public class ModelSubObject : IModelObject
+			{
+				public string SubString { get; set; }
+				public string BaseString { get; set; }
+			}
+
+			public class DtoModel
+			{
+				public DtoObject Object { get; set; }
+			}
+
+			public abstract class DtoObject
+			{
+				public virtual string BaseString { get; set; }
+			}
+
+			public class DtoSubObject : DtoObject
+			{
+				public string SubString { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Reset();
+
+				var model = new Model
+				            	{
+				            		Object = new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
+				            	};
+
+				Mapper.CreateMap<Model, DtoModel>();
+				
+				Mapper.CreateMap<IModelObject, DtoObject>()
+					.Include<ModelSubObject, DtoSubObject>();
+
+				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+				
+				Mapper.AssertConfigurationIsValid();
+
+				_result = Mapper.Map<Model, DtoModel>(model);
+			}
+
+			[Test]
+			public void Should_map_object_to_sub_object()
+			{
+				_result.Object.ShouldNotBeNull();
+				_result.Object.ShouldBeInstanceOf<DtoSubObject>();
+				_result.Object.ShouldBeInstanceOf<DtoSubObject>();
+				_result.Object.BaseString.ShouldEqual("Base2");
+				((DtoSubObject)_result.Object).SubString.ShouldEqual("Sub2");
+			}
+		}
 
 		public class When_mapping_dto_with_only_properties : AutoMapperSpecBase
 		{
@@ -450,6 +574,8 @@ namespace AutoMapper.UnitTests
 				public int GrandChildInt { get; set; }
 				public string GrandChildString { get; set; }
 				public string BlargBucks { get; set; }
+				public int BlargPlus3 { get; set; }
+				public int BlargMinus2 { get; set; }
 				public int MoreBlarg { get; set; }
 			}
 
@@ -477,8 +603,9 @@ namespace AutoMapper.UnitTests
 					.ForMember(dto => dto.SubValue, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SomeSubValue()))
 					.ForMember(dto => dto.GrandChildInt, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.Norf))
 					.ForMember(dto => dto.GrandChildString, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.SomeSubSubValue()))
-					.ForMember(dto => dto.MoreBlarg, opt => opt.MapFrom(m => m.SomeMethodToGetMoreBlarg()));
-
+					.ForMember(dto => dto.MoreBlarg, opt => opt.MapFrom(m => m.SomeMethodToGetMoreBlarg()))
+					.ForMember(dto => dto.BlargPlus3, opt => opt.MapFrom(m=>m.Blarg.Plus(3)))
+					.ForMember(dto => dto.BlargMinus2, opt => opt.MapFrom(m=>m.Blarg - 2));
 
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
@@ -526,10 +653,30 @@ namespace AutoMapper.UnitTests
 			}
 
 			[Test]
+			public void Should_map_blarg_plus_three_using_extension_method()
+			{
+				_result.BlargPlus3.ShouldEqual(13);
+			}
+
+			[Test]
+			public void Should_map_blarg_minus_2_using_lambda()
+			{
+				_result.BlargMinus2.ShouldEqual(8);
+			}
+
+			[Test]
 			public void Should_override_existing_matches_for_new_mappings()
 			{
 				_result.MoreBlarg.ShouldEqual(45);
 			}
+		}
+	}
+
+	public static class MapFromExtensions
+	{
+		public static int Plus(this int left, int right)
+		{
+			return left + right;
 		}
 	}
 }

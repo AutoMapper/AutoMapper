@@ -7,66 +7,50 @@ namespace AutoMapper
 {
 	public class PropertyMap
 	{
-		private readonly LinkedList<TypeMember> _sourceMemberChain = new LinkedList<TypeMember>();
+		private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
 		private readonly IList<Type> _valueFormattersToSkip = new List<Type>();
 		private readonly IList<IValueFormatter> _valueFormatters = new List<IValueFormatter>();
-		private string _nullSubstitute;
-		private IValueResolver _valueResolver;
-		private bool _hasMembersToResolveForCustomResolver;
 		private bool _ignored;
+		private bool _hasCustomValueResolver = false;
 
 		public PropertyMap(PropertyInfo destinationProperty)
 		{
 			DestinationProperty = destinationProperty;
 		}
 
-		public PropertyMap(PropertyInfo destinationProperty, IEnumerable<TypeMember> typeMembers)
+		public PropertyMap(PropertyInfo destinationProperty, IEnumerable<IValueResolver> valueResolvers)
 		{
 			DestinationProperty = destinationProperty;
-			ChainTypeMembers(typeMembers);
-		}
-
-		public bool HasMembersToResolveForCustomResolver
-		{
-			get { return _hasMembersToResolveForCustomResolver; }
-		}
-
-		public bool HasCustomValueResolver()
-		{
-			return _valueResolver != null;
+			ChainResolvers(valueResolvers);
 		}
 
 		public PropertyInfo DestinationProperty { get; private set; }
 
-		public bool Ignored
+		public IValueResolver[] GetSourceValueResolvers()
 		{
-			get { return _ignored; }
+			return _sourceValueResolvers.ToArray();
 		}
 
-		public TypeMember[] GetSourceMemberChain()
+		public void RemoveLastResolver()
 		{
-			return _sourceMemberChain.ToArray();
+			_sourceValueResolvers.RemoveLast();
 		}
 
-		public void RemoveLastModelProperty()
+		public void ChainResolver(IValueResolver IValueResolver)
 		{
-			_sourceMemberChain.RemoveLast();
+			_sourceValueResolvers.AddLast(IValueResolver);
 		}
 
-		public void ChainTypeMember(TypeMember typeMember)
+		public IValueResolver GetLastResolver()
 		{
-			_sourceMemberChain.AddLast(typeMember);
+			return _sourceValueResolvers.Last.Value;
 		}
 
-		public TypeMember GetLastModelMemberInChain()
+		public void ChainResolvers(IEnumerable<IValueResolver> valueResolvers)
 		{
-			return _sourceMemberChain.Last.Value;
-		}
+			_sourceValueResolvers.Clear();
 
-		public void ChainTypeMembers(IEnumerable<TypeMember> typeMembers)
-		{
-			_sourceMemberChain.Clear();
-			typeMembers.ForEach(ChainTypeMember);
+			valueResolvers.ForEach(ChainResolver);
 		}
 
 		public void AddFormatterToSkip<TValueFormatter>() where TValueFormatter : IValueFormatter
@@ -89,40 +73,33 @@ namespace AutoMapper
 			return _valueFormatters.ToArray();
 		}
 
-		public void FormatNullValueAs(string nullSubstitute)
-		{
-			_nullSubstitute = nullSubstitute;
-		}
-
-		public object GetNullSubstitute()
-		{
-			return _nullSubstitute;
-		}
-
 		public void AssignCustomValueResolver(IValueResolver valueResolver)
 		{
-			_valueResolver = valueResolver;
+			ResetSourceMemberChain();
+			ChainResolver(valueResolver);
+			_hasCustomValueResolver = true;
 		}
 
-		public IValueResolver GetCustomValueResolver()
+		public void ChainTypeMemberForResolver(IValueResolver valueResolver)
 		{
-			return _valueResolver;
-		}
-
-		public void ChainTypeMembersForResolver(IEnumerable<TypeMember> typeMembers)
-		{
-			ChainTypeMembers(typeMembers);
-			_hasMembersToResolveForCustomResolver = true;
-		}
-
-		public bool HasSourceMember()
-		{
-			return _sourceMemberChain.Count > 0;
+			_sourceValueResolvers.AddFirst(valueResolver);
 		}
 
 		public void Ignore()
 		{
 			_ignored = true;
 		}
+
+		public void ResetSourceMemberChain()
+		{
+			_sourceValueResolvers.Clear();
+		}
+
+		public bool IsMapped()
+		{
+			return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
+		}
+
+
 	}
 }

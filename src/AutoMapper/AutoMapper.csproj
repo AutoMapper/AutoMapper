@@ -69,16 +69,18 @@
     <Compile Include="MappingEngine.cs" />
     <Compile Include="MappingExpression.cs" />
     <Compile Include="MethodMember.cs" />
+    <Compile Include="NewMethod.cs" />
+    <Compile Include="NullReplacementMethod.cs" />
     <Compile Include="PrimitiveExtensions.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="PropertyMap.cs" />
     <Compile Include="PropertyMember.cs" />
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="ResolutionContext.cs" />
+    <Compile Include="ResolutionExpression.cs" />
     <Compile Include="SelfProfiler.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="TypeMapFactory.cs" />
-    <Compile Include="TypeMember.cs" />
     <Compile Include="ValueFormatter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

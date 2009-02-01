@@ -235,7 +235,7 @@ namespace AutoMapper.UnitTests
 		{
 			private class ModelObject
 			{
-				public DateTime? NullableDate { get; set; }
+				public string NullableDate { get; set; }
 			}
 
 			private class ModelDto
@@ -252,7 +252,7 @@ namespace AutoMapper.UnitTests
 			public void Should_throw_a_mapping_exception()
 			{
 				var model = new ModelObject();
-				model.NullableDate = new DateTime(2007, 8, 4);
+				model.NullableDate = new DateTime(2007, 8, 4).ToString();
 				
 				typeof(AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<ModelObject, ModelDto>(model));
 			}
@@ -292,6 +292,81 @@ namespace AutoMapper.UnitTests
 			{
 				Array.Find(_dto, d => d.SomeValue.Contains("First")).ShouldNotBeNull();
 				Array.Find(_dto, d => d.SomeValue.Contains("Second")).ShouldNotBeNull();
+			}
+		}
+
+		public class When_mapping_a_List_of_model_objects : AutoMapperSpecBase
+		{
+			private List<ModelObject> _model;
+			private ModelDto[] _dto;
+
+			public class ModelObject
+			{
+				public string SomeValue { get; set; }
+			}
+
+			public class ModelDto
+			{
+				public string SomeValue { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<ModelObject, ModelDto>();
+
+				_model = new List<ModelObject> { new ModelObject { SomeValue = "First" }, new ModelObject { SomeValue = "Second" } };
+				_dto = (ModelDto[])Mapper.Map(_model, typeof(ModelObject[]), typeof(ModelDto[]));
+			}
+
+			[Test]
+			public void Should_create_an_array_of_ModelDto_objects()
+			{
+				_dto.Length.ShouldEqual(2);
+			}
+
+			[Test]
+			public void Should_map_properties()
+			{
+				Array.Find(_dto, d => d.SomeValue.Contains("First")).ShouldNotBeNull();
+				Array.Find(_dto, d => d.SomeValue.Contains("Second")).ShouldNotBeNull();
+			}
+		}
+
+		public class When_mapping_a_nullable_type_to_non_nullable_type : AutoMapperSpecBase
+		{
+			private ModelObject _model;
+			private ModelDto _dto;
+
+			public class ModelObject
+			{
+				public int? SomeValue { get; set; }
+				public int? SomeNullableValue { get; set; }
+			}
+
+			public class ModelDto
+			{
+				public int SomeValue { get; set; }
+				public int SomeNullableValue { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<ModelObject, ModelDto>();
+
+				_model = new ModelObject { SomeValue = 2 };
+				_dto = Mapper.Map<ModelObject, ModelDto>(_model);
+			}
+
+			[Test]
+			public void Should_map_value_if_has_value()
+			{
+				_dto.SomeValue.ShouldEqual(2);
+			}
+
+			[Test]
+			public void Should_not_set_value_if_null()
+			{
+				_dto.SomeNullableValue.ShouldEqual(0);
 			}
 		}
 

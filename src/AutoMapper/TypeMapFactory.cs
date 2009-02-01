@@ -40,9 +40,9 @@ namespace AutoMapper
 			PropertyInfo[] sourceProperties = sourceType.GetPublicGetProperties();
 			MethodInfo[] sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
 
-			TypeMember typeMember = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch);
+			IValueResolver IValueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch);
 
-			bool foundMatch = typeMember != null;
+			bool foundMatch = IValueResolver != null;
 
 			if (!foundMatch)
 			{
@@ -55,34 +55,34 @@ namespace AutoMapper
 				{
 					NameSnippet snippet = CreateNameSnippet(matches, i);
 
-					TypeMember snippetTypeMember = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First);
+					IValueResolver valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First);
 
-					if (snippetTypeMember == null)
+					if (valueResolver == null)
 					{
 						continue;
 					}
 
-					propertyMap.ChainTypeMember(snippetTypeMember);
+					propertyMap.ChainResolver(valueResolver);
 
-					foundMatch = MapDestinationPropertyToSource(propertyMap, snippetTypeMember.GetMemberType(), snippet.Second);
+					foundMatch = MapDestinationPropertyToSource(propertyMap, valueResolver.GetResolvedValueType(), snippet.Second);
 
 					if (foundMatch)
 					{
 						break;
 					}
 
-					propertyMap.RemoveLastModelProperty();
+					propertyMap.RemoveLastResolver();
 				}
 			}
 			else
 			{
-				propertyMap.ChainTypeMember(typeMember);
+				propertyMap.ChainResolver(IValueResolver);
 			}
 
 			return foundMatch;
 		}
 
-		private static TypeMember FindTypeMember(PropertyInfo[] modelProperties, MethodInfo[] getMethods, string nameToSearch)
+		private static IValueResolver FindTypeMember(PropertyInfo[] modelProperties, MethodInfo[] getMethods, string nameToSearch)
 		{
 			PropertyInfo pi = ReflectionHelper.FindModelPropertyByName(modelProperties, nameToSearch);
 			if (pi != null)

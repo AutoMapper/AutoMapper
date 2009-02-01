@@ -21,8 +21,16 @@ namespace AutoMapper
 			SourceValueTypeMap = typeMap;
 			ContextTypeMap = typeMap;
 			SourceValue = source;
-			SourceType = sourceType;
-			DestinationType = destinationType;
+			if (typeMap != null)
+			{
+				SourceType = typeMap.SourceType;
+				DestinationType = typeMap.DestinationType;
+			}
+			else
+			{
+				SourceType = sourceType;
+				DestinationType = destinationType;
+			}
 		}
 
 		public string MemberName
@@ -58,9 +66,20 @@ namespace AutoMapper
 
 		public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, Type sourceMemberType, PropertyMap propertyMap)
 		{
+			if (memberTypeMap != null)
+				return new ResolutionContext
+				       	{
+				       		ContextTypeMap = memberTypeMap,
+							DestinationType = memberTypeMap.DestinationType,
+				       		PropertyMap = propertyMap,
+							SourceType = memberTypeMap.SourceType,
+				       		SourceValue = memberValue,
+				       		SourceValueTypeMap = memberTypeMap
+				       	};
+
 			return new ResolutionContext
 				{
-					ContextTypeMap = memberTypeMap ?? ContextTypeMap,
+					ContextTypeMap = ContextTypeMap,
 					DestinationType = propertyMap.DestinationProperty.PropertyType,
 					PropertyMap = propertyMap,
 					SourceType = sourceMemberType,
@@ -81,6 +100,11 @@ namespace AutoMapper
 					SourceValue = item,
 					SourceValueTypeMap = elementTypeMap
 				};
+		}
+
+		public override string ToString()
+		{
+			return string.Format("Trying to map {0} to {1}.", SourceType.Name, DestinationType.Name);
 		}
 	}
 }

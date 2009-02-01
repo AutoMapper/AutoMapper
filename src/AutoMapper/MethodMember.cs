@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	internal class MethodMember : TypeMember
+	internal class MethodMember : IValueResolver
 	{
 		private readonly MethodInfo _method;
 
@@ -12,12 +12,12 @@ namespace AutoMapper
 			_method = method;
 		}
 
-		public override object GetValue(object obj)
+		public object Resolve(object obj)
 		{
 			return _method.Invoke(obj, new object[0]);
 		}
 
-		public override Type GetMemberType()
+		public Type GetResolvedValueType()
 		{
 			return _method.ReturnType;
 		}

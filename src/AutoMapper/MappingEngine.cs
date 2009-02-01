@@ -46,9 +46,9 @@ namespace AutoMapper
 				{
 					valueToAssign = CreateMappedObject(context);
 				}
-				else if (context.DestinationType == typeof(bool) && context.SourceType == typeof(bool?))
+				else if (context.SourceType.IsEnum)
 				{
-					valueToAssign = context.SourceValue ?? false;
+					valueToAssign = MapEnumSource(context);
 				}
 				else if (context.SourceValue == null)
 				{
@@ -79,38 +79,33 @@ namespace AutoMapper
 			}
 		}
 
+		private static object MapEnumSource(ResolutionContext context)
+		{
+			if (context.DestinationType == typeof(string))
+				return context.SourceValue.ToString();
+			
+			if (!context.DestinationType.IsEnum)
+				throw new AutoMapperMappingException(context);
+
+			return Enum.Parse(context.DestinationType, Enum.GetName(context.SourceType, context.SourceValue));
+		}
+
 		private object CreateMappedObject(ResolutionContext context)
 		{
 			object mappedObject = CreateObject(context.DestinationType);
 
 			foreach (PropertyMap propertyMap in context.SourceValueTypeMap.GetPropertyMaps())
 			{
-				if (propertyMap.Ignored) continue;
-
-				object modelMemberValue;
-				Type modelMemberType;
-
-				IValueResolver resolver = propertyMap.GetCustomValueResolver();
-
-				if (resolver != null)
+				if (!propertyMap.IsMapped())
 				{
-					var inputValueToResolve = context.SourceValue;
-
-					if (propertyMap.HasMembersToResolveForCustomResolver)
-					{
-						inputValueToResolve = ResolveModelMemberValue(propertyMap, context.SourceValue);
-					}
-
-					modelMemberValue = resolver.Resolve(inputValueToResolve);
-					modelMemberType = modelMemberValue != null ? modelMemberValue.GetType() : typeof(object);
+					continue;
 				}
-				else
-				{
-					modelMemberValue = ResolveModelMemberValue(propertyMap, context.SourceValue);
 
-					TypeMember modelMemberToUse = propertyMap.GetLastModelMemberInChain();
-					modelMemberType = modelMemberToUse.GetMemberType();
-				}
+				object modelMemberValue = ResolveModelMemberValue(propertyMap, context.SourceValue);
+
+				Type modelMemberType = modelMemberValue == null
+				                       	? propertyMap.GetLastResolver().GetResolvedValueType()
+				                       	: modelMemberValue.GetType();
 
 				var memberTypeMap = Configuration.FindTypeMapFor(modelMemberType, propertyMap.DestinationProperty.PropertyType);
 
@@ -165,24 +160,16 @@ namespace AutoMapper
 		private object CreateNullOrDefaultObject(ResolutionContext context)
 		{
 			object valueToAssign;
-			object nullValueToUse = null;
-
-			if (context.PropertyMap != null)
-				nullValueToUse = context.PropertyMap.GetNullSubstitute();
-
+		
 			if (context.DestinationType == typeof(string))
 			{
-				valueToAssign = FormatDataElement(context.CreateValueContext(nullValueToUse));
+				valueToAssign = FormatDataElement(context.CreateValueContext(null));
 			}
 			else if (context.DestinationType.IsArray)
 			{
 				Type elementType = context.DestinationType.GetElementType();
 				Array arrayValue = Array.CreateInstance(elementType, 0);
 				valueToAssign = arrayValue;
-			}
-			else if (nullValueToUse != null)
-			{
-				valueToAssign = nullValueToUse;
 			}
 			else
 			{
@@ -233,9 +220,9 @@ namespace AutoMapper
 
 			if (modelMemberValue != null)
 			{
-				foreach (TypeMember modelProperty in propertyMap.GetSourceMemberChain())
+				foreach (IValueResolver modelProperty in propertyMap.GetSourceValueResolvers())
 				{
-					modelMemberValue = modelProperty.GetValue(modelMemberValue);
+					modelMemberValue = modelProperty.Resolve(modelMemberValue);
 
 					if (modelMemberValue == null)
 					{

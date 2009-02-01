@@ -67,7 +67,9 @@ namespace AutoMapper
 
 		public void FormatNullValueAs(string nullSubstitute)
 		{
-			_propertyMap.FormatNullValueAs(nullSubstitute);
+			var member = _propertyMap.GetSourceValueResolvers()[0];
+			_propertyMap.RemoveLastResolver();
+			_propertyMap.ChainResolver(new NullReplacementMethod(member, nullSubstitute));
 		}
 
 		public IResolutionExpression<TSource> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
@@ -91,9 +93,8 @@ namespace AutoMapper
 
 		public void MapFrom(Expression<Func<TSource, object>> sourceMember)
 		{
-			TypeMember[] modelTypeMembers = BuildModelTypeMembers(sourceMember);
-
-			_propertyMap.ChainTypeMembers(modelTypeMembers);
+			_propertyMap.ResetSourceMemberChain();
+			_propertyMap.ChainResolver(new NewMethod<TSource>(sourceMember));
 		}
 
 		public void Ignore()
@@ -106,66 +107,6 @@ namespace AutoMapper
 			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
 
 			memberOptions(this);
-		}
-
-		private static TypeMember[] BuildModelTypeMembers(LambdaExpression lambdaExpression)
-		{
-			Expression expressionToCheck = lambdaExpression;
-			var typeMembers = new List<TypeMember>();
-
-			bool done = false;
-
-			while (!done)
-			{
-				switch (expressionToCheck.NodeType)
-				{
-					case ExpressionType.Convert:
-						expressionToCheck = ((UnaryExpression)expressionToCheck).Operand;
-						break;
-					case ExpressionType.Lambda:
-						expressionToCheck = lambdaExpression.Body;
-						break;
-					case ExpressionType.MemberAccess:
-						var memberExpression = ((MemberExpression)expressionToCheck);
-						var propertyInfo = memberExpression.Member as PropertyInfo;
-						if (propertyInfo != null)
-						{
-							typeMembers.Add(new PropertyMember(propertyInfo));
-						}
-						expressionToCheck = memberExpression.Expression;
-						break;
-					case ExpressionType.Call:
-						var methodCallExpression = ((MethodCallExpression)expressionToCheck);
-						typeMembers.Add(new MethodMember(methodCallExpression.Method));
-						expressionToCheck = methodCallExpression.Object;
-						break;
-					default:
-						done = true;
-						break;
-				}
-				if (expressionToCheck == null)
-					done = true;
-			}
-
-			// LINQ lists members in reverse
-			typeMembers.Reverse();
-
-			return typeMembers.ToArray();
-		}
-
-		private class ResolutionExpression<TResolutionModel> : IResolutionExpression<TResolutionModel>
-		{
-			private readonly PropertyMap _propertyMap;
-
-			public ResolutionExpression(PropertyMap propertyMap)
-			{
-				_propertyMap = propertyMap;
-			}
-
-			public void FromMember(Expression<Func<TResolutionModel, object>> sourceMember)
-			{
-				_propertyMap.ChainTypeMembersForResolver(BuildModelTypeMembers(sourceMember));
-			}
 		}
 	}
 }

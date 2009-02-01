@@ -1,3 +1,4 @@
+using System;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
@@ -31,6 +32,11 @@ namespace AutoMapper.UnitTests
 				{
 					return ((ModelObject)model).Value + 1;
 				}
+
+				public Type GetResolvedValueType()
+				{
+					return typeof (int);
+				}
 			}
 
 			public class CustomResolver2 : IValueResolver
@@ -39,6 +45,11 @@ namespace AutoMapper.UnitTests
 				{
 					return ((ModelObject)model).Value2fff + 2;
 				}
+
+				public Type GetResolvedValueType()
+				{
+					return typeof (int);
+				}
 			}
 
 			public class CustomResolver3 : IValueResolver
@@ -46,6 +57,11 @@ namespace AutoMapper.UnitTests
 				public object Resolve(object model)
 				{
 					return ((ModelObject)model).Value4 + 4;
+				}
+
+				public Type GetResolvedValueType()
+				{
+					return typeof (int);
 				}
 			}
 
@@ -110,6 +126,11 @@ namespace AutoMapper.UnitTests
 				{
 					return ((ModelSubObject)model).SomeValue + 1;
 				}
+
+				public Type GetResolvedValueType()
+				{
+					return typeof (int);
+				}
 			}
 
 			protected override void Establish_context()
@@ -156,6 +177,11 @@ namespace AutoMapper.UnitTests
 				{
 					return ((int) model) + 5;
 				}
+
+				public Type GetResolvedValueType()
+				{
+					return typeof (int);
+				}
 			}
 
 			protected override void Establish_context()
@@ -198,6 +224,11 @@ namespace AutoMapper.UnitTests
 				public object Resolve(object model)
 				{
 					return ((int)model) + 5;
+				}
+
+				public Type GetResolvedValueType()
+				{
+					return typeof (int);
 				}
 			}
 

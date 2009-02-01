@@ -51,15 +51,17 @@ namespace AutoMapper
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
-			Type modelType = typeof(TSource);
-			Type destinationType = typeof(TDestination);
+			TypeMap typeMap = CreateTypeMap(typeof(TSource), typeof(TDestination));
+			return new MappingExpression<TSource, TDestination>(typeMap);
+		}
 
-			var typeMapFactory = new TypeMapFactory(modelType, destinationType);
+		private TypeMap CreateTypeMap(Type source, Type destination)
+		{
+			var typeMapFactory = new TypeMapFactory(source, destination);
 			TypeMap typeMap = typeMapFactory.CreateTypeMap();
 
 			_typeMaps.Add(typeMap);
-
-			return new MappingExpression<TSource, TDestination>(typeMap);
+			return typeMap;
 		}
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
@@ -100,10 +102,31 @@ namespace AutoMapper
 		TypeMap IConfiguration.FindTypeMapFor(Type sourceType, Type destinationType)
 		{
 			TypeMap typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+			if (typeMap != null)
+				return typeMap;
+			
+			typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
+			if (typeMap != null)
+				return typeMap;
+			
+			foreach (var sourceInterface in sourceType.GetInterfaces())
+			{
+				typeMap = ((IConfiguration) this).FindTypeMapFor(sourceInterface, destinationType);
+				if (typeMap != null)
+				{
+					var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
+					if (derivedTypeFor != null)
+					{
+						CreateTypeMap(sourceType, derivedTypeFor);
+						return ((IConfiguration)this).FindTypeMapFor(sourceType, derivedTypeFor);
+					}
+					return typeMap;
+				}
+			}
 
-			if ((typeMap == null) && sourceType.BaseType != null)
+			if (sourceType.BaseType != null)
 				return ((IConfiguration)this).FindTypeMapFor(sourceType.BaseType, destinationType);
-
+            
 			return typeMap;
 		}
 

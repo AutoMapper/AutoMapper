@@ -26,13 +26,13 @@ namespace AutoMapper
 		}
 
 		public AutoMapperMappingException(ResolutionContext context)
-			: this("Unable to perform mapping, view the ResolutionContext for more details.")
+			: this("Unable to perform mapping, view the ResolutionContext for more details. " + context)
 		{
 			Context = context;
 		}
 
 		public AutoMapperMappingException(ResolutionContext context, Exception inner)
-			: this("Unable to perform mapping, view the ResolutionContext for more details.", inner)
+			: this("Unable to perform mapping, view the ResolutionContext for more details. " + context, inner)
 		{
 			Context = context;
 		}
