@@ -1,11 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper
 {
-	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IFormattingExpression<TSource>
+	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>
 	{
 		private readonly TypeMap _typeMap;
 		private PropertyMap _propertyMap;
@@ -16,14 +15,14 @@ namespace AutoMapper
 		}
 
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
-		                                                  Action<IFormattingExpression<TSource>> memberOptions)
+		                                                  Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			PropertyInfo destProperty = ReflectionHelper.FindProperty(destinationMember);
 			ForDestinationMember(destProperty, memberOptions);
 			return new MappingExpression<TSource, TDestination>(_typeMap);
 		}
 
-		public void ForAllMembers(Action<IFormattingExpression<TSource>> memberOptions)
+		public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			_typeMap.GetPropertyMaps().ForEach(x => ForDestinationMember(x.DestinationProperty, memberOptions));
 		}
@@ -91,7 +90,7 @@ namespace AutoMapper
 			return new ResolutionExpression<TSource>(_propertyMap);
 		}
 
-		public void MapFrom(Expression<Func<TSource, object>> sourceMember)
+		public void MapFrom(Func<TSource, object> sourceMember)
 		{
 			_propertyMap.ResetSourceMemberChain();
 			_propertyMap.ChainResolver(new NewMethod<TSource>(sourceMember));
@@ -102,7 +101,7 @@ namespace AutoMapper
 			_propertyMap.Ignore();
 		}
 
-		private void ForDestinationMember(PropertyInfo destinationProperty, Action<IFormattingExpression<TSource>> memberOptions)
+		private void ForDestinationMember(PropertyInfo destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
 

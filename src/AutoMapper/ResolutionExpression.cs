@@ -12,7 +12,7 @@ namespace AutoMapper
 			_propertyMap = propertyMap;
 		}
 
-		public void FromMember(Expression<Func<TResolutionModel, object>> sourceMember)
+		public void FromMember(Func<TResolutionModel, object> sourceMember)
 		{
 			_propertyMap.ChainTypeMemberForResolver(new NewMethod<TResolutionModel>(sourceMember));
 		}

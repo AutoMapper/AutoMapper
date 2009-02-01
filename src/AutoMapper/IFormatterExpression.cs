@@ -24,7 +24,6 @@ namespace AutoMapper
 		void ConstructedBy(Func<TValueFormatter> constructor);
 	}
 
-
 	public interface IProfileExpression : IFormatterExpression
 	{
 		IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>();

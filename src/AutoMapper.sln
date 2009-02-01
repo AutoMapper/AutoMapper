@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper", "AutoMapper\AutoMapper.csproj", "{DDF551F9-B27D-4283-BFA0-E7068E05967D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapperSamples", "AutoMapperSamples\AutoMapperSamples.csproj", "{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AutomatedDebug|Any CPU = AutomatedDebug|Any CPU
@@ -29,6 +31,12 @@ Global
 		{DDF551F9-B27D-4283-BFA0-E7068E05967D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDF551F9-B27D-4283-BFA0-E7068E05967D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDF551F9-B27D-4283-BFA0-E7068E05967D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.AutomatedDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.AutomatedDebug|Any CPU.Build.0 = Debug|Any CPU
+		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

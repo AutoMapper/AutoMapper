@@ -1,5 +1,4 @@
 using System;
-using System.Linq.Expressions;
 
 namespace AutoMapper
 {
@@ -7,9 +6,9 @@ namespace AutoMapper
 	{
 		private readonly Func<TSource, object> _method;
 
-		public NewMethod(Expression<Func<TSource, object>> method)
+		public NewMethod(Func<TSource, object> method)
 		{
-			_method = method.Compile();
+			_method = method;
 		}
 
 		public object Resolve(object obj)
