@@ -4,20 +4,16 @@ namespace AutoMapper
 {
 	public interface IValueResolver
 	{
-		object Resolve(object model);
-		Type GetResolvedValueType();
+		ResolutionResult Resolve(ResolutionResult source);
 	}
 
 	public abstract class ValueResolver<TSource, TDestination> : IValueResolver
 	{
-		public object Resolve(object model)
+		public ResolutionResult Resolve(ResolutionResult source)
 		{
-			return ResolveCore((TSource)model);
-		}
-
-		public Type GetResolvedValueType()
-		{
-			return typeof (TDestination);
+			return source.Value == null
+					? new ResolutionResult(source.Value, typeof(TDestination))
+					: new ResolutionResult(ResolveCore((TSource) source.Value), typeof(TDestination));
 		}
 
 		protected abstract TDestination ResolveCore(TSource model);

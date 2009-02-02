@@ -5,13 +5,44 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+	public class ResolutionResult
+	{
+		public ResolutionResult(object value, Type type)
+		{
+			Value = value;
+			Type = type;
+		}
+
+		public ResolutionResult(object value)
+		{
+			Value = value;
+			Type = value == null
+			       	? typeof (object)
+			       	: value.GetType();
+		}
+
+		public object Value { get; private set; }
+		public Type Type { get; private set; }
+	}
+
+	internal class DefaultResolver : IValueResolver
+	{
+		public ResolutionResult Resolve(ResolutionResult source)
+		{
+			return new ResolutionResult(source.Value);
+		}
+	}
+
 	public class PropertyMap
 	{
 		private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
 		private readonly IList<Type> _valueFormattersToSkip = new List<Type>();
 		private readonly IList<IValueFormatter> _valueFormatters = new List<IValueFormatter>();
 		private bool _ignored;
-		private bool _hasCustomValueResolver = false;
+		private bool _hasCustomValueResolver;
+		private IValueResolver _customResolver;
+		private IValueResolver _customMemberResolver;
+		private object _nullSubstitute;
 
 		public PropertyMap(PropertyInfo destinationProperty)
 		{
@@ -26,14 +57,40 @@ namespace AutoMapper
 
 		public PropertyInfo DestinationProperty { get; private set; }
 
-		public IValueResolver[] GetSourceValueResolvers()
+		public IEnumerable<IValueResolver> GetSourceValueResolvers()
 		{
-			return _sourceValueResolvers.ToArray();
+			yield return new DefaultResolver();
+
+			yield return _customMemberResolver;
+
+			yield return _customResolver;
+
+			foreach (var resolver in _sourceValueResolvers)
+			{
+				yield return resolver;
+			}
+
+			yield return new NullReplacementMethod(_nullSubstitute);
 		}
 
 		public void RemoveLastResolver()
 		{
 			_sourceValueResolvers.RemoveLast();
+		}
+
+		public ResolutionResult ResolveValue(object input)
+		{
+			var result = new ResolutionResult(input);
+
+			foreach (var resolver in GetSourceValueResolvers())
+			{
+				if (resolver != null)
+				{
+					result = resolver.Resolve(result);
+				}
+			}
+
+			return result;
 		}
 
 		public void ChainResolver(IValueResolver IValueResolver)
@@ -75,14 +132,20 @@ namespace AutoMapper
 
 		public void AssignCustomValueResolver(IValueResolver valueResolver)
 		{
+			_customResolver = valueResolver;
 			ResetSourceMemberChain();
-			ChainResolver(valueResolver);
 			_hasCustomValueResolver = true;
 		}
 
 		public void ChainTypeMemberForResolver(IValueResolver valueResolver)
 		{
-			_sourceValueResolvers.AddFirst(valueResolver);
+			ResetSourceMemberChain();
+			_customMemberResolver = valueResolver;
+		}
+
+		public void ChainConstructorForResolver(IValueResolver valueResolver)
+		{
+			_customResolver = valueResolver;
 		}
 
 		public void Ignore()
@@ -100,6 +163,14 @@ namespace AutoMapper
 			return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
 		}
 
+		public void RemoveLastFormatter()
+		{
+			_valueFormatters.RemoveAt(_valueFormatters.Count - 1);
+		}
 
+		public void SetNullSubstitute(object nullSubstitute)
+		{
+			_nullSubstitute = nullSubstitute;
+		}
 	}
 }

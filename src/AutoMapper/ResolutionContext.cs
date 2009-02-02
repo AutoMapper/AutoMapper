@@ -64,6 +64,20 @@ namespace AutoMapper
 				};
 		}
 
+		public ResolutionContext CreateValueContext(object sourceValue, Type sourceType)
+		{
+			return new ResolutionContext
+				{
+					ArrayIndex = ArrayIndex,
+					SourceValueTypeMap = SourceValueTypeMap,
+					PropertyMap = PropertyMap,
+					SourceType = sourceType,
+					SourceValue = sourceValue,
+					ContextTypeMap = ContextTypeMap,
+					DestinationType = DestinationType
+				};
+		}
+
 		public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, Type sourceMemberType, PropertyMap propertyMap)
 		{
 			if (memberTypeMap != null)

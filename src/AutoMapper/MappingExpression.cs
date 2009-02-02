@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>
+	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
 	{
 		private readonly TypeMap _typeMap;
 		private PropertyMap _propertyMap;
@@ -47,16 +47,22 @@ namespace AutoMapper
 			_propertyMap.AddFormatterToSkip<TValueFormatter>();
 		}
 
-		public void AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			AddFormatter(typeof(TValueFormatter));
-		}
-
-		public void AddFormatter(Type valueFormatterType)
-		{
-			var formatter = (IValueFormatter)Activator.CreateInstance(valueFormatterType, true);
+			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)Activator.CreateInstance(typeof(TValueFormatter), true));
 
 			AddFormatter(formatter);
+
+			return new FormatterCtorExpression<TValueFormatter>(this);
+		}
+
+		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
+		{
+			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)Activator.CreateInstance(valueFormatterType, true));
+
+			AddFormatter(formatter);
+
+			return new FormatterCtorExpression(valueFormatterType, this);
 		}
 
 		public void AddFormatter(IValueFormatter formatter)
@@ -66,21 +72,25 @@ namespace AutoMapper
 
 		public void FormatNullValueAs(string nullSubstitute)
 		{
-			var member = _propertyMap.GetSourceValueResolvers()[0];
-			_propertyMap.RemoveLastResolver();
-			_propertyMap.ChainResolver(new NullReplacementMethod(member, nullSubstitute));
+			_propertyMap.SetNullSubstitute(nullSubstitute);
 		}
 
-		public IResolutionExpression<TSource> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
+		public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
 		{
-			return ResolveUsing(typeof(TValueResolver));
+			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver) Activator.CreateInstance(typeof (TValueResolver), true));
+
+			ResolveUsing(resolver);
+
+			return new ResolutionExpression<TSource, TValueResolver>(_propertyMap);
 		}
 
-		public IResolutionExpression<TSource> ResolveUsing(Type valueResolverType)
+		public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
 		{
-			var resolver = (IValueResolver)Activator.CreateInstance(valueResolverType, true);
+			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)Activator.CreateInstance(valueResolverType, true));
 
-			return ResolveUsing(resolver);
+			ResolveUsing(resolver);
+
+			return new ResolutionExpression<TSource>(_propertyMap);
 		}
 
 		public IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver)
@@ -106,6 +116,12 @@ namespace AutoMapper
 			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
 
 			memberOptions(this);
+		}
+
+		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
+		{
+			_propertyMap.RemoveLastFormatter();
+			_propertyMap.AddFormatter(new DeferredInstantiatedFormatter(instantiator));
 		}
 	}
 }

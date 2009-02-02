@@ -4,26 +4,22 @@ namespace AutoMapper
 {
 	public class NullReplacementMethod : IValueResolver
 	{
-		private readonly IValueResolver _member;
-		private readonly string _nullSubstitute;
+		private readonly object _nullSubstitute;
 
-		public NullReplacementMethod(IValueResolver member, string nullSubstitute)
+		public NullReplacementMethod(object nullSubstitute)
 		{
-			_member = member;
 			_nullSubstitute = nullSubstitute;
 		}
 
-		public object Resolve(object obj)
+		public ResolutionResult Resolve(ResolutionResult source)
 		{
-			obj = _member.Resolve(obj);
-			if (obj == null)
-				return _nullSubstitute;
-			return obj;
-		}
-
-		public Type GetResolvedValueType()
-		{
-			return _member.GetResolvedValueType();
+			if (_nullSubstitute == null)
+			{
+				return source;
+			}
+			return source.Value == null
+					? new ResolutionResult(_nullSubstitute)
+					: source;
 		}
 	}
 }

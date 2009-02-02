@@ -28,35 +28,25 @@ namespace AutoMapper.UnitTests
 
 			public class CustomResolver : IValueResolver
 			{
-				public object Resolve(object model)
+				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return ((ModelObject)model).Value + 1;
-				}
-
-				public Type GetResolvedValueType()
-				{
-					return typeof (int);
+					return new ResolutionResult(((ModelObject)source.Value).Value + 1);
 				}
 			}
 
 			public class CustomResolver2 : IValueResolver
 			{
-				public object Resolve(object model)
+				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return ((ModelObject)model).Value2fff + 2;
-				}
-
-				public Type GetResolvedValueType()
-				{
-					return typeof (int);
+					return new ResolutionResult(((ModelObject)source.Value).Value2fff + 2);
 				}
 			}
 
 			public class CustomResolver3 : IValueResolver
 			{
-				public object Resolve(object model)
+				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return ((ModelObject)model).Value4 + 4;
+					return new ResolutionResult(((ModelObject)source.Value).Value4 + 4);
 				}
 
 				public Type GetResolvedValueType()
@@ -122,14 +112,9 @@ namespace AutoMapper.UnitTests
 
 			private class CustomResolver : IValueResolver
 			{
-				public object Resolve(object model)
+				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return ((ModelSubObject)model).SomeValue + 1;
-				}
-
-				public Type GetResolvedValueType()
-				{
-					return typeof (int);
+					return new ResolutionResult(((ModelSubObject)source.Value).SomeValue + 1);
 				}
 			}
 
@@ -173,14 +158,9 @@ namespace AutoMapper.UnitTests
 
 			private class CustomResolver : IValueResolver
 			{
-				public object Resolve(object model)
+				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return ((int) model) + 5;
-				}
-
-				public Type GetResolvedValueType()
-				{
-					return typeof (int);
+					return new ResolutionResult(((int)source.Value) + 5);
 				}
 			}
 
@@ -221,14 +201,9 @@ namespace AutoMapper.UnitTests
 
 			private class CustomResolver : IValueResolver
 			{
-				public object Resolve(object model)
+				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return ((int)model) + 5;
-				}
-
-				public Type GetResolvedValueType()
-				{
-					return typeof (int);
+					return new ResolutionResult(((int)source.Value) + 5);
 				}
 			}
 
@@ -249,6 +224,129 @@ namespace AutoMapper.UnitTests
 			public void Should_override_the_existing_match_to_the_new_custom_resolved_member()
 			{
 				_result.Type.ShouldEqual(5);
+			}
+		}
+
+		public class When_specifying_a_custom_constructor_and_member_resolver : AutoMapperSpecBase
+		{
+			private Source _source;
+			private Destination _dest;
+
+			public class Source
+			{
+				public int Value { get; set; }
+			}
+
+			public class Destination
+			{
+				public int Value { get; set; }
+			}
+
+			public class CustomResolver : ValueResolver<int, int>
+			{
+				private readonly int _toAdd;
+
+				public CustomResolver(int toAdd)
+				{
+					_toAdd = toAdd;
+				}
+
+				public CustomResolver()
+				{
+					_toAdd = 10;
+				}
+
+				protected override int ResolveCore(int model)
+				{
+					return model + _toAdd;
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>()
+					.ForMember(s => s.Value, 
+						opt => opt.ResolveUsing<CustomResolver>()
+							.FromMember(s => s.Value)
+							.ConstructedBy(() => new CustomResolver(15)));
+
+				_source = new Source
+					{
+						Value = 10
+					};
+			}
+
+			protected override void Because_of()
+			{
+				_dest = Mapper.Map<Source, Destination>(_source);
+			}
+
+			[Test]
+			public void Should_use_the_custom_constructor()
+			{
+				_dest.Value.ShouldEqual(25);
+			}
+		}
+
+		public class When_specifying_a_member_resolver_and_custom_constructor : AutoMapperSpecBase
+		{
+			private Source _source;
+			private Destination _dest;
+
+			public class Source
+			{
+				public int Value { get; set; }
+			}
+
+			public class Destination
+			{
+				public int Value { get; set; }
+			}
+
+			public class CustomResolver : ValueResolver<int, int>
+			{
+				private readonly int _toAdd;
+
+				public CustomResolver(int toAdd)
+				{
+					_toAdd = toAdd;
+				}
+
+				public CustomResolver()
+				{
+					_toAdd = 10;
+				}
+
+				protected override int ResolveCore(int model)
+				{
+					return model + _toAdd;
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>()
+					.ForMember(s => s.Value,
+						opt => opt.ResolveUsing<CustomResolver>()
+							.ConstructedBy(() => new CustomResolver(15))
+							.FromMember(s => s.Value)
+						);
+
+				_source = new Source
+				{
+					Value = 10
+				};
+			}
+
+			protected override void Because_of()
+			{
+				_dest = Mapper.Map<Source, Destination>(_source);
+			}
+
+			[Test]
+			public void Should_use_the_custom_constructor()
+			{
+				_dest.Value.ShouldEqual(25);
 			}
 		}
 

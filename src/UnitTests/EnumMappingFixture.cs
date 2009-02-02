@@ -123,27 +123,17 @@ namespace AutoMapper.Tests
 
 		public class DtoStatusValueResolver : IValueResolver
 		{
-			public object Resolve(object model)
+			public ResolutionResult Resolve(ResolutionResult source)
 			{
-				return (StatusForDto) ((Order) model).Status;
-			}
-
-			public Type GetResolvedValueType()
-			{
-				return typeof (StatusForDto);
+				return new ResolutionResult(((Order)source.Value).Status);
 			}
 		}
 
 		public class EnumValueResolver<TInputEnum, TOutputEnum> : IValueResolver
 		{
-			public object Resolve(object model)
+			public ResolutionResult Resolve(ResolutionResult source)
 			{
-				return (TOutputEnum) Enum.Parse(typeof (TOutputEnum), Enum.GetName(typeof (TInputEnum), model));
-			}
-
-			public Type GetResolvedValueType()
-			{
-				return typeof (TOutputEnum);
+				return new ResolutionResult((TOutputEnum) Enum.Parse(typeof (TOutputEnum), Enum.GetName(typeof (TInputEnum), source.Value)));
 			}
 		}
 	}

@@ -14,12 +14,12 @@ namespace AutoMapper
 	public interface IMemberConfigurationExpression<TSource>
 	{
 		void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
-		void AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
-		void AddFormatter(Type valueFormatterType);
+		IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
+		IFormatterCtorExpression AddFormatter(Type valueFormatterType);
 		void AddFormatter(IValueFormatter formatter);
 		void FormatNullValueAs(string nullSubstitute);
-		IResolutionExpression<TSource> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver;
-		IResolutionExpression<TSource> ResolveUsing(Type valueResolverType);
+		IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver;
+		IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType);
 		IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver);
 		void MapFrom(Func<TSource, object> sourceMember);
 		void Ignore();
@@ -27,6 +27,18 @@ namespace AutoMapper
 
 	public interface IResolutionExpression<TSource>
 	{
-		void FromMember(Func<TSource, object> sourceMember);
+		IResolutionExpression<TSource> FromMember(Func<TSource, object> sourceMember);		
+	}
+
+	public interface IResolverConfigurationExpression<TSource, TValueResolver>
+		where TValueResolver : IValueResolver
+	{
+		IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Func<TSource, object> sourceMember);
+		IResolverConfigurationExpression<TSource, TValueResolver> ConstructedBy(Func<TValueResolver> constructor);
+	}
+
+	public interface IResolverConfigurationExpression<TSource> : IResolutionExpression<TSource>
+	{
+		IResolutionExpression<TSource> ConstructedBy(Func<IValueResolver> constructor);
 	}
 }

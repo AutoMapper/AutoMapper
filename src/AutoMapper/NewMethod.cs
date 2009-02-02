@@ -11,21 +11,15 @@ namespace AutoMapper
 			_method = method;
 		}
 
-		public object Resolve(object obj)
+		public ResolutionResult Resolve(ResolutionResult source)
 		{
-			if (obj is TSource)
-				return GetValue((TSource) obj);
-			throw new ArgumentException("Expected obj to be of type " + typeof (TSource) + " but was " + obj.GetType());
-		}
+			if (source.Value == null)
+				return source;
 
-		public object GetValue(TSource source)
-		{
-			return _method(source);
-		}
+			if (! (source.Value is TSource))
+				throw new ArgumentException("Expected obj to be of type " + typeof(TSource) + " but was " + source.Value.GetType());
 
-		public Type GetResolvedValueType()
-		{
-			return _method.Method.ReturnType;
+			return new ResolutionResult(_method((TSource) source.Value));
 		}
 	}
 }

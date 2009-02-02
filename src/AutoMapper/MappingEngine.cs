@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace AutoMapper
 {
@@ -66,6 +67,10 @@ namespace AutoMapper
 				{
 					valueToAssign = CreateArrayObject(context);
 				}
+				else if (context.SourceType.IsGenericType && (context.SourceType.GetGenericTypeDefinition().Equals(typeof(Nullable<>))))
+				{
+					valueToAssign = MapNullableType(context);
+				}
 				else
 				{
 					throw new AutoMapperMappingException(context);
@@ -77,6 +82,25 @@ namespace AutoMapper
 			{
 				throw new AutoMapperMappingException(context, ex);
 			}
+		}
+
+		private object MapNullableType(ResolutionContext context)
+		{
+			PropertyInfo hasValueProp = context.SourceType.GetProperty("HasValue", BindingFlags.Public | BindingFlags.ExactBinding | BindingFlags.Instance);
+			PropertyInfo valueProp = context.SourceType.GetProperty("Value", BindingFlags.Public | BindingFlags.ExactBinding | BindingFlags.Instance);
+			Type sourceType = context.SourceType.GetGenericArguments()[0];
+
+			var hasValue = (bool) hasValueProp.GetValue(context.SourceValue, new object[0]);
+			object value = null;
+
+			if (hasValue)
+			{
+				value = valueProp.GetValue(context.SourceValue, new object[0]);
+			}
+
+			var newContext = context.CreateValueContext(value, sourceType);
+
+			return Map(newContext);
 		}
 
 		private static object MapEnumSource(ResolutionContext context)
@@ -101,15 +125,11 @@ namespace AutoMapper
 					continue;
 				}
 
-				object modelMemberValue = ResolveModelMemberValue(propertyMap, context.SourceValue);
+				var result = propertyMap.ResolveValue(context.SourceValue);
 
-				Type modelMemberType = modelMemberValue == null
-				                       	? propertyMap.GetLastResolver().GetResolvedValueType()
-				                       	: modelMemberValue.GetType();
+				var memberTypeMap = Configuration.FindTypeMapFor(result.Type, propertyMap.DestinationProperty.PropertyType);
 
-				var memberTypeMap = Configuration.FindTypeMapFor(modelMemberType, propertyMap.DestinationProperty.PropertyType);
-
-				var newContext = context.CreateMemberContext(memberTypeMap, modelMemberValue, modelMemberType, propertyMap);
+				var newContext = context.CreateMemberContext(memberTypeMap, result.Value, result.Type, propertyMap);
 
 				object propertyValueToAssign = Map(newContext);
 
@@ -214,24 +234,24 @@ namespace AutoMapper
 			throw new ArgumentException(string.Format("Unable to find the element type for type '{0}'.", enumerableType), "enumerableType");
 		}
 
-		private static object ResolveModelMemberValue(PropertyMap propertyMap, object input)
-		{
-			object modelMemberValue = input;
+		//private static object ResolveModelMemberValue(PropertyMap propertyMap, object input)
+		//{
+		//    object modelMemberValue = input;
 
-			if (modelMemberValue != null)
-			{
-				foreach (IValueResolver modelProperty in propertyMap.GetSourceValueResolvers())
-				{
-					modelMemberValue = modelProperty.Resolve(modelMemberValue);
+		//    if (modelMemberValue != null)
+		//    {
+		//        foreach (IValueResolver modelProperty in propertyMap.GetSourceValueResolvers())
+		//        {
+		//            modelMemberValue = modelProperty.Resolve(modelMemberValue);
 
-					if (modelMemberValue == null)
-					{
-						break;
-					}
-				}
-			}
-			return modelMemberValue;
-		}
+		//            if (modelMemberValue == null)
+		//            {
+		//                break;
+		//            }
+		//        }
+		//    }
+		//    return modelMemberValue;
+		//}
 
 		private static object CreateObject(Type type)
 		{

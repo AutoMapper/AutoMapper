@@ -55,7 +55,7 @@ namespace AutoMapper
 				{
 					NameSnippet snippet = CreateNameSnippet(matches, i);
 
-					IValueResolver valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First);
+					TypeMember valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First);
 
 					if (valueResolver == null)
 					{
@@ -82,7 +82,7 @@ namespace AutoMapper
 			return foundMatch;
 		}
 
-		private static IValueResolver FindTypeMember(PropertyInfo[] modelProperties, MethodInfo[] getMethods, string nameToSearch)
+		private static TypeMember FindTypeMember(PropertyInfo[] modelProperties, MethodInfo[] getMethods, string nameToSearch)
 		{
 			PropertyInfo pi = ReflectionHelper.FindModelPropertyByName(modelProperties, nameToSearch);
 			if (pi != null)

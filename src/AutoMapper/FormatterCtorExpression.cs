@@ -5,33 +5,33 @@ namespace AutoMapper
 	internal class FormatterCtorExpression : IFormatterCtorExpression
 	{
 		private readonly Type _formatterType;
-		private readonly FormatterExpression _formatterExpression;
+		private readonly IFormatterCtorConfigurator _formatterCtorConfigurator;
 
-		public FormatterCtorExpression(Type formatterType, FormatterExpression formatterExpression)
+		public FormatterCtorExpression(Type formatterType, IFormatterCtorConfigurator formatterCtorConfigurator)
 		{
 			_formatterType = formatterType;
-			_formatterExpression = formatterExpression;
+			_formatterCtorConfigurator = formatterCtorConfigurator;
 		}
 
 		public void ConstructedBy(Func<IValueFormatter> constructor)
 		{
-			_formatterExpression.ConstructFormatterBy(_formatterType, constructor);
+			_formatterCtorConfigurator.ConstructFormatterBy(_formatterType, constructor);
 		}
 	}
 
 	internal class FormatterCtorExpression<TValueFormatter> : IFormatterCtorExpression<TValueFormatter>
 		where TValueFormatter : IValueFormatter
 	{
-		private readonly FormatterExpression _formatterExpression;
+		private readonly IFormatterCtorConfigurator _formatterCtorConfigurator;
 
-		public FormatterCtorExpression(FormatterExpression formatterExpression)
+		public FormatterCtorExpression(IFormatterCtorConfigurator formatterCtorConfigurator)
 		{
-			_formatterExpression = formatterExpression;
+			_formatterCtorConfigurator = formatterCtorConfigurator;
 		}
 
 		public void ConstructedBy(Func<TValueFormatter> constructor)
 		{
-			_formatterExpression.ConstructFormatterBy(typeof (TValueFormatter), () => constructor());
+			_formatterCtorConfigurator.ConstructFormatterBy(typeof (TValueFormatter), () => constructor());
 		}
 	}
 }

@@ -5,7 +5,7 @@ using System.Linq;
 namespace AutoMapper
 {
 
-	public class FormatterExpression : IFormatterExpression, IFormatterConfiguration
+	public class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator
 	{
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
@@ -73,5 +73,10 @@ namespace AutoMapper
 			_formatters.RemoveAt(_formatters.Count - 1);
 			_formatters.Add(new DeferredInstantiatedFormatter(instantiator));
 		}
+	}
+
+	internal interface IFormatterCtorConfigurator
+	{
+		void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator);
 	}
 }

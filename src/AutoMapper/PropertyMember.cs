@@ -3,7 +3,13 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	internal class PropertyMember : IValueResolver
+	internal abstract class TypeMember : IValueResolver
+	{
+		public abstract Type GetResolvedValueType();
+		public abstract ResolutionResult Resolve(ResolutionResult source);
+	}
+
+	internal class PropertyMember : TypeMember
 	{
 		private readonly PropertyInfo _property;
 
@@ -12,14 +18,16 @@ namespace AutoMapper
 			_property = property;
 		}
 
-		public object Resolve(object obj)
-		{
-			return _property.GetValue(obj, new object[0]);
-		}
-
-		public Type GetResolvedValueType()
+		public override Type GetResolvedValueType()
 		{
 			return _property.PropertyType;
+		}
+
+		public override ResolutionResult Resolve(ResolutionResult source)
+		{
+			return source.Value == null
+				? new ResolutionResult(source.Value, _property.PropertyType)
+				: new ResolutionResult(_property.GetValue(source.Value, new object[0]), _property.PropertyType);
 		}
 	}
 }
