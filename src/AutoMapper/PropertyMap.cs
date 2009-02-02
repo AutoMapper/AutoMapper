@@ -5,36 +5,6 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	public class ResolutionResult
-	{
-		public ResolutionResult(object value, Type type)
-		{
-			Value = value;
-			Type = value == null
-					? type
-					: value.GetType();
-		}
-
-		public ResolutionResult(object value)
-		{
-			Value = value;
-			Type = value == null
-			       	? typeof (object)
-			       	: value.GetType();
-		}
-
-		public object Value { get; private set; }
-		public Type Type { get; private set; }
-	}
-
-	internal class DefaultResolver : IValueResolver
-	{
-		public ResolutionResult Resolve(ResolutionResult source)
-		{
-			return new ResolutionResult(source.Value);
-		}
-	}
-
 	public class PropertyMap
 	{
 		private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
@@ -49,12 +19,6 @@ namespace AutoMapper
 		public PropertyMap(PropertyInfo destinationProperty)
 		{
 			DestinationProperty = destinationProperty;
-		}
-
-		public PropertyMap(PropertyInfo destinationProperty, IEnumerable<IValueResolver> valueResolvers)
-		{
-			DestinationProperty = destinationProperty;
-			ChainResolvers(valueResolvers);
 		}
 
 		public PropertyInfo DestinationProperty { get; private set; }
@@ -100,18 +64,6 @@ namespace AutoMapper
 			_sourceValueResolvers.AddLast(IValueResolver);
 		}
 
-		public IValueResolver GetLastResolver()
-		{
-			return _sourceValueResolvers.Last.Value;
-		}
-
-		public void ChainResolvers(IEnumerable<IValueResolver> valueResolvers)
-		{
-			_sourceValueResolvers.Clear();
-
-			valueResolvers.ForEach(ChainResolver);
-		}
-
 		public void AddFormatterToSkip<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
 			_valueFormattersToSkip.Add(typeof(TValueFormatter));
@@ -155,14 +107,14 @@ namespace AutoMapper
 			_ignored = true;
 		}
 
-		public void ResetSourceMemberChain()
-		{
-			_sourceValueResolvers.Clear();
-		}
-
 		public bool IsMapped()
 		{
 			return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
+		}
+
+		public bool CanResolveValue()
+		{
+			return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver) && !_ignored;
 		}
 
 		public void RemoveLastFormatter()
@@ -173,6 +125,11 @@ namespace AutoMapper
 		public void SetNullSubstitute(object nullSubstitute)
 		{
 			_nullSubstitute = nullSubstitute;
+		}
+
+		private void ResetSourceMemberChain()
+		{
+			_sourceValueResolvers.Clear();
 		}
 	}
 }

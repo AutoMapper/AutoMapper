@@ -15,7 +15,7 @@ namespace AutoMapper
 		}
 
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
-		                                                  Action<IMemberConfigurationExpression<TSource>> memberOptions)
+		                                                           Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			PropertyInfo destProperty = ReflectionHelper.FindProperty(destinationMember);
 			ForDestinationMember(destProperty, memberOptions);
@@ -30,7 +30,7 @@ namespace AutoMapper
 		public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>() where TOtherSource : TSource
 			where TOtherDestination : TDestination
 		{
-			_typeMap.IncludeDerivedTypes(typeof(TOtherSource), typeof(TOtherDestination));
+			_typeMap.IncludeDerivedTypes(typeof (TOtherSource), typeof (TOtherDestination));
 
 			return this;
 		}
@@ -49,7 +49,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)Activator.CreateInstance(typeof(TValueFormatter), true));
+			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter) Activator.CreateInstance(typeof (TValueFormatter), true));
 
 			AddFormatter(formatter);
 
@@ -58,7 +58,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)Activator.CreateInstance(valueFormatterType, true));
+			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter) Activator.CreateInstance(valueFormatterType, true));
 
 			AddFormatter(formatter);
 
@@ -86,7 +86,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
 		{
-			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)Activator.CreateInstance(valueResolverType, true));
+			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver) Activator.CreateInstance(valueResolverType, true));
 
 			ResolveUsing(resolver);
 
@@ -102,8 +102,7 @@ namespace AutoMapper
 
 		public void MapFrom(Func<TSource, object> sourceMember)
 		{
-			_propertyMap.ResetSourceMemberChain();
-			_propertyMap.ChainResolver(new NewMethod<TSource>(sourceMember));
+			_propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(sourceMember));
 		}
 
 		public void Ignore()

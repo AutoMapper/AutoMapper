@@ -2,11 +2,11 @@ using System;
 
 namespace AutoMapper
 {
-	public class NewMethod<TSource> : IValueResolver
+	public class DelegateBasedResolver<TSource> : IValueResolver
 	{
 		private readonly Func<TSource, object> _method;
 
-		public NewMethod(Func<TSource, object> method)
+		public DelegateBasedResolver(Func<TSource, object> method)
 		{
 			_method = method;
 		}

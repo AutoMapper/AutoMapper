@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
+    <Compile Include="DefaultResolver.cs" />
     <Compile Include="DeferredInstantiatedFormatter.cs" />
     <Compile Include="DeferredInstantiatedResolver.cs" />
     <Compile Include="ExpressionValueFormatter.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="MappingEngine.cs" />
     <Compile Include="MappingExpression.cs" />
     <Compile Include="MethodMember.cs" />
-    <Compile Include="NewMethod.cs" />
+    <Compile Include="DelegateBasedResolver.cs" />
     <Compile Include="NullReplacementMethod.cs" />
     <Compile Include="PrimitiveExtensions.cs" />
     <Compile Include="Profile.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="ReflectionHelper.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="ResolutionExpression.cs" />
+    <Compile Include="ResolutionResult.cs" />
     <Compile Include="SelfProfiler.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="TypeMapFactory.cs" />

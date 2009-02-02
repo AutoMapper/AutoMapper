@@ -295,7 +295,7 @@ namespace AutoMapper.UnitTests
 
 			private class Destination
 			{
-				public string Ignored { get; set; }
+				public bool Ignored { get { return true; } }
 				public string Value { get; set; }
 			}
 
@@ -308,7 +308,15 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_successfully()
 			{
-				Mapper.Map<Source, Destination>(_source).Value.ShouldEqual("foo");
+				var destination = Mapper.Map<Source, Destination>(_source);
+				destination.Value.ShouldEqual("foo");
+				destination.Ignored.ShouldBeTrue();
+			}
+
+			[Test]
+			public void Should_succeed_configration_check()
+			{
+				Mapper.AssertConfigurationIsValid();
 			}
 
 			protected override void Establish_context()

@@ -13,7 +13,7 @@ namespace AutoMapper
 
 		public IResolutionExpression<TSource> FromMember(Func<TSource, object> sourceMember)
 		{
-			_propertyMap.ChainTypeMemberForResolver(new NewMethod<TSource>(sourceMember));
+			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
 
 			return this;
 		}
@@ -38,7 +38,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Func<TSource, object> sourceMember)
 		{
-			_propertyMap.ChainTypeMemberForResolver(new NewMethod<TSource>(sourceMember));
+			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
 
 			return this;
 		}

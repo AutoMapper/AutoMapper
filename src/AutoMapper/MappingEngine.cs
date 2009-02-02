@@ -120,7 +120,7 @@ namespace AutoMapper
 
 			foreach (PropertyMap propertyMap in context.SourceValueTypeMap.GetPropertyMaps())
 			{
-				if (!propertyMap.IsMapped())
+				if (!propertyMap.CanResolveValue())
 				{
 					continue;
 				}
@@ -233,25 +233,6 @@ namespace AutoMapper
 
 			throw new ArgumentException(string.Format("Unable to find the element type for type '{0}'.", enumerableType), "enumerableType");
 		}
-
-		//private static object ResolveModelMemberValue(PropertyMap propertyMap, object input)
-		//{
-		//    object modelMemberValue = input;
-
-		//    if (modelMemberValue != null)
-		//    {
-		//        foreach (IValueResolver modelProperty in propertyMap.GetSourceValueResolvers())
-		//        {
-		//            modelMemberValue = modelProperty.Resolve(modelMemberValue);
-
-		//            if (modelMemberValue == null)
-		//            {
-		//                break;
-		//            }
-		//        }
-		//    }
-		//    return modelMemberValue;
-		//}
 
 		private static object CreateObject(Type type)
 		{
