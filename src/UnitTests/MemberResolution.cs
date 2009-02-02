@@ -122,7 +122,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		[Explicit("Needs some more time to get this one to work properly")]
 		public class When_mapping_derived_classes_as_property_of_top_object : AutoMapperSpecBase
 		{
 			private DtoModel _result;

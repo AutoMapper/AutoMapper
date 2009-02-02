@@ -10,7 +10,9 @@ namespace AutoMapper
 		public ResolutionResult(object value, Type type)
 		{
 			Value = value;
-			Type = type;
+			Type = value == null
+					? type
+					: value.GetType();
 		}
 
 		public ResolutionResult(object value)
