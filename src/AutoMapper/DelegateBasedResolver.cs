@@ -19,7 +19,17 @@ namespace AutoMapper
 			if (! (source.Value is TSource))
 				throw new ArgumentException("Expected obj to be of type " + typeof(TSource) + " but was " + source.Value.GetType());
 
-			return new ResolutionResult(_method((TSource) source.Value));
+			object result;
+			try
+			{
+				result = _method((TSource)source.Value);
+			}
+			catch (NullReferenceException)
+			{
+				result = null;
+			}
+
+			return new ResolutionResult(result);
 		}
 	}
 }
