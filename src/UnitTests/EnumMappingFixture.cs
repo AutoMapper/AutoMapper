@@ -137,4 +137,103 @@ namespace AutoMapper.Tests
 			}
 		}
 	}
+
+	[TestFixture]
+	public class When_mapping_from_a_null_object_with_an_enum
+	{
+		[SetUp]
+		public void SetUp()
+		{
+			Mapper.CreateMap<SourceClass, DestinationClass>();
+		}
+
+		public enum EnumValues
+		{
+			One, Two, Three
+		}
+
+		public class DestinationClass
+		{
+			public EnumValues Values { get; set; }
+		}
+
+		public class SourceClass
+		{
+			public EnumValues Values { get; set; }
+		}
+
+		[Test]
+		public void Should_set_the_target_enum_to_the_default_value()
+		{
+			SourceClass sourceClass = null;
+			var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
+			dest.Values.ShouldEqual(default(EnumValues));
+		}
+	}
+
+	[TestFixture]
+	public class When_mapping_from_a_null_object_with_an_enum_on_a_nullable_enum
+	{
+		[SetUp]
+		public void SetUp()
+		{
+			Mapper.CreateMap<SourceClass, DestinationClass>();
+		}
+
+		public enum EnumValues
+		{
+			One, Two, Three
+		}
+
+		public class DestinationClass
+		{
+			public EnumValues? Values { get; set; }
+		}
+
+		public class SourceClass
+		{
+			public EnumValues Values { get; set; }
+		}
+
+		[Test]
+		public void Should_set_the_target_enum_to_null()
+		{
+			SourceClass sourceClass = null;
+			var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
+			dest.Values.ShouldEqual(null);
+		}
+	}
+
+	[TestFixture]
+	public class When_mapping_from_a_null_object_with_a_nullable_enum
+	{
+		[SetUp]
+		public void SetUp()
+		{
+			Mapper.CreateMap<SourceClass, DestinationClass>();
+		}
+
+		public enum EnumValues
+		{
+			One, Two, Three
+		}
+
+		public class DestinationClass
+		{
+			public EnumValues Values { get; set; }
+		}
+
+		public class SourceClass
+		{
+			public EnumValues? Values { get; set; }
+		}
+
+		[Test]
+		public void Should_set_the_target_enum_to_the_default_value()
+		{
+			SourceClass sourceClass = null;
+			var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
+			dest.Values.ShouldEqual(default(EnumValues));
+		}
+	}
 }

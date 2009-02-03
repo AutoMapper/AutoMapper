@@ -67,13 +67,13 @@ namespace AutoMapper
 				{
 					valueToAssign = CreateArrayObject(context);
 				}
-				else if (context.SourceType.IsGenericType && (context.SourceType.GetGenericTypeDefinition().Equals(typeof(Nullable<>))))
+				else if (context.SourceType.IsNullableType())
 				{
 					valueToAssign = MapNullableType(context);
 				}
 				else
 				{
-					throw new AutoMapperMappingException(context);
+					throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
 				}
 
 				return valueToAssign;
@@ -107,9 +107,15 @@ namespace AutoMapper
 		{
 			if (context.DestinationType == typeof(string))
 				return context.SourceValue.ToString();
-			
+
+			if (context.DestinationType.IsNullableType() && context.SourceValue == null)
+				return null;
+
 			if (!context.DestinationType.IsEnum)
-				throw new AutoMapperMappingException(context);
+				throw new AutoMapperMappingException(context, "Cannot map an Enum source type to a non-Enum destination type.");
+
+			if (context.SourceValue == null)
+				return CreateObject(context.DestinationType);
 
 			return Enum.Parse(context.DestinationType, Enum.GetName(context.SourceType, context.SourceValue));
 		}

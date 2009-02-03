@@ -43,6 +43,11 @@ namespace AutoMapper
 		{
 		}
 
+		public AutoMapperMappingException(ResolutionContext context, string message)
+			: this("Unable to perform mapping, view the ResolutionContext for more details. " + context + "\r\n" + message)
+		{
+		}
+
 		public ResolutionContext Context { get; private set; }
 	}
 }
