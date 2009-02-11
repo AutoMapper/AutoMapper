@@ -12,6 +12,8 @@
     <AssemblyName>AutoMapper</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>AutoMapper.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,6 +85,9 @@
     <Compile Include="TypeMap.cs" />
     <Compile Include="TypeMapFactory.cs" />
     <Compile Include="ValueFormatter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AutoMapper.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
