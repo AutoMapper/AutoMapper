@@ -84,6 +84,10 @@ namespace AutoMapper
 				{
 					valueToAssign = CreateArrayObject(context);
 				}
+				else if ((context.DestinationType.IsEnumerableType()) && (context.SourceValue is IEnumerable))
+				{
+					valueToAssign = CreateEnumerableObject(context);
+				}
 				else if (context.SourceType.IsNullableType())
 				{
 					valueToAssign = MapNullableType(context);
@@ -164,6 +168,47 @@ namespace AutoMapper
 			}
 
 			return mappedObject;
+		}
+
+		private object CreateEnumerableObject(ResolutionContext context)
+		{
+			IEnumerable<object> enumerableValue = ((IEnumerable)context.SourceValue).Cast<object>();
+
+			Type sourceElementType = GetElementType(context.SourceType);
+
+			Type destElementType = GetElementType(context.DestinationType);
+			Type destListType = typeof (List<>).MakeGenericType(destElementType);
+			IList destinationList = (IList) CreateObject(destListType);
+
+			int i = 0;
+			foreach (object item in enumerableValue)
+			{
+				Type targetSourceType = sourceElementType;
+				Type targetDestinationType = destElementType;
+
+				if (item.GetType() != sourceElementType)
+				{
+					targetSourceType = item.GetType();
+
+					TypeMap itemTypeMap =
+						Configuration.FindTypeMapFor(sourceElementType, destElementType)
+						?? Configuration.FindTypeMapFor(targetSourceType, destElementType);
+
+					targetDestinationType = itemTypeMap.GetDerivedTypeFor(targetSourceType);
+				}
+
+				TypeMap derivedTypeMap = Configuration.FindTypeMapFor(targetSourceType, targetDestinationType);
+
+				var newContext = context.CreateElementContext(derivedTypeMap, item, targetSourceType, targetDestinationType, i);
+
+				object mappedValue = Map(newContext);
+
+				destinationList.Add(mappedValue);
+
+				i++;
+			}
+
+			return destinationList;
 		}
 
 		private object CreateArrayObject(ResolutionContext context)

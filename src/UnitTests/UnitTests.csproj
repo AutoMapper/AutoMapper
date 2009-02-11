@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
     <Compile Include="AutoMapperTester.cs" />
