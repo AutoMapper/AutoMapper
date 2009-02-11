@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
@@ -35,10 +36,10 @@ namespace AutoMapper.UnitTests
 				Mapper.Reset();
 
 				var model = new[]
-            	{
-            		new ModelObject { BaseString = "Base1" }, 
-					new ModelSubObject { BaseString = "Base2", SubString = "Sub2"}
-            	};
+					{
+						new ModelObject {BaseString = "Base1"},
+						new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
+					};
 
 				Mapper
 					.CreateMap<ModelObject, DtoObject>()
@@ -46,7 +47,7 @@ namespace AutoMapper.UnitTests
 
 				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
 
-				_result = (DtoObject[])Mapper.Map(model, typeof(ModelObject[]), typeof(DtoObject[]));
+				_result = (DtoObject[]) Mapper.Map(model, typeof (ModelObject[]), typeof (DtoObject[]));
 			}
 
 			[Test]
@@ -60,11 +61,11 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_to_the_correct_respective_dto_types()
 			{
-				_result[0].ShouldBeInstanceOfType(typeof(DtoObject));
-				_result[1].ShouldBeInstanceOfType(typeof(DtoSubObject));
+				_result[0].ShouldBeInstanceOfType(typeof (DtoObject));
+				_result[1].ShouldBeInstanceOfType(typeof (DtoSubObject));
 			}
 		}
-		
+
 		public class When_mapping_derived_classes_from_intefaces_to_abstract : AutoMapperSpecBase
 		{
 			private DtoObject[] _result;
@@ -95,16 +96,16 @@ namespace AutoMapper.UnitTests
 				Mapper.Reset();
 
 				var model = new IModelObject[]
-            	{
-					new ModelSubObject { BaseString = "Base2", SubString = "Sub2"}
-            	};
+					{
+						new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
+					};
 
 				Mapper.CreateMap<IModelObject, DtoObject>()
 					.Include<ModelSubObject, DtoSubObject>();
 
 				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
 
-				_result = (DtoObject[])Mapper.Map(model, typeof(IModelObject[]), typeof(DtoObject[]));
+				_result = (DtoObject[]) Mapper.Map(model, typeof (IModelObject[]), typeof (DtoObject[]));
 			}
 
 			[Test]
@@ -117,7 +118,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_to_the_correct_respective_dto_types()
 			{
-				_result[0].ShouldBeInstanceOfType(typeof(DtoSubObject));
+				_result[0].ShouldBeInstanceOfType(typeof (DtoSubObject));
 				((DtoSubObject) _result[0]).SubString.ShouldEqual("Sub2");
 			}
 		}
@@ -160,7 +161,7 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.CreateMap<Model, DtoModel>();
-				
+
 				Mapper.CreateMap<IModelObject, DtoObject>()
 					.Include<ModelSubObject, DtoSubObject>();
 
@@ -171,16 +172,16 @@ namespace AutoMapper.UnitTests
 			public void Should_map_object_to_sub_object()
 			{
 				var model = new Model
-				{
-					Object = new ModelSubObject { BaseString = "Base2", SubString = "Sub2" }
-				};
+					{
+						Object = new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
+					};
 
 				_result = Mapper.Map<Model, DtoModel>(model);
 				_result.Object.ShouldNotBeNull();
 				_result.Object.ShouldBeInstanceOf<DtoSubObject>();
 				_result.Object.ShouldBeInstanceOf<DtoSubObject>();
 				_result.Object.BaseString.ShouldEqual("Base2");
-				((DtoSubObject)_result.Object).SubString.ShouldEqual("Sub2");
+				((DtoSubObject) _result.Object).SubString.ShouldEqual("Sub2");
 			}
 		}
 
@@ -224,29 +225,29 @@ namespace AutoMapper.UnitTests
 				Mapper.Reset();
 
 				var model = new ModelObject
-				{
-					BaseDate = new DateTime(2007, 4, 5),
-					Sub = new ModelSubObject
 					{
-						ProperName = "Some name",
-						SubSub = new ModelSubSubObject
-						{
-							IAmACoolProperty = "Cool daddy-o"
-						}
-					},
-					Sub2 = new ModelSubObject
-					{
-						ProperName = "Sub 2 name"
-					},
-					SubWithExtraName = new ModelSubObject
-					{
-						ProperName = "Some other name"
-					},
-					SubMissing = new ModelSubObject
-					{
-						ProperName = "I have a missing sub sub object"
-					}
-				};
+						BaseDate = new DateTime(2007, 4, 5),
+						Sub = new ModelSubObject
+							{
+								ProperName = "Some name",
+								SubSub = new ModelSubSubObject
+									{
+										IAmACoolProperty = "Cool daddy-o"
+									}
+							},
+						Sub2 = new ModelSubObject
+							{
+								ProperName = "Sub 2 name"
+							},
+						SubWithExtraName = new ModelSubObject
+							{
+								ProperName = "Some other name"
+							},
+						SubMissing = new ModelSubObject
+							{
+								ProperName = "I have a missing sub sub object"
+							}
+					};
 
 				Mapper.CreateMap<ModelObject, ModelDto>();
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
@@ -295,7 +296,11 @@ namespace AutoMapper.UnitTests
 
 			private class Destination
 			{
-				public bool Ignored { get { return true; } }
+				public bool Ignored
+				{
+					get { return true; }
+				}
+
 				public string Value { get; set; }
 			}
 
@@ -359,9 +364,9 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				var model = new ModelObject
-				{
-					Sub = new ModelSubObject()
-				};
+					{
+						Sub = new ModelSubObject()
+					};
 
 				Mapper.CreateMap<ModelObject, ModelDto>();
 
@@ -412,9 +417,9 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				var model = new ModelObject
-				{
-					Sub = new ModelSubObject()
-				};
+					{
+						Sub = new ModelSubObject()
+					};
 
 				Mapper.CreateMap<ModelObject, ModelDto>();
 
@@ -464,12 +469,12 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
 
 				var model = new ModelObject
-				{
-					Sub = new ModelSubObject
 					{
-						SomeValue = "Some value"
-					}
-				};
+						Sub = new ModelSubObject
+							{
+								SomeValue = "Some value"
+							}
+					};
 
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
@@ -585,19 +590,19 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				var model = new ModelObject
-				{
-					Blarg = 10,
-					SomeValue = "Some value",
-					SomeWeirdSubObject = new ModelSubObject
 					{
-						Narf = 5,
-						SubSub = new ModelSubSubObject
-						{
-							Norf = 15
-						}
-					},
-					MoreBlarg = "adsfdsaf"
-				};
+						Blarg = 10,
+						SomeValue = "Some value",
+						SomeWeirdSubObject = new ModelSubObject
+							{
+								Narf = 5,
+								SubSub = new ModelSubSubObject
+									{
+										Norf = 15
+									}
+							},
+						MoreBlarg = "adsfdsaf"
+					};
 				Mapper
 					.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.Splorg, opt => opt.MapFrom(m => m.Blarg))
@@ -607,8 +612,8 @@ namespace AutoMapper.UnitTests
 					.ForMember(dto => dto.GrandChildInt, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.Norf))
 					.ForMember(dto => dto.GrandChildString, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.SomeSubSubValue()))
 					.ForMember(dto => dto.MoreBlarg, opt => opt.MapFrom(m => m.SomeMethodToGetMoreBlarg()))
-					.ForMember(dto => dto.BlargPlus3, opt => opt.MapFrom(m=>m.Blarg.Plus(3)))
-					.ForMember(dto => dto.BlargMinus2, opt => opt.MapFrom(m=>m.Blarg - 2));
+					.ForMember(dto => dto.BlargPlus3, opt => opt.MapFrom(m => m.Blarg.Plus(3)))
+					.ForMember(dto => dto.BlargMinus2, opt => opt.MapFrom(m => m.Blarg - 2));
 
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
@@ -671,6 +676,69 @@ namespace AutoMapper.UnitTests
 			public void Should_override_existing_matches_for_new_mappings()
 			{
 				_result.MoreBlarg.ShouldEqual(45);
+			}
+		}
+
+
+		public class When_mapping_a_collection_to_a_more_type_specific_collection : AutoMapperSpecBase
+		{
+			private ModelDto _result;
+
+			private class Model
+			{
+				public List<Item> Items { get; set; }
+			}
+
+			private class Item
+			{
+				public string Prop { get; set; }
+			}
+
+			private class SubItem : Item
+			{
+				public string SubProp { get; set; }
+			}
+
+			private class ModelDto
+			{
+				public SubItemDto[] Items { get; set; }
+			}
+
+			private class ItemDto
+			{
+				public string Prop { get; set; }
+			}
+
+			private class SubItemDto : ItemDto
+			{
+				public string SubProp { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Model, ModelDto>();
+				Mapper.CreateMap<Item, ItemDto>();
+				Mapper.CreateMap<SubItem, SubItemDto>();
+
+				var model = new Model
+					{
+						Items = new List<Item>
+							{
+								new SubItem
+									{
+										Prop = "value1",
+										SubProp = "value2"
+									}
+							}
+					};
+				_result = Mapper.Map<Model, ModelDto>(model);
+			}
+
+			[Test]
+			public void Should_map_correctly_if_all_types_map()
+			{
+				_result.Items[0].Prop.ShouldEqual("value1");
+				_result.Items[0].SubProp.ShouldEqual("value2");
 			}
 		}
 	}

@@ -183,9 +183,12 @@ namespace AutoMapper
 
 				if (item.GetType() != sourceElementType)
 				{
-					TypeMap itemTypeMap = Configuration.FindTypeMapFor(sourceElementType, destElementType);
-
 					targetSourceType = item.GetType();
+
+					TypeMap itemTypeMap =
+						Configuration.FindTypeMapFor(sourceElementType, destElementType)
+						?? Configuration.FindTypeMapFor(targetSourceType, destElementType);
+
 					targetDestinationType = itemTypeMap.GetDerivedTypeFor(targetSourceType);
 				}
 
