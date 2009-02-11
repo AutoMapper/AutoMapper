@@ -69,6 +69,7 @@
     <Compile Include="EnumMappingFixture.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FillingExistingDestination.cs" />
     <Compile Include="General.cs" />
     <Compile Include="Initialization.cs" />
     <Compile Include="MappingExceptions.cs" />

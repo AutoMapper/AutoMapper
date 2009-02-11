@@ -12,9 +12,19 @@ namespace AutoMapper
 			return Engine.Map<TSource, TDestination>(source);
 		}
 
+		public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+		{
+			return Engine.Map(source, destination);
+		}
+
 		public static object Map(object source, Type sourceType, Type destinationType)
 		{
 			return Engine.Map(source, sourceType, destinationType);
+		}
+
+		public static object Map(object source, object destination, Type sourceType, Type destinationType)
+		{
+			return Engine.Map(source, destination, sourceType, destinationType);
 		}
 
 		public static void Initialize(Action<IConfigurationExpression> action)
@@ -101,8 +111,8 @@ namespace AutoMapper
 
 		public static void Reset()
 		{
-			lock (typeof(IConfiguration))
-				lock (typeof(IMappingEngine))
+			lock (typeof (IConfiguration))
+				lock (typeof (IMappingEngine))
 				{
 					_configuration = new Configuration();
 					_mappingEngine = new MappingEngine(_configuration);
@@ -115,7 +125,7 @@ namespace AutoMapper
 			{
 				if (_configuration == null)
 				{
-					lock (typeof(Configuration))
+					lock (typeof (Configuration))
 					{
 						if (_configuration == null)
 						{
@@ -130,7 +140,7 @@ namespace AutoMapper
 
 		private static IConfigurationExpression ConfigurationExpression
 		{
-			get { return (IConfigurationExpression)Configuration; }
+			get { return (IConfigurationExpression) Configuration; }
 		}
 
 		public static IMappingEngine Engine
@@ -139,7 +149,7 @@ namespace AutoMapper
 			{
 				if (_mappingEngine == null)
 				{
-					lock (typeof(IMappingEngine))
+					lock (typeof (IMappingEngine))
 					{
 						if (_mappingEngine == null)
 						{

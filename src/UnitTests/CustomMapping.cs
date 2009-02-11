@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
@@ -30,7 +32,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((ModelObject)source.Value).Value + 1);
+					return new ResolutionResult(((ModelObject) source.Value).Value + 1);
 				}
 			}
 
@@ -38,7 +40,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((ModelObject)source.Value).Value2fff + 2);
+					return new ResolutionResult(((ModelObject) source.Value).Value2fff + 2);
 				}
 			}
 
@@ -46,7 +48,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((ModelObject)source.Value).Value4 + 4);
+					return new ResolutionResult(((ModelObject) source.Value).Value4 + 4);
 				}
 
 				public Type GetResolvedValueType()
@@ -60,9 +62,9 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.Value, opt => opt.ResolveUsing<CustomResolver>())
 					.ForMember(dto => dto.Value2, opt => opt.ResolveUsing(new CustomResolver2()))
-					.ForMember(dto => dto.Value4, opt => opt.ResolveUsing(typeof(CustomResolver3)));
-				
-				var model = new ModelObject { Value = 42, Value2fff = 42, Value3 = 42, Value4 = 42};
+					.ForMember(dto => dto.Value4, opt => opt.ResolveUsing(typeof (CustomResolver3)));
+
+				var model = new ModelObject {Value = 42, Value2fff = 42, Value3 = 42, Value4 = 42};
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
@@ -114,7 +116,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((ModelSubObject)source.Value).SomeValue + 1);
+					return new ResolutionResult(((ModelSubObject) source.Value).SomeValue + 1);
 				}
 			}
 
@@ -122,14 +124,14 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.SomeValue, opt => opt.ResolveUsing<CustomResolver>().FromMember(m => m.Sub));
-				
+
 				var model = new ModelObject
-				{
-					Sub = new ModelSubObject
 					{
-						SomeValue = 46
-					}
-				};
+						Sub = new ModelSubObject
+							{
+								SomeValue = 46
+							}
+					};
 
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
@@ -160,7 +162,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((int)source.Value) + 5);
+					return new ResolutionResult(((int) source.Value) + 5);
 				}
 			}
 
@@ -203,7 +205,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((int)source.Value) + 5);
+					return new ResolutionResult(((int) source.Value) + 5);
 				}
 			}
 
@@ -213,9 +215,9 @@ namespace AutoMapper.UnitTests
 					.ForMember(dto => dto.Type, opt => opt.MapFrom(m => m.Type));
 
 				var model = new Source
-				{
-					Type = 5 
-				};
+					{
+						Type = 5
+					};
 
 				_result = Mapper.Map<Source, Dest>(model);
 			}
@@ -265,10 +267,10 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.CreateMap<Source, Destination>()
-					.ForMember(s => s.Value, 
-						opt => opt.ResolveUsing<CustomResolver>()
-							.FromMember(s => s.Value)
-							.ConstructedBy(() => new CustomResolver(15)));
+					.ForMember(s => s.Value,
+					           opt => opt.ResolveUsing<CustomResolver>()
+					                  	.FromMember(s => s.Value)
+					                  	.ConstructedBy(() => new CustomResolver(15)));
 
 				_source = new Source
 					{
@@ -327,15 +329,15 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.CreateMap<Source, Destination>()
 					.ForMember(s => s.Value,
-						opt => opt.ResolveUsing<CustomResolver>()
-							.ConstructedBy(() => new CustomResolver(15))
-							.FromMember(s => s.Value)
-						);
+					           opt => opt.ResolveUsing<CustomResolver>()
+					                  	.ConstructedBy(() => new CustomResolver(15))
+					                  	.FromMember(s => s.Value)
+					);
 
 				_source = new Source
-				{
-					Value = 10
-				};
+					{
+						Value = 10
+					};
 			}
 
 			protected override void Because_of()
@@ -351,5 +353,4 @@ namespace AutoMapper.UnitTests
 		}
 
 	}
-
 }

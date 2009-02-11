@@ -11,16 +11,23 @@ namespace AutoMapper
 		public Type DestinationType { get; private set; }
 		public int? ArrayIndex { get; private set; }
 		public object SourceValue { get; private set; }
+		public object DestinationValue { get; private set; }
 
 		private ResolutionContext()
 		{
 		}
 
 		public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType)
+			: this(typeMap, source, null, sourceType, destinationType)
+		{
+		}
+
+		public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType, Type destinationType)
 		{
 			SourceValueTypeMap = typeMap;
 			ContextTypeMap = typeMap;
 			SourceValue = source;
+			DestinationValue = destination;
 			if (typeMap != null)
 			{
 				SourceType = typeMap.SourceType;
@@ -59,6 +66,7 @@ namespace AutoMapper
 					PropertyMap = PropertyMap,
 					SourceType = SourceType,
 					SourceValue = sourceValue,
+					DestinationValue = DestinationValue,
 					ContextTypeMap = ContextTypeMap,
 					DestinationType = DestinationType
 				};
@@ -73,6 +81,7 @@ namespace AutoMapper
 					PropertyMap = PropertyMap,
 					SourceType = sourceType,
 					SourceValue = sourceValue,
+					DestinationValue = DestinationValue,
 					ContextTypeMap = ContextTypeMap,
 					DestinationType = DestinationType
 				};
@@ -82,14 +91,14 @@ namespace AutoMapper
 		{
 			if (memberTypeMap != null)
 				return new ResolutionContext
-				       	{
-				       		ContextTypeMap = memberTypeMap,
-							DestinationType = memberTypeMap.DestinationType,
-				       		PropertyMap = propertyMap,
-							SourceType = memberTypeMap.SourceType,
-				       		SourceValue = memberValue,
-				       		SourceValueTypeMap = memberTypeMap
-				       	};
+					{
+						ContextTypeMap = memberTypeMap,
+						DestinationType = memberTypeMap.DestinationType,
+						PropertyMap = propertyMap,
+						SourceType = memberTypeMap.SourceType,
+						SourceValue = memberValue,
+						SourceValueTypeMap = memberTypeMap
+					};
 
 			return new ResolutionContext
 				{

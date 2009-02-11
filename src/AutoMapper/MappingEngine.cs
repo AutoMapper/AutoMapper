@@ -22,10 +22,18 @@ namespace AutoMapper
 
 		public TDestination Map<TSource, TDestination>(TSource source)
 		{
-			Type modelType = typeof(TSource);
-			Type destinationType = typeof(TDestination);
+			Type modelType = typeof (TSource);
+			Type destinationType = typeof (TDestination);
 
-			return (TDestination)Map(source, modelType, destinationType);
+			return (TDestination) Map(source, modelType, destinationType);
+		}
+
+		public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+		{
+			Type modelType = typeof (TSource);
+			Type destinationType = typeof (TDestination);
+
+			return (TDestination) Map(source, destination, modelType, destinationType);
 		}
 
 		public object Map(object source, Type sourceType, Type destinationType)
@@ -33,6 +41,15 @@ namespace AutoMapper
 			TypeMap typeMap = Configuration.FindTypeMapFor(sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
+
+			return Map(context);
+		}
+
+		public object Map(object source, object destination, Type sourceType, Type destinationType)
+		{
+			TypeMap typeMap = Configuration.FindTypeMapFor(sourceType, destinationType);
+
+			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType);
 
 			return Map(context);
 		}
@@ -55,7 +72,7 @@ namespace AutoMapper
 				{
 					valueToAssign = CreateNullOrDefaultObject(context);
 				}
-				else if (context.DestinationType.Equals(typeof(string)))
+				else if (context.DestinationType.Equals(typeof (string)))
 				{
 					valueToAssign = FormatDataElement(context);
 				}
@@ -105,7 +122,7 @@ namespace AutoMapper
 
 		private static object MapEnumSource(ResolutionContext context)
 		{
-			if (context.DestinationType == typeof(string))
+			if (context.DestinationType == typeof (string))
 				return context.SourceValue.ToString();
 
 			if (context.DestinationType.IsNullableType() && context.SourceValue == null)
@@ -122,7 +139,7 @@ namespace AutoMapper
 
 		private object CreateMappedObject(ResolutionContext context)
 		{
-			object mappedObject = CreateObject(context.DestinationType);
+			object mappedObject = context.DestinationValue ?? CreateObject(context.DestinationType);
 
 			foreach (PropertyMap propertyMap in context.SourceValueTypeMap.GetPropertyMaps())
 			{
@@ -147,7 +164,7 @@ namespace AutoMapper
 
 		private object CreateArrayObject(ResolutionContext context)
 		{
-			IEnumerable<object> enumerableValue = ((IEnumerable)context.SourceValue).Cast<object>();
+			IEnumerable<object> enumerableValue = ((IEnumerable) context.SourceValue).Cast<object>();
 
 			Type sourceElementType = GetElementType(context.SourceType);
 			Type destElementType = context.DestinationType.GetElementType();
@@ -163,7 +180,7 @@ namespace AutoMapper
 				if (item.GetType() != sourceElementType)
 				{
 					TypeMap itemTypeMap = Configuration.FindTypeMapFor(sourceElementType, destElementType);
-					
+
 					targetSourceType = item.GetType();
 					targetDestinationType = itemTypeMap.GetDerivedTypeFor(targetSourceType);
 				}
@@ -186,8 +203,8 @@ namespace AutoMapper
 		private object CreateNullOrDefaultObject(ResolutionContext context)
 		{
 			object valueToAssign;
-		
-			if (context.DestinationType == typeof(string))
+
+			if (context.DestinationType == typeof (string))
 			{
 				valueToAssign = FormatDataElement(context.CreateValueContext(null));
 			}
@@ -199,7 +216,7 @@ namespace AutoMapper
 			}
 			else
 			{
-				valueToAssign = Activator.CreateInstance(context.DestinationType, true);
+				valueToAssign = context.DestinationValue ?? Activator.CreateInstance(context.DestinationType, true);
 			}
 
 			return valueToAssign;
@@ -208,7 +225,7 @@ namespace AutoMapper
 		private string FormatDataElement(ResolutionContext context)
 		{
 			IValueFormatter valueFormatter = context.ContextTypeMap != null
-												? Configuration.GetValueFormatter(context.ContextTypeMap.Profile)
+			                                 	? Configuration.GetValueFormatter(context.ContextTypeMap.Profile)
 			                                 	: Configuration.GetValueFormatter();
 
 			return valueFormatter.FormatValue(context);
@@ -221,7 +238,7 @@ namespace AutoMapper
 				return enumerableType.GetElementType();
 			}
 
-			if (enumerableType.IsGenericType && enumerableType.GetGenericTypeDefinition().Equals(typeof(IEnumerable<>)))
+			if (enumerableType.IsGenericType && enumerableType.GetGenericTypeDefinition().Equals(typeof (IEnumerable<>)))
 			{
 				return enumerableType.GetGenericArguments()[0];
 			}
@@ -232,7 +249,7 @@ namespace AutoMapper
 				return ienumerableType.GetGenericArguments()[0];
 			}
 
-			if (typeof(IEnumerable).IsAssignableFrom(enumerableType))
+			if (typeof (IEnumerable).IsAssignableFrom(enumerableType))
 			{
 				return typeof (object);
 			}
