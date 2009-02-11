@@ -149,6 +149,7 @@ namespace AutoMapper
 		{
 			var badTypeMaps =
 				from typeMap in _typeMaps
+				where typeMap.CustomMapper == null
 				let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
 				where unmappedPropertyNames.Length > 0
 				select new {typeMap, unmappedPropertyNames};

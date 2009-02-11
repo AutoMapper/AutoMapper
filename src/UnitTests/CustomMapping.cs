@@ -400,5 +400,43 @@ namespace AutoMapper.UnitTests
 				_dest.Value.ShouldEqual(20);
 			}
 		}
+
+		public class When_specifying_a_custom_translator_with_mismatched_properties : AutoMapperSpecBase
+		{
+			public class Source
+			{
+				public int Value1 { get; set; }
+				public int AnotherValue { get; set; }
+			}
+
+			public class Destination
+			{
+				public int Value2 { get; set; }
+			}
+			
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>()
+					.ExecutedWith(s => new Destination {Value2 = s.Value1 + 10});
+			}
+
+			[Test]
+			public void Should_pass_all_configuration_checks()
+			{
+				Exception thrown = null;
+				try
+				{
+					Mapper.AssertConfigurationIsValid();
+
+				}
+				catch (Exception ex)
+				{
+					thrown = ex;
+				}
+
+				thrown.ShouldBeNull();
+			}
+		}
+
 	}
 }

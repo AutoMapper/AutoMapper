@@ -13,11 +13,8 @@ namespace AutoMapper
 		}
 
 		public ResolutionResult(object value)
+			: this(value, typeof(object))
 		{
-			Value = value;
-			Type = value == null
-			       	? typeof (object)
-			       	: value.GetType();
 		}
 
 		public object Value { get; private set; }

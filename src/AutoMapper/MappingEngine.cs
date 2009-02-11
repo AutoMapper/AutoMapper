@@ -68,10 +68,6 @@ namespace AutoMapper
 				{
 					valueToAssign = CreateMappedObject(context);
 				}
-				else if (context.SourceType.IsEnum)
-				{
-					valueToAssign = MapEnumSource(context);
-				}
 				else if (context.SourceValue == null)
 				{
 					valueToAssign = CreateNullOrDefaultObject(context);
@@ -80,9 +76,9 @@ namespace AutoMapper
 				{
 					valueToAssign = FormatDataElement(context);
 				}
-				else if (context.DestinationType.IsAssignableFrom(context.SourceType))
+				else if (context.SourceType.IsEnum)
 				{
-					valueToAssign = context.SourceValue;
+					valueToAssign = MapEnumSource(context);
 				}
 				else if ((context.DestinationType.IsArray) && (context.SourceValue is IEnumerable))
 				{
@@ -91,6 +87,10 @@ namespace AutoMapper
 				else if (context.SourceType.IsNullableType())
 				{
 					valueToAssign = MapNullableType(context);
+				}
+				else if (context.DestinationType.IsAssignableFrom(context.SourceType))
+				{
+					valueToAssign = context.SourceValue;
 				}
 				else
 				{
@@ -126,19 +126,19 @@ namespace AutoMapper
 
 		private static object MapEnumSource(ResolutionContext context)
 		{
-			if (context.DestinationType == typeof (string))
-				return context.SourceValue.ToString();
+			Type enumDestType = context.DestinationType;
 
-			if (context.DestinationType.IsNullableType() && context.SourceValue == null)
-				return null;
+			if (context.DestinationType.IsNullableType()) 
+			{
+				enumDestType = context.DestinationType.GetGenericArguments()[0];
+			}
 
-			if (!context.DestinationType.IsEnum)
+			if (!enumDestType.IsEnum)
+			{
 				throw new AutoMapperMappingException(context, "Cannot map an Enum source type to a non-Enum destination type.");
+			}
 
-			if (context.SourceValue == null)
-				return CreateObject(context.DestinationType);
-
-			return Enum.Parse(context.DestinationType, Enum.GetName(context.SourceType, context.SourceValue));
+			return Enum.Parse(enumDestType, Enum.GetName(context.SourceType, context.SourceValue));
 		}
 
 		private object CreateMappedObject(ResolutionContext context)

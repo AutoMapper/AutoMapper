@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AutoMapper
 {
-	public class ValueFormatter : IValueFormatter
+	internal class ValueFormatter : IValueFormatter
 	{
 		private readonly IFormatterConfiguration _formatterConfiguration;
 
@@ -16,22 +16,25 @@ namespace AutoMapper
 		{
 			Type valueType = context.SourceType;
 			object valueToFormat = context.SourceValue;
-			IFormatterConfiguration typeSpecificFormatterConfig;
+			IFormatterConfiguration typeSpecificFormatterConfig = null;
 			string formattedValue = context.SourceValue.ToNullSafeString();
 
-			foreach (IValueFormatter formatter in context.PropertyMap.GetFormatters())
+			if (context.PropertyMap != null)
 			{
-				formattedValue = formatter.FormatValue(context.CreateValueContext(valueToFormat));
-				valueToFormat = formattedValue;
-			}
-			
-			if (_formatterConfiguration.GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
-			{
-				if (!context.PropertyMap.FormattersToSkipContains(typeSpecificFormatterConfig.GetType()))
+				foreach (IValueFormatter formatter in context.PropertyMap.GetFormatters())
 				{
-					var typeSpecificFormatter = new ValueFormatter(typeSpecificFormatterConfig);
-					formattedValue = typeSpecificFormatter.FormatValue(context);
+					formattedValue = formatter.FormatValue(context.CreateValueContext(valueToFormat));
 					valueToFormat = formattedValue;
+				}
+
+				if (_formatterConfiguration.GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
+				{
+					if (!context.PropertyMap.FormattersToSkipContains(typeSpecificFormatterConfig.GetType()))
+					{
+						var typeSpecificFormatter = new ValueFormatter(typeSpecificFormatterConfig);
+						formattedValue = typeSpecificFormatter.FormatValue(context);
+						valueToFormat = formattedValue;
+					}
 				}
 			}
 

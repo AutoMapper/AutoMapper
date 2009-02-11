@@ -4,8 +4,7 @@ using System.Linq;
 
 namespace AutoMapper
 {
-
-	public class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator
+	internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator
 	{
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();

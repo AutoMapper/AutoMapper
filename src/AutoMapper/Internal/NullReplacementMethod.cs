@@ -2,7 +2,7 @@ using System;
 
 namespace AutoMapper
 {
-	public class NullReplacementMethod : IValueResolver
+	internal class NullReplacementMethod : IValueResolver
 	{
 		private readonly object _nullSubstitute;
 

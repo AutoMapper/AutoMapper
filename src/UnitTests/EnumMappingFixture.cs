@@ -29,6 +29,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(Status.InProgress);
 		}
 
+		
 		[Test]
 		public void ShouldMapEnumByMatchingNames()
 		{
@@ -57,6 +58,48 @@ namespace AutoMapper.Tests
 			var dto = Mapper.Map<Order, OrderDtoWithOwnStatus>(order);
 
 			dto.Status.ShouldEqual(StatusForDto.InProgress);
+		}
+
+		[Test]
+		public void ShouldMapSharedNullableEnum() 
+		{
+			Mapper.CreateMap<OrderWithNullableStatus, OrderDtoWithNullableStatus>();
+
+			var order = new OrderWithNullableStatus {
+				Status = Status.InProgress
+			};
+
+			var dto = Mapper.Map<OrderWithNullableStatus, OrderDtoWithNullableStatus>(order);
+
+			dto.Status.ShouldEqual(Status.InProgress);
+		}
+
+		[Test]
+		public void ShouldMapNullableEnumByMatchingValues() 
+		{
+			Mapper.CreateMap<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>();
+
+			var order = new OrderWithNullableStatus {
+				Status = Status.InProgress
+			};
+
+			var dto = Mapper.Map<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>(order);
+
+			dto.Status.ShouldEqual(StatusForDto.InProgress);
+		}
+
+		[Test]
+		public void ShouldMapNullableEnumToNullWhenSourceEnumIsNull() 
+		{
+			Mapper.CreateMap<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>();
+
+			var order = new OrderWithNullableStatus {
+				Status = null
+			};
+
+			var dto = Mapper.Map<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>(order);
+
+			dto.Status.ShouldBeNull();
 		}
 
 		[Test]
@@ -119,6 +162,21 @@ namespace AutoMapper.Tests
 		public class OrderDtoWithOwnStatus
 		{
 			public StatusForDto Status { get; set; }
+		}
+
+		public class OrderWithNullableStatus 
+		{
+			public Status? Status { get; set; }
+		}
+
+		public class OrderDtoWithNullableStatus 
+		{
+			public Status? Status { get; set; }
+		}
+
+		public class OrderDtoWithOwnNullableStatus 
+		{
+			public StatusForDto? Status { get; set; }
 		}
 
 		public class DtoStatusValueResolver : IValueResolver

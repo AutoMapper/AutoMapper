@@ -124,8 +124,6 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				base.Because_of();
-
 				_result = Mapper.Map<SomeEnum, string>(SomeEnum.Two, "test");
 			}
 
