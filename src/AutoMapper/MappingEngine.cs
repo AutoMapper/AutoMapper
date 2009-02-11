@@ -60,7 +60,11 @@ namespace AutoMapper
 			{
 				object valueToAssign;
 
-				if (context.SourceValueTypeMap != null)
+				if (context.SourceValueTypeMap != null && context.SourceValueTypeMap.CustomMapper != null)
+				{
+					valueToAssign = context.SourceValueTypeMap.CustomMapper(context.SourceValue);
+				}
+				else if (context.SourceValueTypeMap != null)
 				{
 					valueToAssign = CreateMappedObject(context);
 				}

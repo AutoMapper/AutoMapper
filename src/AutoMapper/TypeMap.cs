@@ -21,6 +21,7 @@ namespace AutoMapper
 		public Type SourceType { get; private set; }
 		public Type DestinationType { get; private set; }
 		public string Profile { get; set; }
+		public Func<object, object> CustomMapper { get; private set; }
 
 		public PropertyMap[] GetPropertyMaps()
 		{
@@ -68,6 +69,11 @@ namespace AutoMapper
 			}
 
 			return _includedDerivedTypes[derivedSourceType];
+		}
+
+		public void UseCustomMapper(Func<object, object> customMapper)
+		{
+			CustomMapper = customMapper;
 		}
 	}
 }

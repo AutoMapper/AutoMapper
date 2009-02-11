@@ -110,17 +110,22 @@ namespace AutoMapper
 			_propertyMap.Ignore();
 		}
 
+		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
+		{
+			_propertyMap.RemoveLastFormatter();
+			_propertyMap.AddFormatter(new DeferredInstantiatedFormatter(instantiator));
+		}
+
+		public void ExecutedWith(Func<TSource, TDestination> mappingFunction)
+		{
+			_typeMap.UseCustomMapper(source => mappingFunction((TSource) source));
+		}
+
 		private void ForDestinationMember(PropertyInfo destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
 
 			memberOptions(this);
-		}
-
-		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
-		{
-			_propertyMap.RemoveLastFormatter();
-			_propertyMap.AddFormatter(new DeferredInstantiatedFormatter(instantiator));
 		}
 	}
 }
