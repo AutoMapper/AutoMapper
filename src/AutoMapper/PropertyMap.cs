@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace AutoMapper
 {
@@ -16,12 +15,12 @@ namespace AutoMapper
 		private IValueResolver _customMemberResolver;
 		private object _nullSubstitute;
 
-		public PropertyMap(PropertyInfo destinationProperty)
+		public PropertyMap(IMemberAccessor destinationProperty)
 		{
 			DestinationProperty = destinationProperty;
 		}
 
-		public PropertyInfo DestinationProperty { get; private set; }
+		public IMemberAccessor DestinationProperty { get; private set; }
 
 		public IEnumerable<IValueResolver> GetSourceValueResolvers()
 		{

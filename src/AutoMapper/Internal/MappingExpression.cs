@@ -17,7 +17,7 @@ namespace AutoMapper
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
 		                                                           Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
-			PropertyInfo destProperty = ReflectionHelper.FindProperty(destinationMember);
+			IMemberAccessor destProperty = ReflectionHelper.FindProperty(destinationMember);
 			ForDestinationMember(destProperty, memberOptions);
 			return new MappingExpression<TSource, TDestination>(_typeMap);
 		}
@@ -121,7 +121,7 @@ namespace AutoMapper
 			_typeMap.UseCustomMapper(source => mappingFunction((TSource) source));
 		}
 
-		private void ForDestinationMember(PropertyInfo destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
+		private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
 

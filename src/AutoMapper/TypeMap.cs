@@ -38,13 +38,13 @@ namespace AutoMapper
 			var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
 				.Select(pm => pm.DestinationProperty.Name);
 
-			return DestinationType.GetPublicGetProperties()
+			return DestinationType.GetPublicReadAccessors()
 							.Select(p => p.Name)
 							.Except(autoMappedProperties)
 							.ToArray();
 		}
 
-		public PropertyMap FindOrCreatePropertyMapFor(PropertyInfo destinationProperty)
+		public PropertyMap FindOrCreatePropertyMapFor(IMemberAccessor destinationProperty)
 		{
 			var propertyMap = _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
 			if (propertyMap == null)

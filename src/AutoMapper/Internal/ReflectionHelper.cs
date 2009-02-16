@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -13,12 +14,12 @@ namespace AutoMapper
 			return getMethods.FirstOrDefault(m => (String.Compare(m.Name, getName, StringComparison.Ordinal) == 0) || (String.Compare(m.Name, nameToSearch, StringComparison.Ordinal) == 0));
 		}
 
-		public static PropertyInfo FindModelPropertyByName(PropertyInfo[] modelProperties, string nameToSearch)
+		public static IMemberAccessor FindModelPropertyByName(IMemberAccessor[] modelProperties, string nameToSearch)
 		{
 			return modelProperties.FirstOrDefault(prop => String.Compare(prop.Name, nameToSearch, StringComparison.Ordinal) == 0);
 		}
 
-		public static PropertyInfo FindProperty(LambdaExpression lambdaExpression)
+		public static IMemberAccessor FindProperty(LambdaExpression lambdaExpression)
 		{
 			Expression expressionToCheck = lambdaExpression;
 
@@ -35,8 +36,10 @@ namespace AutoMapper
 						expressionToCheck = lambdaExpression.Body;
 						break;
 					case ExpressionType.MemberAccess:
-						var propertyInfo = ((MemberExpression) expressionToCheck).Member as PropertyInfo;
-						return propertyInfo;
+						MemberInfo member = ((MemberExpression) expressionToCheck).Member;
+                        if (member is FieldInfo) return new FieldAccessor((FieldInfo) member);
+                        if (member is PropertyInfo) return new PropertyAccessor((PropertyInfo) member);
+                        return null;
 					default:
 						done = true;
 						break;
@@ -58,13 +61,42 @@ namespace AutoMapper
 					.ToArray();
 			}
 
-			public static PropertyInfo[] GetPublicGetProperties(this Type type)
-			{
-				return type.FindMembers(MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance,
-				                        (m, f) => ((PropertyInfo) m).CanRead, null)
-					.Cast<PropertyInfo>()
-					.ToArray();
-			}
+            public static IMemberAccessor[] GetPublicReadAccessors(this Type type)
+            {
+                MemberInfo[] members = type.FindMembers(MemberTypes.Property | MemberTypes.Field,
+                                                         BindingFlags.Instance | BindingFlags.Public,
+                                                         (m, f) =>
+                                                         m is FieldInfo ||
+                                                         (m is PropertyInfo && ((PropertyInfo) m).CanRead),null);
+                
+                var accessors = new IMemberAccessor[members.Length];
+                for (int i = 0; i < members.Length; i++)
+                    accessors[i] = members[i].ToMemberAccessor();
+                return accessors;
+
+            }
+
+            public static IMemberAccessor GetAccessor(this Type targetType,string accessorName,BindingFlags bindingFlags)
+            {
+                MemberInfo[] members = targetType.GetMember(accessorName, bindingFlags);
+                return
+                    members.FirstOrDefault(member => member is PropertyInfo || member is FieldInfo)
+                    .ToMemberAccessor();
+            }
+
+            public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
+            {
+                if (accessorCandidate == null)
+                    return null;
+
+                if (accessorCandidate is PropertyInfo)
+                    return new PropertyAccessor((PropertyInfo) accessorCandidate);
+
+                if (accessorCandidate is FieldInfo)
+                    return new FieldAccessor((FieldInfo) accessorCandidate);
+
+                return null;
+            }
 		}
 	}
 }

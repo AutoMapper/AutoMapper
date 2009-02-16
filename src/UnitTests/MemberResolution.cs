@@ -284,6 +284,203 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_mapping_dto_with_only_fields : AutoMapperSpecBase
+        {
+            private ModelDto _result;
+
+            public class ModelObject
+            {
+                public DateTime BaseDate;
+                public ModelSubObject Sub;
+                public ModelSubObject Sub2;
+                public ModelSubObject SubWithExtraName;
+                public ModelSubObject SubMissing;
+            }
+
+            public class ModelSubObject
+            {
+                public string ProperName;
+                public ModelSubSubObject SubSub;
+            }
+
+            public class ModelSubSubObject
+            {
+                public string IAmACoolProperty;
+            }
+
+            public class ModelDto
+            {
+                public DateTime BaseDate;
+                public DateTime BaseDate2;
+                public string SubProperName;
+                public string Sub2ProperName;
+                public string SubWithExtraNameProperName;
+                public string SubSubSubIAmACoolProperty;
+                public string SubMissingSubSubIAmACoolProperty;            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Reset();
+
+                var model = new ModelObject
+                {
+                    BaseDate = new DateTime(2007, 4, 5),
+                    Sub = new ModelSubObject
+                    {
+                        ProperName = "Some name",
+                        SubSub = new ModelSubSubObject
+                        {
+                            IAmACoolProperty = "Cool daddy-o"
+                        }
+                    },
+                    Sub2 = new ModelSubObject
+                    {
+                        ProperName = "Sub 2 name"
+                    },
+                    SubWithExtraName = new ModelSubObject
+                    {
+                        ProperName = "Some other name"
+                    },
+                    SubMissing = new ModelSubObject
+                    {
+                        ProperName = "I have a missing sub sub object"
+                    }
+                };
+
+                Mapper.CreateMap<ModelObject, ModelDto>();
+                _result = Mapper.Map<ModelObject, ModelDto>(model);
+            }
+
+            [Test]
+            public void Should_map_item_in_first_level_of_hierarchy()
+            {
+                _result.BaseDate.ShouldEqual(new DateTime(2007, 4, 5));
+            }
+
+            [Test]
+            public void Should_map_a_member_with_a_number()
+            {
+                _result.Sub2ProperName.ShouldEqual("Sub 2 name");
+            }
+
+            [Test]
+            public void Should_map_item_in_second_level_of_hierarchy()
+            {
+                _result.SubProperName.ShouldEqual("Some name");
+            }
+
+            [Test]
+            public void Should_map_item_with_more_items_in_property_name()
+            {
+                _result.SubWithExtraNameProperName.ShouldEqual("Some other name");
+            }
+
+            [Test]
+            public void Should_map_item_in_any_level_of_depth_in_the_hierarchy()
+            {
+                _result.SubSubSubIAmACoolProperty.ShouldEqual("Cool daddy-o");
+            }
+        }
+
+        public class When_mapping_dto_with_fields_and_properties : AutoMapperSpecBase
+        {
+            private ModelDto _result;
+
+            public class ModelObject
+            {
+                public DateTime BaseDate { get; set;}
+                public ModelSubObject Sub;
+                public ModelSubObject Sub2 { get; set;}
+                public ModelSubObject SubWithExtraName;
+                public ModelSubObject SubMissing { get; set; }
+            }
+
+            public class ModelSubObject
+            {
+                public string ProperName { get; set;}
+                public ModelSubSubObject SubSub;
+            }
+
+            public class ModelSubSubObject
+            {
+                public string IAmACoolProperty { get; set;}
+            }
+
+            public class ModelDto
+            {
+                public DateTime BaseDate;
+                public DateTime BaseDate2 { get; set;}
+                public string SubProperName;
+                public string Sub2ProperName { get; set;}
+                public string SubWithExtraNameProperName;
+                public string SubSubSubIAmACoolProperty;
+                public string SubMissingSubSubIAmACoolProperty { get; set;}
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Reset();
+
+                var model = new ModelObject
+                {
+                    BaseDate = new DateTime(2007, 4, 5),
+                    Sub = new ModelSubObject
+                    {
+                        ProperName = "Some name",
+                        SubSub = new ModelSubSubObject
+                        {
+                            IAmACoolProperty = "Cool daddy-o"
+                        }
+                    },
+                    Sub2 = new ModelSubObject
+                    {
+                        ProperName = "Sub 2 name"
+                    },
+                    SubWithExtraName = new ModelSubObject
+                    {
+                        ProperName = "Some other name"
+                    },
+                    SubMissing = new ModelSubObject
+                    {
+                        ProperName = "I have a missing sub sub object"
+                    }
+                };
+
+                Mapper.CreateMap<ModelObject, ModelDto>();
+                _result = Mapper.Map<ModelObject, ModelDto>(model);
+            }
+
+            [Test]
+            public void Should_map_item_in_first_level_of_hierarchy()
+            {
+                _result.BaseDate.ShouldEqual(new DateTime(2007, 4, 5));
+            }
+
+            [Test]
+            public void Should_map_a_member_with_a_number()
+            {
+                _result.Sub2ProperName.ShouldEqual("Sub 2 name");
+            }
+
+            [Test]
+            public void Should_map_item_in_second_level_of_hierarchy()
+            {
+                _result.SubProperName.ShouldEqual("Some name");
+            }
+
+            [Test]
+            public void Should_map_item_with_more_items_in_property_name()
+            {
+                _result.SubWithExtraNameProperName.ShouldEqual("Some other name");
+            }
+
+            [Test]
+            public void Should_map_item_in_any_level_of_depth_in_the_hierarchy()
+            {
+                _result.SubSubSubIAmACoolProperty.ShouldEqual("Cool daddy-o");
+            }
+        }
+
 		public class When_ignoring_a_dto_property_during_configuration : AutoMapperSpecBase
 		{
 			private TypeMap[] _allTypeMaps;

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using AutoMapper.Internal;
 using AutoMapper.ReflectionExtensions;
 
 namespace AutoMapper
@@ -21,9 +22,9 @@ namespace AutoMapper
 		{
 			var typeMap = new TypeMap(_sourceType, _destinationType);
 
-			PropertyInfo[] destProperties = _destinationType.GetPublicGetProperties();
+			IMemberAccessor[] destProperties = _destinationType.GetPublicReadAccessors();
 
-			foreach (PropertyInfo destProperty in destProperties)
+			foreach (IMemberAccessor destProperty in destProperties)
 			{
 				var propertyMap = new PropertyMap(destProperty);
 
@@ -37,7 +38,7 @@ namespace AutoMapper
 
 		private static bool MapDestinationPropertyToSource(PropertyMap propertyMap, Type sourceType, string nameToSearch)
 		{
-			PropertyInfo[] sourceProperties = sourceType.GetPublicGetProperties();
+			IMemberAccessor[] sourceProperties = sourceType.GetPublicReadAccessors();
 			MethodInfo[] sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
 
 			IValueResolver IValueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch);
@@ -55,7 +56,7 @@ namespace AutoMapper
 				{
 					NameSnippet snippet = CreateNameSnippet(matches, i);
 
-					TypeMember valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First);
+					IMemberAccessor valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First);
 
 					if (valueResolver == null)
 					{
@@ -64,7 +65,7 @@ namespace AutoMapper
 
 					propertyMap.ChainResolver(valueResolver);
 
-					foundMatch = MapDestinationPropertyToSource(propertyMap, valueResolver.GetResolvedValueType(), snippet.Second);
+					foundMatch = MapDestinationPropertyToSource(propertyMap, valueResolver.MemberType, snippet.Second);
 
 					if (foundMatch)
 					{
@@ -82,15 +83,15 @@ namespace AutoMapper
 			return foundMatch;
 		}
 
-		private static TypeMember FindTypeMember(PropertyInfo[] modelProperties, MethodInfo[] getMethods, string nameToSearch)
+		private static IMemberAccessor FindTypeMember(IMemberAccessor[] modelProperties, MethodInfo[] getMethods, string nameToSearch)
 		{
-			PropertyInfo pi = ReflectionHelper.FindModelPropertyByName(modelProperties, nameToSearch);
+			IMemberAccessor pi = ReflectionHelper.FindModelPropertyByName(modelProperties, nameToSearch);
 			if (pi != null)
-				return new PropertyMember(pi);
+				return pi;
 
 			MethodInfo mi = ReflectionHelper.FindModelMethodByName(getMethods, nameToSearch);
 			if (mi != null)
-				return new MethodMember(mi);
+				return new MethodAccessor(mi);
 
 			return null;
 		}

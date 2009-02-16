@@ -103,7 +103,7 @@ namespace AutoMapper
 			return new ResolutionContext
 				{
 					ContextTypeMap = ContextTypeMap,
-					DestinationType = propertyMap.DestinationProperty.PropertyType,
+					DestinationType = propertyMap.DestinationProperty.MemberType,
 					PropertyMap = propertyMap,
 					SourceType = sourceMemberType,
 					SourceValue = memberValue,

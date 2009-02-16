@@ -46,6 +46,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -54,8 +56,13 @@
     <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
     <Compile Include="Internal\DeferredInstantiatedResolver.cs" />
     <Compile Include="Internal\ExpressionValueFormatter.cs" />
+    <Compile Include="Internal\FieldAccessor.cs" />
     <Compile Include="Internal\FormatterCtorExpression.cs" />
     <Compile Include="IFormatterConfiguration.cs" />
+    <Compile Include="Internal\MemberAccessorBase.cs" />
+    <Compile Include="Internal\MethodAccessor.cs" />
+    <Compile Include="Internal\PropertyAccessor.cs" />
+    <Compile Include="IMemberAccessor.cs" />
     <Compile Include="ISelfProfiler.cs" />
     <Compile Include="AutoMapperConfigurationException.cs" />
     <Compile Include="Mapper.cs" />
@@ -70,13 +77,11 @@
     <Compile Include="IValueResolver.cs" />
     <Compile Include="MappingEngine.cs" />
     <Compile Include="Internal\MappingExpression.cs" />
-    <Compile Include="Internal\MethodMember.cs" />
     <Compile Include="Internal\DelegateBasedResolver.cs" />
     <Compile Include="Internal\NullReplacementMethod.cs" />
     <Compile Include="Internal\PrimitiveExtensions.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="PropertyMap.cs" />
-    <Compile Include="Internal\PropertyMember.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
@@ -85,6 +90,7 @@
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
     <Compile Include="Internal\ValueFormatter.cs" />
+    <Compile Include="ValueResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AutoMapper.snk" />

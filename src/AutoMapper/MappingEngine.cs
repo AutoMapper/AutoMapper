@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using AutoMapper.ReflectionExtensions;
 
 namespace AutoMapper
 {
@@ -111,16 +112,16 @@ namespace AutoMapper
 
 		private object MapNullableType(ResolutionContext context)
 		{
-			PropertyInfo hasValueProp = context.SourceType.GetProperty("HasValue", BindingFlags.Public | BindingFlags.ExactBinding | BindingFlags.Instance);
-			PropertyInfo valueProp = context.SourceType.GetProperty("Value", BindingFlags.Public | BindingFlags.ExactBinding | BindingFlags.Instance);
+			IMemberAccessor hasValueProp = context.SourceType.GetAccessor("HasValue", BindingFlags.Public | BindingFlags.ExactBinding | BindingFlags.Instance);
+			IMemberAccessor valueProp = context.SourceType.GetAccessor("Value", BindingFlags.Public | BindingFlags.ExactBinding | BindingFlags.Instance);
 			Type sourceType = context.SourceType.GetGenericArguments()[0];
 
-			var hasValue = (bool) hasValueProp.GetValue(context.SourceValue, new object[0]);
+			var hasValue = (bool) hasValueProp.GetValue(context.SourceValue);
 			object value = null;
 
 			if (hasValue)
 			{
-				value = valueProp.GetValue(context.SourceValue, new object[0]);
+				value = valueProp.GetValue(context.SourceValue);
 			}
 
 			var newContext = context.CreateValueContext(value, sourceType);
@@ -158,13 +159,13 @@ namespace AutoMapper
 
 				var result = propertyMap.ResolveValue(context.SourceValue);
 
-				var memberTypeMap = Configuration.FindTypeMapFor(result.Type, propertyMap.DestinationProperty.PropertyType);
+				var memberTypeMap = Configuration.FindTypeMapFor(result.Type, propertyMap.DestinationProperty.MemberType);
 
 				var newContext = context.CreateMemberContext(memberTypeMap, result.Value, result.Type, propertyMap);
 
 				object propertyValueToAssign = Map(newContext);
 
-				propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign, new object[0]);
+				propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
 			}
 
 			return mappedObject;
