@@ -27,7 +27,7 @@ namespace AutoMapper
 
 		public AutoMapperConfigurationException(TypeMap typeMap, string[] unmappedPropertyNames)
 			: base(string.Format(
-					"The following {3} properties on {0} are not mapped: \n\t{2}\nAdd a custom mapping expression or rename the property on {1}.",
+					"The following {3} properties on {0} are not mapped: \n\t{2}\nAdd a custom mapping expression, ignore, or rename the property on {1}.",
 					typeMap.DestinationType.Name, typeMap.SourceType.Name, string.Join("\n\t", unmappedPropertyNames),
 					unmappedPropertyNames.Length))
 		{

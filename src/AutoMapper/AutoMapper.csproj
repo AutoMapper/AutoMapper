@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
+    <Compile Include="IMappingEngineRunner.cs" />
     <Compile Include="Internal\DefaultResolver.cs" />
     <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
     <Compile Include="Internal\DeferredInstantiatedResolver.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="Internal\MethodAccessor.cs" />
     <Compile Include="Internal\PropertyAccessor.cs" />
     <Compile Include="IMemberAccessor.cs" />
+    <Compile Include="IObjectMapper.cs" />
     <Compile Include="ISelfProfiler.cs" />
     <Compile Include="AutoMapperConfigurationException.cs" />
     <Compile Include="Mapper.cs" />
@@ -75,6 +77,16 @@
     <Compile Include="IMappingExpression.cs" />
     <Compile Include="IValueFormatter.cs" />
     <Compile Include="IValueResolver.cs" />
+    <Compile Include="Mappers\ArrayMapper.cs" />
+    <Compile Include="Mappers\CustomTypeMapMapper.cs" />
+    <Compile Include="Mappers\EnumerableMapper.cs" />
+    <Compile Include="Mappers\EnumMapper.cs" />
+    <Compile Include="Mappers\AssignableMapper.cs" />
+    <Compile Include="Mappers\NewOrDefaultMapper.cs" />
+    <Compile Include="Mappers\NullableMapper.cs" />
+    <Compile Include="Mappers\StringMapper.cs" />
+    <Compile Include="Mappers\TypeHelper.cs" />
+    <Compile Include="Mappers\TypeMapMapper.cs" />
     <Compile Include="MappingEngine.cs" />
     <Compile Include="Internal\MappingExpression.cs" />
     <Compile Include="Internal\DelegateBasedResolver.cs" />

@@ -1,4 +1,5 @@
 using System;
+using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
@@ -114,9 +115,28 @@ namespace AutoMapper
 			lock (typeof (IConfiguration))
 				lock (typeof (IMappingEngine))
 				{
-					_configuration = new Configuration();
-					_mappingEngine = new MappingEngine(_configuration);
+					_configuration = null;
+					_mappingEngine = null;
 				}
+		}
+
+		public static IMappingEngine Engine
+		{
+			get
+			{
+				if (_mappingEngine == null)
+				{
+					lock (typeof(IMappingEngine))
+					{
+						if (_mappingEngine == null)
+						{
+							_mappingEngine = new MappingEngine(Configuration, BuildMappers());
+						}
+					}
+				}
+
+				return _mappingEngine;
+			}
 		}
 
 		private static IConfiguration Configuration
@@ -143,23 +163,20 @@ namespace AutoMapper
 			get { return (IConfigurationExpression) Configuration; }
 		}
 
-		public static IMappingEngine Engine
+		private static IObjectMapper[] BuildMappers()
 		{
-			get
-			{
-				if (_mappingEngine == null)
+			return new IObjectMapper[]
 				{
-					lock (typeof (IMappingEngine))
-					{
-						if (_mappingEngine == null)
-						{
-							_mappingEngine = new MappingEngine(Configuration);
-						}
-					}
-				}
-
-				return _mappingEngine;
-			}
+					new CustomTypeMapMapper(),
+					new TypeMapMapper(),
+					new NewOrDefaultMapper(),
+					new StringMapper(),
+					new EnumMapper(),
+					new ArrayMapper(),
+					new EnumerableMapper(),
+					new NullableMapper(),
+					new AssignableMapper()
+				};
 		}
 	}
 }

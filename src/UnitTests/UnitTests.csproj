@@ -73,6 +73,7 @@
     <Compile Include="FillingExistingDestination.cs" />
     <Compile Include="General.cs" />
     <Compile Include="Initialization.cs" />
+    <Compile Include="InterfaceMapping.cs" />
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MemberResolution.cs" />
     <Compile Include="Profiles.cs" />
