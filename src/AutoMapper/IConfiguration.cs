@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 namespace AutoMapper
 {
@@ -10,6 +11,7 @@ namespace AutoMapper
 		IValueFormatter GetValueFormatter();
 		IValueFormatter GetValueFormatter(string profileName);
 		void AssertConfigurationIsValid();
+		IObjectMapper[] GetMappers();
 	}
 
 }

@@ -2,15 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using AutoMapper.Internal;
+using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
 	public class Configuration : IConfiguration, IConfigurationExpression
 	{
+		private readonly IObjectMapper[] _mappers;
 		internal const string DefaultProfileName = "";
 
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
 		private readonly IDictionary<string, FormatterExpression> _formatters = new Dictionary<string, FormatterExpression>();
+
+		public Configuration(IObjectMapper[] mappers)
+		{
+			_mappers = mappers;
+		}
 
 		public IProfileExpression CreateProfile(string profileName)
 		{
@@ -51,7 +59,7 @@ namespace AutoMapper
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
-			TypeMap typeMap = CreateTypeMap(typeof(TSource), typeof(TDestination));
+			TypeMap typeMap = CreateTypeMap(typeof (TSource), typeof (TDestination));
 			return new MappingExpression<TSource, TDestination>(typeMap);
 		}
 
@@ -104,11 +112,11 @@ namespace AutoMapper
 			TypeMap typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
 			if (typeMap != null)
 				return typeMap;
-			
+
 			typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
 			if (typeMap != null)
 				return typeMap;
-			
+
 			foreach (var sourceInterface in sourceType.GetInterfaces())
 			{
 				typeMap = ((IConfiguration) this).FindTypeMapFor(sourceInterface, destinationType);
@@ -118,21 +126,21 @@ namespace AutoMapper
 					if (derivedTypeFor != null)
 					{
 						CreateTypeMap(sourceType, derivedTypeFor);
-						return ((IConfiguration)this).FindTypeMapFor(sourceType, derivedTypeFor);
+						return ((IConfiguration) this).FindTypeMapFor(sourceType, derivedTypeFor);
 					}
 					return typeMap;
 				}
 			}
 
 			if (sourceType.BaseType != null)
-				return ((IConfiguration)this).FindTypeMapFor(sourceType.BaseType, destinationType);
-            
+				return ((IConfiguration) this).FindTypeMapFor(sourceType.BaseType, destinationType);
+
 			return typeMap;
 		}
 
 		TypeMap IConfiguration.FindTypeMapFor<TSource, TDestination>()
 		{
-			return ((IConfiguration)this).FindTypeMapFor(typeof(TSource), typeof(TDestination));
+			return ((IConfiguration) this).FindTypeMapFor(typeof (TSource), typeof (TDestination));
 		}
 
 		IValueFormatter IConfiguration.GetValueFormatter()
@@ -160,11 +168,39 @@ namespace AutoMapper
 			{
 				throw new AutoMapperConfigurationException(firstBadTypeMap.typeMap, firstBadTypeMap.unmappedPropertyNames);
 			}
+
+			foreach (var typeMap in _typeMaps)
+			{
+				foreach (var propertyMap in typeMap.GetPropertyMaps())
+				{
+					var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessorBase);
+
+					if (lastResolver != null)
+					{
+						var sourceType = ((MemberAccessorBase) lastResolver).MemberType;
+						var destinationType = propertyMap.DestinationProperty.MemberType;
+						var customTypeMap = ((IConfiguration) this).FindTypeMapFor(destinationType, sourceType);
+						var context = new ResolutionContext(customTypeMap, null, sourceType, destinationType);
+
+						IObjectMapper mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
+
+						if (mapperToUse == null)
+						{
+							throw new AutoMapperConfigurationException();
+						}
+					}
+				}
+			}
+		}
+
+		public IObjectMapper[] GetMappers()
+		{
+			return _mappers;
 		}
 
 		private void SelfProfile(Type type)
 		{
-			var selfProfiler = (ISelfProfiler)Activator.CreateInstance(type, true);
+			var selfProfiler = (ISelfProfiler) Activator.CreateInstance(type, true);
 			Profile profile = selfProfiler.GetProfile();
 
 			AddProfile(profile);
@@ -173,8 +209,8 @@ namespace AutoMapper
 		private static IEnumerable<Type> GetSelfProfilers(Assembly assembly)
 		{
 			return from t in assembly.GetTypes()
-				   where typeof(ISelfProfiler).IsAssignableFrom(t) && !t.IsAbstract
-				   select t;
+			       where typeof (ISelfProfiler).IsAssignableFrom(t) && !t.IsAbstract
+			       select t;
 		}
 
 		internal FormatterExpression GetProfile(string profileName)

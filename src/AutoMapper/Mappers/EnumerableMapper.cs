@@ -50,7 +50,7 @@ namespace AutoMapper.Mappers
 
 		public bool IsMatch(ResolutionContext context)
 		{
-			return (context.DestinationType.IsEnumerableType()) && (context.SourceValue is IEnumerable);
+			return (context.DestinationType.IsEnumerableType()) && (context.SourceType.IsEnumerableType());
 		}
 	}
 }

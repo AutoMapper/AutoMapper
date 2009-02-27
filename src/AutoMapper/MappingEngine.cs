@@ -1,16 +1,15 @@
 using System;
+using System.Linq;
 
 namespace AutoMapper
 {
 	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
 		private readonly IConfiguration _configuration;
-		private readonly IObjectMapper[] _mappers;
 
-		public MappingEngine(IConfiguration configuration, IObjectMapper[] mappers)
+		public MappingEngine(IConfiguration configuration)
 		{
 			_configuration = configuration;
-			_mappers = mappers;
 		}
 
 		public IConfiguration Configuration
@@ -56,16 +55,7 @@ namespace AutoMapper
 		{
 			try
 			{
-				IObjectMapper mapperToUse = null;
-
-				foreach (var mapper in _mappers)
-				{
-					if (mapper.IsMatch(context))
-					{
-						mapperToUse = mapper;
-						break;
-					}
-				}
+				IObjectMapper mapperToUse = Configuration.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
 
 				if (mapperToUse == null)
 				{

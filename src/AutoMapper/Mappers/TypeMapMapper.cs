@@ -1,3 +1,5 @@
+using System;
+
 namespace AutoMapper.Mappers
 {
 	public class TypeMapMapper : IObjectMapper
@@ -19,9 +21,16 @@ namespace AutoMapper.Mappers
 
 				var newContext = context.CreateMemberContext(memberTypeMap, result.Value, result.Type, propertyMap);
 
-				object propertyValueToAssign = mapper.Map(newContext);
+				try
+				{
+					object propertyValueToAssign = mapper.Map(newContext);
+					propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+				}
+				catch (Exception ex)
+				{
+					throw new AutoMapperMappingException(newContext, ex);
+				}
 
-				propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
 			}
 
 			return mappedObject;

@@ -73,6 +73,31 @@ namespace AutoMapper.UnitTests
 				_typeMap.GetUnmappedPropertyNames().Length.ShouldEqual(0);
 			}
 		}
+	
+		public class When_testing_a_dto_with_matching_member_names_but_mismatched_types : AutoMapperSpecBase
+		{
+			private class Source
+			{
+				public int Value { get; set; }
+			}
+
+			private class Destination
+			{
+				public decimal Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+			}
+
+			[Test]
+			public void Should_fail_a_configuration_check()
+			{
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
+		}
+
 	}
 
 }

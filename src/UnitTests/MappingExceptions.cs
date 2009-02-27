@@ -21,7 +21,6 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.CreateMap<Source, Dest>();
-				Mapper.AssertConfigurationIsValid();
 			}
 
 			[Test]

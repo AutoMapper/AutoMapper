@@ -41,9 +41,9 @@ namespace AutoMapper
 			IMemberAccessor[] sourceProperties = sourceType.GetPublicReadAccessors();
 			MethodInfo[] sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
 
-			IValueResolver IValueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch);
+			IValueResolver resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch);
 
-			bool foundMatch = IValueResolver != null;
+			bool foundMatch = resolver != null;
 
 			if (!foundMatch)
 			{
@@ -77,7 +77,7 @@ namespace AutoMapper
 			}
 			else
 			{
-				propertyMap.ChainResolver(IValueResolver);
+				propertyMap.ChainResolver(resolver);
 			}
 
 			return foundMatch;

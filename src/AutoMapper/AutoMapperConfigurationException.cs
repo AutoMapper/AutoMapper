@@ -33,6 +33,13 @@ namespace AutoMapper
 		{
 		}
 
+		public AutoMapperConfigurationException(TypeMap typeMap, string mismatchedPropertyName)
+			: base(string.Format(
+					"The following property on {0} is cannot be mapped: \n\t{2}\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
+					typeMap.DestinationType.Name, typeMap.SourceType.Name, mismatchedPropertyName))
+		{
+		}
+
 		protected AutoMapperConfigurationException(
 			SerializationInfo info,
 			StreamingContext context) : base(info, context)

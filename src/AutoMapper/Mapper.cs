@@ -130,7 +130,7 @@ namespace AutoMapper
 					{
 						if (_mappingEngine == null)
 						{
-							_mappingEngine = new MappingEngine(Configuration, BuildMappers());
+							_mappingEngine = new MappingEngine(Configuration);
 						}
 					}
 				}
@@ -149,7 +149,7 @@ namespace AutoMapper
 					{
 						if (_configuration == null)
 						{
-							_configuration = new Configuration();
+							_configuration = new Configuration(BuildMappers());
 						}
 					}
 				}
