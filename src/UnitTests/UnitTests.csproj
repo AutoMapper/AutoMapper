@@ -76,10 +76,11 @@
     <Compile Include="InterfaceMapping.cs" />
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MemberResolution.cs" />
+    <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="SelfConfiguration.cs" />
     <Compile Include="TesterExtensions.cs" />
-    <Compile Include="Testing.cs" />
+    <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="ResolutionContextTester.cs" />
   </ItemGroup>
   <ItemGroup>

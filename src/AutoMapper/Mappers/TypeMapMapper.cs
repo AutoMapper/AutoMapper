@@ -6,6 +6,13 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+			var profileConfiguration = mapper.Configuration.GetProfileConfiguration(context.SourceValueTypeMap.Profile);
+
+			if (context.SourceValue == null && profileConfiguration.MapNullSourceValuesAsNull)
+			{
+				return null;
+			}
+
 			object mappedObject = context.DestinationValue ?? mapper.CreateObject(context.DestinationType);
 
 			foreach (PropertyMap propertyMap in context.SourceValueTypeMap.GetPropertyMaps())

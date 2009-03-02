@@ -4,11 +4,16 @@ using System.Linq;
 
 namespace AutoMapper
 {
-	internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator
+	internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IProfileConfiguration
 	{
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
+
+		public bool AllowNullDestinationValues
+		{
+			get; set;
+		}
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
@@ -71,6 +76,11 @@ namespace AutoMapper
 		{
 			_formatters.RemoveAt(_formatters.Count - 1);
 			_formatters.Add(new DeferredInstantiatedFormatter(instantiator));
+		}
+
+		public bool MapNullSourceValuesAsNull
+		{
+			get { return AllowNullDestinationValues; }
 		}
 	}
 

@@ -1,9 +1,10 @@
+using System;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
 namespace AutoMapper.UnitTests
 {
-	public class Testing
+	namespace ConfigurationValidation
 	{
 		public class When_testing_a_dto_with_mismatched_members : AutoMapperSpecBase
 		{
@@ -95,6 +96,57 @@ namespace AutoMapper.UnitTests
 			public void Should_fail_a_configuration_check()
 			{
 				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
+		}
+
+		public class When_testing_a_dto_with_member_type_mapped_mappings : AutoMapperSpecBase
+		{
+			private AutoMapperConfigurationException _exception;
+
+			private class Source
+			{
+				public int Value { get; set; }
+				public OtherSource Other { get; set; }
+			}
+
+			private class OtherSource
+			{
+				public int Value { get; set; }
+			}
+
+			private class Destination
+			{
+				public int Value { get; set; }
+				public OtherDest Other { get; set; }
+			}
+
+			private class OtherDest
+			{
+				public int Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+				Mapper.CreateMap<OtherSource, OtherDest>();
+			}
+
+			protected override void Because_of()
+			{
+				try
+				{
+					Mapper.AssertConfigurationIsValid();
+				}
+				catch (AutoMapperConfigurationException ex)
+				{
+					_exception = ex;
+				}
+			}
+
+			[Test]
+			public void Should_pass_a_configuration_check()
+			{
+				_exception.ShouldBeNull();
 			}
 		}
 

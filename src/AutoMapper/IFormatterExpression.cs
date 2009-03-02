@@ -11,6 +11,7 @@ namespace AutoMapper
 		void AddFormatExpression(Func<ResolutionContext, string> formatExpression);
 		void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
 		IFormatterExpression ForSourceType<TSource>();
+		bool AllowNullDestinationValues { get; set; }
 	}
 
 	public interface IFormatterCtorExpression

@@ -52,6 +52,7 @@ namespace AutoMapper.UnitTests
 				protected override void DescribeConfiguration(IMappingExpression<Source, Destination> map)
 				{
 					map.ForMember(x => x.ConfiguredProperty, o => o.MapFrom(x => x.Property));
+					map.ForMember(x => x.AllowNullDestinationValues, o => o.Ignore());
 				}
 			}
 		}

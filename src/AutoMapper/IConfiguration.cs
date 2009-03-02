@@ -3,13 +3,12 @@ using System.Collections;
 
 namespace AutoMapper
 {
-	public interface IConfiguration
+	public interface IConfiguration : IProfileConfiguration
 	{
 		TypeMap[] GetAllTypeMaps();
 		TypeMap FindTypeMapFor(Type sourceType, Type destinationType);
 		TypeMap FindTypeMapFor<TSource, TDestination>();
-		IValueFormatter GetValueFormatter();
-		IValueFormatter GetValueFormatter(string profileName);
+		IFormatterConfiguration GetProfileConfiguration(string profileName);
 		void AssertConfigurationIsValid();
 		IObjectMapper[] GetMappers();
 	}

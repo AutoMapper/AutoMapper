@@ -8,7 +8,13 @@ namespace AutoMapper.Mappers
 		{
 			object valueToAssign;
 
-			if (context.DestinationType == typeof(string))
+			var mapNullSourceValuesAsNull = MapSourceValuesAsNull(context, mapper);
+
+			if (mapNullSourceValuesAsNull)
+			{
+				valueToAssign = null;
+			}
+			else if (context.DestinationType == typeof(string))
 			{
 				valueToAssign = mapper.FormatValue(context.CreateValueContext(null));
 			}
@@ -24,6 +30,15 @@ namespace AutoMapper.Mappers
 			}
 
 			return valueToAssign;
+		}
+
+		private bool MapSourceValuesAsNull(ResolutionContext context, IMappingEngineRunner mapper)
+		{
+			var typeMap = context.SourceValueTypeMap ?? context.ContextTypeMap;
+			if (typeMap != null)
+				return mapper.Configuration.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
+
+			return mapper.Configuration.MapNullSourceValuesAsNull;
 		}
 
 		public bool IsMatch(ResolutionContext context)

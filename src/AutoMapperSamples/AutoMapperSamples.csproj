@@ -48,6 +48,7 @@
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Flattening.cs" />
     <Compile Include="Lists.cs" />
+    <Compile Include="NestedMappings.cs" />
     <Compile Include="Projection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

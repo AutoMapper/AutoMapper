@@ -20,6 +20,17 @@ namespace AutoMapper
 			_mappers = mappers;
 		}
 
+		public bool AllowNullDestinationValues
+		{
+			get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
+			set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }
+		}
+
+		bool IProfileConfiguration.MapNullSourceValuesAsNull
+		{
+			get { return AllowNullDestinationValues; }
+		}
+
 		public IProfileExpression CreateProfile(string profileName)
 		{
 			var profileExpression = new Profile(profileName);
@@ -143,14 +154,9 @@ namespace AutoMapper
 			return ((IConfiguration) this).FindTypeMapFor(typeof (TSource), typeof (TDestination));
 		}
 
-		IValueFormatter IConfiguration.GetValueFormatter()
+		IFormatterConfiguration IConfiguration.GetProfileConfiguration(string profileName)
 		{
-			return new ValueFormatter(GetProfile(DefaultProfileName));
-		}
-
-		IValueFormatter IConfiguration.GetValueFormatter(string profileName)
-		{
-			return new ValueFormatter(GetProfile(profileName));
+			return GetProfile(profileName);
 		}
 
 		void IConfiguration.AssertConfigurationIsValid()
@@ -179,14 +185,14 @@ namespace AutoMapper
 					{
 						var sourceType = ((MemberAccessorBase) lastResolver).MemberType;
 						var destinationType = propertyMap.DestinationProperty.MemberType;
-						var customTypeMap = ((IConfiguration) this).FindTypeMapFor(destinationType, sourceType);
+						var customTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceType, destinationType);
 						var context = new ResolutionContext(customTypeMap, null, sourceType, destinationType);
 
 						IObjectMapper mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
 
 						if (mapperToUse == null)
 						{
-							throw new AutoMapperConfigurationException();
+							throw new AutoMapperConfigurationException(typeMap, propertyMap.DestinationProperty.Name);
 						}
 					}
 				}
