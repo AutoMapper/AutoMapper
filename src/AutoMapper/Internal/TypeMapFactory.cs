@@ -47,7 +47,7 @@ namespace AutoMapper
 
 			if (!foundMatch)
 			{
-				string[] matches = Regex.Matches(nameToSearch, "[A-Z][a-z0-9]*")
+				string[] matches = Regex.Matches(nameToSearch, @"\p{Lu}[\p{Ll}0-9]*")
 					.Cast<Match>()
 					.Select(m => m.Value)
 					.ToArray();

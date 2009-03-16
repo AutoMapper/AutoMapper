@@ -74,6 +74,7 @@
     <Compile Include="General.cs" />
     <Compile Include="Initialization.cs" />
     <Compile Include="InterfaceMapping.cs" />
+    <Compile Include="Internationalization.cs" />
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MemberResolution.cs" />
     <Compile Include="NullBehavior.cs" />
