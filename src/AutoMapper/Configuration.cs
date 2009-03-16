@@ -179,20 +179,23 @@ namespace AutoMapper
 			{
 				foreach (var propertyMap in typeMap.GetPropertyMaps())
 				{
-					var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessorBase);
-
-					if (lastResolver != null)
+					if (!propertyMap.IsIgnored())
 					{
-						var sourceType = ((MemberAccessorBase) lastResolver).MemberType;
-						var destinationType = propertyMap.DestinationProperty.MemberType;
-						var customTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceType, destinationType);
-						var context = new ResolutionContext(customTypeMap, null, sourceType, destinationType);
+						var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessorBase);
 
-						IObjectMapper mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
-
-						if (mapperToUse == null)
+						if (lastResolver != null)
 						{
-							throw new AutoMapperConfigurationException(typeMap, propertyMap.DestinationProperty.Name);
+							var sourceType = ((MemberAccessorBase) lastResolver).MemberType;
+							var destinationType = propertyMap.DestinationProperty.MemberType;
+							var customTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceType, destinationType);
+							var context = new ResolutionContext(customTypeMap, null, sourceType, destinationType);
+
+							IObjectMapper mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
+
+							if (mapperToUse == null)
+							{
+								throw new AutoMapperConfigurationException(typeMap, propertyMap.DestinationProperty.Name);
+							}
 						}
 					}
 				}

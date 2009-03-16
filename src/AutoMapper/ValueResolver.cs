@@ -9,6 +9,6 @@ namespace AutoMapper
 			       	: new ResolutionResult(ResolveCore((TSource) source.Value), typeof(TDestination));
 		}
 
-		protected abstract TDestination ResolveCore(TSource model);
+		protected abstract TDestination ResolveCore(TSource source);
 	}
 }

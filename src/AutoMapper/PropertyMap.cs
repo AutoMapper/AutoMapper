@@ -65,7 +65,7 @@ namespace AutoMapper
 
 		public void AddFormatterToSkip<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			_valueFormattersToSkip.Add(typeof(TValueFormatter));
+			_valueFormattersToSkip.Add(typeof (TValueFormatter));
 		}
 
 		public bool FormattersToSkipContains(Type valueFormatterType)
@@ -104,6 +104,11 @@ namespace AutoMapper
 		public void Ignore()
 		{
 			_ignored = true;
+		}
+
+		public bool IsIgnored()
+		{
+			return _ignored;
 		}
 
 		public bool IsMapped()

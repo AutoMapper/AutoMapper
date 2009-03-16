@@ -150,6 +150,47 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_testing_a_dto_with_matched_members_but_mismatched_types_that_are_ignored : AutoMapperSpecBase
+		{
+			private AutoMapperConfigurationException _exception;
+
+			private class ModelObject
+			{
+				public string Foo { get; set; }
+				public string Bar { get; set; }
+			}
+
+			private class ModelDto
+			{
+				public string Foo { get; set; }
+				public int Bar { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<ModelObject, ModelDto>()
+					  .ForMember(dest => dest.Bar, opt => opt.Ignore());
+			}
+
+			protected override void Because_of()
+			{
+				try
+				{
+					Mapper.AssertConfigurationIsValid();
+				}
+				catch (AutoMapperConfigurationException ex)
+				{
+					_exception = ex;
+				}
+			}
+
+			[Test]
+			public void Should_pass_a_configuration_check()
+			{
+				_exception.ShouldBeNull();
+			}
+		}
+
 	}
 
 }

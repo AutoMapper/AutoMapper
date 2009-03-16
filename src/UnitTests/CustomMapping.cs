@@ -258,9 +258,9 @@ namespace AutoMapper.UnitTests
 					_toAdd = 10;
 				}
 
-				protected override int ResolveCore(int model)
+				protected override int ResolveCore(int source)
 				{
-					return model + _toAdd;
+					return source + _toAdd;
 				}
 			}
 
@@ -319,9 +319,9 @@ namespace AutoMapper.UnitTests
 					_toAdd = 10;
 				}
 
-				protected override int ResolveCore(int model)
+				protected override int ResolveCore(int source)
 				{
-					return model + _toAdd;
+					return source + _toAdd;
 				}
 			}
 
