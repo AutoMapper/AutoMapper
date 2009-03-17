@@ -64,6 +64,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
     <Compile Include="AutoMapperTester.cs" />
+    <Compile Include="BidirectionalRelationships.cs" />
     <Compile Include="ConfigurationResolution.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />

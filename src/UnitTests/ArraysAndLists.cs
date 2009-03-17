@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using NUnit.Framework;
 using NBehave.Spec.NUnit;
 
@@ -250,6 +251,44 @@ namespace AutoMapper.UnitTests
 				_destination.Values.ShouldContain("2");
 				_destination.Values.ShouldContain("3");
 				_destination.Values.ShouldContain("4");
+			}
+		}
+
+		public class When_mapping_to_a_custom_list_with_the_same_type : AutoMapperSpecBase
+		{
+			private Destination _destination;
+			private Source _source;
+
+			public class ValueCollection : Collection<int>
+			{
+				
+			}
+
+			public class Source
+			{
+				public ValueCollection Values { get; set; }
+			}
+
+			public class Destination
+			{
+				public ValueCollection Values { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+			}
+
+			protected override void Because_of()
+			{
+				_source = new Source { Values = new ValueCollection { 1, 2, 3, 4 } };
+				_destination = Mapper.Map<Source, Destination>(_source);
+			}
+
+			[Test]
+			public void Should_assign_the_value_directly()
+			{
+				_destination.Values.ShouldBeTheSameAs(_source.Values);
 			}
 		}
 	}

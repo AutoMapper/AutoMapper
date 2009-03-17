@@ -172,10 +172,10 @@ namespace AutoMapper
 					new NewOrDefaultMapper(),
 					new StringMapper(),
 					new EnumMapper(),
+					new AssignableMapper(),
 					new ArrayMapper(),
 					new EnumerableMapper(),
 					new NullableMapper(),
-					new AssignableMapper()
 				};
 		}
 	}
