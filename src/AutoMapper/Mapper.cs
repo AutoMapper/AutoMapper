@@ -174,6 +174,7 @@ namespace AutoMapper
 					new EnumMapper(),
 					new AssignableMapper(),
 					new ArrayMapper(),
+					new DictionaryMapper(),
 					new EnumerableMapper(),
 					new NullableMapper(),
 				};

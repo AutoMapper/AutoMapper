@@ -20,5 +20,10 @@ namespace AutoMapper
 		{
 			return type.GetInterfaces().Contains(typeof (IEnumerable));
 		}
+
+		public static bool IsDictionaryType(this Type type)
+		{
+			return type.GetInterface("IDictionary`2") != null;
+		}
 	}
 }

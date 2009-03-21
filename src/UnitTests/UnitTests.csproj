@@ -68,6 +68,7 @@
     <Compile Include="ConfigurationResolution.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
+    <Compile Include="Dictionaries.cs" />
     <Compile Include="EnumMappingFixture.cs">
       <SubType>Code</SubType>
     </Compile>
