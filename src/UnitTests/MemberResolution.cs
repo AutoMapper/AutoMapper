@@ -876,7 +876,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-
 		public class When_mapping_a_collection_to_a_more_type_specific_collection : AutoMapperSpecBase
 		{
 			private ModelDto _result;
@@ -938,6 +937,45 @@ namespace AutoMapper.UnitTests
 				_result.Items[0].SubProp.ShouldEqual("value2");
 			}
 		}
+	
+		public class When_mapping_to_a_top_level_camelCased_destination_member : SpecBase
+		{
+			private Destination _result;
+
+			private class Source
+			{
+				public int SomeValueWithPascalName { get; set; }
+			}
+
+			private class Destination
+			{
+				public int someValueWithPascalName { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+			}
+
+			protected override void Because_of()
+			{
+				var source = new Source {SomeValueWithPascalName = 5};
+				_result = Mapper.Map<Source, Destination>(source);
+			}
+
+			[Test]
+			public void Should_match_to_PascalCased_source_member()
+			{
+				_result.someValueWithPascalName.ShouldEqual(5);
+			}
+
+			[Test]
+			public void Should_pass_configuration_check()
+			{
+				Mapper.AssertConfigurationIsValid();
+			}
+		}
+
 	}
 
 	public static class MapFromExtensions

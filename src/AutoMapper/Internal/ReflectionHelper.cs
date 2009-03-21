@@ -11,12 +11,12 @@ namespace AutoMapper
 		public static MethodInfo FindModelMethodByName(MethodInfo[] getMethods, string nameToSearch)
 		{
 			string getName = "Get" + nameToSearch;
-			return getMethods.FirstOrDefault(m => (String.Compare(m.Name, getName, StringComparison.Ordinal) == 0) || (String.Compare(m.Name, nameToSearch, StringComparison.Ordinal) == 0));
+			return getMethods.FirstOrDefault(m => (NameMatches(m.Name, getName)) || NameMatches(m.Name, nameToSearch));
 		}
 
 		public static IMemberAccessor FindModelPropertyByName(IMemberAccessor[] modelProperties, string nameToSearch)
 		{
-			return modelProperties.FirstOrDefault(prop => String.Compare(prop.Name, nameToSearch, StringComparison.Ordinal) == 0);
+			return modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch));
 		}
 
 		public static IMemberAccessor FindProperty(LambdaExpression lambdaExpression)
@@ -47,6 +47,11 @@ namespace AutoMapper
 			}
 
 			return null;
+		}
+
+		private static bool NameMatches(string memberName, string nameToMatch)
+		{
+			return String.Compare(memberName, nameToMatch, StringComparison.OrdinalIgnoreCase) == 0;
 		}
 	}
 
