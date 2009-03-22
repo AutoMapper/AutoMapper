@@ -1,7 +1,20 @@
 <?xml version="1.0" ?>
 <project name="AutoMapper" default="test" xmlns="http://nant.sf.net/schemas/nant.xsd">
 	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="release" />
+	<property name="src.dir" value="src" />
+
 	<property name="nant.settings.currentframework" value="net-3.5" />
+	<property name="svn.executable" value="tools/subversion/svn.exe" dynamic="true" if="${not property::exists('svn.executable')}" />
+
+	<property name="revisionnumber" value="9999" dynamic="true"/>
+	<property name="project.fullversion" value="0.2.1.${revisionnumber}" dynamic="true"/>
+	<property name="svnargs" value=" --non-interactive " />
+
+	<target name="test" depends="compile, run-unit-tests"
+		description="Compile and Run Tests" />
+
+	<target name="full" depends="clean, commonassemblyinfo, test, dist" description="Compiles, tests, and produces distributions" />
 
 	<!-- User targets -->
 	<target name="clean" description="Delete Automated Build artifacts">
@@ -9,24 +22,50 @@
 	</target>
 
 	<target name="compile" description="Compiles using the AutomatedDebug Configuration">
-		<msbuild project="src\AutoMapper.sln">
-			<property name="verbosity" value="Quiet" />
-			<property name="Configuration" value="AutomatedDebug" />
-		</msbuild>
+		<exec program="${framework::get-framework-directory(framework::get-target-framework())}\msbuild.exe"
+				  commandline="src\AutoMapper.sln /t:Clean /t:Build /p:Configuration=AutomatedDebug /v:q /nologo" workingdir="." />
 	</target>
 
-	<target name="test" depends="compile, run-unit-tests" 
-		description="Compile and Run Tests" />
-		
-	<target name="full" depends="clean, test, dist"	description="Compiles, tests, and produces distributions" />
+	<target name="commonassemblyinfo">
+		<exec failonerror="false" program="${svn.executable}" commandline="info release --xml --revision HEAD ${svnargs}" output="svninfo.xml" append="false" verbose="false"/>
+		<xmlpeek failonerror="false" file="svninfo.xml" xpath="/info/entry/@revision" property="revisionnumber"/>
+
+		<property name="revisionnumber" value="${int::parse(revisionnumber) + 1}"/>
+		<echo message="Current SVN Revision: ${revisionnumber}"/>
+
+		<echo message="MARKING THIS BUILD AS VERSION ${project.fullversion}" />
+		<delete file="${src.dir}/CommonAssemblyInfo.cs" failonerror="false"/>
+		<asminfo output="${src.dir}/CommonAssemblyInfo.cs" language="CSharp">
+			<imports>
+				<import namespace="System" />
+				<import namespace="System.Reflection" />
+				<import namespace="System.Runtime.InteropServices" />
+			</imports>
+			<attributes>
+				<attribute type="ComVisibleAttribute" value="false" />
+				<attribute type="AssemblyVersionAttribute" value="${project.fullversion}" />
+				<attribute type="AssemblyFileVersionAttribute" value="${project.fullversion}" />
+				<attribute type="AssemblyCopyrightAttribute" value="Copyright Â© Jimmy Bogard 2008-${datetime::get-year(datetime::now())}" />
+				<attribute type="AssemblyProductAttribute" value="${project::get-name()}" />
+				<attribute type="AssemblyCompanyAttribute" value="" />
+				<attribute type="AssemblyConfigurationAttribute" value="Debug" />
+				<attribute type="AssemblyInformationalVersionAttribute" value="${project.fullversion}" />
+			</attributes>
+			<references>
+				<include name="System.dll" />
+			</references>
+		</asminfo>
+	</target>
+
 
 	<!-- Internal targets -->
 	<target name="run-unit-tests">
-		<mkdir dir="${build.dir}\test-reports" />
+		<mkdir dir="${build.dir}\results" />
 		<exec program="tools\nunit\nunit-console.exe" 
 			workingdir="${build.dir}\Debug\UnitTests">
-			<arg value="/xml &quot;..\..\test-reports\UnitTests.xml&quot;" />
+			<arg value="/xml &quot;..\..\results\UnitTests.xml&quot;" />
 			<arg value="/nologo" />
+			<arg value="/nodots" />
 			<arg value="&quot;AutoMapper.UnitTests.dll&quot;" />
 		</exec>
 	</target>
@@ -38,7 +77,7 @@
 				<exclude name="**\*.pdb" />
 			</fileset>
 		</copy>
-		<zip zipfile="${build.dir}\AutoMapper.zip">
+		<zip zipfile="${dist.dir}\AutoMapper.zip">
 			<fileset basedir="${build.dir}\dist">
 				<include name="**\*" />
 			</fileset>
