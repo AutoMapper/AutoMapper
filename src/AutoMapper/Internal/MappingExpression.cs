@@ -8,12 +8,14 @@ namespace AutoMapper
 	{
 		private readonly TypeMap _typeMap;
 		private readonly Func<Type, IValueFormatter> _formatterCtor;
+		private readonly Func<Type, IValueResolver> _resolverCtor;
 		private PropertyMap _propertyMap;
 
-		public MappingExpression(TypeMap typeMap, Func<Type, IValueFormatter> formatterCtor)
+		public MappingExpression(TypeMap typeMap, Func<Type, IValueFormatter> formatterCtor, Func<Type, IValueResolver> resolverCtor)
 		{
 			_typeMap = typeMap;
 			_formatterCtor = formatterCtor;
+			_resolverCtor = resolverCtor;
 		}
 
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
@@ -21,7 +23,7 @@ namespace AutoMapper
 		{
 			IMemberAccessor destProperty = ReflectionHelper.FindProperty(destinationMember);
 			ForDestinationMember(destProperty, memberOptions);
-			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor);
+			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor);
 		}
 
 		public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
@@ -79,7 +81,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
 		{
-			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver) Activator.CreateInstance(typeof (TValueResolver), true));
+			var resolver = new DeferredInstantiatedResolver(() => _resolverCtor(typeof(TValueResolver)));
 
 			ResolveUsing(resolver);
 
@@ -88,7 +90,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
 		{
-			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver) Activator.CreateInstance(valueResolverType, true));
+			var resolver = new DeferredInstantiatedResolver(() => _resolverCtor(valueResolverType));
 
 			ResolveUsing(resolver);
 

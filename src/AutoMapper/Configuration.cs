@@ -15,6 +15,7 @@ namespace AutoMapper
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
 		private readonly IDictionary<string, FormatterExpression> _formatters = new Dictionary<string, FormatterExpression>();
 		private Func<Type, IValueFormatter> _formatterCtor = type => (IValueFormatter)Activator.CreateInstance(type, true);
+		private Func<Type, IValueResolver> _resolverCtor = type => (IValueResolver)Activator.CreateInstance(type, true);
 
 		public Configuration(IObjectMapper[] mappers)
 		{
@@ -74,10 +75,15 @@ namespace AutoMapper
 			_formatterCtor = constructor;
 		}
 
+		public void ConstructResolversUsing(Func<Type, IValueResolver> constructor)
+		{
+			_resolverCtor = constructor;
+		}
+
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
 			TypeMap typeMap = CreateTypeMap(typeof (TSource), typeof (TDestination));
-			return new MappingExpression<TSource, TDestination>(typeMap, _formatterCtor);
+			return new MappingExpression<TSource, TDestination>(typeMap, _formatterCtor, _resolverCtor);
 		}
 
 		public TypeMap CreateTypeMap(Type source, Type destination)

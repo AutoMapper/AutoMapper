@@ -38,5 +38,6 @@ namespace AutoMapper
 		void AddProfile<TProfile>() where TProfile : Profile, new();
 		void SelfConfigure(Assembly assembly);
 		void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor);
+		void ConstructResolversUsing(Func<Type, IValueResolver> constructor);
 	}
 }
