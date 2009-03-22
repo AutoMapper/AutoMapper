@@ -35,6 +35,34 @@ namespace AutoMapper
 			return (TDestination) Map(source, destination, modelType, destinationType);
 		}
 
+		public TDestination DynamicMap<TSource, TDestination>(TSource source)
+		{
+			Type modelType = typeof(TSource);
+			Type destinationType = typeof(TDestination);
+
+			return (TDestination)DynamicMap(source, modelType, destinationType);
+		}
+
+		public TDestination DynamicMap<TDestination>(object source)
+		{
+			Type modelType = source == null ? typeof(object) : source.GetType();
+			Type destinationType = typeof(TDestination);
+
+			return (TDestination)DynamicMap(source, modelType, destinationType);
+		}
+
+		public object DynamicMap(object source, Type sourceType, Type destinationType)
+		{
+			var typeMap = Configuration.FindTypeMapFor(sourceType, destinationType);
+			if (typeMap == null)
+			{
+				typeMap = Configuration.CreateTypeMap(sourceType, destinationType);
+				Configuration.AssertConfigurationIsValid(typeMap);
+			}
+
+			return Map(source, sourceType, destinationType);
+		}
+
 		public object Map(object source, Type sourceType, Type destinationType)
 		{
 			TypeMap typeMap = Configuration.FindTypeMapFor(sourceType, destinationType);

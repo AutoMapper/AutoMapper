@@ -74,7 +74,7 @@ namespace AutoMapper
 			return new MappingExpression<TSource, TDestination>(typeMap);
 		}
 
-		private TypeMap CreateTypeMap(Type source, Type destination)
+		public TypeMap CreateTypeMap(Type source, Type destination)
 		{
 			var typeMapFactory = new TypeMapFactory(source, destination);
 			TypeMap typeMap = typeMapFactory.CreateTypeMap();
@@ -159,6 +159,15 @@ namespace AutoMapper
 			return GetProfile(profileName);
 		}
 
+		void IConfiguration.AssertConfigurationIsValid(TypeMap typeMap)
+		{
+			if (typeMap.GetUnmappedPropertyNames().Length > 0)
+			{
+				throw new AutoMapperConfigurationException(typeMap, typeMap.GetUnmappedPropertyNames());
+			}
+			DryRunTypeMap(typeMap);
+		}
+
 		void IConfiguration.AssertConfigurationIsValid()
 		{
 			var badTypeMaps =
@@ -177,25 +186,30 @@ namespace AutoMapper
 
 			foreach (var typeMap in _typeMaps)
 			{
-				foreach (var propertyMap in typeMap.GetPropertyMaps())
+				DryRunTypeMap(typeMap);
+			}
+		}
+
+		private void DryRunTypeMap(TypeMap typeMap)
+		{
+			foreach (var propertyMap in typeMap.GetPropertyMaps())
+			{
+				if (!propertyMap.IsIgnored())
 				{
-					if (!propertyMap.IsIgnored())
+					var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessorBase);
+
+					if (lastResolver != null)
 					{
-						var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessorBase);
+						var sourceType = ((MemberAccessorBase) lastResolver).MemberType;
+						var destinationType = propertyMap.DestinationProperty.MemberType;
+						var customTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceType, destinationType);
+						var context = new ResolutionContext(customTypeMap, null, sourceType, destinationType);
 
-						if (lastResolver != null)
+						IObjectMapper mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
+
+						if (mapperToUse == null)
 						{
-							var sourceType = ((MemberAccessorBase) lastResolver).MemberType;
-							var destinationType = propertyMap.DestinationProperty.MemberType;
-							var customTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceType, destinationType);
-							var context = new ResolutionContext(customTypeMap, null, sourceType, destinationType);
-
-							IObjectMapper mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
-
-							if (mapperToUse == null)
-							{
-								throw new AutoMapperConfigurationException(typeMap, propertyMap.DestinationProperty.Name);
-							}
+							throw new AutoMapperConfigurationException(typeMap, propertyMap.DestinationProperty.Name);
 						}
 					}
 				}

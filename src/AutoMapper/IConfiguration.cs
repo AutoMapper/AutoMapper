@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 
 namespace AutoMapper
 {
@@ -10,7 +9,9 @@ namespace AutoMapper
 		TypeMap FindTypeMapFor<TSource, TDestination>();
 		IFormatterConfiguration GetProfileConfiguration(string profileName);
 		void AssertConfigurationIsValid();
+		void AssertConfigurationIsValid(TypeMap typeMap);
 		IObjectMapper[] GetMappers();
+		TypeMap CreateTypeMap(Type sourceType, Type destinationType);
 	}
 
 }
