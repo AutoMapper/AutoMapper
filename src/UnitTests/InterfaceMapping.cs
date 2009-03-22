@@ -71,5 +71,43 @@ namespace AutoMapper.UnitTests
 				_result.Child.ChildProperty.ShouldEqual("child property value");
 			}
 		}
+	
+		public class When_mapping_a_concrete_type_to_an_interface_type : AutoMapperSpecBase
+		{
+			private IDestination _result;
+
+			private class Source
+			{
+				public int Value { get; set; }
+			}
+
+			public interface IDestination
+			{
+				int Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, IDestination>();
+			}
+
+			protected override void Because_of()
+			{
+				_result = Mapper.Map<Source, IDestination>(new Source {Value = 5});
+			}
+
+			[Test]
+			public void Should_create_an_implementation_of_the_interface()
+			{
+				_result.Value.ShouldEqual(5);
+			}
+
+			[Test]
+			public void Should_pass_configuration_testing()
+			{
+				Mapper.AssertConfigurationIsValid();
+			}
+		}
+
 	}
 }

@@ -42,6 +42,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LinFu.DynamicProxy, Version=1.0.3233.18231, Culture=neutral, PublicKeyToken=62a6874124340d6e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\LinFu.DynamicProxy\3.5\Release\LinFu.DynamicProxy.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -56,6 +60,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="IMappingEngineRunner.cs" />
+    <Compile Include="Internal\PropertyBehaviorInterceptor.cs" />
     <Compile Include="Internal\DefaultResolver.cs" />
     <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
     <Compile Include="Internal\DeferredInstantiatedResolver.cs" />

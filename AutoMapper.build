@@ -3,6 +3,7 @@
 	<property name="build.dir" value="build" />
 	<property name="dist.dir" value="release" />
 	<property name="src.dir" value="src" />
+	<property name="tools.dir" value="tools" />
 
 	<property name="nant.settings.currentframework" value="net-3.5" />
 	<property name="svn.executable" value="tools/subversion/svn.exe" dynamic="true" if="${not property::exists('svn.executable')}" />
@@ -14,7 +15,7 @@
 	<target name="test" depends="compile, run-unit-tests"
 		description="Compile and Run Tests" />
 
-	<target name="full" depends="clean, commonassemblyinfo, test, dist" description="Compiles, tests, and produces distributions" />
+	<target name="full" depends="clean, commonassemblyinfo, test, merge, dist" description="Compiles, tests, and produces distributions" />
 
 	<!-- User targets -->
 	<target name="clean" description="Delete Automated Build artifacts">
@@ -57,6 +58,12 @@
 		</asminfo>
 	</target>
 
+	<target name="merge" depends="clean, compile, run-unit-tests">
+		<!--<msbuild project="src\ILMerge.MSBuild"/>-->
+		<mkdir dir="${build.dir}\merge" />
+		<exec program="${tools.dir}\ILMerge\ilmerge.exe"
+				  commandline="/v2 /log /out:&quot;${build.dir}\merge\AutoMapper.dll&quot; /internalize &quot;${build.dir}\Debug\AutoMapper\AutoMapper.dll&quot; &quot;${build.dir}\Debug\AutoMapper\LinFu.DynamicProxy.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />
+	</target>
 
 	<!-- Internal targets -->
 	<target name="run-unit-tests">
@@ -72,7 +79,7 @@
 	
 	<target name="dist">
 		<copy todir="${build.dir}\dist">
-			<fileset basedir="${build.dir}\Debug\AutoMapper">
+			<fileset basedir="${build.dir}\merge">
 				<include name="**\*"/>
 				<exclude name="**\*.pdb" />
 			</fileset>

@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
+using LinFu.DynamicProxy;
 
 namespace AutoMapper
 {
 	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
 		private readonly IConfiguration _configuration;
+		private readonly ProxyFactory _proxyFactory = new ProxyFactory();
 
 		public MappingEngine(IConfiguration configuration)
 		{
@@ -83,7 +85,10 @@ namespace AutoMapper
 
 		object IMappingEngineRunner.CreateObject(Type type)
 		{
-			return Activator.CreateInstance(type, true);
+			return type.IsInterface
+			       	? _proxyFactory.CreateProxy(type, new PropertyBehaviorInterceptor())
+			       	: Activator.CreateInstance(type, true);
 		}
+
 	}
 }
