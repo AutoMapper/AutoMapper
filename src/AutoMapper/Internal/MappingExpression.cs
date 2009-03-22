@@ -7,11 +7,13 @@ namespace AutoMapper
 	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
 	{
 		private readonly TypeMap _typeMap;
+		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private PropertyMap _propertyMap;
 
-		public MappingExpression(TypeMap typeMap)
+		public MappingExpression(TypeMap typeMap, Func<Type, IValueFormatter> formatterCtor)
 		{
 			_typeMap = typeMap;
+			_formatterCtor = formatterCtor;
 		}
 
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
@@ -19,7 +21,7 @@ namespace AutoMapper
 		{
 			IMemberAccessor destProperty = ReflectionHelper.FindProperty(destinationMember);
 			ForDestinationMember(destProperty, memberOptions);
-			return new MappingExpression<TSource, TDestination>(_typeMap);
+			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor);
 		}
 
 		public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
@@ -49,7 +51,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter) Activator.CreateInstance(typeof (TValueFormatter), true));
+			var formatter = new DeferredInstantiatedFormatter(() => _formatterCtor(typeof(TValueFormatter)));
 
 			AddFormatter(formatter);
 
@@ -58,7 +60,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter) Activator.CreateInstance(valueFormatterType, true));
+			var formatter = new DeferredInstantiatedFormatter(() => _formatterCtor(valueFormatterType));
 
 			AddFormatter(formatter);
 

@@ -4,11 +4,17 @@ using System.Linq;
 
 namespace AutoMapper
 {
-	internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IProfileConfiguration
+	internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator
 	{
+		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
+
+		public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
+		{
+			_formatterCtor = formatterCtor;
+		}
 
 		public bool AllowNullDestinationValues
 		{
@@ -17,7 +23,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)Activator.CreateInstance(typeof(TValueFormatter), true));
+			var formatter = new DeferredInstantiatedFormatter(() => _formatterCtor(typeof(TValueFormatter)));
 
 			AddFormatter(formatter);
 
@@ -26,7 +32,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter) Activator.CreateInstance(valueFormatterType, true));
+			var formatter = new DeferredInstantiatedFormatter(() => _formatterCtor(valueFormatterType));
 
 			AddFormatter(formatter);
 
@@ -50,7 +56,7 @@ namespace AutoMapper
 
 		public IFormatterExpression ForSourceType<TSource>()
 		{
-			var valueFormatter = new FormatterExpression();
+			var valueFormatter = new FormatterExpression(_formatterCtor);
 
 			_typeSpecificFormatters[typeof (TSource)] = valueFormatter;
 

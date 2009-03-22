@@ -420,6 +420,56 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_using_a_global_custom_construction_method_for_formatters : AutoMapperSpecBase
+		{
+			private Destination _result;
+
+			private class Source
+			{
+				public int Value { get; set; }
+			}
+
+			private class Destination
+			{
+				public string Value { get; set; }
+			}
+
+			private class SomeFormatter : IValueFormatter
+			{
+				private readonly string _prefix = "asdf";
+
+				public SomeFormatter() {}
+
+				public SomeFormatter(string prefix)
+				{
+					_prefix = prefix;
+				}
+
+				public string FormatValue(ResolutionContext context)
+				{
+					return _prefix + context.SourceValue;
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(cfg => cfg.ConstructFormattersUsing(type => new SomeFormatter("ctor'd")));
+				Mapper.CreateMap<Source, Destination>()
+					.ForMember(d => d.Value, opt => opt.AddFormatter<SomeFormatter>());
+			}
+
+			protected override void Because_of()
+			{
+				_result = Mapper.Map<Source, Destination>(new Source {Value = 5});
+			}
+
+			[Test]
+			public void Should_use_the_global_construction_method_for_creation()
+			{
+				_result.Value.ShouldEqual("ctor'd5");
+			}
+		}
+
 	}
 
 }

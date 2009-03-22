@@ -14,6 +14,7 @@ namespace AutoMapper
 
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
 		private readonly IDictionary<string, FormatterExpression> _formatters = new Dictionary<string, FormatterExpression>();
+		private Func<Type, IValueFormatter> _formatterCtor = type => (IValueFormatter)Activator.CreateInstance(type, true);
 
 		public Configuration(IObjectMapper[] mappers)
 		{
@@ -68,10 +69,15 @@ namespace AutoMapper
 			selfProfiles.ForEach(SelfProfile);
 		}
 
+		public void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor)
+		{
+			_formatterCtor = constructor;
+		}
+
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
 			TypeMap typeMap = CreateTypeMap(typeof (TSource), typeof (TDestination));
-			return new MappingExpression<TSource, TDestination>(typeMap);
+			return new MappingExpression<TSource, TDestination>(typeMap, _formatterCtor);
 		}
 
 		public TypeMap CreateTypeMap(Type source, Type destination)
@@ -240,7 +246,7 @@ namespace AutoMapper
 		{
 			if (!_formatters.ContainsKey(profileName))
 			{
-				_formatters.Add(profileName, new FormatterExpression());
+				_formatters.Add(profileName, new FormatterExpression(_formatterCtor));
 			}
 
 			return _formatters[profileName];
