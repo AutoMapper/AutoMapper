@@ -68,13 +68,11 @@
 	<!-- Internal targets -->
 	<target name="run-unit-tests">
 		<mkdir dir="${build.dir}\results" />
-		<exec program="tools\nunit\nunit-console.exe" 
-			workingdir="${build.dir}\Debug\UnitTests">
-			<arg value="/xml &quot;..\..\results\UnitTests.xml&quot;" />
-			<arg value="/nologo" />
-			<arg value="/nodots" />
-			<arg value="&quot;AutoMapper.UnitTests.dll&quot;" />
-		</exec>
+		<nunit2 failonerror="true" verbose="true">
+			<formatter type="Xml" outputdir="${build.dir}\results" usefile="true" extension=".xml"/>
+			<formatter type="Plain" />
+			<test assemblyname="${build.dir}/Debug/UnitTests/AutoMapper.UnitTests.dll"/>
+		</nunit2>
 	</target>
 	
 	<target name="dist">
