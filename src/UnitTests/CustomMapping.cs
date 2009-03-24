@@ -383,7 +383,7 @@ namespace AutoMapper.UnitTests
 			public void Should_use_the_custom_translator()
 			{
 				Mapper.CreateMap<Source, Destination>()
-					.ExecutedWith(s => new Destination { Value = s.Value + 10 });
+					.ConvertUsing(s => new Destination { Value = s.Value + 10 });
 
 				_dest = Mapper.Map<Source, Destination>(_source);
 				_dest.Value.ShouldEqual(20);
@@ -394,7 +394,7 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.CreateMap<Source, Destination>()
 					.ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-					.ExecutedWith(s => new Destination { Value = s.Value + 10 });
+					.ConvertUsing(s => new Destination { Value = s.Value + 10 });
 
 				_dest = Mapper.Map<Source, Destination>(_source);
 				_dest.Value.ShouldEqual(20);
@@ -417,7 +417,7 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.CreateMap<Source, Destination>()
-					.ExecutedWith(s => new Destination {Value2 = s.Value1 + 10});
+					.ConvertUsing(s => new Destination {Value2 = s.Value1 + 10});
 			}
 
 			[Test]

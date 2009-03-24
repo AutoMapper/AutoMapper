@@ -88,6 +88,7 @@
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="ResolutionContextTester.cs" />
+    <Compile Include="TypeConverters.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">

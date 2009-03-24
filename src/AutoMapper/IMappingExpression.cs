@@ -9,7 +9,9 @@ namespace AutoMapper
 		void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
 		IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>() where TOtherSource : TSource where TOtherDestination : TDestination;
 		IMappingExpression<TSource, TDestination> WithProfile(string profileName);
-		void ExecutedWith(Func<TSource, TDestination> mappingFunction);
+		void ConvertUsing(Func<TSource, TDestination> mappingFunction);
+		void ConvertUsing(Func<ITypeConverter> converter);
+		void ConvertUsing(ITypeConverter converter);
 	}
 
 	public interface IMemberConfigurationExpression<TSource>

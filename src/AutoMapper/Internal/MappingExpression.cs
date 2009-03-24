@@ -120,9 +120,20 @@ namespace AutoMapper
 			_propertyMap.AddFormatter(new DeferredInstantiatedFormatter(instantiator));
 		}
 
-		public void ExecutedWith(Func<TSource, TDestination> mappingFunction)
+		public void ConvertUsing(Func<TSource, TDestination> mappingFunction)
 		{
 			_typeMap.UseCustomMapper(source => mappingFunction((TSource) source));
+		}
+
+		public void ConvertUsing(Func<ITypeConverter> converter)
+		{
+			ITypeConverter invoke = converter.Invoke();
+			_typeMap.UseCustomMapper(invoke.Convert);
+		}
+
+		public void ConvertUsing(ITypeConverter converter)
+		{
+			_typeMap.UseCustomMapper(converter.Convert);
 		}
 
 		private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)

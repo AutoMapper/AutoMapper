@@ -49,6 +49,7 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ConfigurationValidation.cs" />
+    <Compile Include="GlobalTypeConverters.cs" />
     <Compile Include="CustomValueResolvers.cs" />
     <Compile Include="Flattening.cs" />
     <Compile Include="Lists.cs" />
