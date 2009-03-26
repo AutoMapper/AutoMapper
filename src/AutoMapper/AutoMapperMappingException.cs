@@ -6,6 +6,8 @@ namespace AutoMapper
 	[Serializable]
 	public class AutoMapperMappingException : Exception
 	{
+		private string _message;
+
 		//
 		// For guidelines regarding the creation of new exception types, see
 		//    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconerrorraisinghandlingguidelines.asp
@@ -19,20 +21,21 @@ namespace AutoMapper
 
 		public AutoMapperMappingException(string message) : base(message)
 		{
+			_message = message;
 		}
 
-		public AutoMapperMappingException(string message, Exception inner) : base(message, inner)
+		public AutoMapperMappingException(string message, Exception inner) : base(null, inner)
 		{
+			_message = message;
 		}
 
 		public AutoMapperMappingException(ResolutionContext context)
-			: this("Unable to perform mapping, view the ResolutionContext for more details. " + context)
 		{
 			Context = context;
 		}
 
 		public AutoMapperMappingException(ResolutionContext context, Exception inner)
-			: this("Unable to perform mapping, view the ResolutionContext for more details. " + context, inner)
+			: base(null, inner)
 		{
 			Context = context;
 		}
@@ -44,10 +47,44 @@ namespace AutoMapper
 		}
 
 		public AutoMapperMappingException(ResolutionContext context, string message)
-			: this("Unable to perform mapping, view the ResolutionContext for more details. " + context + "\r\n" + message)
+			: this(context)
 		{
+			_message = message;
 		}
 
 		public ResolutionContext Context { get; private set; }
+
+		public override string Message
+		{
+			get
+			{
+				string message = null;
+				if (Context != null)
+				{
+					message = string.Format("Trying to map {0} to {1}.", Context.SourceType.Name, Context.DestinationType.Name);
+					if (Context.ContextTypeMap != null)
+					{
+						message += string.Format("\r\nUsing mapping configuration for {0} to {1}", Context.ContextTypeMap.SourceType, Context.ContextTypeMap.DestinationType);
+					}
+					if (Context.SourceValueTypeMap != null && Context.SourceValueTypeMap != Context.ContextTypeMap)
+					{
+						message += string.Format("\r\nUsing property mapping configuration for {0} to {1}", Context.SourceValueTypeMap.SourceType, Context.SourceValueTypeMap.DestinationType);
+					}
+					if (Context.PropertyMap != null)
+					{
+						message += string.Format("\r\nDestination property: {0}", Context.PropertyMap.DestinationProperty.Name);
+					}
+				}
+				if (_message != null)
+				{
+					message = (message == null ? null : message + "\r\n") + _message;
+				}
+				if (base.Message != null)
+				{
+					message = (message == null ? null : message + "\r\n") + base.Message;
+				}
+				return message;
+			}
+		}
 	}
 }

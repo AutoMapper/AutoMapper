@@ -127,8 +127,7 @@ namespace AutoMapper
 
 		public void ConvertUsing(Func<ITypeConverter> converter)
 		{
-			ITypeConverter invoke = converter.Invoke();
-			_typeMap.UseCustomMapper(invoke.Convert);
+			_typeMap.UseCustomMapper(source => converter().Convert(source));
 		}
 
 		public void ConvertUsing(ITypeConverter converter)
