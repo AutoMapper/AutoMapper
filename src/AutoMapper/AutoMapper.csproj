@@ -60,6 +60,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="IMappingEngineRunner.cs" />
+    <Compile Include="Internal\DeferredInstantiatedConverter.cs" />
     <Compile Include="Internal\PropertyBehaviorInterceptor.cs" />
     <Compile Include="Internal\DefaultResolver.cs" />
     <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
@@ -109,7 +110,6 @@
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />
     <Compile Include="SelfProfiler.cs" />
-    <Compile Include="TypeConverter.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
     <Compile Include="Internal\ValueFormatter.cs" />

@@ -9,13 +9,15 @@ namespace AutoMapper
 		private readonly TypeMap _typeMap;
 		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private readonly Func<Type, IValueResolver> _resolverCtor;
+		private readonly Func<Type, object> _typeConverterCtor;
 		private PropertyMap _propertyMap;
 
-		public MappingExpression(TypeMap typeMap, Func<Type, IValueFormatter> formatterCtor, Func<Type, IValueResolver> resolverCtor)
+		public MappingExpression(TypeMap typeMap, Func<Type, IValueFormatter> formatterCtor, Func<Type, IValueResolver> resolverCtor, Func<Type, object> typeConverterCtor)
 		{
 			_typeMap = typeMap;
 			_formatterCtor = formatterCtor;
 			_resolverCtor = resolverCtor;
+			_typeConverterCtor = typeConverterCtor;
 		}
 
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
@@ -23,7 +25,7 @@ namespace AutoMapper
 		{
 			IMemberAccessor destProperty = ReflectionHelper.FindProperty(destinationMember);
 			ForDestinationMember(destProperty, memberOptions);
-			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor);
+			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
 		}
 
 		public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
@@ -122,17 +124,19 @@ namespace AutoMapper
 
 		public void ConvertUsing(Func<TSource, TDestination> mappingFunction)
 		{
-			_typeMap.UseCustomMapper(source => mappingFunction((TSource) source));
+			_typeMap.UseCustomMapper(source => mappingFunction((TSource) source.SourceValue));
 		}
 
-		public void ConvertUsing(Func<ITypeConverter> converter)
+		public void ConvertUsing(ITypeConverter<TSource, TDestination> converter)
 		{
-			_typeMap.UseCustomMapper(source => converter().Convert(source));
+			ConvertUsing(converter.Convert);
 		}
 
-		public void ConvertUsing(ITypeConverter converter)
+		public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
 		{
-			_typeMap.UseCustomMapper(converter.Convert);
+			var converter = new DeferredInstantiatedConverter<TSource, TDestination>(() => (TTypeConverter) _typeConverterCtor(typeof (TTypeConverter)));
+
+			ConvertUsing(converter.Convert);
 		}
 
 		private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)

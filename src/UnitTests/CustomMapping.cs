@@ -401,6 +401,117 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_specifying_a_custom_translator_using_generics : AutoMapperSpecBase
+		{
+			private Source _source;
+			private Destination _dest;
+
+			public class Source
+			{
+				public int Value { get; set; }
+				public int AnotherValue { get; set; }
+			}
+
+			public class Destination
+			{
+				public int Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				base.Establish_context();
+
+				_source = new Source
+				{
+					Value = 10,
+					AnotherValue = 1000
+				};
+			}
+
+			public class Converter : ITypeConverter<Source, Destination>
+			{
+				public Destination Convert(Source source)
+				{
+					return new Destination {Value = source.Value + 10};
+				}
+			}
+
+			[Test]
+			public void Should_use_the_custom_translator()
+			{
+				Mapper.CreateMap<Source, Destination>()
+					.ConvertUsing<Converter>();
+
+				_dest = Mapper.Map<Source, Destination>(_source);
+				_dest.Value.ShouldEqual(20);
+			}
+
+			[Test]
+			public void Should_ignore_other_mapping_rules()
+			{
+				Mapper.CreateMap<Source, Destination>()
+					.ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
+					.ConvertUsing(s => new Destination { Value = s.Value + 10 });
+
+				_dest = Mapper.Map<Source, Destination>(_source);
+				_dest.Value.ShouldEqual(20);
+			}
+		}
+
+		public class When_specifying_a_custom_constructor_function_for_custom_converters : AutoMapperSpecBase
+		{
+			private Destination _result;
+
+			private class Source
+			{
+				public int Value { get; set; }
+			}
+
+			private class Destination
+			{
+				public int Value { get; set; }
+			}
+
+			private class CustomConverter : ITypeConverter<Source, Destination>
+			{
+				private readonly int _value;
+
+				public CustomConverter()
+					: this(5)
+				{
+				}
+
+				public CustomConverter(int value)
+				{
+					_value = value;
+				}
+
+				public Destination Convert(Source source)
+				{
+					return new Destination { Value = source.Value + _value };
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(init => init.ConstructTypeConvertersUsing(t => new CustomConverter(10)));
+				Mapper.CreateMap<Source, Destination>()
+					.ConvertUsing<CustomConverter>();
+			}
+
+			protected override void Because_of()
+			{
+				_result = Mapper.Map<Source, Destination>(new Source {Value = 5});
+			}
+
+			[Test]
+			public void Should_use_the_custom_constructor_function()
+			{
+				_result.Value.ShouldEqual(15);
+			}
+		}
+
+
 		public class When_specifying_a_custom_translator_with_mismatched_properties : AutoMapperSpecBase
 		{
 			public class Source

@@ -25,33 +25,28 @@ namespace AutoMapper.UnitTests
 				public Type Value3 { get; set; }
 			}
 
-			public class DateTimeTypeConverter : TypeConverter<string, DateTime>
+			public class DateTimeTypeConverter : ITypeConverter<string, DateTime>
 			{
-				protected override DateTime ConvertCore(string source)
+				public DateTime Convert(string source)
 				{
 					return System.Convert.ToDateTime(source);
 				}
 			}
 
-			public class TypeTypeConverter : TypeConverter<string, Type>
+			public class TypeTypeConverter : ITypeConverter<string, Type>
 			{
-				protected override Type ConvertCore(string source)
+				public Type Convert(string source)
 				{
 					Type type = Assembly.GetExecutingAssembly().GetType(source);
 					return type;
 				}
 			}
 
-			private static TypeTypeConverter GetResolver()
-			{
-				return new TypeTypeConverter();
-			}
-
 			protected override void Establish_context()
 			{
 				Mapper.CreateMap<string, int>().ConvertUsing(arg => Convert.ToInt32(arg));
 				Mapper.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
-				Mapper.CreateMap<string, Type>().ConvertUsing(GetResolver);
+				Mapper.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
 
 				Mapper.CreateMap<Source, Destination>();
 				Mapper.AssertConfigurationIsValid();

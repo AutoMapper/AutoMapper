@@ -4,7 +4,7 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			return context.TypeMap.CustomMapper(context.SourceValue);
+			return context.TypeMap.CustomMapper(context);
 		}
 
 		public bool IsMatch(ResolutionContext context)

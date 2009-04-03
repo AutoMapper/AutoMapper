@@ -39,5 +39,6 @@ namespace AutoMapper
 		void SelfConfigure(Assembly assembly);
 		void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor);
 		void ConstructResolversUsing(Func<Type, IValueResolver> constructor);
+		void ConstructTypeConvertersUsing(Func<Type, object> constructor);
 	}
 }

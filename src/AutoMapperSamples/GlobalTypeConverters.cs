@@ -25,17 +25,17 @@ namespace AutoMapperSamples
 				public Type Value3 { get; set; }
 			}
 
-			public class DateTimeTypeConverter : TypeConverter<string, DateTime>
+			public class DateTimeTypeConverter : ITypeConverter<string, DateTime>
 			{
-				protected override DateTime ConvertCore(string source)
+				public DateTime Convert(string source)
 				{
 					return System.Convert.ToDateTime(source);
 				}
 			}
 
-			public class TypeTypeConverter : TypeConverter<string, Type>
+			public class TypeTypeConverter : ITypeConverter<string, Type>
 			{
-				protected override Type ConvertCore(string source)
+				public Type Convert(string source)
 				{
 					Type type = Assembly.GetExecutingAssembly().GetType(source);
 					return type;
@@ -45,9 +45,9 @@ namespace AutoMapperSamples
 			[Test]
 			public void Example()
 			{
-				Mapper.CreateMap<string, int>().ConvertUsing(arg => Convert.ToInt32(arg));
+				Mapper.CreateMap<string, int>().ConvertUsing(Convert.ToInt32);
 				Mapper.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
-				Mapper.CreateMap<string, Type>().ConvertUsing(GetResolver);
+				Mapper.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
 				Mapper.CreateMap<Source, Destination>();
 				Mapper.AssertConfigurationIsValid();
 
@@ -60,11 +60,6 @@ namespace AutoMapperSamples
 
 				Destination result = Mapper.Map<Source, Destination>(source);
 				result.Value3.ShouldEqual(typeof(Destination));
-			}
-
-			private static TypeTypeConverter GetResolver()
-			{
-				return new TypeTypeConverter();
 			}
 
 			[SetUp]

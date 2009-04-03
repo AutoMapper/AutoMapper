@@ -10,8 +10,8 @@ namespace AutoMapper
 		IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>() where TOtherSource : TSource where TOtherDestination : TDestination;
 		IMappingExpression<TSource, TDestination> WithProfile(string profileName);
 		void ConvertUsing(Func<TSource, TDestination> mappingFunction);
-		void ConvertUsing(Func<ITypeConverter> converter);
-		void ConvertUsing(ITypeConverter converter);
+		void ConvertUsing(ITypeConverter<TSource, TDestination> converter);
+		void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
 	}
 
 	public interface IMemberConfigurationExpression<TSource>

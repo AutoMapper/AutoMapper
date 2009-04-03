@@ -1,7 +1,7 @@
 namespace AutoMapper
 {
-	public interface ITypeConverter
+	public interface ITypeConverter<TSource, TDestination>
 	{
-		object Convert(object source);
+		TDestination Convert(TSource source);
 	}
 }
