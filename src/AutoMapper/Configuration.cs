@@ -238,8 +238,6 @@ namespace AutoMapper
 				Type destElementType = context.DestinationType.GetElementType();
 				TypeMap itemTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceElementType, destElementType);
 				var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType, 0);
-				//var memberContext = new ResolutionContext(itemTypeMap, null, sourceElementType, destElementType);
-				
 
 				DryRunTypeMap(memberContext);
 			}

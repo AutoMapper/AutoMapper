@@ -63,7 +63,7 @@ namespace AutoMapper
 					var message = string.Format("The following property on {0} cannot be mapped: \n\t{2}\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
 						contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName, contextToUse.GetContextPropertyMap().DestinationProperty.Name);
 
-					message += "Context:";
+					message += "\nContext:";
 
 					while (contextToUse != null)
 					{
