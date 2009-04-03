@@ -4,14 +4,14 @@ namespace AutoMapper
 {
 	public class ResolutionContext
 	{
-		public TypeMap SourceValueTypeMap { get; private set; }
-		public TypeMap ContextTypeMap { get; private set; }
+		public TypeMap TypeMap { get; private set; }
 		public PropertyMap PropertyMap { get; private set; }
 		public Type SourceType { get; private set; }
 		public Type DestinationType { get; private set; }
 		public int? ArrayIndex { get; private set; }
 		public object SourceValue { get; private set; }
 		public object DestinationValue { get; private set; }
+		public ResolutionContext Parent { get; private set; }
 
 		private ResolutionContext()
 		{
@@ -24,8 +24,7 @@ namespace AutoMapper
 
 		public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType, Type destinationType)
 		{
-			SourceValueTypeMap = typeMap;
-			ContextTypeMap = typeMap;
+			TypeMap = typeMap;
 			SourceValue = source;
 			DestinationValue = destination;
 			if (typeMap != null)
@@ -62,12 +61,12 @@ namespace AutoMapper
 			return new ResolutionContext
 				{
 					ArrayIndex = ArrayIndex,
-					SourceValueTypeMap = SourceValueTypeMap,
+					TypeMap = TypeMap,
 					PropertyMap = PropertyMap,
 					SourceType = SourceType,
 					SourceValue = sourceValue,
 					DestinationValue = DestinationValue,
-					ContextTypeMap = ContextTypeMap,
+					Parent = this,
 					DestinationType = DestinationType
 				};
 		}
@@ -77,12 +76,12 @@ namespace AutoMapper
 			return new ResolutionContext
 				{
 					ArrayIndex = ArrayIndex,
-					SourceValueTypeMap = SourceValueTypeMap,
+					TypeMap = TypeMap,
 					PropertyMap = PropertyMap,
 					SourceType = sourceType,
 					SourceValue = sourceValue,
 					DestinationValue = DestinationValue,
-					ContextTypeMap = ContextTypeMap,
+					Parent = this,
 					DestinationType = DestinationType
 				};
 		}
@@ -92,22 +91,22 @@ namespace AutoMapper
 			if (memberTypeMap != null)
 				return new ResolutionContext
 					{
-						ContextTypeMap = memberTypeMap,
+						Parent = this,
 						DestinationType = memberTypeMap.DestinationType,
 						PropertyMap = propertyMap,
 						SourceType = memberTypeMap.SourceType,
 						SourceValue = memberValue,
-						SourceValueTypeMap = memberTypeMap
+						TypeMap = memberTypeMap
 					};
 
 			return new ResolutionContext
 				{
-					ContextTypeMap = ContextTypeMap,
+					Parent = this,
 					DestinationType = propertyMap.DestinationProperty.MemberType,
 					PropertyMap = propertyMap,
 					SourceType = sourceMemberType,
 					SourceValue = memberValue,
-					SourceValueTypeMap = memberTypeMap
+					TypeMap = memberTypeMap
 				};
 		}
 
@@ -116,18 +115,42 @@ namespace AutoMapper
 			return new ResolutionContext
 				{
 					ArrayIndex = arrayIndex,
-					ContextTypeMap = elementTypeMap ?? ContextTypeMap,
+					Parent = this,
 					DestinationType = destinationElementType,
 					PropertyMap = PropertyMap,
 					SourceType = sourceElementType,
 					SourceValue = item,
-					SourceValueTypeMap = elementTypeMap
+					TypeMap = elementTypeMap
 				};
 		}
 
 		public override string ToString()
 		{
 			return string.Format("Trying to map {0} to {1}.", SourceType.Name, DestinationType.Name);
+		}
+
+		public TypeMap GetContextTypeMap()
+		{
+			TypeMap typeMap = TypeMap;
+			ResolutionContext parent = Parent;
+			while ((typeMap == null) && (parent != null))
+			{
+				typeMap = parent.TypeMap;
+				parent = parent.Parent;
+			}
+			return typeMap;
+		}
+
+		public PropertyMap GetContextPropertyMap()
+		{
+			PropertyMap propertyMap = PropertyMap;
+			ResolutionContext parent = Parent;
+			while ((propertyMap == null) && (parent != null))
+			{
+				propertyMap = parent.PropertyMap;
+				parent = parent.Parent;
+			}
+			return propertyMap;
 		}
 	}
 }

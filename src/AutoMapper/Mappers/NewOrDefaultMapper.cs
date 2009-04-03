@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers
 
 		private bool MapSourceValuesAsNull(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			var typeMap = context.SourceValueTypeMap ?? context.ContextTypeMap;
+			var typeMap = context.GetContextTypeMap();
 			if (typeMap != null)
 				return mapper.Configuration.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
 

@@ -102,8 +102,9 @@ namespace AutoMapper
 
 		string IMappingEngineRunner.FormatValue(ResolutionContext context)
 		{
-			IFormatterConfiguration configuration = context.ContextTypeMap != null
-			                                 	? Configuration.GetProfileConfiguration(context.ContextTypeMap.Profile)
+			TypeMap contextTypeMap = context.GetContextTypeMap();
+			IFormatterConfiguration configuration = contextTypeMap != null
+												? Configuration.GetProfileConfiguration(contextTypeMap.Profile)
 			                                 	: Configuration.GetProfileConfiguration(AutoMapper.Configuration.DefaultProfileName);
 
 			var valueFormatter = new ValueFormatter(configuration);

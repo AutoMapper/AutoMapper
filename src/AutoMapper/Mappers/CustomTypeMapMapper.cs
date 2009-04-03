@@ -4,12 +4,12 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			return context.SourceValueTypeMap.CustomMapper(context.SourceValue);
+			return context.TypeMap.CustomMapper(context.SourceValue);
 		}
 
 		public bool IsMatch(ResolutionContext context)
 		{
-			return context.SourceValueTypeMap != null && context.SourceValueTypeMap.CustomMapper != null;
+			return context.TypeMap != null && context.TypeMap.CustomMapper != null;
 		}
 	}
 }

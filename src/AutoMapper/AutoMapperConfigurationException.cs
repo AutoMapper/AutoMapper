@@ -35,9 +35,14 @@ namespace AutoMapper
 
 		public AutoMapperConfigurationException(TypeMap typeMap, string mismatchedPropertyName)
 			: base(string.Format(
-					"The following property on {0} is cannot be mapped: \n\t{2}\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
+					"The following property on {0} cannot be mapped: \n\t{2}\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
 					typeMap.DestinationType.Name, typeMap.SourceType.Name, mismatchedPropertyName))
 		{
+		}
+
+		public AutoMapperConfigurationException(ResolutionContext context)
+		{
+			Context = context;
 		}
 
 		protected AutoMapperConfigurationException(
@@ -45,5 +50,34 @@ namespace AutoMapper
 			StreamingContext context) : base(info, context)
 		{
 		}
+
+		public ResolutionContext Context { get; private set; }
+
+		public override string Message
+		{
+			get
+			{
+				if (Context != null)
+				{
+					var contextToUse = Context;
+					var message = string.Format("The following property on {0} cannot be mapped: \n\t{2}\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
+						contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName, contextToUse.GetContextPropertyMap().DestinationProperty.Name);
+
+					message += "Context:";
+
+					while (contextToUse != null)
+					{
+						message += contextToUse.GetContextPropertyMap() == null
+						           	? string.Format("\n\tMapping to type {0} from source type {1}", contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName)
+						           	: string.Format("\n\tMapping to property {0} on {1} from source type {2}", contextToUse.GetContextPropertyMap().DestinationProperty.Name, contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName);
+						contextToUse = contextToUse.Parent;
+					}
+
+					return message + "\n" + base.Message;
+				}
+				return base.Message;
+			}
+		}
+
 	}
 }

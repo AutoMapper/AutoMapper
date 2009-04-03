@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests
 
 			ResolutionContext newContext = context.CreateValueContext(10);
 
-			newContext.ContextTypeMap.ShouldNotBeNull();
+			newContext.GetContextTypeMap().ShouldNotBeNull();
 		}
 	}
 }

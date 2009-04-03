@@ -62,26 +62,27 @@ namespace AutoMapper
 				if (Context != null)
 				{
 					message = string.Format("Trying to map {0} to {1}.", Context.SourceType.Name, Context.DestinationType.Name);
-					if (Context.ContextTypeMap != null)
+					TypeMap contextTypeMap = Context.GetContextTypeMap();
+					if (contextTypeMap != null)
 					{
-						message += string.Format("\r\nUsing mapping configuration for {0} to {1}", Context.ContextTypeMap.SourceType, Context.ContextTypeMap.DestinationType);
+						message += string.Format("\nUsing mapping configuration for {0} to {1}", contextTypeMap.SourceType, contextTypeMap.DestinationType);
 					}
-					if (Context.SourceValueTypeMap != null && Context.SourceValueTypeMap != Context.ContextTypeMap)
+					if (Context.TypeMap != null && Context.TypeMap != contextTypeMap)
 					{
-						message += string.Format("\r\nUsing property mapping configuration for {0} to {1}", Context.SourceValueTypeMap.SourceType, Context.SourceValueTypeMap.DestinationType);
+						message += string.Format("\nUsing property mapping configuration for {0} to {1}", Context.TypeMap.SourceType, Context.TypeMap.DestinationType);
 					}
 					if (Context.PropertyMap != null)
 					{
-						message += string.Format("\r\nDestination property: {0}", Context.PropertyMap.DestinationProperty.Name);
+						message += string.Format("\nDestination property: {0}", Context.PropertyMap.DestinationProperty.Name);
 					}
 				}
 				if (_message != null)
 				{
-					message = (message == null ? null : message + "\r\n") + _message;
+					message = (message == null ? null : message + "\n") + _message;
 				}
 				if (base.Message != null)
 				{
-					message = (message == null ? null : message + "\r\n") + base.Message;
+					message = (message == null ? null : message + "\n") + base.Message;
 				}
 				return message;
 			}

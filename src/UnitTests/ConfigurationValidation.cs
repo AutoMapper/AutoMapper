@@ -191,6 +191,40 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_testing_a_dto_with_array_types_with_mismatched_element_types : AutoMapperSpecBase
+		{
+			private class Source
+			{
+				public SourceItem[] Items;
+			}
+
+			private class Destination
+			{
+				public DestinationItem[] Items;
+			}
+
+			private class SourceItem
+			{
+				
+			}
+
+			private class DestinationItem
+			{
+				
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+			}
+
+			[Test]
+			public void Should_fail_a_configuration_check()
+			{
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
+		}
+
 	}
 
 }

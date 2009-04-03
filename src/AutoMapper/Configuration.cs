@@ -177,7 +177,7 @@ namespace AutoMapper
 			{
 				throw new AutoMapperConfigurationException(typeMap, typeMap.GetUnmappedPropertyNames());
 			}
-			DryRunTypeMap(typeMap);
+			DryRunTypeMap(new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType));
 		}
 
 		void IConfiguration.AssertConfigurationIsValid()
@@ -198,34 +198,52 @@ namespace AutoMapper
 
 			foreach (var typeMap in _typeMaps)
 			{
-				DryRunTypeMap(typeMap);
+				DryRunTypeMap(new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType));
 			}
 		}
 
-		private void DryRunTypeMap(TypeMap typeMap)
+		private void DryRunTypeMap(ResolutionContext context)
 		{
-			foreach (var propertyMap in typeMap.GetPropertyMaps())
+			var mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
+
+			if (mapperToUse == null)
 			{
-				if (!propertyMap.IsIgnored())
+				throw new AutoMapperConfigurationException(context);
+			}
+
+			if (mapperToUse is TypeMapMapper)
+			{
+				foreach (var propertyMap in context.TypeMap.GetPropertyMaps())
 				{
-					var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessorBase);
-
-					if (lastResolver != null)
+					if (!propertyMap.IsIgnored())
 					{
-						var sourceType = ((MemberAccessorBase) lastResolver).MemberType;
-						var destinationType = propertyMap.DestinationProperty.MemberType;
-						var customTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceType, destinationType);
-						var context = new ResolutionContext(customTypeMap, null, sourceType, destinationType);
+						var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessorBase);
 
-						IObjectMapper mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
-
-						if (mapperToUse == null)
+						if (lastResolver != null)
 						{
-							throw new AutoMapperConfigurationException(typeMap, propertyMap.DestinationProperty.Name);
+							var sourceType = ((MemberAccessorBase)lastResolver).MemberType;
+							var destinationType = propertyMap.DestinationProperty.MemberType;
+							var memberTypeMap = ((IConfiguration)this).FindTypeMapFor(sourceType, destinationType);
+
+							var memberContext = context.CreateMemberContext(memberTypeMap, null, sourceType, propertyMap);
+
+							DryRunTypeMap(memberContext);
 						}
 					}
 				}
+			} 
+			else if (mapperToUse is ArrayMapper)
+			{
+				Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
+				Type destElementType = context.DestinationType.GetElementType();
+				TypeMap itemTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceElementType, destElementType);
+				var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType, 0);
+				//var memberContext = new ResolutionContext(itemTypeMap, null, sourceElementType, destElementType);
+				
+
+				DryRunTypeMap(memberContext);
 			}
+
 		}
 
 		public IObjectMapper[] GetMappers()
