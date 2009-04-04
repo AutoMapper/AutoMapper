@@ -25,7 +25,7 @@ namespace AutoMapperSamples
 				Mapper.Reset();
 			}
 
-			[Test]
+			[Test, ExpectedException(typeof(AutoMapperConfigurationException))]
 			public void Example()
 			{
 				Mapper.CreateMap<Source, Destination>();

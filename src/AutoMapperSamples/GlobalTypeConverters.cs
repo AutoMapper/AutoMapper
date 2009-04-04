@@ -55,7 +55,7 @@ namespace AutoMapperSamples
 				             	{
 				             		Value1 = "5",
 				             		Value2 = "01/01/2000",
-				             		Value3 = "AutoMapperSamples.CustomValueResolvers.GlobalTypeConverters+Destination"
+									Value3 = "AutoMapperSamples.GlobalTypeConverters.GlobalTypeConverters+Destination"
 				             	};
 
 				Destination result = Mapper.Map<Source, Destination>(source);

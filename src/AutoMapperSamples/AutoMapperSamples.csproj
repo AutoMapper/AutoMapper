@@ -52,6 +52,7 @@
     <Compile Include="GlobalTypeConverters.cs" />
     <Compile Include="CustomValueResolvers.cs" />
     <Compile Include="Flattening.cs" />
+    <Compile Include="Interfaces.cs" />
     <Compile Include="Lists.cs" />
     <Compile Include="NestedMappings.cs" />
     <Compile Include="Projection.cs" />
