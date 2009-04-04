@@ -109,5 +109,133 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_mapping_a_derived_interface_to_an_derived_concrete_type : AutoMapperSpecBase
+        {
+            private Destination _result = null;
+
+            public interface ISourceBase
+            {
+                int Id { get; }
+            }
+
+            public interface ISource : ISourceBase
+            {
+                int SecondId { get; }
+            }
+
+            private class Source : ISource
+            {
+                public int Id { get; set; }
+                public int SecondId { get; set; }
+            }
+
+            private abstract class DestinationBase
+            {
+                public int Id { get; set; }
+            }
+
+            private class Destination : DestinationBase
+            {
+                public int SecondId { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<ISource, Destination>();
+            }
+
+            protected override void Because_of()
+            {
+                _result = Mapper.Map<ISource, Destination>(new Source { Id = 7, SecondId = 42 });
+            }
+
+            [Test]
+            public void Should_map_base_interface_property()
+            {
+                _result.Id.ShouldEqual(7);
+            }
+
+            [Test]
+            public void Should_map_derived_interface_property()
+            {
+                _result.SecondId.ShouldEqual(42);
+            }
+
+            [Test]
+            public void Should_pass_configuration_testing()
+            {
+                Mapper.AssertConfigurationIsValid();
+            }
+        }
+
+        public class When_mapping_a_derived_interface_to_an_derived_concrete_type_with_readonly_interface_members : AutoMapperSpecBase
+        {
+            private Destination _result = null;
+
+            public interface ISourceBase
+            {
+                int Id { get; }
+            }
+
+            public interface ISource : ISourceBase
+            {
+                int SecondId { get; }
+            }
+
+            private class Source : ISource
+            {
+                public int Id { get; set; }
+                public int SecondId { get; set; }
+            }
+
+            public interface IDestinationBase
+            {
+                int Id { get; }
+            }
+
+            public interface IDestination : IDestinationBase
+            {
+                int SecondId { get; }
+            }
+
+            private abstract class DestinationBase : IDestinationBase
+            {
+                public int Id { get; set; }
+            }
+
+            private class Destination : DestinationBase, IDestination
+            {
+                public int SecondId { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<ISource, Destination>();
+            }
+
+            protected override void Because_of()
+            {
+                _result = Mapper.Map<ISource, Destination>(new Source { Id = 7, SecondId = 42 });
+            }
+
+            [Test]
+            public void Should_map_base_interface_property()
+            {
+                _result.Id.ShouldEqual(7);
+            }
+
+            [Test]
+            public void Should_map_derived_interface_property()
+            {
+                _result.SecondId.ShouldEqual(42);
+            }
+
+            [Test]
+            public void Should_pass_configuration_testing()
+            {
+                Mapper.AssertConfigurationIsValid();
+            }
+        }
+
 	}
 }

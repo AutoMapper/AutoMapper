@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
+using System.Collections.Generic;
 
 namespace AutoMapper
 {
@@ -30,16 +31,16 @@ namespace AutoMapper
 				switch (expressionToCheck.NodeType)
 				{
 					case ExpressionType.Convert:
-						expressionToCheck = ((UnaryExpression) expressionToCheck).Operand;
+						expressionToCheck = ((UnaryExpression)expressionToCheck).Operand;
 						break;
 					case ExpressionType.Lambda:
 						expressionToCheck = lambdaExpression.Body;
 						break;
 					case ExpressionType.MemberAccess:
-						MemberInfo member = ((MemberExpression) expressionToCheck).Member;
-                        if (member is FieldInfo) return new FieldAccessor((FieldInfo) member);
-                        if (member is PropertyInfo) return new PropertyAccessor((PropertyInfo) member);
-                        return null;
+						MemberInfo member = ((MemberExpression)expressionToCheck).Member;
+						if (member is FieldInfo) return new FieldAccessor((FieldInfo)member);
+						if (member is PropertyInfo) return new PropertyAccessor((PropertyInfo)member);
+						return null;
 					default:
 						done = true;
 						break;
@@ -66,42 +67,59 @@ namespace AutoMapper
 					.ToArray();
 			}
 
-            public static IMemberAccessor[] GetPublicReadAccessors(this Type type)
-            {
-                MemberInfo[] members = type.FindMembers(MemberTypes.Property | MemberTypes.Field,
-                                                         BindingFlags.Instance | BindingFlags.Public,
-                                                         (m, f) =>
-                                                         m is FieldInfo ||
-                                                         (m is PropertyInfo && ((PropertyInfo) m).CanRead),null);
-                
-                var accessors = new IMemberAccessor[members.Length];
-                for (int i = 0; i < members.Length; i++)
-                    accessors[i] = members[i].ToMemberAccessor();
-                return accessors;
+			public static IMemberAccessor[] GetPublicReadAccessors(this Type type)
+			{
+				// Collect that target type, its base type, and all implemented/inherited interface types
+				var typesToScan = new[] { type, type.BaseType }
+					.Concat(type.FindInterfaces((m, f) => true, null));
 
-            }
+				// Scan all types for public properties and fields
+				var members = typesToScan
+					.Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
+					.SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
+													 BindingFlags.Instance | BindingFlags.Public,
+													 (m, f) =>
+													 m is FieldInfo ||
+													 (m is PropertyInfo && ((PropertyInfo)m).CanRead), null));
 
-            public static IMemberAccessor GetAccessor(this Type targetType,string accessorName,BindingFlags bindingFlags)
-            {
-                MemberInfo[] members = targetType.GetMember(accessorName, bindingFlags);
-                return
-                    members.FirstOrDefault(member => member is PropertyInfo || member is FieldInfo)
-                    .ToMemberAccessor();
-            }
+				// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
+				var filteredMembers = members
+					.Where(x => x is PropertyInfo) // only interested in filtering properties
+					.OfType<PropertyInfo>()
+					.GroupBy(x => x.Name) // group properties of the same name together
+					.Select(x =>
+						x.Any(y => y.CanRead && y.CanWrite) ? // favor the first property that can both read & write - otherwise pick the first one
+							x.Where(y => y.CanRead && y.CanWrite).First() :
+							x.First())
+					.OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
+					.Concat(members.Where(x => x is FieldInfo));  // add FieldInfo objects back
 
-            public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
-            {
-                if (accessorCandidate == null)
-                    return null;
+				return filteredMembers
+					.Select(x => x.ToMemberAccessor())
+					.ToArray();
+			}
 
-                if (accessorCandidate is PropertyInfo)
-                    return new PropertyAccessor((PropertyInfo) accessorCandidate);
+			public static IMemberAccessor GetAccessor(this Type targetType, string accessorName, BindingFlags bindingFlags)
+			{
+				MemberInfo[] members = targetType.GetMember(accessorName, bindingFlags);
+				return
+					members.FirstOrDefault(member => member is PropertyInfo || member is FieldInfo)
+					.ToMemberAccessor();
+			}
 
-                if (accessorCandidate is FieldInfo)
-                    return new FieldAccessor((FieldInfo) accessorCandidate);
+			public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
+			{
+				if (accessorCandidate == null)
+					return null;
 
-                return null;
-            }
+				if (accessorCandidate is PropertyInfo)
+					return new PropertyAccessor((PropertyInfo)accessorCandidate);
+
+				if (accessorCandidate is FieldInfo)
+					return new FieldAccessor((FieldInfo)accessorCandidate);
+
+				return null;
+			}
 		}
 	}
 }
