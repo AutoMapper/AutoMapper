@@ -62,7 +62,7 @@
 		<!--<msbuild project="src\ILMerge.MSBuild"/>-->
 		<mkdir dir="${build.dir}\merge" />
 		<exec program="${tools.dir}\ILMerge\ilmerge.exe"
-				  commandline="/v2 /log /out:&quot;${build.dir}\merge\AutoMapper.dll&quot; /internalize &quot;${build.dir}\Debug\AutoMapper\AutoMapper.dll&quot; &quot;${build.dir}\Debug\AutoMapper\LinFu.DynamicProxy.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />
+				  commandline="/v2 /log /out:&quot;${build.dir}\merge\AutoMapper.dll&quot; /internalize:AutoMapper.exclude &quot;${build.dir}\Debug\AutoMapper\AutoMapper.dll&quot; &quot;${build.dir}\Debug\AutoMapper\LinFu.DynamicProxy.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />
 	</target>
 
 	<!-- Internal targets -->
@@ -74,10 +74,16 @@
 			<test assemblyname="${build.dir}/Debug/UnitTests/AutoMapper.UnitTests.dll"/>
 		</nunit2>
 	</target>
-	
+
 	<target name="dist">
-		<copy todir="${build.dir}\dist">
+		<copy todir="${build.dir}\dist-merged">
 			<fileset basedir="${build.dir}\merge">
+				<include name="**\*"/>
+				<exclude name="**\*.pdb" />
+			</fileset>
+		</copy>
+		<copy todir="${build.dir}\dist">
+			<fileset basedir="${build.dir}\Debug\AutoMapper">
 				<include name="**\*"/>
 				<exclude name="**\*.pdb" />
 			</fileset>
@@ -87,7 +93,13 @@
 				<include name="**\*" />
 			</fileset>
 		</zip>
+		<zip zipfile="${dist.dir}\AutoMapper-merged.zip">
+			<fileset basedir="${build.dir}\dist-merged">
+				<include name="**\*" />
+			</fileset>
+		</zip>
+		<copy file="${build.dir}\dist\AutoMapper.dll" tofile="${dist.dir}\AutoMapper.dll" />
 	</target>
-	
+
 </project>
 
