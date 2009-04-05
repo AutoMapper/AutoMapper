@@ -80,11 +80,10 @@ namespace AutoMapper
 													 BindingFlags.Instance | BindingFlags.Public,
 													 (m, f) =>
 													 m is FieldInfo ||
-													 (m is PropertyInfo && ((PropertyInfo)m).CanRead), null));
+													 (m is PropertyInfo && ((PropertyInfo)m).CanRead && !((PropertyInfo)m).GetIndexParameters().Any()), null));
 
 				// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
 				var filteredMembers = members
-					.Where(x => x is PropertyInfo) // only interested in filtering properties
 					.OfType<PropertyInfo>()
 					.GroupBy(x => x.Name) // group properties of the same name together
 					.Select(x =>

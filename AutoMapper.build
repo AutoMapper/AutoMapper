@@ -9,7 +9,7 @@
 	<property name="svn.executable" value="tools/subversion/svn.exe" dynamic="true" if="${not property::exists('svn.executable')}" />
 
 	<property name="revisionnumber" value="9999" dynamic="true"/>
-	<property name="project.fullversion" value="0.2.1.${revisionnumber}" dynamic="true"/>
+	<property name="project.fullversion" value="0.3.0.${revisionnumber}" dynamic="true"/>
 	<property name="svnargs" value=" --non-interactive " />
 
 	<target name="test" depends="compile, run-unit-tests"
