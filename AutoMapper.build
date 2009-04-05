@@ -98,7 +98,7 @@
 				<include name="**\*" />
 			</fileset>
 		</zip>
-		<copy file="${build.dir}\dist\AutoMapper.dll" tofile="${dist.dir}\AutoMapper.dll" />
+		<copy file="${build.dir}\dist-merged\AutoMapper.dll" tofile="${dist.dir}\AutoMapper.dll" />
 	</target>
 
 </project>

@@ -1,2 +1,4 @@
 ^LinFu\.DynamicProxy\.IProxy$
 ^LinFu\.DynamicProxy\.IInterceptor$
+^LinFu\.DynamicProxy\.ProxyDummy$
+^LinFu\.DynamicProxy\.InvocationInfo$
