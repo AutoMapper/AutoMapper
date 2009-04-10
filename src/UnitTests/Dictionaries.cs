@@ -104,5 +104,59 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_mapping_to_a_generic_dictionary_interface_with_mapped_value_pairs : SpecBase
+		{
+			private Destination _result;
+
+			private class Source
+			{
+				public Dictionary<string, SourceValue> Values { get; set; }
+			}
+
+			private class SourceValue
+			{
+				public int Value { get; set; }
+			}
+
+			private class Destination
+			{
+				public IDictionary<string, DestinationValue> Values { get; set; }
+			}
+
+			private class DestinationValue
+			{
+				public int Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+				Mapper.CreateMap<SourceValue, DestinationValue>();
+			}
+
+			protected override void Because_of()
+			{
+				var source = new Source
+				{
+					Values = new Dictionary<string, SourceValue>
+							{
+								{"Key1", new SourceValue {Value = 5}},
+								{"Key2", new SourceValue {Value = 10}},
+							}
+				};
+
+				_result = Mapper.Map<Source, Destination>(source);
+			}
+
+			[Test]
+			public void Should_perform_mapping_for_individual_values()
+			{
+				_result.Values.Count.ShouldEqual(2);
+
+				_result.Values["Key1"].Value.ShouldEqual(5);
+				_result.Values["Key2"].Value.ShouldEqual(10);
+			}
+		}
+
 	}
 }

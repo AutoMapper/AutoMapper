@@ -194,10 +194,5 @@ namespace AutoMapper
 					new NullableMapper(),
 				};
 		}
-
-		public static void AddResolver<TSourceMember, TDestinationMember>(IValueResolver resolver)
-		{
-//			return ConfigurationExpression.AddResolver<TSourceMember, TDestinationMember>();
-		}
 	}
 }
