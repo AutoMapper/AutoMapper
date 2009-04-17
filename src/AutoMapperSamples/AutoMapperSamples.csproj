@@ -56,7 +56,9 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="CommonBaseClassConfiguration.cs" />
     <Compile Include="ConfigurationValidation.cs" />
+    <Compile Include="DynamicMapping.cs" />
     <Compile Include="GlobalTypeConverters.cs" />
     <Compile Include="CustomValueResolvers.cs" />
     <Compile Include="Flattening.cs" />
