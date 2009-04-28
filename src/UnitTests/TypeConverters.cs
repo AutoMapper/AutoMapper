@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Reflection;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
@@ -79,5 +80,48 @@ namespace AutoMapper.UnitTests
 				_result.Value3.ShouldEqual(typeof(Destination));
 			}
 		}
+
+		public class When_specifying_mapping_with_the_BCL_type_converter_class : AutoMapperSpecBase
+		{
+			[TypeConverter(typeof(CustomTypeConverter))]
+			private class Source
+			{
+				public int Value { get; set; }
+			}
+
+			private class Destination
+			{
+				public int OtherValue { get; set; }
+			}
+
+			private class CustomTypeConverter : TypeConverter
+			{
+				public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+				{
+					return destinationType == typeof (Destination);
+				}
+
+				public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+				{
+					return new Destination
+						{
+							OtherValue = ((Source) value).Value + 10
+						};
+				}
+			}
+
+			[Test]
+			public void Should_convert_type_using_the_custom_type_converter()
+			{
+				var source = new Source
+					{
+						Value = 5
+					};
+				var destination = Mapper.Map<Source, Destination>(source);
+
+				destination.OtherValue.ShouldEqual(15);
+			}
+		}
+
 	}
 }

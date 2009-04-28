@@ -34,7 +34,7 @@ namespace AutoMapper
 						expressionToCheck = ((UnaryExpression)expressionToCheck).Operand;
 						break;
 					case ExpressionType.Lambda:
-						expressionToCheck = lambdaExpression.Body;
+						expressionToCheck = ((LambdaExpression)expressionToCheck).Body;
 						break;
 					case ExpressionType.MemberAccess:
 						MemberInfo member = ((MemberExpression)expressionToCheck).Member;

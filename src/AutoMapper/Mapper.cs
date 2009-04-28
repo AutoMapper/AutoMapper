@@ -191,6 +191,7 @@ namespace AutoMapper
 					new ArrayMapper(),
 					new DictionaryMapper(),
 					new EnumerableMapper(),
+					new TypeConverterMapper(),
 					new NullableMapper(),
 				};
 		}

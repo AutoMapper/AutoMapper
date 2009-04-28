@@ -96,6 +96,7 @@
     <Compile Include="Mappers\NewOrDefaultMapper.cs" />
     <Compile Include="Mappers\NullableMapper.cs" />
     <Compile Include="Mappers\StringMapper.cs" />
+    <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Mappers\TypeHelper.cs" />
     <Compile Include="Mappers\TypeMapMapper.cs" />
     <Compile Include="MappingEngine.cs" />
