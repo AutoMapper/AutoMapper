@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
@@ -225,6 +226,39 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_testing_a_dto_with_list_types_with_mismatched_element_types : AutoMapperSpecBase
+		{
+			private class Source
+			{
+				public List<SourceItem> Items;
+			}
+
+			private class Destination
+			{
+				public List<DestinationItem> Items;
+			}
+
+			private class SourceItem
+			{
+
+			}
+
+			private class DestinationItem
+			{
+
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+			}
+
+			[Test]
+			public void Should_fail_a_configuration_check()
+			{
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
+		}
 	}
 
 }

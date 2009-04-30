@@ -238,10 +238,10 @@ namespace AutoMapper
 					}
 				}
 			} 
-			else if (mapperToUse is ArrayMapper)
+			else if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper)
 			{
 				Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
-				Type destElementType = context.DestinationType.GetElementType();
+				Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 				TypeMap itemTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceElementType, destElementType);
 				var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType, 0);
 

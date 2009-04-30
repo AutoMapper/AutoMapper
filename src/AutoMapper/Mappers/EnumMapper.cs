@@ -6,12 +6,7 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			Type enumDestType = context.DestinationType;
-
-			if (context.DestinationType.IsNullableType())
-			{
-				enumDestType = context.DestinationType.GetGenericArguments()[0];
-			}
+			Type enumDestType = TypeHelper.GetEnumerationType(context.DestinationType);
 
 			if (!enumDestType.IsEnum)
 			{

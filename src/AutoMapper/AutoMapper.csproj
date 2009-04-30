@@ -91,6 +91,7 @@
     <Compile Include="Mappers\CustomTypeMapMapper.cs" />
     <Compile Include="Mappers\DictionaryMapper.cs" />
     <Compile Include="Mappers\EnumerableMapper.cs" />
+    <Compile Include="Mappers\EnumerableMapperBase.cs" />
     <Compile Include="Mappers\EnumMapper.cs" />
     <Compile Include="Mappers\AssignableMapper.cs" />
     <Compile Include="Mappers\NewOrDefaultMapper.cs" />

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AutoMapper.Mappers
 {
-	public static class TypeHelper
+	internal static class TypeHelper
 	{
 		public static Type GetElementType(Type enumerableType)
 		{
@@ -30,6 +30,19 @@ namespace AutoMapper.Mappers
 			}
 
 			throw new ArgumentException(String.Format("Unable to find the element type for type '{0}'.", enumerableType), "enumerableType");
+		}
+
+		public static Type GetEnumerationType(Type enumType)
+		{
+			if (enumType.IsNullableType())
+			{
+				enumType = enumType.GetGenericArguments()[0];
+			}
+
+			if (!enumType.IsEnum)
+				return null;
+
+			return enumType;
 		}
 	}
 }
