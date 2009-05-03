@@ -938,7 +938,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 	
-		public class When_mapping_to_a_top_level_camelCased_destination_member : SpecBase
+		public class When_mapping_to_a_top_level_camelCased_destination_member : AutoMapperSpecBase
 		{
 			private Destination _result;
 
@@ -976,6 +976,67 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_mapping_to_a_self_referential_object : AutoMapperSpecBase
+        {
+            private CategoryDto _result;
+
+            private class Category
+            {
+                public string Name { get; set; }
+                public IList<Category> Children { get; set; }
+            }
+
+            private class CategoryDto
+            {
+                public string Name { get; set; }
+                public CategoryDto[] Children { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Category, CategoryDto>();
+            }
+
+            protected override void Because_of()
+            {
+                var category = new Category
+                {
+                    Name = "Grandparent",
+                    Children = new List<Category>()
+                    {
+                        new Category { Name = "Parent 1", Children = new List<Category>()
+                        {
+                            new Category { Name = "Child 1"},
+                            new Category { Name = "Child 2"},
+                            new Category { Name = "Child 3"},
+                        }},
+                        new Category { Name = "Parent 2", Children = new List<Category>()
+                        {
+                            new Category { Name = "Child 4"},
+                            new Category { Name = "Child 5"},
+                            new Category { Name = "Child 6"},
+                            new Category { Name = "Child 7"},
+                        }},
+                    }
+                };
+                _result = Mapper.Map<Category, CategoryDto>(category);
+            }
+
+            [Test]
+            public void Should_pass_configuration_check()
+            {
+                Mapper.AssertConfigurationIsValid();
+            }
+
+            [Test]
+            public void Should_resolve_any_level_of_hierarchies()
+            {
+                _result.Name.ShouldEqual("Grandparent");
+                _result.Children.Length.ShouldEqual(2);
+                _result.Children[0].Children.Length.ShouldEqual(3);
+                _result.Children[1].Children.Length.ShouldEqual(4);
+            }
+        }
 	}
 
 	public static class MapFromExtensions

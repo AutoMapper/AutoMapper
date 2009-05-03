@@ -13,7 +13,7 @@ namespace AutoMapper
 		internal const string DefaultProfileName = "";
 
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
-		private readonly IDictionary<string, FormatterExpression> _formatters = new Dictionary<string, FormatterExpression>();
+		private readonly IDictionary<string, FormatterExpression> _formatterProfiles = new Dictionary<string, FormatterExpression>();
 		private Func<Type, IValueFormatter> _formatterCtor = type => (IValueFormatter)Activator.CreateInstance(type, true);
 		private Func<Type, IValueResolver> _resolverCtor = type => (IValueResolver)Activator.CreateInstance(type, true);
 		private Func<Type, object> _typeConverterCtor = type => Activator.CreateInstance(type, true);
@@ -183,7 +183,8 @@ namespace AutoMapper
 			{
 				throw new AutoMapperConfigurationException(typeMap, typeMap.GetUnmappedPropertyNames());
 			}
-			DryRunTypeMap(new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType));
+		    var typeMaps = new List<TypeMap> {typeMap};
+			DryRunTypeMap(typeMaps, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType));
 		}
 
 		void IConfiguration.AssertConfigurationIsValid()
@@ -202,14 +203,21 @@ namespace AutoMapper
 				throw new AutoMapperConfigurationException(firstBadTypeMap.typeMap, firstBadTypeMap.unmappedPropertyNames);
 			}
 
+		    var typeMapsChecked = new List<TypeMap>();
+
 			foreach (var typeMap in _typeMaps)
 			{
-				DryRunTypeMap(new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType));
+				DryRunTypeMap(typeMapsChecked, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType));
 			}
 		}
 
-		private void DryRunTypeMap(ResolutionContext context)
+		private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
 		{
+            if (context.TypeMap != null)
+            {
+                typeMapsChecked.Add(context.TypeMap);
+            }
+
 			var mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
 
 			if (mapperToUse == null)
@@ -231,9 +239,12 @@ namespace AutoMapper
 							var destinationType = propertyMap.DestinationProperty.MemberType;
 							var memberTypeMap = ((IConfiguration)this).FindTypeMapFor(sourceType, destinationType);
 
-							var memberContext = context.CreateMemberContext(memberTypeMap, null, sourceType, propertyMap);
+                            if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
+                                continue;
+                            
+                            var memberContext = context.CreateMemberContext(memberTypeMap, null, sourceType, propertyMap);
 
-							DryRunTypeMap(memberContext);
+                            DryRunTypeMap(typeMapsChecked, memberContext);
 						}
 					}
 				}
@@ -243,9 +254,13 @@ namespace AutoMapper
 				Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
 				Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 				TypeMap itemTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceElementType, destElementType);
-				var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType, 0);
 
-				DryRunTypeMap(memberContext);
+                if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
+                    return;
+                
+                var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType, 0);
+                
+                DryRunTypeMap(typeMapsChecked, memberContext);
 			}
 
 		}
@@ -272,12 +287,12 @@ namespace AutoMapper
 
 		internal FormatterExpression GetProfile(string profileName)
 		{
-			if (!_formatters.ContainsKey(profileName))
+			if (!_formatterProfiles.ContainsKey(profileName))
 			{
-				_formatters.Add(profileName, new FormatterExpression(_formatterCtor));
+				_formatterProfiles.Add(profileName, new FormatterExpression(_formatterCtor));
 			}
 
-			return _formatters[profileName];
+			return _formatterProfiles[profileName];
 		}
 	}
 }
