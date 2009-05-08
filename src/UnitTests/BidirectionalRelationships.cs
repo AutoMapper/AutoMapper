@@ -6,8 +6,8 @@ namespace AutoMapper.UnitTests
 {
 	namespace BidirectionalRelationships
 	{
-		[Explicit]
-		public class When_mapping_to_a_destination_with_a_bidirectional_parent_child_relationship : AutoMapperSpecBase
+		[Ignore]
+		public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship : AutoMapperSpecBase
 		{
 			private ParentDto _dto;
 
@@ -67,6 +67,52 @@ namespace AutoMapper.UnitTests
 			{
 				public string ID { get; set; }
 				public ParentDto Parent { get; protected set; }
+			}
+		}
+		public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_one_child_relationship : AutoMapperSpecBase
+		{
+            private FooBar _dto;
+
+			protected override void Establish_context()
+			{
+                Mapper.CreateMap<Foo, FooBar>();
+				Mapper.AssertConfigurationIsValid();
+			}
+
+			protected override void Because_of()
+			{
+			    var foo = new Foo
+			    {
+			        Bar = new Bar
+			        {
+			            Value = "something"
+			        }
+			    };
+			    foo.Bar.Foo = foo;
+			    _dto = Mapper.Map<Foo, FooBar>(foo);
+			}
+
+			[Test]
+            [Explicit]
+            public void Should_preserve_the_parent_child_relationship_on_the_destination()
+			{
+				_dto.BarFooBarValue.ShouldEqual("something");
+			}
+
+			private class Foo
+			{
+                public Bar Bar { get; set; }
+			}
+
+			private class Bar
+			{
+                public Foo Foo { get; set; }
+                public string Value { get; set; }
+			}
+
+			private class FooBar
+			{
+                public string BarFooBarValue { get; set; }
 			}
 		}
 	}

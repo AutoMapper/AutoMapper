@@ -47,6 +47,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="StructureMap, Version=2.5.3.0, Culture=neutral, PublicKeyToken=e60ad81abae3c223, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\StructureMap\StructureMap.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -63,6 +67,7 @@
     <Compile Include="CustomValueResolvers.cs" />
     <Compile Include="Flattening.cs" />
     <Compile Include="Interfaces.cs" />
+    <Compile Include="InversionOfControl.cs" />
     <Compile Include="Lists.cs" />
     <Compile Include="NestedMappings.cs" />
     <Compile Include="Projection.cs" />
