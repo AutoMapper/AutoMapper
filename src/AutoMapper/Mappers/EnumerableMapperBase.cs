@@ -26,13 +26,16 @@ namespace AutoMapper.Mappers
 
 				if (item.GetType() != sourceElementType)
 				{
-					targetSourceType = item.GetType();
+				    var potentialSourceType = item.GetType();
 
 					TypeMap itemTypeMap =
 						mapper.Configuration.FindTypeMapFor(sourceElementType, destElementType)
-						?? mapper.Configuration.FindTypeMapFor(targetSourceType, destElementType);
+                        ?? mapper.Configuration.FindTypeMapFor(potentialSourceType, destElementType);
 
-					targetDestinationType = itemTypeMap.GetDerivedTypeFor(targetSourceType);
+                    var potentialDestType = itemTypeMap.GetDerivedTypeFor(potentialSourceType);
+
+                    targetSourceType = potentialDestType != destElementType ? potentialSourceType : itemTypeMap.SourceType;
+				    targetDestinationType = potentialDestType;
 				}
 
 				TypeMap derivedTypeMap = mapper.Configuration.FindTypeMapFor(targetSourceType, targetDestinationType);
