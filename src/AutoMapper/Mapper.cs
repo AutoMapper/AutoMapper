@@ -164,7 +164,7 @@ namespace AutoMapper
 					{
 						if (_configuration == null)
 						{
-							_configuration = new Configuration(BuildMappers());
+							_configuration = new Configuration(MapperRegistry.AllMappers());
 						}
 					}
 				}
@@ -176,24 +176,6 @@ namespace AutoMapper
 		private static IConfigurationExpression ConfigurationExpression
 		{
 			get { return (IConfigurationExpression) Configuration; }
-		}
-
-		private static IObjectMapper[] BuildMappers()
-		{
-			return new IObjectMapper[]
-				{
-					new CustomTypeMapMapper(),
-					new TypeMapMapper(),
-					new NewOrDefaultMapper(),
-					new StringMapper(),
-					new EnumMapper(),
-					new AssignableMapper(),
-					new ArrayMapper(),
-					new DictionaryMapper(),
-					new EnumerableMapper(),
-					new TypeConverterMapper(),
-					new NullableMapper(),
-				};
 		}
 	}
 }
