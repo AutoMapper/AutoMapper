@@ -9,10 +9,28 @@ namespace AutoMapper
 {
 	public class Configuration : IConfiguration, IConfigurationExpression
 	{
+		private struct TypePair
+		{
+			public TypePair(Type sourceType, Type destinationType) : this()
+			{
+				SourceType = sourceType;
+				DestinationType = destinationType;
+			}
+
+			private Type SourceType { get; set; }
+			private Type DestinationType { get; set; }
+
+			public override int GetHashCode()
+			{
+				return SourceType.GetHashCode() ^ DestinationType.GetHashCode();
+			}
+		}
+
 		private readonly IObjectMapper[] _mappers;
 		internal const string DefaultProfileName = "";
 
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
+		private readonly IDictionary<TypePair, TypeMap> _typeMapCache = new Dictionary<TypePair, TypeMap>();
 		private readonly IDictionary<string, FormatterExpression> _formatterProfiles = new Dictionary<string, FormatterExpression>();
 		private Func<Type, IValueFormatter> _formatterCtor = type => (IValueFormatter)Activator.CreateInstance(type, true);
 		private Func<Type, IValueResolver> _resolverCtor = type => (IValueResolver)Activator.CreateInstance(type, true);
@@ -98,6 +116,7 @@ namespace AutoMapper
 			TypeMap typeMap = typeMapFactory.CreateTypeMap();
 
 			_typeMaps.Add(typeMap);
+			_typeMapCache[new TypePair(source, destination)] = typeMap;
 			return typeMap;
 		}
 
@@ -138,31 +157,38 @@ namespace AutoMapper
 
 		TypeMap IConfiguration.FindTypeMapFor(Type sourceType, Type destinationType)
 		{
+			var typeMapPair = new TypePair(sourceType, destinationType);
+			
+			// Cache miss
+			if (_typeMapCache.ContainsKey(typeMapPair))
+				return _typeMapCache[typeMapPair];
+
 			TypeMap typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
-			if (typeMap != null)
-				return typeMap;
-
-			typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
-			if (typeMap != null)
-				return typeMap;
-
-			foreach (var sourceInterface in sourceType.GetInterfaces())
+			if (typeMap == null)
 			{
-				typeMap = ((IConfiguration) this).FindTypeMapFor(sourceInterface, destinationType);
-				if (typeMap != null)
+				typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
+
+				if (typeMap == null)
 				{
-					var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
-					if (derivedTypeFor != null)
+					foreach (var sourceInterface in sourceType.GetInterfaces())
 					{
-						CreateTypeMap(sourceType, derivedTypeFor);
-						return ((IConfiguration) this).FindTypeMapFor(sourceType, derivedTypeFor);
+						typeMap = ((IConfiguration) this).FindTypeMapFor(sourceInterface, destinationType);
+						
+						if (typeMap == null) continue;
+
+						var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
+						if (derivedTypeFor != null)
+						{
+							typeMap = CreateTypeMap(sourceType, derivedTypeFor);
+						}
 					}
-					return typeMap;
+
+					if ((sourceType.BaseType != null) && (typeMap == null))
+						typeMap = ((IConfiguration) this).FindTypeMapFor(sourceType.BaseType, destinationType);
 				}
 			}
 
-			if (sourceType.BaseType != null)
-				return ((IConfiguration) this).FindTypeMapFor(sourceType.BaseType, destinationType);
+			_typeMapCache[typeMapPair] = typeMap;
 
 			return typeMap;
 		}

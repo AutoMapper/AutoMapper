@@ -6,7 +6,7 @@ namespace AutoMapper.UnitTests
 {
 	namespace BidirectionalRelationships
 	{
-		[Ignore]
+		[Explicit]
 		public class When_mapping_to_a_destination_with_a_bidirectional_parent_child_relationship : AutoMapperSpecBase
 		{
 			private ParentDto _dto;
