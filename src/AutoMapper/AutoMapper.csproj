@@ -88,6 +88,7 @@
     <Compile Include="IValueFormatter.cs" />
     <Compile Include="IValueResolver.cs" />
     <Compile Include="Mappers\ArrayMapper.cs" />
+    <Compile Include="Mappers\FlagsEnumMapper.cs" />
     <Compile Include="Mappers\CustomTypeMapMapper.cs" />
     <Compile Include="Mappers\DictionaryMapper.cs" />
     <Compile Include="Mappers\EnumerableMapper.cs" />

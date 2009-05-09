@@ -10,6 +10,7 @@ namespace AutoMapper.Mappers
             new TypeMapMapper(),
             new NewOrDefaultMapper(),
             new StringMapper(),
+            new FlagsEnumMapper(),
             new EnumMapper(),
             new AssignableMapper(),
             new ArrayMapper(),

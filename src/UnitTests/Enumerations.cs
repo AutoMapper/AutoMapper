@@ -1,4 +1,5 @@
 using System;
+using AutoMapper.UnitTests;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
@@ -294,4 +295,46 @@ namespace AutoMapper.Tests
 			dest.Values.ShouldEqual(default(EnumValues));
 		}
 	}
+
+	public class When_mapping_a_flags_enum : AutoMapperSpecBase
+	{
+		private DestinationFlags _result;
+
+		[Flags]
+		private enum SourceFlags
+		{
+			None = 0,
+			One = 1,
+			Two = 2,
+			Four = 4,
+			Eight = 8
+		}
+
+		[Flags]
+		private enum DestinationFlags
+		{
+			None = 0,
+			One = 1,
+			Two = 2,
+			Four = 4,
+			Eight = 8
+		}
+
+		protected override void Establish_context()
+		{
+			// No type map needed
+		}
+
+		protected override void Because_of()
+		{
+			_result = Mapper.Map<SourceFlags, DestinationFlags>(SourceFlags.One | SourceFlags.Four | SourceFlags.Eight);
+		}
+
+		[Test]
+		public void Should_include_all_source_enum_values()
+		{
+			_result.ShouldEqual(DestinationFlags.One | DestinationFlags.Four | DestinationFlags.Eight);
+		}
+	}
+
 }

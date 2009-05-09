@@ -1,14 +1,15 @@
 using System;
+using System.Linq;
 
 namespace AutoMapper.Mappers
 {
-	public class EnumMapper : IObjectMapper
+	public class FlagsEnumMapper : IObjectMapper
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
 			Type enumDestType = TypeHelper.GetEnumerationType(context.DestinationType);
 
-			return Enum.Parse(enumDestType, Enum.GetName(context.SourceType, context.SourceValue));
+			return Enum.Parse(enumDestType, context.SourceValue.ToString());
 		}
 
 		public bool IsMatch(ResolutionContext context)
@@ -17,7 +18,9 @@ namespace AutoMapper.Mappers
 			var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);
 
 			return sourceEnumType != null
-				&& destEnumType != null;
+				&& destEnumType != null
+				&& sourceEnumType.GetCustomAttributes(typeof(FlagsAttribute), false).Any()
+				&& destEnumType.GetCustomAttributes(typeof(FlagsAttribute), false).Any();
 		}
 	}
 }
