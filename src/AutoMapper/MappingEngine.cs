@@ -42,7 +42,7 @@ namespace AutoMapper
 
 			return (TDestination)DynamicMap(source, modelType, destinationType);
 		}
-
+			
 		public TDestination DynamicMap<TDestination>(object source)
 		{
 			Type modelType = source == null ? typeof(object) : source.GetType();

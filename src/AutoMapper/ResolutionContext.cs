@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace AutoMapper
 {
@@ -12,6 +13,7 @@ namespace AutoMapper
 		public object SourceValue { get; private set; }
 		public object DestinationValue { get; private set; }
 		public ResolutionContext Parent { get; private set; }
+		public Dictionary<object, object> InstanceCache { get; private set; }
 
 		private ResolutionContext()
 		{
@@ -37,6 +39,7 @@ namespace AutoMapper
 				SourceType = sourceType;
 				DestinationType = destinationType;
 			}
+			InstanceCache = new Dictionary<object, object>();
 		}
 
 		public string MemberName
@@ -67,7 +70,8 @@ namespace AutoMapper
 					SourceValue = sourceValue,
 					DestinationValue = DestinationValue,
 					Parent = this,
-					DestinationType = DestinationType
+					DestinationType = DestinationType,
+					InstanceCache = InstanceCache
 				};
 		}
 
@@ -82,7 +86,8 @@ namespace AutoMapper
 					SourceValue = sourceValue,
 					DestinationValue = DestinationValue,
 					Parent = this,
-					DestinationType = DestinationType
+					DestinationType = DestinationType,
+					InstanceCache = InstanceCache
 				};
 		}
 
@@ -96,7 +101,8 @@ namespace AutoMapper
 						PropertyMap = propertyMap,
 						SourceType = memberTypeMap.SourceType,
 						SourceValue = memberValue,
-						TypeMap = memberTypeMap
+						TypeMap = memberTypeMap,
+						InstanceCache = InstanceCache
 					};
 
 			return new ResolutionContext
@@ -106,7 +112,8 @@ namespace AutoMapper
 					PropertyMap = propertyMap,
 					SourceType = sourceMemberType,
 					SourceValue = memberValue,
-					TypeMap = memberTypeMap
+					TypeMap = memberTypeMap,
+					InstanceCache = InstanceCache
 				};
 		}
 
@@ -120,7 +127,8 @@ namespace AutoMapper
 					PropertyMap = PropertyMap,
 					SourceType = sourceElementType,
 					SourceValue = item,
-					TypeMap = elementTypeMap
+					TypeMap = elementTypeMap,
+					InstanceCache = InstanceCache
 				};
 		}
 

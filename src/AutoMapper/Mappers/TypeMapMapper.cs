@@ -13,7 +13,18 @@ namespace AutoMapper.Mappers
 				return null;
 			}
 
-			object mappedObject = context.DestinationValue ?? mapper.CreateObject(context.DestinationType);
+			object mappedObject = context.DestinationValue;
+
+			if (mappedObject == null)
+			{
+				if (context.SourceValue != null && context.InstanceCache.ContainsKey(context.SourceValue))
+					return context.InstanceCache[context.SourceValue];
+
+				mappedObject = mapper.CreateObject(context.DestinationType);
+
+				if (context.SourceValue != null)
+					context.InstanceCache.Add(context.SourceValue, mappedObject);
+			}
 
 			foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
 			{
