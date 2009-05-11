@@ -7,7 +7,7 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
-	public class Configuration : IConfiguration, IConfigurationExpression
+	public class Configuration : IConfigurationProvider, IConfiguration
 	{
 		private struct TypePair
 		{
@@ -150,12 +150,12 @@ namespace AutoMapper
 			return GetProfile(DefaultProfileName).ForSourceType<TSource>();
 		}
 
-		TypeMap[] IConfiguration.GetAllTypeMaps()
+		public TypeMap[] GetAllTypeMaps()
 		{
 			return _typeMaps.ToArray();
 		}
 
-		TypeMap IConfiguration.FindTypeMapFor(Type sourceType, Type destinationType)
+		public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
 		{
 			var typeMapPair = new TypePair(sourceType, destinationType);
 			
@@ -172,7 +172,7 @@ namespace AutoMapper
 				{
 					foreach (var sourceInterface in sourceType.GetInterfaces())
 					{
-						typeMap = ((IConfiguration) this).FindTypeMapFor(sourceInterface, destinationType);
+						typeMap = ((IConfigurationProvider) this).FindTypeMapFor(sourceInterface, destinationType);
 						
 						if (typeMap == null) continue;
 
@@ -184,7 +184,7 @@ namespace AutoMapper
 					}
 
 					if ((sourceType.BaseType != null) && (typeMap == null))
-						typeMap = ((IConfiguration) this).FindTypeMapFor(sourceType.BaseType, destinationType);
+						typeMap = ((IConfigurationProvider) this).FindTypeMapFor(sourceType.BaseType, destinationType);
 				}
 			}
 
@@ -193,17 +193,17 @@ namespace AutoMapper
 			return typeMap;
 		}
 
-		TypeMap IConfiguration.FindTypeMapFor<TSource, TDestination>()
+		public TypeMap FindTypeMapFor<TSource, TDestination>()
 		{
-			return ((IConfiguration) this).FindTypeMapFor(typeof (TSource), typeof (TDestination));
+			return ((IConfigurationProvider) this).FindTypeMapFor(typeof (TSource), typeof (TDestination));
 		}
 
-		IFormatterConfiguration IConfiguration.GetProfileConfiguration(string profileName)
+		public IFormatterConfiguration GetProfileConfiguration(string profileName)
 		{
 			return GetProfile(profileName);
 		}
 
-		void IConfiguration.AssertConfigurationIsValid(TypeMap typeMap)
+		public void AssertConfigurationIsValid(TypeMap typeMap)
 		{
 			if (typeMap.GetUnmappedPropertyNames().Length > 0)
 			{
@@ -213,7 +213,7 @@ namespace AutoMapper
 			DryRunTypeMap(typeMaps, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType));
 		}
 
-		void IConfiguration.AssertConfigurationIsValid()
+		public void AssertConfigurationIsValid()
 		{
 			var badTypeMaps =
 				from typeMap in _typeMaps
@@ -237,7 +237,12 @@ namespace AutoMapper
 			}
 		}
 
-		private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
+	    public IObjectMapper[] GetMappers()
+	    {
+	        return _mappers;
+	    }
+
+	    private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
 		{
             if (context.TypeMap != null)
             {
@@ -263,7 +268,7 @@ namespace AutoMapper
 						{
 							var sourceType = ((MemberAccessorBase)lastResolver).MemberType;
 							var destinationType = propertyMap.DestinationProperty.MemberType;
-							var memberTypeMap = ((IConfiguration)this).FindTypeMapFor(sourceType, destinationType);
+							var memberTypeMap = ((IConfigurationProvider)this).FindTypeMapFor(sourceType, destinationType);
 
                             if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
                                 continue;
@@ -279,7 +284,7 @@ namespace AutoMapper
 			{
 				Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
 				Type destElementType = TypeHelper.GetElementType(context.DestinationType);
-				TypeMap itemTypeMap = ((IConfiguration) this).FindTypeMapFor(sourceElementType, destElementType);
+				TypeMap itemTypeMap = ((IConfigurationProvider) this).FindTypeMapFor(sourceElementType, destElementType);
 
                 if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
                     return;
@@ -291,12 +296,7 @@ namespace AutoMapper
 
 		}
 
-		public IObjectMapper[] GetMappers()
-		{
-			return _mappers;
-		}
-
-		private void SelfProfile(Type type)
+	    private void SelfProfile(Type type)
 		{
 			var selfProfiler = (ISelfProfiler) Activator.CreateInstance(type, true);
 			Profile profile = selfProfiler.GetProfile();

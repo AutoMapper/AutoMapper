@@ -81,7 +81,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Internal\EnumerableExtensions.cs" />
     <Compile Include="Internal\FormatterExpression.cs" />
-    <Compile Include="IConfiguration.cs" />
+    <Compile Include="IConfigurationProvider.cs" />
     <Compile Include="IFormatterExpression.cs" />
     <Compile Include="IMappingEngine.cs" />
     <Compile Include="IMappingExpression.cs" />

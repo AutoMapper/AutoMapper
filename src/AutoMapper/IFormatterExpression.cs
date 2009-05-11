@@ -30,7 +30,7 @@ namespace AutoMapper
 		IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>();
 	}
 
-	public interface IConfigurationExpression : IProfileExpression
+	public interface IConfiguration : IProfileExpression
 	{
 		IProfileExpression CreateProfile(string profileName);
 		void CreateProfile(string profileName, Action<IProfileExpression> initializationExpression);

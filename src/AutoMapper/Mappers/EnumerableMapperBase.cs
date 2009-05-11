@@ -29,8 +29,8 @@ namespace AutoMapper.Mappers
 				    var potentialSourceType = item.GetType();
 
 					TypeMap itemTypeMap =
-						mapper.Configuration.FindTypeMapFor(sourceElementType, destElementType)
-                        ?? mapper.Configuration.FindTypeMapFor(potentialSourceType, destElementType);
+						mapper.ConfigurationProvider.FindTypeMapFor(sourceElementType, destElementType)
+                        ?? mapper.ConfigurationProvider.FindTypeMapFor(potentialSourceType, destElementType);
 
                     var potentialDestType = itemTypeMap.GetDerivedTypeFor(potentialSourceType);
 
@@ -38,7 +38,7 @@ namespace AutoMapper.Mappers
 				    targetDestinationType = potentialDestType;
 				}
 
-				TypeMap derivedTypeMap = mapper.Configuration.FindTypeMapFor(targetSourceType, targetDestinationType);
+				TypeMap derivedTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(targetSourceType, targetDestinationType);
 
 				var newContext = context.CreateElementContext(derivedTypeMap, item, targetSourceType, targetDestinationType, i);
 

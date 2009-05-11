@@ -2,7 +2,7 @@ using System;
 
 namespace AutoMapper
 {
-	public interface IConfiguration : IProfileConfiguration
+	public interface IConfigurationProvider : IProfileConfiguration
 	{
 		TypeMap[] GetAllTypeMaps();
 		TypeMap FindTypeMapFor(Type sourceType, Type destinationType);

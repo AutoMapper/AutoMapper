@@ -7,6 +7,6 @@ namespace AutoMapper
 		object Map(ResolutionContext context);
 		object CreateObject(Type type);
 		string FormatValue(ResolutionContext context);
-		IConfiguration Configuration { get; }
+		IConfigurationProvider ConfigurationProvider { get; }
 	}
 }

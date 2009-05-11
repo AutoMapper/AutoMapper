@@ -6,17 +6,17 @@ namespace AutoMapper
 {
 	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
-		private readonly IConfiguration _configuration;
+		private readonly IConfigurationProvider _configurationProvider;
 		private readonly ProxyFactory _proxyFactory = new ProxyFactory();
 
-		public MappingEngine(IConfiguration configuration)
+		public MappingEngine(IConfigurationProvider configurationProvider)
 		{
-			_configuration = configuration;
+			_configurationProvider = configurationProvider;
 		}
 
-		public IConfiguration Configuration
+		public IConfigurationProvider ConfigurationProvider
 		{
-			get { return _configuration; }
+			get { return _configurationProvider; }
 		}
 
 		public TDestination Map<TSource, TDestination>(TSource source)
@@ -53,11 +53,11 @@ namespace AutoMapper
 
 		public object DynamicMap(object source, Type sourceType, Type destinationType)
 		{
-			var typeMap = Configuration.FindTypeMapFor(sourceType, destinationType);
+			var typeMap = ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
 			if (typeMap == null)
 			{
-				typeMap = Configuration.CreateTypeMap(sourceType, destinationType);
-				Configuration.AssertConfigurationIsValid(typeMap);
+				typeMap = ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
+				ConfigurationProvider.AssertConfigurationIsValid(typeMap);
 			}
 
 			return Map(source, sourceType, destinationType);
@@ -65,7 +65,7 @@ namespace AutoMapper
 
 		public object Map(object source, Type sourceType, Type destinationType)
 		{
-			TypeMap typeMap = Configuration.FindTypeMapFor(sourceType, destinationType);
+			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
 
@@ -74,7 +74,7 @@ namespace AutoMapper
 
 		public object Map(object source, object destination, Type sourceType, Type destinationType)
 		{
-			TypeMap typeMap = Configuration.FindTypeMapFor(sourceType, destinationType);
+			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType);
 
@@ -85,7 +85,7 @@ namespace AutoMapper
 		{
 			try
 			{
-				IObjectMapper mapperToUse = Configuration.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
+				IObjectMapper mapperToUse = ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
 
 				if (mapperToUse == null)
 				{
@@ -104,8 +104,8 @@ namespace AutoMapper
 		{
 			TypeMap contextTypeMap = context.GetContextTypeMap();
 			IFormatterConfiguration configuration = contextTypeMap != null
-												? Configuration.GetProfileConfiguration(contextTypeMap.Profile)
-			                                 	: Configuration.GetProfileConfiguration(AutoMapper.Configuration.DefaultProfileName);
+												? ConfigurationProvider.GetProfileConfiguration(contextTypeMap.Profile)
+			                                 	: ConfigurationProvider.GetProfileConfiguration(AutoMapper.Configuration.DefaultProfileName);
 
 			var valueFormatter = new ValueFormatter(configuration);
 

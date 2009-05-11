@@ -36,9 +36,9 @@ namespace AutoMapper.Mappers
 		{
 			var typeMap = context.GetContextTypeMap();
 			if (typeMap != null)
-				return mapper.Configuration.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
+				return mapper.ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
 
-			return mapper.Configuration.MapNullSourceValuesAsNull;
+			return mapper.ConfigurationProvider.MapNullSourceValuesAsNull;
 		}
 
 		public bool IsMatch(ResolutionContext context)

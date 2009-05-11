@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			var profileConfiguration = mapper.Configuration.GetProfileConfiguration(context.TypeMap.Profile);
+			var profileConfiguration = mapper.ConfigurationProvider.GetProfileConfiguration(context.TypeMap.Profile);
 
 			if (context.SourceValue == null && profileConfiguration.MapNullSourceValuesAsNull)
 			{
@@ -35,7 +35,7 @@ namespace AutoMapper.Mappers
 
 				var result = propertyMap.ResolveValue(context.SourceValue);
 
-				var memberTypeMap = mapper.Configuration.FindTypeMapFor(result.Type, propertyMap.DestinationProperty.MemberType);
+				var memberTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationProperty.MemberType);
 
 				var newContext = context.CreateMemberContext(memberTypeMap, result.Value, result.Type, propertyMap);
 
