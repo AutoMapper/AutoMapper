@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AutoMapper;
 using AutoMapper.Mappers;
 using NUnit.Framework;
@@ -55,10 +56,10 @@ namespace AutoMapperSamples
         {
             public ConfigurationRegistry()
             {
-                ForRequestedType<Configuration>()
-                    .CacheBy(InstanceScope.Singleton)
-                    .TheDefault.Is.OfConcreteType<Configuration>()
-                    .CtorDependency<IObjectMapper[]>().Is(expr => expr.ConstructedBy(MapperRegistry.AllMappers));
+				ForRequestedType<Configuration>()
+					.CacheBy(InstanceScope.Singleton)
+					.TheDefault.Is.OfConcreteType<Configuration>()
+					.CtorDependency<IEnumerable<IObjectMapper>>().Is(expr => expr.ConstructedBy(MapperRegistry.AllMappers));
 
                 ForRequestedType<IConfigurationProvider>()
                     .TheDefault.Is.ConstructedBy(ctx => ctx.GetInstance<Configuration>());

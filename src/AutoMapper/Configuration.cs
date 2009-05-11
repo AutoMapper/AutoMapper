@@ -26,7 +26,7 @@ namespace AutoMapper
 			}
 		}
 
-		private readonly IObjectMapper[] _mappers;
+		private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
 
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
@@ -36,7 +36,7 @@ namespace AutoMapper
 		private Func<Type, IValueResolver> _resolverCtor = type => (IValueResolver)Activator.CreateInstance(type, true);
 		private Func<Type, object> _typeConverterCtor = type => Activator.CreateInstance(type, true);
 
-		public Configuration(IObjectMapper[] mappers)
+		public Configuration(IEnumerable<IObjectMapper> mappers)
 		{
 			_mappers = mappers;
 		}
@@ -239,7 +239,7 @@ namespace AutoMapper
 
 	    public IObjectMapper[] GetMappers()
 	    {
-	        return _mappers;
+	        return _mappers.ToArray();
 	    }
 
 	    private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
