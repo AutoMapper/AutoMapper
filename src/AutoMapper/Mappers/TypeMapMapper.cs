@@ -17,13 +17,13 @@ namespace AutoMapper.Mappers
 
 			if (mappedObject == null)
 			{
-				if (context.SourceValue != null && context.InstanceCache.ContainsKey(context.SourceValue))
-					return context.InstanceCache[context.SourceValue];
+				if (context.InstanceCache.ContainsKey(context))
+					return context.InstanceCache[context];
 
 				mappedObject = mapper.CreateObject(context.DestinationType);
 
 				if (context.SourceValue != null)
-					context.InstanceCache.Add(context.SourceValue, mappedObject);
+					context.InstanceCache.Add(context, mappedObject);
 			}
 
 			foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())

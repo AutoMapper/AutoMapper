@@ -13,7 +13,7 @@ namespace AutoMapper
 		public object SourceValue { get; private set; }
 		public object DestinationValue { get; private set; }
 		public ResolutionContext Parent { get; private set; }
-		public Dictionary<object, object> InstanceCache { get; private set; }
+		public Dictionary<ResolutionContext, object> InstanceCache { get; private set; }
 
 		private ResolutionContext()
 		{
@@ -39,7 +39,7 @@ namespace AutoMapper
 				SourceType = sourceType;
 				DestinationType = destinationType;
 			}
-			InstanceCache = new Dictionary<object, object>();
+			InstanceCache = new Dictionary<ResolutionContext, object>();
 		}
 
 		public string MemberName
@@ -160,5 +160,34 @@ namespace AutoMapper
 			}
 			return propertyMap;
 		}
+
+	    public bool Equals(ResolutionContext other)
+	    {
+	        if (ReferenceEquals(null, other)) return false;
+	        if (ReferenceEquals(this, other)) return true;
+	        return Equals(other.TypeMap, TypeMap) && Equals(other.SourceType, SourceType) && Equals(other.DestinationType, DestinationType) && other.ArrayIndex.Equals(ArrayIndex) && Equals(other.SourceValue, SourceValue);
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+	        if (ReferenceEquals(null, obj)) return false;
+	        if (ReferenceEquals(this, obj)) return true;
+	        if (obj.GetType() != typeof (ResolutionContext)) return false;
+	        return Equals((ResolutionContext) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+	        unchecked
+	        {
+	            int result = (TypeMap != null ? TypeMap.GetHashCode() : 0);
+	            result = (result*397) ^ (SourceType != null ? SourceType.GetHashCode() : 0);
+	            result = (result*397) ^ (DestinationType != null ? DestinationType.GetHashCode() : 0);
+	            result = (result*397) ^ (ArrayIndex.HasValue ? ArrayIndex.Value : 0);
+	            result = (result*397) ^ (SourceValue != null ? SourceValue.GetHashCode() : 0);
+	            return result;
+	        }
+	    }
 	}
+
 }

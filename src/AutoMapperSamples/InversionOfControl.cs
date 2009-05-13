@@ -50,6 +50,25 @@ namespace AutoMapperSamples
 
                 destination.Value.ShouldEqual(15);
             }
+
+            [Test]
+            public void Example2()
+            {
+                ObjectFactory.Initialize(init =>
+                {
+                    init.AddRegistry<MappingEngineRegistry>();
+                });
+
+                Mapper.Reset();
+
+                Mapper.CreateMap<Source, Destination>();
+
+                var engine = ObjectFactory.GetInstance<IMappingEngine>();
+
+                var destination = engine.Map<Source, Destination>(new Source {Value = 15});
+
+                destination.Value.ShouldEqual(15);
+            }
         }
 
         public class ConfigurationRegistry : Registry
@@ -70,5 +89,15 @@ namespace AutoMapperSamples
                 ForRequestedType<IMappingEngine>().TheDefaultIsConcreteType<MappingEngine>();
             }
         }
+
+        public class MappingEngineRegistry : Registry
+        {
+            public MappingEngineRegistry()
+            {
+                ForRequestedType<IMappingEngine>()
+                    .TheDefault.Is.ConstructedBy(() => Mapper.Engine);
+            }
+        }
+
     }
 }

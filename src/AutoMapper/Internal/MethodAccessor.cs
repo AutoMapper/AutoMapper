@@ -36,5 +36,25 @@ namespace AutoMapper.Internal
 				_methodInfo.Invoke(destination, new[] {value});
 			}
 		}
+
+	    public bool Equals(MethodAccessor other)
+	    {
+	        if (ReferenceEquals(null, other)) return false;
+	        if (ReferenceEquals(this, other)) return true;
+	        return Equals(other._methodInfo, _methodInfo);
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+	        if (ReferenceEquals(null, obj)) return false;
+	        if (ReferenceEquals(this, obj)) return true;
+	        if (obj.GetType() != typeof (MethodAccessor)) return false;
+	        return Equals((MethodAccessor) obj);
+	    }
+
+	    public override int GetHashCode()
+	    {
+	        return _methodInfo.GetHashCode();
+	    }
 	}
 }
