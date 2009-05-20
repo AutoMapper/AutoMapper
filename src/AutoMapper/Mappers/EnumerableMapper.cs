@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AutoMapper.Mappers
 {
@@ -17,10 +15,9 @@ namespace AutoMapper.Mappers
 			destination.Add(mappedValue);
 		}
 
-		protected override IList CreateDestinationObject(Type destElementType, int sourceLength, IMappingEngineRunner mapper)
+		protected override IList CreateDestinationObject(Type destElementType, int sourceLength)
 		{
-			Type destListType = typeof(List<>).MakeGenericType(destElementType);
-			return (IList)mapper.CreateObject(destListType);
+			return ObjectCreator.CreateList(destElementType);
 		}
 	}
 }

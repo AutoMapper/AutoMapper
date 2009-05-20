@@ -49,7 +49,7 @@ namespace AutoMapper.UnitTests
 				_result.Values["Key2"].ShouldEqual(4);
 			}
 		}
-	
+
 		public class When_mapping_to_a_generic_dictionary_with_mapped_value_pairs : SpecBase
 		{
 			private Destination _result;
@@ -137,13 +137,13 @@ namespace AutoMapper.UnitTests
 			protected override void Because_of()
 			{
 				var source = new Source
-				{
-					Values = new Dictionary<string, SourceValue>
+					{
+						Values = new Dictionary<string, SourceValue>
 							{
 								{"Key1", new SourceValue {Value = 5}},
 								{"Key2", new SourceValue {Value = 10}},
 							}
-				};
+					};
 
 				_result = Mapper.Map<Source, Destination>(source);
 			}
@@ -158,5 +158,45 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_mapping_from_a_source_with_a_null_dictionary_member : AutoMapperSpecBase
+		{
+			private FooDto _result;
+
+			public class Foo
+			{
+				public IDictionary<string, Foo> Bar { get; set; }
+			}
+
+			public class FooDto
+			{
+				public IDictionary<string, FooDto> Bar { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Foo, FooDto>();
+				Mapper.CreateMap<FooDto, Foo>();
+			}
+
+			protected override void Because_of()
+			{
+				var foo1 = new Foo
+				{
+					Bar = new Dictionary<string, Foo>
+							{
+								{"lol", new Foo()}
+							}
+				};
+
+				_result = Mapper.Map<Foo, FooDto>(foo1);
+			}
+
+			[Test]
+			public void Should_fill_the_destination_with_an_empty_dictionary()
+			{
+				_result.Bar["lol"].Bar.ShouldNotBeNull();
+				_result.Bar["lol"].Bar.ShouldBeInstanceOf<Dictionary<string, FooDto>>();
+			}
+		}
 	}
 }

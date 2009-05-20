@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
 			var sourceLength = enumerableValue.Count();
-			TEnumerable destination = CreateDestinationObject(destElementType, sourceLength, mapper);
+			TEnumerable destination = CreateDestinationObject(destElementType, sourceLength);
 
 			int i = 0;
 			foreach (object item in enumerableValue)
@@ -56,6 +56,6 @@ namespace AutoMapper.Mappers
 		public abstract bool IsMatch(ResolutionContext context);
 		
 		protected abstract void SetElementValue(TEnumerable destination, object mappedValue, int index);
-		protected abstract TEnumerable CreateDestinationObject(Type destElementType, int sourceLength, IMappingEngineRunner mapper);
+		protected abstract TEnumerable CreateDestinationObject(Type destElementType, int sourceLength);
 	}
 }

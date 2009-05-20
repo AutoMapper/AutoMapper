@@ -21,8 +21,20 @@ namespace AutoMapper.Mappers
 			else if (context.DestinationType.IsArray)
 			{
 				Type elementType = context.DestinationType.GetElementType();
-				Array arrayValue = Array.CreateInstance(elementType, 0);
+				Array arrayValue = ObjectCreator.CreateArray(elementType, 0);
 				valueToAssign = arrayValue;
+			}
+			else if (context.DestinationType.IsDictionaryType())
+			{
+				Type genericDestDictType = context.DestinationType.GetDictionaryType();
+				Type destKeyType = genericDestDictType.GetGenericArguments()[0];
+				Type destValueType = genericDestDictType.GetGenericArguments()[1];
+				valueToAssign = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
+			}
+			else if (context.DestinationType.IsEnumerableType())
+			{
+				Type elementType = context.DestinationType.GetElementType();
+				valueToAssign = ObjectCreator.CreateList(elementType);
 			}
 			else
 			{

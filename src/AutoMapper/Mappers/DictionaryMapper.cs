@@ -29,9 +29,7 @@ namespace AutoMapper.Mappers
 			Type destKeyType = genericDestDictType.GetGenericArguments()[0];
 			Type destValueType = genericDestDictType.GetGenericArguments()[1];
 
-			Type dictionaryTypeToCreate = GetDestinationTypeToCreate(context, destKeyType, destValueType);
-
-			object destDictionary = mapper.CreateObject(dictionaryTypeToCreate);
+			object destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
 			int count = 0;
 
 			foreach (object keyValuePair in keyValuePairs)
@@ -49,16 +47,11 @@ namespace AutoMapper.Mappers
 				object destValue = mapper.Map(valueContext);
 
 				genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] {destKey, destValue});
+
+				count++;
 			}
 
 			return destDictionary;
-		}
-
-		private Type GetDestinationTypeToCreate(ResolutionContext context, Type destKeyType, Type destValueType)
-		{
-			return context.DestinationType.IsInterface
-			       	? typeof(Dictionary<,>).MakeGenericType(destKeyType, destValueType)
-			       	: context.DestinationType;
 		}
 	}
 }

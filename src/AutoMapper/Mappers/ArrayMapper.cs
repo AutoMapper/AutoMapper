@@ -14,9 +14,9 @@ namespace AutoMapper.Mappers
 			destination.SetValue(mappedValue, index);
 		}
 
-		protected override Array CreateDestinationObject(Type destElementType, int sourceLength, IMappingEngineRunner mapper)
+		protected override Array CreateDestinationObject(Type destElementType, int sourceLength)
 		{
-			return Array.CreateInstance(destElementType, sourceLength);
+			return ObjectCreator.CreateArray(destElementType, sourceLength);
 		}
 	}
 }
