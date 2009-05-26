@@ -171,5 +171,53 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_specifying_a_non_generic_type_converter_for_a_non_generic_configuration : SpecBase
+		{
+			private Destination _result;
+
+			public class Source
+			{
+				public int Value { get; set; }
+			}
+
+			public class Destination
+			{
+				public int OtherValue { get; set; }
+			}
+
+			public class CustomConverter : ITypeConverter<Source, Destination>
+			{
+				public Destination Convert(Source source)
+				{
+					return new Destination
+						{
+							OtherValue = source.Value + 10
+						};
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap(typeof(Source), typeof(Destination)).ConvertUsing(typeof(CustomConverter));
+			}
+
+			protected override void Because_of()
+			{
+				_result = Mapper.Map<Source, Destination>(new Source {Value = 5});
+			}
+
+			[Test]
+			public void Should_use_converter_specified()
+			{
+				_result.OtherValue.ShouldEqual(15);
+			}
+
+			[Test]
+			public void Should_pass_configuration_validation()
+			{
+				Mapper.AssertConfigurationIsValid();
+			}
+		}
+
 	}
 }

@@ -6,6 +6,7 @@ namespace AutoMapper
 	public interface IMappingExpression
 	{
 		void ConvertUsing<TTypeConverter>();
+		void ConvertUsing(Type typeConverterType);
 		IMappingExpression WithProfile(string profileName);
 	}
 

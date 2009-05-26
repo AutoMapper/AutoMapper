@@ -3,16 +3,16 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	internal class DeferredInstantiatedConverter<TTypeConverter>
+	internal class DeferredInstantiatedConverter
 	{
-		private readonly Func<TTypeConverter> _instantiator;
-		private MethodInfo _converterMethod;
+		private readonly Func<object> _instantiator;
+		private readonly MethodInfo _converterMethod;
 		private object _customTypeConverter;
 
-		public DeferredInstantiatedConverter(Func<TTypeConverter> instantiator)
+		public DeferredInstantiatedConverter(Type typeConverterType, Func<object> instantiator)
 		{
 			_instantiator = instantiator;
-			_converterMethod = typeof (TTypeConverter).GetMethod("Convert");
+			_converterMethod = typeConverterType.GetMethod("Convert");
 		}
 
 		private void Initialize()

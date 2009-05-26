@@ -17,7 +17,12 @@ namespace AutoMapper
 
 		public void ConvertUsing<TTypeConverter>()
 		{
-			var converter = new DeferredInstantiatedConverter<TTypeConverter>(() => (TTypeConverter)_typeConverterCtor(typeof(TTypeConverter)));
+			ConvertUsing(typeof(TTypeConverter));
+		}
+
+		public void ConvertUsing(Type typeConverterType)
+		{
+			var converter = new DeferredInstantiatedConverter(typeConverterType, () => _typeConverterCtor(typeConverterType));
 
 			_typeMap.UseCustomMapper(source => converter.Convert(source.SourceValue));
 		}
