@@ -4,6 +4,31 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+	internal class MappingExpression : IMappingExpression
+	{
+		private readonly TypeMap _typeMap;
+		private readonly Func<Type, object> _typeConverterCtor;
+
+		public MappingExpression(TypeMap typeMap, Func<Type, object> typeConverterCtor)
+		{
+			_typeMap = typeMap;
+			_typeConverterCtor = typeConverterCtor;
+		}
+
+		public void ConvertUsing<TTypeConverter>()
+		{
+			var converter = new DeferredInstantiatedConverter<TTypeConverter>(() => (TTypeConverter)_typeConverterCtor(typeof(TTypeConverter)));
+
+			_typeMap.UseCustomMapper(source => converter.Convert(source.SourceValue));
+		}
+
+		public IMappingExpression WithProfile(string profileName)
+		{
+			_typeMap.Profile = profileName;
+
+			return this;
+		}
+	}
 	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
 	{
 		private readonly TypeMap _typeMap;

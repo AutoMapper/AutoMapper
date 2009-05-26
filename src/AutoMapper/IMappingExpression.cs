@@ -3,6 +3,12 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
+	public interface IMappingExpression
+	{
+		void ConvertUsing<TTypeConverter>();
+		IMappingExpression WithProfile(string profileName);
+	}
+
 	public interface IMappingExpression<TSource, TDestination>
 	{
 		IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember, Action<IMemberConfigurationExpression<TSource>> memberOptions);

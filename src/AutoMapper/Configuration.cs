@@ -110,6 +110,13 @@ namespace AutoMapper
 			return new MappingExpression<TSource, TDestination>(typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
 		}
 
+		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
+		{
+			var typeMap = CreateTypeMap(sourceType, destinationType);
+
+			return new MappingExpression(typeMap, _typeConverterCtor);
+		}
+
 		public TypeMap CreateTypeMap(Type source, Type destination)
 		{
 			var typeMapFactory = new TypeMapFactory(source, destination);

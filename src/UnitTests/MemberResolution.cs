@@ -1037,6 +1037,38 @@ namespace AutoMapper.UnitTests
                 _result.Children[1].Children.Length.ShouldEqual(4);
             }
         }
+	
+		public class When_mapping_to_types_in_a_non_generic_manner : AutoMapperSpecBase
+		{
+			private Destination _result;
+
+			private class Source
+			{
+				public int Value { get; set; }
+			}
+
+			private class Destination
+			{
+				public int Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap(typeof (Source), typeof (Destination));
+			}
+
+			protected override void Because_of()
+			{
+				_result = Mapper.Map<Source, Destination>(new Source {Value = 5});
+			}
+
+			[Test]
+			public void Should_allow_for_basic_mapping()
+			{
+				_result.Value.ShouldEqual(5);
+			}
+		}
+
 	}
 
 	public static class MapFromExtensions

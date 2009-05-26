@@ -74,6 +74,13 @@ namespace AutoMapper
 			return map.WithProfile(ProfileName);
 		}
 
+		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
+		{
+			var map = _configurator.CreateMap(sourceType, destinationType);
+
+			return map.WithProfile(ProfileName);
+		}
+
 		private FormatterExpression GetProfile()
 		{
 			return _configurator.GetProfile(ProfileName);

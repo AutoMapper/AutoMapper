@@ -85,6 +85,11 @@ namespace AutoMapper
 			return Configuration.CreateMap<TSource, TDestination>();
 		}
 
+		public static IMappingExpression CreateMap(Type sourceType, Type destinationType)
+		{
+			return Configuration.CreateMap(sourceType, destinationType);
+		}
+
 		public static IProfileExpression CreateProfile(string profileName)
 		{
 			return Configuration.CreateProfile(profileName);

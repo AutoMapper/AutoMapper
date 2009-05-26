@@ -28,6 +28,7 @@ namespace AutoMapper
 	public interface IProfileExpression : IFormatterExpression
 	{
 		IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>();
+		IMappingExpression CreateMap(Type sourceType, Type destinationType);
 	}
 
 	public interface IConfiguration : IProfileExpression
