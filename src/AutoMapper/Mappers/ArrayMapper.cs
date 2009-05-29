@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
 			destination.SetValue(mappedValue, index);
 		}
 
-		protected override Array CreateDestinationObject(Type destElementType, int sourceLength)
+		protected override Array CreateDestinationObjectBase(Type destElementType, int sourceLength)
 		{
 			return ObjectCreator.CreateArray(destElementType, sourceLength);
 		}

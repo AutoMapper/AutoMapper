@@ -19,9 +19,10 @@ namespace AutoMapper.Mappers
 
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			IEnumerable<object> keyValuePairs = ((IEnumerable) context.SourceValue).Cast<object>();
+			var sourceEnumerableValue = (IEnumerable) context.SourceValue ?? new object[0];
+			IEnumerable<object> keyValuePairs = sourceEnumerableValue.Cast<object>();
 
-			Type genericSourceDictType = context.SourceType.GetInterface("IDictionary`2");
+			Type genericSourceDictType = context.SourceType.GetDictionaryType();
 			Type sourceKeyType = genericSourceDictType.GetGenericArguments()[0];
 			Type sourceValueType = genericSourceDictType.GetGenericArguments()[1];
 			Type sourceKvpType = KvpType.MakeGenericType(sourceKeyType, sourceValueType);

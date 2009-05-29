@@ -288,7 +288,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_assign_the_value_directly()
 			{
-				_destination.Values.ShouldBeTheSameAs(_source.Values);
+				CollectionAssert.AreEqual(_destination.Values, _source.Values);
 			}
 		}
 	}

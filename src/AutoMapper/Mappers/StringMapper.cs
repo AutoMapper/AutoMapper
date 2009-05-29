@@ -4,6 +4,10 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+			if (context.SourceValue == null)
+			{
+				return mapper.FormatValue(context.CreateValueContext(null));
+			}
 			return mapper.FormatValue(context);
 		}
 

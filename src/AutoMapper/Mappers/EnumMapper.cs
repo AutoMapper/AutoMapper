@@ -8,6 +8,11 @@ namespace AutoMapper.Mappers
 		{
 			Type enumDestType = TypeHelper.GetEnumerationType(context.DestinationType);
 
+			if (context.SourceValue == null)
+			{
+				return context.DestinationValue ?? mapper.CreateObject(context.DestinationType);
+			}
+
 			return Enum.Parse(enumDestType, Enum.GetName(context.SourceType, context.SourceValue));
 		}
 

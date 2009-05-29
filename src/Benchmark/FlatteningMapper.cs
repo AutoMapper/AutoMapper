@@ -15,6 +15,16 @@ namespace Benchmark.Flattening
 		public void Initialize()
 		{
 			Mapper.Reset();
+			Mapper.CreateMap<Model1, Dto1>();
+			Mapper.CreateMap<Model2, Dto2>();
+			Mapper.CreateMap<Model3, Dto3>();
+			Mapper.CreateMap<Model4, Dto4>();
+			Mapper.CreateMap<Model5, Dto5>();
+			Mapper.CreateMap<Model6, Dto6>();
+			Mapper.CreateMap<Model7, Dto7>();
+			Mapper.CreateMap<Model8, Dto8>();
+			Mapper.CreateMap<Model9, Dto9>();
+			Mapper.CreateMap<Model10, Dto10>();
 			Mapper.CreateMap<ModelObject, ModelDto>();
 			Mapper.AssertConfigurationIsValid();
 			_source = new ModelObject
@@ -89,6 +99,106 @@ namespace Benchmark.Flattening
 					SubWithExtraNameProperName = _source.SubWithExtraName.ProperName
 				};
 		}
+	}
+
+	public class Model1
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model2
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model3
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model4
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model5
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model6
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model7
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model8
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model9
+	{
+		public int Value { get; set; }
+	}
+
+	public class Model10
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto1
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto2
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto3
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto4
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto5
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto6
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto7
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto8
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto9
+	{
+		public int Value { get; set; }
+	}
+
+	public class Dto10
+	{
+		public int Value { get; set; }
 	}
 
 	public class ModelObject

@@ -9,23 +9,6 @@ namespace AutoMapper
 {
 	public class Configuration : IConfigurationProvider, IConfiguration
 	{
-		private struct TypePair
-		{
-			public TypePair(Type sourceType, Type destinationType) : this()
-			{
-				SourceType = sourceType;
-				DestinationType = destinationType;
-			}
-
-			private Type SourceType { get; set; }
-			private Type DestinationType { get; set; }
-
-			public override int GetHashCode()
-			{
-				return SourceType.GetHashCode() ^ DestinationType.GetHashCode();
-			}
-		}
-
 		private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
 
@@ -166,11 +149,13 @@ namespace AutoMapper
 		{
 			var typeMapPair = new TypePair(sourceType, destinationType);
 			
-			// Cache miss
-			if (_typeMapCache.ContainsKey(typeMapPair))
-				return _typeMapCache[typeMapPair];
+			TypeMap typeMap;
 
-			TypeMap typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+			if (_typeMapCache.TryGetValue(typeMapPair, out typeMap))
+				return typeMap;
+
+			// Cache miss
+			typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
 			if (typeMap == null)
 			{
 				typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
@@ -256,7 +241,7 @@ namespace AutoMapper
                 typeMapsChecked.Add(context.TypeMap);
             }
 
-			var mapperToUse = GetMappers().Where(mapper => !(mapper is NewOrDefaultMapper)).FirstOrDefault(mapper => mapper.IsMatch(context));
+			var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
 
 			if (mapperToUse == null)
 			{

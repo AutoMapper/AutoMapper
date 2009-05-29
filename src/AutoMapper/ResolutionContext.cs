@@ -161,33 +161,33 @@ namespace AutoMapper
 			return propertyMap;
 		}
 
-	    public bool Equals(ResolutionContext other)
-	    {
-	        if (ReferenceEquals(null, other)) return false;
-	        if (ReferenceEquals(this, other)) return true;
-	        return Equals(other.TypeMap, TypeMap) && Equals(other.SourceType, SourceType) && Equals(other.DestinationType, DestinationType) && other.ArrayIndex.Equals(ArrayIndex) && Equals(other.SourceValue, SourceValue);
-	    }
+		public bool Equals(ResolutionContext other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return Equals(other.TypeMap, TypeMap) && Equals(other.SourceType, SourceType) && Equals(other.DestinationType, DestinationType) && other.ArrayIndex.Equals(ArrayIndex) && Equals(other.SourceValue, SourceValue);
+		}
 
-	    public override bool Equals(object obj)
-	    {
-	        if (ReferenceEquals(null, obj)) return false;
-	        if (ReferenceEquals(this, obj)) return true;
-	        if (obj.GetType() != typeof (ResolutionContext)) return false;
-	        return Equals((ResolutionContext) obj);
-	    }
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != typeof(ResolutionContext)) return false;
+			return Equals((ResolutionContext)obj);
+		}
 
-	    public override int GetHashCode()
-	    {
-	        unchecked
-	        {
-	            int result = (TypeMap != null ? TypeMap.GetHashCode() : 0);
-	            result = (result*397) ^ (SourceType != null ? SourceType.GetHashCode() : 0);
-	            result = (result*397) ^ (DestinationType != null ? DestinationType.GetHashCode() : 0);
-	            result = (result*397) ^ (ArrayIndex.HasValue ? ArrayIndex.Value : 0);
-	            result = (result*397) ^ (SourceValue != null ? SourceValue.GetHashCode() : 0);
-	            return result;
-	        }
-	    }
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				int result = (TypeMap != null ? TypeMap.GetHashCode() : 0);
+				result = (result * 397) ^ (SourceType != null ? SourceType.GetHashCode() : 0);
+				result = (result * 397) ^ (DestinationType != null ? DestinationType.GetHashCode() : 0);
+				result = (result * 397) ^ (ArrayIndex.HasValue ? ArrayIndex.Value : 0);
+				result = (result * 397) ^ (SourceValue != null ? SourceValue.GetHashCode() : 0);
+				return result;
+			}
+		}
 	}
 
 }

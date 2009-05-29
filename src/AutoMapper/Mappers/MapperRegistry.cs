@@ -7,16 +7,14 @@ namespace AutoMapper.Mappers
     {
         public static Func<IEnumerable<IObjectMapper>> AllMappers = () => new IObjectMapper[]
         {
-            new CustomTypeMapMapper(),
             new TypeMapMapper(),
-            new NewOrDefaultMapper(),
             new StringMapper(),
             new FlagsEnumMapper(),
             new EnumMapper(),
-            new AssignableMapper(),
             new ArrayMapper(),
             new DictionaryMapper(),
             new EnumerableMapper(),
+            new AssignableMapper(),
             new TypeConverterMapper(),
             new NullableMapper(),
         };

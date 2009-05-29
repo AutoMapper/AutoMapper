@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper;
 using NUnit.Framework;
@@ -60,6 +61,9 @@ namespace AutoMapperSamples
 
 				Destination result = Mapper.Map<Source, Destination>(source);
 				result.Value3.ShouldEqual(typeof(Destination));
+
+				Expression<Func<Source, object>> func = x => x.Value1;
+
 			}
 
 			[SetUp]

@@ -7,6 +7,11 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+			if (context.SourceValue == null)
+			{
+				return context.DestinationValue ?? mapper.CreateObject(context.DestinationType);
+			}
+
 			TypeConverter typeConverter = GetTypeConverter(context);
 			return typeConverter.ConvertTo(context.SourceValue, context.DestinationType);
 		}
@@ -19,9 +24,7 @@ namespace AutoMapper.Mappers
 
 		private static TypeConverter GetTypeConverter(ResolutionContext context)
 		{
-			return context.SourceValue == null
-			       	? TypeDescriptor.GetConverter(context.SourceType)
-			       	: TypeDescriptor.GetConverter(context.SourceValue);
+			return TypeDescriptor.GetConverter(context.SourceType);
 		}
 	}
 }

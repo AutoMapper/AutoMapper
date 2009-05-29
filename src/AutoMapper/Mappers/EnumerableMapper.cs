@@ -15,7 +15,7 @@ namespace AutoMapper.Mappers
 			destination.Add(mappedValue);
 		}
 
-		protected override IList CreateDestinationObject(Type destElementType, int sourceLength)
+		protected override IList CreateDestinationObjectBase(Type destElementType, int sourceLength)
 		{
 			return ObjectCreator.CreateList(destElementType);
 		}

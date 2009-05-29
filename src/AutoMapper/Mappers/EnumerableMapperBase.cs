@@ -10,13 +10,19 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			IEnumerable<object> enumerableValue = ((IEnumerable)context.SourceValue).Cast<object>();
+			if (context.DestinationType.IsAssignableFrom(context.SourceType) && context.SourceValue != null)
+			{
+				return context.SourceValue;
+			}
+
+			var sourceValue = (IEnumerable)context.SourceValue ?? new object[0];
+			IEnumerable<object> enumerableValue = sourceValue.Cast<object>();
 
 			Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
 			var sourceLength = enumerableValue.Count();
-			TEnumerable destination = CreateDestinationObject(destElementType, sourceLength);
+			TEnumerable destination = CreateDestinationObject(context.DestinationType, destElementType, sourceLength, mapper);
 
 			int i = 0;
 			foreach (object item in enumerableValue)
@@ -53,9 +59,18 @@ namespace AutoMapper.Mappers
 			return valueToAssign;
 		}
 
+		private TEnumerable CreateDestinationObject(Type destinationType, Type destinationElementType, int count, IMappingEngineRunner mapper)
+		{
+			if (!destinationType.IsInterface && !destinationType.IsArray)
+			{
+				return (TEnumerable) mapper.CreateObject(destinationType);
+			}
+			return CreateDestinationObjectBase(destinationElementType, count);
+		}
+
 		public abstract bool IsMatch(ResolutionContext context);
 		
 		protected abstract void SetElementValue(TEnumerable destination, object mappedValue, int index);
-		protected abstract TEnumerable CreateDestinationObject(Type destElementType, int sourceLength);
+		protected abstract TEnumerable CreateDestinationObjectBase(Type destElementType, int sourceLength);
 	}
 }

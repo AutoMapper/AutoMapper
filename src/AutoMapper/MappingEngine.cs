@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using AutoMapper.Internal;
 using LinFu.DynamicProxy;
 
 namespace AutoMapper
@@ -8,10 +10,13 @@ namespace AutoMapper
 	{
 		private readonly IConfigurationProvider _configurationProvider;
 		private readonly ProxyFactory _proxyFactory = new ProxyFactory();
+		private readonly IObjectMapper[] _mappers;
+		private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = new Dictionary<TypePair, IObjectMapper>();
 
 		public MappingEngine(IConfigurationProvider configurationProvider)
 		{
 			_configurationProvider = configurationProvider;
+			_mappers = configurationProvider.GetMappers();
 		}
 
 		public IConfigurationProvider ConfigurationProvider
@@ -85,7 +90,21 @@ namespace AutoMapper
 		{
 			try
 			{
-				IObjectMapper mapperToUse = ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
+				if (context.SourceValue == null && ShouldMapSourceValueAsNull(context))
+				{
+					return null;
+				}
+
+				var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
+
+				IObjectMapper mapperToUse;
+					
+				if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
+				{
+					// Cache miss
+					mapperToUse = _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
+					_objectMapperCache.Add(contextTypePair, mapperToUse);
+				} 
 
 				if (mapperToUse == null)
 				{
@@ -119,5 +138,13 @@ namespace AutoMapper
 			       	: Activator.CreateInstance(type, true);
 		}
 
+		private bool ShouldMapSourceValueAsNull(ResolutionContext context)
+		{
+			var typeMap = context.GetContextTypeMap();
+			if (typeMap != null)
+				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
+
+			return ConfigurationProvider.MapNullSourceValuesAsNull;
+		}
 	}
 }

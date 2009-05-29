@@ -6,6 +6,11 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+			if (context.TypeMap.CustomMapper != null)
+			{
+				return context.TypeMap.CustomMapper(context);				
+			}
+
 			var profileConfiguration = mapper.ConfigurationProvider.GetProfileConfiguration(context.TypeMap.Profile);
 
 			if (context.SourceValue == null && profileConfiguration.MapNullSourceValuesAsNull)

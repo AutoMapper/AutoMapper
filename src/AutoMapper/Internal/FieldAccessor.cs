@@ -6,10 +6,12 @@ namespace AutoMapper.Internal
 	internal class FieldAccessor : MemberAccessorBase
 	{
 		private readonly FieldInfo _fieldInfo;
+		private readonly LateBoundField _lateBoundField;
 
 		public FieldAccessor(FieldInfo fieldInfo)
 		{
 			_fieldInfo = fieldInfo;
+			_lateBoundField = DelegateFactory.Create(fieldInfo);
 		}
 
 		public override string Name
@@ -24,7 +26,7 @@ namespace AutoMapper.Internal
 
 		public override object GetValue(object source)
 		{
-			return _fieldInfo.GetValue(source);
+			return _lateBoundField(source);
 		}
 
 		public override void SetValue(object destination, object value)
