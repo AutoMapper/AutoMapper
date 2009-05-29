@@ -6,22 +6,26 @@ namespace AutoMapper.Internal
 	internal class PropertyAccessor : MemberAccessorBase
 	{
 		private readonly PropertyInfo _propertyInfo;
+		private readonly string _name;
+		private readonly Type _memberType;
 		private readonly LateBoundProperty _lateBoundProperty;
 
 		public PropertyAccessor(PropertyInfo propertyInfo)
 		{
 			_propertyInfo = propertyInfo;
+			_name = _propertyInfo.Name;
+			_memberType = _propertyInfo.PropertyType;
 			_lateBoundProperty = DelegateFactory.Create(propertyInfo);
 		}
 
 		public override string Name
 		{
-			get { return _propertyInfo.Name; }
+			get { return _name; }
 		}
 
 		public override Type MemberType
 		{
-			get { return _propertyInfo.PropertyType; }
+			get { return _memberType; }
 		}
 
 		public override object GetValue(object source)

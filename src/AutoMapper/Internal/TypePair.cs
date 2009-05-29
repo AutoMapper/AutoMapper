@@ -7,16 +7,16 @@ namespace AutoMapper.Internal
 		public TypePair(Type sourceType, Type destinationType)
 			: this()
 		{
-			SourceType = sourceType;
-			DestinationType = destinationType;
+			_sourceType = sourceType;
+			_destinationType = destinationType;
 		}
 
-		private Type SourceType { get; set; }
-		private Type DestinationType { get; set; }
+		private readonly Type _sourceType;
+		private readonly Type _destinationType;
 
 		public bool Equals(TypePair other)
 		{
-			return Equals(other.SourceType, SourceType) && Equals(other.DestinationType, DestinationType);
+			return Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType);
 		}
 
 		public override bool Equals(object obj)
@@ -30,7 +30,7 @@ namespace AutoMapper.Internal
 		{
 			unchecked
 			{
-				return (SourceType.GetHashCode()*397) ^ DestinationType.GetHashCode();
+				return (_sourceType.GetHashCode()*397) ^ _destinationType.GetHashCode();
 			}
 		}
 	}

@@ -3,21 +3,27 @@ using System.Collections.Generic;
 
 namespace AutoMapper
 {
-	public class ResolutionContext
+	public class ResolutionContext : IEquatable<ResolutionContext>
 	{
-		public TypeMap TypeMap { get; private set; }
-		public PropertyMap PropertyMap { get; private set; }
-		public Type SourceType { get; private set; }
-		public Type DestinationType { get; private set; }
-		public int? ArrayIndex { get; private set; }
-		public object SourceValue { get; private set; }
-		public object DestinationValue { get; private set; }
-		public ResolutionContext Parent { get; private set; }
-		public Dictionary<ResolutionContext, object> InstanceCache { get; private set; }
+		private readonly TypeMap _typeMap;
+		private readonly PropertyMap _propertyMap;
+		private readonly Type _sourceType;
+		private readonly Type _destinationType;
+		private readonly int? _arrayIndex;
+		private readonly object _sourceValue;
+		private readonly object _destinationValue;
+		private readonly ResolutionContext _parent;
+		private readonly Dictionary<ResolutionContext, object> _instanceCache;
 
-		private ResolutionContext()
-		{
-		}
+		public TypeMap TypeMap { get { return _typeMap; } }
+		public PropertyMap PropertyMap { get { return _propertyMap; } }
+		public Type SourceType { get { return _sourceType; } }
+		public Type DestinationType { get { return _destinationType; } }
+		public int? ArrayIndex { get { return _arrayIndex; } }
+		public object SourceValue { get { return _sourceValue; } }
+		public object DestinationValue { get { return _destinationValue; } }
+		public ResolutionContext Parent { get { return _parent; } }
+		public Dictionary<ResolutionContext, object> InstanceCache { get { return _instanceCache; } }
 
 		public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType)
 			: this(typeMap, source, null, sourceType, destinationType)
@@ -26,110 +32,118 @@ namespace AutoMapper
 
 		public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType, Type destinationType)
 		{
-			TypeMap = typeMap;
-			SourceValue = source;
-			DestinationValue = destination;
+			_typeMap = typeMap;
+			_sourceValue = source;
+			_destinationValue = destination;
 			if (typeMap != null)
 			{
-				SourceType = typeMap.SourceType;
-				DestinationType = typeMap.DestinationType;
+				_sourceType = typeMap.SourceType;
+				_destinationType = typeMap.DestinationType;
 			}
 			else
 			{
-				SourceType = sourceType;
-				DestinationType = destinationType;
+				_sourceType = sourceType;
+				_destinationType = destinationType;
 			}
-			InstanceCache = new Dictionary<ResolutionContext, object>();
+			_instanceCache = new Dictionary<ResolutionContext, object>();
+		}
+
+		private ResolutionContext(ResolutionContext context, object sourceValue)
+		{
+			_arrayIndex = context._arrayIndex;
+			_typeMap = context._typeMap;
+			_propertyMap = context._propertyMap;
+			_sourceType = context._sourceType;
+			_sourceValue = sourceValue;
+			_destinationValue = context._destinationValue;
+			_parent = context;
+			_destinationType = context._destinationType;
+			_instanceCache = context._instanceCache;
+		}
+
+		private ResolutionContext(ResolutionContext context, object sourceValue, Type sourceType)
+		{
+			_arrayIndex = context._arrayIndex;
+			_typeMap = context._typeMap;
+			_propertyMap = context._propertyMap;
+			_sourceType = sourceType;
+			_sourceValue = sourceValue;
+			_destinationValue = context._destinationValue;
+			_parent = context;
+			_destinationType = context._destinationType;
+			_instanceCache = context._instanceCache;
+		}
+
+		private ResolutionContext(ResolutionContext context, object sourceValue, TypeMap memberTypeMap, PropertyMap propertyMap)
+		{
+			_typeMap = memberTypeMap;
+			_propertyMap = propertyMap;
+			_sourceType = memberTypeMap.SourceType;
+			_sourceValue = sourceValue;
+			_parent = context;
+			_destinationType = memberTypeMap.DestinationType;
+			_instanceCache = context._instanceCache;
+		}
+
+		private ResolutionContext(ResolutionContext context, object sourceValue, Type sourceType, PropertyMap propertyMap)
+		{
+			_propertyMap = propertyMap;
+			_sourceType = sourceType;
+			_sourceValue = sourceValue;
+			_parent = context;
+			_destinationType = propertyMap.DestinationProperty.MemberType;
+			_instanceCache = context._instanceCache;
+		}
+
+		private ResolutionContext(ResolutionContext context, object sourceValue, TypeMap typeMap, Type sourceType, Type destinationType, int arrayIndex)
+		{
+			_arrayIndex = arrayIndex;
+			_typeMap = typeMap;
+			_propertyMap = context._propertyMap;
+			_sourceType = sourceType;
+			_sourceValue = sourceValue;
+			_parent = context;
+			_destinationType = destinationType;
+			_instanceCache = context._instanceCache;
 		}
 
 		public string MemberName
 		{
 			get
 			{
-				return PropertyMap == null
+				return _propertyMap == null
 				       	? string.Empty
-				       	: (ArrayIndex == null
-				       	   	? PropertyMap.DestinationProperty.Name
-				       	   	: PropertyMap.DestinationProperty.Name + ArrayIndex.Value);
+				       	: (_arrayIndex == null
+				       	   	? _propertyMap.DestinationProperty.Name
+				       	   	: _propertyMap.DestinationProperty.Name + _arrayIndex.Value);
 			}
 		}
 
 		public bool IsSourceValueNull
 		{
-			get { return Equals(null, SourceValue); }
+			get { return Equals(null, _sourceValue); }
 		}
 
 		public ResolutionContext CreateValueContext(object sourceValue)
 		{
-			return new ResolutionContext
-				{
-					ArrayIndex = ArrayIndex,
-					TypeMap = TypeMap,
-					PropertyMap = PropertyMap,
-					SourceType = SourceType,
-					SourceValue = sourceValue,
-					DestinationValue = DestinationValue,
-					Parent = this,
-					DestinationType = DestinationType,
-					InstanceCache = InstanceCache
-				};
+			return new ResolutionContext(this, sourceValue);
 		}
 
 		public ResolutionContext CreateValueContext(object sourceValue, Type sourceType)
 		{
-			return new ResolutionContext
-				{
-					ArrayIndex = ArrayIndex,
-					TypeMap = TypeMap,
-					PropertyMap = PropertyMap,
-					SourceType = sourceType,
-					SourceValue = sourceValue,
-					DestinationValue = DestinationValue,
-					Parent = this,
-					DestinationType = DestinationType,
-					InstanceCache = InstanceCache
-				};
+			return new ResolutionContext(this, sourceValue, sourceType);
 		}
 
 		public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, Type sourceMemberType, PropertyMap propertyMap)
 		{
-			if (memberTypeMap != null)
-				return new ResolutionContext
-					{
-						Parent = this,
-						DestinationType = memberTypeMap.DestinationType,
-						PropertyMap = propertyMap,
-						SourceType = memberTypeMap.SourceType,
-						SourceValue = memberValue,
-						TypeMap = memberTypeMap,
-						InstanceCache = InstanceCache
-					};
-
-			return new ResolutionContext
-				{
-					Parent = this,
-					DestinationType = propertyMap.DestinationProperty.MemberType,
-					PropertyMap = propertyMap,
-					SourceType = sourceMemberType,
-					SourceValue = memberValue,
-					TypeMap = memberTypeMap,
-					InstanceCache = InstanceCache
-				};
+			return memberTypeMap != null
+			       	? new ResolutionContext(this, memberValue, memberTypeMap, propertyMap)
+			       	: new ResolutionContext(this, memberValue, sourceMemberType, propertyMap);
 		}
 
 		public ResolutionContext CreateElementContext(TypeMap elementTypeMap, object item, Type sourceElementType, Type destinationElementType, int arrayIndex)
 		{
-			return new ResolutionContext
-				{
-					ArrayIndex = arrayIndex,
-					Parent = this,
-					DestinationType = destinationElementType,
-					PropertyMap = PropertyMap,
-					SourceType = sourceElementType,
-					SourceValue = item,
-					TypeMap = elementTypeMap,
-					InstanceCache = InstanceCache
-				};
+			return new ResolutionContext(this, item, elementTypeMap, sourceElementType, destinationElementType, arrayIndex);
 		}
 
 		public override string ToString()
@@ -139,24 +153,24 @@ namespace AutoMapper
 
 		public TypeMap GetContextTypeMap()
 		{
-			TypeMap typeMap = TypeMap;
-			ResolutionContext parent = Parent;
+			TypeMap typeMap = _typeMap;
+			ResolutionContext parent = _parent;
 			while ((typeMap == null) && (parent != null))
 			{
-				typeMap = parent.TypeMap;
-				parent = parent.Parent;
+				typeMap = parent._typeMap;
+				parent = parent._parent;
 			}
 			return typeMap;
 		}
 
 		public PropertyMap GetContextPropertyMap()
 		{
-			PropertyMap propertyMap = PropertyMap;
-			ResolutionContext parent = Parent;
+			PropertyMap propertyMap = _propertyMap;
+			ResolutionContext parent = _parent;
 			while ((propertyMap == null) && (parent != null))
 			{
-				propertyMap = parent.PropertyMap;
-				parent = parent.Parent;
+				propertyMap = parent._propertyMap;
+				parent = parent._parent;
 			}
 			return propertyMap;
 		}
@@ -165,26 +179,26 @@ namespace AutoMapper
 		{
 			if (ReferenceEquals(null, other)) return false;
 			if (ReferenceEquals(this, other)) return true;
-			return Equals(other.TypeMap, TypeMap) && Equals(other.SourceType, SourceType) && Equals(other.DestinationType, DestinationType) && other.ArrayIndex.Equals(ArrayIndex) && Equals(other.SourceValue, SourceValue);
+			return Equals(other._typeMap, _typeMap) && Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType) && other._arrayIndex.Equals(_arrayIndex) && Equals(other._sourceValue, _sourceValue);
 		}
 
 		public override bool Equals(object obj)
 		{
 			if (ReferenceEquals(null, obj)) return false;
 			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != typeof(ResolutionContext)) return false;
-			return Equals((ResolutionContext)obj);
+			if (obj.GetType() != typeof (ResolutionContext)) return false;
+			return Equals((ResolutionContext) obj);
 		}
 
 		public override int GetHashCode()
 		{
 			unchecked
 			{
-				int result = (TypeMap != null ? TypeMap.GetHashCode() : 0);
-				result = (result * 397) ^ (SourceType != null ? SourceType.GetHashCode() : 0);
-				result = (result * 397) ^ (DestinationType != null ? DestinationType.GetHashCode() : 0);
-				result = (result * 397) ^ (ArrayIndex.HasValue ? ArrayIndex.Value : 0);
-				result = (result * 397) ^ (SourceValue != null ? SourceValue.GetHashCode() : 0);
+				int result = (_typeMap != null ? _typeMap.GetHashCode() : 0);
+				result = (result*397) ^ (_sourceType != null ? _sourceType.GetHashCode() : 0);
+				result = (result*397) ^ (_destinationType != null ? _destinationType.GetHashCode() : 0);
+				result = (result*397) ^ (_arrayIndex.HasValue ? _arrayIndex.Value : 0);
+				result = (result*397) ^ (_sourceValue != null ? _sourceValue.GetHashCode() : 0);
 				return result;
 			}
 		}

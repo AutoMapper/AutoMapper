@@ -6,34 +6,38 @@ namespace AutoMapper.Internal
 	internal class MethodAccessor : MemberAccessorBase
 	{
 		private readonly MethodInfo _methodInfo;
+		private readonly string _name;
+		private readonly Type _memberType;
 		private readonly LateBoundMethod _lateBoundMethod;
 
 		public MethodAccessor(MethodInfo methodInfo)
 		{
 			_methodInfo = methodInfo;
+			_name = _methodInfo.Name;
+			_memberType = _methodInfo.ReturnType;
 			_lateBoundMethod = DelegateFactory.Create(methodInfo);
 		}
 
 		public override string Name
 		{
-			get { return _methodInfo.Name; }
+			get { return _name; }
 		}
 
 		public override Type MemberType
 		{
-			get { return _methodInfo.ReturnType; }
+			get { return _memberType; }
 		}
 
 		public override object GetValue(object source)
 		{
-			return MemberType == null
+			return _memberType == null
 			       	? null
 					: _lateBoundMethod(source, new object[0]);
 		}
 
 		public override void SetValue(object destination, object value)
 		{
-			if (MemberType == null)
+			if (_memberType == null)
 			{
 				_methodInfo.Invoke(destination, new[] {value});
 			}

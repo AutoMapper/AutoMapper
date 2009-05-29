@@ -14,6 +14,8 @@ namespace AutoMapper
 		private IValueResolver _customResolver;
 		private IValueResolver _customMemberResolver;
 		private object _nullSubstitute;
+		private bool _sealed;
+		private IValueResolver[] _cachedResolvers;
 
 		public PropertyMap(IMemberAccessor destinationProperty)
 		{
@@ -45,17 +47,27 @@ namespace AutoMapper
 
 		public ResolutionResult ResolveValue(object input)
 		{
+			Seal();
+
 			var result = new ResolutionResult(input);
 
-			foreach (var resolver in GetSourceValueResolvers())
+			foreach (var resolver in _cachedResolvers)
 			{
-				if (resolver != null)
-				{
-					result = resolver.Resolve(result);
-				}
+				result = resolver.Resolve(result);
 			}
 
 			return result;
+		}
+
+		private void Seal()
+		{
+			if (_sealed)
+			{
+				return;
+			}
+
+			_sealed = true;
+			_cachedResolvers = GetSourceValueResolvers().Where(r => r != null).ToArray();
 		}
 
 		public void ChainResolver(IValueResolver IValueResolver)

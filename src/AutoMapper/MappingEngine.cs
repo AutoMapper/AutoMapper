@@ -124,7 +124,7 @@ namespace AutoMapper
 			TypeMap contextTypeMap = context.GetContextTypeMap();
 			IFormatterConfiguration configuration = contextTypeMap != null
 												? ConfigurationProvider.GetProfileConfiguration(contextTypeMap.Profile)
-			                                 	: ConfigurationProvider.GetProfileConfiguration(AutoMapper.Configuration.DefaultProfileName);
+			                                 	: ConfigurationProvider.GetProfileConfiguration(Configuration.DefaultProfileName);
 
 			var valueFormatter = new ValueFormatter(configuration);
 

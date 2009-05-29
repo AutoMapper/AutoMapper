@@ -38,7 +38,19 @@ namespace AutoMapper.Mappers
 					continue;
 				}
 
-				var result = propertyMap.ResolveValue(context.SourceValue);
+				ResolutionResult result;
+
+				try
+				{
+					result = propertyMap.ResolveValue(context.SourceValue);
+				}
+				catch (Exception ex)
+				{
+					var errorContext = context.CreateMemberContext(null, context.SourceValue, context.SourceValue == null
+					                                                                          	? typeof (object)
+					                                                                          	: context.SourceValue.GetType(), propertyMap);
+					throw new AutoMapperMappingException(errorContext, ex);
+				}
 
 				var memberTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationProperty.MemberType);
 

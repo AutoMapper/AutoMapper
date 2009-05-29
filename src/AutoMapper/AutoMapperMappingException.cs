@@ -61,7 +61,7 @@ namespace AutoMapper
 				string message = null;
 				if (Context != null)
 				{
-					message = string.Format("Trying to map {0} to {1}.", Context.SourceType.Name, Context.DestinationType.Name);
+					message = string.Format("Trying to map {0} to {1}.", Context.SourceType.FullName, Context.DestinationType.FullName);
 					TypeMap contextTypeMap = Context.GetContextTypeMap();
 					if (contextTypeMap != null)
 					{

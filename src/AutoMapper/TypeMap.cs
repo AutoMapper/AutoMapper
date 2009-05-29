@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using AutoMapper.ReflectionExtensions;
 
 namespace AutoMapper
@@ -9,23 +8,25 @@ namespace AutoMapper
 	public class TypeMap
 	{
 		private readonly IList<PropertyMap> _propertyMaps = new List<PropertyMap>();
-		private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>(); // SourceType, DestinationType
+		private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
+		private readonly Type _sourceType;
+		private readonly Type _destinationType;
 
 		public TypeMap(Type sourceType, Type destinationType)
 		{
-			DestinationType = destinationType;
-			SourceType = sourceType;
+			_sourceType = sourceType;
+			_destinationType = destinationType;
 			Profile = Configuration.DefaultProfileName;
 		}
 
-		public Type SourceType { get; private set; }
-		public Type DestinationType { get; private set; }
+		public Type SourceType { get { return _sourceType; } }
+		public Type DestinationType { get { return _destinationType; } }
 		public string Profile { get; set; }
 		public Func<ResolutionContext, object> CustomMapper { get; private set; }
 
-		public PropertyMap[] GetPropertyMaps()
+		public IEnumerable<PropertyMap> GetPropertyMaps()
 		{
-			return _propertyMaps.ToArray();
+			return _propertyMaps;
 		}
 
 		public void AddPropertyMap(PropertyMap propertyMap)
@@ -80,7 +81,7 @@ namespace AutoMapper
 	    {
 	        if (ReferenceEquals(null, other)) return false;
 	        if (ReferenceEquals(this, other)) return true;
-	        return Equals(other.SourceType, SourceType) && Equals(other.DestinationType, DestinationType);
+	        return Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType);
 	    }
 
 	    public override bool Equals(object obj)
@@ -95,7 +96,7 @@ namespace AutoMapper
 	    {
 	        unchecked
 	        {
-	            return (SourceType.GetHashCode()*397) ^ DestinationType.GetHashCode();
+	            return (_sourceType.GetHashCode()*397) ^ _destinationType.GetHashCode();
 	        }
 	    }
 	}

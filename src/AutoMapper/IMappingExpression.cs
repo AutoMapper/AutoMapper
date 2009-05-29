@@ -37,7 +37,7 @@ namespace AutoMapper
 
 	public interface IResolutionExpression<TSource>
 	{
-		IResolutionExpression<TSource> FromMember(Func<TSource, object> sourceMember);		
+		void FromMember(Func<TSource, object> sourceMember);		
 	}
 
 	public interface IResolverConfigurationExpression<TSource, TValueResolver>

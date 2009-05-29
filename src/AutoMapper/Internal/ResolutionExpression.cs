@@ -11,11 +11,9 @@ namespace AutoMapper
 			_propertyMap = propertyMap;
 		}
 
-		public IResolutionExpression<TSource> FromMember(Func<TSource, object> sourceMember)
+		public void FromMember(Func<TSource, object> sourceMember)
 		{
 			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
-
-			return this;
 		}
 
 		public IResolutionExpression<TSource> ConstructedBy(Func<IValueResolver> constructor)

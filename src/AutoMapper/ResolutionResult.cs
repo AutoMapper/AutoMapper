@@ -4,10 +4,13 @@ namespace AutoMapper
 {
 	public class ResolutionResult
 	{
+		private readonly object _value;
+		private readonly Type _type;
+
 		public ResolutionResult(object value, Type type)
 		{
-			Value = value;
-			Type = value == null
+			_value = value;
+			_type = value == null
 			       	? type
 			       	: value.GetType();
 		}
@@ -17,7 +20,7 @@ namespace AutoMapper
 		{
 		}
 
-		public object Value { get; private set; }
-		public Type Type { get; private set; }
+		public object Value { get { return _value; } }
+		public Type Type { get { return _type; } }
 	}
 }

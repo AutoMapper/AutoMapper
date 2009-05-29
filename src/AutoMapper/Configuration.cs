@@ -305,12 +305,18 @@ namespace AutoMapper
 
 		internal FormatterExpression GetProfile(string profileName)
 		{
-			if (!_formatterProfiles.ContainsKey(profileName))
+			FormatterExpression expr;
+
+			if (_formatterProfiles.TryGetValue(profileName, out expr))
 			{
-				_formatterProfiles.Add(profileName, new FormatterExpression(_formatterCtor));
+				return expr;
 			}
 
-			return _formatterProfiles[profileName];
+			var expression = new FormatterExpression(_formatterCtor);
+			
+			_formatterProfiles.Add(profileName, expression);
+
+			return expression;
 		}
 	}
 }
