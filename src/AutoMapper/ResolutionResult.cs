@@ -6,6 +6,7 @@ namespace AutoMapper
 	{
 		private readonly object _value;
 		private readonly Type _type;
+		private readonly Type _memberType;
 
 		public ResolutionResult(object value, Type type)
 		{
@@ -13,6 +14,7 @@ namespace AutoMapper
 			_type = value == null
 			       	? type
 			       	: value.GetType();
+			_memberType = type;
 		}
 
 		public ResolutionResult(object value)
@@ -22,5 +24,6 @@ namespace AutoMapper
 
 		public object Value { get { return _value; } }
 		public Type Type { get { return _type; } }
+		public Type MemberType { get { return _memberType; } }
 	}
 }

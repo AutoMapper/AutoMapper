@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
 namespace AutoMapper.UnitTests
@@ -48,5 +49,60 @@ namespace AutoMapper.UnitTests
                 Assert.AreEqual(domainItems[0].ItemId, dtos[0].Id);
             }
         }
-    }
+   
+    	public class Chris_bennages_nullable_datetime_issue : AutoMapperSpecBase
+    	{
+			private Destination _result;
+
+    		class Source
+			{
+				public DateTime? SomeDate { get; set; }
+			}
+
+			class Destination
+			{
+				public MyCustomDate SomeDate { get; set; }
+			}
+
+			class MyCustomDate
+			{
+				public int Day { get; set; }
+				public int Month { get; set; }
+				public int Year { get; set; }
+
+				public MyCustomDate(int day, int month, int year)
+				{
+					Day = day;
+					Month = month;
+					Year = year;
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+				Mapper.CreateMap<DateTime?, MyCustomDate>()
+					.ConvertUsing(src => src.HasValue ? new MyCustomDate(src.Value.Day, src.Value.Month, src.Value.Year) : null);
+			}
+
+			protected override void Because_of()
+			{
+				_result = Mapper.Map<Source, Destination>(new Source { SomeDate = new DateTime(2005, 12, 1)});
+			}
+
+    		[Test]
+    		public void Should_map_a_date_with_a_value()
+    		{
+    			_result.SomeDate.Day.ShouldEqual(1);
+    		}
+
+    		[Test]
+    		public void Should_map_null_to_null()
+    		{
+    			var destination = Mapper.Map<Source, Destination>(new Source());
+				destination.SomeDate.ShouldBeNull();
+    		}
+    	}
+
+	}
 }
