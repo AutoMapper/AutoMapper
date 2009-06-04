@@ -26,7 +26,7 @@ namespace AutoMapper
 
 		public IEnumerable<PropertyMap> GetPropertyMaps()
 		{
-			return _propertyMaps;
+			return _propertyMaps.OrderBy(map => map.GetMappingOrder());
 		}
 
 		public void AddPropertyMap(PropertyMap propertyMap)

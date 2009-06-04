@@ -85,6 +85,7 @@
     <Compile Include="InterfaceMapping.cs" />
     <Compile Include="Internationalization.cs" />
     <Compile Include="MappingExceptions.cs" />
+    <Compile Include="MappingOrder.cs" />
     <Compile Include="MemberResolution.cs" />
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />

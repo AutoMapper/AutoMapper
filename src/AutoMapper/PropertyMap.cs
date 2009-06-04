@@ -10,6 +10,7 @@ namespace AutoMapper
 		private readonly IList<Type> _valueFormattersToSkip = new List<Type>();
 		private readonly IList<IValueFormatter> _valueFormatters = new List<IValueFormatter>();
 		private bool _ignored;
+		private int _mappingOrder;
 		private bool _hasCustomValueResolver;
 		private IValueResolver _customResolver;
 		private IValueResolver _customMemberResolver;
@@ -77,7 +78,7 @@ namespace AutoMapper
 
 		public void AddFormatterToSkip<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			_valueFormattersToSkip.Add(typeof (TValueFormatter));
+			_valueFormattersToSkip.Add(typeof(TValueFormatter));
 		}
 
 		public bool FormattersToSkipContains(Type valueFormatterType)
@@ -123,6 +124,16 @@ namespace AutoMapper
 			return _ignored;
 		}
 
+		public void SetMappingOrder(int mappingOrder)
+		{
+			_mappingOrder = mappingOrder;
+		}
+
+		public int GetMappingOrder()
+		{
+			return _mappingOrder;
+		}
+
 		public bool IsMapped()
 		{
 			return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
@@ -148,24 +159,24 @@ namespace AutoMapper
 			_sourceValueResolvers.Clear();
 		}
 
-	    public bool Equals(PropertyMap other)
-	    {
-	        if (ReferenceEquals(null, other)) return false;
-	        if (ReferenceEquals(this, other)) return true;
-	        return Equals(other.DestinationProperty, DestinationProperty);
-	    }
+		public bool Equals(PropertyMap other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return Equals(other.DestinationProperty, DestinationProperty);
+		}
 
-	    public override bool Equals(object obj)
-	    {
-	        if (ReferenceEquals(null, obj)) return false;
-	        if (ReferenceEquals(this, obj)) return true;
-	        if (obj.GetType() != typeof (PropertyMap)) return false;
-	        return Equals((PropertyMap) obj);
-	    }
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != typeof(PropertyMap)) return false;
+			return Equals((PropertyMap)obj);
+		}
 
-	    public override int GetHashCode()
-	    {
-	        return DestinationProperty.GetHashCode();
-	    }
+		public override int GetHashCode()
+		{
+			return DestinationProperty.GetHashCode();
+		}
 	}
 }

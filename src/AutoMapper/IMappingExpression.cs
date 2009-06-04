@@ -33,6 +33,7 @@ namespace AutoMapper
 		IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver);
 		void MapFrom(Func<TSource, object> sourceMember);
 		void Ignore();
+		void SetMappingOrder(int mappingOrder);
 	}
 
 	public interface IResolutionExpression<TSource>

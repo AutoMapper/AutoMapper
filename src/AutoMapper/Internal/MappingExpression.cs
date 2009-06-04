@@ -34,6 +34,7 @@ namespace AutoMapper
 			return this;
 		}
 	}
+
 	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
 	{
 		private readonly TypeMap _typeMap;
@@ -146,6 +147,11 @@ namespace AutoMapper
 			_propertyMap.Ignore();
 		}
 
+        public void SetMappingOrder(int mappingOrder)
+        {
+            _propertyMap.SetMappingOrder(mappingOrder);
+        }
+	
 		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
 		{
 			_propertyMap.RemoveLastFormatter();
