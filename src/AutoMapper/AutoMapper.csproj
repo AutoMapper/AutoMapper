@@ -76,7 +76,6 @@
     <Compile Include="IMemberAccessor.cs" />
     <Compile Include="Internal\TypePair.cs" />
     <Compile Include="IObjectMapper.cs" />
-    <Compile Include="ISelfProfiler.cs" />
     <Compile Include="AutoMapperConfigurationException.cs" />
     <Compile Include="ITypeConverter.cs" />
     <Compile Include="Mapper.cs" />
@@ -114,7 +113,6 @@
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />
-    <Compile Include="SelfProfiler.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
     <Compile Include="Internal\ValueFormatter.cs" />

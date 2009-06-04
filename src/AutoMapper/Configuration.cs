@@ -65,13 +65,6 @@ namespace AutoMapper
 			AddProfile(new TProfile());
 		}
 
-		public void SelfConfigure(Assembly assembly)
-		{
-			IEnumerable<Type> selfProfiles = GetSelfProfilers(assembly);
-
-			selfProfiles.ForEach(SelfProfile);
-		}
-
 		public void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor)
 		{
 			_formatterCtor = constructor;
@@ -286,21 +279,6 @@ namespace AutoMapper
                 DryRunTypeMap(typeMapsChecked, memberContext);
 			}
 
-		}
-
-	    private void SelfProfile(Type type)
-		{
-			var selfProfiler = (ISelfProfiler) Activator.CreateInstance(type, true);
-			Profile profile = selfProfiler.GetProfile();
-
-			AddProfile(profile);
-		}
-
-		private static IEnumerable<Type> GetSelfProfilers(Assembly assembly)
-		{
-			return from t in assembly.GetTypes()
-			       where typeof (ISelfProfiler).IsAssignableFrom(t) && !t.IsAbstract
-			       select t;
 		}
 
 		internal FormatterExpression GetProfile(string profileName)

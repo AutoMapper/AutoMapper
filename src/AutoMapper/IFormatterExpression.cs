@@ -37,7 +37,6 @@ namespace AutoMapper
 		void CreateProfile(string profileName, Action<IProfileExpression> initializationExpression);
 		void AddProfile(Profile profile);
 		void AddProfile<TProfile>() where TProfile : Profile, new();
-		void SelfConfigure(Assembly assembly);
 		void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor);
 		void ConstructResolversUsing(Func<Type, IValueResolver> constructor);
 		void ConstructTypeConvertersUsing(Func<Type, object> constructor);
