@@ -345,5 +345,48 @@ namespace AutoMapper.UnitTests
 
 		}
 
-	}
+        public class When_mapping_a_nullable_type_to_a_nullable_type : AutoMapperSpecBase
+        {
+            private ModelObject _model;
+            private ModelDto _dto;
+
+            public class ModelObject
+            {
+                public int? SomeValue { get; set; }
+                public int? SomeOtherValue { get; set; }
+            }
+
+            public class ModelDto
+            {
+                public int? SomeValue { get; set; }
+                public int? SomeOtherValue2 { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<ModelObject, ModelDto>()
+                    .ForMember(dest => dest.SomeOtherValue2, opt => opt.MapFrom(src => src.SomeOtherValue));
+
+                _model = new ModelObject();
+            }
+
+            protected override void Because_of()
+            {
+                _dto = Mapper.Map<ModelObject, ModelDto>(_model);
+            }
+
+            [Test]
+            public void Should_map_value_if_has_value()
+            {
+                _dto.SomeValue.ShouldBeNull();
+            }
+
+            [Test]
+            public void Should_not_set_value_if_null()
+            {
+                _dto.SomeOtherValue2.ShouldBeNull();
+            }
+
+        }
+    }
 }
