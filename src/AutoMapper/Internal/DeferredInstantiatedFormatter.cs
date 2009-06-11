@@ -5,7 +5,6 @@ namespace AutoMapper
 	internal class DeferredInstantiatedFormatter : IValueFormatter
 	{
 		private readonly Func<IValueFormatter> _instantiator;
-		private IValueFormatter _formatter;
 
 		public DeferredInstantiatedFormatter(Func<IValueFormatter> instantiator)
 		{
@@ -14,24 +13,16 @@ namespace AutoMapper
 
 		public string FormatValue(ResolutionContext context)
 		{
-			Initialize();
+            var formatter = _instantiator();
 
-			return _formatter.FormatValue(context);
+            return formatter.FormatValue(context);
 		}
 
 		public Type GetFormatterType()
 		{
-			Initialize();
+		    var formatter = _instantiator();
 
-			return _formatter.GetType();
-		}
-
-		private void Initialize()
-		{
-			if (_formatter == null)
-			{
-				_formatter = _instantiator();
-			}
+		    return formatter.GetType();
 		}
 	}
 }

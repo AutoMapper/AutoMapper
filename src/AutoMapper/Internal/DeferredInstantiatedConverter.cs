@@ -7,7 +7,6 @@ namespace AutoMapper
 	{
 		private readonly Func<object> _instantiator;
 		private readonly MethodInfo _converterMethod;
-		private object _customTypeConverter;
 
 		public DeferredInstantiatedConverter(Type typeConverterType, Func<object> instantiator)
 		{
@@ -15,44 +14,27 @@ namespace AutoMapper
 			_converterMethod = typeConverterType.GetMethod("Convert");
 		}
 
-		private void Initialize()
-		{
-			if (_customTypeConverter == null)
-			{
-				_customTypeConverter = _instantiator();
-			}
-		}
-
 		public object Convert(object source)
 		{
-			Initialize();
+		    var converter = _instantiator();
 
-			return _converterMethod.Invoke(_customTypeConverter, new[] {source});
+		    return _converterMethod.Invoke(converter, new[] { source });
 		}
 	}
 	internal class DeferredInstantiatedConverter<TSource, TDestination> : ITypeConverter<TSource, TDestination>
 	{
 		private readonly Func<ITypeConverter<TSource, TDestination>> _instantiator;
-		private ITypeConverter<TSource, TDestination> _customTypeConverter;
 
 		public DeferredInstantiatedConverter(Func<ITypeConverter<TSource, TDestination>> instantiator)
 		{
 			_instantiator = instantiator;
 		}
 
-		private void Initialize()
-		{
-			if (_customTypeConverter == null)
-			{
-				_customTypeConverter = _instantiator();
-			}
-		}
-
 		public TDestination Convert(TSource source)
 		{
-			Initialize();
+		    var typeConverter = _instantiator();
 
-			return _customTypeConverter.Convert(source);
+		    return typeConverter.Convert(source);
 		}
 	}
 }

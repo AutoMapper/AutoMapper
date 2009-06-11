@@ -5,7 +5,6 @@ namespace AutoMapper
 	internal class DeferredInstantiatedResolver : IValueResolver
 	{
 		private readonly Func<IValueResolver> _constructor;
-		private IValueResolver _resolver;
 
 		public DeferredInstantiatedResolver(Func<IValueResolver> constructor)
 		{
@@ -14,16 +13,9 @@ namespace AutoMapper
 
 		public ResolutionResult Resolve(ResolutionResult source)
 		{
-			CreateResolver();
-			return _resolver.Resolve(source);
-		}
+		    var resolver = _constructor();
 
-		private void CreateResolver()
-		{
-			if (_resolver == null)
-			{
-				_resolver = _constructor();
-			}
+		    return resolver.Resolve(source);
 		}
 	}
 }
