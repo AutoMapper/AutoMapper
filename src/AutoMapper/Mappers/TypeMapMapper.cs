@@ -38,6 +38,7 @@ namespace AutoMapper.Mappers
 					continue;
 				}
 
+			    object destinationValue = null;
 				ResolutionResult result;
 
 				try
@@ -46,9 +47,15 @@ namespace AutoMapper.Mappers
 				}
 				catch (Exception ex)
 				{
-					var errorContext = context.CreateMemberContext(null, context.SourceValue, context.SourceValue == null
-																								? typeof(object)
-																								: context.SourceValue.GetType(), propertyMap);
+				    var errorContext =
+				        context.CreateMemberContext(
+				            null,
+				            context.SourceValue,
+				            destinationValue,
+				            context.SourceValue == null
+				                ? typeof (object)
+				                : context.SourceValue.GetType(),
+				            propertyMap);
 					throw new AutoMapperMappingException(errorContext, ex);
 				}
 
@@ -56,7 +63,12 @@ namespace AutoMapper.Mappers
 				Type targetSourceType = result.Type;
 				Type targetDestinationType = propertyMap.DestinationProperty.MemberType;
 
-				if (result.Type != result.MemberType)
+                if (propertyMap.UseDestinationValue)
+                {
+                    destinationValue = propertyMap.DestinationProperty.GetValue(mappedObject);
+                }
+
+                if (result.Type != result.MemberType)
 				{
 					var potentialSourceType = targetSourceType;
 
@@ -77,12 +89,14 @@ namespace AutoMapper.Mappers
 
 				TypeMap memberTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(targetSourceType, targetDestinationType);
 
-				var newContext = context.CreateMemberContext(memberTypeMap, result.Value, targetSourceType, propertyMap);
+				var newContext = context.CreateMemberContext(memberTypeMap, result.Value, destinationValue, targetSourceType, propertyMap);
 
 				try
 				{
 					object propertyValueToAssign = mapper.Map(newContext);
-					propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+
+                    if (!propertyMap.UseDestinationValue)
+                        propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
 				}
 				catch (Exception ex)
 				{

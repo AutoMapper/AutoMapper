@@ -34,6 +34,7 @@ namespace AutoMapper
 		void MapFrom(Func<TSource, object> sourceMember);
 		void Ignore();
 		void SetMappingOrder(int mappingOrder);
+	    void UseDestinationValue();
 	}
 
 	public interface IResolutionExpression<TSource>

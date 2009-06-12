@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -289,6 +290,58 @@ namespace AutoMapper.UnitTests
 			public void Should_assign_the_value_directly()
 			{
 				CollectionAssert.AreEqual(_destination.Values, _source.Values);
+			}
+		}
+		
+        public class When_mapping_to_a_collection_with_instantiation_managed_by_the_destination : AutoMapperSpecBase
+		{
+			private Destination _destination;
+			private Source _source;
+
+			public class SourceItem
+		    {
+		        public int Value { get; set; }
+            }
+
+            public class DestItem
+            {
+                public int Value { get; set; }
+            }
+
+			public class Source
+			{
+				public List<SourceItem> Values { get; set; }
+			}
+
+			public class Destination
+			{
+                private List<DestItem> _values = new List<DestItem>();
+				
+                public List<DestItem> Values
+				{
+                    get { return _values; }
+				}
+			}
+
+			protected override void Establish_context()
+			{
+			    Mapper.CreateMap<Source, Destination>()
+			        .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
+			    Mapper.CreateMap<SourceItem, DestItem>();
+			}
+
+			protected override void Because_of()
+			{
+				_source = new Source { Values = new List<SourceItem>{ new SourceItem { Value = 5}, new SourceItem { Value = 10 }} };
+				_destination = Mapper.Map<Source, Destination>(_source);
+			}
+
+			[Test]
+			public void Should_assign_the_value_directly()
+			{
+				_destination.Values.Count.ShouldEqual(2);
+                _destination.Values[0].Value.ShouldEqual(5);
+                _destination.Values[1].Value.ShouldEqual(10);
 			}
 		}
 	}

@@ -25,7 +25,9 @@ namespace AutoMapper
 
 		public IMemberAccessor DestinationProperty { get; private set; }
 
-		public IEnumerable<IValueResolver> GetSourceValueResolvers()
+	    public bool UseDestinationValue { get; set; }
+
+	    public IEnumerable<IValueResolver> GetSourceValueResolvers()
 		{
 			yield return new DefaultResolver();
 

@@ -74,22 +74,24 @@ namespace AutoMapper
 			_instanceCache = context._instanceCache;
 		}
 
-		private ResolutionContext(ResolutionContext context, object sourceValue, TypeMap memberTypeMap, PropertyMap propertyMap)
+		private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, TypeMap memberTypeMap, PropertyMap propertyMap)
 		{
 			_typeMap = memberTypeMap;
 			_propertyMap = propertyMap;
 			_sourceType = memberTypeMap.SourceType;
 			_sourceValue = sourceValue;
+            _destinationValue = destinationValue;
 			_parent = context;
 			_destinationType = memberTypeMap.DestinationType;
 			_instanceCache = context._instanceCache;
 		}
 
-		private ResolutionContext(ResolutionContext context, object sourceValue, Type sourceType, PropertyMap propertyMap)
+		private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, Type sourceType, PropertyMap propertyMap)
 		{
 			_propertyMap = propertyMap;
 			_sourceType = sourceType;
 			_sourceValue = sourceValue;
+            _destinationValue = destinationValue;
 			_parent = context;
 			_destinationType = propertyMap.DestinationProperty.MemberType;
 			_instanceCache = context._instanceCache;
@@ -134,11 +136,11 @@ namespace AutoMapper
 			return new ResolutionContext(this, sourceValue, sourceType);
 		}
 
-		public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, Type sourceMemberType, PropertyMap propertyMap)
+		public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, object destinationValue, Type sourceMemberType, PropertyMap propertyMap)
 		{
 			return memberTypeMap != null
-			       	? new ResolutionContext(this, memberValue, memberTypeMap, propertyMap)
-			       	: new ResolutionContext(this, memberValue, sourceMemberType, propertyMap);
+			       	? new ResolutionContext(this, memberValue, destinationValue, memberTypeMap, propertyMap)
+			       	: new ResolutionContext(this, memberValue, destinationValue, sourceMemberType, propertyMap);
 		}
 
 		public ResolutionContext CreateElementContext(TypeMap elementTypeMap, object item, Type sourceElementType, Type destinationElementType, int arrayIndex)

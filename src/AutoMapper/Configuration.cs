@@ -258,7 +258,7 @@ namespace AutoMapper
                             if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
                                 continue;
                             
-                            var memberContext = context.CreateMemberContext(memberTypeMap, null, sourceType, propertyMap);
+                            var memberContext = context.CreateMemberContext(memberTypeMap, null, null, sourceType, propertyMap);
 
                             DryRunTypeMap(typeMapsChecked, memberContext);
 						}

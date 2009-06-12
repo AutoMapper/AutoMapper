@@ -147,6 +147,11 @@ namespace AutoMapper
 			_propertyMap.Ignore();
 		}
 
+        public void UseDestinationValue()
+        {
+            _propertyMap.UseDestinationValue = true;
+        }
+
         public void SetMappingOrder(int mappingOrder)
         {
             _propertyMap.SetMappingOrder(mappingOrder);

@@ -55,62 +55,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_the_destination_array_is_specified : AutoMapperSpecBase
-		{
-			private List<Source> _sourceList;
-			private Destination[] _destinationList;
-
-			public class Source
-			{
-				public int Value { get; set; }
-			}
-
-			public class Destination
-			{
-				public int Value { get; set; }
-			}
-
-			public class DestinationList : List<Destination>
-			{
-				public string Name { get; set; }
-			}
-
-			protected override void Establish_context()
-			{
-				base.Establish_context();
-
-				Mapper.CreateMap<Source, Destination>();
-
-				_sourceList = new List<Source>
-					{
-						new Source() {Value = 10},
-						new Source() {Value = 11},
-						new Source() {Value = 12},
-					};
-				_destinationList = new DestinationList() { new Destination() { Value = 100 } }.ToArray();
-			}
-
-			protected override void Because_of()
-			{
-				_destinationList = Mapper.Map<IList<Source>, Destination[]>(_sourceList, _destinationList);
-			}
-
-			[Test]
-			public void Should_ignore_the_array_passed_in()
-			{
-				_destinationList.Any(d => d.Value == 100).ShouldBeFalse();
-			}
-
-			[Test]
-			public void Should_translate_the_elements_in_the_list()
-			{
-				_destinationList.Count().ShouldEqual(3);
-				_destinationList.Any(d => d.Value == 10).ShouldBeTrue();
-				_destinationList.Any(d => d.Value == 11).ShouldBeTrue();
-				_destinationList.Any(d => d.Value == 12).ShouldBeTrue();
-			}
-		}
-
 		public class When_the_destination_object_is_specified_and_you_are_converting_an_enum : AutoMapperSpecBase
 		{
 			private string _result;
