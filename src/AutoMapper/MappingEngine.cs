@@ -98,15 +98,18 @@ namespace AutoMapper
 				var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
 				IObjectMapper mapperToUse;
-					
-				if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
-				{
-					// Cache miss
-					mapperToUse = _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
-					_objectMapperCache.Add(contextTypePair, mapperToUse);
-				} 
 
-				if (mapperToUse == null)
+                lock (_objectMapperCache)
+                {
+                    if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
+                    {
+                        // Cache miss
+                        mapperToUse = _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
+                        _objectMapperCache.Add(contextTypePair, mapperToUse);
+                    }
+                }
+
+			    if (mapperToUse == null)
 				{
 					throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
 				}

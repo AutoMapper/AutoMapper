@@ -144,41 +144,21 @@ namespace AutoMapper
 			
 			TypeMap typeMap;
 
-			if (_typeMapCache.TryGetValue(typeMapPair, out typeMap))
-				return typeMap;
+            lock (_typeMapCache)
+            {
+                if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
+                {
+                    // Cache miss
+                    typeMap = FindTypeMap(sourceType, destinationType);
 
-			// Cache miss
-			typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
-			if (typeMap == null)
-			{
-				typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
+                    _typeMapCache[typeMapPair] = typeMap;
+                }
+            }
 
-				if (typeMap == null)
-				{
-					foreach (var sourceInterface in sourceType.GetInterfaces())
-					{
-						typeMap = ((IConfigurationProvider) this).FindTypeMapFor(sourceInterface, destinationType);
-						
-						if (typeMap == null) continue;
-
-						var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
-						if (derivedTypeFor != null)
-						{
-							typeMap = CreateTypeMap(sourceType, derivedTypeFor);
-						}
-					}
-
-					if ((sourceType.BaseType != null) && (typeMap == null))
-						typeMap = ((IConfigurationProvider) this).FindTypeMapFor(sourceType.BaseType, destinationType);
-				}
-			}
-
-			_typeMapCache[typeMapPair] = typeMap;
-
-			return typeMap;
+		    return typeMap;
 		}
 
-		public TypeMap FindTypeMapFor<TSource, TDestination>()
+	    public TypeMap FindTypeMapFor<TSource, TDestination>()
 		{
 			return ((IConfigurationProvider) this).FindTypeMapFor(typeof (TSource), typeof (TDestination));
 		}
@@ -227,7 +207,37 @@ namespace AutoMapper
 	        return _mappers.ToArray();
 	    }
 
-	    private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
+        private TypeMap FindTypeMap(Type sourceType, Type destinationType)
+        {
+            TypeMap typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+
+            if (typeMap == null)
+            {
+                typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
+
+                if (typeMap == null)
+                {
+                    foreach (var sourceInterface in sourceType.GetInterfaces())
+                    {
+                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(sourceInterface, destinationType);
+
+                        if (typeMap == null) continue;
+
+                        var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
+                        if (derivedTypeFor != null)
+                        {
+                            typeMap = CreateTypeMap(sourceType, derivedTypeFor);
+                        }
+                    }
+
+                    if ((sourceType.BaseType != null) && (typeMap == null))
+                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(sourceType.BaseType, destinationType);
+                }
+            }
+            return typeMap;
+        }
+
+        private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
 		{
             if (context.TypeMap != null)
             {
