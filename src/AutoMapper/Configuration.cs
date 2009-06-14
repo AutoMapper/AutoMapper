@@ -144,14 +144,17 @@ namespace AutoMapper
 			
 			TypeMap typeMap;
 
-            lock (_typeMapCache)
+            if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
             {
-                if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
+                lock (_typeMapCache)
                 {
-                    // Cache miss
-                    typeMap = FindTypeMap(sourceType, destinationType);
+                    if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
+                    {
+                        // Cache miss
+                        typeMap = FindTypeMap(sourceType, destinationType);
 
-                    _typeMapCache[typeMapPair] = typeMap;
+                        _typeMapCache[typeMapPair] = typeMap;
+                    }
                 }
             }
 

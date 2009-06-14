@@ -99,13 +99,16 @@ namespace AutoMapper
 
 				IObjectMapper mapperToUse;
 
-                lock (_objectMapperCache)
+                if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
                 {
-                    if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
+                    lock (_objectMapperCache)
                     {
-                        // Cache miss
-                        mapperToUse = _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
-                        _objectMapperCache.Add(contextTypePair, mapperToUse);
+                        if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
+                        {
+                            // Cache miss
+                            mapperToUse = _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
+                            _objectMapperCache.Add(contextTypePair, mapperToUse);
+                        }
                     }
                 }
 
