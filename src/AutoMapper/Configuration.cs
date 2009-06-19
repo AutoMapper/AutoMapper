@@ -298,16 +298,20 @@ namespace AutoMapper
 		{
 			FormatterExpression expr;
 
-			if (_formatterProfiles.TryGetValue(profileName, out expr))
-			{
-				return expr;
-			}
+            if (!_formatterProfiles.TryGetValue(profileName, out expr))
+            {
+                lock(_formatterProfiles)
+                {
+                    if (!_formatterProfiles.TryGetValue(profileName, out expr))
+                    {
+                        expr = new FormatterExpression(_formatterCtor);
 
-			var expression = new FormatterExpression(_formatterCtor);
+                        _formatterProfiles.Add(profileName, expr);
+                    }
+                }
+            }
 			
-			_formatterProfiles.Add(profileName, expression);
-
-			return expression;
+            return expr;
 		}
 	}
 }
