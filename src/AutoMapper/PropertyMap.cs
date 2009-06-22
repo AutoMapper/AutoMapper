@@ -69,8 +69,8 @@ namespace AutoMapper
 				return;
 			}
 
-			_sealed = true;
 			_cachedResolvers = GetSourceValueResolvers().Where(r => r != null).ToArray();
+			_sealed = true;
 		}
 
 		public void ChainResolver(IValueResolver IValueResolver)
