@@ -5,6 +5,8 @@ namespace AutoMapper
 {
 	public static class Mapper
 	{
+        private static object _configurationSync = new object();
+        private static object _engineSync = new object();
 		private static Configuration _configuration;
 		private static IMappingEngine _mappingEngine;
 
@@ -132,8 +134,8 @@ namespace AutoMapper
 
 		public static void Reset()
 		{
-			lock (typeof (IConfigurationProvider))
-				lock (typeof (IMappingEngine))
+			lock (_configurationSync)
+				lock (_engineSync)
 				{
 					_configuration = null;
 					_mappingEngine = null;
@@ -146,7 +148,7 @@ namespace AutoMapper
 			{
 				if (_mappingEngine == null)
 				{
-					lock (typeof(IMappingEngine))
+                    lock (_engineSync)
 					{
 						if (_mappingEngine == null)
 						{
@@ -165,7 +167,7 @@ namespace AutoMapper
 			{
 				if (_configuration == null)
 				{
-					lock (typeof (Configuration))
+                    lock (_configurationSync)
 					{
 						if (_configuration == null)
 						{
