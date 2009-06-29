@@ -15,9 +15,9 @@ namespace AutoMapper
 			return Engine.Map<TSource, TDestination>(source);
 		}
 
-		public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+		public static void Map<TSource, TDestination>(TSource source, TDestination destination)
 		{
-			return Engine.Map(source, destination);
+			Engine.Map(source, destination);
 		}
 
 		public static object Map(object source, Type sourceType, Type destinationType)
@@ -25,9 +25,9 @@ namespace AutoMapper
 			return Engine.Map(source, sourceType, destinationType);
 		}
 
-		public static object Map(object source, object destination, Type sourceType, Type destinationType)
+		public static void Map(object source, object destination, Type sourceType, Type destinationType)
 		{
-			return Engine.Map(source, destination, sourceType, destinationType);
+			Engine.Map(source, destination, sourceType, destinationType);
 		}
 
 		public static TDestination DynamicMap<TSource, TDestination>(TSource source)

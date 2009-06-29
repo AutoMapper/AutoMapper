@@ -32,12 +32,12 @@ namespace AutoMapper
 			return (TDestination) Map(source, modelType, destinationType);
 		}
 
-		public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+		public void Map<TSource, TDestination>(TSource source, TDestination destination)
 		{
 			Type modelType = typeof (TSource);
 			Type destinationType = typeof (TDestination);
 
-			return (TDestination) Map(source, destination, modelType, destinationType);
+			Map(source, destination, modelType, destinationType);
 		}
 
 		public TDestination DynamicMap<TSource, TDestination>(TSource source)
@@ -77,13 +77,13 @@ namespace AutoMapper
 			return ((IMappingEngineRunner) this).Map(context);
 		}
 
-		public object Map(object source, object destination, Type sourceType, Type destinationType)
+		public void Map(object source, object destination, Type sourceType, Type destinationType)
 		{
 			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType);
 
-			return ((IMappingEngineRunner) this).Map(context);
+			((IMappingEngineRunner) this).Map(context);
 		}
 
 		object IMappingEngineRunner.Map(ResolutionContext context)
