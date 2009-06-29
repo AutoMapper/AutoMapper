@@ -212,7 +212,6 @@ namespace AutoMapper.UnitTests
 			public class ModelDto
 			{
 				public DateTime BaseDate { get; set; }
-				public DateTime BaseDate2 { get; set; }
 				public string SubProperName { get; set; }
 				public string Sub2ProperName { get; set; }
 				public string SubWithExtraNameProperName { get; set; }
@@ -311,12 +310,12 @@ namespace AutoMapper.UnitTests
             public class ModelDto
             {
                 public DateTime BaseDate;
-                public DateTime BaseDate2;
                 public string SubProperName;
                 public string Sub2ProperName;
                 public string SubWithExtraNameProperName;
                 public string SubSubSubIAmACoolProperty;
-                public string SubMissingSubSubIAmACoolProperty;            }
+                public string SubMissingSubSubIAmACoolProperty;            
+            }
 
             protected override void Establish_context()
             {
@@ -409,7 +408,6 @@ namespace AutoMapper.UnitTests
             public class ModelDto
             {
                 public DateTime BaseDate;
-                public DateTime BaseDate2 { get; set;}
                 public string SubProperName;
                 public string Sub2ProperName { get; set;}
                 public string SubWithExtraNameProperName;
@@ -778,7 +776,6 @@ namespace AutoMapper.UnitTests
 				public string SubValue { get; set; }
 				public int GrandChildInt { get; set; }
 				public string GrandChildString { get; set; }
-				public string BlargBucks { get; set; }
 				public int BlargPlus3 { get; set; }
 				public int BlargMinus2 { get; set; }
 				public int MoreBlarg { get; set; }
@@ -876,7 +873,8 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_mapping_a_collection_to_a_more_type_specific_collection : AutoMapperSpecBase
+        [Description("This one should really pass validation")]
+		public class When_mapping_a_collection_to_a_more_type_specific_collection : NonValidatingSpecBase
 		{
 			private ModelDto _result;
 

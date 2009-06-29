@@ -6,7 +6,7 @@ namespace AutoMapper.UnitTests
 {
 	namespace MappingExceptions
 	{
-		public class When_encountering_a_member_mapping_problem_during_mapping : AutoMapperSpecBase
+		public class When_encountering_a_member_mapping_problem_during_mapping : NonValidatingSpecBase
 		{
 			private class Source
 			{

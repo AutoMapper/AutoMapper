@@ -7,7 +7,7 @@ namespace AutoMapper.UnitTests
 {
 	namespace ConfigurationValidation
 	{
-		public class When_testing_a_dto_with_mismatched_members : AutoMapperSpecBase
+		public class When_testing_a_dto_with_mismatched_members : NonValidatingSpecBase
 		{
 			private TypeMap _typeMap;
 
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 	
-		public class When_testing_a_dto_with_matching_member_names_but_mismatched_types : AutoMapperSpecBase
+		public class When_testing_a_dto_with_matching_member_names_but_mismatched_types : NonValidatingSpecBase
 		{
 			private class Source
 			{
@@ -192,7 +192,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_testing_a_dto_with_array_types_with_mismatched_element_types : AutoMapperSpecBase
+		public class When_testing_a_dto_with_array_types_with_mismatched_element_types : NonValidatingSpecBase
 		{
 			private class Source
 			{
@@ -226,7 +226,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_testing_a_dto_with_list_types_with_mismatched_element_types : AutoMapperSpecBase
+		public class When_testing_a_dto_with_list_types_with_mismatched_element_types : NonValidatingSpecBase
 		{
 			private class Source
 			{

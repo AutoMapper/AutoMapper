@@ -70,8 +70,10 @@ namespace AutoMapper
 			public static IMemberAccessor[] GetPublicReadAccessors(this Type type)
 			{
 				// Collect that target type, its base type, and all implemented/inherited interface types
-				var typesToScan = new[] { type, type.BaseType }
-					.Concat(type.FindInterfaces((m, f) => true, null));
+				IEnumerable<Type> typesToScan = new[] { type, type.BaseType };
+
+                if (type.IsInterface)
+                    typesToScan = typesToScan.Concat(type.FindInterfaces((m, f) => true, null));
 
 				// Scan all types for public properties and fields
 				var members = typesToScan

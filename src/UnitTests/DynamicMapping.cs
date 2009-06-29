@@ -35,7 +35,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_mapping_two_non_configured_types_that_do_not_match : AutoMapperSpecBase
+		public class When_mapping_two_non_configured_types_that_do_not_match : NonValidatingSpecBase
 		{
 			private Exception _thrown;
 

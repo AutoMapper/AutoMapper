@@ -237,5 +237,48 @@ namespace AutoMapper.UnitTests
             }
         }
 
+	    public class When_mapping_to_a_type_with_explicitly_implemented_interface_members : AutoMapperSpecBase
+	    {
+	        private Destination _destination;
+
+	        public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            public interface IOtherDestination
+            {
+                int OtherValue { get; set; }
+            }
+
+            public class Destination : IOtherDestination
+            {
+                public int Value { get; set; }
+                int IOtherDestination.OtherValue { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>();
+            }
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Source, Destination>(new Source {Value = 10});
+            }
+
+	        [Test]
+	        public void Should_ignore_interface_members_for_mapping()
+	        {
+	            _destination.Value.ShouldEqual(10);
+	        }
+
+	        [Test]
+	        public void Should_ignore_interface_members_for_validation()
+	        {
+	            Mapper.AssertConfigurationIsValid();
+	        }
+	    }
+
 	}
 }
