@@ -344,5 +344,35 @@ namespace AutoMapper.UnitTests
                 _destination.Values[1].Value.ShouldEqual(10);
 			}
 		}
-	}
+
+        public class When_mapping_a_collection_with_null_members : AutoMapperSpecBase
+        {
+            const string FirstString = null;
+
+            private IEnumerable<string> _strings;
+            private List<string> _mappedStrings;
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(x => x.AllowNullDestinationValues = true);
+
+                _strings = new List<string> { FirstString };
+
+                _mappedStrings = new List<string>();
+            }
+
+            protected override void Because_of()
+            {
+                _mappedStrings = Mapper.Map<IEnumerable<string>, List<string>>(_strings);
+            }
+
+            [Test]
+            public void Should_map_correctly()
+            {
+                _mappedStrings.ShouldNotBeNull();
+                _mappedStrings.Count.ShouldEqual(1);
+                _mappedStrings[0].ShouldBeNull();
+            }
+        }
+    }
 }

@@ -30,7 +30,7 @@ namespace AutoMapper.Mappers
 				Type targetSourceType = sourceElementType;
 				Type targetDestinationType = destElementType;
 
-				if (item.GetType() != sourceElementType)
+				if (item != null && item.GetType() != sourceElementType)
 				{
 				    var potentialSourceType = item.GetType();
 
