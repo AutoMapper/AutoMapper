@@ -60,44 +60,78 @@ namespace AutoMapper
 	{
 		internal static class ReflectionHelper
 		{
+            private static Dictionary<Type, IMemberAccessor[]> _publicReadAccessorsCache = new Dictionary<Type, IMemberAccessor[]>();
+            private static Dictionary<Type, MethodInfo[]> _publicNoArgMethodsCache = new Dictionary<Type, MethodInfo[]>();
+            private static object _accessorSync = new object();
+            private static object _methodSync = new object();
+
 			public static MethodInfo[] GetPublicNoArgMethods(this Type type)
 			{
-				return type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-					.Where(m => (m.ReturnType != null) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
-					.ToArray();
+			    MethodInfo[] methods;
+
+                if (!_publicNoArgMethodsCache.TryGetValue(type, out methods))
+                {
+                    lock(_methodSync)
+                    {
+                        if (!_publicNoArgMethodsCache.TryGetValue(type, out methods))
+                        {
+                            methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                                .Where(m => (m.ReturnType != null) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
+                                .ToArray();
+                            _publicNoArgMethodsCache[type] = methods;
+                        }
+                    }
+                }
+
+                return methods;
 			}
 
 			public static IMemberAccessor[] GetPublicReadAccessors(this Type type)
 			{
-				// Collect that target type, its base type, and all implemented/inherited interface types
-				IEnumerable<Type> typesToScan = new[] { type, type.BaseType };
+			    IMemberAccessor[] members;
 
-                if (type.IsInterface)
-                    typesToScan = typesToScan.Concat(type.FindInterfaces((m, f) => true, null));
+                if (!_publicReadAccessorsCache.TryGetValue(type, out members))
+                {
+                    lock (_methodSync)
+                    {
+                        if (!_publicReadAccessorsCache.TryGetValue(type, out members))
+                        {
+                            // Collect that target type, its base type, and all implemented/inherited interface types
+                            IEnumerable<Type> typesToScan = new[] { type, type.BaseType };
 
-				// Scan all types for public properties and fields
-				var members = typesToScan
-					.Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-					.SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
-													 BindingFlags.Instance | BindingFlags.Public,
-													 (m, f) =>
-													 m is FieldInfo ||
-													 (m is PropertyInfo && ((PropertyInfo)m).CanRead && !((PropertyInfo)m).GetIndexParameters().Any()), null));
+                            if (type.IsInterface)
+                                typesToScan = typesToScan.Concat(type.FindInterfaces((m, f) => true, null));
 
-				// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
-				var filteredMembers = members
-					.OfType<PropertyInfo>()
-					.GroupBy(x => x.Name) // group properties of the same name together
-					.Select(x =>
-						x.Any(y => y.CanRead && y.CanWrite) ? // favor the first property that can both read & write - otherwise pick the first one
-							x.Where(y => y.CanRead && y.CanWrite).First() :
-							x.First())
-					.OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
-					.Concat(members.Where(x => x is FieldInfo));  // add FieldInfo objects back
+                            // Scan all types for public properties and fields
+                            var allMembers = typesToScan
+                                .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
+                                .SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
+                                                                 BindingFlags.Instance | BindingFlags.Public,
+                                                                 (m, f) =>
+                                                                 m is FieldInfo ||
+                                                                 (m is PropertyInfo && ((PropertyInfo)m).CanRead && !((PropertyInfo)m).GetIndexParameters().Any()), null));
 
-				return filteredMembers
-					.Select(x => x.ToMemberAccessor())
-					.ToArray();
+                            // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
+                            var filteredMembers = allMembers
+                                .OfType<PropertyInfo>()
+                                .GroupBy(x => x.Name) // group properties of the same name together
+                                .Select(x =>
+                                    x.Any(y => y.CanRead && y.CanWrite) ? // favor the first property that can both read & write - otherwise pick the first one
+                                        x.Where(y => y.CanRead && y.CanWrite).First() :
+                                        x.First())
+                                .OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
+                                .Concat(allMembers.Where(x => x is FieldInfo));  // add FieldInfo objects back
+
+                            members = filteredMembers
+                                .Select(x => x.ToMemberAccessor())
+                                .ToArray();
+
+                            _publicReadAccessorsCache[type] = members;
+                        }
+                    }
+                }
+
+                return members;
 			}
 
 			public static IMemberAccessor GetAccessor(this Type targetType, string accessorName, BindingFlags bindingFlags)
