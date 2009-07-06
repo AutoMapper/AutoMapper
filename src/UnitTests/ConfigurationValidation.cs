@@ -26,15 +26,6 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.CreateMap<ModelObject, ModelDto>();
-
-				_typeMap = Mapper.FindTypeMapFor<ModelObject, ModelDto>();
-			}
-
-			[Test]
-			public void Should_fail_an_inspection_of_missing_mappings()
-			{
-				_typeMap.GetUnmappedPropertyNames().Length.ShouldEqual(1);
-				_typeMap.GetUnmappedPropertyNames()[0].ShouldEqual("Bar");
 			}
 
 			[Test]
@@ -44,7 +35,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_testing_a_dto_with_fully_mapped_and_custom_matchers : AutoMapperSpecBase
+		public class When_testing_a_dto_with_fully_mapped_and_custom_matchers : NonValidatingSpecBase
 		{
 			private TypeMap _typeMap;
 
@@ -65,14 +56,12 @@ namespace AutoMapper.UnitTests
 				Mapper
 					.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
-
-				_typeMap = Mapper.FindTypeMapFor<ModelObject, ModelDto>();
 			}
 
 			[Test]
 			public void Should_pass_an_inspection_of_missing_mappings()
 			{
-				_typeMap.GetUnmappedPropertyNames().Length.ShouldEqual(0);
+				Mapper.AssertConfigurationIsValid();
 			}
 		}
 	

@@ -8,13 +8,20 @@ namespace AutoMapper
 		private readonly Type _type;
 		private readonly Type _memberType;
 
-		public ResolutionResult(object value, Type type)
+		public ResolutionResult(object value, Type memberType)
 		{
 			_value = value;
 			_type = value == null
-			       	? type
+			       	? memberType
 			       	: value.GetType();
-			_memberType = type;
+			_memberType = memberType;
+		}
+
+        public ResolutionResult(object value, Type memberType, Type type)
+		{
+			_value = value;
+			_type = type;
+			_memberType = memberType;
 		}
 
 		public ResolutionResult(object value)

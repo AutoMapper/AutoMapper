@@ -5,8 +5,7 @@ namespace AutoMapper
 	public interface IConfigurationProvider : IProfileConfiguration
 	{
 		TypeMap[] GetAllTypeMaps();
-		TypeMap FindTypeMapFor(Type sourceType, Type destinationType);
-		TypeMap FindTypeMapFor<TSource, TDestination>();
+		TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType);
 		IFormatterConfiguration GetProfileConfiguration(string profileName);
 		void AssertConfigurationIsValid();
 		void AssertConfigurationIsValid(TypeMap typeMap);

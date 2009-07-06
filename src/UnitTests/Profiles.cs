@@ -48,51 +48,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_configuring_an_entire_profile_at_once : AutoMapperSpecBase
-		{
-			private TypeMap _typeMap1;
-			private TypeMap _typeMap2;
-
-			private class Model1
-			{
-				public int Value { get; set; }
-			}
-
-			private class Dto1
-			{
-				public string Value { get; set; }
-			}
-
-			private class Model2
-			{
-				public int Value { get; set; }
-			}
-
-			private class Dto2
-			{
-				public string Value { get; set; }
-			}
-
-			protected override void Establish_context()
-			{
-				Mapper.CreateProfile("Custom1", x => x.CreateMap<Model1, Dto1>());
-				Mapper.CreateProfile("Custom2").CreateMap<Model2, Dto2>();
-			}
-
-			protected override void Because_of()
-			{
-				_typeMap1 = Mapper.FindTypeMapFor<Model1, Dto1>();
-				_typeMap2 = Mapper.FindTypeMapFor<Model2, Dto2>();
-			}
-
-			[Test]
-			public void Should_configure_each_type_map_to_have_the_specified_profile()
-			{
-				_typeMap1.Profile.ShouldEqual("Custom1");
-				_typeMap2.Profile.ShouldEqual("Custom2");
-			}
-		}
-
 		public class When_configuring_a_profile_through_a_profile_subclass : AutoMapperSpecBase
 		{
 			private Dto _result;
@@ -171,13 +126,6 @@ namespace AutoMapper.UnitTests
 			public void Should_use_the_overridden_configuration_method_to_configure()
 			{
 				_result.Value.ShouldEqual("5 Custom");
-			}
-
-			[Test]
-			public void Should_assign_the_correct_profile_to_each_configured_type_map()
-			{
-				Mapper.FindTypeMapFor<Model, Dto>().Profile.ShouldEqual("Custom1");
-				Mapper.FindTypeMapFor<Model, Dto2>().Profile.ShouldEqual("Custom2");
 			}
 		}
 

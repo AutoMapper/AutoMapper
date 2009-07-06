@@ -27,26 +27,12 @@ namespace AutoMapper.Mappers
 			int i = 0;
 			foreach (object item in enumerableValue)
 			{
-				Type targetSourceType = sourceElementType;
-				Type targetDestinationType = destElementType;
+			    var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(item, sourceElementType, destElementType);
 
-				if (item != null && item.GetType() != sourceElementType)
-				{
-				    var potentialSourceType = item.GetType();
+                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
+                Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;
 
-					TypeMap itemTypeMap =
-						mapper.ConfigurationProvider.FindTypeMapFor(sourceElementType, destElementType)
-                        ?? mapper.ConfigurationProvider.FindTypeMapFor(potentialSourceType, destElementType);
-
-                    var potentialDestType = itemTypeMap.GetDerivedTypeFor(potentialSourceType);
-
-                    targetSourceType = potentialDestType != destElementType ? potentialSourceType : itemTypeMap.SourceType;
-				    targetDestinationType = potentialDestType;
-				}
-
-				TypeMap derivedTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(targetSourceType, targetDestinationType);
-
-				var newContext = context.CreateElementContext(derivedTypeMap, item, targetSourceType, targetDestinationType, i);
+				var newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, i);
 
 				object mappedValue = mapper.Map(newContext);
 

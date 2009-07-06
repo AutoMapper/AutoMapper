@@ -72,6 +72,11 @@ namespace AutoMapper
 			return _includedDerivedTypes[derivedSourceType];
 		}
 
+        public bool HasDerivedTypesToInclude()
+        {
+            return _includedDerivedTypes.Any();
+        }
+
 		public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
 		{
 			CustomMapper = customMapper;

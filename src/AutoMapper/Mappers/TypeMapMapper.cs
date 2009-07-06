@@ -59,35 +59,35 @@ namespace AutoMapper.Mappers
 					throw new AutoMapperMappingException(errorContext, ex);
 				}
 
-				// Should refactor this back out to FindTypeMapFor or something like that
-				Type targetSourceType = result.Type;
-				Type targetDestinationType = propertyMap.DestinationProperty.MemberType;
-
                 if (propertyMap.UseDestinationValue)
                 {
                     destinationValue = propertyMap.DestinationProperty.GetValue(mappedObject);
                 }
 
+                // Should refactor this back out to FindTypeMapFor or something like that
+                Type targetSourceType = result.Type;
+                Type targetDestinationType = propertyMap.DestinationProperty.MemberType;
+
                 if (result.Type != result.MemberType)
-				{
-					var potentialSourceType = targetSourceType;
+                {
+                    var potentialSourceType = targetSourceType;
 
-					TypeMap itemTypeMap =
-						mapper.ConfigurationProvider.FindTypeMapFor(result.MemberType, targetDestinationType)
-						?? mapper.ConfigurationProvider.FindTypeMapFor(potentialSourceType, targetDestinationType);
+                    TypeMap itemTypeMap =
+                        mapper.ConfigurationProvider.FindTypeMapFor(result.Value, result.MemberType, targetDestinationType)
+                        ?? mapper.ConfigurationProvider.FindTypeMapFor(result.Value, potentialSourceType, targetDestinationType);
 
-					if (itemTypeMap != null)
-					{
-						var potentialDestType = itemTypeMap.GetDerivedTypeFor(potentialSourceType);
+                    if (itemTypeMap != null)
+                    {
+                        var potentialDestType = itemTypeMap.GetDerivedTypeFor(potentialSourceType);
 
-						targetSourceType = potentialDestType != targetDestinationType
-						                   	? potentialSourceType
-						                   	: itemTypeMap.SourceType;
-						targetDestinationType = potentialDestType;
-					}
-				}
+                        targetSourceType = potentialDestType != targetDestinationType
+                                            ? potentialSourceType
+                                            : itemTypeMap.SourceType;
+                        targetDestinationType = potentialDestType;
+                    }
+                }
 
-				TypeMap memberTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(targetSourceType, targetDestinationType);
+                TypeMap memberTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(result.Value, targetSourceType, targetDestinationType);
 
 				var newContext = context.CreateMemberContext(memberTypeMap, result.Value, destinationValue, targetSourceType, propertyMap);
 

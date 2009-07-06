@@ -145,7 +145,7 @@ namespace AutoMapper
 			return _typeMaps.ToArray();
 		}
 
-		public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
+		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
 		{
 			var typeMapPair = new TypePair(sourceType, destinationType);
 			
@@ -158,19 +158,27 @@ namespace AutoMapper
                     if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
                     {
                         // Cache miss
-                        typeMap = FindTypeMap(sourceType, destinationType);
+                        typeMap = FindTypeMap(source, sourceType, destinationType);
 
                         _typeMapCache[typeMapPair] = typeMap;
                     }
                 }
             }
 
-		    return typeMap;
-		}
+            // Check for runtime derived types
+		    var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null) && (source.GetType() != sourceType);
+		    
+            if (shouldCheckDerivedType)
+            {
+                var potentialSourceType = source.GetType();
+                var potentialDestType = typeMap.GetDerivedTypeFor(potentialSourceType);
 
-	    public TypeMap FindTypeMapFor<TSource, TDestination>()
-		{
-			return ((IConfigurationProvider) this).FindTypeMapFor(typeof (TSource), typeof (TDestination));
+                var targetSourceType = potentialDestType != destinationType ? potentialSourceType : typeMap.SourceType;
+                var targetDestinationType = potentialDestType;
+                typeMap = FindTypeMap(source, targetSourceType, targetDestinationType);
+            }
+
+		    return typeMap;
 		}
 
 		public IFormatterConfiguration GetProfileConfiguration(string profileName)
@@ -217,7 +225,7 @@ namespace AutoMapper
 	        return _mappers.ToArray();
 	    }
 
-        private TypeMap FindTypeMap(Type sourceType, Type destinationType)
+        private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType)
         {
             TypeMap typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
 
@@ -229,19 +237,19 @@ namespace AutoMapper
                 {
                     foreach (var sourceInterface in sourceType.GetInterfaces())
                     {
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(sourceInterface, destinationType);
+                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, sourceInterface, destinationType);
 
                         if (typeMap == null) continue;
 
                         var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
-                        if (derivedTypeFor != null)
+                        if (derivedTypeFor != destinationType)
                         {
                             typeMap = CreateTypeMap(sourceType, derivedTypeFor);
                         }
                     }
 
                     if ((sourceType.BaseType != null) && (typeMap == null))
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(sourceType.BaseType, destinationType);
+                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, sourceType.BaseType, destinationType);
                 }
             }
             return typeMap;
@@ -273,7 +281,7 @@ namespace AutoMapper
 						{
 							var sourceType = ((MemberAccessorBase)lastResolver).MemberType;
 							var destinationType = propertyMap.DestinationProperty.MemberType;
-							var memberTypeMap = ((IConfigurationProvider)this).FindTypeMapFor(sourceType, destinationType);
+							var memberTypeMap = ((IConfigurationProvider)this).FindTypeMapFor(null, sourceType, destinationType);
 
                             if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
                                 continue;
@@ -289,7 +297,7 @@ namespace AutoMapper
 			{
 				Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
 				Type destElementType = TypeHelper.GetElementType(context.DestinationType);
-				TypeMap itemTypeMap = ((IConfigurationProvider) this).FindTypeMapFor(sourceElementType, destElementType);
+				TypeMap itemTypeMap = ((IConfigurationProvider) this).FindTypeMapFor(null, sourceElementType, destElementType);
 
                 if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
                     return;

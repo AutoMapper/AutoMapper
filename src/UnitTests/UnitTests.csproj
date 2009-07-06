@@ -69,7 +69,6 @@
     <Compile Include="AutoMapperSpecBase.cs" />
     <Compile Include="AutoMapperTester.cs" />
     <Compile Include="BidirectionalRelationships.cs" />
-    <Compile Include="ConfigurationResolution.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
@@ -81,7 +80,6 @@
     <Compile Include="FillingExistingDestination.cs" />
     <Compile Include="General.cs" />
     <Compile Include="Indexers.cs" />
-    <Compile Include="Initialization.cs" />
     <Compile Include="InterfaceMapping.cs" />
     <Compile Include="Internationalization.cs" />
     <Compile Include="MappingExceptions.cs" />

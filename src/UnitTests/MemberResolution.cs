@@ -7,7 +7,7 @@ namespace AutoMapper.UnitTests
 {
 	namespace MemberResolution
 	{
-		public class When_mapping_derived_classes : AutoMapperSpecBase
+		public class When_mapping_derived_classes_in_arrays : AutoMapperSpecBase
 		{
 			private DtoObject[] _result;
 
@@ -63,6 +63,54 @@ namespace AutoMapper.UnitTests
 			{
 				_result[0].ShouldBeInstanceOfType(typeof (DtoObject));
 				_result[1].ShouldBeInstanceOfType(typeof (DtoSubObject));
+			}
+		}
+
+		public class When_mapping_derived_classes : AutoMapperSpecBase
+		{
+			private DtoObject _result;
+
+			public class ModelObject
+			{
+				public string BaseString { get; set; }
+			}
+
+			public class ModelSubObject : ModelObject
+			{
+				public string SubString { get; set; }
+			}
+
+			public class DtoObject
+			{
+				public string BaseString { get; set; }
+			}
+
+			public class DtoSubObject : DtoObject
+			{
+				public string SubString { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper
+					.CreateMap<ModelObject, DtoObject>()
+					.Include<ModelSubObject, DtoSubObject>();
+
+				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+
+			}
+
+            protected override void Because_of()
+            {
+                var model = new ModelSubObject { BaseString = "Base2", SubString = "Sub2" };
+
+                _result = Mapper.Map<ModelObject, DtoObject>(model);
+            }
+
+			[Test]
+			public void Should_map_to_the_correct_dto_types()
+			{
+                _result.ShouldBeInstanceOfType(typeof(DtoSubObject));
 			}
 		}
 
@@ -873,7 +921,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-        [Description("This one should really pass validation")]
+        [Description("This one should really pass validation"), Ignore("Not sure if this is really valid behavior")]
 		public class When_mapping_a_collection_to_a_more_type_specific_collection : NonValidatingSpecBase
 		{
 			private ModelDto _result;

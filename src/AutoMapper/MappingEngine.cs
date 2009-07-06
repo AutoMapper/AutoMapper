@@ -58,7 +58,7 @@ namespace AutoMapper
 
 		public object DynamicMap(object source, Type sourceType, Type destinationType)
 		{
-			var typeMap = ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
+			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
 			if (typeMap == null)
 			{
 				typeMap = ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
@@ -70,7 +70,7 @@ namespace AutoMapper
 
 		public object Map(object source, Type sourceType, Type destinationType)
 		{
-			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
+			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
 
@@ -79,7 +79,7 @@ namespace AutoMapper
 
 		public void Map(object source, object destination, Type sourceType, Type destinationType)
 		{
-			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
+			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType);
 
