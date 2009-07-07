@@ -374,32 +374,5 @@ namespace AutoMapper.UnitTests
                 _mappedStrings[0].ShouldBeNull();
             }
         }
-
-        public class When_mapping_a_collection_with_existing_members : AutoMapperSpecBase
-        {
-            const string FirstString = null;
-
-            public class CustomCollection : Collection<string> { }
-
-            private IEnumerable<string> _strings;
-            private CustomCollection _mappedStrings;
-
-            protected override void Establish_context()
-            {
-                _strings = new List<string> { "wregf", "Wefwf", "Dgfdgdg" };
-                _mappedStrings = new CustomCollection { "abc", "def"};
-            }
-
-            protected override void Because_of()
-            {
-                Mapper.Map(_strings, _mappedStrings);
-            }
-
-            [Test]
-            public void Should_append_new_members_to_the_list()
-            {
-                _mappedStrings.Count.ShouldEqual(5);
-            }
-        }
     }
 }

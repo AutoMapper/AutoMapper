@@ -401,6 +401,60 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_specifying_a_custom_translator_and_passing_in_the_destination_object : AutoMapperSpecBase
+        {
+            private Source _source;
+            private Destination _dest;
+
+            public class Source
+            {
+                public int Value { get; set; }
+                public int AnotherValue { get; set; }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                base.Establish_context();
+
+                _source = new Source
+                {
+                    Value = 10,
+                    AnotherValue = 1000
+                };
+
+                _dest = new Destination
+                                  {
+                                      Value = 2
+                                  };
+            }
+
+            [Test]
+            public void Should_resolve_to_the_destination_object_from_the_custom_translator()
+            {
+                Mapper.CreateMap<Source, Destination>()
+                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+
+                _dest = Mapper.Map(_source, _dest);
+                _dest.Value.ShouldEqual(20);
+            }
+
+            [Test]
+            public void Should_ignore_other_mapping_rules()
+            {
+                Mapper.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
+                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+
+                _dest = Mapper.Map(_source, _dest);
+                _dest.Value.ShouldEqual(20);
+            }
+        }
+
 		public class When_specifying_a_custom_translator_using_generics : AutoMapperSpecBase
 		{
 			private Source _source;
@@ -598,6 +652,5 @@ namespace AutoMapper.UnitTests
 				_result.Value.ShouldEqual(10);
 			}
 		}
-
 	}
 }
