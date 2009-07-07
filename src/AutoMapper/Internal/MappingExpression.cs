@@ -180,7 +180,21 @@ namespace AutoMapper
 			ConvertUsing(converter.Convert);
 		}
 
-		private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
+	    public IMappingExpression<TSource, TDestination> BeforeMap( Action<TSource, TDestination> beforeFunction )
+	    {
+	        this._typeMap.ActionBeforeMap( (src, dest)=> beforeFunction((TSource)src, (TDestination)dest) );
+
+            return this;
+	    }
+
+	    public IMappingExpression<TSource, TDestination> AfterMap( Action<TSource, TDestination> afterFunction )
+	    {
+	        this._typeMap.ActionAfterMap( ( src, dest ) => afterFunction( (TSource) src, (TDestination) dest ) );
+
+            return this;
+	    }
+
+	    private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
 

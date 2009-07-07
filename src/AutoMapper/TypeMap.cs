@@ -17,12 +17,16 @@ namespace AutoMapper
 			_sourceType = sourceType;
 			_destinationType = destinationType;
 			Profile = Configuration.DefaultProfileName;
+		    BeforeMap = ( src, dest ) => { };
+		    AfterMap = ( src, dest ) => { };
 		}
 
 		public Type SourceType { get { return _sourceType; } }
 		public Type DestinationType { get { return _destinationType; } }
 		public string Profile { get; set; }
 		public Func<ResolutionContext, object> CustomMapper { get; private set; }
+        public Action<object, object> BeforeMap { get; private set; }
+        public Action<object, object> AfterMap { get; private set; }
 
 		public IEnumerable<PropertyMap> GetPropertyMaps()
 		{
@@ -81,6 +85,14 @@ namespace AutoMapper
 		{
 			CustomMapper = customMapper;
 		}
+        public void ActionBeforeMap(Action<object, object> beforeMap)
+        {
+            this.BeforeMap = beforeMap;
+        }
+        public void ActionAfterMap(Action<object, object> afterMap)
+        {
+            this.AfterMap = afterMap;
+        }
 
 	    public bool Equals(TypeMap other)
 	    {

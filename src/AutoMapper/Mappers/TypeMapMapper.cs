@@ -2,51 +2,58 @@ using System;
 
 namespace AutoMapper.Mappers
 {
-	public class TypeMapMapper : IObjectMapper
-	{
-		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
-		{
-			if (context.TypeMap.CustomMapper != null)
-			{
-				return context.TypeMap.CustomMapper(context);
-			}
+    public class TypeMapMapper : IObjectMapper
+    {
+        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        {
+            object mappedObject = null;
+            var profileConfiguration = mapper.ConfigurationProvider.GetProfileConfiguration(context.TypeMap.Profile);
 
-			var profileConfiguration = mapper.ConfigurationProvider.GetProfileConfiguration(context.TypeMap.Profile);
+            if (context.TypeMap.CustomMapper != null)
+            {
+                context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
+                mappedObject = context.TypeMap.CustomMapper(context);
+            }
+            else if (context.SourceValue != null || !profileConfiguration.MapNullSourceValuesAsNull)
+            {
+                if (context.DestinationValue == null && context.InstanceCache.ContainsKey(context))
+                {
+                    mappedObject = context.InstanceCache[context];
+                }
+                else
+                {
+                    if (context.DestinationValue == null)
+                    {
+                        mappedObject = mapper.CreateObject(context.DestinationType);
+                        if (context.SourceValue != null)
+                            context.InstanceCache.Add(context, mappedObject);
+                    }
+                    else
+                    {
+                        mappedObject = context.DestinationValue;
+                    }
 
-			if (context.SourceValue == null && profileConfiguration.MapNullSourceValuesAsNull)
-			{
-				return null;
-			}
+                    context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
+                    foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
+                    {
+                        MapPropertyValue(context, mapper, mappedObject, propertyMap);
+                    }
+                }
 
-			object mappedObject = context.DestinationValue;
+            }
 
-			if (mappedObject == null)
-			{
-				if (context.InstanceCache.ContainsKey(context))
-					return context.InstanceCache[context];
-
-				mappedObject = mapper.CreateObject(context.DestinationType);
-
-				if (context.SourceValue != null)
-					context.InstanceCache.Add(context, mappedObject);
-			}
-
-			foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
-			{
-			    MapPropertyValue(context, mapper, mappedObject, propertyMap);
-			}
-
-		    return mappedObject;
-		}
+            context.TypeMap.AfterMap(context.SourceValue, mappedObject);
+            return mappedObject;
+        }
 
 
-	    public bool IsMatch(ResolutionContext context)
-		{
-			return context.TypeMap != null;
-		}
+        public bool IsMatch(ResolutionContext context)
+        {
+            return context.TypeMap != null;
+        }
 
-	    private void MapPropertyValue(ResolutionContext context, IMappingEngineRunner mapper, object mappedObject, PropertyMap propertyMap)
-	    {
+        private void MapPropertyValue(ResolutionContext context, IMappingEngineRunner mapper, object mappedObject, PropertyMap propertyMap)
+        {
             if (propertyMap.CanResolveValue())
             {
                 object destinationValue = null;
@@ -89,18 +96,18 @@ namespace AutoMapper.Mappers
                     throw new AutoMapperMappingException(newContext, ex);
                 }
             }
-	    }
+        }
 
-	    private ResolutionContext CreateErrorContext(ResolutionContext context, PropertyMap propertyMap, object destinationValue)
-	    {
-	        return context.CreateMemberContext(
-	            null,
-	            context.SourceValue,
-	            destinationValue,
-	            context.SourceValue == null
-	                ? typeof (object)
-	                : context.SourceValue.GetType(),
-	            propertyMap);
-	    }
-	}
+        private ResolutionContext CreateErrorContext(ResolutionContext context, PropertyMap propertyMap, object destinationValue)
+        {
+            return context.CreateMemberContext(
+                null,
+                context.SourceValue,
+                destinationValue,
+                context.SourceValue == null
+                    ? typeof(object)
+                    : context.SourceValue.GetType(),
+                propertyMap);
+        }
+    }
 }
