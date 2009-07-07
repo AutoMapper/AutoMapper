@@ -11,13 +11,11 @@ namespace AutoMapper
 		public ResolutionResult(object value, Type memberType)
 		{
 			_value = value;
-			_type = value == null
-			       	? memberType
-			       	: value.GetType();
+			_type = ResolveType(value, memberType);
 			_memberType = memberType;
 		}
 
-        public ResolutionResult(object value, Type memberType, Type type)
+	    public ResolutionResult(object value, Type memberType, Type type)
 		{
 			_value = value;
 			_type = type;
@@ -25,12 +23,26 @@ namespace AutoMapper
 		}
 
 		public ResolutionResult(object value)
-			: this(value, typeof(object))
 		{
-		}
+            _value = value;
+            _type = ResolveType(value, typeof(object));
+            _memberType = _type;
+        }
 
 		public object Value { get { return _value; } }
 		public Type Type { get { return _type; } }
 		public Type MemberType { get { return _memberType; } }
-	}
+    
+        private Type ResolveType(object value, Type memberType)
+        {
+            if (value == null)
+                return memberType;
+
+            if (memberType.IsGenericType && memberType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                return memberType;
+
+            return value.GetType();
+        }
+
+    }
 }

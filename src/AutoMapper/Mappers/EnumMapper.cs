@@ -13,7 +13,9 @@ namespace AutoMapper.Mappers
 				return context.DestinationValue ?? mapper.CreateObject(context.DestinationType);
 			}
 
-			return Enum.Parse(enumDestType, Enum.GetName(context.SourceType, context.SourceValue));
+		    Type enumSourceType = TypeHelper.GetEnumerationType(context.SourceType);
+
+            return Enum.Parse(enumDestType, Enum.GetName(enumSourceType, context.SourceValue));
 		}
 
 		public bool IsMatch(ResolutionContext context)

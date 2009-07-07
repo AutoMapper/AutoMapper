@@ -33,84 +33,74 @@ namespace AutoMapper.Mappers
 
 			foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
 			{
-				if (!propertyMap.CanResolveValue())
-				{
-					continue;
-				}
+			    MapPropertyValue(context, mapper, mappedObject, propertyMap);
+			}
 
-			    object destinationValue = null;
-				ResolutionResult result;
+		    return mappedObject;
+		}
 
-				try
-				{
-					result = propertyMap.ResolveValue(context.SourceValue);
-				}
-				catch (Exception ex)
-				{
-				    var errorContext =
-				        context.CreateMemberContext(
-				            null,
-				            context.SourceValue,
-				            destinationValue,
-				            context.SourceValue == null
-				                ? typeof (object)
-				                : context.SourceValue.GetType(),
-				            propertyMap);
-					throw new AutoMapperMappingException(errorContext, ex);
-				}
+
+	    public bool IsMatch(ResolutionContext context)
+		{
+			return context.TypeMap != null;
+		}
+
+	    private void MapPropertyValue(ResolutionContext context, IMappingEngineRunner mapper, object mappedObject, PropertyMap propertyMap)
+	    {
+            if (propertyMap.CanResolveValue())
+            {
+                object destinationValue = null;
+                ResolutionResult result;
+
+                try
+                {
+                    result = propertyMap.ResolveValue(context.SourceValue);
+                }
+                catch (Exception ex)
+                {
+                    var errorContext = CreateErrorContext(context, propertyMap, destinationValue);
+                    throw new AutoMapperMappingException(errorContext, ex);
+                }
 
                 if (propertyMap.UseDestinationValue)
                 {
                     destinationValue = propertyMap.DestinationProperty.GetValue(mappedObject);
                 }
 
-                // Should refactor this back out to FindTypeMapFor or something like that
-                Type targetSourceType = result.Type;
-                Type targetDestinationType = propertyMap.DestinationProperty.MemberType;
+                var sourceType = result.Type;
+                var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                if (result.Type != result.MemberType)
+                var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(result.Value, sourceType, destinationType);
+
+                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
+
+                var newContext = context.CreateMemberContext(typeMap, result.Value, destinationValue, targetSourceType,
+                                                             propertyMap);
+
+                try
                 {
-                    var potentialSourceType = targetSourceType;
-
-                    TypeMap itemTypeMap =
-                        mapper.ConfigurationProvider.FindTypeMapFor(result.Value, result.MemberType, targetDestinationType)
-                        ?? mapper.ConfigurationProvider.FindTypeMapFor(result.Value, potentialSourceType, targetDestinationType);
-
-                    if (itemTypeMap != null)
-                    {
-                        var potentialDestType = itemTypeMap.GetDerivedTypeFor(potentialSourceType);
-
-                        targetSourceType = potentialDestType != targetDestinationType
-                                            ? potentialSourceType
-                                            : itemTypeMap.SourceType;
-                        targetDestinationType = potentialDestType;
-                    }
-                }
-
-                TypeMap memberTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(result.Value, targetSourceType, targetDestinationType);
-
-				var newContext = context.CreateMemberContext(memberTypeMap, result.Value, destinationValue, targetSourceType, propertyMap);
-
-				try
-				{
-					object propertyValueToAssign = mapper.Map(newContext);
+                    object propertyValueToAssign = mapper.Map(newContext);
 
                     if (!propertyMap.UseDestinationValue)
                         propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
-				}
-				catch (Exception ex)
-				{
-					throw new AutoMapperMappingException(newContext, ex);
-				}
+                }
+                catch (Exception ex)
+                {
+                    throw new AutoMapperMappingException(newContext, ex);
+                }
+            }
+	    }
 
-			}
-
-			return mappedObject;
-		}
-
-		public bool IsMatch(ResolutionContext context)
-		{
-			return context.TypeMap != null;
-		}
+	    private ResolutionContext CreateErrorContext(ResolutionContext context, PropertyMap propertyMap, object destinationValue)
+	    {
+	        return context.CreateMemberContext(
+	            null,
+	            context.SourceValue,
+	            destinationValue,
+	            context.SourceValue == null
+	                ? typeof (object)
+	                : context.SourceValue.GetType(),
+	            propertyMap);
+	    }
 	}
 }
