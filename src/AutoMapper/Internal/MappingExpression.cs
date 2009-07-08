@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -52,9 +53,17 @@ namespace AutoMapper
 		}
 
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
-		                                                           Action<IMemberConfigurationExpression<TSource>> memberOptions)
+																   Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			IMemberAccessor destProperty = ReflectionHelper.FindProperty(destinationMember);
+			ForDestinationMember(destProperty, memberOptions);
+			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
+		}
+
+		public IMappingExpression<TSource, TDestination> ForMember(string name,
+																   Action<IMemberConfigurationExpression<TSource>> memberOptions)
+		{
+			IMemberAccessor destProperty = new PropertyAccessor(typeof(TDestination).GetProperty(name));
 			ForDestinationMember(destProperty, memberOptions);
 			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
 		}
@@ -64,10 +73,11 @@ namespace AutoMapper
 			_typeMap.GetPropertyMaps().ForEach(x => ForDestinationMember(x.DestinationProperty, memberOptions));
 		}
 
-		public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>() where TOtherSource : TSource
+		public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
+			where TOtherSource : TSource
 			where TOtherDestination : TDestination
 		{
-			_typeMap.IncludeDerivedTypes(typeof (TOtherSource), typeof (TOtherDestination));
+			_typeMap.IncludeDerivedTypes(typeof(TOtherSource), typeof(TOtherDestination));
 
 			return this;
 		}
@@ -147,16 +157,16 @@ namespace AutoMapper
 			_propertyMap.Ignore();
 		}
 
-        public void UseDestinationValue()
-        {
-            _propertyMap.UseDestinationValue = true;
-        }
+		public void UseDestinationValue()
+		{
+			_propertyMap.UseDestinationValue = true;
+		}
 
-        public void SetMappingOrder(int mappingOrder)
-        {
-            _propertyMap.SetMappingOrder(mappingOrder);
-        }
-	
+		public void SetMappingOrder(int mappingOrder)
+		{
+			_propertyMap.SetMappingOrder(mappingOrder);
+		}
+
 		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
 		{
 			_propertyMap.RemoveLastFormatter();
@@ -165,7 +175,7 @@ namespace AutoMapper
 
 		public void ConvertUsing(Func<TSource, TDestination> mappingFunction)
 		{
-			_typeMap.UseCustomMapper(source => mappingFunction((TSource) source.SourceValue));
+			_typeMap.UseCustomMapper(source => mappingFunction((TSource)source.SourceValue));
 		}
 
 		public void ConvertUsing(ITypeConverter<TSource, TDestination> converter)
@@ -175,26 +185,26 @@ namespace AutoMapper
 
 		public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
 		{
-			var converter = new DeferredInstantiatedConverter<TSource, TDestination>(() => (TTypeConverter) _typeConverterCtor(typeof (TTypeConverter)));
+			var converter = new DeferredInstantiatedConverter<TSource, TDestination>(() => (TTypeConverter)_typeConverterCtor(typeof(TTypeConverter)));
 
 			ConvertUsing(converter.Convert);
 		}
 
-	    public IMappingExpression<TSource, TDestination> BeforeMap( Action<TSource, TDestination> beforeFunction )
-	    {
-	        this._typeMap.ActionBeforeMap( (src, dest)=> beforeFunction((TSource)src, (TDestination)dest) );
+		public IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction)
+		{
+			this._typeMap.ActionBeforeMap((src, dest) => beforeFunction((TSource)src, (TDestination)dest));
 
-            return this;
-	    }
+			return this;
+		}
 
-	    public IMappingExpression<TSource, TDestination> AfterMap( Action<TSource, TDestination> afterFunction )
-	    {
-	        this._typeMap.ActionAfterMap( ( src, dest ) => afterFunction( (TSource) src, (TDestination) dest ) );
+		public IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction)
+		{
+			this._typeMap.ActionAfterMap((src, dest) => afterFunction((TSource)src, (TDestination)dest));
 
-            return this;
-	    }
+			return this;
+		}
 
-	    private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
+		private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
 

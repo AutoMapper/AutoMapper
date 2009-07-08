@@ -74,6 +74,7 @@
     <Compile Include="Internal\MethodAccessor.cs" />
     <Compile Include="Internal\PropertyAccessor.cs" />
     <Compile Include="IMemberAccessor.cs" />
+    <Compile Include="Internal\PropertyNameResolver.cs" />
     <Compile Include="Internal\TypePair.cs" />
     <Compile Include="IObjectMapper.cs" />
     <Compile Include="ISelfProfiler.cs" />

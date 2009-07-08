@@ -16,6 +16,11 @@ namespace AutoMapper
 			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
 		}
 
+		public void FromMember(string sourcePropertyName)
+		{
+			_propertyMap.ChainTypeMemberForResolver(new PropertyNameResolver<TSource>(sourcePropertyName));
+		}
+
 		public IResolutionExpression<TSource> ConstructedBy(Func<IValueResolver> constructor)
 		{
 			_propertyMap.ChainConstructorForResolver(new DeferredInstantiatedResolver(constructor));
@@ -24,7 +29,7 @@ namespace AutoMapper
 		}
 	}
 
-	internal class ResolutionExpression<TSource, TValueResolver> : IResolverConfigurationExpression<TSource, TValueResolver> 
+	internal class ResolutionExpression<TSource, TValueResolver> : IResolverConfigurationExpression<TSource, TValueResolver>
 		where TValueResolver : IValueResolver
 	{
 		private readonly PropertyMap _propertyMap;
@@ -37,6 +42,13 @@ namespace AutoMapper
 		public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Func<TSource, object> sourceMember)
 		{
 			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
+
+			return this;
+		}
+
+		public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(string sourcePropertyName)
+		{
+			_propertyMap.ChainTypeMemberForResolver(new PropertyNameResolver<TSource>(sourcePropertyName));
 
 			return this;
 		}

@@ -13,14 +13,17 @@ namespace AutoMapper
 	public interface IMappingExpression<TSource, TDestination>
 	{
 		IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember, Action<IMemberConfigurationExpression<TSource>> memberOptions);
+		IMappingExpression<TSource, TDestination> ForMember(string name, Action<IMemberConfigurationExpression<TSource>> memberOptions);
 		void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
-		IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>() where TOtherSource : TSource where TOtherDestination : TDestination;
+		IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
+			where TOtherSource : TSource
+			where TOtherDestination : TDestination;
 		IMappingExpression<TSource, TDestination> WithProfile(string profileName);
 		void ConvertUsing(Func<TSource, TDestination> mappingFunction);
 		void ConvertUsing(ITypeConverter<TSource, TDestination> converter);
 		void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
-	    IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
-	    IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
+		IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
+		IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
 	}
 
 	public interface IMemberConfigurationExpression<TSource>
@@ -36,18 +39,20 @@ namespace AutoMapper
 		void MapFrom(Func<TSource, object> sourceMember);
 		void Ignore();
 		void SetMappingOrder(int mappingOrder);
-	    void UseDestinationValue();
+		void UseDestinationValue();
 	}
 
 	public interface IResolutionExpression<TSource>
 	{
-		void FromMember(Func<TSource, object> sourceMember);		
+		void FromMember(Func<TSource, object> sourceMember);
+		void FromMember(string sourcePropertyName);
 	}
 
 	public interface IResolverConfigurationExpression<TSource, TValueResolver>
 		where TValueResolver : IValueResolver
 	{
 		IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Func<TSource, object> sourceMember);
+		IResolverConfigurationExpression<TSource, TValueResolver> FromMember(string sourcePropertyName);
 		IResolverConfigurationExpression<TSource, TValueResolver> ConstructedBy(Func<TValueResolver> constructor);
 	}
 
