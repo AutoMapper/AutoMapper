@@ -112,6 +112,16 @@ namespace AutoMapper
 			Configuration.AddProfile<TProfile>();
 		}
 
+		public static TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
+		{
+			return ConfigurationProvider.FindTypeMapFor(null, sourceType, destinationType);
+		}
+
+		public static TypeMap FindTypeMapFor<TSource, TDestination>()
+		{
+			return ConfigurationProvider.FindTypeMapFor(null, typeof(TSource), typeof(TDestination));
+		}
+
 		public static TypeMap[] GetAllTypeMaps()
 		{
 			return ConfigurationProvider.GetAllTypeMaps();
