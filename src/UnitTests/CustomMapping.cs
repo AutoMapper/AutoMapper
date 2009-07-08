@@ -698,5 +698,34 @@ namespace AutoMapper.UnitTests
 				_result.DestinationValue.ShouldEqual(10);
 			}
 		}
+
+		public class When_specifying_a_custom_member_mapping_to_a_nested_object : NonValidatingSpecBase
+		{
+			private class Source
+			{
+				public int Value { get; set; }
+			}
+
+			private class Destination
+			{
+				public SubDest Dest { get; set; }
+			}
+
+			private class SubDest
+			{
+				public int Value { get; set; }
+			}
+
+			[Test]
+			public void Should_fail_with_an_exception_during_configuration()
+			{
+				typeof(ArgumentException).ShouldBeThrownBy(() =>
+				{
+					Mapper.CreateMap<Source, Destination>()
+						.ForMember(dest => dest.Dest.Value, opt => opt.MapFrom(src => src.Value));
+				});
+			}
+		}
+
 	}
 }

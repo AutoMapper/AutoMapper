@@ -37,7 +37,14 @@ namespace AutoMapper
 						expressionToCheck = ((LambdaExpression)expressionToCheck).Body;
 						break;
 					case ExpressionType.MemberAccess:
-						MemberInfo member = ((MemberExpression)expressionToCheck).Member;
+						var memberExpression = ((MemberExpression)expressionToCheck);
+
+						if (memberExpression.Expression.NodeType != ExpressionType.Parameter)
+						{
+							throw new ArgumentException(string.Format("Expression '{0}' must resolve to top-level member.", lambdaExpression), "lambdaExpression");
+						}
+
+						MemberInfo member = memberExpression.Member;
 						if (member is FieldInfo) return new FieldAccessor((FieldInfo)member);
 						if (member is PropertyInfo) return new PropertyAccessor((PropertyInfo)member);
 						return null;
