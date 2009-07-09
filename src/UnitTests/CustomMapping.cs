@@ -727,5 +727,44 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_specifying_a_custom_member_mapping_with_a_cast : NonValidatingSpecBase
+        {
+            private Source _source;
+            private Destination _dest;
+
+            private class Source 
+            {
+                public string MyName { get; set; }
+            }
+
+            private class Destination : ISomeInterface
+            {
+                public string Name { get; set;}
+            }
+
+            private interface ISomeInterface
+            {
+                string Name { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>()
+                    .ForMember(dest => ((ISomeInterface) dest).Name, opt => opt.MapFrom(src => src.MyName));
+
+                _source = new Source {MyName = "jon"};
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Destination>(_source);
+            }
+
+            [Test]
+            public void Should_perform_the_translation()
+            {
+                _dest.Name.ShouldEqual("jon");
+            }
+        }
 	}
 }
