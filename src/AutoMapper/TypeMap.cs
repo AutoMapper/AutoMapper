@@ -11,22 +11,42 @@ namespace AutoMapper
 		private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
 		private readonly Type _sourceType;
 		private readonly Type _destinationType;
+        private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
+        private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
 
 		public TypeMap(Type sourceType, Type destinationType)
 		{
 			_sourceType = sourceType;
 			_destinationType = destinationType;
 			Profile = Configuration.DefaultProfileName;
-		    BeforeMap = ( src, dest ) => { };
-		    AfterMap = ( src, dest ) => { };
 		}
 
 		public Type SourceType { get { return _sourceType; } }
 		public Type DestinationType { get { return _destinationType; } }
 		public string Profile { get; set; }
 		public Func<ResolutionContext, object> CustomMapper { get; private set; }
-        public Action<object, object> BeforeMap { get; private set; }
-        public Action<object, object> AfterMap { get; private set; }
+        public Action<object, object> BeforeMap
+        {
+            get
+            {
+                return (src, dest) =>
+                           {
+                               foreach (var action in _beforeMapActions)
+                                   action(src, dest);
+                           };
+            }
+        }
+        public Action<object, object> AfterMap
+        {
+            get
+            {
+                return (src, dest) =>
+                {
+                    foreach (var action in _afterMapActions)
+                        action(src, dest);
+                };
+            }
+        }
 
 		public IEnumerable<PropertyMap> GetPropertyMaps()
 		{
@@ -85,13 +105,14 @@ namespace AutoMapper
 		{
 			CustomMapper = customMapper;
 		}
+
         public void ActionBeforeMap(Action<object, object> beforeMap)
         {
-            this.BeforeMap = beforeMap;
+            _beforeMapActions.Add(beforeMap);
         }
         public void ActionAfterMap(Action<object, object> afterMap)
         {
-            this.AfterMap = afterMap;
+            _afterMapActions.Add(afterMap);
         }
 
 	    public bool Equals(TypeMap other)
