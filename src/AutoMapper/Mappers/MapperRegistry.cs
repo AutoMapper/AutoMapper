@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
     {
         public static Func<IEnumerable<IObjectMapper>> AllMappers = () => new IObjectMapper[]
         {
-            new TypeMapMapper(),
+            new TypeMapMapper(TypeMapObjectMapperRegistry.AllMappers()),
             new StringMapper(),
             new FlagsEnumMapper(),
             new EnumMapper(),

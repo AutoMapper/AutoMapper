@@ -97,6 +97,7 @@
     <Compile Include="Mappers\EnumerableMapperBase.cs" />
     <Compile Include="Mappers\EnumMapper.cs" />
     <Compile Include="Mappers\AssignableMapper.cs" />
+    <Compile Include="Mappers\ITypeMapObjectMapper.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\NullableMapper.cs" />
     <Compile Include="Mappers\ObjectCreator.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Mappers\TypeHelper.cs" />
     <Compile Include="Mappers\TypeMapMapper.cs" />
+    <Compile Include="Mappers\TypeMapObjectMapperRegistry.cs" />
     <Compile Include="MappingEngine.cs" />
     <Compile Include="Internal\MappingExpression.cs" />
     <Compile Include="Internal\DelegateBasedResolver.cs" />
