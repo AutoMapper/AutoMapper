@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -24,6 +25,15 @@ namespace AutoMapper
 		}
 
 		public IMemberAccessor DestinationProperty { get; private set; }
+
+        public bool CanBeSet
+        {
+            get
+            {
+                return !(DestinationProperty is PropertyAccessor) ||
+                       ((PropertyAccessor)DestinationProperty).HasSetter;
+            }
+        }
 
 	    public bool UseDestinationValue { get; set; }
 

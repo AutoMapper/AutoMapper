@@ -171,7 +171,7 @@ namespace AutoMapper
 					{
 						if (_configuration == null)
 						{
-							_configuration = new Configuration(MapperRegistry.AllMappers());
+							_configuration = new Configuration(new TypeMapFactory(), MapperRegistry.AllMappers());
 						}
 					}
 				}

@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-	internal class MethodAccessor : MemberAccessorBase
+	internal class MethodAccessor : MemberAccessor
 	{
 		private readonly MethodInfo _methodInfo;
 		private readonly string _name;

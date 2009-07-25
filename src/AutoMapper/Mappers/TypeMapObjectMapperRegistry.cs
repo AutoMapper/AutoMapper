@@ -112,7 +112,7 @@ namespace AutoMapper.Mappers
                     {
                         object propertyValueToAssign = mapper.Map(newContext);
 
-                        if (!propertyMap.UseDestinationValue)
+                        if (!propertyMap.UseDestinationValue && propertyMap.CanBeSet)
                             propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
                     }
                     catch (Exception ex)
@@ -121,7 +121,6 @@ namespace AutoMapper.Mappers
                     }
                 }
             }
-
             private ResolutionContext CreateErrorContext(ResolutionContext context, PropertyMap propertyMap, object destinationValue)
             {
                 return context.CreateMemberContext(

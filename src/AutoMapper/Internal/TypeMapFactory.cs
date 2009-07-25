@@ -1,34 +1,29 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using AutoMapper.Internal;
-using AutoMapper.ReflectionExtensions;
 
 namespace AutoMapper
 {
-	internal class TypeMapFactory
+    public class TypeMapFactory : ITypeMapFactory
 	{
-		private readonly Type _sourceType;
-		private readonly Type _destinationType;
+        private static IDictionary<Type, TypeInfo> _typeInfos = new Dictionary<Type, TypeInfo>();
+        private object _typeInfoSync = new object();
 
-		public TypeMapFactory(Type sourceType, Type destinationType)
+		public TypeMap CreateTypeMap(Type sourceType, Type destinationType)
 		{
-			_sourceType = sourceType;
-			_destinationType = destinationType;
-		}
+		    var sourceTypeInfo = GetTypeInfo(sourceType);
+		    var destTypeInfo = GetTypeInfo(destinationType);
 
-		public TypeMap CreateTypeMap()
-		{
-			var typeMap = new TypeMap(_sourceType, _destinationType);
+            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo);
 
-			IMemberAccessor[] destProperties = _destinationType.GetPublicReadAccessors();
-
-			foreach (IMemberAccessor destProperty in destProperties)
+		    foreach (IMemberAccessor destProperty in destTypeInfo.GetPublicReadAccessors())
 			{
 				var propertyMap = new PropertyMap(destProperty);
 
-				if (MapDestinationPropertyToSource(propertyMap, _sourceType, destProperty.Name))
+                if (MapDestinationPropertyToSource(propertyMap, sourceTypeInfo, destProperty.Name))
 				{
 					typeMap.AddPropertyMap(propertyMap);
 				}
@@ -36,10 +31,29 @@ namespace AutoMapper
 			return typeMap;
 		}
 
-		private static bool MapDestinationPropertyToSource(PropertyMap propertyMap, Type sourceType, string nameToSearch)
+        private TypeInfo GetTypeInfo(Type type)
+        {
+            TypeInfo typeInfo;
+
+            if (!_typeInfos.TryGetValue(type, out typeInfo))
+            {
+                lock (_typeInfoSync)
+                {
+                    if (!_typeInfos.TryGetValue(type, out typeInfo))
+                    {
+                        typeInfo = new TypeInfo(type);
+                        _typeInfos.Add(type, typeInfo);
+                    }
+                }
+            }
+
+            return typeInfo;
+        }
+
+		private bool MapDestinationPropertyToSource(PropertyMap propertyMap, TypeInfo sourceType, string nameToSearch)
 		{
-			IMemberAccessor[] sourceProperties = sourceType.GetPublicReadAccessors();
-			MethodInfo[] sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
+			var sourceProperties = sourceType.GetPublicReadAccessors();
+			var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
 
 			IValueResolver resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch);
 
@@ -65,7 +79,7 @@ namespace AutoMapper
 
 					propertyMap.ChainResolver(valueResolver);
 
-					foundMatch = MapDestinationPropertyToSource(propertyMap, valueResolver.MemberType, snippet.Second);
+					foundMatch = MapDestinationPropertyToSource(propertyMap, GetTypeInfo(valueResolver.MemberType), snippet.Second);
 
 					if (foundMatch)
 					{
@@ -83,20 +97,26 @@ namespace AutoMapper
 			return foundMatch;
 		}
 
-		private static IMemberAccessor FindTypeMember(IMemberAccessor[] modelProperties, MethodInfo[] getMethods, string nameToSearch)
+		private static IMemberAccessor FindTypeMember(IEnumerable<IMemberAccessor> modelProperties, IEnumerable<MethodInfo> getMethods, string nameToSearch)
 		{
-			IMemberAccessor pi = ReflectionHelper.FindModelPropertyByName(modelProperties, nameToSearch);
+			IMemberAccessor pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch));
 			if (pi != null)
 				return pi;
 
-			MethodInfo mi = ReflectionHelper.FindModelMethodByName(getMethods, nameToSearch);
+		    string getName = "Get" + nameToSearch;
+		    MethodInfo mi = getMethods.FirstOrDefault(m => (NameMatches(m.Name, getName)) || NameMatches(m.Name, nameToSearch));
 			if (mi != null)
 				return new MethodAccessor(mi);
 
 			return null;
 		}
 
-		private static NameSnippet CreateNameSnippet(string[] matches, int i)
+        private static bool NameMatches(string memberName, string nameToMatch)
+        {
+            return String.Compare(memberName, nameToMatch, StringComparison.OrdinalIgnoreCase) == 0;
+        }
+        
+        private static NameSnippet CreateNameSnippet(IEnumerable<string> matches, int i)
 		{
 			return new NameSnippet
 			       	{

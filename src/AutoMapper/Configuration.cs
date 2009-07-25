@@ -9,7 +9,8 @@ namespace AutoMapper
 {
 	public class Configuration : IConfigurationProvider, IConfiguration
 	{
-		private readonly IEnumerable<IObjectMapper> _mappers;
+	    private readonly ITypeMapFactory _typeMapFactory;
+	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
 
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
@@ -19,12 +20,13 @@ namespace AutoMapper
 		private Func<Type, IValueResolver> _resolverCtor = type => (IValueResolver)Activator.CreateInstance(type, true);
 		private Func<Type, object> _typeConverterCtor = type => Activator.CreateInstance(type, true);
 
-		public Configuration(IEnumerable<IObjectMapper> mappers)
+		public Configuration(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
 		{
-			_mappers = mappers;
+		    _typeMapFactory = typeMapFactory;
+		    _mappers = mappers;
 		}
 
-		public bool AllowNullDestinationValues
+	    public bool AllowNullDestinationValues
 		{
 			get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
 			set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }
@@ -102,8 +104,7 @@ namespace AutoMapper
 
 		public TypeMap CreateTypeMap(Type source, Type destination)
 		{
-			var typeMapFactory = new TypeMapFactory(source, destination);
-			TypeMap typeMap = typeMapFactory.CreateTypeMap();
+            TypeMap typeMap = _typeMapFactory.CreateTypeMap(source, destination);
 
 			_typeMaps.Add(typeMap);
 			_typeMapCache[new TypePair(source, destination)] = typeMap;
@@ -275,11 +276,11 @@ namespace AutoMapper
 				{
 					if (!propertyMap.IsIgnored())
 					{
-						var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessorBase);
+						var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessor);
 
 						if (lastResolver != null)
 						{
-							var sourceType = ((MemberAccessorBase)lastResolver).MemberType;
+							var sourceType = ((MemberAccessor)lastResolver).MemberType;
 							var destinationType = propertyMap.DestinationProperty.MemberType;
 							var memberTypeMap = ((IConfigurationProvider)this).FindTypeMapFor(null, sourceType, destinationType);
 

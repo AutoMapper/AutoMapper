@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-	internal class FieldAccessor : MemberAccessorBase
+	internal class FieldAccessor : MemberAccessor
 	{
 		private readonly FieldInfo _fieldInfo;
 		private readonly string _name;

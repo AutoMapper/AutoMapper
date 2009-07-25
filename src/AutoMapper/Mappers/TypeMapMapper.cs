@@ -21,7 +21,6 @@ namespace AutoMapper.Mappers
 	        return mappedObject;
 		}
 
-
 		public bool IsMatch(ResolutionContext context)
 		{
 			return context.TypeMap != null;

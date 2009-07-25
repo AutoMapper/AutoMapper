@@ -62,6 +62,7 @@
     <Compile Include="IMappingEngineRunner.cs" />
     <Compile Include="Internal\DeferredInstantiatedConverter.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
+    <Compile Include="Internal\ITypeMapFactory.cs" />
     <Compile Include="Internal\PropertyBehaviorInterceptor.cs" />
     <Compile Include="Internal\DefaultResolver.cs" />
     <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
@@ -70,7 +71,7 @@
     <Compile Include="Internal\FieldAccessor.cs" />
     <Compile Include="Internal\FormatterCtorExpression.cs" />
     <Compile Include="IFormatterConfiguration.cs" />
-    <Compile Include="Internal\MemberAccessorBase.cs" />
+    <Compile Include="Internal\MemberAccessor.cs" />
     <Compile Include="Internal\MethodAccessor.cs" />
     <Compile Include="Internal\PropertyAccessor.cs" />
     <Compile Include="IMemberAccessor.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />
     <Compile Include="SelfProfiler.cs" />
+    <Compile Include="TypeInfo.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
     <Compile Include="Internal\ValueFormatter.cs" />

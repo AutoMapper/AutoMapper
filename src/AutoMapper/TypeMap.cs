@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper.ReflectionExtensions;
 
 namespace AutoMapper
 {
@@ -9,20 +8,20 @@ namespace AutoMapper
 	{
 		private readonly IList<PropertyMap> _propertyMaps = new List<PropertyMap>();
 		private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
-		private readonly Type _sourceType;
-		private readonly Type _destinationType;
+		private readonly TypeInfo _sourceType;
+		private readonly TypeInfo _destinationType;
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
 
-		public TypeMap(Type sourceType, Type destinationType)
+        public TypeMap(TypeInfo sourceType, TypeInfo destinationType)
 		{
 			_sourceType = sourceType;
 			_destinationType = destinationType;
 			Profile = Configuration.DefaultProfileName;
 		}
 
-		public Type SourceType { get { return _sourceType; } }
-		public Type DestinationType { get { return _destinationType; } }
+		public Type SourceType { get { return _sourceType.Type; } }
+		public Type DestinationType { get { return _destinationType.Type; } }
 		public string Profile { get; set; }
 		public Func<ResolutionContext, object> CustomMapper { get; private set; }
         public Action<object, object> BeforeMap
@@ -63,7 +62,7 @@ namespace AutoMapper
 			var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
 				.Select(pm => pm.DestinationProperty.Name);
 
-			return DestinationType.GetPublicReadAccessors()
+			return _destinationType.GetPublicReadAccessors()
 							.Select(p => p.Name)
 							.Except(autoMappedProperties)
 							.ToArray();

@@ -3,12 +3,13 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-	internal class PropertyAccessor : MemberAccessorBase
+	internal class PropertyAccessor : MemberAccessor
 	{
 		private readonly PropertyInfo _propertyInfo;
 		private readonly string _name;
 		private readonly Type _memberType;
 		private readonly LateBoundProperty _lateBoundProperty;
+	    private readonly bool _hasSetter;
 
 		public PropertyAccessor(PropertyInfo propertyInfo)
 		{
@@ -16,6 +17,7 @@ namespace AutoMapper.Internal
 			_name = _propertyInfo.Name;
 			_memberType = _propertyInfo.PropertyType;
 			_lateBoundProperty = DelegateFactory.Create(propertyInfo);
+		    _hasSetter = propertyInfo.GetSetMethod(true) != null;
 		}
 
 		public override string Name
@@ -27,6 +29,11 @@ namespace AutoMapper.Internal
 		{
 			get { return _memberType; }
 		}
+
+	    public bool HasSetter
+	    {
+            get { return _hasSetter; }
+	    }
 
 		public override object GetValue(object source)
 		{

@@ -55,7 +55,8 @@ namespace AutoMapper
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
 																   Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
-			IMemberAccessor destProperty = ReflectionHelper.FindProperty(destinationMember);
+		    var memberInfo = ReflectionHelper.FindProperty(destinationMember);
+		    IMemberAccessor destProperty = MemberAccessor.Create(memberInfo);
 			ForDestinationMember(destProperty, memberOptions);
 			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
 		}

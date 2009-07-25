@@ -764,5 +764,71 @@ namespace AutoMapper.UnitTests
                 _dest.Name.ShouldEqual("jon");
             }
         }
+
+        public class When_destination_property_does_not_have_a_setter : NonValidatingSpecBase
+        {
+            private Source _source;
+            private Destination _dest;
+
+            private class Source
+            {
+                public string Name { get; set; }
+                public string Value { get; set;}
+                public string Foo { get; set; }
+            }
+
+            private class Destination 
+            {
+                private DateTime _today;
+
+                public string Name { get; private set; }
+                public string Foo { get; protected set; }
+                public DateTime Today { get { return _today; } }
+                public string Value { get; set; }
+
+                public Destination()
+                {
+                    _today = DateTime.Today;
+                    Name = "name";
+                }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>();
+
+                _source = new Source { Name = "jon", Value = "value", Foo = "bar" };
+                _dest = new Destination();
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Destination>(_source);
+            }
+
+            [Test]
+            public void Should_copy_to_properties_that_have_setters()
+            {
+                _dest.Value.ShouldEqual("value");
+            }
+
+            [Test]
+            public void Should_not_attempt_to_translate_to_properties_that_do_not_have_a_setter()
+            {
+                _dest.Today.ShouldEqual(DateTime.Today);
+            }
+
+            [Test]
+            public void Should_translate_to_properties_that_have_a_private_setters()
+            {
+                _dest.Name.ShouldEqual("jon");
+            }
+
+            [Test]
+            public void Should_translate_to_properties_that_have_a_protected_setters()
+            {
+                _dest.Foo.ShouldEqual("bar");
+            }
+        }
 	}
 }
