@@ -21,11 +21,11 @@ namespace AutoMapper
 
 		    foreach (IMemberAccessor destProperty in destTypeInfo.GetPublicReadAccessors())
 			{
-				var propertyMap = new PropertyMap(destProperty);
+			    var resolvers = new LinkedList<IValueResolver>();
 
-                if (MapDestinationPropertyToSource(propertyMap, sourceTypeInfo, destProperty.Name))
+                if (MapDestinationPropertyToSource(resolvers, sourceTypeInfo, destProperty.Name))
 				{
-					typeMap.AddPropertyMap(propertyMap);
+                    typeMap.AddPropertyMap(destProperty, resolvers);
 				}
 			}
 			return typeMap;
@@ -50,7 +50,7 @@ namespace AutoMapper
             return typeInfo;
         }
 
-		private bool MapDestinationPropertyToSource(PropertyMap propertyMap, TypeInfo sourceType, string nameToSearch)
+		private bool MapDestinationPropertyToSource(LinkedList<IValueResolver> resolvers, TypeInfo sourceType, string nameToSearch)
 		{
 			var sourceProperties = sourceType.GetPublicReadAccessors();
 			var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
@@ -77,21 +77,21 @@ namespace AutoMapper
 						continue;
 					}
 
-					propertyMap.ChainResolver(valueResolver);
+					resolvers.AddLast(valueResolver);
 
-					foundMatch = MapDestinationPropertyToSource(propertyMap, GetTypeInfo(valueResolver.MemberType), snippet.Second);
+					foundMatch = MapDestinationPropertyToSource(resolvers, GetTypeInfo(valueResolver.MemberType), snippet.Second);
 
 					if (foundMatch)
 					{
 						break;
 					}
 
-					propertyMap.RemoveLastResolver();
+					resolvers.RemoveLast();
 				}
 			}
 			else
 			{
-				propertyMap.ChainResolver(resolver);
+                resolvers.AddLast(resolver);
 			}
 
 			return foundMatch;

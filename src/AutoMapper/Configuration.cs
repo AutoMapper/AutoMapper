@@ -71,7 +71,7 @@ namespace AutoMapper
 		{
 			IEnumerable<Type> selfProfiles = GetSelfProfilers(assembly);
 
-			selfProfiles.ForEach(SelfProfile);
+			selfProfiles.Each(SelfProfile);
 		}
 
 		public void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor)

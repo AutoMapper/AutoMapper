@@ -71,7 +71,7 @@ namespace AutoMapper
 
 		public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
-			_typeMap.GetPropertyMaps().ForEach(x => ForDestinationMember(x.DestinationProperty, memberOptions));
+			_typeMap.GetPropertyMaps().Each(x => ForDestinationMember(x.DestinationProperty, memberOptions));
 		}
 
 		public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()

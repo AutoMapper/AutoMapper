@@ -57,6 +57,15 @@ namespace AutoMapper
 			_propertyMaps.Add(propertyMap);
 		}
 
+        public void AddPropertyMap(IMemberAccessor destProperty, LinkedList<IValueResolver> resolvers)
+        {
+            var propertyMap = new PropertyMap(destProperty);
+
+            resolvers.Each(propertyMap.ChainResolver);
+
+            AddPropertyMap(propertyMap);
+        }
+
 		public string[] GetUnmappedPropertyNames()
 		{
 			var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
@@ -74,7 +83,8 @@ namespace AutoMapper
 			if (propertyMap == null)
 			{
 				propertyMap = new PropertyMap(destinationProperty);
-				AddPropertyMap(propertyMap);
+				
+                AddPropertyMap(propertyMap);
 			}
 
 			return propertyMap;
