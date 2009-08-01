@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using AutoMapper.Internal;
@@ -235,7 +236,7 @@ namespace AutoMapper
 		{
 			var badTypeMaps =
 				from typeMap in _typeMaps
-				where typeMap.CustomMapper == null
+				where typeMap.CustomMapper == null && !typeof(IDataRecord).IsAssignableFrom(typeMap.SourceType)
 				let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
 				where unmappedPropertyNames.Length > 0
 				select new {typeMap, unmappedPropertyNames};

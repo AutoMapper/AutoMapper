@@ -1,0 +1,239 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using NUnit.Framework;
+using NUnit.Framework.SyntaxHelpers;
+
+namespace AutoMapper.UnitTests
+{
+    namespace DataReaderMapping
+    {
+        public class When_mapping_a_data_reader_to_a_dto : AutoMapperSpecBase
+        {
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<IDataReader, IEnumerable<DTOObject>>();
+
+                _dataReader = new DataBuilder().BuildDataReader();
+                _result = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader).FirstOrDefault();
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_small_integer_should_be_read()
+            {
+                Assert.That(_result.SmallInteger, Is.EqualTo(_dataReader[FieldName.SmallInt]));  
+            }
+
+            [Test]
+            public void Then_a_column_containing_an_integer_should_be_read()
+            {
+                Assert.That(_result.Integer, Is.EqualTo(_dataReader[FieldName.Int]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_big_integer_should_be_read()
+            {
+                Assert.That(_result.BigInteger, Is.EqualTo(_dataReader[FieldName.BigInt]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_GUID_should_be_read()
+            {
+                Assert.That(_result.Guid, Is.EqualTo(_dataReader[FieldName.Guid]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_float_should_be_read()
+            {
+                Assert.That(_result.Float, Is.EqualTo(_dataReader[FieldName.Float]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_double_should_be_read()
+            {
+                Assert.That(_result.Double, Is.EqualTo(_dataReader[FieldName.Double]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_decimal_should_be_read()
+            {
+                Assert.That(_result.Decimal, Is.EqualTo(_dataReader[FieldName.Decimal]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_date_and_time_should_be_read()
+            {
+                Assert.That(_result.DateTime, Is.EqualTo(_dataReader[FieldName.DateTime]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_byte_should_be_read()
+            {
+                Assert.That(_result.Byte, Is.EqualTo(_dataReader[FieldName.Byte]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_boolean_should_be_read()
+            {
+                Assert.That(_result.Boolean, Is.EqualTo(_dataReader[FieldName.Boolean]));   
+            }
+
+            private DTOObject _result;
+            private IDataReader _dataReader;
+        }
+
+        public class When_mapping_a_single_data_record_to_a_dto : AutoMapperSpecBase
+        {
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<IDataRecord, DTOObject>()
+                    .ForMember(dest => dest.Else, options => options.MapFrom(src => src.GetDateTime(src.GetOrdinal(FieldName.Something))));
+
+                _dataRecord = new DataBuilder().BuildDataRecord();
+                _result = Mapper.Map<IDataRecord, DTOObject>(_dataRecord);
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_small_integer_should_be_read()
+            {
+                Assert.That(_result.SmallInteger, Is.EqualTo(_dataRecord[FieldName.SmallInt]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_an_integer_should_be_read()
+            {
+                Assert.That(_result.Integer, Is.EqualTo(_dataRecord[FieldName.Int]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_big_integer_should_be_read()
+            {
+                Assert.That(_result.BigInteger, Is.EqualTo(_dataRecord[FieldName.BigInt]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_GUID_should_be_read()
+            {
+                Assert.That(_result.Guid, Is.EqualTo(_dataRecord[FieldName.Guid]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_float_should_be_read()
+            {
+                Assert.That(_result.Float, Is.EqualTo(_dataRecord[FieldName.Float]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_double_should_be_read()
+            {
+                Assert.That(_result.Double, Is.EqualTo(_dataRecord[FieldName.Double]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_decimal_should_be_read()
+            {
+                Assert.That(_result.Decimal, Is.EqualTo(_dataRecord[FieldName.Decimal]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_date_and_time_should_be_read()
+            {
+                Assert.That(_result.DateTime, Is.EqualTo(_dataRecord[FieldName.DateTime]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_byte_should_be_read()
+            {
+                Assert.That(_result.Byte, Is.EqualTo(_dataRecord[FieldName.Byte]));
+            }
+
+            [Test]
+            public void Then_a_column_containing_a_boolean_should_be_read()
+            {
+                Assert.That(_result.Boolean, Is.EqualTo(_dataRecord[FieldName.Boolean]));
+            }
+
+            [Test]
+            public void Then_a_projected_column_should_be_read()
+            {
+                Assert.That(_result.Else, Is.EqualTo(_dataRecord[FieldName.Something]));
+            }
+
+            private DTOObject _result;
+            private IDataRecord _dataRecord;
+        }
+
+        internal class FieldName
+        {
+            public const String SmallInt = "SmallInteger";
+            public const String Int = "Integer";
+            public const String BigInt = "BigInteger";
+            public const String Guid = "Guid";
+            public const String Float = "Float";
+            public const String Double = "Double";
+            public const String Decimal = "Decimal";
+            public const String DateTime = "DateTime";
+            public const String Byte = "Byte";
+            public const String Boolean = "Boolean";
+            public const String Something = "Something";
+        }
+
+        public class DataBuilder
+        {
+            public IDataReader BuildDataReader()
+            {
+                var authorizationSetDataTable = new DataTable();
+                authorizationSetDataTable.Columns.Add(FieldName.SmallInt, typeof(Int16));
+                authorizationSetDataTable.Columns.Add(FieldName.Int, typeof(Int32));
+                authorizationSetDataTable.Columns.Add(FieldName.BigInt, typeof(Int64));
+                authorizationSetDataTable.Columns.Add(FieldName.Guid, typeof(Guid));
+                authorizationSetDataTable.Columns.Add(FieldName.Float, typeof(float));
+                authorizationSetDataTable.Columns.Add(FieldName.Double, typeof(Double));
+                authorizationSetDataTable.Columns.Add(FieldName.Decimal, typeof(Decimal));
+                authorizationSetDataTable.Columns.Add(FieldName.DateTime, typeof(DateTime));
+                authorizationSetDataTable.Columns.Add(FieldName.Byte, typeof(Byte));
+                authorizationSetDataTable.Columns.Add(FieldName.Boolean, typeof(Boolean));
+                authorizationSetDataTable.Columns.Add(FieldName.Something, typeof(DateTime));
+
+                var authorizationSetDataRow = authorizationSetDataTable.NewRow();
+                authorizationSetDataRow[FieldName.SmallInt] = 22;
+                authorizationSetDataRow[FieldName.Int] = 6134;
+                authorizationSetDataRow[FieldName.BigInt] = 61346154;
+                authorizationSetDataRow[FieldName.Guid] = Guid.NewGuid();
+                authorizationSetDataRow[FieldName.Float] = 642.61;
+                authorizationSetDataRow[FieldName.Double] = 67164.64;
+                authorizationSetDataRow[FieldName.Decimal] = 94341.61;
+                authorizationSetDataRow[FieldName.DateTime] = DateTime.Now;
+                authorizationSetDataRow[FieldName.Byte] = 0x12;
+                authorizationSetDataRow[FieldName.Boolean] = true;
+                authorizationSetDataRow[FieldName.Something] = DateTime.MaxValue;
+                authorizationSetDataTable.Rows.Add(authorizationSetDataRow);
+
+                return authorizationSetDataTable.CreateDataReader();
+            }
+
+            public IDataRecord BuildDataRecord()
+            {
+                var dataReader = BuildDataReader();
+                dataReader.Read();
+                return dataReader;
+            }
+        }
+
+        public class DTOObject
+        {
+            public Int16 SmallInteger { get; private set; }
+            public Int32 Integer { get; private set; }
+            public Int64 BigInteger { get; private set; }
+            public Guid Guid { get; private set; }
+            public float Float { get; private set; }
+            public Double Double { get; private set; }
+            public Decimal Decimal { get; private set; }
+            public DateTime DateTime { get; private set; }
+            public Byte Byte { get; private set; }
+            public Boolean Boolean { get; private set; }
+            public DateTime Else { get; private set; }
+        }
+    }
+}
