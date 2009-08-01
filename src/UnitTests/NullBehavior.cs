@@ -42,6 +42,7 @@ namespace AutoMapper.UnitTests
 				var model = new ModelObject();
 				model.Sub = null;
 
+				Mapper.AllowNullDestinationValues = false;
 				Mapper.CreateMap<ModelObject, ModelDto>();
 				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
 
@@ -166,7 +167,7 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.CreateProfile("MapsNulls", p =>
 					{
-						p.AllowNullDestinationValues = true;
+						p.AllowNullDestinationValues = false;
 						p.CreateMap<NullSource, NullDestination>();
 					});
 				Mapper.CreateMap<DefaultSource, DefaultDestination>();
@@ -181,13 +182,13 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_use_default_behavior_in_default_profile()
 			{
-				_defaultResult.Value.ShouldNotBeNull();
+				_defaultResult.Value.ShouldBeNull();
 			}
 
 			[Test]
 			public void Should_use_overridden_null_behavior_in_profile()
 			{
-				_nullResult.Value.ShouldBeNull();
+				_nullResult.Value.ShouldNotBeNull();
 			}
 		}
 

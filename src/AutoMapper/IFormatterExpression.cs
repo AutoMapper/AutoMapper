@@ -25,10 +25,12 @@ namespace AutoMapper
 		void ConstructedBy(Func<TValueFormatter> constructor);
 	}
 
-	public interface IProfileExpression : IFormatterExpression
+	public interface IProfileExpression : IFormatterExpression, IMappingOptions
 	{
 		IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>();
 		IMappingExpression CreateMap(Type sourceType, Type destinationType);
+		void RecognizePrefixes(params string[] prefixes);
+		void RecognizePostfixes(params string[] postfixes);
 	}
 
 	public interface IConfiguration : IProfileExpression

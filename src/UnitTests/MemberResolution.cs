@@ -1115,6 +1115,141 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_matching_source_and_destination_members_with_underscored_members : AutoMapperSpecBase
+		{
+			private Destination _destination;
+
+			private class Source
+			{
+				public SubSource some_source { get; set; }
+			}
+
+			private class SubSource
+			{
+				public int value { get; set; }
+			}
+
+			private class Destination
+			{
+				public int some_source_value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(cfg =>
+					{
+						cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
+						cfg.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
+						cfg.CreateMap<Source, Destination>();
+					});
+			}
+
+			protected override void Because_of()
+			{
+				_destination = Mapper.Map<Source, Destination>(new Source {some_source = new SubSource {value = 8}});
+			}
+
+			[Test]
+			public void Should_use_underscores_as_tokenizers_to_flatten()
+			{
+				_destination.some_source_value.ShouldEqual(8);
+			}
+		}
+
+		public class When_source_members_contain_prefixes : AutoMapperSpecBase
+		{
+			private Destination _destination;
+
+			private class Source
+			{
+				public int FooValue { get; set; }
+				public int GetOtherValue() 
+				{
+					return 10; 
+				}
+			}
+
+			public class Destination
+			{
+				public int Value { get; set; }
+				public int OtherValue { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(cfg =>
+					{
+						cfg.RecognizePrefixes("Foo");
+						cfg.CreateMap<Source, Destination>();
+					});
+			}
+
+			protected override void Because_of()
+			{
+				_destination = Mapper.Map<Source, Destination>(new Source {FooValue = 5});
+			}
+
+			[Test]
+			public void Registered_prefixes_ignored()
+			{
+				_destination.Value.ShouldEqual(5);
+			}
+
+			[Test]
+			public void Default_prefix_included()
+			{
+				_destination.OtherValue.ShouldEqual(10);
+			}
+		}
+
+
+		public class When_source_members_contain_postfixes_and_prefixes : AutoMapperSpecBase
+		{
+			private Destination _destination;
+
+			private class Source
+			{
+				public int FooValueBar { get; set; }
+				public int GetOtherValue()
+				{
+					return 10;
+				}
+			}
+
+			public class Destination
+			{
+				public int Value { get; set; }
+				public int OtherValue { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(cfg =>
+				{
+					cfg.RecognizePrefixes("Foo");
+					cfg.RecognizePostfixes("Bar");
+					cfg.CreateMap<Source, Destination>();
+				});
+			}
+
+			protected override void Because_of()
+			{
+				_destination = Mapper.Map<Source, Destination>(new Source { FooValueBar = 5 });
+			}
+
+			[Test]
+			public void Registered_prefixes_ignored()
+			{
+				_destination.Value.ShouldEqual(5);
+			}
+
+			[Test]
+			public void Default_prefix_included()
+			{
+				_destination.OtherValue.ShouldEqual(10);
+			}
+		}
+
 	}
 
 	public static class MapFromExtensions

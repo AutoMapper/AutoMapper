@@ -32,6 +32,24 @@ namespace AutoMapper
 			set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }
 		}
 
+		public INamingConvention SourceMemberNamingConvention
+		{
+			get { return GetProfile(DefaultProfileName).SourceMemberNamingConvention; }
+			set { GetProfile(DefaultProfileName).SourceMemberNamingConvention = value; }
+		}
+
+		public INamingConvention DestinationMemberNamingConvention
+		{
+			get { return GetProfile(DefaultProfileName).DestinationMemberNamingConvention; }
+			set { GetProfile(DefaultProfileName).DestinationMemberNamingConvention = value; }
+		}
+
+		public Func<string, string> SourceMemberNameTransformer
+		{
+			get { return GetProfile(DefaultProfileName).SourceMemberNameTransformer; }
+			set { GetProfile(DefaultProfileName).SourceMemberNameTransformer = value; }
+		}
+
 		bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{
 			get { return AllowNullDestinationValues; }
@@ -102,12 +120,28 @@ namespace AutoMapper
 			return new MappingExpression(typeMap, _typeConverterCtor);
 		}
 
+		public void RecognizePrefixes(params string[] prefixes)
+		{
+			GetProfile(DefaultProfileName).RecognizePrefixes(prefixes);
+		}
+
+		public void RecognizePostfixes(params string[] postfixes)
+		{
+			GetProfile(DefaultProfileName).RecognizePostfixes(postfixes);
+		}
+
 		public TypeMap CreateTypeMap(Type source, Type destination)
 		{
-            TypeMap typeMap = _typeMapFactory.CreateTypeMap(source, destination);
+			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination);
+				
+			if (typeMap == null)
+			{
+				typeMap = _typeMapFactory.CreateTypeMap(source, destination, this);
 
-			_typeMaps.Add(typeMap);
-			_typeMapCache[new TypePair(source, destination)] = typeMap;
+				_typeMaps.Add(typeMap);
+				_typeMapCache[new TypePair(source, destination)] = typeMap;
+			}
+
 			return typeMap;
 		}
 
@@ -228,7 +262,7 @@ namespace AutoMapper
 
         private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType)
         {
-            TypeMap typeMap = _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+            TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType);
 
             if (typeMap == null)
             {
@@ -256,7 +290,12 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
+		private TypeMap FindExplicitlyDefinedTypeMap(Type sourceType, Type destinationType)
+		{
+			return _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+		}
+
+		private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
 		{
             if (context.TypeMap != null)
             {

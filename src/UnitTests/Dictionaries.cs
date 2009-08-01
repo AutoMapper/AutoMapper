@@ -174,6 +174,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
+				Mapper.AllowNullDestinationValues = false;
 				Mapper.CreateMap<Foo, FooDto>();
 				Mapper.CreateMap<FooDto, Foo>();
 			}

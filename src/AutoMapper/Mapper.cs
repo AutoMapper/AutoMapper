@@ -10,6 +10,12 @@ namespace AutoMapper
 		private static Configuration _configuration;
 		private static IMappingEngine _mappingEngine;
 
+		public static bool AllowNullDestinationValues
+		{
+			get { return Configuration.AllowNullDestinationValues; }
+			set { Configuration.AllowNullDestinationValues = value; }
+		}
+
 		public static TDestination Map<TSource, TDestination>(TSource source)
 		{
 			return Engine.Map<TSource, TDestination>(source);
@@ -184,5 +190,6 @@ namespace AutoMapper
 		{
 			get { return (IConfiguration) ConfigurationProvider; }
 		}
+
 	}
 }

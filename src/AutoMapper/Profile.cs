@@ -21,21 +21,30 @@ namespace AutoMapper
 			get { return _profileName; }
 		}
 
-		protected internal virtual void Configure()
-		{
-			// override in a derived class for custom configuration behavior
-		}
-
-		public void Initialize(Configuration configurator)
-		{
-			_configurator = configurator;
-		}
-
 		public bool AllowNullDestinationValues
 		{
 			get { return GetProfile().AllowNullDestinationValues; }
 			set { GetProfile().AllowNullDestinationValues = value; }
 		}
+
+		public INamingConvention SourceMemberNamingConvention
+		{
+			get { return GetProfile().SourceMemberNamingConvention; } 
+			set { GetProfile().SourceMemberNamingConvention = value; }
+		}
+
+		public INamingConvention DestinationMemberNamingConvention
+		{
+			get { return GetProfile().DestinationMemberNamingConvention; }
+			set { GetProfile().DestinationMemberNamingConvention = value; }
+		}
+
+		public Func<string, string> SourceMemberNameTransformer
+		{
+			get { return GetProfile().SourceMemberNameTransformer; }
+			set { GetProfile().SourceMemberNameTransformer = value; }
+		}
+
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
@@ -79,6 +88,26 @@ namespace AutoMapper
 			var map = _configurator.CreateMap(sourceType, destinationType);
 
 			return map.WithProfile(ProfileName);
+		}
+
+		public void RecognizePrefixes(params string[] prefixes)
+		{
+			GetProfile().RecognizePrefixes(prefixes);
+		}
+
+		public void RecognizePostfixes(params string[] postfixes)
+		{
+			GetProfile().RecognizePostfixes(postfixes);
+		}
+
+		protected internal virtual void Configure()
+		{
+			// override in a derived class for custom configuration behavior
+		}
+
+		public void Initialize(Configuration configurator)
+		{
+			_configurator = configurator;
 		}
 
 		private FormatterExpression GetProfile()

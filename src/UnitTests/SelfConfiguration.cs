@@ -53,6 +53,9 @@ namespace AutoMapper.UnitTests
 				{
 					map.ForMember(x => x.ConfiguredProperty, o => o.MapFrom(x => x.Property));
 					map.ForMember(x => x.AllowNullDestinationValues, o => o.Ignore());
+					map.ForMember(x => x.DestinationMemberNamingConvention, o => o.Ignore());
+					map.ForMember(x => x.SourceMemberNamingConvention, o => o.Ignore());
+					map.ForMember(x => x.SourceMemberNameTransformer, o => o.Ignore());
 				}
 			}
 		}

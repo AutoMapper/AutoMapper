@@ -9,10 +9,10 @@ namespace AutoMapper
 {
     public class TypeMapFactory : ITypeMapFactory
 	{
-        private static IDictionary<Type, TypeInfo> _typeInfos = new Dictionary<Type, TypeInfo>();
-        private object _typeInfoSync = new object();
+    	private static readonly IDictionary<Type, TypeInfo> _typeInfos = new Dictionary<Type, TypeInfo>();
+        private readonly object _typeInfoSync = new object();
 
-		public TypeMap CreateTypeMap(Type sourceType, Type destinationType)
+    	public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options)
 		{
 		    var sourceTypeInfo = GetTypeInfo(sourceType);
 		    var destTypeInfo = GetTypeInfo(destinationType);
@@ -23,7 +23,7 @@ namespace AutoMapper
 			{
 			    var resolvers = new LinkedList<IValueResolver>();
 
-                if (MapDestinationPropertyToSource(resolvers, sourceTypeInfo, destProperty.Name))
+                if (MapDestinationPropertyToSource(resolvers, sourceTypeInfo, destProperty.Name, options))
 				{
                     typeMap.AddPropertyMap(destProperty, resolvers);
 				}
@@ -50,27 +50,28 @@ namespace AutoMapper
             return typeInfo;
         }
 
-		private bool MapDestinationPropertyToSource(LinkedList<IValueResolver> resolvers, TypeInfo sourceType, string nameToSearch)
+		private bool MapDestinationPropertyToSource(LinkedList<IValueResolver> resolvers, TypeInfo sourceType, string nameToSearch, IMappingOptions mappingOptions)
 		{
 			var sourceProperties = sourceType.GetPublicReadAccessors();
 			var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
 
-			IValueResolver resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch);
+			IValueResolver resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch, mappingOptions);
 
 			bool foundMatch = resolver != null;
 
 			if (!foundMatch)
 			{
-				string[] matches = Regex.Matches(nameToSearch, @"\p{Lu}[\p{Ll}0-9]*")
+				string[] matches = mappingOptions.DestinationMemberNamingConvention.SplittingExpression
+					.Matches(nameToSearch)
 					.Cast<Match>()
 					.Select(m => m.Value)
 					.ToArray();
 
 				for (int i = 0; i < matches.Length - 1; i++)
 				{
-					NameSnippet snippet = CreateNameSnippet(matches, i);
+					NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
 
-					IMemberAccessor valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First);
+					IMemberAccessor valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First, mappingOptions);
 
 					if (valueResolver == null)
 					{
@@ -79,7 +80,7 @@ namespace AutoMapper
 
 					resolvers.AddLast(valueResolver);
 
-					foundMatch = MapDestinationPropertyToSource(resolvers, GetTypeInfo(valueResolver.MemberType), snippet.Second);
+					foundMatch = MapDestinationPropertyToSource(resolvers, GetTypeInfo(valueResolver.MemberType), snippet.Second, mappingOptions);
 
 					if (foundMatch)
 					{
@@ -97,14 +98,23 @@ namespace AutoMapper
 			return foundMatch;
 		}
 
-		private static IMemberAccessor FindTypeMember(IEnumerable<IMemberAccessor> modelProperties, IEnumerable<MethodInfo> getMethods, string nameToSearch)
+		private static IMemberAccessor FindTypeMember(IEnumerable<IMemberAccessor> modelProperties, IEnumerable<MethodInfo> getMethods, string nameToSearch, IMappingOptions mappingOptions)
 		{
 			IMemberAccessor pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch));
 			if (pi != null)
 				return pi;
 
-		    string getName = "Get" + nameToSearch;
-		    MethodInfo mi = getMethods.FirstOrDefault(m => (NameMatches(m.Name, getName)) || NameMatches(m.Name, nameToSearch));
+		    //string getName = "Get" + nameToSearch;
+		    //MethodInfo mi = getMethods.FirstOrDefault(m => (NameMatches(m.Name, getName)) || NameMatches(m.Name, nameToSearch));
+		    MethodInfo mi = getMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch));
+			if (mi != null)
+				return new MethodAccessor(mi);
+
+			pi = modelProperties.FirstOrDefault(prop => NameMatches(mappingOptions.SourceMemberNameTransformer(prop.Name), nameToSearch));
+			if (pi != null)
+				return pi;
+
+		    mi = getMethods.FirstOrDefault(m => NameMatches(mappingOptions.SourceMemberNameTransformer(m.Name), nameToSearch));
 			if (mi != null)
 				return new MethodAccessor(mi);
 
@@ -116,12 +126,12 @@ namespace AutoMapper
             return String.Compare(memberName, nameToMatch, StringComparison.OrdinalIgnoreCase) == 0;
         }
         
-        private static NameSnippet CreateNameSnippet(IEnumerable<string> matches, int i)
+        private NameSnippet CreateNameSnippet(IEnumerable<string> matches, int i, IMappingOptions mappingOptions)
 		{
 			return new NameSnippet
 			       	{
-			       		First = String.Concat(matches.Take(i + 1).ToArray()),
-			       		Second = String.Concat(matches.Skip(i + 1).ToArray())
+			       		First = String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter, matches.Take(i + 1).ToArray()),
+						Second = String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter, matches.Skip(i + 1).ToArray())
 			       	};
 		}
 

@@ -203,6 +203,7 @@ namespace AutoMapper.Tests
 		[SetUp]
 		public void SetUp()
 		{
+			Mapper.AllowNullDestinationValues = false;
 			Mapper.CreateMap<SourceClass, DestinationClass>();
 		}
 
@@ -236,6 +237,7 @@ namespace AutoMapper.Tests
 		[SetUp]
 		public void SetUp()
 		{
+			Mapper.AllowNullDestinationValues = false;
 			Mapper.CreateMap<SourceClass, DestinationClass>();
 		}
 
@@ -269,6 +271,7 @@ namespace AutoMapper.Tests
 		[SetUp]
 		public void SetUp()
 		{
+			Mapper.AllowNullDestinationValues = false;
 			Mapper.CreateMap<SourceClass, DestinationClass>();
 		}
 

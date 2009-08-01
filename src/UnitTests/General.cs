@@ -46,6 +46,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
+				Mapper.AllowNullDestinationValues = false;
 				Mapper.CreateMap<ModelObject, ModelDto>();
 
 				_result = Mapper.Map<ModelObject, ModelDto>(null);
