@@ -202,6 +202,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+
 		public class When_mapping_to_a_generic_dictionary_that_does_not_use_keyvaluepairs : SpecBase
 		{
 			private IDictionary<string, string> _dest;
@@ -412,5 +413,54 @@ namespace AutoMapper.UnitTests
 
 		}
 
+		public class When_mapping_from_a_list_of_object_to_generic_dictionary : SpecBase
+		{
+			private FooObject _result;
+
+			private class FooDto
+			{
+				public DestinationValuePair[] Values { get; set; }
+			}
+
+			private class FooObject
+			{
+				public Dictionary<string, string> Values { get; set; }
+			}
+
+			private class DestinationValuePair
+			{
+				public string Key { get; set; }
+				public string Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<FooDto, FooObject>();
+				Mapper.CreateMap<DestinationValuePair, KeyValuePair<string, string>>();
+			}
+
+			protected override void Because_of()
+			{
+				var source = new FooDto
+				{
+					Values = new List<DestinationValuePair>
+					{
+						new DestinationValuePair {Key = "Key1", Value = "Value1"},
+						new DestinationValuePair {Key = "Key2", Value = "Value2"}
+					}.ToArray()
+				};
+
+				_result = Mapper.Map<FooDto, FooObject>(source);
+			}
+
+			[Test]
+			public void Should_perform_mapping_for_individual_values()
+			{
+				_result.Values.Count.ShouldEqual(2);
+
+				_result.Values["Key1"].ShouldEqual("Value1");
+				_result.Values["Key2"].ShouldEqual("Value2");
+			}
+		}
 	}
 }

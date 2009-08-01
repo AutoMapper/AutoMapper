@@ -12,6 +12,7 @@ namespace AutoMapper.Mappers
             new FlagsEnumMapper(),
             new EnumMapper(),
             new ArrayMapper(),
+			new EnumerableToDictionaryMapper(),
             new DictionaryMapper(),
             new EnumerableMapper(),
             new AssignableMapper(),
