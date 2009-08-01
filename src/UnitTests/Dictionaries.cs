@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
@@ -199,5 +201,216 @@ namespace AutoMapper.UnitTests
 				_result.Bar["lol"].Bar.ShouldBeInstanceOf<Dictionary<string, FooDto>>();
 			}
 		}
+
+		public class When_mapping_to_a_generic_dictionary_that_does_not_use_keyvaluepairs : SpecBase
+		{
+			private IDictionary<string, string> _dest;
+
+			public class SourceDto
+			{
+				public IDictionary<string, string> Items { get; set; }
+			}
+
+			public class DestDto
+			{
+				public IDictionary<string, string> Items { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<SourceDto, DestDto>()
+					.ForMember(d => d.Items, opt => opt.MapFrom(s => s.Items));
+			}
+
+			protected override void Because_of()
+			{
+				var source = new SourceDto()
+				{
+					Items = new GenericWrappedDictionary<string, string>
+                    {
+                        {"A", "AAA"},
+                        {"B", "BBB"},
+                        {"C", "CCC"}
+                    }
+				};
+
+
+				_dest = Mapper.Map<IDictionary<string, string>, IDictionary<string, string>>(source.Items);
+			}
+
+			[Test]
+			public void Should_map_using_the_nongeneric_dictionaryentry()
+			{
+				_dest.Values.Count.ShouldEqual(3);
+			}
+
+			// A wrapper for an IDictionary that implements IDictionary<TKey, TValue>
+			//
+			// The important difference from a standard generic BCL dictionary is that:
+			//
+			// ((IEnumerable)GenericWrappedDictionary).GetEnumerator() returns DictionaryEntrys
+			// GenericWrappedDictionary.GetEnumerator() returns KeyValuePairs
+			//
+			// This behaviour is demonstrated by NHibernate's PersistentGenericMap
+			// (which wraps a nongeneric PersistentMap).
+			public class GenericWrappedDictionary<TKey, TValue> :
+				IDictionary<TKey, TValue>, IDictionary
+			{
+				IDictionary inner = new Hashtable();
+
+				public void Add(TKey key, TValue value)
+				{
+					inner.Add(key, value);
+				}
+
+				public bool ContainsKey(TKey key)
+				{
+					throw new NotImplementedException();
+				}
+
+				public ICollection<TKey> Keys
+				{
+					get { return inner.Keys.Cast<TKey>().ToList(); }
+				}
+
+				public bool Remove(TKey key)
+				{
+					throw new NotImplementedException();
+				}
+
+				public bool TryGetValue(TKey key, out TValue value)
+				{
+					throw new NotImplementedException();
+				}
+
+				public ICollection<TValue> Values
+				{
+					get { return inner.Values.Cast<TValue>().ToList(); }
+				}
+
+				public TValue this[TKey key]
+				{
+					get
+					{
+						return (TValue)inner[key];
+					}
+					set
+					{
+						inner[key] = value;
+					}
+				}
+
+				public void Add(KeyValuePair<TKey, TValue> item)
+				{
+					throw new NotImplementedException();
+				}
+
+				public void Clear()
+				{
+					throw new NotImplementedException();
+				}
+
+				public bool Contains(KeyValuePair<TKey, TValue> item)
+				{
+					throw new NotImplementedException();
+				}
+
+				public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+				{
+					throw new NotImplementedException();
+				}
+
+				public int Count
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public bool IsReadOnly
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public bool Remove(KeyValuePair<TKey, TValue> item)
+				{
+					throw new NotImplementedException();
+				}
+
+				public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+				{
+					return inner.OfType<DictionaryEntry>()
+						.Select(e => new KeyValuePair<TKey, TValue>((TKey)e.Key, (TValue)e.Value))
+						.GetEnumerator();
+				}
+
+				IEnumerator IEnumerable.GetEnumerator()
+				{
+					return inner.GetEnumerator();
+				}
+
+				public void Add(object key, object value)
+				{
+					inner.Add(key, value);
+				}
+
+				public bool Contains(object key)
+				{
+					throw new NotImplementedException();
+				}
+
+				IDictionaryEnumerator IDictionary.GetEnumerator()
+				{
+					return ((IDictionary)inner).GetEnumerator();
+				}
+
+				public bool IsFixedSize
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				ICollection IDictionary.Keys
+				{
+					get { return inner.Keys; }
+				}
+
+				public void Remove(object key)
+				{
+					throw new NotImplementedException();
+				}
+
+				ICollection IDictionary.Values
+				{
+					get { return inner.Values; }
+				}
+
+				public object this[object key]
+				{
+					get
+					{
+						return inner[key];
+					}
+					set
+					{
+						inner[key] = value;
+					}
+				}
+
+				public void CopyTo(Array array, int index)
+				{
+					throw new NotImplementedException();
+				}
+
+				public bool IsSynchronized
+				{
+					get { throw new NotImplementedException(); }
+				}
+
+				public object SyncRoot
+				{
+					get { throw new NotImplementedException(); }
+				}
+			}
+
+		}
+
 	}
 }

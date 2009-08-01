@@ -19,7 +19,7 @@ namespace AutoMapper.Mappers
 
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			var sourceEnumerableValue = (IEnumerable) context.SourceValue ?? new object[0];
+			var sourceEnumerableValue = (IEnumerable)context.SourceValue ?? new object[0];
 			IEnumerable<object> keyValuePairs = sourceEnumerableValue.Cast<object>();
 
 			Type genericSourceDictType = context.SourceType.GetDictionaryType();
@@ -29,6 +29,10 @@ namespace AutoMapper.Mappers
 			Type genericDestDictType = context.DestinationType.GetDictionaryType();
 			Type destKeyType = genericDestDictType.GetGenericArguments()[0];
 			Type destValueType = genericDestDictType.GetGenericArguments()[1];
+
+			var dictionaryEntries = keyValuePairs.OfType<DictionaryEntry>();
+			if (dictionaryEntries.Any())
+				keyValuePairs = dictionaryEntries.Select(e => Activator.CreateInstance(sourceKvpType, e.Key, e.Value));
 
 			object destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
 			int count = 0;
@@ -47,7 +51,7 @@ namespace AutoMapper.Mappers
 				object destKey = mapper.Map(keyContext);
 				object destValue = mapper.Map(valueContext);
 
-				genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] {destKey, destValue});
+				genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
 
 				count++;
 			}
