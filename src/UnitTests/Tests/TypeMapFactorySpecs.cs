@@ -34,6 +34,7 @@ namespace AutoMapper.UnitTests.Tests
 			var mappingOptions = CreateStub<IMappingOptions>();
 			mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            mappingOptions.SourceMemberNameTransformer = s => s;
 			
 			var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions);
 
