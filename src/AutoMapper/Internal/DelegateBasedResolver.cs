@@ -13,11 +13,10 @@ namespace AutoMapper
 
 		public ResolutionResult Resolve(ResolutionResult source)
 		{
-			if (source.Value == null)
-				return source;
-
-			if (! (source.Value is TSource))
+			if (source.Value != null && ! (source.Value is TSource))
+			{
 				throw new ArgumentException("Expected obj to be of type " + typeof(TSource) + " but was " + source.Value.GetType());
+			}
 
 			object result;
 			try

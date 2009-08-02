@@ -152,7 +152,7 @@ namespace AutoMapper.UnitTests
 			{
 				public object Value { get; set; }
 			}
-			
+
 			private class NullSource
 			{
 				public object Value { get; set; }
@@ -192,5 +192,48 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_using_a_custom_resolver_and_the_source_value_is_null : NonValidatingSpecBase
+		{
+			public class NullResolver : ValueResolver<Source, string>
+			{
+				protected override string ResolveCore(Source source)
+				{
+					if (source == null)
+						return "jon";
+					return "fail";
+				}
+			}
+
+			private Source _source;
+			private Destination _dest;
+
+			public class Source
+			{
+				public string MyName { get; set; }
+			}
+
+			public class Destination
+			{
+				public string Name { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>()
+					.ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver>().FromMember(src => src.MyName));
+				_source = new Source();
+			}
+
+			protected override void Because_of()
+			{
+				_dest = Mapper.Map<Source, Destination>(_source);
+			}
+
+			[Test]
+			public void Should_perform_the_translation()
+			{
+				_dest.Name.ShouldEqual("jon");
+			}
+		}
 	}
 }
