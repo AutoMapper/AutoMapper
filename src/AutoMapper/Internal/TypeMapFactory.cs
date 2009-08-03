@@ -19,7 +19,7 @@ namespace AutoMapper
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo);
 
-            foreach (IMemberAccessor destProperty in destTypeInfo.GetPublicReadAccessors())
+            foreach (IMemberAccessor destProperty in destTypeInfo.GetPublicWriteAccessors())
             {
                 var resolvers = new LinkedList<IValueResolver>();
 
@@ -70,7 +70,7 @@ namespace AutoMapper
             {
                 NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
 
-                IMemberAccessor valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First, mappingOptions);
+                IMemberGetter valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First, mappingOptions);
 
                 if (valueResolver != null)
                 {
@@ -88,17 +88,15 @@ namespace AutoMapper
             return foundMatch;
         }
 
-        private static IMemberAccessor FindTypeMember(IEnumerable<IMemberAccessor> modelProperties, IEnumerable<MethodInfo> getMethods, string nameToSearch, IMappingOptions mappingOptions)
+        private static IMemberGetter FindTypeMember(IEnumerable<IMemberGetter> modelProperties, IEnumerable<MethodInfo> getMethods, string nameToSearch, IMappingOptions mappingOptions)
         {
-            IMemberAccessor pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch));
+            IMemberGetter pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch));
             if (pi != null)
                 return pi;
 
-            //string getName = "Get" + nameToSearch;
-            //MethodInfo mi = getMethods.FirstOrDefault(m => (NameMatches(m.Name, getName)) || NameMatches(m.Name, nameToSearch));
             MethodInfo mi = getMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch));
             if (mi != null)
-                return new MethodAccessor(mi);
+                return new MethodGetter(mi);
 
             pi = modelProperties.FirstOrDefault(prop => NameMatches(mappingOptions.SourceMemberNameTransformer(prop.Name), nameToSearch));
             if (pi != null)
@@ -106,7 +104,7 @@ namespace AutoMapper
 
             mi = getMethods.FirstOrDefault(m => NameMatches(mappingOptions.SourceMemberNameTransformer(m.Name), nameToSearch));
             if (mi != null)
-                return new MethodAccessor(mi);
+                return new MethodGetter(mi);
 
             return null;
         }

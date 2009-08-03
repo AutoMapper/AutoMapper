@@ -3,19 +3,21 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-	internal class FieldAccessor : MemberAccessor
+	internal class FieldGetter : MemberGetter
 	{
 		private readonly FieldInfo _fieldInfo;
 		private readonly string _name;
 		private readonly Type _memberType;
-		private readonly LateBoundField _lateBoundField;
+		private readonly LateBoundFieldGet _lateBoundFieldGet;
+		private readonly LateBoundFieldSet _lateBoundFieldSet;
 
-		public FieldAccessor(FieldInfo fieldInfo)
+		public FieldGetter(FieldInfo fieldInfo)
 		{
 			_fieldInfo = fieldInfo;
 			_name = fieldInfo.Name;
 			_memberType = fieldInfo.FieldType;
-			_lateBoundField = DelegateFactory.Create(fieldInfo);
+			_lateBoundFieldGet = DelegateFactory.CreateGet(fieldInfo);
+			_lateBoundFieldSet = DelegateFactory.CreateSet(fieldInfo);
 		}
 
 		public override string Name
@@ -30,15 +32,10 @@ namespace AutoMapper.Internal
 
 		public override object GetValue(object source)
 		{
-			return _lateBoundField(source);
+			return _lateBoundFieldGet(source);
 		}
 
-		public override void SetValue(object destination, object value)
-		{
-			_fieldInfo.SetValue(destination, value);
-		}
-
-	    public bool Equals(FieldAccessor other)
+	    public bool Equals(FieldGetter other)
 	    {
 	        if (ReferenceEquals(null, other)) return false;
 	        if (ReferenceEquals(this, other)) return true;
@@ -49,13 +46,28 @@ namespace AutoMapper.Internal
 	    {
 	        if (ReferenceEquals(null, obj)) return false;
 	        if (ReferenceEquals(this, obj)) return true;
-	        if (obj.GetType() != typeof (FieldAccessor)) return false;
-	        return Equals((FieldAccessor) obj);
+	        if (obj.GetType() != typeof (FieldGetter)) return false;
+	        return Equals((FieldGetter) obj);
 	    }
 
 	    public override int GetHashCode()
 	    {
 	        return _fieldInfo.GetHashCode();
 	    }
+	}
+
+	internal class FieldAccessor : FieldGetter, IMemberAccessor
+	{
+		private readonly LateBoundFieldSet _lateBoundFieldSet;
+
+		public FieldAccessor(FieldInfo fieldInfo) : base(fieldInfo)
+		{
+			_lateBoundFieldSet = DelegateFactory.CreateSet(fieldInfo);
+		}
+
+		public void SetValue(object destination, object value)
+		{
+			_lateBoundFieldSet(destination, value);
+		}
 	}
 }

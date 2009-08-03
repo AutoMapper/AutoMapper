@@ -7,7 +7,8 @@ namespace AutoMapper
 {
     public class TypeInfo
     {
-        private readonly IMemberAccessor[] _publicReadAccessors;
+        private readonly IMemberGetter[] _publicGetters;
+        private readonly IMemberAccessor[] _publicAccessors;
         private readonly MethodInfo[] _publicGetMethods;
 
         public Type Type { get; private set; }
@@ -15,13 +16,20 @@ namespace AutoMapper
         public TypeInfo(Type type)
         {
             Type = type;
-            _publicReadAccessors = BuildPublicReadAccessors();
+        	var publicReadableMembers = GetAllPublicReadableMembers();
+			_publicGetters = BuildPublicReadAccessors(publicReadableMembers);
+			_publicAccessors = BuildPublicAccessors(publicReadableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
         }
 
-        public IEnumerable<IMemberAccessor> GetPublicReadAccessors()
+        public IEnumerable<IMemberGetter> GetPublicReadAccessors()
         {
-            return _publicReadAccessors;
+            return _publicGetters;
+        }
+
+		public IEnumerable<IMemberAccessor> GetPublicWriteAccessors()
+        {
+            return _publicAccessors;
         }
 
         public IEnumerable<MethodInfo> GetPublicNoArgMethods()
@@ -29,30 +37,30 @@ namespace AutoMapper
             return _publicGetMethods;
         }
 
-        private IMemberAccessor[] BuildPublicReadAccessors()
+        private IMemberGetter[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
         {
-            // Collect that target type, its base type, and all implemented/inherited interface types
-            IEnumerable<Type> typesToScan = new[] { Type, Type.BaseType };
+			// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
+            var filteredMembers = allMembers
+                .OfType<PropertyInfo>()
+                .GroupBy(x => x.Name) // group properties of the same name together
+                .Select(x => x.First())
+                .OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
+                .Concat(allMembers.Where(x => x is FieldInfo));  // add FieldInfo objects back
 
-            if (Type.IsInterface)
-                typesToScan = typesToScan.Concat(Type.FindInterfaces((m, f) => true, null));
+            return filteredMembers
+                .Select(x => x.ToMemberGetter())
+                .ToArray();
+        }
 
-            // Scan all types for public properties and fields
-            var allMembers = typesToScan
-                .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-                .SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
-                                                 BindingFlags.Instance | BindingFlags.Public,
-                                                 (m, f) =>
-                                                 m is FieldInfo ||
-                                                 (m is PropertyInfo && ((PropertyInfo)m).CanRead && !((PropertyInfo)m).GetIndexParameters().Any()), null));
-
-            // Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
+		private IMemberAccessor[] BuildPublicAccessors(IEnumerable<MemberInfo> allMembers)
+        {
+        	// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
             var filteredMembers = allMembers
                 .OfType<PropertyInfo>()
                 .GroupBy(x => x.Name) // group properties of the same name together
                 .Select(x =>
-                    x.Any(y => y.CanRead && y.CanWrite) ? // favor the first property that can both read & write - otherwise pick the first one
-                        x.Where(y => y.CanRead && y.CanWrite).First() :
+                    x.Any(y => y.CanWrite && y.CanRead) ? // favor the first property that can both read & write - otherwise pick the first one
+						x.Where(y => y.CanWrite && y.CanRead).First() :
                         x.First())
                 .OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
                 .Concat(allMembers.Where(x => x is FieldInfo));  // add FieldInfo objects back
@@ -62,7 +70,25 @@ namespace AutoMapper
                 .ToArray();
         }
 
-        private MethodInfo[] BuildPublicNoArgMethods()
+    	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
+    	{
+			// Collect that target type, its base type, and all implemented/inherited interface types
+			IEnumerable<Type> typesToScan = new[] { Type, Type.BaseType };
+
+    		if (Type.IsInterface)
+    			typesToScan = typesToScan.Concat(Type.FindInterfaces((m, f) => true, null));
+
+    		// Scan all types for public properties and fields
+    		return typesToScan
+    			.Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
+    			.SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
+    			                               BindingFlags.Instance | BindingFlags.Public,
+    			                               (m, f) =>
+    			                               m is FieldInfo ||
+    			                               (m is PropertyInfo && ((PropertyInfo)m).CanRead && !((PropertyInfo)m).GetIndexParameters().Any()), null));
+    	}
+
+    	private MethodInfo[] BuildPublicNoArgMethods()
         {
             return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .Where(m => (m.ReturnType != null) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))

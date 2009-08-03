@@ -30,8 +30,8 @@ namespace AutoMapper
         {
             get
             {
-                return !(DestinationProperty is PropertyAccessor) ||
-                       ((PropertyAccessor)DestinationProperty).HasSetter;
+				return !(DestinationProperty is PropertyAccessor) ||
+					   ((PropertyAccessor)DestinationProperty).HasSetter;
             }
         }
 
@@ -153,7 +153,7 @@ namespace AutoMapper
 
 		public bool CanResolveValue()
 		{
-			return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver) && !_ignored;
+			return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
 		}
 
 		public void RemoveLastFormatter()

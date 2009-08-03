@@ -316,11 +316,11 @@ namespace AutoMapper
 				{
 					if (!propertyMap.IsIgnored())
 					{
-						var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberAccessor);
+						var lastResolver = propertyMap.GetSourceValueResolvers().LastOrDefault(r => r is MemberGetter);
 
 						if (lastResolver != null)
 						{
-							var sourceType = ((MemberAccessor)lastResolver).MemberType;
+							var sourceType = ((MemberGetter)lastResolver).MemberType;
 							var destinationType = propertyMap.DestinationProperty.MemberType;
 							var memberTypeMap = ((IConfigurationProvider)this).FindTypeMapFor(null, sourceType, destinationType);
 

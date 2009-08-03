@@ -71,7 +71,7 @@ namespace AutoMapper
 			var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
 				.Select(pm => pm.DestinationProperty.Name);
 
-			return _destinationType.GetPublicReadAccessors()
+			return _destinationType.GetPublicWriteAccessors()
 							.Select(p => p.Name)
 							.Except(autoMappedProperties)
 							.ToArray();
@@ -83,6 +83,8 @@ namespace AutoMapper
 			if (propertyMap == null)
 			{
 				propertyMap = new PropertyMap(destinationProperty);
+
+				propertyMap.ChainResolver(destinationProperty);
 				
                 AddPropertyMap(propertyMap);
 			}

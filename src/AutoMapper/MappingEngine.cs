@@ -92,7 +92,7 @@ namespace AutoMapper
 			{
 				if (context.SourceValue == null && ShouldMapSourceValueAsNull(context))
 				{
-					return null;
+					return CreateDefaultValue(context.DestinationType);
 				}
 
 				var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
@@ -142,6 +142,11 @@ namespace AutoMapper
 			return type.IsInterface
 			       	? _proxyFactory.CreateProxy(type, new PropertyBehaviorInterceptor())
 			       	: Activator.CreateInstance(type, true);
+		}
+
+		private object CreateDefaultValue(Type type)
+		{
+			return !type.IsValueType ? null : Activator.CreateInstance(type);
 		}
 
 		private bool ShouldMapSourceValueAsNull(ResolutionContext context)

@@ -3,19 +3,19 @@ using System.Reflection;
 
 namespace AutoMapper.Internal
 {
-	internal class MethodAccessor : MemberAccessor
+	internal class MethodGetter : MemberGetter
 	{
 		private readonly MethodInfo _methodInfo;
 		private readonly string _name;
 		private readonly Type _memberType;
 		private readonly LateBoundMethod _lateBoundMethod;
 
-		public MethodAccessor(MethodInfo methodInfo)
+		public MethodGetter(MethodInfo methodInfo)
 		{
 			_methodInfo = methodInfo;
 			_name = _methodInfo.Name;
 			_memberType = _methodInfo.ReturnType;
-			_lateBoundMethod = DelegateFactory.Create(methodInfo);
+			_lateBoundMethod = DelegateFactory.CreateGet(methodInfo);
 		}
 
 		public override string Name
@@ -35,15 +35,7 @@ namespace AutoMapper.Internal
 					: _lateBoundMethod(source, new object[0]);
 		}
 
-		public override void SetValue(object destination, object value)
-		{
-			if (_memberType == null)
-			{
-				_methodInfo.Invoke(destination, new[] {value});
-			}
-		}
-
-	    public bool Equals(MethodAccessor other)
+	    public bool Equals(MethodGetter other)
 	    {
 	        if (ReferenceEquals(null, other)) return false;
 	        if (ReferenceEquals(this, other)) return true;
@@ -54,8 +46,8 @@ namespace AutoMapper.Internal
 	    {
 	        if (ReferenceEquals(null, obj)) return false;
 	        if (ReferenceEquals(this, obj)) return true;
-	        if (obj.GetType() != typeof (MethodAccessor)) return false;
-	        return Equals((MethodAccessor) obj);
+	        if (obj.GetType() != typeof (MethodGetter)) return false;
+	        return Equals((MethodGetter) obj);
 	    }
 
 	    public override int GetHashCode()

@@ -45,14 +45,20 @@ namespace AutoMapper
             return null;
         }
         
-        public static IMemberAccessor GetAccessor(this Type targetType, string accessorName, BindingFlags bindingFlags)
+		public static IMemberGetter ToMemberGetter(this MemberInfo accessorCandidate)
 		{
-			MemberInfo[] members = targetType.GetMember(accessorName, bindingFlags);
-			return
-				members.FirstOrDefault(member => member is PropertyInfo || member is FieldInfo)
-				.ToMemberAccessor();
-		}
+			if (accessorCandidate == null)
+				return null;
 
+			if (accessorCandidate is PropertyInfo)
+				return new PropertyGetter((PropertyInfo)accessorCandidate);
+
+			if (accessorCandidate is FieldInfo)
+				return new FieldGetter((FieldInfo)accessorCandidate);
+
+			return null;
+		}
+        
 		public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
 		{
 			if (accessorCandidate == null)
