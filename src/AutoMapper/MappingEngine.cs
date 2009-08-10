@@ -26,18 +26,27 @@ namespace AutoMapper
 
 		public TDestination Map<TSource, TDestination>(TSource source)
 		{
-			Type modelType = typeof (TSource);
-			Type destinationType = typeof (TDestination);
+			Type modelType = typeof(TSource);
+			Type destinationType = typeof(TDestination);
 
-			return (TDestination) Map(source, modelType, destinationType);
+			return (TDestination)Map(source, modelType, destinationType);
+		}
+
+		public TDestination Map<TSource, TDestination>(ResolutionContext parentContext, TSource source)
+		{
+			Type destinationType = typeof(TDestination);
+			Type sourceType = typeof(TSource);
+			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
+			var context = parentContext.CreateTypeContext(typeMap, source, sourceType, destinationType);
+			return (TDestination)((IMappingEngineRunner)this).Map(context);
 		}
 
 		public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
 		{
-			Type modelType = typeof (TSource);
-			Type destinationType = typeof (TDestination);
+			Type modelType = typeof(TSource);
+			Type destinationType = typeof(TDestination);
 
-			return (TDestination) Map(source, destination, modelType, destinationType);
+			return (TDestination)Map(source, destination, modelType, destinationType);
 		}
 
 		public TDestination DynamicMap<TSource, TDestination>(TSource source)
@@ -47,7 +56,7 @@ namespace AutoMapper
 
 			return (TDestination)DynamicMap(source, modelType, destinationType);
 		}
-			
+
 		public TDestination DynamicMap<TDestination>(object source)
 		{
 			Type modelType = source == null ? typeof(object) : source.GetType();
@@ -74,7 +83,7 @@ namespace AutoMapper
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
 
-			return ((IMappingEngineRunner) this).Map(context);
+			return ((IMappingEngineRunner)this).Map(context);
 		}
 
 		public object Map(object source, object destination, Type sourceType, Type destinationType)
@@ -83,7 +92,7 @@ namespace AutoMapper
 
 			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType);
 
-			return ((IMappingEngineRunner) this).Map(context);
+			return ((IMappingEngineRunner)this).Map(context);
 		}
 
 		object IMappingEngineRunner.Map(ResolutionContext context)
@@ -99,20 +108,20 @@ namespace AutoMapper
 
 				IObjectMapper mapperToUse;
 
-                if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
-                {
-                    lock (_objectMapperCache)
-                    {
-                        if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
-                        {
-                            // Cache miss
-                            mapperToUse = _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
-                            _objectMapperCache.Add(contextTypePair, mapperToUse);
-                        }
-                    }
-                }
+				if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
+				{
+					lock (_objectMapperCache)
+					{
+						if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
+						{
+							// Cache miss
+							mapperToUse = _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
+							_objectMapperCache.Add(contextTypePair, mapperToUse);
+						}
+					}
+				}
 
-			    if (mapperToUse == null)
+				if (mapperToUse == null)
 				{
 					throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
 				}
@@ -130,7 +139,7 @@ namespace AutoMapper
 			TypeMap contextTypeMap = context.GetContextTypeMap();
 			IFormatterConfiguration configuration = contextTypeMap != null
 												? ConfigurationProvider.GetProfileConfiguration(contextTypeMap.Profile)
-			                                 	: ConfigurationProvider.GetProfileConfiguration(Configuration.DefaultProfileName);
+												: ConfigurationProvider.GetProfileConfiguration(Configuration.DefaultProfileName);
 
 			var valueFormatter = new ValueFormatter(configuration);
 
@@ -140,8 +149,8 @@ namespace AutoMapper
 		object IMappingEngineRunner.CreateObject(Type type)
 		{
 			return type.IsInterface
-			       	? _proxyFactory.CreateProxy(type, new PropertyBehaviorInterceptor())
-			       	: Activator.CreateInstance(type, true);
+					? _proxyFactory.CreateProxy(type, new PropertyBehaviorInterceptor())
+					: Activator.CreateInstance(type, true);
 		}
 
 		private object CreateDefaultValue(Type type)

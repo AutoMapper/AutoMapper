@@ -179,10 +179,20 @@ namespace AutoMapper
 			_typeMap.UseCustomMapper(source => mappingFunction((TSource)source.SourceValue));
 		}
 
+        public void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction)
+        {
+            _typeMap.UseCustomMapper(source => mappingFunction(source, (TSource)source.SourceValue));
+        }
+
 		public void ConvertUsing(ITypeConverter<TSource, TDestination> converter)
 		{
 			ConvertUsing(converter.Convert);
 		}
+
+        public void ConvertUsing(IWithContextTypeConverter<TSource, TDestination> converter)
+        {
+            ConvertUsing(converter.Convert);
+        }
 
 		public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
 		{

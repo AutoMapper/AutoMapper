@@ -74,7 +74,25 @@ namespace AutoMapper
 			_instanceCache = context._instanceCache;
 		}
 
-		private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, TypeMap memberTypeMap, PropertyMap propertyMap)
+        private ResolutionContext(ResolutionContext context, TypeMap memberTypeMap, object sourceValue, Type sourceType, Type destinationType)
+        {
+            _typeMap = memberTypeMap;
+            _sourceValue = sourceValue;
+            _parent = context;
+            if (memberTypeMap != null)
+            {
+                _destinationType = memberTypeMap.DestinationType;
+                _sourceType = memberTypeMap.SourceType;
+            }
+            else
+            {
+                _destinationType = destinationType;
+                _sourceType = sourceType;
+            }
+            _instanceCache = context._instanceCache;
+        }
+
+	    private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, TypeMap memberTypeMap, PropertyMap propertyMap)
 		{
 			_typeMap = memberTypeMap;
 			_propertyMap = propertyMap;
@@ -135,6 +153,11 @@ namespace AutoMapper
 		{
 			return new ResolutionContext(this, sourceValue, sourceType);
 		}
+
+        public ResolutionContext CreateTypeContext(TypeMap memberTypeMap, object sourceValue, Type sourceType, Type destinationType)
+        {
+            return new ResolutionContext(this, memberTypeMap, sourceValue, sourceType, destinationType);
+        }
 
 		public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, object destinationValue, Type sourceMemberType, PropertyMap propertyMap)
 		{

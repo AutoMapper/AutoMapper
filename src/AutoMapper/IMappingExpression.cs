@@ -20,8 +20,9 @@ namespace AutoMapper
 			where TOtherDestination : TDestination;
 		IMappingExpression<TSource, TDestination> WithProfile(string profileName);
 		void ConvertUsing(Func<TSource, TDestination> mappingFunction);
-		void ConvertUsing(ITypeConverter<TSource, TDestination> converter);
-		void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
+        void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction);
+        void ConvertUsing(ITypeConverter<TSource, TDestination> converter);
+        void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
 		IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
 		IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
 	}

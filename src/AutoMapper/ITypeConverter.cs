@@ -4,4 +4,9 @@ namespace AutoMapper
 	{
 		TDestination Convert(TSource source);
 	}
+
+    public interface IWithContextTypeConverter<TSource, TDestination>
+    {
+        TDestination Convert(ResolutionContext resolutionContext, TSource childId);
+    }
 }
