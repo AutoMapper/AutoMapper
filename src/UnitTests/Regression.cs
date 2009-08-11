@@ -104,5 +104,48 @@ namespace AutoMapper.UnitTests
     		}
     	}
 
+		public class When_mappings_are_created_on_the_fly : NonValidatingSpecBase
+		{
+			private Order _order;
+
+			private class Order
+			{
+				public string Name { get; set; }
+				public Product Product { get; set; }
+			}
+
+			private class Product
+			{
+				public string ProductName { get; set; }
+			}
+
+			[Test]
+			public void Should_not_use_AssignableMapper_when_mappings_are_specified_on_the_fly()
+			{
+				Mapper.CreateMap<Order, Order>();
+
+				var sourceOrder = new Order()
+				{
+					Name = "order",
+					Product = new Product() { ProductName = "product" }
+				};
+				var destinationOrder = new Order();
+				destinationOrder = Mapper.Map(sourceOrder, destinationOrder);
+
+				// Defining this mapping on the fly, but since the previous call to Mapper.Map()
+				// had to deal with mapping Product to Product, it created an AssignableMapper
+				// which will get used in place of this one.  I would expect that if I call
+				// Mapper.CreateMap(), that should replace any cached value in
+				// MappingEngine._objectMapperCache.
+				Mapper.CreateMap<Product, Product>();
+
+				var sourceProduct = new Product() { ProductName = "name" };
+				var destinationProduct = new Product();
+				destinationProduct = Mapper.Map(sourceProduct, destinationProduct);
+
+				sourceProduct.ProductName.ShouldEqual(destinationProduct.ProductName);
+				sourceProduct.ShouldNotEqual(destinationProduct);
+			}
+		}
 	}
 }

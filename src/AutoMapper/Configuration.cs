@@ -27,7 +27,9 @@ namespace AutoMapper
 		    _mappers = mappers;
 		}
 
-	    public bool AllowNullDestinationValues
+		public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
+
+		public bool AllowNullDestinationValues
 		{
 			get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
 			set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }
@@ -141,10 +143,13 @@ namespace AutoMapper
 
 				_typeMaps.Add(typeMap);
 				_typeMapCache[new TypePair(source, destination)] = typeMap;
+
+				OnTypeMapCreated(typeMap);
 			}
 
 			return typeMap;
 		}
+
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
@@ -356,6 +361,13 @@ namespace AutoMapper
 			Profile profile = selfProfiler.GetProfile();
 
 			AddProfile(profile);
+		}
+
+		protected void OnTypeMapCreated(TypeMap typeMap)
+		{
+			var typeMapCreated = TypeMapCreated;
+			if (typeMapCreated != null)
+				typeMapCreated(this, new TypeMapCreatedEventArgs(typeMap));
 		}
 
 		private static IEnumerable<Type> GetSelfProfilers(Assembly assembly)

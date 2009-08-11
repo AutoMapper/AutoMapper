@@ -17,6 +17,7 @@ namespace AutoMapper
 		{
 			_configurationProvider = configurationProvider;
 			_mappers = configurationProvider.GetMappers();
+			_configurationProvider.TypeMapCreated += ClearTypeMap;
 		}
 
 		public IConfigurationProvider ConfigurationProvider
@@ -165,6 +166,11 @@ namespace AutoMapper
 				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
 
 			return ConfigurationProvider.MapNullSourceValuesAsNull;
+		}
+
+		private void ClearTypeMap(object sender, TypeMapCreatedEventArgs e)
+		{
+			_objectMapperCache.Remove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType));
 		}
 	}
 }
