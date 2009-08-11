@@ -1250,6 +1250,33 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_source_member_names_match_with_underscores : AutoMapperSpecBase
+		{
+			private Destination _destination;
+
+			public class Source
+			{
+				public int I_amaCraAZZEE____Name { get; set; }
+			}
+
+			public class Destination
+			{
+				public int I_amaCraAZZEE____Name { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+				_destination = Mapper.Map<Source, Destination>(new Source {I_amaCraAZZEE____Name = 5});
+			}
+
+			[Test]
+			public void Should_match_based_on_name()
+			{
+				_destination.I_amaCraAZZEE____Name.ShouldEqual(5);
+			}
+		}
+
 	}
 
 	public static class MapFromExtensions

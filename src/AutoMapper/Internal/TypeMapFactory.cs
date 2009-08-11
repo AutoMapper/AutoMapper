@@ -58,34 +58,43 @@ namespace AutoMapper
             var sourceProperties = sourceType.GetPublicReadAccessors();
             var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
 
-            bool foundMatch = false;
+			IValueResolver resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch, mappingOptions);
 
-            string[] matches = mappingOptions.DestinationMemberNamingConvention.SplittingExpression
-                .Matches(nameToSearch)
-                .Cast<Match>()
-                .Select(m => m.Value)
-                .ToArray();
+			bool foundMatch = resolver != null;
 
-            for (int i = 1; (i <= matches.Length) && (!foundMatch); i++)
-            {
-                NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
+        	if (foundMatch)
+        	{
+        		resolvers.AddLast(resolver);
+        	}
+        	else
+        	{
+        		string[] matches = mappingOptions.DestinationMemberNamingConvention.SplittingExpression
+        			.Matches(nameToSearch)
+        			.Cast<Match>()
+        			.Select(m => m.Value)
+        			.ToArray();
 
-                IMemberGetter valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First, mappingOptions);
+        		for (int i = 1; (i <= matches.Length) && (!foundMatch); i++)
+        		{
+        			NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
 
-                if (valueResolver != null)
-                {
-                    resolvers.AddLast(valueResolver);
+        			IMemberGetter valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First, mappingOptions);
 
-                    foundMatch = MapDestinationPropertyToSource(resolvers, GetTypeInfo(valueResolver.MemberType), snippet.Second, mappingOptions);
+        			if (valueResolver != null)
+        			{
+        				resolvers.AddLast(valueResolver);
 
-                    if (!foundMatch)
-                    {
-                        resolvers.RemoveLast();
-                    }
-                }
-            }
+        				foundMatch = MapDestinationPropertyToSource(resolvers, GetTypeInfo(valueResolver.MemberType), snippet.Second, mappingOptions);
 
-            return foundMatch;
+        				if (!foundMatch)
+        				{
+        					resolvers.RemoveLast();
+        				}
+        			}
+        		}
+        	}
+
+        	return foundMatch;
         }
 
         private static IMemberGetter FindTypeMember(IEnumerable<IMemberGetter> modelProperties, IEnumerable<MethodInfo> getMethods, string nameToSearch, IMappingOptions mappingOptions)
