@@ -50,7 +50,6 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
 
 				Mapper.CreateMap<Source, Destination>();
-				Mapper.AssertConfigurationIsValid();
 
 				var source = new Source
 				{
@@ -78,6 +77,50 @@ namespace AutoMapper.UnitTests
 			public void Should_convert_type_using_Func_that_returns_instance()
 			{
 				_result.Value3.ShouldEqual(typeof(Destination));
+			}
+		}
+
+		public class When_specifying_type_converters_on_types_with_incompatible_members : AutoMapperSpecBase
+		{
+            private ParentDestination _result;
+
+			public class Source
+			{
+				public string Foo { get; set; }
+			}
+
+			public class Destination
+			{
+                public int Type { get; set; }
+			}
+
+            public class ParentSource
+            {
+                public Source Value { get; set; }
+            }
+
+            public class ParentDestination
+            {
+                public Destination Value { get; set; }
+            }
+
+			protected override void Establish_context()
+			{
+			    Mapper.CreateMap<Source, Destination>().ConvertUsing(arg => new Destination {Type = Convert.ToInt32(arg.Foo)});
+			    Mapper.CreateMap<ParentSource, ParentDestination>();
+
+                var source = new ParentSource
+				{
+					Value = new Source { Foo = "5",}
+				};
+
+                _result = Mapper.Map<ParentSource, ParentDestination>(source);
+			}
+
+			[Test]
+			public void Should_convert_type_using_expression()
+			{
+                _result.Value.Type.ShouldEqual(5);
 			}
 		}
 

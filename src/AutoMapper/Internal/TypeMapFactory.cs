@@ -19,13 +19,15 @@ namespace AutoMapper
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo);
 
-            foreach (IMemberAccessor destProperty in destTypeInfo.GetPublicWriteAccessors())
+            foreach (var destProperty in destTypeInfo.GetPublicWriteAccessors())
             {
-                var resolvers = new LinkedList<IValueResolver>();
+                var members = new LinkedList<MemberInfo>();
 
-                if (MapDestinationPropertyToSource(resolvers, sourceTypeInfo, destProperty.Name, options))
+                if (MapDestinationPropertyToSource(members, sourceTypeInfo, destProperty.Name, options))
                 {
-                    typeMap.AddPropertyMap(destProperty, resolvers);
+                    var resolvers = members.Select(mi => mi.ToMemberGetter()).Cast<IValueResolver>();
+                    var destPropertyAccessor = destProperty.ToMemberAccessor();
+                    typeMap.AddPropertyMap(destPropertyAccessor, resolvers);
                 }
             }
             return typeMap;
@@ -50,7 +52,7 @@ namespace AutoMapper
             return typeInfo;
         }
 
-        private bool MapDestinationPropertyToSource(LinkedList<IValueResolver> resolvers, TypeInfo sourceType, string nameToSearch, IMappingOptions mappingOptions)
+        private bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeInfo sourceType, string nameToSearch, IMappingOptions mappingOptions)
         {
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;
@@ -58,7 +60,7 @@ namespace AutoMapper
             var sourceProperties = sourceType.GetPublicReadAccessors();
             var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
 
-			IValueResolver resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch, mappingOptions);
+			MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch, mappingOptions);
 
 			bool foundMatch = resolver != null;
 
@@ -78,13 +80,13 @@ namespace AutoMapper
         		{
         			NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
 
-        			IMemberGetter valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First, mappingOptions);
+        			var valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First, mappingOptions);
 
         			if (valueResolver != null)
         			{
         				resolvers.AddLast(valueResolver);
 
-        				foundMatch = MapDestinationPropertyToSource(resolvers, GetTypeInfo(valueResolver.MemberType), snippet.Second, mappingOptions);
+        				foundMatch = MapDestinationPropertyToSource(resolvers, GetTypeInfo(valueResolver.GetMemberType()), snippet.Second, mappingOptions);
 
         				if (!foundMatch)
         				{
@@ -97,15 +99,15 @@ namespace AutoMapper
         	return foundMatch;
         }
 
-        private static IMemberGetter FindTypeMember(IEnumerable<IMemberGetter> modelProperties, IEnumerable<MethodInfo> getMethods, string nameToSearch, IMappingOptions mappingOptions)
+        private static MemberInfo FindTypeMember(IEnumerable<MemberInfo> modelProperties, IEnumerable<MethodInfo> getMethods, string nameToSearch, IMappingOptions mappingOptions)
         {
-            IMemberGetter pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch));
+            MemberInfo pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch));
             if (pi != null)
                 return pi;
 
             MethodInfo mi = getMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch));
             if (mi != null)
-                return new MethodGetter(mi);
+                return mi;
 
             pi = modelProperties.FirstOrDefault(prop => NameMatches(mappingOptions.SourceMemberNameTransformer(prop.Name), nameToSearch));
             if (pi != null)
@@ -113,7 +115,7 @@ namespace AutoMapper
 
             mi = getMethods.FirstOrDefault(m => NameMatches(mappingOptions.SourceMemberNameTransformer(m.Name), nameToSearch));
             if (mi != null)
-                return new MethodGetter(mi);
+                return mi;
 
             return null;
         }

@@ -44,6 +44,17 @@ namespace AutoMapper
 
             return null;
         }
+
+        public static Type GetMemberType(this MemberInfo memberInfo)
+        {
+            if (memberInfo is MethodInfo)
+                return ((MethodInfo) memberInfo).ReturnType;
+            if (memberInfo is PropertyInfo)
+                return ((PropertyInfo)memberInfo).PropertyType;
+            if (memberInfo is FieldInfo)
+                return ((FieldInfo)memberInfo).FieldType;
+            return null;
+        }
         
 		public static IMemberGetter ToMemberGetter(this MemberInfo accessorCandidate)
 		{
@@ -55,6 +66,9 @@ namespace AutoMapper
 
 			if (accessorCandidate is FieldInfo)
 				return new FieldGetter((FieldInfo)accessorCandidate);
+
+			if (accessorCandidate is MethodInfo)
+                return new MethodGetter((MethodInfo)accessorCandidate);
 
 			return null;
 		}

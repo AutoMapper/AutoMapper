@@ -57,7 +57,7 @@ namespace AutoMapper
 			_propertyMaps.Add(propertyMap);
 		}
 
-        public void AddPropertyMap(IMemberAccessor destProperty, LinkedList<IValueResolver> resolvers)
+        public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IValueResolver> resolvers)
         {
             var propertyMap = new PropertyMap(destProperty);
 
@@ -115,6 +115,7 @@ namespace AutoMapper
 		public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
 		{
 			CustomMapper = customMapper;
+            _propertyMaps.Clear();
 		}
 
         public void ActionBeforeMap(Action<object, object> beforeMap)

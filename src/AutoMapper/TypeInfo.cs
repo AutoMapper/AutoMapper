@@ -7,8 +7,8 @@ namespace AutoMapper
 {
     public class TypeInfo
     {
-        private readonly IMemberGetter[] _publicGetters;
-        private readonly IMemberAccessor[] _publicAccessors;
+        private readonly MemberInfo[] _publicGetters;
+        private readonly MemberInfo[] _publicAccessors;
         private readonly MethodInfo[] _publicGetMethods;
 
         public Type Type { get; private set; }
@@ -22,12 +22,12 @@ namespace AutoMapper
             _publicGetMethods = BuildPublicNoArgMethods();
         }
 
-        public IEnumerable<IMemberGetter> GetPublicReadAccessors()
+        public IEnumerable<MemberInfo> GetPublicReadAccessors()
         {
             return _publicGetters;
         }
 
-		public IEnumerable<IMemberAccessor> GetPublicWriteAccessors()
+		public IEnumerable<MemberInfo> GetPublicWriteAccessors()
         {
             return _publicAccessors;
         }
@@ -37,7 +37,7 @@ namespace AutoMapper
             return _publicGetMethods;
         }
 
-        private IMemberGetter[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
+        private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
         {
 			// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
             var filteredMembers = allMembers
@@ -47,12 +47,10 @@ namespace AutoMapper
                 .OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
                 .Concat(allMembers.Where(x => x is FieldInfo));  // add FieldInfo objects back
 
-            return filteredMembers
-                .Select(x => x.ToMemberGetter())
-                .ToArray();
+            return filteredMembers.ToArray();
         }
 
-		private IMemberAccessor[] BuildPublicAccessors(IEnumerable<MemberInfo> allMembers)
+        private MemberInfo[] BuildPublicAccessors(IEnumerable<MemberInfo> allMembers)
         {
         	// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
             var filteredMembers = allMembers
@@ -65,9 +63,7 @@ namespace AutoMapper
                 .OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
                 .Concat(allMembers.Where(x => x is FieldInfo));  // add FieldInfo objects back
 
-            return filteredMembers
-                .Select(x => x.ToMemberAccessor())
-                .ToArray();
+            return filteredMembers.ToArray();
         }
 
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
