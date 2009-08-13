@@ -22,7 +22,8 @@ namespace AutoMapper.Mappers
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
 			var sourceLength = enumerableValue.Count();
-			var destination = (TEnumerable) (context.DestinationValue ?? CreateDestinationObject(context.DestinationType, destElementType, sourceLength, mapper));
+			var destination = (context.DestinationValue ?? CreateDestinationObject(context.DestinationType, destElementType, sourceLength, mapper));
+			var enumerable = GetEnumerableFor(destination);
 
 			int i = 0;
 			foreach (object item in enumerableValue)
@@ -36,7 +37,7 @@ namespace AutoMapper.Mappers
 
 				object mappedValue = mapper.Map(newContext);
 
-				SetElementValue(destination, mappedValue, i);
+				SetElementValue(enumerable, mappedValue, i);
 
 				i++;
 			}
@@ -45,11 +46,16 @@ namespace AutoMapper.Mappers
 			return valueToAssign;
 		}
 
-		private TEnumerable CreateDestinationObject(Type destinationType, Type destinationElementType, int count, IMappingEngineRunner mapper)
+		protected virtual TEnumerable GetEnumerableFor(object destination)
+		{
+			return (TEnumerable) destination;
+		}
+
+		private object CreateDestinationObject(Type destinationType, Type destinationElementType, int count, IMappingEngineRunner mapper)
 		{
 			if (!destinationType.IsInterface && !destinationType.IsArray)
 			{
-				return (TEnumerable) mapper.CreateObject(destinationType);
+				return mapper.CreateObject(destinationType);
 			}
 			return CreateDestinationObjectBase(destinationElementType, count);
 		}

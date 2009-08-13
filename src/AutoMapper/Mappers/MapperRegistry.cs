@@ -15,6 +15,7 @@ namespace AutoMapper.Mappers
             new ArrayMapper(),
 			new EnumerableToDictionaryMapper(),
             new DictionaryMapper(),
+            new ListSourceMapper(),
             new EnumerableMapper(),
             new AssignableMapper(),
             new TypeConverterMapper(),

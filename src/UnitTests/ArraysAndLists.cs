@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using NUnit.Framework;
 using NBehave.Spec.NUnit;
+using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
@@ -374,5 +376,62 @@ namespace AutoMapper.UnitTests
                 _mappedStrings[0].ShouldBeNull();
             }
         }
+
+		public class When_destination_collection_is_only_a_list_source_and_not_IList : SpecBase
+		{
+			private Destination _destination;
+
+			private class CustomCollection : IListSource, IEnumerable<int>
+			{
+				private List<int> _customList = new List<int>();
+
+				public IList GetList()
+				{
+					return _customList;
+				}
+
+				public bool ContainsListCollection
+				{
+					get { return true; }
+				}
+
+				IEnumerator<int> IEnumerable<int>.GetEnumerator()
+				{
+					return _customList.GetEnumerator();
+				}
+
+				public IEnumerator GetEnumerator()
+				{
+					return _customList.GetEnumerator();
+				}
+			}
+
+			private class Source
+			{
+				public int[] Values { get; set; }
+			}
+
+			private class Destination
+			{
+				public CustomCollection Values { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+			}
+
+			protected override void Because_of()
+			{
+				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3}});
+			}
+
+			[Test]
+			public void Should_use_the_underlying_list_to_add_values()
+			{
+				_destination.Values.Count().ShouldEqual(3);
+			}
+		}
+
     }
 }
