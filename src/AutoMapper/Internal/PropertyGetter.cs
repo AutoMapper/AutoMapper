@@ -74,9 +74,35 @@ namespace AutoMapper.Internal
 			get { return _hasSetter; }
 		}
 
-		public void SetValue(object destination, object value)
+		public virtual void SetValue(object destination, object value)
 		{
 			_lateBoundPropertySet(destination, value);
+		}
+	}
+
+	internal class ValueTypePropertyAccessor : PropertyGetter, IMemberAccessor
+	{
+		private readonly MethodInfo _lateBoundPropertySet;
+		private readonly bool _hasSetter;
+
+		public ValueTypePropertyAccessor(PropertyInfo propertyInfo) : base(propertyInfo)
+		{
+			var method = propertyInfo.GetSetMethod(true);
+			_hasSetter = method != null;
+			if (_hasSetter)
+			{
+				_lateBoundPropertySet = method;
+			}
+		}
+
+		public bool HasSetter
+		{
+			get { return _hasSetter; }
+		}
+
+		public void SetValue(object destination, object value)
+		{
+			_lateBoundPropertySet.Invoke(destination, new[] {value});
 		}
 	}
 }

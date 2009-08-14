@@ -11,6 +11,8 @@ namespace AutoMapper
 	internal delegate object LateBoundFieldGet(object target);
 	internal delegate void LateBoundFieldSet(object target, object value);
 	internal delegate void LateBoundPropertySet(object target, object value);
+	internal delegate void LateBoundValueTypeFieldSet(ref object target, object value);
+	internal delegate void LateBoundValueTypePropertySet(ref object target, object value);
 
 
 	internal static class DelegateFactory
@@ -66,7 +68,7 @@ namespace AutoMapper
 			var sourceType = field.DeclaringType;
 			var method = new DynamicMethod("Set" + field.Name, null, new[] { typeof(object), typeof(object) }, true);
 			var gen = method.GetILGenerator();
-			
+
 			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
 			gen.Emit(OpCodes.Castclass, sourceType); // Cast to source type
 			gen.Emit(OpCodes.Ldarg_1); // Load value to stack
@@ -94,6 +96,29 @@ namespace AutoMapper
 			gen.Emit(OpCodes.Ret);
 
 			var result = (LateBoundPropertySet)method.CreateDelegate(typeof(LateBoundPropertySet));
+
+			return result;
+		}
+
+		public static LateBoundValueTypePropertySet CreateValueTypeSet(PropertyInfo property)
+		{
+			var sourceType = property.DeclaringType;
+			var setter = property.GetSetMethod(true);
+			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, true);
+			var gen = method.GetILGenerator();
+
+			method.InitLocals = true;
+			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
+			gen.Emit(OpCodes.Ldind_Ref);
+			gen.Emit(OpCodes.Unbox_Any, sourceType); // Unbox the source to its correct type
+			gen.Emit(OpCodes.Stloc_0); // Store the unboxed input on the stack
+			gen.Emit(OpCodes.Ldloca_S, 0);
+			gen.Emit(OpCodes.Ldarg_1); // Load value to stack
+			gen.Emit(OpCodes.Castclass, property.PropertyType); // Unbox the value to its proper value type
+			gen.Emit(OpCodes.Call, setter); // Call the setter method
+			gen.Emit(OpCodes.Ret);
+
+			var result = (LateBoundValueTypePropertySet)method.CreateDelegate(typeof(LateBoundValueTypePropertySet));
 
 			return result;
 		}

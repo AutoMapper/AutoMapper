@@ -16,37 +16,5 @@ namespace AutoMapper.Internal
 			       	: new ResolutionResult(GetValue(source.Value), MemberType);
 		}
 
-        public static IMemberGetter Create(MemberInfo memberInfo)
-        {
-            var fieldInfo = memberInfo as FieldInfo;
-            if (fieldInfo != null)
-                return new FieldGetter(fieldInfo);
-
-            var propertyInfo = memberInfo as PropertyInfo;
-            if (propertyInfo != null)
-                return new PropertyGetter(propertyInfo);
-
-            var methodInfo = memberInfo as MethodInfo;
-            if (methodInfo != null)
-                return new MethodGetter(methodInfo);
-
-            return null;
-        }
-	}
-
-	internal static class MemberAccessor
-	{
-		public static IMemberAccessor Create(MemberInfo memberInfo)
-		{
-			var fieldInfo = memberInfo as FieldInfo;
-			if (fieldInfo != null)
-				return new FieldAccessor(fieldInfo);
-
-			var propertyInfo = memberInfo as PropertyInfo;
-			if (propertyInfo != null)
-				return new PropertyAccessor(propertyInfo);
-
-			return null;
-		}
 	}
 }

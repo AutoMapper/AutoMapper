@@ -7,56 +7,56 @@ using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
-    namespace Regression
-    {
-        public class TestDomainItem : ITestDomainItem
-        {
-            public Guid ItemId { get; set; }
-        }
+	namespace Regression
+	{
+		public class TestDomainItem : ITestDomainItem
+		{
+			public Guid ItemId { get; set; }
+		}
 
-        public interface ITestDomainItem
-        {
-            Guid ItemId { get; }
-        }
+		public interface ITestDomainItem
+		{
+			Guid ItemId { get; }
+		}
 
-        public class TestDtoItem
-        {
-            public Guid Id { get; set; }
-        }
+		public class TestDtoItem
+		{
+			public Guid Id { get; set; }
+		}
 
-        [TestFixture]
-        public class automapper_fails_to_map_custom_mappings_when_mapping_collections_for_an_interface
-        {
-            [SetUp]
-            public void Setup()
-            {
-                Mapper.Reset();
-            }
+		[TestFixture]
+		public class automapper_fails_to_map_custom_mappings_when_mapping_collections_for_an_interface
+		{
+			[SetUp]
+			public void Setup()
+			{
+				Mapper.Reset();
+			}
 
-            [Test]
-            public void should_map_the_id_property()
-            {
-                var domainItems = new List<ITestDomainItem>
+			[Test]
+			public void should_map_the_id_property()
+			{
+				var domainItems = new List<ITestDomainItem>
                 {
                     new TestDomainItem {ItemId = Guid.NewGuid()},
                     new TestDomainItem {ItemId = Guid.NewGuid()}
                 };
-                Mapper.CreateMap<ITestDomainItem, TestDtoItem>()
-                    .ForMember(d => d.Id, s => s.MapFrom(x => x.ItemId));
+				Mapper.CreateMap<ITestDomainItem, TestDtoItem>()
+					.ForMember(d => d.Id, s => s.MapFrom(x => x.ItemId));
 
-                Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid();
 
-                var dtos = Mapper.Map<IEnumerable<ITestDomainItem>, TestDtoItem[]>(domainItems);
+				var dtos = Mapper.Map<IEnumerable<ITestDomainItem>, TestDtoItem[]>(domainItems);
 
-                Assert.AreEqual(domainItems[0].ItemId, dtos[0].Id);
-            }
-        }
-   
-    	public class Chris_bennages_nullable_datetime_issue : AutoMapperSpecBase
-    	{
+				Assert.AreEqual(domainItems[0].ItemId, dtos[0].Id);
+			}
+		}
+
+		public class Chris_bennages_nullable_datetime_issue : AutoMapperSpecBase
+		{
 			private Destination _result;
 
-    		class Source
+			class Source
 			{
 				public DateTime? SomeDate { get; set; }
 			}
@@ -89,22 +89,22 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_result = Mapper.Map<Source, Destination>(new Source { SomeDate = new DateTime(2005, 12, 1)});
+				_result = Mapper.Map<Source, Destination>(new Source { SomeDate = new DateTime(2005, 12, 1) });
 			}
 
-    		[Test]
-    		public void Should_map_a_date_with_a_value()
-    		{
-    			_result.SomeDate.Day.ShouldEqual(1);
-    		}
+			[Test]
+			public void Should_map_a_date_with_a_value()
+			{
+				_result.SomeDate.Day.ShouldEqual(1);
+			}
 
-    		[Test]
-    		public void Should_map_null_to_null()
-    		{
-    			var destination = Mapper.Map<Source, Destination>(new Source());
+			[Test]
+			public void Should_map_null_to_null()
+			{
+				var destination = Mapper.Map<Source, Destination>(new Source());
 				destination.SomeDate.ShouldBeNull();
-    		}
-    	}
+			}
+		}
 
 		public class When_mappings_are_created_on_the_fly : NonValidatingSpecBase
 		{
@@ -147,6 +147,66 @@ namespace AutoMapper.UnitTests
 
 				sourceProduct.ProductName.ShouldEqual(destinationProduct.ProductName);
 				sourceProduct.ShouldNotEqual(destinationProduct);
+			}
+		}
+
+		public class IssueFromSuresh : NonValidatingSpecBase
+		{
+			public class GetStartupDataResponse
+			{
+				public struct KeyValuePair<K, V>
+				{
+					public K Key { get; set; }
+					public V Value { get; set; }
+				}
+
+				public List<GetStartupDataResponse.KeyValuePair<string, string>> Collections { get; set; }
+			}
+
+			public partial class GetStartupDataResponse1
+			{
+				public KeyValuePairOfStringString[] Collections
+				{
+					get;
+					set;
+				}
+			}
+
+			public partial class KeyValuePairOfStringString
+			{
+				public string Key { get; set; }
+				public string Value { get; set; }
+			}
+
+			[Test]
+			public void Test()
+			{
+				//var values = new[] { new KeyValuePairOfStringString { Key = "Name", Value = "Suresh" } };
+
+				//GetStartupDataResponse1 res1 = new GetStartupDataResponse1 { Collections = values };
+				//var response = new GetStartupDataResponse
+				//{
+				//    Collections = new List<GetStartupDataResponse.KeyValuePair<string, string>>
+				//        {
+				//            new GetStartupDataResponse.KeyValuePair<string, string> {Key = "234", Value = "ASdfasdf"}
+				//        }
+				//};
+
+				var pair = new GetStartupDataResponse.KeyValuePair<string, string>();
+
+				SetPair(pair, "234", "asdfsdf");
+
+				//Mapper.CreateMap<GetStartupDataResponse1, GetStartupDataResponse>();
+				//Mapper.CreateMap<KeyValuePairOfStringString, GetStartupDataResponse.KeyValuePair<string, string>>();
+				//Mapper.AssertConfigurationIsValid();
+
+				//var result = Mapper.Map<GetStartupDataResponse1, GetStartupDataResponse>(res1);
+			}
+
+			private void SetPair<K, V>(GetStartupDataResponse.KeyValuePair<K, V> pair, K key, V value)
+			{
+				pair.Key = key;
+				pair.Value = value;
 			}
 		}
 	}

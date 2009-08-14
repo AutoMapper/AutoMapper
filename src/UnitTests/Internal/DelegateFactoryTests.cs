@@ -111,6 +111,14 @@ namespace AutoMapper.UnitTests
 			source.Value4.ShouldEqual("hello");
 		}
 
+		internal delegate void DoIt3(ref ValueSource source, string value);
+
+		private void SetValue(object thing, object value)
+		{
+			var source = ((ValueSource) thing);
+			source.Value = (string)value;
+		}
+
 		[Test, Explicit]
 		public void WhatIWantToDo()
 		{
@@ -152,6 +160,7 @@ namespace AutoMapper.UnitTests
 			span = DateTime.Now - start;
 			Console.WriteLine("MethodInfo:" + span.Ticks);
 
+
 			start = DateTime.Now;
 			for (int i = 0; i < 1000000; i++)
 			{
@@ -162,15 +171,110 @@ namespace AutoMapper.UnitTests
 
 		}
 
+		[Test, Explicit]
+		public void Test_with_DynamicMethod2()
+		{
+			var sourceType = typeof(DelegateFactoryTests);
+			MethodInfo property = sourceType.GetMethod("SetValue2", BindingFlags.Static | BindingFlags.NonPublic);
+
+			var d = (LateBoundValueTypePropertySet)Delegate.CreateDelegate(typeof(LateBoundValueTypePropertySet), property);
+
+			object othersource = new ValueSource();
+			DoIt4(othersource, "Asdf");
+
+			var source = new ValueSource();
+
+			var value = (object) source;
+
+			d(ref value, "hello");
+
+			source.Value.ShouldEqual("hello");
+		}
+
+		[Test, Explicit]
+		public void Test_with_CreateDelegate()
+		{
+			var sourceType = typeof(ValueSource);
+			PropertyInfo property = sourceType.GetProperty("Value");
+
+			LateBoundValueTypePropertySet callback = DelegateFactory.CreateValueTypeSet(property);
+
+			var source = new ValueSource();
+
+			var target = ((object)source);
+
+			callback(ref target, "hello");
+
+			source.Value.ShouldEqual("hello");
+		}
+
+		[Test, Explicit]
+		public void Test_with_DynamicMethod()
+		{
+			var sourceType = typeof(ValueSource);
+			PropertyInfo property = sourceType.GetProperty("Value");
+
+			var setter = property.GetSetMethod(true);
+			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, false);
+			var gen = method.GetILGenerator();
+
+			method.InitLocals = true;
+			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
+			gen.Emit(OpCodes.Ldind_Ref);
+			gen.Emit(OpCodes.Unbox_Any, sourceType); // Unbox the source to its correct type
+			gen.Emit(OpCodes.Stloc_0); // Store the unboxed input on the stack
+			gen.Emit(OpCodes.Ldloca_S, 0);
+			gen.Emit(OpCodes.Ldarg_1); // Load value to stack
+			gen.Emit(OpCodes.Castclass, property.PropertyType); // Unbox the value to its proper value type
+			gen.Emit(OpCodes.Call, setter); // Call the setter method
+			gen.Emit(OpCodes.Ret);
+
+			var result = (LateBoundValueTypePropertySet)method.CreateDelegate(typeof(LateBoundValueTypePropertySet));
+
+			var source = new ValueSource();
+
+			var value = (object) source;
+
+			result(ref value, "hello");
+
+			source.Value.ShouldEqual("hello");
+		}
+
+		public delegate void SetValueDelegate(ref ValueSource source, string value);
+
+		private static void SetValue2(ref object thing, object value)
+		{
+			var source = ((ValueSource)thing);
+			source.Value = (string)value;
+			thing = source;
+		}
+
+		private void SetValue(ref ValueSource thing, string value)
+		{
+			thing.Value = value;
+		}
+
 		private void DoIt(object source, object value)
 		{
 			((Source)source).Value2 = (int)value;
+		}
+
+		private void DoIt4(object source, object value)
+		{
+			var valueSource = ((ValueSource)source);
+			valueSource.Value = (string)value;
 		}
 
 		private void DoIt2(object source, object value)
 		{
 			int toSet = value == null ? default(int) : (int) value;
 			((Source)source).Value = toSet;
+		}
+
+		private void DoIt4(ref object source, object value)
+		{
+			var valueSource = (ValueSource) source;
+			valueSource.Value = (string) value;
 		}
 
 		private static class Test<T>
@@ -181,6 +285,10 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public struct ValueSource
+		{
+			public string Value { get; set; }
+		}
 
 		public interface ISource
 		{

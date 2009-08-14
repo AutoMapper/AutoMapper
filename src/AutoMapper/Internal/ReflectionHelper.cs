@@ -75,14 +75,13 @@ namespace AutoMapper
         
 		public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
 		{
-			if (accessorCandidate == null)
-				return null;
+			var fieldInfo = accessorCandidate as FieldInfo;
+			if (fieldInfo != null)
+				return accessorCandidate.DeclaringType.IsValueType ? (IMemberAccessor)new ValueTypeFieldAccessor(fieldInfo) : new FieldAccessor(fieldInfo);
 
-			if (accessorCandidate is PropertyInfo)
-				return new PropertyAccessor((PropertyInfo)accessorCandidate);
-
-			if (accessorCandidate is FieldInfo)
-				return new FieldAccessor((FieldInfo)accessorCandidate);
+			var propertyInfo = accessorCandidate as PropertyInfo;
+			if (propertyInfo != null)
+				return accessorCandidate.DeclaringType.IsValueType ? (IMemberAccessor)new ValueTypePropertyAccessor(propertyInfo) : new PropertyAccessor(propertyInfo);
 
 			return null;
 		}

@@ -56,7 +56,7 @@ namespace AutoMapper
 																   Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 		    var memberInfo = ReflectionHelper.FindProperty(destinationMember);
-		    IMemberAccessor destProperty = MemberAccessor.Create(memberInfo);
+		    IMemberAccessor destProperty = memberInfo.ToMemberAccessor();
 			ForDestinationMember(destProperty, memberOptions);
 			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
 		}

@@ -102,6 +102,7 @@
     <Compile Include="Tests\TypeInfoSpecs.cs" />
     <Compile Include="Tests\TypeMapFactorySpecs.cs" />
     <Compile Include="TypeConverters.cs" />
+    <Compile Include="ValueTypes.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
