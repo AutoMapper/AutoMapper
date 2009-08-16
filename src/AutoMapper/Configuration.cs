@@ -133,6 +133,11 @@ namespace AutoMapper
 			GetProfile(DefaultProfileName).RecognizePostfixes(postfixes);
 		}
 
+		public void RecognizeAlias(string original, string alias)
+		{
+			GetProfile(DefaultProfileName).RecognizeAlias(original, alias);
+		}
+
 		public TypeMap CreateTypeMap(Type source, Type destination)
 		{
 			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination);

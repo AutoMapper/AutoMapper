@@ -90,6 +90,11 @@ namespace AutoMapper
 			return map.WithProfile(ProfileName);
 		}
 
+		public void RecognizeAlias(string original, string alias)
+		{
+			GetProfile().RecognizeAlias(original, alias);
+		}
+
 		public void RecognizePrefixes(params string[] prefixes)
 		{
 			GetProfile().RecognizePrefixes(prefixes);

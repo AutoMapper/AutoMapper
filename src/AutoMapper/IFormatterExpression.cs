@@ -31,6 +31,7 @@ namespace AutoMapper
 		IMappingExpression CreateMap(Type sourceType, Type destinationType);
 		void RecognizePrefixes(params string[] prefixes);
 		void RecognizePostfixes(params string[] postfixes);
+		void RecognizeAlias(string original, string alias);
 	}
 
 	public interface IConfiguration : IProfileExpression

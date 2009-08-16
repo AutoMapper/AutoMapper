@@ -13,6 +13,7 @@ namespace AutoMapper
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
 		private static readonly Func<string, string, string> PrefixFunc = (src, prefix) => Regex.Replace(src, string.Format("(?:^{0})?(.*)", prefix), "$1");
 		private static readonly Func<string, string, string> PostfixFunc = (src, prefix) => Regex.Replace(src, string.Format("(.*)(?:{0})$", prefix), "$1");
+		private static readonly Func<string, string, string, string> AliasFunc = (src, original, alias) => Regex.Replace(src, string.Format("^({0})$", original), alias);
 
 		public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
 		{
@@ -110,6 +111,12 @@ namespace AutoMapper
 			SourceMemberNameTransformer = val => postfixes.Aggregate(orig(val), PostfixFunc);
 		}
 
+		public void RecognizeAlias(string original, string alias)
+		{
+			var orig = SourceMemberNameTransformer;
+
+			SourceMemberNameTransformer = val => AliasFunc(orig(val), original, alias);
+		}
 	}
 
 	internal interface IFormatterCtorConfigurator

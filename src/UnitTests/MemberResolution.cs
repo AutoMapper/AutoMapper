@@ -1277,6 +1277,41 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_recognizing_explicit_member_aliases : AutoMapperSpecBase
+		{
+			private Destination _destination;
+
+			public class Source
+			{
+				public int Foo { get; set; }
+			}
+
+			public class Destination
+			{
+				public int Bar { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(cfg =>
+				{
+					cfg.RecognizeAlias("Foo", "Bar");
+					cfg.CreateMap<Source, Destination>();
+				});
+			}
+
+			protected override void Because_of()
+			{
+				_destination = Mapper.Map<Source, Destination>(new Source {Foo = 5});
+			}
+
+			[Test]
+			public void Members_that_match_alias_should_be_matched()
+			{
+				_destination.Bar.ShouldEqual(5);
+			}
+		}
+
 	}
 
 	public static class MapFromExtensions
