@@ -19,6 +19,7 @@ namespace AutoMapper
 		IFormatterConfiguration GetProfileConfiguration(string profileName);
 		void AssertConfigurationIsValid();
 		void AssertConfigurationIsValid(TypeMap typeMap);
+		void AssertConfigurationIsValid(string profileName);
 		IObjectMapper[] GetMappers();
 		TypeMap CreateTypeMap(Type sourceType, Type destinationType);
 

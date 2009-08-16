@@ -248,6 +248,77 @@ namespace AutoMapper.UnitTests
 				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
 			}
 		}
+
+		public class When_testing_a_dto_with_readonly_members : NonValidatingSpecBase
+		{
+			public class Source
+			{
+				public int Value { get; set; }
+			}
+
+			public class Destination
+			{
+				public int Value { get; set; }
+				public int ValuePlusOne { get { return Value + 1; } }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+			}
+
+			protected override void Because_of()
+			{
+				Mapper.Map<Source, Destination>(new Source {Value = 5});
+			}
+
+			[Test]
+			public void Should_be_valid()
+			{
+				typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
+		}
+
+		public class When_testing_a_dto_in_a_specfic_profile : NonValidatingSpecBase
+		{
+			public class GoodSource
+			{
+				public int Value { get; set; }
+			}
+
+			public class GoodDest
+			{
+				public int Value { get; set; }
+			}
+
+			public class BadDest
+			{
+				public int Valufffff { get; set; }
+			}
+
+			protected override void Because_of()
+			{
+				Mapper.Initialize(cfg =>
+				{
+					cfg.CreateProfile("Good", profile =>
+					{
+						profile.CreateMap<GoodSource, GoodDest>();
+					});
+					cfg.CreateProfile("Bad", profile =>
+					{
+						profile.CreateMap<GoodSource, BadDest>();
+					});
+				});
+			}
+
+			[Test]
+			public void Should_ignore_bad_dtos_in_other_profiles()
+			{
+				typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid("Good"));
+			}
+		}
+
+
 	}
 
 }

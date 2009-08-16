@@ -138,6 +138,11 @@ namespace AutoMapper
 			ConfigurationProvider.AssertConfigurationIsValid();
 		}
 
+		public static void AssertConfigurationIsValid(string profileName)
+		{
+			ConfigurationProvider.AssertConfigurationIsValid(profileName);
+		}
+
 		public static void Reset()
 		{
 			lock (_configurationSync)

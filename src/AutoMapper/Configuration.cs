@@ -229,22 +229,32 @@ namespace AutoMapper
 
 		public void AssertConfigurationIsValid(TypeMap typeMap)
 		{
-			if (typeMap.GetUnmappedPropertyNames().Length > 0)
-			{
-				throw new AutoMapperConfigurationException(typeMap, typeMap.GetUnmappedPropertyNames());
-			}
-		    var typeMaps = new List<TypeMap> {typeMap};
-			DryRunTypeMap(typeMaps, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType));
+			AssertConfigurationIsValid(Enumerable.Repeat(typeMap, 1));
+		}
+
+		public void AssertConfigurationIsValid(string profileName)
+		{
+			AssertConfigurationIsValid(_typeMaps.Where(typeMap => typeMap.Profile == profileName));
 		}
 
 		public void AssertConfigurationIsValid()
 		{
+			AssertConfigurationIsValid(_typeMaps);
+		}
+
+	    public IObjectMapper[] GetMappers()
+	    {
+	        return _mappers.ToArray();
+	    }
+
+		private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
+		{
 			var badTypeMaps =
-				from typeMap in _typeMaps
+				from typeMap in typeMaps
 				where typeMap.CustomMapper == null && !typeof(IDataRecord).IsAssignableFrom(typeMap.SourceType)
 				let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
 				where unmappedPropertyNames.Length > 0
-				select new {typeMap, unmappedPropertyNames};
+				select new { typeMap, unmappedPropertyNames };
 
 			var firstBadTypeMap = badTypeMaps.FirstOrDefault();
 
@@ -253,7 +263,7 @@ namespace AutoMapper
 				throw new AutoMapperConfigurationException(firstBadTypeMap.typeMap, firstBadTypeMap.unmappedPropertyNames);
 			}
 
-		    var typeMapsChecked = new List<TypeMap>();
+			var typeMapsChecked = new List<TypeMap>();
 
 			foreach (var typeMap in _typeMaps)
 			{
@@ -261,10 +271,7 @@ namespace AutoMapper
 			}
 		}
 
-	    public IObjectMapper[] GetMappers()
-	    {
-	        return _mappers.ToArray();
-	    }
+
 
         private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType)
         {
