@@ -156,7 +156,7 @@ namespace AutoMapper.Mappers
 
 			protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
 			{
-				return mapper.CreateObject(context.DestinationType);
+				return mapper.CreateObject(context);
 			}
 		}
 
@@ -171,7 +171,7 @@ namespace AutoMapper.Mappers
 
 			protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
 			{
-				return mapper.CreateObject(context.DestinationType);
+				return mapper.CreateObject(context);
 			}
 
 			protected override void AssignValue(PropertyMap propertyMap, object mappedObject, object propertyValueToAssign)

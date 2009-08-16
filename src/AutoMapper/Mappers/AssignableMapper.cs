@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
 		{
 			if (context.SourceValue == null)
 			{
-				return context.DestinationValue ?? mapper.CreateObject(context.DestinationType);
+				return mapper.CreateObject(context);
 			}
 
 			return context.SourceValue;

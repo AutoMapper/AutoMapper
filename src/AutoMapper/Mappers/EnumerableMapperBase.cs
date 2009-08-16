@@ -22,7 +22,7 @@ namespace AutoMapper.Mappers
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
 			var sourceLength = enumerableValue.Count();
-			var destination = (context.DestinationValue ?? CreateDestinationObject(context.DestinationType, destElementType, sourceLength, mapper));
+			var destination = (context.DestinationValue ?? CreateDestinationObject(context, destElementType, sourceLength, mapper));
 			var enumerable = GetEnumerableFor(destination);
 
 			int i = 0;
@@ -51,11 +51,13 @@ namespace AutoMapper.Mappers
 			return (TEnumerable) destination;
 		}
 
-		private object CreateDestinationObject(Type destinationType, Type destinationElementType, int count, IMappingEngineRunner mapper)
+		private object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count, IMappingEngineRunner mapper)
 		{
+			var destinationType = context.DestinationType;
+
 			if (!destinationType.IsInterface && !destinationType.IsArray)
 			{
-				return mapper.CreateObject(destinationType);
+				return mapper.CreateObject(context);
 			}
 			return CreateDestinationObjectBase(destinationElementType, count);
 		}

@@ -25,6 +25,7 @@ namespace AutoMapper
         void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
 		IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
 		IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
+		IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor);
 	}
 
 	public interface IMemberConfigurationExpression<TSource>

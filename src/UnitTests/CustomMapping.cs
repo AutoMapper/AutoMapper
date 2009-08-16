@@ -765,7 +765,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_destination_property_does_not_have_a_setter : NonValidatingSpecBase
+        public class When_destination_property_does_not_have_a_setter : AutoMapperSpecBase
         {
             private Source _source;
             private Destination _dest;
@@ -830,5 +830,51 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual("bar");
             }
         }
+	
+		public class When_destination_type_requires_a_constructor : AutoMapperSpecBase
+		{
+			private Destination _destination;
+
+			public class Source
+			{
+				public int Value { get; set; }
+			}
+
+			public class Destination
+			{
+				public Destination(int otherValue)
+				{
+					OtherValue = otherValue;
+				}
+
+				public int Value { get; set; }
+				public int OtherValue { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>()
+					.ConstructUsing(src => new Destination(src.Value + 4))
+					.ForMember(dest => dest.OtherValue, opt => opt.Ignore());
+			}
+
+			protected override void Because_of()
+			{
+				_destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
+			}
+
+			[Test]
+			public void Should_use_supplied_constructor_to_map()
+			{
+				_destination.OtherValue.ShouldEqual(9);
+			}
+
+			[Test]
+			public void Should_map_other_members()
+			{
+				_destination.Value.ShouldEqual(5);
+			}
+		}
+
 	}
 }

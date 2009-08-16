@@ -215,6 +215,13 @@ namespace AutoMapper
 			return this;
 		}
 
+		public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)
+		{
+			_typeMap.DestinationCtor = src => ctor((TSource) src);
+
+			return this;
+		}
+
 		private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
 		{
 			_propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);

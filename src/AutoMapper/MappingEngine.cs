@@ -147,11 +147,22 @@ namespace AutoMapper
 			return valueFormatter.FormatValue(context);
 		}
 
-		object IMappingEngineRunner.CreateObject(Type type)
+		object IMappingEngineRunner.CreateObject(ResolutionContext context)
 		{
-			return type.IsInterface
-					? _proxyFactory.CreateProxy(type, new PropertyBehaviorInterceptor())
-					: Activator.CreateInstance(type, true);
+			var typeMap = context.TypeMap;
+
+			if (typeMap != null && typeMap.DestinationCtor != null)
+				return typeMap.DestinationCtor(context.SourceValue);
+
+			if (context.DestinationValue != null)
+				return context.DestinationValue;
+
+			var destinationType = context.DestinationType;
+
+			if (destinationType.IsInterface)
+				return _proxyFactory.CreateProxy(destinationType, new PropertyBehaviorInterceptor());
+
+			return Activator.CreateInstance(destinationType, true);
 		}
 
 		private object CreateDefaultValue(Type type)

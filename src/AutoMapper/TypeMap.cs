@@ -47,6 +47,8 @@ namespace AutoMapper
             }
         }
 
+		public Func<object, object> DestinationCtor { get; set; }
+
 		public IEnumerable<PropertyMap> GetPropertyMaps()
 		{
 			return _propertyMaps.OrderBy(map => map.GetMappingOrder());
