@@ -235,5 +235,44 @@ namespace AutoMapper.UnitTests
 				_dest.Name.ShouldEqual("jon");
 			}
 		}
+
+	    public class When_mapping_using_a_custom_member_mapping_and_source_is_null : AutoMapperSpecBase
+	    {
+	        private Dest _dest;
+
+	        public class Source
+            {
+                public SubSource Sub { get; set; }
+            }
+
+            public class SubSource
+            {
+                public int Value { get; set; }
+            }
+
+            public class Dest
+            {
+                public int OtherValue { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.AllowNullDestinationValues = false;
+                Mapper.CreateMap<Source, Dest>()
+                    .ForMember(dest => dest.OtherValue, opt => opt.MapFrom(src => src.Sub.Value));
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Dest>(new Source());
+            }
+
+	        [Test]
+	        public void Should_map_to_null_on_destination_values()
+	        {
+	            _dest.OtherValue.ShouldEqual(0);
+	        }
+	    }
+
 	}
 }

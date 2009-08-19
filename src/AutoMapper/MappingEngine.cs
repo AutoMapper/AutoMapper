@@ -124,7 +124,10 @@ namespace AutoMapper
 
 				if (mapperToUse == null)
 				{
-					throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
+                    if (context.SourceValue != null)
+					    throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
+
+				    return CreateDefaultValue(context.DestinationType);
 				}
 
 				return mapperToUse.Map(context, this);
