@@ -17,9 +17,9 @@ namespace AutoMapper
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
 		private readonly IDictionary<TypePair, TypeMap> _typeMapCache = new Dictionary<TypePair, TypeMap>();
 		private readonly IDictionary<string, FormatterExpression> _formatterProfiles = new Dictionary<string, FormatterExpression>();
-		private Func<Type, IValueFormatter> _formatterCtor = type => (IValueFormatter)Activator.CreateInstance(type, true);
-		private Func<Type, IValueResolver> _resolverCtor = type => (IValueResolver)Activator.CreateInstance(type, true);
-		private Func<Type, object> _typeConverterCtor = type => Activator.CreateInstance(type, true);
+		private Func<Type, IValueFormatter> _formatterCtor = type => (IValueFormatter)ObjectCreator.CreateObject(type);
+		private Func<Type, IValueResolver> _resolverCtor = type => (IValueResolver)ObjectCreator.CreateObject(type);
+		private Func<Type, object> _typeConverterCtor = type => ObjectCreator.CreateObject(type);
 
 		public Configuration(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
 		{
@@ -369,7 +369,7 @@ namespace AutoMapper
 
 	    private void SelfProfile(Type type)
 		{
-			var selfProfiler = (ISelfProfiler) Activator.CreateInstance(type, true);
+			var selfProfiler = (ISelfProfiler) ObjectCreator.CreateObject(type);
 			Profile profile = selfProfiler.GetProfile();
 
 			AddProfile(profile);

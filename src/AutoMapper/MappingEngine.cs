@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Internal;
+using AutoMapper.Mappers;
 using LinFu.DynamicProxy;
 
 namespace AutoMapper
@@ -102,7 +103,7 @@ namespace AutoMapper
 			{
 				if (context.SourceValue == null && ShouldMapSourceValueAsNull(context))
 				{
-					return CreateDefaultValue(context.DestinationType);
+					return ObjectCreator.CreateDefaultValue(context.DestinationType);
 				}
 
 				var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
@@ -127,7 +128,7 @@ namespace AutoMapper
                     if (context.SourceValue != null)
 					    throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
 
-				    return CreateDefaultValue(context.DestinationType);
+				    return ObjectCreator.CreateDefaultValue(context.DestinationType);
 				}
 
 				return mapperToUse.Map(context, this);
@@ -165,12 +166,7 @@ namespace AutoMapper
 			if (destinationType.IsInterface)
 				return _proxyFactory.CreateProxy(destinationType, new PropertyBehaviorInterceptor());
 
-			return Activator.CreateInstance(destinationType, true);
-		}
-
-		private object CreateDefaultValue(Type type)
-		{
-			return !type.IsValueType ? null : Activator.CreateInstance(type);
+			return ObjectCreator.CreateObject(destinationType);
 		}
 
 		private bool ShouldMapSourceValueAsNull(ResolutionContext context)

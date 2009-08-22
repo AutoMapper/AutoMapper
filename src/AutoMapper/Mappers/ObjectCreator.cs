@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
 		public static IList CreateList(Type elementType)
 		{
 			Type destListType = typeof(List<>).MakeGenericType(elementType);
-			return (IList) Activator.CreateInstance(destListType, true);
+			return (IList) CreateObject(destListType);
 		}
 
 		public static object CreateDictionary(Type dictionaryType, Type keyType, Type valueType)
@@ -23,6 +23,16 @@ namespace AutoMapper.Mappers
 			           	? typeof(Dictionary<,>).MakeGenericType(keyType, valueType)
 			           	: dictionaryType;
 
+			return CreateObject(type);
+		}
+
+		public static object CreateDefaultValue(Type type)
+		{
+			return !type.IsValueType ? null : CreateObject(type);
+		}
+
+		public static object CreateObject(Type type)
+		{
 			return Activator.CreateInstance(type, true);
 		}
 	}
