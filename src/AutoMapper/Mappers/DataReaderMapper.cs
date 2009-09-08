@@ -12,15 +12,23 @@ namespace AutoMapper.Mappers
 			if (IsDataReader(context))
 			{
 				var dataReader = (IDataReader)context.SourceValue;
-
-				var destinationElementType = TypeHelper.GetElementType(context.DestinationType);
+                var destinationElementType = TypeHelper.GetElementType(context.DestinationType);
+			    var resolveUsingContext = context;
+                if (context.TypeMap == null)
+                {
+                    var configurationProvider = ((MappingEngine)(Mapper.Engine)).ConfigurationProvider;
+                    TypeMap typeMap = configurationProvider.FindTypeMapFor(context.SourceValue, context.SourceType, destinationElementType);
+                    resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType);
+                }
 				var buildFrom = CreateBuilder(destinationElementType, dataReader);
 
 				var results = ObjectCreator.CreateList(destinationElementType);
 				while (dataReader.Read())
 				{
-					results.Add(buildFrom(dataReader));
-				}
+                    var result = buildFrom(dataReader);
+                    MapPropertyValues(resolveUsingContext, mapper, result);
+                    results.Add(result);
+                }
 
 				return results;
 			}
@@ -31,7 +39,7 @@ namespace AutoMapper.Mappers
 				var buildFrom = CreateBuilder(context.DestinationType, dataRecord);
 
 				var result = buildFrom(dataRecord);
-				MapPropertyValues(context, mapper, result);
+                MapPropertyValues(context, mapper, result);
 
 				return result;
 			}

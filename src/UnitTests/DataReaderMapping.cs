@@ -13,7 +13,8 @@ namespace AutoMapper.UnitTests
         {
             protected override void Establish_context()
             {
-                Mapper.CreateMap<IDataReader, IEnumerable<DTOObject>>();
+                Mapper.CreateMap<IDataReader, DTOObject>()
+                    .ForMember(dest => dest.Else, options => options.MapFrom(src => src.GetDateTime(10)));
 
                 _dataReader = new DataBuilder().BuildDataReader();
                 _result = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader).FirstOrDefault();
@@ -78,6 +79,13 @@ namespace AutoMapper.UnitTests
             {
                 Assert.That(_result.Boolean, Is.EqualTo(_dataReader[FieldName.Boolean]));   
             }
+
+            [Test]
+            public void Then_a_projected_column_should_be_read()
+            {
+                Assert.That(_result.Else, Is.EqualTo(_dataReader.GetDateTime(10)));
+            }
+
 
             private DTOObject _result;
             private IDataReader _dataReader;
