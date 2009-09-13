@@ -1314,6 +1314,52 @@ namespace AutoMapper.UnitTests
 
 	}
 
+	public class When_destination_type_has_private_members : AutoMapperSpecBase
+	{
+		private IDestination _destination;
+
+		public class Source
+		{
+			public int Value { get; set; }
+		}
+
+		public interface IDestination
+		{
+			int Value { get; }
+		}
+
+		public class Destination : IDestination
+		{
+			public Destination(int value)
+			{
+				Value = value;
+			}
+
+			private Destination()
+			{
+			}
+
+			public int Value { get; private set; }
+		}
+
+		protected override void Establish_context()
+		{
+			Mapper.CreateMap<Source, Destination>();
+		}
+
+		protected override void Because_of()
+		{
+			_destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
+		}
+
+		[Test]
+		public void Should_use_private_accessors_and_constructors()
+		{
+			_destination.Value.ShouldEqual(5);
+		}
+	}
+
+
 	public static class MapFromExtensions
 	{
 		public static int Plus(this int left, int right)

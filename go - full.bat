@@ -1,2 +1,2 @@
-@tools\nant\NAnt.exe -buildfile:AutoMapper.build full %*
+@tools\nant\NAnt.exe -buildfile:AutoMapper.build -D:config=Release full %*
 pause

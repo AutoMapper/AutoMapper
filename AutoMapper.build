@@ -9,8 +9,9 @@
 	<property name="svn.executable" value="tools/subversion/svn.exe" dynamic="true" if="${not property::exists('svn.executable')}" />
 
 	<property name="revisionnumber" value="9999" dynamic="true"/>
-	<property name="project.fullversion" value="0.3.1.${revisionnumber}" dynamic="true"/>
+	<property name="project.fullversion" value="0.4.0.${revisionnumber}" dynamic="true"/>
 	<property name="svnargs" value=" --non-interactive " />
+	<property name="config" value="Debug" />
 
 	<target name="test" depends="compile, run-unit-tests"
 		description="Compile and Run Tests" />
@@ -24,7 +25,7 @@
 
 	<target name="compile" description="Compiles using the AutomatedDebug Configuration">
 		<exec program="${framework::get-framework-directory(framework::get-target-framework())}\msbuild.exe"
-				  commandline="src\AutoMapper.sln /t:Clean /t:Build /p:Configuration=AutomatedDebug /v:q /nologo" workingdir="." />
+				  commandline="src\AutoMapper.sln /t:Clean /t:Build /p:Configuration=Automated${config} /v:q /nologo" workingdir="." />
 	</target>
 
 	<target name="commonassemblyinfo">
@@ -62,7 +63,7 @@
 		<!--<msbuild project="src\ILMerge.MSBuild"/>-->
 		<mkdir dir="${build.dir}\merge" />
 		<exec program="${tools.dir}\ILMerge\ilmerge.exe"
-				  commandline="/v2 /log /out:&quot;${build.dir}\merge\AutoMapper.dll&quot; /internalize:AutoMapper.exclude &quot;${build.dir}\Debug\AutoMapper\AutoMapper.dll&quot; &quot;${build.dir}\Debug\AutoMapper\LinFu.DynamicProxy.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />
+				  commandline="/v2 /log /out:&quot;${build.dir}\merge\AutoMapper.dll&quot; /internalize:AutoMapper.exclude &quot;${build.dir}\${config}\AutoMapper\AutoMapper.dll&quot; &quot;${build.dir}\${config}\AutoMapper\LinFu.DynamicProxy.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />
 	</target>
 
 	<!-- Internal targets -->
@@ -71,7 +72,7 @@
 		<nunit2 failonerror="true" verbose="true">
 			<formatter type="Xml" outputdir="${build.dir}\results" usefile="true" extension=".xml"/>
 			<formatter type="Plain" />
-			<test assemblyname="${build.dir}/Debug/UnitTests/AutoMapper.UnitTests.dll"/>
+			<test assemblyname="${build.dir}/${config}/UnitTests/AutoMapper.UnitTests.dll"/>
 		</nunit2>
 	</target>
 
@@ -83,7 +84,7 @@
 			</fileset>
 		</copy>
 		<copy todir="${build.dir}\dist">
-			<fileset basedir="${build.dir}\Debug\AutoMapper">
+			<fileset basedir="${build.dir}\${config}\AutoMapper">
 				<include name="**\*"/>
 				<exclude name="**\*.pdb" />
 			</fileset>
