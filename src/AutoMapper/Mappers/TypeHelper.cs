@@ -1,12 +1,18 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AutoMapper.Mappers
 {
 	internal static class TypeHelper
 	{
 		public static Type GetElementType(Type enumerableType)
+		{
+			return GetElementType(enumerableType, null);
+		}
+
+		public static Type GetElementType(Type enumerableType, IEnumerable enumerable)
 		{
 			if (enumerableType.HasElementType)
 			{
@@ -26,6 +32,12 @@ namespace AutoMapper.Mappers
 
 			if (typeof (IEnumerable).IsAssignableFrom(enumerableType))
 			{
+				if (enumerable != null)
+				{
+					var first = enumerable.Cast<object>().First();
+					if (first != null)
+						return first.GetType();
+				}
 				return typeof (object);
 			}
 

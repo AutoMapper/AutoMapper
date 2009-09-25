@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using NBehave.Spec.NUnit;
@@ -150,64 +151,51 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class IssueFromSuresh : NonValidatingSpecBase
+		public class TestEnumerable : AutoMapperSpecBase
 		{
-			public class GetStartupDataResponse
+			protected override void Establish_context()
 			{
-				public struct KeyValuePair<K, V>
-				{
-					public K Key { get; set; }
-					public V Value { get; set; }
-				}
-
-				public List<GetStartupDataResponse.KeyValuePair<string, string>> Collections { get; set; }
-			}
-
-			public partial class GetStartupDataResponse1
-			{
-				public KeyValuePairOfStringString[] Collections
-				{
-					get;
-					set;
-				}
-			}
-
-			public partial class KeyValuePairOfStringString
-			{
-				public string Key { get; set; }
-				public string Value { get; set; }
+				Mapper.CreateMap<Person, PersonModel>();
 			}
 
 			[Test]
-			public void Test()
+			public void MapsEnumerableTypes()
 			{
-				//var values = new[] { new KeyValuePairOfStringString { Key = "Name", Value = "Suresh" } };
-
-				//GetStartupDataResponse1 res1 = new GetStartupDataResponse1 { Collections = values };
-				//var response = new GetStartupDataResponse
-				//{
-				//    Collections = new List<GetStartupDataResponse.KeyValuePair<string, string>>
-				//        {
-				//            new GetStartupDataResponse.KeyValuePair<string, string> {Key = "234", Value = "ASdfasdf"}
-				//        }
-				//};
-
-				var pair = new GetStartupDataResponse.KeyValuePair<string, string>();
-
-				SetPair(pair, "234", "asdfsdf");
-
-				//Mapper.CreateMap<GetStartupDataResponse1, GetStartupDataResponse>();
-				//Mapper.CreateMap<KeyValuePairOfStringString, GetStartupDataResponse.KeyValuePair<string, string>>();
-				//Mapper.AssertConfigurationIsValid();
-
-				//var result = Mapper.Map<GetStartupDataResponse1, GetStartupDataResponse>(res1);
+				Person[] personArr = new[] {new Person() {Name = "Name"}};
+				People people = new People(personArr);
+				
+				var pmc = Mapper.Map<People, List<PersonModel>>(people);
+				
+				Assert.IsNotNull(pmc);
+				Assert.IsTrue(pmc.Count == 1);
 			}
 
-			private void SetPair<K, V>(GetStartupDataResponse.KeyValuePair<K, V> pair, K key, V value)
+			public class People : IEnumerable
 			{
-				pair.Key = key;
-				pair.Value = value;
+				private readonly Person[] people;
+				public People(Person[] people)
+				{
+					this.people = people;
+				}
+				public IEnumerator GetEnumerator()
+				{
+					foreach (var person in people)
+					{
+						yield return person;
+					}
+				}
+			}
+
+			public class Person
+			{
+				public string Name { get; set; }
+			}
+
+			public class PersonModel
+			{
+				public string Name { get; set; }
 			}
 		}
+
 	}
 }

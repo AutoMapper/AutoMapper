@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
 			var sourceValue = (IEnumerable)context.SourceValue ?? new object[0];
 			IEnumerable<object> enumerableValue = sourceValue.Cast<object>();
 
-			Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
+			Type sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceValue);
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
 			var sourceLength = enumerableValue.Count();
