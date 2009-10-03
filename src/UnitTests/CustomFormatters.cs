@@ -339,7 +339,7 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper
 					.CreateMap<ModelObject, ModelDto>()
-					.ForMember(dto => dto.ValueOne, opt => opt.FormatNullValueAs("I am null"));
+					.ForMember(dto => dto.ValueOne, opt => opt.NullSubstitute("I am null"));
 				
 				var model = new ModelObject { ValueOne = null };
 

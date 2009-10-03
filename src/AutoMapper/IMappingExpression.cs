@@ -34,7 +34,7 @@ namespace AutoMapper
 		IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
 		IFormatterCtorExpression AddFormatter(Type valueFormatterType);
 		void AddFormatter(IValueFormatter formatter);
-		void FormatNullValueAs(string nullSubstitute);
+		void NullSubstitute(object nullSubstitute);
 		IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver;
 		IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType);
 		IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver);

@@ -118,7 +118,7 @@ namespace AutoMapper
 			_propertyMap.AddFormatter(formatter);
 		}
 
-		public void FormatNullValueAs(string nullSubstitute)
+		public void NullSubstitute(object nullSubstitute)
 		{
 			_propertyMap.SetNullSubstitute(nullSubstitute);
 		}
