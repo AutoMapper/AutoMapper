@@ -453,7 +453,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(cfg => cfg.ConstructFormattersUsing(type => new SomeFormatter("ctor'd")));
+				Mapper.Initialize(cfg => cfg.ConstructServicesUsing(type => new SomeFormatter("ctor'd")));
 				Mapper.CreateMap<Source, Destination>()
 					.ForMember(d => d.Value, opt => opt.AddFormatter<SomeFormatter>());
 			}

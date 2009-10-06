@@ -546,7 +546,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(init => init.ConstructTypeConvertersUsing(t => new CustomConverter(10)));
+				Mapper.Initialize(init => init.ConstructServicesUsing(t => new CustomConverter(10)));
 				Mapper.CreateMap<Source, Destination>()
 					.ConvertUsing<CustomConverter>();
 			}
@@ -633,7 +633,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(cfg => cfg.ConstructResolversUsing(type => new CustomValueResolver(5)));
+				Mapper.Initialize(cfg => cfg.ConstructServicesUsing(type => new CustomValueResolver(5)));
 
 				Mapper.CreateMap<Source, Destination>()
 					.ForMember(d => d.Value, opt => opt.ResolveUsing<CustomValueResolver>().FromMember(src => src.Value));
@@ -679,7 +679,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(cfg => cfg.ConstructResolversUsing(type => new CustomValueResolver()));
+				Mapper.Initialize(cfg => cfg.ConstructServicesUsing(type => new CustomValueResolver()));
 
 				Mapper.CreateMap<Source, Destination>()
 					.ForMember("DestinationValue", opt => opt.ResolveUsing<CustomValueResolver>().FromMember("SourceValue"));

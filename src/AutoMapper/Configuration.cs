@@ -95,19 +95,11 @@ namespace AutoMapper
 			selfProfiles.Each(SelfProfile);
 		}
 
-		public void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor)
+		public void ConstructServicesUsing(Func<Type, object> constructor)
 		{
-			_formatterCtor = constructor;
-		}
-
-		public void ConstructResolversUsing(Func<Type, IValueResolver> constructor)
-		{
-			_resolverCtor = constructor;
-		}
-
-		public void ConstructTypeConvertersUsing(Func<Type, object> constructor)
-		{
-			_typeConverterCtor = constructor;
+			ConstructFormattersUsing(t => (IValueFormatter) constructor(t));
+			ConstructResolversUsing(t => (IValueResolver)constructor(t));
+			ConstructTypeConvertersUsing(constructor);
 		}
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
@@ -373,6 +365,21 @@ namespace AutoMapper
 			Profile profile = selfProfiler.GetProfile();
 
 			AddProfile(profile);
+		}
+
+		private void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor)
+		{
+			_formatterCtor = constructor;
+		}
+
+		private void ConstructResolversUsing(Func<Type, IValueResolver> constructor)
+		{
+			_resolverCtor = constructor;
+		}
+
+		private void ConstructTypeConvertersUsing(Func<Type, object> constructor)
+		{
+			_typeConverterCtor = constructor;
 		}
 
 		protected void OnTypeMapCreated(TypeMap typeMap)

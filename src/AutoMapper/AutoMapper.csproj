@@ -68,6 +68,7 @@
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
+    <Compile Include="IMappingAction.cs" />
     <Compile Include="IMappingEngineRunner.cs" />
     <Compile Include="INamingConvention.cs" />
     <Compile Include="Internal\DeferredInstantiatedConverter.cs" />

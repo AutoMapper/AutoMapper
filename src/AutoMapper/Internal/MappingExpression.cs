@@ -203,14 +203,14 @@ namespace AutoMapper
 
 		public IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction)
 		{
-			_typeMap.ActionBeforeMap((src, dest) => beforeFunction((TSource)src, (TDestination)dest));
+			_typeMap.AddBeforeMapAction(() => (src, dest) => beforeFunction((TSource)src, (TDestination)dest));
 
 			return this;
 		}
 
 		public IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction)
 		{
-			_typeMap.ActionAfterMap((src, dest) => afterFunction((TSource)src, (TDestination)dest));
+			_typeMap.AddAfterMapAction(() => (src, dest) => afterFunction((TSource)src, (TDestination)dest));
 
 			return this;
 		}
