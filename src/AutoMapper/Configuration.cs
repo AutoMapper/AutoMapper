@@ -17,9 +17,7 @@ namespace AutoMapper
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
 		private readonly IDictionary<TypePair, TypeMap> _typeMapCache = new Dictionary<TypePair, TypeMap>();
 		private readonly IDictionary<string, FormatterExpression> _formatterProfiles = new Dictionary<string, FormatterExpression>();
-		private Func<Type, IValueFormatter> _formatterCtor = type => (IValueFormatter)ObjectCreator.CreateObject(type);
-		private Func<Type, IValueResolver> _resolverCtor = type => (IValueResolver)ObjectCreator.CreateObject(type);
-		private Func<Type, object> _typeConverterCtor = type => ObjectCreator.CreateObject(type);
+		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
 		public Configuration(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
 		{
@@ -97,22 +95,20 @@ namespace AutoMapper
 
 		public void ConstructServicesUsing(Func<Type, object> constructor)
 		{
-			ConstructFormattersUsing(t => (IValueFormatter) constructor(t));
-			ConstructResolversUsing(t => (IValueResolver)constructor(t));
-			ConstructTypeConvertersUsing(constructor);
+			_serviceCtor = constructor;
 		}
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
 			TypeMap typeMap = CreateTypeMap(typeof (TSource), typeof (TDestination));
-			return new MappingExpression<TSource, TDestination>(typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
+			return new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor);
 		}
 
 		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
 			var typeMap = CreateTypeMap(sourceType, destinationType);
 
-			return new MappingExpression(typeMap, _typeConverterCtor);
+			return new MappingExpression(typeMap, _serviceCtor);
 		}
 
 		public void RecognizePrefixes(params string[] prefixes)
@@ -367,21 +363,6 @@ namespace AutoMapper
 			AddProfile(profile);
 		}
 
-		private void ConstructFormattersUsing(Func<Type, IValueFormatter> constructor)
-		{
-			_formatterCtor = constructor;
-		}
-
-		private void ConstructResolversUsing(Func<Type, IValueResolver> constructor)
-		{
-			_resolverCtor = constructor;
-		}
-
-		private void ConstructTypeConvertersUsing(Func<Type, object> constructor)
-		{
-			_typeConverterCtor = constructor;
-		}
-
 		protected void OnTypeMapCreated(TypeMap typeMap)
 		{
 			var typeMapCreated = TypeMapCreated;
@@ -406,7 +387,7 @@ namespace AutoMapper
                 {
                     if (!_formatterProfiles.TryGetValue(profileName, out expr))
                     {
-                        expr = new FormatterExpression(_formatterCtor);
+						expr = new FormatterExpression(t => (IValueFormatter)_serviceCtor(t));
 
                         _formatterProfiles.Add(profileName, expr);
                     }

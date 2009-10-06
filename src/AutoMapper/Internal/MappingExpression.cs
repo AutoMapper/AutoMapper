@@ -39,17 +39,13 @@ namespace AutoMapper
 	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
 	{
 		private readonly TypeMap _typeMap;
-		private readonly Func<Type, IValueFormatter> _formatterCtor;
-		private readonly Func<Type, IValueResolver> _resolverCtor;
-		private readonly Func<Type, object> _typeConverterCtor;
+		private readonly Func<Type, object> _serviceCtor;
 		private PropertyMap _propertyMap;
 
-		public MappingExpression(TypeMap typeMap, Func<Type, IValueFormatter> formatterCtor, Func<Type, IValueResolver> resolverCtor, Func<Type, object> typeConverterCtor)
+		public MappingExpression(TypeMap typeMap, Func<Type, object> serviceCtor)
 		{
 			_typeMap = typeMap;
-			_formatterCtor = formatterCtor;
-			_resolverCtor = resolverCtor;
-			_typeConverterCtor = typeConverterCtor;
+			_serviceCtor = serviceCtor;
 		}
 
 		public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
@@ -58,7 +54,7 @@ namespace AutoMapper
 		    var memberInfo = ReflectionHelper.FindProperty(destinationMember);
 		    IMemberAccessor destProperty = memberInfo.ToMemberAccessor();
 			ForDestinationMember(destProperty, memberOptions);
-			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
+			return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor);
 		}
 
 		public IMappingExpression<TSource, TDestination> ForMember(string name,
@@ -66,7 +62,7 @@ namespace AutoMapper
 		{
 			IMemberAccessor destProperty = new PropertyAccessor(typeof(TDestination).GetProperty(name));
 			ForDestinationMember(destProperty, memberOptions);
-			return new MappingExpression<TSource, TDestination>(_typeMap, _formatterCtor, _resolverCtor, _typeConverterCtor);
+			return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor);
 		}
 
 		public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
@@ -97,7 +93,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => _formatterCtor(typeof(TValueFormatter)));
+			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)_serviceCtor(typeof(TValueFormatter)));
 
 			AddFormatter(formatter);
 
@@ -106,7 +102,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => _formatterCtor(valueFormatterType));
+			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)_serviceCtor(valueFormatterType));
 
 			AddFormatter(formatter);
 
@@ -125,7 +121,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
 		{
-			var resolver = new DeferredInstantiatedResolver(() => _resolverCtor(typeof(TValueResolver)));
+			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)_serviceCtor(typeof(TValueResolver)));
 
 			ResolveUsing(resolver);
 
@@ -134,7 +130,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
 		{
-			var resolver = new DeferredInstantiatedResolver(() => _resolverCtor(valueResolverType));
+			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)_serviceCtor(valueResolverType));
 
 			ResolveUsing(resolver);
 
@@ -196,23 +192,37 @@ namespace AutoMapper
 
 		public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
 		{
-			var converter = new DeferredInstantiatedConverter<TSource, TDestination>(() => (TTypeConverter)_typeConverterCtor(typeof(TTypeConverter)));
+			var converter = new DeferredInstantiatedConverter<TSource, TDestination>(() => (TTypeConverter)_serviceCtor(typeof(TTypeConverter)));
 
 			ConvertUsing(converter.Convert);
 		}
 
 		public IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction)
 		{
-			_typeMap.AddBeforeMapAction(() => (src, dest) => beforeFunction((TSource)src, (TDestination)dest));
+			_typeMap.AddBeforeMapAction((src, dest) => beforeFunction((TSource)src, (TDestination)dest));
 
 			return this;
 		}
 
+		public IMappingExpression<TSource, TDestination> BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
+		{
+			Action<TSource, TDestination> beforeFunction = (src, dest) => ((TMappingAction)_serviceCtor(typeof(TMappingAction))).Process(src, dest);
+
+			return BeforeMap(beforeFunction);
+		}
+
 		public IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction)
 		{
-			_typeMap.AddAfterMapAction(() => (src, dest) => afterFunction((TSource)src, (TDestination)dest));
+			_typeMap.AddAfterMapAction((src, dest) => afterFunction((TSource)src, (TDestination)dest));
 
 			return this;
+		}
+
+		public IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
+		{
+			Action<TSource, TDestination> afterFunction = (src, dest) => ((TMappingAction)_serviceCtor(typeof(TMappingAction))).Process(src, dest);
+
+			return AfterMap(afterFunction);
 		}
 
 		public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)

@@ -6,8 +6,8 @@ namespace AutoMapper
 {
 	public class TypeMap
 	{
-		private readonly IList<Func<Action<object, object>>> _afterMapActions = new List<Func<Action<object, object>>>();
-		private readonly IList<Func<Action<object, object>>> _beforeMapActions = new List<Func<Action<object, object>>>();
+		private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
+		private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
 		private readonly TypeInfo _destinationType;
 		private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
 		private readonly IList<PropertyMap> _propertyMaps = new List<PropertyMap>();
@@ -40,7 +40,7 @@ namespace AutoMapper
 				return (src, dest) =>
 				       	{
 				       		foreach (var action in _beforeMapActions)
-				       			action()(src, dest);
+				       			action(src, dest);
 				       	};
 			}
 		}
@@ -52,7 +52,7 @@ namespace AutoMapper
 				return (src, dest) =>
 				       	{
 				       		foreach (var action in _afterMapActions)
-				       			action()(src, dest);
+				       			action(src, dest);
 				       	};
 			}
 		}
@@ -130,12 +130,12 @@ namespace AutoMapper
 			_propertyMaps.Clear();
 		}
 
-		public void AddBeforeMapAction(Func<Action<object, object>> beforeMap)
+		public void AddBeforeMapAction(Action<object, object> beforeMap)
 		{
 			_beforeMapActions.Add(beforeMap);
 		}
 
-		public void AddAfterMapAction(Func<Action<object, object>> afterMap)
+		public void AddAfterMapAction(Action<object, object> afterMap)
 		{
 			_afterMapActions.Add(afterMap);
 		}

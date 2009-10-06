@@ -24,7 +24,9 @@ namespace AutoMapper
         void ConvertUsing(ITypeConverter<TSource, TDestination> converter);
         void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
 		IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
+		IMappingExpression<TSource, TDestination> BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>;
 		IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
+		IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>;
 		IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor);
 	}
 
