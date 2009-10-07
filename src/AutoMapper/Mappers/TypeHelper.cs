@@ -19,7 +19,7 @@ namespace AutoMapper.Mappers
 				return enumerableType.GetElementType();
 			}
 
-			if (enumerableType.IsGenericType && enumerableType.GetGenericTypeDefinition().Equals(typeof (IEnumerable<>)))
+			if (enumerableType.IsGenericType && enumerableType.GetGenericTypeDefinition().Equals(typeof(IEnumerable<>)))
 			{
 				return enumerableType.GetGenericArguments()[0];
 			}
@@ -30,15 +30,15 @@ namespace AutoMapper.Mappers
 				return ienumerableType.GetGenericArguments()[0];
 			}
 
-			if (typeof (IEnumerable).IsAssignableFrom(enumerableType))
+			if (typeof(IEnumerable).IsAssignableFrom(enumerableType))
 			{
 				if (enumerable != null)
 				{
-					var first = enumerable.Cast<object>().First();
+					var first = enumerable.Cast<object>().FirstOrDefault();
 					if (first != null)
 						return first.GetType();
 				}
-				return typeof (object);
+				return typeof(object);
 			}
 
 			throw new ArgumentException(String.Format("Unable to find the element type for type '{0}'.", enumerableType), "enumerableType");
