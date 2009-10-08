@@ -13,11 +13,11 @@ using System.Runtime.InteropServices;
 //------------------------------------------------------------------------------
 
 [assembly: ComVisibleAttribute(false)]
-[assembly: AssemblyVersionAttribute("0.4.0.131")]
-[assembly: AssemblyFileVersionAttribute("0.4.0.131")]
+[assembly: AssemblyVersionAttribute("0.4.0.132")]
+[assembly: AssemblyFileVersionAttribute("0.4.0.132")]
 [assembly: AssemblyCopyrightAttribute("Copyright © Jimmy Bogard 2008-2009")]
 [assembly: AssemblyProductAttribute("AutoMapper")]
 [assembly: AssemblyCompanyAttribute("")]
 [assembly: AssemblyConfigurationAttribute("Debug")]
-[assembly: AssemblyInformationalVersionAttribute("0.4.0.131")]
+[assembly: AssemblyInformationalVersionAttribute("0.4.0.132")]
 

@@ -41,6 +41,11 @@ namespace AutoMapper
 			return Engine.DynamicMap<TSource, TDestination>(source);
 		}
 
+		public static void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
+		{
+			Engine.DynamicMap<TSource, TDestination>(source, destination);
+		}
+
 		public static TDestination DynamicMap<TDestination>(object source)
 		{
 			return Engine.DynamicMap<TDestination>(source);
@@ -49,6 +54,11 @@ namespace AutoMapper
 		public static object DynamicMap(object source, Type sourceType, Type destinationType)
 		{
 			return Engine.DynamicMap(source, sourceType, destinationType);
+		}
+
+		public static void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
+		{
+			Engine.DynamicMap(source, destination, sourceType, destinationType);
 		}
 
 		public static void Initialize(Action<IConfiguration> action)

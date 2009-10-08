@@ -11,6 +11,8 @@ namespace AutoMapper
     	TDestination DynamicMap<TSource, TDestination>(TSource source);
     	TDestination DynamicMap<TDestination>(object source);
     	object DynamicMap(object source, Type sourceType, Type destinationType);
+		void DynamicMap<TSource, TDestination>(TSource source, TDestination destination);
+    	void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
     }
 }
 
