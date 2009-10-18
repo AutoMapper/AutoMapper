@@ -105,8 +105,8 @@ namespace AutoMapper
 		}
 
 		public void IncludeDerivedTypes(Type derivedSourceType, Type derivedDestinationType)
-		{
-			_includedDerivedTypes.Add(derivedSourceType, derivedDestinationType);
+        {
+            _includedDerivedTypes[derivedSourceType] = derivedDestinationType;
 		}
 
 		public Type GetDerivedTypeFor(Type derivedSourceType)
