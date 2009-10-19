@@ -107,7 +107,7 @@ namespace AutoMapper.Mappers
 					var sourceType = result.Type;
 					var destinationType = propertyMap.DestinationProperty.MemberType;
 
-					var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(result.Value, sourceType, destinationType);
+					var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(result, destinationType);
 
 					Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 

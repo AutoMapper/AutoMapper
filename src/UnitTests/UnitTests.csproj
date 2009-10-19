@@ -84,6 +84,7 @@
     <Compile Include="AutoMapperTester.cs" />
     <Compile Include="BeforeAfterMapping.cs" />
     <Compile Include="BidirectionalRelationships.cs" />
+    <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
       <SubType>Code</SubType>

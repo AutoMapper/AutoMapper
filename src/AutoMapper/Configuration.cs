@@ -215,6 +215,12 @@ namespace AutoMapper
 		    return typeMap;
 		}
 
+		public TypeMap FindTypeMapFor(ResolutionResult resolutionResult, Type destinationType)
+		{
+			return FindTypeMapFor(resolutionResult.Value, resolutionResult.Type, destinationType) ??
+			       FindTypeMapFor(resolutionResult.Value, resolutionResult.MemberType, destinationType);
+		}
+
 		public IFormatterConfiguration GetProfileConfiguration(string profileName)
 		{
 			return GetProfile(profileName);
