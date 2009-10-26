@@ -20,6 +20,11 @@ namespace AutoMapper.Internal
 			_lateBoundFieldSet = DelegateFactory.CreateSet(fieldInfo);
 		}
 
+		public override MemberInfo MemberInfo
+		{
+			get { return _fieldInfo; }
+		}
+
 		public override string Name
 		{
 			get { return _name; }

@@ -19,6 +19,11 @@ namespace AutoMapper.Internal
 				_lateBoundPropertyGet = DelegateFactory.CreateGet(propertyInfo);
 		}
 
+		public override MemberInfo MemberInfo
+		{
+			get { return _propertyInfo; }
+		}
+
 		public override string Name
 		{
 			get { return _name; }

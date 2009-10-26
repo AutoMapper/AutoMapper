@@ -18,6 +18,11 @@ namespace AutoMapper.Internal
 			_lateBoundMethod = DelegateFactory.CreateGet(methodInfo);
 		}
 
+		public override MemberInfo MemberInfo
+		{
+			get { return _methodInfo; }
+		}
+
 		public override string Name
 		{
 			get { return _name; }
