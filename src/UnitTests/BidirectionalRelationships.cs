@@ -97,8 +97,8 @@ namespace AutoMapper.UnitTests
 
 				Dictionary<int, ParentModel> parents = childModels.ToDictionary(x => x.ID, x => x.Parent);
 
-				Mapper.CreateMap<int, ParentDto>().ConvertUsing(x => new ChildIdToParentDtoConverter(parents).Convert(x));
-				Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing(x => new ParentIdToChildDtoListConverter(childModels).Convert(x));
+				Mapper.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
+				Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
 
 				Mapper.CreateMap<ParentModel, ParentDto>()
 					.ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
@@ -118,7 +118,7 @@ namespace AutoMapper.UnitTests
 				_dto.Children[0].Parent.ID.ShouldEqual(_dto.ID);
 			}
 
-			public class ChildIdToParentDtoConverter : ITypeConverter<int, ParentDto>
+			public class ChildIdToParentDtoConverter : TypeConverter<int, ParentDto>
 			{
 				private readonly Dictionary<int, ParentModel> _parentModels;
 
@@ -127,7 +127,7 @@ namespace AutoMapper.UnitTests
 					_parentModels = parentModels;
 				}
 
-				public ParentDto Convert(int childId)
+				protected override ParentDto ConvertCore(int childId)
 				{
 					ParentModel parentModel = _parentModels[childId];
 					MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
@@ -135,7 +135,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			public class ParentIdToChildDtoListConverter : ITypeConverter<int, List<ChildDto>>
+			public class ParentIdToChildDtoListConverter : TypeConverter<int, List<ChildDto>>
 			{
 				private readonly IList<ChildModel> _childModels;
 
@@ -144,7 +144,7 @@ namespace AutoMapper.UnitTests
 					_childModels = childModels;
 				}
 
-				public List<ChildDto> Convert(int childId)
+				protected override List<ChildDto> ConvertCore(int childId)
 				{
 					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == childId).ToList();
 					MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
@@ -199,8 +199,8 @@ namespace AutoMapper.UnitTests
 
 				Dictionary<int, ParentModel> parents = childModels.ToDictionary(x => x.ID, x => x.Parent);
 
-				Mapper.CreateMap<int, ParentDto>().ConvertUsing((r, x) => new ChildIdToParentDtoConverter(parents).Convert(r, x));
-				Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing((r, x) => new ParentIdToChildDtoListConverter(childModels).Convert(r, x));
+				Mapper.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
+				Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
 
 				Mapper.CreateMap<ParentModel, ParentDto>()
 					.ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
@@ -220,7 +220,7 @@ namespace AutoMapper.UnitTests
 				_dto.Children[0].Parent.ID.ShouldEqual(_dto.ID);
 			}
 
-			public class ChildIdToParentDtoConverter : IWithContextTypeConverter<int, ParentDto>
+			public class ChildIdToParentDtoConverter : ITypeConverter<int, ParentDto>
 			{
 				private readonly Dictionary<int, ParentModel> _parentModels;
 
@@ -229,15 +229,16 @@ namespace AutoMapper.UnitTests
 					_parentModels = parentModels;
 				}
 
-				public ParentDto Convert(ResolutionContext resolutionContext, int childId)
+				public ParentDto Convert(ResolutionContext resolutionContext)
 				{
+					int childId = (int) resolutionContext.SourceValue;
 					ParentModel parentModel = _parentModels[childId];
 					MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
 					return mappingEngine.Map<ParentModel, ParentDto>(resolutionContext, parentModel);
 				}
 			}
 
-			public class ParentIdToChildDtoListConverter : IWithContextTypeConverter<int, List<ChildDto>>
+			public class ParentIdToChildDtoListConverter : ITypeConverter<int, List<ChildDto>>
 			{
 				private readonly IList<ChildModel> _childModels;
 
@@ -246,8 +247,9 @@ namespace AutoMapper.UnitTests
 					_childModels = childModels;
 				}
 
-				public List<ChildDto> Convert(ResolutionContext resolutionContext, int childId)
+				public List<ChildDto> Convert(ResolutionContext resolutionContext)
 				{
+					int childId = (int)resolutionContext.SourceValue;
 					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == childId).ToList();
 					MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
 					return mappingEngine.Map<List<ChildModel>, List<ChildDto>>(resolutionContext, childModels);

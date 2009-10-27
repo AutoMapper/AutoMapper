@@ -26,17 +26,17 @@ namespace AutoMapper.UnitTests
 				public Type Value3 { get; set; }
 			}
 
-			public class DateTimeTypeConverter : ITypeConverter<string, DateTime>
+			public class DateTimeTypeConverter : TypeConverter<string, DateTime>
 			{
-				public DateTime Convert(string source)
+				protected override DateTime ConvertCore(string source)
 				{
 					return System.Convert.ToDateTime(source);
 				}
 			}
 
-			public class TypeTypeConverter : ITypeConverter<string, Type>
+			public class TypeTypeConverter : TypeConverter<string, Type>
 			{
-				public Type Convert(string source)
+				protected override Type ConvertCore(string source)
 				{
 					Type type = Assembly.GetExecutingAssembly().GetType(source);
 					return type;
@@ -180,9 +180,9 @@ namespace AutoMapper.UnitTests
 				public int OtherValue { get; set; }
 			}
 
-			public class CustomConverter : ITypeConverter<Source, Destination>
+			public class CustomConverter : TypeConverter<Source, Destination>
 			{
-				public Destination Convert(Source source)
+				protected override Destination ConvertCore(Source source)
 				{
 					return new Destination
 						{
@@ -228,9 +228,9 @@ namespace AutoMapper.UnitTests
 				public int OtherValue { get; set; }
 			}
 
-			public class CustomConverter : ITypeConverter<Source, Destination>
+			public class CustomConverter : TypeConverter<Source, Destination>
 			{
-				public Destination Convert(Source source)
+				protected override Destination ConvertCore(Source source)
 				{
 					return new Destination
 						{

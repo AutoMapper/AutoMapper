@@ -25,7 +25,7 @@ namespace AutoMapper
 		{
 			var converter = new DeferredInstantiatedConverter(typeConverterType, () => _typeConverterCtor(typeConverterType));
 
-			_typeMap.UseCustomMapper(source => converter.Convert(source.SourceValue));
+			_typeMap.UseCustomMapper(converter.Convert);
 		}
 
 		public IMappingExpression WithProfile(string profileName)
@@ -175,6 +175,11 @@ namespace AutoMapper
 			_typeMap.UseCustomMapper(source => mappingFunction((TSource)source.SourceValue));
 		}
 
+		public void ConvertUsing(Func<ResolutionContext, TDestination> mappingFunction)
+		{
+			_typeMap.UseCustomMapper(context => mappingFunction(context));
+		}
+
         public void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction)
         {
             _typeMap.UseCustomMapper(source => mappingFunction(source, (TSource)source.SourceValue));
@@ -184,11 +189,6 @@ namespace AutoMapper
 		{
 			ConvertUsing(converter.Convert);
 		}
-
-        public void ConvertUsing(IWithContextTypeConverter<TSource, TDestination> converter)
-        {
-            ConvertUsing(converter.Convert);
-        }
 
 		public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
 		{

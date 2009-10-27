@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	internal class DeferredInstantiatedConverter
+	internal class DeferredInstantiatedConverter : ITypeConverter<object, object>
 	{
 		private readonly Func<object> _instantiator;
 		private readonly MethodInfo _converterMethod;
@@ -14,11 +14,11 @@ namespace AutoMapper
 			_converterMethod = typeConverterType.GetMethod("Convert");
 		}
 
-		public object Convert(object source)
+		public object Convert(ResolutionContext context)
 		{
-		    var converter = _instantiator();
+			var converter = _instantiator();
 
-		    return _converterMethod.Invoke(converter, new[] { source });
+			return _converterMethod.Invoke(converter, new[] { context });
 		}
 	}
 	internal class DeferredInstantiatedConverter<TSource, TDestination> : ITypeConverter<TSource, TDestination>
@@ -30,11 +30,11 @@ namespace AutoMapper
 			_instantiator = instantiator;
 		}
 
-		public TDestination Convert(TSource source)
+		public TDestination Convert(ResolutionContext context)
 		{
-		    var typeConverter = _instantiator();
+			var typeConverter = _instantiator();
 
-		    return typeConverter.Convert(source);
+			return typeConverter.Convert(context);
 		}
 	}
 }
