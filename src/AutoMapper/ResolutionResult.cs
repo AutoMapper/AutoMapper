@@ -9,7 +9,12 @@ namespace AutoMapper
 		private readonly Type _type;
 		private readonly Type _memberType;
 
-		public ResolutionResult(object value, ResolutionContext context, Type memberType)
+		public ResolutionResult(ResolutionContext context)
+			: this(context.SourceValue, context)
+		{
+		}
+
+		private ResolutionResult(object value, ResolutionContext context, Type memberType)
 		{
 			_value = value;
 			_context = context;
@@ -17,7 +22,7 @@ namespace AutoMapper
 			_memberType = memberType;
 		}
 
-		public ResolutionResult(object value, ResolutionContext context)
+		private ResolutionResult(object value, ResolutionContext context)
 		{
             _value = value;
 			_context = context;
@@ -41,5 +46,14 @@ namespace AutoMapper
             return value.GetType();
         }
 
+		public ResolutionResult New(object value)
+		{
+			return new ResolutionResult(value, Context);
+		}
+
+		public ResolutionResult New(object value, Type memberType)
+		{
+			return new ResolutionResult(value, Context, memberType);
+		}
     }
 }

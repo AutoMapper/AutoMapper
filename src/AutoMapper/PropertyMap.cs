@@ -62,7 +62,7 @@ namespace AutoMapper
 		{
 			Seal();
 
-			var result = new ResolutionResult(context.SourceValue, context);
+			var result = new ResolutionResult(context);
 
 			foreach (var resolver in _cachedResolvers)
 			{

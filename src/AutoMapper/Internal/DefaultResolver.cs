@@ -4,7 +4,7 @@ namespace AutoMapper
 	{
 		public ResolutionResult Resolve(ResolutionResult source)
 		{
-			return new ResolutionResult(source.Value, source.Context);
+			return source.New(source.Value);
 		}
 	}
 }

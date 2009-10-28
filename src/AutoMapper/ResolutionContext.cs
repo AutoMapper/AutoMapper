@@ -227,6 +227,11 @@ namespace AutoMapper
 				return result;
 			}
 		}
+
+		public static ResolutionContext New<TSource>(TSource sourceValue)
+		{
+			return new ResolutionContext(null, sourceValue, typeof (TSource), null);
+		}
 	}
 
 }

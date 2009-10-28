@@ -33,7 +33,7 @@ namespace AutoMapper
 				result = null;
 			}
 
-			return new ResolutionResult(result, source.Context);
+			return source.New(result);
 		}
 
 	}

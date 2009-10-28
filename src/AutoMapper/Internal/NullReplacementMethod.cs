@@ -18,7 +18,7 @@ namespace AutoMapper
 				return source;
 			}
 			return source.Value == null
-					? new ResolutionResult(_nullSubstitute, source.Context)
+					? source.New(_nullSubstitute)
 					: source;
 		}
 	}
