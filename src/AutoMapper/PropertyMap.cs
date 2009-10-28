@@ -58,11 +58,11 @@ namespace AutoMapper
 			_sourceValueResolvers.RemoveLast();
 		}
 
-		public ResolutionResult ResolveValue(object input)
+		public ResolutionResult ResolveValue(ResolutionContext context)
 		{
 			Seal();
 
-			var result = new ResolutionResult(input);
+			var result = new ResolutionResult(context.SourceValue, context);
 
 			foreach (var resolver in _cachedResolvers)
 			{

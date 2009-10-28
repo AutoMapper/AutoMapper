@@ -184,7 +184,7 @@ namespace AutoMapper.Tests
 		{
 			public ResolutionResult Resolve(ResolutionResult source)
 			{
-				return new ResolutionResult(((Order)source.Value).Status);
+				return new ResolutionResult(((Order)source.Value).Status, null);
 			}
 		}
 
@@ -192,7 +192,7 @@ namespace AutoMapper.Tests
 		{
 			public ResolutionResult Resolve(ResolutionResult source)
 			{
-				return new ResolutionResult((TOutputEnum) Enum.Parse(typeof (TOutputEnum), Enum.GetName(typeof (TInputEnum), source.Value)));
+				return new ResolutionResult((TOutputEnum)Enum.Parse(typeof(TOutputEnum), Enum.GetName(typeof(TInputEnum), source.Value)), null);
 			}
 		}
 	}

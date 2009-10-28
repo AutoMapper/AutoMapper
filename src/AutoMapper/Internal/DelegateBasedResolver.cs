@@ -28,7 +28,7 @@ namespace AutoMapper
 				result = null;
 			}
 
-			return new ResolutionResult(result);
+			return new ResolutionResult(result, source.Context);
 		}
 	}
 }

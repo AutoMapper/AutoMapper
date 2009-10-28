@@ -91,7 +91,7 @@ namespace AutoMapper.Mappers
 
 					try
 					{
-						result = propertyMap.ResolveValue(context.SourceValue);
+						result = propertyMap.ResolveValue(context);
 					}
 					catch (Exception ex)
 					{

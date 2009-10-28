@@ -115,7 +115,7 @@ namespace AutoMapper.Mappers
 			if (false == propertyMap.CanResolveValue())
 				return;
 
-			var result = propertyMap.ResolveValue(context.SourceValue);
+			var result = propertyMap.ResolveValue(context);
 			var newContext = context.CreateMemberContext(null, result.Value, null, result.Type, propertyMap);
 
 			try

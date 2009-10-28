@@ -13,8 +13,8 @@ namespace AutoMapper.Internal
 		public ResolutionResult Resolve(ResolutionResult source)
 		{
 			return source.Value == null
-			       	? new ResolutionResult(source.Value, MemberType)
-			       	: new ResolutionResult(GetValue(source.Value), MemberType);
+			       	? new ResolutionResult(source.Value, source.Context, MemberType)
+			       	: new ResolutionResult(GetValue(source.Value), source.Context, MemberType);
 		}
 
 	}

@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((ModelObject)source.Value).Value + 1);
+					return new ResolutionResult(((ModelObject)source.Value).Value + 1, null);
 				}
 			}
 
@@ -38,7 +38,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((ModelObject)source.Value).Value2fff + 2);
+					return new ResolutionResult(((ModelObject)source.Value).Value2fff + 2, null);
 				}
 			}
 
@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((ModelObject)source.Value).Value4 + 4);
+					return new ResolutionResult(((ModelObject)source.Value).Value4 + 4, null);
 				}
 
 				public Type GetResolvedValueType()
@@ -114,7 +114,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((ModelSubObject)source.Value).SomeValue + 1);
+					return new ResolutionResult(((ModelSubObject)source.Value).SomeValue + 1, null);
 				}
 			}
 
@@ -160,7 +160,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((int)source.Value) + 5);
+					return new ResolutionResult(((int)source.Value) + 5, null);
 				}
 			}
 
@@ -203,7 +203,7 @@ namespace AutoMapper.UnitTests
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
-					return new ResolutionResult(((int)source.Value) + 5);
+					return new ResolutionResult(((int)source.Value) + 5, null);
 				}
 			}
 

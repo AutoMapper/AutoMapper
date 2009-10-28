@@ -5,33 +5,30 @@ namespace AutoMapper
 	public class ResolutionResult
 	{
 		private readonly object _value;
+		private readonly ResolutionContext _context;
 		private readonly Type _type;
 		private readonly Type _memberType;
 
-		public ResolutionResult(object value, Type memberType)
+		public ResolutionResult(object value, ResolutionContext context, Type memberType)
 		{
 			_value = value;
+			_context = context;
 			_type = ResolveType(value, memberType);
 			_memberType = memberType;
 		}
 
-	    public ResolutionResult(object value, Type memberType, Type type)
-		{
-			_value = value;
-			_type = type;
-			_memberType = memberType;
-		}
-
-		public ResolutionResult(object value)
+		public ResolutionResult(object value, ResolutionContext context)
 		{
             _value = value;
-            _type = ResolveType(value, typeof(object));
+			_context = context;
+			_type = ResolveType(value, typeof(object));
             _memberType = _type;
         }
 
 		public object Value { get { return _value; } }
 		public Type Type { get { return _type; } }
 		public Type MemberType { get { return _memberType; } }
+		public ResolutionContext Context { get { return _context; } }
     
         private Type ResolveType(object value, Type memberType)
         {
