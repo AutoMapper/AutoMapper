@@ -25,6 +25,8 @@ namespace AutoMapper.Mappers
 			var destination = (context.DestinationValue ?? CreateDestinationObject(context, destElementType, sourceLength, mapper));
 			var enumerable = GetEnumerableFor(destination);
 
+			ClearEnumerable(enumerable);
+
 			int i = 0;
 			foreach (object item in enumerableValue)
 			{
@@ -46,10 +48,13 @@ namespace AutoMapper.Mappers
 			return valueToAssign;
 		}
 
+
 		protected virtual TEnumerable GetEnumerableFor(object destination)
 		{
 			return (TEnumerable) destination;
 		}
+
+		protected virtual void ClearEnumerable(TEnumerable enumerable) { }
 
 		private object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count, IMappingEngineRunner mapper)
 		{
@@ -63,7 +68,8 @@ namespace AutoMapper.Mappers
 		}
 
 		public abstract bool IsMatch(ResolutionContext context);
-		
+
+
 		protected abstract void SetElementValue(TEnumerable destination, object mappedValue, int index);
 		protected abstract TEnumerable CreateDestinationObjectBase(Type destElementType, int sourceLength);
 	}

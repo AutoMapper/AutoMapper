@@ -347,6 +347,58 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_mapping_to_an_existing_list_with_existing_items : SpecBase
+		{
+			private Destination _destination;
+			private Source _source;
+
+			public class SourceItem
+			{
+				public int Value { get; set; }
+			}
+
+			public class DestItem
+			{
+				public int Value { get; set; }
+			}
+
+			public class Source
+			{
+				public List<SourceItem> Values { get; set; }
+			}
+
+			public class Destination
+			{
+				private List<DestItem> _values = new List<DestItem>();
+
+				public List<DestItem> Values
+				{
+					get { return _values; }
+				}
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>()
+					.ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
+				Mapper.CreateMap<SourceItem, DestItem>();
+			}
+
+			protected override void Because_of()
+			{
+				_source = new Source { Values = new List<SourceItem> { new SourceItem { Value = 5 }, new SourceItem { Value = 10 } } };
+				_destination = new Destination();
+				_destination.Values.Add(new DestItem());
+				Mapper.Map(_source, _destination);
+			}
+			
+			[Test]
+			public void Should_clear_the_list_before_mapping()
+			{
+				_destination.Values.Count.ShouldEqual(2);
+			}
+		}
+
         public class When_mapping_a_collection_with_null_members : AutoMapperSpecBase
         {
             const string FirstString = null;

@@ -9,6 +9,11 @@ namespace AutoMapper.Mappers
 			return (context.DestinationType.IsArray) && (context.SourceType.IsEnumerableType());
 		}
 
+		protected override void ClearEnumerable(Array enumerable)
+		{
+			// no op
+		}
+
 		protected override void SetElementValue(Array destination, object mappedValue, int index)
 		{
 			destination.SetValue(mappedValue, index);

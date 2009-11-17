@@ -19,6 +19,11 @@ namespace AutoMapper.Mappers
 			destination.Add(mappedValue);
 		}
 
+		protected override void ClearEnumerable(IList enumerable)
+		{
+			enumerable.Clear();
+		}
+
 		protected override IList CreateDestinationObjectBase(Type destElementType, int sourceLength)
 		{
 			return ObjectCreator.CreateList(destElementType);
@@ -46,6 +51,11 @@ namespace AutoMapper.Mappers
 		{
 			var listSource = (IListSource)destination;
 			return listSource.GetList();
+		}
+
+		protected override void ClearEnumerable(IList enumerable)
+		{
+			enumerable.Clear();
 		}
 	}
 
