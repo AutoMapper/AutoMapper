@@ -30,6 +30,57 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(Status.InProgress);
 		}
 
+		[Test]
+		public void ShouldMapToUnderlyingType() {
+			Mapper.CreateMap<Order, OrderDtoInt>();
+
+			var order = new Order {
+				Status = Status.InProgress
+			};
+
+			var dto = Mapper.Map<Order, OrderDtoInt>(order);
+
+			dto.Status.ShouldEqual(1);
+		}
+
+		[Test]
+		public void ShouldMapToStringType() {
+			Mapper.CreateMap<Order, OrderDtoString>();
+
+			var order = new Order {
+				Status = Status.InProgress
+			};
+
+			var dto = Mapper.Map<Order, OrderDtoString>(order);
+
+			dto.Status.ShouldEqual("InProgress");
+		}
+
+		[Test]
+		public void ShouldMapFromUnderlyingType() {
+			Mapper.CreateMap<OrderDtoInt, Order>();
+
+			var order = new OrderDtoInt {
+				Status = 1
+			};
+
+			var dto = Mapper.Map<OrderDtoInt, Order>(order);
+
+			dto.Status.ShouldEqual(Status.InProgress);
+		}
+
+		[Test]
+		public void ShouldMapFromStringType() {
+			Mapper.CreateMap<OrderDtoString, Order>();
+
+			var order = new OrderDtoString {
+				Status = "InProgress"
+			};
+
+			var dto = Mapper.Map<OrderDtoString, Order>(order);
+
+			dto.Status.ShouldEqual(Status.InProgress);
+		}
 		
 		[Test]
 		public void ShouldMapEnumByMatchingNames()
@@ -158,6 +209,14 @@ namespace AutoMapper.Tests
 		public class OrderDto
 		{
 			public Status Status { get; set; }
+		}
+
+		public class OrderDtoInt {
+			public int Status { get; set; }
+		}
+
+		public class OrderDtoString {
+			public string Status { get; set; }
 		}
 
 		public class OrderDtoWithOwnStatus
