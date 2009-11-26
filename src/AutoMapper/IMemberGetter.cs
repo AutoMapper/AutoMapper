@@ -3,11 +3,15 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	public interface IMemberGetter : IValueResolver
+	public interface IMemberResolver : IValueResolver
+	{
+		Type MemberType { get; }
+	}
+
+	public interface IMemberGetter : IMemberResolver
 	{
 		MemberInfo MemberInfo { get; }
 		string Name { get; }
-		Type MemberType { get; }
 		object GetValue(object source);
 	}
 

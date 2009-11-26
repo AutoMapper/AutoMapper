@@ -39,7 +39,7 @@ namespace AutoMapper
 		IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver;
 		IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType);
 		IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver);
-		void MapFrom(Func<TSource, object> sourceMember);
+		void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
 		void Ignore();
 		void SetMappingOrder(int mappingOrder);
 		void UseDestinationValue();

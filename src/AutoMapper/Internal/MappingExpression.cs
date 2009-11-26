@@ -144,9 +144,9 @@ namespace AutoMapper
 			return new ResolutionExpression<TSource>(_propertyMap);
 		}
 
-		public void MapFrom(Func<TSource, object> sourceMember)
+		public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
 		{
-			_propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(sourceMember));
+			_propertyMap.AssignCustomValueResolver(new ExpressionBasedResolver<TSource, TMember>(sourceMember));
 		}
 
 		public void Ignore()

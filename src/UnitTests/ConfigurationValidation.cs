@@ -318,6 +318,38 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_testing_a_dto_with_mismatched_custom_member_mapping : NonValidatingSpecBase
+		{
+			private TypeMap _typeMap;
+
+			private class SubBarr { }
+
+			private class SubBar { }
+
+			private class ModelObject
+			{
+				public string Foo { get; set; }
+				public SubBarr Barr { get; set; }
+			}
+
+			private class ModelDto
+			{
+				public string Foo { get; set; }
+				public SubBar Bar { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<ModelObject, ModelDto>()
+					.ForMember(dest => dest.Bar, opt => opt.MapFrom(src => src.Barr));
+			}
+
+			[Test]
+			public void Should_fail_a_configuration_check()
+			{
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
+		}
 
 	}
 
