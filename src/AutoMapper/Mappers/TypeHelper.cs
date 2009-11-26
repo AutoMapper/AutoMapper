@@ -24,8 +24,8 @@ namespace AutoMapper.Mappers
 				return enumerableType.GetGenericArguments()[0];
 			}
 
-			Type ienumerableType = enumerableType.GetInterface("IEnumerable`1");
-			if (ienumerableType != null)
+            Type ienumerableType = GetIEnumerableType(enumerableType);
+            if (ienumerableType != null)
 			{
 				return ienumerableType.GetGenericArguments()[0];
 			}
@@ -56,5 +56,20 @@ namespace AutoMapper.Mappers
 
 			return enumType;
 		}
+
+        private static Type GetIEnumerableType(Type enumerableType)
+        {
+            try
+            {
+                return enumerableType.GetInterface("IEnumerable`1");
+            }
+            catch (System.Reflection.AmbiguousMatchException)
+            {
+                if (enumerableType.BaseType != typeof(object))
+                    return GetIEnumerableType(enumerableType.BaseType);
+
+                return null;
+            }
+        }
 	}
 }
