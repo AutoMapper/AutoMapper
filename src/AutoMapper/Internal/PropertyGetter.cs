@@ -39,25 +39,40 @@ namespace AutoMapper.Internal
 			return _lateBoundPropertyGet(source);
 		}
 
-	    public bool Equals(PropertyGetter other)
-	    {
-	        if (ReferenceEquals(null, other)) return false;
-	        if (ReferenceEquals(this, other)) return true;
-	        return Equals(other._propertyInfo, _propertyInfo);
-	    }
+		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+		{
+			return _propertyInfo.GetCustomAttributes(attributeType, inherit);
+		}
 
-	    public override bool Equals(object obj)
-	    {
-	        if (ReferenceEquals(null, obj)) return false;
-	        if (ReferenceEquals(this, obj)) return true;
-	        if (obj.GetType() != typeof (PropertyGetter)) return false;
-	        return Equals((PropertyGetter) obj);
-	    }
+		public override object[] GetCustomAttributes(bool inherit)
+		{
+			return _propertyInfo.GetCustomAttributes(inherit);
+		}
 
-	    public override int GetHashCode()
-	    {
-	        return _propertyInfo.GetHashCode();
-	    }
+		public override bool IsDefined(Type attributeType, bool inherit)
+		{
+			return _propertyInfo.IsDefined(attributeType, inherit);
+		}
+
+		public bool Equals(PropertyGetter other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return Equals(other._propertyInfo, _propertyInfo);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != typeof(PropertyGetter)) return false;
+			return Equals((PropertyGetter)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			return _propertyInfo.GetHashCode();
+		}
 	}
 
 	internal class PropertyAccessor : PropertyGetter, IMemberAccessor
@@ -65,7 +80,8 @@ namespace AutoMapper.Internal
 		private readonly LateBoundPropertySet _lateBoundPropertySet;
 		private readonly bool _hasSetter;
 
-		public PropertyAccessor(PropertyInfo propertyInfo) : base(propertyInfo)
+		public PropertyAccessor(PropertyInfo propertyInfo)
+			: base(propertyInfo)
 		{
 			_hasSetter = propertyInfo.GetSetMethod(true) != null;
 			if (_hasSetter)
@@ -90,7 +106,8 @@ namespace AutoMapper.Internal
 		private readonly MethodInfo _lateBoundPropertySet;
 		private readonly bool _hasSetter;
 
-		public ValueTypePropertyAccessor(PropertyInfo propertyInfo) : base(propertyInfo)
+		public ValueTypePropertyAccessor(PropertyInfo propertyInfo)
+			: base(propertyInfo)
 		{
 			var method = propertyInfo.GetSetMethod(true);
 			_hasSetter = method != null;
@@ -107,7 +124,7 @@ namespace AutoMapper.Internal
 
 		public void SetValue(object destination, object value)
 		{
-			_lateBoundPropertySet.Invoke(destination, new[] {value});
+			_lateBoundPropertySet.Invoke(destination, new[] { value });
 		}
 	}
 }

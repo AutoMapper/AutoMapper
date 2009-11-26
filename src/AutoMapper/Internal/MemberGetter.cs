@@ -17,5 +17,8 @@ namespace AutoMapper.Internal
 			       	: source.New(GetValue(source.Value), MemberType);
 		}
 
+		public abstract object[] GetCustomAttributes(Type attributeType, bool inherit);
+		public abstract object[] GetCustomAttributes(bool inherit);
+		public abstract bool IsDefined(Type attributeType, bool inherit);
 	}
 }

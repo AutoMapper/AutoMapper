@@ -9,7 +9,6 @@ namespace AutoMapper.Internal
 		private readonly string _name;
 		private readonly Type _memberType;
 		private readonly LateBoundFieldGet _lateBoundFieldGet;
-		private readonly LateBoundFieldSet _lateBoundFieldSet;
 
 		public FieldGetter(FieldInfo fieldInfo)
 		{
@@ -17,7 +16,6 @@ namespace AutoMapper.Internal
 			_name = fieldInfo.Name;
 			_memberType = fieldInfo.FieldType;
 			_lateBoundFieldGet = DelegateFactory.CreateGet(fieldInfo);
-			_lateBoundFieldSet = DelegateFactory.CreateSet(fieldInfo);
 		}
 
 		public override MemberInfo MemberInfo
@@ -40,32 +38,48 @@ namespace AutoMapper.Internal
 			return _lateBoundFieldGet(source);
 		}
 
-	    public bool Equals(FieldGetter other)
-	    {
-	        if (ReferenceEquals(null, other)) return false;
-	        if (ReferenceEquals(this, other)) return true;
-	        return Equals(other._fieldInfo, _fieldInfo);
-	    }
+		public bool Equals(FieldGetter other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return Equals(other._fieldInfo, _fieldInfo);
+		}
 
-	    public override bool Equals(object obj)
-	    {
-	        if (ReferenceEquals(null, obj)) return false;
-	        if (ReferenceEquals(this, obj)) return true;
-	        if (obj.GetType() != typeof (FieldGetter)) return false;
-	        return Equals((FieldGetter) obj);
-	    }
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+			if (obj.GetType() != typeof(FieldGetter)) return false;
+			return Equals((FieldGetter)obj);
+		}
 
-	    public override int GetHashCode()
-	    {
-	        return _fieldInfo.GetHashCode();
-	    }
+		public override int GetHashCode()
+		{
+			return _fieldInfo.GetHashCode();
+		}
+
+		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+		{
+			return _fieldInfo.GetCustomAttributes(attributeType, inherit);
+		}
+
+		public override object[] GetCustomAttributes(bool inherit)
+		{
+			return _fieldInfo.GetCustomAttributes(inherit);
+		}
+
+		public override bool IsDefined(Type attributeType, bool inherit)
+		{
+			return _fieldInfo.IsDefined(attributeType, inherit);
+		}
 	}
 
 	internal class FieldAccessor : FieldGetter, IMemberAccessor
 	{
 		private readonly LateBoundFieldSet _lateBoundFieldSet;
 
-		public FieldAccessor(FieldInfo fieldInfo) : base(fieldInfo)
+		public FieldAccessor(FieldInfo fieldInfo)
+			: base(fieldInfo)
 		{
 			_lateBoundFieldSet = DelegateFactory.CreateSet(fieldInfo);
 		}
@@ -80,7 +94,8 @@ namespace AutoMapper.Internal
 	{
 		private readonly FieldInfo _lateBoundFieldSet;
 
-		public ValueTypeFieldAccessor(FieldInfo fieldInfo) : base(fieldInfo)
+		public ValueTypeFieldAccessor(FieldInfo fieldInfo)
+			: base(fieldInfo)
 		{
 			_lateBoundFieldSet = fieldInfo;
 		}
