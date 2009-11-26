@@ -876,5 +876,37 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_mapping_from_a_constant_value : AutoMapperSpecBase
+		{
+			private Dest _dest;
+
+			private class Source
+			{
+				
+			}
+
+			private class Dest
+			{
+				public int Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Dest>()
+					.ForMember(dest => dest.Value, opt => opt.UseValue(5));
+			}
+
+			protected override void Because_of()
+			{
+				_dest = Mapper.Map<Source, Dest>(new Source());
+			}
+
+			[Test]
+			public void Should_map_from_that_constant_value()
+			{
+				_dest.Value.ShouldEqual(5);
+			}
+		}
+
 	}
 }
