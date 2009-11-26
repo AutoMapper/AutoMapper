@@ -1,15 +1,14 @@
 using System;
-using System.Linq.Expressions;
 
 namespace AutoMapper
 {
-	internal class ExpressionBasedResolver<TSource, TMember> : IMemberResolver
+	internal class DelegateBasedResolver<TSource, TMember> : IMemberResolver
 	{
 		private readonly Func<TSource, TMember> _method;
 
-		public ExpressionBasedResolver(Expression<Func<TSource, TMember>> expression)
+		public DelegateBasedResolver(Func<TSource, TMember> method)
 		{
-			_method = expression.Compile();
+			_method = method;
 		}
 
 		public ResolutionResult Resolve(ResolutionResult source)

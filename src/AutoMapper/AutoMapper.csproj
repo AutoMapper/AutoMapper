@@ -71,7 +71,7 @@
     <Compile Include="IMappingAction.cs" />
     <Compile Include="IMappingEngineRunner.cs" />
     <Compile Include="INamingConvention.cs" />
-    <Compile Include="Internal\ExpressionBasedResolver.cs" />
+    <Compile Include="Internal\DelegateBasedResolver2.cs" />
     <Compile Include="Internal\DeferredInstantiatedConverter.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\ITypeMapFactory.cs" />
