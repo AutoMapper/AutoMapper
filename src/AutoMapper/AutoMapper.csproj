@@ -112,6 +112,7 @@
     <Compile Include="Mappers\EnumMapper.cs" />
     <Compile Include="Mappers\AssignableMapper.cs" />
     <Compile Include="Mappers\ITypeMapObjectMapper.cs" />
+    <Compile Include="Mappers\ListSourceMapper.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\NullableMapper.cs" />
     <Compile Include="Mappers\ObjectCreator.cs" />

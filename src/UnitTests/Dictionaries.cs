@@ -436,7 +436,8 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.CreateMap<FooDto, FooObject>();
-				Mapper.CreateMap<DestinationValuePair, KeyValuePair<string, string>>();
+				Mapper.CreateMap<DestinationValuePair, KeyValuePair<string, string>>()
+					.ConvertUsing(src => new KeyValuePair<string, string>(src.Key, src.Value));
 			}
 
 			protected override void Because_of()

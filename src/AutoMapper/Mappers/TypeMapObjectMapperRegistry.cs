@@ -11,7 +11,6 @@ namespace AutoMapper.Mappers
                 new CustomMapperStrategy(),
                 new NullMappingStrategy(),
                 new CacheMappingStrategy(),
-				new KeyValuePairMappingStrategy(),
                 new NewObjectPropertyMapMappingStrategy(),
                 new ExistingObjectMappingStrategy()
             };
@@ -157,33 +156,6 @@ namespace AutoMapper.Mappers
 			protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
 			{
 				return mapper.CreateObject(context);
-			}
-		}
-
-		private class KeyValuePairMappingStrategy : PropertyMapMappingStrategy
-		{
-			private Dictionary<string, object> propertyValues = new Dictionary<string, object>();
-
-			public override bool IsMatch(ResolutionContext context, IMappingEngineRunner mapper)
-			{
-				return context.DestinationType.IsGenericType && context.DestinationType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>);
-			}
-
-			protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
-			{
-				return mapper.CreateObject(context);
-			}
-
-			protected override void AssignValue(PropertyMap propertyMap, object mappedObject, object propertyValueToAssign)
-			{
-				if (propertyValues.ContainsKey(propertyMap.DestinationProperty.Name))
-					propertyValues.Clear();
-				propertyValues.Add(propertyMap.DestinationProperty.Name, propertyValueToAssign);
-			}
-
-			protected override object ReassignValue(ResolutionContext context, object o)
-			{
-				return Activator.CreateInstance(context.DestinationType, propertyValues["Key"], propertyValues["Value"]);
 			}
 		}
 

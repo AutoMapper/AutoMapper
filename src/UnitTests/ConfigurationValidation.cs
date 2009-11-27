@@ -259,7 +259,8 @@ namespace AutoMapper.UnitTests
 			public class Destination
 			{
 				public int Value { get; set; }
-				public int ValuePlusOne { get { return Value + 1; } }
+				public string ValuePlusOne { get { return (Value + 1).ToString(); } }
+				public int ValuePlusTwo { get { return Value + 2; } }
 			}
 
 			protected override void Establish_context()

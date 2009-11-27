@@ -22,6 +22,16 @@ namespace AutoMapper
 			return type.GetInterfaces().Contains(typeof (IEnumerable));
 		}
 
+		public static bool IsListType(this Type type)
+		{
+			return type.GetInterfaces().Contains(typeof (IList));
+		}
+
+		public static bool IsWriteableCollectionType(this Type type)
+		{
+			return type.IsListType() || type.IsDictionaryType();
+		}
+
 		public static bool IsDictionaryType(this Type type)
 		{
 			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))

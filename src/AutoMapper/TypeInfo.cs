@@ -60,7 +60,7 @@ namespace AutoMapper
                     x.Any(y => y.CanWrite && y.CanRead) ? // favor the first property that can both read & write - otherwise pick the first one
 						x.Where(y => y.CanWrite && y.CanRead).First() :
                         x.First())
-				.Where(pi => pi.CanWrite || pi.PropertyType.IsEnumerableType())
+				.Where(pi => pi.CanWrite || pi.PropertyType.IsWriteableCollectionType())
                 .OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
                 .Concat(allMembers.Where(x => x is FieldInfo));  // add FieldInfo objects back
 

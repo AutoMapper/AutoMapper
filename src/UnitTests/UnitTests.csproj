@@ -102,6 +102,7 @@
     <Compile Include="General.cs" />
     <Compile Include="Indexers.cs" />
     <Compile Include="InterfaceMapping.cs" />
+    <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
     <Compile Include="Internationalization.cs" />
     <Compile Include="Mappers\TypeHelperTests.cs">
       <SubType>Code</SubType>
