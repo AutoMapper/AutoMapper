@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,10 +15,13 @@ namespace AutoMapper
 	internal delegate void LateBoundPropertySet(object target, object value);
 	internal delegate void LateBoundValueTypeFieldSet(ref object target, object value);
 	internal delegate void LateBoundValueTypePropertySet(ref object target, object value);
-
+	internal delegate object LateBoundCtor();
 
 	internal static class DelegateFactory
 	{
+		private static readonly Hashtable _ctorCache = Hashtable.Synchronized(new Hashtable());
+		private readonly static Type _ctorDelegateType = typeof(LateBoundCtor);
+		
 		public static LateBoundMethod CreateGet(MethodInfo method)
 		{
 			ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
@@ -123,6 +128,26 @@ namespace AutoMapper
 			return result;
 		}
 
+		public static LateBoundCtor CreateCtor(Type type)
+		{
+			var ctor = _ctorCache[type] as LateBoundCtor;
+			if (ctor == null)
+			{
+				lock (_ctorCache.SyncRoot)
+				{
+					ctor = _ctorCache[type] as LateBoundCtor;
+					if (ctor != null)
+					{
+						return ctor;
+					}
+
+					var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
+					ctor = ctorExpression.Compile();
+					_ctorCache.Add(type, ctor);
+				}
+			}
+			return ctor;
+		}
 		private static Expression[] CreateParameterExpressions(MethodInfo method, Expression argumentsParameter)
 		{
 			return method.GetParameters().Select((parameter, index) =>

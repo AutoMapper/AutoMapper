@@ -208,6 +208,35 @@ namespace AutoMapper.UnitTests
 			source.Value.ShouldEqual("hello");
 		}
 
+		[Test]
+		public void Test_with_create_ctor()
+		{
+			var sourceType = typeof(Source);
+
+			LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
+
+			var target = ctor();
+
+			target.ShouldBeInstanceOf<Source>();
+		}
+
+		[Test]
+		public void Test_with_value_object_create_ctor()
+		{
+			var sourceType = typeof(ValueSource);
+
+			LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
+
+			var target = ctor();
+
+			target.ShouldBeInstanceOf<ValueSource>();
+		}
+
+		public object CreateValueSource()
+		{
+			return new ValueSource();
+		}
+
 		[Test, Explicit]
 		public void Test_with_DynamicMethod()
 		{

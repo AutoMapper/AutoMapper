@@ -33,7 +33,7 @@ namespace AutoMapper.Mappers
 
 		public static object CreateObject(Type type)
 		{
-			return Activator.CreateInstance(type, true);
+			return DelegateFactory.CreateCtor(type)();
 		}
 	}
 }
