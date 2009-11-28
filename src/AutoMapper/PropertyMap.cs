@@ -39,18 +39,21 @@ namespace AutoMapper
 
 	    public IEnumerable<IValueResolver> GetSourceValueResolvers()
 		{
-			yield return new DefaultResolver();
+			//yield return new DefaultResolver();
 
-			yield return _customMemberResolver;
+			if (_customMemberResolver != null)
+				yield return _customMemberResolver;
 
-			yield return _customResolver;
+			if (_customResolver != null)
+				yield return _customResolver;
 
 			foreach (var resolver in _sourceValueResolvers)
 			{
 				yield return resolver;
 			}
 
-			yield return new NullReplacementMethod(_nullSubstitute);
+			if (_nullSubstitute != null)
+				yield return new NullReplacementMethod(_nullSubstitute);
 		}
 
 		public void RemoveLastResolver()
@@ -72,14 +75,14 @@ namespace AutoMapper
 			return result;
 		}
 
-		private void Seal()
+		internal void Seal()
 		{
 			if (_sealed)
 			{
 				return;
 			}
 
-			_cachedResolvers = GetSourceValueResolvers().Where(r => r != null).ToArray();
+			_cachedResolvers = GetSourceValueResolvers().ToArray();
 			_sealed = true;
 		}
 

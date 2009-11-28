@@ -19,6 +19,7 @@ namespace Benchmark
 			var timer = new HiPerfTimer();
 
 			_mapper.Initialize();
+			_mapper.Map();
 
 			timer.Start();
 

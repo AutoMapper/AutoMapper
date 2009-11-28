@@ -4,15 +4,18 @@ namespace AutoMapper.Internal
 {
 	internal struct TypePair : IEquatable<TypePair>
 	{
+
 		public TypePair(Type sourceType, Type destinationType)
 			: this()
 		{
 			_sourceType = sourceType;
 			_destinationType = destinationType;
+			_hashcode = (_sourceType.GetHashCode()*397) ^ _destinationType.GetHashCode();
 		}
 
 		private readonly Type _sourceType;
 		private readonly Type _destinationType;
+		private readonly int _hashcode;
 
 		public bool Equals(TypePair other)
 		{
@@ -30,7 +33,7 @@ namespace AutoMapper.Internal
 		{
 			unchecked
 			{
-				return (_sourceType.GetHashCode()*397) ^ _destinationType.GetHashCode();
+				return _hashcode;
 			}
 		}
 	}

@@ -11,7 +11,9 @@ namespace AutoMapper
 		private readonly TypeInfo _destinationType;
 		private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
 		private readonly IList<PropertyMap> _propertyMaps = new List<PropertyMap>();
+		private PropertyMap[] _orderedPropertyMaps;
 		private readonly TypeInfo _sourceType;
+		private bool _sealed;
 
 		public TypeMap(TypeInfo sourceType, TypeInfo destinationType)
 		{
@@ -61,7 +63,9 @@ namespace AutoMapper
 
 		public IEnumerable<PropertyMap> GetPropertyMaps()
 		{
-			return _propertyMaps.OrderBy(map => map.GetMappingOrder());
+			Seal();
+
+			return _orderedPropertyMaps;
 		}
 
 		public void AddPropertyMap(PropertyMap propertyMap)
@@ -138,6 +142,18 @@ namespace AutoMapper
 		public void AddAfterMapAction(Action<object, object> afterMap)
 		{
 			_afterMapActions.Add(afterMap);
+		}
+
+		public void Seal()
+		{
+			if (_sealed)
+				return;
+
+			_orderedPropertyMaps = _propertyMaps.OrderBy(map => map.GetMappingOrder()).ToArray();
+
+			_orderedPropertyMaps.Each(pm => pm.Seal());
+
+			_sealed = true;
 		}
 
 		public bool Equals(TypeMap other)

@@ -14,18 +14,20 @@ namespace Benchmark.Flattening
 
 		public void Initialize()
 		{
-			Mapper.Reset();
-			Mapper.CreateMap<Model1, Dto1>();
-			Mapper.CreateMap<Model2, Dto2>();
-			Mapper.CreateMap<Model3, Dto3>();
-			Mapper.CreateMap<Model4, Dto4>();
-			Mapper.CreateMap<Model5, Dto5>();
-			Mapper.CreateMap<Model6, Dto6>();
-			Mapper.CreateMap<Model7, Dto7>();
-			Mapper.CreateMap<Model8, Dto8>();
-			Mapper.CreateMap<Model9, Dto9>();
-			Mapper.CreateMap<Model10, Dto10>();
-			Mapper.CreateMap<ModelObject, ModelDto>();
+			Mapper.Initialize(cfg =>
+			{
+				cfg.CreateMap<Model1, Dto1>();
+				cfg.CreateMap<Model2, Dto2>();
+				cfg.CreateMap<Model3, Dto3>();
+				cfg.CreateMap<Model4, Dto4>();
+				cfg.CreateMap<Model5, Dto5>();
+				cfg.CreateMap<Model6, Dto6>();
+				cfg.CreateMap<Model7, Dto7>();
+				cfg.CreateMap<Model8, Dto8>();
+				cfg.CreateMap<Model9, Dto9>();
+				cfg.CreateMap<Model10, Dto10>();
+				cfg.CreateMap<ModelObject, ModelDto>();
+			});
 			Mapper.AssertConfigurationIsValid();
 			_source = new ModelObject
 				{

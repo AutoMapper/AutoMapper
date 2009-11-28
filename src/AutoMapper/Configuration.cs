@@ -98,6 +98,11 @@ namespace AutoMapper
 			_serviceCtor = constructor;
 		}
 
+		public void Seal()
+		{
+			_typeMaps.Each(typeMap => typeMap.Seal());
+		}
+
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
 			TypeMap typeMap = CreateTypeMap(typeof (TSource), typeof (TDestination));

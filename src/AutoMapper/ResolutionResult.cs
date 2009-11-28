@@ -40,9 +40,6 @@ namespace AutoMapper
             if (value == null)
                 return memberType;
 
-            if (memberType.IsGenericType && memberType.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
-                return memberType;
-
             return value.GetType();
         }
 

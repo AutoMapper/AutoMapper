@@ -66,6 +66,8 @@ namespace AutoMapper
 			Reset();
 
 			action(Configuration);
+
+			Configuration.Seal();
 		}
 
 		public static IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
