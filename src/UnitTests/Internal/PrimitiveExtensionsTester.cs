@@ -11,25 +11,25 @@ namespace AutoMapper.UnitTests
 		[Test]
 		public void Should_not_flag_only_enumerable_type_as_writeable_collection()
 		{
-			typeof(string).IsWriteableCollectionType().ShouldBeFalse();
+			typeof(string).IsListOrDictionaryType().ShouldBeFalse();
 		}
 
 		[Test]
 		public void Should_flag_list_as_writable_collection()
 		{
-			typeof(ArrayList).IsWriteableCollectionType().ShouldBeTrue();
+			typeof(ArrayList).IsListOrDictionaryType().ShouldBeTrue();
 		}
 
 		[Test]
 		public void Should_flag_generic_list_as_writeable_collection()
 		{
-			typeof(List<int>).IsWriteableCollectionType().ShouldBeTrue();
+			typeof(List<int>).IsListOrDictionaryType().ShouldBeTrue();
 		}
 
 		[Test]
 		public void Should_flag_dictionary_as_writeable_collection()
 		{
-			typeof(Dictionary<string, int>).IsWriteableCollectionType().ShouldBeTrue();
+			typeof(Dictionary<string, int>).IsListOrDictionaryType().ShouldBeTrue();
 		}
 	}
 }
