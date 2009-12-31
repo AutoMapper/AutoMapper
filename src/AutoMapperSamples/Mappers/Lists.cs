@@ -3,7 +3,7 @@ using AutoMapper;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
-namespace AutoMapperSamples
+namespace AutoMapperSamples.Mappers
 {
 	namespace Lists
 	{
@@ -36,7 +36,6 @@ namespace AutoMapperSamples
 				ICollection<Destination> icollectionDest = Mapper.Map<Source[], ICollection<Destination>>(sources);
 				IList<Destination> ilistDest = Mapper.Map<Source[], IList<Destination>>(sources);
 				List<Destination> listDest = Mapper.Map<Source[], List<Destination>>(sources);
-				Destination[] arrayDest = Mapper.Map<Source[], Destination[]>(sources);
 			}
 		}
 

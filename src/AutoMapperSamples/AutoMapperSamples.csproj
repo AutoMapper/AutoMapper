@@ -62,13 +62,19 @@
     </Compile>
     <Compile Include="CommonBaseClassConfiguration.cs" />
     <Compile Include="ConfigurationValidation.cs" />
-    <Compile Include="DynamicMapping.cs" />
+    <Compile Include="AdvancedMappers\DynamicMapping.cs" />
+    <Compile Include="Configuration\Profiles.cs" />
     <Compile Include="GlobalTypeConverters.cs" />
     <Compile Include="CustomValueResolvers.cs" />
     <Compile Include="Flattening.cs" />
-    <Compile Include="Interfaces.cs" />
-    <Compile Include="InversionOfControl.cs" />
-    <Compile Include="Lists.cs" />
+    <Compile Include="AdvancedMappers\Interfaces.cs" />
+    <Compile Include="InversionOfControl.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Mappers\Dictionaries.cs" />
+    <Compile Include="Mappers\Enumerations.cs" />
+    <Compile Include="Mappers\Lists.cs" />
+    <Compile Include="Mappers\Arrays.cs" />
     <Compile Include="NestedMappings.cs" />
     <Compile Include="Projection.cs" />
   </ItemGroup>

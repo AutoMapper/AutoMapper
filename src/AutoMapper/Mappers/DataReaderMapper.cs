@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Data;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -88,7 +89,16 @@ namespace AutoMapper.Mappers
 					generator.Emit(OpCodes.Ldarg_0);
 					generator.Emit(OpCodes.Ldc_I4, i);
 					generator.Emit(OpCodes.Callvirt, getValueMethod);
-					generator.Emit(OpCodes.Unbox_Any, dataRecord.GetFieldType(i));
+
+                    if (propertyInfo.PropertyType.IsGenericType
+                        && propertyInfo.PropertyType.Name.Equals(typeof(Nullable<>).Name))
+                    {
+                        generator.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
+                    }
+                    else
+                    {
+                        generator.Emit(OpCodes.Unbox_Any, dataRecord.GetFieldType(i));
+                    }
 					generator.Emit(OpCodes.Callvirt, propertyInfo.GetSetMethod(true));
 
 					generator.MarkLabel(endIfLabel);

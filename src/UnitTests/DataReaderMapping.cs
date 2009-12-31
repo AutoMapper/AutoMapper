@@ -172,6 +172,66 @@ namespace AutoMapper.UnitTests
             private IDataRecord _dataRecord;
         }
 
+        public class When_mapping_a_data_reader_to_a_dto_with_nullable_field : AutoMapperSpecBase
+        {
+            internal const string FieldName = "Integer";
+            internal const int FieldValue = 7;
+
+            internal class DtoWithSingleNullableField
+            {
+                public int? Integer { get; set; }
+            }
+
+            internal class DataBuilder
+            {
+                public IDataReader BuildDataReaderWithNullableField()
+                {
+                    var table = new DataTable();
+
+                    var col = table.Columns.Add(FieldName, typeof(int));
+                    col.AllowDBNull = true;
+
+                    var row1 = table.NewRow();
+                    row1[FieldName] = FieldValue;
+                    table.Rows.Add(row1);
+
+                    var row2 = table.NewRow();
+                    row2[FieldName] = DBNull.Value;
+                    table.Rows.Add(row2);
+
+                    return table.CreateDataReader();
+                }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<IDataReader, DtoWithSingleNullableField>();
+
+                _dataReader = new DataBuilder().BuildDataReaderWithNullableField();
+            }
+
+            [Test]
+            public void Then_results_should_be_as_expected()
+            {
+                while (_dataReader.Read())
+                {
+                    var dto = Mapper.Map<IDataReader, DtoWithSingleNullableField>(_dataReader);
+
+                    if (_dataReader.IsDBNull(0))
+                        Assert.That(dto.Integer.HasValue, Is.EqualTo(false));
+                    else
+                    {
+                        // uncomment the following line to see some strange fail message that might be the key to the problem
+                        Assert.That(dto.Integer.HasValue, Is.EqualTo(true));
+
+                        Assert.That(dto.Integer.Value, Is.EqualTo(FieldValue));
+                    }
+                }
+            }
+
+            private IDataReader _dataReader;
+        }
+
         internal class FieldName
         {
             public const String SmallInt = "SmallInteger";
