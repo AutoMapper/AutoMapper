@@ -101,14 +101,6 @@ namespace AutoMapper.UnitTests
 
 					CreateMap<Model, Dto2>();
 				}
-
-				protected override string ProfileName
-				{
-					get
-					{
-						return "Custom2";
-					}
-				}
 			}
 
 			protected override void Establish_context()

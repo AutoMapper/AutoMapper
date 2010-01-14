@@ -14,6 +14,7 @@ namespace AutoMapper
 
 		protected Profile()
 		{
+		    _profileName = GetType().FullName;
 		}
 
 		protected virtual string ProfileName
