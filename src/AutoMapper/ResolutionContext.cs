@@ -204,7 +204,7 @@ namespace AutoMapper
 		{
 			if (ReferenceEquals(null, other)) return false;
 			if (ReferenceEquals(this, other)) return true;
-			return Equals(other._typeMap, _typeMap) && Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType) && other._arrayIndex.Equals(_arrayIndex) && Equals(other._sourceValue, _sourceValue);
+			return Equals(other._typeMap, _typeMap) && Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType) && Equals(other._sourceValue, _sourceValue);
 		}
 
 		public override bool Equals(object obj)

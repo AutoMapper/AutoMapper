@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -384,5 +385,130 @@ namespace AutoMapper.UnitTests
 				public long Id { get; set; }
 			}
 		}
-	}
+
+	    public class When_mapping_with_a_bidirectional_relationship_that_includes_arrays : AutoMapperSpecBase
+
+	    {
+	        private ParentDto _dtoParent;
+
+	        protected override void Establish_context()
+            {
+                var parent1 = new Parent { Name = "Parent 1" };
+                var child1 = new Child { Name = "Child 1" };
+
+                parent1.Children.Add(child1);
+                child1.Parents.Add(parent1);
+
+                Mapper.CreateMap<Parent, ParentDto>();
+                Mapper.CreateMap<Child, ChildDto>();
+
+	            _dtoParent = Mapper.Map<Parent, ParentDto>(parent1);
+            }
+
+	        [Test]
+	        public void Should_map_successfully()
+	        {
+                object.ReferenceEquals(_dtoParent.Children[0].Parents[0], _dtoParent).ShouldBeTrue();
+	        }
+
+            public class Parent
+            {
+                public Guid Id { get; private set; }
+
+                public string Name { get; set; }
+
+                public List<Child> Children { get; set; }
+
+                public Parent()
+                {
+                    Id = Guid.NewGuid();
+                    Children = new List<Child>();
+                }
+
+                public bool Equals(Parent other)
+                {
+                    if (ReferenceEquals(null, other)) return false;
+                    if (ReferenceEquals(this, other)) return true;
+                    return other.Id.Equals(Id);
+                }
+
+                public override bool Equals(object obj)
+                {
+                    if (ReferenceEquals(null, obj)) return false;
+                    if (ReferenceEquals(this, obj)) return true;
+                    if (obj.GetType() != typeof (Parent)) return false;
+                    return Equals((Parent) obj);
+                }
+
+                public override int GetHashCode()
+                {
+                    return Id.GetHashCode();
+                }
+            }
+
+            public class Child
+            {
+                public Guid Id { get; private set; }
+
+                public string Name { get; set; }
+
+                public List<Parent> Parents { get; set; }
+
+                public Child()
+                {
+                    Id = Guid.NewGuid();
+                    Parents = new List<Parent>();
+                }
+
+                public bool Equals(Child other)
+                {
+                    if (ReferenceEquals(null, other)) return false;
+                    if (ReferenceEquals(this, other)) return true;
+                    return other.Id.Equals(Id);
+                }
+
+                public override bool Equals(object obj)
+                {
+                    if (ReferenceEquals(null, obj)) return false;
+                    if (ReferenceEquals(this, obj)) return true;
+                    if (obj.GetType() != typeof (Child)) return false;
+                    return Equals((Child) obj);
+                }
+
+                public override int GetHashCode()
+                {
+                    return Id.GetHashCode();
+                }
+            }
+
+            public class ParentDto
+            {
+                public Guid Id { get; set; }
+
+                public string Name { get; set; }
+
+                public List<ChildDto> Children { get; set; }
+
+                public ParentDto()
+                {
+                    Children = new List<ChildDto>();
+                }
+            }
+
+            public class ChildDto
+            {
+                public Guid Id { get; set; }
+
+                public string Name { get; set; }
+
+                public List<ParentDto> Parents { get; set; }
+
+                public ChildDto()
+                {
+                    Parents = new List<ParentDto>();
+                }
+            }
+	    }
+
+    }
 }
