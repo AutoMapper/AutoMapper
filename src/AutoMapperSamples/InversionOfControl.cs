@@ -87,6 +87,8 @@ namespace AutoMapperSamples
 					.TheDefault.Is.ConstructedBy(ctx => ctx.GetInstance<AutoMapper.Configuration>());
 
                 ForRequestedType<IMappingEngine>().TheDefaultIsConcreteType<MappingEngine>();
+
+            	ForRequestedType<ITypeMapFactory>().TheDefaultIsConcreteType<TypeMapFactory>();
             }
         }
 

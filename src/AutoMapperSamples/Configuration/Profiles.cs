@@ -1,6 +1,7 @@
 using System;
 using AutoMapper;
 using NUnit.Framework;
+using NBehave.Spec.NUnit;
 
 namespace AutoMapperSamples.Configuration
 {
@@ -11,21 +12,26 @@ namespace AutoMapperSamples.Configuration
 		{
 			public class Order
 			{
-				
+				public decimal Amount { get; set; }
 			}
 
 			public class OrderListViewModel
 			{
-				
+				public string Amount { get; set; }
 			}
 
-			//public class MoneyFormatter : ValueFormatter<decimal>
-			//{
-			//    protected override string FormatValueCore(decimal value)
-			//    {
-			//        return value.ToString("c");
-			//    }
-			//}
+			public class OrderEditViewModel
+			{
+				public string Amount { get; set; }
+			}
+
+			public class MoneyFormatter : ValueFormatter<decimal>
+			{
+				protected override string FormatValueCore(decimal value)
+				{
+					return value.ToString("c");
+				}
+			}
 
 			public class ViewModelProfile : Profile
 			{
@@ -38,8 +44,32 @@ namespace AutoMapperSamples.Configuration
 				{
 					CreateMap<Order, OrderListViewModel>();
 
-					//ForSourceType<decimal>().AddFormatter<MoneyFormatter>();
+					ForSourceType<decimal>().AddFormatter<MoneyFormatter>();
 				}
+			}
+
+			[SetUp]
+			public void SetUp()
+			{
+				Mapper.Reset();
+			}
+
+			[Test]
+			public void Example()
+			{
+				Mapper.Initialize(cfg =>
+				{
+					cfg.AddProfile<ViewModelProfile>();
+					cfg.CreateMap<Order, OrderEditViewModel>();
+				});
+
+				var order = new Order {Amount = 50m};
+
+				var listViewModel = Mapper.Map<Order, OrderListViewModel>(order);
+				var editViewModel = Mapper.Map<Order, OrderEditViewModel>(order);
+
+				listViewModel.Amount.ShouldEqual("$50.00");
+				editViewModel.Amount.ShouldEqual("50");
 			}
 		}
 	}

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
+using System.Linq;
 
 namespace AutoMapperSamples.Mappers
 {
@@ -23,7 +24,10 @@ namespace AutoMapperSamples.Mappers
 			[Test]
 			public void Example()
 			{
-				Mapper.CreateMap<Source, Destination>();
+				Mapper.Initialize(cfg =>
+				{
+					cfg.CreateMap<Source, Destination>();
+				});
 
 				var sources = new[]
 					{
@@ -36,6 +40,11 @@ namespace AutoMapperSamples.Mappers
 				ICollection<Destination> icollectionDest = Mapper.Map<Source[], ICollection<Destination>>(sources);
 				IList<Destination> ilistDest = Mapper.Map<Source[], IList<Destination>>(sources);
 				List<Destination> listDest = Mapper.Map<Source[], List<Destination>>(sources);
+
+				ienumerableDest.Count().ShouldEqual(3);
+				icollectionDest.Count().ShouldEqual(3);
+				ilistDest.Count().ShouldEqual(3);
+				listDest.Count().ShouldEqual(3);
 			}
 		}
 
@@ -65,9 +74,12 @@ namespace AutoMapperSamples.Mappers
 			[Test]
 			public void Example()
 			{
-				Mapper.CreateMap<ParentSource, ParentDestination>()
-					.Include<ChildSource, ChildDestination>();
-				Mapper.CreateMap<ChildSource, ChildDestination>();
+				Mapper.Initialize(cfg =>
+				{
+					cfg.CreateMap<ParentSource, ParentDestination>()
+						.Include<ChildSource, ChildDestination>();
+					cfg.CreateMap<ChildSource, ChildDestination>();
+				});
 
 				var sources = new[]
 					{

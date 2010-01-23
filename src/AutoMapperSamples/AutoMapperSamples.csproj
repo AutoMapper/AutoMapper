@@ -31,7 +31,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=0.2.1.10000, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+    <Reference Include="AutoMapper, Version=0.4.0.150, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\release\AutoMapper.dll</HintPath>
     </Reference>
@@ -60,9 +60,11 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AdvancedMappers\MapToExistingObjects.cs" />
     <Compile Include="CommonBaseClassConfiguration.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="AdvancedMappers\DynamicMapping.cs" />
+    <Compile Include="Configuration\Initialization.cs" />
     <Compile Include="Configuration\Profiles.cs" />
     <Compile Include="GlobalTypeConverters.cs" />
     <Compile Include="CustomValueResolvers.cs" />
@@ -71,10 +73,13 @@
     <Compile Include="InversionOfControl.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Mappers\AssignableTypes.cs" />
     <Compile Include="Mappers\Dictionaries.cs" />
     <Compile Include="Mappers\Enumerations.cs" />
     <Compile Include="Mappers\Lists.cs" />
     <Compile Include="Mappers\Arrays.cs" />
+    <Compile Include="Mappers\Strings.cs" />
+    <Compile Include="Mappers\TypeConverters.cs" />
     <Compile Include="NestedMappings.cs" />
     <Compile Include="Projection.cs" />
   </ItemGroup>

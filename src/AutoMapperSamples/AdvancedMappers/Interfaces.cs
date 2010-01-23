@@ -24,16 +24,13 @@ namespace AutoMapperSamples
 				string CustomerName { get; set; }
 			}
 
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
-			}
-
 			[Test]
 			public void Example()
 			{
-				Mapper.CreateMap<OrderForm, ICreateOrderMessage>();
+				Mapper.Initialize(cfg =>
+				{
+					cfg.CreateMap<OrderForm, ICreateOrderMessage>();
+				});
 
 				Mapper.AssertConfigurationIsValid();
 

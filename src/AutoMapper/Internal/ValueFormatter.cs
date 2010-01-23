@@ -69,6 +69,9 @@ namespace AutoMapper
 
 		private static bool CheckPropertyMapSkipList(ResolutionContext context, Type formatterType)
 		{
+			if (context.PropertyMap == null)
+				return true;
+
 			return !context.PropertyMap.FormattersToSkipContains(formatterType);
 		}
 
