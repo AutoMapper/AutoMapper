@@ -23,7 +23,7 @@ namespace AutoMapperSamples.Mappers
 			{
 				Mapper.Initialize(cfg =>
 				{
-					cfg.AddFormatter<MoneyFormatter>();
+					cfg.ForSourceType<decimal>().AddFormatter<MoneyFormatter>();
 				});
 
 				var result = Mapper.Map<decimal, string>(5343.15m);

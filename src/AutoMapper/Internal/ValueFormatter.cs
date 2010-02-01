@@ -36,9 +36,15 @@ namespace AutoMapper
 						valueToFormat = formattedValue;
 					}
 				}
-			}
-
-			foreach (IValueFormatter formatter in _formatterConfiguration.GetFormatters())
+			} 
+            else if (_formatterConfiguration.GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
+            {
+                var typeSpecificFormatter = new ValueFormatter(typeSpecificFormatterConfig);
+                formattedValue = typeSpecificFormatter.FormatValue(context);
+                valueToFormat = formattedValue;
+            }
+            
+            foreach (IValueFormatter formatter in _formatterConfiguration.GetFormatters())
 			{
 				Type formatterType = GetFormatterType(formatter);
 				if (CheckPropertyMapSkipList(context, formatterType) &&

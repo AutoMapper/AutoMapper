@@ -69,8 +69,9 @@ namespace AutoMapper.UnitTests
 		public class When_applying_type_specific_global_formatting_rules : AutoMapperSpecBase
 		{
 			private ModelDto _result;
+		    private string _intResult;
 
-			private class ModelDto
+		    private class ModelDto
 			{
 				public string StartDate { get; set; }
 				public string OtherValue { get; set; }
@@ -92,14 +93,19 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.ForSourceType<DateTime>().AddFormatter<ShortDateFormatter>();
-				Mapper.ForSourceType<int>().AddFormatExpression(context => ((int)context.SourceValue + 1).ToString());
-
-				Mapper.CreateMap<ModelObject, ModelDto>();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.ForSourceType<DateTime>().AddFormatter<ShortDateFormatter>();
+                    cfg.ForSourceType<int>().AddFormatExpression(context => ((int)context.SourceValue + 1).ToString());
+                    
+                    cfg.CreateMap<ModelObject, ModelDto>();
+                });
 
 				var model = new ModelObject { StartDate = new DateTime(2004, 12, 25), OtherValue = 43 };
 
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
+
+			    _intResult = Mapper.Map<int, string>(44);
 			}
 
 			[Test]
@@ -113,6 +119,12 @@ namespace AutoMapper.UnitTests
 			{
 				_result.OtherValue.ShouldEqual("44");
 			}
+
+		    [Test]
+		    public void Should_use_formatter_outside_of_type_map()
+		    {
+		        _intResult.ShouldEqual("45");
+		    }
 		}
 
 		public class When_applying_type_specific_and_general_global_formatting_rules : AutoMapperSpecBase
