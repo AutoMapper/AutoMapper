@@ -187,6 +187,9 @@ namespace AutoMapper
 
 		private bool ShouldMapSourceValueAsNull(ResolutionContext context)
 		{
+            if (context.DestinationType == typeof(string))
+                return false;
+
 			var typeMap = context.GetContextTypeMap();
 			if (typeMap != null)
 				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;

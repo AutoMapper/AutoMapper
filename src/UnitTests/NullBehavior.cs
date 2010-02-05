@@ -66,12 +66,6 @@ namespace AutoMapper.UnitTests
 			{
 				_result.SubSomething.ShouldEqual(0);
 			}
-
-			[Test]
-			public void Default_value_for_string_should_be_empty()
-			{
-				_result.NullString.ShouldEqual(string.Empty);
-			}
 		}
 
 		public class When_overriding_null_behavior_with_null_source_items : AutoMapperSpecBase
@@ -272,6 +266,58 @@ namespace AutoMapper.UnitTests
 	        {
 	            _dest.OtherValue.ShouldEqual(0);
 	        }
+	    }
+
+	    public class When_specifying_a_resolver_for_a_nullable_type : SpecBase
+	    {
+	        private FooViewModel _result;
+
+	        public class NullableBoolToLabel : TypeConverter<bool?, string>
+            {
+                protected override string ConvertCore(bool? source)
+                {
+                    if (source.HasValue)
+                    {
+                        if (source.Value)
+                            return "Yes";
+                        else
+                            return "No";
+                    }
+                    else
+                        return "(n/a)";
+                }
+            }
+
+            public class Foo
+            {
+                public bool? IsFooBarred { get; set; }
+            }
+
+            public class FooViewModel
+            {
+                public string IsFooBarred { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<bool?, string>().ConvertUsing<NullableBoolToLabel>();
+                    cfg.CreateMap<Foo, FooViewModel>();
+                });
+            }
+
+            protected override void Because_of()
+            {
+                var foo3 = new Foo { IsFooBarred = null };
+                _result = Mapper.Map<Foo, FooViewModel>(foo3);
+            }
+
+	        [Test]
+	        public void Should_allow_the_resolver_to_handle_null_values()
+	        {
+                _result.IsFooBarred.ShouldEqual("(n/a)");
+            }
 	    }
 
 	}

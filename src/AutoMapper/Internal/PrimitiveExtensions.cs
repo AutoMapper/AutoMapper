@@ -9,7 +9,7 @@ namespace AutoMapper
 	{
 		public static string ToNullSafeString(this object value)
 		{
-			return value == null ? string.Empty : value.ToString();
+			return value == null ? null : value.ToString();
 		}
         
 		public static bool IsNullableType(this Type type)
