@@ -1,0 +1,12 @@
+build/
+*.suo
+*.user
+bin
+Bin
+obj
+_ReSharper*
+*.csproj.user
+*.resharper.user
+*.suo
+*.cache
+TestResult.xml
