@@ -1,106 +1,106 @@
 <?xml version="1.0" ?>
 <project name="AutoMapper" default="test" xmlns="http://nant.sf.net/schemas/nant.xsd">
-	<property name="build.dir" value="build" />
-	<property name="dist.dir" value="release" />
-	<property name="src.dir" value="src" />
-	<property name="tools.dir" value="tools" />
+    <property name="build.dir" value="build" />
+    <property name="dist.dir" value="release" />
+    <property name="src.dir" value="src" />
+    <property name="tools.dir" value="tools" />
 
-	<property name="nant.settings.currentframework" value="net-3.5" />
-	<property name="svn.executable" value="tools/subversion/svn.exe" dynamic="true" if="${not property::exists('svn.executable')}" />
+    <property name="nant.settings.currentframework" value="net-3.5" />
+    <property name="svn.executable" value="tools/subversion/svn.exe" dynamic="true" if="${not property::exists('svn.executable')}" />
 
-	<property name="revisionnumber" value="9999" dynamic="true"/>
-	<property name="project.fullversion" value="1.0.1.${revisionnumber}" dynamic="true"/>
-	<property name="svnargs" value=" --non-interactive " />
-	<property name="config" value="Debug" />
+    <property name="revisionnumber" value="9999" dynamic="true"/>
+    <property name="project.fullversion" value="1.0.1.999" />
+    <property name="project.fullversion" value="${build.number}" if="${property::exists('build.number')}"/>
+    <property name="svnargs" value=" --non-interactive " />
+    <property name="config" value="Debug" />
 
-	<target name="test" depends="compile, run-unit-tests"
+    <target name="test" depends="compile, run-unit-tests"
 		description="Compile and Run Tests" />
 
-	<target name="full" depends="clean, commonassemblyinfo, test, merge, dist" description="Compiles, tests, and produces distributions" />
+    <target name="full" depends="clean, commonassemblyinfo, test, merge, dist" description="Compiles, tests, and produces distributions" />
 
-	<!-- User targets -->
-	<target name="clean" description="Delete Automated Build artifacts">
-		<delete dir="${build.dir}" if="${directory::exists(build.dir)}"/>
-	</target>
+    <!-- User targets -->
+    <target name="clean" description="Delete Automated Build artifacts">
+        <delete dir="${build.dir}" if="${directory::exists(build.dir)}"/>
+        <delete dir="${dist.dir}" if="${directory::exists(dist.dir)}"/>
+    </target>
 
-	<target name="compile" description="Compiles using the AutomatedDebug Configuration">
-		<exec program="${framework::get-framework-directory(framework::get-target-framework())}\msbuild.exe"
+    <target name="compile" description="Compiles using the AutomatedDebug Configuration">
+        <exec program="${framework::get-framework-directory(framework::get-target-framework())}\msbuild.exe"
 				  commandline="src\AutoMapper.sln /t:Clean /t:Build /p:Configuration=Automated${config} /v:q /nologo" workingdir="." />
-	</target>
+    </target>
 
-	<target name="commonassemblyinfo">
-		<exec failonerror="false" program="${svn.executable}" commandline="info release --xml --revision HEAD ${svnargs}" output="svninfo.xml" append="false" verbose="false"/>
-		<xmlpeek failonerror="false" file="svninfo.xml" xpath="/info/entry/@revision" property="revisionnumber"/>
+    <target name="commonassemblyinfo">
+        <echo message="MARKING THIS BUILD AS VERSION ${project.fullversion}" />
+        <delete file="${src.dir}/CommonAssemblyInfo.cs" failonerror="false"/>
+        <asminfo output="${src.dir}/CommonAssemblyInfo.cs" language="CSharp">
+            <imports>
+                <import namespace="System" />
+                <import namespace="System.Reflection" />
+                <import namespace="System.Runtime.InteropServices" />
+            </imports>
+            <attributes>
+                <attribute type="ComVisibleAttribute" value="false" />
+                <attribute type="AssemblyVersionAttribute" value="${project.fullversion}" />
+                <attribute type="AssemblyFileVersionAttribute" value="${project.fullversion}" />
+                <attribute type="AssemblyCopyrightAttribute" value="Copyright Â© Jimmy Bogard 2008-${datetime::get-year(datetime::now())}" />
+                <attribute type="AssemblyProductAttribute" value="${project::get-name()}" />
+                <attribute type="AssemblyCompanyAttribute" value="" />
+                <attribute type="AssemblyConfigurationAttribute" value="Debug" />
+                <attribute type="AssemblyInformationalVersionAttribute" value="${project.fullversion}" />
+            </attributes>
+            <references>
+                <include name="System.dll" />
+            </references>
+        </asminfo>
+    </target>
 
-		<property name="revisionnumber" value="${int::parse(revisionnumber) + 1}"/>
-		<echo message="Current SVN Revision: ${revisionnumber}"/>
-
-		<echo message="MARKING THIS BUILD AS VERSION ${project.fullversion}" />
-		<delete file="${src.dir}/CommonAssemblyInfo.cs" failonerror="false"/>
-		<asminfo output="${src.dir}/CommonAssemblyInfo.cs" language="CSharp">
-			<imports>
-				<import namespace="System" />
-				<import namespace="System.Reflection" />
-				<import namespace="System.Runtime.InteropServices" />
-			</imports>
-			<attributes>
-				<attribute type="ComVisibleAttribute" value="false" />
-				<attribute type="AssemblyVersionAttribute" value="${project.fullversion}" />
-				<attribute type="AssemblyFileVersionAttribute" value="${project.fullversion}" />
-				<attribute type="AssemblyCopyrightAttribute" value="Copyright Â© Jimmy Bogard 2008-${datetime::get-year(datetime::now())}" />
-				<attribute type="AssemblyProductAttribute" value="${project::get-name()}" />
-				<attribute type="AssemblyCompanyAttribute" value="" />
-				<attribute type="AssemblyConfigurationAttribute" value="Debug" />
-				<attribute type="AssemblyInformationalVersionAttribute" value="${project.fullversion}" />
-			</attributes>
-			<references>
-				<include name="System.dll" />
-			</references>
-		</asminfo>
-	</target>
-
-	<target name="merge" depends="clean, compile, run-unit-tests">
-		<!--<msbuild project="src\ILMerge.MSBuild"/>-->
-		<mkdir dir="${build.dir}\merge" />
-		<exec program="${tools.dir}\ILMerge\ilmerge.exe"
+    <target name="merge" depends="clean, compile, run-unit-tests">
+        <!--<msbuild project="src\ILMerge.MSBuild"/>-->
+        <mkdir dir="${build.dir}\merge" />
+        <exec program="${tools.dir}\ILMerge\ilmerge.exe"
 				  commandline="/v2 /log /out:&quot;${build.dir}\merge\AutoMapper.dll&quot; /internalize:AutoMapper.exclude &quot;${build.dir}\${config}\AutoMapper\AutoMapper.dll&quot; &quot;${build.dir}\${config}\AutoMapper\LinFu.DynamicProxy.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />
-	</target>
+    </target>
 
-	<!-- Internal targets -->
-	<target name="run-unit-tests">
-		<mkdir dir="${build.dir}\results" />
-		<nunit2 failonerror="true" verbose="true">
-			<formatter type="Xml" outputdir="${build.dir}\results" usefile="true" extension=".xml"/>
-			<formatter type="Plain" />
-			<test assemblyname="${build.dir}/${config}/UnitTests/AutoMapper.UnitTests.dll"/>
-		</nunit2>
-	</target>
+    <!-- Internal targets -->
+    <target name="run-unit-tests">
+        <mkdir dir="${build.dir}\results" />
+        <nunit2 failonerror="true" verbose="true">
+            <formatter type="Xml" outputdir="${build.dir}\results" usefile="true" extension=".xml"/>
+            <formatter type="Plain" />
+            <test assemblyname="${build.dir}/${config}/UnitTests/AutoMapper.UnitTests.dll"/>
+        </nunit2>
+    </target>
 
-	<target name="dist">
-		<copy todir="${build.dir}\dist-merged">
-			<fileset basedir="${build.dir}\merge">
-				<include name="**\*"/>
-				<exclude name="**\*.pdb" />
-			</fileset>
-		</copy>
-		<copy todir="${build.dir}\dist">
-			<fileset basedir="${build.dir}\${config}\AutoMapper">
-				<include name="**\*"/>
-				<exclude name="**\*.pdb" />
-			</fileset>
-		</copy>
-		<zip zipfile="${dist.dir}\AutoMapper.zip">
-			<fileset basedir="${build.dir}\dist">
-				<include name="**\*" />
-			</fileset>
-		</zip>
-		<zip zipfile="${dist.dir}\AutoMapper-merged.zip">
-			<fileset basedir="${build.dir}\dist-merged">
-				<include name="**\*" />
-			</fileset>
-		</zip>
-		<copy file="${build.dir}\dist-merged\AutoMapper.dll" tofile="${dist.dir}\AutoMapper.dll" />
-	</target>
+    <target name="dist">
+
+        <mkdir dir="${dist.dir}" />
+
+        <copy todir="${build.dir}\dist-merged">
+            <fileset basedir="${build.dir}\merge">
+                <include name="**\*"/>
+                <exclude name="**\*.pdb" />
+            </fileset>
+        </copy>
+        <copy todir="${build.dir}\dist">
+            <fileset basedir="${build.dir}\${config}\AutoMapper">
+                <include name="**\*"/>
+                <exclude name="**\*.pdb" />
+            </fileset>
+        </copy>
+
+        <zip zipfile="${dist.dir}\AutoMapper.zip">
+            <fileset basedir="${build.dir}\dist">
+                <include name="**\*" />
+            </fileset>
+        </zip>
+        <zip zipfile="${dist.dir}\AutoMapper-merged.zip">
+            <fileset basedir="${build.dir}\dist-merged">
+                <include name="**\*" />
+            </fileset>
+        </zip>
+        <copy file="${build.dir}\dist-merged\AutoMapper.dll" tofile="${dist.dir}\AutoMapper.dll" />
+    </target>
 
 </project>
 
