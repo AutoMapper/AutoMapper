@@ -3,8 +3,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security;
 
-[assembly: AssemblyTitle("AutoMapper")]
-[assembly: AssemblyDescription("AutoMapper")]
+[assembly: AssemblyTitle("AutoMapper.Silverlight")]
+[assembly: AssemblyDescription("AutoMapper.Silverlight")]
 
 [assembly: AssemblyDelaySign(false)]
 [assembly: CLSCompliant(true)]
