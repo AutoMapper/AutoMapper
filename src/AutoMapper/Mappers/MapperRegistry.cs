@@ -7,7 +7,9 @@ namespace AutoMapper.Mappers
     {
         public static Func<IEnumerable<IObjectMapper>> AllMappers = () => new IObjectMapper[]
         {
+#if !SILVERLIGHT
             new DataReaderMapper(),
+#endif
             new TypeMapMapper(TypeMapObjectMapperRegistry.AllMappers()),
             new StringMapper(),
             new FlagsEnumMapper(),
@@ -15,7 +17,9 @@ namespace AutoMapper.Mappers
             new ArrayMapper(),
 			new EnumerableToDictionaryMapper(),
             new DictionaryMapper(),
+#if !SILVERLIGHT
             new ListSourceMapper(),
+#endif
             new EnumerableMapper(),
             new AssignableMapper(),
             new TypeConverterMapper(),

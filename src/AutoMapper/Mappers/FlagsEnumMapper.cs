@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
 				return mapper.CreateObject(context);				
 			}
 
-			return Enum.Parse(enumDestType, context.SourceValue.ToString());
+			return Enum.Parse(enumDestType, context.SourceValue.ToString(), true);
 		}
 
 		public bool IsMatch(ResolutionContext context)

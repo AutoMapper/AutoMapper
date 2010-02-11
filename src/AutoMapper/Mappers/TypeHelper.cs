@@ -61,7 +61,7 @@ namespace AutoMapper.Mappers
         {
             try
             {
-                return enumerableType.GetInterface("IEnumerable`1");
+                return enumerableType.GetInterface("IEnumerable`1", false);
             }
             catch (System.Reflection.AmbiguousMatchException)
             {

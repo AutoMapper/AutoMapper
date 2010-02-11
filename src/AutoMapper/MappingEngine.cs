@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Internal;
 using AutoMapper.Mappers;
-using LinFu.DynamicProxy;
+using Castle.DynamicProxy;
 
 namespace AutoMapper
 {
 	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
 		private readonly IConfigurationProvider _configurationProvider;
-		private readonly ProxyFactory _proxyFactory = new ProxyFactory();
+        private readonly ProxyGenerator _proxyGenerator = new ProxyGenerator();
 		private readonly IObjectMapper[] _mappers;
 		private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = new Dictionary<TypePair, IObjectMapper>();
 
@@ -179,8 +179,8 @@ namespace AutoMapper
 
 			var destinationType = context.DestinationType;
 
-			if (destinationType.IsInterface)
-				return _proxyFactory.CreateProxy(destinationType, new PropertyBehaviorInterceptor());
+            if (destinationType.IsInterface)
+                return _proxyGenerator.CreateInterfaceProxyWithoutTarget(destinationType, new PropertyBehaviorInterceptor());
 
 			return ObjectCreator.CreateObject(destinationType);
 		}

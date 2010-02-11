@@ -429,6 +429,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
+#if !SILVERLIGHT
 		public class When_destination_collection_is_only_a_list_source_and_not_IList : SpecBase
 		{
 			private Destination _destination;
@@ -484,6 +485,6 @@ namespace AutoMapper.UnitTests
 				_destination.Values.Count().ShouldEqual(3);
 			}
 		}
-
+#endif
     }
 }

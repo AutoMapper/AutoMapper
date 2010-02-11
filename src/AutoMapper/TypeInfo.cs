@@ -73,7 +73,7 @@ namespace AutoMapper
 			IEnumerable<Type> typesToScan = new[] { Type, Type.BaseType };
 
     		if (Type.IsInterface)
-    			typesToScan = typesToScan.Concat(Type.FindInterfaces((m, f) => true, null));
+    			typesToScan = typesToScan.Concat(Type.GetInterfaces());
 
     		// Scan all types for public properties and fields
     		return typesToScan

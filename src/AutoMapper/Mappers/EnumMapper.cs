@@ -10,7 +10,7 @@ namespace AutoMapper.Mappers
 
 			if (EnumToStringMapping(context, ref toEnum)) {
 				if (toEnum) {
-					return Enum.Parse(context.DestinationType, context.SourceValue.ToString());
+					return Enum.Parse(context.DestinationType, context.SourceValue.ToString(), true);
 				}
 				return Enum.GetName(enumSourceType, context.SourceValue);
 			}
@@ -21,13 +21,13 @@ namespace AutoMapper.Mappers
 					return mapper.CreateObject(context);
 				}
 
-				return Enum.Parse(enumDestType, Enum.GetName(enumSourceType, context.SourceValue));
+				return Enum.Parse(enumDestType, Enum.GetName(enumSourceType, context.SourceValue), true);
 			}
 			if (EnumToUnderlyingTypeMapping(context, ref toEnum)) {
 				if (toEnum) {
-					return Enum.Parse(context.DestinationType, context.SourceValue.ToString());
+					return Enum.Parse(context.DestinationType, context.SourceValue.ToString(), true);
 				}
-				return Convert.ChangeType(context.SourceValue, context.DestinationType);
+				return Convert.ChangeType(context.SourceValue, context.DestinationType, null);
 			}
 			return null;
 		}

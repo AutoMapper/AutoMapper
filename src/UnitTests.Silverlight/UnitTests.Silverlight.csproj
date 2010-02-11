@@ -4,12 +4,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F855BE89-6122-49D9-9A7A-13BFE1E59469}</ProjectGuid>
+    <ProjectGuid>{982B7279-AFE5-4C36-A6E9-8644EFF185F4}</ProjectGuid>
     <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
-    <AssemblyName>AutoMapper.UnitTests</AssemblyName>
+    <AssemblyName>AutoMapper.UnitTests.Silverlight</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
@@ -38,35 +38,119 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedDebug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\build\Debug\UnitTests.Silverlight\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <NoConfig>true</NoConfig>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|AnyCPU' ">
-    <OutputPath>..\..\build\Release\UnitTests.Silverlight\</OutputPath>
-    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
-    <Optimize>true</Optimize>
-    <NoStdLib>true</NoStdLib>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <NoConfig>true</NoConfig>
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.5.1.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Users\Jimmy Bogard\Downloads\NUnit_2_5_1_Silverlight\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.silverlight, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e574a56a91ab7b53, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Users\Jimmy Bogard\Downloads\NUnit_2_5_1_Silverlight\nunit.silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="mscorlib" />
-    <Reference Include="system" />
-    <Reference Include="System.Core" />
+    <Reference Include="system">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Browser" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AutoMapper.snk" />
+    <Compile Include="..\UnitTests\ArraysAndLists.cs">
+      <Link>ArraysAndLists.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\AssertionExtensions.cs">
+      <Link>AssertionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\AutoMapperSpecBase.cs">
+      <Link>AutoMapperSpecBase.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\AutoMapperTester.cs">
+      <Link>AutoMapperTester.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\BeforeAfterMapping.cs">
+      <Link>BeforeAfterMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\BidirectionalRelationships.cs">
+      <Link>BidirectionalRelationships.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ConfigurationValidation.cs">
+      <Link>ConfigurationValidation.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\CustomFormatters.cs">
+      <Link>CustomFormatters.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\CustomMapping.cs">
+      <Link>CustomMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Dictionaries.cs">
+      <Link>Dictionaries.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\DynamicMapping.cs">
+      <Link>DynamicMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Enumerations.cs">
+      <Link>Enumerations.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\FillingExistingDestination.cs">
+      <Link>FillingExistingDestination.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\General.cs">
+      <Link>General.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Indexers.cs">
+      <Link>Indexers.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\InterfaceMapping.cs">
+      <Link>InterfaceMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Internationalization.cs">
+      <Link>Internationalization.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingExceptions.cs">
+      <Link>MappingExceptions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingOrder.cs">
+      <Link>MappingOrder.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MemberResolution.cs">
+      <Link>MemberResolution.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\NullBehavior.cs">
+      <Link>NullBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Profiles.cs">
+      <Link>Profiles.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Regression.cs">
+      <Link>Regression.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ResolutionContextTester.cs">
+      <Link>ResolutionContextTester.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\SelfConfiguration.cs">
+      <Link>SelfConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\TesterExtensions.cs">
+      <Link>TesterExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\TypeConverters.cs">
+      <Link>TypeConverters.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ValueTypes.cs">
+      <Link>ValueTypes.cs</Link>
+    </Compile>
+    <Compile Include="NBehaveShim\ActionSpecification.cs" />
+    <Compile Include="NBehaveShim\Extensions.cs" />
+    <Compile Include="NBehaveShim\IActionSpecification.cs" />
+    <Compile Include="NBehaveShim\NUnitSpecBase.cs" />
+    <Compile Include="NBehaveShim\SpecBase.cs" />
+    <Compile Include="NBehaveShim\ThrowingAction.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper.Silverlight\AutoMapper.Silverlight.csproj">
@@ -75,10 +159,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dummy.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
+    <None Include="AutoMapper.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
+using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
@@ -223,9 +224,9 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_properties()
 			{
-				Array.Find(_dto, d => d.SomeValue.Contains("First")).ShouldNotBeNull();
-				Array.Find(_dto, d => d.SomeValue.Contains("Second")).ShouldNotBeNull();
-			}
+                _dto.Any(d => d.SomeValue.Contains("First")).ShouldBeTrue();
+                _dto.Any(d => d.SomeValue.Contains("Second")).ShouldBeTrue();
+            }
 		}
 
 		public class When_mapping_a_List_of_model_objects : AutoMapperSpecBase
@@ -260,8 +261,8 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_properties()
 			{
-				Array.Find(_dto, d => d.SomeValue.Contains("First")).ShouldNotBeNull();
-				Array.Find(_dto, d => d.SomeValue.Contains("Second")).ShouldNotBeNull();
+                _dto.Any(d => d.SomeValue.Contains("First")).ShouldBeTrue();
+                _dto.Any(d => d.SomeValue.Contains("Second")).ShouldBeTrue();
 			}
 		}
 

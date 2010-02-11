@@ -251,7 +251,7 @@ namespace AutoMapper.Tests
 		{
 			public ResolutionResult Resolve(ResolutionResult source)
 			{
-				return source.New(((TOutputEnum)Enum.Parse(typeof(TOutputEnum), Enum.GetName(typeof(TInputEnum), source.Value))));
+				return source.New(((TOutputEnum)Enum.Parse(typeof(TOutputEnum), Enum.GetName(typeof(TInputEnum), source.Value), false)));
 			}
 		}
 	}

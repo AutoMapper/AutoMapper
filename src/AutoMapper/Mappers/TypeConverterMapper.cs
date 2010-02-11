@@ -24,7 +24,22 @@ namespace AutoMapper.Mappers
 
 		private static TypeConverter GetTypeConverter(ResolutionContext context)
 		{
-			return TypeDescriptor.GetConverter(context.SourceType);
+#if !SILVERLIGHT
+            return TypeDescriptor.GetConverter(context.SourceType);
+#else
+			var attributes = context.SourceType.GetCustomAttributes(typeof(TypeConverterAttribute), false);
+
+			if (attributes.Length != 1)
+				return null;
+
+			var converterAttribute = (TypeConverterAttribute)attributes[0];
+			var converterType = Type.GetType(converterAttribute.ConverterTypeName);
+
+			if (converterType == null)
+				return null;
+
+			return Activator.CreateInstance(converterType) as TypeConverter;
+#endif
 		}
 	}
 }

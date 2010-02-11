@@ -3,7 +3,9 @@ using System.Runtime.Serialization;
 
 namespace AutoMapper
 {
+#if !SILVERLIGHT
 	[Serializable]
+#endif
 	public class AutoMapperConfigurationException : Exception
 	{
 		//
@@ -45,11 +47,13 @@ namespace AutoMapper
 			Context = context;
 		}
 
+#if !SILVERLIGHT
 		protected AutoMapperConfigurationException(
 			SerializationInfo info,
 			StreamingContext context) : base(info, context)
 		{
 		}
+#endif
 
 		public ResolutionContext Context { get; private set; }
 

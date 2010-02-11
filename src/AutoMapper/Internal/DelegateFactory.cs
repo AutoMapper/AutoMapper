@@ -19,8 +19,8 @@ namespace AutoMapper
 
 	internal static class DelegateFactory
 	{
-		private static readonly Hashtable _ctorCache = Hashtable.Synchronized(new Hashtable());
-		private readonly static Type _ctorDelegateType = typeof(LateBoundCtor);
+        private static readonly object _ctorCacheSync = new object();
+		private static readonly Dictionary<Type, LateBoundCtor> _ctorCache = new Dictionary<Type, LateBoundCtor>();
 		
 		public static LateBoundMethod CreateGet(MethodInfo method)
 		{
@@ -71,7 +71,11 @@ namespace AutoMapper
 		public static LateBoundFieldSet CreateSet(FieldInfo field)
 		{
 			var sourceType = field.DeclaringType;
+#if !SILVERLIGHT
 			var method = new DynamicMethod("Set" + field.Name, null, new[] { typeof(object), typeof(object) }, true);
+#else
+			var method = new DynamicMethod("Set" + field.Name, null, new[] { typeof(object), typeof(object) });
+#endif
 			var gen = method.GetILGenerator();
 
 			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
@@ -90,8 +94,12 @@ namespace AutoMapper
 		{
 			var sourceType = property.DeclaringType;
 			var setter = property.GetSetMethod(true);
+#if !SILVERLIGHT
 			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object), typeof(object) }, true);
-			var gen = method.GetILGenerator();
+#else
+			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object), typeof(object) });
+#endif
+            var gen = method.GetILGenerator();
 
 			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
 			gen.Emit(OpCodes.Castclass, sourceType); // Cast to source type
@@ -109,7 +117,11 @@ namespace AutoMapper
 		{
 			var sourceType = property.DeclaringType;
 			var setter = property.GetSetMethod(true);
+#if !SILVERLIGHT
 			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, true);
+#else
+			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) });
+#endif
 			var gen = method.GetILGenerator();
 
 			method.InitLocals = true;
@@ -130,13 +142,12 @@ namespace AutoMapper
 
 		public static LateBoundCtor CreateCtor(Type type)
 		{
-			var ctor = _ctorCache[type] as LateBoundCtor;
-			if (ctor == null)
+			LateBoundCtor ctor;
+			if (!_ctorCache.TryGetValue(type, out ctor))
 			{
-				lock (_ctorCache.SyncRoot)
+                lock (_ctorCacheSync)
 				{
-					ctor = _ctorCache[type] as LateBoundCtor;
-					if (ctor != null)
+                    if (_ctorCache.TryGetValue(type, out ctor))
 					{
 						return ctor;
 					}

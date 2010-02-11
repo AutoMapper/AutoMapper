@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+
+#if !SILVERLIGHT
 using System.Data;
+#endif
+
 using System.Linq;
 using System.Reflection;
 using AutoMapper.Internal;
@@ -255,7 +259,7 @@ namespace AutoMapper
 		{
 			var badTypeMaps =
 				from typeMap in typeMaps
-				where typeMap.CustomMapper == null && !typeof(IDataRecord).IsAssignableFrom(typeMap.SourceType)
+				where ShouldCheckMap(typeMap)
 				let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
 				where unmappedPropertyNames.Length > 0
 				select new { typeMap, unmappedPropertyNames };
@@ -275,9 +279,17 @@ namespace AutoMapper
 			}
 		}
 
+	    private static bool ShouldCheckMap(TypeMap typeMap)
+	    {
+#if !SILVERLIGHT
+	        return typeMap.CustomMapper == null && !typeof(IDataRecord).IsAssignableFrom(typeMap.SourceType);
+#else
+            return typeMap.CustomMapper == null;
+#endif
+	    }
 
 
-        private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType)
+	    private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType)
         {
             TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType);
 

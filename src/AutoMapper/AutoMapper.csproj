@@ -51,9 +51,13 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LinFu.DynamicProxy, Version=1.0.3.28303, Culture=neutral, PublicKeyToken=62a6874124340d6e, processorArchitecture=MSIL">
+    <Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\LinFu.DynamicProxy\LinFu.DynamicProxy.dll</HintPath>
+      <HintPath>..\..\lib\Castle.DynamicProxy-2.2\bin\net-35\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.DynamicProxy2, Version=2.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Castle.DynamicProxy-2.2\bin\net-35\Castle.DynamicProxy2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -71,11 +75,11 @@
     <Compile Include="IMappingAction.cs" />
     <Compile Include="IMappingEngineRunner.cs" />
     <Compile Include="INamingConvention.cs" />
+    <Compile Include="Internal\PropertyBehaviorInterceptor.cs" />
     <Compile Include="Internal\DelegateBasedResolver2.cs" />
     <Compile Include="Internal\DeferredInstantiatedConverter.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\ITypeMapFactory.cs" />
-    <Compile Include="Internal\PropertyBehaviorInterceptor.cs" />
     <Compile Include="Internal\DefaultResolver.cs" />
     <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
     <Compile Include="Internal\DeferredInstantiatedResolver.cs" />
