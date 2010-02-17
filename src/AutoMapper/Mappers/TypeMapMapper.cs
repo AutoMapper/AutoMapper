@@ -14,6 +14,8 @@ namespace AutoMapper.Mappers
 
 	    public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+	        context.TypeMap.Seal();
+
 	        var mapperToUse = _mappers.First(objectMapper => objectMapper.IsMatch(context, mapper));
             object mappedObject = mapperToUse.Map(context, mapper);
 

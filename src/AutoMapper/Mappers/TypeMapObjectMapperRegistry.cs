@@ -64,6 +64,7 @@ namespace AutoMapper.Mappers
 					context.InstanceCache.Add(context, mappedObject);
 
 				context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
+
 				foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
 				{
 					MapPropertyValue(context, mapper, mappedObject, propertyMap);

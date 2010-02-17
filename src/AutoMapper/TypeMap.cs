@@ -63,9 +63,10 @@ namespace AutoMapper
 
 		public IEnumerable<PropertyMap> GetPropertyMaps()
 		{
-			Seal();
+            if (_sealed)
+                return _orderedPropertyMaps;
 
-			return _orderedPropertyMaps;
+		    return _propertyMaps;
 		}
 
 		public void AddPropertyMap(PropertyMap propertyMap)
