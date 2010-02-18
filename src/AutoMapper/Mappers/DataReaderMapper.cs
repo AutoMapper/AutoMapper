@@ -17,7 +17,7 @@ namespace AutoMapper.Mappers
 			    var resolveUsingContext = context;
                 if (context.TypeMap == null)
                 {
-                    var configurationProvider = ((MappingEngine)(Mapper.Engine)).ConfigurationProvider;
+                    var configurationProvider = mapper.ConfigurationProvider;
                     TypeMap typeMap = configurationProvider.FindTypeMapFor(context.SourceValue, context.SourceType, destinationElementType);
                     resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType);
                 }
