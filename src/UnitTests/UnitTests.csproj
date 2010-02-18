@@ -83,7 +83,6 @@
     <Compile Include="AutoMapperSpecBase.cs" />
     <Compile Include="AutoMapperTester.cs" />
     <Compile Include="BeforeAfterMapping.cs" />
-    <Compile Include="Benchmarks.cs" />
     <Compile Include="BidirectionalRelationships.cs" />
     <Compile Include="Bug\AllMembersNullSubstitute.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
@@ -129,10 +128,6 @@
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
       <Project>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</Project>
       <Name>AutoMapper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Benchmark\Benchmark.csproj">
-      <Project>{B8051389-CB47-46FB-B234-9D49506704AA}</Project>
-      <Name>Benchmark</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
