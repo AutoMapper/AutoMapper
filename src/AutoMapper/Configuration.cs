@@ -333,6 +333,13 @@ namespace AutoMapper
 
 			var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
 
+            if (mapperToUse == null && context.SourceType.IsNullableType())
+            {
+                var nullableContext = context.CreateValueContext(null, Nullable.GetUnderlyingType(context.SourceType));
+
+                mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(nullableContext));
+            }
+
 			if (mapperToUse == null)
 			{
 				throw new AutoMapperConfigurationException(context);

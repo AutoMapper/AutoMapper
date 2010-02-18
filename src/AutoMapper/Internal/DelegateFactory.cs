@@ -71,12 +71,10 @@ namespace AutoMapper
 		public static LateBoundFieldSet CreateSet(FieldInfo field)
 		{
 			var sourceType = field.DeclaringType;
-#if !SILVERLIGHT
-			var method = new DynamicMethod("Set" + field.Name, null, new[] { typeof(object), typeof(object) }, true);
-#else
-			var method = new DynamicMethod("Set" + field.Name, null, new[] { typeof(object), typeof(object) });
-#endif
-			var gen = method.GetILGenerator();
+
+            var method = CreateDynamicMethod(field, sourceType);
+
+            var gen = method.GetILGenerator();
 
 			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
 			gen.Emit(OpCodes.Castclass, sourceType); // Cast to source type
@@ -90,15 +88,11 @@ namespace AutoMapper
 			return callback;
 		}
 
-		public static LateBoundPropertySet CreateSet(PropertyInfo property)
+	    public static LateBoundPropertySet CreateSet(PropertyInfo property)
 		{
 			var sourceType = property.DeclaringType;
 			var setter = property.GetSetMethod(true);
-#if !SILVERLIGHT
-			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object), typeof(object) }, true);
-#else
-			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object), typeof(object) });
-#endif
+			var method = CreateDynamicMethod(property, sourceType);
             var gen = method.GetILGenerator();
 
 			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
@@ -113,15 +107,11 @@ namespace AutoMapper
 			return result;
 		}
 
-		public static LateBoundValueTypePropertySet CreateValueTypeSet(PropertyInfo property)
+	    public static LateBoundValueTypePropertySet CreateValueTypeSet(PropertyInfo property)
 		{
 			var sourceType = property.DeclaringType;
 			var setter = property.GetSetMethod(true);
-#if !SILVERLIGHT
-			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, true);
-#else
-			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) });
-#endif
+			var method = CreateValueTypeDynamicMethod(property, sourceType);
 			var gen = method.GetILGenerator();
 
 			method.InitLocals = true;
@@ -140,7 +130,7 @@ namespace AutoMapper
 			return result;
 		}
 
-		public static LateBoundCtor CreateCtor(Type type)
+	    public static LateBoundCtor CreateCtor(Type type)
 		{
 			LateBoundCtor ctor;
 			if (!_ctorCache.TryGetValue(type, out ctor))
@@ -159,7 +149,24 @@ namespace AutoMapper
 			}
 			return ctor;
 		}
-		private static Expression[] CreateParameterExpressions(MethodInfo method, Expression argumentsParameter)
+
+	    private static DynamicMethod CreateValueTypeDynamicMethod(MemberInfo member, Type sourceType)
+	    {
+            if (sourceType.IsInterface)
+                return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, sourceType.Assembly.ManifestModule, true);
+
+	        return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, sourceType, true);
+	    }
+
+	    private static DynamicMethod CreateDynamicMethod(MemberInfo member, Type sourceType)
+	    {
+	        if (sourceType.IsInterface)
+	            return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object), typeof(object) }, sourceType.Assembly.ManifestModule, true);
+
+	        return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object), typeof(object) }, sourceType, true);
+	    }
+
+	    private static Expression[] CreateParameterExpressions(MethodInfo method, Expression argumentsParameter)
 		{
 			return method.GetParameters().Select((parameter, index) =>
 				Expression.Convert(

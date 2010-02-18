@@ -286,10 +286,13 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.CreateMap<ModelObject, ModelDto>();
-
-				_model = new ModelObject { SomeValue = 2 };
-				_dto = Mapper.Map<ModelObject, ModelDto>(_model);
 			}
+
+            protected override void Because_of()
+            {
+                _model = new ModelObject { SomeValue = 2 };
+                _dto = Mapper.Map<ModelObject, ModelDto>(_model);
+            }
 
 			[Test]
 			public void Should_map_value_if_has_value()
