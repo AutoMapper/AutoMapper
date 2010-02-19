@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Castle.Services.Logging.log4netIntegration</name>
+    </assembly>
+    <members>
+        <member name="M:Castle.Services.Logging.Log4netIntegration.ExtendedLog4netFactory.Create(System.String)">
+            <summary>
+            Creates a new extended logger.
+            </summary>
+        </member>
+        <member name="M:Castle.Services.Logging.Log4netIntegration.ExtendedLog4netFactory.Create(System.String,Castle.Core.Logging.LoggerLevel)">
+            <summary>
+            Creates a new extended logger.
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.Log4netIntegration.ExtendedLog4netLogger.GlobalProperties">
+            <summary>
+            Exposes the Global Context of the extended logger. 
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.Log4netIntegration.ExtendedLog4netLogger.ThreadProperties">
+            <summary>
+            Exposes the Thread Context of the extended logger.
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.Log4netIntegration.ExtendedLog4netLogger.ThreadStacks">
+            <summary>
+            Exposes the Thread Stack of the extended logger.
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.Log4netIntegration.GlobalContextProperties.Item(System.String)">
+            <summary>
+            Gets or sets the value of a property
+            </summary>
+            <value>
+            The value for the property with the specified key
+            </value>
+            <remarks>
+            <para>
+            Gets or sets the value of a property
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Castle.Services.Logging.Log4netIntegration.ThreadContextProperties.Item(System.String)">
+            <summary>
+            Gets or sets the value of a property
+            </summary>
+            <value>
+            The value for the property with the specified key
+            </value>
+            <remarks>
+            <para>
+            Gets or sets the value of a property
+            </para>
+            </remarks>
+        </member>
+    </members>
+</doc>
