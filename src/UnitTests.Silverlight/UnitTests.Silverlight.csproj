@@ -65,11 +65,11 @@
     </Reference>
     <Reference Include="nunit.framework, Version=2.5.1.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Users\Jimmy Bogard\Downloads\NUnit_2_5_1_Silverlight\nunit.framework.dll</HintPath>
+      <HintPath>..\..\lib\NUnit.Silverlight\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="nunit.silverlight, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e574a56a91ab7b53, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Users\Jimmy Bogard\Downloads\NUnit_2_5_1_Silverlight\nunit.silverlight.dll</HintPath>
+      <HintPath>..\..\lib\NUnit.Silverlight\nunit.silverlight.dll</HintPath>
     </Reference>
     <Reference Include="system, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
