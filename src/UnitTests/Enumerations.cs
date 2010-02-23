@@ -189,6 +189,23 @@ namespace AutoMapper.Tests
 			mappedDto.Status.ShouldEqual(StatusForDto.InProgress);
 		}
 
+        [Test]
+        public void ShouldMapEnumWithInvalidValue()
+        {
+            Mapper.CreateMap<Order, OrderDtoWithOwnStatus>();
+
+            var order = new Order
+            {
+                Status = 0
+            };
+
+            var dto = Mapper.Map<Order, OrderDtoWithOwnStatus>(order);
+
+            var expected = (StatusForDto)0;
+
+            dto.Status.ShouldEqual(expected);
+        }
+
 		public enum Status
 		{
 			InProgress = 1,
