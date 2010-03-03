@@ -101,8 +101,6 @@ namespace AutoMapper
 			{
 				propertyMap = new PropertyMap(destinationProperty);
 
-				propertyMap.ChainResolver(destinationProperty);
-
 				AddPropertyMap(propertyMap);
 			}
 
