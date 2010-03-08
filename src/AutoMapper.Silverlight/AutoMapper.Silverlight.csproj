@@ -165,6 +165,9 @@
     <Compile Include="..\AutoMapper\Internal\MethodGetter.cs">
       <Link>Internal\MethodGetter.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\Internal\NotifyPropertyBehaviorInterceptor.cs">
+      <Link>Internal\NotifyPropertyBehaviorInterceptor.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\Internal\NullReplacementMethod.cs">
       <Link>Internal\NullReplacementMethod.cs</Link>
     </Compile>

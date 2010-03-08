@@ -9,12 +9,12 @@ namespace AutoMapper
 	{
 		private readonly IDictionary<string, object> _propertyValues = new Dictionary<string, object>();
 
-        private static string GetPropertyName(IInvocation info)
+	    protected static string GetPropertyName(IInvocation info)
 		{
 			return info.Method.Name.Replace("set_", "").Replace("get_", "");
 		}
 
-        private static bool IsSetterCall(IInvocation info)
+	    protected static bool IsSetterCall(IInvocation info)
 		{
 			return IsPropertyCall(info) && info.Arguments.Length > 0;
 		}
@@ -30,7 +30,7 @@ namespace AutoMapper
                    && (info.Method.Attributes & MethodAttributes.HideBySig) != 0;
 		}
 
-	    public void Intercept(IInvocation invocation)
+        public virtual void Intercept(IInvocation invocation)
 	    {
             object toReturn = null;
 

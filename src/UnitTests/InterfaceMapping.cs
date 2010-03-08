@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using NBehave.Spec.NUnit;
 using NUnit.Framework;
 
@@ -105,9 +106,82 @@ namespace AutoMapper.UnitTests
             }
 
             [Test]
-            public void Should_pass_configuration_testing()
+            public void Should_not_derive_from_INotifyPropertyChanged()
             {
-                Mapper.AssertConfigurationIsValid();
+                _result.ShouldNotBeInstanceOf<INotifyPropertyChanged>();    
+            }
+        }
+
+        public class When_mapping_a_concrete_type_to_an_interface_type_that_derives_from_INotifyPropertyChanged : AutoMapperSpecBase
+        {
+            private IDestination _result;
+
+            private int _count;
+
+            private class Source
+            {
+                public int Value { get; set; }
+            }
+
+            public interface IDestination : INotifyPropertyChanged
+            {
+                int Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, IDestination>();
+            }
+
+            protected override void Because_of()
+            {
+                _result = Mapper.Map<Source, IDestination>(new Source {Value = 5});
+            }
+
+            [Test]
+            public void Should_create_an_implementation_of_the_interface()
+            {
+                _result.Value.ShouldEqual(5);
+            }
+
+            [Test]
+            public void Should_derive_from_INotifyPropertyChanged()
+            {
+                _result.ShouldBeInstanceOf<INotifyPropertyChanged>();    
+            }
+
+            [Test]
+            public void Should_notify_property_changes()
+            {
+                var count = 0;
+                _result.PropertyChanged += (o, e) => {
+                    count++;
+                    e.PropertyName.ShouldEqual("Value");
+                };
+
+                _result.Value = 42;
+                count.ShouldEqual(1);
+                _result.Value.ShouldEqual(42);
+            }
+
+            [Test]
+            public void Should_detach_event_handler()
+            {
+                _result.PropertyChanged += MyHandler;
+                _count.ShouldEqual(0);
+
+                _result.Value = 56;
+                _count.ShouldEqual(1);
+
+                _result.PropertyChanged -= MyHandler;
+                _count.ShouldEqual(1);
+
+                _result.Value = 75;
+                _count.ShouldEqual(1);
+            }
+
+            private void MyHandler(object sender, PropertyChangedEventArgs e) {
+                _count++;
             }
         }
 

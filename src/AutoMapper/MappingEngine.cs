@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using AutoMapper.Internal;
 using AutoMapper.Mappers;
@@ -180,7 +181,11 @@ namespace AutoMapper
 			var destinationType = context.DestinationType;
 
             if (destinationType.IsInterface)
+            {
+                if (typeof(INotifyPropertyChanged).IsAssignableFrom(destinationType))
+                    return _proxyGenerator.CreateInterfaceProxyWithoutTarget(destinationType, new[] { typeof(INotifyPropertyChanged) }, new NotifyPropertyBehaviorInterceptor());
                 return _proxyGenerator.CreateInterfaceProxyWithoutTarget(destinationType, new PropertyBehaviorInterceptor());
+            }
 
 			return ObjectCreator.CreateObject(destinationType);
 		}
