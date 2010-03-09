@@ -16,6 +16,12 @@ namespace AutoMapper
 		{
 			return type.IsGenericType && (type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)));
 		}
+
+        public static Type GetTypeOfNullable(this Type type)
+        {
+            return type.GetGenericArguments()[0];
+        }
+
         
 		public static bool IsEnumerableType(this Type type)
 		{

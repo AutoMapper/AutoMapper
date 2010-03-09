@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using NBehave.Spec.NUnit;
 
@@ -41,5 +42,47 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+
+        public class When_destination_type_is_a_nullable_value_type : AutoMapperSpecBase
+        {
+            private Destination _destination;
+
+            public class Source
+            {
+                public string Value1 { get; set; }
+                public string Value2 { get; set; }
+            }
+
+            public struct Destination
+            {
+                public int Value1 { get; set; }
+                public int? Value2 { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<string, int>().ConvertUsing(Convert.ToInt32);
+                Mapper.CreateMap<Source, Destination>();
+            }
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Source, Destination>(new Source {Value1 = "10", Value2 = "20"});
+            }
+
+            [Test]
+            public void Should_use_map_registered_for_underlying_type()
+            {
+                _destination.Value2.ShouldEqual(20);
+            }
+
+            [Test]
+            public void Should_still_map_value_type()
+            {
+                _destination.Value1.ShouldEqual(10);
+            }
+
+
+        }
 	}
 }

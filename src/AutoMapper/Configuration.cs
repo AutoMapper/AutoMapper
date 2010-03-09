@@ -313,6 +313,11 @@ namespace AutoMapper
         {
             TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType);
 
+            if (typeMap == null && destinationType.IsNullableType())
+            {
+                typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType.GetTypeOfNullable());
+            }
+
             if (typeMap == null)
             {
                 typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
