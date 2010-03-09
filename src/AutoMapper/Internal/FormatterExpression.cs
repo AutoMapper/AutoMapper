@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace AutoMapper
 {
-	internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator
+	internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IMappingOptions
 	{
 		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();

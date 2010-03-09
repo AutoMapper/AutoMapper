@@ -87,6 +87,7 @@
     <Compile Include="Bug\AllMembersNullSubstitute.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
+    <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
       <SubType>Code</SubType>

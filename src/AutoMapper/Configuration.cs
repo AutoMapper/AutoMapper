@@ -109,13 +109,24 @@ namespace AutoMapper
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
-			TypeMap typeMap = CreateTypeMap(typeof (TSource), typeof (TDestination));
-			return new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor);
+		    return CreateMap<TSource, TDestination>(DefaultProfileName);
 		}
+
+
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName)
+        {
+            TypeMap typeMap = CreateTypeMap(typeof(TSource), typeof(TDestination), profileName);
+            return new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor);
+        }
 
 		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
-			var typeMap = CreateTypeMap(sourceType, destinationType);
+		    return CreateMap(sourceType, destinationType, DefaultProfileName);
+		}
+
+		public IMappingExpression CreateMap(Type sourceType, Type destinationType, string profileName)
+		{
+			var typeMap = CreateTypeMap(sourceType, destinationType, profileName);
 
 			return new MappingExpression(typeMap, _serviceCtor);
 		}
@@ -137,11 +148,20 @@ namespace AutoMapper
 
 		public TypeMap CreateTypeMap(Type source, Type destination)
 		{
+		    return CreateTypeMap(source, destination, DefaultProfileName);
+		}
+
+		public TypeMap CreateTypeMap(Type source, Type destination, string profileName)
+		{
 			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination);
 				
 			if (typeMap == null)
 			{
-				typeMap = _typeMapFactory.CreateTypeMap(source, destination, this);
+			    var profileConfiguration = GetProfile(profileName);
+
+				typeMap = _typeMapFactory.CreateTypeMap(source, destination, profileConfiguration);
+
+                typeMap.Profile = profileName;
 
 				_typeMaps.Add(typeMap);
 				_typeMapCache[new TypePair(source, destination)] = typeMap;
@@ -201,7 +221,7 @@ namespace AutoMapper
                     if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
                     {
                         // Cache miss
-                        typeMap = FindTypeMap(source, sourceType, destinationType);
+                        typeMap = FindTypeMap(source, sourceType, destinationType, DefaultProfileName);
 
                         _typeMapCache[typeMapPair] = typeMap;
                     }
@@ -218,7 +238,7 @@ namespace AutoMapper
 
                 var targetSourceType = potentialDestType != destinationType ? potentialSourceType : typeMap.SourceType;
                 var targetDestinationType = potentialDestType;
-                typeMap = FindTypeMap(source, targetSourceType, targetDestinationType);
+                typeMap = FindTypeMap(source, targetSourceType, targetDestinationType, DefaultProfileName);
             }
 
 		    return typeMap;
@@ -289,7 +309,7 @@ namespace AutoMapper
 	    }
 
 
-	    private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType)
+	    private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType, string profileName)
         {
             TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType);
 
@@ -308,7 +328,7 @@ namespace AutoMapper
                         var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
                         if (derivedTypeFor != destinationType)
                         {
-                            typeMap = CreateTypeMap(sourceType, derivedTypeFor);
+                            typeMap = CreateTypeMap(sourceType, derivedTypeFor, profileName);
                         }
                     }
 

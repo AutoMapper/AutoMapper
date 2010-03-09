@@ -79,16 +79,16 @@ namespace AutoMapper
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
-			var map = _configurator.CreateMap<TSource, TDestination>();
+			var map = _configurator.CreateMap<TSource, TDestination>(ProfileName);
 
-			return map.WithProfile(ProfileName);
+			return map;
 		}
 
 		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
-			var map = _configurator.CreateMap(sourceType, destinationType);
+			var map = _configurator.CreateMap(sourceType, destinationType, ProfileName);
 
-			return map.WithProfile(ProfileName);
+			return map;
 		}
 
 		public void RecognizeAlias(string original, string alias)
