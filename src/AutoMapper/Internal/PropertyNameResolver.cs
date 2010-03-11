@@ -3,15 +3,17 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-	public class PropertyNameResolver<TSource> : IValueResolver
+	public class PropertyNameResolver : IValueResolver
 	{
-		private readonly string _propertyName;
+	    private readonly Type _sourceType;
+	    private readonly string _propertyName;
 		private PropertyInfo _propertyInfo;
 
-		public PropertyNameResolver(string propertyName)
+		public PropertyNameResolver(Type sourceType, string propertyName)
 		{
-			_propertyName = propertyName;
-			_propertyInfo = typeof(TSource).GetProperty(_propertyName);
+		    _sourceType = sourceType;
+		    _propertyName = propertyName;
+            _propertyInfo = sourceType.GetProperty(_propertyName);
 		}
 
 
@@ -20,8 +22,9 @@ namespace AutoMapper
 			if (source.Value == null)
 				return source;
 
-			if (!(source.Value is TSource))
-				throw new ArgumentException("Expected obj to be of type " + typeof(TSource) + " but was " + source.Value.GetType());
+		    var valueType = source.Value.GetType();
+		    if (!(_sourceType.IsAssignableFrom(valueType)))
+                throw new ArgumentException("Expected obj to be of type " + _sourceType + " but was " + valueType);
 
 			object result;
 			try

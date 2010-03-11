@@ -1,16 +1,17 @@
 using System;
 using System.Linq.Expressions;
-using System.Reflection;
 using AutoMapper.Internal;
+using System.Linq;
 
 namespace AutoMapper
 {
-	internal class MappingExpression : IMappingExpression
+	internal class MappingExpression : IMappingExpression, IMemberConfigurationExpression
 	{
 		private readonly TypeMap _typeMap;
 		private readonly Func<Type, object> _typeConverterCtor;
+	    private PropertyMap _propertyMap;
 
-		public MappingExpression(TypeMap typeMap, Func<Type, object> typeConverterCtor)
+	    public MappingExpression(TypeMap typeMap, Func<Type, object> typeConverterCtor)
 		{
 			_typeMap = typeMap;
 			_typeConverterCtor = typeConverterCtor;
@@ -34,6 +35,53 @@ namespace AutoMapper
 
 			return this;
 		}
+
+        public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions)
+        {
+            IMemberAccessor destProperty = new PropertyAccessor(_typeMap.DestinationType.GetProperty(name));
+            ForDestinationMember(destProperty, memberOptions);
+            return new MappingExpression(_typeMap, _typeConverterCtor);
+        }
+
+        private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression> memberOptions)
+        {
+            _propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
+
+            memberOptions(this);
+        }
+
+	    public void MapFrom(string sourceMember)
+	    {
+	        var members = _typeMap.SourceType.GetMember(sourceMember);
+            if (!members.Any()) throw new AutoMapperConfigurationException(string.Format("Unable to find source member {0} on type {1}", sourceMember, _typeMap.SourceType.FullName));
+            if (members.Skip(1).Any()) throw new AutoMapperConfigurationException(string.Format("Source member {0} is ambiguous on type {1}", sourceMember, _typeMap.SourceType.FullName));
+            _propertyMap.AssignCustomValueResolver( members.Single().ToMemberGetter() );
+	    }
+
+	    public IResolutionExpression ResolveUsing(IValueResolver valueResolver)
+	    {
+            _propertyMap.AssignCustomValueResolver(valueResolver);
+
+            return new ResolutionExpression(_typeMap.SourceType, _propertyMap);
+        }
+
+        public IResolverConfigurationExpression ResolveUsing(Type valueResolverType)
+        {
+            var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)_typeConverterCtor(valueResolverType));
+
+            ResolveUsing(resolver);
+
+            return new ResolutionExpression(_typeMap.SourceType, _propertyMap);
+        }
+
+	    public IResolverConfigurationExpression ResolveUsing<TValueResolver>()
+	    {
+            var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)_typeConverterCtor(typeof(TValueResolver)));
+
+            ResolveUsing(resolver);
+
+            return new ResolutionExpression(_typeMap.SourceType, _propertyMap);
+        }
 	}
 
 	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator

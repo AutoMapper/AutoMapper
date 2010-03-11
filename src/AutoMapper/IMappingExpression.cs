@@ -8,6 +8,7 @@ namespace AutoMapper
         void ConvertUsing<TTypeConverter>();
         void ConvertUsing(Type typeConverterType);
         IMappingExpression WithProfile(string profileName);
+        IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions);
     }
 
     public interface IMappingExpression<TSource, TDestination>
@@ -29,6 +30,14 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor);
     }
 
+    public interface IMemberConfigurationExpression
+    {
+        void MapFrom(string sourceMember);
+        IResolutionExpression ResolveUsing(IValueResolver valueResolver);
+        IResolverConfigurationExpression ResolveUsing(Type valueResolverType);
+        IResolverConfigurationExpression ResolveUsing<TValueResolver>();
+    }
+
     public interface IMemberConfigurationExpression<TSource>
     {
         void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
@@ -47,10 +56,19 @@ namespace AutoMapper
         void UseValue(object value);
     }
 
-    public interface IResolutionExpression<TSource>
+    public interface IResolutionExpression
+    {
+        void FromMember(string sourcePropertyName);
+    }
+    
+    public interface IResolverConfigurationExpression : IResolutionExpression
+    {
+        IResolutionExpression ConstructedBy(Func<IValueResolver> constructor);
+    }
+
+    public interface IResolutionExpression<TSource> : IResolutionExpression
     {
         void FromMember(Func<TSource, object> sourceMember);
-        void FromMember(string sourcePropertyName);
     }
 
     public interface IResolverConfigurationExpression<TSource, TValueResolver>

@@ -921,6 +921,114 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_mapping_using_custom_member_mappings_without_generics : AutoMapperSpecBase
+        {
+            private OrderDTO _result;
+
+            private class Order
+            {
+                public int Id { get; set; }
+                public string Status { get; set; }
+                public string Customer { get; set; }
+                public string ShippingCode { get; set; }
+                public string Zip { get; set; }
+            }
+
+            private class OrderDTO
+            {
+                public int Id { get; set; }
+                public string CurrentState { get; set; }
+                public string Contact { get; set; }
+                public string Tracking { get; set; }
+                public string Postal { get; set; }
+            }
+
+            private class StringCAPS : ValueResolver<string, string>
+            {
+                protected override string ResolveCore(string source)
+                {
+                    return source.ToUpper();
+                }
+            }
+
+            private class StringLower : ValueResolver<string, string>
+            {
+                protected override string ResolveCore(string source)
+                {
+                    return source.ToLower();
+                }
+            }
+
+            private class StringPadder : ValueResolver<string, string>
+            {
+                private readonly int _desiredLength;
+
+                public StringPadder(int desiredLength)
+                {
+                    _desiredLength = desiredLength;
+                }
+
+                protected override string ResolveCore(string source)
+                {
+                    return source.PadLeft(_desiredLength);
+                }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap(typeof (Order), typeof (OrderDTO))
+                        .ForMember("CurrentState", map => map.MapFrom("Status"))
+                        .ForMember("Contact", map => map.ResolveUsing(new StringCAPS()).FromMember("Customer"))
+                        .ForMember("Tracking", map => map.ResolveUsing(typeof(StringLower)).FromMember("ShippingCode"))
+                        .ForMember("Postal", map => map.ResolveUsing<StringPadder>().ConstructedBy(() => new StringPadder(6)).FromMember("Zip"));
+                });
+
+                var order = new Order
+                {
+                    Id = 7,
+                    Status = "Pending",
+                    Customer = "Buster",
+                    ShippingCode = "AbcxY23",
+                    Zip = "XYZ"
+                };
+                _result = Mapper.Map<Order, OrderDTO>(order);
+            }
+
+            [Test]
+            public void Should_preserve_existing_mapping()
+            {
+                _result.Id.ShouldEqual(7);
+            }
+
+            [Test]
+            public void Should_support_custom_source_member()
+            {
+                _result.CurrentState.ShouldEqual("Pending");
+            }
+
+            [Test]
+            public void Should_support_custom_resolver_on_custom_source_member()
+            {
+                _result.Contact.ShouldEqual("BUSTER");
+            }
+
+            [Test]
+            public void Should_support_custom_resolver_by_type_on_custom_source_member()
+            {
+                _result.Tracking.ShouldEqual("abcxy23");
+            }
+
+            [Test]
+            public void Should_support_custom_resolver_by_generic_type_with_constructor_on_custom_source_member()
+            {
+                _result.Postal.ShouldEqual("   XYZ");
+            }
+
+        }
+
+
         [Description("This one should really pass validation"), Ignore("Not sure if this is really valid behavior")]
 		public class When_mapping_a_collection_to_a_more_type_specific_collection : NonValidatingSpecBase
 		{
