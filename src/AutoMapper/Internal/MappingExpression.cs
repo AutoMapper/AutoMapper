@@ -154,6 +154,11 @@ namespace AutoMapper
 			MapFrom(src => value);
 		}
 
+		public void UseValue(object value)
+		{
+            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(src => value));
+		}
+
 		public void Ignore()
 		{
 			_propertyMap.Ignore();

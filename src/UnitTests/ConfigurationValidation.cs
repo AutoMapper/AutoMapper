@@ -352,6 +352,31 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+	    public class When_testing_a_dto_with_value_specified_members : NonValidatingSpecBase
+	    {
+	        public class Source {}
+            public class Destination
+            {
+                public int Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                object i = 7;
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Source, Destination>()
+                        .ForMember(dest => dest.Value, opt => opt.UseValue(i));
+                });
+            }
+
+	        [Test]
+	        public void Should_validate_successfully()
+	        {
+	            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+	        }
+	    }
+
 	}
 
 }

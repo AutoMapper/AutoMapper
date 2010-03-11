@@ -44,6 +44,7 @@ namespace AutoMapper
         void SetMappingOrder(int mappingOrder);
         void UseDestinationValue();
         void UseValue<TValue>(TValue value);
+        void UseValue(object value);
     }
 
     public interface IResolutionExpression<TSource>
