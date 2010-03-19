@@ -24,15 +24,15 @@ namespace AutoMapper.Internal
 
             if (IsSetterCall(info))
             {
-                OnPropertyChanged(new PropertyChangedEventArgs(GetPropertyName(info)));
+                OnPropertyChanged(info.Proxy, new PropertyChangedEventArgs(GetPropertyName(info)));
             }
         }
 
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        protected virtual void OnPropertyChanged(object target, PropertyChangedEventArgs e)
         {
             var handler = PropertyChanged;
             if (handler != null)
-                handler(this, e);
+                handler(target, e);
         }
     }
 }

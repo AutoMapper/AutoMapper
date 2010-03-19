@@ -156,6 +156,7 @@ namespace AutoMapper.UnitTests
                 var count = 0;
                 _result.PropertyChanged += (o, e) => {
                     count++;
+                    o.ShouldBeTheSameAs(_result); 
                     e.PropertyName.ShouldEqual("Value");
                 };
 
