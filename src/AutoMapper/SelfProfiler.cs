@@ -10,11 +10,6 @@ namespace AutoMapper
 
 		protected abstract void DescribeConfiguration(IMappingExpression<TSource, TDestination> map);
 
-		protected override string ProfileName
-		{
-			get { return GetType().Name + "Profile"; }
-		}
-
 		public Profile GetProfile()
 		{
 			return this;

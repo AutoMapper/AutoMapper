@@ -51,8 +51,9 @@ namespace AutoMapper.UnitTests
 		public class When_configuring_a_profile_through_a_profile_subclass : AutoMapperSpecBase
 		{
 			private Dto _result;
+		    private CustomProfile1 _customProfile;
 
-			private class Model
+		    private class Model
 			{
 				public int Value { get; set; }
 			}
@@ -83,14 +84,6 @@ namespace AutoMapper.UnitTests
 
 					CreateMap<Model, Dto>();
 				}
-
-				protected override string ProfileName
-				{
-					get
-					{
-						return "Custom1";
-					}
-				}
 			}
 
 			private class CustomProfile2 : Profile
@@ -105,7 +98,8 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.AddProfile(new CustomProfile1());
+			    _customProfile = new CustomProfile1();
+			    Mapper.AddProfile(_customProfile);
 				Mapper.AddProfile<CustomProfile2>();
 			}
 
@@ -113,6 +107,12 @@ namespace AutoMapper.UnitTests
 			{
 				_result = Mapper.Map<Model, Dto>(new Model { Value = 5 });
 			}
+
+		    [Test]
+		    public void Should_default_the_custom_profile_name_to_the_type_name()
+		    {
+                _customProfile.ProfileName.ShouldEqual(typeof(CustomProfile1).FullName);
+		    }
 
 			[Test]
 			public void Should_use_the_overridden_configuration_method_to_configure()

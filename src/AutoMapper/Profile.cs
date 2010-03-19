@@ -4,25 +4,21 @@ namespace AutoMapper
 {
 	public class Profile : IProfileExpression
 	{
-		private readonly string _profileName;
-		private Configuration _configurator;
+	    private Configuration _configurator;
 
 		internal Profile(string profileName)
 		{
-			_profileName = profileName;
+			ProfileName = profileName;
 		}
 
 		protected Profile()
 		{
-		    _profileName = GetType().FullName;
+		    ProfileName = GetType().FullName;
 		}
 
-		protected virtual string ProfileName
-		{
-			get { return _profileName; }
-		}
+	    public virtual string ProfileName { get; private set; }
 
-		public bool AllowNullDestinationValues
+	    public bool AllowNullDestinationValues
 		{
 			get { return GetProfile().AllowNullDestinationValues; }
 			set { GetProfile().AllowNullDestinationValues = value; }
