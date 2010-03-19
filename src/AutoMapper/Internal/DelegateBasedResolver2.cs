@@ -18,17 +18,16 @@ namespace AutoMapper
 				throw new ArgumentException("Expected obj to be of type " + typeof(TSource) + " but was " + source.Value.GetType());
 			}
 
-			object result;
-			try
+		    try
 			{
-				result = _method((TSource)source.Value);
+			    var result = _method((TSource)source.Value);
+			    
+                return source.New(result, MemberType);
 			}
 			catch (NullReferenceException)
 			{
-				result = null;
+			    return source.New(null, MemberType);
 			}
-
-			return source.New(result);
 		}
 
 		public Type MemberType

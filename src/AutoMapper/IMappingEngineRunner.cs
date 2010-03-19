@@ -8,5 +8,6 @@ namespace AutoMapper
 		object CreateObject(ResolutionContext context);
 		string FormatValue(ResolutionContext context);
 		IConfigurationProvider ConfigurationProvider { get; }
+	    bool ShouldMapSourceValueAsNull(ResolutionContext context);
 	}
 }

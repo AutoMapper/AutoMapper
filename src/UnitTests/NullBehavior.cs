@@ -66,7 +66,13 @@ namespace AutoMapper.UnitTests
 			{
 				_result.SubSomething.ShouldEqual(0);
 			}
-		}
+	
+            [Test]
+			public void Default_value_for_string_should_be_empty()
+			{
+				_result.NullString.ShouldEqual(string.Empty);
+			}
+        }
 
 		public class When_overriding_null_behavior_with_null_source_items : AutoMapperSpecBase
 		{

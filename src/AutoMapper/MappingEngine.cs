@@ -118,10 +118,10 @@ namespace AutoMapper
 		{
 			try
 			{
-				if (context.SourceValue == null && ShouldMapSourceValueAsNull(context))
-				{
-					return ObjectCreator.CreateDefaultValue(context.DestinationType);
-				}
+                //if (context.SourceValue == null && ShouldMapSourceValueAsNull(context))
+                //{
+                //    return ObjectCreator.CreateDefaultValue(context.DestinationType);
+                //}
 
 				var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
@@ -165,7 +165,12 @@ namespace AutoMapper
 
 			var valueFormatter = new ValueFormatter(configuration);
 
-			return valueFormatter.FormatValue(context);
+		    var formattedValue = valueFormatter.FormatValue(context);
+
+            if (formattedValue == null && !((IMappingEngineRunner)this).ShouldMapSourceValueAsNull(context))
+                return string.Empty;
+
+		    return formattedValue;
 		}
 
 		object IMappingEngineRunner.CreateObject(ResolutionContext context)
@@ -190,9 +195,12 @@ namespace AutoMapper
 			return ObjectCreator.CreateObject(destinationType);
 		}
 
-		private bool ShouldMapSourceValueAsNull(ResolutionContext context)
+        bool IMappingEngineRunner.ShouldMapSourceValueAsNull(ResolutionContext context)
 		{
-            if (context.DestinationType == typeof(string))
+            //if (context.DestinationType == typeof(string))
+            //    return false;
+
+            if (context.DestinationType.IsValueType)
                 return false;
 
 			var typeMap = context.GetContextTypeMap();

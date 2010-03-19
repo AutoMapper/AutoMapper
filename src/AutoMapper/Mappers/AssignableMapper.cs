@@ -4,7 +4,7 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			if (context.SourceValue == null)
+			if (context.SourceValue == null && !mapper.ShouldMapSourceValueAsNull(context))
 			{
 				return mapper.CreateObject(context);
 			}

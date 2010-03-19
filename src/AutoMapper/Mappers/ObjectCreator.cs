@@ -28,7 +28,18 @@ namespace AutoMapper.Mappers
 
 		public static object CreateDefaultValue(Type type)
 		{
-			return !type.IsValueType ? null : CreateObject(type);
+			return type.IsValueType ? CreateObject(type) : null;
+		}
+
+		public static object CreateNonNullValue(Type type)
+		{
+            if (type.IsValueType)
+                return CreateObject(type);
+
+            if (type == typeof(string))
+                return string.Empty;
+
+			return Activator.CreateInstance(type);
 		}
 
 		public static object CreateObject(Type type)
