@@ -237,6 +237,7 @@ namespace AutoMapper.UnitTests
 			return new ValueSource();
 		}
 
+#if !SILVERLIGHT
 		[Test, Explicit]
 		public void Test_with_DynamicMethod()
 		{
@@ -268,6 +269,7 @@ namespace AutoMapper.UnitTests
 
 			source.Value.ShouldEqual("hello");
 		}
+#endif
 
 		public delegate void SetValueDelegate(ref ValueSource source, string value);
 

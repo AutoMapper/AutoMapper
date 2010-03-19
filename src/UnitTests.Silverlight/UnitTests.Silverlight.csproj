@@ -99,6 +99,27 @@
     <Compile Include="..\UnitTests\BidirectionalRelationships.cs">
       <Link>BidirectionalRelationships.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs">
+      <Link>Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\AllMembersNullSubstitute.cs">
+      <Link>Bug\AllMembersNullSubstitute.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\AllowNullDestinationValuesBugs.cs">
+      <Link>Bug\AllowNullDestinationValuesBugs.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\CustomIEnumerableBug.cs">
+      <Link>Bug\CustomIEnumerableBug.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\NamingConventions.cs">
+      <Link>Bug\NamingConventions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\RepeatedMappingConfigurationTest.cs">
+      <Link>Bug\RepeatedMappingConfigurationTest.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\SequenceContainsNoElementsTest.cs">
+      <Link>Bug\SequenceContainsNoElementsTest.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\ConfigurationValidation.cs">
       <Link>ConfigurationValidation.cs</Link>
     </Compile>
@@ -129,8 +150,17 @@
     <Compile Include="..\UnitTests\InterfaceMapping.cs">
       <Link>InterfaceMapping.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Internal\DelegateFactoryTests.cs">
+      <Link>Internal\DelegateFactoryTests.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Internal\PrimitiveExtensionsTester.cs">
+      <Link>Internal\PrimitiveExtensionsTester.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Internationalization.cs">
       <Link>Internationalization.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Mappers\TypeHelperTests.cs">
+      <Link>Mappers\TypeHelperTests.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\MappingExceptions.cs">
       <Link>MappingExceptions.cs</Link>
@@ -158,6 +188,15 @@
     </Compile>
     <Compile Include="..\UnitTests\TesterExtensions.cs">
       <Link>TesterExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Tests\ConfigurationSpecs.cs">
+      <Link>Tests\ConfigurationSpecs.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Tests\MapperTests.cs">
+      <Link>Tests\MapperTests.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Tests\TypeInfoSpecs.cs">
+      <Link>Tests\TypeInfoSpecs.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\TypeConverters.cs">
       <Link>TypeConverters.cs</Link>

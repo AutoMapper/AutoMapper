@@ -79,7 +79,7 @@ namespace AutoMapper.UnitTests
         {
             private IDestination _result;
 
-            private class Source
+            public class Source
             {
                 public int Value { get; set; }
             }
@@ -118,7 +118,7 @@ namespace AutoMapper.UnitTests
 
             private int _count;
 
-            private class Source
+            public class Source
             {
                 public int Value { get; set; }
             }
@@ -200,18 +200,18 @@ namespace AutoMapper.UnitTests
                 int SecondId { get; }
             }
 
-            private class Source : ISource
+            public class Source : ISource
             {
                 public int Id { get; set; }
                 public int SecondId { get; set; }
             }
 
-            private abstract class DestinationBase
+            public abstract class DestinationBase
             {
                 public int Id { get; set; }
             }
 
-            private class Destination : DestinationBase
+            public class Destination : DestinationBase
             {
                 public int SecondId { get; set; }
             }
@@ -260,7 +260,7 @@ namespace AutoMapper.UnitTests
                 int SecondId { get; }
             }
 
-            private class Source : ISource
+            public class Source : ISource
             {
                 public int Id { get; set; }
                 public int SecondId { get; set; }
@@ -276,12 +276,12 @@ namespace AutoMapper.UnitTests
                 int SecondId { get; }
             }
 
-            private abstract class DestinationBase : IDestinationBase
+            public abstract class DestinationBase : IDestinationBase
             {
                 public int Id { get; set; }
             }
 
-            private class Destination : DestinationBase, IDestination
+            public class Destination : DestinationBase, IDestination
             {
                 public int SecondId { get; set; }
             }

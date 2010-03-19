@@ -532,12 +532,12 @@ namespace AutoMapper.UnitTests
 			private TypeMap[] _allTypeMaps;
 			private Source _source;
 
-			private class Source
+			public class Source
 			{
 				public string Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public bool Ignored
 				{
@@ -580,7 +580,7 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public string GetSomeCoolValue()
 				{
@@ -590,7 +590,7 @@ namespace AutoMapper.UnitTests
 				public ModelSubObject Sub { get; set; }
 			}
 
-			private class ModelSubObject
+			public class ModelSubObject
 			{
 				public string GetSomeOtherCoolValue()
 				{
@@ -598,7 +598,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string SomeCoolValue { get; set; }
 				public string SubSomeOtherCoolValue { get; set; }
@@ -633,7 +633,7 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public string SomeCoolValue()
 				{
@@ -643,7 +643,7 @@ namespace AutoMapper.UnitTests
 				public ModelSubObject Sub { get; set; }
 			}
 
-			private class ModelSubObject
+			public class ModelSubObject
 			{
 				public string SomeOtherCoolValue()
 				{
@@ -651,7 +651,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string SomeCoolValue { get; set; }
 				public string SubSomeOtherCoolValue { get; set; }
@@ -686,22 +686,22 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public ModelSubObject Sub { get; set; }
 			}
 
-			private class ModelSubObject
+			public class ModelSubObject
 			{
 				public string SomeValue { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public ModelSubDto Sub { get; set; }
 			}
 
-			private class ModelSubDto
+			public class ModelSubDto
 			{
 				public string SomeValue { get; set; }
 			}
@@ -734,12 +734,12 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public int SomeValue { get; set; }
 			}
 
-			private class ModelObject
+			public class ModelObject
 			{
 				private int _someValue;
 
@@ -775,7 +775,7 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int Blarg { get; set; }
 				public string MoreBlarg { get; set; }
@@ -794,7 +794,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class ModelSubObject
+			public class ModelSubObject
 			{
 				public int Narf { get; set; }
 				public ModelSubSubObject SubSub { get; set; }
@@ -805,7 +805,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class ModelSubSubObject
+			public class ModelSubSubObject
 			{
 				public int Norf { get; set; }
 
@@ -815,7 +815,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public int Splorg { get; set; }
 				public string SomeValue { get; set; }
@@ -925,7 +925,7 @@ namespace AutoMapper.UnitTests
         {
             private OrderDTO _result;
 
-            private class Order
+            public class Order
             {
                 public int Id { get; set; }
                 public string Status { get; set; }
@@ -934,7 +934,7 @@ namespace AutoMapper.UnitTests
                 public string Zip { get; set; }
             }
 
-            private class OrderDTO
+            public class OrderDTO
             {
                 public int Id { get; set; }
                 public string CurrentState { get; set; }
@@ -943,7 +943,7 @@ namespace AutoMapper.UnitTests
                 public string Postal { get; set; }
             }
 
-            private class StringCAPS : ValueResolver<string, string>
+            public class StringCAPS : ValueResolver<string, string>
             {
                 protected override string ResolveCore(string source)
                 {
@@ -951,7 +951,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            private class StringLower : ValueResolver<string, string>
+            public class StringLower : ValueResolver<string, string>
             {
                 protected override string ResolveCore(string source)
                 {
@@ -959,7 +959,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            private class StringPadder : ValueResolver<string, string>
+            public class StringPadder : ValueResolver<string, string>
             {
                 private readonly int _desiredLength;
 
@@ -1034,32 +1034,32 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class Model
+			public class Model
 			{
 				public List<Item> Items { get; set; }
 			}
 
-			private class Item
+			public class Item
 			{
 				public string Prop { get; set; }
 			}
 
-			private class SubItem : Item
+			public class SubItem : Item
 			{
 				public string SubProp { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public SubItemDto[] Items { get; set; }
 			}
 
-			private class ItemDto
+			public class ItemDto
 			{
 				public string Prop { get; set; }
 			}
 
-			private class SubItemDto : ItemDto
+			public class SubItemDto : ItemDto
 			{
 				public string SubProp { get; set; }
 			}
@@ -1096,12 +1096,12 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public int SomeValueWithPascalName { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int someValueWithPascalName { get; set; }
 			}
@@ -1134,13 +1134,13 @@ namespace AutoMapper.UnitTests
         {
             private CategoryDto _result;
 
-            private class Category
+            public class Category
             {
                 public string Name { get; set; }
                 public IList<Category> Children { get; set; }
             }
 
-            private class CategoryDto
+            public class CategoryDto
             {
                 public string Name { get; set; }
                 public CategoryDto[] Children { get; set; }
@@ -1196,12 +1196,12 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int Value { get; set; }
 			}
@@ -1227,17 +1227,17 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _destination;
 
-			private class Source
+			public class Source
 			{
 				public SubSource some_source { get; set; }
 			}
 
-			private class SubSource
+			public class SubSource
 			{
 				public int value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int some_source_value { get; set; }
 			}
@@ -1268,7 +1268,7 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _destination;
 
-			private class Source
+			public class Source
 			{
 				public int FooValue { get; set; }
 				public int GetOtherValue() 
@@ -1315,7 +1315,7 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _destination;
 
-			private class Source
+			public class Source
 			{
 				public int FooValueBar { get; set; }
 				public int GetOtherValue()
@@ -1422,7 +1422,10 @@ namespace AutoMapper.UnitTests
 
 	}
 
-	public class When_destination_type_has_private_members : AutoMapperSpecBase
+#if SILVERLIGHT
+    [Ignore("Setting non-public members not supported with Silverlight DynamicMethod ctor")]
+#endif
+    public class When_destination_type_has_private_members : AutoMapperSpecBase
 	{
 		private IDestination _destination;
 

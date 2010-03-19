@@ -24,16 +24,16 @@ namespace AutoMapper.UnitTests
 			Mapper.Reset();
 		}
 
-		class ModelType
+		public class ModelType
 		{
 			public string TheProperty { get; set; }
 		}
 
-		class DerivedModelType : ModelType
+		public class DerivedModelType : ModelType
 		{
 		}
 
-		class DtoType
+		public class DtoType
 		{
 			public string TheProperty { get; set; }
 		}

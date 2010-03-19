@@ -9,17 +9,17 @@ namespace AutoMapper.UnitTests
 		{
 			private OrderDto _result;
 
-			private class Order
+			public class Order
 			{
 				public Customer Customer { get; set; }
 			}
 
-			private class Customer
+			public class Customer
 			{
 				public string Æøå { get; set; }
 			}
 
-			private class OrderDto
+			public class OrderDto
 			{
 				public string CustomerÆøå { get; set; }
 			}

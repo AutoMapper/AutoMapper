@@ -11,12 +11,12 @@ namespace AutoMapper.UnitTests
 			private Destination _resultWithGenerics;
 			private Destination _resultWithoutGenerics;
 
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int Value { get; set; }
 			}
@@ -37,12 +37,12 @@ namespace AutoMapper.UnitTests
 
 		public class When_mapping_two_non_configured_types_that_do_not_match : NonValidatingSpecBase
 		{
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int Valuefff { get; set; }
 			}
@@ -66,13 +66,13 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _destination;
 
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 				public int Value2 { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int Valuefff { get; set; }
 				public int Value2 { get; set; }

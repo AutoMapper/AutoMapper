@@ -152,19 +152,33 @@ namespace AutoMapper
 
 	    private static DynamicMethod CreateValueTypeDynamicMethod(MemberInfo member, Type sourceType)
 	    {
+#if !SILVERLIGHT
             if (sourceType.IsInterface)
                 return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, sourceType.Assembly.ManifestModule, true);
 
 	        return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, sourceType, true);
-	    }
+#else
+            if (sourceType.IsInterface)
+                return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) });
+
+	        return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) });
+#endif
+        }
 
 	    private static DynamicMethod CreateDynamicMethod(MemberInfo member, Type sourceType)
 	    {
+#if !SILVERLIGHT
 	        if (sourceType.IsInterface)
 	            return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object), typeof(object) }, sourceType.Assembly.ManifestModule, true);
 
 	        return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object), typeof(object) }, sourceType, true);
-	    }
+#else
+	        if (sourceType.IsInterface)
+	            return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object), typeof(object) });
+
+	        return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object), typeof(object) });
+#endif
+        }
 
 	    private static Expression[] CreateParameterExpressions(MethodInfo method, Expression argumentsParameter)
 		{

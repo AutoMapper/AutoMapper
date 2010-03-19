@@ -9,25 +9,25 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public ModelSubDto Sub { get; set; }
 				public int SubSomething { get; set; }
 				public string NullString { get; set; }
 			}
 
-			private class ModelSubDto
+			public class ModelSubDto
 			{
 				public int[] Items { get; set; }
 			}
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public ModelSubObject Sub { get; set; }
 				public string NullString { get; set; }
 			}
 
-			private class ModelSubObject
+			public class ModelSubObject
 			{
 				public int[] GetItems()
 				{
@@ -78,25 +78,25 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public ModelSubDto Sub { get; set; }
 				public int SubSomething { get; set; }
 				public string NullString { get; set; }
 			}
 
-			private class ModelSubDto
+			public class ModelSubDto
 			{
 				public int[] Items { get; set; }
 			}
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public ModelSubObject Sub { get; set; }
 				public string NullString { get; set; }
 			}
 
-			private class ModelSubObject
+			public class ModelSubObject
 			{
 				public int[] GetItems()
 				{
@@ -143,22 +143,22 @@ namespace AutoMapper.UnitTests
 			private DefaultDestination _defaultResult;
 			private NullDestination _nullResult;
 
-			private class DefaultSource
+			public class DefaultSource
 			{
 				public object Value { get; set; }
 			}
 
-			private class DefaultDestination
+			public class DefaultDestination
 			{
 				public object Value { get; set; }
 			}
 
-			private class NullSource
+			public class NullSource
 			{
 				public object Value { get; set; }
 			}
 
-			private class NullDestination
+			public class NullDestination
 			{
 				public object Value { get; set; }
 			}

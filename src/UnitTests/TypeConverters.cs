@@ -127,17 +127,17 @@ namespace AutoMapper.UnitTests
 		public class When_specifying_mapping_with_the_BCL_type_converter_class : AutoMapperSpecBase
 		{
 			[TypeConverter(typeof(CustomTypeConverter))]
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int OtherValue { get; set; }
 			}
 
-			private class CustomTypeConverter : TypeConverter
+			public class CustomTypeConverter : TypeConverter
 			{
 				public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
 				{

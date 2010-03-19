@@ -434,7 +434,7 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _destination;
 
-			private class CustomCollection : IListSource, IEnumerable<int>
+			public class CustomCollection : IListSource, IEnumerable<int>
 			{
 				private List<int> _customList = new List<int>();
 
@@ -459,12 +459,12 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class Source
+			public class Source
 			{
 				public int[] Values { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public CustomCollection Values { get; set; }
 			}

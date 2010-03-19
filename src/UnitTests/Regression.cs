@@ -57,17 +57,17 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			class Source
+			public class Source
 			{
 				public DateTime? SomeDate { get; set; }
 			}
 
-			class Destination
+            public class Destination
 			{
 				public MyCustomDate SomeDate { get; set; }
 			}
 
-			class MyCustomDate
+            public class MyCustomDate
 			{
 				public int Day { get; set; }
 				public int Month { get; set; }
@@ -111,13 +111,13 @@ namespace AutoMapper.UnitTests
 		{
 			private Order _order;
 
-			private class Order
+			public class Order
 			{
 				public string Name { get; set; }
 				public Product Product { get; set; }
 			}
 
-			private class Product
+			public class Product
 			{
 				public string ProductName { get; set; }
 			}

@@ -9,7 +9,7 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+		    public class Source
 			{
 				private int _startValue;
 
@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class Destination
+		    public class Destination
 			{
 				public int Value1 { get; set; }
 				public int Value2 { get; set; }

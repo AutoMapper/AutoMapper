@@ -13,12 +13,12 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public Hashtable Values { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public IDictionary Values { get; set; }
 			}
@@ -56,22 +56,22 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public Dictionary<string, SourceValue> Values { get; set; }
 			}
 
-			private class SourceValue
+			public class SourceValue
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public Dictionary<string, DestinationValue> Values { get; set; }
 			}
 
-			private class DestinationValue
+			public class DestinationValue
 			{
 				public int Value { get; set; }
 			}
@@ -110,22 +110,22 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public Dictionary<string, SourceValue> Values { get; set; }
 			}
 
-			private class SourceValue
+			public class SourceValue
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public IDictionary<string, DestinationValue> Values { get; set; }
 			}
 
-			private class DestinationValue
+			public class DestinationValue
 			{
 				public int Value { get; set; }
 			}
@@ -417,17 +417,17 @@ namespace AutoMapper.UnitTests
 		{
 			private FooObject _result;
 
-			private class FooDto
+			public class FooDto
 			{
 				public DestinationValuePair[] Values { get; set; }
 			}
 
-			private class FooObject
+			public class FooObject
 			{
 				public Dictionary<string, string> Values { get; set; }
 			}
 
-			private class DestinationValuePair
+			public class DestinationValuePair
 			{
 				public string Key { get; set; }
 				public string Value { get; set; }

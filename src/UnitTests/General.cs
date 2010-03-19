@@ -37,11 +37,11 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelDto
+			public class ModelDto
 			{
 			}
 
-			private class ModelObject
+			public class ModelObject
 			{
 			}
 
@@ -64,12 +64,12 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public string SomeValue { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string SomeValue { get; set; }
 
@@ -101,12 +101,12 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int NotAString { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string NotAString { get; set; }
 			}
@@ -134,7 +134,7 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public IEnumerable<int> GetSomeCoolValues()
 				{
@@ -142,7 +142,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string[] SomeCoolValues { get; set; }
 			}
@@ -167,12 +167,12 @@ namespace AutoMapper.UnitTests
 
 		public class When_mapping_a_dto_with_mismatched_property_types : NonValidatingSpecBase
 		{
-			private class ModelObject
+			public class ModelObject
 			{
 				public string NullableDate { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public DateTime NullableDate { get; set; }
 			}

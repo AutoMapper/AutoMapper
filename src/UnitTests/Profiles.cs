@@ -9,17 +9,17 @@ namespace AutoMapper.UnitTests
 		{
 			private Dto _result;
 
-			private class Model
+			public class Model
 			{
 				public int Value { get; set; }
 			}
 
-			private class Dto
+			public class Dto
 			{
 				public string Value { get; set; }
 			}
 
-			private class Formatter : IValueFormatter
+			public class Formatter : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -53,22 +53,22 @@ namespace AutoMapper.UnitTests
 			private Dto _result;
 		    private CustomProfile1 _customProfile;
 
-		    private class Model
+		    public class Model
 			{
 				public int Value { get; set; }
 			}
 
-			private class Dto
+			public class Dto
 			{
 				public string Value { get; set; }
 			}
 
-			private class Dto2
+			public class Dto2
 			{
 				public string Value { get; set; }
 			}
 
-			private class Formatter : IValueFormatter
+			public class Formatter : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class CustomProfile1 : Profile
+			public class CustomProfile1 : Profile
 			{
 				protected internal override void Configure()
 				{
@@ -86,7 +86,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class CustomProfile2 : Profile
+			public class CustomProfile2 : Profile
 			{
 				protected internal override void Configure()
 				{

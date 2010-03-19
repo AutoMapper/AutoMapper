@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests
 				_dto.Children[0].Parent.ShouldBeTheSameAs(_dto);
 			}
 
-			private class ParentModel
+			public class ParentModel
 			{
 				public ParentModel()
 				{
@@ -54,22 +54,22 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class ChildModel
+			public class ChildModel
 			{
 				public string ID { get; set; }
 				public ParentModel Parent { get; set; }
 			}
 
-			private class ParentDto
+			public class ParentDto
 			{
 				public string ID { get; set; }
-				public IList<ChildDto> Children { get; protected set; }
+				public IList<ChildDto> Children { get; set; }
 			}
 
-			private class ChildDto
+			public class ChildDto
 			{
 				public string ID { get; set; }
-				public ParentDto Parent { get; protected set; }
+				public ParentDto Parent { get; set; }
 			}
 		}
 
@@ -311,23 +311,23 @@ namespace AutoMapper.UnitTests
 				_dto.Bar.Foo.ShouldBeTheSameAs(_dto);
 			}
 
-			private class Foo
+			public class Foo
 			{
 				public Bar Bar { get; set; }
 			}
 
-			private class Bar
+			public class Bar
 			{
 				public Foo Foo { get; set; }
 				public string Value { get; set; }
 			}
 
-			private class FooDto
+			public class FooDto
 			{
 				public BarDto Bar { get; set; }
 			}
 
-			private class BarDto
+			public class BarDto
 			{
 				public FooDto Foo { get; set; }
 				public string Value { get; set; }
@@ -364,23 +364,23 @@ namespace AutoMapper.UnitTests
 				Assert.AreEqual(_dto.Screen.Id, "3");
 			}
 
-			private class FooContainerModel
+			public class FooContainerModel
 			{
 				public FooInputModel Input { get; set; }
 				public FooScreenModel Screen { get; set; }
 			}
 
-			private class FooScreenModel
+			public class FooScreenModel
 			{
 				public string Id { get; set; }
 			}
 
-			private class FooInputModel
+			public class FooInputModel
 			{
 				public long Id { get; set; }
 			}
 
-			private class FooModel
+			public class FooModel
 			{
 				public long Id { get; set; }
 			}

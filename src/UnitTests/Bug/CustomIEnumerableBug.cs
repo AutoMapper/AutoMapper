@@ -8,22 +8,22 @@ using NUnit.Framework;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	class One
+	public class One
 	{
 		public IEnumerable<string> Stuff { get; set; }
 	}
 
-	class Two
+	public class Two
 	{
 		public IEnumerable<Item> Stuff { get; set; }
 	}
 
-	class Item
+	public class Item
 	{
 		public string Value { get; set; }
 	}
 
-	class StringToItemConverter : TypeConverter<IEnumerable<string>, IEnumerable<Item>>
+	public class StringToItemConverter : TypeConverter<IEnumerable<string>, IEnumerable<Item>>
 	{
 		protected override IEnumerable<Item> ConvertCore(IEnumerable<string> source)
 		{

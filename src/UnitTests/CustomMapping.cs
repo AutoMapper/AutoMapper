@@ -10,7 +10,7 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int Value { get; set; }
 				public int Value2fff { get; set; }
@@ -18,7 +18,7 @@ namespace AutoMapper.UnitTests
 				public int Value4 { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public int Value { get; set; }
 				public int Value2 { get; set; }
@@ -95,22 +95,22 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public ModelSubObject Sub { get; set; }
 			}
 
-			private class ModelSubObject
+			public class ModelSubObject
 			{
 				public int SomeValue { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public int SomeValue { get; set; }
 			}
 
-			private class CustomResolver : IValueResolver
+			public class CustomResolver : IValueResolver
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
@@ -145,18 +145,18 @@ namespace AutoMapper.UnitTests
 		{
 			private Dest _result;
 
-			private class Source
+			public class Source
 			{
 				public int SomeValue { get; set; }
 				public int SomeOtherValue { get; set; }
 			}
 
-			private class Dest
+			public class Dest
 			{
 				public int SomeValue { get; set; }
 			}
 
-			private class CustomResolver : IValueResolver
+			public class CustomResolver : IValueResolver
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
@@ -189,17 +189,17 @@ namespace AutoMapper.UnitTests
 		{
 			private Dest _result;
 
-			private class Source
+			public class Source
 			{
 				public int Type { get; set; }
 			}
 
-			private class Dest
+			public class Dest
 			{
 				public int Type { get; set; }
 			}
 
-			private class CustomResolver : IValueResolver
+			public class CustomResolver : IValueResolver
 			{
 				public ResolutionResult Resolve(ResolutionResult source)
 				{
@@ -514,17 +514,17 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int Value { get; set; }
 			}
 
-			private class CustomConverter : TypeConverter<Source, Destination>
+			public class CustomConverter : TypeConverter<Source, Destination>
 			{
 				private readonly int _value;
 
@@ -605,17 +605,17 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int Value { get; set; }
 			}
 
-			private class CustomValueResolver : ValueResolver<int, int>
+			public class CustomValueResolver : ValueResolver<int, int>
 			{
 				private readonly int _toAdd;
 				public CustomValueResolver() { _toAdd = 11; }
@@ -655,17 +655,17 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public int SourceValue { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int DestinationValue { get; set; }
 			}
 
-			private class CustomValueResolver : ValueResolver<int, int>
+			public class CustomValueResolver : ValueResolver<int, int>
 			{
 				public CustomValueResolver()
 				{
@@ -699,17 +699,17 @@ namespace AutoMapper.UnitTests
 
 		public class When_specifying_a_custom_member_mapping_to_a_nested_object : NonValidatingSpecBase
 		{
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public SubDest Dest { get; set; }
 			}
 
-			private class SubDest
+			public class SubDest
 			{
 				public int Value { get; set; }
 			}
@@ -730,17 +730,17 @@ namespace AutoMapper.UnitTests
             private Source _source;
             private Destination _dest;
 
-            private class Source 
+            public class Source 
             {
                 public string MyName { get; set; }
             }
 
-            private class Destination : ISomeInterface
+            public class Destination : ISomeInterface
             {
                 public string Name { get; set;}
             }
 
-            private interface ISomeInterface
+            public interface ISomeInterface
             {
                 string Name { get; set; }
             }
@@ -765,19 +765,22 @@ namespace AutoMapper.UnitTests
             }
         }
 
+#if SILVERLIGHT
+        [Ignore("Setting non-public members not supported with Silverlight DynamicMethod ctor")]
+#endif
         public class When_destination_property_does_not_have_a_setter : AutoMapperSpecBase
         {
             private Source _source;
             private Destination _dest;
 
-            private class Source
+            public class Source
             {
                 public string Name { get; set; }
                 public string Value { get; set;}
                 public string Foo { get; set; }
             }
 
-            private class Destination 
+            public class Destination 
             {
                 private DateTime _today;
 
@@ -880,12 +883,12 @@ namespace AutoMapper.UnitTests
 		{
 			private Dest _dest;
 
-			private class Source
+			public class Source
 			{
 				
 			}
 
-			private class Dest
+			public class Dest
 			{
 				public int Value { get; set; }
 			}

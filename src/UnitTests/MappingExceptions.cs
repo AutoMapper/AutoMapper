@@ -8,12 +8,12 @@ namespace AutoMapper.UnitTests
 	{
 		public class When_encountering_a_member_mapping_problem_during_mapping : NonValidatingSpecBase
 		{
-			private class Source
+			public class Source
 			{
 				public string Value { get; set; }
 			}
 
-			private class Dest
+			public class Dest
 			{
 				public int Value { get; set;}
 			}

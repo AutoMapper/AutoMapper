@@ -11,8 +11,8 @@ namespace AutoMapper.UnitTests.Tests
 			private TypeMap _expected;
 			private Configuration _configuration;
 
-			private class Source { }
-			private class Destination { }
+			public class Source { }
+			public class Destination { }
 
 			protected override void Establish_context()
 			{

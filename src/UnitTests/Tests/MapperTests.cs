@@ -6,12 +6,12 @@ namespace AutoMapper.UnitTests.Tests
 	[TestFixture]
 	public class MapperTests : NonValidatingSpecBase
 	{
-		private class Source
+		public class Source
 		{
 			
 		}
 		
-		private class Destination
+		public class Destination
 		{
 			
 		}

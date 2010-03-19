@@ -10,12 +10,12 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public string Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public string Value { get; set; }
 				public string this[string key] { get { return null; }}

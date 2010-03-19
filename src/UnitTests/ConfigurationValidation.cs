@@ -11,13 +11,13 @@ namespace AutoMapper.UnitTests
 		{
 			private TypeMap _typeMap;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public string Foo { get; set; }
 				public string Barr { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string Foo { get; set; }
 				public string Bar { get; set; }
@@ -39,13 +39,13 @@ namespace AutoMapper.UnitTests
 		{
 			private TypeMap _typeMap;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public string Foo { get; set; }
 				public string Barr { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string Foo { get; set; }
 				public string Bar { get; set; }
@@ -67,12 +67,12 @@ namespace AutoMapper.UnitTests
 	
 		public class When_testing_a_dto_with_matching_member_names_but_mismatched_types : NonValidatingSpecBase
 		{
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public decimal Value { get; set; }
 			}
@@ -93,24 +93,24 @@ namespace AutoMapper.UnitTests
 		{
 			private AutoMapperConfigurationException _exception;
 
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 				public OtherSource Other { get; set; }
 			}
 
-			private class OtherSource
+			public class OtherSource
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public int Value { get; set; }
 				public OtherDest Other { get; set; }
 			}
 
-			private class OtherDest
+			public class OtherDest
 			{
 				public int Value { get; set; }
 			}
@@ -144,13 +144,13 @@ namespace AutoMapper.UnitTests
 		{
 			private AutoMapperConfigurationException _exception;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public string Foo { get; set; }
 				public string Bar { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string Foo { get; set; }
 				public int Bar { get; set; }
@@ -183,22 +183,22 @@ namespace AutoMapper.UnitTests
 
 		public class When_testing_a_dto_with_array_types_with_mismatched_element_types : NonValidatingSpecBase
 		{
-			private class Source
+			public class Source
 			{
 				public SourceItem[] Items;
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public DestinationItem[] Items;
 			}
 
-			private class SourceItem
+			public class SourceItem
 			{
 				
 			}
 
-			private class DestinationItem
+			public class DestinationItem
 			{
 				
 			}
@@ -217,22 +217,22 @@ namespace AutoMapper.UnitTests
 
 		public class When_testing_a_dto_with_list_types_with_mismatched_element_types : NonValidatingSpecBase
 		{
-			private class Source
+			public class Source
 			{
 				public List<SourceItem> Items;
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public List<DestinationItem> Items;
 			}
 
-			private class SourceItem
+			public class SourceItem
 			{
 
 			}
 
-			private class DestinationItem
+			public class DestinationItem
 			{
 
 			}
@@ -323,17 +323,17 @@ namespace AutoMapper.UnitTests
 		{
 			private TypeMap _typeMap;
 
-			private class SubBarr { }
+			public class SubBarr { }
 
-			private class SubBar { }
+			public class SubBar { }
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public string Foo { get; set; }
 				public SubBarr Barr { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string Foo { get; set; }
 				public SubBar Bar { get; set; }

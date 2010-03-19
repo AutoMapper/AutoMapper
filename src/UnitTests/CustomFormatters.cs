@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _modelDto;
 
-			private class HardEncoder : IValueFormatter
+			public class HardEncoder : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -19,7 +19,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class SoftEncoder : IValueFormatter
+			public class SoftEncoder : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class RokkenEncoder : IValueFormatter
+			public class RokkenEncoder : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -35,12 +35,12 @@ namespace AutoMapper.UnitTests
 				}
 			}
 			
-			private class ModelDto
+			public class ModelDto
 			{
 				public string Value { get; set; }
 			}
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int Value { get; set; }
 			}
@@ -71,19 +71,19 @@ namespace AutoMapper.UnitTests
 			private ModelDto _result;
 		    private string _intResult;
 
-		    private class ModelDto
+		    public class ModelDto
 			{
 				public string StartDate { get; set; }
 				public string OtherValue { get; set; }
 			}
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public DateTime StartDate { get; set; }
 				public int OtherValue { get; set; }
 			}
 
-			private class ShortDateFormatter : IValueFormatter
+			public class ShortDateFormatter : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -131,12 +131,12 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string OtherValue { get; set; }
 			}
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int OtherValue { get; set; }
 			}
@@ -164,7 +164,7 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _modelDto;
 
-			private class CrazyEncoder : IValueFormatter
+			public class CrazyEncoder : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -172,12 +172,12 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string Value { get; set; }
 			}
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int Value { get; set; }
 			}
@@ -206,19 +206,19 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int ValueOne { get; set; }
 				public int ValueTwo { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string ValueOne { get; set; }
 				public string ValueTwo { get; set; }
 			}
 
-			private class SampleFormatter : IValueFormatter
+			public class SampleFormatter : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -256,17 +256,17 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int ValueOne { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string ValueOne { get; set; }
 			}
 
-			private class SampleFormatter : IValueFormatter
+			public class SampleFormatter : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -297,17 +297,17 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public int ValueOne { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string ValueOne { get; set; }
 			}
 
-			private class SampleFormatter : IValueFormatter
+			public class SampleFormatter : IValueFormatter
 			{
 				public string FormatValue(ResolutionContext context)
 				{
@@ -337,12 +337,12 @@ namespace AutoMapper.UnitTests
 		{
 			private ModelDto _result;
 
-			private class ModelObject
+			public class ModelObject
 			{
 				public string ValueOne { get; set; }
 			}
 
-			private class ModelDto
+			public class ModelDto
 			{
 				public string ValueOne { get; set; }
 			}
@@ -436,17 +436,17 @@ namespace AutoMapper.UnitTests
 		{
 			private Destination _result;
 
-			private class Source
+			public class Source
 			{
 				public int Value { get; set; }
 			}
 
-			private class Destination
+			public class Destination
 			{
 				public string Value { get; set; }
 			}
 
-			private class SomeFormatter : IValueFormatter
+			public class SomeFormatter : IValueFormatter
 			{
 				private readonly string _prefix = "asdf";
 
