@@ -4,6 +4,7 @@
   <property name="dist.dir" value="release" />
   <property name="src.dir" value="src" />
   <property name="tools.dir" value="tools" />
+  <property name="lib.dir" value="lib" />
 
   <property name="nant.settings.currentframework" value="net-3.5" />
   <property name="svn.executable" value="tools/subversion/svn.exe" dynamic="true" if="${not property::exists('svn.executable')}" />
@@ -62,7 +63,7 @@
     <exec program="${tools.dir}\ILMerge\ilmerge.exe"
       commandline="/v2 /log /out:&quot;${build.dir}\merge\AutoMapper.dll&quot; /internalize:AutoMapper.exclude &quot;${build.dir}\${config}\AutoMapper\AutoMapper.dll&quot; &quot;${build.dir}\${config}\AutoMapper\Castle.Core.dll&quot; &quot;${build.dir}\${config}\AutoMapper\Castle.DynamicProxy2.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />
     <exec program="${tools.dir}\ILMerge\ilmerge.exe"
-      commandline="/v2 /log /out:&quot;${build.dir}\merge-sl\AutoMapper.Silverlight.dll&quot; /internalize:AutoMapper.exclude &quot;${build.dir}\${config}\AutoMapper.Silverlight\AutoMapper.Silverlight.dll&quot; &quot;${build.dir}\${config}\AutoMapper.Silverlight\Castle.Core.dll&quot; &quot;${build.dir}\${config}\AutoMapper.Silverlight\Castle.DynamicProxy2.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />-->
+      commandline="/targetplatform:v2,&quot;${lib.dir}\Silverlight 3.0&quot; /lib:&quot;${lib.dir}\Silverlight 3.0&quot; /log /out:&quot;${build.dir}\merge-sl\AutoMapper.Silverlight.dll&quot; /internalize:AutoMapper.exclude &quot;${build.dir}\${config}\AutoMapper.Silverlight\AutoMapper.Silverlight.dll&quot; &quot;${build.dir}\${config}\AutoMapper.Silverlight\Castle.Core.dll&quot; &quot;${build.dir}\${config}\AutoMapper.Silverlight\Castle.DynamicProxy2.dll&quot; /keyfile:&quot;${src.dir}\AutoMapper.snk&quot;" workingdir="." />-->
   </target>
 
   <!-- Internal targets -->

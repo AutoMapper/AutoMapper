@@ -1,0 +1,7 @@
+<Configuration>
+  <Daemon.SolutionSettings>
+    <SkipFilesAndFolders>
+      <Item>0691ABF2-B3C7-43BF-9862-2D8D1299CE58/f:go.bat/l:C!?dev?AutoMapper?go.bat</Item>
+    </SkipFilesAndFolders>
+  </Daemon.SolutionSettings>
+</Configuration>
