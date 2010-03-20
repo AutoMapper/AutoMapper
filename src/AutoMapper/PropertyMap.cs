@@ -18,8 +18,9 @@ namespace AutoMapper
 		private object _nullSubstitute;
 		private bool _sealed;
 		private IValueResolver[] _cachedResolvers;
+	    private Func<ResolutionContext, bool> _condition;
 
-		public PropertyMap(IMemberAccessor destinationProperty)
+	    public PropertyMap(IMemberAccessor destinationProperty)
 		{
 			DestinationProperty = destinationProperty;
 		}
@@ -39,8 +40,6 @@ namespace AutoMapper
 
 	    public IEnumerable<IValueResolver> GetSourceValueResolvers()
 		{
-			//yield return new DefaultResolver();
-
 			if (_customMemberResolver != null)
 				yield return _customMemberResolver;
 
@@ -154,8 +153,11 @@ namespace AutoMapper
 			return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
 		}
 
-		public bool CanResolveValue()
+		public bool CanResolveValue(ResolutionContext context)
 		{
+            if (_condition != null && !_condition(context))
+                return false;
+
 			return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
 		}
 
@@ -193,5 +195,10 @@ namespace AutoMapper
 		{
 			return DestinationProperty.GetHashCode();
 		}
+
+	    public void ApplyCondition(Func<ResolutionContext, bool> condition)
+	    {
+	        _condition = condition;
+	    }
 	}
 }

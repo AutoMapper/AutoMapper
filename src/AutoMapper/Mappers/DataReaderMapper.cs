@@ -122,7 +122,7 @@ namespace AutoMapper.Mappers
 		private static void MapPropertyValue(ResolutionContext context, IMappingEngineRunner mapper,
 											 object mappedObject, PropertyMap propertyMap)
 		{
-			if (false == propertyMap.CanResolveValue())
+			if (!propertyMap.CanResolveValue(context))
 				return;
 
 			var result = propertyMap.ResolveValue(context);

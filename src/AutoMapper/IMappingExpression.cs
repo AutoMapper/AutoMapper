@@ -54,6 +54,7 @@ namespace AutoMapper
         void UseDestinationValue();
         void UseValue<TValue>(TValue value);
         void UseValue(object value);
+        void Condition(Func<TSource, bool> condition);
     }
 
     public interface IResolutionExpression

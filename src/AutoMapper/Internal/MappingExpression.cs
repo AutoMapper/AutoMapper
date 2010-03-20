@@ -207,7 +207,17 @@ namespace AutoMapper
             _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(src => value));
 		}
 
-		public void Ignore()
+	    public void Condition(Func<TSource, bool> condition)
+	    {
+	        Condition(context => condition((TSource) context.SourceValue));
+	    }
+
+        public void Condition(Func<ResolutionContext, bool> condition)
+        {
+            _propertyMap.ApplyCondition(condition);
+        }
+
+	    public void Ignore()
 		{
 			_propertyMap.Ignore();
 		}
