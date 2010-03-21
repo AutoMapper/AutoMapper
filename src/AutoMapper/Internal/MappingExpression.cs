@@ -209,10 +209,10 @@ namespace AutoMapper
 
 	    public void Condition(Func<TSource, bool> condition)
 	    {
-	        Condition(context => condition((TSource) context.SourceValue));
+	        Condition(context => condition((TSource) context.Parent.SourceValue));
 	    }
 
-        public void Condition(Func<ResolutionContext, bool> condition)
+	    public void Condition(Func<ResolutionContext, bool> condition)
         {
             _propertyMap.ApplyCondition(condition);
         }

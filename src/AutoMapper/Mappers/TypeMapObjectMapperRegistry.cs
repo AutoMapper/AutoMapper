@@ -84,7 +84,7 @@ namespace AutoMapper.Mappers
 
 			private void MapPropertyValue(ResolutionContext context, IMappingEngineRunner mapper, object mappedObject, PropertyMap propertyMap)
 			{
-				if (propertyMap.CanResolveValue(context))
+				if (propertyMap.CanResolveValue())
 				{
 					object destinationValue = null;
 					ResolutionResult result;
@@ -113,6 +113,9 @@ namespace AutoMapper.Mappers
 
 					var newContext = context.CreateMemberContext(typeMap, result.Value, destinationValue, targetSourceType,
 																 propertyMap);
+
+                    if (!propertyMap.ShouldAssignValue(newContext))
+                        return;
 
 					try
 					{

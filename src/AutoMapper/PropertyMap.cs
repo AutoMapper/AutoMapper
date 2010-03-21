@@ -153,11 +153,8 @@ namespace AutoMapper
 			return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
 		}
 
-		public bool CanResolveValue(ResolutionContext context)
+		public bool CanResolveValue()
 		{
-            if (_condition != null && !_condition(context))
-                return false;
-
 			return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
 		}
 
@@ -199,6 +196,11 @@ namespace AutoMapper
 	    public void ApplyCondition(Func<ResolutionContext, bool> condition)
 	    {
 	        _condition = condition;
+	    }
+
+	    public bool ShouldAssignValue(ResolutionContext context)
+	    {
+	        return _condition == null || _condition(context);
 	    }
 	}
 }
