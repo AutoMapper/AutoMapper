@@ -88,6 +88,7 @@
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
+    <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
