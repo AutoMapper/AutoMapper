@@ -222,6 +222,9 @@
     <Compile Include="..\AutoMapper\Mappers\AssignableMapper.cs">
       <Link>Mappers\AssignableMapper.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\Mappers\CollectionMapper.cs">
+      <Link>Mappers\CollectionMapper.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\Mappers\DictionaryMapper.cs">
       <Link>Mappers\DictionaryMapper.cs</Link>
     </Compile>

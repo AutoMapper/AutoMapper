@@ -123,6 +123,9 @@
     <Compile Include="..\UnitTests\Bug\SequenceContainsNoElementsTest.cs">
       <Link>Bug\SequenceContainsNoElementsTest.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\CollectionMapping.cs">
+      <Link>CollectionMapping.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\ConditionalMapping.cs">
       <Link>ConditionalMapping.cs</Link>
     </Compile>

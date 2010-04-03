@@ -394,7 +394,7 @@ namespace AutoMapper
 					}
 				}
 			} 
-			else if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper)
+			else if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
 			{
 				Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
 				Type destElementType = TypeHelper.GetElementType(context.DestinationType);

@@ -94,6 +94,7 @@
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
