@@ -18,7 +18,8 @@
   <target name="test" depends="compile, run-unit-tests"
   description="Compile and Run Tests" />
 
-  <target name="full" depends="clean, commonassemblyinfo, test, merge, dist" description="Compiles, tests, and produces distributions" />
+  <target name="full" depends="clean, test, merge, dist" description="Compiles, tests, and produces distributions" />
+  <target name="ci" depends="clean, commonassemblyinfo, test, merge, dist" description="Compiles, tests, and produces distributions with versioning" />
 
   <!-- User targets -->
   <target name="clean" description="Delete Automated Build artifacts">
