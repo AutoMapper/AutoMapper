@@ -335,6 +335,8 @@ namespace AutoMapper
                         {
                             typeMap = CreateTypeMap(sourceType, derivedTypeFor, profileName);
                         }
+
+                        break;
                     }
 
                     if ((sourceType.BaseType != null) && (typeMap == null))

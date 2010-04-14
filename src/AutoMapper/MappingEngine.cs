@@ -118,11 +118,6 @@ namespace AutoMapper
 		{
 			try
 			{
-                //if (context.SourceValue == null && ShouldMapSourceValueAsNull(context))
-                //{
-                //    return ObjectCreator.CreateDefaultValue(context.DestinationType);
-                //}
-
 				var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
 				IObjectMapper mapperToUse;
@@ -197,9 +192,6 @@ namespace AutoMapper
 
         bool IMappingEngineRunner.ShouldMapSourceValueAsNull(ResolutionContext context)
 		{
-            //if (context.DestinationType == typeof(string))
-            //    return false;
-
             if (context.DestinationType.IsValueType)
                 return false;
 
