@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace AutoMapper.Mappers
 {
@@ -30,6 +31,16 @@ namespace AutoMapper.Mappers
                 {
                     return Enum.ToObject(context.DestinationType, context.SourceValue);
                 }
+
+#if !SILVERLIGHT
+                if (!Enum.GetNames(enumDestType).Contains(context.SourceValue.ToString()))
+                {
+                    Type underlyingSourceType = Enum.GetUnderlyingType(enumSourceType);
+                    var underlyingSourceValue = Convert.ChangeType(context.SourceValue, underlyingSourceType);
+
+                    return Enum.ToObject(context.DestinationType, underlyingSourceValue);
+                }
+#endif
 
                 return Enum.Parse(enumDestType, Enum.GetName(enumSourceType, context.SourceValue), true);
             }
