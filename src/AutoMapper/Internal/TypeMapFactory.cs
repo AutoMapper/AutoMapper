@@ -117,6 +117,14 @@ namespace AutoMapper
             if (mi != null)
                 return mi;
 
+            pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, mappingOptions.DestinationMemberNameTransformer(nameToSearch)));
+            if (pi != null)
+                return pi;
+
+            pi = getMethods.FirstOrDefault(m => NameMatches(m.Name, mappingOptions.DestinationMemberNameTransformer(nameToSearch)));
+            if (pi != null)
+                return pi;
+
             return null;
         }
 

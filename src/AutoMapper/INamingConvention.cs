@@ -14,6 +14,7 @@ namespace AutoMapper
 		INamingConvention SourceMemberNamingConvention { get; set; }
 		INamingConvention DestinationMemberNamingConvention { get; set; }
 		Func<string, string> SourceMemberNameTransformer { get; set; }
+	    Func<string, string> DestinationMemberNameTransformer { get; set; }
 	}
 
 	public class PascalCaseNamingConvention : INamingConvention

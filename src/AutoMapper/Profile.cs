@@ -42,6 +42,11 @@ namespace AutoMapper
 			set { GetProfile().SourceMemberNameTransformer = value; }
 		}
 
+        public Func<string, string> DestinationMemberNameTransformer
+        {
+            get { return GetProfile().DestinationMemberNameTransformer; }
+            set { GetProfile().DestinationMemberNameTransformer = value; }
+        }
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
@@ -101,6 +106,16 @@ namespace AutoMapper
 		{
 			GetProfile().RecognizePostfixes(postfixes);
 		}
+
+        public void RecognizeDestinationPrefixes(params string[] prefixes)
+        {
+            GetProfile().RecognizeDestinationPrefixes(prefixes);
+        }
+
+        public void RecognizeDestinationPostfixes(params string[] postfixes)
+        {
+            GetProfile().RecognizeDestinationPostfixes(postfixes);
+        }
 
 		protected internal virtual void Configure()
 		{

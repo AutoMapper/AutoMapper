@@ -1420,6 +1420,44 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_destination_members_contain_prefixes : AutoMapperSpecBase
+        {
+            private Destination _destination;
+
+            public class Source
+            {
+                public int Value { get; set; }
+                public int Value2 { get; set; }
+            }
+
+            public class Destination
+            {
+                public int FooValue { get; set; }
+                public int BarValue2 { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.RecognizeDestinationPrefixes("Foo","Bar");
+                    cfg.CreateMap<Source, Destination>();
+                });
+            }
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Source, Destination>(new Source { Value = 5, Value2 = 10 });
+            }
+
+            [Test]
+            public void Registered_prefixes_ignored()
+            {
+                _destination.FooValue.ShouldEqual(5);
+                _destination.BarValue2.ShouldEqual(10);
+            }
+        }
+
 	}
 
 #if SILVERLIGHT

@@ -32,7 +32,9 @@ namespace AutoMapper
 		void RecognizePrefixes(params string[] prefixes);
 		void RecognizePostfixes(params string[] postfixes);
 		void RecognizeAlias(string original, string alias);
-	}
+        void RecognizeDestinationPrefixes(params string[] prefixes);
+        void RecognizeDestinationPostfixes(params string[] postfixes);
+    }
 
 	public interface IConfiguration : IProfileExpression
 	{

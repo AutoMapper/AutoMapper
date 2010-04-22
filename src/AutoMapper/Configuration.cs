@@ -55,6 +55,12 @@ namespace AutoMapper
 			set { GetProfile(DefaultProfileName).SourceMemberNameTransformer = value; }
 		}
 
+        public Func<string, string> DestinationMemberNameTransformer
+        {
+            get { return GetProfile(DefaultProfileName).DestinationMemberNameTransformer; }
+            set { GetProfile(DefaultProfileName).DestinationMemberNameTransformer = value; }
+        }
+
 		bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{
 			get { return AllowNullDestinationValues; }
@@ -145,6 +151,16 @@ namespace AutoMapper
 		{
 			GetProfile(DefaultProfileName).RecognizeAlias(original, alias);
 		}
+
+        public void RecognizeDestinationPrefixes(params string[] prefixes)
+        {
+            GetProfile(DefaultProfileName).RecognizeDestinationPrefixes(prefixes);
+        }
+
+        public void RecognizeDestinationPostfixes(params string[] postfixes)
+        {
+            GetProfile(DefaultProfileName).RecognizeDestinationPostfixes(postfixes);
+        }
 
 		public TypeMap CreateTypeMap(Type source, Type destination)
 		{

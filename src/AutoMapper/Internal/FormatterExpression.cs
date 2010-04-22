@@ -21,13 +21,15 @@ namespace AutoMapper
 			SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 			SourceMemberNameTransformer = s => Regex.Replace(s, "(?:^Get)?(.*)", "$1");
-			AllowNullDestinationValues = true;
+            DestinationMemberNameTransformer = s => s;
+            AllowNullDestinationValues = true;
 		}
 
 		public bool AllowNullDestinationValues { get; set; }
 		public INamingConvention SourceMemberNamingConvention { get; set; }
 		public INamingConvention DestinationMemberNamingConvention { get; set; }
 		public Func<string, string> SourceMemberNameTransformer { get; set; }
+        public Func<string, string> DestinationMemberNameTransformer { get; set; }
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
@@ -117,7 +119,21 @@ namespace AutoMapper
 
 			SourceMemberNameTransformer = val => AliasFunc(orig(val), original, alias);
 		}
-	}
+
+        public void RecognizeDestinationPrefixes(params string[] prefixes)
+        {
+            var orig = DestinationMemberNameTransformer;
+
+            DestinationMemberNameTransformer = val => prefixes.Aggregate(orig(val), PrefixFunc);
+        }
+
+        public void RecognizeDestinationPostfixes(params string[] postfixes)
+        {
+            var orig = DestinationMemberNameTransformer;
+
+            DestinationMemberNameTransformer = val => postfixes.Aggregate(orig(val), PostfixFunc);
+        }
+    }
 
 	internal interface IFormatterCtorConfigurator
 	{

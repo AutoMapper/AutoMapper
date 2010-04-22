@@ -35,6 +35,7 @@ namespace AutoMapper.UnitTests.Tests
 			mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
             mappingOptions.SourceMemberNameTransformer = s => s;
+            mappingOptions.DestinationMemberNameTransformer = s => s;
 			
 			var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions);
 
@@ -74,6 +75,7 @@ namespace AutoMapper.UnitTests.Tests
 			_mappingOptions.SourceMemberNamingConvention = namingConvention;
 			_mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 			_mappingOptions.SourceMemberNameTransformer = s => s;
+            _mappingOptions.DestinationMemberNameTransformer = s => s;
 
 			_factory = new TypeMapFactory();
 
@@ -122,6 +124,7 @@ namespace AutoMapper.UnitTests.Tests
 			_mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			_mappingOptions.DestinationMemberNamingConvention = namingConvention;
 			_mappingOptions.SourceMemberNameTransformer = s => s;
+            _mappingOptions.DestinationMemberNameTransformer = s => s;
 
 			_factory = new TypeMapFactory();
 		}
@@ -165,7 +168,8 @@ namespace AutoMapper.UnitTests.Tests
 					return Regex.Replace(s, "(.*)(?:Bar|Blah)$", "$1");
 				};
 			_mappingOptions.SourceMemberNameTransformer = transformer;
-			_mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
+            _mappingOptions.DestinationMemberNameTransformer = s => s;
+            _mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			_mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 
 			_factory = new TypeMapFactory();
@@ -183,5 +187,49 @@ namespace AutoMapper.UnitTests.Tests
 		}
 	}
 
+    public class When_specifying_a_custom_destination_transformation_method : SpecBase
+    {
+        private IMappingOptions _mappingOptions;
+        private TypeMapFactory _factory;
+        private TypeMap _map;
 
+        private class Source
+        {
+            public int Value { get; set; }
+            public int FooValueBar2 { get; set; }
+        }
+
+        private class Destination
+        {
+            public int FooValueBar { get; set; }
+            public int FooValueBar2 { get; set; }
+        }
+
+        protected override void Establish_context()
+        {
+            _mappingOptions = CreateStub<IMappingOptions>();
+            Func<string, string> transformer = s =>
+            {
+                s = Regex.Replace(s, "(?:^Foo)?(.*)", "$1");
+                return Regex.Replace(s, "(.*)(?:Bar|Blah)$", "$1");
+            };
+            _mappingOptions.SourceMemberNameTransformer = s => s;
+            _mappingOptions.DestinationMemberNameTransformer = transformer;
+            _mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
+            _mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+
+            _factory = new TypeMapFactory();
+        }
+
+        protected override void Because_of()
+        {
+            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
+        }
+
+        [Test]
+        public void Should_execute_transform_when_members_do_not_match()
+        {
+            _map.GetPropertyMaps().Count().ShouldEqual(2);
+        }
+    }
 }
