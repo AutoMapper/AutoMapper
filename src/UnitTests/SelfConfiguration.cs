@@ -56,7 +56,8 @@ namespace AutoMapper.UnitTests
 					map.ForMember(x => x.DestinationMemberNamingConvention, o => o.Ignore());
 					map.ForMember(x => x.SourceMemberNamingConvention, o => o.Ignore());
 					map.ForMember(x => x.SourceMemberNameTransformer, o => o.Ignore());
-				}
+                    map.ForMember(x => x.DestinationMemberNameTransformer, o => o.Ignore());
+                }
 			}
 		}
 	}
