@@ -90,6 +90,7 @@
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
+    <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
@@ -141,6 +142,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="AutoMapper.snk" />
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

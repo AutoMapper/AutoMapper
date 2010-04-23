@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.DynamicPropertyDTO&lt;T&gt;" Collapsed="true">
+    <Position X="11" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.ComplexPropertyDTO&lt;T&gt;" Collapsed="true">
+    <Position X="11" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.ComponentContainerDTO" Collapsed="true">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.EntityDTO" Collapsed="true">
+    <Position X="9.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.ComponentDTO" Collapsed="true">
+    <Position X="11" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAACAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.HealthDTO" Collapsed="true">
+    <Position X="9.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.PhysicalLocationDTO" Collapsed="true">
+    <Position X="12" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.DynamicProperty&lt;T&gt;" Collapsed="true">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.ComplexProperty&lt;T&gt;" Collapsed="true">
+    <Position X="1.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.SimpleProperty&lt;T&gt;" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.ComponentContainer" Collapsed="true">
+    <Position X="5.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Components" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.Entity" Collapsed="true">
+    <Position X="5.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.Component" Collapsed="true">
+    <Position X="1.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAACAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.Health" Collapsed="true">
+    <Position X="3" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="AutoMapper.UnitTests.Bug.EntityTest1.PhysicalLocation" Collapsed="true">
+    <Position X="0.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="AutoMapper.UnitTests.Bug.EntityTest1.Point2D" Collapsed="true">
+    <Position X="12" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAA=</HashCode>
+      <FileName>Bug\InheritanceIssue.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
