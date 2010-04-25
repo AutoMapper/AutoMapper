@@ -114,6 +114,9 @@
     <Compile Include="..\UnitTests\Bug\IgnoreAll.cs">
       <Link>Bug\IgnoreAll.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Bug\InheritanceIssue.cs">
+      <Link>Bug\InheritanceIssue.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Bug\NamingConventions.cs">
       <Link>Bug\NamingConventions.cs</Link>
     </Compile>
