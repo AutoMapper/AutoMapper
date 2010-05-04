@@ -184,12 +184,12 @@ namespace AutoMapper
 			}
 		}
 
-	    private static IConfiguration Configuration
+	    public static IConfiguration Configuration
 	    {
 	        get { return (IConfiguration) ConfigurationProvider; }
 	    }
 
-	    public static IConfigurationProvider ConfigurationProvider
+	    private static IConfigurationProvider ConfigurationProvider
 		{
 			get
 			{
