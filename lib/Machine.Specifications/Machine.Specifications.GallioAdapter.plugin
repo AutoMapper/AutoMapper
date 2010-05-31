@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<plugin pluginId="Gallio.MSpecAdapter"
+        recommendedInstallationPath="MSpec"
+        xmlns="http://www.gallio.org/">
+  <traits>
+    <name>Machine Specifications Adapter Plugin</name>
+    <version>0.3.0.0</version>
+    <description>Provides support for running MSpec within gallio.  Requires the assemblies from MSpec.</description>
+  </traits>
+
+  <dependencies>
+    <dependency pluginId="Gallio" />
+  </dependencies>
+
+  <files>
+    <file path="Machine.Specifications.dll" />
+    <file path="Machine.Specifications.GallioAdapter.plugin" />
+    <file path="Machine.Specifications.GallioAdapter.3.1.dll" />
+    <!--<file path="Readme.txt" />-->
+  </files>
+
+  <assemblies>
+    <assembly fullName="Machine.Specifications.GallioAdapter.3.1, Version=0.3.0.0, Culture=neutral, PublicKeyToken=null"
+              codeBase="Machine.Specifications.GallioAdapter.3.1.dll"
+              qualifyPartialName="true" />
+
+    <assembly fullName="Machine.Specifications, Version=0.3.0.0, Culture=neutral, PublicKeyToken=5c474de7a495cff1"
+              codeBase="Machine.Specifications.dll" />      
+  </assemblies>
+  
+  <components>
+    <component componentId="Machine.Specifications"
+               serviceId="Gallio.TestFramework"
+               componentType="Machine.Specifications.GallioAdapter.MachineSpecificationsFramework, Machine.Specifications.GallioAdapter.3.1">
+      <traits>
+        <name>Machine Specifications</name>        
+        <frameworkAssemblies>Machine.Specifications, Version=0.3.0.0</frameworkAssemblies>
+        <version>0.3.0.0</version>
+        <fileTypes>Assembly</fileTypes>
+      </traits>
+    </component>
+  </components>
+</plugin>

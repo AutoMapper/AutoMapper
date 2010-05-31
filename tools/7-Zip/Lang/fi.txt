@@ -1,0 +1,544 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.57
+; Translated by Ari Ryynanen
+; Updated by Jarko P. (3.08.04 beta -->4.30)
+; Updated by Juhani Valtasalmi (4.30 --> 4.42)
+; Updated with light modifications by T.Sakkara (4.42 --> 9.07 beta) 1.9.2009
+;
+
+00000000="Finnish"
+00000001="Suomi"
+00000002="11"
+
+; 7-Zip Asetukset
+
+; Title
+01000000="Lisäsetukset"
+
+; Info Page; Tietoja Ohjelmasta
+01000100="Tietoja"
+01000103="7-Zip on ilmainen ohjelmisto. Halutessasi voit kuitenkin tukea kehitystyötä rekisteröitymällä."
+01000104="Tuki (engl.)"
+01000105="Rekisteröidy (engl.)"
+
+; Folders Page; Asetukset/Kansiot
+01000200="Kansiot"
+01000210="&Työkansio"
+01000211="&Järjestelmän väliaikaiskansio"
+01000212="&Nykyinen kansio"
+01000213="&Valittu kansio:"
+01000214="Käytä vain siirrettäville tietovälineille"
+
+01000281="Määritä väliaikaistiedostojen sijainti."
+
+; System Page; Asetukset/Järjestelmäliitännät
+01000300="Järjestelmä"
+01000301="Liitä 7-Zip järjestelmän valikoihin."
+01000302="Ryhmitetty järjestelmävalikko"
+01000310="Järjestelmävalikon sisältö:"
+
+; Language Page; Asetukset/Kieli
+01000400="Kieli"
+01000401="Kieli:"
+
+
+; 7-Zip Explorer extension; 7-Zip Järjestelmäkytkennät
+
+; Context menu; Järjestelmämenu
+02000101="7-Zip"
+02000102="7-Zip komennot"
+02000103="Avaa"
+02000104="Avaa valittu paketti."
+02000105="Purkaa..."
+02000106="Purkaa valitun paketin."
+02000107="Lisää pakettiin..."
+02000108="Lisää tiedostot valittuun pakettiin."
+02000109="Eheystarkastus"
+0200010A="Tarkistaa valitun paketin eheyden."
+0200010B="Purkaa tänne"
+0200010C="Purkaa tiedostot valitusta paketista nykyiseen kansioon."
+0200010D="Purkaa kansioon {0}"
+0200010E="Purkaa tiedostot alikansioon."
+0200010F="Lisää pakettiin {0}"
+02000110="Lisää valitut tiedostot pakettiin."
+02000111="Pakkaa tiedostot ja lähetä..."
+02000112="Pakkaa valitut ja lähetä sähköpostilla."
+02000113="Lisää pakettiin {0} ja lähetä"
+02000114="Lisää valitut tiedostot pakettiin ja lähetä sähköpostilla."
+
+02000140="<Kansio>"
+02000141="<Paketti>"
+
+; Properties; Ominaisuudet
+02000203="Polku"
+02000204="Nimi"
+02000205="Tiedostomuoto"
+02000206="Kansio"
+02000207="Koko"
+02000208="Pakattu koko"
+02000209="Määritteet"
+0200020A="Luotu"
+0200020B="Käytetty"
+0200020C="Muokattu"
+0200020D="Kiinteä"
+0200020E="Kommentoitu"
+0200020F="Suojaus"
+02000210="Pilko ennen"
+02000211="Pilko jälkeen"
+02000212="Sanakirja"
+02000213="CRC"
+02000214="Tyyppi"
+02000215="Anti"
+02000216="Menetelmä"
+02000217="Isäntäjärjestelmä"
+02000218="Tiedostojärjestelmä"
+02000219="Käyttäjä"
+0200021A="Ryhmä"
+0200021B="Lohko"
+0200021C="Kuvaus"
+0200021D="Kohta"
+0200021E="Polun etuliite"
+0200021F="Kansioita"
+02000220="Tiedostoja"
+02000221="Versio"
+02000222="Nimi"
+02000223="Pilkottu"
+02000224="Siirtymä"
+02000225="Linkit"
+02000226="Lohkot"
+02000227="Nimet"
+
+02000229="64-bittinen"
+0200022A="Koodaus: UCS Big-endian"
+0200022B="Suoritin"
+0200022C="Fyysinen koko"
+0200022D="Otsikon koko"
+0200022E="Tarkistussumma"
+0200022F="Ominaisuudet"
+02000230="Virtuaaliosoite"
+02000231="ID"
+02000232="Lyhytnimi"
+02000233="Creator Application"
+02000234="Sektorikoko"
+02000235="Moodi"
+02000236="Linkki"
+
+; Status bar; Tilarivi
+02000301="{0} tiedosto(a) valittu"
+02000302="{0} tiedosto(a)"
+
+02000320="Tiedostoja:"
+02000321="Kansioita:"
+02000322="Koko:"
+02000323="Pakattu koko:"
+02000324="Paketteja:"
+
+; List Context Menu
+02000401="&Sarakkeet..."
+
+02000411="&Avaa"
+02000412="&Purkaa..."
+
+; ToolBar; Työkalut
+02000501="Purkaa"
+
+; Messages; Viestit
+02000601="Tätä pakettia ei voi päivittää."
+02000602="Pakettia '{0}' ei voida päivittää."
+02000603="Ei voida luoda kansioita '{0}.'"
+02000604="Tiedoston pakkaustapaa ei tueta."
+02000605="Virhe!"
+02000606="Liian monta kohdetta."
+02000607="Tiedostotyyppiin ei ole liitetty mitään ohjelmaa."
+02000608="Ei virheitä."
+02000609="Tiedoston '{0}' pakkausta ei voi purkaa."
+0200060A="Ei voi avata suojattua pakettia '{0}'. Onko salasana oikea?"
+0200060B="Ei riittävästi muistia toimintoa varten"
+0200060C="Tuntematon virhe"
+0200060D="Pakkaustapaa ei tueta"
+
+; Dialogs; Ikkunat
+02000702="OK"
+02000705="&Kyllä"
+02000707="Kyllä k&aikkiin"
+02000709="&Ei"
+0200070B="E&i kaikkiin"
+
+02000710="Peruuta"
+02000711="&Peruuta"
+02000713="&Sulje"
+02000714="Pysäytä"
+02000715="Aloita uudelleen"
+
+02000720="Ohje"
+
+; Extract dialog; Purkuikkuna
+02000800="Purkaa"
+02000801="&Purkaa kansioon"
+02000802="Salasana"
+
+02000810="Polkujen sisällytys:"
+02000811="Sisällytä koko polku"
+02000812="Nykyiset nimet"
+02000813="Älä sisällytä polkuja"
+
+02000820="Samannimiset tiedostot:"
+02000821="Kysy tapauskohtaisesti"
+02000822="Korvaa"
+02000823="Ohita"
+02000824="Uudelleennimeä"
+02000825="Uudelleennimeä aiemmat"
+
+02000830="Tiedostot"
+02000831="&Valitut"
+02000832="&Kaikki"
+
+02000881="Purkaa kansioon"
+
+02000890="Puretaan paketti"
+
+; Overwrite dialog; Korvausikkuna
+02000900="Vahvista tiedoston korvaus"
+02000901="Tämä kansio sisältää jo samannimisen tiedoston."
+02000902="Haluatko korvata tiedoston"
+02000903="tällä tiedostolla?"
+
+02000911="&Uudelleennimeä automaattisesti"
+
+02000982="{0} tavua"
+02000983="muokattu"
+
+; Viesti-ikkuna
+02000A00="Tietoja"
+
+02000A80="Viesti"
+
+02000A91="Tukematon pakkausmenetelmä tiedostolle '{0}'."
+02000A92="Tietovirhe tiedostossa '{0}'. Tiedosto on viottunut."
+02000A93="Tiedoston '{0}' eheystarkistus epäonnistui. Tiedosto on vioittunut."
+02000A94="Virhe avattaessa suojattua pakettia '{0}'. Onko salasana oikea?"
+02000A95="CRC-virhe avattaessa suojattua pakettia '{0}'. Onko salasana oikea?"
+
+; Salasanaikkuna
+02000B00="Anna salasana"
+02000B01="Anna salasana:"
+02000B02="Näytä &salasana"
+02000B03="Toista salasana:"
+02000B10="Salasanat eivät täsmää"
+02000B11="Salasanassa voi käyttää numeroita ja erikoismerkkejä, mutta EI skandinaavisia kirjaimia."
+02000B12="Liian pitkä salasana"
+
+; Progress dialog; Edistymisikkuna
+02000C00="Käsitellään"
+02000C01="Aikaa kulunut:"
+02000C02="Aikaa jäljellä:"
+02000C03="Koko:"
+02000C04="Nopeus:"
+02000C05="Käsitelty:"
+02000C06="Pakkaussuhde:"
+
+02000C10="&Tausta-ajona"
+02000C11="&Normaali prioriteetti"
+02000C12="&Pysäytä"
+02000C13="&Jatka"
+
+02000C20="Pysäytetty"
+
+02000C30="Keskeytetäänkö toiminto?"
+
+; Compress dialog; Pakkausikkuna
+02000D00="Lisää pakettiin"
+02000D01="&Paketti:"
+02000D02="&Päivitystapa:"
+02000D03="Pakkaus&:"
+02000D04="Pakkaus&menetelmä:"
+02000D05="Luo Kiinte&ä paketti"
+02000D06="&Parametrit:"
+02000D07="Asetukset"
+02000D08="Luo itsepurkautuva paketti"
+02000D09="Prosessorisäikeet"
+02000D0A="Tiedosto&nimien suojaus"
+02000D0B="Pakkauksen &taso:"
+02000D0C="&Sanakirjan koko:"
+02000D0D="&Sanan koko:"
+02000D0E="Pakkauksessa tarvittava muistimäärä:"
+02000D0F="Purkauksessa tarvittava muistimäärä:"
+02000D10="Suojaus"
+02000D11="Salausalgoritmi"
+02000D12="Prosessorisäikeet"
+02000D13="Kiinteä lohkokoko"
+02000D14="Muuttuva"
+02000D15="Kiinteä"
+02000D16="Pakkaa yhteiset tiedostot"
+
+02000D40="&Osien koko pilkottaessa:"
+02000D41="Pilkotun osan koko epäkelpo"
+02000D42="Pilkottavien osien koko: {0} tavua.\nPilkotaanko paketti edellämainitun kokoisiin osiin?"
+
+02000D81="Ei pakkausta"
+02000D82="Normaali"
+02000D83="Täysi"
+02000D84="Nopea"
+02000D85="Nopein"
+02000D86="Ultra"
+
+02000D90="Selaa"
+
+02000DA1="Lisää ja korvaa tiedostoja"
+02000DA2="Päivitä ja lisää tiedostoja"
+02000DA3="Päivitä olemassaolevat tiedostot"
+02000DA4="Synkronoi tiedostot"
+
+02000DB1="Kaikki tiedostot"
+
+02000DC0="Lisätään pakettiin"
+
+; Columns dialog; Sarakeikkuna
+02000E00="Sarakkeet"
+02000E01="Valitse tässä kansiossa näytettävät sarakkeet. Käytä uudelleenjärjestelyyn painikkeita 'Siirrä ylös' ja 'Siirrä alas'"
+02000E02="Aseta valitun sarakkeen &leveydeksi"
+02000E03="pikseliä."
+
+02000E10="Siirrä &ylös"
+02000E11="Siirrä &alas"
+02000E12="&Näytä"
+02000E13="&Piilota"
+02000E14="Aseta"
+
+02000E81="Otsikko"
+02000E82="Leveys"
+
+; Tarkistus
+02000F90="Eheystarkistus"
+
+
+; File Manager; Tiedostonhallinta
+
+03000000="7-Zip Tiedostonhallinta"
+
+; Menu; Päävalikko
+03000102="&Tiedosto"
+03000103="&Muokkaa"
+03000104="&Näytä"
+03000105="Työ&kalut"
+03000106="&Ohje"
+03000107="&Suosikit"
+
+; File; Tiedosto-valikko
+03000210="&Avaa"
+03000211="Avaa sisäisesti"
+03000212="Avaa &ulkoisesti"
+03000220="&Näytä"
+03000221="&Muokkaa"
+03000230="Nim&eä uudelleen"
+03000231="&Kopioi..."
+03000232="&Siirrä..."
+03000233="&Poista"
+03000240="Ominais&uudet"
+03000241="Ku&vaus"
+03000242="Laske tarkistussummat"
+03000243="Eroavaisuudet"
+03000250="Luo kansio"
+03000251="Luo tiedosto"
+03000260="&Lopeta"
+03000270="&Pilko tiedosto..."
+03000271="&Yhdistä pilkotut..."
+
+; Edit; Muokkaa-valikko
+03000310="&Kumoa"
+03000311="&Toista"
+03000320="&Leikkaa"
+03000321="K&opioi"
+03000322="L&iitä"
+03000323="&Poista"
+03000330="V&alitse kaikki"
+03000331="Poista &valinnat"
+03000332="&Käänteinen valinta"
+03000333="Valitse..."
+03000334="Poista valinta..."
+03000335="Valitse tyypin mukaan"
+03000336="Poista valinnat tyypin mukaan"
+
+; View; Näytä-valikko
+03000410="Suu&ret kuvakkeet"
+03000411="&Pienet kuvakkeet"
+03000412="&Luettelo"
+03000413="&Tiedot"
+03000420="Alkuperäinen järjestys"
+03000430="Avaa pääkansio"
+03000431="Avaa yläkansio"
+03000432="Kansiohistoria..."
+03000440="P&äivitä"
+03000449="Kansioiden sisältö luetteloituna"
+03000450="&Kaksi panelia"
+03000451="&Työkalupalkki"
+03000460="Pakettipalkki"
+03000461="Vakiopalkki"
+03000462="Suuret painikkeet"
+03000463="Näytä painikkeiden tekstit"
+
+; Tools; Työkalut-valikko
+03000510="&Asetukset..."
+03000511="&Nopeustesti"
+
+; Help; Ohje-valikko
+03000610="&Sisältö..."
+03000620="&Tietoja ohjelmasta"
+
+; Favorites; Suosikit
+03000710="&Lisää Suosikit-kansioon"
+03000720="Kirjanmerkki"
+
+; Options Dialog; Asetukset-ikkuna
+
+03010000="Asetukset"
+
+; Plugins; Lisäosat
+03010100="Lisäosat"
+03010101="&Lisäosat:"
+03010110="Lisäsetukset..."
+
+; Edit; Muokkaus
+03010200="Muokkausohjelmat"
+03010201="&Tekstieditori:"
+03010202="&Eroavaisuuksien etsintä:"
+
+; System; Järjestelmäliitännät
+03010300="Järjestelmäliitännät"
+03010302="Liitä 7-Zip seuraaviin tiedostotyypeihin:"
+03010310="Lisäosa"
+
+; Settings; Asetukset
+03010400="Tiedostoikkuna"
+03010401="Näytä &yläkansion symboli"
+03010402="Näytä &aidot tiedostokuvakkeet"
+03010410="Näytä &järjestelmävalikko"
+03010420="&Valitse koko rivi"
+03010421="Näytä &ruudukko"
+03010422="Avaa &kertanapsautuksella"
+03010430="Vaihtoehtoinen valintojen &esitystapa"
+03010440="Käytä &suuria muistisivuja"
+
+; Strings; Merkkijonot
+
+03020201="Kopioi"
+03020202="Siirrä"
+03020203="Kopioi kansioon:"
+03020204="Siirrä kansioon:"
+03020205="Kopioidaan..."
+03020206="Siirretään..."
+03020207="Ei voida siirtää tai kopioida tiedostoja kyseiseen kansioon."
+03020208="Toiminto ei ole tuettu."
+03020209="Valitse kohdekansio."
+
+03020210="Vahvista tiedoston poisto"
+03020211="Vahvista kansion poisto"
+03020212="Vahvista useiden kohteiden poisto"
+03020213="Poistetaanko tiedosto '{0}'?"
+03020214="Poistetaanko kansio '{0}' ja kaiken sen sisällön?"
+03020215="Poistetaanko nämä {0} kohdetta?"
+03020216="Poistetaan..."
+03020217="Virhe poistettaessa tiedostoa tai kansiota"
+03020218="Roskakoriin ei voida siirtää tiedostoa, jolla on pitkä nimi"
+
+03020220="Nimetään uudelleen..."
+03020221="Virhe uudelleennimettäessä tiedostoa tai kansiota"
+03020222="Vahvista tiedoston kopioiminen"
+03020223="Kopioidaanko tiedostot pakettiin?"
+
+03020230="Luo uusi kansio"
+03020231="Kansion nimi:"
+03020232="Uusi kansio"
+03020233="Virhe luotaessa kansiota"
+
+03020240="Luo uusi tiedosto"
+03020241="Tiedostonimi:"
+03020242="Uusi tiedosto"
+03020243="Virhe luotaessa tiedostoa"
+
+03020250="Valitse"
+03020251="Poista valinta"
+03020252="Maski:"
+
+03020260="Kansiohistoria"
+
+03020280="Tiedostoa '{0}' on muutettu.\nHaluatko päivittää paketin?"
+03020281="Ei voida päivittää tiedostoa \n'{0}'."
+03020282="Editoria ei voida käynnistää."
+03020283="Avataan..."
+03020284="Tiedosto vaikuttaa haittaohjelmalta, sillä sen nimi sisältää peräkkäisiä välilyöntejä."
+
+03020290=""
+03020291="&Kuvaus:"
+
+030202A0="Järjestelmä"
+
+03020300="Tietokone"
+03020301="Verkko"
+03020302="Dokumentit"
+
+03020400="Lisää"
+03020401="Purkaa"
+03020402="Tarkista eheys"
+
+03020420="Kopioi"
+03020421="Siirrä"
+03020422="Poista"
+03020423="Ominaisuudet"
+
+03020500="Pilko tiedosto"
+03020501="&Pilko kansioon:"
+03020510="Pilkotaan..."
+03020520="Vahvista pilkkominen"
+03020521="Pilkotaanko tiedosto {0} osaan?"
+03020522="Pilkotun osan koon pitää olla pienempi kuin alkuperäisen tiedoston."
+
+03020600="Yhdistä pilkotut tiedostot"
+03020601="&Yhdistä kansioon:"
+03020610="Yhdistetään..."
+03020620="Valitse vain ensimmäinen tiedosto"
+03020621="Tiedostoa ei tunnisteta pilkotuksi"
+03020622="Vain yksi pilkottu osatiedosto löytyi"
+
+03020710="Laskee tarkistussummaa..."
+03020720="Tarkistussummat"
+03020721="Sisällön CRC-tarkistussumma:"
+03020722="Sisällön ja tiedostonimien CRC-tarkistussumma:"
+
+03020800="Etsitään..."
+
+03020900="Ominaisuudet"
+
+03020A01="Toimintoa ei voi suorittaa kansiosta, jonka nimi on pitkä."
+03020A02="Valitse yksi tiedosto"
+03020A03="Valitse vähintään yksi tiedosto"
+03020A04="Tiedosto {0} on jo olemassa"
+
+; Computer; Tietokone
+03031100="Aseman koko"
+03031101="Vapaata tilaa"
+03031102="Varausyksikön koko"
+03031103="Nimi"
+
+; Network; Verkko
+03031200="Paikallinen nimi"
+03031201="Palveluntarjoja"
+
+; Benchmark Dialog; Nopeustesti
+
+03080000="Nopeustesti"
+03080001="Muistin käyttö:"
+03080002="Pakkaaminen"
+03080003="Purkaminen"
+03080004="Nopeus"
+03080005="Teho"
+03080006="Teho yhteensä"
+03080007="Tämänhetkinen"
+03080008="Tulos"
+03080009="Läpäisyt:"
+0308000A="Virheitä:"
+0308000B="Suoritinkäyttö"
+0308000C="Teho / käyttö"
+
+;!@LangEnd@!
+

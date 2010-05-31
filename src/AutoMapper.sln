@@ -7,8 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.gitignore = ..\.gitignore
 		..\AutoMapper.build = ..\AutoMapper.build
 		..\AutoMapper.exclude = ..\AutoMapper.exclude
+		..\default.ps1 = ..\default.ps1
 		..\go-full.bat = ..\go-full.bat
 		..\go.bat = ..\go.bat
+		..\psake.bat = ..\psake.bat
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper", "AutoMapper\AutoMapper.csproj", "{DDF551F9-B27D-4283-BFA0-E7068E05967D}"
@@ -16,12 +18,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapperSamples", "AutoMapperSamples\AutoMapperSamples.csproj", "{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "Benchmark\Benchmark.csproj", "{B8051389-CB47-46FB-B234-9D49506704AA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.Silverlight", "AutoMapper.Silverlight\AutoMapper.Silverlight.csproj", "{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Silverlight", "Silverlight", "{8434CAD3-5AC9-4FDA-AB16-1F06B9972794}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Silverlight", "UnitTests.Silverlight\UnitTests.Silverlight.csproj", "{982B7279-AFE5-4C36-A6E9-8644EFF185F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,28 +53,8 @@ Global
 		{B8051389-CB47-46FB-B234-9D49506704AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B8051389-CB47-46FB-B234-9D49506704AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8051389-CB47-46FB-B234-9D49506704AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}.AutomatedDebug|Any CPU.ActiveCfg = AutomatedDebug|Any CPU
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}.AutomatedDebug|Any CPU.Build.0 = AutomatedDebug|Any CPU
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}.AutomatedRelease|Any CPU.ActiveCfg = AutomatedRelease|Any CPU
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}.AutomatedRelease|Any CPU.Build.0 = AutomatedRelease|Any CPU
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4}.AutomatedDebug|Any CPU.ActiveCfg = AutomatedDebug|Any CPU
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4}.AutomatedDebug|Any CPU.Build.0 = AutomatedDebug|Any CPU
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4}.AutomatedRelease|Any CPU.ActiveCfg = AutomatedRelease|Any CPU
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4}.AutomatedRelease|Any CPU.Build.0 = AutomatedRelease|Any CPU
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{5FD27B0F-0EE7-4870-BA2B-2F061EA31CFD} = {8434CAD3-5AC9-4FDA-AB16-1F06B9972794}
-		{982B7279-AFE5-4C36-A6E9-8644EFF185F4} = {8434CAD3-5AC9-4FDA-AB16-1F06B9972794}
 	EndGlobalSection
 EndGlobal

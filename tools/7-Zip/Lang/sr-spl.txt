@@ -1,0 +1,456 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.30
+; Translated by Lazar
+
+00000000="Serbian - Latin"
+00000001="Srpski - latinica"
+00000002="26-2"
+
+; 7-Zip Configuration
+
+; Title
+01000000="Podešavanje 7-Zip-a"
+
+; Info Page
+01000100="O programu"
+01000103="7-Zip je besplatan program. No, ako Vam se 7-Zip dopadne i poželite da podržite dalji razvoj programa, molimo Vas registrujte se tako što ćete priložiti donaciju od 20$. To možete uraditi kreditnom karticom ili nekim drugim načinom plaćanja."
+01000104="Podrška"
+01000105="Registracija"
+
+; Folders Page
+01000200="Fascikle"
+01000210="Radna fascikla"
+01000211="Koristi Windows-ovu privremenu fasciklu"
+01000212="Trenutna"
+01000213="Navedena:"
+01000214="Koristi samo za izmenjive medije"
+
+01000281="Navedite lokaciju za smeštanje privremenih datoteka."
+
+; System Page
+01000300="Sistem"
+01000301="Ubaci 7-Zip u sistemski meni"
+01000302="Kaskadni sistemski meni"
+01000310="Stavke sistemskog menija:"
+
+; Language Page
+01000400="Jezik"
+01000401="Jezik:"
+
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip komande"
+02000103="Otvori arhivu"
+02000104="Otvori izabranu arhivu."
+02000105="Izdvoj datoteke..."
+02000106="Izdvoj datoteke iz izabrane arhive."
+02000107="Dodaj u arhivu..."
+02000108="Dodaj izabrane stavke u arhivu."
+02000109="Testiraj arhivu"
+0200010A="Testiraj integritet izabrane arhive."
+0200010B="Izdvoj ovde"
+0200010C="Izdvoj datoteke iz izabrane arhive u trenutnu fasciklu."
+0200010D="Izdvoj u {0}"
+0200010E="Izdvoj datoteke u podfasciklu."
+0200010F="Dodaj u {0}"
+02000110="Dodaj izabrane datoteke u arhivu."
+02000111="Dodaj i napravi e-mail..."
+02000112="Dodaj obeležene datoteke i napravi e-mail."
+02000113="Dodaj u {0} i napravi e-mail"
+02000114="Dodaj obeležene datoteke i napravi e-mail."
+
+02000140="<Folder>"
+02000141="<Archive>"
+
+; Properties
+02000203="Putanja"
+02000204="Naziv"
+02000205="Tip"
+02000206="Fascikla"
+02000207="Veličina"
+02000208="Veličina u zapakovanom stanju"
+02000209="Atributi"
+0200020A="Kreirana"
+0200020B="Pristupano"
+0200020C="Promenjeno"
+0200020D="Solid"
+0200020E="Komentar"
+0200020F="Šifrovano"
+02000210="Podeli pre"
+02000211="Podeli posle"
+02000212="Dictionary"
+02000213="CRC"
+02000214="Tip"
+02000215="Anti"
+02000216="Metod"
+02000217="Operativni sistem"
+02000218="Sistem datoteka"
+02000219="Korisnik"
+0200021A="Grupa"
+0200021B="Blok"
+0200021C="Komentar"
+0200021D="Položaj"
+
+; Status bar
+02000301="{0} objekat(a) izabrano"
+02000302="{0} objekat(a)"
+
+; List Context Menu
+02000401="Kolona..."
+
+02000411="Otvori"
+02000412="Izdvoj..."
+
+; ToolBar
+02000501="Izdvoj"
+
+; Messages
+02000601="Operacija osvežavanja nije dozvoljena za ovu arhivu."
+02000602="Ne mogu da osvežim arhivu {0}"
+02000603="Ne mogu da kreiram Fasciklu '{0}'"
+02000604="Datoteka nije jedna od podržanih arhiva."
+02000605="Greška"
+02000606="Isuviše stavki"
+02000607="Ni jedna aplikacija nije dodeljena navedenoj ekstenziji"
+02000608="Nije bilo nikakvih grešaka"
+
+; Dialogs
+02000702="U redu"
+02000705="Da"
+02000707="Da za sve"
+02000709="Ne"
+0200070B="Ne za sve"
+
+02000710="Otkaži"
+02000711="Otkaži"
+02000713="Zatvori"
+02000714="Stani"
+02000715="Ponovo"
+
+02000720="Pomoć"
+
+; Extract dialog
+02000800="Izdvoj"
+02000801="Izdvoj u:"
+02000802="Šifra"
+
+02000810="Putanje"
+02000811="Puna putanja"
+02000812="Trenutne putanje"
+02000813="Bez putanje"
+
+02000820="Zamena"
+02000821="Pitaj pre nego što zameniš"
+02000822="Zameni bez zapitkivanja"
+02000823="Preskoči postojeće datoteke"
+02000824="Automatska promena naziva"
+02000825="Automatska promena naziva postojećih datoteka"
+
+02000830="Datoteke"
+02000831="Izabrani datoteke"
+02000832="Sve datoteke"
+
+02000881="Navedi lokaciju gde će se izdvajati datoteke iz arhiva."
+
+02000890="Izdvajanje"
+
+; Overwrite dialog
+02000900="Potvrdi zamenu datoteke"
+02000901="Ciljna fascikla već sadrži datoteku koja se trenutno obrađuje."
+02000902="Da li želite da zamenite postojeću datoteku"
+02000903="sa ovom?"
+
+02000911="Automatska promena naziva"
+
+02000982="{0} bajtova"
+02000983="modifikovano"
+
+; Messages dialog
+02000A00="Dijagnostičke poruke"
+
+02000A80="Poruke"
+
+02000A91="Nepodržani metod kompresije za '{0}'."
+02000A92="Greška u '{0}'. Datoteka je neispravana."
+02000A93="CRC greška u '{0}'. Datoteka je neispravana."
+
+; Password dialog
+02000B00="Unesite lozinku"
+02000B01="Unesite lozinku:"
+02000B02="Prikaži lozinku"
+
+; Progress dialog
+02000C00="Obrađujem"
+02000C01="Proteklo vreme:"
+02000C02="Preostalo vreme:"
+02000C03="Veličina:"
+02000C04="Brzina:"
+
+02000C10="Pozadina"
+02000C11="Na vrhu"
+02000C12="Pauza"
+02000C13="Nastavi"
+
+02000C20="Pauza"
+
+02000C30="Da li ste sigurni da želite da prekinete?"
+
+; Compress dialog
+02000D00="Dodaj u arhivu"
+02000D01="Arhiva:"
+02000D02="Nadogradnja arhiva:"
+02000D03="Format arhive:"
+02000D04="Tip kompresije:"
+02000D05="Kreiraj Solid arhivu"
+02000D06="Parametri:"
+02000D07="Opcije"
+02000D08="Kreiraj SFX arhivu"
+02000D09="Više niti"
+02000D0A="Šifruj nazive datoteka"
+02000D0B="Nivo kompresije:"
+02000D0C="Dictionary size:"
+02000D0D="Word size:"
+02000D0E="Potrebna memorija - kompresija:"
+02000D0F="Potrebna memorija - dekompresija:"
+
+02000D40="Podeli na delove, bajti:"
+
+02000D81="Bez kompresije"
+02000D82="Normalno"
+02000D83="Maksimalno"
+02000D84="Brzo"
+02000D85="Brže"
+02000D86="Najbrže"
+
+02000D90="Pregledaj"
+
+02000DA1="Dodaj i zameni datoteke"
+02000DA2="Osveži i dodaj datoteke"
+02000DA3="Ozveži postojeće datoteke"
+02000DA4="Sinhronizuj datoteke"
+
+02000DB1="Sve datoteke"
+
+02000DC0="Dodajem"
+
+; Columns dialog
+02000E00="Kolone"
+02000E01="Obeležite kolone koje biste želeli da budu vidljive u ovom pregledu. Koristite PageUp i PageDown tastere kako biste preuredili kolone po sopstvenom izboru."
+02000E02="Izabrane kolone bi trebale biti"
+02000E03="tačaka široke."
+
+02000E10="Pomeri gore"
+02000E11="Pomeri dole"
+02000E12="Prikaži"
+02000E13="Sakrij"
+02000E14="Postavi"
+
+02000E81="Naslov"
+02000E82="Širina"
+
+; Testing
+02000F90="Testiranje"
+
+; File Manager
+
+03000000="7-Zip"
+
+; Menu
+03000102="Datoteka"
+03000103="Uređivanje"
+03000104="Pregled"
+03000105="Alati"
+03000106="Pomoć"
+03000107="Omiljeno"
+
+; File
+03000210="Pogledaj"
+03000211="Otvori sa 7-Zip-om"
+03000212="Otvori sa pridruženom programom"
+03000220="Pregledaj"
+03000221="Promeni"
+03000230="Preimenuj"
+03000231="Kopiraj u..."
+03000232="Premesti u..."
+03000233="Obriši"
+03000240="Svojstva"
+03000241="Komentar"
+03000250="Nova fascikla"
+03000251="Nova datoteka"
+03000260="Izlaz"
+03000270="Podeli fajl..."
+03000271="Spoj delove..."
+
+
+; Edit
+03000310="Opozovi"
+03000311="Ponovi"
+03000320="Iseci"
+03000321="Kopiraj"
+03000322="Nalepi"
+03000323="Izbriši"
+03000330="Izaberi sve"
+03000331="Poništi izbor svega"
+03000332="Obrnuti izbor"
+03000333="Izaberi..."
+03000334="Poništi izbor..."
+03000335="Izaberi po tipu"
+03000336="Poništi izbor po tipu"
+
+; View
+03000410="Ikone"
+03000411="Naporedno slaganje"
+03000412="Spisak"
+03000413="Detalji"
+03000420="Bez sortiranja"
+03000430="Otvori početnu fasciklu"
+03000431="Gore za jedan nivo"
+03000432="Hronologija..."
+03000440="Osvežavanje"
+03000450="2 Prozora"
+03000451="Trake sa alatkama"
+03000460="Rad sa arhivama"
+03000461="Rad sa datotekama"
+03000462="Velika dugmad"
+03000463="Prikaži tekst ispod dugmadi"
+
+; Tools
+03000510="Opcije..."
+03000511="Benchmark"
+
+; Help
+03000610="Pomoć..."
+03000620="O programu..."
+
+; Favorites
+03000710="Dodaj"
+03000720="Izaberi"
+
+; Options Dialog
+
+03010000="Opcije"
+
+; Plugins
+03010100="Plug-ins"
+03010101="Plug-ins:"
+03010110="Opcije..."
+
+; Edit
+03010200="Promene u datotekama"
+03010201="Program:"
+
+; System
+03010300="Sistem"
+03010302="7-Zip otvara sledeće tipove datoteka:"
+03010310="Plug-in"
+
+; Settings
+03010400="Podešavanja"
+03010401="Prikaži \"..\""
+03010402="Prikaži prave sličice datoteka"
+03010410="Prikaži sistemski meni"
+03010420="Obeleži ceo red"
+03010421="Prikaži linije mreže"
+03010430="Alternativni način za biranje"
+03010440="Koristi velike memorijske blokove"
+
+; Strings
+
+03020201="Kopiraj"
+03020202="Iseci"
+03020203="Kopiraj u:"
+03020204="Premesti u:"
+03020205="Kopiranje u toku..."
+03020206="Premeštanje u toku..."
+03020207="Nije moguće premestiti ili kopirati sadržaj ove Fascikle."
+03020208="Operacija nije podržana."
+
+03020210="Potvrdite brisanje datoteke"
+03020211="Potvrdite brisanje fascikle"
+03020212="Potvrdite višestruko brisanje datoteka"
+03020213="Jeste li sigurni da želite da obrišete '{0}'?"
+03020214="Jeste li sigurni da želite da obrišete fasciklu '{0}' i sav njen sadržaj?"
+03020215="Jeste li sigurni da želite da obrišete ove {0} podatke?"
+03020216="Brisanje u toku..."
+03020217="Greška pri brisanju datoteke ili fascikle"
+
+03020220="Preimenovanje u toku..."
+03020221="Greška pri preimenovanju datoteke ili fascikle"
+03020222="Potvrdi kopiranje datoteke"
+03020223="Da li ste sigurni da želite da kopirate datoteke u arhivu"
+
+03020230="Kreiraj fasciklu"
+03020231="Ime fascikle:"
+03020232="Nova fascikla"
+03020233="Greška pri kreiranju fascikli"
+
+03020240="Kreiraj datoteku"
+03020241="Ime datoteke:"
+03020242="Nova datoteka"
+03020243="Greška pri kreiranju datoteka"
+
+03020250="Odaberi"
+03020251="Poništi izbor"
+03020252="Maska:"
+
+03020260="Hronologija"
+
+03020280="Datoteka '{0}' je izmjenjena.\nDa li želite ažurirati arhivu?"
+03020281="Nije moguće ažurirati datoteku\n'{0}'"
+03020282="Nije moguće započeti uređivanje."
+03020283="Otvaranje u toku..."
+
+03020291="Komentar"
+03020291="Komentar:"
+
+030202A0="Sistem"
+
+03020300="Računar"
+03020301="Mreža"
+
+03020400="Dodaj"
+03020401="Izdvoj"
+03020402="Testiraj"
+
+03020420="Kopiraj"
+03020421="Premesti"
+03020422="Izbriši"
+03020423="Svojstva"
+
+03020500="Podeli datoteku"
+03020501="Podeli na:"
+03020510="Podela..."
+
+03020600="Sastavi datoteke"
+03020601="Sastavi u:"
+03020610="Spajanje..."
+
+; Computer
+03031100="Ukupni kapacitet"
+03031101="Slobodni prostor"
+03031102="Veličina cluster-a"
+03031103="Naziv"
+
+; Network
+03031200="Lokalno ime"
+03031201="Provider"
+
+; Benchmark Dialog
+
+03080000="Benchmark"
+03080001="Korišćenje memorije:"
+03080002="Kompresija"
+03080003="Dekompresija"
+03080004="Brzina"
+03080005="Ocena"
+03080006="Potpuna ocena"
+03080007="Trenutno"
+03080008="Rezultat"
+03080009="Prolazi:"
+0308000A="Greške:"
+
+;!@LangEnd@!

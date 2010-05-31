@@ -1,0 +1,473 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.37
+; Translated by Mikel Hasko
+;
+;
+;
+;
+
+00000000="Albanian"
+00000001="Shqip"
+00000002="28"
+
+; 7-Zip Configuration
+
+; Title
+01000000="Konfigurimi i 7-Zip"
+
+; Info Page
+01000100="Për 7-Zip"
+01000103="7-Zip është softuer falas. Megjithatë, ju mund të përkrahni në zhvillimin e 7-Zip duke e regjistruar atë."
+01000104="Përkrahja"
+01000105="Regjistrimi"
+
+; Folders Page
+01000200="Dosje"
+01000210="&Dosja e punës"
+01000211="Dosja e përkohshme e &sistemit"
+01000212="Dosja &aktuale"
+01000213="I sp&ecifikuar:"
+01000214="Përdor vetëm për njësi të largueshme"
+
+01000281="Specifikoni një vendndodhje për skedarët e përkohshëm të arkivit."
+
+; System Page
+01000300="Sistemi"
+01000301="Integro 7-Zip në kontekst meny"
+01000302="Kaskado kontekst menynë"
+01000310="Elementë të kontekst menysë:"
+
+; Language Page
+01000400="Gjuha"
+01000401="Gjuha:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Komanda të 7-Zip"
+02000103="Hap arkivin"
+02000104="Hap arkivin e selektuar."
+02000105="Zbërthe skedarët..."
+02000106="Zbërthen skedarët na arkivi i selektuar."
+02000107="Shto në arkiv..."
+02000108="Shton artikujt e zgjedhur në arkiv."
+02000109="Testo arkivin"
+0200010A="Teston integritetin e arkivit të selektuar."
+0200010B="Zbërthe këtu"
+0200010C="Zbërthen skedarët nga arkivi i zgjedhur në dosjen aktuale."
+0200010D="Zbërthe në {0}"
+0200010E="Zbërthen skedarët tek nëndosja."
+0200010F="Shto tek {0}"
+02000110="Shton artikujt e zgjedhur në arkiv."
+02000111="Kompreso dhe dërgo me e-mail..."
+02000112="Kompreson artikujt e zgjedhur në arkiv dhe e dërgon këtë të fundit me e-mail."
+02000113="Kompreso në {0} dhe dërgo me e-mail"
+02000114="Kompreson artikujt e zgjedhur në arkiv dhe e dërgon këtë të fundit me e-mail."
+
+02000140="<Dosja>"
+02000141="<Arkivi>"
+
+; Properties
+02000203="Shtegu"
+02000204="Emri"
+02000205="Prapashtesa"
+02000206="Dosja"
+02000207="Madhësia"
+02000208="Madhësia e mbërthimit"
+02000209="Atributet"
+0200020A="Krijuar më"
+0200020B="Hyrë së fundi më"
+0200020C="Modifikuar më"
+0200020D="I qëndrueshëm"
+0200020E="I komentuar"
+0200020F="I shifruar"
+02000210="Ndaj para"
+02000211="Ndaj pas"
+02000212="Fjalori"
+02000213="CRC"
+02000214="Tipi"
+02000215="Anti"
+02000216="Metoda"
+02000217="Pronari i sistemit"
+02000218="Sistemi i skedarit"
+02000219="Përdoruesi"
+0200021A="Grupi"
+0200021B="Blloku"
+0200021C="Komenti"
+0200021D="Pozicioni"
+0200021E="Prefiksi i shtegut"
+
+; Status bar
+02000301="Selektuar {0} objekt(e)"
+02000302="{0} objekt(e)"
+
+02000320="Skedarë:"
+02000321="Dosje:"
+02000322="Madhësia:"
+
+; List Context Menu
+02000401="&Kolona..."
+
+02000411="&Hap"
+02000412="&Zbërthe..."
+
+; ToolBar
+02000501="Zbërthe"
+
+; Messages
+02000601="Operacionet e azhurnimit për këtë arkiv s'përkrahen."
+02000602="S'mund të azhurnojë arkivin {0}"
+02000603="S'mund të krijojë dosjen '{0}'"
+02000604="Skedari është një arkiv i papërkrahur."
+02000605="Gabim"
+02000606="Tepër shumë artikuj"
+02000607="S'ka aplikim të lidhur me prapashtesën e dhënë të emrit të skedarit"
+02000608="S'ka gabime"
+
+; Dialogs
+02000702="Në rregull"
+02000705="&Po"
+02000707="Po për të gjith&a"
+02000709="&Jo"
+0200070B="Jo për të gjit&ha"
+
+02000710="Anulim"
+02000711="&Anulim"
+02000713="&Mbyll"
+02000714="Ndalo"
+02000715="Rinis"
+
+02000720="Ndihmë"
+
+; Extract dialog
+02000800="Zbërthe"
+02000801="Z&bërthe në:"
+02000802="Fjalëkalimi"
+
+02000810="Mënyra e Shtegut"
+02000811="Emra të plotë Shtigjesh"
+02000812="Emrat aktualë të Shtigjeve"
+02000813="Pa emra shtigjesh"
+
+02000820="Mënyra e mbishkrimit"
+02000821="Pyet para se të mbishkruaj"
+02000822="Mbishkruaj pa nxitje"
+02000823="Mbikalo skedarët ekzistues"
+02000824="Riemërto automatikisht"
+02000825="Riemërto auto. skedarët ekzistues"
+
+02000830="Skedarët"
+02000831="Skedarët e &selektuar"
+02000832="&Të gjithë skedarët"
+
+02000881="Specifikoni një vendndodhje për skedarët e zbërthyer."
+
+02000890="Duke zbërthyer"
+
+; Overwrite dialog
+02000900="Konfirmo zëvendësimin e skedarëve"
+02000901="Dosja e destinacionit e përmban një herë skedarin e përpunuar."
+02000902="Dëshironi ta zëvendësoni skedarin ekzistues"
+02000903="me këtë?"
+
+02000911="R&iemërtim automatik"
+
+02000982="{0} bajt"
+02000983="modifikuar më"
+
+; Messages dialog
+02000A00="Mesazhe diagnostikues"
+
+02000A80="Mesazhi"
+
+02000A91="Metodë e papërkrahshme kompresimi për '{0}'."
+02000A92="Gabim të dhënash në '{0}'. Skedari është i prishur."
+02000A93="CRC dështoi '{0}'. Skedari është i prishur."
+
+; Password dialog
+02000B00="Fusni fjalëkalimin"
+02000B01="Fusni fjalëkalimin:"
+02000B02="&Trego fjalëkalimin"
+
+; Progress dialog
+02000C00="Procesi"
+02000C01="Koha e kaluar:"
+02000C02="Koha e mbetur:"
+02000C03="Madhësia:"
+02000C04="Shpejtësia:"
+
+02000C10="Në &sfond"
+02000C11="Në pla&n të parë"
+02000C12="&Pushim"
+02000C13="&Vazhdim"
+
+02000C20="Në pushim"
+
+02000C30="Jeni të sigurt se dëshironi ta anuloni?"
+
+; Compress dialog
+02000D00="Shto në arkiv"
+02000D01="&Arkivi:"
+02000D02="&Mënyra e azhurnimit:"
+02000D03="&Formati i arkivit:"
+02000D04="Metoda e kompr&esimit:"
+02000D05="&Krijo një arkiv të qëndrueshëm"
+02000D06="&Parametrat:"
+02000D07="Opsionet"
+02000D08="Krijo një arkiv SF&X"
+02000D09="Multifillesë"
+02000D0A="Shifro em&rat e skedarëve"
+02000D0B="&Niveli i kompresimit:"
+02000D0C="Ma&dhësia e fjalorit:"
+02000D0D="Mad&hësia e fjalës:"
+02000D0E="Shfrytëzimi i memo. për kompresimin:"
+02000D0F="Shfrytëzimi i memo. për dekompresimin:"
+
+02000D40="Ndaj në &volume (madhësia jepet në bajt):"
+
+02000D81="Ruaj"
+02000D82="Normal"
+02000D83="Maksimal"
+02000D84="I shpejtë"
+02000D85="Më i shpejtë"
+02000D86="Ultra"
+
+02000D90="Shfleto"
+
+02000DA1="Shto dhe zëvendëso skedarët"
+02000DA2="Azhurno dhe shto skedarët"
+02000DA3="Azhurno skedarët ekzistues"
+02000DA4="Sinkronizo skedarët"
+
+02000DB1="Të gjithë skedarët"
+
+02000DC0="Duke kompresuar"
+
+; Columns dialog
+02000E00="Kolonat"
+02000E01="Verifikoni kolonat që dëshironi të jenë të dukshme në këtë dosje. Përdorni tastet \"Lëviz lartë\" & \"Lëviz poshtë\" për të rirenditur kolonat."
+02000E02="Kolonat e zgjedhura duhet të jenë"
+02000E03="piksel &të gjera."
+
+02000E10="Lëviz &lartë"
+02000E11="Lëviz p&oshtë"
+02000E12="&Shfaq"
+02000E13="&Fshih"
+02000E14="Cakto"
+
+02000E81="Titulli"
+02000E82="Gjerësia"
+
+; Testing
+02000F90="Duke testuar"
+
+
+; File Manager
+
+03000000="Menaxheri i skedarëve 7-Zip"
+
+; Menu
+03000102="&Skedari"
+03000103="&Redaktimi"
+03000104="&Pamja"
+03000105="&Veglat"
+03000106="&Ndihma"
+03000107="&Të parapëlqyerit"
+
+; File
+03000210="&Hap"
+03000211="Hap përbre&nda"
+03000212="Hap përjas&hta"
+03000220="&Pamja"
+03000221="&Redakto"
+03000230="Ri&emërto"
+03000231="&Kopjo tek..."
+03000232="&Zhvendos tek..."
+03000233="&Fshi"
+03000240="&Vetitë"
+03000241="Ko&menti"
+03000242="Llogarit shumën e verifikimit"
+03000250="Krijo një dosje"
+03000251="Krijo një skedar"
+03000260="&Dil"
+03000270="N&daj skedarin..."
+03000271="Kom&bino skedarët..."
+
+; Edit
+03000310="&Zhbëj"
+03000311="&Ribëj"
+03000320="&Prit"
+03000321="&Kopjo"
+03000322="&Ngjit"
+03000323="&Fshi"
+03000330="S&elekto të gjithë"
+03000331="Çse&lekto të gjithë"
+03000332="Anasill selekti&min"
+03000333="Selekto..."
+03000334="Çselekto..."
+03000335="Selekto sipas tipit"
+03000336="Çselekto sipas tipit"
+
+; View
+03000410="Ikona të &mëdha"
+03000411="Ikona të &vogla"
+03000412="&Listë"
+03000413="&Detaje"
+03000420="&Të parenditur"
+03000430="Hap dosjen rrënjë"
+03000431="Një nivel më lartë"
+03000432="Historiku i dosjes..."
+03000440="&Rifresko"
+03000449="Pamje e rrafshtë"
+03000450="&2 panele"
+03000451="&Shiritat e veglave"
+03000460="Shiriti i veglave i arkivit"
+03000461="Shiriti standard i veglave"
+03000462="Butona të mëdhenj"
+03000463="Shfaq tekstin e butonave"
+
+; Tools
+03000510="&Opsionet..."
+03000511="&Etapa"
+
+; Help
+03000610="&Përmbajtjet..."
+03000620="&Për 7-Zip..."
+
+; Favorites
+03000710="&Shto dosjen tek të parapëlqyerit si"
+03000720="Shënuesi"
+
+; Options Dialog
+
+03010000="Opsionet"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="Opsionet..."
+
+; Edit
+03010200="Redaktuesi"
+03010201="&Redaktuesi:"
+
+; System
+03010300="Sistemi"
+03010302="Lidh 7-Zip me:"
+03010310="Plugin"
+
+; Settings
+03010400="Rregullimet"
+03010401="Shfaq &artikullin \"..\""
+03010402="Shfaq &ikonat e vërteta të skedarëve"
+03010410="Shfaq &menynë e sistemit"
+03010420="Selekto të tërë &rreshtin"
+03010421="Shfaq &vijat e rrjetit"
+03010430="Mënyrë alternative &selektimi"
+03010440="Përdor &faqe të mëdha të memories"
+
+; Strings
+
+03020201="Kopjo"
+03020202="Zhvendos"
+03020203="Kopjo tek:"
+03020204="Zhvendos tek:"
+03020205="Duke kopjuar..."
+03020206="Duke zhvendosur..."
+03020207="Ju s'mund të zhvendosni ose kopjoni artikuj për dosje të atilla."
+03020208="Operacioni s'përkrahet."
+
+03020210="Konfirmo fshirjen e skedarit"
+03020211="Konfirmo fshirjen e dosjes"
+03020212="Konfirmo fshirjen e shumëfishtë të skedarëve"
+03020213="Jeni të sigurt që doni të fshini '{0}'?"
+03020214="Jeni të sigurt që doni të fshini dosjen '{0}' dhe tërë përmbajtjen e saj?"
+03020215="Jeni të sigurt që doni t'i fshini këto {0} artikuj?"
+03020216="Duke fshirë..."
+03020217="Gabim gjatë fshirjes së skedarit apo dosjes"
+
+03020220="Duke riemërtuar..."
+03020221="Gabim gjatë riemërtimit të skedarit apo dosjes"
+03020222="Konfirmim për kopjimin e skedarëve"
+03020223="Jeni të sigurt që doni të kopjoni skedarë në arkiv"
+
+03020230="Krijo një dosje"
+03020231="Emri i dosjes:"
+03020232="Dosje e re"
+03020233="Gabim gjatë krijimit të dosjes"
+
+03020240="Krijo një skedar"
+03020241="Emri i skedarit:"
+03020242="Skedar i ri"
+03020243="Gabim gjatë krijimit të skedarit"
+
+03020250="Selekto"
+03020251="Çselekto"
+03020252="Maska:"
+
+03020260="Historiku i dosjes"
+
+03020280="Skedari '{0}' u modifikua.\nDoni ta azhurnoni atë edhe në arkiv?"
+03020281="S'mund të azhurnojë skedarin\n'{0}'"
+03020282="S'mund të hap redaktuesin."
+03020283="Duke hapur..."
+
+03020290="Komenti"
+03020291="&Komenti:"
+
+030202A0="Sistemi"
+
+03020300="Kompjuteri"
+03020301="Rrejti"
+
+03020400="Shto"
+03020401="Zbërthe"
+03020402="Testo"
+
+03020420="Kopjo"
+03020421="Zhvendos"
+03020422="Fshi"
+03020423="Info"
+
+03020500="Ndaj skedarin"
+03020501="&Ndaj në:"
+03020510="Duke ndarë..."
+
+03020600="Kombino skedarët"
+03020601="&Kombino në:"
+03020610="Duke kombinuar..."
+
+03020710="Duke llogaritur shumën e verifikimit..."
+03020720="Informacionet e shumës së verifikimit"
+03020721="Shuma e verifikimit CRC për të dhënat:"
+03020722="Shuma e verifikimit CRC për të dhënat dhe emrat:"
+
+03020800="Duke skanuar..."
+
+; Computer
+03031100="Madhësia totale"
+03031101="Hapësira e lirë"
+03031102="Madhësia e cluster-it"
+03031103="Etiketa"
+
+; Network
+03031200="Emri lokal"
+03031201="Kujdestari"
+
+; Benchmark Dialog
+
+03080000="Etapa"
+03080001="Shfrytëzimi i memories:"
+03080002="Kompresimi"
+03080003="Dekompresimi"
+03080004="Shpejtësia"
+03080005="Vlerësimi"
+03080006="Vlerësimi total"
+03080007="Aktualisht"
+03080008="Rezultati"
+03080009="Kalime:"
+0308000A="Gabime:"
+
+;!@LangEnd@!

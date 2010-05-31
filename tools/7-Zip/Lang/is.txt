@@ -1,0 +1,514 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.53
+; Translated by bjossi
+;
+;
+;
+;
+
+00000000="Icelandic"
+00000001="Íslenska"
+00000002="15"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Stillingar"
+
+; Info Page
+01000100="Um 7-Zip"
+01000103="7-Zip er ókeypis forrit. En þú getur stutt þróun 7-Zip með því að skrá þig."
+01000104="Aðstoð"
+01000105="Skráning"
+
+; Folders Page
+01000200="Möppur"
+01000210="&Mappa notuð til vinnslu:"
+01000211="&Tímabundin kerfismappa"
+01000212="&Núverandi mappa"
+01000213="&Skilgreindu möppu:"
+01000214="Nota aðeins með flash drifum"
+
+01000281="Skilgreindu staðsetningu fyir tímabundin gagnasöfn."
+
+; System Page
+01000300="Kerfi"
+01000301="Innleiða 7-Zip í flýtivalmynd"
+01000302="Lagskipt flýtivalmynd"
+01000310="Hlutir í flýtivalmynd:"
+
+; Language Page
+01000400="Tungumál"
+01000401="Tungumál:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip skipanir"
+02000103="Opna gagnasafn"
+02000104="Opnar valið gagnasafn."
+02000105="Afþjappa gögn..."
+02000106="Afþjappar gögnum frá völdu gagnasafni."
+02000107="Bæta við gagnasafn..."
+02000108="Bætir skjölum í gagnasafn."
+02000109="Prófa gagnasafn"
+0200010A="Prófar stöðugleika gagnasafns."
+0200010B="Afþjappa hér"
+0200010C="Afþjappar gögnum frá gagnasafni í núverandi möppu."
+0200010D="Afþjappa í {0}"
+0200010E="Afþjappar gögn í hliðar-möppur."
+0200010F="Bæta við {0}"
+02000110="Bætir gögnum við gagnasafn."
+02000111="Þjappa og senda..."
+02000112="Þjappar saman gögnum í gagnasafn og sendir það með tölvupósti."
+02000113="Þjappa til {0} og senda"
+02000114="Þjappar saman gögnum í gagnasafn og sendir það með tölvupósti."
+
+02000140="<Mappa>"
+02000141="<Gagnasafn>"
+
+; Properties
+02000203="Slóð"
+02000204="Nafn"
+02000205="Tegund skráar"
+02000206="Mappa"
+02000207="Stærð"
+02000208="Þjöppuð stærð"
+02000209="Eiginleikar"
+0200020A="Búið til"
+0200020B="Opnað"
+0200020C="Breytt"
+0200020D="Þétt"
+0200020E="Umsögn"
+0200020F="Lykilorð"
+02000210="Bútuð niður fyrir"
+02000211="Bútuð niður eftir"
+02000212="Orðasafn"
+02000213="CRC"
+02000214="Tegund"
+02000215="Anti"
+02000216="Aðferð"
+02000217="Stýrikerfi"
+02000218="Gagnakerfi"
+02000219="Notandi"
+0200021A="Hópur"
+0200021B="Kubbur"
+0200021C="Umsögn"
+0200021D="Staðsetning"
+0200021E="Prefix slóðar"
+0200021F="Möppur"
+02000220="Skrár"
+02000221="Útgáfa"
+02000222="Kerfi"
+02000223="Fjölkerfi"
+02000224="Staðsetning"
+02000225="Slóðar"
+02000226="Kubbar"
+02000227="Kerfi"
+
+; Status bar
+02000301="{0} hlutir valdir"
+02000302="{0} hlutir"
+
+02000320="Skrár:"
+02000321="Möppur:"
+02000322="Stærð:"
+02000323="Þjöppuð stærð:"
+02000324="Gagnasöfn:"
+
+; List Context Menu
+02000401="&Runur..."
+
+02000411="&Opna"
+02000412="&Afþjappa..."
+
+; ToolBar
+02000501="Afþjappa"
+
+; Messages
+02000601="Þessi tegund gagnasafns styður ekki uppfærsluskipanir."
+02000602="Get ekki uppfært gagnasafn {0}"
+02000603="Get ekki búið til möppu '{0}'"
+02000604="Viðkomandi skrá er ekki gagnasafn."
+02000605="Villa"
+02000606="Of margar skrár"
+02000607="Það er ekkert forrit í boði fyrir viðkomandi tegund skráar"
+02000608="Það eru engar villur"
+02000609="Get ekki opnað skrá '{0}' sem gagnasafn"
+0200060A="Get ekki opnað læst gagnasafn '{0}'. Rangt lykilorð?"
+
+; Dialogs
+02000702="OK"
+02000705="&Já"
+02000707="Já við &Öllu"
+02000709="&Nei"
+0200070B="Nei við &Öllu"
+
+02000710="Hætta við"
+02000711="&Hætta við"
+02000713="&Loka"
+02000714="Hætta"
+02000715="Endurræsa"
+
+02000720="Hjálp"
+
+; Extract dialog
+02000800="Afþjappa"
+02000801="&Afþjappa í:"
+02000802="Lykilorð"
+
+02000810="Slóðar"
+02000811="Full slóða-nöfn"
+02000812="Núverandi slóða-nöfn"
+02000813="Engin slóða-nöfn"
+
+02000820="Yfirfærsla"
+02000821="Spyrja fyrir yfirfærslu"
+02000822="Yfirfæra án viðvörunar"
+02000823="Sleppa öðrum skrám"
+02000824="Endurnefna sjálfkrafa"
+02000825="Endurnefna aðrar skrár"
+
+02000830="Skrár"
+02000831="&Valdar skrár"
+02000832="&Allar skrár"
+
+02000881="Skilgreindu staðsetningu fyrir afþjappaðar skrár."
+
+02000890="Afþjappa"
+
+; Overwrite dialog
+02000900="Staðfesta Yfirfærslu Skráar"
+02000901="Skilgreind mappa inniheldur unna skrá nú þegar."
+02000902="Vilt þú yfirfæra fyrrverandi skrá"
+02000903="með þessari?"
+
+02000911="&Endurnefna Sjálfkrafa"
+
+02000982="{0} bæti"
+02000983="Breytt þann"
+
+; Messages dialog
+02000A00="Prufuskilaboð"
+
+02000A80="Skilaboð"
+
+02000A91="Óstutt samþjöppunaraðferð fyrir '{0}'."
+02000A92="Gagnavilla í '{0}'. Skrá er biluð."
+02000A93="CRC gekk ekki í '{0}'. Skrá er biluð."
+02000A94="Gagnavilla í læstu skjali '{0}'. Rangt lykilorð?"
+02000A95="CRC gekk ekki í læstu skjali '{0}'. Rangt lykilorð?"
+
+; Password dialog
+02000B00="Skrifaðu lykilorð"
+02000B01="Skrifaðu lykilorð:"
+02000B02="&Sýna lykilorð"
+02000B03="Skrifaðu lykilorð aftur:"
+02000B10="Lykilorðin eru ekki eins"
+02000B11="Notaðu aðeins enska stafi, tölur og sérstaka stafi (!, #, $, ...) í lykilorðum"
+02000B12="Lykilorðið er of langt"
+
+; Progress dialog
+02000C00="Vinna"
+02000C01="Áætlaður tími:"
+02000C02="Tími eftir:"
+02000C03="Heildarstærð:"
+02000C04="Hraði:"
+02000C05="Unnið:"
+02000C06="Samþjöppunarstuðull:"
+
+02000C10="&Bakgrunnur"
+02000C11="&Fyrirgrunnur"
+02000C12="&Bíða"
+02000C13="&Halda áfram"
+
+02000C20="Bíður"
+
+02000C30="Ertu viss um að þú viljir hætta við?"
+
+; Compress dialog
+02000D00="Bæta við gagnasafn"
+02000D01="&Gagnasafn:"
+02000D02="&Uppfærsla:"
+02000D03="&Tegund gagnasafns:"
+02000D04="&Styrkur samþjöppunar:"
+02000D05="Gera &þétt gagnasafn"
+02000D06="&Skipanir:"
+02000D07="Stillingar"
+02000D08="Gera &SFX gagnasafn"
+02000D09="Fjölvinnsla"
+02000D0A="Rugla &skráarnöfn"
+02000D0B="Samþjöppun &stig:"
+02000D0C="&Stærð orðasafns:"
+02000D0D="&Orðastærð:"
+02000D0E="Vinnsluminnisnotkun fyrir samþjöppun:"
+02000D0F="Vinnsluminnisnotkun fyrir afþjöppun:"
+02000D10="Læsing"
+02000D11="Aðferð læsingar:"
+02000D12="Fjöldi örgjörvakjarna:"
+02000D13="Stærð þétts kubbs:"
+02000D14="Óþétt"
+02000D15="Þétt"
+02000D16="Þjappa deildum skrám"
+
+02000D40="Skipta skráarsafni í &hluta, bæti:"
+02000D41="Vitlaus stærð hluts"
+02000D42="Skilgreind stærð hluta: {0} bæti.\nErtu viss um að þú viljir skipta gagnasafni í þessa hluta?"
+
+02000D81="Geyma"
+02000D82="Meðallag"
+02000D83="Hámark"
+02000D84="Hratt"
+02000D85="Hraðast"
+02000D86="Ultra"
+
+02000D90="Skoða"
+
+02000DA1="Bæta við og yfirfæra skrár"
+02000DA2="Uppfæra og bæta við skrám"
+02000DA3="Lífga upp á núverandi skrár"
+02000DA4="Samrýma skrár"
+
+02000DB1="Allar Skrár"
+
+02000DC0="Samþjappa"
+
+; Columns dialog
+02000E00="Runur"
+02000E01="Veldu runurnar sem þú vilt gera sýnilegar í þessari möppu. Notaðu Fara Upp og Fara Niður takkana til að endurraða rununum."
+02000E02="Valda runan ætti að vera"
+02000E03="pixlar &vítt."
+
+02000E10="Fara &Upp"
+02000E11="Fara &Niður"
+02000E12="&Sýna"
+02000E13="&Fela"
+02000E14="Setja"
+
+02000E81="Titill"
+02000E82="Vídd"
+
+; Testing
+02000F90="Prófa"
+
+
+; File Manager
+
+03000000="7-Zip File Manager"
+
+; Menu
+03000102="&Skrá"
+03000103="&Skipanir"
+03000104="&Útlit"
+03000105="&Tól"
+03000106="&Hjálp"
+03000107="&Uppáhald"
+
+; File
+03000210="&Opna"
+03000211="Opna &inni"
+03000212="Opna &úti"
+03000220="&Skoða"
+03000221="&Breyta"
+03000230="&Endurnefna"
+03000231="&Afrita í..."
+03000232="&Færa til..."
+03000233="&Eyða"
+03000240="&Stillingar"
+03000241="&Umsögn"
+03000242="Reikna út checksummu"
+03000250="Búa til möppu"
+03000251="Búa til skrá"
+03000260="&Hætta"
+03000270="&Búta niður skrá..."
+03000271="&Sameina skrár..."
+
+; Edit
+03000310="&Bakka"
+03000311="&Gera aftur"
+03000320="&Klippa"
+03000321="&Afrita"
+03000322="&Líma"
+03000323="&Eyða"
+03000330="Velja &allt"
+03000331="Afvelja allt"
+03000332="&Öfugsnúið val"
+03000333="Velja..."
+03000334="Afvelja..."
+03000335="Velja eftir tegund"
+03000336="Afvelja eftir tegund"
+
+; View
+03000410="&Stórar myndir"
+03000411="&Smáar myndir"
+03000412="&Listi"
+03000413="&Smáatriði"
+03000420="Óflokkað"
+03000430="Opna aðalmöppu"
+03000431="Til baka"
+03000432="Yfirlit yfir notkun"
+03000440="&Uppfæra"
+03000449="Birta heildarinnihald möppu"
+03000450="&2 Vinnsluborð"
+03000451="&Tólaröð"
+03000460="Tólaröð gagnasafns"
+03000461="Eðlileg tólaröð"
+03000462="Stórir Takkar"
+03000463="Sýna texta á tökkum"
+
+; Tools
+03000510="&Stillingar"
+03000511="&Hraðaprufa"
+
+; Help
+03000610="&Leiðarvísir"
+03000620="&Um 7-Zip..."
+
+; Favorites
+03000710="&Bæta möppu við uppáhald sem"
+03000720="Bókarmerki"
+
+; Options Dialog
+
+03010000="Stillingar"
+
+; Plugins
+03010100="Viðbætur"
+03010101="&Viðbætur:"
+03010110="Stillingar..."
+
+; Edit
+03010200="Breytir"
+03010201="&Breytir:"
+
+; System
+03010300="Stýrikerfi"
+03010302="Innleiða 7-Zip í:"
+03010310="Viðbót"
+
+; Settings
+03010400="Stillingar"
+03010401="Sýna \"..\" hluti"
+03010402="Sýna réttar skráarmyndir"
+03010410="Sýna kerfisvalmynd"
+03010420="&Fullt raðaval"
+03010421="Sýna &hnitalínur"
+03010430="&Öðruvísi valstilling"
+03010440="Nota &stórar minnissíður"
+
+; Strings
+
+03020201="Afrita"
+03020202="Færa"
+03020203="Afrita í:"
+03020204="Færa skrá/möppu til:"
+03020205="Afrita..."
+03020206="Færa..."
+03020207="Þú getur ekki fært eða afritað svona skrár fyrir þessar möppur."
+03020208="Skipun er ekki studd."
+03020209="Veldu staðsetningarmöppu."
+
+03020210="Staðfestu Eyðingu Skráar"
+03020211="Staðfestu Eyðingu Möppu"
+03020212="Staðfestu Fjöldaeyðingu Skráa"
+03020213="Ertu viss um að þú viljir eyða '{0}'?"
+03020214="Ertu viss um að þú viljir eyða möppunni '{0}' og öllu innihaldi hennar?"
+03020215="Ertu viss um að þú viljir eyða þessum {0} skrám?"
+03020216="Eyða..."
+03020217="Ekki tókst að eyða Skrá eða Möppu"
+
+03020220="Endurnefna..."
+03020221="Villa við endurnafn Skráar eða Möppu"
+03020222="Staðfestu Afritun Skráar"
+03020223="Ertu viss um að þú viljir afrita þessa skrá í gagnasafn?"
+
+03020230="Gera Möppu"
+03020231="Nafn möppu:"
+03020232="Ný Mappa"
+03020233="Villa við gerð möppu"
+
+03020240="Gera Skrá"
+03020241="Nafn Skráar:"
+03020242="Ný Skrá"
+03020243="Villa við gerð skráar"
+
+03020250="Velja"
+03020251="Afvelja"
+03020252="Skyggja:"
+
+03020260="Yfirlit yfir notkun"
+
+03020280="Skrá '{0}' var breytt.\nViltu uppfæra hana í gagnasafninu?"
+03020281="Get ekki uppfært skrá\n'{0}'"
+03020282="Get ekki opnað breyti."
+03020283="Opna..."
+
+03020290="Umsögn"
+03020291="&Umsögn:"
+
+030202A0="Kerfi"
+
+03020300="Tölva"
+03020301="Internet"
+
+03020400="Bæta við"
+03020401="Afþjappa"
+03020402="Prófa"
+
+03020420="Afrita"
+03020421="Færa"
+03020422="Eyða"
+03020423="Upplýsingar"
+
+03020500="Skipta Skrá"
+03020501="&Skipta í:"
+03020510="Skipta..."
+03020520="Staðfestu skiptingu"
+03020521="Ertu viss um að þú viljir skipta skránni í {0} hluta?"
+03020522="Stærð hluta verður að vera smærri en stærð upprunalegu skrárinnar"
+
+03020600="Sameina skrár"
+03020601="&Sameina í:"
+03020610="Sameina..."
+03020620="Veldu aðeins fyrstu skránna"
+
+03020710="Checksumma í vinnslu..."
+03020720="Upplýsingar um checksummu"
+03020721="CRC checksumma fyrir gögn:"
+03020722="CRC checksumma fyrir gögn og nöfn:"
+
+03020800="Skanna..."
+
+03020900="Stillingar"
+
+; Computer
+03031100="Heildarstærð"
+03031101="Laust pláss"
+03031102="Stærð hóps"
+03031103="Titill"
+
+; Network
+03031200="Nafn Hér"
+03031201="Þjónustugjafi"
+
+; Benchmark Dialog
+
+03080000="Hraðaprufa"
+03080001="Vinnsluminnisnotkun:"
+03080002="Samþjöppun"
+03080003="Afþjöppun"
+03080004="Hraði"
+03080005="Útkoma"
+03080006="Heildarútkoma"
+03080007="Núverandi"
+03080008="Niðurstaða"
+03080009="Fjöldi prufa:"
+0308000A="Villur:"
+0308000B="Örgjörvanotkun"
+0308000C="Útkoma / Notkun"
+
+;!@LangEnd@!
+
+ 	  	 

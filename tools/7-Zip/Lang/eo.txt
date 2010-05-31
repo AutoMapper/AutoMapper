@@ -1,0 +1,473 @@
+;!@Lang@!UTF-8!
+; 7-Zip 4.37
+; Translated by Dmitri Gabinski
+;
+;
+;
+;
+
+00000000="Esperanto"
+00000001="Esperanto"
+00000002=""
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip-Konfiguro"
+
+; Info Page
+01000100="Informo"
+01000103="7-Zip estas senpaga programo. Tamen, vi povas subteni evoluadon de 7-Zip per enregistriĝo."
+01000104="Subteno"
+01000105="Enregistriĝo"
+
+; Folders Page
+01000200="Dosierujoj"
+01000210="&Kuranta dosierujo"
+01000211="&Sistema labora dosierujo"
+01000212="&Ĉi tiu"
+01000213="&Specifu:"
+01000214="&Uzi nur por demeteblaj datumportiloj"
+
+01000281="Specifu ujon por laboraj dosieroj."
+
+; System Page
+01000300="Sistemo"
+01000301="Metu 7-Zip'on en kuntekstan menuon de ŝelo"
+01000302="Kaskada kunteksta menuo"
+01000310="Punktoj de kunteksta menuo:"
+
+; Language Page
+01000400="Lingvo"
+01000401="Lingvo:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Komandoj de 7-Zip"
+02000103="Malfermu"
+02000104="Malfermu markitan dosieron."
+02000105="Elarĥivigu dosierojn..."
+02000106="Elarĥivigo de dosieroj el markita arĥivo."
+02000107="Enarĥivigu..."
+02000108="Enarĥivigu markitajn objektojn."
+02000109="Testu arĥivon"
+0200010A="Testo de kohero de markita arĥivo."
+0200010B="Elarĥivigu ĉi-tien"
+0200010C="Elarĥivigo de dosieroj el markita arĥivo en kurantan dosierujon."
+0200010D="Elarĥivigu en {0}"
+0200010E="Elarĥvigas dosierojn en subdosierujon."
+0200010F="Aldonu al {0}"
+02000110="Aldonu markitajn aĵojn al arĥivo."
+02000111="Enarĥivigu kaj enretpoŝtigu..."
+02000112="Enarĥivigu la markitajn aĵojn kaj enretpoŝtigu la arĥivon."
+02000113="Enarĥivigu en {0} kaj enretpoŝtigu..."
+02000113="Enarĥivigu la markitajn aĵojn kaj enretpoŝtigu la arĥivon."
+
+02000140="<Dosierujo>"
+02000141="<Arĥivo>"
+
+; Properties
+02000203="Dosierindiko"
+02000204="Nomo"
+02000205="Dosiernoma sufikso"
+02000206="Dosierujo"
+02000207="Grando"
+02000208="Enarĥiva grando"
+02000209="Atributoj"
+0200020A="Kreita"
+0200020B="Malfermita"
+0200020C="Ŝanĝita"
+0200020D="Solida"
+0200020E="Komento"
+0200020F="Ĉifra"
+02000210="Disigita antaŭ"
+02000211="Disigita post"
+02000212="Vortaro"
+02000213="CRC"
+02000214="Tipo"
+02000215="Kontraŭ"
+02000216="Metodo"
+02000217="Gastiga operaciumo"
+02000218="Dosiersistemo"
+02000219="Uzulo"
+0200021A="Grupo"
+0200021B="Bloko"
+0200021C="Komento"
+0200021D="Pozicio"
+0200021E="Vojprefikso"
+
+; Status bar
+02000301="{0} objekto(j) markita(j)"
+02000302="{0} objekto(j)"
+
+02000320="Dosieroj:"
+02000321="Dosierujoj:"
+02000322="Grando:"
+
+; List Context Menu
+02000401="&Kolumnoj..."
+
+02000411="&Malfermu"
+02000412="&Elarĥivigu..."
+
+; ToolBar
+02000501="Elarĥivigu"
+
+; Messages
+02000601="Ĝisdatigoperacioj ne estas subtenataj por ĉi-tiu arĥivo."
+02000602="Fiaskis ĝisdatigi arĥivon {0}"
+02000603="Fiaskis krei dosierujon '{0}'"
+02000604="Dosiero ne estas subtenata arĥivo."
+02000605="Eraro"
+02000606="Troaj elementoj"
+02000607="Mankas kunligita programo"
+02000608="Eraroj ne trovitaj"
+
+; Dialogs
+02000702="B&one"
+02000705="&Jes"
+02000707="Jes por ĉ&iuj"
+02000709="&Ne"
+0200070B="Ne por ĉi&uj"
+
+02000710="Nuligu"
+02000711="&Nuligu"
+02000713="&Fermu"
+02000714="&Haltu"
+02000715="Restartigu"
+
+02000720="Helpo"
+
+; Extract dialog
+02000800="&Elarĥivigu"
+02000801="E&larĥivigu en:"
+02000802="&Pasvorto"
+
+02000810="Dosierindikoj"
+02000811="&Absolutaj dosierindikoj"
+02000812="&Relativaj dosierindikoj"
+02000813="&Sen dosierindikoj"
+
+02000820="Anstataŭiga skribreĝimo"
+02000821="&Kun konfirmo"
+02000822="&Sen konfirmo"
+02000823="&Preterlasu estantaj dosieroj"
+02000824="Aŭtonomŝanĝo"
+02000825="Aŭtonomŝanĝo de ekzistantaj dosieroj"
+
+02000830="Dosieroj"
+02000831="&Markitaj dosieroj"
+02000832="Ĉ&iuj dosieroj"
+
+02000881="Specifu ujon por elarĥivendaj dosieroj."
+
+02000890="Elarĥivigo"
+
+; Overwrite dialog
+02000900="Konfirmo de nomŝanĝo"
+02000901="Dosierujo jam enhavas prilaboratan dosieron."
+02000902="Anstataŭigu estantan dosieron"
+02000903="per ĉi-tiu?"
+
+02000911="&Aŭtonomŝanĝo."
+
+02000982="{0} bajtoj"
+02000983="anstataŭigitaj per"
+
+; Messages dialog
+02000A00="Diagnozaj mesaĝoj"
+
+02000A80="Mesaĝo"
+
+02000A91="Ne estas subtenata densigmetodo por dosiero '{0}'."
+02000A92="Datumeraro en '{0}'. Difektiĝinta dosiero."
+02000A93="CRC-eraro en '{0}'. Difektiĝinta dosiero."
+
+; Password dialog
+02000B00="Pasvorto"
+02000B01="Enigu pasvorton:"
+02000B02="&Montru pasvorton"
+
+; Progress dialog
+02000C00="Procezo"
+02000C01="Pasinta tempo:"
+02000C02="Restanta tempo:"
+02000C03="Grando:"
+02000C04="Rapideco:"
+
+02000C10="&Fono"
+02000C11="&Malfono"
+02000C12="&Paŭzo"
+02000C13="&Daŭrigu"
+
+02000C20="Paŭzita"
+
+02000C30="Ĉu vi vere volas nuligi?"
+
+; Compress dialog
+02000D00="Enarĥivigu"
+02000D01="&Arĥivo:"
+02000D02="A&nstataŭigreĝimo:"
+02000D03="A&rĥivformato:"
+02000D04="&Densigmetodo:"
+02000D05="Kreu &solidan arĥivon"
+02000D06="&Parametroj:"
+02000D07="Agordoj"
+02000D08="Kreu SF&X-arĥivon"
+02000D09="Disfadenigo"
+02000D0A="Ĉifru dosier&nomojn"
+02000D0B="Densigo&nivelo"
+02000D0C="&Vortarogrando:"
+02000D0D="Vo&rtogrando:"
+02000D0E="Memoruzo por densigo:"
+02000D0F="Memoruzo por maldensigo:"
+
+02000D40="&Plurvolumigu, bajtoj:"
+
+02000D81="Sen densigo"
+02000D82="Normala densigo"
+02000D83="Maksimuma densigo"
+02000D84="Rapide"
+02000D85="Plej rapide"
+02000D86="Ultra"
+
+02000D90="Foliumu"
+
+02000DA1="Aldonu kaj anstataŭigu dosierojn"
+02000DA2="Ĝisdatigu kaj aldonu dosierojn"
+02000DA3="Refreŝigu estantajn dosierojn"
+02000DA4="Sinkronigu dosierojn"
+
+02000DB1="Ĉiuj dosieroj"
+
+02000DC0="Densigo"
+
+; Columns dialog
+02000E00="Kolumnoj"
+02000E01="Marku kolumnojn, enarĥivendaj en ĉi-tiu dosierujo. Per butonoj Supren kaj Suben eblas difini sekvordo de kolumnoj."
+02000E02="Markita kolumno devas havi &larĝecon de"
+02000E03="rastumeroj."
+
+02000E10="&Supren"
+02000E11="S&uben"
+02000E12="&Montru"
+02000E13="&Kaŝu"
+02000E14="Difinu"
+
+02000E81="Nomo"
+02000E82="Larĝeco"
+
+; Testing
+02000F90="Testado"
+
+
+; File Manager
+
+03000000="7-Zip-dosieradministrilo"
+
+; Menu
+03000102="&Dosiero"
+03000103="&Redakto"
+03000104="&Vido"
+03000105="&Agordoj"
+03000106="&Helpo"
+03000107="&Favoritaj"
+
+; File
+03000210="&Malfermu"
+03000211="Malfermu &ene"
+03000212="Malfermu ek&stere"
+03000220="&Vidigu"
+03000221="&Redaktu"
+03000230="Ŝ&anĝu nomon"
+03000231="&Kopiu en..."
+03000232="M&ovu en..."
+03000233="&Forigu"
+03000240="A&tributoj"
+03000241="Ko&mentu"
+03000242="Kalkulu kontrolsumon"
+03000250="Kreu &dosierujon"
+03000251="Kre&u dos&ieron"
+03000260="E&liru"
+03000270="&Erigu dosierojn..."
+03000271="Komb&inu dosierojn..."
+
+; Edit
+03000310="&Malfaru"
+03000311="&Refaru"
+03000320="&Tondu"
+03000321="&Kopiu"
+03000322="Al&gluu"
+03000323="&Forigu"
+03000330="M&arku ĉiun"
+03000331="Ma&lmarku ĉiun"
+03000332="&Inversigu markon"
+03000333="Marku..."
+03000334="Malmarku..."
+03000335="Marku laŭ tipo"
+03000336="Malmarku laŭ tipo"
+
+; View
+03000410="&Grandaj bildetoj"
+03000411="&Malgrandaj bildetoj"
+03000412="&Listo"
+03000413="&Detale"
+03000420="&Neordigite"
+03000430="Malfermu radikan dosierujon"
+03000431="Supren je unu nivelo"
+03000432="Dosierujhistorio..."
+03000440="Ĝ&isdatigu"
+03000449="Ununivela vido"
+03000450="&2 paneloj"
+03000451="&Ilobretoj"
+03000460="Arĥivo-ilobreto"
+03000461="Norma ilobreto"
+03000462="Grandaj bildetoj"
+03000463="Montru butontekston"
+
+; Tools
+03000510="&Agordoj..."
+03000511="&Etalono"
+
+; Help
+03000610="&Enhavo..."
+03000620="&Pri 7-Zip..."
+
+; Favorites
+03000710="&Aldonu dosierujon al favorataj kiel"
+03000720="Legosigno"
+
+; Options Dialog
+
+03010000="Agordoj"
+
+; Plugins
+03010100="Kromaĵoj"
+03010101="&Kromaĵoj:"
+03010110="Agordoj"
+
+; Edit
+03010200="Redaktilo"
+03010201="&Redaktilo:"
+
+; System
+03010300="Sistemo"
+03010302="Asociu 7-Zip-on kun dosieroj:"
+03010310="Kromaĵo"
+
+; Settings
+03010400="Agordoj"
+03010401="Montru \"..\"-elementon"
+03010402="Montru realajn dosierbildetojn"
+03010410="Montru sisteman menuon"
+03010420="Marku &tutan linion"
+03010421="Montru &kradliniojn"
+03010430="&Alternativa markreĝimo"
+03010440="Uzu &grandajn memorpaĝojn"
+
+; Strings
+
+03020201="Kopiu"
+03020202="Movu"
+03020203="Kopiu en:"
+03020204="Movu en:"
+03020205="Kopio..."
+03020206="Movo..."
+03020207="Maleblas kopii objektojn por tiaj dosieroj."
+03020208="Operacio ne estas subtenata."
+
+03020210="Konfirmo de forigo de dosiero"
+03020211="Konfirmo de forigo de dosierujo"
+03020212="Konfirmo de forigo de dosieraro"
+03020213="Ĉu vi vere volas forigi '{0}'?"
+03020214="Ĉu vi vere volas forigi dosierujon \"{0}\" kaj tutan ĝian enhavon?"
+03020215="Ĉu vi vere volas forigi ĉi tiajn {0} objektojn?"
+03020216="Forigo..."
+03020217="Eraro dum forigo de dosiero aŭ dosierujo"
+
+03020220="Nomŝanĝo..."
+03020221="Eraro dum nomŝanĝo de dosiero aŭ dosierujo"
+03020222="Konfirmu dosierkopion"
+03020223="Ĉu vere kopii dosierojn enarĥiven"
+
+03020230="Kreu dosierujon"
+03020231="Dosierujnomo:"
+03020232="Nova dosierujo"
+03020233="Eraro dum dosierujkreo"
+
+03020240="Kreu dosieron"
+03020241="Dosiernomo:"
+03020242="Nova dosiero"
+03020243="Eraro dum dosierkreo"
+
+03020250="Marku"
+03020251="Malmarku"
+03020252="Masko:"
+
+03020260="Dosierujhistorio"
+
+03020280="Dosiero '{0}' ŝanĝiĝis.\nĈu vi volas ĝistadigi ĝin enraĥive?"
+03020281="Fiaskis ĝisdatigi dosieron\n'{0}''"
+03020282="Fiaskis startigi redaktilon."
+03020283="Malfermo..."
+
+03020290="Komento"
+03020291="&Komento:"
+
+030202A0="Sistemo"
+
+03020300="Komputilo"
+03020301="Reto"
+
+03020400="Enarĥivigu"
+03020401="Elarĥivigu"
+03020402="Testu"
+
+03020420="Kopiu"
+03020421="Movu"
+03020422="Forigu"
+03020423="Informo"
+
+03020500="Erigu dosieron"
+03020501="&Erigu en:"
+03020510="Erigo..."
+
+03020600="Kombinu dosierojn"
+03020601="&Kombinu en:"
+03020610="Kombino..."
+
+03020710="Kalkulante kontrolsumon..."
+03020720="Informo pri kontrolsumo"
+03020721="CRC-kontrolsumo por datumoj:"
+03020722="CRC-kontrolsumo por datumoj kaj nomoj:"
+
+03020800="Analizante..."
+
+; Computer
+03031100="Kapacito"
+03031101="Libera"
+03031102="Faskogrando"
+03031103="Marko"
+
+; Network
+03031200="Loka nomo"
+03031201="Provizanto"
+
+; Benchmark Dialog
+
+03080000="Etalono"
+03080001="Memoruzo:"
+03080002="Densigo"
+03080003="Maldensigo"
+03080004="Rapideco"
+03080005="Takso"
+03080006="Tuta takso"
+03080007="Kuranta"
+03080008="Rezulta"
+03080009="Pasoj:"
+0308000A="Eraroj:"
+
+;!@LangEnd@!

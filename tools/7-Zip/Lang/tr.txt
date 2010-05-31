@@ -1,0 +1,545 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 9.07
+; Translated by X-FoRcE 22.09.2009
+;
+; X-FoRcE
+; Turkiye
+;
+
+00000000="Turkish"
+00000001="Türkçe"
+00000002="31"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Yapılandırma"
+
+; Info Page
+01000100="7-Zip hakkında"
+01000103="7-Zip özgür bir yazılımdır. Ancak, kayıt olarak 7-zip geliştirme faaliyetine destek olabilirsiniz."
+01000104="Destek"
+01000105="Kayıt ol"
+
+; Folders Page
+01000200="Klasörler"
+01000210="Ça&lışma klasörü"
+01000211="&Sistem TEMP klasörü"
+01000212="&Geçerli klasör"
+01000213="&Belirtilen klasör:"
+01000214="Sadece çıkarılabilen sürücüler için kullan"
+
+01000281="Geçici arşiv dosyaları için bir yer belirleyin."
+
+; System Page
+01000300="Sistem"
+01000301="İçerik menülerinde 7-Zip görünsün"
+01000302="Kademeli içerik menüsü"
+01000310="İçerik menü öğeleri:"
+
+; Language Page
+01000400="Dil"
+01000401="Dil:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip komutları"
+02000103="Arşivi aç"
+02000104="Seçili arşivi açar."
+02000105="Dosyaları çıkart..."
+02000106="Seçili arşivden dosyaları çıkartır."
+02000107="Arşivle..."
+02000108="Seçili öğeleri arşive ekler."
+02000109="Arşivi sına"
+0200010A="Seçili arşivin bütünlüğünü test eder."
+0200010B="Burada çıkart"
+0200010C="Seçili arşivdeki dosyaları geçerli klasöre çıkartır."
+0200010D="{0} klasörüne çıkart"
+0200010E="Alt klasöre çıkartır."
+0200010F="{0} olarak arşivle"
+02000110="Seçili öğeleri arşive ekler."
+02000111="Sıkıştırıp postala..."
+02000112="Seçili öğeleri sıkıştırıp arşivler ve arşivi e-posta ile gönderir."
+02000113="{0} olarak sıkıştır ve postala"
+02000114="Seçili öğeleri sıkıştırıp arşivler ve arşivi e-posta ile gönderir."
+
+02000140="<Klasör>"
+02000141="<Arşiv>"
+
+; Properties
+02000203="Yol"
+02000204="Ad"
+02000205="Uzantı"
+02000206="Klasör"
+02000207="Boyut"
+02000208="Arşivde boyutu"
+02000209="Öznitelikler"
+0200020A="Oluşturma"
+0200020B="Erişim"
+0200020C="Değiştirme"
+0200020D="Katı"
+0200020E="Açıklanmış"
+0200020F="Şifrelenmiş"
+02000210="Önceki parça"
+02000211="Sonraki parça"
+02000212="Sözlük"
+02000213="CRC"
+02000214="Tür"
+02000215="Anti"
+02000216="Sıkıştırma şekli"
+02000217="İşletim sistemi"
+02000218="Dosya Sistemi"
+02000219="Kullanıcı"
+0200021A="Grup"
+0200021B="Blok"
+0200021C="Açıklama"
+0200021D="Konum"
+0200021E="Yol Öneki"
+0200021F="Klasörler"
+02000220="Dosyalar"
+02000221="Sürüm"
+02000222="Cilt"
+02000223="Çoklu Cilt"
+02000224="Konum"
+02000225="Bağlantılar"
+02000226="Bloklar"
+02000227="Ciltler"
+
+02000229="64-bit"
+0200022A="Big-endian"
+0200022B="İşlemci"
+0200022C="Fiziksel Boyut"
+0200022D="Başlık Boyutu"
+0200022E="Checksum"
+0200022F="Karakteristik"
+02000230="Sanal Adres"
+02000231="ID"
+02000232="Kısa İsim"
+02000233="Oluşturan Yazılım"
+02000234="Kesim Boyutu"
+02000235="Biçim"
+02000236="Bağlantı"
+
+; Status bar
+02000301="{0} adet öğe seçili"
+02000302="{0} adet öğe"
+
+02000320="Dosyalar:"
+02000321="Klasörler:"
+02000322="Boyut:"
+02000323="Sıkıştırılmış Boyut:"
+02000324="Arşivler:"
+
+; List Context Menu
+02000401="&Sütunlar..."
+
+02000411="&Aç"
+02000412="&Çıkart..."
+
+; ToolBar
+02000501="Çıkart"
+
+; Messages
+02000601="Bu arşiv üzerinde güncelleme yapamazsınız."
+02000602="{0} arşivi güncellenemiyor"
+02000603="'{0}' klasörü oluşturulamıyor"
+02000604="Bu dosya bilinen bir arşiv değil."
+02000605="Hata"
+02000606="Çok fazla öğe"
+02000607="Bu dosya uzantısı ile ilişkili bir uygulama yok"
+02000608="Hata yok."
+02000609="'{0}' arşiv dosyası olarak açılamıyor."
+0200060A="'{0}' dosyası açılamıyor. Şifreniz yanlış olabilir mi?"
+0200060B="Sistem gerekli belleği ayarlayamadı"
+0200060C="Bilinmeyen hata"
+0200060D="Desteklenmeyen arşiv tipi"
+
+; Dialogs
+02000702="Tamam"
+02000705="&Evet"
+02000707="Tümüne E&vet"
+02000709="&Hayır"
+0200070B="Tümüne Ha&yır"
+
+02000710="İptal"
+02000711="İ&ptal"
+02000713="&Kapat"
+02000714="Dur"
+02000715="Tekrar başlat"
+
+02000720="Yardım"
+
+; Extract dialog
+02000800="Çıkart"
+02000801="&Çıkartılacak yer:"
+02000802="Parola"
+
+02000810="Yol adları"
+02000811="Tam yol adları"
+02000812="Geçerli yol adları"
+02000813="Yol adları olmasın"
+
+02000820="Olan dosyalar"
+02000821="Üzerine yazmak için sor"
+02000822="Sormadan üzerine yaz"
+02000823="Çıkartma"
+02000824="Arşivdekilere yeni ad ver"
+02000825="Olanlara yeni ad ver"
+
+02000830="Dosyalar"
+02000831="&Seçili dosyalar"
+02000832="&Tüm dosyalar"
+
+02000881="Çıkartılacak dosyalar için bir yer belirleyin."
+
+02000890="çıkartılıyor"
+
+; Overwrite dialog
+02000900="Üzerine Yazma Durumu"
+02000901="Hedef klasörde bu adla bir dosya var. Üzerine yazılsın mı?"
+02000902="Mevcut dosya:"
+02000903="Çıkartılan dosya:"
+
+02000911="&Yeni ad ver"
+
+02000982="{0} bayt"
+02000983="son değişimi "
+
+; Messages dialog
+02000A00="Tanılayıcı iletiler"
+
+02000A80="İleti"
+
+02000A91="'{0}' için sıkıştırma şekli tanınamadı."
+02000A92="'{0}' bozuk. (Veri hatası)"
+02000A93="'{0}' bozuk. (CRC hatası)"
+02000A94="Şifrelenmiş '{0}' dosyası hatalı. Şifreniz yanlış olabilir mi?"
+02000A95="'{0}' dosyasında CRC hatası. Şifreniz yanlış olabilir mi?"
+
+; Password dialog
+02000B00="Parola Girişi"
+02000B01="Parolayı girin:"
+02000B02="Par&ola görünsün"
+02000B03="Şifre tekrarı:"
+02000B10="Şifreler birbiriyle uyuşmuyor."
+02000B11="Şifre için İngilizce harfler, sayılar ve özel karekterden (!, #, $, ...) kullanabilirsiniz."
+02000B12="Şifre çok uzun"
+
+; Progress dialog
+02000C00="işle"
+02000C01="Geçen süre:"
+02000C02="Kalan süre:"
+02000C03="Boyut:"
+02000C04="Hız:"
+02000C05="İşlenen:"
+02000C06="Sıkıştırma oranı:"
+
+02000C10="&Arka planda"
+02000C11="Ö&nde"
+02000C12="&Duraklat"
+02000C13="De&vam et"
+
+02000C20="Duraklatıldı - "
+
+02000C30="İptal edilsin mi?"
+
+; Compress dialog
+02000D00="Arşivle"
+02000D01="&Arşiv:"
+02000D02="&Güncelleme şekli:"
+02000D03="Arşiv &biçimi:"
+02000D04="Sı&kıştırma şekli:"
+02000D05="Ka&tı olsun"
+02000D06="&Parametreler:"
+02000D07="Seçenekler"
+02000D08="Ke&ndi çıkartsın (SFX)"
+02000D09="Ç&ok ilmekli"
+02000D0A="Dosya adlarını şi&frele"
+02000D0B="Sıkıştırma dü&zeyi:"
+02000D0C="&Sözlük boyutu:"
+02000D0D="Ke&lime boyutu:"
+02000D0E="Bellek kullanımı (Sıkıştırma):"
+02000D0F="Bellek kullanımı (Çözme):"
+02000D10="Şifreleme"
+02000D11="Şifreleme metodu:"
+02000D12="İşlemci iş parçası sayısı:"
+02000D13="Aralıksız blok boyutu:"
+02000D14="Aralıklı"
+02000D15="Aralıksız"
+02000D16="Paylaşılan dosyaları sıkıştır"
+
+02000D40="Bayt/&cilt olarak parçala:"
+02000D41="Yanlış cilt boyutu"
+02000D42="Belirtilen cilt boyutu: {0} bayt.\nBu boyutta ciltlere ayırmak istediğinize emin misiniz?"
+
+02000D81="Sıkıştırmasız"
+02000D82="Normal"
+02000D83="Maksimum"
+02000D84="Hızlı"
+02000D85="En hızlı"
+02000D86="Ultra"
+
+02000D90="Gözat"
+
+02000DA1="Dosyaları ekle, olanları çıkart"
+02000DA2="Dosyaları ekle, eskileri güncelle"
+02000DA3="Sadece eskileri güncelle"
+02000DA4="Dosyaları eşitle"
+
+02000DB1="Tüm dosyalar"
+
+02000DC0="sıkıştırılıyor"
+
+; Columns dialog
+02000E00="Sütunlar"
+02000E01="Bu klasörde görülebilir olmasını istediğiniz sütunları işaretleyin. Sütunları sıralamak için yukarı-aşağı düğmelerini kullanın."
+02000E02="Seçili sütun genişliği"
+02000E03="&piksel olsun."
+
+02000E10="&Yukarı"
+02000E11="&Aşağı"
+02000E12="&Göster"
+02000E13="Gi&zle"
+02000E14="Tayin et"
+
+02000E81="Başlık"
+02000E82="Genişlik"
+
+; Testing
+02000F90="Sınanıyor"
+
+
+; File Manager
+
+03000000="7-Zip Dosya Yöneticisi"
+
+; Menu
+03000102="&Dosya"
+03000103="Dü&zenle"
+03000104="Gö&rüntüle"
+03000105="&Araçlar"
+03000106="&Yardım"
+03000107="Sı&k Kullanılanlar"
+
+; File
+03000210="&Aç"
+03000211="Pa&nelde Aç"
+03000212="Pence&rede Aç"
+03000220="&Görüntüle"
+03000221="Dü&zenle"
+03000230="Yeni a&d ver"
+03000231="K&opyala"
+03000232="&Taşı"
+03000233="&Sil"
+03000240="Öz&ellikler"
+03000241="Açıkla&ma"
+03000242="Toplam checksum hesapla"
+03000243="Fark"
+03000250="Yeni k&lasör"
+03000251="Yeni dos&ya"
+03000260="Çı&k"
+03000270="&Parçala..."
+03000271="&Birleştir..."
+
+; Edit
+03000310="&Geri al"
+03000311="&Yinele"
+03000320="&Kes"
+03000321="K&opyala"
+03000322="Ya&pıştır"
+03000323="&Sil"
+03000330="&Tümünü seç"
+03000331="Tüm seçimi ka&ldır"
+03000332="&Aksini seç"
+03000333="Seç..."
+03000334="Seçimi kaldır..."
+03000335="Bu uzantıyı seç"
+03000336="Uzantılı seçimi kaldır"
+
+; View
+03000410="&Büyük Simgeler"
+03000411="&Küçük Simgeler"
+03000412="&Liste"
+03000413="&Detaylar"
+03000420="Sırasız"
+03000430="Kök Klasörü Aç"
+03000431="Bir Seviye Yukarı"
+03000432="Klasör Geçmişi..."
+03000440="&Yenile"
+03000449="Düz Görünüm"
+03000450="&2 Panel aç"
+03000451="&Araç çubukları"
+03000460="Arşiv çubuğu"
+03000461="Standart çubuk"
+03000462="Büyük düğmeler"
+03000463="Düğme metinleri görünsün"
+
+; Tools
+03000510="&Seçenekler..."
+03000511="&Performans ölçümü"
+
+; Help
+03000610="İç&indekiler..."
+03000620="7-Zip &Hakkında..."
+
+; Favorites
+03000710="Geçerli &klasörü ekle"
+03000720="Yer"
+
+; Options Dialog
+
+03010000="Seçenekler"
+
+; Plugins
+03010100="Eklentiler"
+03010101="&Eklentiler:"
+03010110="Ayarlar..."
+
+; Edit
+03010200="Düzenleyici"
+03010201="Metin &düzenleyici:"
+03010202="&Fark:"
+
+; System
+03010300="Sistem"
+03010302="7-Zip ile ilişkilendir:"
+03010310="Eklenti"
+
+; Settings
+03010400="Ayarlar"
+03010401="\"..\" öğesi görünsün"
+03010402="Gerçek dosya simgeleri görünsün"
+03010410="Sistem menüsü görünsün"
+03010420="&Tüm satır seçilsin"
+03010421="Tabl&o çizgileri görünsün"
+03010422="Öğeyi açmak için tek tıkla"
+03010430="&Alternatif seçim kipi"
+03010440="Geniş &bellek sayfaları kullan"
+
+; Strings
+
+03020201="Kopyala"
+03020202="Taşı"
+03020203="Kopyalanacak yer:"
+03020204="Taşınacak yer:"
+03020205="Kopyalanıyor..."
+03020206="Taşınıyor..."
+03020207="Öğelerin kopyalanması veya taşınması bu klasör için mümkün değil."
+03020208="Bu klasör için istenen işlem desteklenmiyor."
+03020209="Hedef klasörü seçiniz."
+
+03020210="Dosya Silme Onayı"
+03020211="Klasör Silme Onayı"
+03020212="Birden Fazla Dosya Silme Onayı"
+03020213="'{0}' silinsin mi?"
+03020214="'{0}' klasörü ve içindekiler silinsin mi?"
+03020215="{0} silinsin mi?"
+03020216="Siliniyor..."
+03020217="Dosya veya Klasör Silme Hatası"
+03020218="Dosya yolu uzun olduğundan Geri Dönüşüm Kutusuna taşınamıyor"
+
+03020220="Dosya Adı Değiştiriliyor..."
+03020221="Dosya veya Klasör Adlandırma Hatası"
+03020222="Kopyalama Onayı"
+03020223="Dosyalar arşive kopyalansın mı"
+
+03020230="Yeni klasör"
+03020231="Klasör adı:"
+03020232="Yeni Klasör"
+03020233="Klasör Oluşturma Hatası"
+
+03020240="Yeni dosya"
+03020241="Dosya Adı:"
+03020242="Yeni Dosya"
+03020243="Dosya Oluşturma Hatası"
+
+03020250="Seç"
+03020251="Seçimi kaldır"
+03020252="Seçim ifadesi:"
+
+03020260="Klasör Geçmişi"
+
+03020280="'{0}' dosyası değişmiş.\nArşivde güncellensin mi?"
+03020281="'{0}' dosyası güncellenemedi"
+03020282="Metin düzenleyici başlatılamadı."
+03020283="açılıyor..."
+03020284="Bu dosya virüs gibi görünüyor.(Dosya ismi uzun boşluk içeriyor)."
+
+03020290="Açıklama"
+03020291="&Açıklama:"
+
+030202A0="Sistem"
+
+03020300="Bilgisayar"
+03020301="Ağ"
+03020302="Belgeler"
+
+03020400="Arşivle"
+03020401="Çıkart"
+03020402="Sına"
+
+03020420="Kopyala"
+03020421="Taşı"
+03020422="Sil"
+03020423="Bilgi"
+
+03020500="Parçala"
+03020501="Şu &klasörde parçala:"
+03020510="Parçalanıyor..."
+03020520="Silmeyi onaylayın"
+03020521="Dosyayı {0} parçaya ayırmak istediğinizden emin misiniz?"
+03020522="Parça büyüklüğü, orjinal dosya boyutundan küçük olmalıdır"
+
+03020600="Birleştir"
+03020601="Şu &klasörde birleştir:"
+03020610="Birleştiriliyor..."
+03020620="Sadece ilk parçayı seçiniz"
+03020621="Parçalanan dosya tespit edilemedi"
+03020622="Parçalanmış dosyanın bir parçadan fazlası bulunamadı"
+
+03020710="Checksum değeri hesaplanıyor..."
+03020720="Checksum bilgisi"
+03020721="Verinin CRC değeri:"
+03020722="Verinin CRC değeri ve isimler:"
+
+03020800="Taranıyor..."
+
+03020900="Özellikler"
+
+03020A01="The operation cannot be called from a folder that has a long path."
+03020A02="Bir dosya seçmelisiniz"
+03020A03="Bir veya daha fazla dosya seçmelisiniz"
+03020A04="Dosya {0} zaten mevcut"
+
+; Computer
+03031100="Toplam Boyut"
+03031101="Boş Alan"
+03031102="Küme Boyutu"
+03031103="Etiket"
+
+; Network
+03031200="Yerel Ad"
+03031201="Sağlayıcı"
+
+; Benchmark Dialog
+
+03080000="Bilgisayar performansı"
+03080001="Bellek kullanımı:"
+03080002="Sıkıştırılıyor"
+03080003="Çözülüyor"
+03080004="Hız"
+03080005="Puan"
+03080006="Toplam Puan"
+03080007="Mevcut"
+03080008="Sonuç"
+03080009="Başarılı:"
+0308000A="Hatalı:"
+0308000B="İşlemci kullanımı"
+0308000C="Puan / Kullanım"
+
+;!@LangEnd@!
+
+ 	  	 

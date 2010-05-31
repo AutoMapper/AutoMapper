@@ -1,0 +1,543 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 9.07
+; Translated by Igor Pavlov
+;
+;
+;
+;
+
+00000000="English"
+00000001="English"
+00000002="9"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Configuration"
+
+; Info Page
+01000100="About 7-Zip"
+01000103="7-Zip is free software. However, you can support development of 7-Zip by registering."
+01000104="Support"
+01000105="Register"
+
+; Folders Page
+01000200="Folders"
+01000210="&Working folder"
+01000211="&System temp folder"
+01000212="&Current"
+01000213="&Specified:"
+01000214="Use for removable drives only"
+
+01000281="Specify a location for temporary archive files."
+
+; System Page
+01000300="System"
+01000301="Integrate 7-Zip to shell context menu"
+01000302="Cascaded context menu"
+01000310="Context menu items:"
+
+; Language Page
+01000400="Language"
+01000401="Language:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip commands"
+02000103="Open archive"
+02000104="Opens the selected archive."
+02000105="Extract files..."
+02000106="Extracts files from the selected archive."
+02000107="Add to archive..."
+02000108="Adds the selected items to archive."
+02000109="Test archive"
+0200010A="Tests integrity of the selected archive."
+0200010B="Extract Here"
+0200010C="Extracts files from the selected archive to current folder."
+0200010D="Extract to {0}"
+0200010E="Extracts files to subfolder."
+0200010F="Add to {0}"
+02000110="Adds the selected items to archive."
+02000111="Compress and email..."
+02000112="Compresses the selected items to archive and sends archive via email."
+02000113="Compress to {0} and email"
+02000114="Compresses the selected items to archive and sends archive via email."
+
+02000140="<Folder>"
+02000141="<Archive>"
+
+; Properties
+02000203="Path"
+02000204="Name"
+02000205="Extension"
+02000206="Folder"
+02000207="Size"
+02000208="Packed Size"
+02000209="Attributes"
+0200020A="Created"
+0200020B="Accessed"
+0200020C="Modified"
+0200020D="Solid"
+0200020E="Commented"
+0200020F="Encrypted"
+02000210="Split Before"
+02000211="Split After"
+02000212="Dictionary"
+02000213="CRC"
+02000214="Type"
+02000215="Anti"
+02000216="Method"
+02000217="Host OS"
+02000218="File System"
+02000219="User"
+0200021A="Group"
+0200021B="Block"
+0200021C="Comment"
+0200021D="Position"
+0200021E="Path Prefix"
+0200021F="Folders"
+02000220="Files"
+02000221="Version"
+02000222="Volume"
+02000223="Multivolume"
+02000224="Offset"
+02000225="Links"
+02000226="Blocks"
+02000227="Volumes"
+
+02000229="64-bit"
+0200022A="Big-endian"
+0200022B="CPU"
+0200022C="Physical Size"
+0200022D="Headers Size"
+0200022E="Checksum"
+0200022F="Characteristics"
+02000230="Virtual Address"
+02000231="ID"
+02000232="Short Name"
+02000233="Creator Application"
+02000234="Sector Size"
+02000235="Mode"
+02000236="Link"
+
+; Status bar
+02000301="{0} object(s) selected"
+02000302="{0} object(s)"
+
+02000320="Files:"
+02000321="Folders:"
+02000322="Size:"
+02000323="Compressed size:"
+02000324="Archives:"
+
+; List Context Menu
+02000401="&Columns..."
+
+02000411="&Open"
+02000412="&Extract..."
+
+; ToolBar
+02000501="Extract"
+
+; Messages
+02000601="Update operations are not supported for this archive."
+02000602="Cannot update archive {0}"
+02000603="Cannot create folder '{0}'"
+02000604="File is not supported archive."
+02000605="Error"
+02000606="Too many items"
+02000607="There is no application associated with the given file name extension"
+02000608="There are no errors"
+02000609="Can not open file '{0}' as archive"
+0200060A="Can not open encrypted archive '{0}'. Wrong password?"
+0200060B="The system cannot allocate the required amount of memory"
+0200060C="Unknown error"
+0200060D="Unsupported archive type"
+
+; Dialogs
+02000702="OK"
+02000705="&Yes"
+02000707="Yes to &All"
+02000709="&No"
+0200070B="No to A&ll"
+
+02000710="Cancel"
+02000711="&Cancel"
+02000713="&Close"
+02000714="Stop"
+02000715="Restart"
+
+02000720="Help"
+
+; Extract dialog
+02000800="Extract"
+02000801="E&xtract to:"
+02000802="Password"
+
+02000810="Path mode"
+02000811="Full pathnames"
+02000812="Current pathnames"
+02000813="No pathnames"
+
+02000820="Overwrite mode"
+02000821="Ask before overwrite"
+02000822="Overwrite without prompt"
+02000823="Skip existing files"
+02000824="Auto rename"
+02000825="Auto rename existing files"
+
+02000830="Files"
+02000831="&Selected files"
+02000832="&All files"
+
+02000881="Specify a location for extracted files."
+
+02000890="Extracting"
+
+; Overwrite dialog
+02000900="Confirm File Replace"
+02000901="Destination folder already contains processed file."
+02000902="Would you like to replace the existing file"
+02000903="with this one?"
+
+02000911="A&uto Rename"
+
+02000982="{0} bytes"
+02000983="modified on"
+
+; Messages dialog
+02000A00="Diagnostic messages"
+
+02000A80="Message"
+
+02000A91="Unsupported compression method for '{0}'."
+02000A92="Data error in '{0}'. File is broken."
+02000A93="CRC failed in '{0}'. File is broken."
+02000A94="Data error in encrypted file '{0}'. Wrong password?"
+02000A95="CRC failed in encrypted file '{0}'. Wrong password?"
+
+; Password dialog
+02000B00="Enter password"
+02000B01="Enter password:"
+02000B02="&Show password"
+02000B03="Reenter password:"
+02000B10="Passwords do not match"
+02000B11="Use only English letters, numbers and special characters (!, #, $, ...) for password"
+02000B12="Password is too long"
+
+; Progress dialog
+02000C00="Process"
+02000C01="Elapsed time:"
+02000C02="Remaining time:"
+02000C03="Total size:"
+02000C04="Speed:"
+02000C05="Processed:"
+02000C06="Compression ratio:"
+
+02000C10="&Background"
+02000C11="&Foreground"
+02000C12="&Pause"
+02000C13="&Continue"
+
+02000C20="Paused"
+
+02000C30="Are you sure you want to cancel?"
+
+; Compress dialog
+02000D00="Add to archive"
+02000D01="&Archive:"
+02000D02="&Update mode:"
+02000D03="Archive &format:"
+02000D04="Compression &method:"
+02000D05="Create &Solid archive"
+02000D06="&Parameters:"
+02000D07="Options"
+02000D08="Create SF&X archive"
+02000D09="Multi-threading"
+02000D0A="Encrypt file &names"
+02000D0B="Compression &level:"
+02000D0C="&Dictionary size:"
+02000D0D="&Word size:"
+02000D0E="Memory usage for Compressing:"
+02000D0F="Memory usage for Decompressing:"
+02000D10="Encryption"
+02000D11="Encryption method:"
+02000D12="Number of CPU threads:"
+02000D13="Solid block size:"
+02000D14="Non-solid"
+02000D15="Solid"
+02000D16="Compress shared files"
+
+02000D40="Split to &volumes, bytes:"
+02000D41="Incorrect volume size"
+02000D42="Specified volume size: {0} bytes.\nAre you sure you want to split archive into such volumes?"
+
+02000D81="Store"
+02000D82="Normal"
+02000D83="Maximum"
+02000D84="Fast"
+02000D85="Fastest"
+02000D86="Ultra"
+
+02000D90="Browse"
+
+02000DA1="Add and replace files"
+02000DA2="Update and add files"
+02000DA3="Freshen existing files"
+02000DA4="Synchronize files"
+
+02000DB1="All Files"
+
+02000DC0="Compressing"
+
+; Columns dialog
+02000E00="Columns"
+02000E01="Check the columns that you would like to make visible in this folder. Use the Move Up and Move Down buttons to reorder the columns."
+02000E02="The selected column should be"
+02000E03="pixels &wide."
+
+02000E10="Move &Up"
+02000E11="Move &Down"
+02000E12="&Show"
+02000E13="&Hide"
+02000E14="Set"
+
+02000E81="Title"
+02000E82="Width"
+
+; Testing
+02000F90="Testing"
+
+
+; File Manager
+
+03000000="7-Zip File Manager"
+
+; Menu
+03000102="&File"
+03000103="&Edit"
+03000104="&View"
+03000105="&Tools"
+03000106="&Help"
+03000107="F&avorites"
+
+; File
+03000210="&Open"
+03000211="Open &Inside"
+03000212="Open O&utside"
+03000220="&View"
+03000221="&Edit"
+03000230="Rena&me"
+03000231="&Copy To..."
+03000232="&Move To..."
+03000233="&Delete"
+03000240="P&roperties"
+03000241="Comme&nt..."
+03000242="Calculate checksum"
+03000243="Diff"
+03000250="Create Folder"
+03000251="Create File"
+03000260="E&xit"
+03000270="&Split file..."
+03000271="Com&bine files..."
+
+; Edit
+03000310="&Undo"
+03000311="&Redo"
+03000320="Cu&t"
+03000321="&Copy"
+03000322="&Paste"
+03000323="&Delete"
+03000330="Select &All"
+03000331="Deselect All"
+03000332="&Invert Selection"
+03000333="Select..."
+03000334="Deselect..."
+03000335="Select by Type"
+03000336="Deselect by Type"
+
+; View
+03000410="Lar&ge Icons"
+03000411="S&mall Icons"
+03000412="&List"
+03000413="&Details"
+03000420="Unsorted"
+03000430="Open Root Folder"
+03000431="Up One Level"
+03000432="Folders History..."
+03000440="&Refresh"
+03000449="Flat View"
+03000450="&2 Panels"
+03000451="&Toolbars"
+03000460="Archive Toolbar"
+03000461="Standard Toolbar"
+03000462="Large Buttons"
+03000463="Show Buttons Text"
+
+; Tools
+03000510="&Options..."
+03000511="&Benchmark"
+
+; Help
+03000610="&Contents..."
+03000620="&About 7-Zip..."
+
+; Favorites
+03000710="&Add folder to Favorites as"
+03000720="Bookmark"
+
+; Options Dialog
+
+03010000="Options"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="Options..."
+
+; Edit
+03010200="Editor"
+03010201="&Editor:"
+03010202="&Diff:"
+
+; System
+03010300="System"
+03010302="Associate 7-Zip with:"
+03010310="Plugin"
+
+; Settings
+03010400="Settings"
+03010401="Show \"..\" item"
+03010402="Show real file icons"
+03010410="Show system menu"
+03010420="&Full row select"
+03010421="Show &grid lines"
+03010422="Single-click to open an item"
+03010430="&Alternative selection mode"
+03010440="Use &large memory pages"
+
+; Strings
+
+03020201="Copy"
+03020202="Move"
+03020203="Copy to:"
+03020204="Move to:"
+03020205="Copying..."
+03020206="Moving..."
+03020207="You cannot move or copy items for such folders."
+03020208="The operation is not supported for this folder."
+03020209="Select destination folder."
+
+03020210="Confirm File Delete"
+03020211="Confirm Folder Delete"
+03020212="Confirm Multiple File Delete"
+03020213="Are you sure you want to delete '{0}'?"
+03020214="Are you sure you want to delete the folder '{0}' and all its contents?"
+03020215="Are you sure you want to delete these {0} items?"
+03020216="Deleting..."
+03020217="Error Deleting File or Folder"
+03020218="The system cannot move a file with long path to the Recycle Bin"
+
+03020220="Renaming..."
+03020221="Error Renaming File or Folder"
+03020222="Confirm File Copy"
+03020223="Are you sure you want to copy files to archive"
+
+03020230="Create Folder"
+03020231="Folder name:"
+03020232="New Folder"
+03020233="Error Creating Folder"
+
+03020240="Create File"
+03020241="File Name:"
+03020242="New File"
+03020243="Error Creating File"
+
+03020250="Select"
+03020251="Deselect"
+03020252="Mask:"
+
+03020260="Folders History"
+
+03020280="File '{0}' was modified.\nDo you want to update it in the archive?"
+03020281="Can not update file\n'{0}'"
+03020282="Cannot start editor."
+03020283="Opening..."
+03020284="The file looks like a virus (the file name contains long spaces in name)."
+
+03020290="Comment"
+03020291="&Comment:"
+
+030202A0="System"
+
+03020300="Computer"
+03020301="Network"
+03020302="Documents"
+
+03020400="Add"
+03020401="Extract"
+03020402="Test"
+
+03020420="Copy"
+03020421="Move"
+03020422="Delete"
+03020423="Info"
+
+03020500="Split File"
+03020501="&Split to:"
+03020510="Splitting..."
+03020520="Confirm Splitting"
+03020521="Are you sure you want to split file into {0} volumes?"
+03020522="Volume size must be smaller than size of original file"
+
+03020600="Combine Files"
+03020601="&Combine to:"
+03020610="Combining..."
+03020620="Select only first part of split file"
+03020621="Can not detect file as part of split file"
+03020622="Can not find more than one part of split file"
+
+03020710="Checksum calculating..."
+03020720="Checksum information"
+03020721="CRC checksum for data:"
+03020722="CRC checksum for data and names:"
+
+03020800="Scanning..."
+
+03020900="Properties"
+
+03020A01="The operation cannot be called from a folder that has a long path."
+03020A02="You must select one file"
+03020A03="You must select one or more files"
+03020A04="File {0} is already exist"
+
+; Computer
+03031100="Total Size"
+03031101="Free Space"
+03031102="Cluster Size"
+03031103="Label"
+
+; Network
+03031200="Local Name"
+03031201="Provider"
+
+; Benchmark Dialog
+
+03080000="Benchmark"
+03080001="Memory usage:"
+03080002="Compressing"
+03080003="Decompressing"
+03080004="Speed"
+03080005="Rating"
+03080006="Total Rating"
+03080007="Current"
+03080008="Resulting"
+03080009="Passes:"
+0308000A="Errors:"
+0308000B="CPU Usage"
+0308000C="Rating / Usage"
+
+;!@LangEnd@!

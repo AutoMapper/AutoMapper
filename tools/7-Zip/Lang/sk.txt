@@ -1,0 +1,543 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 9.07 beta
+; Translated by Pavel Devečka
+;
+;
+;
+;
+
+00000000="Slovak"
+00000001="Slovenčina"
+00000002="27"
+
+; 7-Zip Configuration
+
+; Title
+01000000="Nastavenia 7-Zip"
+
+; Info Page
+01000100="O programe 7-Zip"
+01000103="7-Zip je voľne šíriteľný program. Jeho vývoj môžete podporiť tým, že sa zaregistrujete."
+01000104="Podporiť"
+01000105="Zaregistrovať"
+
+; Folders Page
+01000200="Adresáre"
+01000210="&Pracovný adresár"
+01000211="&Systémový adresár pre dočasné súbory"
+01000212="&Aktuálny adresár"
+01000213="&Manuálne vybraný adresár:"
+01000214="Po&užiť len pre vymeniteľné jednotky"
+
+01000281="Vyberte adresár pre dočasné súbory."
+
+; System Page
+01000300="Systém"
+01000301="Integrovať 7-Zip do kontextového menu"
+01000302="Kaskádové kontextové menu"
+01000310="Položky kontextového menu:"
+
+; Language Page
+01000400="Jazyk"
+01000401="Jazyk:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Príkazy 7-Zip"
+02000103="Otvoriť archív"
+02000104="Otvorí vybraný archív."
+02000105="Rozbaliť súbory..."
+02000106="Rozbalí súbory z vybraného archívu."
+02000107="Pridať do archívu..."
+02000108="Pridá vybrané položky do archívu."
+02000109="Otestovať archív"
+0200010A="Otestuje integritu vybraného archívu."
+0200010B="Rozbaliť tu"
+0200010C="Rozbalí súbory z vybraného archívu do aktuálneho adresára."
+0200010D="Rozbaliť do {0}"
+0200010E="Rozbalí súbory do podadresára."
+0200010F="Pridať do {0}"
+02000110="Pridá vybrané položky do archívu."
+02000111="Skomprimovať a poslať emailom..."
+02000112="Skomprimuje vybrané položky do archívu a pošle archív emailom."
+02000113="Skomprimovať do {0} a poslať emailom"
+02000114="Skomprimuje vybrané položky do archívu a pošle archív emailom."
+
+02000140="<Adresár>"
+02000141="<Archív>"
+
+; Properties
+02000203="Cesta"
+02000204="Meno"
+02000205="Prípona"
+02000206="Adresár"
+02000207="Veľkosť"
+02000208="Veľkosť po kompresii"
+02000209="Atribúty"
+0200020A="Vytvorený"
+0200020B="Sprístupnený"
+0200020C="Zmenený"
+0200020D="Jednoliaty"
+0200020E="Komentovaný"
+0200020F="Zašifrovaný"
+02000210="Rozdelený predtým"
+02000211="Rozdelený potom"
+02000212="Slovník"
+02000213="CRC"
+02000214="Typ"
+02000215="Anti"
+02000216="Metóda"
+02000217="Hostiteľský OS"
+02000218="Súborový systém"
+02000219="Užívateľ"
+0200021A="Skupina"
+0200021B="Blok"
+0200021C="Komentár"
+0200021D="Pozícia"
+0200021E="Predpona cesty"
+0200021F="Adresáre"
+02000220="Súbory"
+02000221="Verzia"
+02000222="Zväzok"
+02000223="Multizväzok"
+02000224="Ofset"
+02000225="Väzby"
+02000226="Bloky"
+02000227="Zväzky"
+
+02000229="64-bitov"
+0200022A="Big-endian"
+0200022B="CPU"
+0200022C="Fyzická veľkosť"
+0200022D="Veľkosť hlavičiek"
+0200022E="Kontrolný súčet"
+0200022F="Charakteristiky"
+02000230="Virtuálna adresa"
+02000231="ID"
+02000232="Skrátený názov"
+02000233="Aplikácia"
+02000234="Veľkosť sektoru"
+02000235="Režim"
+02000236="Odkaz"
+
+; Status bar
+02000301="{0} objekt(ov) vybraných"
+02000302="{0} objekt(ov)"
+
+02000320="Súbory:"
+02000321="Adresáre:"
+02000322="Veľkosť:"
+02000323="Veľkosť po kompresii:"
+02000324="Archívy:"
+
+; List Context Menu
+02000401="&Stĺpce..."
+
+02000411="&Otvoriť"
+02000412="&Rozbaliť..."
+
+; ToolBar
+02000501="Rozbaliť"
+
+; Messages
+02000601="Aktualizačné operácie nie sú v tomto archíve podporované."
+02000602="Nemožno aktualizovať archív {0}"
+02000603="Nemožno vytvoriť adresár '{0}'."
+02000604="Súbor nie je podporovaný archív."
+02000605="Chyba"
+02000606="Priveľa položiek"
+02000607="Žiadna aplikácia nie je priradená k súborom s touto príponou."
+02000608="V archíve sa nenašli žiadne chyby."
+02000609="Súbor '{0}' nemožno otvoriť ako archív."
+0200060A="Nemožno otvoriť šifrovaný archív '{0}'. Nesprávne heslo?"
+0200060B="Systém nemôže alokovať požadované množstvo pamäte."
+0200060C="Neznáma chyba"
+0200060D="Nepodporovaný typ archívu"
+
+; Dialogs
+02000702="OK"
+02000705="&Áno"
+02000707="Áno na &všetko"
+02000709="&Nie"
+0200070B="Nie na vš&etko"
+
+02000710="Storno"
+02000711="&Storno"
+02000713="&Zatvoriť"
+02000714="Zastaviť"
+02000715="Reštartovať"
+
+02000720="Nápoveda"
+
+; Extract dialog
+02000800="Rozbaliť"
+02000801="Rozbaliť do:"
+02000802="Heslo"
+
+02000810="Nastavenie názvov ciest"
+02000811="Plné názvy ciest"
+02000812="Aktuálne názvy ciest"
+02000813="Žiadne názvy ciest"
+
+02000820="Nastavenie prepísania"
+02000821="Spýtať sa pred prepísaním"
+02000822="Prepísať bez výzvy"
+02000823="Preskočiť existujúce súbory"
+02000824="Automaticky premenovať"
+02000825="Auto. premenovať existujúce súbory"
+
+02000830="Súbory"
+02000831="&Vybrané súbory"
+02000832="Vš&etky súbory"
+
+02000881="Špecifikujte adresár pre rozbalené súbory."
+
+02000890="Rozbaľovanie"
+
+; Overwrite dialog
+02000900="Potvrdenie nahradenia súboru"
+02000901="Cieľový adresár už obsahuje rozbaľovaný súbor."
+02000902="Chcete nahradiť existujúci súbor"
+02000903="týmto?"
+
+02000911="&Automaticky premenovať"
+
+02000982="{0} bajtov"
+02000983="upravených"
+
+; Messages dialog
+02000A00="Diagnostické správy"
+
+02000A80="Správa"
+
+02000A91="Nepodporovaná kompresná metóda pre '{0}'."
+02000A92="Dátová chyba v '{0}'. Súbor je porušený."
+02000A93="CRC zlyhalo v '{0}'. Súbor je porušený."
+02000A94="Dátová chyba v šifrovanom súbore '{0}'. Nesprávne heslo?"
+02000A95="CRC zlyhalo v šifrovanom súbore '{0}'. Nesprávne heslo?"
+
+; Password dialog
+02000B00="Zadajte heslo"
+02000B01="Zadajte heslo:"
+02000B02="Ukázať heslo"
+02000B03="Zopakujte heslo:"
+02000B10="Heslá nie sú zhodné!"
+02000B11="Používajte len písmená bez diakritiky, čísla a špeciálne znaky (!, #, $, ...)!"
+02000B12="Heslo je príliš dlhé!"
+
+; Progress dialog
+02000C00="Priebeh"
+02000C01="Uplynutý čas:"
+02000C02="Zostávajúci čas:"
+02000C03="Veľkosť:"
+02000C04="Rýchlosť:"
+02000C05="Spracované:"
+02000C06="Úroveň kompresie:"
+
+02000C10="&Pozadie"
+02000C11="P&opredie"
+02000C12="Po&zastaviť"
+02000C13="Po&kračovať"
+
+02000C20="Pozastavené"
+
+02000C30="Ste si istý, že chcete akciu zrušiť?"
+
+; Compress dialog
+02000D00="Pridať do archívu"
+02000D01="&Archív:"
+02000D02="&Nastavenie aktualizácie súborov v existujúcich archívoch:"
+02000D03="&Formát archívu:"
+02000D04="&Kompresná metóda:"
+02000D05="V&ytvoriť jednoliaty archív"
+02000D06="&Parametre:"
+02000D07="Možnosti"
+02000D08="Vytvoriť samorozbaľovací archív"
+02000D09="Multi-threading"
+02000D0A="Zašifrovať mená súborov"
+02000D0B="Ú&roveň kompresie:"
+02000D0C="&Veľkosť slovníka:"
+02000D0D="V&eľkosť slova:"
+02000D0E="Pamäť potrebná na kompresiu:"
+02000D0F="Pamäť potrebná na dekompresiu:"
+02000D10="Šifrovanie"
+02000D11="Metóda šifrovania:"
+02000D12="Poče&t CPU vlákien:"
+02000D13="Veľk&osť jednoliateho bloku:"
+02000D14="Nejednoliaty"
+02000D15="Jednoliaty"
+02000D16="Komprimovať zdieľané súbory"
+
+02000D40="Roz&deliť na časti, bajtov:"
+02000D41="Nesprávna veľkosť časti"
+02000D42="Vybraná veľkosť časti: {0} bytov.\nSte si istý, že chcete rozdeliť archív na také časti?"
+
+02000D81="Bez kompresie"
+02000D82="Normálna"
+02000D83="Maximálna"
+02000D84="Rýchla"
+02000D85="Najrýchlejšia"
+02000D86="Ultra"
+
+02000D90="Prechádzať"
+
+02000DA1="Pridať a nahradiť súbory"
+02000DA2="Aktualizovať a pridať súbory"
+02000DA3="Aktualizovať existujúce súbory"
+02000DA4="Synchronizovať súbory"
+
+02000DB1="Všetky súbory"
+
+02000DC0="Komprimovanie"
+
+; Columns dialog
+02000E00="Stĺpce"
+02000E01="Zaškrtnite stĺpce, ktoré by ste radi zviditeľnili v tomto adresári. Použite tlačítka Posunúť hore a Posunúť dole na usporiadanie stĺpcov."
+02000E02="Vybraný stĺpec by mal byť"
+02000E03="pixelov &široký."
+
+02000E10="Posunúť &hore"
+02000E11="Posunúť &dole"
+02000E12="&Ukázať"
+02000E13="&Skryť"
+02000E14="Nastaviť"
+
+02000E81="Titulok"
+02000E82="Šírka"
+
+; Testing
+02000F90="Výsledok testovania"
+
+
+; File Manager
+
+03000000="7-Zip File Manager"
+
+; Menu
+03000102="&Súbor"
+03000103="&Upraviť"
+03000104="&Zobraziť"
+03000105="&Nástroje"
+03000106="Ná&poveda"
+03000107="&Obľúbené"
+
+; File
+03000210="&Otvoriť"
+03000211="O&tvoriť vnútri"
+03000212="Ot&voriť externe"
+03000220="&Zobraziť"
+03000221="&Upraviť"
+03000230="&Premenovať"
+03000231="&Kopírovať do..."
+03000232="P&resunúť do..."
+03000233="O&dstrániť"
+03000240="V&lastnosti"
+03000241="Ko&mentár"
+03000242="Vypočítať kontrolný súčet"
+03000243="Rozdiel (Diff)"
+03000250="Vytvoriť adresár"
+03000251="Vytvoriť súbor"
+03000260="Uko&nčiť"
+03000270="Ro&zdeliť súbor..."
+03000271="Zlúč&iť súbory..."
+
+; Edit
+03000310="&Späť"
+03000311="&Znovu"
+03000320="&Vystrihnúť"
+03000321="&Kopírovať"
+03000322="V&ložiť"
+03000323="&Vymazať"
+03000330="Označiť všetko"
+03000331="Odznačiť všetko"
+03000332="Invertovať označenie"
+03000333="Označiť..."
+03000334="Odznačiť..."
+03000335="Označiť podľa typu"
+03000336="Odznačiť podľa typu"
+
+; View
+03000410="&Veľké ikony"
+03000411="&Malé ikony"
+03000412="&Zoznam"
+03000413="&Podrobnosti"
+03000420="Netriediť"
+03000430="Otvoriť koreňový adresár"
+03000431="O úroveň vyššie"
+03000432="História adresárov..."
+03000440="&Obnoviť"
+03000449="Plochý pohľad"
+03000450="&2 Panely"
+03000451="P&anely nástrojov"
+03000460="Archív"
+03000461="Štandard"
+03000462="Veľké ikony"
+03000463="Textový popis pod ikonami"
+
+; Tools
+03000510="N&astavenia"
+03000511="&Skúšobný test"
+
+; Help
+03000610="&Obsah nápovedy"
+03000620="O p&rograme 7-Zip"
+
+; Favorites
+03000710="Pridať adresár medzi Obľúbené ako"
+03000720="Záložka"
+
+; Options Dialog
+
+03010000="Nastavenia"
+
+; Plugins
+03010100="Zásuvné moduly"
+03010101="Zásuvné moduly:"
+03010110="Konfigurácia"
+
+; Edit
+03010200="Editor"
+03010201="Editor:"
+03010202="Vyhľadávač rozdielov (Diff):"
+
+; System
+03010300="Systém"
+03010302="Asociovať 7-Zip s vybranými typmi súborov:"
+03010310="Zásuvný modul"
+
+; Settings
+03010400="Nastavenia"
+03010401="Ukázať \"..\" položku"
+03010402="Ukázať skutočné ikony súborov"
+03010410="Ukázať systémové menu"
+03010420="Označiť celý riadok"
+03010421="Zobraziť čiary mriežky"
+03010422="Otvoriť položku jednoduchým kliknutím"
+03010430="Alternatívny mód výberu"
+03010440="Použitie veľkých stránok pamäti"
+
+; Strings
+
+03020201="Kopírovať"
+03020202="Presunúť"
+03020203="Kopírovať do:"
+03020204="Presunúť do:"
+03020205="Kopírovanie..."
+03020206="Presúvanie..."
+03020207="Nemôžete presunúť alebo kopírovať položky smerom do takých adresárov."
+03020208="Operácia nie je podporovaná."
+03020209="Vyberte cieľový adresár."
+
+03020210="Potvrdenie odstránenia súboru"
+03020211="Potvrdenie odstránenia adresára"
+03020212="Potvrdenie odstránenia viacerých položiek"
+03020213="Ste si istý, že chcete odstrániť súbor '{0}'?"
+03020214="Ste si istý, že chcete odstrániť adresár '{0}' a celý jeho obsah?"
+03020215="Ste si istý, že chcete odstrániť týchto {0} položiek?"
+03020216="Odstraňovanie..."
+03020217="Chyba pri odstraňovaní súboru alebo adresáru"
+03020218="Systém nemôže do koša presunúť súbor s dlhou cestou"
+
+03020220="Premenovanie..."
+03020221="Chyba pri premenovaní súboru alebo adresáru"
+03020222="Potvrdiť kopírovanie súboru/súborov"
+03020223="Ste si istý, že chcete kopírovať súbor/súbory do archívu?"
+
+03020230="Vytvoriť adresár"
+03020231="Meno adresáru:"
+03020232="Nový adresár"
+03020233="Chyba pri vytváraní adresáru"
+
+03020240="Vytvoriť súbor"
+03020241="Meno súboru:"
+03020242="Nový súbor"
+03020243="Chyba pri vytváraní súboru"
+
+03020250="Označiť"
+03020251="Odznačiť"
+03020252="Maska:"
+
+03020260="História adresárov"
+
+03020280="Súbor '{0}' bol zmenený.\nChcete ho aktualizovať v archíve?"
+03020281="Nemožno aktualizovať súbor\n'{0}'"
+03020282="Nemožno spustiť editor."
+03020283="Otváranie..."
+03020284="Súbor vyzerá ako vírus. (Meno súboru obsahuje veľa medzier.)"
+
+03020290="Komentár"
+03020291="&Komentár:"
+
+030202A0="Systém"
+
+03020300="Počítač"
+03020301="Sieť"
+03020302="Dokumenty"
+
+03020400="Pridať"
+03020401="Rozbaliť"
+03020402="Otestovať"
+
+03020420="Kopírovať"
+03020421="Presunúť"
+03020422="Odstrániť"
+03020423="Vlastnosti"
+
+03020500="Rozdeliť súbor"
+03020501="&Rozdeliť do:"
+03020510="Rozdeľovanie..."
+03020520="Potvrďte rozdeľovanie."
+03020521="Ste si istý, že chcete rozdeliť súbor na {0} častí?"
+03020522="Veľkosť časti musí byť menšia, než veľkosť pôvodného súboru."
+
+03020600="Zlúčiť súbory"
+03020601="&Zlúčiť do:"
+03020610="Zlučovanie..."
+03020620="Vyberte len prvý súbor."
+03020621="Nie je možné detekovať súbor ako časť rozdeleného súboru."
+03020622="Nie je možné nájsť viac ako jednu časť rozdeleného súboru."
+
+03020710="Výpočet CRC..."
+03020720="Informácie o CRC"
+03020721="CRC pre dáta:"
+03020722="CRC pre dáta a názvy:"
+
+03020800="Prehľadávanie..."
+
+03020900="Vlastnosti"
+
+03020A01="Operácia nemôže byť volaná z adresára, ktorý má dlhú cestu."
+03020A02="Musíte si vybrať jeden súbor."
+03020A03="Musíte si vybrať jeden alebo viac súborov."
+03020A04="Súbor {0} už existuje."
+
+; Computer
+03031100="Celková veľkosť"
+03031101="Voľné miesto"
+03031102="Veľkosť klastra"
+03031103="Menovka"
+
+; Network
+03031200="Lokálny názov"
+03031201="Prevádzkovateľ"
+
+; Benchmark Dialog
+
+03080000="Skúšobný test"
+03080001="Použitá pamäť:"
+03080002="Komprimovanie"
+03080003="Rozbaľovanie"
+03080004="Rýchlosť"
+03080005="Hodnotenie"
+03080006="Celkové hodnotenie"
+03080007="Aktuálne:"
+03080008="Výsledné:"
+03080009="Testov bez chýb:"
+0308000A="Chyby:"
+0308000B="Využitie CPU"
+0308000C="Hodn. / Využitie"
+
+;!@LangEnd@!

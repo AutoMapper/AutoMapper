@@ -1,0 +1,497 @@
+;!@Lang@!UTF-8!
+; 7-Zip 4.48 beta
+; Translated by Nguyễn Hồng Quân
+;
+;
+;
+;
+
+00000000="Vietnamese"
+00000001="Tiếng Việt"
+00000002="42"
+
+; 7-Zip Configuration
+
+; Title
+01000000="Cấu hình 7-Zip"
+
+; Info Page
+01000100="Giới thiệu 7-Zip"
+01000103="7-Zip là một phần mềm miễn phí. Tuy nhiên, bạn vui lòng ủng hộ nhóm phát triển 7-Zip bằng cách đăng ký."
+01000104="Ủng hộ"
+01000105="Đăng ký"
+
+; Folders Page
+01000200="Thư mục"
+01000210="&Thư mục làm việc"
+01000211="&Thư mục tạm của hệ thống"
+01000212="&Hiện hành"
+01000213="&Đặc biệt:"
+01000214="Chỉ sử dụng cho ổ đĩa tháo lắp"
+
+01000281="Chỉ định nơi chứa tập tin lưu tạm."
+
+; System Page
+01000300="Hệ thống"
+01000301="Tích hợp 7-Zip vào menu ngữ cảnh"
+01000302="Xếp tầng menu ngữ cảnh"
+01000310="Menu ngữ cảnh:"
+
+; Language Page
+01000400="Ngôn ngữ"
+01000401="Ngôn ngữ:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Các lệnh của 7-Zip"
+02000103="Mở tập tin đã nén"
+02000104="Mở tập tin đã nén."
+02000105="Giải nén tập tin..."
+02000106="Giải nén từ tập tin nén đã chọn."
+02000107="Thêm vào tập tin nén..."
+02000108="Thêm những tập tin đã chọn vào tập tin nén."
+02000109="Kiểm tra tập tin nén"
+0200010A="Kiểm tra tính toàn vẹn của tập tin đã nén."
+0200010B="Giải nén tại đây"
+0200010C="Giải nén vào thư mục hiện hành."
+0200010D="Giải nén vào {0}"
+0200010E="Giải nén vào thư mục con."
+0200010F="Thêm vào {0}"
+02000110="Thêm những tập tin đã chọn vào tập tin nén."
+02000111="Nén và gởi email..."
+02000112="Nén những tập tin đã chọn thành tập tin nén rồi gởi email."
+02000113="Nén thành {0} rồi gởi email"
+02000114="Nén những tập tin đã chọn vào tập tin nén rồi gởi email."
+
+02000140="<Thư mục>"
+02000141="<Tập tin nén>"
+
+; Properties
+02000203="Đường dẫn"
+02000204="Tên"
+02000205="Phần mở rộng"
+02000206="Thư mục"
+02000207="Trước khi nén"
+02000208="Sau khi nén"
+02000209="Thuộc tính"
+0200020A="Thời điểm tạo thành"
+0200020B="Thời điểm truy xuất"
+0200020C="Thời điểm sửa đổi"
+0200020D="Đặc"
+0200020E="Ghi chú"
+0200020F="Đã được mã hoá"
+02000210="Chia nhỏ trước"
+02000211="Chia nhỏ sau"
+02000212="Từ điển"
+02000213="CRC"
+02000214="Loại"
+02000215="Anti"
+02000216="Phương pháp"
+02000217="Host OS"
+02000218="Hệ thống tập tin"
+02000219="Người dùng"
+0200021A="Nhóm"
+0200021B="Đóng khối"
+0200021C="Chú thích"
+0200021D="Vị trí"
+0200021E="Đầu ngữ đường dẫn"
+
+; Status bar
+02000301="{0} đối tượng đã được chọn"
+02000302="{0} đối tượng"
+
+02000320="Tập tin:"
+02000321="Thư mục:"
+02000322="Kích cỡ:"
+
+; List Context Menu
+02000401="&Cột..."
+
+02000411="&Mở"
+02000412="&Giải nén..."
+
+; ToolBar
+02000501="Giải nén"
+
+; Messages
+02000601="Thao tác cập nhật không được hỗ trợ cho tập tin này."
+02000602="Không thể cập nhật tập tin {0}"
+02000603="Không thể tạo thư mục '{0}'"
+02000604="Dạng tập tin này không được hỗ trợ."
+02000605="Lỗi"
+02000606="Quá nhiều mục"
+02000607="Không có ứng dụng tương ứng với phần mở rộng của tập tin này"
+02000608="Không xuất hiện lỗi"
+02000609="Không thể mở '{0}' như là tập tin nén"
+0200060A="Không thể mở tập tin nén bị mã hóa '{0}'. Mật khẩu sai?"
+
+; Dialogs
+02000702="Đồng ý"
+02000705="&Có"
+02000707="Có &tất"
+02000709="&Không"
+0200070B="Khôn&g tất"
+
+02000710="Huỷ bỏ"
+02000711="&Huỷ bỏ"
+02000713="&Đóng"
+02000714="Dừng"
+02000715="Làm lại"
+
+02000720="Giúp đỡ"
+
+; Extract dialog
+02000800="Giải nén"
+02000801="&Giải nén vào:"
+02000802="Mật mã"
+
+02000810="Chế độ đường dẫn"
+02000811="Đường dẫn đầy đủ"
+02000812="Đường dẫn hiện thời"
+02000813="Không có đường dẫn"
+
+02000820="Chế độ ghi đè"
+02000821="Hỏi trước khi ghi đè"
+02000822="Ghi đè không cần hỏi"
+02000823="Bỏ qua tập tin đã có"
+02000824="Tự động đổi tên"
+02000825="Tự động đổi tên tập tin đã có"
+
+02000830="Tập tin"
+02000831="Tập tin đã &chọn"
+02000832="&Tất cả tập tin"
+
+02000881="Chọn nơi để giải nén tập tin."
+
+02000890="Đang giải nén"
+
+; Overwrite dialog
+02000900="Xác nhận thay thế tập tin"
+02000901="Thư mục đích đã có tập tin cần xử lý."
+02000902="Bạn có muốn thay thế tập tin đã có"
+02000903="bằng tập tin mới?"
+
+02000911="&Tự đổi tên"
+
+02000982="{0} bytes"
+02000983="chỉnh sửa ngày"
+
+; Messages dialog
+02000A00="Thông điệp chẩn đoán"
+
+02000A80="Thông điệp"
+
+02000A91="Phương pháp nén không được hỗ trợ cho '{0}'."
+02000A92="Lỗi về dữ liệu trong '{0}'. Tập tin đã bị hỏng."
+02000A93="Lỗi chẵn/lẻ (CRC) trong '{0}'. Tập tin đã bị hỏng."
+02000A94="Lỗi dữ liệu trong tập tin nén bị mã hóa '{0}'. Mật khẩu sai?"
+02000A95="CRC không thành trong tập tin nén bị mã hóa '{0}'. Mật khẩu sai?"
+
+; Password dialog
+02000B00="Nhập mật khẩu"
+02000B01="Nhập mật khẩu:"
+02000B02="&Hiển thị mật khẩu"
+02000B03="Nhập lại mật khẩu:"
+02000B10="Các mật khẩu không khớp nhau"
+02000B11="Chỉ dùng những chữ cái tiếng Anh, số và những kí tự đặc biệt (!, #, $, ...) cho mật khẩu"
+02000B12="Mật khẩu quá dài đi"
+
+; Progress dialog
+02000C00="Xử lý"
+02000C01="Thời gian đã qua:"
+02000C02="Thời gian còn lại:"
+02000C03="Kích thước:"
+02000C04="Tốc độ:"
+
+02000C10="&Chạy nền"
+02000C11="&Chạy ưu tiên"
+02000C12="&Dừng"
+02000C13="&Tiếp tục"
+
+02000C20="Đã dừng"
+
+02000C30="Bạn có muốn chấm dứt?"
+
+; Compress dialog
+02000D00="Thêm vào tập tin nén"
+02000D01="&Tập tin nén:"
+02000D02="&Chế độ cập nhật:"
+02000D03="&Dạng tập tin nén:"
+02000D04="&Phương thức nén:"
+02000D05="Chỉ tạo thành &một tập tin nén"
+02000D06="Tham &số:"
+02000D07="Tuỳ chọn"
+02000D08="Tạo tập tin &tự giải nén"
+02000D09="Đa luồng"
+02000D0A="Mã hoá &tên tập tin"
+02000D0B="&Cấp độ nén:"
+02000D0C="&Kích thước thư mục:"
+02000D0D="&Kích thước từ:"
+02000D0E="Bộ nhớ sử dụng cho việc nén:"
+02000D0F="Bộ nhớ sử dụng cho việc giải nén:"
+02000D10="Mã hóa"
+02000D11="Phương pháp mã hóa:"
+02000D12="Số luồng xử lý CPU:"
+02000D13="Kích cỡ khối đặc:"
+02000D14="Không đặc"
+02000D15="Đặc"
+02000D16="Nén những tập tin chia sẻ"
+
+02000D40="Chia thành &nhiều phần, bytes:"
+02000D41="Kích cỡ phần chia chưa đúng"
+02000D42="Kích cỡ phần chia đã định là: {0} bytes.\nĐúng là bạn muốn chia nhỏ tập tin nén thành những phần như thế?"
+
+02000D81="Lưu trữ"
+02000D82="Thường"
+02000D83="Tối đa"
+02000D84="Nhanh"
+02000D85="Nhanh nhất"
+02000D86="Siêu nhanh"
+
+02000D90="Tìm chọn"
+
+02000DA1="Thêm và thay thế tập tin"
+02000DA2="Cập nhật và thêm tập tin"
+02000DA3="Cập nhật tập tin đã có"
+02000DA4="Đồng bộ tập tin"
+
+02000DB1="Tất cả tập tin"
+
+02000DC0="Đang nén, chờ tí"
+
+; Columns dialog
+02000E00="Cột"
+02000E01="Đánh dấu chọn các cột mà bạn muốn xuất hiện trong thư mục này. Dùng các nút LÊN/XUỐNG để thay đổi thứ tự các cột."
+02000E02="Cột đã chọn nên có"
+02000E03="độ &rộng theo điểm ảnh."
+
+02000E10="Chuyển &Lên"
+02000E11="Chuyển &Xuống"
+02000E12="&Hiển thị"
+02000E13="&Ẩn"
+02000E14="Đặt"
+
+02000E81="Tiêu đề"
+02000E82="Độ rộng"
+
+; Testing
+02000F90="Kiểm tra"
+
+
+; File Manager
+
+03000000="Chương trình quản lý tập tin 7-Zip"
+
+; Menu
+03000102="&Tập tin"
+03000103="&Biên tập"
+03000104="&Xem"
+03000105="&Công cụ"
+03000106="&Giúp đỡ"
+03000107="Ư&a thích"
+
+; File
+03000210="&Mở"
+03000211="Mở &tại đây"
+03000212="Mở trong cửa sổ &khác"
+03000220="&Xem"
+03000221="&Biên tập"
+03000230="Đổ&i tên"
+03000231="&Sao chép đến..."
+03000232="&Di chuyển đến..."
+03000233="&Xoá"
+03000240="Th&uộc tính"
+03000241="C&hú thích"
+03000242="Tính checksum"
+03000250="Tạo thư mục"
+03000251="Tạo tập tin"
+03000260="Th&oát"
+03000270="&Cắt tập tin..."
+03000271="&Nối tập tin..."
+
+; Edit
+03000310="Như &cũ"
+03000311="Làm &lại"
+03000320="&Cắt"
+03000321="&Sao chép"
+03000322="&Dán"
+03000323="&Xoá"
+03000330="Chọn &tất cả"
+03000331="Bỏ chọn tất cả"
+03000332="Chọn &ngược lại"
+03000333="Chọn..."
+03000334="Bỏ chọn..."
+03000335="Chọn theo loại"
+03000336="Bỏ chọn theo loại"
+
+; View
+03000410="Biểu tượng &lớn"
+03000411="Biểu tượng &nhỏ"
+03000412="&Danh sách"
+03000413="&Chi tiết"
+03000420="Không sắp xếp"
+03000430="Mở thư mục gốc"
+03000431="Lên một cấp"
+03000432="Lịch sử thư mục..."
+03000440="&Rà soát lại"
+03000450="&2 bảng"
+03000449="Xem dàn trải"
+03000451="&Thanh công cụ"
+03000460="Thanh công cụ nén"
+03000461="Thanh công cụ chuẩn"
+03000462="Sử dụng nút lớn"
+03000463="Hiển thị chữ trên nút"
+
+; Tools
+03000510="&Tuỳ chọn..."
+03000511="Đo tốc độ"
+
+; Help
+03000610="&Nội dung..."
+03000620="&Giới thiệu 7-Zip..."
+
+; Favorites
+03000710="&Thêm thư mục vào 'Ưa thích' như là"
+03000720="Đánh dấu"
+
+; Options Dialog
+
+03010000="Các tùy chọn"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="Tuỳ chọn..."
+
+; Edit
+03010200="Biên tập"
+03010201="&Biên tập:"
+
+; System
+03010300="Hệ thống"
+03010302="Liên kết 7-Zip với:"
+03010310="Plugin"
+
+; Settings
+03010400="Sắp đặt"
+03010401="Hiển thị \"..\""
+03010402="Hiển thị biểu tượng thực của tập tin"
+03010410="Hiển thị menu hệ thống"
+03010420="Chọn cả &dòng"
+03010421="Hiển thị &lưới"
+03010430="Chế độ chọn luân &phiên"
+03010440="Sử dụng bộ &nhớ lớn"
+
+; Strings
+
+03020201="Sao chép"
+03020202="Di chuyển"
+03020203="Sao chép đến:"
+03020204="Di chuyển đến:"
+03020205="Đang sao chép..."
+03020206="Đang di chuyển..."
+03020207="Bạn không thể di chuyển hoặc sao chép vào thư mục đó."
+03020208="Thao tác không được hỗ trợ."
+03020209="Chọn thư mục đến."
+
+03020210="Xác nhận xoá tập tin"
+03020211="Xác nhận xoá thư mục"
+03020212="Xác nhận xoá nhiều tập tin"
+03020213="Bạn có chắc là bạn có muốn xoá '{0}'?"
+03020214="Bạn có chắc là bạn muốn xoá thư mục '{0}' và tất cả tập tin trong nó?"
+03020215="Bạn có chắc là bạn muốn xoá {0} ?"
+03020216="Đang xoá..."
+03020217="Lỗi khi đang xoá tập tin hoặc thư mục"
+
+03020220="Đang đổi tên..."
+03020221="Lỗi khi đổi tên tập tin hoặc thư mục"
+03020222="Xác nhận sao chép tập tin"
+03020223="Bạn chắc chắn muốn sao chép vào tập tin nén chứ"
+
+03020230="Tạo thư mục"
+03020231="Tên thư mục:"
+03020232="Thư mục mới"
+03020233="Lỗi khi tạo thư mục"
+
+03020240="Tạo tập tin"
+03020241="Tên tập tin:"
+03020242="Tập tin mới"
+03020243="Lỗi khi tạo tập tin"
+
+03020250="Chọn"
+03020251="Bỏ chọn"
+03020252="Mặt nạ:"
+
+03020260="Lịch sử thư mục"
+
+03020280="Tập tin '{0}' đã bị thay đổi.\nBạn có muốn cập nhật vào tập tin nén?"
+03020281="Không thể cập nhật tập tin\n'{0}'"
+03020282="Không thể khởi động trình biên tập."
+03020283="Đang mở..."
+
+03020290="Chú thích"
+03020291="&Chú thích:"
+
+030202A0="Hệ thống"
+
+03020300="Máy tính"
+03020301="Mạng"
+
+03020400="Thêm"
+03020401="Giải nén"
+03020402="Kiểm tra"
+
+03020420="Sao chép"
+03020421="Di chuyển"
+03020422="Xoá"
+03020423="Thông tin"
+
+03020500="Chia nhỏ tập tin"
+03020501="&Chia nhỏ thành:"
+03020510="Đang chia nhỏ..."
+03020520="Xác nhận việc chia nhỏ"
+03020521="Bạn có chắc là muốn chia nhỏ tập tin nén thành {0} phần?"
+03020522="Kích cỡ phần chia phải nhỏ hơn tập tin gốc à nha!"
+
+03020600="Nối tập tin"
+03020601="&Nối thành:"
+03020610="Đang nối..."
+03020620="Chỉ chọn tập tin đầu thôi"
+
+03020710="Đang tính checksum..."
+03020720="Thông tin checksum"
+03020721="CRC checksum cho dữ liệu:"
+03020722="CRC checksum cho dữ liệu và tên:"
+
+03020800="Đang quét..."
+
+; Computer
+03031100="Tổng kích thước"
+03031101="Kích thước trống"
+03031102="Kích thước cluster"
+03031103="Nhãn"
+
+; Network
+03031200="Tên cục bộ"
+03031201="Nhà cung cấp"
+
+; Benchmark Dialog
+
+03080000="Đo tốc độ"
+03080001="Bộ nhớ sử dụng:"
+03080002="Nén"
+03080003="Giải nén"
+03080004="Tốc độ"
+03080005="Đánh giá"
+03080006="Tổng đánh giá"
+03080007="Hiện thời"
+03080008="Kết quả"
+03080009="Đã qua:"
+0308000A="Lỗi:"
+0308000B="Mức dùng CPU"
+0308000C="Tốc độ / Mức dùng"
+
+;!@LangEnd@!

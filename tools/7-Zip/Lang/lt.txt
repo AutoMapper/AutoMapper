@@ -1,0 +1,512 @@
+;!@Lang@!UTF-8!
+; 7-Zip 4.57
+; Translated by Marius Navickas <http://www.teisininkas.lt/ivairus/7-zip> edited by Domas Jokubauskis
+;
+;
+;
+;
+
+00000000="Lithuanian"
+00000001="Lietuvių"
+00000002="39"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip nustatymai"
+
+; Info Page
+01000100="Apie 7-Zip"
+01000103="7-Zip yra nemokama programa. Vis dėlto, jeigu jums patinka 7-Zip ir jūs norėtumėte paremti jos tolesnį vystymą, prašome pinigais paremti 7-Zip projektą."
+01000104="Techninis palaikymas"
+01000105="Paremti"
+
+; Folders Page
+01000200="Aplankai"
+01000210="&Darbinis aplankas"
+01000211="&Sisteminis laikinas aplankas"
+01000212="D&abartinis"
+01000213="Nurodyta&s:"
+01000214="Naudoti tik išimamiems diskams"
+
+01000281="Nurodyti vietą laikinoms archyvinėms byloms."
+
+; System Page
+01000300="Sistema"
+01000301="Integruoti 7-Zip į kontekstinį meniu "
+01000302="Pakopinis kontekstinis meniu"
+01000310="Kontekstinio meniu įrašai:"
+
+; Language Page
+01000400="Kalba"
+01000401="Kalba:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip komandos"
+02000103="Atverti archyvą"
+02000104="Atveria pasirinktą archyvą."
+02000105="Išskleisti failus..."
+02000106="Išskleidžia failus iš pasirinkto archyvo."
+02000107="Įtraukti į archyvą..."
+02000108="Įtraukia pasirinktus elementus į archyvą."
+02000109="Patikrinti archyvą"
+0200010A="Patikrina pasirinkto archyvo vientisumą."
+0200010B="Išskleisti čia"
+0200010C="Išskleidžia pasirinkto archyvo failus šiame aplanke."
+0200010D="Išskleisti į {0}"
+0200010E="Išskleidžia failus į paaplankį."
+0200010F="Įtraukti į {0}"
+02000110="Įtraukia pasirinktus elementus į archyvą."
+02000111="Suglaudinti ir išsiųsti el. paštu..."
+02000112="Suglaudina pasirinktus failus į archyvą ir išsiunčia jį el. paštu."
+02000113="Suglaudinti į {0} ir išsiųsti el. paštu"
+02000114="Suglaudina pasirinktus failus į archyvą ir išsiunčia jį el. paštu."
+
+02000140="<Aplankas>"
+02000141="<Archyvas>"
+
+; Properties
+02000203="Kelias"
+02000204="Pavadinimas"
+02000205="Plėtinys"
+02000206="Aplankas"
+02000207="Dydis"
+02000208="Dydis archyve"
+02000209="Atributai"
+0200020A="Sukurta"
+0200020B="Naudota"
+0200020C="Pakeista"
+0200020D="Vientisas"
+0200020E="Komentaras"
+0200020F="Šifruotas"
+02000210="Perskyra prieš"
+02000211="Perskyra paskui"
+02000212="Žodynas"
+02000213="CRC"
+02000214="Tipas"
+02000215="Anti"
+02000216="Būdas"
+02000217="Kompiuterio OS"
+02000218="Bylų sistema"
+02000219="Vartotojas"
+0200021A="Grupė"
+0200021B="Blokas"
+0200021C="Komentaras"
+0200021D="Pozicija"
+0200021E="Aplankas"
+0200021F="Aplankai"
+02000220="Vylos"
+02000221="Versija"
+02000222="Dalis"
+02000223="!!Multivolume"
+02000224="!!Offset"
+02000225="Nuorodos"
+02000226="Blokai"
+02000227="Dalys"
+
+; Status bar
+02000301="Pasirinkta {0} objektų: "
+02000302="{0} objektų"
+
+02000320="Failai:"
+02000321="Aplankai:"
+02000322="Dydis:"
+02000323="Dydis suglaudinus:"
+02000324="Archyvai:"
+
+; List Context Menu
+02000401="&Stulpelių..."
+
+02000411="&Atverti"
+02000412="&Išskleisti..."
+
+; ToolBar
+02000501="Išskleisti"
+
+; Messages
+02000601="Šio archyvo negalima atnaujinti."
+02000602="Negalima atnaujinti archyvo „{0}“"
+02000603="Negalima sukurti aplanko „{0}“"
+02000604="Failas nėra palaikomas archyvas."
+02000605="Klaida"
+02000606="Per daug elementų"
+02000607="Nėra programų, kurios būtų susietos su pateikto failo plėtiniu"
+02000608="Klaidų nerasta"
+02000609="Negalima atverti „{0}“ failo kaip archyvo"
+0200060A="Negalima atverti šifruoto archyvo „{0}“. Neteisingas slaptažodis?"
+
+; Dialogs
+02000702="Gerai"
+02000705="&Taip"
+02000707="T&aip Visiems"
+02000709="&Ne"
+0200070B="Ne v&isiems"
+
+02000710="Atšaukti"
+02000711="&Atšaukti"
+02000713="&Uždaryti"
+02000714="Sustabdyti"
+02000715="Iš naujo"
+
+02000720="Elektroninis žinynas"
+
+; Extract dialog
+02000800="Išskleisti"
+02000801="Iš&skleisti į:"
+02000802="Slaptažodis"
+
+02000810="Kelio režimas"
+02000811="Pilni keliai"
+02000812="Dabartiniai keliai"
+02000813="Jokių kelių"
+
+02000820="Perrašymo režimas"
+02000821="Paklausti prieš perrašant"
+02000822="Perrašyti neįspėjant"
+02000823="Praleisti esančius failus"
+02000824="Automatiškai pervadinti"
+02000825="Automatiškai pervadinti esančius failus"
+
+02000830="Failai"
+02000831="Pa&sirinktus failus"
+02000832="Visus f&ailus"
+
+02000881="Nurodyti vietą išskleidžiamiesiems failams."
+
+02000890="Išskleidžiama"
+
+; Overwrite dialog
+02000900="Failų pakeitimo patvirtinimas"
+02000901="Paskirtame aplanke jau yra apdorojamas failas."
+02000902="Ar norėtumėte pakeisti esančią failą"
+02000903="šia failu?"
+
+02000911="A&utomatinis pervadinimas"
+
+02000982="{0} baitų"
+02000983="pakeista"
+
+; Messages dialog
+02000A00="Diagnostiniai pranešimai"
+
+02000A80="Pranešimas"
+
+02000A91="Nepalaikomas suglaudinimo metodas failui „{0}“."
+02000A92="Duomenų klaida „{0}“. Failas pažeistas."
+02000A93="CRC klaida „{0}“. Failas pažeistas."
+02000A94="Duomenų klaida šifruotame faile „{0}“. Neteisingas slaptažodis?"
+02000A95="CRC neatitikimas šifruotame faile „{0}“. Neteisingas slaptažodis?"
+
+; Password dialog
+02000B00="Slaptažodžio įvedimas"
+02000B01="Įveskite slaptažodį:"
+02000B02="&Rodyti slaptažodį"
+02000B03="Pakartokite slaptažodį:"
+02000B10="Slaptažodžiai nesutampa"
+02000B11="Slaptažodžiui naudokite tik lotyniškas raides, numerius bei specialiuosius simbolius (!, #, $, ...)"
+02000B12="Slaptažodis yra per ilgas"
+
+; Progress dialog
+02000C00="Vykdymas"
+02000C01="Praėjęs laikas:"
+02000C02="Likęs laikas:"
+02000C03="Dydis:"
+02000C04="Sparta:"
+02000C05="Apdorota:"
+02000C06="Suglaudinimo laipsnis:"
+
+02000C10="&Fone"
+02000C11="&Pirminis procesas"
+02000C12="&Laikinai sustabdyti"
+02000C13="&Tęsti"
+
+02000C20="Laikinai sustabdyta"
+
+02000C30="Ar jūs esate tikri, kad norite atšaukti?"
+
+; Compress dialog
+02000D00="Įtraukti į archyvą"
+02000D01="&Archyvas:"
+02000D02="Atna&ujinimo režimas:"
+02000D03="Archyvo &formatas:"
+02000D04="Glaudini&mo būdas:"
+02000D05="Sukurti &vientisą archyvą"
+02000D06="&Parametrai:"
+02000D07="Nustatymai"
+02000D08="Iš&sipakuojantis archyvas"
+02000D09="Daugiagijiškumas"
+02000D0A="Už&šifruoti failų pavadinimus"
+02000D0B="Suglaudinimo &lygis:"
+02000D0C="Žo&dyno dydis:"
+02000D0D="Ž&odžio dydis:"
+02000D0E="Atmintinės naudojimas suglaudinimui:"
+02000D0F="Atmintinės naudojimas išskleidimui:"
+02000D10="Šifravimas"
+02000D11="Šifravimo metodas:"
+02000D12="CPU gijų skaičius:"
+02000D13="Vientiso bloko dydis:"
+02000D14="Ne vientisas"
+02000D15="Vientisas archyvas"
+02000D16="Glaudinti dalijamus failus"
+
+02000D40="Skaidyti į dalis bai&tais:"
+02000D41="Neteisingas dalies dydis"
+02000D42="Nurodytas dalies dydis: {0} baitai.\nAr jūs esate įsitikinę, jog norite archyvą skaidyti į tokias dalis?"
+
+02000D81="Mažiausias"
+02000D82="Normalus"
+02000D83="Didžiausias"
+02000D84="Greitas"
+02000D85="Greitesnis"
+02000D86="Smarkiausias"
+
+02000D90="Naršyti"
+
+02000DA1="Įtraukti ir pakeisti failus"
+02000DA2="Atnaujinti ir įtraukti failus"
+02000DA3="Atnaujinti esančius failus"
+02000DA4="Sinchronizuoti failus"
+
+02000DB1="Visus failus"
+
+02000DC0="Glaudinama"
+
+; Columns dialog
+02000E00="Stulpeliai"
+02000E01="Pasirinkite stulpelius, kuriuos norėtumėte matyti aplanke. Naudokite mygtukus Aukštyn ir Žemyn keisdami stulpelių tvarką."
+02000E02="Pasirinktas stulpelis turėtų būti"
+02000E03="taškų &pločio."
+
+02000E10="&Aukštyn"
+02000E11="Žemyn(&Z)"
+02000E12="&Rodyti"
+02000E13="&Slėpti"
+02000E14="Nustatyti"
+
+02000E81="Antraštė"
+02000E82="Plotis"
+
+; Testing
+02000F90="tikrinama"
+
+
+; File Manager
+
+03000000="7-Zip failų tvarkyklė"
+
+; Menu
+03000102="&Failas"
+03000103="K&eisti"
+03000104="&Rodyti"
+03000105="Įran&kiai"
+03000106="&Elektroninis žinynas"
+03000107="Mėgi&amiausi"
+
+; Failas
+03000210="&Atverti"
+03000211="Atverti v&iduje"
+03000212="Atverti iš&orėje"
+03000220="&Rodyti"
+03000221="K&eisti"
+03000230="Pervadi&nti"
+03000231="&Kopijuoti į..."
+03000232="&Perkelti į..."
+03000233="Šalin&ti"
+03000240="Savy&bės"
+03000241="Kome&ntuoti"
+03000242="Skaičiuoti kontrolinę sumą"
+03000250="Sukurti aplanką"
+03000251="Sukurti failą"
+03000260="Išei&ti"
+03000270="&Skaidyti failą..."
+03000271="Jungti &failus..."
+
+; Edit
+03000310="Atša&ukti"
+03000311="Paka&rtoti"
+03000320="Iškirp&ti"
+03000321="&Kopijuoti"
+03000322="Į&dėti"
+03000323="Išt&rinti"
+03000330="Pažymėti &viską"
+03000331="Nužymėti viską"
+03000332="Atv&irkštinis žymėjimas"
+03000333="Pasirikti..."
+03000334="Atžymėti..."
+03000335="Pasirinkti pagal tipą"
+03000336="Atžymėti pagal tipą"
+
+; View
+03000410="Did&elės piktogramos"
+03000411="&Mažos piktogramos"
+03000412="&Sąrašas"
+03000413="&Išsamiai"
+03000420="Nerūšiuotos"
+03000430="Atverti pagrindinį aplanką"
+03000431="Lygiu aukščiau"
+03000432="Aplankų istorija..."
+03000440="&Atnaujinti"
+03000449="Nepaisyti aplankų"
+03000450="&2 skydeliai"
+03000451="&Parankinės"
+03000460="Archyvo parankinė"
+03000461="Standartinė parankinė"
+03000462="Dideli mygtukai"
+03000463="Rodyti mygtukų tekstą"
+
+; Tools
+03000510="&Nuostatos..."
+03000511="&Spartos bandymas"
+
+; Help
+03000610="&Turinys..."
+03000620="&Apie 7-Zip..."
+
+; Favorites
+03000710="&Pridėti katalogą prie mėgiamiausiųjų kaip"
+03000720="Mėgiamiausias"
+
+; Options Dialog
+
+03010000="Nustatymai"
+
+; Plugins
+03010100="Įskiepiai"
+03010101="Įskie&piai:"
+03010110="Nuostatos..."
+
+; Edit
+03010200="Redaktorius"
+03010201="R&edaktorius:"
+
+; System
+03010300="Sistema"
+03010302="Susieti 7-Zip su:"
+03010310="Įskiepis"
+
+; Settings
+03010400="Nustatos"
+03010401="Rodyti „..“ failų sąraše"
+03010402="Rodyti tikras failų piktogramas"
+03010410="Rodyti sisteminį meniu"
+03010420="&Žymėti visą eilutę"
+03010421="Rodyti tinklelio linija&s"
+03010430="&Kitoks žymėjimo būdas"
+03010440="Naudoti didžiu&lius atmintinės puslapius"
+
+; Strings
+
+03020201="Kopijuoti"
+03020202="Perkelti"
+03020203="Kopijuoti į:"
+03020204="Perkelti į:"
+03020205="kopijuojama..."
+03020206="perkeliama..."
+03020207="Jūs negalite perkelti arba kopijuoti elementų šiuose aplankuose."
+03020208="Veiksmas nepalaikomas."
+03020209="Pasirinkite paskirties aplanką."
+
+03020210="Patvirtinkite failo šalinimą"
+03020211="Patvirtinkite aplanko šalinimą"
+03020212="Patvirtinkite kelių failų šalinimą"
+03020213="Ar esate įsitikinę, jog norite pašalinti „{0}“?"
+03020214="Ar esate įsitikinę, jog norite pašalinti „{0}“ aplanką ir visą jo turinį?"
+03020215="Ar esate įsitikinę, jog norite pašalinti šiuos {0} elementus?"
+03020216="šalinama..."
+03020217="Klaida trinant failą ar aplanką"
+
+03020220="pervadinama..."
+03020221="Klaida pervadinant failą ar aplanką"
+03020222="Failų kopijavimo patvirtinimas"
+03020223="Ar jūs esate įsitikinę, jog norite kopijuoti failus į archyvą?"
+
+03020230="Sukurti aplanką"
+03020231="Aplanko pavadinimas:"
+03020232="Naujas aplankas"
+03020233="Klaida kuriant aplanką"
+
+03020240="Sukurti failą"
+03020241="Failo pavadinimas:"
+03020242="Naujas failas"
+03020243="Klaida kuriant failą"
+
+03020250="Pasirinkti"
+03020251="Nesirinkti"
+03020252="Šablonas:"
+
+03020260="Aplankų istorija"
+
+03020280="Failas „{0}“ buvo pakeistas.\nAr norite ją atnaujinti archyve?"
+03020281="Negalima atnaujinti failo\n„{0}“"
+03020282="Negalima paleisti redaktoriaus."
+03020283="Atidaroma..."
+
+03020290="Komentaras"
+03020291="&Komentaras:"
+
+030202A0="Sistema"
+
+03020300="Kompiuteris"
+03020301="Tinklas"
+
+03020400="Glaudinti"
+03020401="Išskleisti"
+03020402="Bandyti"
+
+03020420="Kopijuoti"
+03020421="Perkelti"
+03020422="Šalinti"
+03020423="Informacija"
+
+03020500="Skaidyti failą"
+03020501="&Skaidyti į:"
+03020510="skaidoma..."
+03020520="Skaidymo patvirtinimas"
+03020521="Ar jūs esate įsitikinę, jog norite failą skaidyti į {0} dalis?"
+03020522="Dalies dydis privalo būti mažesnis už dalijamo failo dydį"
+
+03020600="Sujungti failus"
+03020601="&Sujungti į:"
+03020610="sujungiami failai..."
+03020620="Pažymėkite tik pirmą failą"
+
+03020710="kontrolinės sumos skaičiavimas..."
+03020720="Kontrolinės sumos informacija"
+03020721="Duomenų CRC kontrolinė suma:"
+03020722="Duomenų ir failų pavadinimų CRC kontrolinė suma:"
+
+03020800="skenuojama..."
+
+03020900="Nuostatos"
+
+; Computer
+03031100="Visas dydis"
+03031101="Laisva vieta"
+03031102="Blokinio dydis"
+03031103="Pavadinimas"
+
+; Network
+03031200="Vietinis pavadinimas"
+03031201="Tiekėjas"
+
+; Benchmark Dialog
+
+03080000="Spartos bandymas"
+03080001="Atmintinės naudojimas:"
+03080002="Suglaudinama"
+03080003="Išskleidžiama"
+03080004="Sparta"
+03080005="Vertinimas"
+03080006="Galutinis vertinimas"
+03080007="Dabartinis"
+03080008="Vidutinis"
+03080009="Kartai:"
+0308000A="Klaidos:"
+0308000B="CPU naudojimas"
+0308000C="Reitingas / naudojimas"
+
+;!@LangEnd@!

@@ -1,0 +1,514 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.53
+; Translated by Berend Ytsma
+;
+;
+;
+
+00000000="Frisian"
+00000001="Frysk"
+00000002="98"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Konfiguraasje"
+
+; Info Page
+01000100="7-Zip it hoe en het"
+01000103="7-Zip is fergees. Mar, jo kinne de ûntwikkeling stypje troch jo te registrearjen."
+01000104="Stipe"
+01000105="Registrearje"
+
+; Folders Page
+01000200="Mappen"
+01000210="&Wurkmap"
+01000211="&Tydlikesysteemmap"
+01000212="&Aktive"
+01000213="&Oantsjutte:"
+01000214="Allinnich brûke foar útnimbere skiven"
+
+01000281="ynfiere fan de lokaasje foar tydlike argyftriemmen."
+
+; System Page
+01000300="Systeem"
+01000301="Yntegraasje fan 7-Zip yn ferbânmenu"
+01000302="Ferbânmenu yn trepfoarm"
+01000310="Ferbânmenu-items:"
+
+; Language Page
+01000400="Taal"
+01000401="Taal:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip kommando"
+02000103="Argyf iepenje"
+02000104="Iepenet it selektearre argyf."
+02000105="Triemmen útpakke..."
+02000106="Triemmen út it selektearre argyf útpakke."
+02000107="Oan argyf taheakje..."
+02000108="De selektearre items wurde oan argyf taheakke."
+02000109="Argyf teste"
+0200010A="Besjocht de yntegriteit fan it selektearre argyf."
+0200010B="Hjir útpakke"
+0200010C="Triemmen út it selektearre argyf yn de aktive map útpakke."
+0200010D="Utpakke yn {0}"
+0200010E="Utpakke fan triemmen yn ûndermap."
+0200010F="Oan {0} taheakje"
+02000110="Foeget de selektearre items ta oan argyf."
+02000111="komprimearje en ferstjoere..."
+02000112="Komprimearret de selektearre items nei argyf en stjoerd argyf fuort mei e-post."
+02000113="Komprimearje nei {0} en poste"
+02000114="komprimearret de selektearre items nei argyf en stjoerd argyf fuort mei e-post."
+
+02000140="<Map>"
+02000141="<Argyf>"
+
+; Properties
+02000203="Paad"
+02000204="Namme"
+02000205="Taheaksel"
+02000206="Map"
+02000207="Grutte"
+02000208="Ynpakte grutte"
+02000209="Skaaimerk"
+0200020A="Makke"
+0200020B="Lêste tagong"
+0200020C="Feroare"
+0200020D="Kompakt"
+0200020E="Kommentaar"
+0200020F="Fersifere"
+02000210="Spjalt foar"
+02000211="Spjalt efter"
+02000212="Wurdboek"
+02000213="CRC"
+02000214="Type"
+02000215="Anty"
+02000216="Metoade"
+02000217="Host OS"
+02000218="Triemsysteem"
+02000219="Brûker"
+0200021A="Keppel"
+0200021B="Blok"
+0200021C="Kommentaar"
+0200021D="Posysje"
+0200021E="Paad foarheaksel"
+0200021F="Mappen"
+02000220="Triemmen"
+02000221="Ferzje"
+02000222="Folume"
+02000223="Multifolume"
+02000224="Offset"
+02000225="Links"
+02000226="Blokken"
+02000227="Folumes"
+
+; Status bar
+02000301="{0} objekt(en) selektearre"
+02000302="{0} objekt(en)"
+
+02000320="Triemmen:"
+02000321="Mappen:"
+02000322="Grutte:"
+02000323="Komprimearregrutte:"
+02000324="Argiven:"
+
+; List Context Menu
+02000401="&Kolommen..."
+
+02000411="&Iepenje"
+02000412="&Utpakke..."
+
+; ToolBar
+02000501="Utpakke"
+
+; Messages
+02000601="Bywurk operaasje waard net stipe troch dit argyf."
+02000602="Kin argyf {0} net bywurkje"
+02000603="Kin map '{0}' net meitsje "
+02000604="Triem is in net stipe argyf."
+02000605="Flater"
+02000606="Tefolle items"
+02000607="Der is gjin applikaasje ferbûn oan dit triem taheaksel"
+02000608="Der binne gjin flaters"
+02000609="Kin triem '{0} net as argyf iepenje"
+0200060A="Kin fersifere argyf '{0}' net iepenje. Ferkeard wachtwurd?"
+
+; Dialogs
+02000702="Okee"
+02000705="&Jawis"
+02000707="Jawis foar &Alles"
+02000709="&Nee"
+0200070B="Nee foar A&lles"
+
+02000710="Ofbrekke"
+02000711="&Ofbrekke"
+02000713="&Slute"
+02000714="Stopje"
+02000715="Opnij begjinne"
+
+02000720="Help"
+
+; Extract dialog
+02000800="Utpakke"
+02000801="U&tpakke nei:"
+02000802="Wachtwurd"
+
+02000810="Paad modus"
+02000811="Folsleine paadnammen"
+02000812="Aktive paadnammen"
+02000813="Gjin paadnammen"
+
+02000820="Oerskriuw modus"
+02000821="Freegje foardat jo oerskriuwe"
+02000822="Oerskriuwe sûnder pront"
+02000823="Besteande triemmen oerslaan"
+02000824="Automatysk omneame"
+02000825="Automatysk ek by besteande triemmen"
+
+02000830="Triemmen"
+02000831="&Selektearre triemmen"
+02000832="&Alle triemmen"
+
+02000881="De lokaasje om nei út te pakken oantsjutte."
+
+02000890="Utpakke"
+
+; Overwrite dialog
+02000900="It ferfangen fan de triem befêstigje"
+02000901="Bestimmingsmap befettet al in triem mei dizze namme."
+02000902="Wolle jo de triem ferfange"
+02000903="Mei dizze?"
+
+02000911="A&utomatysk omneame"
+
+02000982="{0} bytes"
+02000983="Feroare op"
+
+; Messages dialog
+02000A00="Diagnostyk berjocht"
+
+02000A80="Berjocht"
+
+02000A91="Net stipe kompresjemetoade foar '{0}'."
+02000A92="Data flater yn '{0}'. Triem is beskeadige."
+02000A93="CRC mislearre yn '{0}'. Triem is beskeadige."
+02000A94="Data flater yn fersifere triem '{0}'. Ferkeard wachtwurd?"
+02000A95="CRC mislearre yn fersifere triem '{0}'. Ferkeard wachtwurd?"
+
+; Password dialog
+02000B00="Wachtwurd ynfiere"
+02000B01="Wachtwurd ynfiere:"
+02000B02="Wachtwurd &sjen litte"
+02000B03="Wachwurd opnij ynfiere:"
+02000B10="Wachtwurden komme net oerien"
+02000B11="Brûk allinne ingelske letters, nûmers en spesjale karakters (!, #, $, ...) foar it wachtwurd"
+02000B12="Wachtwurd is te lang"
+
+; Progress dialog
+02000C00="Proses"
+02000C01="Ferstrutsen tiid:"
+02000C02="Tiid noch te gean:"
+02000C03="Totale grutte:"
+02000C04="Fluggens:"
+02000C05="Ferwurke:"
+02000C06="Kompresje nivo:"
+
+02000C10="&Eftergrûn"
+02000C11="&Foargrûn"
+02000C12="&Skoftsje"
+02000C13="&Ferfetsje"
+
+02000C20="Skoft"
+
+02000C30="Binne jo wis dat jo ôfbrekke wolle?"
+
+; Compress dialog
+02000D00="Oan argyf taheakje"
+02000D01="&Argyf:"
+02000D02="&Bywurkmodus:"
+02000D03="Argyf &formaat:"
+02000D04="Kompresje&metoade:"
+02000D05="&Kompakt argyf meitsje"
+02000D06="&Parameters:"
+02000D07="Opsjes"
+02000D08="Meitsje SF&X-argyf"
+02000D09="Meardere streamen"
+02000D0A="Fersiferje triem&nammen"
+02000D0B="Kompresje&nivo:"
+02000D0C="&Wurdboekgrutte:"
+02000D0D="&Wurdgrutte:"
+02000D0E="Unthâld gebrûk by komprimearjen:"
+02000D0F="Unthâld gebrûk by ûntkomprimearjen:"
+02000D10="Fersifering"
+02000D11="Fersiferingmetoade:"
+02000D12="Tal CPU trieden:"
+02000D13="Kompakte blokgrutte:"
+02000D14="net-kompakt"
+02000D15="Kompakt"
+02000D16="Dielde triemmen komprimearje"
+
+02000D40="Spjalte nei &folumes, bytes:"
+02000D41="Net juste folumegrutte"
+02000D42="Oantsjutte folumegrutte: {0} bytes.\nWolle jo it argyf yn sokke folumes spjalte?"
+
+
+02000D81="Bewarje"
+02000D82="Normaal"
+02000D83="Maksimum"
+02000D84="Fluch"
+02000D85="Fluchst"
+02000D86="Ultra"
+
+02000D90="Blêdzje"
+
+02000DA1="Triemmen taheakje en ferfange"
+02000DA2="Triemmen taheakje en bywurkje"
+02000DA3="Besteande triemmen ferfarskje"
+02000DA4="Triemmen lyk rinne litte"
+
+02000DB1="Alle triemmen"
+
+02000DC0="Oan it komprimearjen"
+
+; Columns dialog
+02000E00="Kolommen"
+02000E01="Kontrolearje de kolommen dy't jo yn dizze map sichtber meitsje wolle. Brûk de omheech en omleech knoppen om de kolommen te oarderjen."
+02000E02="De selektearre kolom soe"
+02000E03="Piksels &breed wêze moatte."
+
+02000E10="Om&heech ferpleatse"
+02000E11="Om&leech ferpleatse"
+02000E12="&Sjen litte"
+02000E13="&Fertopje"
+02000E14="Set"
+
+02000E81="Titel"
+02000E82="Breedte"
+
+; Testing
+02000F90="Oan it Testen"
+
+
+; File Manager
+
+03000000="7-Zip Triembehearder"
+
+; Menu
+03000102="&Triem"
+03000103="&Bewurkje"
+03000104="&Byld"
+03000105="&Ark"
+03000106="&Help"
+03000107="B&lêdwizers"
+
+; File
+03000210="&Iepenje"
+03000211="Iepenje &yn"
+03000212="Iepenje bû&ten"
+03000220="&Byld"
+03000221="&Bewurkje"
+03000230="Omne&ame"
+03000231="&Kopiearje nei..."
+03000232="&Ferpleats nei..."
+03000233="&Wiskje"
+03000240="E&igenskippen"
+03000241="Komme&ntaar"
+03000242="Kontrôlesom berekenje"
+03000250="Map meitsje"
+03000251="Triem meitsje"
+03000260="U&tgong"
+03000270="Triemmen &spjalte..."
+03000271="Triemmen Kom&binearje..."
+
+; Edit
+03000310="&Ungedien meitsje"
+03000311="&Opnij"
+03000320="Kni&ppe"
+03000321="&Kopiearje"
+03000322="&Plakke"
+03000323="&Wiskje"
+03000330="&Alles selektearje"
+03000331="Alles net selektearje"
+03000332="&Seleksje omdraaien"
+03000333="Selektearje..."
+03000334="Net selektearje..."
+03000335="Selektearje neffens type"
+03000336="Net selektearje neffens type"
+
+; View
+03000410="Gru&tte Ikoanen"
+03000411="L&ytse Ikoanen"
+03000412="&List"
+03000413="&Details"
+03000420="Net Sortearre"
+03000430="Haadmap iepenje"
+03000431="Ien nivo omheech"
+03000432="Maphistoarje..."
+03000440="&Ferfarskje"
+03000449="Platte werjefte"
+03000450="&2 Panielen"
+03000451="&Arkbalke"
+03000460="Argyf arkbalke"
+03000461="Standert arkbalke"
+03000462="Grutte knoppen"
+03000463="Knoptekst sjen litte"
+
+; Tools
+03000510="&Opsjes..."
+03000511="&Ykpunt"
+
+; Help
+03000610="&Ynhâld..."
+03000620="&7-Zip it hoe en het..."
+
+; Favorites
+03000710="Map oan blêdwizers &taheakje  as"
+03000720="Blêdwizer meitsje"
+
+; Options Dialog
+
+03010000="Opsjes"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="Opsjes..."
+
+; Edit
+03010200="Bewurker"
+03010201="&Bewurker:"
+
+; System
+03010300="Systeem"
+03010302="Ferbyn 7-Zip Mei:"
+03010310="Plugin"
+
+; Settings
+03010400="Ynstellings"
+03010401="\"..\" item sjen litte"
+03010402="Echte triem ikoanen sjen litte"
+03010410="Systeemmenu sjen litte"
+03010420="&Folsleine rige selektearje"
+03010421="&Roaster sjen litte"
+03010430="&Alternative seleksje modus"
+03010440="Brûk &grut ûnthâld siden"
+
+; Strings
+
+03020201="Kopiearje"
+03020202="Ferpleatse"
+03020203="Kopiearje nei:"
+03020204="Ferpleats nei:"
+03020205="Oan it kopiearren..."
+03020206="Oan it ferpleatsen..."
+03020207="Jo kinne net foar sokke mappen items kopiearje of ferpleatse"
+03020208="Operaasje wurdt net stipe."
+03020209="Bestimmingsmap selektearje."
+
+03020210="It wiskjen fan de triem befêstigje"
+03020211="It wiskjen fan de map befêstigje"
+03020212="It wiskjen fan meardere triemmen befêstigje"
+03020213="Binne jo wis dat jo '{0}' wiskje wolle?"
+03020214="Binne jo wis dat jo de map '{0}' en al syn ynhâld wiskje wolle?"
+03020215="Binne jo wis dat jo {0} items wiskje wolle?"
+03020216="Oan it wiskjen"
+03020217="Flater by it wiskjen fan triem of map"
+
+03020220="Omneame..."
+03020221="Flater by it omneamen fan triem of map"
+03020222="Triem kopiearje befêstigje"
+03020223="Binne jo wis dat jo de triemmen nei it argyf kopiearje wolle?"
+
+03020230="Map meitsje"
+03020231="Mapnamme:"
+03020232="Nije map"
+03020233="Flater by it meitsjen fan map"
+
+03020240="Triem meitsje"
+03020241="Triem namme:"
+03020242="Nije triem"
+03020243="Flater by’t meitsjen fan triem"
+
+03020250="Selektearje"
+03020251="Net Selektearje"
+03020252="Masker:"
+
+03020260="Maphistoarje"
+
+03020280="Triem '{0}' is wizige.\nWolle jo it bywurkje yn it argyf?"
+03020281="Kin triem '{0}'\nnet bywurkje"
+03020282="Kin bewurker net starte."
+03020283="Oan it iepenjen..."
+
+03020290="Kommentaar"
+03020291="&Kommentaar:"
+
+030202A0="Systeem"
+
+03020300="Kompjûter"
+03020301="Netwurk"
+
+03020400="Taheakje"
+03020401="Utpakke"
+03020402="Test"
+
+03020420="Kopiearje"
+03020421="Ferpleatse"
+03020422="Wiskje"
+03020423="Ynformaasje"
+
+03020500="Triem spjalte"
+03020501="&Spjalt nei:"
+03020510="Oan it Spjalten..."
+03020520="Spjalte befêstigje"
+03020521="Wolle jo de triem spjalte yn {0} dielen?"
+03020522="Folumegrutte moat lytser wêze dan de grutte fan it orizjineel"
+
+
+03020600="Triemmen kombinearje"
+03020601="&Kombinearje nei:"
+03020610="Oan it kombinearjen..."
+03020620="Allinne earste triem selektearje"
+
+03020710="Kontrôlesom oan it berekenjen..."
+03020720="Kontrôlesom ynformaasje"
+03020721="CRC kontrôlesom foar data:"
+03020722="CRC kontrôlesom foar data en nammen:"
+
+03020800="Oan it skennen..."
+
+03020900="Eigenskippen"
+
+; Computer
+03031100="Totale grutte"
+03031101="Frije romte"
+03031102="Kluster grutte"
+03031103="Kaartsje"
+
+
+; Network
+03031200="Lokale namme"
+03031201="Ferskaffer"
+
+; Benchmark Dialog
+
+03080000="Benchmark"
+03080001="Unthâld gebrûk:"
+03080002="Oan it komprimearren"
+03080003="Oan it ûntkomprimearren"
+03080004="Fluggens"
+03080005="Wurdearring"
+03080006="Totale Wurdearring"
+03080007="Hjoeddeiske"
+03080008="Resultaat"
+03080009="Kear foarbei:"
+0308000A="Flaters:"
+0308000B="CPU brûkens"
+0308000C="Beoardieling / Brûkens"
+
+;!@LangEnd@!

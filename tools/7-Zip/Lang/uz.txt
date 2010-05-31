@@ -1,0 +1,459 @@
+;!@Lang@!UTF-8!
+; 7-Zip 4.30
+; Translated by Sherzod Mamatkulov
+;
+;
+;
+;
+
+00000000="Uzbek"
+00000001="O'zbek"
+00000002="67"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip tanlovlari"
+
+; Info Page
+01000100="7-Zip haqida"
+01000103="7-Zip bepul dasturiy ta'minot. Binobarin, siz uni qayd qildirish orqali qo'llab-quvvatlashingiz mumkin."
+01000104="Yordam"
+01000105="Qayd qilish"
+
+; Folders Page
+01000200="Papkalar"
+01000210="&Ish papkasi"
+01000211="Tizim &vaqtinchalik papkasi"
+01000212="&Joriy papka"
+01000213="&Tayinlangan:"
+01000214="Faqat olinadigan drayvlar uchun ishlat"
+
+01000281="Vaqtinchalik arxiv fayllari uchun manzilni tayinlang."
+
+; System Page
+01000300="Tizim"
+01000301="7-Zipni qobiq kontekst menyusiga qo'sh"
+01000302="Kontekst menyusi pog'onali"
+01000310="Kontekst menyu bandlari:"
+
+; Language Page
+01000400="Til"
+01000401="Til:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip buyruqlari"
+02000103="Arxivni och"
+02000104="Tanlangan arxivni ochadi."
+02000105="Fayllarni ajrat..."
+02000106="Tanlangan arxivdan fayllarni ajratadi."
+02000107="Arxivga qo'sh..."
+02000108="Tanlangan qismlarni arxivga qo'shadi."
+02000109="Arxivni sina"
+0200010A="Tanlangan arxivning butunligini tekshiradi."
+0200010B="Shu joyga ajrat"
+0200010C="Tanlangan arxivdagi fayllarni joriy papkaga ajratadi."
+0200010D="{0}ga ajrat"
+0200010E="Fayllarni nimpapkaga ajratadi."
+0200010F="{0}ga qo'sh"
+02000110="Tanlangan qismlarni arxivga qo'shadi."
+02000111="Siq va emailda jo'nat..."
+02000112="Tanlangan qismlarni arxivga siqib, email orqali jo'natadi."
+02000113="{0}ga siq va emailda jo'nat"
+02000114="Tanlangan qismlarni arxivga siqib, email orqali jo'natadi."
+
+02000140="<Papka>"
+02000141="<Arxiv>"
+
+; Properties
+02000203="Yo'lak"
+02000204="Nomi"
+02000205="Kengaytma"
+02000206="Papka"
+02000207="Hajmi"
+02000208="Siqilgan hajmi"
+02000209="Atributlari"
+0200020A="Yaratilgan"
+0200020B="Ochilgan"
+0200020C="O'zgartirilgan"
+0200020D="Yaxlit"
+0200020E="Sharhlangan"
+0200020F="Tilsimlangan"
+02000210="Bundan oldin bo'laklangan"
+02000211="Bundan keyin bo'laklangan"
+02000212="Lug'at"
+02000213="CRC"
+02000214="Turi"
+02000215="Anti"
+02000216="Uslub"
+02000217="Mezbon OS"
+02000218="Fayl tizimi"
+02000219="Foydalanuvchi"
+0200021A="Guruh"
+0200021B="Block"
+0200021C="Sharh"
+0200021D="Joylashuv"
+
+; Status bar
+02000301="{0} ta qism tanlangan"
+02000302="{0} ta qism"
+
+; List Context Menu
+02000401="&Ustunlar..."
+
+02000411="&Ochish"
+02000412="&Ajrat..."
+
+; ToolBar
+02000501="Ajrat"
+
+; Messages
+02000601="Bu arxivga nisbatan yangilash amallari bajarilmaydi."
+02000602="{0} arxivini yagilay olmadim"
+02000603="'{0}' papkasini yarata olmadim"
+02000604="Ushbu fayl tushunarli arxiv emas."
+02000605="Xato"
+02000606="Qismlar o'ta ko'p"
+02000607="Berilgan fayl nomi kengaytmasi bilan hechqanday dastur biriktirilmagan"
+02000608="Hechqanday xato yo'q"
+
+; Dialogs
+02000702="OK"
+02000705="&Ha"
+02000707="H&ammasiga ha"
+02000709="&Yo'q"
+0200070B="Hammasiga y&o'q"
+
+02000710="Bekor"
+02000711="&Bekor"
+02000713="&Yopish"
+02000714="To'xta"
+02000715="Qayta boshla"
+
+02000720="Yordam"
+
+; Extract dialog
+02000800="Ajratish"
+02000801="&Buyerga ajrat:"
+02000802="Parol"
+
+02000810="Yo'lak uslubi"
+02000811="To'liq yo'lak nomlari"
+02000812="Joriy yo'lak nomlari"
+02000813="Yo'lak nomi yo'q"
+
+02000820="Ustidan yozish uslubi"
+02000821="Yozib yuborishdan oldin so'ra"
+02000822="So'ramasdan yozib yubor"
+02000823="Oldindan mavjud fayllarni tashlab ket"
+02000824="Avtomatik tarzda qayta nomla"
+02000825="Mavjud fayllarni avto qayta nomla"
+
+02000830="Fayllar"
+02000831="&Tanlangan fayllar"
+02000832="&Barcha fayllar"
+
+02000881="Ajratilgan fayllar uchun manzil tayinlang."
+
+02000890="Ajratilmoqda"
+
+; Overwrite dialog
+02000900="Fayl ustidan yozishni tasdiqlash"
+02000901="Manziliy papkada ishlangan fayl oldindan mavjud."
+02000902="Mavjud faylni"
+02000903="bunisi bilan almashtirasizmi?"
+
+02000911="A&vtomatik tarzda qayta nomla"
+
+02000982="{0} bayt"
+02000983="o'zgargan sanasi"
+
+; Messages dialog
+02000A00="Diagnostik xabarlar"
+
+02000A80="Xabar"
+
+02000A91="'{0}'dagi siquv metodi notanish."
+02000A92="'{0}'da data xatosi yuz berdi. Fayl zararlangan."
+02000A93="'{0}'da CRC amalga oshmadi. Fayl zararlangan."
+
+; Password dialog
+02000B00="Parolni kiritish"
+02000B01="Parolni kiriting:"
+02000B02="&Parolni ko'rsat"
+
+; Progress dialog
+02000C00="Jarayon"
+02000C01="O'tgan vaqt:"
+02000C02="Qolgan vaqt:"
+02000C03="Hajm:"
+02000C04="Tezlik:"
+
+02000C10="&Orqa fon"
+02000C11="Ol&di fon"
+02000C12="&Pauza"
+02000C13="&Davom et"
+
+02000C20="Pauza qilingan"
+
+02000C30="Rostdan ham bekor qilishni istaysizmi?"
+
+; Compress dialog
+02000D00="Arxivga qo'shish"
+02000D01="&Arxiv:"
+02000D02="&Yangilash uslubi:"
+02000D03="Arxiv &formati:"
+02000D04="&Siquv metodi:"
+02000D05="&Yaxlit arxiv yarat"
+02000D06="&Parametrlar:"
+02000D07="Tanlovlar"
+02000D08="SF&X arxiv yarat"
+02000D09="Ko'p-bo'limda"
+02000D0A="Fayl &nomlarini tilsimla"
+02000D0B="Siq&uv bosqichi:"
+02000D0C="&Lug'at hajmi:"
+02000D0D="So'z haj&mi:"
+02000D0E="Siquvda ishlatiladigan xotira:"
+02000D0F="Ajratuvda ishlatiladigan xotira:"
+
+02000D40="&Tomlarga bo'lakla, bayt:"
+
+02000D81="Saqlash"
+02000D82="O'rtacha"
+02000D83="Eng zo'r"
+02000D84="Tez"
+02000D85="Eng tez"
+02000D86="Ultra"
+
+02000D90="Belgila"
+
+02000DA1="Fayllarni qo'sh va almashtir"
+02000DA2="Fayllarni yangila va qo'sh"
+02000DA3="Mavjud fayllarni yangila"
+02000DA4="Fayllarni sinxronla"
+
+02000DB1="Barcha fayllar"
+
+02000DC0="Siquv ketmoqda"
+
+; Columns dialog
+02000E00="Ustunlar"
+02000E01="Ushbu papkada ko'rinadigan ustunlarni belgilang. Ustunlarni tartibini o'zgartirish uchun Yuqoriga va Pastga tugmalaridan foydalaning."
+02000E02="Tanlangan ustun kengligi"
+02000E03="pi&xel bo'lsin."
+
+02000E10="&Yuqoriga"
+02000E11="&Pastga"
+02000E12="&Ko'rsat"
+02000E13="Y&ashir"
+02000E14="Tayinla"
+
+02000E81="Sarlavha"
+02000E82="Kengligi"
+
+; Testing
+02000F90="sinaldi"
+
+
+; File Manager
+
+03000000="7-Zip fayl boshqaruvchisi"
+
+; Menu
+03000102="&Fayl"
+03000103="&Tahrir"
+03000104="&Ko'rish"
+03000105="&Asboblar"
+03000106="&Yordam"
+03000107="Fa&voritlar"
+
+; File
+03000210="&Ochish"
+03000211="&Ichkarida ochish"
+03000212="&Tashqarida ochish"
+03000220="&Ko'rish"
+03000221="Ta&hrirla"
+03000230="&Qayta nomla"
+03000231="Buyerga &nusxala..."
+03000232="B&uyerga ko'chir..."
+03000233="O'chir"
+03000240="&Xossalari"
+03000241="&Sharh"
+03000250="Papka yarat"
+03000251="Fayl yarat"
+03000260="&Chiqish"
+03000270="&Faylni bo'lakla..."
+03000271="Fayllarni &birlashtir..."
+
+; Edit
+03000310="&Qaytar"
+03000311="Qayta &bajar"
+03000320="Q&irqish"
+03000321="&Nusxala"
+03000322="Qo'yis&h"
+03000323="&O'chir"
+03000330="H&ammasini tanla"
+03000331="Hammasini tashla"
+03000332="&Tanlanishni teskarila"
+03000333="Tanlash..."
+03000334="Tashlash..."
+03000335="Turi bo'yicha tanla"
+03000336="Turi bo'yicha tashla"
+
+; View
+03000410="&Yirik ikonlar"
+03000411="&Mitti ikonlar"
+03000412="&Ro'yxat"
+03000413="&Tafsilotlar"
+03000420="Saralanmagan"
+03000430="Ildiz papkasini och"
+03000431="Bir bosqich yuqoriga"
+03000432="Papkalar tarixi..."
+03000440="&Qayta och"
+03000450="&2 ta panel"
+03000451="&Uskunalar majmuasi"
+03000460="Arxiv toolbari"
+03000461="Standart toolbar"
+03000462="Yirik tugmalar"
+03000463="Tugmalar matnini ko'rsat"
+
+; Tools
+03000510="Tanl&ovlar..."
+03000511="&Baholash"
+
+; Help
+03000610="&Tarkibi..."
+03000620="&7-Zip haqida..."
+
+; Favorites
+03000710="&Papkani ushbu xatcho'p qo'sh"
+03000720="Xatcho'p"
+
+; Options Dialog
+
+03010000="Tanlovlar"
+
+; Plugins
+03010100="Plaginlar"
+03010101="&Plaginlar:"
+03010110="Tanlovlar..."
+
+; Edit
+03010200="Muharrir"
+03010201="&Muharrir:"
+
+; System
+03010300="Tizim"
+03010302="Ushbu arxivlarni 7-Zip bilan biriktir:"
+03010310="Plagin"
+
+; Settings
+03010400="Sharoit"
+03010401="\"..\" qismini ko'rsat"
+03010402="Fayllarning haqiqiy ikonlarini ko'rsat"
+03010410="Tizim menyusini ko'rsat"
+03010420="&To'liq yo'lakni tanlash"
+03010421="&Panjara chiziqlarini ko'rsat"
+03010430="&Muqobil tanlash uslubini qo'lla"
+03010440="&Yirik xotira pageini ishlat"
+
+; Strings
+
+03020201="Nusxalash"
+03020202="Ko'chirish"
+03020203="Ushbu katalogga nusxala:"
+03020204="Ushbu katalogga ko'chir:"
+03020205="Nusxalanmoqda..."
+03020206="Ko'chirilmoqda..."
+03020207="Bunaqangi papkalar uchun qismlarni ko'chirish yoki nusxalashning iloji yo'q."
+03020208="Ushbu operatsiya qo'llanmaydi."
+
+03020210="Faylni o'chirishni tasdiqlang"
+03020211="Papkani o'chirishni tasdiqlang"
+03020212="Ko'plab fayllarni o'chirishni tasdiqlang"
+03020213="Rostdan ham '{0}'ni o'chirib tashlamoqchimisiz?"
+03020214="Rostdan ham '{0}' papkasini butun tarkibi bilan o'chirib tashlamoqchimisiz?"
+03020215="Rostdan ham ushbu {0} ta qismni o'chirib tashlamoqchimisiz?"
+03020216="O'chirilmoqda..."
+03020217="Fayl yoki papkani o'chirishda xato yuz berdi"
+
+03020220="Qayta nomlanmoqda..."
+03020221="Fayl yoki papkani qayta nomlashda xato yuz berdi"
+03020222="Faylni nusxalashni tasdiqlang"
+03020223="Rostdan ham fayllarni arxivga nusxalashni xohlaysizmi"
+
+03020230="Papka yaratish"
+03020231="Papka nomi:"
+03020232="Yangi papka"
+03020233="Papka yaratishda xato yuz berdi"
+
+03020240="Fayl yaratish"
+03020241="Fayl nomi:"
+03020242="Yangi fayl"
+03020243="Fayl yaratishda xatolik yuz berdi"
+
+03020250="Tanlash"
+03020251="Tashlash"
+03020252="Maska:"
+
+03020260="Papkalar tarixi"
+
+03020280="'{0}' fayli o'zgartirildi.\nUni arxiv ichida yangilashni xohlaysizmi?"
+03020281="Ushbu faylni yangilay olmadim\n'{0}'"
+03020282="Muharrirni ocha olmadim."
+03020283="Ochilmoqda..."
+
+03020290="sharhi"
+03020291="&Sharh:"
+
+030202A0="Tizim"
+
+03020300="Kompyuter"
+03020301="Tarmoq"
+
+03020400="Qo'sh"
+03020401="Ajrat"
+03020402="Sina"
+
+03020420="Nusxala"
+03020421="Ko'chir"
+03020422="O'chir"
+03020423="Info"
+
+03020500="Faylni bo'laklash"
+03020501="&Ushbu katalogga bo'lakla:"
+03020510="Bo'laklanmoqda..."
+
+03020600="Fayllarni birlashtirish"
+03020601="&Ushbu katalogga birlashtir:"
+03020610="Birlashtirilmoqda..."
+
+; Computer
+03031100="Umumiy hajmi"
+03031101="Bo'sh joy"
+03031102="Klaster hajmi"
+03031103="Yorliq"
+
+; Network
+03031200="Lokal nomi"
+03031201="Provayder"
+
+; Benchmark Dialog
+
+03080000="Baholash"
+03080001="Xotira ishlatilishi:"
+03080002="Siqish"
+03080003="Ajratish"
+03080004="Tezlik"
+03080005="Reyting"
+03080006="Umumiy reyting"
+03080007="Joriy"
+03080008="Natijaviy"
+03080009="O'tganlar:"
+0308000A="Xatolar:"
+
+;!@LangEnd@!

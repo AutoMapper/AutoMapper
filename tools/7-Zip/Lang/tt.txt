@@ -1,0 +1,454 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.07 beta
+; Translated by Albert Fazlí (http://soft.beznen.net/)
+;
+;
+;
+;
+
+00000000="Tatarish"
+00000001="Tatarça"
+00000002="68"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Caylaw"
+
+; Info Page
+01000100="7-Zip turında"
+01000103="7-Zip yazılımı buşlay. Alay bulsa da, terkälü aşa anı citeşterü eşenä yärdäm itep bula."
+01000105="Terkälü"
+
+; Folders Page
+01000200="Törgäklär"
+01000210="&Eş törgäge"
+01000211="&Sistemneñ çorlı törgäge"
+01000212="&Biredäge"
+01000213="Bo&nısı:"
+01000214="Çığarmalı cıharlar öçen genä qullanası"
+
+01000281="Çorlı tuplam biremnäre öçen urınlaşu bilgeläw."
+
+; System Page
+01000300="Sistem"
+01000301="7-Zip'ne atılma saylaqqa kertäse"
+01000302="Atılma saylaqnı töräse"
+01000310="Atılma saylaq kereme:"
+
+; Language Page
+01000400="Telläşterü"
+01000401="Tel saylaw:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip boyırığı"
+02000103="Tuplamanı Açu"
+02000104="Saylanğan tuplamanı aça."
+02000105="Biremne Çişü..."
+02000106="Saylanğan tuplama biremnären çişä."
+02000107="Tuplamağa Östäw..."
+02000108="Saylanğan kermenärne tuplamağa östi."
+02000109="Tuplamanı Sına"
+0200010A="Saylanğan tuplamanıñ tulılığın tikşerä."
+0200010B="Bonda Çiş"
+0200010C="Saylanğan tuplama biremnären biredäge törgäkkä çişä."
+0200010D="Boña Çiş: {0}"
+0200010E="Biremnärne eçtörgäkkä çişä."
+0200010F="Boña Östä: {0}"
+02000110="Saylanğan keremnärne tuplamağa östi."
+02000111="Qısıp Cibärü..."
+02000112="Saylanğan keremnärne tuplamağa östäp, şul tuplamanı email aşa cibärä."
+02000113="Qısıp Cibär, {0} kebek"
+02000114="Saylanğan keremnärne tuplamağa östäp, şul tuplamanı email aşa cibärä."
+
+02000140="<Törgäk>"
+02000141="<Tuplama>"
+
+; Properties
+02000203="Yul"
+02000204="Adı"
+02000205="Quşımta"
+02000206="Törgäk"
+02000207="Küläm"
+02000208="Qısqan Küläm"
+02000209="Üzençälek"
+0200020A="Yasaldı"
+0200020B="İreşelde"
+0200020C="Üzgärelde"
+0200020D="Özelmäs"
+0200020E="Açıqlamalı"
+0200020F="Serlängän"
+02000210="Bülü Aldında"
+02000211="Bülüdän Soñ"
+02000212="Süznämä"
+02000213="CRC"
+02000214="Törlek"
+02000215="Qarşı"
+02000216="Isul"
+02000217="Host OS"
+02000218="Birem Sisteme"
+02000219="Qullanuçı"
+0200021A="Törkem"
+0200021B="Blok"
+0200021C="Açıqlama"
+0200021D="Urını"
+
+; Status bar
+02000301="{0} cisem saylandı"
+02000302="{0} cisem"
+
+; List Context Menu
+02000401="&Buylar..."
+
+02000411="&Aç"
+02000412="&Çişü..."
+
+; ToolBar
+02000501="Çişü"
+
+; Messages
+02000601="Bu tuplama öçen yañartu eşen uzdırıp bulmí."
+02000602="Tuplamanı yañartıp buldı: {0}"
+02000603="Törgäkne yasap bulmadı: {0}"
+02000604="Bu birem totılğan tuplamalardan tügel."
+02000605="Xata"
+02000606="Keremnär artıq küp"
+02000607="Bu birem adındağı quşımtağa kileştergän yazılımnar yuq"
+02000608="Xatalar yuq"
+
+; Dialogs
+02000702="OK"
+02000705="Ä&ye"
+02000707="&Barına da Äye"
+02000709="Yu&q"
+0200070B="Barına da Y&uq"
+
+02000710="Kiräkmi"
+02000711="&Kiräkmi"
+02000713="&Çığış"
+02000714="Tuqta"
+02000715="Yänä Cibär"
+
+02000720="Yärdäm"
+
+; Extract dialog
+02000800="Çiş"
+02000801="Boña çişä&se:"
+02000802="Sersüz"
+
+02000810="Yullar"
+02000811="Tulı yul adı"
+02000812="Bu yuldan tayanıp"
+02000813="Yullarsız"
+
+02000820="Östän yazıp"
+02000821="Östän yazu aldınnan sorísı"
+02000822="Östän yazu aldınnan soramísı"
+02000823="Bulğan biremne uzası"
+02000824="Adın üzgärtäse"
+02000825="Bulğan birem adın üzgärtäse"
+
+02000830="Biremnär"
+02000831="&Saylanğan biremnär"
+02000832="&Bar biremnär"
+
+02000881="Çiğelgän biremnär öçen urınlaşu törgägen bilgeläw."
+
+02000890="Çişü"
+
+; Overwrite dialog
+02000900="Birem Almaştırunı Raslaw"
+02000901="Çişü törgägendä eşkärtelä torğan biremnär bar inde."
+02000902="Şul bar bulğan biremne"
+02000903="bonısına almaştırasımı?"
+
+02000911="Üzennän &Atap tor"
+
+02000982="{0} bayt"
+02000983="üzgärtelüe"
+
+; Messages dialog
+02000A00="Tikşerü beldermäse"
+
+02000A80="Beldermä"
+
+02000A91="'{0}' eçtälegeneñ qısu ısulı totılmí."
+02000A92="'{0}' eçtälege yaraqsız. Bu birem bozıq."
+02000A93="'{0}' CRC'se kileşmi. Bu birem bozıq."
+
+; Password dialog
+02000B00="Sersüz kertü"
+02000B01="Sersüz kertü:"
+02000B02="&Sersüz kürsätäse"
+
+; Progress dialog
+02000C00="Alğa barış"
+02000C01="Uylanğan waqıt:"
+02000C02="Qalğan waqıt:"
+02000C03="Küläm:"
+02000C04="Tizlek:"
+
+02000C10="&Artqı yaqta"
+02000C11="A&lğı yaqta"
+02000C12="&Tuqtap tor"
+02000C13="&Dawam it"
+
+02000C20="Tuqtap tora"
+
+02000C30="Bu eşne çınlap ta özäseme?"
+
+; Compress dialog
+02000D00="Tuplamağa östä"
+02000D01="&Tuplama:"
+02000D02="&Yañartu isulı:"
+02000D03="Tuplama &töre:"
+02000D04="Qısu &ısulı:"
+02000D05="Ö&zelmäs tuplama yasísı"
+02000D06="&Köylämä:"
+02000D07="Köylämälär"
+02000D08="SF&X tuplama yasísı"
+02000D09="Küp-ceple"
+02000D0A="Birem adı&n serlise"
+02000D0B="Qızu &köçe:"
+02000D0C="&Süznämä küläme:"
+02000D0D="Sü&z küläme:"
+02000D0E="Qısqanda Xäter qullanu:"
+02000D0F="Çişkändä Xäter qullanu:"
+
+02000D40="&Töplämgä büläse, bayt:"
+
+02000D81="Saqlap"
+02000D82="Ğädäti"
+02000D83="Bik qısıp"
+02000D84="Tiz"
+02000D85="Bik tiz"
+02000D86="İs kitkeç"
+
+02000D90="Saylaw"
+
+02000DA1="Biremnärne östise dä almaştırası"
+02000DA2="Biremnärne östise dä yañartası"
+02000DA3="Bulğan biremnärne yañartası"
+02000DA4="Biremnärne çordaşlísı"
+
+02000DB1="Bar Biremnär"
+
+02000DC0="Qısu"
+
+; Columns dialog
+02000E00="Buylar"
+02000E01="Bu törgäktä küräse kilgän buylarnı saylaw. Buylarnıñ tezeleşen üzgärtü öçen, Öskäräk/Asqaraq töymälären qullanası."
+02000E02="Saylanğan buy "
+02000E03="tap &kiñlegendä bulırğa tieş."
+
+02000E10="Ös&käräk"
+02000E11="As&qaraq"
+02000E12="Kü&rsät"
+02000E13="&Yäşer"
+02000E14="Quy"
+
+02000E81="Başlıq"
+02000E82="Kiñlek"
+
+; Testing
+02000F90="Sınaw"
+
+
+; File Manager
+
+03000000="7-Zip Birem İdäräçe"
+
+; Menu
+03000102="&Birem"
+03000103="Ü&zgärtü"
+03000104="&Küreneş"
+03000105="&Qoral"
+03000106="&Yärdäm"
+03000107="&Saylanma"
+
+; File
+03000210="&Aç"
+03000211="&Üzendä Aç"
+03000212="&Tıştan Aç"
+03000220="&Eçtälege"
+03000221="Ü&zgärtü"
+03000230="İse&m Quşu"
+03000231="Boña &Kübäytü..."
+03000232="Boña Küçe&rü..."
+03000233="&Beter"
+03000240="&Üzençälege"
+03000241="Açıqla&ma"
+03000250="Törgäk Yasaw..."
+03000251="Birem Yasaw..."
+03000260="Çı&ğış"
+03000270="Biremne &Bülü..."
+03000271="Biremnärne &Berläşterü..."
+
+; Edit
+03000310="Kire a&l"
+03000311="Kire &qaq"
+03000320="Ki&sep al"
+03000321="&İskä al"
+03000322="&Östäp quy"
+03000323="&Beter"
+03000330="B&arın da Sayla"
+03000331="Saylanunı Beter"
+03000332="K&ire Saylap"
+03000333="Saylanğan itü"
+03000334="Saylanmağan itü"
+03000335="Törne Saylanğan itü"
+03000336="Törne Saylanmağan itü"
+
+; View
+03000410="&Olı Tamğa"
+03000411="&Keçe Tamğa"
+03000412="&Tezmä"
+03000413="&Cäymä"
+03000420="Tezmiçä"
+03000430="Töp Torgäkne Aç"
+03000431="Ber Adımğa Öskä"
+03000432="Utkän Törgäklär..."
+03000440="&Yañart"
+03000450="&2 Taqta"
+03000451="&Qoraltirä"
+03000460="Tuplama Qoraltiräse"
+03000461="Töp Qoraltirä"
+03000462="Olı Töymälär"
+03000463="Töymä Yazması belän"
+
+; Tools
+03000510="&Caylaw..."
+03000511="Ci&tezlek"
+
+; Help
+03000610="&Eçtälek..."
+03000620="7-Zip &Turında..."
+
+; Favorites
+03000710="&Törgäkne bolay itep östä:"
+03000720="Bitbilge"
+
+; Options Dialog
+
+03010000="Caylaw"
+
+; Plugins
+03010100="Östämä"
+03010101="&Östämä:"
+03010110="Caylaw..."
+
+; Edit
+03010200="Tözätkeç"
+03010201="&Tözätkeç:"
+
+; System
+03010300="Sistem"
+03010302="7-Zip belän Kileşter:"
+03010310="Östämä"
+
+; Settings
+03010400="Caylaw"
+03010401="Tezmädä \"..\" törgägen kürsätäse"
+03010402="Birem tamğasın kürsätäse"
+03010410="Sistem saylağın kürsätäse"
+03010420="Yulnı &tulayım saylísı"
+03010421="Yulara sızıq &kürsätäse"
+
+; Strings
+
+03020201="İskä"
+03020202="Küçer"
+03020203="Boña kübäyt:"
+03020204="Boña küçer:"
+03020205="Kübäytü..."
+03020206="Küçerü..."
+03020207="Bu törgäk öçen keremnärne kübäytep/küçerep bulmí."
+03020208="Bonı eşläp bulmí."
+
+03020210="Birem Beterüne Raslaw"
+03020211="Törgäk Beterüne Raslaw"
+03020212="Biremnärne Küpläp Beterüne Raslaw"
+03020213="Bonı çınlap ta beteräseme: '{0}'?"
+03020214="Bu törgäkne anıñ bar eçtälege belän çınlap ta beteräseme: '{0}'?"
+03020215="Bu {0} keremne çınlap ta beteräseme?"
+03020216="Beterü..."
+03020217="Birem/Törgäkne Beterü Xatası"
+
+03020220="İsem quşu..."
+03020221="Birem/Törgäkkä İsem quşu Xatası"
+
+03020230="Törgäk Yasaw"
+03020231="Törgäk adı:"
+03020232="Yaña Törgäk"
+03020233="Törgäk Yasaw Xatası"
+
+03020240="Birem Yasaw"
+03020241="Birem Adı:"
+03020242="Yaña Birem"
+03020243="Birem Yasaw Xatası"
+
+03020250="Saylağan it"
+03020251="Saylanmağan it"
+03020252="Ürnäk:"
+
+03020260="Uzğan Törgäklär"
+
+03020280="'{0}' atlı birem üzgärtelde.\nAnı tuplamada da yañartasımı?"
+03020281="Biremne yañartıp bulmadı\n'{0}'"
+03020282="Tözätkeçne cibärep bulmadı."
+03020283="Açu..."
+
+03020290="Açıqlama"
+03020291="&Açıqlama:"
+
+030202A0="Sistem"
+
+03020300="Sanaq"
+03020301="Çeltär"
+
+03020400="Östä"
+03020401="Çiş"
+03020402="Sına"
+
+03020420="Kübäyt"
+03020421="Küçer"
+03020422="Beter"
+03020423="Turında"
+
+03020500="Biremne Bül"
+03020501="&Boña büläse:"
+03020510="Bülderü..."
+
+03020600="Biremne Ber it"
+03020601="&Boña ber itäse:"
+03020610="Berläşterü..."
+
+; Computer
+03031100="Barlıq Küläm"
+03031101="Buş Alan"
+03031102="Börtek Küläme"
+03031103="Yazma"
+
+; Network
+03031200="Cirle Atama"
+03031201="Tä'minçe"
+
+; Benchmark Dialog
+
+03080000="Citezlek"
+03080001="Xäter totıla:"
+03080002="Qısqanda"
+03080003="Çişkändä"
+03080004="Tizlek"
+03080005="Köç"
+03080006="Köç Yomğağı"
+03080007="Biredä"
+03080008="Näticä"
+03080009="Eşläp çığu:"
+0308000A="Xatalar:"
+
+;!@LangEnd@!

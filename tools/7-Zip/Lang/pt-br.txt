@@ -1,0 +1,534 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.59
+; Translated by Fabricio Biazzotto - Atualizado por Felipe
+;
+;
+;
+;
+
+00000000="Portuguese Brazil"
+00000001="Português (Brasil)"
+00000002="22-1"
+
+; 7-Zip Configuration
+
+; Title
+01000000="Configuração do 7-Zip"
+
+; Info Page
+01000100="Sobre o 7-Zip"
+01000103="7-Zip é um software livre. Contudo, você pode ajudar com o seu desenvolvimento registrando-o."
+01000104="Suporte"
+01000105="Registrar"
+
+; Folders Page
+01000200="Pastas"
+01000210="&Pasta de trabalho"
+01000211="&Pasta temporária do sistema"
+01000212="&Atual"
+01000213="&Especificada:"
+01000214="Usar apenas para drives removíveis"
+
+01000281="Especifique um local para os arquivos temporários."
+
+; System Page
+01000300="Sistema"
+01000301="Integrar o 7-Zip ao menu de contexto"
+01000302="Menu de contexto em cascata"
+01000310="Itens do menu de contexto:"
+
+; Language Page
+01000400="Idioma"
+01000401="Idioma:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Comandos do 7-Zip"
+02000103="Abrir arquivo"
+02000104="Abre o arquivo selecionado."
+02000105="Extrair arquivos..."
+02000106="Extrai o conteúdo do arquivo selecionado."
+02000107="Adicionar ao arquivo..."
+02000108="Adiciona os itens selecionados ao arquivo."
+02000109="Testar o arquivo"
+0200010A="Testa a integridade do arquivo selecionado."
+0200010B="Extrair aqui"
+0200010C="Extrai o conteúdo do arquivo selecionado na pasta atual."
+0200010D="Extrair para {0}"
+0200010E="Extrai os arquivos para uma sub-pasta."
+0200010F="Adicionar para {0}"
+02000110="Adiciona os itens selecionados ao arquivo."
+02000111="Comprimir e enviar por email..."
+02000112="Comprime os itens selecionados e envia o arquivo por e-mail."
+02000113="Comprimir para {0} e enviar por email"
+02000114="Comprime os itens selecionados e envia o arquivo por e-mail."
+
+02000140="<Pasta>"
+02000141="<Arquivo>"
+
+; Properties
+02000203="Caminho"
+02000204="Nome"
+02000205="Extensão"
+02000206="Pasta"
+02000207="Tamanho"
+02000208="Tamanho Compactado"
+02000209="Atributos"
+0200020A="Criado"
+0200020B="Acessado"
+0200020C="Modificado"
+0200020D="Sólido"
+0200020E="Comentado"
+0200020F="Criptografado"
+02000210="Dividir Antes"
+02000211="Dividir Depois"
+02000212="Dicionário"
+02000213="CRC"
+02000214="Tipo"
+02000215="Anti"
+02000216="Método"
+02000217="Sistema Operacional"
+02000218="Sistema de Arquivos"
+02000219="Usuário"
+0200021A="Grupo"
+0200021B="Bloco"
+0200021C="Comentário"
+0200021D="Posição"
+0200021E="Prefixo do Caminho"
+0200021F="Pastas"
+02000220="Arquivos"
+02000221="Versão"
+02000222="Volume"
+02000223="Multivolume"
+02000224="Offset"
+02000225="Links"
+02000226="Blocos"
+02000227="Volumes"
+
+02000229="64 bits"
+0200022A="Big-endian"
+0200022B="CPU"
+0200022C="Tamanho Físico"
+0200022D="Tamanho dos Cabeçalhos"
+0200022E="Checksum"
+0200022F="Características"
+02000230="Endereço Virtual"
+
+; Status bar
+02000301="{0} objeto(s) selecionado(s)"
+02000302="{0} objeto(s)"
+
+02000320="Arquivos:"
+02000321="Pastas:"
+02000322="Tamanho:"
+02000323="Tamanho comprimido:"
+02000324="Arquivos:"
+
+; List Context Menu
+02000401="&Colunas..."
+
+02000411="&Abrir"
+02000412="&Extrair..."
+
+; ToolBar
+02000501="Extrair"
+
+; Messages
+02000601="Operações de atualização não são suportadas por este arquivo."
+02000602="Não pôde atualizar o arquivo {0}"
+02000603="Não pôde criar a pasta '{0}'"
+02000604="O arquivo não é suportado."
+02000605="Erro"
+02000606="Itens demais"
+02000607="Não há nenhuma aplicação associada com o nome da extensão dado a este arquivo"
+02000608="Não há erros"
+02000609="Não pôde abrir o arquivo '{0}' como arquivo"
+0200060A="Não pôde abrir o arquivo encriptado '{0}'. Senha errada?"
+0200060B="O sistema não pôde alocar a quantidade requerida de memória"
+0200060C="Erro desconhecido"
+0200060D="Tipo de arquivo não suportado"
+
+; Dialogs
+02000702="OK"
+02000705="&Sim"
+02000707="Sim para &Todos"
+02000709="&Não"
+0200070B="Não para To&dos"
+
+02000710="Cancelar"
+02000711="&Cancelar"
+02000713="&Fechar"
+02000714="Parar"
+02000715="Reiniciar"
+
+02000720="Ajuda"
+
+; Extract dialog
+02000800="Extrair"
+02000801="E&xtrair para:"
+02000802="Senha"
+
+02000810="Modo de caminho"
+02000811="Nomes dos caminhos completos"
+02000812="Nomes dos caminhos atuais"
+02000813="Sem nomes de caminhos"
+
+02000820="Modo de substituição"
+02000821="Perguntar antes de sobrescrever"
+02000822="Sobrescrever sem perguntar"
+02000823="Pular os arquivos existentes"
+02000824="Auto-renomear"
+02000825="Auto-renomear os arquivos existentes"
+
+02000830="Arquivos"
+02000831="&Arquivos selecionados"
+02000832="&Todos os arquivos"
+
+02000881="Especifique um local para os arquivos extraídos."
+
+02000890="Extraindo"
+
+; Overwrite dialog
+02000900="Confirmar a substituição dos arquivos"
+02000901="A pasta destino já contém o arquivo processado."
+02000902="Você gostaria de substituir o arquivo existente"
+02000903="por este?"
+
+02000911="A&uto-Renomear"
+
+02000982="{0} bytes"
+02000983="modificado em"
+
+; Messages dialog
+02000A00="Mensagens de diagnóstico"
+
+02000A80="Mensagem"
+
+02000A91="Método de compressão não suportado por '{0}'."
+02000A92="Erro nos dados de '{0}'. O arquivo está danificado."
+02000A93="Falha no CRC de '{0}'. O arquivo está danificado."
+02000A94="Erros nos dados do arquivo encriptado '{0}'. Senha errada?"
+02000A95="Falha de CRC no arquivo encriptado '{0}'. Senha errada?"
+
+; Password dialog
+02000B00="Inserir senha"
+02000B01="Inserir senha:"
+02000B02="&Mostrar senha"
+02000B03="Re-inserir a senha:"
+02000B10="As senhas não combinam"
+02000B11="Usar apenas letras em Inglês, números e caracteres especiais (!, #, $, ...) para a senha"
+02000B12="A senha é muito longa"
+
+; Progress dialog
+02000C00="Processo"
+02000C01="Tempo decorrido:"
+02000C02="Tempo restante:"
+02000C03="Tamanho total:"
+02000C04="Velocidade:"
+02000C05="Processado:"
+02000C06="Taxa de compressão:"
+
+02000C10="&Em segundo plano"
+02000C11="&Em primeiro plano"
+02000C12="&Pausar"
+02000C13="&Continuar"
+
+02000C20="Pausado"
+
+02000C30="Você tem certeza que você quer cancelar?"
+
+; Compress dialog
+02000D00="Adicionar ao arquivo"
+02000D01="&Arquivo:"
+02000D02="&Modo de atualização:"
+02000D03="Formato do &arquivo:"
+02000D04="Método de &compressão:"
+02000D05="Criar &arquivo sólido"
+02000D06="&Parâmetros:"
+02000D07="Opções"
+02000D08="Criar ar&quivo SFX"
+02000D09="Multi-processamento"
+02000D0A="Criptografar os &nomes dos arquivos"
+02000D0B="Nível da &compressão:"
+02000D0C="&Tamanho do dicionário:"
+02000D0D="&Tamanho da palavra:"
+02000D0E="Uso de memória para compressão:"
+02000D0F="Uso de memória para descompressão:"
+02000D10="Encriptação"
+02000D11="Método de encriptação:"
+02000D12="Número de threads da CPU:"
+02000D13="Tamanho do bloco sólido:"
+02000D14="Não-sólido"
+02000D15="Sólido"
+02000D16="Comprimir arquivos compartilhados"
+
+02000D40="Dividir em &volumes, bytes:"
+02000D41="Tamanho do volume incorreto"
+02000D42="Tamanho do volume especificado: {0} bytes.\nVocê tem certeza que você quer dividir o arquivo em tais volumes?"
+
+02000D81="Armazenar"
+02000D82="Normal"
+02000D83="Máximo"
+02000D84="Rápida"
+02000D85="Mais rápida"
+02000D86="Ultra"
+
+02000D90="Navegar"
+
+02000DA1="Adicionar e substituir arquivos"
+02000DA2="Atualizar e adicionar arquivos"
+02000DA3="Atualizar arquivos existentes"
+02000DA4="Sincronizar arquivos"
+
+02000DB1="Todos os Arquivos"
+
+02000DC0="Comprimindo"
+
+; Columns dialog
+02000E00="Colunas"
+02000E01="Marque as colunas que você gostaria de tornar visíveis nesta pasta. Use os botões Mover para cima e Mover para baixo para re-ordernar as colunas."
+02000E02="A coluna selecionada deve ter"
+02000E03="pixels de &largura."
+
+02000E10="Mover para &cima"
+02000E11="Mover para &baixo"
+02000E12="&Mostrar"
+02000E13="&Esconder"
+02000E14="Definir"
+
+02000E81="Título"
+02000E82="Largura"
+
+; Testing
+02000F90="Testando"
+
+
+; File Manager
+
+03000000="Gerenciador de Arquivos do 7-Zip"
+
+; Menu
+03000102="&Arquivo"
+03000103="&Editar"
+03000104="&Ver"
+03000105="&Ferramentas"
+03000106="&Ajuda"
+03000107="F&avoritos"
+
+; File
+03000210="&Abrir"
+03000211="Abrir &por dentro"
+03000212="Abrir ex&ternamente"
+03000220="&Ver"
+03000221="&Editar"
+03000230="Re&nomear"
+03000231="&Copiar para..."
+03000232="&Mover para..."
+03000233="&Apagar"
+03000240="P&ropriedades"
+03000241="Comen&tário"
+03000242="Calcular checksum"
+03000250="Criar Pasta"
+03000251="Criar Arquivo"
+03000260="Sai&r"
+03000270="&Dividir arquivo..."
+03000271="Com&binar arquivos..."
+
+; Edit
+03000310="&Desfazer"
+03000311="&Refazer"
+03000320="Co&rtar"
+03000321="&Copiar"
+03000322="&Colar"
+03000323="&Apagar"
+03000330="Selecionar &tudo"
+03000331="Desfazer seleção"
+03000332="&Inverter seleção"
+03000333="Selecionar..."
+03000334="Desfazer seleção..."
+03000335="Selecionar por tipo"
+03000336="Desfazer seleção por tipo"
+
+; View
+03000410="Íco&nes grandes"
+03000411="Íco&nes pequenos"
+03000412="&Lista"
+03000413="&Detalhes"
+03000420="Desordenado"
+03000430="Abrir a Pasta Raiz"
+03000431="Subir um nível"
+03000432="Histórico das Pastas..."
+03000440="&Atualizar"
+03000449="Visão Plana"
+03000450="&2 Painéis"
+03000451="&Barra de Ferramentas"
+03000460="Barra de Ferramentas do Arquivo"
+03000461="Barra de Ferramentas Padrão"
+03000462="Botões Grandes"
+03000463="Mostrar o Texto dos Botões"
+
+; Tools
+03000510="&Opções..."
+03000511="&Benchmark"
+
+; Help
+03000610="&Conteúdo..."
+03000620="&Sobre o 7-Zip..."
+
+; Favorites
+03000710="&Adicionar a pasta aos favoritos como"
+03000720="Bookmark"
+
+; Options Dialog
+
+03010000="Opções"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="Opções..."
+
+; Edit
+03010200="Editor"
+03010201="&Editor:"
+
+; System
+03010300="Sistema"
+03010302="Associar o 7-Zip com:"
+03010310="Plugin"
+
+; Settings
+03010400="Configurações"
+03010401="Mostrar o item \"..\" "
+03010402="Mostrar os ícones reais dos arquivos"
+03010410="Mostrar o menu do sistema"
+03010420="&Selecionar a linha inteira"
+03010421="Mostrar as &linhas de grade"
+03010430="&Modo de seleção alternativo"
+03010440="Usar &grandes páginas de memória"
+
+; Strings
+
+03020201="Copiar"
+03020202="Mover"
+03020203="Copiar para:"
+03020204="Mover para:"
+03020205="Copiando..."
+03020206="Movendo..."
+03020207="Você não pode mover ou copiar itens para tais pastas."
+03020208="A operação não é suportada."
+03020209="Selecionar a pasta destino."
+
+03020210="Confirmar a exclusão do arquivo"
+03020211="Confirmar a exclusão da pasta"
+03020212="Confirmar a exclusão de múltiplos arquivos"
+03020213="Você tem certeza que você quer apagar '{0}'?"
+03020214="Você tem certeza que você quer apagar a pasta '{0}' e todo o seu conteúdo?"
+03020215="Você tem certeza que você quer apagar estes {0} itens?"
+03020216="Apagando..."
+03020217="Erro ao apagar o arquivo ou pasta"
+03020218="O sistema não pode mover um arquivo com caminho longo para o Recycle Bin"
+
+03020220="Renomeando..."
+03020221="Erro ao renomear o arquivo ou pasta"
+03020222="Confirmar a cópia do arquivo"
+03020223="Você tem certeza que você quer copiar os arquivos para dentro do arquivo compactado?"
+
+03020230="Criar Pasta"
+03020231="Nome da pasta:"
+03020232="Nova Pasta"
+03020233="Erro na Criação da Pasta"
+
+03020240="Criar Arquivo"
+03020241="Nome do Arquivo:"
+03020242="Novo Arquivo"
+03020243="Erro na Criação do Arquivo"
+
+03020250="Selecionar"
+03020251="Desfazer seleção"
+03020252="Máscara:"
+
+03020260="Histórico das Pastas"
+
+03020280="O arquivo '{0}' foi modificado.\nVocê quer atualizá-lo no arquivo compactado?"
+03020281="Não pôde atualizar o arquivo\n'{0}'"
+03020282="Não pôde iniciar o editor."
+03020283="Abrindo..."
+03020284="O arquivo parece um vírus (o nome do arquivo contém espaços longos no nome)."
+
+03020290="Comentário"
+03020291="&Comentário:"
+
+030202A0="Sistema"
+
+03020300="Computador"
+03020301="Rede"
+03020302="Documentos"
+
+03020400="Adicionar"
+03020401="Extrair"
+03020402="Testar"
+
+03020420="Copiar"
+03020421="Mover"
+03020422="Apagar"
+03020423="Info"
+
+03020500="Dividir Arquivo"
+03020501="&Dividir para:"
+03020510="Dividindo..."
+03020520="Confirmar a Divisão"
+03020521="Você tem certeza de quer você dividir o arquivo em {0} volumes?"
+03020522="O tamanho do volume deve ser menor do que o tamanho do arquivo original"
+
+03020600="Combinar Arquivos"
+03020601="&Combinar para:"
+03020610="Combinando..."
+03020620="Selecionar apenas o primeiro arquivo"
+03020621="Não pôde detectar o arquivo como parte do arquivo dividido"
+03020622="Não pôde achar mais do que uma parte do arquivo dividido"
+
+03020710="Calculando checksum..."
+03020720="Informação de checksum"
+03020721="CRC checksum para dados:"
+03020722="CRC checksum para dados e nomes:"
+
+03020800="Escaneando..."
+
+03020900="Propriedades"
+
+03020A01="A operação não pode ser chamada de uma pasta que tem um caminho longo."
+03020A02="Você deve selecionar um arquivo"
+03020A03="Você deve selecionar um ou mais arquivos"
+03020A04="O arquivo {0} já existe"
+
+; Computer
+03031100="Tamanho Total"
+03031101="Espaço Livre"
+03031102="Tamanho do Cluster"
+03031103="Rótulo"
+
+; Network
+03031200="Nome Local"
+03031201="Provedor"
+
+; Benchmark Dialog
+
+03080000="Benchmark"
+03080001="Uso de memória:"
+03080002="Comprimindo"
+03080003="Descomprimindo"
+03080004="Velocidade"
+03080005="Avaliação"
+03080006="Total da Avaliação"
+03080007="Atual"
+03080008="Resultado"
+03080009="Passos:"
+0308000A="Erros:"
+0308000B="Uso da CPU"
+0308000C="Avaliação / Uso"
+
+;!@LangEnd@!

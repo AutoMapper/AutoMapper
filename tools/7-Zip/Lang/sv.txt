@@ -1,0 +1,536 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.59
+; Original translation by Andreas M Nilsson and Christoffer Enqvist
+; Maintained since '7-Zip 4.07 beta' by Andreas M Nilsson
+; Updated for '7-Zip 4.42' by Bernhard Eriksson, Wermlandsdata, Sweden
+; Incorpororated changes made by Andreas M Nilsson for 4.44
+; Updated for 4.53 and 4.59 by Bernhard Eriksson, Wermlandsdata, Sweden
+
+00000000="Swedish"
+00000001="Svenska"
+00000002="29"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip konfiguration"
+
+; Info Page
+01000100="Om 7-Zip"
+01000103="7-Zip är fri programvara. Du kan emellertid stödja den fortsatta utvecklingen av 7-Zip genom att donera. Den aktuella översättningen på svenska är gjord av Wermlandsdata, baserad på arbete utfört av Andreas M Nilsson och Christoffer Enqvist."
+01000104="Support"
+01000105="Donera"
+
+; Folders Page
+01000200="Mappar"
+01000210="&Arbetsmapp"
+01000211="&Systemets temp-mapp"
+01000212="A&ktuell"
+01000213="Spe&cificerad:"
+01000214="Använd enbart för &flyttbara enheter"
+
+01000281="Ange plats där temporära arkivfiler ska sparas."
+
+; System Page
+01000300="System"
+01000301="Lägg till 7-Zip som alternativ i Utforskarens högerklicksmenyn"
+01000302="Placera 7-Zip som en undermeny"
+01000310="Objekt i högerklicksmenyn:"
+
+; Language Page
+01000400="Språk"
+01000401="Språk:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip kommandon"
+02000103="Öppna"
+02000104="Öppna det markerade arkivet."
+02000105="Packa upp filer..."
+02000106="Packar upp filer från det markerade arkivet."
+02000107="Lägg till arkiv..."
+02000108="Lägger till de markerade filerna till ett arkiv."
+02000109="Kontrollera arkivet"
+0200010A="Kontrollerar om arkivet är korrupt."
+0200010B="Packa upp här"
+0200010C="Packar upp filer från det markerade arkivet till den aktuella mappen."
+0200010D="Packa upp till {0}"
+0200010E="Packar upp filer till en undermapp."
+0200010F="Lägg till {0}"
+02000110="Lägger till de markerade filerna till ett arkiv."
+02000111="Komprimera och skicka som e-post..."
+02000112="Komprimerar de markerade filerna till ett arkiv och skickar arkivet via e-post."
+02000113="Komprimera till {0} och skicka som e-post"
+02000114="Komprimerar de markerade filerna till ett arkiv och skickar arkivet via e-post."
+
+02000140="<Mapp>"
+02000141="<Arkiv>"
+
+; Properties
+02000203="Sökväg"
+02000204="Namn"
+02000205="Filändelse"
+02000206="Mapp"
+02000207="Storlek"
+02000208="Storlek komprimerad"
+02000209="Attribut"
+0200020A="Skapad"
+0200020B="Använd"
+0200020C="Ändrad"
+0200020D="Sammanhängande (Solid)"
+0200020E="Kommenterad"
+0200020F="Krypterad"
+02000210="Delad före"
+02000211="Delad efter"
+02000212="Ordlista"
+02000213="CRC"
+02000214="Typ"
+02000215="Anti"
+02000216="Metod"
+02000217="Värd OS"
+02000218="Filsystem"
+02000219="Användare"
+0200021A="Grupp"
+0200021B="Block"
+0200021C="Kommentar"
+0200021D="Position"
+0200021E="Sökvägs prefix"
+0200021F="Kataloger"
+02000220="Filer"
+02000221="Version"
+02000222="Volym"
+02000223="Multivolym"
+02000224="Offset"
+02000225="Länkar"
+02000226="Block"
+02000227="Volymer"
+
+02000229="64-bitars"
+0200022A="Big-endian"
+0200022B="CPU"
+0200022C="Fysisk storlek"
+0200022D="Storlek på header"
+0200022E="Checksumma"
+0200022F="Karakteristisk"
+02000230="Virtuell adress"
+
+; Status bar
+02000301="{0} objekt markerade"
+02000302="{0} objekt"
+
+02000320="Filer:"
+02000321="Mappar:"
+02000322="Storlek:"
+02000323="Komprimerad storlek:"
+02000324="Arkiv:"
+
+; List Context Menu
+02000401="&Kolumner..."
+
+02000411="&Öppna"
+02000412="&Packa upp..."
+
+; ToolBar
+02000501="Packa upp"
+
+; Messages
+02000601="Uppdatering stöds inte för det här arkivet."
+02000602="Kan inte uppdatera arkiv {0}"
+02000603="Kan inte skapa mapp '{0}'"
+02000604="Arkivformatet stöds inte."
+02000605="Fel"
+02000606="För många objekt"
+02000607="Filändelsen är inte associerad till något program"
+02000608="Inga fel påträffades"
+02000609="Kan inte öppna filen '{0}' som ett arkiv"
+0200060A="Kan inte öppna det krypterade arkivet '{0}'. Fel lösenord?"
+0200060B="Systemet kan inte allokera den begärda minnesmängden"
+0200060C="Okänt fel"
+0200060D="Arkiv typen stöds ej"
+
+; Dialogs
+02000702="OK"
+02000705="&Ja"
+02000707="Ja till &Alla"
+02000709="&Nej"
+0200070B="Nej till A&lla"
+
+02000710="Avbryt"
+02000711="A&vbryt"
+02000713="&Stäng"
+02000714="Stopp"
+02000715="Starta om"
+
+02000720="Hjälp"
+
+; Extract dialog
+02000800="Packa upp"
+02000801="&Packa upp till:"
+02000802="&Lösenord"
+
+02000810="&Sökvägstyp"
+02000811="Kompletta sökvägar"
+02000812="Aktuella sökvägar"
+02000813="Inga sökvägar"
+
+02000820="&Överskrivning"
+02000821="Fråga före överskrivning"
+02000822="Skriv över befintliga filer"
+02000823="Hoppa över befintliga filer"
+02000824="Automatisk omdöpning"
+02000825="Automatisk omdöpning av befintliga filer"
+
+02000830="Filer"
+02000831="&Markerade filer"
+02000832="&Alla filer"
+
+02000881="Ange sökväg för uppackade filer."
+
+02000890="Packar upp"
+
+; Overwrite dialog
+02000900="Bekräfta överskrivning av fil"
+02000901="Målmappen innehåller redan den behandlade filen."
+02000902="Vill du skriva över den befintliga filen"
+02000903="med den här?"
+
+02000911="A&utomatisk omdöpning"
+
+02000982="{0} bytes"
+02000983="ändrad den"
+
+; Messages dialog
+02000A00="Diagnostiska meddelanden"
+
+02000A80="Meddelande"
+
+02000A91="Komprimeringsmetoden stöds inte för '{0}'."
+02000A92="Datafel i '{0}'. Filen är korrupt."
+02000A93="CRC-fel i '{0}'. Filen är korrupt."
+02000A94="Datafel i den krypterade filen '{0}'. Fel lösenord?"
+02000A95="CRC-fel i den krypterade filen '{0}'. Fel lösenord?"
+
+; Password dialog
+02000B00="Ange lösenord"
+02000B01="Ange lösenord:"
+02000B02="&Visa lösenord"
+02000B03="Upprepa lösenord:"
+02000B10="Lösenorden stämmer inte överens."
+02000B11="Använd endast engelska tecken, siffror och special tecken (!, #, $, ...) till lösenord"
+02000B12="Lösenordet är för långt."
+
+; Progress dialog
+02000C00="Förlopp"
+02000C01="Förfluten tid:"
+02000C02="Återstående tid:"
+02000C03="Storlek:"
+02000C04="Hastighet:"
+02000C05="Bearbetat:"
+02000C06="Komprimeringsgrad:"
+
+02000C10="&Bakgrunden"
+02000C11="&Förgrunden"
+02000C12="&Pausa"
+02000C13="F&ortsätt"
+
+02000C20="Pausad"
+
+02000C30="Är du säker på att du vill avbryta?"
+
+; Compress dialog
+02000D00="Lägg till arkiv"
+02000D01="&Arkiv:"
+02000D02="&Uppdateringsmetod:"
+02000D03="Arkiv&format:"
+02000D04="&Komprimeringsmetod:"
+02000D05="Skapa ett &sammanhängande (eng. solid) arkiv"
+02000D06="&Parametrar:"
+02000D07="Alternativ"
+02000D08="Skapa sj&älvuppackande arkiv"
+02000D09="Använd flera trådar"
+02000D0A="Kryptera fil&namn"
+02000D0B="Komprimeringsniv&å:"
+02000D0C="Storlek på &ordlista:"
+02000D0D="Storlek på o&rd:"
+02000D0E="Minne behövt vid komprimering:"
+02000D0F="Minne behövt vid dekomprimering:"
+02000D10="Kryptering"
+02000D11="Krypteringsmetod:"
+02000D12="Antal trådar:"
+02000D13="Solit block storlek:"
+02000D14="Icke-solit"
+02000D15="Solit"
+02000D16="Komprimera delade filer"
+
+02000D40="Dela upp i &delar (volymer), bytes:"
+02000D41="Felaktig volymstorlek."
+02000D42="Specificerad volymstorlek: {0} byte.\nÄr du säker du vill dela arkivet i sådana delar?"
+
+02000D81="Okomprimerat"
+02000D82="Normal"
+02000D83="Maximal"
+02000D84="Snabb"
+02000D85="Snabbaste"
+02000D86="Ultra"
+
+02000D90="Bläddra"
+
+02000DA1="Lägg till och ersätt filer"
+02000DA2="Lägg till och uppdatera befintliga filer"
+02000DA3="Uppdatera enbart befintliga filer"
+02000DA4="Synkronisera filer"
+
+02000DB1="Alla filer"
+
+02000DC0="Komprimerar"
+
+; Columns dialog
+02000E00="Kolumner"
+02000E01="Markera de kolumner du vill ska vara synliga i den här mappen. Använd \"Flytta Upp\" och \"Flytta Ner\" knapparna för att ordna om kolumnerna."
+02000E02="Den valda kolumnen ska vara"
+02000E03="pixlar &bred."
+
+02000E10="Flytta &Upp"
+02000E11="Flytta &Ner"
+02000E12="&Visa"
+02000E13="&Dölj"
+02000E14="Bestäm"
+
+02000E81="Titel"
+02000E82="Bredd"
+
+; Testing
+02000F90="Kontrollerar"
+
+
+; File Manager
+
+03000000="7-Zip Filhanterare"
+
+; Menu
+03000102="&Arkiv"
+03000103="&Redigera"
+03000104="&Visa"
+03000105="Verkt&yg"
+03000106="&Hjälp"
+03000107="&Favoriter"
+
+; File
+03000210="&Öppna"
+03000211="Öppna &internt"
+03000212="Öppna &externt"
+03000220="&Visa"
+03000221="&Redigera"
+03000230="&Byt namn"
+03000231="&Kopiera till..."
+03000232="&Flytta till..."
+03000233="&Ta bort"
+03000240="E&genskaper"
+03000241="Komme&ntera"
+03000242="Beräkna checksumma"
+03000250="Skapa mapp"
+03000251="Skapa fil"
+03000260="&Avsluta"
+03000270="&Dela upp fil..."
+03000271="&Sätt ihop filer..."
+
+; Edit
+03000310="&Ångra"
+03000311="&Gör om"
+03000320="&Klipp ut"
+03000321="K&opiera"
+03000322="K&listra in"
+03000323="&Ta bort"
+03000330="Markera &alla"
+03000331="Avmarkera alla"
+03000332="&Invertera markering"
+03000333="Markera..."
+03000334="Avmarkera..."
+03000335="Markera efter typ"
+03000336="Avmarkera efter typ"
+
+; View
+03000410="St&ora ikoner"
+03000411="Sm&å ikoner"
+03000412="&Lista"
+03000413="&Detaljerad lista"
+03000420="Osorterade"
+03000430="Öppna rotmappen"
+03000431="Upp en nivå"
+03000432="Mapphistorik..."
+03000440="&Uppdatera"
+03000449="Platt vy"
+03000450="&2 Paneler"
+03000451="&Verktygsfält"
+03000460="Verktygsfältet Arkiv"
+03000461="Verktygsfältet Standard"
+03000462="Stora Knappar"
+03000463="Visa Knapptext"
+
+; Tools
+03000510="&Alternativ..."
+03000511="&Benchmark"
+
+; Help
+03000610="&Innehåll..."
+03000620="&Om 7-Zip..."
+
+; Favorites
+03000710="&Lägg mappen till Favoriter som"
+03000720="Bokmärke"
+
+; Options Dialog
+
+03010000="Alternativ"
+
+; Plugins
+03010100="Insticksmoduler"
+03010101="&Insticksmoduler:"
+03010110="Alternativ..."
+
+; Edit
+03010200="Redigerare"
+03010201="&Redigerare:"
+
+; System
+03010300="System"
+03010302="Associera med 7-Zip:"
+03010310="Insticksmodul"
+
+; Settings
+03010400="Inställningar"
+03010401="Visa \"..\" objektet"
+03010402="Visa riktiga ikoner, för filer innehållande ikoner (el. länkade)"
+03010410="Visa system-menyn"
+03010420="Markera &hel rad"
+03010421="Visa &rutnät"
+03010430="&Alternativt markeringsläge"
+03010440="Använd &stora minnessidor"
+
+; Strings
+
+03020201="Kopiera"
+03020202="Flytta"
+03020203="Kopiera till:"
+03020204="Flytta till:"
+03020205="Kopierar..."
+03020206="Flyttar..."
+03020207="Du kan inte flytta eller kopiera objekt till sådan mapp."
+03020208="Funktionen stöds inte."
+03020209="Välj målmapp."
+
+03020210="Bekräfta borttagning av fil"
+03020211="Bekräfta borttagning av mapp"
+03020212="Bekräfta borttagning av flera filer"
+03020213="Är du säker på att du vill ta bort '{0}'?"
+03020214="Är du säker på att du vill ta bort mappen '{0}' och allt dess innehåll?"
+03020215="Är du säker på att du vill ta bort de här {0} objekten?"
+03020216="Tar bort..."
+03020217="Ett fel uppstod under borttagning av fil eller mapp"
+03020218="Systemet kan inte flytta en fil med s lng skvg till papperskorgen"
+
+03020220="Döper om..."
+03020221="Ett fel uppstod under omdöpning av fil eller mapp"
+03020222="Bekräfta kopiering av fil"
+03020223="Är du säker på att du vill kopiera filerna till arkivet"
+
+03020230="Skapa mapp"
+03020231="Mappnamn:"
+03020232="Ny mapp"
+03020233="Fel vid skapande av mapp"
+
+03020240="Skapa fil"
+03020241="Filnamn:"
+03020242="Ny fil"
+03020243="Fel vid skapande av fil"
+
+03020250="Markera"
+03020251="Avmarkera"
+03020252="Filter:"
+
+03020260="Mapphistorik"
+
+03020280="Filen '{0}' har blivit ändrad.\nVill du uppdatera den i arkivet?"
+03020281="Kan inte uppdatera filen\n'{0}'"
+03020282="Kan inte starta redigeraren."
+03020283="Öppnar..."
+03020284="Filen verkar vara ett virus (filnamnet innehåller 'långa' mellanslag)."
+
+03020290="Kommentar"
+03020291="&Kommentar:"
+
+030202A0="System"
+
+03020300="Dator"
+03020301="Nätverk"
+03020302="Dokument"
+
+03020400="Lägg till"
+03020401="Packa upp"
+03020402="Testa"
+
+03020420="Kopiera"
+03020421="Flytta"
+03020422="Radera"
+03020423="Info"
+
+03020500="Dela Upp Fil"
+03020501="&Dela upp till:"
+03020510="Delar upp..."
+03020520="Bekräfta uppdelning"
+03020521="Är det säkert du vill dela upp filen i {0} volymer?"
+03020522="Volymstorleken måste vara mindre än storleken på originalfilen."
+
+03020600="Sätt Ihop Filer"
+03020601="&Sätt ihop till:"
+03020610="Sätter ihop..."
+03020620="Markera bara första filen"
+03020621="Kan inte upptäcka att filen är en del av en uppdelad fil"
+03020622="Kan inte hitta mer än en del av en uppdelad fil"
+
+03020710="Beräknar checksumma..."
+03020720="Checksumma information"
+03020721="CRC checksumma för data:"
+03020722="CRC checksumma för data och namn:"
+
+03020800="Skannar..."
+
+03020900="Egenskaper"
+
+03020A01="Operation kan inte utföras från en katalog med en så lång sökväg."
+03020A02="Du måste välja en fil"
+03020A03="Du måste välja en eller flera filer"
+03020A04="Filen {0} existerar redan"
+
+; Computer
+03031100="Total Storlek"
+03031101="Ledigt utrymme"
+03031102="Kluster storlek"
+03031103="Etikett"
+
+; Network
+03031200="Datornamn"
+03031201="Nätverkstyp"
+
+; Benchmark Dialog
+
+03080000="Benchmark"
+03080001="Minnesanvändning:"
+03080002="Komprimering"
+03080003="Dekomprimering"
+03080004="Hastighet"
+03080005="Prestanda"
+03080006="Total prestanda"
+03080007="Aktuellt"
+03080008="Resultat"
+03080009="Omgångar:"
+0308000A="Fel:"
+0308000B="CPU Användning"
+0308000C="Rate / Användning"
+
+;!@LangEnd@!
+
+ 	  	 

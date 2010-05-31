@@ -1,0 +1,545 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 9.07
+; Translated by Jeroen Tulp - Vertaald door Jeroen Tulp
+;
+; Changed and updated translations as done for 7-Zip 4.26 Beta by Jeroen van der Weijde.
+;
+; Special thanks to Fuss! and r00n for their support in perfecting these translations.
+
+00000000="Dutch"
+00000001="Nederlands"
+00000002="19"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Configuratie"
+
+; Info Page
+01000100="Over 7-Zip"
+01000103="7-Zip is gratis software. Echter, u kunt de ontwikkeling van 7-Zip ondersteunen door u te registreren."
+01000104="&Ondersteuning"
+01000105="&Registreren"
+
+; Folders Page
+01000200="Mappen"
+01000210="&Werkmap"
+01000211="&Tijdelijke systeemmap"
+01000212="&Huidige"
+01000213="&Gespecificeerd:"
+01000214="Alleen voor verwisselbare schijven gebruiken."
+
+01000281="Specificeer een locatie voor tijdelijke archiefbestanden."
+
+; System Page
+01000300="Systeem"
+01000301="7-Zip in het contextmenu integreren."
+01000302="Trapsgewijs contextmenu"
+01000310="Contextmenu items:"
+
+; Language Page
+01000400="Taal"
+01000401="Taal:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip opdrachten"
+02000103="Open archief"
+02000104="Opent het geselecteerde archief."
+02000105="Bestanden uitpakken..."
+02000106="Bestanden uitpakken voor het geselecteerde archief."
+02000107="Toevoegen aan archief..."
+02000108="Toevoegen van de geselecteerde items aan een archief."
+02000109="Archief testen"
+0200010A="Integriteit van het geselecteerde archief testen."
+0200010B="Pak hier uit"
+0200010C="Pakt bestanden in het archief uit naar de huidige map."
+0200010D="Pak uit naar {0}"
+0200010E="Pakt bestanden in het archief uit naar een submap."
+0200010F="Toevoegen aan {0}"
+02000110="Toevoegen van geselecteerde items aan het archief."
+02000111="Comprimeer en verstuur..."
+02000112="Comprimeert de geselecteerde items in een archief en verstuur het via e-mail."
+02000113="Comprimeer naar {0} en verstuur"
+02000114="Comprimeert de geselecteerde items in het archief en verstuur het via e-mail."
+
+02000140="<Map>"
+02000141="<Archief>"
+
+; Properties
+02000203="Pad"
+02000204="Naam"
+02000205="Extensie"
+02000206="Map"
+02000207="Grootte"
+02000208="Ingepakte grootte"
+02000209="Kenmerken"
+0200020A="Aangemaakt"
+0200020B="Laatst geopend"
+0200020C="Gewijzigd"
+0200020D="Compact"
+0200020E="Commentaar"
+0200020F="Gecodeerd"
+02000210="Gesplitst voor"
+02000211="Gesplitst na"
+02000212="Woordenboek"
+02000213="CRC"
+02000214="Type"
+02000215="Anti"
+02000216="Methode"
+02000217="Gastheer OS"
+02000218="Bestandssysteem"
+02000219="Gebruiker"
+0200021A="Groep"
+0200021B="Blok"
+0200021C="Opmerking"
+0200021D="Positie"
+0200021E="Pad Prefix"
+0200021F="Mappen"
+02000220="Bestanden"
+02000221="Versie"
+02000222="Volume"
+02000223="Multivolume"
+02000224="Offset"
+02000225="Koppelingen"
+02000226="Blokken"
+02000227="Volumes"
+
+02000229="64-bit"
+0200022A="Big-endian"
+0200022B="CPU"
+0200022C="Fysieke grootte"
+0200022D="Kop grootte"
+0200022E="Checksum"
+0200022F="Karakteristieken"
+02000230="Virtueel Adres"
+02000231="ID"
+02000232="Korte Naam"
+02000233="Aanmaak Applicatie"
+02000234="Sector Grootte"
+02000235="Modus"
+02000236="Link"
+
+; Status bar
+02000301="{0} item(s) geselecteerd"
+02000302="{0} item(s)"
+
+02000320="Bestanden:"
+02000321="Mappen:"
+02000322="Grootte:"
+02000323="Gecomprimeerde grootte:"
+02000324="Archieven:"
+
+; List Context Menu
+02000401="&Kolommen..."
+
+02000411="&Openen"
+02000412="&Uitpakken..."
+
+; ToolBar
+02000501="Uitpakken"
+
+; Messages
+02000601="Bijwerkfuncties niet ondersteund voor dit archief."
+02000602="Kan archief {0} niet bijwerken."
+02000603="Kan map '{0}' niet aanmaken."
+02000604="Dit bestand is geen ondersteund archief."
+02000605="Fout"
+02000606="Te veel items"
+02000607="Er is geen programma geassocieerd met deze bestandsextensie."
+02000608="Er zijn geen fouten."
+02000609="Kan bestand '{0}' niet openen als archief."
+0200060A="Kan het gecodeerde archief '{0}' niet openen. Verkeerd wachtwoord?"
+0200060B="Het systeem kan de benodigde hoeveelheid geheugen niet alloceren"
+0200060C="Onbekende fout"
+0200060D="Niet ondersteund archief type"
+
+; Dialogs
+02000702="OK"
+02000705="&Ja"
+02000707="Ja op &alles"
+02000709="&Nee"
+0200070B="Nee op a&lles"
+
+02000710="Annuleren"
+02000711="&Annuleren"
+02000713="A&fsluiten"
+02000714="Stop"
+02000715="Herstarten"
+
+02000720="Help"
+
+; Extract dialog
+02000800="&Uitpakken"
+02000801="U&itpakken naar:"
+02000802="&Wachtwoord"
+
+02000810="Padmethode"
+02000811="Volledige padnamen"
+02000812="Huidige padnamen"
+02000813="Geen padnamen"
+
+02000820="Overschrijfmethode"
+02000821="Vraag voor overschrijven"
+02000822="Overschrijven zonder bevestiging"
+02000823="Bestaande bestanden overslaan"
+02000824="Automatisch hernoemen"
+02000825="Automatisch hernoemen van bestaande bestanden"
+
+02000830="Bestanden"
+02000831="&Geselecteerde bestanden"
+02000832="&Alle bestanden"
+
+02000881="Geef een locatie op voor de uitgepakte bestanden."
+
+02000890="Bezig met uitpakken..."
+
+; Overwrite dialog
+02000900="Bevestig vervangen bestand"
+02000901="Doelmap bevat reeds het verwerkte bestand."
+02000902="Wilt u het bestaande bestand vervangen"
+02000903="door dit bestand?"
+
+02000911="A&utomatisch hernoemen"
+
+02000982="{0} bytes"
+02000983="gewijzigd op"
+
+; Messages dialog
+02000A00="Diagnostische berichten"
+
+02000A80="Bericht"
+
+02000A91="Niet ondersteunde compressiemethode voor '{0}'."
+02000A92="Gegevensfout in '{0}'. Bestand is beschadigd."
+02000A93="CRC mislukt in '{0}'. Bestand is beschadigd."
+02000A94="Gegevensfout in het gecodeerde bestand '{0}'. Verkeerd wachtwoord?"
+02000A95="CRC mislukt in het gecodeerde bestand '{0}'. Verkeerd wachtwoord?"
+
+; Password dialog
+02000B00="Wachtwoord ingeven"
+02000B01="Wachtwoord &ingeven:"
+02000B02="Wachtwoord &tonen"
+02000B03="Wachtwoord bevestigen:"
+02000B10="Wachtwoorden komen niet overeen."
+02000B11="Gebruik alleen alfanumerieke en speciale karakters (!, #, $, ...) voor het wachtwoord."
+02000B12="Wachtwoord is te lang."
+
+; Progress dialog
+02000C00="Verwerking"
+02000C01="Verstreken tijd:"
+02000C02="Overgebleven tijd:"
+02000C03="Grootte:"
+02000C04="Snelheid:"
+02000C05="Verwerkt:"
+02000C06="Compressie verhouding:"
+
+02000C10="&Achtergrond"
+02000C11="&Voorgrond"
+02000C12="&Pauzeren"
+02000C13="&Hervatten"
+
+02000C20="Gepauzeerd"
+
+02000C30="Weet u zeker dat u wilt annuleren?"
+
+; Compress dialog
+02000D00="Toevoegen aan archief"
+02000D01="&Archief:"
+02000D02="&Bijwerkmethode:"
+02000D03="Archief &formaat:"
+02000D04="Compressie&methode:"
+02000D05="&Compact archief maken"
+02000D06="&Parameters:"
+02000D07="Opties"
+02000D08="SF&X archief maken"
+02000D09="Multi-threading"
+02000D0A="Codee&r bestandsnamen"
+02000D0B="Compressie&niveau:"
+02000D0C="&Woordenboekgrootte:"
+02000D0D="W&oordgrootte:"
+02000D0E="Geheugengebruik bij het inpakken:"
+02000D0F="Geheugengebruik bij het uitpakken:"
+02000D10="Codering"
+02000D11="Cod&eermethode:"
+02000D12="Aantal CP&U-threads:"
+02000D13="Compacte b&lokgrootte:"
+02000D14="Niet compact"
+02000D15="Compact"
+02000D16="Comprimeer &gedeelde bestanden"
+
+02000D40="Opsplitsen in &volumes (grootte in bytes):"
+02000D41="Verkeerde volumegrootte"
+02000D42="Gespecificeerde volumegrootte: {0} bytes.\nWeet u zeker dat u het archief zo wilt splitsen?"
+
+02000D81="Opslaan"
+02000D82="Normaal"
+02000D83="Maximum"
+02000D84="Snel"
+02000D85="Snelst"
+02000D86="Ultra"
+
+02000D90="Bladeren"
+
+02000DA1="Bestanden toevoegen en vervangen"
+02000DA2="Bestanden bijwerken en toevoegen"
+02000DA3="Bestaande bestanden opfrissen"
+02000DA4="Bestanden synchroniseren"
+
+02000DB1="Alle bestanden"
+
+02000DC0="Bezig met comprimeren..."
+
+; Columns dialog
+02000E00="Kolommen"
+02000E01="Markeer de kolommen die u zichtbar wilt maken in deze map. Gebruik de omhoog en omlaag knoppen om de kolommen te rangschikken."
+02000E02="De gemarkeerde kolom moet"
+02000E03="pixels &breed zijn."
+
+02000E10="Om&hoog verplaatsen"
+02000E11="Om&laag verplaatsen"
+02000E12="&Tonen"
+02000E13="&Verbergen"
+02000E14="Instellen"
+
+02000E81="Titel"
+02000E82="Breedte"
+
+; Testing
+02000F90="Bezig met testen..."
+
+
+; File Manager
+
+03000000="7-Zip Bestandsbeheer"
+
+; Menu
+03000102="&Bestand"
+03000103="Be&werken"
+03000104="Bee&ld"
+03000105="E&xtra"
+03000106="&Help"
+03000107="&Favorieten"
+
+; File
+03000210="&Openen"
+03000211="Open B&innen"
+03000212="Open B&uiten"
+03000220="Bee&ld"
+03000221="&Bewerken"
+03000230="Naam wi&jzigen"
+03000231="Kopiëren &naar..."
+03000232="&Verplaatsen naar..."
+03000233="Verwij&deren"
+03000240="Ei&genschappen"
+03000241="O&pmerking"
+03000242="&Checksum berekenen"
+03000243="Vergelijken"
+03000250="Nieuwe &map"
+03000251="Nieuw b&estand"
+03000260="&Sluiten"
+03000270="Bestand opspli&tsen..."
+03000271="Bestanden s&amenvoegen..."
+
+; Edit
+03000310="&Ongedaan maken"
+03000311="&Opnieuw"
+03000320="Kn&ippen"
+03000321="&Kopiëren"
+03000322="P&lakken"
+03000323="Verwij&deren"
+03000330="&Alles selecteren"
+03000331="All&es de-selecteren"
+03000332="Sele&ctie omkeren"
+03000333="&Selecteer..."
+03000334="&De-selecteer..."
+03000335="&Selecteer op type"
+03000336="&De-selecteer op type"
+
+; View
+03000410="&Grote pictogrammen"
+03000411="&Kleine pictogrammen"
+03000412="&Lijst"
+03000413="&Details"
+03000420="&Ongesorteerd"
+03000430="&Root map openen"
+03000431="Één &niveau omhoog"
+03000432="&Mappen Geschiedenis..."
+03000440="&Vernieuwen"
+03000449="&Platte weergave"
+03000450="&2 Panelen"
+03000451="&Werkbalken"
+03000460="&Archief werkbalk"
+03000461="&Standaard werkbalk"
+03000462="Grote kn&oppen"
+03000463="Knop&tekst weergeven"
+
+; Tools
+03000510="&Opties..."
+03000511="&Benchmark"
+
+; Help
+03000610="&Inhoud..."
+03000620="&Over 7-Zip..."
+
+; Favorites
+03000710="&Map toevoegen aan favorieten"
+03000720="Toevoegen als"
+
+; Options Dialog
+
+03010000="Opties"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="&Opties..."
+
+; Edit
+03010200="Editor"
+03010201="&Editor:"
+03010202="&Vergelijken:"
+
+; System
+03010300="Systeem"
+03010302="Associeer 7-Zip met:"
+03010310="Plugin"
+
+; Settings
+03010400="Instellingen"
+03010401="Toon \"..\" &item"
+03010402="Toon &echte bestandspictogrammen"
+03010410="Toon &systeem contextmenu"
+03010420="&Selecteer gehele rij"
+03010421="Toon &rasterlijnen"
+03010422="Enkele klik om een item te openen"
+03010430="&Alternatieve selectiemodus"
+03010440="&Gebruik grote geheugenpagina's"
+
+; Strings
+
+03020201="Kopiëren"
+03020202="Verplaatsen"
+03020203="Kopiëren naar:"
+03020204="Verplaatsen naar:"
+03020205="Bezig met kopiëren..."
+03020206="Bezig met verplaatsen..."
+03020207="U kunt items niet verplaatsen of kopiëren voor dergelijke mappen."
+03020208="Functie wordt niet ondersteund."
+03020209="Selecteer een doelmap."
+
+03020210="Verwijdering bestand bevestigen"
+03020211="Verwijdering map bevestigen"
+03020212="Verwijdering van meerdere bestanden bevestigen"
+03020213="Weet u zeker dat u '{0}' wilt verwijderen?"
+03020214="Weet u zeker dat u de map '{0}' en alle onderliggende items wilt verwijderen?"
+03020215="Weet u zeker dat u deze {0} items wilt verwijderen?"
+03020216="Bezig met verwijderen..."
+03020217="Fout bij het verwijderen van een bestand of map"
+03020218="Het systeem kan een bestand met een lang pad niet verplaatsen naar de Prullenbak"
+
+03020220="Bezig met hernoemen..."
+03020221="Fout bij het hernoemen van een bestand of map"
+03020222="Bevestig kopiëren van bestand"
+03020223="Weet u zeker dat u deze bestanden naar het archief wilt kopiëren"
+
+03020230="Map maken"
+03020231="Naam van de map:"
+03020232="Nieuwe map"
+03020233="Fout bij het maken van de map"
+
+03020240="Bestand maken"
+03020241="Bestandsnaam:"
+03020242="Nieuw bestand"
+03020243="Fout bij het maken van het bestand."
+
+03020250="Selecteren"
+03020251="De-selecteren"
+03020252="Masker:"
+
+03020260="Mappen Geschiedenis"
+
+03020280="Bestand '{0}' is gewijzigd.\nWilt u het bijwerken in het archief?"
+03020281="Kan bestand\n'{0}' niet bijwerken."
+03020282="Kan de editor niet starten."
+03020283="Bezig met openen..."
+03020284="Het bestand lijkt op een virus (het bevat veel opeenvolgende spaties in de naam)."
+
+03020290="Opmerking"
+03020291="&Opmerking:"
+
+030202A0="Systeem"
+
+03020300="Computer"
+03020301="Netwerk"
+03020302="Documenten"
+
+03020400="Toevoegen"
+03020401="Uitpakken"
+03020402="Testen"
+
+03020420="Kopiëren"
+03020421="Verplaatsen"
+03020422="Verwijderen"
+03020423="Info"
+
+03020500="Opsplitsen bestand"
+03020501="&Opsplitsen naar:"
+03020510="Bezig met opsplitsen..."
+03020520="Bevestigen opsplitsen"
+03020521="Weet u zeker dat u het bestand wilt opsplitsen in {0} volumes?"
+03020522="De volumegrootte moet kleiner zijn dan de grootte van het oorspronkelijke bestand."
+
+03020600="Bestanden samenvoegen"
+03020601="&Samenvoegen naar:"
+03020610="Bezig met samenvoegen..."
+03020620="Selecteer alleen het eerste bestand."
+03020621="Kan het bestand niet herkennen als onderdeel van een gesplitst bestand"
+03020622="Kan niet meer dan 1  deel van een gesplitst bestand"
+
+03020710="Bezig met checksum berekenen..."
+03020720="Checksum informatie"
+03020721="CRC checksum voor gegevens:"
+03020722="CRC checksum voor gegevens en namen:"
+
+03020800="Bezig met scannen..."
+
+03020900="Eigenschappen"
+
+03020A01="De actie kan niet worden uitgevoerd vanuit een folder met een dermate lang pad."
+03020A02="U moet 1 bestand selecteren"
+03020A03="U moet 1 of meerdere bestanden selecteren"
+03020A04="Bestand {0} bestaat reeds"
+
+; Computer
+03031100="Capaciteit"
+03031101="Beschikbaar"
+03031102="Clustergrootte"
+03031103="Label"
+
+; Network
+03031200="Lokale naam"
+03031201="Provider"
+
+; Benchmark Dialog
+
+03080000="Benchmark"
+03080001="Geheugengebruik:"
+03080002="Inpakken"
+03080003="Uitpakken"
+03080004="Snelheid"
+03080005="Waarde"
+03080006="Totale waarde"
+03080007="Huidig"
+03080008="Resultaat"
+03080009="Doorgangen:"
+0308000A="Fouten:"
+0308000B="CPU-gebruik"
+0308000C="Waarde / gebruik"
+
+;!@LangEnd@!
+
+ 	  	 

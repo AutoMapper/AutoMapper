@@ -1,0 +1,534 @@
+;!@Lang@!UTF-8!
+; 7-Zip 4.60 beta
+; Translated by Andrea Decorte (Klenje)
+; http://softfurlan.altervista.org
+; secont l'ortografie uficiâl de Provincie di Udin
+;
+;
+
+00000000="Friulian"
+00000001="Furlan"
+00000002=""
+
+; 7-Zip Configuration
+
+; Title
+01000000="Configurazion di 7-Zip"
+
+; Info Page
+01000100="Informazions su 7-Zip"
+01000103="7-Zip al è un program libar. Purpûr, tu puedis supuartâ il disvilup di 7-Zip cu la regjistrazion. I utents regjistrâts a podaran otignî supuart tecnic."
+01000104="Supuart tecnic"
+01000105="Regjistre"
+
+; Folders Page
+01000200="Cartelis"
+01000210="Cartele di &vore"
+01000211="Cartele &provisorie dal sisteme"
+01000212="&Corinte"
+01000213="&Specificade:"
+01000214="Dopre dome pai drives che si puedin gjavâ"
+
+01000281="Specifiche une posizion pai files provisoris di un archivi."
+
+; System Page
+01000300="Sisteme"
+01000301="Integre 7-Zip intal menù contestuâl de shell"
+01000302="Menù contestuâl in discjadude"
+01000310="Elements dal menù contestuâl:"
+
+; Language Page
+01000400="Lenghe"
+01000401="Lenghe:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Comants di 7-Zip"
+02000103="Viarç archivi"
+02000104="Viarç l'archivi selezionât."
+02000105="Tire fûr files..."
+02000106="Tire fûr files dal archivi selezionât."
+02000107="Zonte a un archivi..."
+02000108="Zonte i elements selezionâts a un archivi."
+02000109="Prove archivi"
+0200010A="Prove l'integritât dal archivi selezionât."
+0200010B="Tire fûr ca"
+0200010C="Tire fûr files dal archivi selezionât inte cartele corinte."
+0200010D="Tire fûr in {0}"
+0200010E="Tire fûr i files intune sotcartele."
+0200010F="Zonte a {0}"
+02000110="Zonte i elements selezionâts a un archivi."
+02000111="Comprim e mande par email..."
+02000112="Comprim i elements selezionâts e mande l'archivi par email."
+02000113="Comprim in {0} e mande par email"
+02000114="Comprim i elements selezionâts e mande l'archivi par email."
+
+02000140="<Cartele>"
+02000141="<archivi>"
+
+; Properties
+02000203="Percors"
+02000204="Non"
+02000205="Estension"
+02000206="Cartele"
+02000207="Dimension"
+02000208="Dimension comprimude"
+02000209="Atribûts"
+0200020A="Creât"
+0200020B="Ultin acès"
+0200020C="Modificât"
+0200020D="Solit"
+0200020E="Comentât"
+0200020F="Cifrât"
+02000210="Divît prin di"
+02000211="Divît daspò di"
+02000212="Dizionari"
+02000213="CRC"
+02000214="Gjenar"
+02000215="Anti"
+02000216="Metodi"
+02000217="SO di origjin"
+02000218="Sisteme dai files"
+02000219="Utent"
+0200021A="Grup"
+0200021B="Bloc"
+0200021C="Coment"
+0200021D="Posizion"
+0200021E="Prefìs dal troi"
+0200021F="Cartelis"
+02000220="Files"
+02000221="Version"
+02000222="Volum"
+02000223="Multivolum"
+02000224="Offset"
+02000225="Leams"
+02000226="Blocs"
+02000227="Volums"
+
+02000229="64-bit"
+0200022A="Big-endian"
+0200022B="CPU"
+0200022C="Dimension fisiche"
+0200022D="Dimension intestazions"
+0200022E="Some di control"
+0200022F="Caracteristichis"
+02000230="Direzion virtuâl"
+
+; Status bar
+02000301="{0} ogjet(s) selezionât(s)"
+02000302="{0} ogjet(s)"
+
+02000320="Files:"
+02000321="Cartelis:"
+02000322="Dimension:"
+02000323="Dimension comprimude:"
+02000324="Archivis:"
+
+; List Context Menu
+02000401="&Colonis..."
+
+02000411="&Viarç"
+02000412="&Tire fûr..."
+
+; ToolBar
+02000501="Tire fûr"
+
+; Messages
+02000601="Lis operazions di atualizazion no son supuartadis par chest archivi."
+02000602="No si pues atualizâ l'archivi {0}"
+02000603="No si pues creâ la cartele '{0}'"
+02000604="Il file nol è un archivi supuartât."
+02000605="Erôr"
+02000606="Masse elements"
+02000607="Nissune aplicazion e je associade cu la estension di chest file"
+02000608="Nissun erôr cjatât"
+02000609="No si pues viarzi il file '{0}' come archivi"
+0200060A="No si pues viarzi l'archivi cifrât '{0}'. Ise sbaliade la peraule clâf?"
+0200060B="Il sisteme nol rive a cjoli la cuantitât di memorie che e covente"
+0200060C="Erôr no cognossût"
+0200060D="Gjenar di archivi no supuartât"
+
+; Dialogs
+02000702="Va ben"
+02000705="&Sì"
+02000707="Sì &a ducj"
+02000709="&No"
+0200070B="No a &ducj"
+
+02000710="Scancele"
+02000711="S&cancele"
+02000713="&Siare"
+02000714="Ferme"
+02000715="Torne a inviâ"
+
+02000720="&Jutori"
+
+; Extract dialog
+02000800="Tire fûr"
+02000801="Tir&e fûr in:"
+02000802="Peraule clâf"
+
+02000810="Struture des cartelis"
+02000811="Percors intîrs"
+02000812="Percors corints"
+02000813="Nissun percors"
+
+02000820="Sore scriture"
+02000821="Domande prin di scrivi parsore"
+02000822="Scrîf parsore cence domandâ"
+02000823="Salte i files che esistin"
+02000824="Gambie nons in automatic"
+02000825="Gambie nons in automatic se a esistin"
+
+02000830="Files"
+02000831="Files &selezionâts"
+02000832="Duc&j i files"
+
+02000881="Specifiche une posizion pai files tirâts fûr."
+
+02000890="Daûr a tirâ fûr..."
+
+; Overwrite dialog
+02000900="Conferme de sostituzion dal file"
+02000901="Inte cartele di destinazion al è za il file processât."
+02000902="Vuelistu sostituî il file esistint"
+02000903="cun chest file?"
+
+02000911="&Gambie non in automatic"
+
+02000982="{0} bytes"
+02000983="modificât ai"
+
+; Messages dialog
+02000A00="Messaçs diagnostics"
+
+02000A80="Messaç"
+
+02000A91="Il metodi di compression nol è supuartât par '{0}'."
+02000A92="Erôr di dâts in '{0}'. Il file al è corot."
+02000A93="CRC falît in '{0}'. Il file al è corot."
+02000A94="Erôr di dâts tal file cifrât '{0}'. Peraule clâf sbaliade?"
+02000A95="CRC falît tal file cifrât '{0}'. Peraule clâf sbaliade?"
+
+; Password dialog
+02000B00="Scrîf peraule clâf"
+02000B01="Scrîf la peraule clâf:"
+02000B02="&Mostre la peraule clâf"
+02000B03="Torne a inserî la peraule clâf:"
+02000B10="Lis peraulis clâfs no son compagnis"
+02000B11="Dopre dome lis letaris inglesis (no acentadis), i numars e i caratars speciâi (!, #, $, ...) inte peraule clâf"
+02000B12="La peraule clâf e je masse lungje"
+
+; Progress dialog
+02000C00="Procès"
+02000C01="Timp passât:"
+02000C02="Timp restant:"
+02000C03="Dimension:"
+02000C04="Sveltece:"
+02000C05="Elaborât:"
+02000C06="Tas di compression:"
+
+02000C10="&Sfont"
+02000C11="P&rin plan"
+02000C12="&Pause"
+02000C13="&Continue"
+
+02000C20="In pause"
+
+02000C30="Sêstu sigûr di volê scancelâ?"
+
+; Compress dialog
+02000D00="Zonte a un archivi"
+02000D01="&Archivi:"
+02000D02="Mût di at&ualizazion:"
+02000D03="&Formât archivi:"
+02000D04="&Metodi di compression:"
+02000D05="Cree archivi &solit"
+02000D06="&Parametris:"
+02000D07="Opzions"
+02000D08="Cree archivi SF&X"
+02000D09="Multi-threading"
+02000D0A="Cifre i &nons dai files"
+02000D0B="Nive&l di compression:"
+02000D0C="&Dimension dizionari:"
+02000D0D="Dimension &peraule:"
+02000D0E="Utilizazion memorie comprimint:"
+02000D0F="Utilizazion memorie decomprimint:"
+02000D10="Ciframent"
+02000D11="Metodi di ciframent:"
+02000D12="Numar di threads de CPU:"
+02000D13="Dimension bloc solit:"
+02000D14="No-solit"
+02000D15="Solit"
+02000D16="Comprim i files condividûts"
+
+02000D40="Divît in &volums, grandece in bytes:"
+02000D41="Dimension dai volums sbaliade"
+02000D42="Dimension dai volums volude: {0} bytes.\nSêstu sigûr di volê dividi l'archivi in tocs di cheste dimension?"
+
+02000D81="Cence compression"
+02000D82="Normâl"
+02000D83="Massim"
+02000D84="Svelt"
+02000D85="Il pi svelt"
+02000D86="Super"
+
+02000D90="Sgarfe"
+
+02000DA1="Zonte e sostituìs files"
+02000DA2="Atualize e zonte files"
+02000DA3="Atualize i files che esistin"
+02000DA4="Sincronize i files"
+
+02000DB1="Ducj i files"
+
+02000DC0="Daûr a comprimi"
+
+; Columns dialog
+02000E00="Colonis"
+02000E01="Selezione lis colonis che tu vuelis rindi visibilis in cheste cartele. Dopre i botons Pare sù e Pare jù par gambiâ l'ordin des colonis."
+02000E02="La colone selezionade e à di jessi"
+02000E03="pixels &largje."
+
+02000E10="Par&e sù"
+02000E11="Pare &jù"
+02000E12="&Mostre"
+02000E13="&Plate"
+02000E14="Configure"
+
+02000E81="Titul"
+02000E82="Largjece"
+
+; Testing
+02000F90="Daûr a provâ"
+
+
+; File Manager
+
+03000000="7-Zip - Aministradôr di files"
+
+; Menu
+03000102="&File"
+03000103="&Modifiche"
+03000104="&Viodude"
+03000105="&Imprescj"
+03000106="&Jutori"
+03000107="&Preferîts"
+
+; File
+03000210="&Viarç"
+03000211="Viarç dentri 7-&Zip"
+03000212="V&iarç fûr di 7-Zip"
+03000220="&Mostre"
+03000221="M&odifiche"
+03000230="Gambie &non"
+03000231="&Copie in..."
+03000232="Mô&f in..."
+03000233="&Elimine"
+03000240="P&ropietâts"
+03000241="Comen&t"
+03000242="Calcole so&me di control"
+03000250="Cree cartele"
+03000251="Cree file"
+03000260="V&a fûr"
+03000270="&Divît file..."
+03000271="Torne a &unî files..."
+
+; Edit
+03000310="&Anule"
+03000311="Torne a &fâ"
+03000320="&Taie"
+03000321="&Copie"
+03000322="Tac&he"
+03000323="&Elimine"
+03000330="Selezione d&ut"
+03000331="&Deselezione dut"
+03000332="&Invertìs selezion"
+03000333="Selezione..."
+03000334="Deselezione..."
+03000335="Selezione par gjenar"
+03000336="Deselezione par gjenar"
+
+; View
+03000410="Iconis &grandis"
+03000411="Iconis &piçulis"
+03000412="&Liste"
+03000413="&Detais"
+03000420="Cence ordin"
+03000430="Viarç cartele principâl"
+03000431="Parsore di un nivel"
+03000432="Storic des cartelis..."
+03000440="&Atualize"
+03000449="Viodude plane"
+03000450="&2 panei"
+03000451="Sbaris dai impresc&j"
+03000460="Sbare dai imprescj par l'archivi"
+03000461="Sbare dai imprescj standard"
+03000462="Botons larcs"
+03000463="Mostre test dai botons"
+
+; Tools
+03000510="&Opzions..."
+03000511="&Banc di prove"
+
+; Help
+03000610="&Argoments..."
+03000620="&Informazions su 7-Zip..."
+
+; Favorites
+03000710="&Zonte cartele ai Preferîts sicu"
+03000720="Preferît"
+
+; Options Dialog
+
+03010000="Opzions"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="Opzions..."
+
+; Edit
+03010200="Editôr"
+03010201="&Editôr:"
+
+; System
+03010300="Sisteme"
+03010302="Associe 7-Zip cun:"
+03010310="Plugin"
+
+; Settings
+03010400="Configurazion"
+03010401="Mostre l'element \"..\""
+03010402="Mostre lis veris iconis dai files"
+03010410="Mostre il menù dal sisteme"
+03010420="&Selezione la rie intire"
+03010421="Mostre les liniis de &gridele sot"
+03010430="Mût di selezion &alternatîf"
+03010440="Dopre pagjinis di memorie &largjis"
+
+; Strings
+
+03020201="Copie"
+03020202="Môf"
+03020203="Copie in:"
+03020204="Môf in:"
+03020205="Daûr a copiâ..."
+03020206="Daûr a movi..."
+03020207="No si pues movi o copiâ elements di chest gjenar di cartelis."
+03020208="L'operazion no je supuartade."
+03020209="Sielç la cartele di destinazion."
+
+03020210="Conferme de eliminazion dal file"
+03020211="Conferme de eliminazion de cartele"
+03020212="Conferme de eliminazion di plui files"
+03020213="Sêstu sigûr di volê eliminâ '{0}'?"
+03020214="Sêstu sigûr di volê eliminâ la cartele '{0}' e dut ce ch'al è lì dentri?"
+03020215="Sêstu sigûr di volê eliminâ chescj {0} elements?"
+03020216="Daûr a eliminâ..."
+03020217="Erôr eliminant un file o une cartele"
+03020218="Il sisteme nol pues movi un file cuntun troi lunc te Scovacere"
+
+03020220="Daûr a gambiâ non..."
+03020221="Erôr gambiant non a un file o une cartele"
+03020222="Conferme de copie dai files"
+03020223="Sêstu sigûr di volê copiâ i files tal archivi"
+
+03020230="Cree cartele"
+03020231="Non de cartele:"
+03020232="Gnove cartele"
+03020233="Erôr inte creazion de cartele"
+
+03020240="Cree file"
+03020241="Non dal file:"
+03020242="Gnûf file"
+03020243="Erôr inte creazion dal file"
+
+03020250="Selezione"
+03020251="Deselezione"
+03020252="Filtri:"
+
+03020260="Storic des cartelis"
+
+03020280="Il file '{0}' al è stât modificât.\nVuelistu atualizâlu intal archivi?"
+03020281="No si pues atualizâ il file\n'{0}'"
+03020282="No si pues inviâ l'editôr."
+03020283="Daûr a viarzi..."
+03020284="Il file al samee un virus (il non al à dentri un grum di spazis)."
+
+03020290="Coment"
+03020291="&Coment:"
+
+030202A0="Sisteme"
+
+03020300="Ordenadôr"
+03020301="Rêt"
+03020302="Documents"
+
+03020400="Zonte"
+03020401="Tire fûr"
+03020402="Prove"
+
+03020420="Copie"
+03020421="Môf"
+03020422="Elimine"
+03020423="Info"
+
+03020500="Divît file"
+03020501="&Divît in:"
+03020510="Daûr a dividi..."
+03020520="Conferme de division"
+03020521="Sêstu sigûr di volê dividi il file in {0} tocs?"
+03020522="La dimension di un volum e à di jessi plui piçule di chê dal file origjinâl"
+
+03020600="Torne a unî files"
+03020601="&Torne a unî in:"
+03020610="Daûr a tornâ a unî..."
+03020620="Sielç dome il prin file"
+03020621="No si pues rilevâ il file come toc di un file dividût"
+03020622="No son stâts cjatâts plui tocs di file dividûts"
+
+03020710="Daûr a calcolâ la some di control..."
+03020720="Informazions su la some di control"
+03020721="Some di control CRC pai dâts:"
+03020722="Some di control CRC pai dâts e i nons:"
+
+03020800="Daûr a scandaiâ..."
+
+03020900="Propietâts"
+
+03020A01="Cheste operazion no pues jessi clamade di une cartele cuntun troi lunc."
+03020A02="Tu scugnis sielzi un file"
+03020A03="Tu scugnis sielzi un o plui files"
+03020A04="Il file {0} al esist za"
+
+; Computer
+03031100="Dimension totâl"
+03031101="Puest libar"
+03031102="Dimension setôr"
+03031103="Etichete"
+
+; Network
+03031200="Non locâl"
+03031201="Furnidôr"
+
+; Benchmark Dialog
+
+03080000="Banc di prove"
+03080001="Utilizazion memorie:"
+03080002="Comprimint"
+03080003="Decomprimint"
+03080004="Sveltece"
+03080005="Valutazion"
+03080006="Valutazion totâl"
+03080007="Corint"
+03080008="Risultant"
+03080009="Passaçs:"
+0308000A="Erôrs:"
+0308000B="Utilizazion CPU"
+0308000C="Judizi / Utilizazion"
+
+;!@LangEnd@!

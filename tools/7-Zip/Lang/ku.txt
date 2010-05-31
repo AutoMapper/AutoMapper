@@ -1,0 +1,473 @@
+;!@Lang@!UTF-8!
+; 7-Zip 4.37
+; Translated by Rizoyê Xerzî
+;
+;
+;
+;
+
+00000000="Kurdish"
+00000001="Kurdî"
+00000002=""
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Sazkirin"
+
+; Info Page
+01000100="Der barê 7-Zip de"
+01000103="7-Zip nivîsbariyeke azad e. Lê, tu dikarî wekî tomarkirin desteka pêşxistina 7-zip bibî."
+01000104="Destek"
+01000105="Tomarkirin"
+
+; Folders Page
+01000200="Peldank"
+01000210="Peldanka &Xebatê"
+01000211="&Peldanka TEMP a Pergalê"
+01000212="P&eldanka Derbasdar"
+01000213="Pe&ldanka Navborî:"
+01000214="Bi tenê ji bo ajokarên derketî bi kar bîne"
+
+01000281="Ji bo dosiyên demdemî yên arşîvê cih belî bike."
+
+; System Page
+01000300="Pergal"
+01000301="Bila di pêşekên naverokê de 7-Zip bixuye"
+01000302="Pêşeka naverokê ya sûlavî"
+01000310="Hêmanên peşeka naverokê:"
+
+; Language Page
+01000400="Ziman"
+01000401="Ziman:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Fermanên 7-Zip"
+02000103="Arşîvê veke"
+02000104="Arşîva hilbijartî vedike."
+02000105="Dosiyan derxe..."
+02000106="Dosiyan ji arşîva hilbijartî derdixe."
+02000107="Bike Arşîv..."
+02000108="Hêmanên hilbijartî dixe arşîvê."
+02000109="Arşîvê bihêçîne"
+0200010A="Tevahiya arşîva hilbijartî diceribîne."
+0200010B="Valake vir"
+0200010C="Dosiyên arşîva hilbijartî derdixe peldanka derbasdar."
+0200010D="Peldanka {0} derxe"
+0200010E="Derdixe bin-peldankê."
+0200010F="Wekî {0} bike arşîv"
+02000110="Hêmanên hilbijartî dike arşîv."
+02000111="Bişidîne û bişîne..."
+02000112="Hêman hilbijartî dişidîne û arşîvê bi e-peyamê re dişîne."
+02000113="Wekî {0} bişidîne û bişîne"
+02000114="Hêmanên hilbijartî dişidîne û dike arşîv û arşîvê bi e-peyamê re dişîne."
+
+02000140="<Peldank>"
+02000141="<Arşîv>"
+
+; Properties
+02000203="Rê"
+02000204="Nav"
+02000205="Cure"
+02000206="Peldank"
+02000207="Mezinahî"
+02000208="Mezinahiya di arşîvê de"
+02000209="Taybetiyên xweser"
+0200020A="Çêbûyî"
+0200020B="Gihaştî"
+0200020C="Guhertî"
+0200020D="Hişk"
+0200020E="Daxuyankirî"
+0200020F="Şîfrekirî"
+02000210="Parçeyê borî"
+02000211="Parçeyê piştre"
+02000212="Ferheng"
+02000213="CRC"
+02000214="Cure"
+02000215="Dij"
+02000216="Awayê şidandinê"
+02000217="Platform"
+02000218="Pergala Dosiyê"
+02000219="Bikarhêner"
+0200021A="Kom"
+0200021B="Stûn"
+0200021C="Daxuyanî"
+0200021D="Cih"
+0200021E="Path Prefix"
+
+; Status bar
+02000301="{0} heb hêman hilbijartî ne"
+02000302="{0} heb hêman"
+
+02000320="Pel:"
+02000321="Peldank:"
+02000322="Mezinahî:"
+
+; List Context Menu
+02000401="&Stûn..."
+
+02000411="&Veke"
+02000412="&Derxe..."
+
+; ToolBar
+02000501="Derxe"
+
+; Messages
+02000601="Tu nikarî vê arşîvê rojane bikî."
+02000602="Arşîva {0} nayê rojanekirin"
+02000603="Peldanka '{0}' nayê çêkirin"
+02000604="Ev dosya ne arşîveke naskirî ye."
+02000605="Çewtî"
+02000606="Hêman zêde ne"
+02000607="Sepaneke têkildarî vî cureyê dosiyê nîn e"
+02000608="Çewtî nîn e."
+
+; Dialogs
+02000702="Temam"
+02000705="&Erê"
+02000707="&Ji Bo Hemûyî Erê"
+02000709="&Na"
+0200070B="Ji &Bo Hemûyî Na"
+
+02000710="Betal"
+02000711="B&etal"
+02000713="Bi&gire"
+02000714="Raweste"
+02000715="Dîsa Destpêke"
+
+02000720="Alîkarî"
+
+; Extract dialog
+02000800="Derxe"
+02000801="&Cihê Dê Derkevê:"
+02000802="Şîfre"
+
+02000810="Navê Rê"
+02000811="Navê tevahî yên rê"
+02000812="Navê derbasdar ên rê"
+02000813="Bila navên rê tune bin"
+
+02000820="Dosiyên heyî"
+02000821="Ji bo li ser binivîse bipirse"
+02000822="Bê pirs li ser binivîse"
+02000823="Derxistin"
+02000824="Navekî nû li yên di arşîvê de bike"
+02000825="Navekî nû li yên heyî bike"
+
+02000830="Dosya"
+02000831="D&osiyên hilbijartî"
+02000832="He&mû Dosya"
+
+02000881="Ji bo dosya derkevinê cihekî belî bike."
+
+02000890="Tên derxistin"
+
+; Overwrite dialog
+02000900="Rewla Lisernivîsandinê"
+02000901="Di dosiya armanckirî de bi vî navî dosiyek heye. Bila li ser bête nivîsîn?"
+02000902="Dosiya heyî:"
+02000903="Dosiya tê derxistin:"
+
+02000911="Na&vekî nû lê bike"
+
+02000982="{0} bayt"
+02000983="guhertina dawî "
+
+; Messages dialog
+02000A00="Peyamên haydariyê"
+
+02000A80="Peyam"
+
+02000A91="Ji bo '{0}' awayê şidandinê nehate nasîn."
+02000A92="'{0}' xerabe ye. (Çewtiya daneyê)"
+02000A93="'{0}' xerabe ye. (Çewtiya CRC)"
+
+; Password dialog
+02000B00="Têketina Şîfreyê"
+02000B01="Şîfreyê binivîse:"
+02000B02="Bi&la şîfre bixuye"
+
+; Progress dialog
+02000C00="bixebite"
+02000C01="Dema borî:"
+02000C02="Dema mayî:"
+02000C03="Mezinahî:"
+02000C04="Lez:"
+
+02000C10="L%i Pişt"
+02000C11="Li &Pêş"
+02000C12="&Rawestîne"
+02000C13="Bi&domîne"
+
+02000C20="Rawestiya - "
+
+02000C30="Ma bila betal bibe?"
+
+; Compress dialog
+02000D00="Bike Arşîv"
+02000D01="&Arşîv:"
+02000D02="A&wayê rojanekirinê:"
+02000D03="Awa&yê arşîvê:"
+02000D04="Awayê şi&dandinê:"
+02000D05="Bila &hişk be"
+02000D06="&Parametre:"
+02000D07="Vebijêrk"
+02000D08="Bila ew bixwe derxe (SFX)"
+02000D09="Pir&girêkî"
+02000D0A="Navên dosiyê bike şîfre"
+02000D0B="A&sta şidandinê:"
+02000D0C="Me&zinahiya ferhengê:"
+02000D0D="M&ezinahiya bêjeyê:"
+02000D0E="Bikaranîna bîrê (Şidandin):"
+02000D0F="Bikaranîna bîrê (Vekirin):"
+
+02000D40="Wekî Bayt/&cilt bike parçe:"
+
+02000D81="Bêyî şidandin"
+02000D82="Asayî"
+02000D83="Herî Pir"
+02000D84="Bi Lez"
+02000D85="Leztirîn"
+02000D86="Ultra"
+
+02000D90="Bibîne"
+
+02000DA1="Dosiyan têxê, yên heyî derxe"
+02000DA2="Dosiyan têxê, yên kevin rojane bike"
+02000DA3="Bi tenê yên kevin rojane bike"
+02000DA4="Dosiyan bike wekî hev"
+
+02000DB1="Hemû dosya"
+
+02000DC0="tên şidandin"
+
+; Columns dialog
+02000E00="Stûn"
+02000E01="Stûnên tu dixwazî di vê peldankê de xuya bibin nîşan bike. Ji bo rêzkirina stûnan bişkojkên berjor-berjêr bi kar bîne."
+02000E02="Firehiya stûna hilbijartî"
+02000E03="Bila &piksel be."
+
+02000E10="B&erjor"
+02000E11="&Berjêr"
+02000E12="&Nîşan Bide"
+02000E13="&Veşêre"
+02000E14="Peywirdar bike"
+
+02000E81="Sernivîs"
+02000E82="Firehî"
+
+; Testing
+02000F90="tê hêçandin"
+
+
+; File Manager
+
+03000000="7-Zip Gerînendeyê Dosiyan"
+
+; Menu
+03000102="&Dosya"
+03000103="&Bipergalîne"
+03000104="&Nîşan Bide"
+03000105="&Amûr"
+03000106="A&lîkarî"
+03000107="Bi&jare"
+
+; File
+03000210="&Veke"
+03000211="&Di Panelê De Veke"
+03000212="Di &Paceyê De Veke"
+03000220="&Nîşan Bide"
+03000221="&Sererast bike"
+03000230="&Navekî Nû Bidê"
+03000231="&Ji Ber Bigire"
+03000232="B&ar Bike"
+03000233="Jê B&ibe"
+03000240="&Taybetî"
+03000241="Da&xuyanî"
+03000242="checksum heseb bike"
+03000250="Pe&ldankeke Nû"
+03000251="Do&siyeke Nû"
+03000260="De&rkeve"
+03000270="Parçe Bi&ke..."
+03000271="Bike &Yek..."
+
+; Edit
+03000310="&Vegere"
+03000311="&Nû Bike"
+03000320="&Bibire"
+03000321="&Ji Ber Bigire"
+03000322="&Pêveke"
+03000323="Jê Bib&e"
+03000330="&Hemûyî hilbijêre"
+03000331="He&mû hilijartinê rake"
+03000332="Be&revajî wê hilbijêre"
+03000333="&Hilbijêre..."
+03000334="Hilbijarti&nê Rake..."
+03000335="Vî cureyî hilbijêre"
+03000336="Hilbijartina cure rake"
+
+; View
+03000410="&Dawêrên Mezin"
+03000411="D&awêrên Biçûk"
+03000412="&Lîste"
+03000413="&Hûragahî"
+03000420="Bê Dor"
+03000430="Peldanka Kok Veke"
+03000431="Astekê Berjor"
+03000432="Dîroka Peldankê..."
+03000440="&Nû Bike"
+03000449="xuyakirina sade"
+03000450="&2 Panelan veke"
+03000451="Da&rikê amûran"
+03000460="Darikê arşîvê"
+03000461="Darikê standart"
+03000462="Bişkojkên mezin"
+03000463="Bila nivîsa bişkojkan bixuye"
+
+; Tools
+03000510="&Vebijêrk..."
+03000511="&Pîvana Çalakbûnê"
+
+; Help
+03000610="&Naverok..."
+03000620="D&er barê 7-Zip de..."
+
+; Favorites
+03000710="Pe&ldanka derbasdar veke"
+03000720="Cih"
+
+; Options Dialog
+
+03010000="Vebijêrk"
+
+; Plugins
+03010100="Leqêq"
+03010101="&Hemû Lehêq:"
+03010110="Mîheng..."
+
+; Edit
+03010200="Per&galker"
+03010201="Pergalkerê De&qê:"
+
+; System
+03010300="Pergal"
+03010302="Bi 7-Zip re têkildar bike:"
+03010310="Leqêq"
+
+; Settings
+03010400="Mîheng"
+03010401="Bila hêmana \"..\" xuya bike"
+03010402="Bila dawêrên dosiyên rastî xuya bikin"
+03010410="Bila pêşeka pergalê xuya bike"
+03010420="Bila &hemû rêzikê bibore"
+03010421="Bila &xêzên tabloyê xuya bike"
+03010430="&Kipa hilbijartina alternatîf"
+03010440="bîra berfireh bikar bîne"
+
+; Strings
+
+03020201="Ji Ber Bigire"
+03020202="Bar Bike"
+03020203="Cihê Dê Were Jibergirtin:"
+03020204="Cihê Dê Were Barkirin:"
+03020205="tê jibergirtin..."
+03020206="tê barkirin..."
+03020207="Jibergirtin û barkirin ji bo vê peldankê nabe."
+03020208="Kirin ne pêkan e."
+
+03020210="Erêkirina jêbirina dosiyê"
+03020211="Erêkirina jêbirina peldankê"
+03020212="Erêkirina jêbirina gelek dosiyan"
+03020213="Ma bila dosiya '{0}' bête jêbirin?"
+03020214="Ma bila peldanka  '{0}' û yên tê de bên jêbirin?"
+03020215="Ma bila hêmana {0} bête jêbirin?"
+03020216="tê jêbirin..."
+03020217="Çewtiya Jêbirinê"
+
+03020220="navekî nû tê lêkirin..."
+03020221="Çewtiya Navlêkirinê"
+03020222="Erêkirina Jibergirtinê"
+03020223="Ma bila dosî ji bo arşîvê bên jibergirtin"
+
+03020230="Peldankeke nû"
+03020231="Navê peldankê:"
+03020232="Peldankeke Nû"
+03020233="Çewtiya Çêkirina peldankê"
+
+03020240="Dosiyeke Nû"
+03020241="Navê Dosiyê:"
+03020242="Dosiyeke Nû"
+03020243="Çewtiya çêkirina Dosiyê"
+
+03020250="Hilbijêre"
+03020251="Hilbijartinê rake"
+03020252="Derbirîna hilbijartinê:"
+
+03020260="Rabirdûya Peldankê"
+
+03020280="Dosiya '{0}' hatiye guhartin.\nMa bila di arşîvê bête rojanekirin?"
+03020281="Dosiya '{0}' nehate rojanekirin"
+03020282="Pergalkerê deqê nehate destpêkirin."
+03020283="vedibe..."
+
+03020290="Daxuyanî"
+03020291="&Daxuyanî:"
+
+030202A0="Pergal"
+
+03020300="Komputer"
+03020301="Tor"
+
+03020400="Bike Arşîv"
+03020401="Derxe"
+03020402="Bihêçîne"
+
+03020420="Ji Ber Bigire"
+03020421="Bar Bike"
+03020422="Jê Bibe"
+03020423="Agahî"
+
+03020500="Bike Parçe"
+03020501="Di &vê peldankê de parçe bike:"
+03020510="tê parçekirin..."
+
+03020600="Bike Yek"
+03020601="Di vê &peldankê de bike yek:"
+03020610="tê yekirin..."
+
+03020710="Hesabê sererastkirî..."
+03020720="Agahiyên hesabê sererast"
+03020721="CRC hesabê sererast bo data:"
+03020722="CRC hesabê sererast bo data û nav:"
+
+03020800="Tê raguhestin"
+
+; Computer
+03031100="Hemû Mezinahî"
+03031101="Cihê Vala"
+03031102="Mezinahiya telpikî"
+03031103="Etîket"
+
+; Network
+03031200="Navê Herêmî"
+03031201="Derfetkar"
+
+; Benchmark Dialog
+
+03080000="Çalakiya komputerê"
+03080001="Bikaranîna birê:"
+03080002="Şidandin"
+03080003="Vekirin"
+03080004="Lez"
+03080005="Puan"
+03080006="bi guloverî puanan"
+03080007="Carî"
+03080008="Encam"
+03080009="Serkeftî:"
+0308000A="Çewt:"
+
+;!@LangEnd@!

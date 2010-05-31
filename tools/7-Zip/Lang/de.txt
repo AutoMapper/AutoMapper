@@ -1,0 +1,543 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 2.30 Beta 22
+; Translated by Soeren Finster
+; 7-Zip 4.07 beta
+; Updated by JAK-Software.DE
+; 7-Zip 9.07 beta
+; Maintained by Joachim Henke (since 4.12 beta)
+
+00000000="German"
+00000001="Deutsch"
+00000002="7"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Einstellungen"
+
+; Info Page
+01000100="Info über 7-Zip"
+01000103="7-Zip ist freie Software. Sie können jedoch das Projekt durch eine Registrierung unterstützen."
+01000104="techn. Unterstützung"
+01000105="Registrieren"
+
+; Folders Page
+01000200="Ordner"
+01000210="&Arbeitsverzeichnis"
+01000211="&TEMP-Ordner des Systems"
+01000212="Aktueller &Ordner"
+01000213="&Benutzerdefiniert:"
+01000214="Nur bei &Wechselmedien benutzen"
+
+01000281="Wählen Sie einen Ordner für temporäre Archivdateien:"
+
+; System Page
+01000300="System"
+01000301="7-Zip in Kontextmenü integrieren"
+01000302="Kontextmenü kaskadieren"
+01000310="Einträge im Kontextmenü:"
+
+; Language Page
+01000400="Sprache"
+01000401="Sprache:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip Befehle"
+02000103="Öffnen"
+02000104="Ausgewähltes Archiv öffnen"
+02000105="Dateien entpacken..."
+02000106="Dateien aus dem gewählten Archiv entpacken"
+02000107="Zu einem Archiv hinzufügen..."
+02000108="Fügt die markierten Objekte einem Archiv hinzu."
+02000109="Archiv überprüfen"
+0200010A="Prüft die Integrität des ausgewählten Archivs."
+0200010B="Hier entpacken"
+0200010C="Entpackt das gewählte Archiv in den aktuellen Ordner."
+0200010D="Entpacken nach {0}"
+0200010E="Entpackt Dateien in ein Unterverzeichnis."
+0200010F="Hinzufügen zu {0}"
+02000110="Fügt die markierten Objekte dem Archiv hinzu."
+02000111="Archivieren und versenden..."
+02000112="Packt die markierten Objekte und verschickt das Archiv per E-Mail."
+02000113="Archivieren in {0} und versenden"
+02000114="Packt die markierten Objekte und verschickt das Archiv per E-Mail."
+
+02000140="<Verzeichnis>"
+02000141="<Archiv>"
+
+; Properties
+02000203="Pfad"
+02000204="Name"
+02000205="Erweiterung"
+02000206="Ordner"
+02000207="Größe"
+02000208="Gepackte Größe"
+02000209="Attribute"
+0200020A="Erstellt am"
+0200020B="Letzter Zugriff"
+0200020C="Geändert am"
+0200020D="Kompakt (solid)"
+0200020E="Kommentiert"
+0200020F="Verschlüsselt"
+02000210="Vorher geteilt"
+02000211="Danach geteilt"
+02000212="Wörterbuch"
+02000213="CRC"
+02000214="Typ"
+02000215="Anti"
+02000216="Verfahren"
+02000217="Herkunft"
+02000218="Dateisystem"
+02000219="Besitzer"
+0200021A="Gruppe"
+0200021B="Block"
+0200021C="Kommentar"
+0200021D="Position"
+0200021E="Pfad"
+0200021F="Ordner"
+02000220="Dateien"
+02000221="Version"
+02000222="Teilarchiv"
+02000223="Mehrteiliges Archiv"
+02000224="Offset"
+02000225="Verknüpfungen"
+02000226="Blöcke"
+02000227="Teilarchive"
+
+02000229="64 Bit"
+0200022A="Big-Endian"
+0200022B="CPU"
+0200022C="Gesamtgröße"
+0200022D="Header-Größe"
+0200022E="Prüfsumme"
+0200022F="Kenndaten"
+02000230="Virtuelle Adresse"
+02000231="ID"
+02000232="Kurzname"
+02000233="Erstellt durch"
+02000234="Sektorgröße"
+02000235="Zugriffsrechte"
+02000236="Link"
+
+; Status bar
+02000301="{0} Objekt(e) markiert"
+02000302="{0} Objekt(e)"
+
+02000320="Dateien:"
+02000321="Ordner:"
+02000322="Größe:"
+02000323="Komprimierte Größe:"
+02000324="Archive:"
+
+; List Context Menu
+02000401="&Spalten..."
+
+02000411="Ö&ffnen"
+02000412="&Entpacken..."
+
+; ToolBar
+02000501="Entpacken"
+
+; Messages
+02000601="Aktualisierungen werden für dieses Archiv nicht unterstützt."
+02000602="Kann das Archiv \"{0}\" nicht aktualisieren."
+02000603="Kann den Ordner \"{0}\" nicht erstellen."
+02000604="Diese Datei ist kein unterstütztes Archiv."
+02000605="Fehler"
+02000606="Zu viele Objekte"
+02000607="Mit dieser Erweiterung ist kein Programm verknüpft."
+02000608="Es sind keine Fehler aufgetreten."
+02000609="Die Datei \"{0}\" kann nicht als Archiv geöffnet werden."
+0200060A="Das verschlüsselte Archiv \"{0}\" kann nicht geöffnet werden. Falsches Passwort?"
+0200060B="Das System kann die benötigte Speichermenge nicht bereit stellen."
+0200060C="Unbekannter Fehler"
+0200060D="Typ des Archives wird nicht unterstützt"
+
+; Dialogs
+02000702="OK"
+02000705="&Ja"
+02000707="Ja für &alle"
+02000709="&Nein"
+0200070B="Nein für a&lle"
+
+02000710="Abbrechen"
+02000711="&Abbrechen"
+02000713="&Schließen"
+02000714="Stopp"
+02000715="Neustart"
+
+02000720="Hilfe"
+
+; Extract dialog
+02000800="Entpacken"
+02000801="&Entpacken nach:"
+02000802="Passwort"
+
+02000810="Verzeichnisstruktur wiederherstellen"
+02000811="Komplette Pfadangaben"
+02000812="Relative Pfadangaben"
+02000813="Keine Pfadangaben"
+
+02000820="Dateien überschreiben"
+02000821="Nur mit Bestätigung"
+02000822="Ohne Bestätigung"
+02000823="Vorhandene Dateien überspringen"
+02000824="Automatisch umbenennen"
+02000825="Vorhandene Dateien umbenennen"
+
+02000830="Dateien"
+02000831="&Markierte Dateien"
+02000832="&Alle Dateien"
+
+02000881="Wählen Sie einen Ordner für die entpackten Dateien:"
+
+02000890="Entpacken"
+
+; Overwrite dialog
+02000900="Überschreiben bestätigen"
+02000901="Der Zielordner beinhaltet bereits eine Datei diesen Namens."
+02000902="Wollen Sie diese Datei"
+02000903="durch diese ersetzen?"
+
+02000911="A&utomatisch umbenennen"
+
+02000982="{0} Bytes"
+02000983="geändert am"
+
+; Messages dialog
+02000A00="Diagnosemeldungen"
+
+02000A80="Meldung"
+
+02000A91="Das Kompressionsverfahren in \"{0}\" wird nicht unterstützt."
+02000A92="Datenfehler in \"{0}\". Die Datei ist beschädigt."
+02000A93="CRC-Prüfsummenfehler. Die Datei \"{0}\" ist beschädigt."
+02000A94="Datenfehler in der verschlüsselten Datei \"{0}\". Falsches Passwort?"
+02000A95="CRC-Prüfsummenfehler bei verschlüsselter Datei \"{0}\". Falsches Passwort?"
+
+; Password dialog
+02000B00="Kennworteingabe"
+02000B01="Passwort eingeben:"
+02000B02="Passwort an&zeigen"
+02000B03="Passwort bestätigen:"
+02000B10="Die Passwörter stimmen nicht überein."
+02000B11="Bitte nur Buchstaben des englischen Alphabets, Ziffern und Sonderzeichen (!, #, $, ...) im Passwort verwenden!"
+02000B12="Das Passwort ist zu lang."
+
+; Progress dialog
+02000C00="Fortschritt"
+02000C01="Verstrichene Zeit:"
+02000C02="Verbleibende Zeit:"
+02000C03="Gesamtdatenmenge:"
+02000C04="Geschwindigkeit:"
+02000C05="Verarbeitet:"
+02000C06="Kompressionsrate:"
+
+02000C10="&Hintergrund"
+02000C11="&Vordergrund"
+02000C12="&Pause"
+02000C13="&Fortsetzen"
+
+02000C20="Pause"
+
+02000C30="Möchten Sie wirklich abbrechen?"
+
+; Compress dialog
+02000D00="Zu Archiv hinzufügen"
+02000D01="&Archiv:"
+02000D02="Art der Akt&ualisierung:"
+02000D03="Archiv&format:"
+02000D04="Kompressions&verfahren:"
+02000D05="Kompaktes Archiv erstellen (solid)"
+02000D06="&Parameter:"
+02000D07="Optionen"
+02000D08="Selbstentpackendes Archiv (SF&X) erstellen"
+02000D09="Multithreading"
+02000D0A="Datei&namen verschlüsseln"
+02000D0B="&Kompressionsstärke:"
+02000D0C="Wörter&buchgröße:"
+02000D0D="&Wortgröße:"
+02000D0E="Speicherbedarf beim Komprimieren:"
+02000D0F="Speicherbedarf beim Entpacken:"
+02000D10="Verschlüsselung"
+02000D11="Verfahren:"
+02000D12="Anzahl &CPU-Threads:"
+02000D13="Größe &solider Blöcke:"
+02000D14="Nicht solide"
+02000D15="Solide"
+02000D16="Zum Schreiben &geöffnete Dateien einbeziehen"
+
+02000D40="In &Teildateien aufsplitten (Bytes):"
+02000D41="Ungültiger Wert für Dateigrößen"
+02000D42="Angegebene Größe für Teildateien: {0} Bytes.\nSind Sie sicher, dass das Archiv dementsprechend aufgesplittet werden soll?"
+
+02000D81="Speichern"
+02000D82="Normal"
+02000D83="Maximum"
+02000D84="Schnell"
+02000D85="Schnellste"
+02000D86="Ultra"
+
+02000D90="Durchsuchen"
+
+02000DA1="Hinzufügen und Ersetzen"
+02000DA2="Aktualisieren und Hinzufügen"
+02000DA3="Vorhandene Dateien aktualisieren"
+02000DA4="Synchronisieren"
+
+02000DB1="Alle Dateien"
+
+02000DC0="Komprimiere"
+
+; Columns dialog
+02000E00="Spalten"
+02000E01="Markieren Sie die Spalten, die Sie in dieser Ansicht sehen wollen. Benutzen Sie die Aufwärts- und Abwärts-Schaltflächen, um die Spalten wie gewünscht anzuordnen."
+02000E02="Die markierte Spalte soll"
+02000E03="Pixel &breit sein."
+
+02000E10="&Aufwärts"
+02000E11="Ab&wärts"
+02000E12="&Zeigen"
+02000E13="&Verstecken"
+02000E14="Speichern"
+
+02000E81="Titel"
+02000E82="Breite"
+
+; Testing
+02000F90="Überprüfen"
+
+
+; File Manager
+
+03000000="7-Zip Dateimanager"
+
+; Menu
+03000102="&Datei"
+03000103="&Bearbeiten"
+03000104="&Ansicht"
+03000105="&Extras"
+03000106="&?"
+03000107="&Favoriten"
+
+; File
+03000210="Ö&ffnen"
+03000211="I&ntern öffnen"
+03000212="E&xtern öffnen"
+03000220="&Ansehen"
+03000221="&Bearbeiten"
+03000230="&Umbenennen"
+03000231="&Kopieren nach..."
+03000232="&Verschieben nach..."
+03000233="&Löschen"
+03000240="E&igenschaften"
+03000241="K&ommentieren"
+03000242="&Prüfsumme berechnen"
+03000243="Ver&gleichen"
+03000250="Ordner erstellen"
+03000251="Datei erstellen"
+03000260="Be&enden"
+03000270="Datei auf&splitten..."
+03000271="Dateien &zusammenfügen..."
+
+; Edit
+03000310="&Rückgängig"
+03000311="&Wiederherstellen"
+03000320="&Ausschneiden"
+03000321="&Kopieren"
+03000322="&Einfügen"
+03000323="&Löschen"
+03000330="Alles &markieren"
+03000331="Alles abwählen"
+03000332="Markierung &umkehren"
+03000333="Auswählen..."
+03000334="Auswahl aufheben..."
+03000335="Nach Typ auswählen"
+03000336="Nach Typ abwählen"
+
+; View
+03000410="&Große Symbole"
+03000411="&Kleine Symbole"
+03000412="&Liste"
+03000413="&Details"
+03000420="Unsortiert"
+03000430="Wurzelverzeichnis"
+03000431="Übergeordneter Ordner"
+03000432="Ordnerverlauf..."
+03000440="&Aktualisieren"
+03000449="Alles in einer &Ebene"
+03000450="&Zweigeteiltes Fenster"
+03000451="&Symbolleisten"
+03000460="Archivfunktionen"
+03000461="Standardfunktionen"
+03000462="Große Schaltflächen"
+03000463="Schaltflächenbeschriftung"
+
+; Tools
+03000510="&Optionen..."
+03000511="&Benchmark"
+
+; Help
+03000610="&Hilfethemen"
+03000620="Ü&ber 7-Zip..."
+
+; Favorites
+03000710="&Ordner hinzufügen als"
+03000720="Favorit"
+
+; Options Dialog
+
+03010000="Optionen"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="Optionen..."
+
+; Edit
+03010200="Editor"
+03010201="&Editor:"
+03010202="Programm zum &Vergleichen:"
+
+; System
+03010300="System"
+03010302="7-Zip verknüpfen mit:"
+03010310="Plugin"
+
+; Settings
+03010400="Einstellungen"
+03010401="&Verzeichniseintrag \"..\" anzeigen"
+03010402="Symbole aus &Dateien laden und anzeigen"
+03010410="System-Kontext&menü im Dateimenü anzeigen"
+03010420="Dateiauswahl markiert ganze &Zeile"
+03010421="&Gitternetzlinien anzeigen"
+03010422="Einfacher &Klick zum Öffnen"
+03010430="&Alternativer Dateiauswahl-Modus"
+03010440="Große &Speicherseiten verwenden"
+
+; Strings
+
+03020201="Kopieren"
+03020202="Verschieben"
+03020203="Kopieren nach:"
+03020204="Verschieben nach:"
+03020205="Kopiere..."
+03020206="Verschiebe..."
+03020207="Verschieben und Kopieren ist für diesen Ordner nicht möglich."
+03020208="Die Operation wird für diesen Ordner nicht unterstützt."
+03020209="Zielordner auswählen"
+
+03020210="Löschen von Datei bestätigen"
+03020211="Löschen von Ordner bestätigen"
+03020212="Löschen von mehreren Dateien bestätigen"
+03020213="Soll \"{0}\" wirklich gelöscht werden?"
+03020214="Soll der Ordner \"{0}\" und sein gesamter Inhalt wirklich gelöscht werden?"
+03020215="Sollen diese {0} Objekte wirklich gelöscht werden?"
+03020216="Lösche..."
+03020217="Fehler beim Löschen von Datei oder Ordner"
+03020218="Das System kann Dateien mit langem Pfad nicht in den Papierkorb verschieben."
+
+03020220="Umbenennen..."
+03020221="Fehler beim Umbenennen von Datei oder Ordner"
+03020222="Kopieren bestätigen"
+03020223="Sollen die Dateien wirklich in dieses Archiv kopiert werden:"
+
+03020230="Ordner erstellen"
+03020231="Ordnername:"
+03020232="Neuer Ordner"
+03020233="Fehler beim Erstellen des Ordners"
+
+03020240="Datei erstellen"
+03020241="Dateiname:"
+03020242="Neue Datei"
+03020243="Fehler beim Erstellen der Datei"
+
+03020250="Auswählen"
+03020251="Auswahl aufheben"
+03020252="Filter:"
+
+03020260="Ordnerverlauf"
+
+03020280="Die Datei \"{0}\" wurde geändert.\nSoll sie im Archiv aktualisiert werden?"
+03020281="Die Datei konnte nicht aktualisiert werden.\n\"{0}\""
+03020282="Kann Editor nicht starten"
+03020283="Öffne..."
+03020284="Die Datei scheint ein Virus zu sein (Dateiname enthält lange Reihen von Leerzeichen)."
+
+03020290="Kommentar"
+03020291="&Kommentar:"
+
+030202A0="System"
+
+03020300="Arbeitsplatz"
+03020301="Netzwerk"
+03020302="Dokumente"
+
+03020400="Hinzufügen"
+03020401="Entpacken"
+03020402="Überprüfen"
+
+03020420="Kopieren"
+03020421="Verschieben"
+03020422="Löschen"
+03020423="Eigenschaften"
+
+03020500="Datei aufsplitten"
+03020501="Teildateien &nach:"
+03020510="Aufsplitten..."
+03020520="Aufsplitten bestätigen"
+03020521="Sind Sie sicher, die Datei in {0} Teildateien aufsplitten zu wollen?"
+03020522="Die Größe der Teildateien muss kleiner sein als die der ursprünglichen Datei."
+
+03020600="Dateien zusammenfügen"
+03020601="Zieldatei &nach:"
+03020610="Zusammenfügen..."
+03020620="Bitte nur den ersten Teil der Datei auswählen."
+03020621="Datei nicht als Teil einer aufgesplitteten Datei erkannt"
+03020622="Kann nicht mehr als eine Teildatei finden."
+
+03020710="Berechne Prüfsumme..."
+03020720="Prüfsummen-Information"
+03020721="CRC-Prüfsumme über die Daten:"
+03020722="Prüfsumme über Daten und Namen:"
+
+03020800="Durchsuche..."
+
+03020900="Eigenschaften"
+
+03020A01="Die Operation kann nicht aus einem Ordner mit langem Pfad aufgerufen werden."
+03020A02="Bitte genau eine Datei auswählen."
+03020A03="Bitte mindestens eine Datei auswählen."
+03020A04="Die Datei {0} existiert bereits."
+
+; Computer
+03031100="Gesamtgröße"
+03031101="Freier Speicherplatz"
+03031102="Cluster-Größe"
+03031103="Name"
+
+; Network
+03031200="Lokaler Name"
+03031201="Provider"
+
+; Benchmark Dialog
+
+03080000="Benchmark"
+03080001="Speichernutzung:"
+03080002="Komprimierung"
+03080003="Dekomprimierung"
+03080004="Geschwindigkeit"
+03080005="Bewertung"
+03080006="Gesamtwertung"
+03080007="Aktuell"
+03080008="Ergebnis"
+03080009="Durchläufe:"
+0308000A="Fehler:"
+0308000B="CPU-Nutzung"
+0308000C="Bewert./Nutzung"
+
+;!@LangEnd@!

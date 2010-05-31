@@ -1,0 +1,482 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.37
+; Translated by Owain Lewis
+;
+;
+;
+;
+
+00000000="Welsh"
+00000001="Cymraeg"
+00000002="82"
+
+; 7-Zip Configuration
+
+; Title
+01000000="Ffurfweddiad 7-Zip"
+
+; Info Page
+01000100="Manylion 7-Zip"
+01000103="Mae 7-Zip yn meddalwedd am ddim. Ond, gallwch cefnogi y
+datblygiad o 7-Zip trwy cofrestru."
+01000104="Cefnogi"
+01000105="Cofrestri"
+
+; Folders Page
+01000200="Ffolderi"
+01000210="Ffolder &gweithio"
+01000211="Ffolder tymor byr y &system"
+01000212="&Cyfredol"
+01000213="&Penodol:"
+01000214="Defnyddiwch am gyriant symudadwy yn unig"
+
+01000281="Nodwch lleoliad am ffeiliau archif tymor byr."
+
+; System Page
+01000300="System"
+01000301="Cyfuno 7-Zip mewn i dewislen cyd-destun y cribyn"
+01000302="Dewislen cyd-destun wedi'i rhaeadru"
+01000310="Eitemau dewislen cyd-destun:"
+
+; Language Page
+01000400="Iaith"
+01000401="Iaith:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Gorchymynion 7-Zip"
+02000103="Agor archif"
+02000104="Agor yr archif dethol."
+02000105="Echdynnu ffeiliau..."
+02000106="Echdynnu ffeiliau o'r archif dethol."
+02000107="Ychwanegu i'r archif..."
+02000108="Ychwanegu yr eitemau dethol i'r archif."
+02000109="Profi archif"
+0200010A="Profi cywirdeb yr archif dethol."
+0200010B="Echdynnu Yma"
+0200010C="Echdynnu ffeiliau o'r archif dethol i'r ffolder cyfredol."
+0200010D="Echdynnu i {0}"
+0200010E="Echdynnu ffeiliau i is-ffolder."
+0200010F="Ychwanegu i {0}"
+02000110="Ychwanegu yr eitemau dethol i'r archif."
+02000111="Cywasgu ac e-bostio..."
+02000112="Cywasgu yr eitemau dethol i archif a danfon yr archif trwy
+e-bost."
+02000113="Cywasgu i {0} ac e-bostio"
+02000114="Cywasgu yr eitemau dethol i archif a danfon yr archif trwy
+e-bost."
+
+02000140="<Ffolder>"
+02000141="<Archif>"
+
+; Properties
+02000203="Llwybr"
+02000204="Enw"
+02000205="Estyniad"
+02000206="Ffolder"
+02000207="Maint"
+02000208="Maint wedi'i Cywasgu"
+02000209="Priodweddau"
+0200020A="Crëwyd"
+0200020B="Cyrchwyd"
+0200020C="Addaswyd"
+0200020D="Solet"
+0200020E="Sylwad"
+0200020F="Amgryptio"
+02000210="Hollti Cyn"
+02000211="Hollti ar Ôl"
+02000212="Geiriadur"
+02000213="CRC"
+02000214="Math"
+02000215="Anti"
+02000216="Dull"
+02000217="SW Cynnal"
+02000218="System Ffeiliau"
+02000219="Ddefnyddiwr"
+0200021A="Grŵp"
+0200021B="Bloc"
+0200021C="Sylwad"
+0200021D="Safle"
+0200021E="Rhagddodiad y Llwybr"
+
+; Status bar
+02000301="{0} gwrthrych(au) dethol"
+02000302="{0} gwrthrych(au)"
+
+02000320="Ffeiliau:"
+02000321="Ffolderi:"
+02000322="Maint:"
+
+; List Context Menu
+02000401="&Colofnau..."
+
+02000411="&Agor"
+02000412="&Echdynnu..."
+
+; ToolBar
+02000501="Echdynnu"
+
+; Messages
+02000601="Mae gweithrediadau diweddaru ddim yn ateg am yr archif hyn."
+02000602="Ddim yn gallu diweddaru yr archif {0}"
+02000603="Ddim yn gallu creu y ffolder '{0}'"
+02000604="Mae'r ffeil ddim yn archif ateg."
+02000605="Gwall"
+02000606="Gormod o eitemau"
+02000607="Mae na ddim rhaglen wedi'i cysylltu gyda'r estyniad enw ffeil"
+02000608="Mae na ddim wallau"
+
+; Dialogs
+02000702="Iawn"
+02000705="&Iawn"
+02000707="Iawn i'r &Cwbwl"
+02000709="&Na"
+0200070B="Na i'r C&wbwl"
+
+02000710="Canslo"
+02000711="&Canslo"
+02000713="&Cau"
+02000714="Stopio"
+02000715="Ailgychwyn"
+
+02000720="Cymorth"
+
+; Extract dialog
+02000800="Echdynnu"
+02000801="E&chdynnu i:"
+02000802="Cyfrinair"
+
+02000810="Modd llwybr"
+02000811="Enwau llwybr llawn"
+02000812="Enwau llwybr gyfredol"
+02000813="Dim enwau llwybr"
+
+02000820="Modd disodli"
+02000821="Gofyn cyn disodli"
+02000822="Disodli heb awgrymeb"
+02000823="Crychneidio ffeiliau presennol"
+02000824="Ailenwu yn awtomatig"
+02000825="Ailenwu ffeiliau presennol yn awtomatig"
+
+02000830="Ffeiliau"
+02000831="&Ffeiliau dethol"
+02000832="&Pob ffeil"
+
+02000881="Nodwch lleoliad am echdynnu ffeiliau."
+
+02000890="Echdynnu"
+
+; Overwrite dialog
+02000900="Cadarnhau Disodli Ffeil"
+02000901="Mae'r ffolder hon eisioes yn cynnwys y ffeil cyrchfan."
+02000902="Hoffech chi ddisodli'r ffeil sy'n bodoli eisioes"
+02000903="Gyda hon?"
+
+02000911="Ailenwi A&wtomatig"
+
+02000982="{0} beit"
+02000983="addaswyd ar"
+
+; Messages dialog
+02000A00="Neges diagnostig"
+
+02000A80="Neges"
+
+02000A91="Modd cywasgu ddim yn dilys am '{0}'."
+02000A92="Gwall data mewn '{0}'. Ffeil wedi'i torri."
+02000A93="CRC wedi'i methu mewn '{0}'. Ffeil wedi'i torri."
+
+; Password dialog
+02000B00="Mewnbynnwch cyfrinair"
+02000B01="Mewnbynnwch cyfrinair:"
+02000B02="&Dangos cyfrinair"
+
+; Progress dialog
+02000C00="Proses"
+02000C01="Wedi treiglo:"
+02000C02="Amser a'r ôl:"
+02000C03="Maint:"
+02000C04="Cyflymder:"
+
+02000C10="&Cefndir"
+02000C11="&Blaendir"
+02000C12="&Pwyllo"
+02000C13="P&arhau"
+
+02000C20="Pwyllo"
+
+02000C30="Ydych chi am canslo?"
+
+; Compress dialog
+02000D00="Ychwanegu i'r archif"
+02000D01="&Archif:"
+02000D02="Modd &diweddaru:"
+02000D03="&Fformat yr archif:"
+02000D04="Dull &cywasgu:"
+02000D05="Creu archif &Solet"
+02000D06="&Paramedrau:"
+02000D07="Dewisiadau"
+02000D08="Creu archif SF&X"
+02000D09="Multi-threading"
+02000D0A="Amgryptio &enwau ffeiliau"
+02000D0B="&Lefel cywasgu:"
+02000D0C="Maint &geiriadur:"
+02000D0D="Maint geiria&u:"
+02000D0E="Defnydd cof am Cywasgu:"
+02000D0F="Defnydd cof am Datgywasgu:"
+
+02000D40="Hollti i &cyfeintiau, beitiau:"
+
+02000D81="Storio"
+02000D82="Arferol"
+02000D83="Uchafswm"
+02000D84="Cyflum"
+02000D85="Cyflymach"
+02000D86="Ultra"
+
+02000D90="Pori"
+
+02000DA1="Ychwanegu ac amnewid ffeiliau"
+02000DA2="Diweddaru ac ychwanegu ffeiliau"
+02000DA3="Adnewyddu y ffeiliau presennol"
+02000DA4="Cyfamseru ffeiliau"
+
+02000DB1="Pob Ffeil"
+
+02000DC0="Cywasgu"
+
+; Columns dialog
+02000E00="Colofnau"
+02000E01="Ticiwch y colofnau byddech yn hoffi gwneud yn gweledig yn y
+ffolder hon. Defnyddiwch y botwmau Symud Lan a Symud Lawr i ailtrefnu y
+colofnau."
+02000E02="Dylid y colofn dethol bod"
+02000E03="picseli &llydan."
+
+02000E10="Symud &Lan"
+02000E11="Symud La&wr"
+02000E12="&Dangos"
+02000E13="&Cuddio"
+02000E14="Gosod"
+
+02000E81="Teitl"
+02000E82="Lled"
+
+; Testing
+02000F90="Ymbrofi"
+
+
+; File Manager
+
+03000000="Rheolwr Ffeil 7-Zip"
+
+; Menu
+03000102="&Ffeil"
+03000103="&Golygu"
+03000104="Gwe&ld"
+03000105="&Offer"
+03000106="&Cymorth"
+03000107="Ff&efrynnau"
+
+; File
+03000210="&Agor"
+03000211="Agor tu &Mewn"
+03000212="Agor tu &Fas"
+03000220="Gwe&ld"
+03000221="&Golygu"
+03000230="A&ilenwi"
+03000231="&Copïo i..."
+03000232="&Symud i..."
+03000233="&Dileu"
+03000240="&Priodweddau"
+03000241="Syl&wad"
+03000242="Cyfrifo swm-gwirio"
+03000250="Creu Ffolder"
+03000251="Creu Ffeil"
+03000260="Alla&n"
+03000270="&Hollti ffeil..."
+03000271="Cy&funo ffeilau..."
+
+; Edit
+03000310="&Dadwneud"
+03000311="&Ailwneud"
+03000320="&Torri"
+03000321="&Copïo"
+03000322="&Gludo"
+03000323="D&ileu"
+03000330="Dewis y C&yfan"
+03000331="Dad-ddewis y Cyfan"
+03000332="Gwrt&hdroi'r Dewis"
+03000333="Dewis..."
+03000334="Dad-ddewis..."
+03000335="Dewis trwy Math"
+03000336="Dad-ddewis trwy Math"
+
+; View
+03000410="Eiconau &Mawr"
+03000411="Eiconau &Bach"
+03000412="&Rhestr"
+03000413="Ma&nylion"
+03000420="Dad-dosbarthu"
+03000430="Agor Ffolder Gwraidd"
+03000431="Lan Un Lefel"
+03000432="Hanes Ffolderi..."
+03000440="&Adnewyddu"
+03000449="Golwg Flat"
+03000450="&2 Paneli"
+03000451="Bariau &Offer"
+03000460="Bar Offer Archif"
+03000461="Bar Offer Arferol"
+03000462="Botwmau Fawr"
+03000463="Dangos Testun Botwmau"
+
+; Tools
+03000510="&Dewisiadau..."
+03000511="&Meincnod"
+
+; Help
+03000610="&Cynnwys..."
+03000620="&Manylion 7-Zip..."
+
+; Favorites
+03000710="&Ychwanegu ffolder i Ffefrynnau fel"
+03000720="Llyfrnod"
+
+; Options Dialog
+
+03010000="Dewisiadau"
+
+; Plugins
+03010100="Plugins"
+03010101="&Plugins:"
+03010110="Dewisiadau..."
+
+; Edit
+03010200="Golygydd"
+03010201="&Golygydd:"
+
+; System
+03010300="System"
+03010302="Cysylltu 7-Zip gyda:"
+03010310="Plugin"
+
+; Settings
+03010400="Gosodiadau"
+03010401="Dangos eitem \"..\""
+03010402="Dangos eicon ffeil go iawn"
+03010410="Dangos dewislen y system"
+03010420="Dethol &holl rhes"
+03010421="Dangos llinellau &grid"
+03010430="Modd dethol &arallddewisiol"
+03010440="Defnyddiwch tudalenau cof &mawr"
+
+; Strings
+
+03020201="Copïo"
+03020202="Symud"
+03020203="Copïo i:"
+03020204="Symud i:"
+03020205="Copïo..."
+03020206="Symud..."
+03020207="Rydych ddim yn gallu symud na copïo eitemau am ffolderi o'r
+fath."
+03020208="Mae'r gweithrediad ddim wedi'i ategu."
+
+03020210="Cadarnhau Dileu Ffeil"
+03020211="Cadarnhau Dileu Ffolder"
+03020212="Cadarnhau Dileu Ffeiliau Amryfal"
+03020213="Ydych chi'n siŵr eich bod am dileu '{0}'?"
+03020214="Ydych chi'n siŵr eich bod am dileu y ffolder '{0}' ac ei holl
+cynnwys?"
+03020215="Ydych chi'n siŵr eich bod am dileu yr eitemau hyn {0}?"
+03020216="Dileu..."
+03020217="Gwall Dileu Ffeil neu Ffolder"
+
+03020220="Ailenwi..."
+03020221="Gwall wrth Ailenwi Ffeil neu Ffolder"
+03020222="Cadarnhau Copi Ffeil"
+03020223="Ydych chi'n siŵr eich bod am copïo'r ffeiliau i'r archif"
+
+03020230="Creu Ffolder"
+03020231="Enw Ffolder:"
+03020232="Ffolder Newydd"
+03020233="Gwall wrth Creu Ffolder"
+
+03020240="Creu Ffeil"
+03020241="Enw Ffeil:"
+03020242="Ffeil Newydd"
+03020243="Gwall wrth Creu Ffeil"
+
+03020250="Dewis"
+03020251="Dad-ddewis"
+03020252="Mwgwd:"
+
+03020260="Hanes Ffolderi"
+
+03020280="Roedd ffeil '{0}' wedi'i addasu.\nWyt ti moen ei diweddaru yn yr
+archif?"
+03020281="Ddim yn gallu diweddaru ffeil\n'{0}'"
+03020282="Ddim yn gallu dechrau golygydd."
+03020283="Agor..."
+
+03020290="Sylwad"
+03020291="&Sylwad:"
+
+030202A0="System"
+
+03020300="Cyfrifiadur"
+03020301="Rhyngrwyd"
+
+03020400="Ychwanegu"
+03020401="Echdynnu"
+03020402="Profi"
+
+03020420="Copïo"
+03020421="Symud"
+03020422="Dileu"
+03020423="Gwybodaeth"
+
+03020500="Hollti Ffeil"
+03020501="&Hollti i:"
+03020510="Hollti..."
+
+03020600="Cyfuno Ffeiliau"
+03020601="&Cyfuno i:"
+03020610="Cyfuno..."
+
+03020710="Cyfrifo swm-gwirio..."
+03020720="Gwybodaeth swm-gwirio"
+03020721="Swm-gwirio CRC am data:"
+03020722="Swm-gwirio CRC am data ac enwau:"
+
+03020800="Sganio..."
+
+; Computer
+03031100="Cyfanswm Maint"
+03031101="Lle Rhydd"
+03031102="Maint Clwstwr"
+03031103="Label"
+
+; Network
+03031200="Enw Lleol"
+03031201="Darparwr"
+
+; Benchmark Dialog
+
+03080000="Meincnod"
+03080001="Defnyddiad cof:"
+03080002="Cywasgu"
+03080003="Datgywasgu"
+03080004="Cyflymdra"
+03080005="Amcangyfrif"
+03080006="Amcangyfrif llwyr"
+03080007="Presennol"
+03080008="Canlyniad"
+03080009="Pasio:"
+0308000A="Gwallau:"
+
+;!@LangEnd@!
+

@@ -1,0 +1,459 @@
+;!@Lang@!UTF-8!
+; 7-Zip 4.30
+; Diterjemahkan oleh Khairul Ridhwan Bin Omar
+;
+;
+;
+;
+
+00000000="Malay"
+00000001="Bahasa Melayu"
+00000002="62"
+
+; 7-Zip Configuration
+
+; Title
+01000000="Konfigurasi 7-Zip"
+
+; Info Page
+01000100="Perihal 7-Zip"
+01000103="7-Zip adalah perisian percuma. Sokong pembangunan 7-Zip dengan melakukan pendaftaran."
+01000105="Pendaftaran"
+
+; Folders Page
+01000200="Folder"
+01000210="&Folder kerja"
+01000211="&Folder sementara sistem"
+01000212="&Sekarang"
+01000213="&Ditentukan:"
+01000214="Hanya untuk pemacu mudah alih"
+
+01000281="Tentukan lokasi untuk arkib fail sementara."
+
+; System Page
+01000300="Sistem"
+01000301="Integrasikan 7-Zip ke shell konteks menu"
+01000302="Cascaded konteks menu"
+01000310="Item pada konteks menu:"
+
+; Language Page
+01000400="Bahasa"
+01000401="Bahasa:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Arahan dalam 7-Zip"
+02000103="Buka arkib"
+02000104="Buka arkib terpilih."
+02000105="Ekstrak fail..."
+02000106="Ekstrak fail dari arkib terpilih."
+02000107="Tambahkan ke arkib..."
+02000108="Tambahkan item yang terpilih ke arkib."
+02000109="Uji arkib"
+0200010A="Uji integriti dari arkib terpilih."
+0200010B="Ekstrak di sini"
+0200010C="Ekstrak fail arkib yang terpilih ke folder ini."
+0200010D="Ekstrak ke {0}"
+0200010E="Ekstrak fail ke subfolder."
+0200010F="Tambahkan ke {0}"
+02000110="Tambahkan item terpilih ke arkib."
+02000111="Padatkan dan kirimkan melalui email..."
+02000112="Padatkan item yang terpilih ke arkib dan kirimkan melalui email."
+02000113="Padatkan ke {0} dan kirimkan melalui email"
+02000114="Padatkan item yang terpilih ke arkib dan kirimkan melalui email."
+
+02000140="<Folder>"
+02000141="<Arkib>"
+
+; Properties
+02000203="Bahagian"
+02000204="Nama"
+02000205="Sambungan"
+02000206="Folder"
+02000207="Saiz"
+02000208="Saiz Paket"
+02000209="Atribut"
+0200020A="Dibuat"
+0200020B="Diakses"
+0200020C="Diubah Suai"
+0200020D="Solid"
+0200020E="Komen"
+0200020F="Terenkripsi"
+02000210="Terpisah Sebelum"
+02000211="Terpisah Selepas"
+02000212="Kamus"
+02000213="CRC"
+02000214="Jenis"
+02000215="Anti"
+02000216="Kaedah"
+02000217="Sistem Operasi"
+02000218="Sistem Fail"
+02000219="Pengguna"
+0200021A="Kumpulan"
+0200021B="Blok"
+0200021C="Komen"
+0200021D="Posisi"
+
+; Status bar
+02000301="{0} buah objek telah terpilih"
+02000302="{0} buah objek"
+
+; List Context Menu
+02000401="&Kolum..."
+
+02000411="&Buka"
+02000412="&Ekstrak..."
+
+; ToolBar
+02000501="Ekstrak"
+
+; Messages
+02000601="Tidak menyokong pengemaskinian untuk arkib ini."
+02000602="Tidak dapat mengemaskini arkib {0}"
+02000603="Tidak dapat membuat folder '{0}'"
+02000604="Tidak dapat menyokong fail arkib jenis ini."
+02000605="Ralat"
+02000606="Terlalu banyak item"
+02000607="Tidak ada aplikasi yang dikongsikan dengan sambungan dari nama fail yang diberikan"
+02000608="Tidak ada ralat"
+
+; Dialogs
+02000702="OK"
+02000705="&Ya"
+02000707="Ya untuk Semua"
+02000709="&Tidak"
+0200070B="Tidak untuk Semua"
+
+02000710="Batal"
+02000711="&Batal"
+02000713="&Tutup"
+02000714="Henti"
+02000715="Mula Semula"
+
+02000720="Bantuan"
+
+; Extract dialog
+02000800="Ekstrak"
+02000801="Ekstrak ke:"
+02000802="Kata laluan"
+
+02000810="Mod laluan"
+02000811="Laluan nama penuh"
+02000812="Nama laluan sekarang"
+02000813="Tidak pakai nama laluan"
+
+02000820="Mod tulis semula"
+02000821="Tanya sebelum menulis semula"
+02000822="Tulis semula tanpa perlu diberitahu"
+02000823="Abaikan fail yang ada"
+02000824="Namakan semula automatik"
+02000825="Namakan automatik fail yang ada"
+
+02000830="Fail"
+02000831="&Fail yang terpilih"
+02000832="&Semua fail"
+
+02000881="Tentukan lokasi untuk pengekstrakan fail."
+
+02000890="Sedang mengekstrak"
+
+; Overwrite dialog
+02000900="Pastikan penggantian fail"
+02000901="Folder tujuan telah berisi fail yang telah terproses."
+02000902="Mahukah anda menggantikan fail yang ada"
+02000903="dengan yang ini?"
+
+02000911="N&amakan semula Automatik"
+
+02000982="{0} baits"
+02000983="diubah suai pada"
+
+; Messages dialog
+02000A00="Mesej diagnostik"
+
+02000A80="Mesej"
+
+02000A91="Kaedah pemampatan untuk '{0}' tidak disokong."
+02000A92="Data ralat di '{0}'. Fail ini rosak."
+02000A93="CRC gagal di '{0}'. Fail ini rosak."
+
+; Password dialog
+02000B00="Masukkan kata laluan"
+02000B01="Masukkan kata laluan:"
+02000B02="&Perlihatkan kata laluan"
+
+; Progress dialog
+02000C00="Proses"
+02000C01="Telah berlalu:"
+02000C02="Selesai dalam:"
+02000C03="Saiz:"
+02000C04="Kecepatan:"
+
+02000C10="&Latar belakang"
+02000C11="&Latar depan"
+02000C12="&Berehat"
+02000C13="&Teruskan"
+
+02000C20="Berehat"
+
+02000C30="Anda yakin untuk membatalkannya?"
+
+; Compress dialog
+02000D00="Tambahkan ke arkib"
+02000D01="&Arkib:"
+02000D02="&Mod kemaskini:"
+02000D03="Format arkib:"
+02000D04="Kaedah mampatan:"
+02000D05="Buat arkib solid"
+02000D06="&Parameter:"
+02000D07="Opsyen"
+02000D08="Buat arkib SF&X"
+02000D09="Multi-threading"
+02000D0A="Enkripsi nama &fail"
+02000D0B="Aras &mampatan:"
+02000D0C="&Saiz kamus:"
+02000D0D="&Saiz perkataan:"
+02000D0E="Penggunaan memori untuk Memampatkan:"
+02000D0F="Penggunaan memori untuk Menyah-mampatkan:"
+
+02000D40="Bahagi/belah ke &nilai, baits:"
+
+02000D81="Untuk Penyimpanan"
+02000D82="Normal"
+02000D83="Maksimum"
+02000D84="Cepat"
+02000D85="Lebih cepat"
+02000D86="Ultra"
+
+02000D90="Selusur..."
+
+02000DA1="Tambah dan gantikan fail"
+02000DA2="Kemaskini dan tambahkan fail"
+02000DA3="Perbaharui fail yang ada"
+02000DA4="Menyesuaikan fail"
+
+02000DB1="Semua Fail"
+
+02000DC0="Memampatkan"
+
+; Columns dialog
+02000E00="Kolum"
+02000E01="Semak kolum yang anda ingin lihat untuk folder ini. Gunakan bebutang Ke Atas dan Ke Bawah untuk menyusun kolum."
+02000E02="Kolum yang sepatutnya dipilih"
+02000E03="piksel &lebar."
+
+02000E10="Pindah ke &Atas"
+02000E11="Pindah ke &Bawah"
+02000E12="&Perlihatkan"
+02000E13="&Sembunyikan"
+02000E14="Set"
+
+02000E81="Judul"
+02000E82="Lebar"
+
+; Testing
+02000F90="Pengujian"
+
+
+; File Manager
+
+03000000="Pengurusan Fail 7-Zip"
+
+; Menu
+03000102="&Fail"
+03000103="&Edit"
+03000104="&Paparan"
+03000105="&Alat"
+03000106="&Bantuan"
+03000107="K&egemaran"
+
+; File
+03000210="&Buka"
+03000211="Buka di D&alam"
+03000212="Buka di L&uar"
+03000220="&Paparan"
+03000221="&Edit"
+03000230="Nam&akan semula"
+03000231="&Salin ke..."
+03000232="&Pindahkan ke..."
+03000233="Hapus"
+03000240="P&roperti"
+03000241="Kom&en"
+03000250="Buat Folder"
+03000251="Buat Fail"
+03000260="K&eluar"
+03000270="&Bahagi/belah Fail..."
+03000271="Gab&ung Fail..."
+
+; Edit
+03000310="&Buat Asal"
+03000311="&Buat Semula"
+03000320="Poton&g"
+03000321="&Salin"
+03000322="&Tampal"
+03000323="&Hapus"
+03000330="Pilih &Semua"
+03000331="Jangan Pilih Semua"
+03000332="&Sonsangkan Pilihan "
+03000333="Pilih..."
+03000334="Tidak Memilih..."
+03000335="Pilih Berdasarkan Jenis"
+03000336="Tidak Memilih Berdasarkan Jenis"
+
+; View
+03000410="Ikon B&esar"
+03000411="Ikon K&ecil"
+03000412="&Senarai"
+03000413="&Butiran"
+03000420="Tidak Tersusun"
+03000430="Buka Root Folder"
+03000431="Ke atas Satu Aras"
+03000432="Folder Sejarah..."
+03000440="&Segarkan Semula"
+03000450="&2 Panel"
+03000451="&Toolbar"
+03000460="Toolbar Arkib"
+03000461="Toolbar Standard"
+03000462="Bebutang Besar"
+03000463="Perlihatkan Teks Bebutang"
+
+; Tools
+03000510="&Opsyen..."
+03000511="&Tanda Aras"
+
+; Help
+03000610="&Kandungan..."
+03000620="&Perihal 7-Zip..."
+
+; Favorites
+03000710="&Tambah folder pada Kegemaran sebagai"
+03000720="Penanda Buku"
+
+; Options Dialog
+
+03010000="Opsyen"
+
+; Plugins
+03010100="Plugin"
+03010101="&Plugin:"
+03010110="Opsyen..."
+
+; Edit
+03010200="Editor"
+03010201="&Editor:"
+
+; System
+03010300="Sistem"
+03010302="Kongsikan 7-Zip dengan:"
+03010310="Plugin"
+
+; Settings
+03010400="Seting"
+03010401="Perlihatkan \"..\" item"
+03010402="Perlihatkan ikon asli dari fail"
+03010410="Perlihatkan menu sistem"
+03010420="&Pilih barisan penuh "
+03010421="Perlihatkan garisan grid"
+03010430="&Mod Pilihan Alternatif"
+03010440="Gunakan muka surat memori yang &besar"
+
+; Strings
+
+03020201="Salin"
+03020202="Pindah"
+03020203="Salin ke:"
+03020204="Pindah ke:"
+03020205="Sedang menyalin..."
+03020206="Sedang memindah..."
+03020207="Anda tidak boleh memindah atau menyalin item untuk folder yang demikian."
+03020208="Operasi tidak disokong."
+
+03020210="Pasti penghapusan fail"
+03020211="Pasti penghapusan folder"
+03020212="Pasti penghapusan fail-fail"
+03020213="Anda yakin untuk menghapus '{0}'?"
+03020214="Anda yakin untuk menghapus folder '{0}' dan semua isi kandungannya?"
+03020215="Anda yakin untuk menghapus item {0}?"
+03020216="Penghapusan..."
+03020217="Ralat ketika menghapuskan Fail atau Folder"
+
+03020220="Namakan semula..."
+03020221="Ralat, ketika namakan semula Fail atau Folder"
+03020222="Pasti salinkan fail"
+03020223="Anda yakin untuk menyalinkan fail kepada arkib"
+
+
+03020230="Buat Folder"
+03020231="Nama Folder:"
+03020232="Folder Baru"
+03020233="Ralat, tidak dapat Membuat Folder"
+
+03020240="Buat Fail"
+03020241="Nama Fail:"
+03020242="Fail Baru"
+03020243="Ralat, tidak dapat Membuat Fail"
+
+03020250="Pilih"
+03020251="Tidak Memilih"
+03020252="Topeng:"
+
+03020260="Folder Sejarah"
+
+03020280="Fail '{0}' telah terubah suai.\nApakah anda ingin mengemaskininya pada arkib?"
+03020281="Tidak dapat mengemaskini fail\n'{0}'"
+03020282="Tidak dapat membuka editor."
+03020283="Membuka..."
+
+03020290="Komen"
+03020291="&Komen:"
+
+030202A0="Sistem"
+
+03020300="Komputer"
+03020301="Rangkaian"
+
+03020400="Tambah"
+03020401="Ekstrak"
+03020402="Uji"
+
+03020420="Salin"
+03020421="Pindah"
+03020422="Hapus"
+03020423="Maklumat"
+
+03020500="Pisahkan Fail"
+03020501="&Pisahkan ke:"
+03020510="Pembelahan ..."
+
+03020600="Gabungan Fail"
+03020601="&Gabung ke:"
+03020610="Penggabungan ..."
+
+; Computer
+03031100="Saiz Keseluruhan"
+03031101="Ruang Kosong"
+03031102="Saiz Kluster"
+03031103="Label"
+
+; Network
+03031200="Nama Tempatan"
+03031201="Penyedia"
+
+; Benchmark Dialog
+
+03080000="Tanda Aras"
+03080001="Penggunaan memori:"
+03080002="Pemampatan"
+03080003="Penyah-mampatan"
+03080004="Kecepatan"
+03080005="Rating"
+03080006="Total Rating"
+03080007="Sekarang"
+03080008="Keputusan"
+03080009="Lulus:"
+0308000A="Ralat:"
+
+;!@LangEnd@!

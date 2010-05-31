@@ -1,0 +1,454 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 3.12
+; Translated by KAD-Korvigelloù An Drouizig (drouizig.org).
+;
+; And updated since
+;
+;
+
+00000000="Breton"
+00000001="Brezhoneg"
+00000002="126"
+
+; 7-Zip Configuration
+
+; Title
+01000000="Kefluniañ 7-Zip"
+
+; Info Page
+01000100="Keloù"
+01000103="Digoust eo ar meziant 7-Zip. Mar plij deoc'h 7-zip ha mar fell deoc'h skoazellañ ar raktres-mañ e c'hellit donezoniñ argant da 7-Zip."
+01000105="Donezoniñ"
+
+; Folders Page
+01000200="Teulioù"
+01000210="Teulioù &labour"
+01000211="Teul dibadelus ar &reizhiad"
+01000212="Teul &red"
+01000213="Teul &spisaet :"
+01000214="Implijout nemet evit ar mediaoù dilec'hus"
+
+01000281="Spisait un teul evit lakaat ar restroù diell dibadelus."
+
+; System Page
+01000300="Reizhiad"
+01000301="Lakaat 7-Zip el lañser kemperzhel"
+01000302="Lañser kemperzhel a-steud"
+01000310="Elfennoù al lañser kemperzhel :"
+
+; Language Page
+01000400="Yezh"
+01000401="Yezh :"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="Arc'hwelioù 7-Zip"
+02000103="Digeriñ"
+02000104="Digeriñ an diell diuzet."
+02000105="Eztennañ ar restroù..."
+02000106="Eztennañ ar restroù diouzh an diell diuzet."
+02000107="Ouzhpennañ d'an diell..."
+02000108="Ouzhpennañ an elfennoù diuzet d'an diell."
+02000109="Gwiriañ an diell"
+0200010A="Gwiriañ yalc'h an diell diuzet."
+0200010B="Eztennañ amañ"
+0200010C="Eztennañ restroù an diell diuzet en teul red."
+0200010D="Eztennañ diwar {0}"
+0200010E="Eztennañ e-barzh un is-teul."
+0200010F="Ouzhpennañ da {0}"
+02000110="Ouzhpennañ an elfennoù diuzet d'an diell."
+02000111="Gwaskañ ha kas dre postel..."
+02000112="Gwaskañ an elfennoù diuzet d'an diell a kas anezhi dre postel."
+02000113="Gwaskañ diwar {0} ha kas dre postel."
+02000114="Gwaskañ an elfennoù diuzet d'an diell ha kas anezhi dre postel."
+
+02000140="<Teul>"
+02000141="<Diell>"
+
+; Properties
+02000203="Treug"
+02000204="Anv"
+02000205="Astenn"
+02000206="Teul"
+02000207="Ment"
+02000208="Gwasket"
+02000209="Doareennoù"
+0200020A="Savet d'ar"
+0200020B="Stoket d'ar"
+0200020C="Kemmet d'ar"
+0200020D="Solut"
+0200020E="Evezhiadenn"
+0200020F="Ennodet"
+02000210="Rannañ a-raok"
+02000211="Rannañ war-lerc'h"
+02000212="Geriadur"
+02000213="CRC"
+02000214="Rizh"
+02000215="Enep"
+02000216="Hentenn"
+02000217="OS ostiz"
+02000218="Reizhiad restroù"
+02000219="Implijour"
+0200021A="Strollad"
+0200021B="Bloc'h"
+0200021C="Evezhiadenn"
+0200021D="Lec'hiadur"
+
+; Status bar
+02000301="{0} elfenn ziuzet"
+02000302="{0} elfenn"
+
+; List Context Menu
+02000401="&Bannoù..."
+
+02000411="&Digeriñ"
+02000412="&Eztennañ..."
+
+; ToolBar
+02000501="Eztennañ"
+
+; Messages
+02000601="N'haller ket ober gant an oberiadennoù nevesaat evti an diell-mañ."
+02000602="N'haller ket nevesaat an diell '{0}'"
+02000603="N'haller ket sevel ar restr '{0}'"
+02000604="N'eo ket ur restr diell reizh ar restr-mañ."
+02000605="Fazi"
+02000606="Re a elfennoù"
+02000607="Arload ebet kenstaget gant ar rizh restr-mañ"
+02000608="N'eus fazi ebet"
+
+; Dialogs
+02000702="Mat eo"
+02000705="&Ya"
+02000707="Ya be&pred"
+02000709="&Ket"
+0200070B="Ket &bepred"
+
+02000710="Nullañ"
+02000711="&Nullañ"
+02000713="&Serriñ"
+02000714="Paouez"
+02000715="Adloc'hañ"
+
+02000720="Skoazell"
+
+; Extract dialog
+02000800="Eztennañ"
+02000801="E&ztennañ diwar :"
+02000802="Ger-tremen"
+
+02000810="Treugoù"
+02000811="Treugoù klok"
+02000812="Treugoù daveel"
+02000813="Treug ebet"
+
+02000820="Mod erlec'hiañ"
+02000821="Goulenn a-raok erlec'hiañ"
+02000822="Erlec'hiañ hep goulenn"
+02000823="Lakaat ar restroù a zo anezho a-gostez"
+02000824="Adenvel ent-emgefre"
+02000824="Adenvel ent-emgefre ar restroù a zo anezho"
+
+02000830="Restroù"
+02000831="&Restroù diuzet"
+02000832="&An holl restroù"
+
+02000881="Dibabit un teul evit eztennañ an restroù."
+
+02000890="Eztennañ"
+
+; Overwrite dialog
+02000900="Kadarnaat a-raok erlec'hiañ ur restr"
+02000901="Emañ dija ur restr gant ar memes anv en teul bukenn."
+02000902="Ha fellout a ra deoc'h lakaat e-lec'h"
+02000903="ar restr da heul ?"
+
+02000911="Adenvel ent-&emgefre"
+
+02000982="{0} eizhtet"
+02000983="kemmet d'ar"
+
+; Messages dialog
+02000A00="Kemennoù yalc'h"
+
+02000A80="Kemenn"
+
+02000A91="Hentenn waskañ direizh evit '{0}'."
+02000A92="Stlenn faziet e-barzh '{0}'. Gwastet eo ar restr."
+02000A93="Fazi ar reoliñ CRC evit '{0}'. Gwastet eo ar restr."
+
+; Password dialog
+02000B00="Roit ar ger-tremen"
+02000B01="Roit ar ger-tremen :"
+02000B02="&Diskouez ar ger-tremen"
+
+; Progress dialog
+02000C00="O labourat"
+02000C01="Amzer dremenet :"
+02000C02="Amzer o chom :"
+02000C03="Ment :"
+02000C04="Tizh :"
+
+02000C10="&Drekleur"
+02000C11="&Rakleur"
+02000C12="&Ehan"
+02000C13="&Kenderc'hel"
+
+02000C20="Ehanet"
+
+02000C30="Ha fellout a ra deoc'h nullañ ?"
+
+; Compress dialog
+02000D00="Ouzhpennañ d'an diell"
+02000D01="&Diell :"
+02000D02="&Mod nevesaat :"
+02000D03="&Mentrezh an diell :"
+02000D04="Rizh &gwaskañ:"
+02000D05="Sevel un diell &solut"
+02000D06="&Perzhioù:"
+02000D07="&Dibaboù"
+02000D08="Sevel un diell SF&X"
+02000D09="Lies-neudennañ"
+02000D0A="Ennodiñ an &anvioù restroù"
+02000D0B="L&ive gwaskañ :"
+02000D0C="&Ment ar geriadur :"
+02000D0D="Me&nt ar gerioù :"
+02000D0E="Memor evit ar waskerezh :"
+02000D0F="Memor evit an diwaskerezh :"
+
+02000D40="Troc'hañ e &levrennoù, eizhtetoù :"
+
+02000D81="Gwaskañ ebet"
+02000D82="Reizh"
+02000D83="Uhelañ"
+02000D84="Prim"
+02000D85="Primañ"
+02000D86="Gour"
+
+02000D90="Furchal"
+
+02000DA1="Ouzhpennañ hag erlec'hiañ ar restroù"
+02000DA2="Nevesaat hag ouzhpennañ ar restroù"
+02000DA3="Freskaat ar restroù a zo anezho"
+02000DA4="Goubredañ ar restroù"
+
+02000DB1="An holl restroù"
+
+02000DC0="O waskañ"
+
+; Columns dialog
+02000E00="Bannoù"
+02000E01="Merkit ar bannoù a fell deoc'h diskouez. Implijit ar meudellioù Dilec'hiañ a-us hag a-zindan evit kemmañ an urzh."
+02000E02="Ret eo bezañ ar bann diuzet"
+02000E03="piksel a ledander."
+
+02000E10="Dil. a-&us"
+02000E11="Dil. a-&zindan"
+02000E12="&Diskouez"
+02000E13="&Kuzhat"
+02000E14="Lakaat"
+
+02000E81="Titl"
+02000E82="Ledander"
+
+; Testing
+02000F90="Gwiriañ"
+
+
+; File Manager
+
+03000000="Ardoer restroù 7-Zip"
+
+; Menu
+03000102="&Restr"
+03000103="&Aozañ"
+03000104="&Gwelout"
+03000105="&Ostilhoù"
+03000106="&Skoazell"
+03000107="Di&baboù"
+
+; File
+03000210="&Digeriñ"
+03000211="Digeriñ a-zia&barzh"
+03000212="Digeriñ a-zia&vaez"
+03000220="&Gwelout"
+03000221="&Aozañ"
+03000230="Adenv&el"
+03000231="&Kopiañ diwar..."
+03000232="&Dilec'hiañ diwar..."
+03000233="D&ilemel"
+03000240="P&erzhioù"
+03000241="Evezhia&denn"
+03000250="Sevel un teul"
+03000251="Sevel ur restr"
+03000260="&Kuitaat"
+03000270="&Troc'hañ restr..."
+03000271="&Kendeuziñ restroù..."
+
+; Edit
+03000310="&Nullañ"
+03000311="&Adober"
+03000320="&Troc'hañ"
+03000321="Ko&piañ"
+03000322="P&egañ"
+03000323="Di&lemel"
+03000330="Diuz pep &tra"
+03000331="Diziuz pe tra"
+03000332="Lakaat an &diuzad war an tu gin"
+03000333="Diuz..."
+03000334="Diziuz..."
+03000335="Diuz diouzh ar rizh"
+03000336="Diziuz diouzh ar rizh"
+
+; View
+03000410="Arlunioù &bras"
+03000411="Arlunioù &bihan"
+03000412="&Roll"
+03000413="&Munudoù"
+03000420="Dirummet"
+03000430="Digeriñ an teul gwrizienn"
+03000431="Teul kerent"
+03000432="Roll istor an teul..."
+03000440="Fresk&aat"
+03000450="&2 brenestr"
+03000451="&Barrennoù ostilhoù"
+03000460="Barrenn ziell"
+03000461="Barrenn skouerek"
+03000462="Meudellioù bras"
+03000463="Diskouez an destenn"
+
+; Tools
+03000510="&Dibaboù..."
+03000511="&Amprouiñ"
+
+; Help
+03000610="&Roll ar pennadoù..."
+03000620="A-&zivout 7-Zip..."
+
+; Favorites
+03000710="&Ouzhpennañ ar c'havlec'h d'ar sinedoù"
+03000720="Sined"
+
+; Options Dialog
+
+03010000="Dibaboù"
+
+; Plugins
+03010100="Molladoù"
+03010101="&Molladoù :"
+03010110="Dibaboù..."
+
+; Edit
+03010200="Embanner"
+03010201="&Embanner :"
+
+; System
+03010300="Reizhiad"
+03010302="Kenstagañ 7-Zip ouzh :"
+03010310="Mollad"
+
+; Settings
+03010400="Perzhioù"
+03010401="Diskouez an elfenn \"..\""
+03010402="Diskouez arlunioù gwirion ar restroù"
+03010410="Diskouez al lañser reizhiad"
+03010420="&Diuz ar bannoù a-bezh"
+03010421="Diskouez al &linennoù kael"
+
+; Strings
+
+03020201="Kopiañ"
+03020202="Dilec'hiañ"
+03020203="Kopiañ e-barzh :"
+03020204="Dilec'hiañ diwar :"
+03020205="O kopiañ..."
+03020206="O tilec'hiañ..."
+03020207="N'hallit ket dilec'hiañ pe gopiañ lod a elfennoù evit ar restroù-se."
+03020208="N'haller ket ober an oberiadenn-mañ."
+
+03020210="Kadarnañ a-raok dilemel ar restr"
+03020211="Kadarnañ a-raok dilemel an teul"
+03020212="Kadarnañ a-raok dilemel an holl restroù"
+03020213="Ha fellout a ra deoc'h dilemel '{0}' ?"
+03020214="Ha fellout a ra deoc'h dilemel an teul '{0}' ha pep tra a zo e-barzh ?"
+03020215="Ha fellout a ra deoc'h dilemel ar {0} elfenn-mañ ?"
+03020216="O tilemel..."
+03020217="Fazo o tilemel ar restr pe an teul"
+
+03020220="Oc'h adenvel..."
+03020221="Fazi oc'h adenvel ar restr pe an teul"
+
+03020230="Sevel un teul"
+03020231="Anv an teul :"
+03020232="Teul nevez"
+03020233="Fazi o sevel an teul"
+
+03020240="Sevel ur restr"
+03020241="Anv restr :"
+03020242="Restr nevez"
+03020243="Fazi o sevel ar restr"
+
+03020250="Diuz"
+03020251="Diziuz"
+03020252="Kuzh :"
+
+03020260="Roll istor an teulioù"
+
+03020280="Kemmet ez eo bet ar restr '{0}'.\nHa fellout a ra deoc'h he nevesaat en diell ?"
+03020281="N'haller ket nevesaat\n'{0}'"
+03020282="N'haller ket loc'hañ an embanner."
+03020283="O tigeriñ..."
+
+03020290="Evezhiadenn"
+03020291="&Evezhiadenn :"
+
+030202A0="Reizhiad"
+
+03020300="Urzhiataer"
+03020301="Rouedad"
+
+03020400="Ouzhpennañ"
+03020401="Eztennañ"
+03020402="Amprouiñ"
+
+03020420="Kopiañ"
+03020421="Dilec'hiañ"
+03020422="Dilemel"
+03020423="Keloù"
+
+03020500="Troc'hañ restr"
+03020501="&Troc'hañ da :"
+03020510="O troc'hañ..."
+
+03020600="Kendeuziñ restroù"
+03020601="&Kendeuziñ da :"
+03020610="O kendeuziñ..."
+
+; Computer
+03031100="Ment en holl"
+03031101="Egor vak"
+03031102="Ment ar c'hleusteurioù"
+03031103="Skritellig"
+
+; Network
+03031200="Anv lec'hel"
+03031201="Pourchaser"
+
+; Benchmark Dialog
+
+03080000="Amprouiñ"
+03080001="Implij ar vemor :"
+03080002="Gwaskerezh"
+03080003="Diwaskerezh"
+03080004="Tizh"
+03080005="Feur"
+03080006="Feur en holl"
+03080007="Red"
+03080008="Da heul"
+03080009="Tremenioù :"
+0308000A="Fazioù :"
+
+;!@LangEnd@!

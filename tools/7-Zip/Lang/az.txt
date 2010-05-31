@@ -1,0 +1,534 @@
+;!@Lang@!UTF-8!
+; 7-Zip 4.59
+; Translated by F@rhad
+;
+;
+;
+
+
+00000000="Azeri"
+00000001="Azərbaycanca"
+00000002="44"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip Nizamlama"
+
+; Info Page
+01000100="7-Zip haqqında"
+01000103="7-Zip açıq proqramdır. Ancaq, üzv olaraq 7-zip inkişaf fəaliyyətinə qoşula bilərsiniz."
+01000104="Texniki kömək"
+01000105="Qeydiyyat"
+
+; Folders Page
+01000200="Qovluqlar"
+01000210="İş qovluğu"
+01000211="Sistem TEMP qovluğu"
+01000212="Cari qovluq"
+01000213="Göstərilən qovluq:"
+01000214="Yalnız çıxarıla bilən sürücülərlə işlə"
+
+01000281="Müvəqqəti arxiv sənədləri üçün bir yer göstərin."
+
+; System Page
+01000300="Sistem"
+01000301="Tərkib menülərində 7-Zip görünsün"
+01000302="Açılan tərkib menüsü"
+01000310="Tərkib menüsündəkilər:"
+
+; Language Page
+01000400="Dil"
+01000401="Dil:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip əmrləri"
+02000103="Arxivi aç"
+02000104="Seçilmiş arxivi açar."
+02000105="Sənədləri çıxar..."
+02000106="Seçilmiş arxivdən sənədləri çıxarar."
+02000107="Arxivlə..."
+02000108="Seçilənləri arxivə əlavə edər."
+02000109="Arxivi sına"
+0200010A="Seçilmiş arxivin tamlığını sınayar."
+0200010B="Buraya çıxar"
+0200010C="Seçilmiş arxivdəki sənədləri cari qovluqda çıxarar."
+0200010D="{0} qovluğunda çıxar"
+0200010E="Alt qovluğa çıxarar."
+0200010F="{0} kimi arxivlə"
+02000110="Seçilənləri arxivə əlavə edər."
+02000111="Sıxıb e-məktubla göndər..."
+02000112="Seçilənləri sıxıb arxivləyər və arxivi e-məktubla göndərər."
+02000113="{0} kimi sıx və e-məktubla göndər"
+02000114="Seçilənləri sıxıb arxivləyər və arxivi e-məktubla göndərər."
+
+02000140="<Qovluq>"
+02000141="<Arxiv>"
+
+; Properties
+02000203="Yol"
+02000204="Ad"
+02000205="Genişləmə"
+02000206="Qovluq"
+02000207="Ölçü"
+02000208="Arxivdəki həcmi"
+02000209="Xüsusi kəmiyyətlər"
+0200020A="Yaranmış"
+0200020B="Müdaxiləli"
+0200020C="Dəyişmə"
+0200020D="Tam"
+0200020E="İzahlı"
+0200020F="Kilidli"
+02000210="Əvvəlki parça"
+02000211="Sonrakı parça"
+02000212="Lüğət"
+02000213="CRC"
+02000214="Tip"
+02000215="Anti"
+02000216="Sıxılma şəkli"
+02000217="Sistem"
+02000218="Sənəd Sistemi"
+02000219="İstifadəçi"
+0200021A="Qrup"
+0200021B="Blok"
+0200021C="İzah"
+0200021D="Mövqe"
+0200021E="Yol ön şəkilçisi"
+0200021F="Qovluqlar"
+02000220="Sənədlər"
+02000221="Buraxılış"
+02000222="Cild"
+02000223="Çox cildli"
+02000224="Ofset"
+02000225="Körpülər"
+02000226="Blok"
+02000227="Cild"
+
+02000229="64-bit"
+0200022A="Big-endian"
+0200022B="CPU"
+0200022C="Fiziki ölçü"
+0200022D="Başlıqların ölçüsü"
+0200022E="Checksum"
+0200022F="Xarakteristika"
+02000230="Xəyali ünvan"
+
+; Status bar
+02000301="{0} ədəd seçildi"
+02000302="{0} ədəd"
+
+02000320="Sənədlər:"
+02000321="Qovluqlar:"
+02000322="Ölçü:"
+02000323="Sıxılmış halda ölçü:"
+02000324="Arxivlər:"
+
+; List Context Menu
+02000401="Sütunlar..."
+
+02000411="Aç"
+02000412="Çıxar..."
+
+; ToolBar
+02000501="Çıxar"
+
+; Messages
+02000601="Bu arxivi yeniləyə bilməzsiniz."
+02000602="{0} arxivi yenilənmir"
+02000603="'{0}' qovluğu yaradıla bilmir"
+02000604="Bu sənəd tanınan arxiv deyil."
+02000605="Xəta"
+02000606="Həddən artıq çoxdur"
+02000607="Bu genişləməyə bağlı bir proqram yoxdur"
+02000608="Xəta yoxdur."
+02000609="'{0}' arxiv kimi açıla bilmir"
+0200060A="Şifrlənmiş '{0}'arxivi açıla bilmir. Açar səhvdirmi?"
+0200060B="Sistem lazımi qədər yaddaşı işlədə bilmir"
+0200060C="Bilinməyən xəta baş verdi"
+0200060D="Arxiv tipi tanınmır"
+
+; Dialogs
+02000702="Oldu"
+02000705="Bəli"
+02000707="Hamısına bəli"
+02000709="Xeyr"
+0200070B="Hamısına xeyr"
+
+02000710="Olmadı"
+02000711="Olmadı"
+02000713="Bağla"
+02000714="Saxla"
+02000715="Təkrar başla"
+
+02000720="Kömək"
+
+; Extract dialog
+02000800="Çıxar"
+02000801="Çıxarılacaq yer:"
+02000802="Açar"
+
+02000810="Yol adları"
+02000811="Tam yol adları"
+02000812="Cari yol adları"
+02000813="Yol adları olmasın"
+
+02000820="Üzərinə yazılma"
+02000821="Üstünə yazmaq üçün soruş"
+02000822="Soruşmadan üstünə yaz"
+02000823="Mövcud olanları nəzərə alma"
+02000824="Avtomatik yenidən adlandır"
+02000825="Mövcud olanları yenidən adlandır"
+
+02000830="Sənədlər"
+02000831="Seçilmiş sənədlər"
+02000832="Bütün sənədlər"
+
+02000881="Çıxarılacaq sənədlər üçün bir yer göstərin."
+
+02000890="çıxarılır"
+
+; Overwrite dialog
+02000900="Üstünə yazma təsdiqi"
+02000901="Hədəf qovluqda eyni adlı sənəd var. Üstünə yazılsın?"
+02000902="Mövcud sənəd:"
+02000903="bununla dəyişdirilsinmi:"
+
+02000911="Yenidən adlandır"
+
+02000982="{0} bayt"
+02000983="son dəyişmə "
+
+; Messages dialog
+02000A00="Bildirişlər"
+
+02000A80="Bildiriş"
+
+02000A91="'{0}' üçün sıxılma şəkli tanınmadı."
+02000A92="'{0}' yararsızdır. (Verilənlər xətası)"
+02000A93="'{0}' yararsızdır. (CRC xətası)"
+02000A94="Şifrlənmiş '{0}' sənədində verilənlər xətası. Açar səhvdirmi?"
+02000A95="Şifrlənmiş '{0}' sənədində CRC xətası. Açar səhvdirmi?"
+
+; Password dialog
+02000B00="Açar"
+02000B01="Açarı daxil edin:"
+02000B02="Açar görünsün"
+02000B03="Açarı təkrarlayın:"
+02000B10="Açarlar eyni deyil"
+02000B11="Açar üçün yalnız İngilis hərfləri, rəqəm və xüsusi simvollardan (!, #, $, ...) istifadə edin"
+02000B12="Açar çox uzundur"
+
+; Progress dialog
+02000C00="İş"
+02000C01="Keçən müddət:"
+02000C02="Qalan müddət:"
+02000C03="Həcm:"
+02000C04="Sür'ət:"
+02000C05="Yerinə yetirilən:"
+02000C06="Sıxılma dərəcəsi:"
+
+02000C10="Arxa planda"
+02000C11="Ön planda"
+02000C12="Ara ver"
+02000C13="Davam et"
+
+02000C20="Ara verildi - "
+
+02000C30="Həqiqətən əməliyyatın dayandırılmasını istəyirsiniz?"
+
+; Compress dialog
+02000D00="Arxivlə"
+02000D01="Arxiv:"
+02000D02="Yeniləmə şəkli:"
+02000D03="Arxiv növü:"
+02000D04="Sıxılma şəkli:"
+02000D05="Tam olsun"
+02000D06="Parametrlər:"
+02000D07="Seçmələr"
+02000D08="Özü cıxarılan olsun (SFX)"
+02000D09="Çox ilməli"
+02000D0A="Sənəd adlarını şifrlə"
+02000D0B="Sıxılma səviyyəsi:"
+02000D0C="Lüğət ölçüsü:"
+02000D0D="Söz ölçüsü:"
+02000D0E="Yaddaş istifadəsi (Sıxma):"
+02000D0F="Yaddaş istifadəsi (Açma):"
+02000D10="Şifrləmə"
+02000D11="Şifrləmə üsulu:"
+02000D12="CPU axın sayı:"
+02000D13="Ardıcıl blok ölçüsü:"
+02000D14="Qeyri ardıcıl"
+02000D15="Ardıcıl"
+02000D16="Birgə istifadəyə açıq sənədlər sıxılsın"
+
+02000D40="Cildlərə böl (Bayt):"
+02000D41="Cild ölçüsü düz deyil"
+02000D42="Tə'yin edilmiş cild ölçüsü: {0} bayt.\nArxivi bu ölçü ilə cildlərə bölmək istədiyinizə əminsinizmi?"
+
+02000D81="Sıxılmasız"
+02000D82="Normal"
+02000D83="Ən yüksək"
+02000D84="Sür'ətli"
+02000D85="Ən sür'ətli"
+02000D86="Ultra"
+
+02000D90="Göz gəzdir"
+
+02000DA1="Artır və dəyişdir"
+02000DA2="Yenilə və artır"
+02000DA3="Yalnız yenilə"
+02000DA4="Tutuşdur"
+
+02000DB1="Bütün sənədlər"
+
+02000DC0="sıxılır"
+
+; Columns dialog
+02000E00="Sütunlar"
+02000E01="Bu qovluqda görünə bilən olmasını istədiyiniz sütunları işarələyin. Sütunları düzmək üçün yuxarı-aşağı düymələrindən istifadə edin."
+02000E02="Seçilən sütun genişliyi"
+02000E03="nöqtə olsun."
+
+02000E10="Yuxarı"
+02000E11="Aşağı"
+02000E12="Göstər"
+02000E13="Gizlə"
+02000E14="Tə'yin et"
+
+02000E81="Başlıq"
+02000E82="Genişlik"
+
+; Testing
+02000F90="Sınaq"
+
+
+; File Manager
+
+03000000="7-Zip Sənəd İdarəedicisi"
+
+; Menu
+03000102="Sənəd"
+03000103="Düzəliş"
+03000104="Baxış"
+03000105="Vasitələr"
+03000106="Kömək"
+03000107="Çox işlədilənlər"
+
+; File
+03000210="Aç"
+03000211="Burada aç"
+03000212="Pəncərədə aç"
+03000220="Göstər"
+03000221="Dəyişiklik et"
+03000230="Yenidən adlandır"
+03000231="Köçür"
+03000232="Yerini dəyiş"
+03000233="Sil"
+03000240="Xüsusiyyətlər"
+03000241="Şərh"
+03000242="Yoxlama cəmini hesabla"
+03000250="Qovluq yarat"
+03000251="Sənəd yarat"
+03000260="Çıx"
+03000270="Böl..."
+03000271="Birləşdir..."
+
+; Edit
+03000310="Geri get"
+03000311="Təkrarla"
+03000320="Kəs"
+03000321="Köçür"
+03000322="Yapıştır"
+03000323="Sil"
+03000330="Hamısını seç"
+03000331="Heç birin seçmə"
+03000332="Tərsini seç"
+03000333="Seç..."
+03000334="Seçmə..."
+03000335="Bu genişləməni seç"
+03000336="Genişləmə seçmə"
+
+; View
+03000410="Böyük Simvollar"
+03000411="Kiçik Simvollar"
+03000412="Siyahı"
+03000413="Cədvəl"
+03000420="Sırasız"
+03000430="Kök qovluğu aç"
+03000431="Bir səviyyə yuxarı"
+03000432="Qovluq tarixçəsi..."
+03000440="Yenilə"
+03000449="Müstəvi görünüş"
+03000450="2 lövhə"
+03000451="Alət çubuğu"
+03000460="Arxiv çubuğu"
+03000461="Standart çubuq"
+03000462="Böyük düymələr"
+03000463="Düymə mətni görünsün"
+
+; Tools
+03000510="Seçmələr..."
+03000511="FİƏ ölçüsü"
+
+; Help
+03000610="İçindəkilər..."
+03000620="7-Zip haqqında..."
+
+; Favorites
+03000710="Cari qovluğu artır"
+03000720="Yer"
+
+; Options Dialog
+
+03010000="Seçmələr"
+
+; Plugins
+03010100="Əlavə tərkiblər"
+03010101="Əlavə tərkiblər:"
+03010110="Xüsusiyyətlər"
+
+; Edit
+03010200="Mətn düzəltmə"
+03010201="Mətn düzəltmə:"
+
+; System
+03010300="Sistem"
+03010302="7-Zip-ə bağla:"
+03010310="Əlavə tərkib"
+
+; Settings
+03010400="Tənzimləmələr"
+03010401="\"..\" görünsün"
+03010402="Sənədlərin həqiqi simvolları görünsün"
+03010410="Sistem menüsü görünsün"
+03010420="Bütün sətir seçilsin"
+03010421="Ayırıcılar görünsün"
+03010430="Alternativ seçki rejimi"
+03010440="Geniş yaddaş səhifələri işlət"
+
+; Strings
+
+03020201="Köçür"
+03020202="Yerini dəyiş"
+03020203="Köçürüləcək yer:"
+03020204="Yer dəyişdiriləcək yer:"
+03020205="köçürülür..."
+03020206="yer dəyişdirilir..."
+03020207="Köçürülmə və ya yer dəyişmə bu cür qovluq üçün mümkün deyil."
+03020208="İş mümkün deyil."
+03020209="Qovluq seçin."
+
+03020210="Sənəd silmə təsdiqi"
+03020211="Qovluq silmə təsdiqi"
+03020212="Birdən çox sənədi silmə təsdiqi"
+03020213="\"{0}\" silinsin?"
+03020214="\"{0}\" qovluğu və içindəkilər silinsin?"
+03020215="Bu {0} ədəd silinənlər geri qaytarılmayacaq, silinsin?"
+03020216="silinir..."
+03020217="Silmə xətası"
+03020218="Sistem uzun yola malik sənədi zibil qutusuna ata bilmir"
+
+03020220="yeni ad verilir..."
+03020221="Adlandırma xətası"
+03020222="Sənəd köçürülməsi təsdiqi"
+03020223="Sənədləri arxivə köçürmək istədiyinizə əminsinizmi"
+
+03020230="Qovluq yarat"
+03020231="Qovluq adı:"
+03020232="Yeni qovluq"
+03020233="Qovluq yaratma xətası"
+
+03020240="Sənəd yarat"
+03020241="Sənəd adı:"
+03020242="Yeni sənəd"
+03020243="Sənəd yaratma xətası"
+
+03020250="Seç"
+03020251="Seçmə"
+03020252="Seçmə ifadəsi:"
+
+03020260="Qovluq tarixçəsi"
+
+03020280="'{0}' sənədi dəyişmişdir.\nArxivdə yenilənməsini istəyirsinizmi?"
+03020281="'{0}' sənədi yenilənmədi"
+03020282="Mətn düzəltmə işə düşmədi."
+03020283="açılır..."
+03020284="Sənəd virusa bənzəyir (sənəd adında çıx sayda simvol işlədilir)."
+
+03020290="Şərh"
+03020291="Şərh:"
+
+030202A0="Sistem"
+
+03020300="EHM"
+03020301="Şəbəkə"
+03020302="Sənədlər"
+
+03020400="Arxivlə"
+03020401="Çıxar"
+03020402="Sına"
+
+03020420="Köçür"
+03020421="Yerini dəyiş"
+03020422="Sil"
+03020423="Mə'lumat"
+
+03020500="Böl"
+03020501="Bu qovluqda böl:"
+03020510="bölünür..."
+03020520="Bölünmə təsdiqi"
+03020521="Sənədi {0} cildə bölmək istədiyinizə əminsinizmi?"
+03020522="Cild ölçüsü sənədin ölçüsündən kiçik olmalıdır"
+
+03020600="Birləşdir"
+03020601="Bu qovluqda birləşdir:"
+03020610="birləşdirilir..."
+03020620="Yalnız birinci sənədi seçin"
+03020621="Sənədi bölünmüş sənədin bir hissəsi kimi qəbul etmək olmur"
+03020622="Bölünmüş sənədin birdən çox parçası tapıla bilmir"
+
+03020710="Yoxlama cəmi hesablanır..."
+03020720="Yoxlama cəmi"
+03020721="Verilənlər üçün CRC yoxlama cəmi:"
+03020722="Verilənlər və adlar üçün CRC yoxlama cəmi:"
+
+03020800="Oxunur..."
+
+03020900="Xüsusiyyətlər"
+
+03020A01="Əməliyyat uzun yola malik qovluqdan işə salına bilmir."
+03020A02="Bir sənəd seçməlisiniz"
+03020A03="Bir və ya daha çox sənəd seçməlisiniz"
+03020A04="{0} sənədi mövcuddur"
+
+; Computer
+03031100="Cəmi həcm"
+03031101="Boş yer"
+03031102="Qism həcmi"
+03031103="Açıqlama"
+
+; Network
+03031200="Yerli ad"
+03031201="Tə'min edici"
+
+; Benchmark Dialog
+
+03080000="FİƏ ölçülməsi"
+03080001="Yaddaş istifadəsi:"
+03080002="Sıxma"
+03080003="Çıxarma"
+03080004="Sür'ət"
+03080005="Xal"
+03080006="Təxmini orta xal"
+03080007="Cari"
+03080008="Nəticə"
+03080009="Müvəffəqiyyət:"
+0308000A="Xətalar:"
+0308000B="CPU istifadəsi"
+0308000C="Üstünlük / İstifadə"
+
+;!@LangEnd@!

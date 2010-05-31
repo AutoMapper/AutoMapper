@@ -1,0 +1,545 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 9.07
+; Eesti keelde on tõlkinud Kaupo Suviste
+; Täiendas Mihkel Tõnnov
+;
+;
+;
+
+00000000="Estonian"
+00000001="eesti keel"
+00000002="37"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zipi suvandid"
+
+; Info Page
+01000100="Teave 7-Zipi kohta"
+01000103="7-Zip on vaba tarkvara. Kuid kui soovite toetada 7-Zipi arendamist, siis saate programmi registreerida.\n\n7-Zipi Eesti koduleht:\nhttp://www.hot.ee/somberg/7zip.html"
+01000104="Tugi"
+01000105="Registreeri"
+
+; Folders Page
+01000200="Kaustad"
+01000210="&Töökaust"
+01000211="&Süsteemi ajutiste failide kaust"
+01000212="&Praegune kaust"
+01000213="&Kasutaja määratud:"
+01000214="Kasuta ainult irddraivide puhul"
+
+01000281="Määrake ajutiste arhiivifailide asukoht."
+
+; System Page
+01000300="Süsteem"
+01000301="Integreeri 7-Zip kesta hüpikmenüüsse"
+01000302="Kaskaad-hüpikmenüü"
+01000310="Hüpikmenüü käsud:"
+
+; Language Page
+01000400="Keel"
+01000401="Keel:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zipi käsud"
+02000103="Ava arhiiv"
+02000104="Avab valitud arhiivi."
+02000105="Eralda failid..."
+02000106="Eraldab failid valitud arhiivist välja."
+02000107="Lisa arhiivi..."
+02000108="Lisab valitud üksused arhiivi."
+02000109="Testi arhiivi"
+0200010A="Testib valitud arhiivi terviklust."
+0200010B="Eralda siia"
+0200010C="Eraldab failid valitud arhiivist välja praegusesse kausta."
+0200010D="Eralda kausta {0}"
+0200010E="Eraldab failid välja alamkausta."
+0200010F="Lisa arhiivi {0}"
+02000110="Lisab valitud üksused arhiivi."
+02000111="Tihenda ja meili..."
+02000112="Tihendab valitud üksused arhiiviks ja saadab arhiivi e-postiga."
+02000113="Tihenda arhiiviks {0} ja meili"
+02000114="Tihendab valitud üksused arhiiviks ja saadab arhiivi e-postiga."
+
+02000140="<Kaust>"
+02000141="<Arhiiv>"
+
+; Properties
+02000203="Tee"
+02000204="Nimi"
+02000205="Laiend"
+02000206="Kaust"
+02000207="Maht"
+02000208="Maht tihendatult"
+02000209="Atribuudid"
+0200020A="Loodud"
+0200020B="Avatud"
+0200020C="Muudetud"
+0200020D="Ühtne"
+0200020E="Kommenteeritud"
+0200020F="Krüptitud"
+02000210="Tükeldatud enne"
+02000211="Tükeldatud pärast"
+02000212="Sõnastik"
+02000213="CRC"
+02000214="Tüüp"
+02000215="Anti"
+02000216="Meetod"
+02000217="Opsüsteem"
+02000218="Failisüsteem"
+02000219="Kasutaja"
+0200021A="Rühm"
+0200021B="Plokk"
+0200021C="Kommentaar"
+0200021D="Koht"
+0200021E="Tee prefiks"
+0200021F="Kaustu"
+02000220="Faile"
+02000221="Versioon"
+02000222="Köide"
+02000223="Mitmeköiteline"
+02000224="Nihe"
+02000225="Linke"
+02000226="Plokke"
+02000227="Köiteid"
+
+02000229="64-bitine"
+0200022A="Big-Endian"
+0200022B="Protsessor"
+0200022C="Füüsiline maht"
+0200022D="Päiste maht"
+0200022E="Kontrollsumma"
+0200022F="Karakteristikud"
+02000230="Virtuaalaadress"
+02000231="ID"
+02000232="Lühinimi"
+02000233="Loomisrakendus"
+02000234="Sektori maht"
+02000235="Režiim"
+02000236="Link"
+
+; Status bar
+02000301="{0} üksus(t) valitud"
+02000302="{0} üksus(t)"
+
+02000320="Faile:"
+02000321="Kaustu:"
+02000322="Maht:"
+02000323="Maht tihendatult:"
+02000324="Arhiive:"
+
+; List Context Menu
+02000401="&Veerud..."
+
+02000411="&Ava"
+02000412="&Eralda välja..."
+
+; ToolBar
+02000501="Eralda välja"
+
+; Messages
+02000601="Selle arhiivi värskendamistoiminguid ei toetata."
+02000602="Ei saa värskendada arhiivi {0}"
+02000603="Ei saa luua kausta {0}"
+02000604="Programm ei toeta faili vormingut."
+02000605="Tõrge"
+02000606="Liiga palju üksusi."
+02000607="Selle failinime laiendiga pole seostatud ühtki rakendust."
+02000608="Vigu ei leitud."
+02000609="Ei saa avada faili {0} arhiivina."
+0200060A="Ei saa avada krüptitud arhiivi {0}. Kas vale parool?"
+0200060B="Süsteem ei saa eraldada nõutavat mälumahtu."
+0200060C="Tundmatu tõrge"
+0200060D="Toetamata arhiivitüüp."
+
+; Dialogs
+02000702="OK"
+02000705="&Jah"
+02000707="Kõigile j&ah"
+02000709="&Ei"
+0200070B="Kõigile e&i"
+
+02000710="Loobu"
+02000711="&Loobu"
+02000713="&Sulge"
+02000714="Seiska"
+02000715="Restardi"
+
+02000720="Abi"
+
+; Extract dialog
+02000800="Väljaeraldamine"
+02000801="&Eralda välja kausta:"
+02000802="&Parool"
+
+02000810="Teed"
+02000811="&Täielikud teenimed"
+02000812="Su&htelised teenimed"
+02000813="Teenime&deta"
+
+02000820="Ülekirjutus"
+02000821="Küsi e&nne ülekirjutamist"
+02000822="Ki&rjuta küsimata üle"
+02000823="&Jäta olemasolevad failid vahele"
+02000824="Nimeta a&utomaatselt ümber"
+02000825="Nimeta &olemasolevad f. autom. ümber"
+
+02000830="Failid"
+02000831="&Valitud failid"
+02000832="&Kõik failid"
+
+02000881="Määrake väljaeraldatud failide asukoht."
+
+02000890="välja eraldatud"
+
+; Overwrite dialog
+02000900="Failiasenduse kinnitamine"
+02000901="Sihtkaust juba sisaldab töödeldavat faili."
+02000902="Kas soovite asendada olemasoleva faili"
+02000903="selle failiga?"
+
+02000911="Nimeta a&utomaatselt ümber"
+
+02000982="{0} baiti"
+02000983="muudetud"
+
+; Messages dialog
+02000A00="Diagnostikateated"
+
+02000A80="Teade"
+
+02000A91="Toetuseta tihendusmeetod failile {0}."
+02000A92="Andmeviga failis {0}. Fail on rikutud."
+02000A93="Tsükkelkoodkontroll (CRC) failis {0} nurjus. Fail on rikutud."
+02000A94="Andmeviga krüptitud failis {0}. Kas vale parool?"
+02000A95="Tsükkelkoodkontroll (CRC) krüptitud failis {0} nurjus. Kas vale parool?"
+
+; Password dialog
+02000B00="Parooli sisestamine"
+02000B01="Sisestage parool:"
+02000B02="&Kuva parool"
+02000B03="Parooli kordus:"
+02000B10="Paroolid ei kattu."
+02000B11="Kasutage paroolis ainult inglise keele tähti, numbreid ja erimärke (!, #, $, ...)."
+02000B12="Parool on liiga pikk."
+
+; Progress dialog
+02000C00="Töötlemine"
+02000C01="Kulunud aeg:"
+02000C02="Järelejäänud aeg:"
+02000C03="Kogumaht:"
+02000C04="Kiirus:"
+02000C05="Töödeldud:"
+02000C06="Tihendussuhe:"
+
+02000C10="&Taustal"
+02000C11="&Esiplaanile"
+02000C12="&Paus"
+02000C13="&Jätka"
+
+02000C20="Pausiks peatatud"
+
+02000C30="Kas soovite kindlasti loobuda?"
+
+; Compress dialog
+02000D00="Arhiivi lisamine"
+02000D01="&Arhiiv:"
+02000D02="Värskend&usrežiim:"
+02000D03="Arhiivi&vorming:"
+02000D04="Tihendus&meetod:"
+02000D05="&Loo ühtne arhiiv"
+02000D06="Pa&rameetrid:"
+02000D07="Suvandid"
+02000D08="Loo is&eavanev arhiiv"
+02000D09="Lõimtöötlus"
+02000D0A="Krüpti faili&nimed"
+02000D0B="&Tihendusaste:"
+02000D0C="Sõnaraamatu ma&ht:"
+02000D0D="&Sõna maht:"
+02000D0E="Mälu hõivatus tihendamisel:"
+02000D0F="Mälu hõivatus hõrendamisel:"
+02000D10="Krüptimine"
+02000D11="Krüptimismeetod:"
+02000D12="Protsessorilõimede arv:"
+02000D13="Ühtse ploki maht:"
+02000D14="Mitteühtne"
+02000D15="Ühtne"
+02000D16="Tihenda kirjutuseks avatud failid"
+
+02000D40="&Tükelda köideteks (baitides):"
+02000D41="Sobimatu köitemaht."
+02000D42="Määratud köitemaht: {0} baiti.\nKas soovite kindlasti tükeldada arhiivi niisugusteks köideteks?"
+
+02000D81="Tihenduseta"
+02000D82="Normaaltihendus"
+02000D83="Maksimaaltihendus"
+02000D84="Kiirtihendus"
+02000D85="Kiireim tihendus"
+02000D86="Ultratihendus"
+
+02000D90="Sirvi"
+
+02000DA1="Lisa ja asenda failid"
+02000DA2="Värskenda ja lisa failid"
+02000DA3="Värskenda olemasolevad failid"
+02000DA4="Sünkrooni failid"
+
+02000DB1="Kõik failid"
+
+02000DC0="tihendatud"
+
+; Columns dialog
+02000E00="Veerud"
+02000E01="Märkige veerud, mida soovite selles kaustas kuvada. Soovitud järjestusse saate veerud seada nuppude Nihuta üles ja Nihuta alla abil."
+02000E02="Valitud veerg peaks olema"
+02000E03="pi&kslit lai."
+
+02000E10="Ni&huta üles"
+02000E11="Nihuta &alla"
+02000E12="K&uva"
+02000E13="&Peida"
+02000E14="Sea"
+
+02000E81="Tiitel"
+02000E82="Laius"
+
+; Testing
+02000F90="Testimine"
+
+
+; File Manager
+
+03000000="7-Zipi failihaldur"
+
+; Menu
+03000102="&Fail"
+03000103="&Redigeeri"
+03000104="&Vaade"
+03000105="&Tööriistad"
+03000106="&Abi"
+03000107="&Lemmikud"
+
+; File
+03000210="&Ava"
+03000211="Ava s&ees"
+03000212="Ava väljasp&ool"
+03000220="Vaat&ur"
+03000221="&Redigeeri"
+03000230="&Nimeta ümber"
+03000231="&Kopeeri asukohta..."
+03000232="&Teisalda asukohta..."
+03000233="Ku&stuta"
+03000240="Atri&buudid"
+03000241="Ko&mmentaar..."
+03000242="Arvuta kontrollsumma"
+03000243="Võrdle"
+03000250="Loo kaust"
+03000251="Loo fail"
+03000260="&Välju"
+03000270="Tükel&da fail..."
+03000271="Ü&henda failid..."
+
+; Edit
+03000310="&Võta tagasi"
+03000311="&Tee uuesti"
+03000320="&Lõika"
+03000321="&Kopeeri"
+03000322="Klee&bi"
+03000323="Ku&stuta"
+03000330="V&ali kõik"
+03000331="Tühista kõik valikud"
+03000332="&Pööra valik"
+03000333="Vali..."
+03000334="Tühista valik..."
+03000335="Vali tüübi järgi"
+03000336="Tühista tüübi järgi valik"
+
+; View
+03000410="&Suured ikoonid"
+03000411="Väik&esed ikoonid"
+03000412="&Loend"
+03000413="Üksikasja&d"
+03000420="Sortimata"
+03000430="Ava juurkaust"
+03000431="Taseme võrra üles"
+03000432="Kaustaajalugu..."
+03000440="&Värskenda"
+03000449="Lame vaade"
+03000450="&Kaks paani"
+03000451="&Tööriistaribad"
+03000460="Arhiiviriistariba"
+03000461="Standardnupuriba"
+03000462="Suured nupud"
+03000463="Kuva nupusildid"
+
+; Tools
+03000510="&Häälestus..."
+03000511="&Jõudlustest"
+
+; Help
+03000610="&Sisukord..."
+03000620="&Teave 7-Zipi kohta..."
+
+; Favorites
+03000710="&Lisa kaust lemmikute hulka järjehoidjana"
+03000720="Järjehoidja"
+
+; Options Dialog
+
+03010000="Häälestus"
+
+; Plugins
+03010100="Pluginad"
+03010101="&Pluginad:"
+03010110="Suvandid..."
+
+; Edit
+03010200="Redaktor"
+03010201="&Redaktor:"
+03010202="&Võrdlusprogramm:"
+
+; System
+03010300="Süsteem"
+03010302="Seosta 7-Zip laienditega:"
+03010310="Plugin"
+
+; Settings
+03010400="Sätted"
+03010401="Kuva element \"..\""
+03010402="Kuva tegelikud failiikoonid"
+03010410="Kuva süsteemimenüü"
+03010420="&Vali terve rida"
+03010421="Kuva &ruudujooned"
+03010422="Ava üksus ühe klõpsuga"
+03010430="&Alternatiivne valikurežiim"
+03010440="Kasuta &suuri mälulehekülgi"
+
+; Strings
+
+03020201="Kopeerimine"
+03020202="Teisaldamine"
+03020203="Kopeeri asukohta:"
+03020204="Teisalda asukohta:"
+03020205="Kopeerimine..."
+03020206="Teisaldamine..."
+03020207="Te ei saa teisaldada või kopeerida üksusi niisugustesse kaustadesse."
+03020208="See toiming pole selles kaustas toetatud."
+03020209="Valige sihtkaust."
+
+03020210="Failikustutuse kinnitamine"
+03020211="Kaustakustutuse kinnitamine"
+03020212="Mitme faili kustutamise kinnitamine"
+03020213="Kas soovite kindlasti kustutada faili {0}?"
+03020214="Kas soovite kindlasti kustutada kausta {0} ja kogu selle sisu?"
+03020215="Kas soovite kindlasti kustutada need {0} üksust?"
+03020216="Kustutamine..."
+03020217="Tõrge faili või kausta kustutamisel"
+03020218="Süsteem ei saa teisaldada prügikasti pika teega faili."
+
+03020220="Ümbernimetamine..."
+03020221="Tõrge faili või kausta ümbernimetamisel"
+03020222="Failikopeerimise kinnitamine"
+03020223="Kas soovite kindlasti kopeerida arhiivi järgmised failid:"
+
+03020230="Kausta loomine"
+03020231="Kausta nimi:"
+03020232="Uus kaust"
+03020233="Tõrge kausta loomisel"
+
+03020240="Faili loomine"
+03020241="Faili nimi:"
+03020242="Uus fail"
+03020243="Tõrge faili loomisel"
+
+03020250="Valimine"
+03020251="Valiku tühistamine"
+03020252="Mask:"
+
+03020260="Kaustaajalugu"
+
+03020280="Faili {0} on muudetud.\nKas soovite selle arhiivis värskendada?"
+03020281="Ei saa värskendada faili\n{0}"
+03020282="Ei saa käivitada redaktorit."
+03020283="Avamine..."
+03020284="See fail sarnaneb viirusega (faili nimi sisaldab pikka tühikute jada)."
+
+03020290="- kommentaar"
+03020291="&Kommentaar:"
+
+030202A0="Süsteem"
+
+03020300="Arvuti"
+03020301="Võrk"
+03020302="Dokumendid"
+
+03020400="Lisa"
+03020401="Eralda välja"
+03020402="Testi"
+
+03020420="Kopeeri"
+03020421="Teisalda"
+03020422="Kustuta"
+03020423="Teave"
+
+03020500="Faili tükeldamine:"
+03020501="&Tükelda asukohta:"
+03020510="Tükeldamine..."
+03020520="Tükeldamise kinnitamine"
+03020521="Kas soovite kindlasti tükeldada faili {0} köiteks?"
+03020522="Köite maht peab olema algfaili mahust väiksem."
+
+03020600="Failide ühendamine:"
+03020601="Ü&henda asukohta:"
+03020610="Ühendamine..."
+03020620="Valige ainult tükeldatud faili esimene osa."
+03020621="Ei õnnestu tuvastada, et see fail oleks tükeldatud faili osa."
+03020622="Ei leia rohkem kui ühte tükeldatud faili osa."
+
+03020710="Kontrollsumma arvutamine..."
+03020720="Kontrollsumma"
+03020721="Andmete CRC-kontrollsumma:"
+03020722="Andmete ja nimede CRC-kontrollsumma:"
+
+03020800="Läbivaatamine..."
+
+03020900="Atribuudid"
+
+03020A01="Toimingut ei saa käivitada kaustast, millel on pikk tee."
+03020A02="Te peate valima ühe faili."
+03020A03="Te peate valima ühe või mitu faili."
+03020A04="Fail {0} on juba olemas."
+
+; Computer
+03031100="Kogumaht"
+03031101="Vaba ruum"
+03031102="Klastri suurus"
+03031103="Silt"
+
+; Network
+03031200="Kohalik nimi"
+03031201="Teenusepakkuja"
+
+; Benchmark Dialog
+
+03080000="Jõudlustest"
+03080001="Mälu hõivatus:"
+03080002="Tihendamine"
+03080003="Hõrendamine"
+03080004="Kiirus"
+03080005="Hinnang"
+03080006="Üldine jõudlushinnang"
+03080007="Praegune:"
+03080008="Lõpptulemus:"
+03080009="Töötiire:"
+0308000A="Vigu:"
+0308000B="CPU hõivatus"
+0308000C="Hinnang/hõivatus"
+
+;!@LangEnd@!
+
+ 	  	 

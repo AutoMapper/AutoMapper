@@ -1,0 +1,545 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 3.12
+; Translated by Alan Šimek
+; 7-Zip 4.53
+; Corrected and updated by Hasan Osmanagić
+; 7-Zip 9.07 beta
+; Corrected and updated by Stjepan Treger
+
+00000000="Croatian"
+00000001="Hrvatski"
+00000002="26-1"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip postavke"
+
+; Info Page
+01000100="O 7-Zip-u"
+01000103="7-Zip je besplatan. Međutim, možete podržati daljnji razvoj 7-Zipa registriranjem. Kao registriranom korisniku biti će Vam omogućena tehnička podrška."
+01000104="Podrška"
+01000105="Registriraj se"
+
+; Folders Page
+01000200="Mape"
+01000210="&Radna mapa"
+01000211="&Privremena sistemska mapa"
+01000212="&Trenutna"
+01000213="&Navedena:"
+01000214="Koristi samo za izmjenjive diskove"
+
+01000281="Lokaciju za smještaj privremenih datoteka."
+
+; System Page
+01000300="Sustav"
+01000301="Integriraj 7-Zip u padajući kontekstni izbornik"
+01000302="Padajući kontekstni izbornik"
+01000310="Stavke kontekstnog izbornika:"
+
+; Language Page
+01000400="Jezik"
+01000401="Jezik:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip naredbe"
+02000103="Otvori arhiv"
+02000104="Otvori izabranu arhiv"
+02000105="Raspakiraj datoteke..."
+02000106="Raspakiraj datoteke odabrane arhive"
+02000107="Dodaj u arhiv..."
+02000108="Dodaj izabrane stavke u arhiv"
+02000109="Testiraj arhiv"
+0200010A="Testiraj integritet odabrane arhive"
+0200010B="Raspakiraj ovdje"
+0200010C="Raspakiraj podatke iz odabrane arhive u trenutnu mapu"
+0200010D="Raspakiraj u{0}"
+0200010E="Raspakiraj podatke u pod-mapu"
+0200010F="Dodaj u {0}"
+02000110="Dodaj odabrane podatke u arhiv"
+02000111="Sažimanje i slanje e-poštom"
+02000112="Sažimanje odabranih podataka u arhiv i slanje e-poštom"
+02000113="Sažimanje u {0} i slanje e-poštom"
+02000114="Sažimanje odabranih podataka u arhiv i slanje e-poštom"
+
+02000140="<Mapa>"
+02000141="<Arhiva>"
+
+; Properties
+02000203="Putanja"
+02000204="Prema nazivu"
+02000205="Tip"
+02000206="Mapa"
+02000207="Prema veličini"
+02000208="Sažeta veličina"
+02000209="Atributi"
+0200020A="Kreirano"
+0200020B="Pristupano"
+0200020C="Prema mijenjanju"
+0200020D="Zbijeno"
+0200020E="Komentar"
+0200020F="Enkripcija"
+02000210="Podjeli prije"
+02000211="Podjeli poslije"
+02000212="Rječnik"
+02000213="CRC"
+02000214="Prema tipu"
+02000215="Anti"
+02000216="Način"
+02000217="Glavni OS"
+02000218="Sustav datoteka"
+02000219="Korisnik"
+0200021A="Grupa"
+0200021B="Zbijeno"
+0200021C="Komentar"
+0200021D="Pozicija"
+0200021E="U datoteci"
+0200021F="Mape"
+02000220="Datoteke"
+02000221="Inačica"
+02000222="Dio"
+02000223="Višedijelni"
+02000224="Razmak"
+02000225="Veza"
+02000226="Blokovi"
+02000227="Dijelova"
+
+02000229="64-bitno"
+0200022A="Big-endian"
+0200022B="CPU"
+0200022C="Fizička veličina"
+0200022D="Veličina zaglavlja"
+0200022E="Kontrolni zbroj"
+0200022F="Karakteristike"
+02000230="Virtualna adresa"
+02000231="Jedinstvena oznaka"
+02000232="Kratko ime"
+02000233="Aplikacija stvaranja"
+02000234="Veličina sektora"
+02000235="Način"
+02000236="Poveznica"
+
+; Status bar
+02000301="{0} objekt(a) izabrano"
+02000302="{0} objekt(a)"
+
+02000320="Datoteka(e):"
+02000321="Mapa(e):"
+02000322="Veličina:"
+02000323="Sažeta veličina:"
+02000324="Arhive:"
+
+; List Context Menu
+02000401="&Stupci..."
+
+02000411="&Otvori"
+02000412="&Raspakiraj..."
+
+; ToolBar
+02000501="Raspakiraj"
+
+; Messages
+02000601="Obnova nije podržana za ovaj arhiv."
+02000602="Ne mogu obnoviti arhiv {0}"
+02000603="Ne mogu kreirati mapu '{0}'"
+02000604="Datoteka nije podržan arhiv."
+02000605="Greška"
+02000606="Previše stavki"
+02000607="Ni jedan program nije vezan uz navedeni tip"
+02000608="Nema grešaka"
+02000609="Nemoguće otvoriti datoteku '{0}' kao arhiv"
+0200060A="Nemoguće otvoriti kriptiranu arhivu '{0}'. Kriva lozinka?"
+0200060B="Sustav ne može pripremiti potrebnu količinu memorije"
+0200060C="Nepoznata greška"
+0200060D="Tip arhive nije podržan"
+
+; Dialogs
+02000702="U redu"
+02000705="&Da"
+02000707="Da za &Sve"
+02000709="&Ne"
+0200070B="Ne za Sv&e"
+
+02000710="Odustajem"
+02000711="&Odustajem"
+02000713="&Zatvori"
+02000714="&Stani"
+02000715="Ponovi"
+
+02000720="Pomoć"
+
+; Extract dialog
+02000800="Raspakiraj"
+02000801="&Raspakiraj u:"
+02000802="&Lozinka"
+
+02000810="Putanja mapa"
+02000811="Potpuni tokovi"
+02000812="Trenutni tokovi"
+02000813="Bez tokova"
+
+02000820="Natpiši postojeće"
+02000821="Pitaj prije natpisivanja postojećeg"
+02000822="Natpiši postojeće bez upozorenja"
+02000823="Preskoči postojeće datoteke"
+02000824="Automatska promjena naziva"
+02000825="Automatska promjena naziva postojećih datoteka"
+
+02000830="Datoteke"
+02000831="&Izabrane datoteke"
+02000832="&Sve datoteke"
+
+02000881="Lokacija za raspakiranje datoteka."
+
+02000890="Raspakiranje"
+
+; Overwrite dialog
+02000900="Potvrdite zamjenu datoteka"
+02000901="Ciljana mapa već sadrži datoteku koja se trenutno obrađuje."
+02000902="Zamijeniti postojeću"
+02000903="datoteku s ovom?"
+
+02000911="A&utomatska promjena naziva"
+
+02000982="{0} bajte"
+02000983="Izmijenjeno"
+
+; Messages dialog
+02000A00="Dijagnostičke poruke"
+
+02000A80="Poruka"
+
+02000A91="Nije podržan način sažimanja za '{0}'."
+02000A92="Podatkovna greška u '{0}'. Datoteka je neispravna."
+02000A93="CRC greška u '{0}'. Datoteka je neispravna."
+02000A94="Greška u kriptiranoj datoteci '{0}'. Kriva lozinka?"
+02000A95="CRC greška u kriptiranoj datoteci '{0}'. Kriva lozinka?"
+
+; Password dialog
+02000B00="Unesite lozinku"
+02000B01="Unesite lozinku:"
+02000B02="&Prikaži lozinku"
+02000B03="Ponovite lozinku:"
+02000B10="Lozinka nije jednaka"
+02000B11="Koristite samo engleska slova, brojeve i specijalne znake (!, #, $, ...) za lozinku"
+02000B12="Lozinka je preduga"
+
+; Progress dialog
+02000C00="Obrada"
+02000C01="Utrošeno vrijeme:"
+02000C02="Preostalo vrijeme:"
+02000C03="Veličina:"
+02000C04="Brzina:"
+02000C05="Obrađeno:"
+02000C06="Omjer kompresije:"
+
+02000C10="U pozadini"
+02000C11="U prvom planu"
+02000C20="&Pauza"
+02000C13="Nastavi"
+
+02000C20="Pauza"
+
+02000C30="Poništiti?"
+
+; Compress dialog
+02000D00="Dodavanje u arhiv ili stvaranje novog arhiva"
+02000D01="&Arhiv:"
+02000D02="&Način obnove:"
+02000D03="&Format arhiva:"
+02000D04="&Metoda sažimanja:"
+02000D05="Kreiraj &zbijeni arhiv"
+02000D06="&Parametri:"
+02000D07="&Mogućnosti"
+02000D08="Kreiraj E&XE arhiv"
+02000D09="Višenitnost"
+02000D0A="Enkripcija naziva datoteka"
+02000D0B="Stupanj sažimanja"
+02000D0D="Veličina rječnika:"
+02000D0D="&Veličina riječi:"
+02000D0E="Korištenje memorije za sažimanje:"
+02000D0F="Korištenje memorije za raspakiranje:"
+02000D10="Kriptiranje"
+02000D11="Metoda kriptiranja:"
+02000D12="Broj niti u CPU:"
+02000D13="Veličina bloka u zbijenom:"
+02000D14="Bez-zbijanja"
+02000D15="Zbijeno"
+02000D16="Sažmi i datoteke u upotrebi"
+
+02000D40="Razdvajanje na dijelove, bajta:"
+02000D41="Netočna veličina bloka"
+02000D42="Veličina bloka: {0} bajtova.\nJeste li sigurni da želite podijeliti u takve dijelove?"
+
+02000D81="Bez sažimanja"
+02000D82="Uobičajeno"
+02000D83="Najjače"
+02000D84="Brzo"
+02000D85="Vrlo brzo"
+02000D86="Ultra"
+
+02000D90="Traži"
+
+02000DA1="Dodaj i zamjeni datoteke"
+02000DA2="Obnovi i dodaj datoteke"
+02000DA3="Osvježi postojeće datoteke"
+02000DA4="Sinkroniziraj datoteke"
+
+02000DB1="Sve datoteke"
+
+02000DC0="Sažimanje u arhiv"
+
+; Columns dialog
+02000E00="Stupci"
+02000E01="Označavanje vidljivih stupaca u ovom pogledu. Koristite tipke Page UP i Page Down za uređivanje stupaca po vlastitom izboru."
+02000E02="Odabrani stupac treba biti"
+02000E03="točaka širo&k."
+
+02000E10="Pomakni &Gore"
+02000E11="Pomakni &Dolje"
+02000E12="&Prikaži"
+02000E13="&Skriveno"
+02000E14="Postavi"
+
+02000E81="Naslov"
+02000E82="Širina"
+
+; Testing
+02000F90="Testiranje"
+
+
+; File Manager
+
+03000000="7-Zip upravljač datoteka"
+
+; Menu
+03000102="&Datoteke"
+03000103="&Uređivanje"
+03000104="&Izgled"
+03000105="&Alati"
+03000106="&Pomoć"
+03000107="Omiljene mape"
+
+; File
+03000210="&Otvori"
+03000211="Ot&vori mapu"
+03000212="Otvori u &sustavu"
+03000220="Iz&gled"
+03000221="&Uređivanje"
+03000230="Prei&menuj"
+03000231="&Kopiraj u..."
+03000232="Premje&sti u..."
+03000233="O&briši"
+03000240="Svojs&tva"
+03000241="Komentar"
+03000242="Izračun kontrolnog zbroja"
+03000243="Uspoređivanje"
+03000250="Stvo&ri mapu"
+03000251="Stvori &datoteku"
+03000260="&Izlaz"
+03000270="Podije&li datoteku..."
+03000271="Spo&ji datoteke..."
+
+; Edit
+03000310="&Poništi"
+03000311="Po&novi"
+03000320="Od&reži"
+03000321="&Kopiraj"
+03000322="&Zalijepi"
+03000323="O&briši"
+03000330="Odaberi &sve"
+03000331="Poništi odabir"
+03000332="&Obrni odabir"
+03000333="Odaberi..."
+03000334="Poništi odabir..."
+03000335="Odabir po tipu"
+03000336="Poništi odabir tipa"
+
+; View
+03000410="&Velike ikone"
+03000411="&Male ikone"
+03000412="&Popis"
+03000413="&Detalji"
+03000420="Neso&rtirano"
+03000430="&Korijen"
+03000431="&Nadmapa"
+03000432="Proš&le mape..."
+03000440="O&svježi"
+03000449="Sadržaj mapa"
+03000450="&2 okna"
+03000451="Alatne &trake"
+03000460="Alatna traka arhiva"
+03000461="Standardna alatna traka"
+03000462="Velike tipke"
+03000463="Prikaži tekst"
+
+; Tools
+03000510="&Mogućnosti..."
+03000511="M&jerenje"
+
+; Help
+03000610="&7-Zip pomoć..."
+03000620="&O programu..."
+
+; Favorites
+03000710="Dodaj u popis omiljenih uz"
+03000720="prečicu"
+
+; Options Dialog
+
+03010000="Mogućnosti"
+
+; Plugins
+03010100="Dodaci"
+03010101="&Dodaci:"
+03010110="Mogućnosti..."
+
+; Edit
+03010200="Uređivač"
+03010201="&Program za uređivanje:"
+03010202="Program za uspoređivanje:"
+
+; System
+03010300="Sustav"
+03010302="Poveži 7-Zip sa:"
+03010310="Dodatak"
+
+; Settings
+03010400="Postavke"
+03010401="Nadmapa \"..\" "
+03010402="Prikaži prave ikone datoteka"
+03010410="Prikaži sistemski izbornik"
+03010420="&Označi cijeli redak"
+03010421="Prikaži &linije mreže"
+03010422="Jedan klik za otvaranje stavke"
+03010430="Drugi n&ačin označavanja"
+03010440="Koristi raspo&loživu memoriju"
+
+; Strings
+
+03020201="Kopiraj"
+03020202="Premjesti"
+03020203="Kopiraj u:"
+03020204="Premjesti u:"
+03020205="Kopiranje u tijeku..."
+03020206="Premještanje u tijeku..."
+03020207="Nije moguće pomaknuti ili kopirati podatke ove mape."
+03020208="Operacija nije podržana."
+03020209="Odabir odredišne mape."
+
+03020210="Potvrdite brisanje datoteke"
+03020211="Potvrdite brisanje mape"
+03020212="Potvrdite višestruko brisanje datoteka"
+03020213="Obrisati '{0}'?"
+03020214="Obrisati mapu '{0}' i sav njezin sadržaj?"
+03020215="Obrisati ove {0} podatke?"
+03020216="Brisanje u tijeku..."
+03020217="Greška pri brisanju datoteke ili mape"
+03020218="Sustav ne može premjestiti datoteku sa dugačkom putanjom u Kantu za recikliranje"
+
+03020220="Preimenovanje u tijeku..."
+03020221="Greška pri preimenovanju datoteke ili mape"
+03020222="Potvrdite kopiranje datoteka"
+03020223="Kopiranje datoteka u arhiv?"
+
+03020230="Kreiraj mapu"
+03020231="Naziv mape:"
+03020232="Nova mapa"
+03020233="Greška pri kreiranju mape"
+
+03020240="Kreiraj datoteku"
+03020241="Naziv datoteke:"
+03020242="Nova datoteka"
+03020243="Greška pri kreiranju datoteka"
+
+03020250="Odaberi"
+03020251="Poništi odabir"
+03020252="Maska:"
+
+03020260="Kronologija mapa"
+
+03020280="Datoteka '{0}' je izmijenjena.\nObnoviti arhiv?"
+03020281="Nije moguće obnoviti datoteku\n'{0}'"
+03020282="Nije moguće započeti uređivanje."
+03020283="Otvaranje u tijeku..."
+03020284="Datoteka izgleda kao virus (naziv datoteke sadrži dugačke razmake)."
+
+03020291="Komentar"
+03020291="&Komentar:"
+
+030202A0="Sustav"
+
+03020300="Računalo"
+03020301="Mreža"
+03020302="Dokumenti"
+
+03020400="Dodaj"
+03020401="Raspakiraj"
+03020402="Testiraj"
+
+03020420="Kopiraj"
+03020421="Premjesti"
+03020422="Obriši"
+03020423="Svojstva"
+
+03020500="Podijeli datoteku"
+03020501="&Podijeli u:"
+03020510="Dioba..."
+03020520="Potvrdite diobu"
+03020521="Podijeliti datoteku u {0} dijelova?"
+03020522="Veličina diobenog dijela mora biti manja od izvorne datoteke"
+
+03020600="Spoji datoteke"
+03020601="&Spoji u:"
+03020610="Spajanje..."
+03020620="Označite samo prvu datoteku"
+03020621="Nije pronađena datoteka koja je dio razdijeljenih datoteka"
+03020622="Pronađena samo jedna datoteka od razdijeljenih datoteka"
+
+03020710="Izračunavanje kontrolnog zbroja..."
+03020720="Info kontrolni zbroj"
+03020721="CRC kontrolni zbroj za podatke:"
+03020722="CRC kontrolni zbroj za podatke i nazive:"
+
+03020800="Skeniram..."
+
+03020900="Svojstva"
+
+03020A01="Operaciju nemoguće pozvati iz mape koja ima dugačku putanju."
+03020A02="Morate obilježiti jednu datoteku"
+03020A03="Morate obilježiti jednu ili više datoteka"
+03020A04="Datoteka {0} već postoji"
+
+; Computer
+03031100="Ukupni kapacitet"
+03031101="Slobodni prostor"
+03031102="Veličina klastera"
+03031103="Naziv"
+
+; Network
+03031200="Lokalni naziv"
+03031201="Pružatelj"
+
+; Benchmark Dialog
+
+03080000="Mjerenje"
+03080001="Korištenje memorije:"
+03080002="Sažimanje"
+03080003="Raspakiranje"
+03080004="Brzina"
+03080005="Ocjena"
+03080006="Ukupna ocjena"
+03080007="Trenutno"
+03080008="Rezultat"
+03080009="Prolazi:"
+0308000A="Greške:"
+0308000B="CPU zauzeće"
+0308000C="Ocjena / Zauzeće"
+
+;!@LangEnd@!
+
+ 	  	 

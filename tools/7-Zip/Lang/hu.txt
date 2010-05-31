@@ -1,0 +1,454 @@
+﻿;!@Lang@!UTF-8!
+; 7-Zip 4.07 beta
+; Translated by Jozsef Tamas Herczeg
+;
+;
+;
+;
+
+00000000="Hungarian"
+00000001="Magyar"
+00000002="14"
+
+; 7-Zip Configuration
+
+; Title
+01000000="7-Zip beállítása"
+
+; Info Page
+01000100="Névjegy"
+01000103="A 7-Zip ingyenes szoftver. Ha elnyerte a tetszését, s mégis szeretné támogatni a további fejlesztését, regisztrálja 20 US$ áron, fizethet hitelkártyval vagy más módon."
+01000105="Regisztráció"
+
+; Folders Page
+01000200="Mappák"
+01000210="&Munkamappa"
+01000211="A &rendszer ideiglenes mappája"
+01000212="&Jelenlegi"
+01000213="&Meghatározott:"
+01000214="Csak cserélhető meghajtókhoz"
+
+01000281="Válassza ki az ideiglenes archív fájlok mappáját."
+
+; System Page
+01000300="Rendszer"
+01000301="Hozzáadás a parancsértelmező helyi menüjéhez"
+01000302="Lépcsőzetes helyi menü"
+01000310="Helyi menü elemek:"
+
+; Language Page
+01000400="Nyelvek"
+01000401="Nyelv:"
+
+
+; 7-Zip Explorer extension
+
+; Context menu
+02000101="7-Zip"
+02000102="7-Zip parancsai"
+02000103="Megnyitás"
+02000104="Megnyitja a kijelölt archívumot."
+02000105="Fájlok kibontása..."
+02000106="Kibontja a fájlokat a kijelölt archívumból."
+02000107="Behelyezés archívumba..."
+02000108="Behelyezi a kijelölt elemeket az archívumba."
+02000109="Archívum tesztelése"
+0200010A="Ellenőrzi a kijelölt archívum állapotát."
+0200010B="Kibontás ide"
+0200010C="Fájlok kibontása a kijelölt archívumból a jelenlegi mappába."
+0200010D="Kibontás ide: {0}"
+0200010E="A fájlok kibontása almappába."
+0200010F="Behelyezés: {0}"
+02000110="Archívumba helyezi a kijelölt elemeket."
+02000111="Tömörítés és küldés..."
+02000112="Archívumba tömöríti a kijelölt elemeket és e-mailben elküldi az archívumot."
+02000113="Tömörítés {0} archívumba és küldés"
+02000114="Archívumba tömöríti a kijelölt elemeket és e-mailben elküldi az archívumot."
+
+02000140="<Mappa>"
+02000141="<Archívum>"
+
+; Properties
+02000203="Útvonal"
+02000204="Név"
+02000205="Kiterjesztés"
+02000206="Mappa"
+02000207="Méret"
+02000208="Tömörtve"
+02000209="Attribútumok"
+0200020A="Létrehozva"
+0200020B="Hozzáférés"
+0200020C="Módosítva"
+0200020D="Tömör"
+0200020E="Megjegyzés"
+0200020F="Titkosított"
+02000210="Feldarabolás előtt"
+02000211="Feldarabolás után"
+02000212="Szótár"
+02000213="CRC"
+02000214="Típus"
+02000215="Anti"
+02000216="Módszer"
+02000217="Gazda OS"
+02000218="Fájlrendszer"
+02000219="Felhasználó"
+0200021A="Csoport"
+0200021B="Blokk"
+0200021C="Megjegyzés"
+0200021D="Pozíció"
+
+; Status bar
+02000301="{0} objektum kijelölve"
+02000302="{0} objektum"
+
+; List Context Menu
+02000401="&Oszlopok..."
+
+02000411="M&egnyitás"
+02000412="&Kibontás..."
+
+; ToolBar
+02000501="Kibontás"
+
+; Messages
+02000601="Az aktualizálás ennél az archívumtípusnál nem támogatott."
+02000602="A(z) {0} archívum nem aktualizálható"
+02000603="A(z) '{0}' mappát nem lehet létrehozni"
+02000604="A fájl nem támogatott archívum."
+02000605="Hiba"
+02000606="Túl sok elem"
+02000607="Nem társított alkalmazást az adott fájlkiterjesztéshez"
+02000608="Az archívum hibamentes"
+
+; Dialogs
+02000702="OK"
+02000705="&Igen"
+02000707="Igen, &mindet"
+02000709="&Nem"
+0200070B="Egyet &sem"
+
+02000710="Mégse"
+02000711="&Mégse"
+02000713="&Bezárás"
+02000714="Leállítás"
+02000715="Újraindítás"
+
+02000720="Súgó"
+
+; Extract dialog
+02000800="Kibontás"
+02000801="&Kibontás ide:"
+02000802="Jelszó"
+
+02000810="Útvonal"
+02000811="Teljes útvonal"
+02000812="Jelenlegi útvonal"
+02000813="Nincs útvonal"
+
+02000820="Felülírás"
+02000821="Rákérdezés felülírás előtt"
+02000822="Felülírás rákérdezés nélkül"
+02000823="A létező fájlok kihagyása"
+02000824="Automatikus átnevezés"
+02000825="A létező fájlok automatikus átnevezése"
+
+02000830="Fájlok"
+02000831="&Kijelölt fájlok"
+02000832="&Minden fájl"
+
+02000881="Határozza meg a kibontott fájlok tárolómappáját."
+
+02000890="Kibontás"
+
+; Overwrite dialog
+02000900="Fájlcsere megerősítése"
+02000901="A célmappa már tartalmazza a feldolgozott fájlt."
+02000902="Kívánja lecserélni a létező fájlt"
+02000903="ezzel a fájllal?"
+
+02000911="A&utomatikus átnevezés"
+
+02000982="{0} bájt"
+02000983="módosítva"
+
+; Messages dialog
+02000A00="Diagnosztikai üzenetek"
+
+02000A80="Üzenet"
+
+02000A91="A(z) '{0}' tömörítési módja nem támogatott."
+02000A92="Adathiba a következőben: '{0}'. A fjl srlt."
+02000A93="CRC-hiba a következőben: '{0}'. A fjl srlt."
+
+; Password dialog
+02000B00="Jelszó beírása"
+02000B01="Írja be a jelszót:"
+02000B02="A &jelszó megjelenítése"
+
+; Progress dialog
+02000C00="Folyamat"
+02000C01="Eltelt idő:"
+02000C02="Hátralévő idő:"
+02000C03="Méret:"
+02000C04="Sebesség:"
+
+02000C10="&Háttérben"
+02000C11="&Előtérben"
+02000C12="&Szünet"
+02000C13="&Folytatás"
+
+02000C20="Szünet"
+
+02000C30="Biztos, hogy megszakítja a folyamatot?"
+
+; Compress dialog
+02000D00="Behelyezés archívumba"
+02000D01="&Archívum:"
+02000D02="Akt&ualizálás módja:"
+02000D03="Arcíhvum &formátuma:"
+02000D04="Tömörítés &módja:"
+02000D05="&Tömör archívum létrehozása"
+02000D06="&Tulajdonságok:"
+02000D07="Beállítások"
+02000D08="SF&X archívum létrehozása"
+02000D09="Többszálas"
+02000D0A="Fájlnevek &titkosítása"
+02000D0B="Tömörítés &foka:"
+02000D0C="&Címtár mérete:"
+02000D0D="&Szó mérete:"
+02000D0E="A tömörítés memóriahasználata:"
+02000D0F="A kitömörítés memóriahasználata:"
+
+02000D40="Darabolás &kötetekre, bájt:"
+
+02000D81="Raktár"
+02000D82="Normál"
+02000D83="Legnagyobb"
+02000D84="Gyors"
+02000D85="Leggyorsabb"
+02000D86="Ultra"
+
+02000D90="Tallózás"
+
+02000DA1="Fájlok behelyezése és cseréje"
+02000DA2="Fájlok aktualizálása és behelyezése"
+02000DA3="Létező fájlok frissítése"
+02000DA4="Fájlok szinkronizálása"
+
+02000DB1="Minden fájl"
+
+02000DC0="Tömörítés"
+
+; Columns dialog
+02000E00="Oszlopok"
+02000E01="Jelölje be azokat az oszlopokat melyeket ebben a nézetben megjeleníteni kíván. A Fel s a Le gombbal tetszés szerint átrendezheti az oszlopokat."
+02000E02="A kijelölt oszlop legyen "
+02000E03="képpont &széles."
+
+02000E10="&Fel"
+02000E11="&Le"
+02000E12="&Megjelenítés"
+02000E13="&Elrejtés"
+02000E14="Beállítás"
+
+02000E81="Cím"
+02000E82="Széles"
+
+; Testing
+02000F90="Tesztelés"
+
+
+; File Manager
+
+03000000="7-Zip fájlkezelő"
+
+; Menu
+03000102="&Fájl"
+03000103="S&zerkesztés"
+03000104="&Nézet"
+03000105="&Eszközök"
+03000106="&Súgó"
+03000107="Ked&vencek"
+
+; File
+03000210="M&egnyitás"
+03000211="Megnyitás &belül"
+03000212="Megnyitás kí&vül"
+03000220="&Nézet"
+03000221="S&zerkesztés"
+03000230="Átn&evezés"
+03000231="Más&olás mappába..."
+03000232="Át&helyezés mappába..."
+03000233="&Törlés"
+03000240="T&ulajdonságok"
+03000241="&Megjegyzés"
+03000250="Mappa létrehozása"
+03000251="Fájl létrehozása"
+03000260="&Kilépés"
+03000270="Fájl&darabolás..."
+03000271="Fájl&egyesítés..."
+
+; Edit
+03000310="&Visszavonás"
+03000311="&Ismét"
+03000320="&Kivágás"
+03000321="&Másolás"
+03000322="&Beillesztés"
+03000323="&Törlés"
+03000330="Min&d kijelölése"
+03000331="Kijelölés megszüntetése"
+03000332="Kijelölés &megfordítása"
+03000333="Kijelölés..."
+03000334="Megszüntetés..."
+03000335="Kijelölés típus alapján"
+03000336="Megszüntetés típus alapján"
+
+; View
+03000410="&Nagy ikonok"
+03000411="&Kis ikonok"
+03000412="&Lista"
+03000413="&Részletek"
+03000420="Rendezetlen"
+03000430="Gyökérmappa megnyitása"
+03000431="Egy szinttel följebb"
+03000432="Mappa előzmények..."
+03000440="&Frissítés"
+03000450="&2 panel"
+03000451="&Eszköztárak"
+03000460="Archiválás eszköztár"
+03000461="Szokásos eszköztár"
+03000462="Nagy gombok"
+03000463="Szövegcímkék megjelenítése"
+
+; Tools
+03000510="&Beállítások..."
+03000511="&Teljesítménymérés"
+
+; Help
+03000610="&Tartalomjegyzék..."
+03000620="7-Zip &névjegye..."
+
+; Favorites
+03000710="Mappa &hozzáadása a Kedvencekhez mint"
+03000720="Könyvjelző"
+
+; Options Dialog
+
+03010000="Beállítások"
+
+; Plugins
+03010100="Beépülő modulok"
+03010101="&Beépülő modulok:"
+03010110="Beállítások..."
+
+; Edit
+03010200="Szerkesztő"
+03010201="&Szerkesztő:"
+
+; System
+03010300="Rendszer"
+03010302="7-Zip társítása:"
+03010310="Beépülő modul"
+
+; Settings
+03010400="Beállítások"
+03010401="A \"..\" elem látható"
+03010402="Az eredeti fájlikonok láthatók"
+03010410="Látható a rendszermenü"
+03010420="&Teljes soros kijelölés"
+03010421="&Rácsvonalak kijelzése"
+
+; Strings
+
+03020201="Másolás"
+03020202="Áthelyezés"
+03020203="Másolás ide:"
+03020204="Áthelyezés ide:"
+03020205="Másolás..."
+03020206="Áthelyezés..."
+03020207="Ilyen mappák esetén az elemek nem helyezhetők át vagy másolhatók."
+03020208="A művelet nem támogatott."
+
+03020210="Fájltörlés megerősítése"
+03020211="Mappatörlés megerősítése"
+03020212="Több fájltörlés megerősítése"
+03020213="Biztos, hogy törölni akarja a következőt: '{0}'?"
+03020214="Biztos, hogy törölni akarja a(z) '{0}' mappát és annak teljes tartalmát?"
+03020215="Biztos, hogy törölni akarja ezt a(z) {0} elemet?"
+03020216="Törlés..."
+03020217="Hiba történt a fájl vagy a mappa törlésekor"
+
+03020220="Átnevezés..."
+03020221="Hiba történt a fájl vagy a mappa átnevezésekor"
+
+03020230="Mappa létrehozása"
+03020231="Mappa neve:"
+03020232="Új mappa"
+03020233="Hiba történt a mappa létrehozásakor"
+
+03020240="Fájl létrehozása"
+03020241="Fájlnév:"
+03020242="Új fájl"
+03020243="Hiba történt a fájl létrehozásakor"
+
+03020250="Kijelölés"
+03020251="Megszüntetés"
+03020252="Maszk:"
+
+03020260="Mappa előzmények"
+
+03020280="'{0}'\nA fájl tartalma megváltozott.\nKívánja aktualizálni az archívumban?"
+03020281="A fájl nem aktualizálható:\n'{0}'"
+03020282="A szerkesztő nem indítható."
+03020283="Megnyitás..."
+
+03020290="Megjegyzés"
+03020291="&Megjegyzés:"
+
+030202A0="Rendszer"
+
+03020300="Sajátgép"
+03020301="Hálózati helyek"
+
+03020400="Hozzáadás"
+03020401="Kibontás"
+03020402="Teszt"
+
+03020420="Másolás"
+03020421="Áthelyezés"
+03020422="Törlés"
+03020423="Tulajdonságok"
+
+03020500="Fájldarabolás"
+03020501="&Darabolás ide:"
+03020510="Darabolás..."
+
+03020600="Fájlegyesítés"
+03020601="&Egyesítés ide:"
+03020610="Egyesítés..."
+
+; Computer
+03031100="Teljes méret"
+03031101="Szabad terület"
+03031102="Kluszterméret"
+03031103="Címke"
+
+; Network
+03031200="Helyi név"
+03031201="Szolgáltató"
+
+; Benchmark Dialog
+
+03080000="Teljesítménymérés"
+03080001="Memóriahasználat:"
+03080002="Tömörítés"
+03080003="Kitömörítés"
+03080004="Sebesség"
+03080005="Értékelés"
+03080006="Összértékelés"
+03080007="Jelenlegi"
+03080008="Eredmény"
+03080009="Menetek:"
+0308000A="Hibák:"
+
+;!@LangEnd@!
