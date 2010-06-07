@@ -207,7 +207,7 @@ namespace AutoMapper
 				int result = (TypeMap != null ? TypeMap.GetHashCode() : 0);
 				result = (result*397) ^ (SourceType != null ? SourceType.GetHashCode() : 0);
 				result = (result*397) ^ (DestinationType != null ? DestinationType.GetHashCode() : 0);
-				result = (result*397) ^ (ArrayIndex.HasValue ? ArrayIndex.Value : 0);
+				//result = (result*397) ^ (ArrayIndex.HasValue ? ArrayIndex.Value : 0);
 				result = (result*397) ^ (SourceValue != null ? SourceValue.GetHashCode() : 0);
 				return result;
 			}
