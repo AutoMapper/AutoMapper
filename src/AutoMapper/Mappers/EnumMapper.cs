@@ -9,19 +9,18 @@ namespace AutoMapper.Mappers
         {
             bool toEnum = false;
             Type enumSourceType = TypeHelper.GetEnumerationType(context.SourceType);
+        	Type enumDestinationType = TypeHelper.GetEnumerationType(context.DestinationType);
 
             if (EnumToStringMapping(context, ref toEnum))
             {
                 if (toEnum)
                 {
-                    return Enum.Parse(context.DestinationType, context.SourceValue.ToString(), true);
+					return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
                 }
                 return Enum.GetName(enumSourceType, context.SourceValue);
             }
             if (EnumToEnumMapping(context))
             {
-                Type enumDestType = TypeHelper.GetEnumerationType(context.DestinationType);
-
                 if (context.SourceValue == null)
                 {
                     return mapper.CreateObject(context);
@@ -29,11 +28,11 @@ namespace AutoMapper.Mappers
 
                 if (!Enum.IsDefined(enumSourceType, context.SourceValue))
                 {
-                    return Enum.ToObject(context.DestinationType, context.SourceValue);
+					return Enum.ToObject(enumDestinationType, context.SourceValue);
                 }
 
 #if !SILVERLIGHT
-                if (!Enum.GetNames(enumDestType).Contains(context.SourceValue.ToString()))
+				if (!Enum.GetNames(enumDestinationType).Contains(context.SourceValue.ToString()))
                 {
                     Type underlyingSourceType = Enum.GetUnderlyingType(enumSourceType);
                     var underlyingSourceValue = Convert.ChangeType(context.SourceValue, underlyingSourceType);
@@ -42,13 +41,13 @@ namespace AutoMapper.Mappers
                 }
 #endif
 
-                return Enum.Parse(enumDestType, Enum.GetName(enumSourceType, context.SourceValue), true);
+				return Enum.Parse(enumDestinationType, Enum.GetName(enumSourceType, context.SourceValue), true);
             }
             if (EnumToUnderlyingTypeMapping(context, ref toEnum))
             {
                 if (toEnum)
                 {
-                    return Enum.Parse(context.DestinationType, context.SourceValue.ToString(), true);
+					return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
                 }
                 return Convert.ChangeType(context.SourceValue, context.DestinationType, null);
             }
@@ -77,12 +76,12 @@ namespace AutoMapper.Mappers
             // Enum to underlying type
             if (sourceEnumType != null)
             {
-                return context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(context.SourceType));
+				return context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(sourceEnumType));
             }
             if (destEnumType != null)
             {
                 toEnum = true;
-                return context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(context.DestinationType));
+				return context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(destEnumType));
             }
             return false;
         }
