@@ -63,7 +63,7 @@ namespace AutoMapperSamples.Configuration
 				var listViewModel = Mapper.Map<Order, OrderListViewModel>(order);
 				var editViewModel = Mapper.Map<Order, OrderEditViewModel>(order);
 
-				listViewModel.Amount.ShouldEqual("$50.00");
+				listViewModel.Amount.ShouldEqual(order.Amount.ToString("c"));
 				editViewModel.Amount.ShouldEqual("50");
 			}
 		}

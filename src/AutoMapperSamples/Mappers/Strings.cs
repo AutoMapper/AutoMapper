@@ -26,9 +26,11 @@ namespace AutoMapperSamples.Mappers
 					cfg.ForSourceType<decimal>().AddFormatter<MoneyFormatter>();
 				});
 
-				var result = Mapper.Map<decimal, string>(5343.15m);
+				var value = 5343.15m;
 
-				result.ShouldEqual("$5,343.15");
+				var result = Mapper.Map<decimal, string>(value);
+
+				result.ShouldEqual(value.ToString("c"));
 			}
 		}
 	}
