@@ -25,7 +25,8 @@ task compile -depends clean {
 }
 
 task commonAssemblyInfo {
-    create-commonAssemblyInfo "$buildNumber" "$source_dir\CommonAssemblyInfo.cs"
+    $commit = git log -1 --pretty=format:%H
+    create-commonAssemblyInfo "$buildNumber" "$commit" "$source_dir\CommonAssemblyInfo.cs"
 }
 
 task merge {
@@ -84,7 +85,7 @@ function global:run_nunit ($test_assembly)
     exec { & $tools_dir\nunit\nunit-console-x86.exe $test_dir$test_assembly /nologo /nodots /xml=$result_dir$test_assembly.xml }
 }
 
-function global:create-commonAssemblyInfo($version, $filename)
+function global:create-commonAssemblyInfo($version, $commit, $filename)
 {
 	$date = Get-Date
     "using System;
@@ -106,6 +107,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersionAttribute(""$version"")]
 [assembly: AssemblyCopyrightAttribute(""Copyright Jimmy Bogard 2008-" + $date.Year + """)]
 [assembly: AssemblyProductAttribute(""AutoMapper"")]
+[assembly: AssemblyTrademarkAttribute(""$commit"")]
 [assembly: AssemblyCompanyAttribute("""")]
 [assembly: AssemblyConfigurationAttribute(""release"")]
 [assembly: AssemblyInformationalVersionAttribute(""$version"")]"  | out-file $filename -encoding "ASCII"    
