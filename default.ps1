@@ -6,10 +6,11 @@ properties {
 	$tools_dir = "$base_dir\tools"
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
-	$buildNumber = 9999
+	$buildNumber = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.0.9999.0' }
 	$config = "debug"
 }
 
+task default -depends local
 task local -depends compile, test
 task full -depends local, merge, dist
 task ci -depends clean, commonAssemblyInfo, local, merge, dist
@@ -24,8 +25,7 @@ task compile -depends clean {
 }
 
 task commonAssemblyInfo {
-    $version = "2.0.$buildNumber.0"   
-    create-commonAssemblyInfo "$version" "$source_dir\CommonAssemblyInfo.cs"
+    create-commonAssemblyInfo "$buildNumber" "$source_dir\CommonAssemblyInfo.cs"
 }
 
 task merge {
