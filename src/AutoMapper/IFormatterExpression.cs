@@ -34,6 +34,7 @@ namespace AutoMapper
 		void RecognizeAlias(string original, string alias);
         void RecognizeDestinationPrefixes(params string[] prefixes);
         void RecognizeDestinationPostfixes(params string[] postfixes);
+        void AddGlobalIgnore(string propertyNameStartingWith);
     }
 
 	public interface IConfiguration : IProfileExpression

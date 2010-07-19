@@ -104,6 +104,7 @@
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
     <Compile Include="DataReaderMapping.cs" />
+    <Compile Include="IgnoreAllTests.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="DynamicMapping.cs" />

@@ -24,7 +24,7 @@ namespace AutoMapper
 			set { GetProfile().AllowNullDestinationValues = value; }
 		}
 
-		public INamingConvention SourceMemberNamingConvention
+	    public INamingConvention SourceMemberNamingConvention
 		{
 			get { return GetProfile().SourceMemberNamingConvention; } 
 			set { GetProfile().SourceMemberNamingConvention = value; }
@@ -117,7 +117,12 @@ namespace AutoMapper
             GetProfile().RecognizeDestinationPostfixes(postfixes);
         }
 
-		protected internal virtual void Configure()
+	    public void AddGlobalIgnore(string propertyNameStartingWith)
+	    {
+	        _configurator.AddGlobalIgnore(propertyNameStartingWith);
+	    }
+
+	    protected internal virtual void Configure()
 		{
 			// override in a derived class for custom configuration behavior
 		}

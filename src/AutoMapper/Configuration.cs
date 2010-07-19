@@ -22,11 +22,13 @@ namespace AutoMapper
 		private readonly IDictionary<TypePair, TypeMap> _typeMapCache = new Dictionary<TypePair, TypeMap>();
 		private readonly IDictionary<string, FormatterExpression> _formatterProfiles = new Dictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
+	    private List<string> _globalIgnore;
 
-		public Configuration(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
+	    public Configuration(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
 		{
 		    _typeMapFactory = typeMapFactory;
 		    _mappers = mappers;
+            _globalIgnore = new List<string>();
 		}
 
 		public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
@@ -178,6 +180,7 @@ namespace AutoMapper
 				typeMap = _typeMapFactory.CreateTypeMap(source, destination, profileConfiguration);
 
                 typeMap.Profile = profileName;
+			    typeMap.IgnorePropertiesStartingWith = _globalIgnore;
 
 				_typeMaps.Add(typeMap);
 				_typeMapCache[new TypePair(source, destination)] = typeMap;
@@ -469,5 +472,10 @@ namespace AutoMapper
 			
             return expr;
 		}
+
+	    public void AddGlobalIgnore(string startingwith)
+	    {
+	        _globalIgnore.Add(startingwith);
+	    }
 	}
 }

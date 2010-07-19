@@ -61,7 +61,9 @@ namespace AutoMapper
 
 		public Func<object, object> DestinationCtor { get; set; }
 
-		public IEnumerable<PropertyMap> GetPropertyMaps()
+	    public List<string> IgnorePropertiesStartingWith { get; set; }
+
+	    public IEnumerable<PropertyMap> GetPropertyMaps()
 		{
             if (_sealed)
                 return _orderedPropertyMaps;
@@ -88,10 +90,11 @@ namespace AutoMapper
 			var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
 				.Select(pm => pm.DestinationProperty.Name);
 
-			return _destinationType.GetPublicWriteAccessors()
-				.Select(p => p.Name)
-				.Except(autoMappedProperties)
-				.ToArray();
+		    var properties = _destinationType.GetPublicWriteAccessors()
+		        .Select(p => p.Name)
+		        .Except(autoMappedProperties);
+
+		    return properties.Where(x => IgnorePropertiesStartingWith.Select(y => y.StartsWith(x)) == null).ToArray();
 		}
 
 		public PropertyMap FindOrCreatePropertyMapFor(IMemberAccessor destinationProperty)

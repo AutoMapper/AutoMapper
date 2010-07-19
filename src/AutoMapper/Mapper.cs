@@ -207,5 +207,10 @@ namespace AutoMapper
 				return _configuration;
 			}
 		}
+
+	    public static void AddGlobalIgnore(string startingwith)
+	    {
+            Configuration.AddGlobalIgnore(startingwith);
+	    }
 	}
 }
