@@ -10,11 +10,6 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			if (context.DestinationType.IsAssignableFrom(context.SourceType) && context.SourceValue != null)
-			{
-				return context.SourceValue;
-			}
-
 			var sourceValue = (IEnumerable)context.SourceValue ?? new object[0];
 			IEnumerable<object> enumerableValue = sourceValue.Cast<object>();
 
@@ -30,12 +25,15 @@ namespace AutoMapper.Mappers
 			int i = 0;
 			foreach (object item in enumerableValue)
 			{
-			    var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(item, sourceElementType, destElementType);
+				var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, i);
+				var elementResolutionResult = new ResolutionResult(newContext);
 
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
+				var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(elementResolutionResult, destElementType);
+
+				Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
                 Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;
 
-				var newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, i);
+				newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, i);
 
 				object mappedValue = mapper.Map(newContext);
 
