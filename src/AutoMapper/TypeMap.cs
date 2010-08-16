@@ -94,7 +94,7 @@ namespace AutoMapper
 		        .Select(p => p.Name)
 		        .Except(autoMappedProperties);
 
-		    return properties.Where(x => IgnorePropertiesStartingWith.Select(y => y.StartsWith(x)) == null).ToArray();
+		    return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
 		}
 
 		public PropertyMap FindOrCreatePropertyMapFor(IMemberAccessor destinationProperty)

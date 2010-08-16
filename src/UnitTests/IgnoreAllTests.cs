@@ -23,9 +23,13 @@ namespace AutoMapper.UnitTests
         [Test]
         public void GlobalIgnore_ignores_all_properties_beginning_with_string()
         {
-            Mapper.AddGlobalIgnore("StartingWith");
+			Mapper.Initialize(cfg =>
+			{
+				cfg.AddGlobalIgnore("StartingWith");
+				cfg.CreateMap<Source, Destination>()
+					.ForMember(dest => dest.AnotherString_ShouldBeNullAfterwards, opt => opt.Ignore());
+			});
             
-            Mapper.CreateMap<Source, Destination>();
             Mapper.Map<Source, Destination>(new Source{ShouldBeMapped = "true"});
             Mapper.AssertConfigurationIsValid();
         }
@@ -33,8 +37,12 @@ namespace AutoMapper.UnitTests
         [Test]
         public void Ignored_properties_should_be_default_value()
         {
-            Mapper.AddGlobalIgnore("StartingWith");           
-            Mapper.CreateMap<Source, Destination>();
+			Mapper.Initialize(cfg =>
+			{
+				cfg.AddGlobalIgnore("StartingWith");
+				cfg.CreateMap<Source, Destination>()
+					.ForMember(dest => dest.AnotherString_ShouldBeNullAfterwards, opt => opt.Ignore());
+			});
 
             Destination destination = Mapper.Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
             Assert.That(destination.StartingWith_ShouldBeNullAfterwards, Is.Null);
@@ -44,9 +52,12 @@ namespace AutoMapper.UnitTests
         [Test]
         public void Ignore_supports_two_different_values()
         {
-            Mapper.AddGlobalIgnore("StartingWith");
-            Mapper.AddGlobalIgnore("AnotherString");
-            Mapper.CreateMap<Source, Destination>();
+			Mapper.Initialize(cfg =>
+			{
+				cfg.AddGlobalIgnore("StartingWith");
+				cfg.AddGlobalIgnore("AnotherString");
+				cfg.CreateMap<Source, Destination>();
+			});
 
             Destination destination = Mapper.Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
             Assert.That(destination.AnotherString_ShouldBeNullAfterwards, Is.Null);

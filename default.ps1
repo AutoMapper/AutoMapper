@@ -1,3 +1,5 @@
+$framework = '4.0'
+
 properties {
 	$base_dir = resolve-path .
 	$build_dir = "$base_dir\build"
@@ -6,9 +8,12 @@ properties {
 	$tools_dir = "$base_dir\tools"
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
+	$lib_dir = "$base_dir\lib"
+	$path_to_msbuild = "$lib_dir\msbuild\Microsoft.Build.Engine.dll"
 	$buildNumber = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.0.9999.0' }
 	$config = "debug"
 }
+
 
 task default -depends local
 task local -depends compile, test
