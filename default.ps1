@@ -9,9 +9,9 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$path_to_msbuild = "$lib_dir\msbuild\Microsoft.Build.Engine.dll"
 	$buildNumber = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.0.9999.0' }
 	$config = "debug"
+	$framework_dir = Get-FrameworkDirectory
 }
 
 
@@ -36,7 +36,7 @@ task commonAssemblyInfo {
 
 task merge {
 	create_directory "$build_dir\merge"
-	exec { & $tools_dir\ILMerge\ilmerge.exe /v2 /log /out:"$build_dir\merge\AutoMapper.dll" /internalize:AutoMapper.exclude "$build_dir\$config\AutoMapper\AutoMapper.dll" "$build_dir\$config\AutoMapper\Castle.Core.dll" "$build_dir\$config\AutoMapper\Castle.DynamicProxy2.dll" /keyfile:"$source_dir\AutoMapper.snk" }
+	exec { & $tools_dir\ILMerge\ilmerge.exe /targetplatform:"v4,$framework_dir" /log /out:"$build_dir\merge\AutoMapper.dll" /internalize:AutoMapper.exclude "$build_dir\$config\AutoMapper\AutoMapper.dll" "$build_dir\$config\AutoMapper\Castle.Core.dll" "$build_dir\$config\AutoMapper\Castle.DynamicProxy2.dll" /keyfile:"$source_dir\AutoMapper.snk" }
 }
 
 task test {
@@ -56,6 +56,11 @@ task dist {
 # -------------------------------------------------------------------------------------------------------------
 # generalized functions 
 # --------------------------------------------------------------------------------------------------------------
+function Get-FrameworkDirectory()
+{
+    $([System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory().Replace("v2.0.50727", "v4.0.30319"))
+}
+
 function global:zip_directory($directory, $file)
 {
     delete_file $file
