@@ -24,7 +24,9 @@ namespace AutoMapper
 
 		public void ConvertUsing(Type typeConverterType)
 		{
-			var converter = new DeferredInstantiatedConverter(typeConverterType, () => _typeConverterCtor(typeConverterType));
+			var interfaceType = typeof (ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, _typeMap.DestinationType);
+			var convertMethodType = interfaceType.IsAssignableFrom(typeConverterType) ? interfaceType : typeConverterType;
+			var converter = new DeferredInstantiatedConverter(convertMethodType, () => _typeConverterCtor(typeConverterType));
 
 			_typeMap.UseCustomMapper(converter.Convert);
 		}
