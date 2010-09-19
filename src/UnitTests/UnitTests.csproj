@@ -75,6 +75,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Machine.Specifications">
+      <HintPath>..\..\tools\Machine.Specifications-net-4.0-Release\Machine.Specifications.dll</HintPath>
+    </Reference>
     <Reference Include="NBehave.Spec.Framework, Version=0.4.0.0, Culture=neutral, PublicKeyToken=d421feca0f4a05f6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NBehave.Spec.Framework.dll</HintPath>
@@ -126,6 +129,7 @@
     </Compile>
     <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />
+    <Compile Include="Configuration\MapperConfigurationSpecs.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
     <Compile Include="DataReaderMapping.cs" />

@@ -19,7 +19,7 @@ namespace AutoMapper
 		{
 			_sourceType = sourceType;
 			_destinationType = destinationType;
-			Profile = Configuration.DefaultProfileName;
+            Profile = ConfigurationStore.DefaultProfileName;
 		}
 
 		public Type SourceType

@@ -96,6 +96,9 @@
     </Compile>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
+    <Compile Include="Configuration\MapperConfiguration.cs" />
+    <Compile Include="Configuration\MapperRegistry.cs" />
+    <Compile Include="Configuration\TypeMapConfiguration.cs" />
     <Compile Include="IMappingAction.cs" />
     <Compile Include="IMappingEngineRunner.cs" />
     <Compile Include="INamingConvention.cs" />
@@ -123,7 +126,7 @@
     <Compile Include="AutoMapperConfigurationException.cs" />
     <Compile Include="ITypeConverter.cs" />
     <Compile Include="Mapper.cs" />
-    <Compile Include="Configuration.cs" />
+    <Compile Include="ConfigurationStore.cs" />
     <Compile Include="Internal\EnumerableExtensions.cs" />
     <Compile Include="Internal\FormatterExpression.cs" />
     <Compile Include="IConfigurationProvider.cs" />
@@ -191,6 +194,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

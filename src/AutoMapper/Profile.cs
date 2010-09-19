@@ -4,7 +4,7 @@ namespace AutoMapper
 {
 	public class Profile : IProfileExpression
 	{
-	    private Configuration _configurator;
+        private ConfigurationStore _configurator;
 
 		internal Profile(string profileName)
 		{
@@ -127,7 +127,7 @@ namespace AutoMapper
 			// override in a derived class for custom configuration behavior
 		}
 
-		public void Initialize(Configuration configurator)
+        public void Initialize(ConfigurationStore configurator)
 		{
 			_configurator = configurator;
 		}

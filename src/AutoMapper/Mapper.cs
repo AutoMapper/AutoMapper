@@ -7,7 +7,7 @@ namespace AutoMapper
 	{
         private static object _configurationSync = new object();
         private static object _engineSync = new object();
-		private static Configuration _configuration;
+        private static ConfigurationStore _configuration;
 		private static IMappingEngine _mappingEngine;
 
 		public static bool AllowNullDestinationValues
@@ -199,7 +199,7 @@ namespace AutoMapper
 					{
 						if (_configuration == null)
 						{
-							_configuration = new Configuration(new TypeMapFactory(), MapperRegistry.AllMappers());
+                            _configuration = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
 						}
 					}
 				}

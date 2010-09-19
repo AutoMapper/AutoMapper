@@ -12,7 +12,7 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
-	public class Configuration : IConfigurationProvider, IConfiguration
+	public class ConfigurationStore : IConfigurationProvider, IConfiguration
 	{
 	    private readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
@@ -24,7 +24,7 @@ namespace AutoMapper
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 	    private List<string> _globalIgnore;
 
-	    public Configuration(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
+	    public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
 		{
 		    _typeMapFactory = typeMapFactory;
 		    _mappers = mappers;
