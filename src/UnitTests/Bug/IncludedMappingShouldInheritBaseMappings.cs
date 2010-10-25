@@ -25,6 +25,11 @@ namespace AutoMapper.UnitTests.Bug
             public string SubString { get; set; }
         }
 
+        public class OtherDto
+        {
+            public string SubString { get; set; }
+        }
+
         [Test]
         public void included_mapping_should_inherit_base_mappings_should_not_throw()
         {
@@ -52,6 +57,36 @@ namespace AutoMapper.UnitTests.Bug
 
             Assert.AreEqual("123", dto.BaseString);
             Assert.AreEqual("456", dto.SubString);
+        }
+
+        [Test]
+        public void included_mapping_should_not_inherit_base_mappings_for_other()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
+                .Include<ModelSubObject, DtoSubObject>();
+
+            Mapper.CreateMap<ModelSubObject, OtherDto>();
+
+            var dto = Mapper.Map<ModelSubObject, OtherDto>(new ModelSubObject
+            {
+                DifferentBaseString = "123",
+                SubString = "456"
+            });
+
+            Assert.AreEqual("456", dto.SubString);
+        }
+
+        [Test]
+        public void included_mapping_should_not_inherit_base_mappings_for_other_should_not_throw()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
+                .Include<ModelSubObject, DtoSubObject>();
+
+            Mapper.CreateMap<ModelSubObject, OtherDto>();
+
+            Mapper.AssertConfigurationIsValid();
         }
     }
 }

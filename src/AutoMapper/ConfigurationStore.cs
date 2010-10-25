@@ -183,7 +183,7 @@ namespace AutoMapper
                 typeMap.Profile = profileName;
 			    typeMap.IgnorePropertiesStartingWith = _globalIgnore;
 
-			    foreach (var map in _typeMaps.Where(t => t.TypeHasBeenIncluded(source)))
+			    foreach (var map in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
 			    {
                     foreach (var mappedProperty in map.GetCustomPropertyMaps().Where(m => m.IsMapped()))
                     {
