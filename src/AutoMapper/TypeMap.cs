@@ -71,6 +71,11 @@ namespace AutoMapper
 		    return _propertyMaps;
 		}
 
+        public IEnumerable<PropertyMap> GetCustomPropertyMaps()
+        {
+            return _propertyMaps;
+        }
+
 		public void AddPropertyMap(PropertyMap propertyMap)
 		{
 			_propertyMaps.Add(propertyMap);
@@ -124,6 +129,11 @@ namespace AutoMapper
 
 			return _includedDerivedTypes[derivedSourceType];
 		}
+
+        public bool TypeHasBeenIncluded(Type derivedSourceType)
+        {
+            return _includedDerivedTypes.ContainsKey(derivedSourceType);
+        }
 
 		public bool HasDerivedTypesToInclude()
 		{
