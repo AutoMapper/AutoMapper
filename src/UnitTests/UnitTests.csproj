@@ -119,6 +119,7 @@
     <Compile Include="Bug\DuplicateValuesBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
+    <Compile Include="Bug\IncludedMappingShouldInheritBaseMappings.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\NamingConventions.cs" />

@@ -124,6 +124,7 @@ namespace AutoMapper
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName)
         {
             TypeMap typeMap = CreateTypeMap(typeof(TSource), typeof(TDestination), profileName);
+
             return new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor);
         }
 
@@ -181,6 +182,21 @@ namespace AutoMapper
 
                 typeMap.Profile = profileName;
 			    typeMap.IgnorePropertiesStartingWith = _globalIgnore;
+
+			    foreach (var map in _typeMaps.Where(t => t.TypeHasBeenIncluded(source)))
+			    {
+                    foreach (var mappedProperty in map.GetCustomPropertyMaps().Where(m => m.IsMapped()))
+                    {
+                        var existingMapping = typeMap.GetPropertyMaps()
+                            .SingleOrDefault(m =>
+                                m.DestinationProperty == mappedProperty.DestinationProperty &&
+                                                  !m.IsMapped());
+                        if (existingMapping == null)
+                        {
+                            typeMap.AddPropertyMap(mappedProperty);
+                        }
+                    }
+			    }
 
 				_typeMaps.Add(typeMap);
 				_typeMapCache[new TypePair(source, destination)] = typeMap;
@@ -326,7 +342,6 @@ namespace AutoMapper
             return typeMap.CustomMapper == null;
 #endif
 	    }
-
 
 	    private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType, string profileName)
         {
