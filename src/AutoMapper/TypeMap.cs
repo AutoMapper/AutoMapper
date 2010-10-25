@@ -130,9 +130,11 @@ namespace AutoMapper
 			return _includedDerivedTypes[derivedSourceType];
 		}
 
-        public bool TypeHasBeenIncluded(Type derivedSourceType)
+        public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
         {
-            return _includedDerivedTypes.ContainsKey(derivedSourceType);
+            if (_includedDerivedTypes.ContainsKey(derivedSourceType))
+                return _includedDerivedTypes[derivedSourceType].IsAssignableFrom(derivedDestinationType);
+            return false;
         }
 
 		public bool HasDerivedTypesToInclude()
