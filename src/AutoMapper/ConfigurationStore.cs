@@ -183,20 +183,7 @@ namespace AutoMapper
                 typeMap.Profile = profileName;
 			    typeMap.IgnorePropertiesStartingWith = _globalIgnore;
 
-			    foreach (var map in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
-			    {
-                    foreach (var mappedProperty in map.GetCustomPropertyMaps().Where(m => m.IsMapped()))
-                    {
-                        var existingMapping = typeMap.GetPropertyMaps()
-                            .SingleOrDefault(m =>
-                                m.DestinationProperty == mappedProperty.DestinationProperty &&
-                                                  !m.IsMapped());
-                        if (existingMapping == null)
-                        {
-                            typeMap.AddPropertyMap(mappedProperty);
-                        }
-                    }
-			    }
+			    IncludeBaseMappings(source, destination, typeMap);
 
 				_typeMaps.Add(typeMap);
 				_typeMapCache[new TypePair(source, destination)] = typeMap;
@@ -207,8 +194,26 @@ namespace AutoMapper
 			return typeMap;
 		}
 
+	    private void IncludeBaseMappings(Type source, Type destination, TypeMap typeMap)
+	    {
+	        foreach (var map in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
+	        {
+	            foreach (var mappedProperty in map.GetCustomPropertyMaps().Where(m => m.IsMapped()))
+	            {
+	                var existingMapping = typeMap.GetPropertyMaps()
+	                    .SingleOrDefault(m =>
+	                                     m.DestinationProperty == mappedProperty.DestinationProperty &&
+	                                     !m.IsMapped());
+	                if (existingMapping == null)
+	                {
+	                    typeMap.AddPropertyMap(mappedProperty);
+	                }
+	            }
+	        }
+	    }
 
-		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+
+	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
 			return GetProfile(DefaultProfileName).AddFormatter<TValueFormatter>();
 		}

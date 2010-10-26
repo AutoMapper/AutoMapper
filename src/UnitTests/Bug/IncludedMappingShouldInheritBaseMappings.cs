@@ -42,12 +42,24 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         [Test]
-        public void included_mapping_should_inherit_base_mappings()
+        public void more_specific_map_should_override_base_mapping()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
                 .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
                 .Include<ModelSubObject, DtoSubObject>();
             Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+
+            Mapper.AssertConfigurationIsValid();
+        }
+
+        [Test]
+        public void included_mapping_should_inherit_base_mappings()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
+                .Include<ModelSubObject, DtoSubObject>();
+            Mapper.CreateMap<ModelSubObject, DtoSubObject>()
+                .ForMember(d=>d.BaseString, m=>m.UseValue("789"));
 
             var dto = Mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject
                                                                    {
@@ -55,7 +67,7 @@ namespace AutoMapper.UnitTests.Bug
                                                                        SubString = "456"
                                                                    });
 
-            Assert.AreEqual("123", dto.BaseString);
+            Assert.AreEqual("789", dto.BaseString);
             Assert.AreEqual("456", dto.SubString);
         }
 
