@@ -42,7 +42,7 @@ task merge {
 task test {
 	create_directory "$build_dir\results"
     exec { & $tools_dir\nunit\nunit-console-x86.exe $build_dir/$config/UnitTests/AutoMapper.UnitTests.dll /nologo /nodots /xml=$result_dir\AutoMapper.xml }
-    exec { & $tools_dir\Machine.Specifications-net-4.0-Release\mspec.exe $build_dir/$config/UnitTests/AutoMapper.UnitTests.dll }
+    exec { & $tools_dir\Machine.Specifications-net-4.0-Release\mspec.exe --teamcity $build_dir/$config/UnitTests/AutoMapper.UnitTests.dll }
 }
 
 task dist {
