@@ -369,6 +369,12 @@
             <see cref="P:NAnt.VisualCpp.Tasks.LinkTask.OutputFile"/> and the extension .pdb.
             </summary>
         </member>
+        <member name="P:NAnt.VisualCpp.Tasks.LinkTask.ModuleDefinition">
+            <summary>
+            The name of a module-definition file (.def) to be passed to the
+            linker.
+            </summary>
+        </member>
         <member name="P:NAnt.VisualCpp.Tasks.LinkTask.DelayLoadedDlls">
             <summary>
             Specified DLLs for delay loading.

@@ -222,6 +222,163 @@
             The current element in the collection.
             </returns>
         </member>
+        <member name="T:NAnt.NUnit2.Tasks.NUnit2Task">
+            <summary>
+            Runs tests using the NUnit V2.2 framework.
+            </summary>
+            <remarks>
+              <para>
+              The <see cref="P:NAnt.NUnit2.Tasks.NUnit2Task.HaltOnFailure"/> attribute is only useful when more 
+              than one test suite is used, and you want to continue running other 
+              test suites although a test failed.
+              </para>
+              <para>
+              Set <see cref="P:NAnt.Core.Task.FailOnError"/> to <see langword="false"/> to 
+              ignore any errors and continue the build.
+              </para>
+              <para>
+              In order to run a test assembly built with NUnit 2.0 or 2.1 using 
+              <see cref="T:NAnt.NUnit2.Tasks.NUnit2Task"/>, you must add the following node to your
+              test config file :
+              </para>
+              <code>
+                <![CDATA[
+            <configuration>
+                ...
+                <runtime>
+                    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+                        <dependentAssembly>
+                            <assemblyIdentity name="nunit.framework" publicKeyToken="96d09a1eb7f44a77" culture="Neutral" /> 
+                            <bindingRedirect oldVersion="2.0.6.0" newVersion="2.2.8.0" /> 
+                            <bindingRedirect oldVersion="2.1.4.0" newVersion="2.2.8.0" /> 
+                        </dependentAssembly>
+                    </assemblyBinding>
+                </runtime>
+                ...
+            </configuration>
+                ]]>
+              </code>
+              <para>
+              See the <see href="http://nunit.sf.net">NUnit home page</see> for more 
+              information.
+              </para>
+            </remarks>
+            <example>
+              <para>
+              Run tests in the <c>MyProject.Tests.dll</c> assembly.
+              </para>
+              <code>
+                <![CDATA[
+            <nunit2>
+                <formatter type="Plain" />
+                <test assemblyname="MyProject.Tests.dll" appconfig="MyProject.Tests.dll.config" />
+            </nunit2>
+                ]]>
+              </code>
+            </example>
+            <example>
+              <para>
+              Only run tests that are not known to fail in files listed in the <c>tests.txt</c>
+              file.
+              </para>
+              <code>
+                <![CDATA[
+            <nunit2>
+                <formatter type="Xml" usefile="true" extension=".xml" outputdir="${build.dir}/results" />
+                <test>
+                    <assemblies>
+                        <includesfile name="tests.txt" />
+                    </assemblies>
+                    <categories>
+                        <exclude name="NotWorking" />
+                    </categories>
+                    <references basedir="build">
+                        <include name="Cegeka.Income.Services.dll" />
+                        <include name="Cegeka.Util.dll" />
+                    </references>
+                </test>
+            </nunit2>
+                ]]>
+              </code>
+            </example>
+        </member>
+        <member name="M:NAnt.NUnit2.Tasks.NUnit2Task.ExecuteTask">
+            <summary>
+            Runs the tests and sets up the formatters.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Tasks.NUnit2Task.HaltOnFailure">
+            <summary>
+            Stop the test run if a test fails. The default is <see langword="false" />.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Tasks.NUnit2Task.Tests">
+            <summary>
+            Tests to run.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Tasks.NUnit2Task.FormatterElements">
+            <summary>
+            Formatters to output results of unit tests.
+            </summary>
+        </member>
+        <member name="T:NAnt.NUnit2.Types.NUnit2Test">
+            <summary>
+            Represents a <c>test</c> element of an <see cref="T:NAnt.NUnit2.Tasks.NUnit2Task"/>.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.AssemblyFile">
+            <summary>
+            Name of the assembly to search for tests.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.TestName">
+            <summary>
+            Name of a specific testfixture to run. If not specified then all 
+            testfixtures are run.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.Assemblies">
+            <summary>
+            Assemblies to include in test.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.References">
+            <summary>
+            Assemblies to scan for missing assembly references.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.Categories">
+            <summary>
+            Categories of test cases to include or exclude.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.HaltOnFailure">
+            <summary>
+            Build fails on failure. The default is <see langword="true" />.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.XsltFile">
+            <summary>
+            XSLT transform file to use when using the <see cref="F:NAnt.NUnit.Types.FormatterType.Plain"/> 
+            formatter.
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.AppConfigFile">
+            <summary>
+            The application configuration file to use for the NUnit test domain.
+            If not specified, NAnt will try to use a configuration name matching
+            the file name of the assembly with extension ".config".
+            </summary>
+        </member>
+        <member name="P:NAnt.NUnit2.Types.NUnit2Test.TestAssemblies">
+            <summary>
+            Gets all assemblies specified for these tests.
+            </summary>
+            <returns>
+            All assemblies specified for these tests.
+            </returns>
+        </member>
         <member name="T:NAnt.NUnit2.Types.NUnit2TestCollection">
             <summary>
             Contains a strongly typed collection of <see cref="T:NAnt.NUnit2.Types.NUnit2Test"/> objects.
@@ -352,154 +509,6 @@
             The current element in the collection.
             </returns>
         </member>
-        <member name="T:NAnt.NUnit2.Tasks.NUnit2Task">
-            <summary>
-            Runs tests using the NUnit V2.2 framework.
-            </summary>
-            <remarks>
-              <para>
-              The <see cref="P:NAnt.NUnit2.Tasks.NUnit2Task.HaltOnFailure"/> attribute is only useful when more 
-              than one test suite is used, and you want to continue running other 
-              test suites although a test failed.
-              </para>
-              <para>
-              Set <see cref="P:NAnt.Core.Task.FailOnError"/> to <see langword="false"/> to 
-              ignore any errors and continue the build.
-              </para>
-              <para>
-              In order to run a test assembly built with NUnit 2.0 or 2.1 using 
-              <see cref="T:NAnt.NUnit2.Tasks.NUnit2Task"/>, you must add the following node to your
-              test config file :
-              </para>
-              <code>
-                <![CDATA[
-            <configuration>
-                ...
-                <runtime>
-                    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-                        <dependentAssembly>
-                            <assemblyIdentity name="nunit.framework" publicKeyToken="96d09a1eb7f44a77" culture="Neutral" /> 
-                            <bindingRedirect oldVersion="2.0.6.0" newVersion="2.2.8.0" /> 
-                            <bindingRedirect oldVersion="2.1.4.0" newVersion="2.2.8.0" /> 
-                        </dependentAssembly>
-                    </assemblyBinding>
-                </runtime>
-                ...
-            </configuration>
-                ]]>
-              </code>
-              <para>
-              See the <see href="http://nunit.sf.net">NUnit home page</see> for more 
-              information.
-              </para>
-            </remarks>
-            <example>
-              <para>
-              Run tests in the <c>MyProject.Tests.dll</c> assembly.
-              </para>
-              <code>
-                <![CDATA[
-            <nunit2>
-                <formatter type="Plain" />
-                <test assemblyname="MyProject.Tests.dll" appconfig="MyProject.Tests.dll.config" />
-            </nunit2>
-                ]]>
-              </code>
-            </example>
-            <example>
-              <para>
-              Only run tests that are not known to fail in files listed in the <c>tests.txt</c>
-              file.
-              </para>
-              <code>
-                <![CDATA[
-            <nunit2>
-                <formatter type="Xml" usefile="true" extension=".xml" outputdir="${build.dir}/results" />
-                <test>
-                    <assemblies>
-                        <includesfile name="tests.txt" />
-                    </assemblies>
-                    <categories>
-                        <exclude name="NotWorking" />
-                    </categories>
-                </test>
-            </nunit2>
-                ]]>
-              </code>
-            </example>
-        </member>
-        <member name="M:NAnt.NUnit2.Tasks.NUnit2Task.ExecuteTask">
-            <summary>
-            Runs the tests and sets up the formatters.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Tasks.NUnit2Task.HaltOnFailure">
-            <summary>
-            Stop the test run if a test fails. The default is <see langword="false" />.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Tasks.NUnit2Task.Tests">
-            <summary>
-            Tests to run.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Tasks.NUnit2Task.FormatterElements">
-            <summary>
-            Formatters to output results of unit tests.
-            </summary>
-        </member>
-        <member name="T:NAnt.NUnit2.Types.NUnit2Test">
-            <summary>
-            Represents a <c>test</c> element of an <see cref="T:NAnt.NUnit2.Tasks.NUnit2Task"/>.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Types.NUnit2Test.AssemblyFile">
-            <summary>
-            Name of the assembly to search for tests.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Types.NUnit2Test.TestName">
-            <summary>
-            Name of a specific testfixture to run. If not specified then all 
-            testfixtures are run.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Types.NUnit2Test.Assemblies">
-            <summary>
-            Assemblies to include in test.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Types.NUnit2Test.Categories">
-            <summary>
-            Categories of test cases to include or exclude.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Types.NUnit2Test.HaltOnFailure">
-            <summary>
-            Build fails on failure. The default is <see langword="true" />.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Types.NUnit2Test.XsltFile">
-            <summary>
-            XSLT transform file to use when using the <see cref="F:NAnt.NUnit.Types.FormatterType.Plain"/> 
-            formatter.
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Types.NUnit2Test.AppConfigFile">
-            <summary>
-            The application configuration file to use for the NUnit test domain.
-            If not specified, NAnt will try to use a configuration name matching
-            the file name of the assembly with extension ".config".
-            </summary>
-        </member>
-        <member name="P:NAnt.NUnit2.Types.NUnit2Test.TestAssemblies">
-            <summary>
-            Gets all assemblies specified for these tests.
-            </summary>
-            <returns>
-            All assemblies specified for these tests.
-            </returns>
-        </member>
         <member name="T:NAnt.NUnit2.Tasks.NUnit2TestDomain">
             <summary>
             Custom TestDomain, similar to the one included with NUnit, in order 
@@ -512,12 +521,13 @@
             class.
             </summary>
         </member>
-        <member name="M:NAnt.NUnit2.Tasks.NUnit2TestDomain.CreateRunner(System.IO.FileInfo,System.IO.FileInfo)">
+        <member name="M:NAnt.NUnit2.Tasks.NUnit2TestDomain.CreateRunner(System.IO.FileInfo,System.IO.FileInfo,System.Collections.Specialized.StringCollection)">
             <summary>
             Runs a single testcase.
             </summary>
             <param name="assemblyFile">The test assembly.</param>
             <param name="configFile">The application configuration file for the test domain.</param>
+            <param name="referenceAssemblies">List of files to scan for missing assembly references.</param>
             <returns>
             The result of the test.
             </returns>
@@ -527,9 +537,9 @@
             Helper class called when an assembly resolve event is raised.
             </summary>
         </member>
-        <member name="M:NAnt.NUnit2.Tasks.NUnit2TestDomain.AssemblyResolveHandler.#ctor(System.String[])">
+        <member name="M:NAnt.NUnit2.Tasks.NUnit2TestDomain.AssemblyResolveHandler.#ctor(System.String[],System.String[])">
             <summary> 
-            Initializes an instanse of the <see cref="T:NAnt.NUnit2.Tasks.NUnit2TestDomain.AssemblyResolveHandler"/> 
+            Initializes an instanse of the <see cref="T:NAnt.NUnit2.Tasks.NUnit2TestDomain.AssemblyResolveHandler"/>
             class.
             </summary>
         </member>
@@ -556,6 +566,12 @@
         <member name="F:NAnt.NUnit2.Tasks.NUnit2TestDomain.AssemblyResolveHandler._probePaths">
             <summary>
             Holds the list of directories that will be scanned for missing
+            assembly references.
+            </summary>
+        </member>
+        <member name="F:NAnt.NUnit2.Tasks.NUnit2TestDomain.AssemblyResolveHandler._referenceAssemblies">
+            <summary>
+            Holds the list of assemblies that can be scanned for missing
             assembly references.
             </summary>
         </member>

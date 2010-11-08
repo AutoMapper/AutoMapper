@@ -648,7 +648,7 @@
             <param name="name">The name of the option which should be passed to the compiler.</param>
             <param name="value">The value of the option which should be passed to the compiler.</param>
             <remarks>
-            The combination of <paramref name="option"/> and 
+            The combination of <paramref name="name"/> and 
             <paramref name="value"/> (separated by a colon) is quoted
             unless <paramref name="value"/> is already surrounded by quotes.
             </remarks>
@@ -737,6 +737,16 @@
             <remarks>
             <para>
             Corresponds to <c>/win32icon:</c> flag.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:NAnt.DotNet.Tasks.CompilerBase.Win32Res">
+            <summary>
+            Specifies a Win32 resource file (.res).
+            </summary>
+            <remarks>
+            <para>
+            Corresponds to <c>/win32res[ource]:</c> flag.
             </para>
             </remarks>
         </member>
@@ -2424,7 +2434,7 @@
             </returns>
             <remarks>
             This check will only be accurate for 1.0 resource file, but the
-            2.0 resx files can only be compiled with a resgen tool that supported
+            2.0 resx files can only be compiled with a resgen tool that supports
             assembly references, so this method will not be used anyway.
             </remarks>
         </member>
@@ -2557,20 +2567,27 @@
         </member>
         <member name="T:NAnt.DotNet.Tasks.ScriptTask">
             <summary>
-            Executes the code contained within the task. This code can include custom extension function definitions. 
-            Once the script task has executed those custom functions will be available for use in the buildfile.
+            Executes the code contained within the task.
             </summary>
             <remarks>
+                <h5>Code</h5>
                 <para>
                 The <see cref="T:NAnt.DotNet.Tasks.ScriptTask"/> must contain a single <c>code</c> 
                 element, which in turn contains the script code.
                 </para>
                 <para>
-                A static entry point named <c>ScriptMain</c> is required if no custom functions have been defined. It must 
-                have a single <see cref="T:NAnt.Core.Project"/> parameter.
+                This code can include extensions such as functions, or tasks. Once
+                the script task has executed those extensions will be available for
+                use in the buildfile.
                 </para>
                 <para>
-                The following namespaces are loaded by default:
+                If no extensions have been defined, a static entry point named
+                <c>ScriptMain</c> - which must have a single <see cref="T:NAnt.Core.Project"/>
+                argument - is required.
+                </para>
+                <h5>Namespaces</h5>
+                <para>
+                The following namespaces are imported by default:
                 </para>
                 <list type="bullet">
                     <item>
@@ -2580,21 +2597,27 @@
                         <description>System.Collections</description>
                     </item>
                     <item>
-                        <description>System.Collections.Specialized</description>
-                    </item>
-                    <item>
                         <description>System.IO</description>
                     </item>
                     <item>
                         <description>System.Text</description>
                     </item>
                     <item>
-                        <description>System.Text.RegularExpressions</description>
-                    </item>
-                    <item>
                         <description>NAnt.Core</description>
                     </item>
+                    <item>
+                        <description>NAnt.Core.Attributes</description>
+                    </item>
                 </list>
+                <h5>Assembly References</h5>
+                <para>
+                The assembly references that are specified will be used to compile
+                the script, and will be loaded into the NAnt appdomain.
+                </para>
+                <para>
+                By default, only the <c>NAnt.Core</c> and <c>mscorlib</c> assemblies
+                are referenced.
+                </para>
             </remarks>
             <example>
               <para>Run C# code that writes a message to the build log.</para>
@@ -2691,24 +2714,17 @@
                             [TaskName("usertask")]
                             public class TestTask : Task {
                               #region Private Instance Fields
-            
-                              private string _message;
-            
-                              #endregion Private Instance Fields
-            
-                              #region Public Instance Properties
-            
-                              [TaskAttribute("message", Required=true)]
+                                          private string _message;
+                                          #endregion Private Instance Fields
+                                          #region Public Instance Properties
+                                          [TaskAttribute("message", Required=true)]
                               public string FileName {
                                   get { return _message; }
                                   set { _message = value; }
                               }
-            
-                              #endregion Public Instance Properties
-            
-                              #region Override implementation of Task
-            
-                              protected override void ExecuteTask() {
+                                          #endregion Public Instance Properties
+                                          #region Override implementation of Task
+                                          protected override void ExecuteTask() {
                                   Log(Level.Info, _message.ToUpper());
                               }
                               #endregion Override implementation of Task
@@ -4126,7 +4142,7 @@
             Inserts a <see cref="T:NAnt.DotNet.Types.EmbeddedResource"/> into the collection at the
             specified index.
             </summary>
-            <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            <param name="index">The zero-based index at which <paramref name="value"/> should be inserted.</param>
             <param name="value">The <see cref="T:NAnt.DotNet.Types.EmbeddedResource"/> to insert.</param>
         </member>
         <member name="M:NAnt.DotNet.Types.EmbeddedResourceCollection.System#Collections#IList#Remove(System.Object)">
@@ -4189,7 +4205,7 @@
             Inserts a <see cref="T:NAnt.DotNet.Types.EmbeddedResource"/> into the collection at the
             specified index.
             </summary>
-            <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            <param name="index">The zero-based index at which <paramref name="value"/> should be inserted.</param>
             <param name="value">The <see cref="T:NAnt.DotNet.Types.EmbeddedResource"/> to insert.</param>
         </member>
         <member name="M:NAnt.DotNet.Types.EmbeddedResourceCollection.Remove(NAnt.DotNet.Types.EmbeddedResource)">
@@ -4366,7 +4382,7 @@
             Inserts a <see cref="T:NAnt.DotNet.Types.Module"/> into the collection at the
             specified index.
             </summary>
-            <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            <param name="index">The zero-based index at which <paramref name="value"/> should be inserted.</param>
             <param name="value">The <see cref="T:NAnt.DotNet.Types.Module"/> to insert.</param>
         </member>
         <member name="M:NAnt.DotNet.Types.ModuleCollection.System#Collections#IList#Remove(System.Object)">
@@ -4444,7 +4460,7 @@
             Inserts a <see cref="T:NAnt.DotNet.Types.Module"/> into the collection at the
             specified index.
             </summary>
-            <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            <param name="index">The zero-based index at which <paramref name="value"/> should be inserted.</param>
             <param name="value">The <see cref="T:NAnt.DotNet.Types.Module"/> to insert.</param>
         </member>
         <member name="M:NAnt.DotNet.Types.ModuleCollection.Remove(NAnt.DotNet.Types.Module)">
@@ -4734,7 +4750,7 @@
             Inserts a <see cref="T:NAnt.DotNet.Types.NamespaceImport"/> into the collection at the
             specified index.
             </summary>
-            <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            <param name="index">The zero-based index at which <paramref name="value"/> should be inserted.</param>
             <param name="value">The <see cref="T:NAnt.DotNet.Types.NamespaceImport"/> to insert.</param>
         </member>
         <member name="M:NAnt.DotNet.Types.NamespaceImportCollection.System#Collections#IList#Remove(System.Object)">
@@ -4797,7 +4813,7 @@
             Inserts a <see cref="T:NAnt.DotNet.Types.NamespaceImport"/> into the collection at the
             specified index.
             </summary>
-            <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+            <param name="index">The zero-based index at which <paramref name="value"/> should be inserted.</param>
             <param name="value">The <see cref="T:NAnt.DotNet.Types.NamespaceImport"/> to insert.</param>
         </member>
         <member name="M:NAnt.DotNet.Types.NamespaceImportCollection.Remove(NAnt.DotNet.Types.NamespaceImport)">
