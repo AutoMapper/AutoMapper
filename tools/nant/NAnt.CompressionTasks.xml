@@ -4,6 +4,49 @@
         <name>NAnt.CompressionTasks</name>
     </assembly>
     <members>
+        <member name="T:NAnt.Compression.Tasks.ExpandBaseTask">
+            <summary>
+            Summary description for ExpandTask.
+            </summary>
+        </member>
+        <member name="M:NAnt.Compression.Tasks.ExpandBaseTask.ExtractFile(System.IO.Stream,System.String,System.String,System.DateTime,System.Int64)">
+            <summary>
+            Extracts a file entry from the specified stream.
+            </summary>
+            <param name="inputStream">The <see cref="T:System.IO.Stream"/> containing the compressed entry.</param>
+            <param name="destDirectory">The directory where to store the expanded file.</param>
+            <param name="entryName">The name of the entry including directory information.</param>
+            <param name="entryDate">The date of the entry.</param>
+            <param name="entrySize">The uncompressed size of the entry.</param>
+            <exception cref="T:NAnt.Core.BuildException">
+              <para>The destination directory for the entry could not be created.</para>
+              <para>-or-</para>
+              <para>The entry could not be extracted.</para>
+            </exception>
+            <remarks>
+            We cannot rely on the fact that the directory entry of a given file
+            is created before the file is extracted, so we should create the
+            directory if it doesn't yet exist.
+            </remarks>
+        </member>
+        <member name="M:NAnt.Compression.Tasks.ExpandBaseTask.ExtractDirectory(System.IO.Stream,System.String,System.String,System.DateTime)">
+            <summary>
+            Extracts a directory entry from the specified stream.
+            </summary>
+            <param name="inputStream">The <see cref="T:System.IO.Stream"/> containing the directory entry.</param>
+            <param name="destDirectory">The directory where to create the subdirectory.</param>
+            <param name="entryName">The name of the directory entry.</param>
+            <param name="entryDate">The date of the entry.</param>
+            <exception cref="T:NAnt.Core.BuildException">
+              <para>The destination directory for the entry could not be created.</para>
+            </exception>
+        </member>
+        <member name="P:NAnt.Compression.Tasks.ExpandBaseTask.Overwrite">
+            <summary>
+            Overwrite files, even if they are newer than the corresponding 
+            entries in the archive. The default is <see langword="true" />.
+            </summary>
+        </member>
         <member name="T:NAnt.Compression.Tasks.GUnzip">
             <summary>
             Expands a file packed using GZip compression.
@@ -81,32 +124,52 @@
         </member>
         <member name="P:NAnt.Compression.Tasks.TarTask.CompressionMethod">
             <summary>
-            The compression method. The default is <see cref="F:NAnt.Compression.Tasks.TarCompressionMethod.None"/>.
+            The compression method. The default is <see cref="F:NAnt.Compression.Types.TarCompressionMethod.None"/>.
             </summary>
         </member>
-        <member name="T:NAnt.Compression.Tasks.TarCompressionMethod">
+        <member name="T:NAnt.Compression.Tasks.UnTarTask">
             <summary>
-            Specifies the compression methods supported by <see cref="T:NAnt.Compression.Tasks.TarTask"/>.
+            Extracts files from a tar archive.
+            </summary>
+            <remarks>
+              <para>
+              Uses <see href="http://www.icsharpcode.net/OpenSource/SharpZipLib/">#ziplib</see>
+              (SharpZipLib), an open source Zip/GZip library written entirely in C#.
+              </para>
+            </remarks>
+            <example>
+              <para>Extracts all files from a gzipped tar, preserving the directory structure.</para>
+              <code>
+                <![CDATA[
+            <untar src="nant-bin.tar.gz" dest="bin" compression="gzip" />
+                ]]>
+              </code>
+            </example>
+        </member>
+        <member name="M:NAnt.Compression.Tasks.UnTarTask.ExecuteTask">
+            <summary>
+            Extracts the files from the archive.
             </summary>
         </member>
-        <member name="F:NAnt.Compression.Tasks.TarCompressionMethod.None">
+        <member name="P:NAnt.Compression.Tasks.UnTarTask.SrcFile">
             <summary>
-            No compression.
+            The archive file to expand.
             </summary>
         </member>
-        <member name="F:NAnt.Compression.Tasks.TarCompressionMethod.GZip">
+        <member name="P:NAnt.Compression.Tasks.UnTarTask.DestinationDirectory">
             <summary>
-            GZIP compression.
+            The directory where to store the expanded file(s). The default is
+            the project base directory.
             </summary>
         </member>
-        <member name="F:NAnt.Compression.Tasks.TarCompressionMethod.BZip2">
+        <member name="P:NAnt.Compression.Tasks.UnTarTask.CompressionMethod">
             <summary>
-            BZIP2 compression.
+            The compression method. The default is <see cref="F:NAnt.Compression.Types.TarCompressionMethod.None"/>.
             </summary>
         </member>
         <member name="T:NAnt.Compression.Tasks.UnZipTask">
             <summary>
-            Extracts files from a zip file.
+            Extracts files from a zip archive.
             </summary>
             <remarks>
               <para>
@@ -128,36 +191,6 @@
             Extracts the files from the zip file.
             </summary>
         </member>
-        <member name="M:NAnt.Compression.Tasks.UnZipTask.ExtractFile(System.IO.Stream,System.String,System.DateTime,System.Int64)">
-            <summary>
-            Extracts a file entry from the specified stream.
-            </summary>
-            <param name="inputStream">The <see cref="T:System.IO.Stream"/> containing the compressed entry.</param>
-            <param name="entryName">The name of the entry including directory information.</param>
-            <param name="entryDate">The date of the entry.</param>
-            <param name="entrySize">The uncompressed size of the entry.</param>
-            <exception cref="T:NAnt.Core.BuildException">
-              <para>The destination directory for the entry could not be created.</para>
-              <para>-or-</para>
-              <para>The entry could not be extracted.</para>
-            </exception>
-            <remarks>
-            We cannot rely on the fact that the directory entry of a given file
-            is created before the file is extracted, so we should create the
-            directory if it doesn't yet exist.
-            </remarks>
-        </member>
-        <member name="M:NAnt.Compression.Tasks.UnZipTask.ExtractDirectory(System.IO.Stream,System.String,System.DateTime)">
-            <summary>
-            Extracts a directory entry from the specified stream.
-            </summary>
-            <param name="inputStream">The <see cref="T:System.IO.Stream"/> containing the directory entry.</param>
-            <param name="entryName">The name of the directory entry.</param>
-            <param name="entryDate">The date of the entry.</param>
-            <exception cref="T:NAnt.Core.BuildException">
-              <para>The destination directory for the entry could not be created.</para>
-            </exception>
-        </member>
         <member name="P:NAnt.Compression.Tasks.UnZipTask.ZipFile">
             <summary>
             The archive file to expand.
@@ -167,12 +200,6 @@
             <summary>
             The directory where the expanded files should be stored. The 
             default is the project base directory.
-            </summary>
-        </member>
-        <member name="P:NAnt.Compression.Tasks.UnZipTask.Overwrite">
-            <summary>
-            Overwrite files, even if they are newer than the corresponding 
-            entries in the archive. The default is <see langword="true" />.
             </summary>
         </member>
         <member name="P:NAnt.Compression.Tasks.UnZipTask.Encoding">
@@ -278,6 +305,75 @@
             <summary>
             Report failure when two entries have the same name.
             </summary>
+        </member>
+        <member name="T:NAnt.Compression.Types.DuplicateHandlingConverter">
+            <summary>
+            Specialized <see cref="T:System.ComponentModel.EnumConverter"/> for <see cref="T:NAnt.Compression.Types.TarCompressionMethod"/>
+            that ignores case when converting from string.
+            </summary>
+        </member>
+        <member name="M:NAnt.Compression.Types.DuplicateHandlingConverter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NAnt.Compression.Types.DuplicateHandlingConverter"/>
+            class.
+            </summary>
+        </member>
+        <member name="M:NAnt.Compression.Types.DuplicateHandlingConverter.ConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object)">
+            <summary>
+            Converts the given object to the type of this converter, using the 
+            specified context and culture information.
+            </summary>
+            <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
+            <param name="culture">A <see cref="T:System.Globalization.CultureInfo"/> object. If a <see langword="null"/> is passed, the current culture is assumed.</param>
+            <param name="value">The <see cref="T:System.Object"/> to convert.</param>
+            <returns>
+            An <see cref="T:System.Object"/> that represents the converted value.
+            </returns>
+        </member>
+        <member name="T:NAnt.Compression.Types.TarCompressionMethod">
+            <summary>
+            Specifies the compression methods supported by <see cref="T:NAnt.Compression.Tasks.TarTask"/>
+            and <see cref="T:NAnt.Compression.Tasks.UnTarTask"/>.
+            </summary>
+        </member>
+        <member name="F:NAnt.Compression.Types.TarCompressionMethod.None">
+            <summary>
+            No compression.
+            </summary>
+        </member>
+        <member name="F:NAnt.Compression.Types.TarCompressionMethod.GZip">
+            <summary>
+            GZIP compression.
+            </summary>
+        </member>
+        <member name="F:NAnt.Compression.Types.TarCompressionMethod.BZip2">
+            <summary>
+            BZIP2 compression.
+            </summary>
+        </member>
+        <member name="T:NAnt.Compression.Types.TarCompressionMethodConverter">
+            <summary>
+            Specialized <see cref="T:System.ComponentModel.EnumConverter"/> for <see cref="T:NAnt.Compression.Types.TarCompressionMethod"/>
+            that ignores case when converting from string.
+            </summary>
+        </member>
+        <member name="M:NAnt.Compression.Types.TarCompressionMethodConverter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:NAnt.Compression.Types.TarCompressionMethodConverter"/>
+            class.
+            </summary>
+        </member>
+        <member name="M:NAnt.Compression.Types.TarCompressionMethodConverter.ConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object)">
+            <summary>
+            Converts the given object to the type of this converter, using the 
+            specified context and culture information.
+            </summary>
+            <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
+            <param name="culture">A <see cref="T:System.Globalization.CultureInfo"/> object. If a <see langword="null"/> is passed, the current culture is assumed.</param>
+            <param name="value">The <see cref="T:System.Object"/> to convert.</param>
+            <returns>
+            An <see cref="T:System.Object"/> that represents the converted value.
+            </returns>
         </member>
         <member name="T:NAnt.Compression.Types.TarFileSet">
             <summary>

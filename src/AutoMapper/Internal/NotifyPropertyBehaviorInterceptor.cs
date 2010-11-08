@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using Castle.Core.Interceptor;
+using Castle.DynamicProxy;
 
 namespace AutoMapper.Internal
 {

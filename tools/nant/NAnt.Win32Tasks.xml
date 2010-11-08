@@ -173,6 +173,69 @@
             The command-line arguments for the external program.
             </value>
         </member>
+        <member name="T:NAnt.Win32.Tasks.LocateSdkTask">
+            <summary>
+            Reads the most recent Windows SDK InstallationFolder key into a NAnt property
+            </summary>
+            <example>
+              <code>
+                <![CDATA[
+            <locatesdk prefix="dotNetFX" minsdk="v6.0" />
+                ]]>
+              </code>
+            </example>
+        </member>
+        <member name="M:NAnt.Win32.Tasks.LocateSdkTask.ExecuteTask">
+            <summary>
+            locate the most recent WinSDK installed
+            </summary>
+        </member>
+        <member name="M:NAnt.Win32.Tasks.LocateSdkTask.StringToVersion(System.String)">
+            <summary>
+            Converts a version expressed as a string into a Version object 
+            </summary>
+            <param name="sdkVersion">
+            A <see cref="T:System.String"/> containing the version to convert.
+            </param>
+            <returns>
+            A <see cref="T:System.Version"/> object representing the version string.
+            </returns>
+        </member>
+        <member name="P:NAnt.Win32.Tasks.LocateSdkTask.PropertyName">
+            <summary>
+                <para>
+                The property to set to the value stored in the InstalledFolder key of the located WinSDK version.
+                </para>
+            </summary>
+        </member>
+        <member name="P:NAnt.Win32.Tasks.LocateSdkTask.MinWinSdkVersion">
+            <summary>
+                <para>
+                The minimum acceptable Windows SDK version.
+                </para>
+            </summary>
+        </member>
+        <member name="P:NAnt.Win32.Tasks.LocateSdkTask.MaxWinSdkVersion">
+            <summary>
+                <para>
+                The maximum acceptable Windows SDK version.
+                </para>
+            </summary>
+        </member>
+        <member name="P:NAnt.Win32.Tasks.LocateSdkTask.MinNetFxVersion">
+            <summary>
+                <para>
+                The minimum acceptable .NET sdk version.
+                </para>
+            </summary>
+        </member>
+        <member name="P:NAnt.Win32.Tasks.LocateSdkTask.MaxNetFxVersion">
+            <summary>
+                <para>
+                The maximum acceptable .NET sdk version.
+                </para>
+            </summary>
+        </member>
         <member name="T:NAnt.Win32.Tasks.ReadRegistryTask">
             <summary>
             Reads a value or set of values from the Windows Registry into one or 

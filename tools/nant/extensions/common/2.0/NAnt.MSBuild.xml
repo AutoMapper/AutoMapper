@@ -30,7 +30,6 @@
         <member name="T:NAnt.VSNet.WhidbeySolution">
             <summary>
             Analyses Microsoft Visual Studio .NET 2005 (Whidbey) solution files.
-            !! FOR NOW IT IS PLAIN COPY OF EVERETT (2003) !!
             </summary>
         </member>
     </members>
