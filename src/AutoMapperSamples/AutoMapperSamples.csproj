@@ -78,6 +78,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AdvancedMappers\ChainedMapping.cs" />
     <Compile Include="AdvancedMappers\MapToExistingObjects.cs" />
     <Compile Include="CommonBaseClassConfiguration.cs" />
     <Compile Include="ConfigurationValidation.cs" />
