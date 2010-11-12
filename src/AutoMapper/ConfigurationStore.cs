@@ -194,24 +194,37 @@ namespace AutoMapper
 			return typeMap;
 		}
 
-	    private void IncludeBaseMappings(Type source, Type destination, TypeMap typeMap)
-	    {
-	        foreach (var map in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
-	        {
-	            foreach (var mappedProperty in map.GetCustomPropertyMaps().Where(m => m.IsMapped()))
-	            {
-	                var existingMapping = typeMap.GetPropertyMaps()
-	                    .SingleOrDefault(m =>
-	                                     m.DestinationProperty == mappedProperty.DestinationProperty &&
-	                                     !m.IsMapped());
-	                if (existingMapping == null)
-	                {
-	                    typeMap.AddPropertyMap(mappedProperty);
-	                }
-	            }
-	        }
-	    }
+        private void IncludeBaseMappings(Type source, Type destination, TypeMap typeMap)
+        {
+            foreach (var inheritedTypeMap in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
+            {
+                foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
+                {
+                    var conventionPropertyMap = typeMap.GetPropertyMaps()
+                        .SingleOrDefault(m =>
+                                         m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
 
+                    if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
+                        conventionPropertyMap.AssignCustomValueResolver(inheritedMappedProperty.GetSourceValueResolvers().First());
+                    else if (conventionPropertyMap == null)
+                    {
+                        var propertyMap = new PropertyMap(inheritedMappedProperty.DestinationProperty);
+
+                        if (inheritedMappedProperty.IsIgnored())
+                            propertyMap.Ignore();
+                        else
+                        {
+                            foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
+                            {
+                                propertyMap.ChainResolver(sourceValueResolver);
+                            }
+                        }
+
+                        typeMap.AddInheritedPropertyMap(propertyMap);
+                    }
+                }
+            }
+        }
 
 	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
@@ -263,9 +276,16 @@ namespace AutoMapper
                         // Cache miss
                         typeMap = FindTypeMap(source, sourceType, destinationType, DefaultProfileName);
 
-                        _typeMapCache[typeMapPair] = typeMap;
+                        //We don't want to inherit base mappings which may be ambiguous or too specific resulting in cast exceptions
+                        if (source == null || source.GetType() == sourceType)
+                            _typeMapCache[typeMapPair] = typeMap;
                     }
                 }
+            }
+            // Due to the inheritance we can have derrived mapping cached which is not valid for this source object
+            else if (source != null && typeMap != null && !typeMap.SourceType.IsAssignableFrom(source.GetType()))
+            {
+                typeMap = FindTypeMapFor(source, source.GetType(), destinationType);
             }
 
             // Check for runtime derived types
@@ -274,15 +294,68 @@ namespace AutoMapper
             if (shouldCheckDerivedType)
             {
                 var potentialSourceType = source.GetType();
-                var potentialDestType = typeMap.GetDerivedTypeFor(potentialSourceType);
+                //Try and get the most specific type map possible
+                var potentialTypes = _typeMaps
+                    .Where(t =>
+                    {
+                        return destinationType.IsAssignableFrom(t.DestinationType) &&
+                               t.SourceType.IsAssignableFrom(source.GetType()) &&
+                               (
+                                   destinationType.IsAssignableFrom(t.DestinationType) ||
+                                   t.GetDerivedTypeFor(potentialSourceType) != null
+                               )
+                            ;
+                    }
+                    );
 
-                var targetSourceType = potentialDestType != destinationType ? potentialSourceType : typeMap.SourceType;
-                var targetDestinationType = potentialDestType;
-                typeMap = FindTypeMap(source, targetSourceType, targetDestinationType, DefaultProfileName);
+                var potentialDestTypeMap =
+                    potentialTypes
+                        .OrderByDescending(t => GetInheritanceDepth(t.DestinationType))
+                        .FirstOrDefault();
+                var ambiguousPotentialTypes = potentialTypes
+                    .Where(t => t.DestinationType == potentialDestTypeMap.DestinationType)
+                    .ToList();
+
+                if (ambiguousPotentialTypes.Count > 1)
+                {
+                    potentialDestTypeMap = ambiguousPotentialTypes
+                        .OrderByDescending(t => GetInheritanceDepth(t.SourceType))
+                        .FirstOrDefault();
+                }
+
+                if (potentialDestTypeMap == typeMap)
+                    return typeMap;
+
+                var targetDestinationType = potentialDestTypeMap.DestinationType;
+                var potentialTypeMap = FindExplicitlyDefinedTypeMap(potentialSourceType, targetDestinationType);
+                if (potentialTypeMap == null)
+                {
+                    var targetSourceType = targetDestinationType != destinationType ? potentialSourceType : typeMap.SourceType;
+                    typeMap = FindTypeMap(source, targetSourceType, targetDestinationType, DefaultProfileName);
+                }
+                else
+                    typeMap = potentialTypeMap;
             }
 
 		    return typeMap;
 		}
+
+        private static int GetInheritanceDepth(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+
+            int depth = 0;
+
+            // Keep walking up the inheritance tree until there are no more base classes.
+            while (type != null)
+            {
+                type = type.BaseType;
+                depth++;
+            }
+
+            return depth;
+        }
 
 		public TypeMap FindTypeMapFor(ResolutionResult resolutionResult, Type destinationType)
 		{

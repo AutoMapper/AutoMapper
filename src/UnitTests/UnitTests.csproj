@@ -119,7 +119,6 @@
     <Compile Include="Bug\DuplicateValuesBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
-    <Compile Include="Bug\IncludedMappingShouldInheritBaseMappings.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
@@ -151,6 +150,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MappingExceptions.cs" />
+    <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
+    <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
+    <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
+    <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
+    <Compile Include="MappingInheritance\OverrideIgnore.cs" />
+    <Compile Include="MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs" />
     <Compile Include="MappingOrder.cs" />
     <Compile Include="MemberResolution.cs" />
     <Compile Include="NullBehavior.cs" />

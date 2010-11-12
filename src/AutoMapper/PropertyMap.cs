@@ -5,202 +5,208 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
-	public class PropertyMap
-	{
-		private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
-		private readonly IList<Type> _valueFormattersToSkip = new List<Type>();
-		private readonly IList<IValueFormatter> _valueFormatters = new List<IValueFormatter>();
-		private bool _ignored;
-		private int _mappingOrder;
-		private bool _hasCustomValueResolver;
-		private IValueResolver _customResolver;
-		private IValueResolver _customMemberResolver;
-		private object _nullSubstitute;
-		private bool _sealed;
-		private IValueResolver[] _cachedResolvers;
-	    private Func<ResolutionContext, bool> _condition;
+    public class PropertyMap
+    {
+        private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
+        private readonly IList<Type> _valueFormattersToSkip = new List<Type>();
+        private readonly IList<IValueFormatter> _valueFormatters = new List<IValueFormatter>();
+        private bool _ignored;
+        private int _mappingOrder;
+        private bool _hasCustomValueResolver;
+        private IValueResolver _customResolver;
+        private IValueResolver _customMemberResolver;
+        private object _nullSubstitute;
+        private bool _sealed;
+        private IValueResolver[] _cachedResolvers;
+        private Func<ResolutionContext, bool> _condition;
 
-	    public PropertyMap(IMemberAccessor destinationProperty)
-		{
-			DestinationProperty = destinationProperty;
-		}
+        public PropertyMap(IMemberAccessor destinationProperty)
+        {
+            DestinationProperty = destinationProperty;
+        }
 
-		public IMemberAccessor DestinationProperty { get; private set; }
+        public IMemberAccessor DestinationProperty { get; private set; }
 
         public bool CanBeSet
         {
             get
             {
-				return !(DestinationProperty is PropertyAccessor) ||
-					   ((PropertyAccessor)DestinationProperty).HasSetter;
+                return !(DestinationProperty is PropertyAccessor) ||
+                       ((PropertyAccessor)DestinationProperty).HasSetter;
             }
         }
 
-	    public bool UseDestinationValue { get; set; }
+        public bool UseDestinationValue { get; set; }
 
-	    public IEnumerable<IValueResolver> GetSourceValueResolvers()
-		{
-			if (_customMemberResolver != null)
-				yield return _customMemberResolver;
+        internal bool HasCustomValueResolver
+        {
+            get { return _hasCustomValueResolver; }
+        }
 
-			if (_customResolver != null)
-				yield return _customResolver;
+        public IEnumerable<IValueResolver> GetSourceValueResolvers()
+        {
+            if (_customMemberResolver != null)
+                yield return _customMemberResolver;
 
-			foreach (var resolver in _sourceValueResolvers)
-			{
-				yield return resolver;
-			}
+            if (_customResolver != null)
+                yield return _customResolver;
 
-			if (_nullSubstitute != null)
-				yield return new NullReplacementMethod(_nullSubstitute);
-		}
+            foreach (var resolver in _sourceValueResolvers)
+            {
+                yield return resolver;
+            }
 
-		public void RemoveLastResolver()
-		{
-			_sourceValueResolvers.RemoveLast();
-		}
+            if (_nullSubstitute != null)
+                yield return new NullReplacementMethod(_nullSubstitute);
+        }
 
-		public ResolutionResult ResolveValue(ResolutionContext context)
-		{
-			Seal();
+        public void RemoveLastResolver()
+        {
+            _sourceValueResolvers.RemoveLast();
+        }
 
-			var result = new ResolutionResult(context);
+        public ResolutionResult ResolveValue(ResolutionContext context)
+        {
+            Seal();
 
-			foreach (var resolver in _cachedResolvers)
-			{
-				result = resolver.Resolve(result);
-			}
+            var result = new ResolutionResult(context);
 
-			return result;
-		}
+            foreach (var resolver in _cachedResolvers)
+            {
+                result = resolver.Resolve(result);
+            }
 
-		internal void Seal()
-		{
-			if (_sealed)
-			{
-				return;
-			}
+            return result;
+        }
 
-			_cachedResolvers = GetSourceValueResolvers().ToArray();
-			_sealed = true;
-		}
+        internal void Seal()
+        {
+            if (_sealed)
+            {
+                return;
+            }
 
-		public void ChainResolver(IValueResolver IValueResolver)
-		{
-			_sourceValueResolvers.AddLast(IValueResolver);
-		}
+            _cachedResolvers = GetSourceValueResolvers().ToArray();
+            _sealed = true;
+        }
 
-		public void AddFormatterToSkip<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			_valueFormattersToSkip.Add(typeof(TValueFormatter));
-		}
+        public void ChainResolver(IValueResolver IValueResolver)
+        {
+            _sourceValueResolvers.AddLast(IValueResolver);
+        }
 
-		public bool FormattersToSkipContains(Type valueFormatterType)
-		{
-			return _valueFormattersToSkip.Contains(valueFormatterType);
-		}
+        public void AddFormatterToSkip<TValueFormatter>() where TValueFormatter : IValueFormatter
+        {
+            _valueFormattersToSkip.Add(typeof(TValueFormatter));
+        }
 
-		public void AddFormatter(IValueFormatter valueFormatter)
-		{
-			_valueFormatters.Add(valueFormatter);
-		}
+        public bool FormattersToSkipContains(Type valueFormatterType)
+        {
+            return _valueFormattersToSkip.Contains(valueFormatterType);
+        }
 
-		public IValueFormatter[] GetFormatters()
-		{
-			return _valueFormatters.ToArray();
-		}
+        public void AddFormatter(IValueFormatter valueFormatter)
+        {
+            _valueFormatters.Add(valueFormatter);
+        }
 
-		public void AssignCustomValueResolver(IValueResolver valueResolver)
-		{
-			_customResolver = valueResolver;
-			ResetSourceMemberChain();
-			_hasCustomValueResolver = true;
-		}
+        public IValueFormatter[] GetFormatters()
+        {
+            return _valueFormatters.ToArray();
+        }
 
-		public void ChainTypeMemberForResolver(IValueResolver valueResolver)
-		{
-			ResetSourceMemberChain();
-			_customMemberResolver = valueResolver;
-		}
+        public void AssignCustomValueResolver(IValueResolver valueResolver)
+        {
+            _ignored = false;
+            _customResolver = valueResolver;
+            ResetSourceMemberChain();
+            _hasCustomValueResolver = true;
+        }
 
-		public void ChainConstructorForResolver(IValueResolver valueResolver)
-		{
-			_customResolver = valueResolver;
-		}
+        public void ChainTypeMemberForResolver(IValueResolver valueResolver)
+        {
+            ResetSourceMemberChain();
+            _customMemberResolver = valueResolver;
+        }
 
-		public void Ignore()
-		{
-			_ignored = true;
-		}
+        public void ChainConstructorForResolver(IValueResolver valueResolver)
+        {
+            _customResolver = valueResolver;
+        }
 
-		public bool IsIgnored()
-		{
-			return _ignored;
-		}
+        public void Ignore()
+        {
+            _ignored = true;
+        }
 
-		public void SetMappingOrder(int mappingOrder)
-		{
-			_mappingOrder = mappingOrder;
-		}
+        public bool IsIgnored()
+        {
+            return _ignored;
+        }
 
-		public int GetMappingOrder()
-		{
-			return _mappingOrder;
-		}
+        public void SetMappingOrder(int mappingOrder)
+        {
+            _mappingOrder = mappingOrder;
+        }
 
-		public bool IsMapped()
-		{
-			return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
-		}
+        public int GetMappingOrder()
+        {
+            return _mappingOrder;
+        }
 
-		public bool CanResolveValue()
-		{
-			return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
-		}
+        public bool IsMapped()
+        {
+            return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
+        }
 
-		public void RemoveLastFormatter()
-		{
-			_valueFormatters.RemoveAt(_valueFormatters.Count - 1);
-		}
+        public bool CanResolveValue()
+        {
+            return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
+        }
 
-		public void SetNullSubstitute(object nullSubstitute)
-		{
-			_nullSubstitute = nullSubstitute;
-		}
+        public void RemoveLastFormatter()
+        {
+            _valueFormatters.RemoveAt(_valueFormatters.Count - 1);
+        }
 
-		private void ResetSourceMemberChain()
-		{
-			_sourceValueResolvers.Clear();
-		}
+        public void SetNullSubstitute(object nullSubstitute)
+        {
+            _nullSubstitute = nullSubstitute;
+        }
 
-		public bool Equals(PropertyMap other)
-		{
-			if (ReferenceEquals(null, other)) return false;
-			if (ReferenceEquals(this, other)) return true;
-			return Equals(other.DestinationProperty, DestinationProperty);
-		}
+        private void ResetSourceMemberChain()
+        {
+            _sourceValueResolvers.Clear();
+        }
 
-		public override bool Equals(object obj)
-		{
-			if (ReferenceEquals(null, obj)) return false;
-			if (ReferenceEquals(this, obj)) return true;
-			if (obj.GetType() != typeof(PropertyMap)) return false;
-			return Equals((PropertyMap)obj);
-		}
+        public bool Equals(PropertyMap other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(other.DestinationProperty, DestinationProperty);
+        }
 
-		public override int GetHashCode()
-		{
-			return DestinationProperty.GetHashCode();
-		}
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof(PropertyMap)) return false;
+            return Equals((PropertyMap)obj);
+        }
 
-	    public void ApplyCondition(Func<ResolutionContext, bool> condition)
-	    {
-	        _condition = condition;
-	    }
+        public override int GetHashCode()
+        {
+            return DestinationProperty.GetHashCode();
+        }
 
-	    public bool ShouldAssignValue(ResolutionContext context)
-	    {
-	        return _condition == null || _condition(context);
-	    }
-	}
+        public void ApplyCondition(Func<ResolutionContext, bool> condition)
+        {
+            _condition = condition;
+        }
+
+        public bool ShouldAssignValue(ResolutionContext context)
+        {
+            return _condition == null || _condition(context);
+        }
+    }
 }
