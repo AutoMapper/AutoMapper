@@ -3354,56 +3354,6 @@
             Supports mocking of SMTP Client code.
             </summary>
         </member>
-        <member name="M:NLog.Internal.MySmtpClient.Dispose">
-            <summary>
-            Sends a QUIT message to the SMTP server, gracefully ends the TCP connection, and releases all resources used by the current instance of the <see cref="T:System.Net.Mail.SmtpClient"/> class.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#get_Host">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#set_Host(System.String)">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#get_Port">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#set_Port(System.Int32)">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#get_Credentials">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#set_Credentials(System.Net.ICredentialsByHost)">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#get_EnableSsl">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#set_EnableSsl(System.Boolean)">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
-        <member name="M:NLog.Internal.MySmtpClient.NLog#Internal#ISmtpClient#Send(System.Net.Mail.MailMessage)">
-            <summary>
-            Supports mocking of SMTP Client code.
-            </summary>
-        </member>
         <member name="T:NLog.Internal.NetworkSenders.INetworkSenderFactory">
             <summary>
             Creates instances of <see cref="T:NLog.Internal.NetworkSenders.NetworkSender"/> objects for given URLs.
