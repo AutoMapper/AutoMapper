@@ -1011,45 +1011,52 @@
             </summary>
             <value></value>
         </member>
-        <member name="T:Castle.Components.DictionaryAdapter.AttributesUtil">
+        <member name="T:Castle.Core.Internal.AttributesUtil">
             <summary>
-            Helper class for retrieving attributes.
+              Helper class for retrieving attributes.
             </summary>
         </member>
-        <member name="M:Castle.Components.DictionaryAdapter.AttributesUtil.GetTypeAttribute``1(System.Type)">
+        <member name="M:Castle.Core.Internal.AttributesUtil.GetAttribute``1(System.Reflection.ICustomAttributeProvider)">
             <summary>
-            Gets the type attribute.
+              Gets the attribute.
             </summary>
-            <param name="type">The type.</param>
-            <returns>The type attribute.</returns>
-        </member>
-        <member name="M:Castle.Components.DictionaryAdapter.AttributesUtil.GetAttribute``1(System.Reflection.MemberInfo)">
-            <summary>
-            Gets the attribute.
-            </summary>
-            <param name="member">The member.</param>
+            <param name = "member">The member.</param>
             <returns>The member attribute.</returns>
         </member>
-        <member name="M:Castle.Components.DictionaryAdapter.AttributesUtil.GetTypeAttributes``1(System.Type)">
+        <member name="M:Castle.Core.Internal.AttributesUtil.GetAttributes``1(System.Reflection.ICustomAttributeProvider)">
             <summary>
-            Gets the type attributes.
+              Gets the attributes. Does not consider inherited attributes!
             </summary>
-            <param name="type">The type.</param>
-            <returns>The type attributes.</returns>
-        </member>
-        <member name="M:Castle.Components.DictionaryAdapter.AttributesUtil.GetAttributes``1(System.Reflection.MemberInfo)">
-            <summary>
-            Gets the attributes.
-            </summary>
-            <param name="member">The member.</param>
+            <param name = "member">The member.</param>
             <returns>The member attributes.</returns>
         </member>
-        <member name="M:Castle.Components.DictionaryAdapter.AttributesUtil.GetTypeConverter(System.Reflection.MemberInfo)">
+        <member name="M:Castle.Core.Internal.AttributesUtil.GetTypeAttribute``1(System.Type)">
             <summary>
-            Gets the type converter.
+              Gets the type attribute.
             </summary>
-            <param name="member">The member.</param>
+            <param name = "type">The type.</param>
+            <returns>The type attribute.</returns>
+        </member>
+        <member name="M:Castle.Core.Internal.AttributesUtil.GetTypeAttributes``1(System.Type)">
+            <summary>
+              Gets the type attributes.
+            </summary>
+            <param name = "type">The type.</param>
+            <returns>The type attributes.</returns>
+        </member>
+        <member name="M:Castle.Core.Internal.AttributesUtil.GetTypeConverter(System.Reflection.MemberInfo)">
+            <summary>
+              Gets the type converter.
+            </summary>
+            <param name = "member">The member.</param>
             <returns></returns>
+        </member>
+        <member name="M:Castle.Core.Internal.AttributesUtil.HasAttribute``1(System.Reflection.ICustomAttributeProvider)">
+            <summary>
+              Gets the attribute.
+            </summary>
+            <param name = "member">The member.</param>
+            <returns>The member attribute.</returns>
         </member>
         <member name="T:Castle.Components.DictionaryAdapter.IDynamicValue`1">
             <summary>
@@ -1088,11 +1095,11 @@
         </member>
         <member name="M:Castle.DynamicProxy.IInvocation.GetConcreteMethod">
             <summary>
-            Returns the concrete instantiation of the <see cref="P:Castle.DynamicProxy.IInvocation.Method"/>, with any generic
+            Returns the concrete instantiation of the <see cref="P:Castle.DynamicProxy.IInvocation.Method"/> on the proxy, with any generic
             parameters bound to real types.
             </summary>
             <returns>
-            The concrete instantiation of the <see cref="P:Castle.DynamicProxy.IInvocation.Method"/>, or the <see cref="P:Castle.DynamicProxy.IInvocation.Method"/> if
+            The concrete instantiation of the <see cref="P:Castle.DynamicProxy.IInvocation.Method"/> on the proxy, or the <see cref="P:Castle.DynamicProxy.IInvocation.Method"/> if
             not a generic method.
             </returns>
             <remarks>Can be slower than calling <see cref="P:Castle.DynamicProxy.IInvocation.Method"/>.</remarks>
@@ -1101,10 +1108,11 @@
             <summary>
             Returns the concrete instantiation of <see cref="P:Castle.DynamicProxy.IInvocation.MethodInvocationTarget"/>, with any
             generic parameters bound to real types.
+            For interface proxies, this will point to the <see cref="T:System.Reflection.MethodInfo"/> on the target class.
             </summary>
             <returns>The concrete instantiation of <see cref="P:Castle.DynamicProxy.IInvocation.MethodInvocationTarget"/>, or
             <see cref="P:Castle.DynamicProxy.IInvocation.MethodInvocationTarget"/> if not a generic method.</returns>
-            <remarks>Can be slower than calling <see cref="P:Castle.DynamicProxy.IInvocation.MethodInvocationTarget"/>.</remarks>
+            <remarks>In debug builds this can be slower than calling <see cref="P:Castle.DynamicProxy.IInvocation.MethodInvocationTarget"/>.</remarks>
         </member>
         <member name="M:Castle.DynamicProxy.IInvocation.Proceed">
             <summary>
@@ -1150,7 +1158,7 @@
         </member>
         <member name="P:Castle.DynamicProxy.IInvocation.Method">
             <summary>
-            Gets the <see cref="T:System.Reflection.MethodInfo"/> representing the method being invoked.
+            Gets the <see cref="T:System.Reflection.MethodInfo"/> representing the method being invoked on the proxy.
             </summary>
             <value>The <see cref="T:System.Reflection.MethodInfo"/> representing the method being invoked.</value>
         </member>
@@ -1549,7 +1557,7 @@
             <summary>
               Returns list of all unique interfaces implemented given types, including their base interfaces.
             </summary>
-            <param name="types"></param>
+            <param name = "types"></param>
             <returns></returns>
         </member>
         <member name="M:Castle.DynamicProxy.Generators.MetaEvent.#ctor(System.String,System.Type,System.Type,Castle.DynamicProxy.Generators.MetaMethod,Castle.DynamicProxy.Generators.MetaMethod,System.Reflection.EventAttributes)">
@@ -4390,7 +4398,7 @@
             </summary>
             <param name="type">The <see cref="T:System.Type"/></param>
             <param name="defaultValue">
-            The Default value returned if the convertion fails.
+            The Default value returned if the conversion fails.
             </param>
             <returns>The Value converted into the specified type.</returns>
         </member>
@@ -4744,7 +4752,7 @@
             </summary>
             <remarks>
             Implementors should return <c>true</c>
-            only if the given identificator is supported
+            only if the given identifier is supported
             by the resource factory
             </remarks>
             <param name="uri"></param>

@@ -1,0 +1,551 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Castle.Services.Logging.NLogIntegration</name>
+    </assembly>
+    <members>
+        <member name="T:Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory">
+            <summary>
+            Implementation of <see cref="T:Castle.Core.Logging.IExtendedLoggerFactory"/> for NLog.
+            </summary>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory"/> class.
+            Configures NLog with a config file name 'nlog.config' 
+            <seealso cref="M:Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory.Create(System.String)"/>
+            </summary>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory"/> class with the configfile specified by <paramref name="configFile"/>
+            </summary>
+            <param name="configFile">The config file.</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory.Create(System.String)">
+            <summary>
+            Creates a new extended logger with the specified <paramref name="name"/>.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory.Create(System.String,Castle.Core.Logging.LoggerLevel)">
+            <summary>
+            Not implemented, NLog logger levels cannot be set at runtime.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="level">The level.</param>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"/>
+        </member>
+        <member name="T:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger">
+            <summary>
+            Implementation of <see cref="T:Castle.Core.Logging.IExtendedLogger"/> for NLog.
+            </summary>
+        </member>
+        <member name="T:Castle.Services.Logging.NLogIntegration.NLogLogger">
+            <summary>
+            Implementation of <see cref="T:Castle.Core.Logging.ILogger"/> for NLog.
+            </summary>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.#ctor(NLog.Logger,Castle.Services.Logging.NLogIntegration.NLogFactory)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Castle.Services.Logging.NLogIntegration.NLogLogger"/> class.
+            </summary>
+            <param name="logger">The logger.</param>
+            <param name="factory">The factory.</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.CreateChildLogger(System.String)">
+            <summary>
+            Creates a child logger with the specied <paramref name="name"/>.
+            </summary>
+            <param name="name">The name.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"/> that represents this instance.
+            </summary>
+            <returns>
+            A <see cref="T:System.String"/> that represents this instance.
+            </returns>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Debug(System.String)">
+            <summary>
+            Logs a debug message.
+            </summary>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Debug(System.String,System.Exception)">
+            <summary>
+            Logs a debug message. 
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Debug(System.String,System.Object[])">
+            <summary>
+            Logs a debug message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.DebugFormat(System.String,System.Object[])">
+            <summary>
+            Logs a debug message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.DebugFormat(System.Exception,System.String,System.Object[])">
+            <summary>
+            Logs a debug message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.DebugFormat(System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs a debug message.
+            </summary>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.DebugFormat(System.Exception,System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs a debug message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Info(System.String)">
+            <summary>
+            Logs an info message.
+            </summary>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Info(System.String,System.Exception)">
+            <summary>
+            Logs an info message. 
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Info(System.String,System.Object[])">
+            <summary>
+            Logs an info message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.InfoFormat(System.String,System.Object[])">
+            <summary>
+            Logs an info message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.InfoFormat(System.Exception,System.String,System.Object[])">
+            <summary>
+            Logs an info message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.InfoFormat(System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs an info message.
+            </summary>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.InfoFormat(System.Exception,System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs an info message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Warn(System.String)">
+            <summary>
+            Logs a warn message.
+            </summary>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Warn(System.String,System.Exception)">
+            <summary>
+            Logs a warn message. 
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Warn(System.String,System.Object[])">
+            <summary>
+            Logs a warn message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.WarnFormat(System.String,System.Object[])">
+            <summary>
+            Logs a warn message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.WarnFormat(System.Exception,System.String,System.Object[])">
+            <summary>
+            Logs a warn message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.WarnFormat(System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs a warn message.
+            </summary>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.WarnFormat(System.Exception,System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs a warn message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Error(System.String)">
+            <summary>
+            Logs an error message.
+            </summary>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Error(System.String,System.Exception)">
+            <summary>
+            Logs an error message. 
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Error(System.String,System.Object[])">
+            <summary>
+            Logs an error message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.ErrorFormat(System.String,System.Object[])">
+            <summary>
+            Logs an error message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.ErrorFormat(System.Exception,System.String,System.Object[])">
+            <summary>
+            Logs an error message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.ErrorFormat(System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs an error message.
+            </summary>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.ErrorFormat(System.Exception,System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs an error message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Fatal(System.String)">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Fatal(System.String,System.Exception)">
+            <summary>
+            Logs a fatal message. 
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.Fatal(System.String,System.Object[])">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.FatalFormat(System.String,System.Object[])">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.FatalFormat(System.Exception,System.String,System.Object[])">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.FatalFormat(System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.FatalFormat(System.Exception,System.IFormatProvider,System.String,System.Object[])">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="exception">The exception to log</param>
+            <param name="formatProvider">The format provider to use</param>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.FatalError(System.String,System.Object[])">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="format">Format string for the message to log</param>
+            <param name="args">Format arguments for the message to log</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.FatalError(System.String,System.Exception)">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="message">The message to log</param>
+            <param name="exception">The exception</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogLogger.FatalError(System.String)">
+            <summary>
+            Logs a fatal message.
+            </summary>
+            <param name="message">The message to log</param>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.NLogLogger.Logger">
+            <summary>
+            Gets or sets the logger.
+            </summary>
+            <value>The logger.</value>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.NLogLogger.Factory">
+            <summary>
+            Gets or sets the factory.
+            </summary>
+            <value>The factory.</value>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.NLogLogger.IsDebugEnabled">
+            <summary>
+            Determines if messages of priority "debug" will be logged.
+            </summary>
+            <value>True if "debug" messages will be logged.</value> 
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.NLogLogger.IsInfoEnabled">
+            <summary>
+            Determines if messages of priority "info" will be logged.
+            </summary>
+            <value><c>true</c> if "info" messages will be logged, <c>false</c> otherwise</value> 
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.NLogLogger.IsWarnEnabled">
+            <summary>
+            Determines if messages of priority "warn" will be logged.
+            </summary>
+            <value><c>true</c> if "warn" messages will be logged, <c>false</c> otherwise</value> 
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.NLogLogger.IsErrorEnabled">
+            <summary>
+            Determines if messages of priority "error" will be logged.
+            </summary>
+            <value><c>true</c> if "error" messages will be logged, <c>false</c> otherwise</value> 
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.NLogLogger.IsFatalEnabled">
+            <summary>
+            Determines if messages of priority "fatal" will be logged.
+            </summary>
+            <value><c>true</c> if "fatal" messages will be logged, <c>false</c> otherwise</value> 
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.NLogLogger.IsFatalErrorEnabled">
+            <summary>
+            Determines if messages of priority "fatal" will be logged.
+            </summary>
+            <value><c>true</c> if "fatal" messages will be logged, <c>false</c> otherwise</value> 
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger.#ctor(NLog.Logger,Castle.Services.Logging.NLogIntegration.ExtendedNLogFactory)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger"/> class.
+            </summary>
+            <param name="logger">The logger.</param>
+            <param name="factory">The factory.</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger.CreateChildLogger(System.String)">
+            <summary>
+            Creates a child logger with the specied <paramref name="name"/>.
+            </summary>
+            <param name="name">The name.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger.CreateExtendedChildLogger(System.String)">
+            <summary>
+            Creates an extended child logger with the specified <paramref name="name"/>
+            </summary>
+            <param name="name">The name.</param>
+            <returns></returns>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger.Factory">
+            <summary>
+            Gets or sets the factory.
+            </summary>
+            <value>The factory.</value>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger.GlobalProperties">
+            <summary>
+            Exposes the Global Context of the extended logger. 
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger.ThreadProperties">
+            <summary>
+            Exposes the Thread Context of the extended logger.
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.ExtendedNLogLogger.ThreadStacks">
+            <summary>
+            Exposes the Thread Stack of the extended logger.
+            </summary>
+        </member>
+        <member name="T:Castle.Services.Logging.NLogIntegration.GlobalContextProperties">
+            <summary>
+            Used to access <see cref="T:NLog.GlobalDiagnosticsContext"/>
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.GlobalContextProperties.Item(System.String)">
+            <summary>
+            Gets or sets the value of a property
+            </summary>
+            <value>
+            The value for the property with the specified key
+            </value>
+            <remarks>
+            <para>
+            Gets or sets the value of a property
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Castle.Services.Logging.NLogIntegration.NLogFactory">
+            <summary>
+            Implementation of <see cref="T:Castle.Core.Logging.ILoggerFactory"/> for NLog.
+            </summary>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogFactory.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Castle.Services.Logging.NLogIntegration.NLogFactory"/> class.
+            </summary>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogFactory.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Castle.Services.Logging.NLogIntegration.NLogFactory"/> class.
+            </summary>
+            <param name="configFile">The config file.</param>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogFactory.Create(System.String)">
+            <summary>
+            Creates a logger with specified <paramref name="name"/>.
+            </summary>
+            <param name="name">The name.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.NLogFactory.Create(System.String,Castle.Core.Logging.LoggerLevel)">
+            <summary>
+            Not implemented, NLog logger levels cannot be set at runtime.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="level">The level.</param>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"/>
+        </member>
+        <member name="T:Castle.Services.Logging.NLogIntegration.ThreadContextProperties">
+            <summary>
+            Used to access to <see cref="T:NLog.MappedDiagnosticsContext"/>
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.ThreadContextProperties.Item(System.String)">
+            <summary>
+            Gets or sets the value of a property
+            </summary>
+            <value>
+            The value for the property with the specified key
+            </value>
+            <remarks>
+            <para>
+            Gets or sets the value of a property
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Castle.Services.Logging.NLogIntegration.ThreadContextStack">
+            <summary>
+            Used to access <see cref="T:NLog.NestedDiagnosticsContext"/>
+            </summary>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ThreadContextStack.Clear">
+            <summary>
+            Clears current thread NDC stack.
+            </summary>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ThreadContextStack.Pop">
+            <summary>
+            Pops the top message off the NDC stack.
+            </summary>
+            <returns>The top message which is no longer on the stack.</returns>
+        </member>
+        <member name="M:Castle.Services.Logging.NLogIntegration.ThreadContextStack.Push(System.String)">
+            <summary>
+            Pushes the specified text on current thread NDC.
+            </summary>
+            <param name="message">The message to be pushed.</param>
+            <returns>An instance of the object that implements IDisposable that returns the stack to the previous level when IDisposable.Dispose() is called. To be used with C# using() statement.</returns>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.ThreadContextStack.Count">
+            <summary>
+            Not implemented.
+            </summary>
+            <exception cref="T:System.NotImplementedException"/>
+        </member>
+        <member name="T:Castle.Services.Logging.NLogIntegration.ThreadContextStacks">
+            <summary>
+            </summary>
+        </member>
+        <member name="P:Castle.Services.Logging.NLogIntegration.ThreadContextStacks.Item(System.String)">
+            <summary>
+            Gets the single <see cref="T:Castle.Core.Logging.IContextStack"/>.
+            </summary>
+            <value>The value of <param name="key"></param> is ignored because NLog only has a single stack</value>
+        </member>
+    </members>
+</doc>
