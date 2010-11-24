@@ -38,6 +38,11 @@ namespace AutoMapper
 
 	    public bool UseDestinationValue { get; set; }
 
+        internal bool HasCustomValueResolver
+        {
+            get { return _hasCustomValueResolver; }
+        }
+
 	    public IEnumerable<IValueResolver> GetSourceValueResolvers()
 		{
 			if (_customMemberResolver != null)
@@ -112,6 +117,7 @@ namespace AutoMapper
 
 		public void AssignCustomValueResolver(IValueResolver valueResolver)
 		{
+            _ignored = false;
 			_customResolver = valueResolver;
 			ResetSourceMemberChain();
 			_hasCustomValueResolver = true;
@@ -150,12 +156,12 @@ namespace AutoMapper
 
 		public bool IsMapped()
 		{
-			return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
+            return _sourceValueResolvers.Count > 0 || HasCustomValueResolver || _ignored;
 		}
 
 		public bool CanResolveValue()
 		{
-			return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
+            return (_sourceValueResolvers.Count > 0 || HasCustomValueResolver || UseDestinationValue) && !_ignored;
 		}
 
 		public void RemoveLastFormatter()

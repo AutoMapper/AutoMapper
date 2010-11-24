@@ -11,6 +11,7 @@ namespace AutoMapper
 		private readonly TypeInfo _destinationType;
 		private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
 		private readonly IList<PropertyMap> _propertyMaps = new List<PropertyMap>();
+        private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
 		private PropertyMap[] _orderedPropertyMaps;
 		private readonly TypeInfo _sourceType;
 		private bool _sealed;
@@ -68,13 +69,28 @@ namespace AutoMapper
             if (_sealed)
                 return _orderedPropertyMaps;
 
-		    return _propertyMaps;
+            return _propertyMaps.Concat(_inheritedMaps);
 		}
+
+        public void ReplacePropertyMap(PropertyMap propertyMap)
+        {
+            var existingProperty = _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(propertyMap.DestinationProperty.Name));
+
+            if (existingProperty != null)
+                _propertyMaps.Remove(existingProperty);
+
+            _propertyMaps.Add(propertyMap);
+        }
 
 		public void AddPropertyMap(PropertyMap propertyMap)
 		{
 			_propertyMaps.Add(propertyMap);
 		}
+
+        protected void AddInheritedMap(PropertyMap propertyMap)
+        {
+            _inheritedMaps.Add(propertyMap);
+        }
 
 		public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IValueResolver> resolvers)
 		{
@@ -90,16 +106,20 @@ namespace AutoMapper
 			var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
 				.Select(pm => pm.DestinationProperty.Name);
 
+            var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
+                .Select(pm => pm.DestinationProperty.Name);
+
 		    var properties = _destinationType.GetPublicWriteAccessors()
 		        .Select(p => p.Name)
-		        .Except(autoMappedProperties);
+		        .Except(autoMappedProperties)
+                .Except(inheritedProperties);
 
 		    return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
 		}
 
 		public PropertyMap FindOrCreatePropertyMapFor(IMemberAccessor destinationProperty)
 		{
-			var propertyMap = _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+            var propertyMap = GetExistingPropertyMapFor(destinationProperty);
 			if (propertyMap == null)
 			{
 				propertyMap = new PropertyMap(destinationProperty);
@@ -151,12 +171,43 @@ namespace AutoMapper
 			if (_sealed)
 				return;
 
-			_orderedPropertyMaps = _propertyMaps.OrderBy(map => map.GetMappingOrder()).ToArray();
+            _orderedPropertyMaps =
+                _propertyMaps
+                .Union(_inheritedMaps)
+                .OrderBy(map => map.GetMappingOrder()).ToArray();
 
 			_orderedPropertyMaps.Each(pm => pm.Seal());
 
 			_sealed = true;
 		}
+
+        public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
+        {
+            if (_includedDerivedTypes.ContainsKey(derivedSourceType))
+                return _includedDerivedTypes[derivedSourceType].IsAssignableFrom(derivedDestinationType);
+            return false;
+        }
+
+        public PropertyMap GetExistingPropertyMapFor(IMemberAccessor destinationProperty)
+        {
+            return _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name))
+                   ??
+                   _inheritedMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+        }
+
+        public void AddInheritedPropertyMap(PropertyMap mappedProperty)
+        {
+            _inheritedMaps.Add(mappedProperty);
+        }
+
+        public void InheritTypes(TypeMap inheritedTypeMap)
+        {
+            foreach (var includedDerivedType in inheritedTypeMap._includedDerivedTypes
+                .Where(includedDerivedType => !_includedDerivedTypes.Contains(includedDerivedType)))
+            {
+                _includedDerivedTypes.Add(includedDerivedType);
+            }
+        }
 
 		public bool Equals(TypeMap other)
 		{

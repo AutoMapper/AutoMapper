@@ -145,6 +145,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MappingExceptions.cs" />
+    <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
+    <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
+    <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
+    <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
+    <Compile Include="MappingInheritance\OverrideIgnore.cs" />
+    <Compile Include="MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs" />
     <Compile Include="MappingOrder.cs" />
     <Compile Include="MemberResolution.cs" />
     <Compile Include="NullBehavior.cs" />
