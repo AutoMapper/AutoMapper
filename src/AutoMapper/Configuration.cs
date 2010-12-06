@@ -179,7 +179,7 @@ namespace AutoMapper
 
 				typeMap = _typeMapFactory.CreateTypeMap(source, destination, profileConfiguration);
 
-                IncludeBaseMappings(source, destination, typeMap);
+			    InheritConfigurations(source, destination, typeMap);
 
                 typeMap.Profile = profileName;
 			    typeMap.IgnorePropertiesStartingWith = _globalIgnore;
@@ -193,39 +193,52 @@ namespace AutoMapper
 			return typeMap;
 		}
 
-        private void IncludeBaseMappings(Type source, Type destination, TypeMap typeMap)
-        {
+	    private void InheritConfigurations(Type source, Type destination, TypeMap typeMap)
+	    {
             foreach (var inheritedTypeMap in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
             {
-                foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
+                IncludeBaseMappings(typeMap, inheritedTypeMap);
+                IncludeBeforeAfterMaps(typeMap, inheritedTypeMap);
+            }
+	    }
+
+        private static void IncludeBeforeAfterMaps(TypeMap typeMap, TypeMap inheritedTypeMap)
+	    {
+            typeMap.AddAfterMapAction(inheritedTypeMap.AfterMap);
+            typeMap.AddBeforeMapAction(inheritedTypeMap.BeforeMap);
+	    }
+
+        private static void IncludeBaseMappings(TypeMap typeMap, TypeMap inheritedTypeMap)
+        {
+            foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
+            {
+                var conventionPropertyMap = typeMap.GetPropertyMaps()
+                    .SingleOrDefault(m =>
+                                     m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
+
+                if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
+                    conventionPropertyMap.AssignCustomValueResolver(
+                        inheritedMappedProperty.GetSourceValueResolvers().First());
+                else if (conventionPropertyMap == null)
                 {
-                    var conventionPropertyMap = typeMap.GetPropertyMaps()
-                        .SingleOrDefault(m =>
-                                         m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
+                    var propertyMap = new PropertyMap(inheritedMappedProperty.DestinationProperty);
 
-                    if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
-                        conventionPropertyMap.AssignCustomValueResolver(inheritedMappedProperty.GetSourceValueResolvers().First());
-                    else if (conventionPropertyMap == null)
+                    if (inheritedMappedProperty.IsIgnored())
+                        propertyMap.Ignore();
+                    else
                     {
-                        var propertyMap = new PropertyMap(inheritedMappedProperty.DestinationProperty);
-
-                        if (inheritedMappedProperty.IsIgnored())
-                            propertyMap.Ignore();
-                        else
+                        foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
                         {
-                            foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
-                            {
-                                propertyMap.ChainResolver(sourceValueResolver);
-                            }
+                            propertyMap.ChainResolver(sourceValueResolver);
                         }
-
-                        typeMap.AddInheritedPropertyMap(propertyMap);
                     }
+
+                    typeMap.AddInheritedPropertyMap(propertyMap);
                 }
             }
         }
 
-		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
 			return GetProfile(DefaultProfileName).AddFormatter<TValueFormatter>();
 		}

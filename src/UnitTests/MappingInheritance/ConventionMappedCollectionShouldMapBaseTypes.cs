@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.UnitTests.MappingInheritance
 {
     [TestFixture]
     public class ConventionMappedCollectionShouldMapBaseTypes
     {
+        [SetUp]
+        public void SetUp()
+        {
+            Mapper.Reset();
+        }
 
         private class ItemBase{}
         private class GeneralItem : ItemBase {}

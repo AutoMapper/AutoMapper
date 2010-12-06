@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.UnitTests.MappingInheritance
 {
     [TestFixture]
     public class PropertyOnMappingShouldResolveMostSpecificType
