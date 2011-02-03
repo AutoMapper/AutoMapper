@@ -84,6 +84,11 @@ namespace AutoMapper
 
             return new ResolutionExpression(_typeMap.SourceType, _propertyMap);
         }
+
+	    public void Ignore()
+	    {
+	        _propertyMap.Ignore();
+	    }
 	}
 
 	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator

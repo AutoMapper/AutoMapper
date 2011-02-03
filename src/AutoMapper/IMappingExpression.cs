@@ -36,6 +36,7 @@ namespace AutoMapper
         IResolutionExpression ResolveUsing(IValueResolver valueResolver);
         IResolverConfigurationExpression ResolveUsing(Type valueResolverType);
         IResolverConfigurationExpression ResolveUsing<TValueResolver>();
+        void Ignore();
     }
 
     public interface IMemberConfigurationExpression<TSource>
