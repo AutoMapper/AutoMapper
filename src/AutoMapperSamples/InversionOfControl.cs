@@ -39,7 +39,7 @@ namespace AutoMapperSamples
                 var configurationProvider = ObjectFactory.GetInstance<IConfigurationProvider>();
                 configurationProvider.ShouldBeTheSameAs(configuration1);
 
-                var configuration = ObjectFactory.GetInstance<AutoMapper.Configuration>();
+                var configuration = ObjectFactory.GetInstance<ConfigurationStore>();
                 configuration.ShouldBeTheSameAs(configuration1);
                 
                 configuration1.CreateMap<Source, Destination>();
@@ -75,16 +75,16 @@ namespace AutoMapperSamples
         {
             public ConfigurationRegistry()
             {
-				ForRequestedType<AutoMapper.Configuration>()
+				ForRequestedType<ConfigurationStore>()
 					.CacheBy(InstanceScope.Singleton)
-					.TheDefault.Is.OfConcreteType<AutoMapper.Configuration>()
+					.TheDefault.Is.OfConcreteType<ConfigurationStore>()
 					.CtorDependency<IEnumerable<IObjectMapper>>().Is(expr => expr.ConstructedBy(MapperRegistry.AllMappers));
 
                 ForRequestedType<IConfigurationProvider>()
-					.TheDefault.Is.ConstructedBy(ctx => ctx.GetInstance<AutoMapper.Configuration>());
+					.TheDefault.Is.ConstructedBy(ctx => ctx.GetInstance<ConfigurationStore>());
 
                 ForRequestedType<IConfiguration>()
-					.TheDefault.Is.ConstructedBy(ctx => ctx.GetInstance<AutoMapper.Configuration>());
+					.TheDefault.Is.ConstructedBy(ctx => ctx.GetInstance<ConfigurationStore>());
 
                 ForRequestedType<IMappingEngine>().TheDefaultIsConcreteType<MappingEngine>();
 
