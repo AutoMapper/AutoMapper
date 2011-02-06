@@ -125,7 +125,7 @@ namespace AutoMapper
         {
             TypeMap typeMap = CreateTypeMap(typeof(TSource), typeof(TDestination), profileName);
 
-            return new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor);
+            return CreateMappingExpression<TSource, TDestination>(typeMap);
         }
 
 		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
@@ -137,7 +137,7 @@ namespace AutoMapper
 		{
 			var typeMap = CreateTypeMap(sourceType, destinationType, profileName);
 
-			return new MappingExpression(typeMap, _serviceCtor);
+			return CreateMappingExpression(typeMap, destinationType);
 		}
 
 		public void RecognizePrefixes(params string[] prefixes)
@@ -387,6 +387,41 @@ namespace AutoMapper
 	    {
 	        return _mappers.ToArray();
 	    }
+
+		private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(TypeMap typeMap)
+		{
+			IMappingExpression<TSource, TDestination> mappingExp =
+				new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor);
+			/// Custom Hack
+			TypeInfo destInfo = new TypeInfo(typeof(TDestination));
+			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
+			{
+				object[] attrs = destProperty.GetCustomAttributes(true);
+				if (attrs.Any(x => x is IgnoreMapAttribute))
+				{
+					mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
+				}
+			}
+
+			return mappingExp;
+		}
+
+		private IMappingExpression CreateMappingExpression(TypeMap typeMap, Type destinationType)
+		{
+			IMappingExpression mappingExp = new MappingExpression(typeMap, _serviceCtor);
+
+			TypeInfo destInfo = new TypeInfo(destinationType);
+			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
+			{
+				object[] attrs = destProperty.GetCustomAttributes(true);
+				if (attrs.Any(x => x is IgnoreMapAttribute))
+				{
+					mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
+				}
+			}
+
+			return mappingExp;
+		}
 
 		private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
 		{
