@@ -212,5 +212,26 @@ namespace AutoMapper
 	    {
             Configuration.AddGlobalIgnore(startingwith);
 	    }
+
+		public struct MappingHelper<TSource>
+		{
+			private readonly TSource _source;
+
+			internal MappingHelper(TSource source)
+			{
+				_source = source;
+			}
+
+			public TDestination To<TDestination>()
+			{
+				return Map<TSource, TDestination>(_source);
+			}
+		}
+
+		public static MappingHelper<TSource> Map<TSource>(TSource source)
+		{
+			return new MappingHelper<TSource>(source);
+		}
+
 	}
 }
