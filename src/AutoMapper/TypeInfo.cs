@@ -70,10 +70,12 @@ namespace AutoMapper
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
     	{
 			// Collect that target type, its base type, and all implemented/inherited interface types
-			IEnumerable<Type> typesToScan = new[] { Type, Type.BaseType };
+            var typesToScan = new List<Type>();
+            for (var t = Type; t != null; t = t.BaseType)
+                typesToScan.Add(t);
 
     		if (Type.IsInterface)
-    			typesToScan = typesToScan.Concat(Type.GetInterfaces());
+    			typesToScan.AddRange(Type.GetInterfaces());
 
     		// Scan all types for public properties and fields
     		return typesToScan
