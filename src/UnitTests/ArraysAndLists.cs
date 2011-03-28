@@ -359,6 +359,7 @@ namespace AutoMapper.UnitTests
 
 			public class DestItem
 			{
+                public int Id { get; set; }
 				public int Value { get; set; }
 			}
 
@@ -386,17 +387,26 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_source = new Source { Values = new List<SourceItem> { new SourceItem { Value = 5 }, new SourceItem { Value = 10 } } };
+			    _source = new Source {Values = new List<SourceItem> {new SourceItem {Value = 5 }, new SourceItem {Value = 10 } } };
 				_destination = new Destination();
 				_destination.Values.Add(new DestItem());
-				Mapper.Map(_source, _destination);
 			}
 			
 			[Test]
 			public void Should_clear_the_list_before_mapping()
 			{
+                Mapper.Map(_source, _destination);
 				_destination.Values.Count.ShouldEqual(2);
 			}
+            [Test]
+            public void Should_map_to_existing_items_if_count_of_items_is_equal()
+            {
+                _destination.Values.Add(new DestItem{Id = 5});
+                Mapper.Map(_source, _destination);
+                _destination.Values.Count.ShouldEqual(2);
+                _destination.Values[0].Id.ShouldEqual(0);
+                _destination.Values[1].Id.ShouldEqual(5);
+            }
 		}
 
         public class When_mapping_a_collection_with_null_members : AutoMapperSpecBase

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AutoMapper.Mappers
 {
@@ -29,7 +30,7 @@ namespace AutoMapper.Mappers
         #region Nested type: EnumerableMapper
 
         private class EnumerableMapper<TCollection, TElement> : EnumerableMapperBase<TCollection>
-            where TCollection : ICollection<TElement>
+            where TCollection : IList<TElement>
         {
             public override bool IsMatch(ResolutionContext context)
             {
@@ -38,7 +39,14 @@ namespace AutoMapper.Mappers
 
             protected override void SetElementValue(TCollection destination, object mappedValue, int index)
             {
-                destination.Add((TElement)mappedValue);
+                if (destination.Count < index)
+                {
+                    destination.Add((TElement) mappedValue);
+                }
+                else
+                {
+                    destination[index] = (TElement) mappedValue;
+                }
             }
 
             protected override void ClearEnumerable(TCollection enumerable)
