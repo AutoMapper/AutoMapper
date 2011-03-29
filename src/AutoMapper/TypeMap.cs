@@ -64,6 +64,8 @@ namespace AutoMapper
 
         public List<string> IgnorePropertiesStartingWith { get; set; }
 
+        public Type DestinationTypeOverride { get; set; }
+
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {
             if (_sealed)
