@@ -312,3 +312,7 @@ namespace AutoMapper
 		}
 	}
 }
+        public void As<T>()
+        {
+            _typeMap.DestinationTypeOverride = typeof(T);
+        }

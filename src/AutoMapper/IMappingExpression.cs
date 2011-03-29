@@ -28,6 +28,7 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
         IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>;
         IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor);
+        void As<T>();
     }
 
     public interface IMemberConfigurationExpression
