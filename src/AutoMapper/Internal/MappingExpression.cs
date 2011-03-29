@@ -310,9 +310,11 @@ namespace AutoMapper
 
 			memberOptions(this);
 		}
-	}
-}
+
         public void As<T>()
         {
             _typeMap.DestinationTypeOverride = typeof(T);
         }
+	}
+}
+
