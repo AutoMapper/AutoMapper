@@ -29,6 +29,7 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>;
         IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor);
         void As<T>();
+        IMappingExpression<TSource, TDestination> MaxDepth(int depth);
     }
 
     public interface IMemberConfigurationExpression
