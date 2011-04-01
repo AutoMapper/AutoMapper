@@ -15,6 +15,7 @@ namespace AutoMapper
         private PropertyMap[] _orderedPropertyMaps;
         private readonly TypeInfo _sourceType;
         private bool _sealed;
+        private Func<ResolutionContext, bool> _condition;
 
         public TypeMap(TypeInfo sourceType, TypeInfo destinationType)
         {
@@ -226,6 +227,16 @@ namespace AutoMapper
             {
                 _includedDerivedTypes.Add(includedDerivedType);
             }
+        }
+
+        public void SetCondition(Func<ResolutionContext, bool> condition)
+        {
+            _condition = condition;
+        }
+
+        public bool ShouldAssignValue(ResolutionContext resolutionContext)
+        {
+            return _condition == null || _condition(resolutionContext);
         }
     }
 }
