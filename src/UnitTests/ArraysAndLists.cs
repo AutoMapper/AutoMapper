@@ -380,9 +380,10 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
-				Mapper.CreateMap<SourceItem, DestItem>();
+			    Mapper.CreateMap<Source, Destination>()
+			        .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
+			    Mapper.CreateMap<SourceItem, DestItem>()
+			        .ForMember(dest => dest.Id, opt => opt.Ignore());
 			}
 
 			protected override void Because_of()
@@ -401,6 +402,8 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_map_to_existing_items_if_count_of_items_is_equal()
             {
+                _destination.Values.Clear();
+                _destination.Values.Add(new DestItem());
                 _destination.Values.Add(new DestItem{Id = 5});
                 Mapper.Map(_source, _destination);
                 _destination.Values.Count.ShouldEqual(2);

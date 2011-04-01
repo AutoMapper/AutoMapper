@@ -14,10 +14,10 @@ namespace AutoMapper.Mappers
 		    bool mapToExisting = true;
 
 			var sourceValue = (IEnumerable)context.SourceValue ?? new object[0];
-			IEnumerable<object> enumerableSourceValues = sourceValue.Cast<object>();
+			IList<object> enumerableSourceValues = sourceValue.Cast<object>().ToList();
             
             var destinationValue = (IEnumerable)context.DestinationValue ?? new object[0];
-			IEnumerable<object> enumerableDestinationValues = destinationValue.Cast<object>();
+			IList<object> enumerableDestinationValues = destinationValue.Cast<object>().ToList();
 
             Type sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceValue);
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
@@ -27,36 +27,56 @@ namespace AutoMapper.Mappers
 
             //Careful don't wipe out and set the destination unless you mean it
 			var destination = (context.DestinationValue ?? CreateDestinationObject(context, destElementType, sourceLength, mapper));
-			var enumerable = GetEnumerableFor(destination);
+			var enumerableDestination = GetEnumerableFor(destination);
 
             //Validate that incoming context has UseDestinationValue set, then if source and destination sizes are equal don't clear but map to existing items.
-            if (!context.PropertyMap.UseDestinationValue || sourceLength != destinationLength)
+            if (context.PropertyMap != null && !context.PropertyMap.UseDestinationValue || sourceLength != destinationLength)
             {
-                ClearEnumerable(enumerable);
+                ClearEnumerable(enumerableDestination);
                 mapToExisting = false;
             }
 
-		    int i = 0;
-			foreach (object item in enumerableSourceValues)
-			{
-				var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, i);
-				var elementResolutionResult = new ResolutionResult(newContext);
+            if (mapToExisting)
+            {
+                int sourceCount = enumerableSourceValues.Count();
+                for (int j = 0; j < sourceCount; j++)
+                {
+                    var item = enumerableSourceValues[j];
+                    var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, j);
+                    var elementResolutionResult = new ResolutionResult(newContext);
 
-				var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(elementResolutionResult, destElementType);
+                    var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(elementResolutionResult, destElementType);
 
-				Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
-                Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;
+                    Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
+                    newContext = context.CreateMemberContext(typeMap, item, enumerableDestinationValues[j], targetSourceType, newContext.PropertyMap);
+                    mapper.Map(newContext);
+                }
 
-				newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, i);
 
-				object mappedValue = mapper.Map(newContext);
+            }
+            else
+            {
+                int i = 0;
+                foreach (object item in enumerableSourceValues)
+                {
+                    var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, i);
+                    var elementResolutionResult = new ResolutionResult(newContext);
 
-				SetElementValue(enumerable, mappedValue, i);
+                    var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(elementResolutionResult, destElementType);
 
-				i++;
-			}
+                    Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
+                    Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;
 
-			object valueToAssign = destination;
+                    newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, i);
+
+                    object mappedValue = mapper.Map(newContext);
+
+                    SetElementValue(enumerableDestination, mappedValue, i);
+
+                    i++;
+                }
+            }
+		    object valueToAssign = destination;
 			return valueToAssign;
 		}
 
