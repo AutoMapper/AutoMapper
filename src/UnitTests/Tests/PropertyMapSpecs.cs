@@ -5,12 +5,12 @@ using Machine.Specifications;
 
 namespace AutoMapper.UnitTests.Tests
 {
-    [Subject(typeof(PropertyMap), "SourceMember property")]
     public abstract class PropertyMap_SourceMember_Specs
     {
         Establish context = () => Mapper.CreateMap<Source, Destination>()
             .ForMember(d => d.Ignored, o => o.Ignore())
             .ForMember(d => d.RenamedField, o => o.MapFrom(s => s.NamedProperty));
+
         Cleanup after = () => Mapper.Reset();
 
         protected class Source
@@ -34,7 +34,8 @@ namespace AutoMapper.UnitTests.Tests
         }
     }
 
-    public class When_getting_the_SourceMember_of_a_PropertyMap_where_members_have_matching_names : PropertyMap_SourceMember_Specs
+    [Subject(typeof(PropertyMap), ".SourceMember")]
+    public class when_members_have_matching_names : PropertyMap_SourceMember_Specs
     {
         const string memberName = "PropertyWithMatchingName";
         static MemberInfo sourceMember;
@@ -51,7 +52,8 @@ namespace AutoMapper.UnitTests.Tests
             sourceMember.ShouldBeTheSameAs(typeof(Source).GetProperty(memberName));
     }
 
-    public class When_getting_the_SourceMember_of_a_PropertyMap_where_the_destination_member_is_flattened : PropertyMap_SourceMember_Specs
+    [Subject(typeof(PropertyMap), ".SourceMember")]
+    public class when_the_destination_member_is_flattened : PropertyMap_SourceMember_Specs
     {
         static MemberInfo sourceMember;
 
@@ -67,7 +69,8 @@ namespace AutoMapper.UnitTests.Tests
             sourceMember.ShouldBeTheSameAs(typeof(NestedSource).GetField("SomeField"));
     }
 
-    public class When_getting_the_SourceMember_of_a_PropertyMap_where_the_destination_member_is_ignored : PropertyMap_SourceMember_Specs
+    [Subject(typeof(PropertyMap), ".SourceMember")]
+    public class when_the_destination_member_is_ignored : PropertyMap_SourceMember_Specs
     {
         static Exception exception;
         static MemberInfo sourceMember;
@@ -85,7 +88,8 @@ namespace AutoMapper.UnitTests.Tests
         It should_be_null = () => sourceMember.ShouldBeNull();
     }
 
-    public class When_getting_the_SourceMember_of_a_PropertyMap_where_the_destination_member_is_projected : PropertyMap_SourceMember_Specs
+    [Subject(typeof(PropertyMap), ".SourceMember")]
+    public class when_the_destination_member_is_projected : PropertyMap_SourceMember_Specs
     {
         static MemberInfo sourceMember;
 
