@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using AutoMapper.Internal;
 
 namespace AutoMapper
@@ -26,6 +27,14 @@ namespace AutoMapper
         }
 
         public IMemberAccessor DestinationProperty { get; private set; }
+
+        public MemberInfo SourceMember
+        {
+            get
+            {
+                return GetSourceValueResolvers().OfType<IMemberGetter>().Single().MemberInfo;
+            }
+        }
 
         public bool CanBeSet
         {
