@@ -107,4 +107,37 @@ namespace AutoMapper.UnitTests.Tests
         It should_have_the_projected_member_of_the_source_type_as_value = () =>
             sourceMember.ShouldBeTheSameAs(typeof(Source).GetProperty("NamedProperty"));
     }
+
+    public abstract class using_nongeneric_configuration : PropertyMap_SourceMember_Specs
+    {
+        Establish context = () => Mapper.CreateMap(typeof(Source), typeof(Destination))
+            .ForMember("RenamedProperty", o => o.MapFrom("NamedProperty"));
+
+        protected class Source
+        {
+            public int NamedProperty { get; set; }
+        }
+
+        protected class Destination
+        {
+            public string RenamedProperty { get; set; }
+        }
+    }
+
+    [Subject(typeof(PropertyMap), ".SourceMember")]
+    public class when_the_destination_property_is_projected : using_nongeneric_configuration
+    {
+        static MemberInfo sourceMember;
+
+        Because of = () => sourceMember =
+            Mapper.FindTypeMapFor<Source, Destination>()
+                .GetPropertyMaps()
+                .Single(pm => pm.DestinationProperty.Name == "RenamedProperty")
+                .SourceMember;
+
+        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+
+        It should_have_the_projected_member_of_the_source_type_as_value = () =>
+            sourceMember.ShouldBeTheSameAs(typeof(Source).GetProperty("NamedProperty"));
+    }
 }

@@ -57,7 +57,9 @@ namespace AutoMapper
 	        var members = _typeMap.SourceType.GetMember(sourceMember);
             if (!members.Any()) throw new AutoMapperConfigurationException(string.Format("Unable to find source member {0} on type {1}", sourceMember, _typeMap.SourceType.FullName));
             if (members.Skip(1).Any()) throw new AutoMapperConfigurationException(string.Format("Source member {0} is ambiguous on type {1}", sourceMember, _typeMap.SourceType.FullName));
-            _propertyMap.AssignCustomValueResolver( members.Single().ToMemberGetter() );
+            var member = members.Single();
+            _propertyMap.SourceMember = member;
+            _propertyMap.AssignCustomValueResolver(member.ToMemberGetter());
 	    }
 
 	    public IResolutionExpression ResolveUsing(IValueResolver valueResolver)
