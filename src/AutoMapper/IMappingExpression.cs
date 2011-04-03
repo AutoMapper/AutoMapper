@@ -49,7 +49,8 @@ namespace AutoMapper
         IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver;
         IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType);
         IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver);
-        void MapFrom<TMember>(Func<TSource, TMember> sourceMember);
+        void ResolveUsing(Func<TSource, object> resolver);
+        void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
         void Ignore();
         void SetMappingOrder(int mappingOrder);
         void UseDestinationValue();
@@ -71,13 +72,13 @@ namespace AutoMapper
 
     public interface IResolutionExpression<TSource> : IResolutionExpression
     {
-        void FromMember(Func<TSource, object> sourceMember);
+        void FromMember(Expression<Func<TSource, object>> sourceMember);
     }
 
     public interface IResolverConfigurationExpression<TSource, TValueResolver>
         where TValueResolver : IValueResolver
     {
-        IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Func<TSource, object> sourceMember);
+        IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Expression<Func<TSource, object>> sourceMember);
         IResolverConfigurationExpression<TSource, TValueResolver> FromMember(string sourcePropertyName);
         IResolverConfigurationExpression<TSource, TValueResolver> ConstructedBy(Func<TValueResolver> constructor);
     }

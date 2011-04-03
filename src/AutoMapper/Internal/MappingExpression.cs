@@ -57,7 +57,9 @@ namespace AutoMapper
 	        var members = _typeMap.SourceType.GetMember(sourceMember);
             if (!members.Any()) throw new AutoMapperConfigurationException(string.Format("Unable to find source member {0} on type {1}", sourceMember, _typeMap.SourceType.FullName));
             if (members.Skip(1).Any()) throw new AutoMapperConfigurationException(string.Format("Source member {0} is ambiguous on type {1}", sourceMember, _typeMap.SourceType.FullName));
-            _propertyMap.AssignCustomValueResolver( members.Single().ToMemberGetter() );
+            var member = members.Single();
+            _propertyMap.SourceMember = member;
+            _propertyMap.AssignCustomValueResolver(member.ToMemberGetter());
 	    }
 
 	    public IResolutionExpression ResolveUsing(IValueResolver valueResolver)
@@ -201,9 +203,18 @@ namespace AutoMapper
 			return new ResolutionExpression<TSource>(_propertyMap);
 		}
 
-		public void MapFrom<TMember>(Func<TSource, TMember> sourceMember)
+		public void ResolveUsing(Func<TSource, object> resolver)
 		{
-			_propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember));
+			_propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver));
+		}
+
+		public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
+		{
+            if (sourceMember.Body is MemberExpression)
+            {
+                _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
+            }
+            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile()));
 		}
 
 		public void UseValue<TValue>(TValue value)
