@@ -7,11 +7,14 @@ namespace AutoMapper.UnitTests.Tests
 {
     public abstract class PropertyMap_SourceMember_Specs
     {
+        Cleanup after = () => Mapper.Reset();
+    }
+
+    public abstract class using_generic_configuration : PropertyMap_SourceMember_Specs
+    {
         Establish context = () => Mapper.CreateMap<Source, Destination>()
             .ForMember(d => d.Ignored, o => o.Ignore())
             .ForMember(d => d.RenamedField, o => o.MapFrom(s => s.NamedProperty));
-
-        Cleanup after = () => Mapper.Reset();
 
         protected class Source
         {
@@ -35,7 +38,7 @@ namespace AutoMapper.UnitTests.Tests
     }
 
     [Subject(typeof(PropertyMap), ".SourceMember")]
-    public class when_members_have_matching_names : PropertyMap_SourceMember_Specs
+    public class when_members_have_matching_names : using_generic_configuration
     {
         const string memberName = "PropertyWithMatchingName";
         static MemberInfo sourceMember;
@@ -53,7 +56,7 @@ namespace AutoMapper.UnitTests.Tests
     }
 
     [Subject(typeof(PropertyMap), ".SourceMember")]
-    public class when_the_destination_member_is_flattened : PropertyMap_SourceMember_Specs
+    public class when_the_destination_member_is_flattened : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
@@ -70,7 +73,7 @@ namespace AutoMapper.UnitTests.Tests
     }
 
     [Subject(typeof(PropertyMap), ".SourceMember")]
-    public class when_the_destination_member_is_ignored : PropertyMap_SourceMember_Specs
+    public class when_the_destination_member_is_ignored : using_generic_configuration
     {
         static Exception exception;
         static MemberInfo sourceMember;
@@ -89,7 +92,7 @@ namespace AutoMapper.UnitTests.Tests
     }
 
     [Subject(typeof(PropertyMap), ".SourceMember")]
-    public class when_the_destination_member_is_projected : PropertyMap_SourceMember_Specs
+    public class when_the_destination_member_is_projected : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
