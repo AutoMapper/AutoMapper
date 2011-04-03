@@ -16,9 +16,13 @@ namespace AutoMapper
 	        _propertyMap = propertyMap;
 	    }
 
-	    public void FromMember(Func<TSource, object> sourceMember)
+	    public void FromMember(Expression<Func<TSource, object>> sourceMember)
 		{
-			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
+            if (sourceMember.Body is MemberExpression)
+            {
+                _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
+            }
+            _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember.Compile()));
 		}
 
 		public void FromMember(string sourcePropertyName)
