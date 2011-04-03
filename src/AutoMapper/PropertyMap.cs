@@ -32,7 +32,7 @@ namespace AutoMapper
         {
             get
             {
-                return GetSourceValueResolvers().OfType<IMemberGetter>().Single().MemberInfo;
+                return GetSourceValueResolvers().OfType<IMemberGetter>().Last().MemberInfo;
             }
         }
 
