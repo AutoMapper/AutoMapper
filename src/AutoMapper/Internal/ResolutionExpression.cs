@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 
 namespace AutoMapper
 {
@@ -53,9 +54,13 @@ namespace AutoMapper
 			_propertyMap = propertyMap;
 		}
 
-		public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Func<TSource, object> sourceMember)
+        public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Expression<Func<TSource, object>> sourceMember)
 		{
-			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
+            if (sourceMember.Body is MemberExpression)
+            {
+                _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
+            }
+            _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember.Compile()));
 
 			return this;
 		}

@@ -77,7 +77,7 @@ namespace AutoMapper
     public interface IResolverConfigurationExpression<TSource, TValueResolver>
         where TValueResolver : IValueResolver
     {
-        IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Func<TSource, object> sourceMember);
+        IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Expression<Func<TSource, object>> sourceMember);
         IResolverConfigurationExpression<TSource, TValueResolver> FromMember(string sourcePropertyName);
         IResolverConfigurationExpression<TSource, TValueResolver> ConstructedBy(Func<TValueResolver> constructor);
     }
