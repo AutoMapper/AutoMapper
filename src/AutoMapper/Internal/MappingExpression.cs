@@ -201,9 +201,13 @@ namespace AutoMapper
 			return new ResolutionExpression<TSource>(_propertyMap);
 		}
 
-		public void MapFrom<TMember>(Func<TSource, TMember> sourceMember)
+        public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
 		{
-			_propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember));
+            if (sourceMember.Body is MemberExpression)
+            {
+                _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
+            }
+            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile()));
 		}
 
 		public void UseValue<TValue>(TValue value)

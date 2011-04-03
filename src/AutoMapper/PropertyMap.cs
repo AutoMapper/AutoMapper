@@ -20,6 +20,7 @@ namespace AutoMapper
         private bool _sealed;
         private IValueResolver[] _cachedResolvers;
         private Func<ResolutionContext, bool> _condition;
+        private MemberInfo _sourceMember;
 
         public PropertyMap(IMemberAccessor destinationProperty)
         {
@@ -32,9 +33,20 @@ namespace AutoMapper
         {
             get
             {
-                var sourceMemberGetter = GetSourceValueResolvers()
-                    .OfType<IMemberGetter>().LastOrDefault();
-                return sourceMemberGetter == null ? null : sourceMemberGetter.MemberInfo;
+                if (_sourceMember == null)
+                {
+                    var sourceMemberGetter = GetSourceValueResolvers()
+                        .OfType<IMemberGetter>().LastOrDefault();
+                    return sourceMemberGetter == null ? null : sourceMemberGetter.MemberInfo;
+                }
+                else
+                {
+                    return _sourceMember;
+                }
+            }
+            internal set
+            {
+                _sourceMember = value;
             }
         }
 
