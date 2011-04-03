@@ -67,6 +67,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(string sourcePropertyName)
 		{
+            _propertyMap.SourceMember = typeof(TSource).GetMember(sourcePropertyName)[0];
 			_propertyMap.ChainTypeMemberForResolver(new PropertyNameResolver(typeof(TSource), sourcePropertyName));
 
 			return this;

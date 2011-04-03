@@ -15,7 +15,8 @@ namespace AutoMapper.UnitTests.Tests
         Establish context = () => Mapper.CreateMap<Source, Destination>()
             .ForMember(d => d.Ignored, o => o.Ignore())
             .ForMember(d => d.RenamedField, o => o.MapFrom(s => s.NamedProperty))
-            .ForMember(d => d.IntField, o => o.ResolveUsing<FakeResolver>().FromMember(s => s.StringField));
+            .ForMember(d => d.IntField, o => o.ResolveUsing<FakeResolver>().FromMember(s => s.StringField))
+            .ForMember("IntProperty", o => o.ResolveUsing<FakeResolver>().FromMember("AnotherStringField"));
 
         protected class Source
         {
@@ -23,6 +24,7 @@ namespace AutoMapper.UnitTests.Tests
             public NestedSource NestedSource { get; set; }
             public int NamedProperty { get; set; }
             public string StringField;
+            public string AnotherStringField;
         }
 
         protected class NestedSource
@@ -37,6 +39,7 @@ namespace AutoMapper.UnitTests.Tests
             public string Ignored { get; set; }
             public string RenamedField;
             public int IntField;
+            public int IntProperty { get; set; }
         }
 
         class FakeResolver : ValueResolver<string, int>
@@ -134,6 +137,23 @@ namespace AutoMapper.UnitTests.Tests
 
         It should_have_the_member_of_the_source_type_it_is_resolved_by_as_value = () =>
             sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("StringField"));
+    }
+
+    [Subject(typeof(PropertyMap), ".SourceMember")]
+    public class when_the_destination_property_is_resolved_from_a_source_member_using_Magic_String_overload : using_generic_configuration
+    {
+        static MemberInfo sourceMember;
+
+        Because of = () => sourceMember =
+            Mapper.FindTypeMapFor<Source, Destination>()
+                .GetPropertyMaps()
+                .Single(pm => pm.DestinationProperty.Name == "IntProperty")
+                .SourceMember;
+
+        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+
+        It should_have_the_member_of_the_source_type_it_is_resolved_by_as_value = () =>
+            sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("AnotherStringField"));
     }
 
     public abstract class using_nongeneric_configuration : PropertyMap_SourceMember_Specs
