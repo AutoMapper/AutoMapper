@@ -27,6 +27,7 @@ namespace AutoMapper
 
 		public void FromMember(string sourcePropertyName)
 		{
+            _propertyMap.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
 			_propertyMap.ChainTypeMemberForResolver(new PropertyNameResolver(_sourceType, sourcePropertyName));
 		}
 
