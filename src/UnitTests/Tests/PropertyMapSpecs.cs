@@ -141,12 +141,12 @@ namespace AutoMapper.UnitTests.Tests
 
         It should_not_be_null = () => sourceMember.ShouldNotBeNull();
 
-        It should_have_the_member_of_the_source_type_it_is_resolved_by_as_value = () =>
+        It should_have_the_member_of_the_source_type_it_is_resolved_from_as_value = () =>
             sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("StringField"));
     }
 
     [Subject(typeof(PropertyMap), ".SourceMember")]
-    public class when_the_destination_property_is_resolved_from_a_source_member_using_Magic_String_overload : using_generic_configuration
+    public class when_the_destination_property_is_resolved_from_a_source_member_using_the_Magic_String_overload : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
@@ -158,12 +158,12 @@ namespace AutoMapper.UnitTests.Tests
 
         It should_not_be_null = () => sourceMember.ShouldNotBeNull();
 
-        It should_have_the_member_of_the_source_type_it_is_resolved_by_as_value = () =>
+        It should_have_the_member_of_the_source_type_it_is_resolved_from_as_value = () =>
             sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("AnotherStringField"));
     }
 
     [Subject(typeof(PropertyMap), ".SourceMember")]
-    public class when_the_destination_property_is_resolved_from_a_source_member_using_non_generic_resolve_method : using_generic_configuration
+    public class when_the_destination_property_is_resolved_from_a_source_member_using_the_non_generic_resolve_method : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
@@ -175,7 +175,7 @@ namespace AutoMapper.UnitTests.Tests
 
         It should_not_be_null = () => sourceMember.ShouldNotBeNull();
 
-        It should_have_the_member_of_the_source_type_it_is_resolved_by_as_value = () =>
+        It should_have_the_member_of_the_source_type_it_is_resolved_from_as_value = () =>
             sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("StringField3"));
     }
 
