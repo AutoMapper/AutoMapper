@@ -78,6 +78,8 @@
     <Reference Include="Machine.Specifications">
       <HintPath>..\..\tools\Machine.Specifications-net-4.0-Release\Machine.Specifications.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Pex.Framework, Version=0.94.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="NBehave.Spec.Framework, Version=0.4.0.0, Culture=neutral, PublicKeyToken=d421feca0f4a05f6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NBehave.Spec.Framework.dll</HintPath>
@@ -114,12 +116,15 @@
     <Compile Include="Bug\AllMembersNullSubstitute.cs" />
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
+    <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
+    <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
+    <Compile Include="Bug\LazyCollectionMapping.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
     <Compile Include="Bug\NamingConventions.cs" />

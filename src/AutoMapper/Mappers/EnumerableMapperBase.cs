@@ -22,8 +22,8 @@ namespace AutoMapper.Mappers
             Type sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceValue);
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
-            var sourceLength = enumerableSourceValues.Count();
-		    var destinationLength = enumerableDestinationValues.Count();
+            var sourceLength = enumerableSourceValues.Count;
+		    var destinationLength = enumerableDestinationValues.Count;
 
             //Careful don't wipe out and set the destination unless you mean it
 			var destination = (context.DestinationValue ?? CreateDestinationObject(context, destElementType, sourceLength, mapper));
