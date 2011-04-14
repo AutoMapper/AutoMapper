@@ -14,11 +14,16 @@ namespace AutoMapper.Mappers
 
 		public bool IsMatch(ResolutionContext context)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+
 			return (context.SourceType.IsDictionaryType() && context.DestinationType.IsDictionaryType());
 		}
 
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
-		{
+        {
+            if (context == null) throw new ArgumentNullException("context");
+            if (mapper == null) throw new ArgumentNullException("mapper");
+
 			var sourceEnumerableValue = (IEnumerable)context.SourceValue ?? new object[0];
 			IEnumerable<object> keyValuePairs = sourceEnumerableValue.Cast<object>();
 

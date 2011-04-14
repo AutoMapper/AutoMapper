@@ -7,6 +7,9 @@ namespace AutoMapper.Mappers
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
+            if (context == null) throw new ArgumentNullException("context");
+            if (mapper == null) throw new ArgumentNullException("mapper");
+
             bool toEnum = false;
             Type enumSourceType = TypeHelper.GetEnumerationType(context.SourceType);
         	Type enumDestinationType = TypeHelper.GetEnumerationType(context.DestinationType);
@@ -56,6 +59,8 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(ResolutionContext context)
         {
+            if (context == null) throw new ArgumentNullException("context");
+
             bool toEnum = false;
             return EnumToStringMapping(context, ref toEnum) || EnumToEnumMapping(context) || EnumToUnderlyingTypeMapping(context, ref toEnum);
         }

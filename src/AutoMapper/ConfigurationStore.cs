@@ -4,7 +4,7 @@ using System.Collections.Generic;
 #if !SILVERLIGHT
 using System.Data;
 #endif
-
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using AutoMapper.Internal;
@@ -26,6 +26,9 @@ namespace AutoMapper
 
 	    public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
 		{
+            if(typeMapFactory == null) throw new ArgumentNullException("typeMapFactory");
+            if(mappers == null) throw new ArgumentNullException("mappers");
+            if(mappers.Count() == 0) throw new ArgumentOutOfRangeException("mappers", "Collection of IObjectMapper can't be empty");
 		    _typeMapFactory = typeMapFactory;
 		    _mappers = mappers;
             _globalIgnore = new List<string>();
@@ -79,6 +82,8 @@ namespace AutoMapper
 
 		public void CreateProfile(string profileName, Action<IProfileExpression> initializationExpression)
 		{
+            if(initializationExpression == null) throw new ArgumentNullException("initializationExpression");
+
 			var profileExpression = new Profile(profileName);
 
 			profileExpression.Initialize(this);
@@ -88,6 +93,8 @@ namespace AutoMapper
 
 		public void AddProfile(Profile profile)
 		{
+            if(profile == null) throw new ArgumentNullException("profile");
+
 			profile.Initialize(this);
 
 			profile.Configure();
@@ -172,6 +179,9 @@ namespace AutoMapper
 
 		public TypeMap CreateTypeMap(Type source, Type destination, string profileName)
 		{
+            if(source == null) throw new ArgumentNullException("source");
+            if(destination == null) throw new ArgumentNullException("destination");
+
 			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination);
 				
 			if (typeMap == null)
@@ -263,6 +273,9 @@ namespace AutoMapper
 
 		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
 		{
+            if(sourceType == null) throw new ArgumentNullException("sourceType");
+            if(destinationType == null) throw new ArgumentNullException("destinationType");
+
 			var typeMapPair = new TypePair(sourceType, destinationType);
 			
 			TypeMap typeMap;
@@ -359,6 +372,8 @@ namespace AutoMapper
 
 		public TypeMap FindTypeMapFor(ResolutionResult resolutionResult, Type destinationType)
 		{
+            if(resolutionResult == null) throw new ArgumentNullException("resolutionResult");
+
 			return FindTypeMapFor(resolutionResult.Value, resolutionResult.Type, destinationType) ??
 			       FindTypeMapFor(resolutionResult.Value, resolutionResult.MemberType, destinationType);
 		}
@@ -414,6 +429,8 @@ namespace AutoMapper
 
 	    private static bool ShouldCheckMap(TypeMap typeMap)
 	    {
+            if(typeMap == null) throw new ArgumentNullException("typeMap");
+
 #if !SILVERLIGHT
 	        return typeMap.CustomMapper == null && !typeof(IDataRecord).IsAssignableFrom(typeMap.SourceType);
 #else
@@ -541,6 +558,8 @@ namespace AutoMapper
 
 		private static IEnumerable<Type> GetSelfProfilers(Assembly assembly)
 		{
+            if(assembly == null) throw new ArgumentNullException("assembly");
+
 			return from t in assembly.GetTypes()
 			       where typeof (ISelfProfiler).IsAssignableFrom(t) && !t.IsAbstract
 			       select t;
@@ -548,6 +567,8 @@ namespace AutoMapper
 
 		internal FormatterExpression GetProfile(string profileName)
 		{
+            if(profileName == null) throw new ArgumentNullException("profileName");
+
 			FormatterExpression expr;
 
             if (!_formatterProfiles.TryGetValue(profileName, out expr))

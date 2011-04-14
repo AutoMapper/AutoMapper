@@ -63,6 +63,7 @@ namespace AutoMapper
 
 		public static void Initialize(Action<IConfiguration> action)
 		{
+            if(action == null) throw new ArgumentNullException("action");
 			Reset();
 
 			action(Configuration);

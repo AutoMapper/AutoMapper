@@ -7,6 +7,8 @@ namespace AutoMapper.Configuration
     {
         public MapperConfiguration(Action<MapperRegistry> initializationExpression)
         {
+            if (initializationExpression == null) throw new ArgumentNullException("initializationExpression");
+
             var registry = new MapperRegistry();
 
             initializationExpression(registry);

@@ -15,6 +15,8 @@ namespace AutoMapper
 
         public TypeInfo(Type type)
         {
+            if(type == null) throw new ArgumentNullException("type");
+
             Type = type;
         	var publicReadableMembers = GetAllPublicReadableMembers();
 			_publicGetters = BuildPublicReadAccessors(publicReadableMembers);

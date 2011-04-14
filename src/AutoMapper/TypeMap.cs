@@ -18,6 +18,9 @@ namespace AutoMapper
 
         public TypeMap(TypeInfo sourceType, TypeInfo destinationType)
         {
+            if(sourceType == null) throw new ArgumentNullException("sourceType");
+            if(destinationType == null) throw new ArgumentNullException("destinationType");
+
             _sourceType = sourceType;
             _destinationType = destinationType;
             Profile = ConfigurationStore.DefaultProfileName;

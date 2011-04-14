@@ -11,6 +11,8 @@ namespace AutoMapper
 
 		public PropertyNameResolver(Type sourceType, string propertyName)
 		{
+            if(sourceType == null) throw new ArgumentNullException("sourceType");
+
 		    _sourceType = sourceType;
 		    _propertyName = propertyName;
             _propertyInfo = sourceType.GetProperty(_propertyName);

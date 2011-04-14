@@ -10,21 +10,29 @@ namespace AutoMapper.Mappers
 	{
 		public override bool IsMatch(ResolutionContext context)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+
 			return (context.DestinationType.IsEnumerableType()) && (context.SourceType.IsEnumerableType());
 		}
 
 		protected override void SetElementValue(IList destination, object mappedValue, int index)
 		{
+            if(destination == null) throw new ArgumentNullException("destination");
+
 			destination.Add(mappedValue);
 		}
 
 		protected override void ClearEnumerable(IList enumerable)
 		{
+            if(enumerable == null) throw new ArgumentNullException("enumerable");
+
 			enumerable.Clear();
 		}
 
 		protected override IList CreateDestinationObjectBase(Type destElementType, int sourceLength)
 		{
+            if(destElementType == null) throw new ArgumentNullException("destElementType");
+
 			return ObjectCreator.CreateList(destElementType);
 		}
 	}
@@ -35,6 +43,8 @@ namespace AutoMapper.Mappers
 
 		public bool IsMatch(ResolutionContext context)
 		{
+            if(context == null) throw new ArgumentNullException("context");
+
 			return (context.DestinationType.IsDictionaryType()) 
 				&& (context.SourceType.IsEnumerableType())
 				&& (!context.SourceType.IsDictionaryType());
@@ -42,6 +52,9 @@ namespace AutoMapper.Mappers
 
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+            if (mapper == null) throw new ArgumentNullException("mapper");
+
 			var sourceEnumerableValue = (IEnumerable)context.SourceValue ?? new object[0];
 			IEnumerable<object> enumerableValue = sourceEnumerableValue.Cast<object>();
 

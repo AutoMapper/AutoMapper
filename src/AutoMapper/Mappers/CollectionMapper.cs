@@ -8,6 +8,9 @@ namespace AutoMapper.Mappers
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
+            if (context == null) throw new ArgumentNullException("context");
+            if (mapper == null) throw new ArgumentNullException("mapper");
+
             Type genericType = typeof(EnumerableMapper<,>);
 
             var collectionType = context.DestinationType;
@@ -22,6 +25,8 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(ResolutionContext context)
         {
+            if (context == null) throw new ArgumentNullException("context");
+            
             var isMatch = context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
 
             return isMatch;

@@ -22,6 +22,9 @@ namespace AutoMapper
 
 		public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType, Type destinationType)
 		{
+            if(sourceType == null) throw new ArgumentNullException("sourceType");
+            if(destinationType == null) throw new ArgumentNullException("destinationType");
+
 			TypeMap = typeMap;
 			SourceValue = source;
 			DestinationValue = destination;
@@ -146,6 +149,8 @@ namespace AutoMapper
 
 		public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, object destinationValue, Type sourceMemberType, PropertyMap propertyMap)
 		{
+            if(propertyMap == null) throw new ArgumentNullException("propertyMap");
+
 			return memberTypeMap != null
 			       	? new ResolutionContext(this, memberValue, destinationValue, memberTypeMap, propertyMap)
 			       	: new ResolutionContext(this, memberValue, destinationValue, sourceMemberType, propertyMap);

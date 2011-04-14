@@ -10,6 +10,9 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+            if (mapper == null) throw new ArgumentNullException("mapper");
+
 			if (IsDataReader(context))
 			{
 				var dataReader = (IDataReader)context.SourceValue;
@@ -50,6 +53,8 @@ namespace AutoMapper.Mappers
 
 		public bool IsMatch(ResolutionContext context)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+
 			return IsDataReader(context) || IsDataRecord(context);
 		}
 

@@ -7,6 +7,9 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+            if (mapper == null) throw new ArgumentNullException("mapper");
+
 			if (context.SourceValue == null)
 			{
 				return mapper.CreateObject(context);
@@ -18,6 +21,8 @@ namespace AutoMapper.Mappers
 
 		public bool IsMatch(ResolutionContext context)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+
 			TypeConverter typeConverter = GetTypeConverter(context);
 			return typeConverter.CanConvertTo(context.DestinationType);
 		}

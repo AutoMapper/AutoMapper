@@ -17,6 +17,7 @@ namespace AutoMapper
 
 		public MappingEngine(IConfigurationProvider configurationProvider)
 		{
+            if(configurationProvider == null) throw new ArgumentNullException("configurationProvider");
 			_configurationProvider = configurationProvider;
 			_mappers = configurationProvider.GetMappers();
 			_configurationProvider.TypeMapCreated += ClearTypeMap;
@@ -37,6 +38,8 @@ namespace AutoMapper
 
 		public TDestination Map<TSource, TDestination>(ResolutionContext parentContext, TSource source)
 		{
+            if(parentContext == null) throw new ArgumentNullException("parentContext");
+
 			Type destinationType = typeof(TDestination);
 			Type sourceType = typeof(TSource);
 			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
@@ -78,6 +81,9 @@ namespace AutoMapper
 
 		public object DynamicMap(object source, Type sourceType, Type destinationType)
 		{
+            if(sourceType == null) throw new ArgumentNullException("sourceType");
+            if(destinationType == null) throw new ArgumentNullException("destinationType");
+
 			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
@@ -88,6 +94,9 @@ namespace AutoMapper
 
 		public void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
 		{
+            if (sourceType == null) throw new ArgumentNullException("sourceType");
+            if (destinationType == null) throw new ArgumentNullException("destinationType");
+
 			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
@@ -98,6 +107,9 @@ namespace AutoMapper
 
 		public object Map(object source, Type sourceType, Type destinationType)
 		{
+            if (sourceType == null) throw new ArgumentNullException("sourceType");
+            if (destinationType == null) throw new ArgumentNullException("destinationType");
+
 			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
@@ -107,6 +119,9 @@ namespace AutoMapper
 
 		public object Map(object source, object destination, Type sourceType, Type destinationType)
 		{
+            if (sourceType == null) throw new ArgumentNullException("sourceType");
+            if (destinationType == null) throw new ArgumentNullException("destinationType");
+
 			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType);

@@ -35,6 +35,8 @@ namespace AutoMapper
 
         private TypeInfo GetTypeInfo(Type type)
         {
+            if(type == null) throw new ArgumentNullException("type");
+
             TypeInfo typeInfo;
 
             if (!_typeInfos.TryGetValue(type, out typeInfo))

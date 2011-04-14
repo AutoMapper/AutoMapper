@@ -22,6 +22,7 @@ namespace AutoMapper
 
         public PropertyMap(IMemberAccessor destinationProperty)
         {
+            if(destinationProperty == null) throw new ArgumentNullException("destinationProperty");
             DestinationProperty = destinationProperty;
         }
 
@@ -62,7 +63,10 @@ namespace AutoMapper
 
         public void RemoveLastResolver()
         {
-            _sourceValueResolvers.RemoveLast();
+            if(_sourceValueResolvers.Count > 0)
+            {
+                _sourceValueResolvers.RemoveLast();
+            }
         }
 
         public ResolutionResult ResolveValue(ResolutionContext context)
@@ -166,7 +170,10 @@ namespace AutoMapper
 
         public void RemoveLastFormatter()
         {
-            _valueFormatters.RemoveAt(_valueFormatters.Count - 1);
+            if(_valueFormatters.Count > 0)
+            {
+                _valueFormatters.RemoveAt(_valueFormatters.Count - 1);
+            }
         }
 
         public void SetNullSubstitute(object nullSubstitute)

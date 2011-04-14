@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,11 +10,14 @@ namespace AutoMapper.Mappers
 
 	    public TypeMapMapper(IEnumerable<ITypeMapObjectMapper> mappers)
         {
+            if(mappers == null) throw new ArgumentNullException("mappers");
             _mappers = mappers;
         }
 
 	    public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+            if(context == null) throw new ArgumentNullException("context");
+
 	        context.TypeMap.Seal();
 
 	        var mapperToUse = _mappers.First(objectMapper => objectMapper.IsMatch(context, mapper));
@@ -25,6 +29,7 @@ namespace AutoMapper.Mappers
 
 		public bool IsMatch(ResolutionContext context)
 		{
+            if (context == null) throw new ArgumentNullException("context");
 			return context.TypeMap != null;
 		}
 	}

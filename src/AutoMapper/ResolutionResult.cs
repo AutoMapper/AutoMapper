@@ -10,12 +10,20 @@ namespace AutoMapper
 		private readonly Type _memberType;
 
 		public ResolutionResult(ResolutionContext context)
-			: this(context.SourceValue, context)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+
+            _value = context.SourceValue;
+            _context = context;
+            _type = ResolveType(_value, typeof(object));
+            _memberType = _type;
 		}
 
 		private ResolutionResult(object value, ResolutionContext context, Type memberType)
 		{
+            if(context == null) throw new ArgumentNullException("context");
+            if(memberType == null) throw new ArgumentNullException("memberType");
+
 			_value = value;
 			_context = context;
 			_type = ResolveType(value, memberType);
@@ -24,6 +32,8 @@ namespace AutoMapper
 
 		private ResolutionResult(object value, ResolutionContext context)
 		{
+            if (context == null) throw new ArgumentNullException("context");
+
             _value = value;
 			_context = context;
 			_type = ResolveType(value, typeof(object));
