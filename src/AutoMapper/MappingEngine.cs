@@ -158,9 +158,17 @@ namespace AutoMapper
 												? ConfigurationProvider.GetProfileConfiguration(contextTypeMap.Profile)
                                                 : ConfigurationProvider.GetProfileConfiguration(ConfigurationStore.DefaultProfileName);
 
-			var valueFormatter = new ValueFormatter(configuration);
+            object valueToFormat = context.SourceValue;
+            string formattedValue = context.SourceValue.ToNullSafeString();
 
-		    var formattedValue = valueFormatter.FormatValue(context);
+            var formatters = configuration.GetFormattersToApply(context);
+
+            foreach (var valueFormatter in formatters)
+            {
+                formattedValue = valueFormatter.FormatValue(context.CreateValueContext(valueToFormat));
+
+                valueToFormat = formattedValue;
+            }
 
             if (formattedValue == null && !((IMappingEngineRunner)this).ShouldMapSourceValueAsNull(context))
                 return string.Empty;

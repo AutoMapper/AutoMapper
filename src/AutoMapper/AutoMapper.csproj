@@ -166,7 +166,6 @@
     <Compile Include="TypeInfo.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
-    <Compile Include="Internal\ValueFormatter.cs" />
     <Compile Include="ValueFormatter.cs" />
     <Compile Include="ValueResolver.cs" />
   </ItemGroup>

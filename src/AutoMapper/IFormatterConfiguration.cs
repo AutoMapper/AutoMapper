@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace AutoMapper
@@ -8,6 +9,7 @@ namespace AutoMapper
 		IValueFormatter[] GetFormatters();
 		IDictionary<Type, IFormatterConfiguration> GetTypeSpecificFormatters();
 		Type[] GetFormatterTypesToSkip();
+	    IEnumerable<IValueFormatter> GetFormattersToApply(ResolutionContext context);
 	}
 
 	public interface IProfileConfiguration
