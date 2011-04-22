@@ -5,10 +5,15 @@ namespace AutoMapper
 {
 	public static class Mapper
 	{
-        private static object _configurationSync = new object();
-        private static object _engineSync = new object();
-        private static ConfigurationStore _configuration;
-		private static IMappingEngine _mappingEngine;
+	    private static readonly Func<ConfigurationStore> _configurationInit =
+	        () => new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
+        
+        private static Lazy<ConfigurationStore> _configuration = new Lazy<ConfigurationStore>(_configurationInit);
+
+        private static readonly Func<IMappingEngine> _mappingEngineInit = 
+            () => new MappingEngine(_configuration.Value);
+
+		private static Lazy<IMappingEngine> _mappingEngine = new Lazy<IMappingEngine>(_mappingEngineInit);
 
 		public static bool AllowNullDestinationValues
 		{
@@ -157,30 +162,15 @@ namespace AutoMapper
 
 		public static void Reset()
 		{
-			lock (_configurationSync)
-				lock (_engineSync)
-				{
-					_configuration = null;
-					_mappingEngine = null;
-				}
+			_configuration = new Lazy<ConfigurationStore>(_configurationInit);
+			_mappingEngine = new Lazy<IMappingEngine>(_mappingEngineInit);
 		}
 
 		public static IMappingEngine Engine
 		{
 			get
 			{
-				if (_mappingEngine == null)
-				{
-                    lock (_engineSync)
-					{
-						if (_mappingEngine == null)
-						{
-							_mappingEngine = new MappingEngine(ConfigurationProvider);
-						}
-					}
-				}
-
-				return _mappingEngine;
+			    return _mappingEngine.Value;
 			}
 		}
 
@@ -193,18 +183,7 @@ namespace AutoMapper
 		{
 			get
 			{
-				if (_configuration == null)
-				{
-                    lock (_configurationSync)
-					{
-						if (_configuration == null)
-						{
-                            _configuration = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
-						}
-					}
-				}
-
-				return _configuration;
+			    return _configuration.Value;
 			}
 		}
 

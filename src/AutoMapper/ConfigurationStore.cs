@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 #if !SILVERLIGHT
@@ -19,8 +20,8 @@ namespace AutoMapper
 		internal const string DefaultProfileName = "";
 
 		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
-		private readonly IDictionary<TypePair, TypeMap> _typeMapCache = new Dictionary<TypePair, TypeMap>();
-		private readonly IDictionary<string, FormatterExpression> _formatterProfiles = new Dictionary<string, FormatterExpression>();
+        private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapCache = new ConcurrentDictionary<TypePair, TypeMap>();
+        private readonly ConcurrentDictionary<string, FormatterExpression> _formatterProfiles = new ConcurrentDictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 	    private List<string> _globalIgnore;
 
@@ -186,7 +187,9 @@ namespace AutoMapper
 			    IncludeBaseMappings(source, destination, typeMap);
 
 				_typeMaps.Add(typeMap);
-				_typeMapCache[new TypePair(source, destination)] = typeMap;
+
+			    var typePair = new TypePair(source, destination);
+			    _typeMapCache.AddOrUpdate(typePair, typeMap, (tp, tm) => typeMap);
 
 				OnTypeMapCreated(typeMap);
 			}
@@ -269,18 +272,12 @@ namespace AutoMapper
 
             if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
             {
-                lock (_typeMapCache)
-                {
-                    if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
-                    {
-                        // Cache miss
-                        typeMap = FindTypeMap(source, sourceType, destinationType, DefaultProfileName);
+                // Cache miss
+                typeMap = FindTypeMap(source, sourceType, destinationType, DefaultProfileName);
 
-                        //We don't want to inherit base mappings which may be ambiguous or too specific resulting in cast exceptions
-                        if (source == null || source.GetType() == sourceType)
-                            _typeMapCache[typeMapPair] = typeMap;
-                    }
-                }
+                //We don't want to inherit base mappings which may be ambiguous or too specific resulting in cast exceptions
+                if (source == null || source.GetType() == sourceType)
+                    _typeMapCache[typeMapPair] = typeMap;
             }
             // Due to the inheritance we can have derrived mapping cached which is not valid for this source object
             else if (source != null && typeMap != null && !typeMap.SourceType.IsAssignableFrom(source.GetType()))
@@ -345,16 +342,16 @@ namespace AutoMapper
             if (type == null)
                 throw new ArgumentNullException("type");
 
-            int depth = 0;
+            return InheritanceTree(type).Count();
+        }
 
-            // Keep walking up the inheritance tree until there are no more base classes.
+        private static IEnumerable<Type> InheritanceTree(Type type)
+        {
             while (type != null)
             {
+                yield return type;
                 type = type.BaseType;
-                depth++;
             }
-
-            return depth;
         }
 
 		public TypeMap FindTypeMapFor(ResolutionResult resolutionResult, Type destinationType)
@@ -583,22 +580,10 @@ namespace AutoMapper
 
 		internal FormatterExpression GetProfile(string profileName)
 		{
-			FormatterExpression expr;
+		    FormatterExpression expr = _formatterProfiles.GetOrAdd(profileName,
+		                                                           name => new FormatterExpression(t => (IValueFormatter) _serviceCtor(t)));
 
-            if (!_formatterProfiles.TryGetValue(profileName, out expr))
-            {
-                lock(_formatterProfiles)
-                {
-                    if (!_formatterProfiles.TryGetValue(profileName, out expr))
-                    {
-						expr = new FormatterExpression(t => (IValueFormatter)_serviceCtor(t));
-
-                        _formatterProfiles.Add(profileName, expr);
-                    }
-                }
-            }
-			
-            return expr;
+		    return expr;
 		}
 
 	    public void AddGlobalIgnore(string startingwith)
