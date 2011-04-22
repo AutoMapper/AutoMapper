@@ -55,7 +55,7 @@ namespace AutoMapper.Mappers
 
 		protected virtual void ClearEnumerable(TEnumerable enumerable) { }
 
-		private object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count, IMappingEngineRunner mapper)
+		protected virtual object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count, IMappingEngineRunner mapper)
 		{
 			var destinationType = context.DestinationType;
 
