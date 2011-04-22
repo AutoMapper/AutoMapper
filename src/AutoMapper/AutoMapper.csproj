@@ -146,6 +146,7 @@
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\NullableMapper.cs" />
     <Compile Include="Mappers\ObjectCreator.cs" />
+    <Compile Include="Mappers\ReadOnlyCollectionMapper.cs" />
     <Compile Include="Mappers\StringMapper.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Mappers\TypeHelper.cs" />
