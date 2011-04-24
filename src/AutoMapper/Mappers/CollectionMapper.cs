@@ -52,7 +52,7 @@ namespace AutoMapper.Mappers
                 
                 if (typeof(TCollection).IsInterface)
                 {
-                    if (typeof(TCollection).Name == "ISet`1")
+                    if (typeof(TCollection).IsGenericType && (typeof(TCollection).GetGenericTypeDefinition() == typeof(ISet<>)))
                     {
                         collection = new HashSet<TElement>();
                     }
