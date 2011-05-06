@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 
 namespace AutoMapper
 {
@@ -15,13 +16,18 @@ namespace AutoMapper
 	        _propertyMap = propertyMap;
 	    }
 
-	    public void FromMember(Func<TSource, object> sourceMember)
+	    public void FromMember(Expression<Func<TSource, object>> sourceMember)
 		{
-			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
+            if (sourceMember.Body is MemberExpression)
+            {
+                _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
+            }
+            _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember.Compile()));
 		}
 
 		public void FromMember(string sourcePropertyName)
 		{
+            _propertyMap.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
 			_propertyMap.ChainTypeMemberForResolver(new PropertyNameResolver(_sourceType, sourcePropertyName));
 		}
 
@@ -53,15 +59,20 @@ namespace AutoMapper
 			_propertyMap = propertyMap;
 		}
 
-		public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Func<TSource, object> sourceMember)
+        public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(Expression<Func<TSource, object>> sourceMember)
 		{
-			_propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember));
+            if (sourceMember.Body is MemberExpression)
+            {
+                _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
+            }
+            _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember.Compile()));
 
 			return this;
 		}
 
 		public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(string sourcePropertyName)
 		{
+            _propertyMap.SourceMember = typeof(TSource).GetMember(sourcePropertyName)[0];
 			_propertyMap.ChainTypeMemberForResolver(new PropertyNameResolver(typeof(TSource), sourcePropertyName));
 
 			return this;
