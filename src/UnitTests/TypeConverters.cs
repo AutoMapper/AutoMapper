@@ -151,10 +151,18 @@ namespace AutoMapper.UnitTests
 							OtherValue = ((Source) value).Value + 10
 						};
 				}
+				public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+				{
+					return sourceType == typeof(Destination);
+				}
+				public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+				{
+					return new Source {Value = ((Destination) value).OtherValue - 10};
+				}
 			}
 
 			[Test]
-			public void Should_convert_type_using_the_custom_type_converter()
+			public void Should_convert_from_type_using_the_custom_type_converter()
 			{
 				var source = new Source
 					{
@@ -163,6 +171,18 @@ namespace AutoMapper.UnitTests
 				var destination = Mapper.Map<Source, Destination>(source);
 
 				destination.OtherValue.ShouldEqual(15);
+			}
+
+			[Test]
+			public void Should_convert_to_type_using_the_custom_type_converter()
+			{
+				var source = new Destination()
+				{
+					OtherValue = 15
+				};
+				var destination = Mapper.Map<Destination, Source>(source);
+
+				destination.Value.ShouldEqual(5);
 			}
 		}
 

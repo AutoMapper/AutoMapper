@@ -11,23 +11,32 @@ namespace AutoMapper.Mappers
 			{
 				return mapper.CreateObject(context);
 			}
-
-			TypeConverter typeConverter = GetTypeConverter(context);
-			return typeConverter.ConvertTo(context.SourceValue, context.DestinationType);
+			Func<object> converter = GetConverter(context);
+			return converter != null ? converter() : null;
 		}
+		private static Func<object> GetConverter(ResolutionContext context)
+		{
+			TypeConverter typeConverter = GetTypeConverter(context.SourceType);
+			if (typeConverter.CanConvertTo(context.DestinationType))
+				return () => typeConverter.ConvertTo(context.SourceValue, context.DestinationType);
 
+			typeConverter = GetTypeConverter(context.DestinationType);
+			if(typeConverter.CanConvertFrom(context.SourceType))
+				return () => typeConverter.ConvertFrom(context.SourceValue);
+
+			return null;
+		}
 		public bool IsMatch(ResolutionContext context)
 		{
-			TypeConverter typeConverter = GetTypeConverter(context);
-			return typeConverter.CanConvertTo(context.DestinationType);
+			return GetConverter(context) != null;
 		}
 
-		private static TypeConverter GetTypeConverter(ResolutionContext context)
+		private static TypeConverter GetTypeConverter(Type type)
 		{
 #if !SILVERLIGHT
-            return TypeDescriptor.GetConverter(context.SourceType);
+			return TypeDescriptor.GetConverter(type);
 #else
-			var attributes = context.SourceType.GetCustomAttributes(typeof(TypeConverterAttribute), false);
+			var attributes = type.GetCustomAttributes(typeof(TypeConverterAttribute), false);
 
 			if (attributes.Length != 1)
 				return new TypeConverter();
@@ -40,6 +49,6 @@ namespace AutoMapper.Mappers
 
 			return Activator.CreateInstance(converterType) as TypeConverter;
 #endif
-        }
+		}
 	}
 }
