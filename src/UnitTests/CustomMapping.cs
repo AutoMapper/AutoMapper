@@ -660,6 +660,48 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+
+        public class When_custom_resolver_requests_property_to_be_ignored : AutoMapperSpecBase
+        {
+            private Destination _result = new Destination() { Value = 55 };
+
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+            }
+
+            public class CustomValueResolver : IValueResolver
+            {
+                public ResolutionResult Resolve(ResolutionResult source)
+                {
+                    return source.Ignore();
+                }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>()
+                    .ForMember(d => d.Value, opt => opt.ResolveUsing<CustomValueResolver>().FromMember(src => src.Value));
+            }
+
+            protected override void Because_of()
+            {
+                _result = Mapper.Map(new Source { Value = 5 }, _result);
+            }
+
+            [Test]
+            public void Should_not_overwrite_destination_value()
+            {
+                _result.Value.ShouldEqual(55);
+            }
+        }
+
+
 		public class When_specifying_member_and_member_resolver_using_string_property_names : AutoMapperSpecBase
 		{
 			private Destination _result;
