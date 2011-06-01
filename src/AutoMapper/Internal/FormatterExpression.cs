@@ -88,7 +88,54 @@ namespace AutoMapper
 			return _formattersToSkip.ToArray();
 		}
 
-		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
+	    public IEnumerable<IValueFormatter> GetFormattersToApply(ResolutionContext context)
+	    {
+	        return GetFormatters(context);
+	    }
+
+        private IEnumerable<IValueFormatter> GetFormatters(ResolutionContext context)
+        {
+            Type valueType = context.SourceType;
+            IFormatterConfiguration typeSpecificFormatterConfig;
+
+            if (context.PropertyMap != null)
+            {
+                foreach (IValueFormatter formatter in context.PropertyMap.GetFormatters())
+                {
+                    yield return formatter;
+                }
+
+                if (GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
+                {
+                    if (!context.PropertyMap.FormattersToSkipContains(typeSpecificFormatterConfig.GetType()))
+                    {
+                        foreach (var typeSpecificFormatter in typeSpecificFormatterConfig.GetFormattersToApply(context))
+                        {
+                            yield return typeSpecificFormatter;
+                        }
+                    }
+                }
+            }
+            else if (GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
+            {
+                foreach (var typeSpecificFormatter in typeSpecificFormatterConfig.GetFormattersToApply(context))
+                {
+                    yield return typeSpecificFormatter;
+                }
+            }
+
+            foreach (IValueFormatter formatter in GetFormatters())
+            {
+                Type formatterType = GetFormatterType(formatter);
+                if (CheckPropertyMapSkipList(context, formatterType) &&
+                    CheckTypeSpecificSkipList(typeSpecificFormatterConfig, formatterType))
+                {
+                    yield return formatter;
+                }
+            }
+        }
+
+	    public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
 		{
 			_formatters.RemoveAt(_formatters.Count - 1);
 			_formatters.Add(new DeferredInstantiatedFormatter(instantiator));
@@ -133,6 +180,30 @@ namespace AutoMapper
 
             DestinationMemberNameTransformer = val => postfixes.Aggregate(orig(val), PostfixFunc);
         }
+
+        private static Type GetFormatterType(IValueFormatter formatter)
+        {
+            return formatter is DeferredInstantiatedFormatter ? ((DeferredInstantiatedFormatter)formatter).GetFormatterType() : formatter.GetType();
+        }
+
+        private static bool CheckTypeSpecificSkipList(IFormatterConfiguration valueFormatter, Type formatterType)
+        {
+            if (valueFormatter == null)
+            {
+                return true;
+            }
+
+            return !valueFormatter.GetFormatterTypesToSkip().Contains(formatterType);
+        }
+
+        private static bool CheckPropertyMapSkipList(ResolutionContext context, Type formatterType)
+        {
+            if (context.PropertyMap == null)
+                return true;
+
+            return !context.PropertyMap.FormattersToSkipContains(formatterType);
+        }
+
     }
 
 	internal interface IFormatterCtorConfigurator

@@ -90,15 +90,23 @@ namespace AutoMapper.Mappers
 					generator.Emit(OpCodes.Ldc_I4, i);
 					generator.Emit(OpCodes.Callvirt, getValueMethod);
 
-                    if (propertyInfo.PropertyType.IsGenericType
-                        && propertyInfo.PropertyType.Name.Equals(typeof(Nullable<>).Name))
-                    {
-                        generator.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
-                    }
-                    else
-                    {
-                        generator.Emit(OpCodes.Unbox_Any, dataRecord.GetFieldType(i));
-                    }
+					if (propertyInfo.PropertyType.IsGenericType
+						&& propertyInfo.PropertyType.GetGenericTypeDefinition().Equals(typeof(Nullable<>))
+						)
+					{
+						var nullableType = propertyInfo.PropertyType.GetGenericTypeDefinition().GetGenericArguments()[0];
+						if (!nullableType.IsEnum)
+							generator.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
+						else
+						{
+							generator.Emit(OpCodes.Unbox_Any, nullableType);
+							generator.Emit(OpCodes.Newobj, propertyInfo.PropertyType);
+						}
+					}
+					else
+					{
+						generator.Emit(OpCodes.Unbox_Any, dataRecord.GetFieldType(i));
+					}
 					generator.Emit(OpCodes.Callvirt, propertyInfo.GetSetMethod(true));
 
 					generator.MarkLabel(endIfLabel);
@@ -146,6 +154,8 @@ namespace AutoMapper.Mappers
 
 		private delegate object Build(IDataRecord dataRecord);
 
+		private static readonly MethodInfo parseMethod =
+			typeof(Enum).GetMethod("get_Item", new[] { typeof(int) });
 		private static readonly MethodInfo getValueMethod =
 			typeof(IDataRecord).GetMethod("get_Item", new[] { typeof(int) });
 		private static readonly MethodInfo isDBNullMethod =

@@ -48,11 +48,25 @@ namespace AutoMapper.Mappers
 
             protected override TCollection CreateDestinationObjectBase(Type destElementType, int sourceLength)
             {
-                var list = typeof(TCollection).IsInterface 
-                                  ? new List<TElement>() 
-                                  : ObjectCreator.CreateDefaultValue(typeof (TCollection));
+                Object collection;
+                
+                if (typeof(TCollection).IsInterface)
+                {
+                    if (typeof(TCollection).IsGenericType && (typeof(TCollection).GetGenericTypeDefinition() == typeof(ISet<>)))
+                    {
+                        collection = new HashSet<TElement>();
+                    }
+                    else
+                    {
+                        collection = new List<TElement>();
+                    }
+                }
+                else
+                {
+                    collection = ObjectCreator.CreateDefaultValue(typeof(TCollection));
+                }
 
-                return (TCollection) list;
+                return (TCollection)collection;
             }
         }
 

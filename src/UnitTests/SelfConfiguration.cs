@@ -42,6 +42,7 @@ namespace AutoMapper.UnitTests
 			public class Source
 			{
 				public string Property { get; set; }
+                public string ProfileName { get; set; }
 			}
 
 			public class Destination : SelfProfiler<Source, Destination>

@@ -16,6 +16,7 @@ namespace AutoMapper.UnitTests
 				public int Value2fff { get; set; }
 				public int Value3 { get; set; }
 				public int Value4 { get; set; }
+				public int Value5 { get; set; }
 			}
 
 			public class ModelDto
@@ -24,6 +25,7 @@ namespace AutoMapper.UnitTests
 				public int Value2 { get; set; }
 				public int Value3 { get; set; }
 				public int Value4 { get; set; }
+				public int Value5 { get; set; }
 			}
 
 			public class CustomResolver : IValueResolver
@@ -60,9 +62,10 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<ModelObject, ModelDto>()
 					.ForMember(dto => dto.Value, opt => opt.ResolveUsing<CustomResolver>())
 					.ForMember(dto => dto.Value2, opt => opt.ResolveUsing(new CustomResolver2()))
-					.ForMember(dto => dto.Value4, opt => opt.ResolveUsing(typeof(CustomResolver3)));
+					.ForMember(dto => dto.Value4, opt => opt.ResolveUsing(typeof(CustomResolver3)))
+					.ForMember(dto => dto.Value5, opt => opt.ResolveUsing(src => src.Value5 + 5));
 
-				var model = new ModelObject { Value = 42, Value2fff = 42, Value3 = 42, Value4 = 42 };
+				var model = new ModelObject { Value = 42, Value2fff = 42, Value3 = 42, Value4 = 42, Value5 = 42 };
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
@@ -88,6 +91,12 @@ namespace AutoMapper.UnitTests
 			public void Should_use_the_type_object_based_mapping_for_custom_dto_members()
 			{
 				_result.Value4.ShouldEqual(46);
+			}
+
+			[Test]
+			public void Should_use_the_func_based_mapping_for_custom_dto_members()
+			{
+				_result.Value5.ShouldEqual(47);
 			}
 		}
 

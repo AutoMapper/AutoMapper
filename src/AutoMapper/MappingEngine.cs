@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace AutoMapper
 		private readonly IConfigurationProvider _configurationProvider;
         private readonly ProxyGenerator _proxyGenerator = new ProxyGenerator();
 		private readonly IObjectMapper[] _mappers;
-		private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = new Dictionary<TypePair, IObjectMapper>();
+        private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
 
 		public MappingEngine(IConfigurationProvider configurationProvider)
 		{
@@ -120,20 +121,9 @@ namespace AutoMapper
 			{
 				var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
-				IObjectMapper mapperToUse;
+			    Func<TypePair, IObjectMapper> missFunc = tp => _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
 
-				if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
-				{
-					lock (_objectMapperCache)
-					{
-						if (!_objectMapperCache.TryGetValue(contextTypePair, out mapperToUse))
-						{
-							// Cache miss
-							mapperToUse = _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
-							_objectMapperCache.Add(contextTypePair, mapperToUse);
-						}
-					}
-				}
+			    IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
 
 				if (mapperToUse == null)
 				{
@@ -158,9 +148,17 @@ namespace AutoMapper
 												? ConfigurationProvider.GetProfileConfiguration(contextTypeMap.Profile)
                                                 : ConfigurationProvider.GetProfileConfiguration(ConfigurationStore.DefaultProfileName);
 
-			var valueFormatter = new ValueFormatter(configuration);
+            object valueToFormat = context.SourceValue;
+            string formattedValue = context.SourceValue.ToNullSafeString();
 
-		    var formattedValue = valueFormatter.FormatValue(context);
+            var formatters = configuration.GetFormattersToApply(context);
+
+            foreach (var valueFormatter in formatters)
+            {
+                formattedValue = valueFormatter.FormatValue(context.CreateValueContext(valueToFormat));
+
+                valueToFormat = formattedValue;
+            }
 
             if (formattedValue == null && !((IMappingEngineRunner)this).ShouldMapSourceValueAsNull(context))
                 return string.Empty;
@@ -204,7 +202,9 @@ namespace AutoMapper
 
 		private void ClearTypeMap(object sender, TypeMapCreatedEventArgs e)
 		{
-			_objectMapperCache.Remove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType));
+		    IObjectMapper existing;
+
+		    _objectMapperCache.TryRemove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType), out existing);
 		}
 	}
 }

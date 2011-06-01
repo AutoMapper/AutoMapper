@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,8 +10,7 @@ namespace AutoMapper
 {
     public class TypeMapFactory : ITypeMapFactory
     {
-        private static readonly IDictionary<Type, TypeInfo> _typeInfos = new Dictionary<Type, TypeInfo>();
-        private readonly object _typeInfoSync = new object();
+        private static readonly ConcurrentDictionary<Type, TypeInfo> _typeInfos = new ConcurrentDictionary<Type, TypeInfo>();
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options)
         {
@@ -25,7 +25,7 @@ namespace AutoMapper
 
                 if (MapDestinationPropertyToSource(members, sourceTypeInfo, destProperty.Name, options))
                 {
-                    var resolvers = members.Select(mi => mi.ToMemberGetter()).Cast<IValueResolver>();
+                    var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
                     typeMap.AddPropertyMap(destPropertyAccessor, resolvers);
                 }
@@ -33,21 +33,9 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private TypeInfo GetTypeInfo(Type type)
+        private static TypeInfo GetTypeInfo(Type type)
         {
-            TypeInfo typeInfo;
-
-            if (!_typeInfos.TryGetValue(type, out typeInfo))
-            {
-                lock (_typeInfoSync)
-                {
-                    if (!_typeInfos.TryGetValue(type, out typeInfo))
-                    {
-                        typeInfo = new TypeInfo(type);
-                        _typeInfos.Add(type, typeInfo);
-                    }
-                }
-            }
+            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type));
 
             return typeInfo;
         }

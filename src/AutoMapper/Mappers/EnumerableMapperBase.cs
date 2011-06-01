@@ -10,13 +10,14 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
-			var sourceValue = (IEnumerable)context.SourceValue ?? new object[0];
-			IEnumerable<object> enumerableValue = sourceValue.Cast<object>();
+			ICollection<object> enumerableValue = ((IEnumerable) context.SourceValue ?? new object[0])
+				.Cast<object>()
+				.ToList();
 
-			Type sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceValue);
+			Type sourceElementType = TypeHelper.GetElementType(context.SourceType, enumerableValue);
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
-			var sourceLength = enumerableValue.Count();
+			var sourceLength = enumerableValue.Count;
 			var destination = (context.DestinationValue ?? CreateDestinationObject(context, destElementType, sourceLength, mapper));
 			var enumerable = GetEnumerableFor(destination);
 
@@ -54,7 +55,7 @@ namespace AutoMapper.Mappers
 
 		protected virtual void ClearEnumerable(TEnumerable enumerable) { }
 
-		private object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count, IMappingEngineRunner mapper)
+		protected virtual object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count, IMappingEngineRunner mapper)
 		{
 			var destinationType = context.DestinationType;
 

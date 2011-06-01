@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,8 +20,7 @@ namespace AutoMapper
 
 	internal static class DelegateFactory
 	{
-        private static readonly object _ctorCacheSync = new object();
-		private static readonly Dictionary<Type, LateBoundCtor> _ctorCache = new Dictionary<Type, LateBoundCtor>();
+        private static readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache = new ConcurrentDictionary<Type, LateBoundCtor>();
 		
 		public static LateBoundMethod CreateGet(MethodInfo method)
 		{
@@ -131,24 +131,16 @@ namespace AutoMapper
 		}
 
 	    public static LateBoundCtor CreateCtor(Type type)
-		{
-			LateBoundCtor ctor;
-			if (!_ctorCache.TryGetValue(type, out ctor))
-			{
-                lock (_ctorCacheSync)
-				{
-                    if (_ctorCache.TryGetValue(type, out ctor))
-					{
-						return ctor;
-					}
+	    {
+	        LateBoundCtor ctor = _ctorCache.GetOrAdd(type, t =>
+	        {
+	            var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
+                
+	            return ctorExpression.Compile();
+	        });
 
-					var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
-					ctor = ctorExpression.Compile();
-					_ctorCache.Add(type, ctor);
-				}
-			}
-			return ctor;
-		}
+	        return ctor;
+	    }
 
 	    private static DynamicMethod CreateValueTypeDynamicMethod(MemberInfo member, Type sourceType)
 	    {

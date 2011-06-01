@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using AutoMapper.Internal;
 
 namespace AutoMapper
@@ -19,6 +20,7 @@ namespace AutoMapper
         private bool _sealed;
         private IValueResolver[] _cachedResolvers;
         private Func<ResolutionContext, bool> _condition;
+        private MemberInfo _sourceMember;
 
         public PropertyMap(IMemberAccessor destinationProperty)
         {
@@ -26,6 +28,27 @@ namespace AutoMapper
         }
 
         public IMemberAccessor DestinationProperty { get; private set; }
+
+        public MemberInfo SourceMember
+        {
+            get
+            {
+                if (_sourceMember == null)
+                {
+                    var sourceMemberGetter = GetSourceValueResolvers()
+                        .OfType<IMemberGetter>().LastOrDefault();
+                    return sourceMemberGetter == null ? null : sourceMemberGetter.MemberInfo;
+                }
+                else
+                {
+                    return _sourceMember;
+                }
+            }
+            internal set
+            {
+                _sourceMember = value;
+            }
+        }
 
         public bool CanBeSet
         {

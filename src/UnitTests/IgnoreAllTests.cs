@@ -64,4 +64,37 @@ namespace AutoMapper.UnitTests
             Assert.That(destination.StartingWith_ShouldNotBeMapped, Is.Null);
         }
     }
+
+	[TestFixture]
+	public class IgnoreAttributeTests
+	{
+		public class Source
+		{
+			public string ShouldBeMapped { get; set; }
+			public string ShouldNotBeMapped { get; set; }
+		}
+
+		public class Destination
+		{
+			public string ShouldBeMapped { get; set; }
+			[IgnoreMap]
+			public string ShouldNotBeMapped { get; set; }
+		}
+
+		[Test]
+		public void Ignore_On_Source_Field()
+		{
+			Mapper.CreateMap<Source, Destination>();
+			Mapper.AssertConfigurationIsValid();
+
+			Source source = new Source
+			{
+				ShouldBeMapped = "Value1",
+				ShouldNotBeMapped = "Value2"
+			};
+
+			Destination destination = Mapper.Map<Source, Destination>(source);
+			Assert.That(destination.ShouldNotBeMapped, Is.Null);
+		}
+	}
 }
