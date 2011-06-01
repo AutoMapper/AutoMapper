@@ -99,6 +99,8 @@ namespace AutoMapper.Mappers
 						throw new AutoMapperMappingException(errorContext, ex);
 					}
 
+                    if (result.ShouldIgnore) return;
+
 					if (propertyMap.UseDestinationValue)
 					{
 						destinationValue = propertyMap.DestinationProperty.GetValue(mappedObject);

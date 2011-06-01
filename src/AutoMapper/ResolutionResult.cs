@@ -34,13 +34,19 @@ namespace AutoMapper
 		public Type Type { get { return _type; } }
 		public Type MemberType { get { return _memberType; } }
 		public ResolutionContext Context { get { return _context; } }
-    
-        private Type ResolveType(object value, Type memberType)
+
+        public bool ShouldIgnore { get; set; }
+
+	    private Type ResolveType(object value, Type memberType)
         {
             if (value == null)
                 return memberType;
 
             return value.GetType();
+        }
+        public ResolutionResult Ignore()
+        {
+            return new ResolutionResult(Context) { ShouldIgnore = true };
         }
 
 		public ResolutionResult New(object value)
