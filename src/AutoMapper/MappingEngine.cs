@@ -31,6 +31,19 @@ namespace AutoMapper
 			get { return _configurationProvider; }
 		}
 
+        public TDestination Map<TDestination>(object source)
+        {
+            var mappedObject = default(TDestination);
+            if (source != null)
+            {
+                var sourceType = source.GetType();
+                var destinationType = typeof(TDestination);
+
+                mappedObject = (TDestination)Map(source, sourceType, destinationType);
+            }
+            return mappedObject;
+        }
+
 		public TDestination Map<TSource, TDestination>(TSource source)
 		{
 			Type modelType = typeof(TSource);
