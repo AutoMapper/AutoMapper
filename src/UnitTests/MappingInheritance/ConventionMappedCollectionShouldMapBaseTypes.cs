@@ -62,5 +62,30 @@ namespace AutoMapper.UnitTests.Bug
             Assert.IsInstanceOfType(typeof(GeneralItemDto), dto.Items[0]);
             Assert.IsInstanceOfType(typeof(SpecificItemDto), dto.Items[1]);
         }
+
+        [Test]
+        public void item_collection_should_map_by_base_type_for_map_with_one_parameter()
+        {
+            Mapper.CreateMap<Container, ContainerDto>();
+
+            Mapper.CreateMap<ItemBase, ItemDto>()
+                .Include<GeneralItem, GeneralItemDto>()
+                .Include<SpecificItem, SpecificItemDto>();
+
+            Mapper.CreateMap<GeneralItem, GeneralItemDto>();
+            Mapper.CreateMap<SpecificItem, SpecificItemDto>();
+
+            var dto = Mapper.Map<ContainerDto>(new Container
+            {
+                Items =
+                                                            {
+                                                                new GeneralItem(),
+                                                                new SpecificItem()
+                                                            }
+            });
+
+            Assert.IsInstanceOfType(typeof(GeneralItemDto), dto.Items[0]);
+            Assert.IsInstanceOfType(typeof(SpecificItemDto), dto.Items[1]);
+        }
     }
 }

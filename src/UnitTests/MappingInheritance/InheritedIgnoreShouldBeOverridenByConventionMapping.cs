@@ -45,5 +45,19 @@ namespace AutoMapper.UnitTests.Bug
 
             Assert.AreEqual("Test", dto.SpecificProperty);
         }
+        
+        [Test]
+        public void inhertited_ignore_should_be_overridden_by_successful_convention_mapping_with_one_parameter()
+        {
+            Mapper.CreateMap<BaseDomain, Dto>()
+                .ForMember(d => d.SpecificProperty, m => m.Ignore())
+                .Include<SpecificDomain, Dto>();
+
+            Mapper.CreateMap<SpecificDomain, Dto>();
+
+            var dto = Mapper.Map<Dto>(new SpecificDomain { SpecificProperty = "Test" });
+
+            Assert.AreEqual("Test", dto.SpecificProperty);
+        }
     }
 }
