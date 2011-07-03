@@ -1,4 +1,5 @@
 $framework = '4.0'
+$version = '2.0.0'
 
 properties {
 	$base_dir = resolve-path .
@@ -9,7 +10,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$buildNumber = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.0.9999.0' }
+	$buildNumber = if ($env:build_number -ne $NULL) { $version + '.' + $env:build_number } else { $version + '.0' }
 	$config = "debug"
 	$framework_dir = Get-FrameworkDirectory
 }
@@ -52,6 +53,13 @@ task dist {
 	copy_files "$build_dir\$config\AutoMapper" "$build_dir\dist" $exclude
 	zip_directory "$build_dir\dist" "$dist_dir\AutoMapper-unmerged.zip"
 	copy-item "$build_dir\dist-merged\AutoMapper.dll" "$dist_dir"
+    create-merged-nuspec "$buildNumber"
+    create-unmerged-nuspec "$buildNumber"
+
+    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.nuspec }
+    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.UnMerged.nuspec }
+
+	move-item "*.nupkg" "$dist_dir"
 }
 
 # -------------------------------------------------------------------------------------------------------------
@@ -122,4 +130,49 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompanyAttribute("""")]
 [assembly: AssemblyConfigurationAttribute(""release"")]
 [assembly: AssemblyInformationalVersionAttribute(""$version"")]"  | out-file $filename -encoding "ASCII"    
+}
+
+function global:create-merged-nuspec()
+{
+    "<?xml version=""1.0""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>AutoMapper</id>
+    <version>$version</version>
+    <authors>Jimmy Bogard</authors>
+    <owners>Jimmy Bogard</owners>
+    <licenseUrl>http://automapper.codeplex.com/license</licenseUrl>
+    <projectUrl>http://automapper.codeplex.com</projectUrl>
+    <iconUrl>https://s3.amazonaws.com/automapper/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
+  </metadata>
+  <files>
+    <file src=""$build_dir\dist-merged\AutoMapper.dll"" target=""lib"" />
+  </files>
+</package>" | out-file $build_dir\AutoMapper.nuspec -encoding "ASCII"
+}
+
+function global:create-unmerged-nuspec()
+{
+    "<?xml version=""1.0""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata>
+    <id>AutoMapper.UnMerged</id>
+    <version>$version</version>
+    <authors>Jimmy Bogard</authors>
+    <owners>Jimmy Bogard</owners>
+    <licenseUrl>http://automapper.codeplex.com/license</licenseUrl>
+    <projectUrl>http://automapper.codeplex.com</projectUrl>
+    <iconUrl>https://s3.amazonaws.com/automapper/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
+    <dependencies>
+      <dependency id=""Castle.Core"" version=""2.5.1"" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src=""$build_dir\dist\AutoMapper.dll"" target=""lib"" />
+  </files>
+</package>" | out-file $build_dir\AutoMapper.UnMerged.nuspec -encoding "ASCII"
 }
