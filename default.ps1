@@ -11,7 +11,7 @@ properties {
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
 	$buildNumber = if ($env:build_number -ne $NULL) { $version + '.' + $env:build_number } else { $version + '.0' }
-	$config = "debug"
+	$global:config = "debug"
 	$framework_dir = Get-FrameworkDirectory
 }
 
@@ -19,11 +19,15 @@ properties {
 task default -depends local
 task local -depends compile, test
 task full -depends local, merge, dist
-task ci -depends clean, commonAssemblyInfo, local, merge, dist
+task ci -depends clean, release, commonAssemblyInfo, local, merge, dist
 
 task clean {
 	delete_directory "$build_dir"
 	delete_directory "$dist_dir"
+}
+
+task release {
+    $global:config = "release"
 }
 
 task compile -depends clean { 
@@ -48,16 +52,15 @@ task test {
 
 task dist {
 	create_directory $dist_dir
-	$exclude = @('*.pdb')
-	copy_files "$build_dir\merge" "$build_dir\dist-merged" $exclude
-	copy_files "$build_dir\$config\AutoMapper" "$build_dir\dist" $exclude
+	copy_files "$build_dir\merge" "$build_dir\dist-merged"
+	copy_files "$build_dir\$config\AutoMapper" "$build_dir\dist"
 	zip_directory "$build_dir\dist" "$dist_dir\AutoMapper-unmerged.zip"
 	copy-item "$build_dir\dist-merged\AutoMapper.dll" "$dist_dir"
     create-merged-nuspec "$buildNumber"
     create-unmerged-nuspec "$buildNumber"
 
-    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.nuspec }
-    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.UnMerged.nuspec }
+    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.nuspec -Symbols }
+    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.UnMerged.nuspec -Symbols }
 
 	move-item "*.nupkg" "$dist_dir"
 }
@@ -149,6 +152,7 @@ function global:create-merged-nuspec()
   </metadata>
   <files>
     <file src=""$build_dir\dist-merged\AutoMapper.dll"" target=""lib"" />
+    <file src=""$build_dir\dist-merged\AutoMapper.pdb"" target=""lib"" />
   </files>
 </package>" | out-file $build_dir\AutoMapper.nuspec -encoding "ASCII"
 }
@@ -173,6 +177,7 @@ function global:create-unmerged-nuspec()
   </metadata>
   <files>
     <file src=""$build_dir\dist\AutoMapper.dll"" target=""lib"" />
+    <file src=""$build_dir\dist\AutoMapper.pdb"" target=""lib"" />
   </files>
 </package>" | out-file $build_dir\AutoMapper.UnMerged.nuspec -encoding "ASCII"
 }
