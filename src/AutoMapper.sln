@@ -15,6 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapperSamples", "AutoMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "Benchmark\Benchmark.csproj", "{B8051389-CB47-46FB-B234-9D49506704AA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{C1930F52-C66E-4E56-B7DB-FD42E497FFF0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1BCC7A00-6382-4891-936A-F164614D26A4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B84E9CD3-2DDB-47FA-84BE-732EBF2F46CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AutomatedDebug|Any CPU = AutomatedDebug|Any CPU
@@ -54,5 +60,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DDF551F9-B27D-4283-BFA0-E7068E05967D} = {C1930F52-C66E-4E56-B7DB-FD42E497FFF0}
+		{002075C5-6517-4794-BC99-9B17B9E884E7} = {1BCC7A00-6382-4891-936A-F164614D26A4}
+		{B8051389-CB47-46FB-B234-9D49506704AA} = {1BCC7A00-6382-4891-936A-F164614D26A4}
+		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7} = {B84E9CD3-2DDB-47FA-84BE-732EBF2F46CD}
 	EndGlobalSection
 EndGlobal
