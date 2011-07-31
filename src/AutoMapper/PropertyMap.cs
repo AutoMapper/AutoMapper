@@ -94,12 +94,7 @@ namespace AutoMapper
 
             var result = new ResolutionResult(context);
 
-            foreach (var resolver in _cachedResolvers)
-            {
-                result = resolver.Resolve(result);
-            }
-
-            return result;
+            return _cachedResolvers.Aggregate(result, (current, resolver) => resolver.Resolve(current));
         }
 
         internal void Seal()

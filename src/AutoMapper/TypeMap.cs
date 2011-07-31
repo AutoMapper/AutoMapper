@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace AutoMapper
 {
@@ -16,12 +17,18 @@ namespace AutoMapper
         private readonly TypeInfo _sourceType;
         private bool _sealed;
         private Func<ResolutionContext, bool> _condition;
+        private ConstructorMap _constructorMap;
 
         public TypeMap(TypeInfo sourceType, TypeInfo destinationType)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             Profile = ConfigurationStore.DefaultProfileName;
+        }
+
+        public ConstructorMap ConstructorMap
+        {
+            get { return _constructorMap; }
         }
 
         public Type SourceType
@@ -237,6 +244,12 @@ namespace AutoMapper
         public bool ShouldAssignValue(ResolutionContext resolutionContext)
         {
             return _condition == null || _condition(resolutionContext);
+        }
+
+        public void AddConstructorMap(ConstructorInfo constructorInfo, IEnumerable<ConstructorParameterMap> parameters)
+        {
+            var ctorMap = new ConstructorMap(constructorInfo, parameters);
+            _constructorMap = ctorMap;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace AutoMapper
         private readonly MemberInfo[] _publicGetters;
         private readonly MemberInfo[] _publicAccessors;
         private readonly MethodInfo[] _publicGetMethods;
+        private readonly ConstructorInfo[] _constructors;
 
         public Type Type { get; private set; }
 
@@ -20,6 +21,12 @@ namespace AutoMapper
 			_publicGetters = BuildPublicReadAccessors(publicReadableMembers);
 			_publicAccessors = BuildPublicAccessors(publicReadableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
+            _constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        }
+
+        public IEnumerable<ConstructorInfo> GetConstructors()
+        {
+            return _constructors;
         }
 
         public IEnumerable<MemberInfo> GetPublicReadAccessors()

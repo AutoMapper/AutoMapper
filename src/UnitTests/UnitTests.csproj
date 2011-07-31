@@ -133,6 +133,7 @@
     <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="Configuration\MapperConfigurationSpecs.cs" />
+    <Compile Include="Constructors.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
     <Compile Include="DataReaderMapping.cs" />

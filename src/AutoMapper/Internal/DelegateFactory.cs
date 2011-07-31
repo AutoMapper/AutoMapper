@@ -17,6 +17,7 @@ namespace AutoMapper
 	internal delegate void LateBoundValueTypeFieldSet(ref object target, object value);
 	internal delegate void LateBoundValueTypePropertySet(ref object target, object value);
 	internal delegate object LateBoundCtor();
+    internal delegate object LateBoundParamsCtor(params object[] parameters);
 
 	internal static class DelegateFactory
 	{
@@ -179,5 +180,22 @@ namespace AutoMapper
 					Expression.ArrayIndex(argumentsParameter, Expression.Constant(index)),
 					parameter.ParameterType)).ToArray();
 		}
+
+	    public static LateBoundParamsCtor CreateCtor(ConstructorInfo constructorInfo, IEnumerable<ConstructorParameterMap> ctorParams)
+	    {
+	        ParameterExpression paramsExpr = Expression.Parameter(typeof(object[]), "parameters");
+
+            var convertExprs = ctorParams
+                .Select((ctorParam, i) => Expression.Convert(
+                    Expression.ArrayIndex(paramsExpr, Expression.Constant(i)),
+                    ctorParam.Parameter.ParameterType))
+                .ToArray();
+
+            NewExpression newExpression = Expression.New(constructorInfo, convertExprs);
+
+	        var lambda = Expression.Lambda<LateBoundParamsCtor>(newExpression, paramsExpr);
+
+	        return lambda.Compile();
+	    }
 	}
 }

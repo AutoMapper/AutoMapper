@@ -95,6 +95,8 @@
     <Compile Include="Configuration\MapperConfiguration.cs" />
     <Compile Include="Configuration\MapperRegistry.cs" />
     <Compile Include="Configuration\TypeMapConfiguration.cs" />
+    <Compile Include="ConstructorMap.cs" />
+    <Compile Include="ConstructorParameterMap.cs" />
     <Compile Include="IgnoreMapAttribute.cs" />
     <Compile Include="IMappingAction.cs" />
     <Compile Include="IMappingEngineRunner.cs" />

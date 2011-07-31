@@ -170,8 +170,13 @@ namespace AutoMapper
 		{
 			var typeMap = context.TypeMap;
 
-			if (typeMap != null && typeMap.DestinationCtor != null)
-				return typeMap.DestinationCtor(context.SourceValue);
+			if (typeMap != null)
+                if (typeMap.DestinationCtor != null)
+				    return typeMap.DestinationCtor(context.SourceValue);
+                else if (typeMap.ConstructorMap != null)
+                {
+                    return typeMap.ConstructorMap.ResolveValue(context);
+                }
 
 			if (context.DestinationValue != null)
 				return context.DestinationValue;
