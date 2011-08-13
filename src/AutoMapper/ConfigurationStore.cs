@@ -264,6 +264,11 @@ namespace AutoMapper
 			return _typeMaps.ToArray();
 		}
 
+        public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
+        {
+            return FindTypeMapFor(null, sourceType, destinationType);
+        }
+
 		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
 		{
 			var typeMapPair = new TypePair(sourceType, destinationType);

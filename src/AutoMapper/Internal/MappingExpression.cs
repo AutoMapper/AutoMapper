@@ -210,11 +210,7 @@ namespace AutoMapper
 
 		public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
 		{
-            if (sourceMember.Body is MemberExpression)
-            {
-                _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
-            }
-            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile()));
+            _propertyMap.SetCustomValueResolverExpression(sourceMember);
 		}
 
 		public void UseValue<TValue>(TValue value)

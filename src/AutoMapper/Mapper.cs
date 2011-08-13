@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using AutoMapper.Mappers;
 
 namespace AutoMapper
@@ -39,6 +40,11 @@ namespace AutoMapper
 		public static object Map(object source, object destination, Type sourceType, Type destinationType)
 		{
 			return Engine.Map(source, destination, sourceType, destinationType);
+		}
+
+        public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>()
+		{
+            return Engine.CreateMapExpression<TSource, TDestination>();
 		}
 
 		public static TDestination DynamicMap<TSource, TDestination>(TSource source)

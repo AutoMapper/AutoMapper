@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using AutoMapper.Internal;
 using AutoMapper.Mappers;
 using Castle.DynamicProxy;
@@ -15,6 +17,7 @@ namespace AutoMapper
         private readonly ProxyGenerator _proxyGenerator = new ProxyGenerator();
 		private readonly IObjectMapper[] _mappers;
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
+        private readonly ConcurrentDictionary<TypePair, LambdaExpression> _expressionCache = new ConcurrentDictionary<TypePair, LambdaExpression>();
 
 		public MappingEngine(IConfigurationProvider configurationProvider)
 		{
@@ -115,6 +118,129 @@ namespace AutoMapper
 			return ((IMappingEngineRunner)this).Map(context);
 		}
 
+        public Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>()
+        {
+            return (Expression<Func<TSource, TDestination>>) 
+                _expressionCache.GetOrAdd(new TypePair(typeof (TSource), typeof (TDestination)), tp =>
+            {
+                int i = 0;
+                return CreateMapExpression(tp.SourceType, tp.DestinationType, "source", ref i);
+            });
+        }
+
+        private LambdaExpression CreateMapExpression(
+            Type typeIn, Type typeOut, string variableName, ref int i)
+        {
+            var typeMap = ConfigurationProvider.FindTypeMapFor(typeIn, typeOut);
+
+            // this is the input parameter of this expression with name <variableName>
+            ParameterExpression instanceParameter = Expression.Parameter(typeIn, variableName);
+
+            var bindings = new List<MemberBinding>();
+            foreach (var propertyMap in typeMap.GetPropertyMaps())
+            {
+                var destinationProperty = propertyMap.DestinationProperty;
+                var destinationMember = destinationProperty.MemberInfo;
+
+                Expression currentChild = instanceParameter;
+                Type currentChildType = typeIn;
+                foreach (var resolver in propertyMap.GetSourceValueResolvers())
+                {
+                    var getter = resolver as IMemberGetter;
+                    if (getter != null)
+                    {
+                        var memberInfo = getter.MemberInfo;
+
+                        var propertyInfo = memberInfo as PropertyInfo;
+                        if (propertyInfo != null)
+                        {
+                            currentChild = Expression.Property(currentChild, propertyInfo);
+                            currentChildType = propertyInfo.PropertyType;
+                        }
+                    }
+                    else
+                    {
+                        var oldParameter =
+                            ((LambdaExpression)propertyMap.CustomExpression).Parameters.Single();
+                        var newParameter = instanceParameter;
+                        var converter = new ConversionVisitor(newParameter, oldParameter);
+                        currentChild = converter.Visit(((LambdaExpression)propertyMap.CustomExpression).Body);
+                        var propertyInfo = propertyMap.SourceMember as PropertyInfo;
+                        if (propertyInfo != null)
+                        {
+                            currentChildType = propertyInfo.PropertyType;
+                        }
+                    }
+                }
+
+                var prop = destinationProperty.MemberInfo as PropertyInfo;
+
+                // next to lists, also arrays
+                // and objects!!!
+                if (prop != null &&
+                    prop.PropertyType.GetInterface("IEnumerable") != null &&
+                    prop.PropertyType != typeof(string))
+                {
+
+                    Type destinationListType = prop.PropertyType.GetGenericArguments().First();
+                    Type sourceListType = null;
+                    // is list
+
+                    sourceListType = currentChildType.GetGenericArguments().First();
+
+                    var newVariableName = "t" + (i++);
+                    var transformedExpression = CreateMapExpression(
+                        sourceListType, destinationListType, newVariableName,
+                        ref i);
+
+                    MethodCallExpression selectExpression = Expression.Call(
+                                typeof(Enumerable),
+                                "Select",
+                                new[] { sourceListType, destinationListType },
+                                currentChild,
+                                transformedExpression);
+                    MethodCallExpression toListCallExpression = Expression.Call(
+                        typeof(Enumerable),
+                        "ToList",
+                        new Type[] { destinationListType },
+                        selectExpression);
+
+                    // todo .ToArray()
+                    bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+                }
+                else
+                {
+                    // does of course not work for subclasses etc./generic ...
+                    if (currentChildType != prop.PropertyType &&
+                        // avoid nullable etc.
+                        prop.PropertyType.BaseType != typeof(ValueType))
+                    {
+                        var newVariableName = "t" + (i++);
+                        var transformedExpression = CreateMapExpression(
+                            currentChildType, prop.PropertyType,
+                            newVariableName, ref i);
+                        var expr2 = Expression.Invoke(
+                            transformedExpression,
+                            instanceParameter
+                        );
+                        bindings.Add(Expression.Bind(destinationMember, expr2));
+                    }
+                    else
+                    {
+                        bindings.Add(Expression.Bind(destinationMember, currentChild));
+                    }
+                }
+
+            }
+            var total = Expression.MemberInit(
+                Expression.New(typeOut),
+                bindings.ToArray()
+            );
+
+            return Expression.Lambda(total, instanceParameter);
+        }
+
+
 		object IMappingEngineRunner.Map(ResolutionContext context)
 		{
 			try
@@ -211,5 +337,38 @@ namespace AutoMapper
 
 		    _objectMapperCache.TryRemove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType), out existing);
 		}
+
+        /// <summary>
+        /// This expression visitor will replace an input parameter by another one
+        /// 
+        /// see http://stackoverflow.com/questions/4601844/expression-tree-copy-or-convert
+        /// </summary>
+        private class ConversionVisitor : ExpressionVisitor
+        {
+            private readonly ParameterExpression newParameter;
+            private readonly ParameterExpression oldParameter;
+
+            public ConversionVisitor(ParameterExpression newParameter, ParameterExpression oldParameter)
+            {
+                this.newParameter = newParameter;
+                this.oldParameter = oldParameter;
+            }
+
+            protected override Expression VisitParameter(ParameterExpression node)
+            {
+                return newParameter; // replace all old param references with new ones
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node.Expression != oldParameter) // if instance is not old parameter - do nothing
+                    return base.VisitMember(node);
+
+                var newObj = Visit(node.Expression);
+                var newMember = newParameter.Type.GetMember(node.Member.Name).First();
+                return Expression.MakeMemberAccess(newObj, newMember);
+            }
+        }
+
 	}
 }

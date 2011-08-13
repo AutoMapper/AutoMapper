@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
 
@@ -28,6 +29,7 @@ namespace AutoMapper
         }
 
         public IMemberAccessor DestinationProperty { get; private set; }
+        public LambdaExpression CustomExpression { get; private set; }
 
         public MemberInfo SourceMember
         {
@@ -226,5 +228,16 @@ namespace AutoMapper
         {
             return _condition == null || _condition(context);
         }
+
+        public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
+        {
+            if (sourceMember.Body is MemberExpression)
+            {
+                SourceMember = ((MemberExpression) sourceMember.Body).Member;
+            }
+            CustomExpression = sourceMember;
+            AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile()));
+        }
+
     }
 }
