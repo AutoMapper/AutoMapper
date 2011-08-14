@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using NUnit.Framework;
-using NBehave.Spec.NUnit;
+using Should;
 #if !SILVERLIGHT
 using NUnit.Framework.SyntaxHelpers;
 #endif

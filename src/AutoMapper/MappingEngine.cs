@@ -36,27 +36,68 @@ namespace AutoMapper
 			Type modelType = typeof(TSource);
 			Type destinationType = typeof(TDestination);
 
-			return (TDestination)Map(source, modelType, destinationType);
+			return (TDestination)Map(source, modelType, destinationType, opts => {});
 		}
 
-		public TDestination Map<TSource, TDestination>(ResolutionContext parentContext, TSource source)
+        public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
+        {
+            Type modelType = typeof (TSource);
+            Type destinationType = typeof (TDestination);
+
+            return (TDestination) Map(source, modelType, destinationType, opts);
+        }
+
+	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
 		{
-			Type destinationType = typeof(TDestination);
-			Type sourceType = typeof(TSource);
-			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
-			var context = parentContext.CreateTypeContext(typeMap, source, sourceType, destinationType);
-			return (TDestination)((IMappingEngineRunner)this).Map(context);
+		    return Map(source, destination, opts => { });
 		}
 
-		public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
-		{
-			Type modelType = typeof(TSource);
-			Type destinationType = typeof(TDestination);
+	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
+	    {
+            Type modelType = typeof(TSource);
+            Type destinationType = typeof(TDestination);
 
-			return (TDestination)Map(source, destination, modelType, destinationType);
-		}
+            return (TDestination)Map(source, destination, modelType, destinationType, opts);
+        }
 
-		public TDestination DynamicMap<TSource, TDestination>(TSource source)
+	    public object Map(object source, Type sourceType, Type destinationType)
+	    {
+	        return Map(source, sourceType, destinationType, opt => { });
+	    }
+
+	    public object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+	    {
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
+
+	        var options = new MappingOperationOptions();
+
+            opts(options);
+
+	        var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options);
+
+            return ((IMappingEngineRunner)this).Map(context);
+	    }
+
+	    public object Map(object source, object destination, Type sourceType, Type destinationType)
+	    {
+	        return Map(source, destination, sourceType, destinationType, opts => { });
+        }
+
+	    public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+	    {
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
+
+	        var options = new MappingOperationOptions();
+
+            opts(options);
+
+	        var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options);
+
+            return ((IMappingEngineRunner)this).Map(context);
+        }
+
+
+	    public TDestination DynamicMap<TSource, TDestination>(TSource source)
 		{
 			Type modelType = typeof(TSource);
 			Type destinationType = typeof(TDestination);
@@ -85,7 +126,7 @@ namespace AutoMapper
 			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
-			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
+			var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions());
 
 			return ((IMappingEngineRunner)this).Map(context);
 		}
@@ -95,27 +136,9 @@ namespace AutoMapper
 			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
-			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType);
+			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions());
 
 			((IMappingEngineRunner)this).Map(context);
-		}
-
-		public object Map(object source, Type sourceType, Type destinationType)
-		{
-			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
-
-			var context = new ResolutionContext(typeMap, source, sourceType, destinationType);
-
-			return ((IMappingEngineRunner)this).Map(context);
-		}
-
-		public object Map(object source, object destination, Type sourceType, Type destinationType)
-		{
-			TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
-
-			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType);
-
-			return ((IMappingEngineRunner)this).Map(context);
 		}
 
         public Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>()
@@ -126,6 +149,15 @@ namespace AutoMapper
                 int i = 0;
                 return CreateMapExpression(tp.SourceType, tp.DestinationType, "source", ref i);
             });
+        }
+
+        public TDestination Map<TSource, TDestination>(ResolutionContext parentContext, TSource source)
+        {
+            Type destinationType = typeof(TDestination);
+            Type sourceType = typeof(TSource);
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
+            var context = parentContext.CreateTypeContext(typeMap, source, sourceType, destinationType);
+            return (TDestination)((IMappingEngineRunner)this).Map(context);
         }
 
         private LambdaExpression CreateMapExpression(

@@ -1,6 +1,6 @@
 using System;
 using AutoMapper.UnitTests;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapper.Tests

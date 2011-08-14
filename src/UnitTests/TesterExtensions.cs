@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using NBehave.Spec.NUnit;
+using Should;
 
 namespace AutoMapper.UnitTests
 {

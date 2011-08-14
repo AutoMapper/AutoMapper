@@ -1,6 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 using System.Linq;
 using Rhino.Mocks;

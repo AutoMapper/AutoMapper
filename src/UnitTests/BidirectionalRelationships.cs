@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using NBehave.Spec.NUnit;
+using Should;
 
 using NUnit.Framework;
 
@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_preserve_the_parent_child_relationship_on_the_destination()
 			{
-				_dto.Children[0].Parent.ShouldBeTheSameAs(_dto);
+				_dto.Children[0].Parent.ShouldBeSameAs(_dto);
 			}
 
 			public class ParentModel
@@ -308,7 +308,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_preserve_the_parent_child_relationship_on_the_destination()
 			{
-				_dto.Bar.Foo.ShouldBeTheSameAs(_dto);
+				_dto.Bar.Foo.ShouldBeSameAs(_dto);
 			}
 
 			public class Foo

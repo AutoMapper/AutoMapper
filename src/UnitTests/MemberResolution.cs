@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapper.UnitTests
@@ -61,8 +61,8 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_to_the_correct_respective_dto_types()
 			{
-				_result[0].ShouldBeInstanceOfType(typeof (DtoObject));
-				_result[1].ShouldBeInstanceOfType(typeof (DtoSubObject));
+				_result[0].ShouldBeType(typeof (DtoObject));
+				_result[1].ShouldBeType(typeof (DtoSubObject));
 			}
 		}
 
@@ -110,7 +110,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_to_the_correct_dto_types()
 			{
-                _result.ShouldBeInstanceOfType(typeof(DtoSubObject));
+                _result.ShouldBeType(typeof(DtoSubObject));
 			}
 		}
 
@@ -166,7 +166,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_map_to_the_correct_respective_dto_types()
 			{
-				_result[0].ShouldBeInstanceOfType(typeof (DtoSubObject));
+				_result[0].ShouldBeType(typeof (DtoSubObject));
 				((DtoSubObject) _result[0]).SubString.ShouldEqual("Sub2");
 			}
 		}
@@ -226,8 +226,8 @@ namespace AutoMapper.UnitTests
 
 				_result = Mapper.Map<Model, DtoModel>(model);
 				_result.Object.ShouldNotBeNull();
-				_result.Object.ShouldBeInstanceOf<DtoSubObject>();
-				_result.Object.ShouldBeInstanceOf<DtoSubObject>();
+				_result.Object.ShouldBeType<DtoSubObject>();
+				_result.Object.ShouldBeType<DtoSubObject>();
 				_result.Object.BaseString.ShouldEqual("Base2");
 				((DtoSubObject) _result.Object).SubString.ShouldEqual("Sub2");
 			}

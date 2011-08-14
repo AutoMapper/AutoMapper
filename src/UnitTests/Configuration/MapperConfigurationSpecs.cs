@@ -1,13 +1,11 @@
-using System.Linq;
 using AutoMapper.Configuration;
-using Machine.Specifications;
+using NUnit.Framework;
 
 namespace AutoMapper.UnitTests.Configuration
 {
     namespace MapperConfigurationSpecs
     {
-        [Subject("Basic configuration")]
-        public class when_configuring_two_flat_types
+        public class when_configuring_two_flat_types : AutoMapperSpecBase
         {
             static MapperConfiguration _configuration;
 
@@ -21,23 +19,20 @@ namespace AutoMapper.UnitTests.Configuration
                 public int Value { get; set; }
             }
 
-            Establish context = () =>
+            protected override void Establish_context()
             {
                 _configuration = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Source, Destination>();
                 });
-            };
+            }
 
-            Because of = () =>
-            {
-
-            };
-
-            It should_record_the_type_map = () =>
+            [Test]
+            public void should_record_the_type_map()
             {
                 //_configuration.TypeMaps.Count().ShouldEqual(1);
-            };
+                
+            }
         }
     }
 }

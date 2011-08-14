@@ -1,6 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapper.UnitTests.Bug

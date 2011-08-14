@@ -33,7 +33,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => _formatterCtor(typeof(TValueFormatter)));
+            var formatter = new DeferredInstantiatedFormatter(BuildCtor(typeof(TValueFormatter)));
 
 			AddFormatter(formatter);
 
@@ -42,7 +42,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => _formatterCtor(valueFormatterType));
+			var formatter = new DeferredInstantiatedFormatter(BuildCtor(valueFormatterType));
 
 			AddFormatter(formatter);
 
@@ -126,7 +126,7 @@ namespace AutoMapper
 
             foreach (IValueFormatter formatter in GetFormatters())
             {
-                Type formatterType = GetFormatterType(formatter);
+                Type formatterType = GetFormatterType(formatter, context);
                 if (CheckPropertyMapSkipList(context, formatterType) &&
                     CheckTypeSpecificSkipList(typeSpecificFormatterConfig, formatterType))
                 {
@@ -138,7 +138,7 @@ namespace AutoMapper
 	    public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
 		{
 			_formatters.RemoveAt(_formatters.Count - 1);
-			_formatters.Add(new DeferredInstantiatedFormatter(instantiator));
+			_formatters.Add(new DeferredInstantiatedFormatter(ctxt => instantiator()));
 		}
 
 		public bool MapNullSourceValuesAsNull
@@ -181,9 +181,9 @@ namespace AutoMapper
             DestinationMemberNameTransformer = val => postfixes.Aggregate(orig(val), PostfixFunc);
         }
 
-        private static Type GetFormatterType(IValueFormatter formatter)
+        private static Type GetFormatterType(IValueFormatter formatter, ResolutionContext context)
         {
-            return formatter is DeferredInstantiatedFormatter ? ((DeferredInstantiatedFormatter)formatter).GetFormatterType() : formatter.GetType();
+            return formatter is DeferredInstantiatedFormatter ? ((DeferredInstantiatedFormatter)formatter).GetFormatterType(context) : formatter.GetType();
         }
 
         private static bool CheckTypeSpecificSkipList(IFormatterConfiguration valueFormatter, Type formatterType)
@@ -202,6 +202,20 @@ namespace AutoMapper
                 return true;
 
             return !context.PropertyMap.FormattersToSkipContains(formatterType);
+        }
+
+        private Func<ResolutionContext, IValueFormatter> BuildCtor(Type type)
+        {
+            return context =>
+            {
+                if (context.Options.ServiceCtor != null)
+                {
+                    var obj = context.Options.ServiceCtor(type);
+                    if (obj != null)
+                        return (IValueFormatter)obj;
+                }
+                return (IValueFormatter)_formatterCtor(type);
+            };
         }
 
     }

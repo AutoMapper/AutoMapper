@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using NBehave.Spec.NUnit;
+using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -68,7 +68,7 @@ namespace AutoMapper.UnitTests.Bug
 
 				destList.Count.ShouldEqual(2);
 				destList[0].Children.Count.ShouldEqual(1);
-				destList[0].Children[0].ShouldBeTheSameAs(destList[1]);
+				destList[0].Children[0].ShouldBeSameAs(destList[1]);
 			}
 		}
 	}

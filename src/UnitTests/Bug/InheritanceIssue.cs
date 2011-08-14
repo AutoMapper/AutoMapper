@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using AutoMapper;
-using NBehave.Spec.NUnit;
+using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -185,9 +185,9 @@ namespace AutoMapper.UnitTests.Bug
 
                 targetEntity.Components.Last().Value.Name.ShouldEqual("PhysicalLocation");
 
-                targetEntity.Components.First().Value.ShouldBeInstanceOf<HealthDTO>();
+                targetEntity.Components.First().Value.ShouldBeType<HealthDTO>();
 
-                targetEntity.Components.Last().Value.ShouldBeInstanceOf<PhysicalLocationDTO>();
+                targetEntity.Components.Last().Value.ShouldBeType<PhysicalLocationDTO>();
             }
         }
     }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using NBehave.Spec.NUnit;
+using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -75,7 +75,7 @@ namespace AutoMapper.UnitTests.Bug
 				Assert.AreEqual(source.Addresses[0].Street, result.Addresses[0].Street);
 
 				// This is what I can't get to pass:
-				result.Addresses[0].ShouldBeInstanceOf<AddressTwo>();
+				result.Addresses[0].ShouldBeType<AddressTwo>();
 
 				// Expected: instance of <AutomapperTest.AddressTwo>
 				// But was:  <AutomapperTest.AddressOne>

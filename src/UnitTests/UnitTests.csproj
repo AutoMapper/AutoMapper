@@ -75,17 +75,6 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Machine.Specifications">
-      <HintPath>..\..\tools\Machine.Specifications-net-4.0-Release\Machine.Specifications.dll</HintPath>
-    </Reference>
-    <Reference Include="NBehave.Spec.Framework, Version=0.4.0.0, Culture=neutral, PublicKeyToken=d421feca0f4a05f6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NBehave.Spec.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="NBehave.Spec.NUnit, Version=0.4.0.0, Culture=neutral, PublicKeyToken=d421feca0f4a05f6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NBehave.Spec.NUnit.dll</HintPath>
-    </Reference>
     <Reference Include="NUnit.framework">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NUnit.framework.dll</HintPath>
@@ -93,6 +82,9 @@
     <Reference Include="Rhino.Mocks, Version=3.5.0.1337, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Rhino.Mocks.dll</HintPath>
+    </Reference>
+    <Reference Include="Should">
+      <HintPath>..\..\lib\Should.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -167,6 +159,7 @@
     <Compile Include="MappingOrder.cs" />
     <Compile Include="MaxDepthTests.cs" />
     <Compile Include="MemberResolution.cs" />
+    <Compile Include="NestedContainers.cs" />
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="Regression.cs" />

@@ -1,10 +1,11 @@
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace AutoMapper.UnitTests
 {
     public class AutoMapperSpecBase : NonValidatingSpecBase
-	{
+    {
         [Test]
         public void Should_have_valid_configuration()
         {
@@ -20,4 +21,59 @@ namespace AutoMapper.UnitTests
         }
 
     }
+
+    public abstract class SpecBaseBase
+    {
+        public virtual void MainSetup()
+        {
+            Establish_context();
+            Because_of();
+        }
+
+        public virtual void MainTeardown()
+        {
+            Cleanup();
+        }
+
+        protected virtual void Establish_context()
+        {
+        }
+
+        protected virtual void Because_of()
+        {
+        }
+
+        protected virtual void Cleanup()
+        {
+        }
+
+        protected TType CreateDependency<TType>()
+            where TType : class
+        {
+            return MockRepository.GenerateMock<TType>();
+        }
+
+        protected TType CreateStub<TType>() where TType : class
+        {
+            return MockRepository.GenerateStub<TType>();
+        }
+    }
+
+    [TestFixture]
+    public abstract class SpecBase : SpecBaseBase
+    {
+        [TestFixtureSetUp]
+        public override void MainSetup()
+        {
+            base.MainSetup();
+        }
+
+        [TestFixtureTearDown]
+        public override void MainTeardown()
+        {
+            base.MainTeardown();
+        }
+    }
+
 }
+

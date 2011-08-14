@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using NUnit.Framework;
-using NBehave.Spec.NUnit;
+using Should;
 using System.Linq;
 
 namespace AutoMapper.UnitTests

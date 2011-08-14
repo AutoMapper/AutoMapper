@@ -26,7 +26,7 @@ namespace AutoMapper
 		{
 			var interfaceType = typeof (ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, _typeMap.DestinationType);
 			var convertMethodType = interfaceType.IsAssignableFrom(typeConverterType) ? interfaceType : typeConverterType;
-			var converter = new DeferredInstantiatedConverter(convertMethodType, () => _typeConverterCtor(typeConverterType));
+            var converter = new DeferredInstantiatedConverter(convertMethodType, BuildCtor<object>(typeConverterType));
 
 			_typeMap.UseCustomMapper(converter.Convert);
 		}
@@ -71,7 +71,7 @@ namespace AutoMapper
 
         public IResolverConfigurationExpression ResolveUsing(Type valueResolverType)
         {
-            var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)_typeConverterCtor(valueResolverType));
+            var resolver = new DeferredInstantiatedResolver(BuildCtor<IValueResolver>(valueResolverType));
 
             ResolveUsing(resolver);
 
@@ -80,7 +80,7 @@ namespace AutoMapper
 
 	    public IResolverConfigurationExpression ResolveUsing<TValueResolver>()
 	    {
-            var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)_typeConverterCtor(typeof(TValueResolver)));
+            var resolver = new DeferredInstantiatedResolver(BuildCtor<IValueResolver>((typeof(TValueResolver))));
 
             ResolveUsing(resolver);
 
@@ -91,7 +91,21 @@ namespace AutoMapper
 	    {
 	        _propertyMap.Ignore();
 	    }
-	}
+
+        private Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)
+        {
+            return context =>
+            {
+                if (context.Options.ServiceCtor != null)
+                {
+                    var obj = context.Options.ServiceCtor(type);
+                    if (obj != null)
+                        return (TServiceType)obj;
+                }
+                return (TServiceType)_typeConverterCtor(type);
+            };
+        }
+    }
 
 	internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
 	{
@@ -152,7 +166,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)_serviceCtor(typeof(TValueFormatter)));
+			var formatter = new DeferredInstantiatedFormatter(BuildCtor<IValueFormatter>(typeof(TValueFormatter)));
 
 			AddFormatter(formatter);
 
@@ -161,7 +175,7 @@ namespace AutoMapper
 
 		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
 		{
-			var formatter = new DeferredInstantiatedFormatter(() => (IValueFormatter)_serviceCtor(valueFormatterType));
+			var formatter = new DeferredInstantiatedFormatter(BuildCtor<IValueFormatter>(valueFormatterType));
 
 			AddFormatter(formatter);
 
@@ -180,7 +194,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
 		{
-			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)_serviceCtor(typeof(TValueResolver)));
+			var resolver = new DeferredInstantiatedResolver(BuildCtor<IValueResolver>(typeof(TValueResolver)));
 
 			ResolveUsing(resolver);
 
@@ -189,7 +203,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
 		{
-			var resolver = new DeferredInstantiatedResolver(() => (IValueResolver)_serviceCtor(valueResolverType));
+			var resolver = new DeferredInstantiatedResolver(BuildCtor<IValueResolver>(valueResolverType));
 
 			ResolveUsing(resolver);
 
@@ -283,7 +297,7 @@ namespace AutoMapper
 		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
 		{
 			_propertyMap.RemoveLastFormatter();
-			_propertyMap.AddFormatter(new DeferredInstantiatedFormatter(instantiator));
+			_propertyMap.AddFormatter(new DeferredInstantiatedFormatter(ctxt => instantiator()));
 		}
 
 		public void ConvertUsing(Func<TSource, TDestination> mappingFunction)
@@ -358,6 +372,20 @@ namespace AutoMapper
         public void As<T>()
         {
             _typeMap.DestinationTypeOverride = typeof(T);
+        }
+
+        private Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)
+        {
+            return context =>
+            {
+                if (context.Options.ServiceCtor != null)
+                {
+                    var obj = context.Options.ServiceCtor(type);
+                    if (obj != null)
+                        return (TServiceType)obj;
+                }
+                return (TServiceType)_serviceCtor(type);
+            };
         }
 	}
 }

@@ -2,7 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapper.UnitTests
@@ -217,7 +217,7 @@ namespace AutoMapper.UnitTests
 
 			var target = ctor();
 
-			target.ShouldBeInstanceOf<Source>();
+			target.ShouldBeType<Source>();
 		}
 
 		[Test]
@@ -229,7 +229,7 @@ namespace AutoMapper.UnitTests
 
 			var target = ctor();
 
-			target.ShouldBeInstanceOf<ValueSource>();
+			target.ShouldBeType<ValueSource>();
 		}
 
 		public object CreateValueSource()

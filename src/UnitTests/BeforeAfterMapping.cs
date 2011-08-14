@@ -1,5 +1,5 @@
 using System;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapper.UnitTests.BeforeAfterMapping

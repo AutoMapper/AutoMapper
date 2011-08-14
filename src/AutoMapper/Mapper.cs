@@ -4,7 +4,7 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
-	public static class Mapper
+    public static class Mapper
 	{
 	    private static readonly Func<ConfigurationStore> _configurationInit =
 	        () => new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
@@ -32,15 +32,35 @@ namespace AutoMapper
 			return Engine.Map(source, destination);
 		}
 
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
+        {
+            return Engine.Map(source, destination, opts);
+        }
+
+		public static TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
+		{
+            return Engine.Map<TSource, TDestination>(source, opts);
+		}
+
 		public static object Map(object source, Type sourceType, Type destinationType)
 		{
 			return Engine.Map(source, sourceType, destinationType);
 		}
 
+        public static object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+        {
+            return Engine.Map(source, sourceType, destinationType, opts);
+        }
+
 		public static object Map(object source, object destination, Type sourceType, Type destinationType)
 		{
 			return Engine.Map(source, destination, sourceType, destinationType);
 		}
+
+        public static object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+        {
+            return Engine.Map(source, destination, sourceType, destinationType, opts);
+        }
 
         public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>()
 		{

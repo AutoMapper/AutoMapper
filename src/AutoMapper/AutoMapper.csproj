@@ -100,6 +100,7 @@
     <Compile Include="IgnoreMapAttribute.cs" />
     <Compile Include="IMappingAction.cs" />
     <Compile Include="IMappingEngineRunner.cs" />
+    <Compile Include="IMappingOperationOptions.cs" />
     <Compile Include="INamingConvention.cs" />
     <Compile Include="Internal\NotifyPropertyBehaviorInterceptor.cs" />
     <Compile Include="Internal\PropertyBehaviorInterceptor.cs" />

@@ -38,7 +38,7 @@ namespace AutoMapper
 
 	    public IResolutionExpression<TSource> ConstructedBy(Func<IValueResolver> constructor)
 		{
-			_propertyMap.ChainConstructorForResolver(new DeferredInstantiatedResolver(constructor));
+			_propertyMap.ChainConstructorForResolver(new DeferredInstantiatedResolver(ctxt => constructor())); 
 
 			return this;
 		}
@@ -63,7 +63,7 @@ namespace AutoMapper
 		{
             if (sourceMember.Body is MemberExpression)
             {
-                _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
+                _propertyMap.SourceMember = ((MemberExpression) sourceMember.Body).Member;
             }
             _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember.Compile()));
 
@@ -80,7 +80,7 @@ namespace AutoMapper
 
 		public IResolverConfigurationExpression<TSource, TValueResolver> ConstructedBy(Func<TValueResolver> constructor)
 		{
-			_propertyMap.ChainConstructorForResolver(new DeferredInstantiatedResolver(() => constructor()));
+			_propertyMap.ChainConstructorForResolver(new DeferredInstantiatedResolver(ctxt => constructor()));
 
 			return this;
 		}

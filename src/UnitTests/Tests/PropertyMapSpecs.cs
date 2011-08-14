@@ -1,24 +1,24 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using Machine.Specifications;
+using NUnit.Framework;
+using Should;
 
 namespace AutoMapper.UnitTests.Tests
 {
-    public abstract class PropertyMap_SourceMember_Specs
+    public abstract class using_generic_configuration : AutoMapperSpecBase
     {
-        Cleanup after = () => Mapper.Reset();
-    }
-
-    public abstract class using_generic_configuration : PropertyMap_SourceMember_Specs
-    {
-        Establish context = () => Mapper.CreateMap<Source, Destination>()
-            .ForMember(d => d.Ignored, o => o.Ignore())
-            .ForMember(d => d.RenamedField, o => o.MapFrom(s => s.NamedProperty))
-            .ForMember(d => d.IntField, o => o.ResolveUsing<FakeResolver>().FromMember(s => s.StringField))
-            .ForMember("IntProperty", o => o.ResolveUsing<FakeResolver>().FromMember("AnotherStringField"))
-            .ForMember(d => d.IntProperty3, o => o.ResolveUsing(typeof(FakeResolver)).FromMember(s => s.StringField3))
-            .ForMember(d => d.IntField4, o => o.ResolveUsing(new FakeResolver()).FromMember("StringField4"));
+        protected override void Establish_context()
+        {
+            Mapper.CreateMap<Source, Destination>()
+                .ForMember(d => d.Ignored, o => o.Ignore())
+                .ForMember(d => d.RenamedField, o => o.MapFrom(s => s.NamedProperty))
+                .ForMember(d => d.IntField, o => o.ResolveUsing<FakeResolver>().FromMember(s => s.StringField))
+                .ForMember("IntProperty", o => o.ResolveUsing<FakeResolver>().FromMember("AnotherStringField"))
+                .ForMember(d => d.IntProperty3,
+                           o => o.ResolveUsing(typeof (FakeResolver)).FromMember(s => s.StringField3))
+                .ForMember(d => d.IntField4, o => o.ResolveUsing(new FakeResolver()).FromMember("StringField4"));
+        }
 
         protected class Source
         {
@@ -57,149 +57,218 @@ namespace AutoMapper.UnitTests.Tests
         }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_members_have_matching_names : using_generic_configuration
     {
         const string memberName = "PropertyWithMatchingName";
         static MemberInfo sourceMember;
 
-        Because of = () => sourceMember =
-            Mapper.FindTypeMapFor<Source, Destination>()
-                .GetPropertyMaps()
-                .Single(pm => pm.DestinationProperty.Name == memberName)
-                .SourceMember;
+        protected override void Because_of()
+        {
+            sourceMember =
+                Mapper.FindTypeMapFor<Source, Destination>()
+                    .GetPropertyMaps()
+                    .Single(pm => pm.DestinationProperty.Name == memberName)
+                    .SourceMember;
+        }
 
-        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+        [Test]
+        public void should_not_be_null()
+        {
+            sourceMember.ShouldNotBeNull();
+        }
 
-        It should_have_the_matching_member_of_the_source_type_as_value = () =>
-            sourceMember.ShouldBeTheSameAs(typeof(Source).GetProperty(memberName));
+        [Test]
+        public void should_have_the_matching_member_of_the_source_type_as_value()
+        {
+            sourceMember.ShouldBeSameAs(typeof (Source).GetProperty(memberName));
+        }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_the_destination_member_is_flattened : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
-        Because of = () => sourceMember =
-            Mapper.FindTypeMapFor<Source, Destination>()
-                .GetPropertyMaps()
-                .Single(pm => pm.DestinationProperty.Name == "NestedSourceSomeField")
-                .SourceMember;
+        protected override void Because_of()
+        {
+            sourceMember =
+                Mapper.FindTypeMapFor<Source, Destination>()
+                    .GetPropertyMaps()
+                    .Single(pm => pm.DestinationProperty.Name == "NestedSourceSomeField")
+                    .SourceMember;
+        }
 
-        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+        [Test] public void should_not_be_null()
+        {
+            sourceMember.ShouldNotBeNull();
+        }
 
-        It should_have_the_member_of_the_nested_source_type_as_value = () =>
-            sourceMember.ShouldBeTheSameAs(typeof(NestedSource).GetField("SomeField"));
+        [Test] public void should_have_the_member_of_the_nested_source_type_as_value()
+        {
+            sourceMember.ShouldBeSameAs(typeof (NestedSource).GetField("SomeField"));
+        }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_the_destination_member_is_ignored : using_generic_configuration
     {
         static Exception exception;
         static MemberInfo sourceMember;
 
-        Because of = () => exception = Catch.Exception(() =>
-            sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
-                    .GetPropertyMaps()
-                    .Single(pm => pm.DestinationProperty.Name == "Ignored")
-                    .SourceMember
-        );
+        protected override void Because_of()
+        {
+            try
+            {
+                sourceMember =
+                    Mapper.FindTypeMapFor<Source, Destination>()
+                        .GetPropertyMaps()
+                        .Single(pm => pm.DestinationProperty.Name == "Ignored")
+                        .SourceMember;
 
-        It should_not_throw_an_exception = () => exception.ShouldBeNull();
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
+                                        
+        }
 
-        It should_be_null = () => sourceMember.ShouldBeNull();
+        [Test] public void should_not_throw_an_exception()
+        {
+            exception.ShouldBeNull();
+        }
+
+        [Test] public void should_be_null()
+        {
+            sourceMember.ShouldBeNull();
+        }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_the_destination_member_is_projected : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
-        Because of = () => sourceMember =
-            Mapper.FindTypeMapFor<Source, Destination>()
-                .GetPropertyMaps()
-                .Single(pm => pm.DestinationProperty.Name == "RenamedField")
-                .SourceMember;
+        protected override void Because_of()
+        {
+            sourceMember =
+                Mapper.FindTypeMapFor<Source, Destination>()
+                    .GetPropertyMaps()
+                    .Single(pm => pm.DestinationProperty.Name == "RenamedField")
+                    .SourceMember;
+        }
 
-        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+        [Test] public void should_not_be_null()
+        {
+            sourceMember.ShouldNotBeNull();
+        }
 
-        It should_have_the_projected_member_of_the_source_type_as_value = () =>
-            sourceMember.ShouldBeTheSameAs(typeof(Source).GetProperty("NamedProperty"));
+        [Test] public void should_have_the_projected_member_of_the_source_type_as_value()
+        {
+            sourceMember.ShouldBeSameAs(typeof (Source).GetProperty("NamedProperty"));
+        }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_the_destination_member_is_resolved_from_a_source_member : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
-        Because of = () => sourceMember =
-            Mapper.FindTypeMapFor<Source, Destination>()
-                .GetPropertyMaps()
-                .Single(pm => pm.DestinationProperty.Name == "IntField")
-                .SourceMember;
+        protected override void Because_of()
+        {
+            sourceMember =
+                Mapper.FindTypeMapFor<Source, Destination>()
+                    .GetPropertyMaps()
+                    .Single(pm => pm.DestinationProperty.Name == "IntField")
+                    .SourceMember;
+        }
 
-        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+        [Test] public void should_not_be_null()
+        {
+            sourceMember.ShouldNotBeNull();
+        }
 
-        It should_have_the_member_of_the_source_type_it_is_resolved_from_as_value = () =>
-            sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("StringField"));
+        [Test] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
+        {
+            sourceMember.ShouldBeSameAs(typeof (Source).GetField("StringField"));
+        }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_the_destination_property_is_resolved_from_a_source_member_using_the_Magic_String_overload : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
-        Because of = () => sourceMember =
-            Mapper.FindTypeMapFor<Source, Destination>()
-                .GetPropertyMaps()
-                .Single(pm => pm.DestinationProperty.Name == "IntProperty")
-                .SourceMember;
+        protected override void Because_of()
+        {
+            sourceMember =
+                Mapper.FindTypeMapFor<Source, Destination>()
+                    .GetPropertyMaps()
+                    .Single(pm => pm.DestinationProperty.Name == "IntProperty")
+                    .SourceMember;
+        }
 
-        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+        [Test] public void should_not_be_null()
+        {
+            sourceMember.ShouldNotBeNull();
+        }
 
-        It should_have_the_member_of_the_source_type_it_is_resolved_from_as_value = () =>
-            sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("AnotherStringField"));
+        [Test] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
+        {
+            sourceMember.ShouldBeSameAs(typeof (Source).GetField("AnotherStringField"));
+        }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_the_destination_property_is_resolved_from_a_source_member_using_the_non_generic_resolve_method : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
-        Because of = () => sourceMember =
-            Mapper.FindTypeMapFor<Source, Destination>()
-                .GetPropertyMaps()
-                .Single(pm => pm.DestinationProperty.Name == "IntProperty3")
-                .SourceMember;
+        protected override void Because_of()
+        {
+            sourceMember =
+                Mapper.FindTypeMapFor<Source, Destination>()
+                    .GetPropertyMaps()
+                    .Single(pm => pm.DestinationProperty.Name == "IntProperty3")
+                    .SourceMember;
+        }
 
-        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+        [Test] public void should_not_be_null()
+        {
+            sourceMember.ShouldNotBeNull();
+        }
 
-        It should_have_the_member_of_the_source_type_it_is_resolved_from_as_value = () =>
-            sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("StringField3"));
+        [Test] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
+        {
+            sourceMember.ShouldBeSameAs(typeof (Source).GetField("StringField3"));
+        }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_the_destination_property_is_resolved_from_a_source_member_using_non_the_generic_resolve_method_and_the_Magic_String_overload : using_generic_configuration
     {
         static MemberInfo sourceMember;
 
-        Because of = () => sourceMember =
-            Mapper.FindTypeMapFor<Source, Destination>()
-                .GetPropertyMaps()
-                .Single(pm => pm.DestinationProperty.Name == "IntField4")
-                .SourceMember;
+        protected override void Because_of()
+        {
+            sourceMember =
+                Mapper.FindTypeMapFor<Source, Destination>()
+                    .GetPropertyMaps()
+                    .Single(pm => pm.DestinationProperty.Name == "IntField4")
+                    .SourceMember;
+        }
 
-        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+        [Test] public void should_not_be_null()
+        {
+            sourceMember.ShouldNotBeNull();
+        }
 
-        It should_have_the_member_of_the_source_type_it_is_resolved_from_as_value = () =>
-            sourceMember.ShouldBeTheSameAs(typeof(Source).GetField("StringField4"));
+        [Test] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
+        {
+            sourceMember.ShouldBeSameAs(typeof (Source).GetField("StringField4"));
+        }
     }
 
-    public abstract class using_nongeneric_configuration : PropertyMap_SourceMember_Specs
+    public abstract class using_nongeneric_configuration : AutoMapperSpecBase
     {
-        Establish context = () => Mapper.CreateMap(typeof(Source), typeof(Destination))
-            .ForMember("RenamedProperty", o => o.MapFrom("NamedProperty"));
+        protected override void Establish_context()
+        {
+            Mapper.CreateMap(typeof (Source), typeof (Destination))
+                .ForMember("RenamedProperty", o => o.MapFrom("NamedProperty"));
+        }
 
         protected class Source
         {
@@ -212,20 +281,28 @@ namespace AutoMapper.UnitTests.Tests
         }
     }
 
-    [Subject(typeof(PropertyMap), ".SourceMember")]
     public class when_the_destination_property_is_projected : using_nongeneric_configuration
     {
         static MemberInfo sourceMember;
 
-        Because of = () => sourceMember =
-            Mapper.FindTypeMapFor<Source, Destination>()
-                .GetPropertyMaps()
-                .Single(pm => pm.DestinationProperty.Name == "RenamedProperty")
-                .SourceMember;
+        protected override void Because_of()
+        {
+            sourceMember =
+                Mapper.FindTypeMapFor<Source, Destination>()
+                    .GetPropertyMaps()
+                    .Single(pm => pm.DestinationProperty.Name == "RenamedProperty")
+                    .SourceMember;
+        }
 
-        It should_not_be_null = () => sourceMember.ShouldNotBeNull();
+        [Test] public void should_not_be_null()
+        {
+            sourceMember.ShouldNotBeNull();
+        }
 
-        It should_have_the_projected_member_of_the_source_type_as_value = () =>
-            sourceMember.ShouldBeTheSameAs(typeof(Source).GetProperty("NamedProperty"));
+        [Test]
+        public void should_have_the_projected_member_of_the_source_type_as_value()
+        {
+            sourceMember.ShouldBeSameAs(typeof (Source).GetProperty("NamedProperty"));
+        }
     }
 }

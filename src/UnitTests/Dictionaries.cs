@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapper.UnitTests
@@ -199,7 +199,7 @@ namespace AutoMapper.UnitTests
 			public void Should_fill_the_destination_with_an_empty_dictionary()
 			{
 				_result.Bar["lol"].Bar.ShouldNotBeNull();
-				_result.Bar["lol"].Bar.ShouldBeInstanceOf<Dictionary<string, FooDto>>();
+				_result.Bar["lol"].Bar.ShouldBeType<Dictionary<string, FooDto>>();
 			}
 		}
 
