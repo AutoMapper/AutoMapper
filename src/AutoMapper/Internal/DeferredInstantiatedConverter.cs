@@ -5,10 +5,10 @@ namespace AutoMapper
 {
 	internal class DeferredInstantiatedConverter : ITypeConverter<object, object>
 	{
-		private readonly Func<object> _instantiator;
+        private readonly Func<ResolutionContext, object> _instantiator;
 		private readonly MethodInfo _converterMethod;
 
-		public DeferredInstantiatedConverter(Type typeConverterType, Func<object> instantiator)
+		public DeferredInstantiatedConverter(Type typeConverterType, Func<ResolutionContext, object> instantiator)
 		{
 			_instantiator = instantiator;
 			_converterMethod = typeConverterType.GetMethod("Convert");
@@ -16,7 +16,7 @@ namespace AutoMapper
 
 		public object Convert(ResolutionContext context)
 		{
-			var converter = _instantiator();
+			var converter = _instantiator(context);
 
 			return _converterMethod.Invoke(converter, new[] { context });
 		}

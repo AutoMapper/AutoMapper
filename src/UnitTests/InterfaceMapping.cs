@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapper.UnitTests
@@ -65,7 +65,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_map_Child_to_SubDtoChildObject_type()
             {
-                _result.Child.ShouldBeInstanceOfType(typeof (SubDtoChildObject));
+                _result.Child.ShouldBeType(typeof (SubDtoChildObject));
             }
 
             [Test]
@@ -147,7 +147,8 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_derive_from_INotifyPropertyChanged()
             {
-                _result.ShouldBeInstanceOf<INotifyPropertyChanged>();    
+                var q = _result as INotifyPropertyChanged;
+                q.ShouldNotBeNull();
             }
 
             [Test]
@@ -156,7 +157,7 @@ namespace AutoMapper.UnitTests
                 var count = 0;
                 _result.PropertyChanged += (o, e) => {
                     count++;
-                    o.ShouldBeTheSameAs(_result); 
+                    o.ShouldBeSameAs(_result); 
                     e.PropertyName.ShouldEqual("Value");
                 };
 

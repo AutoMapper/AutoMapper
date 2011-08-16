@@ -3,7 +3,49 @@ using AutoMapper;
 
 namespace Benchmark.Flattening
 {
-	public class FlatteningMapper : IObjectToObjectMapper
+
+    public class CtorMapper : IObjectToObjectMapper
+    {
+        private Model11 _model;
+
+        public string Name
+        {
+            get { return "CtorMapper"; }
+        }
+
+        public void Initialize()
+        {
+            Mapper.Initialize(cfg => cfg.CreateMap<Model11, Dto11>());
+            _model = new Model11 { Value = 5 };
+        }
+
+        public void Map()
+        {
+            Mapper.Map<Model11, Dto11>(_model);
+        }
+    }
+
+    public class ManualCtorMapper : IObjectToObjectMapper
+    {
+        private Model11 _model;
+
+        public string Name
+        {
+            get { return "ManualCtorMapper"; }
+        }
+
+        public void Initialize()
+        {
+            _model = new Model11 {Value = 5};
+        }
+
+        public void Map()
+        {
+            Dto11 dto = new Dto11(_model.Value);
+        }
+    }
+
+    public class FlatteningMapper : IObjectToObjectMapper
 	{
 		private ModelObject _source;
 
@@ -153,6 +195,11 @@ namespace Benchmark.Flattening
 		public int Value { get; set; }
 	}
 
+	public class Model11
+	{
+		public int Value { get; set; }
+	}
+
 	public class Dto1
 	{
 		public int Value { get; set; }
@@ -201,6 +248,21 @@ namespace Benchmark.Flattening
 	public class Dto10
 	{
 		public int Value { get; set; }
+	}
+
+	public class Dto11
+	{
+	    public Dto11(int value)
+	    {
+	        _value = value;
+	    }
+
+	    private readonly int _value;
+
+	    public int Value
+	    {
+	        get { return _value; }
+	    }
 	}
 
 	public class ModelObject

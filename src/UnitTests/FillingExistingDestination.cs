@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 using System.Linq;
 
@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_return_the_destination_object_that_was_passed_in()
 			{
-				_originalDest.ShouldBeTheSameAs(_dest);
+				_originalDest.ShouldBeSameAs(_dest);
 			}
 		}
 

@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
-using Machine.Specifications;
+using Should;
 
 namespace AutoMapper.UnitTests
 {

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using NBehave.Spec.NUnit;
+using Should;
 
 namespace AutoMapper.UnitTests
 {

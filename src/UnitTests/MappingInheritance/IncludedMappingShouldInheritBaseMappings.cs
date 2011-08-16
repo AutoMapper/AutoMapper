@@ -71,6 +71,25 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         [Test]
+        public void more_specific_map_should_override_base_ignore_with_one_parameter()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m => m.Ignore())
+                .Include<ModelSubObject, DtoSubObject>();
+            Mapper.CreateMap<ModelSubObject, DtoSubObject>()
+                .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString));
+
+            var dto = Mapper.Map<DtoSubObject>(new ModelSubObject
+            {
+                DifferentBaseString = "123",
+                SubString = "456"
+            });
+
+            Assert.AreEqual("123", dto.BaseString);
+            Assert.AreEqual("456", dto.SubString);
+        }
+
+        [Test]
         public void more_specific_map_should_override_base_ignore()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -100,7 +119,25 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.AssertConfigurationIsValid();
         }
+        [Test]
+        public void more_specific_map_should_override_base_mapping_with_one_parameter()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
+                .Include<ModelSubObject, DtoSubObject>();
+            Mapper.CreateMap<ModelSubObject, DtoSubObject>()
+                .ForMember(d=>d.BaseString, m=>m.UseValue("789"));
 
+            var dto = Mapper.Map<DtoSubObject>(new ModelSubObject
+                                                                   {
+                                                                       DifferentBaseString = "123",
+                                                                       SubString = "456"
+                                                                   });
+
+            Assert.AreEqual("789", dto.BaseString);
+            Assert.AreEqual("456", dto.SubString);
+        }
+        
         [Test]
         public void more_specific_map_should_override_base_mapping()
         {
@@ -117,6 +154,24 @@ namespace AutoMapper.UnitTests.Bug
                                                                    });
 
             Assert.AreEqual("789", dto.BaseString);
+            Assert.AreEqual("456", dto.SubString);
+        }
+
+        [Test]
+        public void included_mapping_should_not_inherit_base_mappings_for_other_with_one_parameter()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
+                .Include<ModelSubObject, DtoSubObject>();
+
+            Mapper.CreateMap<ModelSubObject, OtherDto>();
+
+            var dto = Mapper.Map<OtherDto>(new ModelSubObject
+            {
+                DifferentBaseString = "123",
+                SubString = "456"
+            });
+
             Assert.AreEqual("456", dto.SubString);
         }
 
@@ -149,7 +204,24 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.AssertConfigurationIsValid();
         }
+        [Test]
+        public void include_should_allow_automapper_to_select_more_specific_included_type_with_one_parameter()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
+                .Include<ModelSubObject, DtoSubObject>();
 
+            Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+
+            var dto = Mapper.Map<ModelObject, DtoObject>(new ModelSubObject
+            {
+                DifferentBaseString = "123",
+                SubString = "456"
+            });
+
+            Assert.IsInstanceOfType(typeof(DtoSubObject), dto);
+        }
+        
         [Test]
         public void include_should_allow_automapper_to_select_more_specific_included_type()
         {

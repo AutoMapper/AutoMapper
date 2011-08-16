@@ -1,6 +1,6 @@
 using System;
 using NUnit.Framework;
-using NBehave.Spec.NUnit;
+using Should;
 
 namespace AutoMapper.UnitTests
 {
@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests
 				}
 				thrown.ShouldNotBeNull();
 				thrown.InnerException.ShouldNotBeNull();
-				thrown.InnerException.ShouldBeInstanceOf<AutoMapperMappingException>();
+				thrown.InnerException.ShouldBeType<AutoMapperMappingException>();
 				((AutoMapperMappingException) thrown.InnerException).Context.PropertyMap.ShouldNotBeNull();
 			}
 		}

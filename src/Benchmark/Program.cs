@@ -10,7 +10,8 @@ namespace Benchmark
 		{
 			var mappers = new Dictionary<string, IObjectToObjectMapper[]>
 				{
-					{ "Flattening", new IObjectToObjectMapper[] { new FlatteningMapper(), new ManualMapper() } }
+					{ "Flattening", new IObjectToObjectMapper[] { new FlatteningMapper(), new ManualMapper() } },
+					{ "Ctors", new IObjectToObjectMapper[] { new CtorMapper(), new ManualCtorMapper(),  } }
 				};
 		
 

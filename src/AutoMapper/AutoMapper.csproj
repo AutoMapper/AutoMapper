@@ -99,9 +99,12 @@
     <Compile Include="Configuration\MapperConfiguration.cs" />
     <Compile Include="Configuration\MapperRegistry.cs" />
     <Compile Include="Configuration\TypeMapConfiguration.cs" />
+    <Compile Include="ConstructorMap.cs" />
+    <Compile Include="ConstructorParameterMap.cs" />
     <Compile Include="IgnoreMapAttribute.cs" />
     <Compile Include="IMappingAction.cs" />
     <Compile Include="IMappingEngineRunner.cs" />
+    <Compile Include="IMappingOperationOptions.cs" />
     <Compile Include="INamingConvention.cs" />
     <Compile Include="Internal\NotifyPropertyBehaviorInterceptor.cs" />
     <Compile Include="Internal\PropertyBehaviorInterceptor.cs" />
@@ -164,6 +167,7 @@
     <Compile Include="Profile.cs" />
     <Compile Include="PropertyMap.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
+    <Compile Include="QueryableExtensions.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />

@@ -5,6 +5,7 @@ namespace AutoMapper
 {
 	public class ResolutionContext : IEquatable<ResolutionContext>
 	{
+	    public MappingOperationOptions Options { get; private set; }
 	    public TypeMap TypeMap { get; private set; }
 	    public PropertyMap PropertyMap { get; private set; }
 	    public Type SourceType { get; private set; }
@@ -15,19 +16,20 @@ namespace AutoMapper
 	    public ResolutionContext Parent { get; private set; }
 	    public Dictionary<ResolutionContext, object> InstanceCache { get; private set; }
 
-	    public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType)
-			: this(typeMap, source, null, sourceType, destinationType)
-		{
-		}
+	    public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType, MappingOperationOptions options)
+			: this(typeMap, source, null, sourceType, destinationType, options)
+	    {
+	    }
 
-		public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType, Type destinationType)
+        public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType, Type destinationType, MappingOperationOptions options)
 		{
 			TypeMap = typeMap;
 			SourceValue = source;
 			DestinationValue = destination;
             AssignTypes(typeMap, sourceType, destinationType);
 			InstanceCache = new Dictionary<ResolutionContext, object>();
-		}
+            Options = options;
+        }
 
         private void AssignTypes(TypeMap typeMap, Type sourceType, Type destinationType)
         {
@@ -54,6 +56,7 @@ namespace AutoMapper
 			Parent = context;
 			DestinationType = context.DestinationType;
 			InstanceCache = context.InstanceCache;
+            Options = context.Options;
 		}
 
 		private ResolutionContext(ResolutionContext context, object sourceValue, Type sourceType)
@@ -67,7 +70,8 @@ namespace AutoMapper
 			Parent = context;
 			DestinationType = context.DestinationType;
 			InstanceCache = context.InstanceCache;
-		}
+            Options = context.Options;
+        }
 
         private ResolutionContext(ResolutionContext context, TypeMap memberTypeMap, object sourceValue, Type sourceType, Type destinationType)
         {
@@ -76,6 +80,7 @@ namespace AutoMapper
             Parent = context;
             AssignTypes(memberTypeMap, sourceType, destinationType);
             InstanceCache = context.InstanceCache;
+            Options = context.Options;
         }
 
 	    private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, TypeMap memberTypeMap, PropertyMap propertyMap)
@@ -88,6 +93,7 @@ namespace AutoMapper
 			InstanceCache = context.InstanceCache;
             SourceType = memberTypeMap.SourceType;
             DestinationType = memberTypeMap.DestinationType;
+            Options = context.Options;
         }
 
 		private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, Type sourceType, PropertyMap propertyMap)
@@ -99,7 +105,8 @@ namespace AutoMapper
 			Parent = context;
 			DestinationType = propertyMap.DestinationProperty.MemberType;
 			InstanceCache = context.InstanceCache;
-		}
+            Options = context.Options;
+        }
 
 		private ResolutionContext(ResolutionContext context, object sourceValue, TypeMap typeMap, Type sourceType, Type destinationType, int arrayIndex)
 		{
@@ -110,6 +117,7 @@ namespace AutoMapper
 			Parent = context;
 			InstanceCache = context.InstanceCache;
             AssignTypes(typeMap, sourceType, destinationType);
+            Options = context.Options;
         }
 
 		public string MemberName
@@ -214,7 +222,7 @@ namespace AutoMapper
 
 		public static ResolutionContext New<TSource>(TSource sourceValue)
 		{
-			return new ResolutionContext(null, sourceValue, typeof (TSource), null);
+			return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions());
 		}
 	}
 

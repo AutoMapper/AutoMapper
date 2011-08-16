@@ -13,9 +13,19 @@ namespace AutoMapper.Internal
 			_hashcode = (_sourceType.GetHashCode()*397) ^ _destinationType.GetHashCode();
 		}
 
-		private readonly Type _sourceType;
-		private readonly Type _destinationType;
-		private readonly int _hashcode;
+        private readonly Type _destinationType;
+        private readonly int _hashcode;
+        private readonly Type _sourceType;
+
+	    public Type SourceType
+	    {
+	        get { return _sourceType; }
+	    }
+
+	    public Type DestinationType
+	    {
+	        get { return _destinationType; }
+	    }
 
 		public bool Equals(TypePair other)
 		{
