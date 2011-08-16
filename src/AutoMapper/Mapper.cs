@@ -22,6 +22,11 @@ namespace AutoMapper
 			set { Configuration.AllowNullDestinationValues = value; }
 		}
 
+        public static TDestination Map<TDestination>(object source)
+        {
+            return Engine.Map<TDestination>(source);
+        }
+
 		public static TDestination Map<TSource, TDestination>(TSource source)
 		{
 			return Engine.Map<TSource, TDestination>(source);

@@ -5,6 +5,7 @@ namespace AutoMapper
 {
     public interface IMappingEngine
     {
+        TDestination Map<TDestination>(object source);
         TDestination Map<TSource, TDestination>(TSource source);
         TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts);
         TDestination Map<TSource, TDestination>(TSource source, TDestination destination);
