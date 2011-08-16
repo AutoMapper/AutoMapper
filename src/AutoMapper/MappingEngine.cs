@@ -146,8 +146,7 @@ namespace AutoMapper
             return (Expression<Func<TSource, TDestination>>) 
                 _expressionCache.GetOrAdd(new TypePair(typeof (TSource), typeof (TDestination)), tp =>
             {
-                int i = 0;
-                return CreateMapExpression(tp.SourceType, tp.DestinationType, "source", ref i);
+                return CreateMapExpression(tp.SourceType, tp.DestinationType);
             });
         }
 
@@ -161,12 +160,12 @@ namespace AutoMapper
         }
 
         private LambdaExpression CreateMapExpression(
-            Type typeIn, Type typeOut, string variableName, ref int i)
+            Type typeIn, Type typeOut)
         {
             var typeMap = ConfigurationProvider.FindTypeMapFor(typeIn, typeOut);
 
             // this is the input parameter of this expression with name <variableName>
-            ParameterExpression instanceParameter = Expression.Parameter(typeIn, variableName);
+            ParameterExpression instanceParameter = Expression.Parameter(typeIn);
 
             var bindings = new List<MemberBinding>();
             foreach (var propertyMap in typeMap.GetPropertyMaps())
@@ -220,10 +219,8 @@ namespace AutoMapper
 
                     sourceListType = currentChildType.GetGenericArguments().First();
 
-                    var newVariableName = "t" + (i++);
-                    var transformedExpression = CreateMapExpression(
-                        sourceListType, destinationListType, newVariableName,
-                        ref i);
+                    //var newVariableName = "t" + (i++);
+                    var transformedExpression = CreateMapExpression(sourceListType, destinationListType);
 
                     MethodCallExpression selectExpression = Expression.Call(
                                 typeof(Enumerable),
@@ -247,10 +244,7 @@ namespace AutoMapper
                         // avoid nullable etc.
                         prop.PropertyType.BaseType != typeof(ValueType))
                     {
-                        var newVariableName = "t" + (i++);
-                        var transformedExpression = CreateMapExpression(
-                            currentChildType, prop.PropertyType,
-                            newVariableName, ref i);
+                        var transformedExpression = CreateMapExpression(currentChildType, prop.PropertyType);
                         var expr2 = Expression.Invoke(
                             transformedExpression,
                             instanceParameter
