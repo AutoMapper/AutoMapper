@@ -18,12 +18,13 @@ namespace AutoMapper
 	    private readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
+		
+		private readonly ThreadSafeList<TypeMap> _typeMaps = new ThreadSafeList<TypeMap>();
 
-		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapCache = new ConcurrentDictionary<TypePair, TypeMap>();
         private readonly ConcurrentDictionary<string, FormatterExpression> _formatterProfiles = new ConcurrentDictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
-	    private List<string> _globalIgnore;
+	    private readonly List<string> _globalIgnore;
 
 	    public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
 		{
@@ -264,10 +265,10 @@ namespace AutoMapper
 			return _typeMaps.ToArray();
 		}
 
-        public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
-        {
-            return FindTypeMapFor(null, sourceType, destinationType);
-        }
+		public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
+		{
+			return FindTypeMapFor( null, sourceType, destinationType ) ;
+		}
 
 		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
 		{

@@ -172,6 +172,7 @@
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />
     <Compile Include="SelfProfiler.cs" />
+    <Compile Include="ThreadSafeList.cs" />
     <Compile Include="TypeInfo.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
