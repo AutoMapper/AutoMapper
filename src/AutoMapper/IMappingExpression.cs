@@ -11,7 +11,7 @@ namespace AutoMapper
         IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions);
     }
 
-    public interface IMappingExpression<TSource, TDestination>
+    public interface IMappingExpression<TSource, TDestination> : IMappingExpression
     {
         IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember, Action<IMemberConfigurationExpression<TSource>> memberOptions);
         IMappingExpression<TSource, TDestination> ForMember(string name, Action<IMemberConfigurationExpression<TSource>> memberOptions);
@@ -19,10 +19,10 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
             where TOtherDestination : TDestination;
-        IMappingExpression<TSource, TDestination> WithProfile(string profileName);
+
         void ConvertUsing(Func<TSource, TDestination> mappingFunction);
         void ConvertUsing(ITypeConverter<TSource, TDestination> converter);
-        void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>;
+
         IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
         IMappingExpression<TSource, TDestination> BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>;
         IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
