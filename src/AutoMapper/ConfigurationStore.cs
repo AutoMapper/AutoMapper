@@ -18,8 +18,10 @@ namespace AutoMapper
 	    private readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
+		
+		private readonly ThreadSafeList<TypeMap> _typeMaps = new ThreadSafeList<TypeMap>();
 
-		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
+		//private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapCache = new ConcurrentDictionary<TypePair, TypeMap>();
         private readonly ConcurrentDictionary<string, FormatterExpression> _formatterProfiles = new ConcurrentDictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
@@ -113,7 +115,7 @@ namespace AutoMapper
 
 		public void Seal()
 		{
-			_typeMaps.Each(typeMap => typeMap.Seal());
+			_typeMaps.Items.Each(typeMap => typeMap.Seal());
 		}
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
@@ -199,7 +201,7 @@ namespace AutoMapper
 
         private void IncludeBaseMappings(Type source, Type destination, TypeMap typeMap)
         {
-            foreach (var inheritedTypeMap in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
+            foreach (var inheritedTypeMap in _typeMaps.Items.Where(t => t.TypeHasBeenIncluded(source, destination)))
             {
                 foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
                 {
@@ -261,13 +263,13 @@ namespace AutoMapper
 
 		public TypeMap[] GetAllTypeMaps()
 		{
-			return _typeMaps.ToArray();
+			return _typeMaps.Items.ToArray();
 		}
 
-        public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
-        {
-            return FindTypeMapFor(null, sourceType, destinationType);
-        }
+		public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
+		{
+			return FindTypeMapFor( null, sourceType, destinationType ) ;
+		}
 
 		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
 		{
@@ -302,7 +304,7 @@ namespace AutoMapper
                 var potentialSourceType = source.GetType();
                 //Try and get the most specific type map possible
                 var potentialTypes = _typeMaps
-                    .Where(t =>
+                    .Items.Where(t =>
                     {
                         return destinationType.IsAssignableFrom(t.DestinationType) &&
                                t.SourceType.IsAssignableFrom(source.GetType()) &&
@@ -381,12 +383,12 @@ namespace AutoMapper
 
 		public void AssertConfigurationIsValid(string profileName)
 		{
-			AssertConfigurationIsValid(_typeMaps.Where(typeMap => typeMap.Profile == profileName));
+			AssertConfigurationIsValid(_typeMaps.Items.Where(typeMap => typeMap.Profile == profileName));
 		}
 
 		public void AssertConfigurationIsValid()
 		{
-			AssertConfigurationIsValid(_typeMaps);
+			AssertConfigurationIsValid(_typeMaps.Items);
 		}
 
 	    public IObjectMapper[] GetMappers()
@@ -447,7 +449,7 @@ namespace AutoMapper
 
 			var typeMapsChecked = new List<TypeMap>();
 
-			foreach (var typeMap in _typeMaps)
+			foreach (var typeMap in _typeMaps.Items)
 			{
 				DryRunTypeMap(typeMapsChecked, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType, new MappingOperationOptions()));
 			}
@@ -473,7 +475,7 @@ namespace AutoMapper
 
             if (typeMap == null)
             {
-                typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
+                typeMap = _typeMaps.Items.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
 
                 if (typeMap == null)
                 {
@@ -501,7 +503,7 @@ namespace AutoMapper
 
 		private TypeMap FindExplicitlyDefinedTypeMap(Type sourceType, Type destinationType)
 		{
-			return _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+			return _typeMaps.Items.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
 		}
 
 		private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)

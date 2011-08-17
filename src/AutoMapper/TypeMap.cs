@@ -11,7 +11,7 @@ namespace AutoMapper
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
         private readonly TypeInfo _destinationType;
         private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
-        private readonly IList<PropertyMap> _propertyMaps = new List<PropertyMap>();
+		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private readonly TypeInfo _sourceType;
@@ -79,12 +79,12 @@ namespace AutoMapper
             if (_sealed)
                 return _orderedPropertyMaps;
 
-            return _propertyMaps.Concat(_inheritedMaps);
+            return _propertyMaps.Items.Concat(_inheritedMaps);
         }
 
         public IEnumerable<PropertyMap> GetCustomPropertyMaps()
         {
-            return _propertyMaps;
+            return _propertyMaps.Items;
         }
 
         public void AddPropertyMap(PropertyMap propertyMap)
@@ -108,7 +108,7 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
-            var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
+            var autoMappedProperties = _propertyMaps.Items.Where(pm => pm.IsMapped())
                 .Select(pm => pm.DestinationProperty.Name);
             var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
                 .Select(pm => pm.DestinationProperty.Name);
@@ -183,7 +183,7 @@ namespace AutoMapper
                 return;
 
             _orderedPropertyMaps =
-                _propertyMaps
+                _propertyMaps.Items
                 .Union(_inheritedMaps)
                 .OrderBy(map => map.GetMappingOrder()).ToArray();
 
@@ -217,7 +217,7 @@ namespace AutoMapper
 
         public PropertyMap GetExistingPropertyMapFor(IMemberAccessor destinationProperty)
         {
-            return _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name))
+            return _propertyMaps.Items.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name))
                    ??
                    _inheritedMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
         }

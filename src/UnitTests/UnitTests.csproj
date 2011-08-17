@@ -116,6 +116,7 @@
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
+    <Compile Include="Bug\MultiThreadingIssues.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\NullableBytesAndEnums.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
