@@ -4,9 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using NUnit.Framework;
-#if !SILVERLIGHT
-using NUnit.Framework.SyntaxHelpers;
-#endif
 
 namespace AutoMapper.UnitTests.Bug
 {

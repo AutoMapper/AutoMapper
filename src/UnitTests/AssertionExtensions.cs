@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Should;
 
 namespace AutoMapper.UnitTests

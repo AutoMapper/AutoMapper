@@ -37,7 +37,7 @@ namespace AutoMapperSamples
                 configuration1.ShouldBeTheSameAs(configuration2);
 
                 var configurationProvider = ObjectFactory.GetInstance<IConfigurationProvider>();
-                configurationProvider.ShouldBeTheSameAs(configuration1);
+                configurationProvider.ShouldBeTheSameAs((IConfigurationProvider)configuration1);
 
                 var configuration = ObjectFactory.GetInstance<ConfigurationStore>();
                 configuration.ShouldBeTheSameAs(configuration1);
