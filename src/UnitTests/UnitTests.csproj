@@ -106,7 +106,7 @@
     <Compile Include="Asbjornu\Mapping\CustomerToCustomerResourceMapper.cs" />
     <Compile Include="Asbjornu\Mapping\IMapper.cs" />
     <Compile Include="Asbjornu\Mapping\MapperBase.cs" />
-    <Compile Include="Asbjornu\Mapping\ResourceMappingProfile.cs" />
+    <Compile Include="Asbjornu\Mapping\ModelMappingProfile.cs" />
     <Compile Include="Asbjornu\Models\CustomerModel.cs" />
     <Compile Include="Asbjornu\Models\ContactInfo.cs" />
     <Compile Include="Asbjornu\Models\ModelBase.cs" />

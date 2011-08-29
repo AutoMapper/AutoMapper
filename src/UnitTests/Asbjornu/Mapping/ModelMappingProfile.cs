@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests.Asbjornu.Mapping
 {
-	public class ResourceMappingProfile : Profile
+	public class ModelMappingProfile : Profile
 	{
 		private readonly IList<IMapper> mappers;
 
 
-		public ResourceMappingProfile()
+		public ModelMappingProfile()
 		{
 			this.mappers = new List<IMapper>
 			{

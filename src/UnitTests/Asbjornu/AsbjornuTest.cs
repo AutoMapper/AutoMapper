@@ -16,8 +16,8 @@ namespace AutoMapper.UnitTests.Asbjornu
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
-			ResourceMappingProfile resourceMappingProfile = new ResourceMappingProfile();
-			Mapper.Initialize(x => x.AddProfile(resourceMappingProfile));
+			ModelMappingProfile modelMappingProfile = new ModelMappingProfile();
+			Mapper.Initialize(x => x.AddProfile(modelMappingProfile));
 		}
 
 
