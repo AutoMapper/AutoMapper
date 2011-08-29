@@ -101,11 +101,6 @@
     <Compile Include="Asbjornu\AsbjornuTest.cs" />
     <Compile Include="Asbjornu\Domain\Customer.cs" />
     <Compile Include="Asbjornu\Domain\ContactInfo.cs" />
-    <Compile Include="Asbjornu\Mapping\ModelsContactInfoToRelationsContactInfoMapper.cs" />
-    <Compile Include="Asbjornu\Mapping\RelationsContactInfoToModelsContactInfoMapper.cs" />
-    <Compile Include="Asbjornu\Mapping\CustomerToCustomerResourceMapper.cs" />
-    <Compile Include="Asbjornu\Mapping\IMapper.cs" />
-    <Compile Include="Asbjornu\Mapping\MapperBase.cs" />
     <Compile Include="Asbjornu\Mapping\ModelMappingProfile.cs" />
     <Compile Include="Asbjornu\Models\CustomerModel.cs" />
     <Compile Include="Asbjornu\Models\ContactInfo.cs" />

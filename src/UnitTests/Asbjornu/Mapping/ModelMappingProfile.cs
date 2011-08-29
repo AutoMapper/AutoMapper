@@ -1,24 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AutoMapper.UnitTests.Asbjornu.Domain;
+using AutoMapper.UnitTests.Asbjornu.Models;
 
 namespace AutoMapper.UnitTests.Asbjornu.Mapping
 {
 	public class ModelMappingProfile : Profile
 	{
-		private readonly IList<IMapper> mappers;
-
-
-		public ModelMappingProfile()
-		{
-			this.mappers = new List<IMapper>
-			{
-				new ModelsContactInfoToModelsContactInfoMapper(this),
-				new RelationsContactInfoToModelsContactInfoMapper(this),
-				new CustomerToCustomerResourceMapper(this),
-			};
-		}
-
-
 		public override string ProfileName
 		{
 			get { return GetType().Name; }
@@ -27,11 +13,14 @@ namespace AutoMapper.UnitTests.Asbjornu.Mapping
 
 		protected internal override void Configure()
 		{
-			if (this.mappers.Count == 0)
-				throw new InvalidOperationException("No mappers found to configure.");
+			CreateMap<Customer, CustomerModel>()
+				.ForMember(d => d.ContactInfo, o => o.Ignore())
+				.ForMember(d => d.Url, o => o.Ignore());
 
-			foreach (IMapper mapper in this.mappers)
-				mapper.Configure();
+			CreateMap<Models.ContactInfo, Domain.ContactInfo>()
+				.ConstructUsing(x => new Domain.ContactInfo());
+
+			CreateMap<Domain.ContactInfo, Models.ContactInfo>();
 		}
 	}
 }
