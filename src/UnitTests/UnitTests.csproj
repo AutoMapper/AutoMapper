@@ -104,7 +104,6 @@
     <Compile Include="Asbjornu\Mapping\ModelMappingProfile.cs" />
     <Compile Include="Asbjornu\Models\CustomerModel.cs" />
     <Compile Include="Asbjornu\Models\ContactInfo.cs" />
-    <Compile Include="Asbjornu\Models\ModelBase.cs" />
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />

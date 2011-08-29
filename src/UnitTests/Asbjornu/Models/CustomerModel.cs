@@ -2,7 +2,7 @@
 
 namespace AutoMapper.UnitTests.Asbjornu.Models
 {
-	public class CustomerModel : ModelBase
+	public class CustomerModel
 	{
 		public CustomerModel()
 		{
@@ -18,5 +18,7 @@ namespace AutoMapper.UnitTests.Asbjornu.Models
 		}
 
 		public ContactInfo ContactInfo { get; set; }
+
+		public int Id { get; set; }
 	}
 }
