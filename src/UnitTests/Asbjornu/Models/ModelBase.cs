@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace AutoMapper.UnitTests.Asbjornu.Resources
+namespace AutoMapper.UnitTests.Asbjornu.Models
 {
-   public abstract class ResourceBase
+   public abstract class ModelBase
    {
       public int Id { get; set; }
 

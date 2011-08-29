@@ -101,15 +101,15 @@
     <Compile Include="Asbjornu\AsbjornuTest.cs" />
     <Compile Include="Asbjornu\Domain\Customer.cs" />
     <Compile Include="Asbjornu\Domain\ContactInfo.cs" />
-    <Compile Include="Asbjornu\Mapping\ContactInfo\ModelsContactInfoToRelationsContactInfoMapper.cs" />
-    <Compile Include="Asbjornu\Mapping\ContactInfo\RelationsContactInfoToModelsContactInfoMapper.cs" />
-    <Compile Include="Asbjornu\Mapping\Customer\CustomerToCustomerResourceMapper.cs" />
+    <Compile Include="Asbjornu\Mapping\ModelsContactInfoToRelationsContactInfoMapper.cs" />
+    <Compile Include="Asbjornu\Mapping\RelationsContactInfoToModelsContactInfoMapper.cs" />
+    <Compile Include="Asbjornu\Mapping\CustomerToCustomerResourceMapper.cs" />
     <Compile Include="Asbjornu\Mapping\IMapper.cs" />
     <Compile Include="Asbjornu\Mapping\MapperBase.cs" />
     <Compile Include="Asbjornu\Mapping\ResourceMappingProfile.cs" />
-    <Compile Include="Asbjornu\Resources\CustomerResource.cs" />
-    <Compile Include="Asbjornu\Resources\Models\ContactInfo.cs" />
-    <Compile Include="Asbjornu\Resources\ResourceBase.cs" />
+    <Compile Include="Asbjornu\Models\CustomerModel.cs" />
+    <Compile Include="Asbjornu\Models\ContactInfo.cs" />
+    <Compile Include="Asbjornu\Models\ModelBase.cs" />
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
@@ -215,10 +215,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Asbjornu\Domain\Customers\" />
-    <Folder Include="Asbjornu\Domain\Relations\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

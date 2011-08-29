@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using AutoMapper.UnitTests.Asbjornu.Mapping.ContactInfo;
-using AutoMapper.UnitTests.Asbjornu.Mapping.Customer;
-
 namespace AutoMapper.UnitTests.Asbjornu.Mapping
 {
 	public class ResourceMappingProfile : Profile

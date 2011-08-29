@@ -2,9 +2,11 @@ using System;
 
 using AutoMapper.UnitTests.Asbjornu.Domain;
 using AutoMapper.UnitTests.Asbjornu.Mapping;
-using AutoMapper.UnitTests.Asbjornu.Resources;
+using AutoMapper.UnitTests.Asbjornu.Models;
 
 using NUnit.Framework;
+
+using ContactInfo = AutoMapper.UnitTests.Asbjornu.Domain.ContactInfo;
 
 namespace AutoMapper.UnitTests.Asbjornu
 {
@@ -37,8 +39,8 @@ namespace AutoMapper.UnitTests.Asbjornu
 				Phone = "1234568",
 			};
 
-			Resources.Models.ContactInfo mappedContactInfo =
-				Mapper.Map<Resources.Models.ContactInfo>(contactInfo);
+			Models.ContactInfo mappedContactInfo =
+				Mapper.Map<Models.ContactInfo>(contactInfo);
 
 			Assert.That(mappedContactInfo, Is.Not.Null, "ContactInfo");
 			Assert.That(mappedContactInfo.Email, Is.EqualTo(contactInfo.Email), "ContactInfo.Email");
@@ -65,27 +67,27 @@ namespace AutoMapper.UnitTests.Asbjornu
 				}
 			};
 
-			CustomerResource customerResource = Mapper.Map<CustomerResource>(customer);
+			CustomerModel customerModel = Mapper.Map<CustomerModel>(customer);
 
-			Assert.That(customerResource, Is.Not.Null, "CustomerResource");
-			Assert.That(customerResource.ContactInfo, Is.Not.Null, "CustomerResource.ContactInfo");
+			Assert.That(customerModel, Is.Not.Null, "CustomerResource");
+			Assert.That(customerModel.ContactInfo, Is.Not.Null, "CustomerResource.ContactInfo");
 			Assert.That(
-				customerResource.ContactInfo.Email,
+				customerModel.ContactInfo.Email,
 				Is.EqualTo(customer.ContactInfo.Email),
 				"CustomerResource.ContactInfo.Email");
 
 			Assert.That(
-				customerResource.ContactInfo.FirstName,
+				customerModel.ContactInfo.FirstName,
 				Is.EqualTo(customer.ContactInfo.FirstName),
 				"CustomerResource.ContactInfo.FirstName");
 
 			Assert.That(
-				customerResource.ContactInfo.LastName,
+				customerModel.ContactInfo.LastName,
 				Is.EqualTo(customer.ContactInfo.LastName),
 				"CustomerResource.ContactInfo.LastName");
 
 			Assert.That(
-				customerResource.ContactInfo.Phone,
+				customerModel.ContactInfo.Phone,
 				Is.EqualTo(customer.ContactInfo.Phone),
 				"CustomerResource.ContactInfo.MobilePhoneNumber");
 		}

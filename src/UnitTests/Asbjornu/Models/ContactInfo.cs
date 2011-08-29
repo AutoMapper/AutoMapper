@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AutoMapper.UnitTests.Asbjornu.Resources.Models
+namespace AutoMapper.UnitTests.Asbjornu.Models
 {
    public class ContactInfo
    {
