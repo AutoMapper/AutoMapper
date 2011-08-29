@@ -1,4 +1,4 @@
-﻿namespace AutoMapper.UnitTests.Asbjornu.Domain.Relations
+﻿namespace AutoMapper.UnitTests.Asbjornu.Domain
 {
    public class ContactInfo
    {

@@ -99,8 +99,8 @@
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="Asbjornu\AsbjornuTest.cs" />
-    <Compile Include="Asbjornu\Domain\Customers\Customer.cs" />
-    <Compile Include="Asbjornu\Domain\Relations\ContactInfo.cs" />
+    <Compile Include="Asbjornu\Domain\Customer.cs" />
+    <Compile Include="Asbjornu\Domain\ContactInfo.cs" />
     <Compile Include="Asbjornu\Mapping\ContactInfo\ModelsContactInfoToRelationsContactInfoMapper.cs" />
     <Compile Include="Asbjornu\Mapping\ContactInfo\RelationsContactInfoToModelsContactInfoMapper.cs" />
     <Compile Include="Asbjornu\Mapping\Customer\CustomerToCustomerResourceMapper.cs" />
@@ -215,7 +215,10 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Asbjornu\Domain\Customers\" />
+    <Folder Include="Asbjornu\Domain\Relations\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

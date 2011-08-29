@@ -1,6 +1,4 @@
-﻿using AutoMapper.UnitTests.Asbjornu.Domain.Relations;
-
-namespace AutoMapper.UnitTests.Asbjornu.Domain.Customers
+﻿namespace AutoMapper.UnitTests.Asbjornu.Domain
 {
 	public class Customer
 	{

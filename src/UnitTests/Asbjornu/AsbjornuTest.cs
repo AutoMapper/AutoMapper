@@ -1,7 +1,6 @@
 using System;
 
-using AutoMapper.UnitTests.Asbjornu.Domain.Customers;
-using AutoMapper.UnitTests.Asbjornu.Domain.Relations;
+using AutoMapper.UnitTests.Asbjornu.Domain;
 using AutoMapper.UnitTests.Asbjornu.Mapping;
 using AutoMapper.UnitTests.Asbjornu.Resources;
 
