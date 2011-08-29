@@ -1,5 +1,6 @@
-﻿using AutoMapper.UnitTests.Asbjornu.Domain;
-using AutoMapper.UnitTests.Asbjornu.Models;
+﻿using AutoMapper.UnitTests.Asbjornu.Models;
+
+using ContactInfo = AutoMapper.UnitTests.Asbjornu.Models.ContactInfo;
 
 namespace AutoMapper.UnitTests.Asbjornu.Mapping
 {
@@ -13,14 +14,9 @@ namespace AutoMapper.UnitTests.Asbjornu.Mapping
 
 		protected internal override void Configure()
 		{
-			CreateMap<Customer, CustomerModel>()
-				.ForMember(d => d.ContactInfo, o => o.Ignore())
-				.ForMember(d => d.Url, o => o.Ignore());
-
-			CreateMap<Models.ContactInfo, Domain.ContactInfo>()
-				.ConstructUsing(x => new Domain.ContactInfo());
-
-			CreateMap<Domain.ContactInfo, Models.ContactInfo>();
+			CreateMap<Domain.Customer, CustomerModel>();
+			CreateMap<ContactInfo, Domain.ContactInfo>();
+			CreateMap<Domain.ContactInfo, ContactInfo>();
 		}
 	}
 }
