@@ -7,14 +7,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
 using AutoMapper.Mappers;
-using Castle.DynamicProxy;
 
 namespace AutoMapper
 {
 	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
 		private readonly IConfigurationProvider _configurationProvider;
-        private readonly ProxyGenerator _proxyGenerator = new ProxyGenerator();
 		private readonly IObjectMapper[] _mappers;
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
         private readonly ConcurrentDictionary<TypePair, LambdaExpression> _expressionCache = new ConcurrentDictionary<TypePair, LambdaExpression>();
@@ -350,9 +348,7 @@ namespace AutoMapper
 
             if (destinationType.IsInterface)
             {
-                if (typeof(INotifyPropertyChanged).IsAssignableFrom(destinationType))
-                    return _proxyGenerator.CreateInterfaceProxyWithoutTarget(destinationType, new[] { typeof(INotifyPropertyChanged) }, new NotifyPropertyBehaviorInterceptor());
-                return _proxyGenerator.CreateInterfaceProxyWithoutTarget(destinationType, new PropertyBehaviorInterceptor());
+                destinationType = ProxyGenerator.GetProxyType(destinationType);
             }
 
 			return ObjectCreator.CreateObject(destinationType);

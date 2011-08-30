@@ -79,10 +79,6 @@
     <DocumentationFile>..\..\build\Release\AutoMapper\AutoMapper.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Castle.DynamicProxy-2.2\bin\net-35\Castle.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -106,8 +102,6 @@
     <Compile Include="IMappingEngineRunner.cs" />
     <Compile Include="IMappingOperationOptions.cs" />
     <Compile Include="INamingConvention.cs" />
-    <Compile Include="Internal\NotifyPropertyBehaviorInterceptor.cs" />
-    <Compile Include="Internal\PropertyBehaviorInterceptor.cs" />
     <Compile Include="Internal\DelegateBasedResolver2.cs" />
     <Compile Include="Internal\DeferredInstantiatedConverter.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
@@ -165,8 +159,11 @@
     <Compile Include="Internal\NullReplacementMethod.cs" />
     <Compile Include="Internal\PrimitiveExtensions.cs" />
     <Compile Include="Profile.cs" />
+    <Compile Include="Internal\PropertyEmitter.cs" />
     <Compile Include="PropertyMap.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
+    <Compile Include="Internal\ProxyBase.cs" />
+    <Compile Include="Internal\ProxyGenerator.cs" />
     <Compile Include="QueryableExtensions.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
@@ -180,7 +177,7 @@
     <Compile Include="ValueResolver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AutoMapper.snk" />
+    <EmbeddedResource Include="AutoMapper.snk" />
     <None Include="SemanticModel.cd" />
   </ItemGroup>
   <ItemGroup>
