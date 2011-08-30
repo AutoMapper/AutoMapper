@@ -15,7 +15,6 @@ namespace AutoMapper.UnitTests.Asbjornu.Mapping
 		protected internal override void Configure()
 		{
 			CreateMap<Domain.Customer, CustomerModel>();
-			CreateMap<ContactInfo, Domain.ContactInfo>();
 			CreateMap<Domain.ContactInfo, ContactInfo>();
 		}
 	}
