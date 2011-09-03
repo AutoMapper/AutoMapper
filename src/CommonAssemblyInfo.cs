@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersionAttribute("2.0.0.0")]
 [assembly: AssemblyCopyrightAttribute("Copyright Jimmy Bogard 2008-2011")]
 [assembly: AssemblyProductAttribute("AutoMapper")]
-[assembly: AssemblyTrademarkAttribute("75457834ed67c2f042c7e3e2a05d87da04b5aa28")]
+[assembly: AssemblyTrademarkAttribute("14e3b1fe041bdf23d0f64a7676ea5f671d45d2ac")]
 [assembly: AssemblyCompanyAttribute("")]
 [assembly: AssemblyConfigurationAttribute("release")]
 [assembly: AssemblyInformationalVersionAttribute("2.0.0.0")]

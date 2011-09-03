@@ -18,8 +18,8 @@ properties {
 
 task default -depends local
 task local -depends compile, test
-task full -depends local, merge, dist
-task ci -depends clean, release, commonAssemblyInfo, local, merge, dist
+task full -depends local, dist
+task ci -depends clean, release, commonAssemblyInfo, local, dist
 
 task clean {
 	delete_directory "$build_dir"
@@ -39,11 +39,6 @@ task commonAssemblyInfo {
     create-commonAssemblyInfo "$buildNumber" "$commit" "$source_dir\CommonAssemblyInfo.cs"
 }
 
-task merge {
-	create_directory "$build_dir\merge"
-	exec { & $tools_dir\ILMerge\ilmerge.exe /targetplatform:"v4,$framework_dir" /log /out:"$build_dir\merge\AutoMapper.dll" /internalize:AutoMapper.exclude "$build_dir\$config\AutoMapper\AutoMapper.dll" "$build_dir\$config\AutoMapper\Castle.Core.dll" /keyfile:"$source_dir\AutoMapper.snk" }
-}
-
 task test {
 	create_directory "$build_dir\results"
     exec { & $tools_dir\nunit\nunit-console-x86.exe $build_dir/$config/UnitTests/AutoMapper.UnitTests.dll /nologo /nodots /xml=$result_dir\AutoMapper.xml }
@@ -51,15 +46,10 @@ task test {
 
 task dist {
 	create_directory $dist_dir
-	copy_files "$build_dir\merge" "$build_dir\dist-merged"
-	copy_files "$build_dir\$config\AutoMapper" "$build_dir\dist"
-	zip_directory "$build_dir\dist" "$dist_dir\AutoMapper-unmerged.zip"
-	copy-item "$build_dir\dist-merged\AutoMapper.dll" "$dist_dir"
-    create-merged-nuspec "$buildNumber"
-    create-unmerged-nuspec "$buildNumber"
+	copy_files "$build_dir\$config\AutoMapper" "$dist_dir"
+    create-nuspec "$buildNumber"
 
     exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.nuspec -Symbols }
-    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.UnMerged.nuspec -Symbols }
 
 	move-item "*.nupkg" "$dist_dir"
 }
@@ -134,7 +124,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersionAttribute(""$version"")]"  | out-file $filename -encoding "ASCII"    
 }
 
-function global:create-merged-nuspec()
+function global:create-nuspec()
 {
     "<?xml version=""1.0""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
@@ -150,33 +140,10 @@ function global:create-merged-nuspec()
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
   </metadata>
   <files>
-    <file src=""$build_dir\dist-merged\AutoMapper.dll"" target=""lib"" />
-    <file src=""$build_dir\dist-merged\AutoMapper.pdb"" target=""lib"" />
+    <file src=""$dist_dir\AutoMapper.dll"" target=""lib"" />
+    <file src=""$dist_dir\AutoMapper.pdb"" target=""lib"" />
+    <file src=""$dist_dir\AutoMapper.xml"" target=""lib"" />
   </files>
 </package>" | out-file $build_dir\AutoMapper.nuspec -encoding "ASCII"
 }
 
-function global:create-unmerged-nuspec()
-{
-    "<?xml version=""1.0""?>
-<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
-  <metadata>
-    <id>AutoMapper.UnMerged</id>
-    <version>$version</version>
-    <authors>Jimmy Bogard</authors>
-    <owners>Jimmy Bogard</owners>
-    <licenseUrl>http://automapper.codeplex.com/license</licenseUrl>
-    <projectUrl>http://automapper.codeplex.com</projectUrl>
-    <iconUrl>https://s3.amazonaws.com/automapper/icon.png</iconUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
-    <dependencies>
-      <dependency id=""Castle.Core"" version=""2.5.1"" />
-    </dependencies>
-  </metadata>
-  <files>
-    <file src=""$build_dir\dist\AutoMapper.dll"" target=""lib"" />
-    <file src=""$build_dir\dist\AutoMapper.pdb"" target=""lib"" />
-  </files>
-</package>" | out-file $build_dir\AutoMapper.UnMerged.nuspec -encoding "ASCII"
-}

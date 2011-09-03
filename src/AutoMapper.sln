@@ -2,7 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0691ABF2-B3C7-43BF-9862-2D8D1299CE58}"
 	ProjectSection(SolutionItems) = preProject
-		..\AutoMapper.exclude = ..\AutoMapper.exclude
 		..\default.ps1 = ..\default.ps1
 		..\psake.bat = ..\psake.bat
 	EndProjectSection
@@ -61,9 +60,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{DDF551F9-B27D-4283-BFA0-E7068E05967D} = {C1930F52-C66E-4E56-B7DB-FD42E497FFF0}
-		{002075C5-6517-4794-BC99-9B17B9E884E7} = {1BCC7A00-6382-4891-936A-F164614D26A4}
 		{B8051389-CB47-46FB-B234-9D49506704AA} = {1BCC7A00-6382-4891-936A-F164614D26A4}
+		{002075C5-6517-4794-BC99-9B17B9E884E7} = {1BCC7A00-6382-4891-936A-F164614D26A4}
+		{DDF551F9-B27D-4283-BFA0-E7068E05967D} = {C1930F52-C66E-4E56-B7DB-FD42E497FFF0}
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7} = {B84E9CD3-2DDB-47FA-84BE-732EBF2F46CD}
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using AutoMapper;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 using System.Linq;
 
@@ -90,9 +90,9 @@ namespace AutoMapperSamples.Mappers
 
 				var destinations = Mapper.Map<ParentSource[], ParentDestination[]>(sources);
 
-				destinations[0].ShouldBeInstanceOf<ParentDestination>();
-				destinations[1].ShouldBeInstanceOf<ChildDestination>();
-				destinations[2].ShouldBeInstanceOf<ParentDestination>();
+				destinations[0].ShouldBeType<ParentDestination>();
+				destinations[1].ShouldBeType<ChildDestination>();
+				destinations[2].ShouldBeType<ParentDestination>();
 			}
 		}
 	}

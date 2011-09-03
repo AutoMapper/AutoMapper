@@ -4,7 +4,7 @@ using AutoMapper.Mappers;
 using NUnit.Framework;
 using StructureMap;
 using StructureMap.Attributes;
-using NBehave.Spec.NUnit;
+using Should;
 using StructureMap.Configuration.DSL;
 
 namespace AutoMapperSamples
@@ -34,13 +34,13 @@ namespace AutoMapperSamples
 
                 var configuration1 = ObjectFactory.GetInstance<IConfiguration>();
                 var configuration2 = ObjectFactory.GetInstance<IConfiguration>();
-                configuration1.ShouldBeTheSameAs(configuration2);
+                configuration1.ShouldBeSameAs(configuration2);
 
                 var configurationProvider = ObjectFactory.GetInstance<IConfigurationProvider>();
-                configurationProvider.ShouldBeTheSameAs(configuration1);
+                configurationProvider.ShouldBeSameAs(configuration1);
 
                 var configuration = ObjectFactory.GetInstance<ConfigurationStore>();
-                configuration.ShouldBeTheSameAs(configuration1);
+                configuration.ShouldBeSameAs(configuration1);
                 
                 configuration1.CreateMap<Source, Destination>();
 
