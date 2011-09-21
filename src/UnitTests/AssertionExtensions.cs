@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Linq;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -50,7 +49,7 @@ namespace AutoMapper.UnitTests
 
         public static void ShouldNotBeInstanceOf<TExpectedType>(this object actual)
         {
-            Assert.That(actual, Is.Not.InstanceOfType(typeof(TExpectedType)));
+            actual.ShouldNotBeType<TExpectedType>();
         }
 	}
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+using Should;
 
 namespace AutoMapper.UnitTests
 {
@@ -45,8 +45,8 @@ namespace AutoMapper.UnitTests
 			});
 
             Destination destination = Mapper.Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
-            Assert.That(destination.StartingWith_ShouldBeNullAfterwards, Is.Null);
-            Assert.That(destination.StartingWith_ShouldNotBeMapped, Is.Null);
+            destination.StartingWith_ShouldBeNullAfterwards.ShouldEqual(null);
+            destination.StartingWith_ShouldNotBeMapped.ShouldEqual(null);
         }
 
         [Test]
@@ -60,8 +60,8 @@ namespace AutoMapper.UnitTests
 			});
 
             Destination destination = Mapper.Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
-            Assert.That(destination.AnotherString_ShouldBeNullAfterwards, Is.Null);
-            Assert.That(destination.StartingWith_ShouldNotBeMapped, Is.Null);
+            destination.AnotherString_ShouldBeNullAfterwards.ShouldEqual(null);
+            destination.StartingWith_ShouldNotBeMapped.ShouldEqual(null);
         }
     }
 
@@ -94,7 +94,7 @@ namespace AutoMapper.UnitTests
 			};
 
 			Destination destination = Mapper.Map<Source, Destination>(source);
-			Assert.That(destination.ShouldNotBeMapped, Is.Null);
+            destination.ShouldNotBeMapped.ShouldEqual(null);
 		}
 	}
 }

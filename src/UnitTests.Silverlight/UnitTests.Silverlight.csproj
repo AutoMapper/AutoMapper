@@ -1,4 +1,8 @@
-﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,12 +14,34 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
     <AssemblyName>AutoMapper.UnitTests.Silverlight</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>AutoMapper.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,6 +53,7 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +64,7 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,6 +75,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <NoConfig>true</NoConfig>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|AnyCPU' ">
     <OutputPath>..\..\build\Release\UnitTests.Silverlight\</OutputPath>
@@ -57,11 +86,12 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <NoConfig>true</NoConfig>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Silverlight 3.0\mscorlib.dll</HintPath>
+      <HintPath>..\..\lib\Silverlight 4.0\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.5.1.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -71,13 +101,19 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NUnit.Silverlight\nunit.silverlight.dll</HintPath>
     </Reference>
+    <Reference Include="Should.Core.Silverlight">
+      <HintPath>..\..\lib\Should.Core.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="Should.Silverlight">
+      <HintPath>..\..\lib\Should.Silverlight.dll</HintPath>
+    </Reference>
     <Reference Include="system, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Silverlight 3.0\system.dll</HintPath>
+      <HintPath>..\..\lib\Silverlight 4.0\system.dll</HintPath>
     </Reference>
     <Reference Include="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Silverlight 3.0\System.Core.dll</HintPath>
+      <HintPath>..\..\lib\Silverlight 4.0\System.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -108,8 +144,23 @@
     <Compile Include="..\UnitTests\Bug\AllowNullDestinationValuesBugs.cs">
       <Link>Bug\AllowNullDestinationValuesBugs.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Bug\AssignableCollectionBug.cs">
+      <Link>Bug\AssignableCollectionBug.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\AutoMapperInheritanceProblemDemo.cs">
+      <Link>Bug\AutoMapperInheritanceProblemDemo.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\CollectionMapperMapsISetIncorrectly.cs">
+      <Link>Bug\CollectionMapperMapsISetIncorrectly.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Bug\CustomIEnumerableBug.cs">
       <Link>Bug\CustomIEnumerableBug.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\DuplicateValuesBug.cs">
+      <Link>Bug\DuplicateValuesBug.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\EnumMatchingOnValue.cs">
+      <Link>Bug\EnumMatchingOnValue.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\Bug\IgnoreAll.cs">
       <Link>Bug\IgnoreAll.cs</Link>
@@ -117,8 +168,23 @@
     <Compile Include="..\UnitTests\Bug\InheritanceIssue.cs">
       <Link>Bug\InheritanceIssue.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Bug\LazyCollectionMapping.cs">
+      <Link>Bug\LazyCollectionMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\MappingToAReadOnlyCollection.cs">
+      <Link>Bug\MappingToAReadOnlyCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\MultipleInterfaceInheritance.cs">
+      <Link>Bug\MultipleInterfaceInheritance.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\MultipleTypeConverterInterfaces.cs">
+      <Link>Bug\MultipleTypeConverterInterfaces.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Bug\NamingConventions.cs">
       <Link>Bug\NamingConventions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\NullableBytesAndEnums.cs">
+      <Link>Bug\NullableBytesAndEnums.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\Bug\RepeatedMappingConfigurationTest.cs">
       <Link>Bug\RepeatedMappingConfigurationTest.cs</Link>
@@ -135,6 +201,9 @@
     <Compile Include="..\UnitTests\ConfigurationValidation.cs">
       <Link>ConfigurationValidation.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Constructors.cs">
+      <Link>Constructors.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\CustomFormatters.cs">
       <Link>CustomFormatters.cs</Link>
     </Compile>
@@ -150,11 +219,17 @@
     <Compile Include="..\UnitTests\Enumerations.cs">
       <Link>Enumerations.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\ExpressionBridge.cs">
+      <Link>ExpressionBridge.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\FillingExistingDestination.cs">
       <Link>FillingExistingDestination.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\General.cs">
       <Link>General.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\IgnoreAllTests.cs">
+      <Link>IgnoreAllTests.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\Indexers.cs">
       <Link>Indexers.cs</Link>
@@ -177,11 +252,41 @@
     <Compile Include="..\UnitTests\MappingExceptions.cs">
       <Link>MappingExceptions.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs">
+      <Link>MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs">
+      <Link>MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs">
+      <Link>MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs">
+      <Link>MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs">
+      <Link>MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingInheritance\OverrideIgnore.cs">
+      <Link>MappingInheritance\OverrideIgnore.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs">
+      <Link>MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs">
+      <Link>MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\MappingOrder.cs">
       <Link>MappingOrder.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\MaxDepthTests.cs">
+      <Link>MaxDepthTests.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\MemberResolution.cs">
       <Link>MemberResolution.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\NestedContainers.cs">
+      <Link>NestedContainers.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\NullBehavior.cs">
       <Link>NullBehavior.cs</Link>
@@ -195,17 +300,14 @@
     <Compile Include="..\UnitTests\ResolutionContextTester.cs">
       <Link>ResolutionContextTester.cs</Link>
     </Compile>
-    <Compile Include="..\UnitTests\SelfConfiguration.cs">
-      <Link>SelfConfiguration.cs</Link>
-    </Compile>
     <Compile Include="..\UnitTests\TesterExtensions.cs">
       <Link>TesterExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\UnitTests\Tests\ConfigurationSpecs.cs">
-      <Link>Tests\ConfigurationSpecs.cs</Link>
-    </Compile>
     <Compile Include="..\UnitTests\Tests\MapperTests.cs">
       <Link>Tests\MapperTests.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Tests\PropertyMapSpecs.cs">
+      <Link>Tests\PropertyMapSpecs.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\Tests\TypeInfoSpecs.cs">
       <Link>Tests\TypeInfoSpecs.cs</Link>
@@ -233,7 +335,24 @@
   <ItemGroup>
     <None Include="AutoMapper.snk" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" />
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

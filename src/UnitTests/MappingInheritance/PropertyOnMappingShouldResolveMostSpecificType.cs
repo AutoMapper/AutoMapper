@@ -6,36 +6,36 @@ namespace AutoMapper.UnitTests.Bug
     [TestFixture]
     public class PropertyOnMappingShouldResolveMostSpecificType
     {
-        private class ItemBase
+        public class ItemBase
         {
             public string SomeBaseProperty { get; set; }
         }
 
-        private class GenericItem : ItemBase{}
+        public class GenericItem : ItemBase{}
 
-        private class SpecificItem :ItemBase{}
+        public class SpecificItem :ItemBase{}
 
-        private class DifferentItem : GenericItem { }
-        private class DifferentItem2 : GenericItem { }
+        public class DifferentItem : GenericItem { }
+        public class DifferentItem2 : GenericItem { }
 
-        private class ItemDto
+        public class ItemDto
         {
             public DescriptionBaseDto Description { get; set; }
             public string SomeProperty { get; set; }
         }
 
-        private class SpecificItemDto : ItemDto{}
+        public class SpecificItemDto : ItemDto{}
 
 
-        private class DescriptionBaseDto{}
+        public class DescriptionBaseDto{}
 
-        private class GenericDescriptionDto : DescriptionBaseDto{}
+        public class GenericDescriptionDto : DescriptionBaseDto{}
 
-        private class SpecificDescriptionDto : DescriptionBaseDto{}
-        private class DifferentDescriptionDto : GenericDescriptionDto { }
-        private class DifferentDescriptionDto2 : GenericDescriptionDto { }
+        public class SpecificDescriptionDto : DescriptionBaseDto{}
+        public class DifferentDescriptionDto : GenericDescriptionDto { }
+        public class DifferentDescriptionDto2 : GenericDescriptionDto { }
 
-        private class Container
+        public class Container
         {
             public Container()
             {
@@ -44,13 +44,17 @@ namespace AutoMapper.UnitTests.Bug
             public List<ItemBase> Items { get; private set; }
         }
 
-        private class ContainerDto
+        public class ContainerDto
         {
             public ContainerDto()
             {
                 Items = new List<ItemDto>();
             }
+#if SILVERLIGHT
+            public List<ItemDto> Items { get; set; }
+#else
             public List<ItemDto> Items { get; private set; }
+#endif
         }
 
         [Test]

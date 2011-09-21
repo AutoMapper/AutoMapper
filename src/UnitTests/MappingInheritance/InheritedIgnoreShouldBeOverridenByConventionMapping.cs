@@ -5,17 +5,17 @@ namespace AutoMapper.UnitTests.Bug
     [TestFixture]
     public class InheritedIgnoreShouldBeOverriddenByConventionMapping
     {
-        private class BaseDomain
+        public class BaseDomain
         {
             
         }
 
-        private class SpecificDomain : BaseDomain
+        public class SpecificDomain : BaseDomain
         {
             public string SpecificProperty { get; set; }            
         }
 
-        private class Dto
+        public class Dto
         {
             public string SpecificProperty { get; set; }
         }

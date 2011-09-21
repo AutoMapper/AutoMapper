@@ -5,24 +5,24 @@ namespace AutoMapper.UnitTests.Bug
     [TestFixture]
     public class MultipleMappingsOfSameTypeFails
     {
-        private class MyClass
+        public class MyClass
         {
             public ActivityBase Information { get; set; }
             public InformationClass CurrentInformation { get; set; }
         }
 
-        private class MySpecificClass :MyClass{}
+        public class MySpecificClass :MyClass{}
 
-        private class MyDto
+        public class MyDto
         {
             public InformationDto Information { get; set; }
         }
 
-        private class MySpecificDto : MyDto{}
-        private class InformationDto{}
-        private class ActivityBase{}
-        private class InformationBase{}
-        private class InformationClass{}
+        public class MySpecificDto : MyDto{}
+        public class InformationDto{}
+        public class ActivityBase{}
+        public class InformationBase{}
+        public class InformationClass{}
 
         [Test]
         public void multiple_inherited_base_mappings_of_same_type_fails()

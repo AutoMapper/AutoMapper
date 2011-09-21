@@ -1,5 +1,9 @@
 using System;
+#if !SILVERLIGHT
 using System.Collections.Concurrent;
+#else
+using TvdP.Collections;
+#endif
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -220,7 +224,7 @@ namespace AutoMapper
                 // next to lists, also arrays
                 // and objects!!!
                 if (prop != null &&
-                    prop.PropertyType.GetInterface("IEnumerable") != null &&
+                    prop.PropertyType.GetInterface("IEnumerable", true) != null &&
                     prop.PropertyType != typeof(string))
                 {
 
@@ -348,7 +352,11 @@ namespace AutoMapper
 
             if (destinationType.IsInterface)
             {
+//#if !SILVERLIGHT
                 destinationType = ProxyGenerator.GetProxyType(destinationType);
+//#else
+//                throw new NotSupportedException("Mapping to interfaces not supported in Silverlight. Silverlight does not support advanced reflection and assembly generation scenarios. Create concrete implementations instead.");
+//#endif
             }
 
 			return ObjectCreator.CreateObject(destinationType);

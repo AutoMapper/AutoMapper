@@ -10,30 +10,38 @@ namespace AutoMapper.UnitTests.Bug
     public class ConventionMappedCollectionShouldMapBaseTypes
     {
 
-        private class ItemBase{}
-        private class GeneralItem : ItemBase {}
-        private class SpecificItem : ItemBase {}
+        public class ItemBase{}
+        public class GeneralItem : ItemBase {}
+        public class SpecificItem : ItemBase {}
 
-        private class Container
+        public class Container
         {
             public Container ()
             {
                 Items = new List<ItemBase>();
             }
+#if SILVERLIGHT
+            public List<ItemBase> Items { get; set; }
+#else
             public List<ItemBase> Items { get; private set; }
+#endif
         }
 
-        private class ItemDto {}
-        private class GeneralItemDto :ItemDto {}
-        private class SpecificItemDto :ItemDto {}
+        public class ItemDto {}
+        public class GeneralItemDto :ItemDto {}
+        public class SpecificItemDto :ItemDto {}
 
-        private class ContainerDto
+        public class ContainerDto
         {
             public ContainerDto()
             {
                 Items = new List<ItemDto>();
             }
+#if SILVERLIGHT
+            public List<ItemDto> Items { get; set; }
+#else
             public List<ItemDto> Items { get; private set; }
+#endif
         }
 
         // Getting an exception casting from SpecificItemDto to GeneralItemDto 

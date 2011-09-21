@@ -1,4 +1,8 @@
-﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -9,13 +13,36 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper</RootNamespace>
-    <AssemblyName>AutoMapper.Silverlight</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <AssemblyName>AutoMapper</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>AutoMapper.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,6 +54,7 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,6 +65,7 @@
     <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,6 +76,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <NoConfig>true</NoConfig>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>..\..\build\Debug\AutoMapper.Silverlight\AutoMapper.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|AnyCPU' ">
     <OutputPath>..\..\build\Release\AutoMapper.Silverlight\</OutputPath>
@@ -57,27 +88,21 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <NoConfig>true</NoConfig>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>..\..\build\Release\AutoMapper.Silverlight\AutoMapper.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=1.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Castle.DynamicProxy-2.2\bin\sl-30\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.DynamicProxy2, Version=2.2.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Castle.DynamicProxy-2.2\bin\sl-30\Castle.DynamicProxy2.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Silverlight 3.0\mscorlib.dll</HintPath>
+      <HintPath>..\..\lib\Silverlight 4.0\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="system, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Silverlight 3.0\system.dll</HintPath>
+      <HintPath>..\..\lib\Silverlight 4.0\system.dll</HintPath>
     </Reference>
     <Reference Include="System.Core, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Silverlight 3.0\System.Core.dll</HintPath>
+      <HintPath>..\..\lib\Silverlight 4.0\System.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -87,8 +112,14 @@
     <Compile Include="..\AutoMapper\AutoMapperMappingException.cs">
       <Link>AutoMapperMappingException.cs</Link>
     </Compile>
-    <Compile Include="..\AutoMapper\Configuration.cs">
-      <Link>Configuration.cs</Link>
+    <Compile Include="..\AutoMapper\ConfigurationStore.cs">
+      <Link>ConfigurationStore.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ConstructorMap.cs">
+      <Link>ConstructorMap.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ConstructorParameterMap.cs">
+      <Link>ConstructorParameterMap.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\IConfigurationProvider.cs">
       <Link>IConfigurationProvider.cs</Link>
@@ -98,6 +129,9 @@
     </Compile>
     <Compile Include="..\AutoMapper\IFormatterExpression.cs">
       <Link>IFormatterExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IgnoreMapAttribute.cs">
+      <Link>IgnoreMapAttribute.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\IMappingAction.cs">
       <Link>IMappingAction.cs</Link>
@@ -110,6 +144,9 @@
     </Compile>
     <Compile Include="..\AutoMapper\IMappingExpression.cs">
       <Link>IMappingExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMappingOperationOptions.cs">
+      <Link>IMappingOperationOptions.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\IMemberGetter.cs">
       <Link>IMemberGetter.cs</Link>
@@ -165,23 +202,26 @@
     <Compile Include="..\AutoMapper\Internal\MethodGetter.cs">
       <Link>Internal\MethodGetter.cs</Link>
     </Compile>
-    <Compile Include="..\AutoMapper\Internal\NotifyPropertyBehaviorInterceptor.cs">
-      <Link>Internal\NotifyPropertyBehaviorInterceptor.cs</Link>
-    </Compile>
     <Compile Include="..\AutoMapper\Internal\NullReplacementMethod.cs">
       <Link>Internal\NullReplacementMethod.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\Internal\PrimitiveExtensions.cs">
       <Link>Internal\PrimitiveExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\AutoMapper\Internal\PropertyBehaviorInterceptor.cs">
-      <Link>Internal\PropertyBehaviorInterceptor.cs</Link>
+    <Compile Include="..\AutoMapper\Internal\PropertyEmitter.cs">
+      <Link>Internal\PropertyEmitter.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\Internal\PropertyGetter.cs">
       <Link>Internal\PropertyGetter.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\Internal\PropertyNameResolver.cs">
       <Link>Internal\PropertyNameResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ProxyBase.cs">
+      <Link>Internal\ProxyBase.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ProxyGenerator.cs">
+      <Link>Internal\ProxyGenerator.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\Internal\ReflectionHelper.cs">
       <Link>Internal\ReflectionHelper.cs</Link>
@@ -195,14 +235,8 @@
     <Compile Include="..\AutoMapper\Internal\TypePair.cs">
       <Link>Internal\TypePair.cs</Link>
     </Compile>
-    <Compile Include="..\AutoMapper\Internal\ValueFormatter.cs">
-      <Link>Internal\ValueFormatter.cs</Link>
-    </Compile>
     <Compile Include="..\AutoMapper\IObjectMapper.cs">
       <Link>IObjectMapper.cs</Link>
-    </Compile>
-    <Compile Include="..\AutoMapper\ISelfProfiler.cs">
-      <Link>ISelfProfiler.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\ITypeConverter.cs">
       <Link>ITypeConverter.cs</Link>
@@ -252,6 +286,9 @@
     <Compile Include="..\AutoMapper\Mappers\ObjectCreator.cs">
       <Link>Mappers\ObjectCreator.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ReadOnlyCollectionMapper.cs">
+      <Link>Mappers\ReadOnlyCollectionMapper.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\Mappers\StringMapper.cs">
       <Link>Mappers\StringMapper.cs</Link>
     </Compile>
@@ -276,14 +313,17 @@
     <Compile Include="..\AutoMapper\PropertyMap.cs">
       <Link>PropertyMap.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions.cs">
+      <Link>QueryableExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\ResolutionContext.cs">
       <Link>ResolutionContext.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\ResolutionResult.cs">
       <Link>ResolutionResult.cs</Link>
     </Compile>
-    <Compile Include="..\AutoMapper\SelfProfiler.cs">
-      <Link>SelfProfiler.cs</Link>
+    <Compile Include="..\AutoMapper\ThreadSafeList.cs">
+      <Link>ThreadSafeList.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\TypeInfo.cs">
       <Link>TypeInfo.cs</Link>
@@ -300,12 +340,43 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Internal\ConcurrentDictionary.cs" />
+    <Compile Include="Internal\ConcurrentHashtable.cs" />
+    <Compile Include="Internal\Hasher.cs" />
+    <Compile Include="Internal\Segment.cs" />
+    <Compile Include="Internal\SegmentRange.cs" />
+    <Compile Include="Internal\TinyReaderWriterLock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="System\LockRecursionException.cs" />
+    <Compile Include="System\LockRecursionPolicy.cs" />
+    <Compile Include="System\ReaderWriterSlimLock.cs" />
+    <Compile Include="System\SerializableAttribute.cs" />
+    <Compile Include="System\SynchronizationLockException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="AutoMapper.snk" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" />
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="system" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

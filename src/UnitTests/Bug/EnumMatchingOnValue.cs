@@ -4,6 +4,9 @@ using NUnit.Framework;
 namespace AutoMapper.UnitTests.Bug
 {
     [TestFixture]
+#if SILVERLIGHT
+    [Ignore("Not supported in Silverlight 4")]
+#endif
     public class EnumMatchingOnValue : AutoMapperSpecBase
     {
         private SecondClass _result;

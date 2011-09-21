@@ -9,7 +9,10 @@ using System.Reflection.Emit;
 using System.Text.RegularExpressions;
 
 namespace AutoMapper.Internal {
-	internal static class ProxyGenerator {
+	internal static class ProxyGenerator
+	{
+	    private static readonly byte[] privateKey = StringToByteArray("002400000480000094000000060200000024000052534131000400000100010079dfef85ed6ba841717e154f13182c0a6029a40794a6ecd2886c7dc38825f6a4c05b0622723a01cd080f9879126708eef58f134accdc99627947425960ac2397162067507e3c627992aa6b92656ad3380999b30b5d5645ba46cc3fcc6a1de5de7afebcf896c65fb4f9547a6c0c6433045fceccb1fa15e960d519d0cd694b29a4");
+        private static readonly byte[] privateKeyToken = StringToByteArray("be96cd2c38ef1005");
 		private static readonly MethodInfo delegate_Combine = typeof(Delegate).GetMethod("Combine", BindingFlags.Public|BindingFlags.Static, null, new[] {typeof(Delegate), typeof(Delegate)}, null);
 		private static readonly MethodInfo delegate_Remove = typeof(Delegate).GetMethod("Remove", BindingFlags.Public|BindingFlags.Static, null, new[] {typeof(Delegate), typeof(Delegate)}, null);
 		private static readonly EventInfo iNotifyPropertyChanged_PropertyChanged = typeof(INotifyPropertyChanged).GetEvent("PropertyChanged", BindingFlags.Instance|BindingFlags.Public);
@@ -20,14 +23,10 @@ namespace AutoMapper.Internal {
 
 		private static ModuleBuilder CreateProxyModule() {
 			AssemblyName name = new AssemblyName("AutoMapper.Proxies");
-			using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Mapper), "AutoMapper.snk")) {
-				Debug.Assert(stream != null);
-				byte[] data = new byte[stream.Length];
-				int read = stream.Read(data, 0, data.Length);
-				Debug.Assert(read == data.Length);
-				name.KeyPair = new StrongNameKeyPair(data);
-			}
-			AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.RunAndCollect);
+            name.SetPublicKey(privateKey);
+            name.SetPublicKeyToken(privateKeyToken);
+            //AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+			AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
 			return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
 		}
 
@@ -114,5 +113,14 @@ namespace AutoMapper.Internal {
 				return proxyType;
 			}
 		}
+
+	    private static byte[] StringToByteArray(string hex)
+        {
+            int numberChars = hex.Length;
+            byte[] bytes = new byte[numberChars / 2];
+            for (int i = 0; i < numberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
+        }
 	}
 }

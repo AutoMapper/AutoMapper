@@ -1,11 +1,13 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 #if !SILVERLIGHT
+using System.Collections.Concurrent;
 using System.Data;
+#else
+using TvdP.Collections;
 #endif
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AutoMapper.Internal;
@@ -98,13 +100,6 @@ namespace AutoMapper
 		public void AddProfile<TProfile>() where TProfile : Profile, new()
 		{
 			AddProfile(new TProfile());
-		}
-
-		public void SelfConfigure(Assembly assembly)
-		{
-			IEnumerable<Type> selfProfiles = GetSelfProfilers(assembly);
-
-			selfProfiles.Each(SelfProfile);
 		}
 
 		public void ConstructServicesUsing(Func<Type, object> constructor)
@@ -566,26 +561,11 @@ namespace AutoMapper
 
 		}
 
-	    private void SelfProfile(Type type)
-		{
-			var selfProfiler = (ISelfProfiler) ObjectCreator.CreateObject(type);
-			Profile profile = selfProfiler.GetProfile();
-
-			AddProfile(profile);
-		}
-
 		protected void OnTypeMapCreated(TypeMap typeMap)
 		{
 			var typeMapCreated = TypeMapCreated;
 			if (typeMapCreated != null)
 				typeMapCreated(this, new TypeMapCreatedEventArgs(typeMap));
-		}
-
-		private static IEnumerable<Type> GetSelfProfilers(Assembly assembly)
-		{
-			return from t in assembly.GetTypes()
-			       where typeof (ISelfProfiler).IsAssignableFrom(t) && !t.IsAbstract
-			       select t;
 		}
 
 		internal FormatterExpression GetProfile(string profileName)

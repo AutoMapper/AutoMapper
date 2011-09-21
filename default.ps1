@@ -1,4 +1,4 @@
-$framework = '4.0'
+$framework = '4.0x86'
 $version = '2.0.0'
 
 properties {
@@ -42,11 +42,13 @@ task commonAssemblyInfo {
 task test {
 	create_directory "$build_dir\results"
     exec { & $tools_dir\nunit\nunit-console-x86.exe $build_dir/$config/UnitTests/AutoMapper.UnitTests.dll /nologo /nodots /xml=$result_dir\AutoMapper.xml }
+    exec { & $tools_dir\nunit\nunit-console-x86.exe $build_dir/$config/UnitTests.Silverlight/AutoMapper.UnitTests.Silverlight.dll /nologo /nodots /xml=$result_dir\AutoMapper.Silverlight.xml }
 }
 
 task dist {
 	create_directory $dist_dir
-	copy_files "$build_dir\$config\AutoMapper" "$dist_dir"
+	copy_files "$build_dir\$config\AutoMapper" "$dist_dir\net40-client"
+	copy_files "$build_dir\$config\AutoMapper.Silverlight" "$dist_dir\sl4" "mscorlib.dll"
     create-nuspec "$buildNumber"
 
     exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.nuspec -Symbols }
@@ -141,9 +143,12 @@ function global:create-nuspec()
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
   </metadata>
   <files>
-    <file src=""$dist_dir\AutoMapper.dll"" target=""lib\net40-client"" />
-    <file src=""$dist_dir\AutoMapper.pdb"" target=""lib\net40-client"" />
-    <file src=""$dist_dir\AutoMapper.xml"" target=""lib\net40-client"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40-client"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40-client"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40-client"" />
+    <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
   </files>
 </package>" | out-file $build_dir\AutoMapper.nuspec -encoding "ASCII"
 }

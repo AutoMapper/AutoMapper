@@ -10,28 +10,28 @@ namespace AutoMapper.UnitTests.MappingInheritance
     [TestFixture]
     public class DestinationTypePolymorphismTest
     {
-        class Customer
+        public class Customer
         {
             public int Id { get; set; }
             public string Name { get; set; }
         }
 
-        class CustomerStubDTO
+        public class CustomerStubDTO
         {
             public int Id { get; set; }
         }
 
-        class CustomerDTO : CustomerStubDTO
+        public class CustomerDTO : CustomerStubDTO
         {
             public string Name { get; set; }
         }
 
-        class Order
+        public class Order
         {
             public Customer Customer { get; set; }
         }
 
-        class OrderDTO
+        public class OrderDTO
         {
             public CustomerStubDTO Customer { get; set; }
         }
