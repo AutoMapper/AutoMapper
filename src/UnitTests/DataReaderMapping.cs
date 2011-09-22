@@ -88,8 +88,22 @@ namespace AutoMapper.UnitTests
             }
 
 
-            private DTOObject _result;
-            private IDataReader _dataReader;
+            protected DTOObject _result;
+            protected IDataReader _dataReader;
+        }
+
+        /// <summary>
+        /// The purpose of this test is to exercise the internal caching logic of DataReaderMapper.
+        /// </summary>
+        public class When_mapping_a_data_reader_to_a_dto_twice : When_mapping_a_data_reader_to_a_dto
+        {
+            protected override void Establish_context()
+            {
+                base.Establish_context();
+
+                _dataReader = new DataBuilder().BuildDataReader();
+                _result = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader).FirstOrDefault();
+            }
         }
 
         public class When_mapping_a_data_reader_to_a_dto_and_the_map_does_not_exist : AutoMapperSpecBase
