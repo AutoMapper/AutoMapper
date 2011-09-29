@@ -27,6 +27,11 @@ namespace AutoMapper
             return Engine.Map<TDestination>(source);
         }
 
+        public static TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
+        {
+            return Engine.Map<TDestination>(source, opts);
+        }
+
 		public static TDestination Map<TSource, TDestination>(TSource source)
 		{
 			return Engine.Map<TSource, TDestination>(source);

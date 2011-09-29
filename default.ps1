@@ -1,5 +1,5 @@
 $framework = '4.0x86'
-$version = '2.0.0'
+$version = '2.1.0'
 
 properties {
 	$base_dir = resolve-path .
