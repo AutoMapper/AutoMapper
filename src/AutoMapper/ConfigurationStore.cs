@@ -26,6 +26,7 @@ namespace AutoMapper
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapCache = new ConcurrentDictionary<TypePair, TypeMap>();
         private readonly ConcurrentDictionary<string, FormatterExpression> _formatterProfiles = new ConcurrentDictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
+
 	    private readonly List<string> _globalIgnore;
 
 	    public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
@@ -35,9 +36,14 @@ namespace AutoMapper
             _globalIgnore = new List<string>();
 		}
 
-		public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
+	    public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
 
-		public bool AllowNullDestinationValues
+	    public Func<Type, object> ServiceCtor
+	    {
+	        get { return _serviceCtor; }
+	    }
+
+	    public bool AllowNullDestinationValues
 		{
 			get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
 			set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }

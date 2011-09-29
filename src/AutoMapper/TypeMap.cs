@@ -74,6 +74,8 @@ namespace AutoMapper
 
         public Type DestinationTypeOverride { get; set; }
 
+        public bool ConstructDestinationUsingServiceLocator { get; set; }
+
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {
             if (_sealed)

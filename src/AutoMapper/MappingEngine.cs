@@ -341,28 +341,23 @@ namespace AutoMapper
 		object IMappingEngineRunner.CreateObject(ResolutionContext context)
 		{
 			var typeMap = context.TypeMap;
+            var destinationType = context.DestinationType;
 
-			if (typeMap != null)
+            if (typeMap != null)
                 if (typeMap.DestinationCtor != null)
-				    return typeMap.DestinationCtor(context.SourceValue);
+                    return typeMap.DestinationCtor(context.SourceValue);
+                else if (typeMap.ConstructDestinationUsingServiceLocator && context.Options.ServiceCtor != null)
+                    return context.Options.ServiceCtor(destinationType);
+                else if (typeMap.ConstructDestinationUsingServiceLocator)
+                    return _configurationProvider.ServiceCtor(destinationType);
                 else if (typeMap.ConstructorMap != null)
-                {
                     return typeMap.ConstructorMap.ResolveValue(context);
-                }
 
 			if (context.DestinationValue != null)
 				return context.DestinationValue;
 
-			var destinationType = context.DestinationType;
-
             if (destinationType.IsInterface)
-            {
-//#if !SILVERLIGHT
                 destinationType = ProxyGenerator.GetProxyType(destinationType);
-//#else
-//                throw new NotSupportedException("Mapping to interfaces not supported in Silverlight. Silverlight does not support advanced reflection and assembly generation scenarios. Create concrete implementations instead.");
-//#endif
-            }
 
 			return ObjectCreator.CreateObject(destinationType);
 		}

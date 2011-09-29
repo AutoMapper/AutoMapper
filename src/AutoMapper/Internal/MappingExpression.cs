@@ -248,7 +248,14 @@ namespace AutoMapper
             return this;
         }
 
-        private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
+	    public IMappingExpression<TSource, TDestination> ConstructUsingServiceLocator()
+	    {
+	        _typeMap.ConstructDestinationUsingServiceLocator = true;
+
+	        return this;
+	    }
+
+	    private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
         {
             if (context.InstanceCache.ContainsKey(context))
             {
