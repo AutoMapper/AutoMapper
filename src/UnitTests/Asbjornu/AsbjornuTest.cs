@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests.Asbjornu
 
 
 		[Test]
-		public void Map_Customer_ReturnsCustomerResource()
+		public void Map_Customer_ReturnsCustomerModel()
 		{
 			Customer customer = new Customer
 			{
