@@ -1,5 +1,5 @@
 using AutoMapper;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapperSamples

@@ -1,6 +1,8 @@
 using Should;
 using NUnit.Framework;
+#if !SILVERLIGHT
 using Rhino.Mocks;
+#endif
 
 namespace AutoMapper.UnitTests
 {
@@ -47,6 +49,7 @@ namespace AutoMapper.UnitTests
         {
         }
 
+#if !SILVERLIGHT
         protected TType CreateDependency<TType>()
             where TType : class
         {
@@ -57,6 +60,7 @@ namespace AutoMapper.UnitTests
         {
             return MockRepository.GenerateStub<TType>();
         }
+#endif
     }
 
     [TestFixture]

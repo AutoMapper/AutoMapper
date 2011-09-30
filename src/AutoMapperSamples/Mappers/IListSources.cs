@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using AutoMapper;
-using NBehave.Spec.NUnit;
+using Should;
 using NUnit.Framework;
 
 namespace AutoMapperSamples.Mappers

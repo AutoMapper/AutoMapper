@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper;
 using NUnit.Framework;
-using NBehave.Spec.NUnit;
+using Should;
 
 namespace AutoMapperSamples
 {

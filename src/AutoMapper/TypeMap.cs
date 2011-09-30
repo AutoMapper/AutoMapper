@@ -11,7 +11,7 @@ namespace AutoMapper
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
         private readonly TypeInfo _destinationType;
         private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
-        private readonly IList<PropertyMap> _propertyMaps = new List<PropertyMap>();
+		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private readonly TypeInfo _sourceType;
@@ -73,6 +73,8 @@ namespace AutoMapper
         public List<string> IgnorePropertiesStartingWith { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
+
+        public bool ConstructDestinationUsingServiceLocator { get; set; }
 
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {

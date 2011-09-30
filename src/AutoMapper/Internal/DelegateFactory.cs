@@ -1,6 +1,10 @@
 using System;
 using System.Collections;
+#if !SILVERLIGHT
 using System.Collections.Concurrent;
+#else
+using TvdP.Collections;
+#endif
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;

@@ -122,6 +122,7 @@
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
+    <Compile Include="Bug\MultiThreadingIssues.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\NullableBytesAndEnums.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
@@ -169,7 +170,6 @@
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="Regression.cs" />
-    <Compile Include="SelfConfiguration.cs" />
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="ResolutionContextTester.cs" />

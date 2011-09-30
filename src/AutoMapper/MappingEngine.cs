@@ -1,5 +1,9 @@
 using System;
+#if !SILVERLIGHT
 using System.Collections.Concurrent;
+#else
+using TvdP.Collections;
+#endif
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -7,14 +11,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
 using AutoMapper.Mappers;
-using Castle.DynamicProxy;
 
 namespace AutoMapper
 {
 	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
 		private readonly IConfigurationProvider _configurationProvider;
-        private readonly ProxyGenerator _proxyGenerator = new ProxyGenerator();
 		private readonly IObjectMapper[] _mappers;
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
         private readonly ConcurrentDictionary<TypePair, LambdaExpression> _expressionCache = new ConcurrentDictionary<TypePair, LambdaExpression>();
@@ -33,13 +35,18 @@ namespace AutoMapper
 
         public TDestination Map<TDestination>(object source)
         {
+            return Map<TDestination>(source, opts => { });
+        }
+
+        public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
+        {
             var mappedObject = default(TDestination);
             if (source != null)
             {
                 var sourceType = source.GetType();
                 var destinationType = typeof(TDestination);
 
-                mappedObject = (TDestination)Map(source, sourceType, destinationType);
+                mappedObject = (TDestination)Map(source, sourceType, destinationType, opts);
             }
             return mappedObject;
         }
@@ -222,7 +229,7 @@ namespace AutoMapper
                 // next to lists, also arrays
                 // and objects!!!
                 if (prop != null &&
-                    prop.PropertyType.GetInterface("IEnumerable") != null &&
+                    prop.PropertyType.GetInterface("IEnumerable", true) != null &&
                     prop.PropertyType != typeof(string))
                 {
 
@@ -334,26 +341,23 @@ namespace AutoMapper
 		object IMappingEngineRunner.CreateObject(ResolutionContext context)
 		{
 			var typeMap = context.TypeMap;
+            var destinationType = context.DestinationType;
 
-			if (typeMap != null)
+            if (typeMap != null)
                 if (typeMap.DestinationCtor != null)
-				    return typeMap.DestinationCtor(context.SourceValue);
+                    return typeMap.DestinationCtor(context.SourceValue);
+                else if (typeMap.ConstructDestinationUsingServiceLocator && context.Options.ServiceCtor != null)
+                    return context.Options.ServiceCtor(destinationType);
+                else if (typeMap.ConstructDestinationUsingServiceLocator)
+                    return _configurationProvider.ServiceCtor(destinationType);
                 else if (typeMap.ConstructorMap != null)
-                {
                     return typeMap.ConstructorMap.ResolveValue(context);
-                }
 
 			if (context.DestinationValue != null)
 				return context.DestinationValue;
 
-			var destinationType = context.DestinationType;
-
             if (destinationType.IsInterface)
-            {
-                if (typeof(INotifyPropertyChanged).IsAssignableFrom(destinationType))
-                    return _proxyGenerator.CreateInterfaceProxyWithoutTarget(destinationType, new[] { typeof(INotifyPropertyChanged) }, new NotifyPropertyBehaviorInterceptor());
-                return _proxyGenerator.CreateInterfaceProxyWithoutTarget(destinationType, new PropertyBehaviorInterceptor());
-            }
+                destinationType = ProxyGenerator.GetProxyType(destinationType);
 
 			return ObjectCreator.CreateObject(destinationType);
 		}

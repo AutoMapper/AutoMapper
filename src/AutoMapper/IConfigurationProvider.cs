@@ -26,6 +26,7 @@ namespace AutoMapper
 		TypeMap CreateTypeMap(Type sourceType, Type destinationType);
 
 		event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
+	    Func<Type, object> ServiceCtor { get; }
 	}
 
 }

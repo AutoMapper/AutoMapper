@@ -109,8 +109,6 @@ namespace AutoMapper.UnitTests
 
 		public class When_mappings_are_created_on_the_fly : NonValidatingSpecBase
 		{
-			private Order _order;
-
 			public class Order
 			{
 				public string Name { get; set; }

@@ -49,7 +49,7 @@ namespace AutoMapper.UnitTests
 
         public static void ShouldNotBeInstanceOf<TExpectedType>(this object actual)
         {
-            Assert.That(actual, Is.Not.InstanceOfType(typeof(TExpectedType)));
+            actual.ShouldNotBeType<TExpectedType>();
         }
 	}
 }

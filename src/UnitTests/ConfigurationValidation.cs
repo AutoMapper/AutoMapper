@@ -9,8 +9,6 @@ namespace AutoMapper.UnitTests
 	{
 		public class When_testing_a_dto_with_mismatched_members : NonValidatingSpecBase
 		{
-			private TypeMap _typeMap;
-
 			public class ModelObject
 			{
 				public string Foo { get; set; }
@@ -37,8 +35,6 @@ namespace AutoMapper.UnitTests
 
 		public class When_testing_a_dto_with_fully_mapped_and_custom_matchers : NonValidatingSpecBase
 		{
-			private TypeMap _typeMap;
-
 			public class ModelObject
 			{
 				public string Foo { get; set; }
@@ -321,8 +317,6 @@ namespace AutoMapper.UnitTests
 
 		public class When_testing_a_dto_with_mismatched_custom_member_mapping : NonValidatingSpecBase
 		{
-			private TypeMap _typeMap;
-
 			public class SubBarr { }
 
 			public class SubBar { }

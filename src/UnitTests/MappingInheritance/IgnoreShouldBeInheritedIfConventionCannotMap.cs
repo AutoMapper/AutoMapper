@@ -9,26 +9,26 @@ namespace AutoMapper.UnitTests.Bug
     [TestFixture]
     public class IgnoreShouldBeInheritedIfConventionCannotMap
     {
-        private class BaseDomain
+        public class BaseDomain
         {
 
         }
 
-        private class StandardDomain : BaseDomain
-        {
-            
-        }
-
-        private class SpecificDomain : StandardDomain
-        {
-        }
-
-        private class MoreSpecificDomain : SpecificDomain
+        public class StandardDomain : BaseDomain
         {
             
         }
 
-        private class Dto
+        public class SpecificDomain : StandardDomain
+        {
+        }
+
+        public class MoreSpecificDomain : SpecificDomain
+        {
+            
+        }
+
+        public class Dto
         {
             public string SpecificProperty { get; set; }
         }

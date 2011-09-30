@@ -1,11 +1,13 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 #if !SILVERLIGHT
+using System.Collections.Concurrent;
 using System.Data;
+#else
+using TvdP.Collections;
 #endif
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AutoMapper.Internal;
@@ -18,12 +20,14 @@ namespace AutoMapper
 	    private readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
+		
+		private readonly ThreadSafeList<TypeMap> _typeMaps = new ThreadSafeList<TypeMap>();
 
-		private readonly IList<TypeMap> _typeMaps = new List<TypeMap>();
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapCache = new ConcurrentDictionary<TypePair, TypeMap>();
         private readonly ConcurrentDictionary<string, FormatterExpression> _formatterProfiles = new ConcurrentDictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
-	    private List<string> _globalIgnore;
+
+	    private readonly List<string> _globalIgnore;
 
 	    public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
 		{
@@ -32,9 +36,14 @@ namespace AutoMapper
             _globalIgnore = new List<string>();
 		}
 
-		public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
+	    public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
 
-		public bool AllowNullDestinationValues
+	    public Func<Type, object> ServiceCtor
+	    {
+	        get { return _serviceCtor; }
+	    }
+
+	    public bool AllowNullDestinationValues
 		{
 			get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
 			set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }
@@ -97,13 +106,6 @@ namespace AutoMapper
 		public void AddProfile<TProfile>() where TProfile : Profile, new()
 		{
 			AddProfile(new TProfile());
-		}
-
-		public void SelfConfigure(Assembly assembly)
-		{
-			IEnumerable<Type> selfProfiles = GetSelfProfilers(assembly);
-
-			selfProfiles.Each(SelfProfile);
 		}
 
 		public void ConstructServicesUsing(Func<Type, object> constructor)
@@ -264,10 +266,10 @@ namespace AutoMapper
 			return _typeMaps.ToArray();
 		}
 
-        public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
-        {
-            return FindTypeMapFor(null, sourceType, destinationType);
-        }
+		public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
+		{
+			return FindTypeMapFor( null, sourceType, destinationType ) ;
+		}
 
 		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
 		{
@@ -565,26 +567,11 @@ namespace AutoMapper
 
 		}
 
-	    private void SelfProfile(Type type)
-		{
-			var selfProfiler = (ISelfProfiler) ObjectCreator.CreateObject(type);
-			Profile profile = selfProfiler.GetProfile();
-
-			AddProfile(profile);
-		}
-
 		protected void OnTypeMapCreated(TypeMap typeMap)
 		{
 			var typeMapCreated = TypeMapCreated;
 			if (typeMapCreated != null)
 				typeMapCreated(this, new TypeMapCreatedEventArgs(typeMap));
-		}
-
-		private static IEnumerable<Type> GetSelfProfilers(Assembly assembly)
-		{
-			return from t in assembly.GetTypes()
-			       where typeof (ISelfProfiler).IsAssignableFrom(t) && !t.IsAbstract
-			       select t;
 		}
 
 		internal FormatterExpression GetProfile(string profileName)

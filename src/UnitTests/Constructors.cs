@@ -101,6 +101,113 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual(5);
             }
         }
+       
+        public class When_mapping_to_an_object_using_service_location : AutoMapperSpecBase
+        {
+            private Dest _dest;
+
+            public class Source
+            {
+                public int Foo { get; set; }
+            }
+
+            public class Dest
+            {
+                private int _foo;
+                private readonly int _addend;
+
+                public int Foo
+                {
+                    get { return _foo + _addend; }
+                    set { _foo = value; }
+                }
+
+                public Dest(int addend)
+                {
+                    _addend = addend;
+                }
+
+                public Dest()
+                    : this(0)
+                {
+                }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.ConstructServicesUsing(t => new Dest(5));
+                    cfg.CreateMap<Source, Dest>()
+                        .ConstructUsingServiceLocator();
+                });
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5 });
+            }
+
+            [Test]
+            public void Should_map_with_the_custom_constructor()
+            {
+                _dest.Foo.ShouldEqual(10);
+            }
+        }
+       
+        public class When_mapping_to_an_object_using_contextual_service_location : AutoMapperSpecBase
+        {
+            private Dest _dest;
+
+            public class Source
+            {
+                public int Foo { get; set; }
+            }
+
+            public class Dest
+            {
+                private int _foo;
+                private readonly int _addend;
+
+                public int Foo
+                {
+                    get { return _foo + _addend; }
+                    set { _foo = value; }
+                }
+
+                public Dest(int addend)
+                {
+                    _addend = addend;
+                }
+
+                public Dest()
+                    : this(0)
+                {
+                }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.ConstructServicesUsing(t => new Dest(5));
+                    cfg.CreateMap<Source, Dest>()
+                        .ConstructUsingServiceLocator();
+                });
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5 }, opt => opt.ConstructServicesUsing(t => new Dest(6)));
+            }
+
+            [Test]
+            public void Should_map_with_the_custom_constructor()
+            {
+                _dest.Foo.ShouldEqual(11);
+            }
+        }
+
 
     }
 }

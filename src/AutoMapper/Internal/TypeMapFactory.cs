@@ -1,10 +1,13 @@
 using System;
+#if !SILVERLIGHT
 using System.Collections.Concurrent;
+#else
+using TvdP.Collections;
+#endif
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -28,7 +31,11 @@ namespace AutoMapper
                 {
                     var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
+#if !SILVERLIGHT
                     typeMap.AddPropertyMap(destPropertyAccessor, resolvers);
+#else
+                    typeMap.AddPropertyMap(destPropertyAccessor, resolvers.Cast<IValueResolver>());
+#endif
                 }
             }
             if (!destinationType.IsAbstract && destinationType.IsClass)

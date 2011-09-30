@@ -43,7 +43,6 @@ namespace AutoMapper
 		void CreateProfile(string profileName, Action<IProfileExpression> initializationExpression);
 		void AddProfile(Profile profile);
 		void AddProfile<TProfile>() where TProfile : Profile, new();
-		void SelfConfigure(Assembly assembly);
 		void ConstructServicesUsing(Func<Type, object> constructor);
 		void Seal();
 	}
