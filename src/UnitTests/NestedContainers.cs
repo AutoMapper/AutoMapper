@@ -78,5 +78,69 @@ namespace AutoMapper.UnitTests
                 _dest.Value2.ShouldEqual(7);
             }
         }
+
+        public class When_specifying_a_custom_contextual_constructor_for_type_converters : AutoMapperSpecBase
+        {
+            private Dest _dest;
+
+            public class FooTypeConverter : TypeConverter<Source, Dest>
+            {
+                private readonly int _value;
+
+                public FooTypeConverter()
+                    : this(1)
+                {
+                }
+
+                public FooTypeConverter(int value)
+                {
+                    _value = value;
+                }
+
+                protected override Dest ConvertCore(Source source)
+                {
+                    return new Dest
+                    {
+                        Value = source.Value + _value,
+                        Value2 = source.Value2 + _value
+                    };
+                }
+            }
+
+            public class Source
+            {
+                public int Value { get; set; }
+                public int Value2 { get; set; }
+            }
+
+            public class Dest
+            {
+                public int Value { get; set; }
+                public int Value2 { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Source, Dest>()
+                        .ConvertUsing<FooTypeConverter>();
+                });
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Dest>(new Source { Value = 5, Value2 = 6 },
+                    opt => opt.ConstructServicesUsing(type => type == typeof(FooTypeConverter) ? new FooTypeConverter(2) : null));
+            }
+
+            [Test]
+            public void Should_use_the_new_ctor()
+            {
+                _dest.Value.ShouldEqual(7);
+                _dest.Value2.ShouldEqual(8);
+            }
+
+        }
     }
 }

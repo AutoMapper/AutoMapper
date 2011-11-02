@@ -1,6 +1,6 @@
 namespace AutoMapper
 {
-	public interface ITypeConverter<TSource, TDestination>
+	public interface ITypeConverter<in TSource, out TDestination>
 	{
 		TDestination Convert(ResolutionContext context);
 	}

@@ -329,7 +329,7 @@ namespace AutoMapper
 
 		public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
 		{
-			var converter = new DeferredInstantiatedConverter<TSource, TDestination>(() => (TTypeConverter)_serviceCtor(typeof(TTypeConverter)));
+            var converter = new DeferredInstantiatedConverter<TSource, TDestination>(BuildCtor<ITypeConverter<TSource, TDestination>>(typeof(TTypeConverter)));
 
 			ConvertUsing(converter.Convert);
 		}
