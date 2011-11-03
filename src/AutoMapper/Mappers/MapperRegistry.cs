@@ -16,6 +16,9 @@ namespace AutoMapper.Mappers
             new EnumMapper(),
             new ArrayMapper(),
 			new EnumerableToDictionaryMapper(),
+#if !SILVERLIGHT
+            new NameValueCollectionMapper(), 
+#endif
             new DictionaryMapper(),
 #if !SILVERLIGHT
             new ListSourceMapper(),
