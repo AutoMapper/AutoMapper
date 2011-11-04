@@ -10,68 +10,82 @@ namespace AutoMapper.UnitTests
 {
 	namespace BidirectionalRelationships
 	{
-		public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship : AutoMapperSpecBase
-		{
-			private ParentDto _dto;
+        public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship : AutoMapperSpecBase
+        {
+            private ParentDto _dto;
+            private int _beforeMapCount = 0;
+            private int _afterMapCount = 0;
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<ParentModel, ParentDto>();
-				Mapper.CreateMap<ChildModel, ChildDto>();
-				Mapper.AssertConfigurationIsValid();
-			}
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<ParentModel, ParentDto>()
+                    .BeforeMap((src, dest) => _beforeMapCount++)
+                    .AfterMap((src, dest) => _afterMapCount++);
+                Mapper.CreateMap<ChildModel, ChildDto>();
+                Mapper.AssertConfigurationIsValid();
+            }
 
-			protected override void Because_of()
-			{
+            protected override void Because_of()
+            {
                 var parent = new ParentModel { ID = "PARENT_ONE" };
 
                 parent.AddChild(new ChildModel { ID = "CHILD_ONE" });
 
-				_dto = Mapper.Map<ParentModel, ParentDto>(parent);
-			}
+                parent.AddChild(new ChildModel { ID = "CHILD_TWO" });
 
-			[Test]
-			public void Should_preserve_the_parent_child_relationship_on_the_destination()
-			{
-				_dto.Children[0].Parent.ShouldBeSameAs(_dto);
-			}
+                _dto = Mapper.Map<ParentModel, ParentDto>(parent);
+            }
 
-			public class ParentModel
-			{
-				public ParentModel()
-				{
-					Children = new List<ChildModel>();
-				}
+            [Test]
+            public void Should_preserve_the_parent_child_relationship_on_the_destination()
+            {
+                _dto.Children[0].Parent.ShouldBeSameAs(_dto);
+                _dto.Children[1].Parent.ShouldBeSameAs(_dto);
+            }
 
-				public string ID { get; set; }
+            [Test]
+            public void Before_and_After_for_the_parent_should_be_called_once()
+            {
+                _beforeMapCount.ShouldEqual(1);
+                _afterMapCount.ShouldEqual(1);
+            }
 
-				public IList<ChildModel> Children { get; private set; }
+            public class ParentModel
+            {
+                public ParentModel()
+                {
+                    Children = new List<ChildModel>();
+                }
 
-				public void AddChild(ChildModel child)
-				{
-					child.Parent = this;
-					Children.Add(child);
-				}
-			}
+                public string ID { get; set; }
 
-			public class ChildModel
-			{
-				public string ID { get; set; }
-				public ParentModel Parent { get; set; }
-			}
+                public IList<ChildModel> Children { get; private set; }
 
-			public class ParentDto
-			{
-				public string ID { get; set; }
-				public IList<ChildDto> Children { get; set; }
-			}
+                public void AddChild(ChildModel child)
+                {
+                    child.Parent = this;
+                    Children.Add(child);
+                }
+            }
 
-			public class ChildDto
-			{
-				public string ID { get; set; }
-				public ParentDto Parent { get; set; }
-			}
-		}
+            public class ChildModel
+            {
+                public string ID { get; set; }
+                public ParentModel Parent { get; set; }
+            }
+
+            public class ParentDto
+            {
+                public string ID { get; set; }
+                public IList<ChildDto> Children { get; set; }
+            }
+
+            public class ChildDto
+            {
+                public string ID { get; set; }
+                public ParentDto Parent { get; set; }
+            }
+        }
 
 
 		[Ignore("This test breaks the Test Runner")]

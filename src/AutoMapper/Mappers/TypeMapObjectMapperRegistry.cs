@@ -70,7 +70,10 @@ namespace AutoMapper.Mappers
 					MapPropertyValue(context, mapper, mappedObject, propertyMap);
 				}
 				mappedObject = ReassignValue(context, mappedObject);
-				return mappedObject;
+
+                context.TypeMap.AfterMap(context.SourceValue, mappedObject);
+
+                return mappedObject;
 			}
 
 			protected virtual object ReassignValue(ResolutionContext context, object o)
