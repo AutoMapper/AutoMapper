@@ -121,6 +121,9 @@ namespace AutoMapper.Mappers
 
 		private static void MapPropertyValues(ResolutionContext context, IMappingEngineRunner mapper, object result)
 		{
+            if (context.TypeMap == null)
+                throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
+
 			foreach (var propertyMap in context.TypeMap.GetPropertyMaps())
 			{
 				MapPropertyValue(context, mapper, result, propertyMap);

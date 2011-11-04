@@ -92,6 +92,24 @@ namespace AutoMapper.UnitTests
             private IDataReader _dataReader;
         }
 
+        public class When_mapping_a_data_reader_to_a_dto_and_the_map_does_not_exist : AutoMapperSpecBase
+        {
+            protected override void Establish_context()
+            {
+                _dataReader = new DataBuilder().BuildDataReader();
+            }
+
+            [Test]
+            public void Then_an_automapper_exception_should_be_thrown()
+            {
+                typeof (AutoMapperMappingException).ShouldBeThrownBy(
+                    () => Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader).FirstOrDefault());
+            }
+
+            private IDataReader _dataReader;
+        }
+
+
         public class When_mapping_a_single_data_record_to_a_dto : AutoMapperSpecBase
         {
             protected override void Establish_context()
