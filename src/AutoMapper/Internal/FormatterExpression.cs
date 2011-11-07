@@ -26,6 +26,7 @@ namespace AutoMapper
 		}
 
 		public bool AllowNullDestinationValues { get; set; }
+		public bool AllowNullCollections { get; set; }
 		public INamingConvention SourceMemberNamingConvention { get; set; }
 		public INamingConvention DestinationMemberNamingConvention { get; set; }
 		public Func<string, string> SourceMemberNameTransformer { get; set; }
@@ -144,6 +145,11 @@ namespace AutoMapper
 		public bool MapNullSourceValuesAsNull
 		{
 			get { return AllowNullDestinationValues; }
+		}
+
+		public bool MapNullSourceCollectionsAsNull
+		{
+			get { return AllowNullCollections; }
 		}
 
 		public void RecognizePrefixes(params string[] prefixes)

@@ -12,7 +12,8 @@ namespace AutoMapper
 		void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
 		IFormatterExpression ForSourceType<TSource>();
 		bool AllowNullDestinationValues { get; set; }
-	}
+        bool AllowNullCollections { get; set; }
+    }
 
 	public interface IFormatterCtorExpression
 	{

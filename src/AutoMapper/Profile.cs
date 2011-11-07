@@ -24,6 +24,12 @@ namespace AutoMapper
 			set { GetProfile().AllowNullDestinationValues = value; }
 		}
 
+	    public bool AllowNullCollections
+		{
+            get { return GetProfile().AllowNullCollections; }
+            set { GetProfile().AllowNullCollections = value; }
+		}
+
 	    public INamingConvention SourceMemberNamingConvention
 		{
 			get { return GetProfile().SourceMemberNamingConvention; } 

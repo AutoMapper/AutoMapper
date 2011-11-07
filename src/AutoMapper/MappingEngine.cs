@@ -374,6 +374,15 @@ namespace AutoMapper
 			return ConfigurationProvider.MapNullSourceValuesAsNull;
 		}
 
+        bool IMappingEngineRunner.ShouldMapSourceCollectionAsNull(ResolutionContext context)
+		{
+			var typeMap = context.GetContextTypeMap();
+			if (typeMap != null)
+				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceCollectionsAsNull;
+
+            return ConfigurationProvider.MapNullSourceCollectionsAsNull;
+		}
+
 		private void ClearTypeMap(object sender, TypeMapCreatedEventArgs e)
 		{
 		    IObjectMapper existing;

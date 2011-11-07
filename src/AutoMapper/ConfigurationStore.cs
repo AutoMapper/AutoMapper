@@ -49,6 +49,12 @@ namespace AutoMapper
 			set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }
 		}
 
+	    public bool AllowNullCollections
+		{
+			get { return GetProfile(DefaultProfileName).AllowNullCollections; }
+			set { GetProfile(DefaultProfileName).AllowNullCollections = value; }
+		}
+
 		public INamingConvention SourceMemberNamingConvention
 		{
 			get { return GetProfile(DefaultProfileName).SourceMemberNamingConvention; }
@@ -76,6 +82,11 @@ namespace AutoMapper
 		bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{
 			get { return AllowNullDestinationValues; }
+		}
+
+		bool IProfileConfiguration.MapNullSourceCollectionsAsNull
+		{
+			get { return AllowNullCollections; }
 		}
 
 		public IProfileExpression CreateProfile(string profileName)

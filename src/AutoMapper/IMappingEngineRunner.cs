@@ -9,5 +9,6 @@ namespace AutoMapper
 		string FormatValue(ResolutionContext context);
 		IConfigurationProvider ConfigurationProvider { get; }
 	    bool ShouldMapSourceValueAsNull(ResolutionContext context);
+	    bool ShouldMapSourceCollectionAsNull(ResolutionContext context);
 	}
 }
