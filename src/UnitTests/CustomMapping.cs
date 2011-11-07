@@ -962,7 +962,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-        public class When_building_custom_configuration_mapping_to_itself : AutoMapperSpecBase
+        public class When_building_custom_configuration_mapping_to_itself : NonValidatingSpecBase
         {
             private Exception _e;
 

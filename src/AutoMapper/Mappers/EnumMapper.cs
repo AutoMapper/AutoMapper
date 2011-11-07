@@ -13,9 +13,20 @@ namespace AutoMapper.Mappers
 
             if (EnumToStringMapping(context, ref toEnum))
             {
+                if (context.SourceValue == null)
+                {
+                    return mapper.CreateObject(context);
+                }
+
                 if (toEnum)
                 {
-					return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
+                    var stringValue = context.SourceValue.ToString();
+                    if (string.IsNullOrEmpty(stringValue))
+                    {
+                        return mapper.CreateObject(context);
+                    }
+
+                    return Enum.Parse(enumDestinationType, stringValue, true);
                 }
                 return Enum.GetName(enumSourceType, context.SourceValue);
             }
@@ -32,7 +43,7 @@ namespace AutoMapper.Mappers
                 }
 
 #if !SILVERLIGHT
-				if (!Enum.GetNames(enumDestinationType).Contains(context.SourceValue.ToString()))
+                if (!Enum.GetNames(enumDestinationType).Contains(context.SourceValue.ToString()))
                 {
                     Type underlyingSourceType = Enum.GetUnderlyingType(enumSourceType);
                     var underlyingSourceValue = Convert.ChangeType(context.SourceValue, underlyingSourceType);
@@ -47,7 +58,7 @@ namespace AutoMapper.Mappers
             {
                 if (toEnum)
                 {
-					return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
+                    return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
                 }
                 return Convert.ChangeType(context.SourceValue, context.DestinationType, null);
             }
