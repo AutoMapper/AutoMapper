@@ -262,7 +262,8 @@ namespace AutoMapper
                     // does of course not work for subclasses etc./generic ...
                     if (currentChildType != prop.PropertyType &&
                         // avoid nullable etc.
-                        prop.PropertyType.BaseType != typeof(ValueType))
+                        prop.PropertyType.BaseType != typeof(ValueType) && 
+                        prop.PropertyType.BaseType != typeof(Enum))
                     {
                         var transformedExpression = CreateMapExpression(currentChildType, prop.PropertyType);
                         var expr2 = Expression.Invoke(
