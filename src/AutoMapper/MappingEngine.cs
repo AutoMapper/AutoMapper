@@ -312,7 +312,7 @@ namespace AutoMapper
             {
                 throw;
             }
-            catch (Exception ex)
+			catch (Exception ex)
 			{
 				throw new AutoMapperMappingException(context, ex);
 			}
