@@ -267,7 +267,7 @@ namespace AutoMapper
                         var transformedExpression = CreateMapExpression(currentChildType, prop.PropertyType);
                         var expr2 = Expression.Invoke(
                             transformedExpression,
-                            instanceParameter
+                            currentChild
                         );
                         bindings.Add(Expression.Bind(destinationMember, expr2));
                     }
