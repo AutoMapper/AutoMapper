@@ -409,7 +409,8 @@ namespace AutoMapper
 
             protected override Expression VisitParameter(ParameterExpression node)
             {
-                return newParameter; // replace all old param references with new ones
+                // replace all old param references with new ones
+                return node.Type == oldParameter.Type ? newParameter : node; 
             }
 
             protected override Expression VisitMember(MemberExpression node)
