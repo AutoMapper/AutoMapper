@@ -21,8 +21,8 @@ namespace AutoMapper
 			SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 			SourceMemberNameTransformer = s => Regex.Replace(s, "(?:^Get)?(.*)", "$1");
-            DestinationMemberNameTransformer = s => s;
-            AllowNullDestinationValues = true;
+			DestinationMemberNameTransformer = s => s;
+			AllowNullDestinationValues = true;
 		}
 
 		public bool AllowNullDestinationValues { get; set; }
@@ -30,11 +30,11 @@ namespace AutoMapper
 		public INamingConvention SourceMemberNamingConvention { get; set; }
 		public INamingConvention DestinationMemberNamingConvention { get; set; }
 		public Func<string, string> SourceMemberNameTransformer { get; set; }
-        public Func<string, string> DestinationMemberNameTransformer { get; set; }
+		public Func<string, string> DestinationMemberNameTransformer { get; set; }
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
-            var formatter = new DeferredInstantiatedFormatter(BuildCtor(typeof(TValueFormatter)));
+			var formatter = new DeferredInstantiatedFormatter(BuildCtor(typeof(TValueFormatter)));
 
 			AddFormatter(formatter);
 
@@ -89,54 +89,54 @@ namespace AutoMapper
 			return _formattersToSkip.ToArray();
 		}
 
-	    public IEnumerable<IValueFormatter> GetFormattersToApply(ResolutionContext context)
-	    {
-	        return GetFormatters(context);
-	    }
+		public IEnumerable<IValueFormatter> GetFormattersToApply(ResolutionContext context)
+		{
+			return GetFormatters(context);
+		}
 
-        private IEnumerable<IValueFormatter> GetFormatters(ResolutionContext context)
-        {
-            Type valueType = context.SourceType;
-            IFormatterConfiguration typeSpecificFormatterConfig;
+		private IEnumerable<IValueFormatter> GetFormatters(ResolutionContext context)
+		{
+			Type valueType = context.SourceType;
+			IFormatterConfiguration typeSpecificFormatterConfig;
 
-            if (context.PropertyMap != null)
-            {
-                foreach (IValueFormatter formatter in context.PropertyMap.GetFormatters())
-                {
-                    yield return formatter;
-                }
+			if (context.PropertyMap != null)
+			{
+				foreach (IValueFormatter formatter in context.PropertyMap.GetFormatters())
+				{
+					yield return formatter;
+				}
 
-                if (GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
-                {
-                    if (!context.PropertyMap.FormattersToSkipContains(typeSpecificFormatterConfig.GetType()))
-                    {
-                        foreach (var typeSpecificFormatter in typeSpecificFormatterConfig.GetFormattersToApply(context))
-                        {
-                            yield return typeSpecificFormatter;
-                        }
-                    }
-                }
-            }
-            else if (GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
-            {
-                foreach (var typeSpecificFormatter in typeSpecificFormatterConfig.GetFormattersToApply(context))
-                {
-                    yield return typeSpecificFormatter;
-                }
-            }
+				if (GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
+				{
+					if (!context.PropertyMap.FormattersToSkipContains(typeSpecificFormatterConfig.GetType()))
+					{
+						foreach (var typeSpecificFormatter in typeSpecificFormatterConfig.GetFormattersToApply(context))
+						{
+							yield return typeSpecificFormatter;
+						}
+					}
+				}
+			}
+			else if (GetTypeSpecificFormatters().TryGetValue(valueType, out typeSpecificFormatterConfig))
+			{
+				foreach (var typeSpecificFormatter in typeSpecificFormatterConfig.GetFormattersToApply(context))
+				{
+					yield return typeSpecificFormatter;
+				}
+			}
 
-            foreach (IValueFormatter formatter in GetFormatters())
-            {
-                Type formatterType = GetFormatterType(formatter, context);
-                if (CheckPropertyMapSkipList(context, formatterType) &&
-                    CheckTypeSpecificSkipList(typeSpecificFormatterConfig, formatterType))
-                {
-                    yield return formatter;
-                }
-            }
-        }
+			foreach (IValueFormatter formatter in GetFormatters())
+			{
+				Type formatterType = GetFormatterType(formatter, context);
+				if (CheckPropertyMapSkipList(context, formatterType) &&
+					CheckTypeSpecificSkipList(typeSpecificFormatterConfig, formatterType))
+				{
+					yield return formatter;
+				}
+			}
+		}
 
-	    public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
+		public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
 		{
 			_formatters.RemoveAt(_formatters.Count - 1);
 			_formatters.Add(new DeferredInstantiatedFormatter(ctxt => instantiator()));
@@ -173,58 +173,58 @@ namespace AutoMapper
 			SourceMemberNameTransformer = val => AliasFunc(orig(val), original, alias);
 		}
 
-        public void RecognizeDestinationPrefixes(params string[] prefixes)
-        {
-            var orig = DestinationMemberNameTransformer;
+		public void RecognizeDestinationPrefixes(params string[] prefixes)
+		{
+			var orig = DestinationMemberNameTransformer;
 
-            DestinationMemberNameTransformer = val => prefixes.Aggregate(orig(val), PrefixFunc);
-        }
+			DestinationMemberNameTransformer = val => prefixes.Aggregate(orig(val), PrefixFunc);
+		}
 
-        public void RecognizeDestinationPostfixes(params string[] postfixes)
-        {
-            var orig = DestinationMemberNameTransformer;
+		public void RecognizeDestinationPostfixes(params string[] postfixes)
+		{
+			var orig = DestinationMemberNameTransformer;
 
-            DestinationMemberNameTransformer = val => postfixes.Aggregate(orig(val), PostfixFunc);
-        }
+			DestinationMemberNameTransformer = val => postfixes.Aggregate(orig(val), PostfixFunc);
+		}
 
-        private static Type GetFormatterType(IValueFormatter formatter, ResolutionContext context)
-        {
-            return formatter is DeferredInstantiatedFormatter ? ((DeferredInstantiatedFormatter)formatter).GetFormatterType(context) : formatter.GetType();
-        }
+		private static Type GetFormatterType(IValueFormatter formatter, ResolutionContext context)
+		{
+			return formatter is DeferredInstantiatedFormatter ? ((DeferredInstantiatedFormatter)formatter).GetFormatterType(context) : formatter.GetType();
+		}
 
-        private static bool CheckTypeSpecificSkipList(IFormatterConfiguration valueFormatter, Type formatterType)
-        {
-            if (valueFormatter == null)
-            {
-                return true;
-            }
+		private static bool CheckTypeSpecificSkipList(IFormatterConfiguration valueFormatter, Type formatterType)
+		{
+			if (valueFormatter == null)
+			{
+				return true;
+			}
 
-            return !valueFormatter.GetFormatterTypesToSkip().Contains(formatterType);
-        }
+			return !valueFormatter.GetFormatterTypesToSkip().Contains(formatterType);
+		}
 
-        private static bool CheckPropertyMapSkipList(ResolutionContext context, Type formatterType)
-        {
-            if (context.PropertyMap == null)
-                return true;
+		private static bool CheckPropertyMapSkipList(ResolutionContext context, Type formatterType)
+		{
+			if (context.PropertyMap == null)
+				return true;
 
-            return !context.PropertyMap.FormattersToSkipContains(formatterType);
-        }
+			return !context.PropertyMap.FormattersToSkipContains(formatterType);
+		}
 
-        private Func<ResolutionContext, IValueFormatter> BuildCtor(Type type)
-        {
-            return context =>
-            {
-                if (context.Options.ServiceCtor != null)
-                {
-                    var obj = context.Options.ServiceCtor(type);
-                    if (obj != null)
-                        return (IValueFormatter)obj;
-                }
-                return (IValueFormatter)_formatterCtor(type);
-            };
-        }
+		private Func<ResolutionContext, IValueFormatter> BuildCtor(Type type)
+		{
+			return context =>
+			{
+				if (context.Options.ServiceCtor != null)
+				{
+					var obj = context.Options.ServiceCtor(type);
+					if (obj != null)
+						return (IValueFormatter)obj;
+				}
+				return (IValueFormatter)_formatterCtor(type);
+			};
+		}
 
-    }
+	}
 
 	internal interface IFormatterCtorConfigurator
 	{
