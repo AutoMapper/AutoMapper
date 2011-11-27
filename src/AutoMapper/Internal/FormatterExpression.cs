@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace AutoMapper
 {
@@ -11,16 +10,16 @@ namespace AutoMapper
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
-		private static readonly Func<string, string, string> PrefixFunc = (src, prefix) => Regex.Replace(src, string.Format("(?:^{0})?(.*)", prefix), "$1");
-		private static readonly Func<string, string, string> PostfixFunc = (src, prefix) => Regex.Replace(src, string.Format("(.*)(?:{0})$", prefix), "$1");
-		private static readonly Func<string, string, string, string> AliasFunc = (src, original, alias) => Regex.Replace(src, string.Format("^({0})$", original), alias);
+		private static readonly Func<string, string, string> PrefixFunc = (src, prefix) => DefaultPrefixTransformer(src, prefix);
+		private static readonly Func<string, string, string> PostfixFunc = (src, postfix) => DefaultPostfixTransformer(src, postfix);
+		private static readonly Func<string, string, string, string> AliasFunc = (src, original, alias) => DefaultAliasTransformer(src, original, alias);
 
 		public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
 		{
 			_formatterCtor = formatterCtor;
 			SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			DestinationMemberNamingConvention = new PascalCaseNamingConvention();
-			SourceMemberNameTransformer = s => Regex.Replace(s, "(?:^Get)?(.*)", "$1");
+			SourceMemberNameTransformer = DefaultSourceMemberNameTransformer;
 			DestinationMemberNameTransformer = s => s;
 			AllowNullDestinationValues = true;
 		}
@@ -224,6 +223,40 @@ namespace AutoMapper
 			};
 		}
 
+		private static string DefaultPrefixTransformer(string src, string prefix)
+		{
+			return src != null
+				&& !String.IsNullOrEmpty(prefix)
+				&& src.StartsWith(prefix, StringComparison.Ordinal)
+					? src.Substring(prefix.Length)
+					: src;
+		}
+
+		private static string DefaultPostfixTransformer(string src, string postfix)
+		{
+			return src != null
+				&& !String.IsNullOrEmpty(postfix)
+				&& src.EndsWith(postfix, StringComparison.Ordinal)
+					? src.Remove(src.Length - postfix.Length)
+					: src;
+		}
+
+		private static string DefaultAliasTransformer(string src, string original, string @alias)
+		{
+			return src != null
+				&& !String.IsNullOrEmpty(original)
+				&& String.Equals(src, original, StringComparison.Ordinal)
+					? @alias
+					: src;
+		}
+
+		private static string DefaultSourceMemberNameTransformer(string src)
+		{
+			return src != null
+				&& src.StartsWith("Get", StringComparison.Ordinal)
+					? src.Substring(3) // Removes initial "Get"
+					: src;
+		}
 	}
 
 	internal interface IFormatterCtorConfigurator
