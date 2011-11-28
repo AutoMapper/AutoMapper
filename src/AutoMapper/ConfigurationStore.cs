@@ -410,7 +410,7 @@ namespace AutoMapper
 		private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(TypeMap typeMap)
 		{
 			IMappingExpression<TSource, TDestination> mappingExp =
-				new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor);
+				new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, this);
 			// Custom Hack
 			var destInfo = new TypeInfo(typeof(TDestination));
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())

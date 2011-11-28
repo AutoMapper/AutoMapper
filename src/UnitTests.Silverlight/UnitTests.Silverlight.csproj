@@ -300,6 +300,9 @@
     <Compile Include="..\UnitTests\ResolutionContextTester.cs">
       <Link>ResolutionContextTester.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\ReverseMapping.cs">
+      <Link>ReverseMapping.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\TesterExtensions.cs">
       <Link>TesterExtensions.cs</Link>
     </Compile>
