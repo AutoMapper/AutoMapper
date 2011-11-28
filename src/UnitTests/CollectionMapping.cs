@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using NUnit.Framework;
 using Should;
 #if !SILVERLIGHT
@@ -271,6 +272,19 @@ namespace AutoMapper.UnitTests
 
             Assert.That(master.Details, Is.Not.SameAs(originalCollection));
         }
+
+#if !SILVERLIGHT
+        [Test]
+        public void Should_map_to_NameValueCollection() {
+            // initially results in the following exception:
+            // ----> System.InvalidCastException : Unable to cast object of type 'System.Collections.Specialized.NameValueCollection' to type 'System.Collections.IList'.
+            // this was fixed by adding NameValueCollectionMapper to the MapperRegistry.
+            var c = new NameValueCollection();
+            var mappedCollection = Mapper.Map<NameValueCollection, NameValueCollection>(c);
+
+            Assert.IsNotNull(mappedCollection);
+        }
+#endif
 
 #if SILVERLIGHT
         public class HashSet<T> : Collection<T>
