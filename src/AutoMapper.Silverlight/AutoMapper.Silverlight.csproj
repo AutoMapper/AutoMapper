@@ -308,6 +308,9 @@
     <Compile Include="..\AutoMapper\MappingEngine.cs">
       <Link>MappingEngine.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\MemberList.cs">
+      <Link>MemberList.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\Profile.cs">
       <Link>Profile.cs</Link>
     </Compile>

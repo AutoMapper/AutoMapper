@@ -86,14 +86,24 @@ namespace AutoMapper
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
-			var map = _configurator.CreateMap<TSource, TDestination>(ProfileName);
+		    return CreateMap<TSource, TDestination>(MemberList.Destination);
+		}
+
+		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
+		{
+			var map = _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
 
 			return map;
 		}
 
 		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
-			var map = _configurator.CreateMap(sourceType, destinationType, ProfileName);
+		    return CreateMap(sourceType, destinationType, MemberList.Destination);
+		}
+
+		public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
+		{
+			var map = _configurator.CreateMap(sourceType, destinationType, memberList, ProfileName);
 
 			return map;
 		}

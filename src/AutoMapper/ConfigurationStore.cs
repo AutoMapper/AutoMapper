@@ -134,22 +134,37 @@ namespace AutoMapper
 		    return CreateMap<TSource, TDestination>(DefaultProfileName);
 		}
 
+		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
+		{
+		    return CreateMap<TSource, TDestination>(DefaultProfileName, memberList);
+		}
+
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName)
         {
-            TypeMap typeMap = CreateTypeMap(typeof(TSource), typeof(TDestination), profileName);
+            return CreateMap<TSource, TDestination>(profileName, MemberList.Destination);
+        }
+
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList)
+        {
+            TypeMap typeMap = CreateTypeMap(typeof(TSource), typeof(TDestination), profileName, memberList);
 
             return CreateMappingExpression<TSource, TDestination>(typeMap);
         }
 
 		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
-		    return CreateMap(sourceType, destinationType, DefaultProfileName);
+		    return CreateMap(sourceType, destinationType, MemberList.Destination);
 		}
 
-		public IMappingExpression CreateMap(Type sourceType, Type destinationType, string profileName)
+	    public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
+	    {
+	        return CreateMap(sourceType, destinationType, memberList, DefaultProfileName);
+	    }
+
+	    public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
 		{
-			var typeMap = CreateTypeMap(sourceType, destinationType, profileName);
+			var typeMap = CreateTypeMap(sourceType, destinationType, profileName, memberList);
 
 			return CreateMappingExpression(typeMap, destinationType);
 		}
@@ -181,10 +196,10 @@ namespace AutoMapper
 
 		public TypeMap CreateTypeMap(Type source, Type destination)
 		{
-		    return CreateTypeMap(source, destination, DefaultProfileName);
+		    return CreateTypeMap(source, destination, DefaultProfileName, MemberList.Destination);
 		}
 
-		public TypeMap CreateTypeMap(Type source, Type destination, string profileName)
+		public TypeMap CreateTypeMap(Type source, Type destination, string profileName, MemberList memberList)
 		{
 			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination);
 				
@@ -192,7 +207,7 @@ namespace AutoMapper
 			{
 			    var profileConfiguration = GetProfile(profileName);
 
-				typeMap = _typeMapFactory.CreateTypeMap(source, destination, profileConfiguration);
+				typeMap = _typeMapFactory.CreateTypeMap(source, destination, profileConfiguration, memberList);
 
                 typeMap.Profile = profileName;
 			    typeMap.IgnorePropertiesStartingWith = _globalIgnore;
@@ -499,7 +514,7 @@ namespace AutoMapper
                         var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
                         if (derivedTypeFor != destinationType)
                         {
-                            typeMap = CreateTypeMap(sourceType, derivedTypeFor, profileName);
+                            typeMap = CreateTypeMap(sourceType, derivedTypeFor, profileName, typeMap.ConfiguredMemberList);
                         }
 
                         break;

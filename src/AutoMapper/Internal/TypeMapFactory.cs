@@ -16,12 +16,12 @@ namespace AutoMapper
         private static readonly ConcurrentDictionary<Type, TypeInfo> _typeInfos =
             new ConcurrentDictionary<Type, TypeInfo>();
 
-        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options)
+        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
         {
             var sourceTypeInfo = GetTypeInfo(sourceType);
             var destTypeInfo = GetTypeInfo(destinationType);
 
-            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo);
+            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
 
             foreach (var destProperty in destTypeInfo.GetPublicWriteAccessors())
             {

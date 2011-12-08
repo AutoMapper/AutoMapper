@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -19,11 +20,12 @@ namespace AutoMapper
         private Func<ResolutionContext, bool> _condition;
         private ConstructorMap _constructorMap;
 
-        public TypeMap(TypeInfo sourceType, TypeInfo destinationType)
+        public TypeMap(TypeInfo sourceType, TypeInfo destinationType, MemberList memberList)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             Profile = ConfigurationStore.DefaultProfileName;
+            ConfiguredMemberList = memberList;
         }
 
         public ConstructorMap ConstructorMap
@@ -76,6 +78,8 @@ namespace AutoMapper
 
         public bool ConstructDestinationUsingServiceLocator { get; set; }
 
+        public MemberList ConfiguredMemberList { get; private set; }
+
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {
             if (_sealed)
@@ -115,10 +119,18 @@ namespace AutoMapper
             var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
                 .Select(pm => pm.DestinationProperty.Name);
 
-            var properties = _destinationType.GetPublicWriteAccessors()
-                .Select(p => p.Name)
-                .Except(autoMappedProperties)
-                .Except(inheritedProperties);
+            IEnumerable<string> properties;
+
+            if (ConfiguredMemberList == MemberList.Destination)
+                properties = _destinationType.GetPublicWriteAccessors()
+                    .Select(p => p.Name)
+                    .Except(autoMappedProperties)
+                    .Except(inheritedProperties);
+            else
+                properties = _sourceType.GetPublicReadAccessors()
+                    .Select(p => p.Name)
+                    .Except(autoMappedProperties)
+                    .Except(inheritedProperties);
 
             return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
         }

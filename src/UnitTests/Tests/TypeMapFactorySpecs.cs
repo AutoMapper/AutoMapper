@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests.Tests
             mappingOptions.SourceMemberNameTransformer = s => s;
             mappingOptions.DestinationMemberNameTransformer = s => s;
 			
-			var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions);
+			var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions, MemberList.Destination);
 
             var propertyMaps = typeMap.GetPropertyMaps();
             
@@ -83,7 +83,7 @@ namespace AutoMapper.UnitTests.Tests
 
 		protected override void Because_of()
 		{
-			_map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
+			_map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions, MemberList.Destination);
 		}
 
 		[Test]
@@ -131,7 +131,7 @@ namespace AutoMapper.UnitTests.Tests
 
 		protected override void Because_of()
 		{
-			_map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
+			_map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions, MemberList.Destination);
 		}
 
 		[Test]
@@ -177,7 +177,7 @@ namespace AutoMapper.UnitTests.Tests
 
 		protected override void Because_of()
 		{
-			_map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
+			_map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions, MemberList.Destination);
 		}
 
 		[Test]
@@ -223,7 +223,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Because_of()
         {
-            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions);
+            _map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions, MemberList.Destination);
         }
 
         [Test]
