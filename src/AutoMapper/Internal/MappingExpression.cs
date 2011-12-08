@@ -262,6 +262,15 @@ namespace AutoMapper
             return _configurationContainer.CreateMap<TDestination, TSource>();
         }
 
+        public IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions)
+        {
+            var srcConfig = new SourceMappingExpression(_typeMap, sourceMember);
+
+            memberOptions(srcConfig);
+
+            return this;
+        }
+
         private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
         {
             if (context.InstanceCache.ContainsKey(context))
@@ -400,6 +409,23 @@ namespace AutoMapper
                 }
                 return (TServiceType)_serviceCtor(type);
             };
+        }
+
+        private class SourceMappingExpression : ISourceMemberConfigurationExpression<TSource>
+        {
+            private readonly SourceMemberConfig _sourcePropertyConfig;
+
+            public SourceMappingExpression(TypeMap typeMap, LambdaExpression sourceMember)
+            {
+                var memberInfo = ReflectionHelper.FindProperty(sourceMember);
+
+                _sourcePropertyConfig = typeMap.FindOrCreateSourceMemberConfigFor(memberInfo);
+            }
+
+            public void Ignore()
+            {
+                _sourcePropertyConfig.Ignore();
+            }
         }
     }
 }

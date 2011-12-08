@@ -13,6 +13,7 @@ namespace AutoMapper
         private readonly TypeInfo _destinationType;
         private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
 		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
+        private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs = new ThreadSafeList<SourceMemberConfig>();
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private readonly TypeInfo _sourceType;
@@ -133,11 +134,16 @@ namespace AutoMapper
                     .Where(pm => pm.CustomExpression != null)
                     .Select(pm => pm.SourceMember.Name);
 
+                var ignoredSourceMembers = _sourceMemberConfigs
+                    .Where(smc => smc.IsIgnored())
+                    .Select(pm => pm.SourceMember.Name);
+
                 properties = _sourceType.GetPublicReadAccessors()
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties)
                     .Except(redirectedSourceMembers)
+                    .Except(ignoredSourceMembers)
                     ;
             }
 
@@ -273,6 +279,18 @@ namespace AutoMapper
         {
             var ctorMap = new ConstructorMap(constructorInfo, parameters);
             _constructorMap = ctorMap;
+        }
+
+        public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
+        {
+            var config = _sourceMemberConfigs.FirstOrDefault(smc => smc.SourceMember == sourceMember);
+            if (config == null)
+            {
+                config = new SourceMemberConfig(sourceMember);
+                _sourceMemberConfigs.Add(config);
+            }
+
+            return config;
         }
     }
 }

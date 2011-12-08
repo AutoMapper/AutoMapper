@@ -326,6 +326,9 @@
     <Compile Include="..\AutoMapper\ResolutionResult.cs">
       <Link>ResolutionResult.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\SourceMemberConfig.cs">
+      <Link>SourceMemberConfig.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\ThreadSafeList.cs">
       <Link>ThreadSafeList.cs</Link>
     </Compile>

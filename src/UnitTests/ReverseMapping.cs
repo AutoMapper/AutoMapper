@@ -135,5 +135,35 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_validating_only_against_source_members_and_unmatching_source_members_are_manually_mapped_with_resolvers : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+                public int Value2 { get; set; }
+            }
+            public class Destination
+            {
+                public int Value { get; set; }
+                public int Value3 { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Source, Destination>(MemberList.Source)
+                        .ForMember(dest => dest.Value3, opt => opt.ResolveUsing(src => src.Value2))
+                        .ForSourceMember(src => src.Value2, opt => opt.Ignore());
+                });
+            }
+
+            [Test]
+            public void Should_not_throw_a_configuration_validation_error()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+            }
+        }
+
     }
 }

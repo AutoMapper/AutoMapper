@@ -32,6 +32,7 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> MaxDepth(int depth);
         IMappingExpression<TSource, TDestination> ConstructUsingServiceLocator();
         IMappingExpression<TDestination, TSource> ReverseMap();
+        IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
     }
 
     public interface IMemberConfigurationExpression
@@ -40,6 +41,11 @@ namespace AutoMapper
         IResolutionExpression ResolveUsing(IValueResolver valueResolver);
         IResolverConfigurationExpression ResolveUsing(Type valueResolverType);
         IResolverConfigurationExpression ResolveUsing<TValueResolver>();
+        void Ignore();
+    }
+
+    public interface ISourceMemberConfigurationExpression<TSource>
+    {
         void Ignore();
     }
 
