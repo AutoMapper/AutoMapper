@@ -135,17 +135,17 @@ function global:create-nuspec()
     <version>$version</version>
     <authors>Jimmy Bogard</authors>
     <owners>Jimmy Bogard</owners>
-    <licenseUrl>http://automapper.codeplex.com/license</licenseUrl>
-    <projectUrl>http://automapper.codeplex.com</projectUrl>
+    <licenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://automapper.org</projectUrl>
     <iconUrl>https://s3.amazonaws.com/automapper/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A convention-based object-object mapper</summary>
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
   </metadata>
   <files>
-    <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40-client"" />
-    <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40-client"" />
-    <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40-client"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40"" />
     <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
