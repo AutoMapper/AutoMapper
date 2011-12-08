@@ -127,10 +127,19 @@ namespace AutoMapper
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties);
             else
+            {
+                var redirectedSourceMembers = _propertyMaps
+                    .Where(pm => pm.IsMapped())
+                    .Where(pm => pm.CustomExpression != null)
+                    .Select(pm => pm.SourceMember.Name);
+
                 properties = _sourceType.GetPublicReadAccessors()
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
-                    .Except(inheritedProperties);
+                    .Except(inheritedProperties)
+                    .Except(redirectedSourceMembers)
+                    ;
+            }
 
             return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
         }
