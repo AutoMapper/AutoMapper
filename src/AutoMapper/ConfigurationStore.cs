@@ -460,17 +460,16 @@ namespace AutoMapper
 		private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
 		{
 			var badTypeMaps =
-				from typeMap in typeMaps
+				(from typeMap in typeMaps
 				where ShouldCheckMap(typeMap)
 				let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
 				where unmappedPropertyNames.Length > 0
-				select new { typeMap, unmappedPropertyNames };
+                select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames)
+                ).ToArray();
 
-			var firstBadTypeMap = badTypeMaps.FirstOrDefault();
-
-			if (firstBadTypeMap != null)
+			if (badTypeMaps.Any())
 			{
-				throw new AutoMapperConfigurationException(firstBadTypeMap.typeMap, firstBadTypeMap.unmappedPropertyNames);
+				throw new AutoMapperConfigurationException(badTypeMaps);
 			}
 
 			var typeMapsChecked = new List<TypeMap>();
