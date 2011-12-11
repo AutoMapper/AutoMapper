@@ -75,9 +75,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NUnit.framework">
+    <Reference Include="nunit.framework">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\NUnit.framework.dll</HintPath>
+      <HintPath>..\..\lib\NUnit\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks, Version=3.5.0.1337, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -98,6 +98,12 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
+    <Compile Include="Asbjornu\AsbjornuTest.cs" />
+    <Compile Include="Asbjornu\Domain\Customer.cs" />
+    <Compile Include="Asbjornu\Domain\ContactInfo.cs" />
+    <Compile Include="Asbjornu\Mapping\ModelMappingProfile.cs" />
+    <Compile Include="Asbjornu\Models\CustomerModel.cs" />
+    <Compile Include="Asbjornu\Models\ContactInfo.cs" />
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
@@ -204,6 +210,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

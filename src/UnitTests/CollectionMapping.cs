@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using NUnit.Framework;
 using Should;
-#if !SILVERLIGHT
-using NUnit.Framework.SyntaxHelpers;
-#endif
 
 namespace AutoMapper.UnitTests
 {
