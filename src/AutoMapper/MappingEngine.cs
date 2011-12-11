@@ -5,7 +5,6 @@ using System.Collections.Concurrent;
 using TvdP.Collections;
 #endif
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -14,8 +13,9 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
-	public class MappingEngine : IMappingEngine, IMappingEngineRunner
+	public class MappingEngine : IMappingEngine, IMappingEngineRunner, IDisposable
 	{
+	    private bool _disposed;
 		private readonly IConfigurationProvider _configurationProvider;
 		private readonly IObjectMapper[] _mappers;
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
@@ -25,7 +25,7 @@ namespace AutoMapper
 		{
 			_configurationProvider = configurationProvider;
 			_mappers = configurationProvider.GetMappers();
-			_configurationProvider.TypeMapCreated += ClearTypeMap;
+            _configurationProvider.TypeMapCreated += ClearTypeMap;
 		}
 
 		public IConfigurationProvider ConfigurationProvider
@@ -33,7 +33,27 @@ namespace AutoMapper
 			get { return _configurationProvider; }
 		}
 
-        public TDestination Map<TDestination>(object source)
+	    public void Dispose()
+	    {
+	        Dispose(true);
+            GC.SuppressFinalize(this);
+	    }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_configurationProvider != null)
+                        _configurationProvider.TypeMapCreated -= ClearTypeMap;
+                }
+
+                _disposed = true;
+            }
+        }
+
+	    public TDestination Map<TDestination>(object source)
         {
             return Map<TDestination>(source, opts => { });
         }
