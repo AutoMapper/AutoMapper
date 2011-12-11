@@ -23,6 +23,20 @@ namespace AutoMapper.UnitTests
             public string CategoryName { set; get; }
             public List<BillOfMaterialsDto> BOM { set; get; }
         }
+        public class ComplexProductDto
+        {
+            public string Name { get; set; }
+            public ProductSubcategoryDto ProductSubcategory { get; set; }
+        }
+        public class ProductSubcategoryDto
+        {
+            public string Name { get; set; }
+            public ProductCategoryDto ProductCategory { get; set; }
+        }
+        public class ProductCategoryDto
+        {
+            public string Name { get; set; }
+        }
         public class BillOfMaterialsDto
         {
             public int BillOfMaterialsID { set; get; }
@@ -70,6 +84,9 @@ namespace AutoMapper.UnitTests
                         .ForMember(m => m.CategoryName, dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name))
                         .ForMember(m => m.BOM, dst => dst.MapFrom(p => p.BillOfMaterials));
                     cfg.CreateMap<BillOfMaterials, BillOfMaterialsDto>();
+                    cfg.CreateMap<Product, ComplexProductDto>();
+                    cfg.CreateMap<ProductSubcategory, ProductSubcategoryDto>();
+                    cfg.CreateMap<ProductCategory, ProductCategoryDto>();
                 });
 
                 _simpleProductConversionLinq = Mapper.CreateMapExpression<Product, SimpleProductDto>();
@@ -130,6 +147,8 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_use_extension_methods()
             {
+
+                
                 var queryable = _products.AsQueryable();
 
                 var simpleProducts = queryable.Project().To<SimpleProductDto>().ToList();
@@ -147,6 +166,13 @@ namespace AutoMapper.UnitTests
                 extendedProducts[0].CategoryName.ShouldEqual("Baz");
                 extendedProducts[0].BOM.Count.ShouldEqual(1);
                 extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldEqual(5);
+
+                var complexProducts = queryable.Project().To<ComplexProductDto>().ToList();
+
+                complexProducts.Count.ShouldEqual(1);
+                complexProducts[0].Name.ShouldEqual("Foo");
+                complexProducts[0].ProductSubcategory.Name.ShouldEqual("Bar");
+                complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
             }
         }
     }

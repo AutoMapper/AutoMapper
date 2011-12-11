@@ -262,12 +262,13 @@ namespace AutoMapper
                     // does of course not work for subclasses etc./generic ...
                     if (currentChildType != prop.PropertyType &&
                         // avoid nullable etc.
-                        prop.PropertyType.BaseType != typeof(ValueType))
+                        prop.PropertyType.BaseType != typeof(ValueType) && 
+                        prop.PropertyType.BaseType != typeof(Enum))
                     {
                         var transformedExpression = CreateMapExpression(currentChildType, prop.PropertyType);
                         var expr2 = Expression.Invoke(
                             transformedExpression,
-                            instanceParameter
+                            currentChild
                         );
                         bindings.Add(Expression.Bind(destinationMember, expr2));
                     }
@@ -412,7 +413,8 @@ namespace AutoMapper
 
             protected override Expression VisitParameter(ParameterExpression node)
             {
-                return newParameter; // replace all old param references with new ones
+                // replace all old param references with new ones
+                return node.Type == oldParameter.Type ? newParameter : node; 
             }
 
             protected override Expression VisitMember(MemberExpression node)
