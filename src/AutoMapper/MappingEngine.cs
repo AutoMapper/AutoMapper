@@ -13,7 +13,7 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
-	public class MappingEngine : IMappingEngine, IMappingEngineRunner, IDisposable
+	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
 	    private bool _disposed;
 		private readonly IConfigurationProvider _configurationProvider;
@@ -376,7 +376,7 @@ namespace AutoMapper
                 else if (typeMap.ConstructDestinationUsingServiceLocator)
                     return _configurationProvider.ServiceCtor(destinationType);
                 else if (typeMap.ConstructorMap != null)
-                    return typeMap.ConstructorMap.ResolveValue(context);
+                    return typeMap.ConstructorMap.ResolveValue(context, this);
 
 			if (context.DestinationValue != null)
 				return context.DestinationValue;
