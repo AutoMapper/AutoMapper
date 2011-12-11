@@ -161,7 +161,11 @@ namespace AutoMapper.Mappers
 				if (propertyMap.CanBeSet)
 					propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
 			}
-			catch (Exception ex)
+            catch (AutoMapperMappingException)
+            {
+                throw;
+            }
+            catch (Exception ex)
 			{
 				throw new AutoMapperMappingException(newContext, ex);
 			}

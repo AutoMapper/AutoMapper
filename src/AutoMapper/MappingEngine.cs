@@ -307,7 +307,11 @@ namespace AutoMapper
 
 				return mapperToUse.Map(context, this);
 			}
-			catch (Exception ex)
+            catch (AutoMapperMappingException)
+            {
+                throw;
+            }
+            catch (Exception ex)
 			{
 				throw new AutoMapperMappingException(context, ex);
 			}

@@ -96,7 +96,11 @@ namespace AutoMapper.Mappers
 					{
 						result = propertyMap.ResolveValue(context);
 					}
-					catch (Exception ex)
+                    catch (AutoMapperMappingException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
 					{
 						var errorContext = CreateErrorContext(context, propertyMap, destinationValue);
 						throw new AutoMapperMappingException(errorContext, ex);
@@ -128,6 +132,10 @@ namespace AutoMapper.Mappers
 
 						AssignValue(propertyMap, mappedObject, propertyValueToAssign);
 					}
+                    catch (AutoMapperMappingException)
+                    {
+                        throw;
+                    }
 					catch (Exception ex)
 					{
 						throw new AutoMapperMappingException(newContext, ex);
