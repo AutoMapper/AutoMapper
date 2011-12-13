@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace AutoMapper
@@ -11,11 +12,14 @@ namespace AutoMapper
 
 	public interface IMappingOptions
 	{
-		INamingConvention SourceMemberNamingConvention { get; set; }
-		INamingConvention DestinationMemberNamingConvention { get; set; }
-		Func<string, string> SourceMemberNameTransformer { get; set; }
-	    Func<string, string> DestinationMemberNameTransformer { get; set; }
-	}
+        INamingConvention SourceMemberNamingConvention { get; set; }
+        INamingConvention DestinationMemberNamingConvention { get; set; }
+	    IEnumerable<string> Prefixes { get; }
+	    IEnumerable<string> Postfixes { get; }
+	    IEnumerable<string> DestinationPrefixes { get; }
+	    IEnumerable<string> DestinationPostfixes { get; }
+	    IEnumerable<AliasedMember> Aliases { get; }
+    }
 
 	public class PascalCaseNamingConvention : INamingConvention
 	{

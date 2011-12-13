@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace AutoMapper
 {
@@ -42,19 +43,32 @@ namespace AutoMapper
 			set { GetProfile().DestinationMemberNamingConvention = value; }
 		}
 
-		public Func<string, string> SourceMemberNameTransformer
-		{
-			get { return GetProfile().SourceMemberNameTransformer; }
-			set { GetProfile().SourceMemberNameTransformer = value; }
-		}
+	    public IEnumerable<string> Prefixes
+	    {
+	        get { return GetProfile().Prefixes; }
+	    }
 
-        public Func<string, string> DestinationMemberNameTransformer
-        {
-            get { return GetProfile().DestinationMemberNameTransformer; }
-            set { GetProfile().DestinationMemberNameTransformer = value; }
-        }
+	    public IEnumerable<string> Postfixes
+	    {
+	        get { return GetProfile().Postfixes; }
+	    }
 
-		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+	    public IEnumerable<string> DestinationPrefixes
+	    {
+	        get { return GetProfile().DestinationPrefixes; }
+	    }
+
+	    public IEnumerable<string> DestinationPostfixes
+	    {
+	        get { return GetProfile().DestinationPostfixes; }
+	    }
+
+	    public IEnumerable<AliasedMember> Aliases
+	    {
+	        get { throw new NotImplementedException(); }
+	    }
+
+	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
 			return GetProfile().AddFormatter<TValueFormatter>();
 		}

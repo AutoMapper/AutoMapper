@@ -155,6 +155,9 @@
     <Compile Include="..\AutoMapper\INamingConvention.cs">
       <Link>INamingConvention.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\Internal\AliasedMember.cs">
+      <Link>Internal\AliasedMember.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\Internal\DefaultResolver.cs">
       <Link>Internal\DefaultResolver.cs</Link>
     </Compile>

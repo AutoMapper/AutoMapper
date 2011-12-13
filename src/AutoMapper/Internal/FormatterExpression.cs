@@ -4,23 +4,24 @@ using System.Linq;
 
 namespace AutoMapper
 {
-	internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IMappingOptions
+    internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IMappingOptions
 	{
 		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
-		private static readonly Func<string, string, string> PrefixFunc = (src, prefix) => DefaultPrefixTransformer(src, prefix);
-		private static readonly Func<string, string, string> PostfixFunc = (src, postfix) => DefaultPostfixTransformer(src, postfix);
-		private static readonly Func<string, string, string, string> AliasFunc = (src, original, alias) => DefaultAliasTransformer(src, original, alias);
+	    private readonly HashSet<string> _prefixes = new HashSet<string>();
+	    private readonly HashSet<string> _postfixes = new HashSet<string>();
+	    private readonly HashSet<string> _destinationPrefixes = new HashSet<string>();
+	    private readonly HashSet<string> _destinationPostfixes = new HashSet<string>();
+        private readonly HashSet<AliasedMember> _aliases = new HashSet<AliasedMember>();
 
-		public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
+	    public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
 		{
 			_formatterCtor = formatterCtor;
 			SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			DestinationMemberNamingConvention = new PascalCaseNamingConvention();
-			SourceMemberNameTransformer = DefaultSourceMemberNameTransformer;
-			DestinationMemberNameTransformer = s => s;
+		    RecognizePrefixes("Get");
 			AllowNullDestinationValues = true;
 		}
 
@@ -28,8 +29,11 @@ namespace AutoMapper
 		public bool AllowNullCollections { get; set; }
 		public INamingConvention SourceMemberNamingConvention { get; set; }
 		public INamingConvention DestinationMemberNamingConvention { get; set; }
-		public Func<string, string> SourceMemberNameTransformer { get; set; }
-		public Func<string, string> DestinationMemberNameTransformer { get; set; }
+        public IEnumerable<string> Prefixes { get { return _prefixes; } }
+        public IEnumerable<string> Postfixes { get { return _postfixes; } }
+        public IEnumerable<string> DestinationPrefixes { get { return _destinationPrefixes; } }
+        public IEnumerable<string> DestinationPostfixes { get { return _destinationPostfixes; } }
+        public IEnumerable<AliasedMember> Aliases { get { return _aliases; } }
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
@@ -153,37 +157,39 @@ namespace AutoMapper
 
 		public void RecognizePrefixes(params string[] prefixes)
 		{
-			var orig = SourceMemberNameTransformer;
-
-			SourceMemberNameTransformer = val => prefixes.Aggregate(orig(val), PrefixFunc);
+		    foreach (var prefix in prefixes)
+		    {
+                _prefixes.Add(prefix);
+		    }
 		}
 
 		public void RecognizePostfixes(params string[] postfixes)
 		{
-			var orig = SourceMemberNameTransformer;
-
-			SourceMemberNameTransformer = val => postfixes.Aggregate(orig(val), PostfixFunc);
+		    foreach (var postfix in postfixes)
+		    {
+                _postfixes.Add(postfix);
+		    }
 		}
 
 		public void RecognizeAlias(string original, string alias)
 		{
-			var orig = SourceMemberNameTransformer;
-
-			SourceMemberNameTransformer = val => AliasFunc(orig(val), original, alias);
+		    _aliases.Add(new AliasedMember(original, alias));
 		}
 
 		public void RecognizeDestinationPrefixes(params string[] prefixes)
 		{
-			var orig = DestinationMemberNameTransformer;
-
-			DestinationMemberNameTransformer = val => prefixes.Aggregate(orig(val), PrefixFunc);
+		    foreach (var prefix in prefixes)
+		    {
+		        _destinationPrefixes.Add(prefix);
+		    }
 		}
 
 		public void RecognizeDestinationPostfixes(params string[] postfixes)
 		{
-			var orig = DestinationMemberNameTransformer;
-
-			DestinationMemberNameTransformer = val => postfixes.Aggregate(orig(val), PostfixFunc);
+		    foreach (var postfix in postfixes)
+		    {
+		        _destinationPostfixes.Add(postfix);
+		    }
 		}
 
 		private static Type GetFormatterType(IValueFormatter formatter, ResolutionContext context)

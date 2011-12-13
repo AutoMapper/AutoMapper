@@ -119,6 +119,7 @@
     <Compile Include="Bug\MultiThreadingIssues.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\NullableBytesAndEnums.cs" />
+    <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
       <SubType>Code</SubType>

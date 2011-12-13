@@ -67,17 +67,30 @@ namespace AutoMapper
 			set { GetProfile(DefaultProfileName).DestinationMemberNamingConvention = value; }
 		}
 
-		public Func<string, string> SourceMemberNameTransformer
-		{
-			get { return GetProfile(DefaultProfileName).SourceMemberNameTransformer; }
-			set { GetProfile(DefaultProfileName).SourceMemberNameTransformer = value; }
-		}
+	    public IEnumerable<string> Prefixes
+	    {
+            get { return GetProfile(DefaultProfileName).Prefixes; }
+	    }
 
-        public Func<string, string> DestinationMemberNameTransformer
-        {
-            get { return GetProfile(DefaultProfileName).DestinationMemberNameTransformer; }
-            set { GetProfile(DefaultProfileName).DestinationMemberNameTransformer = value; }
-        }
+	    public IEnumerable<string> Postfixes
+	    {
+            get { return GetProfile(DefaultProfileName).Postfixes; }
+	    }
+
+	    public IEnumerable<string> DestinationPrefixes
+	    {
+            get { return GetProfile(DefaultProfileName).DestinationPrefixes; }
+	    }
+
+	    public IEnumerable<string> DestinationPostfixes
+	    {
+            get { return GetProfile(DefaultProfileName).DestinationPostfixes; }
+	    }
+
+	    public IEnumerable<AliasedMember> Aliases
+	    {
+	        get { return GetProfile(DefaultProfileName).Aliases; }
+	    }
 
 		bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{
