@@ -92,6 +92,8 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Internal\AliasedMember.cs" />
+    <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

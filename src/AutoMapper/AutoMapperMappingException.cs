@@ -70,7 +70,8 @@ namespace AutoMapper
                 string message = null;
                 if (Context != null)
                 {
-                    message = "\n\nMapping types:";
+
+                    message = _message + "\n\nMapping types:";
                     message += Environment.NewLine + string.Format("{0} -> {1}", Context.SourceType.Name, Context.DestinationType.Name);
                     message += Environment.NewLine + string.Format("{0} -> {1}", Context.SourceType.FullName, Context.DestinationType.FullName);
 
@@ -124,6 +125,7 @@ namespace AutoMapper
 	        yield return context;
 	    }
 
+#if !DEBUG
 	    public override string StackTrace
         {
             get
@@ -134,5 +136,6 @@ namespace AutoMapper
                         .Where(str => !str.TrimStart().StartsWith("at AutoMapper.")));
             }
         }
+#endif
     }
 }

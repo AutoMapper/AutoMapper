@@ -275,8 +275,14 @@
     <Compile Include="..\AutoMapper\Mappers\EnumMapper.cs">
       <Link>Mappers\EnumMapper.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ExplicitConversionOperatorMapper.cs">
+      <Link>Mappers\ExplicitConversionOperatorMapper.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\Mappers\FlagsEnumMapper.cs">
       <Link>Mappers\FlagsEnumMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ImplicitConversionOperatorMapper.cs">
+      <Link>Mappers\ImplicitConversionOperatorMapper.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\Mappers\ITypeMapObjectMapper.cs">
       <Link>Mappers\ITypeMapObjectMapper.cs</Link>

@@ -103,12 +103,12 @@ namespace AutoMapper.UnitTests
         {
             public class Source
             {
-                public int Value { get; set; }
+                public decimal Value { get; set; }
             }
 
             public class Destination
             {
-                public decimal Value { get; set; }
+                public Type Value { get; set; }
             }
 
             protected override void Establish_context()
