@@ -132,6 +132,7 @@ namespace AutoMapper
                 var redirectedSourceMembers = _propertyMaps
                     .Where(pm => pm.IsMapped())
                     .Where(pm => pm.CustomExpression != null)
+                    .Where(pm => pm.SourceMember != null)
                     .Select(pm => pm.SourceMember.Name);
 
                 var ignoredSourceMembers = _sourceMemberConfigs
