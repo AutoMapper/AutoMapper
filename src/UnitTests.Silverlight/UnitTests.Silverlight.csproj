@@ -159,6 +159,9 @@
     <Compile Include="..\UnitTests\Bug\DuplicateValuesBug.cs">
       <Link>Bug\DuplicateValuesBug.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Bug\EnumConditionsBug.cs">
+      <Link>Bug\EnumConditionsBug.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Bug\EnumMatchingOnValue.cs">
       <Link>Bug\EnumMatchingOnValue.cs</Link>
     </Compile>
