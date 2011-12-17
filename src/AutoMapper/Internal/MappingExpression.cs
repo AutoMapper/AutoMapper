@@ -380,7 +380,12 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)
         {
-            _typeMap.DestinationCtor = src => ctor((TSource)src);
+            return ConstructUsing(ctxt => ctor((TSource) ctxt.SourceValue));
+        }
+
+        public IMappingExpression<TSource, TDestination> ConstructUsing(Func<ResolutionContext, TDestination> ctor)
+        {
+            _typeMap.DestinationCtor = ctxt => ctor(ctxt);
 
             return this;
         }

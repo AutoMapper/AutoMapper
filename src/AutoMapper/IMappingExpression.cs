@@ -28,6 +28,7 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
         IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>;
         IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor);
+        IMappingExpression<TSource, TDestination> ConstructUsing(Func<ResolutionContext, TDestination> ctor);
         void As<T>();
         IMappingExpression<TSource, TDestination> MaxDepth(int depth);
         IMappingExpression<TSource, TDestination> ConstructUsingServiceLocator();

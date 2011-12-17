@@ -370,7 +370,7 @@ namespace AutoMapper
 
             if (typeMap != null)
                 if (typeMap.DestinationCtor != null)
-                    return typeMap.DestinationCtor(context.SourceValue);
+                    return typeMap.DestinationCtor(context);
                 else if (typeMap.ConstructDestinationUsingServiceLocator && context.Options.ServiceCtor != null)
                     return context.Options.ServiceCtor(destinationType);
                 else if (typeMap.ConstructDestinationUsingServiceLocator)

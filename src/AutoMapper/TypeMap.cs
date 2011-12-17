@@ -71,7 +71,7 @@ namespace AutoMapper
             }
         }
 
-        public Func<object, object> DestinationCtor { get; set; }
+        public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
         public List<string> IgnorePropertiesStartingWith { get; set; }
 
