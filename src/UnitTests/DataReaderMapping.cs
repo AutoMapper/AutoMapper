@@ -88,6 +88,12 @@ namespace AutoMapper.UnitTests
 			}
 
 			[Test]
+			public void Then_a_column_containing_a_string_should_be_read()
+			{
+				Assert.That(_result.Char, Is.EqualTo(_dataReader[FieldName.String]));
+			}
+
+			[Test]
 			public void Then_a_projected_column_should_be_read()
 			{
 				Assert.That(_result.Else, Is.EqualTo(_dataReader.GetDateTime(10)));
@@ -205,6 +211,12 @@ namespace AutoMapper.UnitTests
 			public void Then_a_column_containing_a_char_should_be_read()
 			{
 				Assert.That(_result.Char, Is.EqualTo(_dataRecord[FieldName.Char]));
+			}
+
+			[Test]
+			public void Then_a_column_containing_a_string_should_be_read()
+			{
+				Assert.That(_result.Char, Is.EqualTo(_dataRecord[FieldName.String]));
 			}
 
 			[Test]
@@ -363,6 +375,7 @@ namespace AutoMapper.UnitTests
 			public const String Byte = "Byte";
 			public const String Boolean = "Boolean";
 			public const String Char = "Char";
+			public const String String = "String";
 			public const String Something = "Something";
 		}
 
@@ -382,6 +395,7 @@ namespace AutoMapper.UnitTests
 				authorizationSetDataTable.Columns.Add(FieldName.Byte, typeof(Byte));
 				authorizationSetDataTable.Columns.Add(FieldName.Boolean, typeof(Boolean));
 				authorizationSetDataTable.Columns.Add(FieldName.Char, typeof(char));
+				authorizationSetDataTable.Columns.Add(FieldName.String, typeof(string));
 				authorizationSetDataTable.Columns.Add(FieldName.Something, typeof(DateTime));
 
 				var authorizationSetDataRow = authorizationSetDataTable.NewRow();
@@ -396,6 +410,7 @@ namespace AutoMapper.UnitTests
 				authorizationSetDataRow[FieldName.Byte] = 0x12;
 				authorizationSetDataRow[FieldName.Boolean] = true;
 				authorizationSetDataRow[FieldName.Char] = 'X';
+				authorizationSetDataRow[FieldName.String] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec consectetur imperdiet vestibulum. Nulla facilisi. Maecenas gravida, mauris accumsan interdum sagittis, nisi velit iaculis ligula, et varius sapien lacus id tellus. Morbi sit amet libero nec libero sollicitudin volutpat id sed odio.";
 				authorizationSetDataRow[FieldName.Something] = DateTime.MaxValue;
 				authorizationSetDataTable.Rows.Add(authorizationSetDataRow);
 
