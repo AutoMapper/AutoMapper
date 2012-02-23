@@ -438,6 +438,7 @@ namespace AutoMapper.UnitTests
 			public Byte Byte { get; private set; }
 			public Boolean Boolean { get; private set; }
 			public char Char { get; private set; }
+			public string String { get; private set; }
 			public DateTime Else { get; private set; }
 		}
 	}
