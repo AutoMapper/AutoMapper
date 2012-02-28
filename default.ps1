@@ -1,5 +1,4 @@
 $framework = '4.0x86'
-$version = '2.1.0'
 
 properties {
 	$base_dir = resolve-path .
@@ -10,7 +9,8 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$buildNumber = if ($env:build_number -ne $NULL) { $version + '.' + $env:build_number } else { $version + '.0' }
+	$version = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.1.0' }
+	$buildNumber = $version + '.0'
 	$global:config = "debug"
 	$framework_dir = Get-FrameworkDirectory
 }
@@ -50,10 +50,6 @@ task dist {
 	copy_files "$build_dir\$config\AutoMapper" "$dist_dir\net40-client"
 	copy_files "$build_dir\$config\AutoMapper.Silverlight" "$dist_dir\sl4" "mscorlib.dll"
     create-nuspec "$buildNumber"
-
-    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.nuspec -Symbols }
-
-	move-item "*.nupkg" "$dist_dir"
 }
 
 # -------------------------------------------------------------------------------------------------------------
