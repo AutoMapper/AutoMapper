@@ -145,6 +145,7 @@ function global:create-nuspec()
     <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
+    <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\AutoMapper.nuspec -encoding "ASCII"
 }
