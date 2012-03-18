@@ -268,14 +268,23 @@ namespace AutoMapper
                                 new[] { sourceListType, destinationListType },
                                 currentChild,
                                 transformedExpression);
-                    MethodCallExpression toListCallExpression = Expression.Call(
-                        typeof(Enumerable),
-                        "ToList",
-                        new Type[] { destinationListType },
-                        selectExpression);
 
-                    // todo .ToArray()
-                    bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+                    if (prop.PropertyType.GetInterface("IList", true) != null)
+                    {
+                        MethodCallExpression toListCallExpression = Expression.Call(
+                            typeof(Enumerable),
+                            "ToList",
+                            new Type[] { destinationListType },
+                            selectExpression);
+
+                        // todo .ToArray()
+                        bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+                    }
+                    else
+                    {
+                        // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
+                        bindings.Add(Expression.Bind(destinationMember, selectExpression));
+                    }
                 }
                 else
                 {
