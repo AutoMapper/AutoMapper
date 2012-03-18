@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
 using AutoMapper.Mappers;
+using System.Collections;
 
 namespace AutoMapper
 {
@@ -269,7 +270,7 @@ namespace AutoMapper
                                 currentChild,
                                 transformedExpression);
 
-                    if (prop.PropertyType.GetInterface("IList", true) != null)
+                    if (typeof(IList).IsAssignableFrom(prop.PropertyType))
                     {
                         MethodCallExpression toListCallExpression = Expression.Call(
                             typeof(Enumerable),
