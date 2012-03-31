@@ -10,7 +10,7 @@ namespace AutoMapper.Internal
 		{
 			_sourceType = sourceType;
 			_destinationType = destinationType;
-			_hashcode = (_sourceType.GetHashCode()*397) ^ _destinationType.GetHashCode();
+			_hashcode = unchecked((_sourceType.GetHashCode()*397) ^ _destinationType.GetHashCode());
 		}
 
         private readonly Type _destinationType;
@@ -41,10 +41,7 @@ namespace AutoMapper.Internal
 
 		public override int GetHashCode()
 		{
-			unchecked
-			{
 				return _hashcode;
 			}
 		}
-	}
 }
