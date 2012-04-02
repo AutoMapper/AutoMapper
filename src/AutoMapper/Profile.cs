@@ -98,7 +98,17 @@ namespace AutoMapper
 			return GetProfile().ForSourceType<TSource>();
 		}
 
-		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
+	  public bool TryCreateMap<TSource, TDestination>(out IMappingExpression<TSource, TDestination> mappingExpression)
+	  {
+	    return TryCreateMap(MemberList.Destination, out mappingExpression);
+	  }
+
+	  public bool TryCreateMap<TSource, TDestination>(MemberList memberList, out IMappingExpression<TSource, TDestination> mappingExpression)
+	  {
+      return _configurator.TryCreateMap(ProfileName, memberList, out mappingExpression);
+	  }
+
+	  public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
 		    return CreateMap<TSource, TDestination>(MemberList.Destination);
 		}
@@ -110,7 +120,17 @@ namespace AutoMapper
 			return map;
 		}
 
-		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
+	  public bool TryCreateMap(Type sourceType, Type destinationType, out IMappingExpression mappingExpression)
+	  {
+	    return TryCreateMap(sourceType, destinationType, MemberList.Destination, out mappingExpression);
+	  }
+
+	  public bool TryCreateMap(Type sourceType, Type destinationType, MemberList memberList, out IMappingExpression mappingExpression)
+	  {
+      return _configurator.TryCreateMap(sourceType, destinationType, memberList, out mappingExpression);
+	  }
+
+	  public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
 		    return CreateMap(sourceType, destinationType, MemberList.Destination);
 		}
