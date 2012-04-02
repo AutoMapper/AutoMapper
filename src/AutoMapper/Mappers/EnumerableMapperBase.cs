@@ -10,6 +10,11 @@ namespace AutoMapper.Mappers
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+            if (context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+            {
+                return null;
+            }
+
 			ICollection<object> enumerableValue = ((IEnumerable) context.SourceValue ?? new object[0])
 				.Cast<object>()
 				.ToList();

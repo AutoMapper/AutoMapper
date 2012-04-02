@@ -21,7 +21,6 @@ namespace AutoMapper.Mappers
 	        // check whether the context passes conditions before attempting to map the value (depth check)
             object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : mapperToUse.Map(context, mapper);
 
-            context.TypeMap.AfterMap(context.SourceValue, mappedObject);
 	        return mappedObject;
 		}
 

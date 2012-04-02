@@ -45,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Debug\AutoMapper.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -90,6 +91,11 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Internal\AliasedMember.cs" />
+    <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
+    <Compile Include="MemberList.cs" />
+    <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="Configuration\MapperConfiguration.cs" />
@@ -167,6 +173,7 @@
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />
+    <Compile Include="SourceMemberConfig.cs" />
     <Compile Include="ThreadSafeList.cs" />
     <Compile Include="TypeInfo.cs" />
     <Compile Include="TypeMap.cs" />

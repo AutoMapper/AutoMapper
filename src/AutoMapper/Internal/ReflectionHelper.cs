@@ -42,7 +42,7 @@ namespace AutoMapper
                 }
             }
 
-            return null;
+            throw new AutoMapperConfigurationException("Custom configuration for members is only supported for top-level individual members on a type.");
         }
 
         public static Type GetMemberType(this MemberInfo memberInfo)

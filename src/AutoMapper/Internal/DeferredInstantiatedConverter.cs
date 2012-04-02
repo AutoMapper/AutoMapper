@@ -23,16 +23,16 @@ namespace AutoMapper
 	}
 	internal class DeferredInstantiatedConverter<TSource, TDestination> : ITypeConverter<TSource, TDestination>
 	{
-		private readonly Func<ITypeConverter<TSource, TDestination>> _instantiator;
+        private readonly Func<ResolutionContext, ITypeConverter<TSource, TDestination>> _instantiator;
 
-		public DeferredInstantiatedConverter(Func<ITypeConverter<TSource, TDestination>> instantiator)
+        public DeferredInstantiatedConverter(Func<ResolutionContext, ITypeConverter<TSource, TDestination>> instantiator)
 		{
 			_instantiator = instantiator;
 		}
 
 		public TDestination Convert(ResolutionContext context)
 		{
-			var typeConverter = _instantiator();
+			var typeConverter = _instantiator(context);
 
 			return typeConverter.Convert(context);
 		}

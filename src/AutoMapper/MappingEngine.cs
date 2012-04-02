@@ -5,7 +5,6 @@ using System.Collections.Concurrent;
 using TvdP.Collections;
 #endif
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -16,6 +15,7 @@ namespace AutoMapper
 {
 	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
+	    private bool _disposed;
 		private readonly IConfigurationProvider _configurationProvider;
 		private readonly IObjectMapper[] _mappers;
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
@@ -25,7 +25,7 @@ namespace AutoMapper
 		{
 			_configurationProvider = configurationProvider;
 			_mappers = configurationProvider.GetMappers();
-			_configurationProvider.TypeMapCreated += ClearTypeMap;
+            _configurationProvider.TypeMapCreated += ClearTypeMap;
 		}
 
 		public IConfigurationProvider ConfigurationProvider
@@ -33,7 +33,27 @@ namespace AutoMapper
 			get { return _configurationProvider; }
 		}
 
-        public TDestination Map<TDestination>(object source)
+	    public void Dispose()
+	    {
+	        Dispose(true);
+            GC.SuppressFinalize(this);
+	    }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_configurationProvider != null)
+                        _configurationProvider.TypeMapCreated -= ClearTypeMap;
+                }
+
+                _disposed = true;
+            }
+        }
+
+	    public TDestination Map<TDestination>(object source)
         {
             return Map<TDestination>(source, opts => { });
         }
@@ -262,12 +282,13 @@ namespace AutoMapper
                     // does of course not work for subclasses etc./generic ...
                     if (currentChildType != prop.PropertyType &&
                         // avoid nullable etc.
-                        prop.PropertyType.BaseType != typeof(ValueType))
+                        prop.PropertyType.BaseType != typeof(ValueType) && 
+                        prop.PropertyType.BaseType != typeof(Enum))
                     {
                         var transformedExpression = CreateMapExpression(currentChildType, prop.PropertyType);
                         var expr2 = Expression.Invoke(
                             transformedExpression,
-                            instanceParameter
+                            currentChild
                         );
                         bindings.Add(Expression.Bind(destinationMember, expr2));
                     }
@@ -307,6 +328,10 @@ namespace AutoMapper
 
 				return mapperToUse.Map(context, this);
 			}
+            catch (AutoMapperMappingException)
+            {
+                throw;
+            }
 			catch (Exception ex)
 			{
 				throw new AutoMapperMappingException(context, ex);
@@ -345,13 +370,13 @@ namespace AutoMapper
 
             if (typeMap != null)
                 if (typeMap.DestinationCtor != null)
-                    return typeMap.DestinationCtor(context.SourceValue);
+                    return typeMap.DestinationCtor(context);
                 else if (typeMap.ConstructDestinationUsingServiceLocator && context.Options.ServiceCtor != null)
                     return context.Options.ServiceCtor(destinationType);
                 else if (typeMap.ConstructDestinationUsingServiceLocator)
                     return _configurationProvider.ServiceCtor(destinationType);
                 else if (typeMap.ConstructorMap != null)
-                    return typeMap.ConstructorMap.ResolveValue(context);
+                    return typeMap.ConstructorMap.ResolveValue(context, this);
 
 			if (context.DestinationValue != null)
 				return context.DestinationValue;
@@ -372,6 +397,15 @@ namespace AutoMapper
 				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
 
 			return ConfigurationProvider.MapNullSourceValuesAsNull;
+		}
+
+        bool IMappingEngineRunner.ShouldMapSourceCollectionAsNull(ResolutionContext context)
+		{
+			var typeMap = context.GetContextTypeMap();
+			if (typeMap != null)
+				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceCollectionsAsNull;
+
+            return ConfigurationProvider.MapNullSourceCollectionsAsNull;
 		}
 
 		private void ClearTypeMap(object sender, TypeMapCreatedEventArgs e)
@@ -399,7 +433,8 @@ namespace AutoMapper
 
             protected override Expression VisitParameter(ParameterExpression node)
             {
-                return newParameter; // replace all old param references with new ones
+                // replace all old param references with new ones
+                return node.Type == oldParameter.Type ? newParameter : node; 
             }
 
             protected override Expression VisitMember(MemberExpression node)

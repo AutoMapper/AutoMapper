@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -19,14 +20,29 @@ namespace AutoMapper
             _runtimeCtor = DelegateFactory.CreateCtor(ctor, CtorParams);
         }
 
-        public object ResolveValue(ResolutionContext context)
+        public object ResolveValue(ResolutionContext context, IMappingEngineRunner mappingEngine)
         {
-            var ctorArgs = CtorParams
-                        .Select(p => p.ResolveValue(context))
-                        .Select(result => result.Value)
-                        .ToArray();
+            var ctorArgs = new List<object>();
 
-            return _runtimeCtor(ctorArgs);
+            foreach (var map in CtorParams)
+            {
+                var result = map.ResolveValue(context);
+
+                var sourceType = result.Type;
+                var destinationType = map.Parameter.ParameterType;
+
+                var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result, destinationType);
+
+                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
+
+                var newContext = context.CreateTypeContext(typeMap, result.Value, targetSourceType, destinationType);
+
+                var value = mappingEngine.Map(newContext);
+
+                ctorArgs.Add(value);
+            }
+
+            return _runtimeCtor(ctorArgs.ToArray());
         }
     }
 }

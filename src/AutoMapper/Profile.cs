@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace AutoMapper
 {
@@ -24,6 +25,12 @@ namespace AutoMapper
 			set { GetProfile().AllowNullDestinationValues = value; }
 		}
 
+	    public bool AllowNullCollections
+		{
+            get { return GetProfile().AllowNullCollections; }
+            set { GetProfile().AllowNullCollections = value; }
+		}
+
 	    public INamingConvention SourceMemberNamingConvention
 		{
 			get { return GetProfile().SourceMemberNamingConvention; } 
@@ -36,19 +43,32 @@ namespace AutoMapper
 			set { GetProfile().DestinationMemberNamingConvention = value; }
 		}
 
-		public Func<string, string> SourceMemberNameTransformer
-		{
-			get { return GetProfile().SourceMemberNameTransformer; }
-			set { GetProfile().SourceMemberNameTransformer = value; }
-		}
+	    public IEnumerable<string> Prefixes
+	    {
+	        get { return GetProfile().Prefixes; }
+	    }
 
-        public Func<string, string> DestinationMemberNameTransformer
-        {
-            get { return GetProfile().DestinationMemberNameTransformer; }
-            set { GetProfile().DestinationMemberNameTransformer = value; }
-        }
+	    public IEnumerable<string> Postfixes
+	    {
+	        get { return GetProfile().Postfixes; }
+	    }
 
-		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+	    public IEnumerable<string> DestinationPrefixes
+	    {
+	        get { return GetProfile().DestinationPrefixes; }
+	    }
+
+	    public IEnumerable<string> DestinationPostfixes
+	    {
+	        get { return GetProfile().DestinationPostfixes; }
+	    }
+
+	    public IEnumerable<AliasedMember> Aliases
+	    {
+	        get { throw new NotImplementedException(); }
+	    }
+
+	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
 			return GetProfile().AddFormatter<TValueFormatter>();
 		}
@@ -80,14 +100,24 @@ namespace AutoMapper
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
-			var map = _configurator.CreateMap<TSource, TDestination>(ProfileName);
+		    return CreateMap<TSource, TDestination>(MemberList.Destination);
+		}
+
+		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
+		{
+			var map = _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
 
 			return map;
 		}
 
 		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
-			var map = _configurator.CreateMap(sourceType, destinationType, ProfileName);
+		    return CreateMap(sourceType, destinationType, MemberList.Destination);
+		}
+
+		public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
+		{
+			var map = _configurator.CreateMap(sourceType, destinationType, memberList, ProfileName);
 
 			return map;
 		}

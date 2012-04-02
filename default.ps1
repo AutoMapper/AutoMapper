@@ -1,5 +1,4 @@
 $framework = '4.0x86'
-$version = '2.1.0'
 
 properties {
 	$base_dir = resolve-path .
@@ -10,7 +9,8 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$buildNumber = if ($env:build_number -ne $NULL) { $version + '.' + $env:build_number } else { $version + '.0' }
+	$version = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.1.0' }
+	$buildNumber = $version + '.0'
 	$global:config = "debug"
 	$framework_dir = Get-FrameworkDirectory
 }
@@ -50,10 +50,6 @@ task dist {
 	copy_files "$build_dir\$config\AutoMapper" "$dist_dir\net40-client"
 	copy_files "$build_dir\$config\AutoMapper.Silverlight" "$dist_dir\sl4" "mscorlib.dll"
     create-nuspec "$buildNumber"
-
-    exec { & $tools_dir\NuGet.exe pack $build_dir\AutoMapper.nuspec -Symbols }
-
-	move-item "*.nupkg" "$dist_dir"
 }
 
 # -------------------------------------------------------------------------------------------------------------
@@ -135,20 +131,21 @@ function global:create-nuspec()
     <version>$version</version>
     <authors>Jimmy Bogard</authors>
     <owners>Jimmy Bogard</owners>
-    <licenseUrl>http://automapper.codeplex.com/license</licenseUrl>
-    <projectUrl>http://automapper.codeplex.com</projectUrl>
+    <licenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://automapper.org</projectUrl>
     <iconUrl>https://s3.amazonaws.com/automapper/icon.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A convention-based object-object mapper</summary>
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
   </metadata>
   <files>
-    <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40-client"" />
-    <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40-client"" />
-    <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40-client"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40"" />
     <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
+    <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\AutoMapper.nuspec -encoding "ASCII"
 }

@@ -962,5 +962,44 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_building_custom_configuration_mapping_to_itself : NonValidatingSpecBase
+        {
+            private Exception _e;
+
+            public class Source
+            {
+
+            }
+
+            public class Dest
+            {
+                public int Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+            }
+
+            protected override void Because_of()
+            {
+                try
+                {
+                    Mapper.CreateMap<Source, Dest>()
+                        .ForMember(dest => dest, opt => opt.UseValue(5));
+                }
+                catch (Exception e)
+                {
+                    _e = e;
+                }
+            }
+
+            [Test]
+            public void Should_map_from_that_constant_value()
+            {
+                _e.ShouldNotBeNull();
+            }
+        }
+
+
 	}
 }

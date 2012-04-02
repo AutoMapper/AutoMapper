@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Should;
 using NUnit.Framework;
 
@@ -326,5 +328,79 @@ namespace AutoMapper.UnitTests
             }
 	    }
 
+        public class When_overriding_collection_null_behavior : AutoMapperSpecBase
+        {
+            private Dest _dest;
+
+            public class Source
+            {
+                public IEnumerable<int> Values1 { get; set; }
+                public List<int> Values2 { get; set; }
+                public Dictionary<string, int> Values3 { get; set; }
+                public int[] Values4 { get; set; }
+                public ReadOnlyCollection<int> Values5 { get; set; }
+                public Collection<int> Values6 { get; set; }
+            }
+
+            public class Dest
+            {
+                public IEnumerable<int> Values1 { get; set; }
+                public List<int> Values2 { get; set; }
+                public Dictionary<string, int> Values3 { get; set; }
+                public int[] Values4 { get; set; }
+                public ReadOnlyCollection<int> Values5 { get; set; }
+                public Collection<int> Values6 { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Source, Dest>();
+                    cfg.AllowNullCollections = true;
+                });
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Dest>(new Source());
+            }
+
+            [Test]
+            public void Should_allow_null_ienumerables()
+            {
+                _dest.Values1.ShouldBeNull();
+            }
+
+            [Test]
+            public void Should_allow_null_lists()
+            {
+                _dest.Values2.ShouldBeNull();
+            }
+
+            [Test]
+            public void Should_allow_null_dictionaries()
+            {
+                _dest.Values3.ShouldBeNull();
+            }
+
+            [Test]
+            public void Should_allow_null_arrays()
+            {
+                _dest.Values4.ShouldBeNull();
+            }
+
+            [Test]
+            public void Should_allow_null_read_only_collections()
+            {
+                _dest.Values5.ShouldBeNull();
+            }
+
+            [Test]
+            public void Should_allow_null_collections()
+            {
+                _dest.Values6.ShouldBeNull();
+            }
+        }
 	}
 }

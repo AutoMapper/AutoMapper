@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
-    public interface IMappingEngine
+    public interface IMappingEngine : IDisposable
     {
         TDestination Map<TDestination>(object source);
         TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts);

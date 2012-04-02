@@ -375,6 +375,62 @@ namespace AutoMapper.Tests
 		}
 	}
 
+    [TestFixture]
+    public class When_mapping_from_a_null_object_with_a_nullable_enum_as_string : AutoMapperSpecBase
+    {
+        protected override void Establish_context()
+        {
+            Mapper.CreateMap<SourceClass, DestinationClass>();
+        }
+
+        public enum EnumValues
+        {
+            One, Two, Three
+        }
+
+        public class DestinationClass
+        {
+            public EnumValues Values1 { get; set; }
+            public EnumValues? Values2 { get; set; }
+            public EnumValues Values3 { get; set; }
+        }
+
+        public class SourceClass
+        {
+            public string Values1 { get; set; }
+            public string Values2 { get; set; }
+            public string Values3 { get; set; }
+        }
+
+        [Test]
+        public void Should_set_the_target_enum_to_the_default_value()
+        {
+            var sourceClass = new SourceClass();
+            var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
+            dest.Values1.ShouldEqual(default(EnumValues));
+        }
+
+        [Test]
+        public void Should_set_the_target_nullable_to_null()
+        {
+            var sourceClass = new SourceClass();
+            var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
+            dest.Values2.ShouldBeNull();
+        }
+
+        [Test]
+        public void Should_set_the_target_empty_to_null()
+        {
+            var sourceClass = new SourceClass
+            {
+                Values3 = ""
+            };
+            var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
+            dest.Values3.ShouldEqual(default(EnumValues));
+        }
+    }
+
+
 	public class When_mapping_a_flags_enum : AutoMapperSpecBase
 	{
 		private DestinationFlags _result;

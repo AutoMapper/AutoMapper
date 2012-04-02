@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,7 @@ namespace AutoMapper
         private readonly TypeInfo _destinationType;
         private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
 		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
+        private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs = new ThreadSafeList<SourceMemberConfig>();
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private readonly TypeInfo _sourceType;
@@ -19,11 +21,12 @@ namespace AutoMapper
         private Func<ResolutionContext, bool> _condition;
         private ConstructorMap _constructorMap;
 
-        public TypeMap(TypeInfo sourceType, TypeInfo destinationType)
+        public TypeMap(TypeInfo sourceType, TypeInfo destinationType, MemberList memberList)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             Profile = ConfigurationStore.DefaultProfileName;
+            ConfiguredMemberList = memberList;
         }
 
         public ConstructorMap ConstructorMap
@@ -68,13 +71,15 @@ namespace AutoMapper
             }
         }
 
-        public Func<object, object> DestinationCtor { get; set; }
+        public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
         public List<string> IgnorePropertiesStartingWith { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
 
         public bool ConstructDestinationUsingServiceLocator { get; set; }
+
+        public MemberList ConfiguredMemberList { get; private set; }
 
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {
@@ -115,10 +120,33 @@ namespace AutoMapper
             var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
                 .Select(pm => pm.DestinationProperty.Name);
 
-            var properties = _destinationType.GetPublicWriteAccessors()
-                .Select(p => p.Name)
-                .Except(autoMappedProperties)
-                .Except(inheritedProperties);
+            IEnumerable<string> properties;
+
+            if (ConfiguredMemberList == MemberList.Destination)
+                properties = _destinationType.GetPublicWriteAccessors()
+                    .Select(p => p.Name)
+                    .Except(autoMappedProperties)
+                    .Except(inheritedProperties);
+            else
+            {
+                var redirectedSourceMembers = _propertyMaps
+                    .Where(pm => pm.IsMapped())
+                    .Where(pm => pm.CustomExpression != null)
+                    .Where(pm => pm.SourceMember != null)
+                    .Select(pm => pm.SourceMember.Name);
+
+                var ignoredSourceMembers = _sourceMemberConfigs
+                    .Where(smc => smc.IsIgnored())
+                    .Select(pm => pm.SourceMember.Name);
+
+                properties = _sourceType.GetPublicReadAccessors()
+                    .Select(p => p.Name)
+                    .Except(autoMappedProperties)
+                    .Except(inheritedProperties)
+                    .Except(redirectedSourceMembers)
+                    .Except(ignoredSourceMembers)
+                    ;
+            }
 
             return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
         }
@@ -252,6 +280,18 @@ namespace AutoMapper
         {
             var ctorMap = new ConstructorMap(constructorInfo, parameters);
             _constructorMap = ctorMap;
+        }
+
+        public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
+        {
+            var config = _sourceMemberConfigs.FirstOrDefault(smc => smc.SourceMember == sourceMember);
+            if (config == null)
+            {
+                config = new SourceMemberConfig(sourceMember);
+                _sourceMemberConfigs.Add(config);
+            }
+
+            return config;
         }
     }
 }

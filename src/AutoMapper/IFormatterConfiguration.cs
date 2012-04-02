@@ -15,5 +15,6 @@ namespace AutoMapper
 	public interface IProfileConfiguration
 	{
 		bool MapNullSourceValuesAsNull { get; }
+		bool MapNullSourceCollectionsAsNull { get; }
 	}
 }

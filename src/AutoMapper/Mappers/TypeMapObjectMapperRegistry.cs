@@ -70,7 +70,10 @@ namespace AutoMapper.Mappers
 					MapPropertyValue(context, mapper, mappedObject, propertyMap);
 				}
 				mappedObject = ReassignValue(context, mappedObject);
-				return mappedObject;
+
+                context.TypeMap.AfterMap(context.SourceValue, mappedObject);
+
+                return mappedObject;
 			}
 
 			protected virtual object ReassignValue(ResolutionContext context, object o)
@@ -85,7 +88,10 @@ namespace AutoMapper.Mappers
 			private void MapPropertyValue(ResolutionContext context, IMappingEngineRunner mapper, object mappedObject, PropertyMap propertyMap)
 			{
 				if (propertyMap.CanResolveValue())
-				{
+                {
+                    if (!propertyMap.ShouldAssignValue(context.CreateMemberContext(null, null, null, null, propertyMap)))
+                        return;
+
 					object destinationValue = null;
 					ResolutionResult result;
 
@@ -93,7 +99,11 @@ namespace AutoMapper.Mappers
 					{
 						result = propertyMap.ResolveValue(context);
 					}
-					catch (Exception ex)
+                    catch (AutoMapperMappingException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
 					{
 						var errorContext = CreateErrorContext(context, propertyMap, destinationValue);
 						throw new AutoMapperMappingException(errorContext, ex);
@@ -116,15 +126,16 @@ namespace AutoMapper.Mappers
 					var newContext = context.CreateMemberContext(typeMap, result.Value, destinationValue, targetSourceType,
 																 propertyMap);
 
-                    if (!propertyMap.ShouldAssignValue(newContext))
-                        return;
-
 					try
 					{
 						object propertyValueToAssign = mapper.Map(newContext);
 
 						AssignValue(propertyMap, mappedObject, propertyValueToAssign);
 					}
+                    catch (AutoMapperMappingException)
+                    {
+                        throw;
+                    }
 					catch (Exception ex)
 					{
 						throw new AutoMapperMappingException(newContext, ex);

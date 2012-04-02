@@ -16,12 +16,12 @@ namespace AutoMapper
         private static readonly ConcurrentDictionary<Type, TypeInfo> _typeInfos =
             new ConcurrentDictionary<Type, TypeInfo>();
 
-        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options)
+        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
         {
             var sourceTypeInfo = GetTypeInfo(sourceType);
             var destTypeInfo = GetTypeInfo(destinationType);
 
-            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo);
+            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
 
             foreach (var destProperty in destTypeInfo.GetPublicWriteAccessors())
             {
@@ -137,44 +137,60 @@ namespace AutoMapper
                                                  IEnumerable<MethodInfo> getMethods, string nameToSearch,
                                                  IMappingOptions mappingOptions)
         {
-            MemberInfo pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch));
+            MemberInfo pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch, mappingOptions));
             if (pi != null)
                 return pi;
 
-            MethodInfo mi = getMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch));
+            MethodInfo mi = getMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
             if (mi != null)
                 return mi;
-
-            pi =
-                modelProperties.FirstOrDefault(
-                    prop => NameMatches(mappingOptions.SourceMemberNameTransformer(prop.Name), nameToSearch));
-            if (pi != null)
-                return pi;
-
-            mi =
-                getMethods.FirstOrDefault(
-                    m => NameMatches(mappingOptions.SourceMemberNameTransformer(m.Name), nameToSearch));
-            if (mi != null)
-                return mi;
-
-            pi =
-                modelProperties.FirstOrDefault(
-                    prop => NameMatches(prop.Name, mappingOptions.DestinationMemberNameTransformer(nameToSearch)));
-            if (pi != null)
-                return pi;
-
-            pi =
-                getMethods.FirstOrDefault(
-                    m => NameMatches(m.Name, mappingOptions.DestinationMemberNameTransformer(nameToSearch)));
-            if (pi != null)
-                return pi;
 
             return null;
         }
 
-        private static bool NameMatches(string memberName, string nameToMatch)
+        private static bool NameMatches(string memberName, string nameToMatch, IMappingOptions mappingOptions)
         {
-            return String.Compare(memberName, nameToMatch, StringComparison.OrdinalIgnoreCase) == 0;
+            var possibleSourceNames = PossibleNames(memberName, mappingOptions.Aliases, mappingOptions.Prefixes,
+                                                          mappingOptions.Postfixes);
+            var possibleDestNames = PossibleNames(nameToMatch, mappingOptions.Aliases, mappingOptions.DestinationPrefixes,
+                                                          mappingOptions.DestinationPostfixes);
+
+            var all =
+                from sourceName in possibleSourceNames
+                from destName in possibleDestNames
+                select new {sourceName, destName};
+
+            return all.Any(pair => String.Compare(pair.sourceName, pair.destName, StringComparison.OrdinalIgnoreCase) == 0);
+        }
+
+        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases, IEnumerable<string> prefixes, IEnumerable<string> postfixes)
+        {
+            if (string.IsNullOrEmpty(memberName))
+                yield break;
+
+            yield return memberName;
+
+            foreach (var alias in aliases.Where(alias => String.Equals(memberName, alias.Member, StringComparison.Ordinal)))
+            {
+                yield return alias.Alias;
+            }
+
+            foreach (var prefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.Ordinal)))
+            {
+                var withoutPrefix = memberName.Substring(prefix.Length);
+
+                yield return withoutPrefix;
+
+                foreach (var postfix in postfixes.Where(postfix => withoutPrefix.EndsWith(postfix, StringComparison.Ordinal)))
+                {
+                    yield return withoutPrefix.Remove(withoutPrefix.Length - postfix.Length);
+                }
+            }
+
+            foreach (var postfix in postfixes.Where(postfix => memberName.EndsWith(postfix, StringComparison.Ordinal)))
+            {
+                yield return memberName.Remove(memberName.Length - postfix.Length);
+            }
         }
 
         private NameSnippet CreateNameSnippet(IEnumerable<string> matches, int i, IMappingOptions mappingOptions)

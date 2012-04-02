@@ -55,6 +55,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -153,6 +154,9 @@
     </Compile>
     <Compile Include="..\AutoMapper\INamingConvention.cs">
       <Link>INamingConvention.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\AliasedMember.cs">
+      <Link>Internal\AliasedMember.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\Internal\DefaultResolver.cs">
       <Link>Internal\DefaultResolver.cs</Link>
@@ -271,8 +275,14 @@
     <Compile Include="..\AutoMapper\Mappers\EnumMapper.cs">
       <Link>Mappers\EnumMapper.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ExplicitConversionOperatorMapper.cs">
+      <Link>Mappers\ExplicitConversionOperatorMapper.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\Mappers\FlagsEnumMapper.cs">
       <Link>Mappers\FlagsEnumMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ImplicitConversionOperatorMapper.cs">
+      <Link>Mappers\ImplicitConversionOperatorMapper.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\Mappers\ITypeMapObjectMapper.cs">
       <Link>Mappers\ITypeMapObjectMapper.cs</Link>
@@ -307,6 +317,9 @@
     <Compile Include="..\AutoMapper\MappingEngine.cs">
       <Link>MappingEngine.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\MemberList.cs">
+      <Link>MemberList.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\Profile.cs">
       <Link>Profile.cs</Link>
     </Compile>
@@ -321,6 +334,9 @@
     </Compile>
     <Compile Include="..\AutoMapper\ResolutionResult.cs">
       <Link>ResolutionResult.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\SourceMemberConfig.cs">
+      <Link>SourceMemberConfig.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\ThreadSafeList.cs">
       <Link>ThreadSafeList.cs</Link>

@@ -19,6 +19,9 @@ namespace AutoMapper.Mappers
 
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
+            if (context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+                return null;
+
 			var sourceEnumerableValue = (IEnumerable)context.SourceValue ?? new object[0];
 			IEnumerable<object> keyValuePairs = sourceEnumerableValue.Cast<object>();
 

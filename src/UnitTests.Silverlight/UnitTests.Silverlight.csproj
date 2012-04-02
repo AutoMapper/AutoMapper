@@ -159,6 +159,9 @@
     <Compile Include="..\UnitTests\Bug\DuplicateValuesBug.cs">
       <Link>Bug\DuplicateValuesBug.cs</Link>
     </Compile>
+    <Compile Include="..\UnitTests\Bug\EnumConditionsBug.cs">
+      <Link>Bug\EnumConditionsBug.cs</Link>
+    </Compile>
     <Compile Include="..\UnitTests\Bug\EnumMatchingOnValue.cs">
       <Link>Bug\EnumMatchingOnValue.cs</Link>
     </Compile>
@@ -185,6 +188,9 @@
     </Compile>
     <Compile Include="..\UnitTests\Bug\NullableBytesAndEnums.cs">
       <Link>Bug\NullableBytesAndEnums.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Bug\RecognizeIxesBug.cs">
+      <Link>Bug\RecognizeIxesBug.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\Bug\RepeatedMappingConfigurationTest.cs">
       <Link>Bug\RepeatedMappingConfigurationTest.cs</Link>
@@ -299,6 +305,9 @@
     </Compile>
     <Compile Include="..\UnitTests\ResolutionContextTester.cs">
       <Link>ResolutionContextTester.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ReverseMapping.cs">
+      <Link>ReverseMapping.cs</Link>
     </Compile>
     <Compile Include="..\UnitTests\TesterExtensions.cs">
       <Link>TesterExtensions.cs</Link>

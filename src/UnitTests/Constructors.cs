@@ -208,6 +208,74 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        [TestFixture]
+        public class UsingMappingEngineToResolveConstructorArguments : AutoMapperSpecBase
+        {
+            [Test]
+            public void Should_resolve_constructor_arguments_using_mapping_engine()
+            {
+                Mapper.CreateMap<SourceBar, DestinationBar>();
 
+                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+
+                var sourceBar = new SourceBar("fooBar");
+                var sourceFoo = new SourceFoo(sourceBar);
+
+                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+
+                destinationFoo.Bar.FooBar.ShouldEqual(sourceBar.FooBar);
+            }
+
+
+            public class DestinationFoo
+            {
+                private readonly DestinationBar _bar;
+
+                public DestinationBar Bar
+                {
+                    get { return _bar; }
+                }
+
+                public DestinationFoo(DestinationBar bar)
+                {
+                    _bar = bar;
+                }
+            }
+
+            public class DestinationBar
+            {
+                private readonly string _fooBar;
+
+                public string FooBar
+                {
+                    get { return _fooBar; }
+                }
+
+                public DestinationBar(string fooBar)
+                {
+                    _fooBar = fooBar;
+                }
+            }
+
+            public class SourceFoo
+            {
+                public SourceBar Bar { get; private set; }
+
+                public SourceFoo(SourceBar bar)
+                {
+                    Bar = bar;
+                }
+            }
+
+            public class SourceBar
+            {
+                public string FooBar { get; private set; }
+
+                public SourceBar(string fooBar)
+                {
+                    FooBar = fooBar;
+                }
+            }
+        }
     }
 }

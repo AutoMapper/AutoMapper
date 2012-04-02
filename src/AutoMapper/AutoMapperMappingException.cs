@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace AutoMapper
 {
@@ -67,31 +70,72 @@ namespace AutoMapper
                 string message = null;
                 if (Context != null)
                 {
-                    message = string.Format("Trying to map {0} to {1}.", Context.SourceType.FullName, Context.DestinationType.FullName);
-                    TypeMap contextTypeMap = Context.GetContextTypeMap();
-                    if (contextTypeMap != null)
-                    {
-                        message += string.Format("\nUsing mapping configuration for {0} to {1}", contextTypeMap.SourceType, contextTypeMap.DestinationType);
-                    }
-                    if (Context.TypeMap != null && Context.TypeMap != contextTypeMap)
-                    {
-                        message += string.Format("\nUsing property mapping configuration for {0} to {1}", Context.TypeMap.SourceType, Context.TypeMap.DestinationType);
-                    }
-                    if (Context.PropertyMap != null)
-                    {
-                        message += string.Format("\nDestination property: {0}", Context.PropertyMap.DestinationProperty.Name);
-                    }
+
+                    message = _message + "\n\nMapping types:";
+                    message += Environment.NewLine + string.Format("{0} -> {1}", Context.SourceType.Name, Context.DestinationType.Name);
+                    message += Environment.NewLine + string.Format("{0} -> {1}", Context.SourceType.FullName, Context.DestinationType.FullName);
+
+                    var destPath = GetDestPath(Context);
+                    message += "\n\nDestination path:\n" + destPath;
+
+                    message += "\n\nSource value:\n" + (Context.SourceValue ?? "(null)");
+
+                    return message;
                 }
                 if (_message != null)
                 {
-                    message = (message == null ? null : message + "\n") + _message;
+                    message = _message;
                 }
-                if (base.Message != null)
-                {
-                    message = (message == null ? null : message + "\n") + base.Message;
-                }
+
+                message = (message == null ? null : message + "\n") + base.Message;
+
                 return message;
             }
         }
+
+	    private string GetDestPath(ResolutionContext context)
+	    {
+	        var allContexts = GetContexts(context).Reverse();
+
+	        var builder = new StringBuilder(allContexts.First().DestinationType.Name);
+
+	        foreach (var ctxt in allContexts)
+	        {
+	            if (!string.IsNullOrEmpty(ctxt.MemberName))
+	            {
+	                builder.Append(".");
+	                builder.Append(ctxt.MemberName);
+	            }
+                if (ctxt.ArrayIndex != null)
+                {
+                    builder.AppendFormat("[{0}]", ctxt.ArrayIndex);
+                }
+	        }
+	        return builder.ToString();
+	    }
+
+	    private static IEnumerable<ResolutionContext> GetContexts(ResolutionContext context)
+	    {
+            while (context.Parent != null)
+            {
+                yield return context;
+
+                context = context.Parent;
+            }
+	        yield return context;
+	    }
+
+#if !DEBUG
+	    public override string StackTrace
+        {
+            get
+            {
+                return string.Join(Environment.NewLine,
+                    base.StackTrace
+                        .Split(new[] {Environment.NewLine}, StringSplitOptions.None)
+                        .Where(str => !str.TrimStart().StartsWith("at AutoMapper.")));
+            }
+        }
+#endif
     }
 }
