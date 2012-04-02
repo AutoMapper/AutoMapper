@@ -255,21 +255,6 @@ namespace AutoMapper
 	        return this;
 	    }
 
-        public IMappingExpression<TSource, TDestination> IgnoreAllNonExisting()
-        {
-            var sourceType = typeof(TSource);
-            var destinationType = typeof(TDestination);
-
-            var allTypeMaps = Mapper.GetAllTypeMaps().First(x => x.SourceType.Equals(sourceType) && x.DestinationType.Equals(destinationType));
-
-            foreach (var property in allTypeMaps.GetUnmappedPropertyNames())
-            {
-                ForMember(property, opt => opt.Ignore());
-            }
-
-            return this;
-        }
-
 	    private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
         {
             if (context.InstanceCache.ContainsKey(context))

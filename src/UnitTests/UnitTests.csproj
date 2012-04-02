@@ -145,7 +145,6 @@
     <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
     <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
-    <Compile Include="Mappers\IMappingExpressionTests.cs" />
     <Compile Include="Mappers\TypeHelperTests.cs">
       <SubType>Code</SubType>
     </Compile>
