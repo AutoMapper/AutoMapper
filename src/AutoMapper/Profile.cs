@@ -68,6 +68,11 @@ namespace AutoMapper
 	        get { throw new NotImplementedException(); }
 	    }
 
+	    public bool ConstructorMappingEnabled
+	    {
+	        get { return _configurator.ConstructorMappingEnabled; }
+	    }
+
 	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
 			return GetProfile().AddFormatter<TValueFormatter>();
