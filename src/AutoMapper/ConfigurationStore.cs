@@ -92,7 +92,12 @@ namespace AutoMapper
 	        get { return GetProfile(DefaultProfileName).Aliases; }
 	    }
 
-		bool IProfileConfiguration.MapNullSourceValuesAsNull
+	    public bool ConstructorMappingEnabled
+	    {
+	        get { return GetProfile(DefaultProfileName).ConstructorMappingEnabled; }
+	    }
+
+	    bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{
 			get { return AllowNullDestinationValues; }
 		}
@@ -137,7 +142,12 @@ namespace AutoMapper
 			_serviceCtor = constructor;
 		}
 
-		public void Seal()
+	    public void DisableConstructorMapping()
+	    {
+	        GetProfile(DefaultProfileName).ConstructorMappingEnabled = false;
+	    }
+
+	    public void Seal()
 		{
 			_typeMaps.Each(typeMap => typeMap.Seal());
 		}

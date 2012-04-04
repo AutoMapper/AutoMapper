@@ -208,6 +208,53 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_mapping_to_an_object_with_multiple_constructors_and_constructor_mapping_is_disabled : AutoMapperSpecBase
+        {
+            private Dest _dest;
+
+            public class Source
+            {
+                public int Foo { get; set; }
+                public int Bar { get; set; }
+            }
+
+            public class Dest
+            {
+                public int Foo { get; set; }
+
+                public int Bar { get; set; }
+
+                public Dest(int foo)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public Dest() { }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                                      {
+                                          cfg.DisableConstructorMapping();
+                                          cfg.CreateMap<Source, Dest>();
+                                      }
+                    );
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5, Bar = 10 });
+            }
+
+            [Test]
+            public void Should_map_the_existing_properties()
+            {
+                _dest.Foo.ShouldEqual(5);
+                _dest.Bar.ShouldEqual(10);
+            }
+        }
+
         [TestFixture]
         public class UsingMappingEngineToResolveConstructorArguments : AutoMapperSpecBase
         {

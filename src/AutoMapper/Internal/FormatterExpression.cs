@@ -23,6 +23,7 @@ namespace AutoMapper
 			DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 		    RecognizePrefixes("Get");
 			AllowNullDestinationValues = true;
+	        ConstructorMappingEnabled = true;
 		}
 
 		public bool AllowNullDestinationValues { get; set; }
@@ -34,8 +35,9 @@ namespace AutoMapper
         public IEnumerable<string> DestinationPrefixes { get { return _destinationPrefixes; } }
         public IEnumerable<string> DestinationPostfixes { get { return _destinationPostfixes; } }
         public IEnumerable<AliasedMember> Aliases { get { return _aliases; } }
+        public bool ConstructorMappingEnabled { get; set; }
 
-		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+        public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
 			var formatter = new DeferredInstantiatedFormatter(BuildCtor(typeof(TValueFormatter)));
 
