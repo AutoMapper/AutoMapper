@@ -41,7 +41,7 @@ namespace AutoMapper.Internal
 
 		public override int GetHashCode()
 		{
-				return _hashcode;
-			}
+			return _hashcode;			
 		}
+	}
 }
