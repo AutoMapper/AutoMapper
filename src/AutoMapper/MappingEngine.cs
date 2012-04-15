@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
 using AutoMapper.Mappers;
+using System.Collections;
 
 namespace AutoMapper
 {
@@ -268,14 +269,23 @@ namespace AutoMapper
                                 new[] { sourceListType, destinationListType },
                                 currentChild,
                                 transformedExpression);
-                    MethodCallExpression toListCallExpression = Expression.Call(
-                        typeof(Enumerable),
-                        "ToList",
-                        new Type[] { destinationListType },
-                        selectExpression);
 
-                    // todo .ToArray()
-                    bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+                    if (typeof(IList).IsAssignableFrom(prop.PropertyType))
+                    {
+                        MethodCallExpression toListCallExpression = Expression.Call(
+                            typeof(Enumerable),
+                            "ToList",
+                            new Type[] { destinationListType },
+                            selectExpression);
+
+                        // todo .ToArray()
+                        bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+                    }
+                    else
+                    {
+                        // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
+                        bindings.Add(Expression.Bind(destinationMember, selectExpression));
+                    }
                 }
                 else
                 {
