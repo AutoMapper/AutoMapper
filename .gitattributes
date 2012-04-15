@@ -13,37 +13,12 @@
 *.png 	binary
 *.gif 	binary
 
-*.cs text diff=csharp 
-*.vb text
-*.c text
-*.cpp text
-*.cxx text
-*.h text
-*.hxx text
-*.py text
-*.rb text
-*.java text
-*.html text
-*.htm text
-*.css text
-*.scss text
-*.sass text
-*.less text
-*.js text
-*.lisp text
-*.clj text
-*.sql text
-*.php text
-*.lua text
-*.m text
-*.asm text
-*.erl text
-*.fs text
-*.fsx text
-*.hs text
+core.eol crlf
 
-*.csproj text merge=union 
-*.vbproj text merge=union 
-*.fsproj text merge=union 
-*.dbproj text merge=union 
-*.sln text eol=crlf merge=union 
+*.cs diff=csharp 
+
+*.csproj merge=union 
+*.vbproj merge=union 
+*.fsproj merge=union 
+*.dbproj merge=union 
+*.sln merge=union 
