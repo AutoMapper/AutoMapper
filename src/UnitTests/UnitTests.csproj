@@ -107,6 +107,7 @@
     <Compile Include="Bug\AllMembersNullSubstitute.cs" />
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
+    <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />

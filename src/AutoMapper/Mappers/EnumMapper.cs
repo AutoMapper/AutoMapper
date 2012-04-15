@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 
 namespace AutoMapper.Mappers
@@ -60,6 +61,12 @@ namespace AutoMapper.Mappers
                 {
                     return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
                 }
+
+                if (EnumToNullableTypeMapping(context))
+                {
+                    return ConvertEnumToNullableType(context);
+                }
+
                 return Convert.ChangeType(context.SourceValue, context.DestinationType, null);
             }
             return null;
@@ -114,5 +121,24 @@ namespace AutoMapper.Mappers
             }
             return false;
         }
+
+        private static bool EnumToNullableTypeMapping(ResolutionContext context)
+        {
+            if (!context.DestinationType.IsGenericType)
+            {
+                return false;
+            }
+
+            var genericType = context.DestinationType.GetGenericTypeDefinition();
+            return genericType.Equals(typeof(Nullable<>));
+        }
+
+        private static object ConvertEnumToNullableType(ResolutionContext context)
+        {
+            var nullableConverter = new NullableConverter(context.DestinationType);
+            var destType = nullableConverter.UnderlyingType;
+            return Convert.ChangeType(context.SourceValue, destType);
+        }
+
     }
 }
