@@ -38,7 +38,7 @@ namespace AutoMapper
         void RecognizeDestinationPrefixes(params string[] prefixes);
         void RecognizeDestinationPostfixes(params string[] postfixes);
         void AddGlobalIgnore(string propertyNameStartingWith);
-    }
+	}
 
 	public interface IConfiguration : IProfileExpression
 	{
@@ -47,6 +47,7 @@ namespace AutoMapper
 		void AddProfile(Profile profile);
 		void AddProfile<TProfile>() where TProfile : Profile, new();
 		void ConstructServicesUsing(Func<Type, object> constructor);
+	    void DisableConstructorMapping();
 		void Seal();
 	}
 }

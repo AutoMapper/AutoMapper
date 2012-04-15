@@ -60,6 +60,11 @@ namespace AutoMapper.UnitTests.Tests
         {
             get { return _aliases; }
         }
+
+        public bool ConstructorMappingEnabled
+        {
+            get { return true; }
+        }
     }
 
     public class When_constructing_type_maps_with_matching_property_names : SpecBase
