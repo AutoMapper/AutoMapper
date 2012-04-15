@@ -49,7 +49,8 @@ task dist {
 	create_directory $dist_dir
 	copy_files "$build_dir\$config\AutoMapper" "$dist_dir\net40-client"
 	copy_files "$build_dir\$config\AutoMapper.Silverlight" "$dist_dir\sl4" "mscorlib.dll"
-    create-nuspec "$buildNumber"
+    create-nuspec "$version" "AutoMapper.nuspec"
+    create-nuspec "$version-ci" "AutoMapper-CI.nuspec"
 }
 
 # -------------------------------------------------------------------------------------------------------------
@@ -122,7 +123,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersionAttribute(""$version"")]"  | out-file $filename -encoding "ASCII"    
 }
 
-function global:create-nuspec()
+function global:create-nuspec($version, $fileName)
 {
     "<?xml version=""1.0""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
@@ -147,6 +148,6 @@ function global:create-nuspec()
     <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
-</package>" | out-file $build_dir\AutoMapper.nuspec -encoding "ASCII"
+</package>" | out-file $build_dir\$fileName -encoding "ASCII"
 }
 
