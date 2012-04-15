@@ -141,6 +141,34 @@ namespace AutoMapper
 		{
 			_typeMaps.Each(typeMap => typeMap.Seal());
 		}
+    public bool TryCreateMap<TSource, TDestination>(out IMappingExpression<TSource, TDestination> mappingExpression)
+    {
+      return TryCreateMap(DefaultProfileName, out mappingExpression);
+    }
+
+    public bool TryCreateMap<TSource, TDestination>(MemberList memberList, out IMappingExpression<TSource, TDestination> mappingExpression)
+    {
+      return TryCreateMap(DefaultProfileName, memberList, out mappingExpression);
+    }
+
+    public bool TryCreateMap<TSource, TDestination>(string profileName, out IMappingExpression<TSource, TDestination> mappingExpression)
+    {
+      return TryCreateMap(profileName, MemberList.Destination, out mappingExpression);
+    }
+
+    public bool TryCreateMap<TSource, TDestination>(string profileName, MemberList memberList, out IMappingExpression<TSource, TDestination> mappingExpression)
+    {
+      try
+      {
+        mappingExpression = CreateMap<TSource, TDestination>(profileName, memberList);
+        return true;
+      }
+      catch
+      {
+        mappingExpression = null;
+        return false;
+      }
+    }
 
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
@@ -164,7 +192,25 @@ namespace AutoMapper
 
             return CreateMappingExpression<TSource, TDestination>(typeMap);
         }
-
+    public bool TryCreateMap(Type sourceType, Type destinationType, out IMappingExpression mappingExpression)
+    {
+      return TryCreateMap(sourceType, destinationType, MemberList.Destination, out mappingExpression);
+    }    public bool TryCreateMap(Type sourceType, Type destinationType, MemberList memberList, out IMappingExpression mappingExpression)
+    {
+      return TryCreateMap(sourceType, destinationType, memberList, DefaultProfileName, out mappingExpression);
+    }    public bool TryCreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName, out IMappingExpression mappingExpression)
+    {
+      try
+      {
+        mappingExpression = CreateMap(sourceType, destinationType, memberList, profileName);
+        return true;
+      }
+      catch
+      {
+        mappingExpression = null;
+        return false;
+      }
+    }
 		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
 		    return CreateMap(sourceType, destinationType, MemberList.Destination);

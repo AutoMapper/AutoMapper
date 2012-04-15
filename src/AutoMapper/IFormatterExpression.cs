@@ -28,17 +28,19 @@ namespace AutoMapper
 
 	public interface IProfileExpression : IFormatterExpression, IMappingOptions
 	{
-		IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>();
-        IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList source);
-        IMappingExpression CreateMap(Type sourceType, Type destinationType);
-        IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList source);
+	  bool TryCreateMap<TSource, TDestination>(out IMappingExpression<TSource, TDestination> mappingExpression);
+    bool TryCreateMap<TSource, TDestination>(MemberList source, out IMappingExpression<TSource, TDestination> mappingExpression);
+		IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>();    IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList source);
+
+	  bool TryCreateMap(Type sourceType, Type destinationType, out IMappingExpression mappingExpression);
+	  bool TryCreateMap(Type sourceType, Type destinationType, MemberList source, out IMappingExpression mappingExpression);    IMappingExpression CreateMap(Type sourceType, Type destinationType);    IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList source);
+
 		void RecognizePrefixes(params string[] prefixes);
 		void RecognizePostfixes(params string[] postfixes);
 		void RecognizeAlias(string original, string alias);
-        void RecognizeDestinationPrefixes(params string[] prefixes);
-        void RecognizeDestinationPostfixes(params string[] postfixes);
-        void AddGlobalIgnore(string propertyNameStartingWith);
-    }
+    void RecognizeDestinationPrefixes(params string[] prefixes);
+    void RecognizeDestinationPostfixes(params string[] postfixes);    void AddGlobalIgnore(string propertyNameStartingWith);
+  }
 
 	public interface IConfiguration : IProfileExpression
 	{

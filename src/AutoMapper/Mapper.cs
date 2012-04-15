@@ -139,7 +139,25 @@ namespace AutoMapper
 		public static IFormatterExpression ForSourceType<TSource>()
 		{
 			return Configuration.ForSourceType<TSource>();
-		}
+		}    public static bool TryCreateMap<TSource, TDestination>()
+    {
+      IMappingExpression<TSource, TDestination> mappingExpression;
+      return TryCreateMap(out mappingExpression);
+    }    public static bool TryCreateMap<TSource, TDestination>(out IMappingExpression<TSource, TDestination> mappingExpression)
+    {
+      return Configuration.TryCreateMap(out mappingExpression);
+    }
+
+    public static bool TryCreateMap(Type sourceType, Type destinationType)
+    {
+      IMappingExpression mappingExpression;
+      return TryCreateMap(sourceType, destinationType, out mappingExpression);
+    }
+
+    public static bool TryCreateMap(Type sourceType, Type destinationType, out IMappingExpression mappingExpression)
+    {
+      return Configuration.TryCreateMap(sourceType, destinationType, out mappingExpression);
+    }
 
 		public static IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
