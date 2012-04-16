@@ -68,7 +68,6 @@ namespace AutoMapper.UnitTests
                             opt.ResolveUsing(src =>
                             {
                                 throw new Exception("Blarg");
-                                return 5;
                             });
                         });
                 });
