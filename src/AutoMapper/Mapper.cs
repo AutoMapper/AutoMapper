@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using AutoMapper.Mappers;
+using AutoMapper.Modules;
 
 namespace AutoMapper
 {
@@ -227,5 +228,13 @@ namespace AutoMapper
 	    {
             Configuration.AddGlobalIgnore(startingwith);
 	    }
+
+        public static void AddModules(params AutoMapperModule[] modules)
+        {
+            foreach (var module in modules)
+            {
+                module.Load();
+            }
+        }
 	}
 }

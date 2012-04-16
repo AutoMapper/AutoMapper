@@ -95,11 +95,26 @@ namespace AutoMapper.UnitTests.Modules
         public void loaded_modules_should_affect_mapping()
         {
             new TestModule().Load();
+            Source s = CreateSource();
+
+            Destination d = Mapper.Map<Source, Destination>(s);
+            Assert.AreEqual(s.SomeProperty, d.SomeProperty);
+        }
+
+        private static Source CreateSource()
+        {
             Source s = new Source
             {
                 SomeProperty = 42
             };
+            return s;
+        }
 
+        [Test]
+        public void mapper_should_be_able_to_load_modules()
+        {
+            Mapper.AddModules(new TestModule());
+            Source s = CreateSource();
             Destination d = Mapper.Map<Source, Destination>(s);
             Assert.AreEqual(s.SomeProperty, d.SomeProperty);
         }
