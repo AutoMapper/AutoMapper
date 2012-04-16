@@ -165,6 +165,7 @@
     <Compile Include="MappingOrder.cs" />
     <Compile Include="MaxDepthTests.cs" />
     <Compile Include="MemberResolution.cs" />
+    <Compile Include="Modules\ModuleLoading.cs" />
     <Compile Include="NestedContainers.cs" />
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
