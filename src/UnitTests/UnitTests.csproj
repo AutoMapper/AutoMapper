@@ -187,6 +187,10 @@
       <Project>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</Project>
       <Name>AutoMapper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestModuleAssembly\TestModuleAssembly.csproj">
+      <Project>{66988158-C472-4C34-9317-9F5FAD49C748}</Project>
+      <Name>TestModuleAssembly</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

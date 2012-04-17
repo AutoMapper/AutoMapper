@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Rhino.Mocks;
 using AutoMapper.Modules;
+using TestModuleAssembly;
 
 namespace AutoMapper.UnitTests.Modules
 {
@@ -117,6 +118,20 @@ namespace AutoMapper.UnitTests.Modules
             Source s = CreateSource();
             Destination d = Mapper.Map<Source, Destination>(s);
             Assert.AreEqual(s.SomeProperty, d.SomeProperty);
+        }
+
+        [Test]
+        public void mapper_should_be_able_load_modules_in_bulk_from_assemblies()
+        {
+            Mapper.AddModules("TestModuleAssembly.dll");
+            TAMAnotherSource source = new TAMAnotherSource
+            {
+                SomeProperty = 1,
+                SomeOtherProperty = 2
+            };
+            var destination = Mapper.Map<TAMAnotherSource, TAMAnotherDestination>(source);
+            Assert.AreEqual(source.SomeProperty, destination.SomeOtherProperty);
+            Assert.AreEqual(source.SomeOtherProperty, destination.SomeProperty);
         }
     }
 }
