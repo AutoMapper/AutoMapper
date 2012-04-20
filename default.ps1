@@ -42,13 +42,11 @@ task commonAssemblyInfo {
 task test {
 	create_directory "$build_dir\results"
     exec { & $tools_dir\nunit\nunit-console-x86.exe $build_dir/$config/UnitTests/AutoMapper.UnitTests.dll /nologo /nodots /xml=$result_dir\AutoMapper.xml }
-    exec { & $tools_dir\nunit\nunit-console-x86.exe $build_dir/$config/UnitTests.Silverlight/AutoMapper.UnitTests.Silverlight.dll /nologo /nodots /xml=$result_dir\AutoMapper.Silverlight.xml }
 }
 
 task dist {
 	create_directory $dist_dir
 	copy_files "$build_dir\$config\AutoMapper" "$dist_dir\net40-client"
-	copy_files "$build_dir\$config\AutoMapper.Silverlight" "$dist_dir\sl4" "mscorlib.dll"
     create-nuspec "$version" "AutoMapper.nuspec"
     create-nuspec "$version-ci" "AutoMapper-CI.nuspec"
 }
@@ -143,9 +141,6 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40"" />
     <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40"" />
     <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40"" />
-    <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
