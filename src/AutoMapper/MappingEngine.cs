@@ -96,7 +96,7 @@ namespace AutoMapper
 	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
 	    {
             Type modelType = typeof(TSource);
-            Type destinationType = typeof(TDestination);
+            Type destinationType = (Equals(destination, default(TDestination)) ? typeof(TDestination) : destination.GetType());
 
             return (TDestination)Map(source, destination, modelType, destinationType, opts);
         }
@@ -149,7 +149,7 @@ namespace AutoMapper
 		public void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
 		{
 			Type modelType = typeof(TSource);
-			Type destinationType = typeof(TDestination);
+            Type destinationType = (Equals(destination, default(TDestination)) ? typeof(TDestination) : destination.GetType());
 
 			DynamicMap(source, destination, modelType, destinationType);
 		}
