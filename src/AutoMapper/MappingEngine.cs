@@ -209,7 +209,7 @@ namespace AutoMapper
             ParameterExpression instanceParameter = Expression.Parameter(typeIn);
 
             var bindings = new List<MemberBinding>();
-            foreach (var propertyMap in typeMap.GetPropertyMaps())
+            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
             {
                 var destinationProperty = propertyMap.DestinationProperty;
                 var destinationMember = destinationProperty.MemberInfo;
