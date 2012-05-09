@@ -15,4 +15,4 @@ First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). 
 
     PM> Install-Package AutoMapper
 
-AutoMapper is Copyright &copy; 2008-2011 [Jimmy Bogard](http://jimmybogard.lostechies.com) and other contributors under the [MIT license](LICENSE.txt).
+AutoMapper is Copyright &copy; 2008-2012 [Jimmy Bogard](http://jimmybogard.lostechies.com) and other contributors under the [MIT license](LICENSE.txt).
