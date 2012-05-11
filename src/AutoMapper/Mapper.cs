@@ -191,6 +191,11 @@ namespace AutoMapper
 			ConfigurationProvider.AssertConfigurationIsValid();
 		}
 
+		public static void AssertConfigurationIsValid(TypeMap tm)
+		{
+			ConfigurationProvider.AssertConfigurationIsValid(tm);
+		}
+
 		public static void AssertConfigurationIsValid(string profileName)
 		{
 			ConfigurationProvider.AssertConfigurationIsValid(profileName);
