@@ -884,7 +884,58 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual("bar");
             }
         }
+
+        public class When_destination_property_does_not_have_a_getter : AutoMapperSpecBase
+        {
+            private Source _source;
+            private Destination _dest;
+
+            public class Source
+            {
+                public string Value { get; set; }
+                
+            }
+
+            public class Destination
+            {
+                private string _value;
+
+                public string Value
+                {
+                    set { _value = value; }
+                }
+                
+
+                public string GetValue()
+                {
+                    return _value;
+                }
+
+//                public string Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>();
+
+                _source = new Source { Value = "jon" };
+                _dest = new Destination();
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Destination>(_source);
+            }
+
+            [Test]
+            public void Should_translate_to_properties_that_dont_have_a_getter()
+            {
+                _dest.GetValue().ShouldEqual("jon");
+//                _dest.Value.ShouldEqual("jon");
+            }
+        }
 	
+
 		public class When_destination_type_requires_a_constructor : AutoMapperSpecBase
 		{
 			private Destination _destination;
