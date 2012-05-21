@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Should;
 using NUnit.Framework;
 
@@ -884,7 +885,88 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual("bar");
             }
         }
+
+        public class When_destination_property_does_not_have_a_getter : AutoMapperSpecBase
+        {
+            private Source _source;
+            private Destination _dest;
+            private SourceWithList _sourceWithList;
+            private DestinationWithList _destWithList;
+
+            public class Source
+            {
+                public string Value { get; set; }
+                
+            }
+
+            public class Destination
+            {
+                private string _value;
+
+                public string Value
+                {
+                    set { _value = value; }
+                }
+
+                public string GetValue()
+                {
+                    return _value;
+                }
+            }
+
+            public class SourceWithList
+            {
+                public IList SomeList { get; set; }
+            }
+
+            public class DestinationWithList
+            {
+                private IList _someList;
+
+                public IList SomeList
+                {
+                    set { _someList = value; }
+                }
+
+                public IList GetSomeList()
+                {
+                    return _someList;
+                }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>();
+                Mapper.CreateMap<SourceWithList, DestinationWithList>();
+
+                _source = new Source { Value = "jon" };
+                _dest = new Destination();
+
+
+                _sourceWithList = new SourceWithList { SomeList = new ArrayList() { 1, 2} };
+                _destWithList = new DestinationWithList();
+            }
+
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Destination>(_source);
+                _destWithList = Mapper.Map<SourceWithList, DestinationWithList>(_sourceWithList);
+            }
+
+            [Test]
+            public void Should_translate_to_properties_that_doesnt_have_a_getter()
+            {
+                _dest.GetValue().ShouldEqual("jon");
+            }
+
+            [Test]
+            public void Should_translate_to_enumerable_properties_that_doesnt_have_a_getter()
+            {
+                Assert.AreEqual(new ArrayList() { 1, 2 }, _destWithList.GetSomeList());
+            }
+        }
 	
+
 		public class When_destination_type_requires_a_constructor : AutoMapperSpecBase
 		{
 			private Destination _destination;
