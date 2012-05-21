@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +19,7 @@ namespace AutoMapper
         {
             Type = type;
         	var publicReadableMembers = GetAllPublicReadableMembers();
-        	var publicWritableMembers = GetAllPublicWritableMembers();
+            var publicWritableMembers = GetAllPublicWritableMembers();
 			_publicGetters = BuildPublicReadAccessors(publicReadableMembers);
             _publicAccessors = BuildPublicAccessors(publicWritableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
@@ -77,12 +78,25 @@ namespace AutoMapper
 
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
     	{
-            return GetAllPublicMembers(p => p.CanRead, BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+            return GetAllPublicMembers(PropertyReadable, BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
     	}
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
         {
-            return GetAllPublicMembers(p => p.CanWrite, BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty);
+            return GetAllPublicMembers(PropertyWritable, BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty);
+        }
+
+        private bool PropertyReadable(PropertyInfo propertyInfo)
+        {
+            return propertyInfo.CanRead;
+        }
+
+        private bool PropertyWritable(PropertyInfo propertyInfo)
+        {
+            bool propertyIsEnumerable = (typeof(string) != propertyInfo.PropertyType)
+                                         && typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType);
+
+            return propertyInfo.CanWrite || propertyIsEnumerable;
         }
 
         private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor, BindingFlags bindingAttr)
