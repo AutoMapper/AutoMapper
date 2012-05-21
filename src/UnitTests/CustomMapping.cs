@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Should;
 using NUnit.Framework;
 
@@ -904,7 +905,6 @@ namespace AutoMapper.UnitTests
                 {
                     set { _value = value; }
                 }
-                
 
                 public string GetValue()
                 {
@@ -926,7 +926,7 @@ namespace AutoMapper.UnitTests
             }
 
             [Test]
-            public void Should_translate_to_properties_that_dont_have_a_getter()
+            public void Should_translate_to_properties_that_doesnt_have_a_getter()
             {
                 _dest.GetValue().ShouldEqual("jon");
             }
