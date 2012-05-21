@@ -18,7 +18,7 @@ namespace AutoMapper
         {
             Type = type;
         	var publicReadableMembers = GetAllPublicReadableMembers();
-        	var publicWritableMembers = GetAllPublicWritebleMembers();
+        	var publicWritableMembers = GetAllPublicWritableMembers();
 			_publicGetters = BuildPublicReadAccessors(publicReadableMembers);
             _publicAccessors = BuildPublicAccessors(publicWritableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
@@ -77,15 +77,15 @@ namespace AutoMapper
 
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
     	{
-            return GetAllPublicMembers(p => p.CanRead);
+            return GetAllPublicMembers(p => p.CanRead, BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
     	}
 
-        private IEnumerable<MemberInfo> GetAllPublicWritebleMembers()
+        private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
         {
-            return GetAllPublicMembers(p => p.CanWrite);
+            return GetAllPublicMembers(p => p.CanWrite, BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty);
         }
 
-        private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor)
+        private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor, BindingFlags bindingAttr)
         {
             var typesToScan = new List<Type>();
             for (var t = Type; t != null; t = t.BaseType)
@@ -98,7 +98,7 @@ namespace AutoMapper
             return typesToScan
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
                 .SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
-                                               BindingFlags.Instance | BindingFlags.Public,
+                                               bindingAttr, 
                                                (m, f) =>
                                                m is FieldInfo ||
                                                (m is PropertyInfo && propertyAvailableFor.Invoke((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any()), null));

@@ -910,8 +910,6 @@ namespace AutoMapper.UnitTests
                 {
                     return _value;
                 }
-
-//                public string Value { get; set; }
             }
 
             protected override void Establish_context()
@@ -931,7 +929,6 @@ namespace AutoMapper.UnitTests
             public void Should_translate_to_properties_that_dont_have_a_getter()
             {
                 _dest.GetValue().ShouldEqual("jon");
-//                _dest.Value.ShouldEqual("jon");
             }
         }
 	
