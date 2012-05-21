@@ -890,6 +890,8 @@ namespace AutoMapper.UnitTests
         {
             private Source _source;
             private Destination _dest;
+            private SourceWithList _sourceWithList;
+            private DestinationWithList _destWithList;
 
             public class Source
             {
@@ -912,23 +914,55 @@ namespace AutoMapper.UnitTests
                 }
             }
 
+            public class SourceWithList
+            {
+                public IList SomeList { get; set; }
+            }
+
+            public class DestinationWithList
+            {
+                private IList _someList;
+
+                public IList SomeList
+                {
+                    set { _someList = value; }
+                }
+
+                public IList GetSomeList()
+                {
+                    return _someList;
+                }
+            }
+
             protected override void Establish_context()
             {
                 Mapper.CreateMap<Source, Destination>();
+                Mapper.CreateMap<SourceWithList, DestinationWithList>();
 
                 _source = new Source { Value = "jon" };
                 _dest = new Destination();
+
+
+                _sourceWithList = new SourceWithList { SomeList = new ArrayList() { 1, 2} };
+                _destWithList = new DestinationWithList();
             }
 
             protected override void Because_of()
             {
                 _dest = Mapper.Map<Source, Destination>(_source);
+                _destWithList = Mapper.Map<SourceWithList, DestinationWithList>(_sourceWithList);
             }
 
             [Test]
             public void Should_translate_to_properties_that_doesnt_have_a_getter()
             {
                 _dest.GetValue().ShouldEqual("jon");
+            }
+
+            [Test]
+            public void Should_translate_to_enumerable_properties_that_doesnt_have_a_getter()
+            {
+                Assert.AreEqual(new ArrayList() { 1, 2 }, _destWithList.GetSomeList());
             }
         }
 	
