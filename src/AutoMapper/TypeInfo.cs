@@ -94,11 +94,11 @@ namespace AutoMapper
     			                               (m is PropertyInfo && ((PropertyInfo)m).CanRead && !((PropertyInfo)m).GetIndexParameters().Any()), null));
     	}
 
-    	private MethodInfo[] BuildPublicNoArgMethods()
-        {
-            return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(m => (m.ReturnType != null) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
-                .ToArray();
-        }
+		private MethodInfo[] BuildPublicNoArgMethods()
+		{
+			return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+				.Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
+				.ToArray();
+		}
     }
 }
