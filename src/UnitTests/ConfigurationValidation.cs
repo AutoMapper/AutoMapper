@@ -408,7 +408,56 @@ namespace AutoMapper.UnitTests
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
         }
+		
+		public class When_testing_a_dto_with_setter_only_peroperty_member : NonValidatingSpecBase
+		{
+			public class Source
+			{
+				public string Value { set { } }
+			}
 
+			public class Destination
+			{
+				public string Value { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
+			}
+
+			[Test]
+			public void Should_fail_a_configuration_check()
+			{
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
+		}
+
+		public class When_testing_a_dto_with_matching_void_method_member : NonValidatingSpecBase
+		{
+			public class Source
+			{
+				public void Method()
+				{
+				}
+			}
+
+			public class Destination
+			{
+				public string Method { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
+			}
+
+			[Test]
+			public void Should_fail_a_configuration_check()
+			{
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+			}
+		}
     }
 
 }

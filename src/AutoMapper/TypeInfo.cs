@@ -121,7 +121,7 @@ namespace AutoMapper
         private MethodInfo[] BuildPublicNoArgMethods()
         {
             return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(m => (m.ReturnType != null) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
+                .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
                 .ToArray();
         }
     }
