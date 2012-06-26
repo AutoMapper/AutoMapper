@@ -19,6 +19,7 @@ namespace AutoMapper
 	    IEnumerable<string> DestinationPrefixes { get; }
 	    IEnumerable<string> DestinationPostfixes { get; }
 	    IEnumerable<AliasedMember> Aliases { get; }
+	    bool ConstructorMappingEnabled { get; }
     }
 
 	public class PascalCaseNamingConvention : INamingConvention

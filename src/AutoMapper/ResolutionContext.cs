@@ -152,6 +152,11 @@ namespace AutoMapper
             return new ResolutionContext(this, memberTypeMap, sourceValue, sourceType, destinationType);
         }
 
+        public ResolutionContext CreatePropertyMapContext(PropertyMap propertyMap)
+        {
+            return new ResolutionContext(this, SourceValue, DestinationValue, SourceType, propertyMap);
+        }
+
 		public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, object destinationValue, Type sourceMemberType, PropertyMap propertyMap)
 		{
 			return memberTypeMap != null

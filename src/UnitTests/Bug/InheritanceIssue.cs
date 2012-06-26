@@ -15,14 +15,11 @@ namespace AutoMapper.UnitTests.Bug
         #region Dto objects
         public abstract class DynamicPropertyDTO<T>
         {
-            public abstract event PropertyChangedEventHandler PropertyChanged;
         }
 
         public class ComplexPropertyDTO<T> : DynamicPropertyDTO<T>
         {
             public Dictionary<string, object> Properties { get; set; }
-
-            public override event PropertyChangedEventHandler PropertyChanged;
 
             public ComplexPropertyDTO()
             {
@@ -81,6 +78,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             public Dictionary<string, object> Properties { get; set; }
 
+            #pragma warning disable 67
             public override event PropertyChangedEventHandler PropertyChanged;
 
             public ComplexProperty()
@@ -91,6 +89,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class SimpleProperty<T> : DynamicProperty<T>
         {
+            #pragma warning disable 67
             public override event PropertyChangedEventHandler PropertyChanged;
         }
 
