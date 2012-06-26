@@ -5,6 +5,7 @@ using Should;
 using NUnit.Framework;
 using System.Linq;
 using Rhino.Mocks;
+using System.Reflection;
 
 namespace AutoMapper.UnitTests.Tests
 {
@@ -23,6 +24,8 @@ namespace AutoMapper.UnitTests.Tests
         private IEnumerable<string> _destinationPostfixes = new List<string>();
 
         private IEnumerable<AliasedMember> _aliases = new List<AliasedMember>();
+
+		private Assembly[] _sourceExtensionMethodSearch = null;
 
         public INamingConvention SourceMemberNamingConvention
         {
@@ -65,7 +68,13 @@ namespace AutoMapper.UnitTests.Tests
         {
             get { return true; }
         }
-    }
+
+		public Assembly[] SourceExtensionMethodSearch
+		{
+			get { return _sourceExtensionMethodSearch; }
+			set { _sourceExtensionMethodSearch = value; }
+		}
+	}
 
     public class When_constructing_type_maps_with_matching_property_names : SpecBase
     {

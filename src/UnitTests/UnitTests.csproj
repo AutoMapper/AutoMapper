@@ -139,6 +139,7 @@
     <Compile Include="CustomMapping.cs" />
     <Compile Include="DataReaderMapping.cs" />
     <Compile Include="ExpressionBridge.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IgnoreAllTests.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Dictionaries.cs" />
