@@ -107,7 +107,9 @@
     <Compile Include="Bug\AllMembersNullSubstitute.cs" />
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
+    <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
+    <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
@@ -120,6 +122,7 @@
     <Compile Include="Bug\MultiThreadingIssues.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\NullableBytesAndEnums.cs" />
+    <Compile Include="Bug\ObjectTypeMapFailure.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
@@ -134,6 +137,7 @@
     <Compile Include="CustomMapping.cs" />
     <Compile Include="DataReaderMapping.cs" />
     <Compile Include="ExpressionBridge.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IgnoreAllTests.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Dictionaries.cs" />
@@ -167,6 +171,7 @@
     <Compile Include="NestedContainers.cs" />
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
+    <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
     <Compile Include="TesterExtensions.cs" />

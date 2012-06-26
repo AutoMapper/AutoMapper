@@ -55,8 +55,12 @@ namespace AutoMapper
                                                 IMappingOptions options)
         {
             var parameters = new List<ConstructorParameterMap>();
+            var ctorParameters = destCtor.GetParameters();
 
-            foreach (var parameter in destCtor.GetParameters())
+            if (ctorParameters.Length > 0 && !options.ConstructorMappingEnabled)
+                return false;
+
+            foreach (var parameter in ctorParameters)
             {
                 var members = new LinkedList<MemberInfo>();
 
@@ -90,8 +94,9 @@ namespace AutoMapper
 
             var sourceProperties = sourceType.GetPublicReadAccessors();
             var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
+			var sourceNoArgExtensionMethods = sourceType.GetPublicNoArgExtensionMethods(mappingOptions.SourceExtensionMethodSearch);
 
-            MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, nameToSearch, mappingOptions);
+			MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, nameToSearch, mappingOptions);
 
             bool foundMatch = resolver != null;
 
@@ -111,7 +116,7 @@ namespace AutoMapper
                 {
                     NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
 
-                    var valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, snippet.First,
+					var valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, snippet.First,
                                                        mappingOptions);
 
                     if (valueResolver != null)
@@ -134,8 +139,10 @@ namespace AutoMapper
         }
 
         private static MemberInfo FindTypeMember(IEnumerable<MemberInfo> modelProperties,
-                                                 IEnumerable<MethodInfo> getMethods, string nameToSearch,
-                                                 IMappingOptions mappingOptions)
+												 IEnumerable<MethodInfo> getMethods,
+												 IEnumerable<MethodInfo> getExtensionMethods,
+												 string nameToSearch,
+												 IMappingOptions mappingOptions)
         {
             MemberInfo pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch, mappingOptions));
             if (pi != null)
@@ -145,7 +152,11 @@ namespace AutoMapper
             if (mi != null)
                 return mi;
 
-            return null;
+			mi = getExtensionMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
+			if (mi != null)
+				return mi;
+
+			return null;
         }
 
         private static bool NameMatches(string memberName, string nameToMatch, IMappingOptions mappingOptions)

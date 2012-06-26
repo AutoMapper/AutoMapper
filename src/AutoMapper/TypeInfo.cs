@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace AutoMapper
 {
@@ -18,8 +20,9 @@ namespace AutoMapper
         {
             Type = type;
         	var publicReadableMembers = GetAllPublicReadableMembers();
+            var publicWritableMembers = GetAllPublicWritableMembers();
 			_publicGetters = BuildPublicReadAccessors(publicReadableMembers);
-			_publicAccessors = BuildPublicAccessors(publicReadableMembers);
+            _publicAccessors = BuildPublicAccessors(publicWritableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
             _constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         }
@@ -44,7 +47,23 @@ namespace AutoMapper
             return _publicGetMethods;
         }
 
-        private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
+		public IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(Assembly[] sourceExtensionMethodSearch)
+		{
+			if (sourceExtensionMethodSearch == null)
+			{
+				return new MethodInfo[] { };
+			}
+
+			//http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
+			return sourceExtensionMethodSearch
+				.SelectMany(assembly => assembly.GetTypes())
+				.Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
+				.SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+				.Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
+				.Where(method => method.GetParameters()[0].ParameterType == this.Type);
+		}
+
+		private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
         {
 			// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
             var filteredMembers = allMembers
@@ -76,28 +95,50 @@ namespace AutoMapper
 
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
     	{
-			// Collect that target type, its base type, and all implemented/inherited interface types
+            return GetAllPublicMembers(PropertyReadable, BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+    	}
+
+        private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
+        {
+            return GetAllPublicMembers(PropertyWritable, BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty);
+        }
+
+        private bool PropertyReadable(PropertyInfo propertyInfo)
+        {
+            return propertyInfo.CanRead;
+        }
+
+        private bool PropertyWritable(PropertyInfo propertyInfo)
+        {
+            bool propertyIsEnumerable = (typeof(string) != propertyInfo.PropertyType)
+                                         && typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType);
+
+            return propertyInfo.CanWrite || propertyIsEnumerable;
+        }
+
+        private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor, BindingFlags bindingAttr)
+        {
             var typesToScan = new List<Type>();
             for (var t = Type; t != null; t = t.BaseType)
                 typesToScan.Add(t);
 
-    		if (Type.IsInterface)
-    			typesToScan.AddRange(Type.GetInterfaces());
+            if (Type.IsInterface)
+                typesToScan.AddRange(Type.GetInterfaces());
 
-    		// Scan all types for public properties and fields
-    		return typesToScan
-    			.Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-    			.SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
-    			                               BindingFlags.Instance | BindingFlags.Public,
-    			                               (m, f) =>
-    			                               m is FieldInfo ||
-    			                               (m is PropertyInfo && ((PropertyInfo)m).CanRead && !((PropertyInfo)m).GetIndexParameters().Any()), null));
-    	}
+            // Scan all types for public properties and fields
+            return typesToScan
+                .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
+                .SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
+                                               bindingAttr, 
+                                               (m, f) =>
+                                               m is FieldInfo ||
+                                               (m is PropertyInfo && propertyAvailableFor.Invoke((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any()), null));
+        }
 
-    	private MethodInfo[] BuildPublicNoArgMethods()
+        private MethodInfo[] BuildPublicNoArgMethods()
         {
             return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(m => (m.ReturnType != null) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
+                .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
                 .ToArray();
         }
     }

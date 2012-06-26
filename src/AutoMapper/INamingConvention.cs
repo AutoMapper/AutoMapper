@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace AutoMapper
@@ -19,7 +19,9 @@ namespace AutoMapper
 	    IEnumerable<string> DestinationPrefixes { get; }
 	    IEnumerable<string> DestinationPostfixes { get; }
 	    IEnumerable<AliasedMember> Aliases { get; }
-    }
+	    bool ConstructorMappingEnabled { get; }
+		Assembly[] SourceExtensionMethodSearch { get; set; }
+	}
 
 	public class PascalCaseNamingConvention : INamingConvention
 	{

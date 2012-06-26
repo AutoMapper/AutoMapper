@@ -65,11 +65,11 @@ namespace AutoMapper.Mappers
 
 				context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
 
-				foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
-				{
-					MapPropertyValue(context, mapper, mappedObject, propertyMap);
-				}
-				mappedObject = ReassignValue(context, mappedObject);
+                foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
+                {
+                    MapPropertyValue(context.CreatePropertyMapContext(propertyMap), mapper, mappedObject, propertyMap);
+                }
+                mappedObject = ReassignValue(context, mappedObject); mappedObject = ReassignValue(context, mappedObject);
 
                 context.TypeMap.AfterMap(context.SourceValue, mappedObject);
 

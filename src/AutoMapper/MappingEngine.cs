@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
 using AutoMapper.Mappers;
+using System.Collections;
 
 namespace AutoMapper
 {
@@ -95,7 +96,7 @@ namespace AutoMapper
 	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
 	    {
             Type modelType = typeof(TSource);
-            Type destinationType = typeof(TDestination);
+            Type destinationType = (Equals(destination, default(TDestination)) ? typeof(TDestination) : destination.GetType());
 
             return (TDestination)Map(source, destination, modelType, destinationType, opts);
         }
@@ -148,7 +149,7 @@ namespace AutoMapper
 		public void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
 		{
 			Type modelType = typeof(TSource);
-			Type destinationType = typeof(TDestination);
+            Type destinationType = (Equals(destination, default(TDestination)) ? typeof(TDestination) : destination.GetType());
 
 			DynamicMap(source, destination, modelType, destinationType);
 		}
@@ -208,7 +209,7 @@ namespace AutoMapper
             ParameterExpression instanceParameter = Expression.Parameter(typeIn);
 
             var bindings = new List<MemberBinding>();
-            foreach (var propertyMap in typeMap.GetPropertyMaps())
+            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
             {
                 var destinationProperty = propertyMap.DestinationProperty;
                 var destinationMember = destinationProperty.MemberInfo;
@@ -268,14 +269,23 @@ namespace AutoMapper
                                 new[] { sourceListType, destinationListType },
                                 currentChild,
                                 transformedExpression);
-                    MethodCallExpression toListCallExpression = Expression.Call(
-                        typeof(Enumerable),
-                        "ToList",
-                        new Type[] { destinationListType },
-                        selectExpression);
 
-                    // todo .ToArray()
-                    bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+                    if (typeof(IList).IsAssignableFrom(prop.PropertyType))
+                    {
+                        MethodCallExpression toListCallExpression = Expression.Call(
+                            typeof(Enumerable),
+                            "ToList",
+                            new Type[] { destinationListType },
+                            selectExpression);
+
+                        // todo .ToArray()
+                        bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+                    }
+                    else
+                    {
+                        // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
+                        bindings.Add(Expression.Bind(destinationMember, selectExpression));
+                    }
                 }
                 else
                 {

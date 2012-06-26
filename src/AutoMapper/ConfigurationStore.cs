@@ -92,7 +92,18 @@ namespace AutoMapper
 	        get { return GetProfile(DefaultProfileName).Aliases; }
 	    }
 
-		bool IProfileConfiguration.MapNullSourceValuesAsNull
+	    public bool ConstructorMappingEnabled
+	    {
+	        get { return GetProfile(DefaultProfileName).ConstructorMappingEnabled; }
+	    }
+
+		public Assembly[] SourceExtensionMethodSearch
+		{
+			get { return GetProfile(DefaultProfileName).SourceExtensionMethodSearch; }
+			set { GetProfile(DefaultProfileName).SourceExtensionMethodSearch = value; }
+		}
+
+	    bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{
 			get { return AllowNullDestinationValues; }
 		}
@@ -137,7 +148,12 @@ namespace AutoMapper
 			_serviceCtor = constructor;
 		}
 
-		public void Seal()
+	    public void DisableConstructorMapping()
+	    {
+	        GetProfile(DefaultProfileName).ConstructorMappingEnabled = false;
+	    }
+
+	    public void Seal()
 		{
 			_typeMaps.Each(typeMap => typeMap.Seal());
 		}
