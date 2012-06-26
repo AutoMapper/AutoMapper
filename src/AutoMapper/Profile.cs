@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace AutoMapper
 {
@@ -43,7 +44,7 @@ namespace AutoMapper
 			set { GetProfile().DestinationMemberNamingConvention = value; }
 		}
 
-	    public IEnumerable<string> Prefixes
+		public IEnumerable<string> Prefixes
 	    {
 	        get { return GetProfile().Prefixes; }
 	    }
@@ -73,7 +74,13 @@ namespace AutoMapper
 	        get { return _configurator.ConstructorMappingEnabled; }
 	    }
 
-	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
+		public Assembly[] SourceExtensionMethodSearch
+		{
+			get { return GetProfile().SourceExtensionMethodSearch; }
+			set { GetProfile().SourceExtensionMethodSearch = value; }
+		}
+
+		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
 			return GetProfile().AddFormatter<TValueFormatter>();
 		}

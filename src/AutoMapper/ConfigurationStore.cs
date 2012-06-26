@@ -97,6 +97,12 @@ namespace AutoMapper
 	        get { return GetProfile(DefaultProfileName).ConstructorMappingEnabled; }
 	    }
 
+		public Assembly[] SourceExtensionMethodSearch
+		{
+			get { return GetProfile(DefaultProfileName).SourceExtensionMethodSearch; }
+			set { GetProfile(DefaultProfileName).SourceExtensionMethodSearch = value; }
+		}
+
 	    bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{
 			get { return AllowNullDestinationValues; }

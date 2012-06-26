@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace AutoMapper
 {
@@ -32,10 +33,22 @@ namespace AutoMapper
 			ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
 			ParameterExpression argumentsParameter = Expression.Parameter(typeof(object[]), "arguments");
 
-			MethodCallExpression call = Expression.Call(
-				Expression.Convert(instanceParameter, method.DeclaringType),
-				method,
-				CreateParameterExpressions(method, argumentsParameter));
+			MethodCallExpression call;
+			if (!method.IsDefined(typeof(ExtensionAttribute), false))
+			{
+				// instance member method
+				call = Expression.Call(
+					Expression.Convert(instanceParameter, method.DeclaringType),
+					method,
+					CreateParameterExpressions(method, instanceParameter, argumentsParameter));
+			}
+			else
+			{
+				// static extension method
+				call = Expression.Call(
+					method,
+					CreateParameterExpressions(method, instanceParameter, argumentsParameter));
+			}
 
 			Expression<LateBoundMethod> lambda = Expression.Lambda<LateBoundMethod>(
 				Expression.Convert(call, typeof(object)),
@@ -177,12 +190,23 @@ namespace AutoMapper
 #endif
         }
 
-	    private static Expression[] CreateParameterExpressions(MethodInfo method, Expression argumentsParameter)
+		private static Expression[] CreateParameterExpressions(MethodInfo method, Expression instanceParameter, Expression argumentsParameter)
 		{
-			return method.GetParameters().Select((parameter, index) =>
+			var expressions = new List<UnaryExpression>();
+			var realMethodParameters = method.GetParameters();
+			if (method.IsDefined(typeof(ExtensionAttribute), false))
+			{
+				Type extendedType = method.GetParameters()[0].ParameterType;
+				expressions.Add(Expression.Convert(instanceParameter, extendedType));
+				realMethodParameters = realMethodParameters.Skip(1).ToArray();
+			}
+
+			expressions.AddRange(realMethodParameters.Select((parameter, index) =>
 				Expression.Convert(
 					Expression.ArrayIndex(argumentsParameter, Expression.Constant(index)),
-					parameter.ParameterType)).ToArray();
+					parameter.ParameterType)));
+
+			return expressions.ToArray();
 		}
 
 	    public static LateBoundParamsCtor CreateCtor(ConstructorInfo constructorInfo, IEnumerable<ConstructorParameterMap> ctorParams)

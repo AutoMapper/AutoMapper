@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace AutoMapper
 {
@@ -46,7 +47,23 @@ namespace AutoMapper
             return _publicGetMethods;
         }
 
-        private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
+		public IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(Assembly[] sourceExtensionMethodSearch)
+		{
+			if (sourceExtensionMethodSearch == null)
+			{
+				return new MethodInfo[] { };
+			}
+
+			//http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
+			return sourceExtensionMethodSearch
+				.SelectMany(assembly => assembly.GetTypes())
+				.Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
+				.SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+				.Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
+				.Where(method => method.GetParameters()[0].ParameterType == this.Type);
+		}
+
+		private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
         {
 			// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
             var filteredMembers = allMembers

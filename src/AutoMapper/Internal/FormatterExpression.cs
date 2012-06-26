@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace AutoMapper
 {
@@ -36,6 +37,7 @@ namespace AutoMapper
         public IEnumerable<string> DestinationPostfixes { get { return _destinationPostfixes; } }
         public IEnumerable<AliasedMember> Aliases { get { return _aliases; } }
         public bool ConstructorMappingEnabled { get; set; }
+		public Assembly[] SourceExtensionMethodSearch { get; set; }
 
         public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
