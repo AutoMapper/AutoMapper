@@ -1,6 +1,10 @@
 using System;
 using System.Linq.Expressions;
 using AutoMapper.Mappers;
+using AutoMapper.Modules;
+using System.Reflection;
+using System.IO;
+using System.Linq;
 
 namespace AutoMapper
 {
@@ -232,5 +236,30 @@ namespace AutoMapper
 	    {
             Configuration.AddGlobalIgnore(startingwith);
 	    }
+
+        public static void AddModules(params AutoMapperModule[] modules)
+        {
+            foreach (var module in modules)
+            {
+                module.Load();
+            }
+        }
+
+        public static void AddModules(string dllName)
+        {
+            var assembly = Assembly.LoadFrom(dllName);
+            var modules = assembly.GetExportedTypes()
+                                  .Where(t => IsLoadableModule(t))
+                                  .Select(type => Activator.CreateInstance(type) as AutoMapperModule);
+            AddModules(modules.ToArray());
+        }
+
+        private static bool IsLoadableModule(Type type)
+        {
+            return typeof(AutoMapperModule).IsAssignableFrom(type)
+                && !type.IsAbstract
+                && !type.IsInterface
+                && type.GetConstructor(Type.EmptyTypes) != null;
+        }
 	}
 }

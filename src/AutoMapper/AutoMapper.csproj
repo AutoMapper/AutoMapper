@@ -96,6 +96,7 @@
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />
+    <Compile Include="Modules\AutoMapperModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="Configuration\MapperConfiguration.cs" />

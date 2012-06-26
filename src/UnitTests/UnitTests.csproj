@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -109,7 +109,6 @@
     <Compile Include="Bug\AssignableCollectionBug.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
-    <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
@@ -122,7 +121,6 @@
     <Compile Include="Bug\MultiThreadingIssues.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\NullableBytesAndEnums.cs" />
-    <Compile Include="Bug\ObjectTypeMapFailure.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
@@ -167,10 +165,10 @@
     <Compile Include="MappingOrder.cs" />
     <Compile Include="MaxDepthTests.cs" />
     <Compile Include="MemberResolution.cs" />
+    <Compile Include="Modules\ModuleLoading.cs" />
     <Compile Include="NestedContainers.cs" />
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
-    <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
     <Compile Include="TesterExtensions.cs" />
@@ -188,6 +186,10 @@
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
       <Project>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</Project>
       <Name>AutoMapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TestModuleAssembly\TestModuleAssembly.csproj">
+      <Project>{66988158-C472-4C34-9317-9F5FAD49C748}</Project>
+      <Name>TestModuleAssembly</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -213,11 +215,4 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
