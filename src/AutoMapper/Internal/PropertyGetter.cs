@@ -17,6 +17,8 @@ namespace AutoMapper.Internal
 			_memberType = _propertyInfo.PropertyType;
 			if (_propertyInfo.GetGetMethod(true) != null)
 				_lateBoundPropertyGet = DelegateFactory.CreateGet(propertyInfo);
+			else
+			    _lateBoundPropertyGet = src => null;
 		}
 
 		public override MemberInfo MemberInfo

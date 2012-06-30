@@ -205,7 +205,7 @@ namespace AutoMapper.UnitTests
         }
 
         [Test]
-        public void Should_replace_destination_collection()
+        public void Should_not_replace_destination_collection()
         {
             Mapper.CreateMap<MasterDto, MasterWithCollection>();
             Mapper.CreateMap<DetailDto, Detail>();
@@ -225,7 +225,7 @@ namespace AutoMapper.UnitTests
 
             Mapper.Map(dto, master);
 
-            Assert.That(master.Details, Is.Not.SameAs(originalCollection));
+            Assert.That(master.Details, Is.SameAs(originalCollection));
         }
 
         [Test]
@@ -250,7 +250,7 @@ namespace AutoMapper.UnitTests
         }
 
         [Test]
-        public void Should_replace_destination_list()
+        public void Should_not_replace_destination_list()
         {
             Mapper.CreateMap<MasterDto, MasterWithList>();
             Mapper.CreateMap<DetailDto, Detail>();
@@ -270,7 +270,7 @@ namespace AutoMapper.UnitTests
 
             Mapper.Map(dto, master);
 
-            Assert.That(master.Details, Is.Not.SameAs(originalCollection));
+            Assert.That(master.Details, Is.SameAs(originalCollection));
         }
 
 #if !SILVERLIGHT

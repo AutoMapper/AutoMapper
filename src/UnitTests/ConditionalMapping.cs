@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests
                             opt.Condition(src => src.Value > 0);
                             opt.ResolveUsing(src =>
                             {
-                                throw new Exception("Blarg");
+                                return 10;
                             });
                         });
                 });
@@ -84,7 +84,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_execute_the_mapping_when_the_condition_is_false()
             {
-                typeof(AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<Source, Destination>(new Source { Value = 7 }));
+                Mapper.Map<Source, Destination>(new Source { Value = 7 }).Value.ShouldEqual(10);
             }
         }
 

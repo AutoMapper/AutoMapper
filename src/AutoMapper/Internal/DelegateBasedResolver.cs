@@ -27,6 +27,10 @@ namespace AutoMapper
 			{
 				result = null;
 			}
+			catch (ArgumentNullException)
+			{
+				result = null;
+			}
 
 			return source.New(result);
 		}

@@ -89,11 +89,7 @@ namespace AutoMapper.Mappers
 			{
 				if (propertyMap.CanResolveValue())
                 {
-                    if (!propertyMap.ShouldAssignValue(context.CreateMemberContext(null, null, null, null, propertyMap)))
-                        return;
-
-					object destinationValue = null;
-					ResolutionResult result;
+                    ResolutionResult result;
 
 					try
 					{
@@ -105,16 +101,14 @@ namespace AutoMapper.Mappers
                     }
                     catch (Exception ex)
 					{
-						var errorContext = CreateErrorContext(context, propertyMap, destinationValue);
+						var errorContext = CreateErrorContext(context, propertyMap, null);
 						throw new AutoMapperMappingException(errorContext, ex);
 					}
 
-                    if (result.ShouldIgnore) return;
+                    if (result.ShouldIgnore) 
+                        return;
 
-					if (propertyMap.UseDestinationValue)
-					{
-						destinationValue = propertyMap.DestinationProperty.GetValue(mappedObject);
-					}
+					object destinationValue = propertyMap.DestinationProperty.GetValue(mappedObject);
 
 					var sourceType = result.Type;
 					var destinationType = propertyMap.DestinationProperty.MemberType;
@@ -126,7 +120,10 @@ namespace AutoMapper.Mappers
 					var newContext = context.CreateMemberContext(typeMap, result.Value, destinationValue, targetSourceType,
 																 propertyMap);
 
-					try
+                    if (!propertyMap.ShouldAssignValue(newContext))
+                        return;
+
+                    try
 					{
 						object propertyValueToAssign = mapper.Map(newContext);
 
