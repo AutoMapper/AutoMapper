@@ -10,7 +10,7 @@ namespace AutoMapper
 		private readonly Type _memberType;
 
 		public ResolutionResult(ResolutionContext context)
-			: this(context.SourceValue, context)
+			: this(context.SourceValue, context, context.SourceType)
 		{
 		}
 
