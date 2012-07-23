@@ -267,6 +267,13 @@ namespace AutoMapper
                         typeMap.AddInheritedPropertyMap(propertyMap);
                     }
                 }
+
+                //Include BeforeMap
+                if (inheritedTypeMap.BeforeMap != null)
+                    typeMap.AddBeforeMapAction(inheritedTypeMap.BeforeMap);
+                //Include AfterMap
+                if (inheritedTypeMap.AfterMap != null)
+                    typeMap.AddAfterMapAction(inheritedTypeMap.AfterMap);
             }
         }
 
