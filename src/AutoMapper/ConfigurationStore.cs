@@ -103,7 +103,7 @@ namespace AutoMapper
 			set { GetProfile(DefaultProfileName).SourceExtensionMethodSearch = value; }
 		}
 
-	    bool IProfileConfiguration.MapNullSourceValuesAsNull
+		bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{
 			get { return AllowNullDestinationValues; }
 		}
@@ -153,7 +153,7 @@ namespace AutoMapper
 	        GetProfile(DefaultProfileName).ConstructorMappingEnabled = false;
 	    }
 
-	    public void Seal()
+		public void Seal()
 		{
 			_typeMaps.Each(typeMap => typeMap.Seal());
 		}
@@ -283,6 +283,13 @@ namespace AutoMapper
                         typeMap.AddInheritedPropertyMap(propertyMap);
                     }
                 }
+
+                //Include BeforeMap
+                if (inheritedTypeMap.BeforeMap != null)
+                    typeMap.AddBeforeMapAction(inheritedTypeMap.BeforeMap);
+                //Include AfterMap
+                if (inheritedTypeMap.AfterMap != null)
+                    typeMap.AddAfterMapAction(inheritedTypeMap.AfterMap);
             }
         }
 

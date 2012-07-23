@@ -108,9 +108,9 @@
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
-    <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
     <Compile Include="Bug\ContextValuesIncorrect.cs" />
     <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
+    <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
@@ -166,6 +166,7 @@
     <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
     <Compile Include="MappingInheritance\OverrideIgnore.cs" />
     <Compile Include="MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs" />
+    <Compile Include="MappingInheritance\ShouldInheritBeforeAndAfterMap.cs" />
     <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
     <Compile Include="MappingOrder.cs" />
     <Compile Include="MaxDepthTests.cs" />

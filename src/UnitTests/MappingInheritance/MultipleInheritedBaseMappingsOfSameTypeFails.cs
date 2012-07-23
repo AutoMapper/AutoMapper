@@ -37,6 +37,4 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.AssertConfigurationIsValid();
         }
     }
-
-    
 }
