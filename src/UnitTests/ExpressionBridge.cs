@@ -37,6 +37,35 @@ namespace AutoMapper.UnitTests
         {
             public string Name { get; set; }
         }
+        public class AbstractProductDto
+        {
+            public string Name { set; get; }
+            public string ProductSubcategoryName { set; get; }
+            public string CategoryName { set; get; }
+            public List<ProductTypeDto> Types { get; set; }
+        }
+        public abstract class ProductTypeDto { }
+        public class ProdTypeA : ProductTypeDto {}
+        public class ProdTypeB : ProductTypeDto {}
+
+        public class ProductTypeConverter : TypeConverter<ProductType, ProductTypeDto>
+        {
+            protected override ProductTypeDto ConvertCore(ProductType source)
+            {
+                if (source.TypeName == "A")
+                    return new ProdTypeA();
+                if (source.TypeName == "B")
+                    return new ProdTypeB();
+                throw new ArgumentException();
+            }
+        }
+
+
+        public class ProductType
+        {
+            public string TypeName { get; set; }
+        }
+
         public class BillOfMaterialsDto
         {
             public int BillOfMaterialsID { set; get; }
@@ -47,6 +76,7 @@ namespace AutoMapper.UnitTests
             public string Name { get; set; }
             public ProductSubcategory ProductSubcategory { get; set; }
             public List<BillOfMaterials> BillOfMaterials { set; get; }
+            public List<ProductType> Types { get; set; }
         }
 
         public class ProductSubcategory
@@ -71,6 +101,7 @@ namespace AutoMapper.UnitTests
             private List<Product> _products;
             private Expression<Func<Product, SimpleProductDto>> _simpleProductConversionLinq;
             private Expression<Func<Product, ExtendedProductDto>> _extendedProductConversionLinq;
+            private Expression<Func<Product, AbstractProductDto>> _abstractProductConversionLinq;
             private List<SimpleProductDto> _simpleProducts;
             private List<ExtendedProductDto> _extendedProducts;
 
@@ -87,10 +118,15 @@ namespace AutoMapper.UnitTests
                     cfg.CreateMap<Product, ComplexProductDto>();
                     cfg.CreateMap<ProductSubcategory, ProductSubcategoryDto>();
                     cfg.CreateMap<ProductCategory, ProductCategoryDto>();
+                    cfg.CreateMap<Product, AbstractProductDto>();
+                    cfg.CreateMap<ProductType, ProductTypeDto>()
+                        //.ConvertUsing(x => ProductTypeDto.GetProdType(x));
+                        .ConvertUsing<ProductTypeConverter>();
                 });
 
                 _simpleProductConversionLinq = Mapper.CreateMapExpression<Product, SimpleProductDto>();
                 _extendedProductConversionLinq = Mapper.CreateMapExpression<Product, ExtendedProductDto>();
+                _abstractProductConversionLinq = Mapper.CreateMapExpression<Product, AbstractProductDto>();
 
                 _products = new List<Product>()
                 {
@@ -112,6 +148,13 @@ namespace AutoMapper.UnitTests
                                 BillOfMaterialsID = 5
                             }
                         }
+                        ,
+                        Types = new List<ProductType>
+                                    {
+                                        new ProductType() { TypeName = "A" },
+                                        new ProductType() { TypeName = "B" },
+                                        new ProductType() { TypeName = "A" }
+                                    }
                     }
                 };
             }
@@ -173,6 +216,22 @@ namespace AutoMapper.UnitTests
                 complexProducts[0].Name.ShouldEqual("Foo");
                 complexProducts[0].ProductSubcategory.Name.ShouldEqual("Bar");
                 complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
+            }
+
+            [Test]
+            public void List_of_abstract_should_be_mapped()
+            {
+                var mapped = Mapper.Map<AbstractProductDto>(_products[0]);
+                mapped.Types.Count.ShouldEqual(3);
+
+                var queryable = _products.AsQueryable();
+
+                var abstractProducts = queryable.Project().To<AbstractProductDto>().ToList();
+
+                abstractProducts[0].Types.Count.ShouldEqual(3);
+                abstractProducts[0].Types[0].GetType().ShouldEqual(typeof (ProdTypeA));
+                abstractProducts[0].Types[1].GetType().ShouldEqual(typeof (ProdTypeB));
+                abstractProducts[0].Types[2].GetType().ShouldEqual(typeof (ProdTypeA));
             }
         }
     }
