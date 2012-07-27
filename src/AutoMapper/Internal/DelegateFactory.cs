@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
 using System.Collections.Concurrent;
 #else
 using TvdP.Collections;
@@ -149,7 +149,7 @@ namespace AutoMapper
 
 	    private static DynamicMethod CreateValueTypeDynamicMethod(MemberInfo member, Type sourceType)
 	    {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
             if (sourceType.IsInterface)
                 return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, sourceType.Assembly.ManifestModule, true);
 
@@ -164,7 +164,7 @@ namespace AutoMapper
 
 	    private static DynamicMethod CreateDynamicMethod(MemberInfo member, Type sourceType)
 	    {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
 	        if (sourceType.IsInterface)
 	            return new DynamicMethod("Set" + member.Name, null, new[] { typeof(object), typeof(object) }, sourceType.Assembly.ManifestModule, true);
 

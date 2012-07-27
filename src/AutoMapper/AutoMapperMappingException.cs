@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AutoMapper
 {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
 	[Serializable]
 #endif
     public class AutoMapperMappingException : Exception
@@ -47,7 +47,7 @@ namespace AutoMapper
             Context = context;
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
 		protected AutoMapperMappingException(
 			SerializationInfo info,
 			StreamingContext context) : base(info, context)

@@ -33,7 +33,7 @@ namespace AutoMapper.Mappers
 
 		private static TypeConverter GetTypeConverter(Type type)
 		{
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
 			return TypeDescriptor.GetConverter(type);
 #else
 			var attributes = type.GetCustomAttributes(typeof(TypeConverterAttribute), false);

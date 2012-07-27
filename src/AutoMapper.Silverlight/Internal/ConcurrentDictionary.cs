@@ -55,13 +55,13 @@ namespace TvdP.Collections
     /// a set of items based on a hash of those items. The more segments there are and the beter the hash, the fewer collisions will occur.
     /// This means that a nearly empty ConcurrentDictionary is not as concurrent as one containing many items. 
     /// </remarks>
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
     [Serializable]
 #endif
     public class ConcurrentDictionary<TKey, TValue>
         : ConcurrentHashtable<KeyValuePair<TKey, TValue>?, ConcurrentDictionaryKey<TKey, TValue>>
             , IDictionary<TKey, TValue>, IDictionary
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
             , ISerializable 
 #endif
     {
@@ -90,7 +90,7 @@ namespace TvdP.Collections
             Initialize();
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
         ConcurrentDictionary(SerializationInfo serializationInfo, StreamingContext streamingContext)
         {
             _Comparer = (IEqualityComparer<TKey>)serializationInfo.GetValue("Comparer", typeof(IEqualityComparer<TKey>));
@@ -510,7 +510,7 @@ namespace TvdP.Collections
 
         #endregion
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
         #region ISerializable Members
 
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter=true)]

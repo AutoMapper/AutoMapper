@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
     {
         public static Func<IEnumerable<IObjectMapper>> AllMappers = () => new IObjectMapper[]
         {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
             new DataReaderMapper(),
 #endif
             new TypeMapMapper(TypeMapObjectMapperRegistry.AllMappers()),
@@ -16,11 +16,11 @@ namespace AutoMapper.Mappers
             new EnumMapper(),
             new ArrayMapper(),
 			new EnumerableToDictionaryMapper(),
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
             new NameValueCollectionMapper(), 
 #endif
             new DictionaryMapper(),
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !__ANDROID__
             new ListSourceMapper(),
 #endif
             new ReadOnlyCollectionMapper(), 
