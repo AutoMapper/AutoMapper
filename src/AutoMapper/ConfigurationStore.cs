@@ -1,6 +1,6 @@
 using System;
 
-#if !SILVERLIGHT && !MONODROID
+#if !SILVERLIGHT && !__ANDROID__
 using System.Collections.Concurrent;
 using System.Data;
 #else
@@ -495,7 +495,7 @@ namespace AutoMapper
 
 	    private static bool ShouldCheckMap(TypeMap typeMap)
 	    {
-#if !SILVERLIGHT && !MONODROID
+#if !SILVERLIGHT && !__ANDROID__
 	        return typeMap.CustomMapper == null && !typeof(IDataRecord).IsAssignableFrom(typeMap.SourceType);
 #else
             return typeMap.CustomMapper == null;

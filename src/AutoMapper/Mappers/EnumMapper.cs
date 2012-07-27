@@ -42,7 +42,7 @@ namespace AutoMapper.Mappers
 					return Enum.ToObject(enumDestinationType, context.SourceValue);
                 }
 
-#if !SILVERLIGHT && !MONODROID
+#if !SILVERLIGHT && !__ANDROID__
                 if (!Enum.GetNames(enumDestinationType).Contains(context.SourceValue.ToString()))
                 {
                     Type underlyingSourceType = Enum.GetUnderlyingType(enumSourceType);
