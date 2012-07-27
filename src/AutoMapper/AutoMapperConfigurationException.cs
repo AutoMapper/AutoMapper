@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AutoMapper
 {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !MONODROID
     [Serializable]
 #endif
     public class AutoMapperConfigurationException : Exception

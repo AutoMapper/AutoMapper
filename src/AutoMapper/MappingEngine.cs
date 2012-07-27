@@ -1,5 +1,5 @@
 using System;
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !MONODROID
 using System.Collections.Concurrent;
 #else
 using TvdP.Collections;

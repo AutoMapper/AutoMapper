@@ -1,5 +1,5 @@
 using System;
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !MONODROID && !MONODROID
 using System.Collections.Concurrent;
 #else
 using TvdP.Collections;
@@ -31,7 +31,7 @@ namespace AutoMapper
                 {
                     var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !MONODROID && !MONODROID
                     typeMap.AddPropertyMap(destPropertyAccessor, resolvers);
 #else
                     typeMap.AddPropertyMap(destPropertyAccessor, resolvers.Cast<IValueResolver>());
