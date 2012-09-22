@@ -119,6 +119,7 @@
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
+    <Compile Include="Bug\MemberNamedTypeBug.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
     <Compile Include="Bug\MultiThreadingIssues.cs" />

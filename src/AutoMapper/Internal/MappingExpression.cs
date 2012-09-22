@@ -45,8 +45,18 @@ namespace AutoMapper
 
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions)
         {
-            IMemberAccessor destProperty = new PropertyAccessor(_typeMap.DestinationType.GetProperty(name));
-            ForDestinationMember(destProperty, memberOptions);
+            IMemberAccessor destMember = null;
+            var propertyInfo = _typeMap.DestinationType.GetProperty(name);
+            if (propertyInfo != null)
+            {
+                destMember = new PropertyAccessor(propertyInfo);
+            }
+            if (destMember == null)
+            {
+                var fieldInfo = _typeMap.DestinationType.GetField(name);
+                destMember = new FieldAccessor(fieldInfo);
+            }
+            ForDestinationMember(destMember, memberOptions);
             return new MappingExpression(_typeMap, _typeConverterCtor);
         }
 
@@ -138,8 +148,18 @@ namespace AutoMapper
         public IMappingExpression<TSource, TDestination> ForMember(string name,
                                                                    Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            IMemberAccessor destProperty = new PropertyAccessor(typeof(TDestination).GetProperty(name));
-            ForDestinationMember(destProperty, memberOptions);
+            IMemberAccessor destMember = null;
+            var propertyInfo = _typeMap.DestinationType.GetProperty(name);
+            if (propertyInfo != null)
+            {
+                destMember = new PropertyAccessor(propertyInfo);
+            }
+            if (destMember == null)
+            {
+                var fieldInfo = _typeMap.DestinationType.GetField(name);
+                destMember = new FieldAccessor(fieldInfo);
+            }
+            ForDestinationMember(destMember, memberOptions);
             return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor, _configurationContainer);
         }
 
