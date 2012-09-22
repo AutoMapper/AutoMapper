@@ -53,14 +53,14 @@ namespace AutoMapper
                 {
                     var contextToUse = Context;
                     var message = string.Format("The following property on {0} cannot be mapped: \n\t{2}\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
-                        contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName, contextToUse.GetContextPropertyMap().DestinationProperty.Name);
+                        contextToUse.DestinationType.FullName, contextToUse.DestinationType.FullName, contextToUse.GetContextPropertyMap().DestinationProperty.Name);
 
                     message += "\nContext:";
 
                     while (contextToUse != null)
                     {
                         message += contextToUse.GetContextPropertyMap() == null
-                                    ? string.Format("\n\tMapping to type {0} from source type {1}", contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName)
+                                    ? string.Format("\n\tMapping f type {0} from source type {1}", contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName)
                                     : string.Format("\n\tMapping to property {0} of type {1} from source type {2}", contextToUse.GetContextPropertyMap().DestinationProperty.Name, contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName);
                         contextToUse = contextToUse.Parent;
                     }
