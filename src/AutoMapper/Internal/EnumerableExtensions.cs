@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AutoMapper
 {
-	internal static class EnumerableExtensions
+	public static class EnumerableExtensions
 	{
 		public static void Each<T>(this IEnumerable<T> items, Action<T> action)
 		{

@@ -1,12 +1,10 @@
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Internal;
 
-namespace AutoMapper
+namespace AutoMapper.Impl
 {
-	internal static class ReflectionHelper
+	public static class ReflectionHelper
 	{
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
         {

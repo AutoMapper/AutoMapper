@@ -2,7 +2,7 @@ using System;
 
 namespace AutoMapper
 {
-	internal class DelegateBasedResolver<TSource, TMember> : IMemberResolver
+	public class DelegateBasedResolver<TSource, TMember> : IMemberResolver
 	{
 		private readonly Func<TSource, TMember> _method;
 

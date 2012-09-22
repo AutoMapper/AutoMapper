@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AutoMapper
 {
-	internal static class PrimitiveExtensions
+	public static class PrimitiveExtensions
 	{
 		public static string ToNullSafeString(this object value)
 		{

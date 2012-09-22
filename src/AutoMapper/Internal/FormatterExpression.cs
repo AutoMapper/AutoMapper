@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-    internal class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IMappingOptions
+    public class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IMappingOptions
 	{
 		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
@@ -269,7 +269,7 @@ namespace AutoMapper
 		}
 	}
 
-	internal interface IFormatterCtorConfigurator
+    public interface IFormatterCtorConfigurator
 	{
 		void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator);
 	}

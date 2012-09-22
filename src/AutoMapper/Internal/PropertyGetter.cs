@@ -1,9 +1,10 @@
 using System;
 using System.Reflection;
+using AutoMapper;
 
-namespace AutoMapper.Internal
+namespace AutoMapper.Impl
 {
-	internal class PropertyGetter : MemberGetter
+	public class PropertyGetter : MemberGetter
 	{
 		private readonly PropertyInfo _propertyInfo;
 		private readonly string _name;
@@ -77,7 +78,7 @@ namespace AutoMapper.Internal
 		}
 	}
 
-	internal class PropertyAccessor : PropertyGetter, IMemberAccessor
+	public class PropertyAccessor : PropertyGetter, IMemberAccessor
 	{
 		private readonly LateBoundPropertySet _lateBoundPropertySet;
 		private readonly bool _hasSetter;
@@ -103,7 +104,7 @@ namespace AutoMapper.Internal
 		}
 	}
 
-	internal class ValueTypePropertyAccessor : PropertyGetter, IMemberAccessor
+	public class ValueTypePropertyAccessor : PropertyGetter, IMemberAccessor
 	{
 		private readonly MethodInfo _lateBoundPropertySet;
 		private readonly bool _hasSetter;

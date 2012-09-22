@@ -2,7 +2,7 @@ using System;
 
 namespace AutoMapper
 {
-	internal class FormatterCtorExpression : IFormatterCtorExpression
+	public class FormatterCtorExpression : IFormatterCtorExpression
 	{
 		private readonly Type _formatterType;
 		private readonly IFormatterCtorConfigurator _formatterCtorConfigurator;
@@ -19,7 +19,7 @@ namespace AutoMapper
 		}
 	}
 
-	internal class FormatterCtorExpression<TValueFormatter> : IFormatterCtorExpression<TValueFormatter>
+	public class FormatterCtorExpression<TValueFormatter> : IFormatterCtorExpression<TValueFormatter>
 		where TValueFormatter : IValueFormatter
 	{
 		private readonly IFormatterCtorConfigurator _formatterCtorConfigurator;

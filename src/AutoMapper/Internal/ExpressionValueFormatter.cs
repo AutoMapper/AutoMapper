@@ -2,7 +2,7 @@ using System;
 
 namespace AutoMapper
 {
-	internal class ExpressionValueFormatter : IValueFormatter
+	public class ExpressionValueFormatter : IValueFormatter
 	{
 		private readonly Func<ResolutionContext, string> _valueFormatterExpression;
 

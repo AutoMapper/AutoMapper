@@ -1,8 +1,8 @@
 using System;
 
-namespace AutoMapper.Internal
+namespace AutoMapper.Impl
 {
-    internal struct TypePair : IEquatable<TypePair>
+    public struct TypePair : IEquatable<TypePair>
     {
 
         public TypePair(Type sourceType, Type destinationType)

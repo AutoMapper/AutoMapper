@@ -1,9 +1,9 @@
 using System;
 using System.Reflection;
 
-namespace AutoMapper.Internal
+namespace AutoMapper.Impl
 {
-	internal abstract class MemberGetter : IMemberGetter
+    public abstract class MemberGetter : IMemberGetter
 	{
 		public abstract MemberInfo MemberInfo { get; }
 		public abstract string Name { get; }

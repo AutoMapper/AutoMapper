@@ -1,11 +1,11 @@
 using System;
 using System.Linq.Expressions;
-using AutoMapper.Internal;
+using AutoMapper.Impl;
 using System.Linq;
 
 namespace AutoMapper
 {
-    internal class MappingExpression : IMappingExpression, IMemberConfigurationExpression
+    public class MappingExpression : IMappingExpression, IMemberConfigurationExpression
     {
         private readonly TypeMap _typeMap;
         private readonly Func<Type, object> _typeConverterCtor;
@@ -107,7 +107,7 @@ namespace AutoMapper
         }
     }
 
-    internal class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
+    public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
     {
         private readonly TypeMap _typeMap;
         private readonly Func<Type, object> _serviceCtor;

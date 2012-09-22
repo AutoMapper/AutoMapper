@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace AutoMapper.Internal {
-	internal class PropertyEmitter {
+namespace AutoMapper.Impl {
+	public class PropertyEmitter {
 		private static readonly MethodInfo proxyBase_NotifyPropertyChanged = typeof(ProxyBase).GetMethod("NotifyPropertyChanged", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.Public, null, new[] {typeof(PropertyChangedEventHandler), typeof(string)}, null);
 
 		private readonly FieldBuilder fieldBuilder;

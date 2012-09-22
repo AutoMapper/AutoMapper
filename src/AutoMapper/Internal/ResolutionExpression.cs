@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
-	internal class ResolutionExpression<TSource> : IResolverConfigurationExpression<TSource>, IResolverConfigurationExpression
+	public class ResolutionExpression<TSource> : IResolverConfigurationExpression<TSource>, IResolverConfigurationExpression
 	{
 	    private readonly Type _sourceType;
 	    private readonly PropertyMap _propertyMap;
@@ -44,12 +44,12 @@ namespace AutoMapper
 		}
 	}
 
-    internal class ResolutionExpression : ResolutionExpression<object>
+    public class ResolutionExpression : ResolutionExpression<object>
     {
         public ResolutionExpression(Type sourceType, PropertyMap propertyMap) : base(sourceType, propertyMap) {}
     }
 
-	internal class ResolutionExpression<TSource, TValueResolver> : IResolverConfigurationExpression<TSource, TValueResolver>
+	public class ResolutionExpression<TSource, TValueResolver> : IResolverConfigurationExpression<TSource, TValueResolver>
 		where TValueResolver : IValueResolver
 	{
 		private readonly PropertyMap _propertyMap;

@@ -10,7 +10,7 @@ using TvdP.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AutoMapper.Internal;
+using AutoMapper.Impl;
 using AutoMapper.Mappers;
 
 namespace AutoMapper

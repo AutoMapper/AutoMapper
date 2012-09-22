@@ -1,9 +1,10 @@
 using System;
 using System.Reflection;
+using AutoMapper;
 
-namespace AutoMapper.Internal
+namespace AutoMapper.Impl
 {
-	internal class FieldGetter : MemberGetter
+	public class FieldGetter : MemberGetter
 	{
 		private readonly FieldInfo _fieldInfo;
 		private readonly string _name;
@@ -74,7 +75,7 @@ namespace AutoMapper.Internal
 		}
 	}
 
-	internal class FieldAccessor : FieldGetter, IMemberAccessor
+	public class FieldAccessor : FieldGetter, IMemberAccessor
 	{
 		private readonly LateBoundFieldSet _lateBoundFieldSet;
 
@@ -90,7 +91,7 @@ namespace AutoMapper.Internal
 		}
 	}
 
-	internal class ValueTypeFieldAccessor : FieldGetter, IMemberAccessor
+	public class ValueTypeFieldAccessor : FieldGetter, IMemberAccessor
 	{
 		private readonly FieldInfo _lateBoundFieldSet;
 

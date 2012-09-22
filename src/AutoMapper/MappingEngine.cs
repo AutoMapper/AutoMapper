@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Internal;
+using AutoMapper.Impl;
 using AutoMapper.Mappers;
 using System.Collections;
 

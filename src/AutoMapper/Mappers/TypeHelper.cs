@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AutoMapper.Mappers
 {
-	internal static class TypeHelper
+    public static class TypeHelper
 	{
 		public static Type GetElementType(Type enumerableType)
 		{

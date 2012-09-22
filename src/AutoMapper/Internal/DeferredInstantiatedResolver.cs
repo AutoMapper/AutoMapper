@@ -2,7 +2,7 @@ using System;
 
 namespace AutoMapper
 {
-	internal class DeferredInstantiatedResolver : IValueResolver
+	public class DeferredInstantiatedResolver : IValueResolver
 	{
         private readonly Func<ResolutionContext, IValueResolver> _constructor;
 

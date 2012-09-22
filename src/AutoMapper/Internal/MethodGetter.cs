@@ -1,9 +1,10 @@
 using System;
 using System.Reflection;
+using AutoMapper;
 
-namespace AutoMapper.Internal
+namespace AutoMapper.Impl
 {
-	internal class MethodGetter : MemberGetter
+	public class MethodGetter : MemberGetter
 	{
 		private readonly MethodInfo _methodInfo;
 		private readonly string _name;

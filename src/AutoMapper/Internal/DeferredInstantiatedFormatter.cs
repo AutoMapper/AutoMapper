@@ -2,7 +2,7 @@ using System;
 
 namespace AutoMapper
 {
-	internal class DeferredInstantiatedFormatter : IValueFormatter
+	public class DeferredInstantiatedFormatter : IValueFormatter
 	{
         private readonly Func<ResolutionContext, IValueFormatter> _instantiator;
 

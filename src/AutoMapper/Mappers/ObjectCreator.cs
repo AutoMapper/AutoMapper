@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AutoMapper.Mappers
 {
-	internal static class ObjectCreator
+    public static class ObjectCreator
 	{
 		public static Array CreateArray(Type elementType, int length)
 		{
