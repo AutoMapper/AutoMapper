@@ -7,6 +7,7 @@ namespace AutoMapper
     {
         void ConvertUsing<TTypeConverter>();
         void ConvertUsing(Type typeConverterType);
+        void As(Type typeOverride);
         IMappingExpression WithProfile(string profileName);
         IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions);
     }

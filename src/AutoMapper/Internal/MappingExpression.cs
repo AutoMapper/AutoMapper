@@ -31,6 +31,11 @@ namespace AutoMapper
             _typeMap.UseCustomMapper(converter.Convert);
         }
 
+        public void As(Type typeOverride)
+        {
+            _typeMap.DestinationTypeOverride = typeOverride;
+        }
+
         public IMappingExpression WithProfile(string profileName)
         {
             _typeMap.Profile = profileName;
