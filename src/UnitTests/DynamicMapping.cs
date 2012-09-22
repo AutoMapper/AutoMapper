@@ -35,6 +35,58 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+        public class When_mapping_two_non_configured_types_with_nesting : AutoMapperSpecBase
+        {
+            private Destination _resultWithGenerics;
+
+            public class Source
+            {
+                public int Value { get; set; }
+                public ChildSource Child { get; set; }
+            }
+
+            public class ChildSource
+            {
+                public string Value2 { get; set; }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+                public ChildDestination Child { get; set; }
+            }
+
+            public class ChildDestination
+            {
+                public string Value2 { get; set; }
+            }
+
+            protected override void Because_of()
+            {
+                var source = new Source
+                {
+                    Value = 5,
+                    Child = new ChildSource
+                    {
+                        Value2 = "foo"
+                    }
+                };
+                _resultWithGenerics = Mapper.DynamicMap<Source, Destination>(source);
+            }
+
+            [Test]
+            public void Should_dynamically_map_the_two_types()
+            {
+                _resultWithGenerics.Value.ShouldEqual(5);
+            }
+
+            [Test]
+            public void Should_dynamically_map_the_children()
+            {
+                _resultWithGenerics.Child.Value2.ShouldEqual("foo");
+            }
+        }
+
 		public class When_mapping_two_non_configured_types_that_do_not_match : NonValidatingSpecBase
 		{
 			public class Source

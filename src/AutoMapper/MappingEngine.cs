@@ -167,7 +167,10 @@ namespace AutoMapper
 			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
-			var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions());
+			var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions
+			{
+			    CreateMissingTypeMaps = true
+			});
 
 			return ((IMappingEngineRunner)this).Map(context);
 		}
@@ -177,7 +180,10 @@ namespace AutoMapper
 			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
-			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions());
+			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions
+			{
+			    CreateMissingTypeMaps = true
+			});
 
 			((IMappingEngineRunner)this).Map(context);
 		}
@@ -330,10 +336,21 @@ namespace AutoMapper
 
 				if (mapperToUse == null)
 				{
-                    if (context.SourceValue != null)
-					    throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
+                    if (context.Options.CreateMissingTypeMaps)
+                    {
+                        var typeMap = ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType);
 
-				    return ObjectCreator.CreateDefaultValue(context.DestinationType);
+                        context = context.CreateTypeContext(typeMap, context.SourceValue, context.SourceType, context.DestinationType);
+
+                        mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
+                    }
+                    else
+                    {
+                        if (context.SourceValue != null)
+                            throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
+
+                        return ObjectCreator.CreateDefaultValue(context.DestinationType);
+                    }
 				}
 
 				return mapperToUse.Map(context, this);
