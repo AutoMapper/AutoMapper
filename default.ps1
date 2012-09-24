@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$version = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.1.0' }
+	$version = if ($env:build_number -ne $NULL) { $env:build_number } else { '3.0.0' }
 	$buildNumber = $version + '.0'
 	$global:config = "debug"
 	$framework_dir = Get-FrameworkDirectory
