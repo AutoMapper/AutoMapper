@@ -90,6 +90,7 @@
     <Compile Include="Mappers\Dictionaries.cs" />
     <Compile Include="Mappers\Enumerations.cs" />
     <Compile Include="Mappers\IListSources.cs" />
+    <Compile Include="Mappers\LINQ.cs" />
     <Compile Include="Mappers\Lists.cs" />
     <Compile Include="Mappers\Arrays.cs" />
     <Compile Include="Mappers\Strings.cs" />

@@ -245,9 +245,9 @@ namespace AutoMapper
                         currentChild = converter.Visit(((LambdaExpression)propertyMap.CustomExpression).Body);
                         var propertyInfo = propertyMap.SourceMember as PropertyInfo;
                         if (propertyInfo != null)
-                        {
                             currentChildType = propertyInfo.PropertyType;
-                        }
+                        else
+                            currentChildType = currentChild.Type;
                     }
                 }
 
@@ -260,32 +260,46 @@ namespace AutoMapper
                     prop.PropertyType != typeof(string))
                 {
 
-                    Type destinationListType = prop.PropertyType.GetGenericArguments().First();
+                    Type destinationListType = prop.PropertyType.GetGenericArguments().FirstOrDefault() ?? prop.PropertyType.GetElementType();
                     Type sourceListType = null;
                     // is list
 
                     sourceListType = currentChildType.GetGenericArguments().First();
 
-                    //var newVariableName = "t" + (i++);
-                    var transformedExpression = CreateMapExpression(sourceListType, destinationListType);
+                    var selectExpression = currentChild;
 
-                    MethodCallExpression selectExpression = Expression.Call(
-                                typeof(Enumerable),
-                                "Select",
-                                new[] { sourceListType, destinationListType },
-                                currentChild,
-                                transformedExpression);
-
-                    if (typeof(IList).IsAssignableFrom(prop.PropertyType))
+                    // Transform the child expression, if the sourcen and destination list types differ
+                    if (sourceListType != destinationListType)
                     {
+                        var transformedExpression = CreateMapExpression(sourceListType, destinationListType);
+                        selectExpression = Expression.Call(
+                            typeof (Enumerable),
+                            "Select",
+                            new[] {sourceListType, destinationListType},
+                            currentChild,
+                            transformedExpression);
+                    }
+
+
+                    if (prop.PropertyType.IsSubclassOf(typeof(IList)))
+                    {
+                        // Call .ToList() on IEnumerable
                         MethodCallExpression toListCallExpression = Expression.Call(
                             typeof(Enumerable),
                             "ToList",
                             new Type[] { destinationListType },
                             selectExpression);
-
-                        // todo .ToArray()
                         bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+                    }
+                    else if (prop.PropertyType.IsArray)
+                    {
+                        // Call .ToArray() on IEnumerable
+                        MethodCallExpression toArrayCallExpression = Expression.Call(
+                           typeof(Enumerable),
+                           "ToArray",
+                           new Type[] { destinationListType },
+                           selectExpression);
+                        bindings.Add(Expression.Bind(destinationMember, toArrayCallExpression));
                     }
                     else
                     {
