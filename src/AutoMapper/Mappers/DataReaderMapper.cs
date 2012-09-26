@@ -21,7 +21,7 @@ namespace AutoMapper.Mappers
                 if (context.TypeMap == null)
                 {
                     var configurationProvider = mapper.ConfigurationProvider;
-                    TypeMap typeMap = configurationProvider.FindTypeMapFor(context.SourceValue, context.SourceType, destinationElementType);
+                    TypeMap typeMap = configurationProvider.FindTypeMapFor(context.SourceValue, null, context.SourceType, destinationElementType);
                     resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType, new MappingOperationOptions());
                 }
 				var buildFrom = CreateBuilder(destinationElementType, dataReader);

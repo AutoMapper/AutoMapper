@@ -330,10 +330,10 @@ namespace AutoMapper
 
 		public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
 		{
-			return FindTypeMapFor( null, sourceType, destinationType ) ;
+			return FindTypeMapFor( null, null, sourceType, destinationType ) ;
 		}
 
-		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
+		public TypeMap FindTypeMapFor(object source, object destination, Type sourceType, Type destinationType)
 		{
 			var typeMapPair = new TypePair(sourceType, destinationType);
 			
@@ -342,7 +342,7 @@ namespace AutoMapper
             if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
             {
                 // Cache miss
-                typeMap = FindTypeMap(source, sourceType, destinationType, DefaultProfileName);
+                typeMap = FindTypeMap(source, destination, sourceType, destinationType, DefaultProfileName);
 
                 //We don't want to inherit base mappings which may be ambiguous or too specific resulting in cast exceptions
                 if (source == null || source.GetType() == sourceType)
@@ -351,12 +351,16 @@ namespace AutoMapper
             // Due to the inheritance we can have derrived mapping cached which is not valid for this source object
             else if (source != null && typeMap != null && !typeMap.SourceType.IsAssignableFrom(source.GetType()))
             {
-                typeMap = FindTypeMapFor(source, source.GetType(), destinationType);
+                typeMap = FindTypeMapFor(source, destination, source.GetType(), destinationType);
             }
 
+            if (typeMap == null && destination != null && destination.GetType() != destinationType)
+            {
+                typeMap = FindTypeMapFor(source, destination, sourceType, destination.GetType());
+            }
             if (typeMap != null && typeMap.DestinationTypeOverride != null)
             {
-                return FindTypeMapFor(source, sourceType, typeMap.DestinationTypeOverride);
+                return FindTypeMapFor(source, destination, sourceType, typeMap.DestinationTypeOverride);
             }
             // Check for runtime derived types
 		    var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null) && (source.GetType() != sourceType);
@@ -401,7 +405,7 @@ namespace AutoMapper
                 if (potentialTypeMap == null)
                 {
                     var targetSourceType = targetDestinationType != destinationType ? potentialSourceType : typeMap.SourceType;
-                    typeMap = FindTypeMap(source, targetSourceType, targetDestinationType, DefaultProfileName);
+                    typeMap = FindTypeMap(source, destination, targetSourceType, targetDestinationType, DefaultProfileName);
                 }
                 else
                     typeMap = potentialTypeMap;
@@ -429,8 +433,8 @@ namespace AutoMapper
 
 		public TypeMap FindTypeMapFor(ResolutionResult resolutionResult, Type destinationType)
 		{
-			return FindTypeMapFor(resolutionResult.Value, resolutionResult.Type, destinationType) ??
-			       FindTypeMapFor(resolutionResult.Value, resolutionResult.MemberType, destinationType);
+			return FindTypeMapFor(resolutionResult.Value, null, resolutionResult.Type, destinationType) ??
+			       FindTypeMapFor(resolutionResult.Value, null, resolutionResult.MemberType, destinationType);
 		}
 
 		public IFormatterConfiguration GetProfileConfiguration(string profileName)
@@ -525,7 +529,7 @@ namespace AutoMapper
 #endif
 	    }
 
-	    private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType, string profileName)
+	    private TypeMap FindTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
         {
             TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType);
 
@@ -542,7 +546,7 @@ namespace AutoMapper
                 {
                     foreach (var sourceInterface in sourceType.GetInterfaces())
                     {
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, sourceInterface, destinationType);
+                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceInterface, destinationType);
 
                         if (typeMap == null) continue;
 
@@ -556,7 +560,7 @@ namespace AutoMapper
                     }
 
                     if ((sourceType.BaseType != null) && (typeMap == null))
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, sourceType.BaseType, destinationType);
+                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceType.BaseType, destinationType);
                 }
             }
             return typeMap;
@@ -600,7 +604,7 @@ namespace AutoMapper
 						{
 							var sourceType = lastResolver.MemberType;
 							var destinationType = propertyMap.DestinationProperty.MemberType;
-							var memberTypeMap = ((IConfigurationProvider)this).FindTypeMapFor(null, sourceType, destinationType);
+							var memberTypeMap = ((IConfigurationProvider)this).FindTypeMapFor(sourceType, destinationType);
 
                             if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
                                 continue;
@@ -616,7 +620,7 @@ namespace AutoMapper
 			{
 				Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
 				Type destElementType = TypeHelper.GetElementType(context.DestinationType);
-				TypeMap itemTypeMap = ((IConfigurationProvider) this).FindTypeMapFor(null, sourceElementType, destElementType);
+				TypeMap itemTypeMap = ((IConfigurationProvider) this).FindTypeMapFor(sourceElementType, destElementType);
 
                 if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
                     return;
