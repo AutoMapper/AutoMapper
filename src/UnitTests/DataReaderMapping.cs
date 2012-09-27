@@ -18,7 +18,8 @@ namespace AutoMapper.UnitTests
                     .ForMember(dest => dest.Else, options => options.MapFrom(src => src.GetDateTime(10)));
 
                 _dataReader = new DataBuilder().BuildDataReader();
-                _result = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader).FirstOrDefault();
+                _results = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader); 
+                _result = _results.FirstOrDefault();
             }
 
             [Test]
@@ -87,8 +88,8 @@ namespace AutoMapper.UnitTests
                 Assert.That(_result.Else, Is.EqualTo(_dataReader.GetDateTime(10)));
             }
 
-
             protected DTOObject _result;
+            protected IEnumerable<DTOObject> _results;
             protected IDataReader _dataReader;
         }
 
@@ -102,7 +103,32 @@ namespace AutoMapper.UnitTests
                 base.Establish_context();
 
                 _dataReader = new DataBuilder().BuildDataReader();
-                _result = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader).FirstOrDefault();
+                _results = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader);
+                _result = _results.FirstOrDefault();
+            }
+        }
+
+        public class When_mapping_a_data_reader_using_the_default_coniguration : When_mapping_a_data_reader_to_a_dto
+        {
+            [Test]
+            public void Then_the_enumerable_should_be_a_list()
+            {
+                Assert.That(_results, Is.InstanceOfType(typeof(IList<DTOObject>)));
+            }
+        }
+
+        public class When_mapping_a_data_reader_using_the_yield_return_option : When_mapping_a_data_reader_to_a_dto
+        {
+            protected override void Establish_context()
+            {
+                Mapper.Configuration.EnableYieldReturnForDataReaderMapper();
+                base.Establish_context();
+            }
+
+            [Test]
+            public void Then_the_enumerable_should_not_be_a_list()
+            {
+                Assert.That(_results, Is.Not.InstanceOfType(typeof(IList<DTOObject>)));
             }
         }
 

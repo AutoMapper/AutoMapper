@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Should;
-using NUnit.Framework;
 using System.Linq;
-using Rhino.Mocks;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using NUnit.Framework;
+using Rhino.Mocks;
+using Should;
 
 namespace AutoMapper.UnitTests.Tests
 {
@@ -69,7 +68,12 @@ namespace AutoMapper.UnitTests.Tests
             get { return true; }
         }
 
-		public Assembly[] SourceExtensionMethodSearch
+        public bool DataReaderMapperYieldReturnEnabled
+        {
+            get { return false; }
+        }
+
+        public Assembly[] SourceExtensionMethodSearch
 		{
 			get { return _sourceExtensionMethodSearch; }
 			set { _sourceExtensionMethodSearch = value; }

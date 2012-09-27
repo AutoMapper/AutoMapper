@@ -20,7 +20,8 @@ namespace AutoMapper
 	    IEnumerable<string> DestinationPostfixes { get; }
 	    IEnumerable<AliasedMember> Aliases { get; }
 	    bool ConstructorMappingEnabled { get; }
-		Assembly[] SourceExtensionMethodSearch { get; set; }
+	    bool DataReaderMapperYieldReturnEnabled { get; }
+	    Assembly[] SourceExtensionMethodSearch { get; set; }
 	}
 
 	public class PascalCaseNamingConvention : INamingConvention
