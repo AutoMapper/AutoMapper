@@ -97,7 +97,12 @@ namespace AutoMapper
 	        get { return GetProfile(DefaultProfileName).ConstructorMappingEnabled; }
 	    }
 
-		public Assembly[] SourceExtensionMethodSearch
+	    public bool DataReaderMapperYieldReturnEnabled
+	    {
+            get { return GetProfile(DefaultProfileName).DataReaderMapperYieldReturnEnabled; }
+	    }
+
+	    public Assembly[] SourceExtensionMethodSearch
 		{
 			get { return GetProfile(DefaultProfileName).SourceExtensionMethodSearch; }
 			set { GetProfile(DefaultProfileName).SourceExtensionMethodSearch = value; }
@@ -153,7 +158,12 @@ namespace AutoMapper
 	        GetProfile(DefaultProfileName).ConstructorMappingEnabled = false;
 	    }
 
-		public void Seal()
+	    public void EnableYieldReturnForDataReaderMapper()
+	    {
+	        GetProfile(DefaultProfileName).DataReaderMapperYieldReturnEnabled = true;
+	    }
+
+	    public void Seal()
 		{
 			_typeMaps.Each(typeMap => typeMap.Seal());
 		}

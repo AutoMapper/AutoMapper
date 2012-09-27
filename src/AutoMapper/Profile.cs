@@ -74,7 +74,12 @@ namespace AutoMapper
 	        get { return _configurator.ConstructorMappingEnabled; }
 	    }
 
-		public Assembly[] SourceExtensionMethodSearch
+	    public bool DataReaderMapperYieldReturnEnabled
+	    {
+            get { return _configurator.DataReaderMapperYieldReturnEnabled; }
+	    }
+
+	    public Assembly[] SourceExtensionMethodSearch
 		{
 			get { return GetProfile().SourceExtensionMethodSearch; }
 			set { GetProfile().SourceExtensionMethodSearch = value; }

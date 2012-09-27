@@ -1,57 +1,94 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 
 namespace AutoMapper.Mappers
 {
-	public class DataReaderMapper : IObjectMapper
+    public class DataReaderMapper : IObjectMapper
 	{
 		private static ConcurrentDictionary<BuilderKey, Build> _builderCache = new ConcurrentDictionary<BuilderKey, Build>();
+        private static ConcurrentDictionary<Type, CreateEnumerableAdapter> _enumerableAdapterCache = new ConcurrentDictionary<Type, CreateEnumerableAdapter>();
 
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
 			if (IsDataReader(context))
 			{
-				var dataReader = (IDataReader)context.SourceValue;
+			    var useYieldReturn = ((IConfiguration)mapper.ConfigurationProvider).DataReaderMapperYieldReturnEnabled;
                 var destinationElementType = TypeHelper.GetElementType(context.DestinationType);
-			    var resolveUsingContext = context;
-                if (context.TypeMap == null)
+			    var results = MapDataReaderToEnumerable(context, mapper, destinationElementType, useYieldReturn);
+
+                if (useYieldReturn)
                 {
-                    var configurationProvider = mapper.ConfigurationProvider;
-                    TypeMap typeMap = configurationProvider.FindTypeMapFor(context.SourceValue, context.SourceType, destinationElementType);
-                    resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType, new MappingOperationOptions());
-                }
-				var buildFrom = CreateBuilder(destinationElementType, dataReader);
-
-				var results = ObjectCreator.CreateList(destinationElementType);
-				while (dataReader.Read())
-				{
-                    var result = buildFrom(dataReader);
-                    MapPropertyValues(resolveUsingContext, mapper, result);
-                    results.Add(result);
+                    var adapterBuilder = GetDelegateToCreateEnumerableAdapter(destinationElementType);
+                    return adapterBuilder(results);
                 }
 
-				return results;
+			    return results;
 			}
 			
 			if (IsDataRecord(context))
 			{
 				var dataRecord = context.SourceValue as IDataRecord;
 				var buildFrom = CreateBuilder(context.DestinationType, dataRecord);
-
 				var result = buildFrom(dataRecord);
                 MapPropertyValues(context, mapper, result);
-
 				return result;
 			}
 
 			return null;
 		}
 
-		public bool IsMatch(ResolutionContext context)
+	    static IEnumerable MapDataReaderToEnumerable(ResolutionContext context, IMappingEngineRunner mapper, Type destinationElementType, bool useYieldReturn)
+	    {
+	        var dataReader = (IDataReader) context.SourceValue;
+	        var resolveUsingContext = context;
+	        
+            if (context.TypeMap == null)
+	        {
+	            var configurationProvider = mapper.ConfigurationProvider;
+	            var typeMap = configurationProvider.FindTypeMapFor(context.SourceValue, context.SourceType, destinationElementType);
+	            resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType, new MappingOperationOptions());
+	        }
+	        
+            var buildFrom = CreateBuilder(destinationElementType, dataReader);
+	        
+            if (useYieldReturn)
+                return LoadDataReaderViaYieldReturn(dataReader, mapper, buildFrom, resolveUsingContext);
+
+	        return LoadDataReaderViaList(dataReader, mapper, buildFrom, resolveUsingContext, destinationElementType);
+	    }
+
+        static IEnumerable LoadDataReaderViaList(IDataReader dataReader, IMappingEngineRunner mapper, Build buildFrom, ResolutionContext resolveUsingContext, Type elementType)
+        {
+            var list = ObjectCreator.CreateList(elementType);
+
+            while (dataReader.Read())
+            {
+                var result = buildFrom(dataReader);
+                MapPropertyValues(resolveUsingContext, mapper, result);
+                list.Add(result);
+            }
+
+            return list;
+        }
+
+        static IEnumerable LoadDataReaderViaYieldReturn(IDataReader dataReader, IMappingEngineRunner mapper, Build buildFrom, ResolutionContext resolveUsingContext)
+        {
+            while (dataReader.Read())
+            {
+                var result = buildFrom(dataReader);
+                MapPropertyValues(resolveUsingContext, mapper, result);
+                yield return result;
+            }
+        }
+
+        public bool IsMatch(ResolutionContext context)
 		{
 			return IsDataReader(context) || IsDataRecord(context);
 		}
@@ -171,14 +208,29 @@ namespace AutoMapper.Mappers
 			}
 		}
 
-		private delegate object Build(IDataRecord dataRecord);
+        private static CreateEnumerableAdapter GetDelegateToCreateEnumerableAdapter(Type elementType)
+        {
+            CreateEnumerableAdapter builder;
+            if (_enumerableAdapterCache.TryGetValue(elementType, out builder))
+			{
+				return builder;
+			}
 
-		private static readonly MethodInfo parseMethod =
-			typeof(Enum).GetMethod("get_Item", new[] { typeof(int) });
-		private static readonly MethodInfo getValueMethod =
-			typeof(IDataRecord).GetMethod("get_Item", new[] { typeof(int) });
-		private static readonly MethodInfo isDBNullMethod =
-			typeof(IDataRecord).GetMethod("IsDBNull", new[] { typeof(int) });
+            var adapterType = typeof(EnumerableAdapter<>).MakeGenericType(elementType);
+            var adapterCtor = adapterType.GetConstructor(new[] {typeof(IEnumerable)});
+            var adapterCtorArg = Expression.Parameter(typeof(IEnumerable), "items");
+            var adapterCtorExpression = Expression.New(adapterCtor, adapterCtorArg);
+            builder = (CreateEnumerableAdapter)Expression.Lambda(typeof (CreateEnumerableAdapter), adapterCtorExpression, adapterCtorArg).Compile();
+
+            _enumerableAdapterCache[elementType] = builder;
+            return builder;
+        }
+
+		private delegate object Build(IDataRecord dataRecord);
+        private delegate object CreateEnumerableAdapter(IEnumerable items);
+
+        private static readonly MethodInfo getValueMethod = typeof(IDataRecord).GetMethod("get_Item", new[] { typeof(int) });
+		private static readonly MethodInfo isDBNullMethod = typeof(IDataRecord).GetMethod("IsDBNull", new[] { typeof(int) });
 
 		private class BuilderKey
 		{
@@ -222,5 +274,25 @@ namespace AutoMapper.Mappers
 				return true;
 			}
 		}
+
+        private class EnumerableAdapter<Item> : IEnumerable<Item>
+        {
+            IEnumerable<Item> _items;
+
+            public EnumerableAdapter(IEnumerable items)
+            {
+                _items = items.Cast<Item>();
+            }
+
+            public IEnumerator<Item> GetEnumerator()
+            {
+                return _items.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+        }
 	}
 }
