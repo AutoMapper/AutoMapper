@@ -146,6 +146,8 @@ function global:create-nuspec($version, $fileName)
 	</dependencies>
   </metadata>
   <files>
+    <file src=""README.md"" target=""content\net35"" />
+    <file src=""README.md"" target=""content\sl40"" />
     <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40"" />
     <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40"" />
     <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40"" />
