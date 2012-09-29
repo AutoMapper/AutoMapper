@@ -136,18 +136,8 @@ function global:create-nuspec($version, $fileName)
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A convention-based object-object mapper</summary>
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
-	<dependencies>
-		<group targetFramework=""net35"">
-			<dependency id=""AutoMapper.NET35"" version=""1.1.0.118"" />
-		</group>
-		<group targetFramework=""sl4"">
-			<dependency id=""AutoMapper.Silverlight"" version=""2.1.267"" />
-		</group>
-	</dependencies>
   </metadata>
   <files>
-    <file src=""README.md"" target=""content\net35"" />
-    <file src=""README.md"" target=""content\sl40"" />
     <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40"" />
     <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40"" />
     <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40"" />
