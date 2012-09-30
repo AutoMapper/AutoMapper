@@ -416,7 +416,7 @@ namespace AutoMapper
 
         bool IMappingEngineRunner.ShouldMapSourceValueAsNull(ResolutionContext context)
 		{
-            if (context.DestinationType.IsValueType)
+            if (context.DestinationType.IsValueType && !context.DestinationType.IsNullableType())
                 return false;
 
 			var typeMap = context.GetContextTypeMap();
