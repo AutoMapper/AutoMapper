@@ -35,6 +35,9 @@ namespace AutoMapper.Mappers
             {
                 if (context.SourceValue == null)
                 {
+                    if (mapper.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
+                        return null;
+
                     return mapper.CreateObject(context);
                 }
 

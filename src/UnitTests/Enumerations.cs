@@ -141,6 +141,30 @@ namespace AutoMapper.Tests
 		}
 
 		[Test]
+		public void ShouldMapNullableEnumToNullWhenSourceEnumIsNullAndDestinationWasNotNull() 
+		{
+            Mapper.Initialize(cfg =>
+            {
+                cfg.AllowNullDestinationValues = true;
+                cfg.CreateMap<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>();
+            });
+
+			var dto = new OrderDtoWithOwnNullableStatus()
+			{
+				Status = StatusForDto.Complete
+			};
+
+			var order = new OrderWithNullableStatus
+			{
+				Status = null
+			};
+
+			Mapper.Map(order, dto);
+
+			dto.Status.ShouldBeNull();
+		}
+
+		[Test]
 		public void ShouldMapNullableEnumToNullWhenSourceEnumIsNull() 
 		{
 			Mapper.CreateMap<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>();
