@@ -91,6 +91,7 @@ namespace AutoMapper.Mappers
                 {
                     ResolutionResult result;
 
+                    Exception resolvingExc = null;
 					try
 					{
 						result = propertyMap.ResolveValue(context);
@@ -102,7 +103,9 @@ namespace AutoMapper.Mappers
                     catch (Exception ex)
 					{
 						var errorContext = CreateErrorContext(context, propertyMap, null);
-						throw new AutoMapperMappingException(errorContext, ex);
+						resolvingExc = new AutoMapperMappingException(errorContext, ex);
+
+                        result = new ResolutionResult(context);
 					}
 
                     if (result.ShouldIgnore) 
@@ -122,6 +125,10 @@ namespace AutoMapper.Mappers
 
                     if (!propertyMap.ShouldAssignValue(newContext))
                         return;
+
+                    // If condition succeeded and resolving failed, throw
+                    if (resolvingExc != null)
+                        throw resolvingExc;
 
                     try
 					{
