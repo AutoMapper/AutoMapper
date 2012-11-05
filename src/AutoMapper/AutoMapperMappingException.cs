@@ -68,17 +68,17 @@ namespace AutoMapper
             get
             {
                 string message = null;
+                var newLine = Environment.NewLine;
                 if (Context != null)
                 {
-
-                    message = _message + "\n\nMapping types:";
-                    message += Environment.NewLine + string.Format("{0} -> {1}", Context.SourceType.Name, Context.DestinationType.Name);
-                    message += Environment.NewLine + string.Format("{0} -> {1}", Context.SourceType.FullName, Context.DestinationType.FullName);
+                    message = _message + newLine + newLine + "Mapping types:";
+                    message += newLine + string.Format("{0} -> {1}", Context.SourceType.Name, Context.DestinationType.Name);
+                    message += newLine + string.Format("{0} -> {1}", Context.SourceType.FullName, Context.DestinationType.FullName);
 
                     var destPath = GetDestPath(Context);
-                    message += "\n\nDestination path:\n" + destPath;
+                    message += newLine + newLine + "Destination path:" + newLine + destPath;
 
-                    message += "\n\nSource value:\n" + (Context.SourceValue ?? "(null)");
+                    message += newLine + newLine + "Source value:" + newLine + (Context.SourceValue ?? "(null)");
 
                     return message;
                 }
@@ -87,7 +87,7 @@ namespace AutoMapper
                     message = _message;
                 }
 
-                message = (message == null ? null : message + "\n") + base.Message;
+                message = (message == null ? null : message + newLine) + base.Message;
 
                 return message;
             }
