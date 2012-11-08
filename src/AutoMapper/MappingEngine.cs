@@ -210,6 +210,8 @@ namespace AutoMapper
             Type typeIn, Type typeOut)
         {
             var typeMap = ConfigurationProvider.FindTypeMapFor(typeIn, typeOut);
+            if (typeMap == null)
+                throw new ArgumentException(string.Format("Type map for converting from \"{0}\" to \"{1}\" was not found. Please use Mapper.CreateMap<{0}, {1}>() to register a type map.", typeIn.Name, typeOut.Name));
 
             // this is the input parameter of this expression with name <variableName>
             ParameterExpression instanceParameter = Expression.Parameter(typeIn);
@@ -238,11 +240,10 @@ namespace AutoMapper
                     }
                     else
                     {
-                        var oldParameter =
-                            ((LambdaExpression)propertyMap.CustomExpression).Parameters.Single();
+                        var oldParameter = propertyMap.CustomExpression.Parameters.Single();
                         var newParameter = instanceParameter;
                         var converter = new ConversionVisitor(newParameter, oldParameter);
-                        currentChild = converter.Visit(((LambdaExpression)propertyMap.CustomExpression).Body);
+                        currentChild = converter.Visit(propertyMap.CustomExpression.Body);
                         var propertyInfo = propertyMap.SourceMember as PropertyInfo;
                         if (propertyInfo != null)
                             currentChildType = propertyInfo.PropertyType;
@@ -261,10 +262,14 @@ namespace AutoMapper
                 {
 
                     Type destinationListType = prop.PropertyType.GetGenericArguments().FirstOrDefault() ?? prop.PropertyType.GetElementType();
+<<<<<<< HEAD
                     Type sourceListType = null;
+=======
+                    Type sourceListType;
+>>>>>>> Added Support for EF Proxies
                     // is list
 
-                    sourceListType = currentChildType.GetGenericArguments().First();
+                    sourceListType = currentChildType.GetGenericArguments().FirstOrDefault() ?? currentChildType.GetElementType();
 
                     var selectExpression = currentChild;
 
@@ -287,7 +292,7 @@ namespace AutoMapper
                         MethodCallExpression toListCallExpression = Expression.Call(
                             typeof(Enumerable),
                             "ToList",
-                            new Type[] { destinationListType },
+                            new [] { destinationListType },
                             selectExpression);
                         bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
                     }
@@ -297,7 +302,11 @@ namespace AutoMapper
                         MethodCallExpression toArrayCallExpression = Expression.Call(
                            typeof(Enumerable),
                            "ToArray",
+<<<<<<< HEAD
                            new Type[] { destinationListType },
+=======
+                           new [] { destinationListType },
+>>>>>>> Added Support for EF Proxies
                            selectExpression);
                         bindings.Add(Expression.Bind(destinationMember, toArrayCallExpression));
                     }

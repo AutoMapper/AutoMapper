@@ -564,8 +564,22 @@ namespace AutoMapper
 
 		private TypeMap FindExplicitlyDefinedTypeMap(Type sourceType, Type destinationType)
 		{
-			return _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+            sourceType = ConvertEntityFrameworkProxyType(sourceType);
+            destinationType = ConvertEntityFrameworkProxyType(destinationType);
+            return _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
 		}
+
+        /// <summary>
+        /// Gets the base type, if the given <see cref="type"/> is an Entity Framework proxy.
+        /// </summary>
+        /// <param name="type">The type to convert.</param>
+        private Type ConvertEntityFrameworkProxyType(Type type)
+        {
+            if (type != null && type.FullName != null && type.FullName.StartsWith("System.Data.Entity.DynamicProxies.") && type.BaseType != null)
+                return type.BaseType;
+            else
+                return type;
+        }
 
 		private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
 		{
