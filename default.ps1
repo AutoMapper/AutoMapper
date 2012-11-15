@@ -62,16 +62,25 @@ function Get-FrameworkDirectory()
 
 function global:Fix-PreReleaseVersion($pkgVersion)
 {
+    Write-Host($pkgVersion)
     if ($pkgVersion.Contains("-"))
     {
         $buildNumRegEx = [regex]'([0-9]*)$'
         $buildNum = $buildNumRegEx.Match($pkgVersion).Value -as [int]
+        Write-Host($buildNum)
         $formattedBuildNum = "{0:d3}" -f $buildNum
-        $pkgVersion = $pkgVersion -replace "[0-9]*$", ""
-        $pkgVersion = $pkgVersion + $formattedBuildNum
+        Write-Host($formattedBuildNum)
+        $cleanVersion = $pkgVersion -replace "[0-9]*$", ""
+        Write-Host($cleanVersion)
+        $fixedVersion = $cleanVersion + $formattedBuildNum
+        Write-Host($fixedVersion)
+        $env:build_number = $pkgVersion
+        $fixedVersion
     }
-    $env:build_number = $pkgVersion
-    $pkgVersion
+    else
+    {
+        $pkgVersion
+    }
 }
 
 function global:zip_directory($directory, $file)
