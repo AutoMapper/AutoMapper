@@ -239,5 +239,12 @@ namespace AutoMapper
             AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile()));
         }
 
+        public object GetDestinationValue(object mappedObject)
+        {
+            return DestinationProperty.GetValue(mappedObject);
+            return UseDestinationValue
+                       ? DestinationProperty.GetValue(mappedObject)
+                       : null;
+        }
     }
 }

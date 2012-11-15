@@ -110,6 +110,7 @@
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\ConditionBug.cs" />
     <Compile Include="Bug\ContextValuesIncorrect.cs" />
+    <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
     <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
     <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />

@@ -61,7 +61,7 @@ namespace AutoMapper.Mappers
 			{
 				var mappedObject = GetMappedObject(context, mapper);
 				if (context.SourceValue != null)
-					context.InstanceCache.Add(context, mappedObject);
+                    context.InstanceCache[context] = mappedObject;
 
 				context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
 
@@ -111,7 +111,7 @@ namespace AutoMapper.Mappers
                     if (result.ShouldIgnore) 
                         return;
 
-					object destinationValue = propertyMap.DestinationProperty.GetValue(mappedObject);
+					object destinationValue = propertyMap.GetDestinationValue(mappedObject);;
 
 					var sourceType = result.Type;
 					var destinationType = propertyMap.DestinationProperty.MemberType;
