@@ -9,8 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-    $rawPkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.2.1' }
-	$pkgVersion = Fix-PreReleaseVersion($rawPkgVersion)
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.2.1' }
 	$version = $pkgVersion -replace "-.*$", ""
 	$buildNumber = $version + '.0'
 	$global:config = "debug"
@@ -58,25 +57,6 @@ task dist {
 function Get-FrameworkDirectory()
 {
     $([System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory().Replace("v2.0.50727", "v4.0.30319"))
-}
-
-function global:Fix-PreReleaseVersion($pkgVersion)
-{
-    if ($pkgVersion.Contains("-"))
-    {
-        $buildNumRegEx = [regex]'([0-9]*)$'
-        $buildNum = $buildNumRegEx.Match($pkgVersion).Value -as [int]
-        $formattedBuildNum = "{0:d3}" -f $buildNum
-        $cleanVersion = $pkgVersion -replace "[0-9]*$", ""
-        $fixedVersion = $cleanVersion + $formattedBuildNum
-        $env:pkg_number = $pkgVersion
-        $fixedVersion
-    }
-    else
-    {
-        $env:pkg_number = $pkgVersion
-        $pkgVersion
-    }
 }
 
 function global:zip_directory($directory, $file)

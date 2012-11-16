@@ -242,6 +242,9 @@ namespace AutoMapper
         public object GetDestinationValue(object mappedObject)
         {
             return DestinationProperty.GetValue(mappedObject);
+            return UseDestinationValue
+                       ? DestinationProperty.GetValue(mappedObject)
+                       : null;
         }
     }
 }
