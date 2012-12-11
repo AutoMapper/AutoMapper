@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests
         [Test]
         public void Should_have_valid_configuration()
         {
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
     }
 

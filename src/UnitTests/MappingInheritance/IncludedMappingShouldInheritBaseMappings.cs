@@ -44,7 +44,7 @@ namespace AutoMapper.UnitTests.Bug
                 .Include<ModelSubObject, DtoSubObject>();
             Mapper.CreateMap<ModelSubObject, DtoSubObject>();
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace AutoMapper.UnitTests.Bug
                 .Include<ModelSubObject, DtoSubObject>();
             Mapper.CreateMap<ModelSubObject, DtoSubObject>();
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.CreateMap<ModelSubObject, DtoSubObject>()
                 .ForMember(d=>d.BaseString, m=>m.MapFrom(s=>s.DifferentBaseString));
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.CreateMap<ModelSubObject, DtoSubObject>()
                 .ForMember(d => d.BaseString, m => m.UseValue("789"));
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
         [Test]
         public void more_specific_map_should_override_base_mapping_with_one_parameter()
@@ -202,7 +202,7 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.CreateMap<ModelSubObject, OtherDto>();
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
         [Test]
         public void include_should_allow_automapper_to_select_more_specific_included_type_with_one_parameter()

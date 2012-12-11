@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Bug
             var actualContCDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContCSrc);
             var actualContBDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContBSrc); // THROWS
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
             Assert.IsNotNull(actualContBDest);
             Assert.IsNotNull(actualContCDest);
         }

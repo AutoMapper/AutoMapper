@@ -564,7 +564,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_succeed_configration_check()
 			{
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 
 			protected override void Establish_context()
@@ -1126,7 +1126,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_pass_configuration_check()
 			{
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 		}
 
@@ -1179,7 +1179,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_pass_configuration_check()
             {
-                Mapper.AssertConfigurationIsValid();
+                Mapper.AssertConfigurationIsValid(false);
             }
 
             [Test]

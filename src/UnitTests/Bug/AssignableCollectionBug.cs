@@ -65,7 +65,7 @@ namespace AutoMapper.UnitTests.Bug
 				Mapper.CreateMap<PersonOne, PersonTwo>();
 				Mapper.CreateMap<AddressOne, AddressTwo>();
 				Mapper.CreateMap<AddressOne, IAddress>().ConvertUsing(Mapper.Map<AddressOne, AddressTwo>);
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 				var result = Mapper.Map<PersonOne, PersonTwo>(source);
 
 				// These are ok.

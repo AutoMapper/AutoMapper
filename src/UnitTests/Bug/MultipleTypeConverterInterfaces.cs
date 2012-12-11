@@ -70,7 +70,7 @@ namespace AutoMapper.UnitTests.Bug
 			[Test]
 			public void Should_pass_configuration_validation()
 			{
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 		}
 }

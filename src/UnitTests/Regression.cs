@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<ITestDomainItem, TestDtoItem>()
 					.ForMember(d => d.Id, s => s.MapFrom(x => x.ItemId));
 
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 
 				var dtos = Mapper.Map<IEnumerable<ITestDomainItem>, TestDtoItem[]>(domainItems);
 

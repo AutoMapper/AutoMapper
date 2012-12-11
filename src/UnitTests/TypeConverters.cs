@@ -230,7 +230,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_pass_configuration_validation()
 			{
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 		}
 
@@ -278,7 +278,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_pass_configuration_validation()
 			{
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 		}
 

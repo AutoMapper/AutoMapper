@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests.Bug
 
 			config.CreateMap<IEnumerable<string>, IEnumerable<Item>>().ConvertUsing<StringToItemConverter>();
 
-			config.AssertConfigurationIsValid();
+			config.AssertConfigurationIsValid(false);
 
 			var engine = new MappingEngine(config);
 			var one = new One

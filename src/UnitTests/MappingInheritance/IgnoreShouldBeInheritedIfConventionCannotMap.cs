@@ -48,7 +48,7 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.CreateMap<MoreSpecificDomain, Dto>();
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
     }
 }

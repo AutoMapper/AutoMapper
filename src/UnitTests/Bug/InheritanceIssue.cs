@@ -176,7 +176,7 @@ namespace AutoMapper.UnitTests.Bug
                 Mapper.CreateMap<Health, HealthDTO>();
                 Mapper.CreateMap<PhysicalLocation, PhysicalLocationDTO>();
 
-                Mapper.AssertConfigurationIsValid();
+                Mapper.AssertConfigurationIsValid(false);
 
                 EntityDTO targetEntity = Mapper.Map<Entity, EntityDTO>(entity);
 

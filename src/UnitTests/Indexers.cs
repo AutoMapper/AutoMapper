@@ -43,7 +43,7 @@ namespace AutoMapper.UnitTests
 				Exception thrown = null;
 				try
 				{
-					Mapper.AssertConfigurationIsValid();
+					Mapper.AssertConfigurationIsValid(false);
 				}
 				catch (Exception ex)
 				{
