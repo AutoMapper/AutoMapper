@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
 			});
             
             Mapper.Map<Source, Destination>(new Source{ShouldBeMapped = "true"});
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace AutoMapper.UnitTests
 		public void Ignore_On_Source_Field()
 		{
 			Mapper.CreateMap<Source, Destination>();
-			Mapper.AssertConfigurationIsValid();
+			Mapper.AssertConfigurationIsValid(false);
 
 			Source source = new Source
 			{

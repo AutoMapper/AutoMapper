@@ -29,7 +29,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             Mapper.CreateMap<ModelObjectNotMatching, ModelDto>()
                 .ForAllMembers(opt => opt.Ignore());
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
     }
 }

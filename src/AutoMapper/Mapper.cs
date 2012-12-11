@@ -186,20 +186,38 @@ namespace AutoMapper
 			return ConfigurationProvider.GetAllTypeMaps();
 		}
 
+        [Obsolete]
 		public static void AssertConfigurationIsValid()
 		{
 			ConfigurationProvider.AssertConfigurationIsValid();
 		}
 
+        [Obsolete]
 		public static void AssertConfigurationIsValid(TypeMap tm)
 		{
 			ConfigurationProvider.AssertConfigurationIsValid(tm);
 		}
 
+        [Obsolete]
 		public static void AssertConfigurationIsValid(string profileName)
 		{
 			ConfigurationProvider.AssertConfigurationIsValid(profileName);
-		}
+        }
+
+        public static void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties)
+        {
+            ConfigurationProvider.AssertConfigurationIsValid(onlyCheckPubliclySettableProperties);
+        }
+
+        public static void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties, TypeMap tm)
+        {
+            ConfigurationProvider.AssertConfigurationIsValid(onlyCheckPubliclySettableProperties, tm);
+        }
+
+        public static void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties, string profileName)
+        {
+            ConfigurationProvider.AssertConfigurationIsValid(onlyCheckPubliclySettableProperties, profileName);
+        }
 
 		public static void Reset()
 		{

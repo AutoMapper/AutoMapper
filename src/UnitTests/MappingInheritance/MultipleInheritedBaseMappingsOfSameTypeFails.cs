@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.CreateMap<InformationClass, InformationDto>();
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
         }
     }
 }

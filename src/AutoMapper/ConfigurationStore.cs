@@ -436,22 +436,40 @@ namespace AutoMapper
 		public IFormatterConfiguration GetProfileConfiguration(string profileName)
 		{
 			return GetProfile(profileName);
-		}
+        }
 
-		public void AssertConfigurationIsValid(TypeMap typeMap)
-		{
-			AssertConfigurationIsValid(Enumerable.Repeat(typeMap, 1));
-		}
+        [Obsolete]
+        public void AssertConfigurationIsValid(TypeMap typeMap)
+        {
+            AssertConfigurationIsValid(Enumerable.Repeat(typeMap, 1), false);
+        }
 
-		public void AssertConfigurationIsValid(string profileName)
-		{
-			AssertConfigurationIsValid(_typeMaps.Where(typeMap => typeMap.Profile == profileName));
-		}
+        [Obsolete]
+        public void AssertConfigurationIsValid(string profileName)
+        {
+            AssertConfigurationIsValid(_typeMaps.Where(typeMap => typeMap.Profile == profileName), false);
+        }
 
-		public void AssertConfigurationIsValid()
-		{
-			AssertConfigurationIsValid(_typeMaps);
-		}
+        [Obsolete]
+        public void AssertConfigurationIsValid()
+        {
+            AssertConfigurationIsValid(_typeMaps, false);
+        }
+
+        public void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties, TypeMap typeMap)
+        {
+            AssertConfigurationIsValid(Enumerable.Repeat(typeMap, 1), onlyCheckPubliclySettableProperties);
+        }
+
+        public void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties, string profileName)
+        {
+            AssertConfigurationIsValid(_typeMaps.Where(typeMap => typeMap.Profile == profileName), onlyCheckPubliclySettableProperties);
+        }
+
+        public void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties)
+        {
+            AssertConfigurationIsValid(_typeMaps, onlyCheckPubliclySettableProperties);
+        }
 
 	    public IObjectMapper[] GetMappers()
 	    {
@@ -493,7 +511,7 @@ namespace AutoMapper
 			return mappingExp;
 		}
 
-		private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
+        private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps, bool onlyCheckPubliclySettableProperties)
 		{
 			var badTypeMaps =
 				(from typeMap in typeMaps
@@ -502,6 +520,19 @@ namespace AutoMapper
 				where unmappedPropertyNames.Length > 0
                 select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames)
                 ).ToArray();
+
+            if (onlyCheckPubliclySettableProperties)
+            {
+                badTypeMaps = badTypeMaps
+                    .Select(typeMap =>
+                        new AutoMapperConfigurationException.TypeMapConfigErrors(
+                            typeMap.TypeMap,
+                            typeMap.UnmappedPropertyNames
+                                .Where(propertyName => typeMap.TypeMap.DestinationType.GetProperty(propertyName).GetSetMethod(false) != null)
+                                .ToArray()))
+                    .Where(typeMap => typeMap.UnmappedPropertyNames.Any())
+                    .ToArray();
+            }
 
 			if (badTypeMaps.Any())
 			{

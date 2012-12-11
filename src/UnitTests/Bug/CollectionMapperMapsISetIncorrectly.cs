@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Bug
             config.CreateMap<SourceWithIEnumerable, TargetWithISet>()
                   .ForMember(dest => dest.Stuff, opt => opt.MapFrom(src => src.Stuff.Select(s => s.Value)));
 
-            config.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid(false);
 
             var engine = new MappingEngine(config);
 

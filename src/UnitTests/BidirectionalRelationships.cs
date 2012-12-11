@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests
                     .BeforeMap((src, dest) => _beforeMapCount++)
                     .AfterMap((src, dest) => _afterMapCount++);
                 Mapper.CreateMap<ChildModel, ChildDto>();
-                Mapper.AssertConfigurationIsValid();
+                Mapper.AssertConfigurationIsValid(false);
             }
 
             protected override void Because_of()
@@ -119,7 +119,7 @@ namespace AutoMapper.UnitTests
 					.ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
 				Mapper.CreateMap<ChildModel, ChildDto>();
 
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 
 			protected override void Because_of()
@@ -221,7 +221,7 @@ namespace AutoMapper.UnitTests
 					.ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
 				Mapper.CreateMap<ChildModel, ChildDto>();
 
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 
 			protected override void Because_of()
@@ -303,7 +303,7 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.CreateMap<Foo, FooDto>();
 				Mapper.CreateMap<Bar, BarDto>();
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 
 			protected override void Because_of()
@@ -359,7 +359,7 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<FooModel, FooContainerModel>()
 					.ForMember(dest => dest.Input, opt => opt.MapFrom(src => src))
 					.ForMember(dest => dest.Screen, opt => opt.MapFrom(src => src));
-				Mapper.AssertConfigurationIsValid();
+				Mapper.AssertConfigurationIsValid(false);
 			}
 
 			protected override void Because_of()

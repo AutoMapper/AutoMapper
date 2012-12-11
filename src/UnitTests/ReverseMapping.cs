@@ -75,7 +75,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_not_throw_any_configuration_validation_errors()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -102,7 +102,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_throw_a_configuration_validation_error()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -131,7 +131,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_not_throw_a_configuration_validation_error()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -161,7 +161,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_not_throw_a_configuration_validation_error()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 

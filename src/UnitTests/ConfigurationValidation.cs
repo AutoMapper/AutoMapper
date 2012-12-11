@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -95,7 +95,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_pass_an_inspection_of_missing_mappings()
             {
-                Mapper.AssertConfigurationIsValid();
+                Mapper.AssertConfigurationIsValid(false);
             }
         }
 
@@ -119,7 +119,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -159,7 +159,7 @@ namespace AutoMapper.UnitTests
             {
                 try
                 {
-                    Mapper.AssertConfigurationIsValid();
+                    Mapper.AssertConfigurationIsValid(false);
                 }
                 catch (AutoMapperConfigurationException ex)
                 {
@@ -200,7 +200,7 @@ namespace AutoMapper.UnitTests
             {
                 try
                 {
-                    Mapper.AssertConfigurationIsValid();
+                    Mapper.AssertConfigurationIsValid(false);
                 }
                 catch (AutoMapperConfigurationException ex)
                 {
@@ -245,7 +245,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -279,7 +279,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -310,7 +310,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_be_valid()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -349,7 +349,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_ignore_bad_dtos_in_other_profiles()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid("Good"));
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid(false, "Good"));
             }
         }
 
@@ -380,7 +380,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 
@@ -405,7 +405,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_validate_successfully()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
 		
@@ -429,7 +429,7 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_fail_a_configuration_check()
 			{
-				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
 			}
 		}
 
@@ -455,9 +455,40 @@ namespace AutoMapper.UnitTests
 			[Test]
 			public void Should_fail_a_configuration_check()
 			{
-				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
 			}
 		}
+
+        public class When_testing_a_dto_with_non_publicly_settable_properties : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Id { get; set; }
+            }
+
+            public class Destination
+            {
+                public int Id { get; set; }
+                public string Name { get; protected set; }
+                public int Age { get; private set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>();
+            }
+
+            protected override void Because_of()
+            {
+                Mapper.Map<Source, Destination>(new Source { Id = 5 });
+            }
+
+            [Test]
+            public void Should_be_valid()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid(true));
+            }
+        }
     }
 
 }

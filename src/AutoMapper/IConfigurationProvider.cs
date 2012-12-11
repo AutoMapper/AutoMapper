@@ -19,9 +19,17 @@ namespace AutoMapper
 		TypeMap FindTypeMapFor(Type sourceType, Type destinationType);
 		TypeMap FindTypeMapFor(ResolutionResult resolutionResult, Type destinationType);
 		IFormatterConfiguration GetProfileConfiguration(string profileName);
+
+        [Obsolete]
 		void AssertConfigurationIsValid();
+        [Obsolete]
 		void AssertConfigurationIsValid(TypeMap typeMap);
-		void AssertConfigurationIsValid(string profileName);
+        [Obsolete]
+        void AssertConfigurationIsValid(string profileName);
+
+        void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties);
+        void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties, TypeMap typeMap);
+        void AssertConfigurationIsValid(bool onlyCheckPubliclySettableProperties, string profileName);
 		IObjectMapper[] GetMappers();
 		TypeMap CreateTypeMap(Type sourceType, Type destinationType);
 

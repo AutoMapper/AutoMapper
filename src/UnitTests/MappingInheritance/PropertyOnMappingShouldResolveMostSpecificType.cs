@@ -152,7 +152,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.CreateMap<DifferentItem, DifferentDescriptionDto>();
             Mapper.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
 
             var dto = Mapper.Map<ItemBase, ItemDto>(new DifferentItem());
 
@@ -181,7 +181,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.CreateMap<DifferentItem, DifferentDescriptionDto>();
             Mapper.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
 
-            Mapper.AssertConfigurationIsValid();
+            Mapper.AssertConfigurationIsValid(false);
 
             var dto = Mapper.Map<ItemDto>(new DifferentItem());
 

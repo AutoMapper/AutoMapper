@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests.Bug
             [Test]
             public void Should_show_configuration_error()
             {
-                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(() => Mapper.AssertConfigurationIsValid(false));
             }
         }
     }

@@ -58,7 +58,7 @@ namespace AutoMapper.UnitTests
 
                 Mapper.CreateMap<SubChildModelObject, SubDtoChildObject>();
 
-                Mapper.AssertConfigurationIsValid();
+                Mapper.AssertConfigurationIsValid(false);
 
                 _result = Mapper.Map<ModelObject, DtoObject>(model);
             }
@@ -243,7 +243,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_pass_configuration_testing()
             {
-                Mapper.AssertConfigurationIsValid();
+                Mapper.AssertConfigurationIsValid(false);
             }
         }
 
@@ -313,7 +313,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_pass_configuration_testing()
             {
-                Mapper.AssertConfigurationIsValid();
+                Mapper.AssertConfigurationIsValid(false);
             }
         }
 
@@ -356,7 +356,7 @@ namespace AutoMapper.UnitTests
             [Test]
             public void Should_ignore_interface_members_for_validation()
             {
-                Mapper.AssertConfigurationIsValid();
+                Mapper.AssertConfigurationIsValid(false);
             }
         }
 
