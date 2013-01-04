@@ -29,6 +29,7 @@ namespace AutoMapper
 	public interface IProfileExpression : IFormatterExpression, IMappingOptions
 	{
 		IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>();
+        IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName);
         IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList source);
         IMappingExpression CreateMap(Type sourceType, Type destinationType);
         IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList source);

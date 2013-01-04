@@ -230,7 +230,7 @@ namespace AutoMapper
 
 		public TypeMap CreateTypeMap(Type source, Type destination, string profileName, MemberList memberList)
 		{
-			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination);
+			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination, profileName);
 				
 			if (typeMap == null)
 			{
@@ -245,7 +245,7 @@ namespace AutoMapper
 
 				_typeMaps.Add(typeMap);
 
-			    var typePair = new TypePair(source, destination);
+			    var typePair = new TypePair(source, destination, profileName);
 			    _typeMapCache.AddOrUpdate(typePair, typeMap, (tp, tm) => typeMap);
 
 				OnTypeMapCreated(typeMap);
@@ -328,16 +328,11 @@ namespace AutoMapper
 			return _typeMaps.ToArray();
 		}
 
-		public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
-		{
-			return FindTypeMapFor( null, sourceType, destinationType ) ;
-		}
+	    public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType, string profileName)
+	    {
+            var typeMapPair = new TypePair(sourceType, destinationType, profileName);
 
-		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
-		{
-			var typeMapPair = new TypePair(sourceType, destinationType);
-			
-			TypeMap typeMap;
+            TypeMap typeMap;
 
             if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
             {
@@ -359,8 +354,8 @@ namespace AutoMapper
                 return FindTypeMapFor(source, sourceType, typeMap.DestinationTypeOverride);
             }
             // Check for runtime derived types
-		    var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null) && (source.GetType() != sourceType);
-		    
+            var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null) && (source.GetType() != sourceType);
+
             if (shouldCheckDerivedType)
             {
                 var potentialSourceType = source.GetType();
@@ -397,7 +392,7 @@ namespace AutoMapper
                     return typeMap;
 
                 var targetDestinationType = potentialDestTypeMap.DestinationType;
-                var potentialTypeMap = FindExplicitlyDefinedTypeMap(potentialSourceType, targetDestinationType);
+                var potentialTypeMap = FindExplicitlyDefinedTypeMap(potentialSourceType, targetDestinationType, profileName);
                 if (potentialTypeMap == null)
                 {
                     var targetSourceType = targetDestinationType != destinationType ? potentialSourceType : typeMap.SourceType;
@@ -407,7 +402,17 @@ namespace AutoMapper
                     typeMap = potentialTypeMap;
             }
 
-		    return typeMap;
+            return typeMap;
+        }
+
+	    public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
+		{
+			return FindTypeMapFor( null, sourceType, destinationType ) ;
+		}
+
+		public TypeMap FindTypeMapFor(object source, Type sourceType, Type destinationType)
+		{
+            return FindTypeMapFor(source, sourceType, destinationType, DefaultProfileName);
 		}
 
         private static int GetInheritanceDepth(Type type)
@@ -433,7 +438,12 @@ namespace AutoMapper
 			       FindTypeMapFor(resolutionResult.Value, resolutionResult.MemberType, destinationType);
 		}
 
-		public IFormatterConfiguration GetProfileConfiguration(string profileName)
+	    public TypeMap FindTypeMapFor(ResolutionResult resolutionResult, Type destinationType, string profileName)
+	    {
+	        throw new NotImplementedException();
+	    }
+
+	    public IFormatterConfiguration GetProfileConfiguration(string profileName)
 		{
 			return GetProfile(profileName);
 		}
@@ -527,11 +537,11 @@ namespace AutoMapper
 
 	    private TypeMap FindTypeMap(object source, Type sourceType, Type destinationType, string profileName)
         {
-            TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType);
+            TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType, profileName);
 
             if (typeMap == null && destinationType.IsNullableType())
             {
-                typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType.GetTypeOfNullable());
+                typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType.GetTypeOfNullable(), profileName);
             }
 
             if (typeMap == null)
@@ -562,9 +572,9 @@ namespace AutoMapper
             return typeMap;
         }
 
-		private TypeMap FindExplicitlyDefinedTypeMap(Type sourceType, Type destinationType)
+		private TypeMap FindExplicitlyDefinedTypeMap(Type sourceType, Type destinationType, string profileName)
 		{
-			return _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+			return _typeMaps.FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType && x.Profile == profileName);
 		}
 
 		private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
