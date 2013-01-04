@@ -10,11 +10,19 @@ namespace AutoMapper.Impl
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
+            _profileName = string.Empty;
             _hashcode = unchecked((_sourceType.GetHashCode() * 397) ^ _destinationType.GetHashCode());
+        }
+
+        public TypePair(Type sourceType, Type destinationType, string profileName)
+            : this(sourceType, destinationType)
+        {
+            _profileName = profileName;
         }
 
         private readonly Type _destinationType;
         private readonly int _hashcode;
+        private readonly string _profileName;
         private readonly Type _sourceType;
 
         public Type SourceType
@@ -29,7 +37,7 @@ namespace AutoMapper.Impl
 
         public bool Equals(TypePair other)
         {
-            return Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType);
+            return Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType) && Equals(other._profileName, _profileName);
         }
 
         public override bool Equals(object obj)

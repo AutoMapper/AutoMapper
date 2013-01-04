@@ -8,6 +8,7 @@ namespace AutoMapper
         TDestination Map<TDestination>(object source);
         TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts);
         TDestination Map<TSource, TDestination>(TSource source);
+        TDestination Map<TSource, TDestination>(TSource source, string profileName);
         TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts);
         TDestination Map<TSource, TDestination>(TSource source, TDestination destination);
         TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts);

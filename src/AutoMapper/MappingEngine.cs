@@ -80,7 +80,15 @@ namespace AutoMapper
 			return (TDestination)Map(source, modelType, destinationType, opts => {});
 		}
 
-        public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
+	    public TDestination Map<TSource, TDestination>(TSource source, string profileName)
+	    {
+            Type modelType = typeof(TSource);
+            Type destinationType = typeof(TDestination);
+
+            return (TDestination)Map(source, modelType, destinationType, profileName);
+        }
+
+	    public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
         {
             Type modelType = typeof (TSource);
             Type destinationType = typeof (TDestination);
@@ -204,6 +212,15 @@ namespace AutoMapper
             TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
             var context = parentContext.CreateTypeContext(typeMap, source, sourceType, destinationType);
             return (TDestination)((IMappingEngineRunner)this).Map(context);
+        }
+
+        public object Map(object source, Type sourceType, Type destinationType, string profileName)
+        {
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType, profileName);
+
+            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions());
+
+            return ((IMappingEngineRunner)this).Map(context);
         }
 
         private LambdaExpression CreateMapExpression(
@@ -439,7 +456,7 @@ namespace AutoMapper
 		{
 		    IObjectMapper existing;
 
-		    _objectMapperCache.TryRemove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType), out existing);
+		    _objectMapperCache.TryRemove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType, e.TypeMap.Profile), out existing);
 		}
 
         /// <summary>

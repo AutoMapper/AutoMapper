@@ -42,6 +42,11 @@ namespace AutoMapper
 			return Engine.Map(source, destination);
 		}
 
+        public static TDestination Map<TSource, TDestination>(TSource source, string profileName)
+        {
+            return Engine.Map<TSource, TDestination>(source, profileName);
+        }
+
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
         {
             return Engine.Map(source, destination, opts);
@@ -145,6 +150,11 @@ namespace AutoMapper
 		{
 			return Configuration.CreateMap<TSource, TDestination>();
 		}
+
+        public static IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName)
+        {
+            return Configuration.CreateMap<TSource, TDestination>(profileName);
+        }
 
 		public static IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
