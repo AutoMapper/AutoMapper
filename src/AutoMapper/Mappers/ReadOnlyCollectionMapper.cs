@@ -16,16 +16,23 @@ namespace AutoMapper.Mappers
 
             var objectMapper = (IObjectMapper)Activator.CreateInstance(enumerableMapper);
 
-            return objectMapper.Map(context, mapper);
+            var nullDestinationValueSoTheReadOnlyCollectionMapperWorks = context.CreateMemberContext(context.TypeMap, context.SourceValue, null, context.SourceType, context.PropertyMap);
+
+            return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks, mapper);
         }
 
         public bool IsMatch(ResolutionContext context)
         {
-            var isMatch = context.SourceType.IsEnumerableType() &&
-                          context.DestinationType.IsGenericType &&
-                          context.DestinationType.GetGenericTypeDefinition() == typeof (ReadOnlyCollection<>);
+			  if(!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType))
+              return false;
 
-            return isMatch;
+			  var genericType= context.DestinationType.GetGenericTypeDefinition();
+			  if (genericType == typeof(ReadOnlyCollection<>) ||
+				  genericType == typeof(IReadOnlyList<>) ||
+				  genericType == typeof(IReadOnlyCollection<>))
+				  return true;
+
+			  return false;
         }
 
         #region Nested type: EnumerableMapper

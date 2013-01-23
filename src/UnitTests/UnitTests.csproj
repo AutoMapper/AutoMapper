@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
     <AssemblyName>AutoMapper.UnitTests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>AutoMapper.snk</AssemblyOriginatorKeyFile>
@@ -157,6 +157,7 @@
     <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
     <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
+    <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
     <Compile Include="Mappers\TypeHelperTests.cs">
       <SubType>Code</SubType>
     </Compile>
