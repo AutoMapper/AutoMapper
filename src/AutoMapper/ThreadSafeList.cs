@@ -6,11 +6,12 @@ using System.Threading;
 
 namespace AutoMapper
 {
-    public class ThreadSafeList<T> : IEnumerable<T>
+    public class ThreadSafeList<T> : IEnumerable<T>, IDisposable
         where T : class
     {
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private readonly IList<T> _propertyMaps = new List<T>();
+        private bool _disposed;
 
         public void Add(T propertyMap)
         {
@@ -89,6 +90,27 @@ namespace AutoMapper
             finally
             {
                 _lock.ExitReadLock();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_lock != null)
+                        _lock.Dispose();
+                }
+
+                _lock = null;
+                _disposed = true;
             }
         }
     }
