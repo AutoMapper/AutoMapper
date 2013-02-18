@@ -131,6 +131,7 @@
     <Compile Include="Bug\NullableBytesAndEnums.cs" />
     <Compile Include="Bug\NullableConverterBug.cs" />
     <Compile Include="Bug\NullableEnums.cs" />
+    <Compile Include="Bug\NullableEnumToNullableValueType.cs" />
     <Compile Include="Bug\NullablePropertiesBug.cs" />
     <Compile Include="Bug\ObjectTypeMapFailure.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
