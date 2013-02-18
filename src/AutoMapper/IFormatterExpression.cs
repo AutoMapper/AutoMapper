@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 
 namespace AutoMapper
 {
@@ -49,5 +48,6 @@ namespace AutoMapper
 		void ConstructServicesUsing(Func<Type, object> constructor);
 	    void DisableConstructorMapping();
 		void Seal();
+	    void EnableYieldReturnForDataReaderMapper();
 	}
 }

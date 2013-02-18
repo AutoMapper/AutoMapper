@@ -45,8 +45,8 @@ namespace AutoMapper.Mappers
 				object sourceKey = sourceKvpType.GetProperty("Key").GetValue(keyValuePair, new object[0]);
 				object sourceValue = sourceKvpType.GetProperty("Value").GetValue(keyValuePair, new object[0]);
 
-				TypeMap keyTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(sourceKey, sourceKeyType, destKeyType);
-				TypeMap valueTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(sourceValue, sourceValueType, destValueType);
+				TypeMap keyTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(sourceKey, null, sourceKeyType, destKeyType);
+				TypeMap valueTypeMap = mapper.ConfigurationProvider.FindTypeMapFor(sourceValue, null, sourceValueType, destValueType);
 
 				ResolutionContext keyContext = context.CreateElementContext(keyTypeMap, sourceKey, sourceKeyType, destKeyType, count);
 				ResolutionContext valueContext = context.CreateElementContext(valueTypeMap, sourceValue, sourceValueType, destValueType, count);

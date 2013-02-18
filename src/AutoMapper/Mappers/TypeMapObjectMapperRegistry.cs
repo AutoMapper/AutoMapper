@@ -61,7 +61,7 @@ namespace AutoMapper.Mappers
 			{
 				var mappedObject = GetMappedObject(context, mapper);
 				if (context.SourceValue != null)
-					context.InstanceCache.Add(context, mappedObject);
+                    context.InstanceCache[context] = mappedObject;
 
 				context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
 
@@ -69,7 +69,7 @@ namespace AutoMapper.Mappers
                 {
                     MapPropertyValue(context.CreatePropertyMapContext(propertyMap), mapper, mappedObject, propertyMap);
                 }
-                mappedObject = ReassignValue(context, mappedObject); mappedObject = ReassignValue(context, mappedObject);
+                mappedObject = ReassignValue(context, mappedObject);
 
                 context.TypeMap.AfterMap(context.SourceValue, mappedObject);
 
@@ -91,6 +91,7 @@ namespace AutoMapper.Mappers
                 {
                     ResolutionResult result;
 
+                    Exception resolvingExc = null;
 					try
 					{
 						result = propertyMap.ResolveValue(context);
@@ -102,13 +103,15 @@ namespace AutoMapper.Mappers
                     catch (Exception ex)
 					{
 						var errorContext = CreateErrorContext(context, propertyMap, null);
-						throw new AutoMapperMappingException(errorContext, ex);
+						resolvingExc = new AutoMapperMappingException(errorContext, ex);
+
+                        result = new ResolutionResult(context);
 					}
 
                     if (result.ShouldIgnore) 
                         return;
 
-					object destinationValue = propertyMap.DestinationProperty.GetValue(mappedObject);
+					object destinationValue = propertyMap.GetDestinationValue(mappedObject);;
 
 					var sourceType = result.Type;
 					var destinationType = propertyMap.DestinationProperty.MemberType;
@@ -122,6 +125,10 @@ namespace AutoMapper.Mappers
 
                     if (!propertyMap.ShouldAssignValue(newContext))
                         return;
+
+                    // If condition succeeded and resolving failed, throw
+                    if (resolvingExc != null)
+                        throw resolvingExc;
 
                     try
 					{

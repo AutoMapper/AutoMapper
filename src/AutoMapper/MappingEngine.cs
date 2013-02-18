@@ -96,7 +96,7 @@ namespace AutoMapper
 	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
 	    {
             Type modelType = typeof(TSource);
-            Type destinationType = (Equals(destination, default(TDestination)) ? typeof(TDestination) : destination.GetType());
+            Type destinationType = typeof(TDestination);
 
             return (TDestination)Map(source, destination, modelType, destinationType, opts);
         }
@@ -108,7 +108,7 @@ namespace AutoMapper
 
 	    public object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
 	    {
-            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType);
 
 	        var options = new MappingOperationOptions();
 
@@ -126,7 +126,7 @@ namespace AutoMapper
 
 	    public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
 	    {
-            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, destination, sourceType, destinationType);
 
 	        var options = new MappingOperationOptions();
 
@@ -139,7 +139,7 @@ namespace AutoMapper
 
 
 	    public TDestination DynamicMap<TSource, TDestination>(TSource source)
-		{
+		{   
 			Type modelType = typeof(TSource);
 			Type destinationType = typeof(TDestination);
 
@@ -149,7 +149,7 @@ namespace AutoMapper
 		public void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
 		{
 			Type modelType = typeof(TSource);
-            Type destinationType = (Equals(destination, default(TDestination)) ? typeof(TDestination) : destination.GetType());
+            Type destinationType = typeof(TDestination);
 
 			DynamicMap(source, destination, modelType, destinationType);
 		}
@@ -164,7 +164,7 @@ namespace AutoMapper
 
 		public object DynamicMap(object source, Type sourceType, Type destinationType)
 		{
-			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType) ??
+			var typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions
@@ -177,7 +177,7 @@ namespace AutoMapper
 
 		public void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
 		{
-			var typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType) ??
+			var typeMap = ConfigurationProvider.FindTypeMapFor(source, destination, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions
@@ -201,7 +201,7 @@ namespace AutoMapper
         {
             Type destinationType = typeof(TDestination);
             Type sourceType = typeof(TSource);
-            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, sourceType, destinationType);
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType);
             var context = parentContext.CreateTypeContext(typeMap, source, sourceType, destinationType);
             return (TDestination)((IMappingEngineRunner)this).Map(context);
         }
@@ -315,10 +315,51 @@ namespace AutoMapper
                 }
 
             }
-            var total = Expression.MemberInit(
-                Expression.New(typeOut),
-                bindings.ToArray()
-            );
+            Expression total;
+            if (typeOut.IsAbstract)
+            {
+                if (typeMap.CustomMapper == null)
+                    throw new AutoMapperMappingException(
+                        String.Format("Abstract type {0} can not be mapped without custom mapper (tip: use ConvertUsing)", typeOut.Name));
+                // We are going to return roughly following expression
+                // typeOut (typeIn)x => (typeOut)(typeMap.CustomMapper.Invoke(new ResolutionContext(typeMap, x, typeIn, typeOut, options)))
+
+                // This expression generates a new ResolutionContext
+                // for the custom mapper (ResolveCore)
+                var context = Expression.MemberInit(
+                    Expression.New(
+                        typeof(ResolutionContext).GetConstructor(BindingFlags.Instance | BindingFlags.Public, null,
+                                                                  new Type[]
+                                                                      {
+                                                                          typeof (TypeMap), typeof (object),
+                                                                          typeof (Type),
+                                                                          typeof (Type),
+                                                                          typeof (MappingOperationOptions)
+                                                                      },
+                                                                  null),
+                        new List<Expression>
+                            {
+                                Expression.Constant(typeMap),
+                                instanceParameter, // Using the original parameter
+                                Expression.Constant(typeIn),
+                                Expression.Constant(typeOut),
+                                Expression.Constant(new MappingOperationOptions())
+                            })
+                    );
+                // This expression gets the CustomMapper from the typeMap
+                Expression<Func<TypeMap, Func<ResolutionContext, object>>> method = x => x.CustomMapper;
+                var customMapper = Expression.Invoke(method, Expression.Constant(typeMap));
+                // This expression calls the Invoke method from the CustomMapper func
+                var invoke = Expression.Call(customMapper, 
+                                typeof (Func<ResolutionContext, object>).GetMethod("Invoke"), context);
+                // We have to convert the object from Invoke to typeOut
+                total = Expression.Convert(invoke, typeOut);
+            }
+            else
+                total = Expression.MemberInit(
+                    Expression.New(typeOut),
+                    bindings.ToArray()
+                );
 
             return Expression.Lambda(total, instanceParameter);
         }
@@ -416,7 +457,7 @@ namespace AutoMapper
 
         bool IMappingEngineRunner.ShouldMapSourceValueAsNull(ResolutionContext context)
 		{
-            if (context.DestinationType.IsValueType)
+            if (context.DestinationType.IsValueType && !context.DestinationType.IsNullableType())
                 return false;
 
 			var typeMap = context.GetContextTypeMap();

@@ -23,7 +23,7 @@ namespace AutoMapper.Mappers
 			Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
 			var sourceLength = enumerableValue.Count;
-			var destination = (context.DestinationValue ?? CreateDestinationObject(context, destElementType, sourceLength, mapper));
+			var destination = GetOrCreateDestinationObject(context, mapper, destElementType, sourceLength);
 			var enumerable = GetEnumerableFor(destination);
 
 			ClearEnumerable(enumerable);
@@ -52,8 +52,12 @@ namespace AutoMapper.Mappers
 			return valueToAssign;
 		}
 
+	    protected virtual object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper, Type destElementType, int sourceLength)
+	    {
+	        return (context.DestinationValue ?? CreateDestinationObject(context, destElementType, sourceLength, mapper));
+	    }
 
-		protected virtual TEnumerable GetEnumerableFor(object destination)
+	    protected virtual TEnumerable GetEnumerableFor(object destination)
 		{
 			return (TEnumerable) destination;
 		}

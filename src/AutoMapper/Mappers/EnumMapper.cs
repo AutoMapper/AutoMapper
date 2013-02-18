@@ -35,6 +35,9 @@ namespace AutoMapper.Mappers
             {
                 if (context.SourceValue == null)
                 {
+                    if (mapper.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
+                        return null;
+
                     return mapper.CreateObject(context);
                 }
 
@@ -136,6 +139,12 @@ namespace AutoMapper.Mappers
         private static object ConvertEnumToNullableType(ResolutionContext context)
         {
             var nullableConverter = new NullableConverter(context.DestinationType);
+            
+            if (context.IsSourceValueNull)
+            {
+                return nullableConverter.ConvertFrom(context.SourceValue);
+            }
+
             var destType = nullableConverter.UnderlyingType;
             return Convert.ChangeType(context.SourceValue, destType);
         }

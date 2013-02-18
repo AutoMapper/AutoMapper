@@ -108,17 +108,22 @@
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
+    <Compile Include="Bug\ConditionBug.cs" />
     <Compile Include="Bug\ContextValuesIncorrect.cs" />
+    <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
     <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
     <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\DeepInheritanceIssue.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
+    <Compile Include="Bug\EFCollections.cs" />
     <Compile Include="Bug\EnumConditionsBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
+    <Compile Include="Bug\ExistingArrays.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
+    <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
     <Compile Include="Bug\MemberNamedTypeBug.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
@@ -126,12 +131,16 @@
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\NullableBytesAndEnums.cs" />
     <Compile Include="Bug\NullableConverterBug.cs" />
+    <Compile Include="Bug\NullableEnums.cs" />
+    <Compile Include="Bug\NullableEnumToNullableValueType.cs" />
+    <Compile Include="Bug\NullablePropertiesBug.cs" />
     <Compile Include="Bug\ObjectTypeMapFailure.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Bug\SubclassMappings.cs" />
     <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="Configuration\MapperConfigurationSpecs.cs" />
@@ -157,6 +166,7 @@
     <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
     <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
+    <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
     <Compile Include="Mappers\TypeHelperTests.cs">
       <SubType>Code</SubType>
     </Compile>

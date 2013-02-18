@@ -173,12 +173,12 @@ namespace AutoMapper
 
 		public static TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
 		{
-			return ConfigurationProvider.FindTypeMapFor(null, sourceType, destinationType);
+			return ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
 		}
 
 		public static TypeMap FindTypeMapFor<TSource, TDestination>()
 		{
-			return ConfigurationProvider.FindTypeMapFor(null, typeof(TSource), typeof(TDestination));
+			return ConfigurationProvider.FindTypeMapFor(typeof(TSource), typeof(TDestination));
 		}
 
 		public static TypeMap[] GetAllTypeMaps()

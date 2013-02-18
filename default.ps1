@@ -9,7 +9,8 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$version = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.1.0' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.2.1' }
+	$version = $pkgVersion -replace "-.*$", ""
 	$buildNumber = $version + '.0'
 	$global:config = "debug"
 	$framework_dir = Get-FrameworkDirectory
@@ -35,7 +36,7 @@ task compile -depends clean {
 }
 
 task commonAssemblyInfo {
-    $commit = git log -1 --pretty=format:%H
+    $commit = if ($env:BUILD_VCS_NUMBER -ne $NULL) { $env:BUILD_VCS_NUMBER } else { git log -1 --pretty=format:%H }
     create-commonAssemblyInfo "$buildNumber" "$commit" "$source_dir\CommonAssemblyInfo.cs"
 }
 
@@ -47,8 +48,7 @@ task test {
 task dist {
 	create_directory $dist_dir
 	copy_files "$build_dir\$config\AutoMapper" "$dist_dir\net40-client"
-    create-nuspec "$version" "AutoMapper.nuspec"
-    create-nuspec "$version-ci" "AutoMapper-CI.nuspec"
+    create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
 # -------------------------------------------------------------------------------------------------------------
@@ -115,10 +115,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersionAttribute(""$version"")]
 [assembly: AssemblyCopyrightAttribute(""Copyright Jimmy Bogard 2008-" + $date.Year + """)]
 [assembly: AssemblyProductAttribute(""AutoMapper"")]
-[assembly: AssemblyTrademarkAttribute(""$commit"")]
+[assembly: AssemblyTrademarkAttribute(""AutoMapper"")]
 [assembly: AssemblyCompanyAttribute("""")]
 [assembly: AssemblyConfigurationAttribute(""release"")]
-[assembly: AssemblyInformationalVersionAttribute(""$version"")]"  | out-file $filename -encoding "ASCII"    
+[assembly: AssemblyInformationalVersionAttribute(""$commit"")]"  | out-file $filename -encoding "ASCII"    
 }
 
 function global:create-nuspec($version, $fileName)
