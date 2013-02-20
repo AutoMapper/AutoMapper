@@ -49,5 +49,6 @@ namespace AutoMapper
 	    void DisableConstructorMapping();
 		void Seal();
 	    void EnableYieldReturnForDataReaderMapper();
+        bool AllowDuplicateCallsPerMapping { get; set; }
 	}
 }

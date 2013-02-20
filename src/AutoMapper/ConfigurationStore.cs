@@ -34,6 +34,7 @@ namespace AutoMapper
 		    _typeMapFactory = typeMapFactory;
 		    _mappers = mappers;
             _globalIgnore = new List<string>();
+            AllowDuplicateCallsPerMapping = true;
 		}
 
 	    public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
@@ -42,6 +43,8 @@ namespace AutoMapper
 	    {
 	        get { return _serviceCtor; }
 	    }
+
+        public bool AllowDuplicateCallsPerMapping { get; set; }
 
 	    public bool AllowNullDestinationValues
 		{
@@ -241,7 +244,12 @@ namespace AutoMapper
 		public TypeMap CreateTypeMap(Type source, Type destination, string profileName, MemberList memberList)
 		{
 			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination);
-				
+
+            var profileConfiguration2 = GetProfile(profileName);
+			if (this.AllowDuplicateCallsPerMapping == false)
+                if (typeMap != null)
+                    throw new DuplicateCallsPerMappingException(string.Format("Mapping was already define before! Mapping from {0} to {1}, profile {2}", 
+                        source.FullName, destination.FullName, profileName));
 			if (typeMap == null)
 			{
 			    var profileConfiguration = GetProfile(profileName);

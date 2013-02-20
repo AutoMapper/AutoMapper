@@ -22,6 +22,12 @@ namespace AutoMapper
 			set { Configuration.AllowNullDestinationValues = value; }
 		}
 
+        public static bool AllowDuplicateCallsPerMapping
+        {
+            get { return Configuration.AllowDuplicateCallsPerMapping; }
+            set { Configuration.AllowDuplicateCallsPerMapping = value; }
+        }
+
         public static TDestination Map<TDestination>(object source)
         {
             return Engine.Map<TDestination>(source);
