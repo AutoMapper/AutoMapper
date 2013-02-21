@@ -15,6 +15,7 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
+
 	public class ConfigurationStore : IConfigurationProvider, IConfiguration
 	{
 	    private readonly ITypeMapFactory _typeMapFactory;
@@ -26,6 +27,12 @@ namespace AutoMapper
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapCache = new ConcurrentDictionary<TypePair, TypeMap>();
         private readonly ConcurrentDictionary<string, FormatterExpression> _formatterProfiles = new ConcurrentDictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
+        /// <summary>
+        /// Stores stack traces where a type map where registered. This is in use only when AllowDuplicateCallsPerMapping
+        /// setting is set to true. This will output previous typeMap registration location, plus current one (which 
+        /// will be evident from exceptions stack trace)
+        /// </summary>
+        private readonly  ConcurrentDictionary<TypeMap, string> _typeMapRegistrationLocations = new ConcurrentDictionary<TypeMap, string>();
 
 	    private readonly List<string> _globalIgnore;
 
@@ -34,6 +41,7 @@ namespace AutoMapper
 		    _typeMapFactory = typeMapFactory;
 		    _mappers = mappers;
             _globalIgnore = new List<string>();
+            AllowDuplicateCallsPerMapping = true;
 		}
 
 	    public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
@@ -42,6 +50,8 @@ namespace AutoMapper
 	    {
 	        get { return _serviceCtor; }
 	    }
+
+        public bool AllowDuplicateCallsPerMapping { get; set; }
 
 	    public bool AllowNullDestinationValues
 		{
@@ -241,7 +251,12 @@ namespace AutoMapper
 		public TypeMap CreateTypeMap(Type source, Type destination, string profileName, MemberList memberList)
 		{
 			TypeMap typeMap = FindExplicitlyDefinedTypeMap(source, destination);
-				
+
+			if (this.AllowDuplicateCallsPerMapping == false)
+                if (typeMap != null)
+                    throw new DuplicateCallsPerMappingException(string.Format("Mapping was already define before! Mapping from type '{0}' to '{1}'. " +
+                                                                              "Original type map was registered here {2}", 
+                        source.FullName, destination.FullName, _typeMapRegistrationLocations[typeMap]));
 			if (typeMap == null)
 			{
 			    var profileConfiguration = GetProfile(profileName);
@@ -250,6 +265,7 @@ namespace AutoMapper
 
                 typeMap.Profile = profileName;
 			    typeMap.IgnorePropertiesStartingWith = _globalIgnore;
+                
 
 			    IncludeBaseMappings(source, destination, typeMap);
 
@@ -258,13 +274,22 @@ namespace AutoMapper
 			    var typePair = new TypePair(source, destination);
 			    _typeMapCache.AddOrUpdate(typePair, typeMap, (tp, tm) => typeMap);
 
+                if (this.AllowDuplicateCallsPerMapping == false)
+                    UpdateRegistrationLocations(typeMap);
+
 				OnTypeMapCreated(typeMap);
 			}
 
 			return typeMap;
 		}
 
-        private void IncludeBaseMappings(Type source, Type destination, TypeMap typeMap)
+	    private void UpdateRegistrationLocations(TypeMap typeMap)
+	    {
+	        var stackTrace = Environment.StackTrace;
+	        this._typeMapRegistrationLocations.AddOrUpdate(typeMap, stackTrace, (old, n) => stackTrace);
+	    }
+
+	    private void IncludeBaseMappings(Type source, Type destination, TypeMap typeMap)
         {
             foreach (var inheritedTypeMap in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
             {
