@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AutoMapper.Mappers;
 using Should;
 using NUnit.Framework;
 
@@ -269,7 +270,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Reset();
+                Mapper.Reset();
 
 				var model = new ModelObject
 					{

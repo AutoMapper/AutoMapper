@@ -123,7 +123,7 @@ namespace AutoMapper.UnitTests
 
 			public class Destination
 			{
-				public IDictionary<string, DestinationValue> Values { get; set; }
+				public System.Collections.Generic.IDictionary<string, DestinationValue> Values { get; set; }
 			}
 
 			public class DestinationValue
@@ -167,12 +167,12 @@ namespace AutoMapper.UnitTests
 
 			public class Foo
 			{
-				public IDictionary<string, Foo> Bar { get; set; }
+				public System.Collections.Generic.IDictionary<string, Foo> Bar { get; set; }
 			}
 
 			public class FooDto
 			{
-				public IDictionary<string, FooDto> Bar { get; set; }
+				public System.Collections.Generic.IDictionary<string, FooDto> Bar { get; set; }
 			}
 
 			protected override void Establish_context()
@@ -206,16 +206,16 @@ namespace AutoMapper.UnitTests
 
 		public class When_mapping_to_a_generic_dictionary_that_does_not_use_keyvaluepairs : SpecBase
 		{
-			private IDictionary<string, string> _dest;
+			private System.Collections.Generic.IDictionary<string, string> _dest;
 
 			public class SourceDto
 			{
-				public IDictionary<string, string> Items { get; set; }
+				public System.Collections.Generic.IDictionary<string, string> Items { get; set; }
 			}
 
 			public class DestDto
 			{
-				public IDictionary<string, string> Items { get; set; }
+				public System.Collections.Generic.IDictionary<string, string> Items { get; set; }
 			}
 
 			protected override void Establish_context()
@@ -237,7 +237,7 @@ namespace AutoMapper.UnitTests
 				};
 
 
-				_dest = Mapper.Map<IDictionary<string, string>, IDictionary<string, string>>(source.Items);
+				_dest = Mapper.Map<System.Collections.Generic.IDictionary<string, string>, System.Collections.Generic.IDictionary<string, string>>(source.Items);
 			}
 
 			[Test]
@@ -256,7 +256,7 @@ namespace AutoMapper.UnitTests
 			// This behaviour is demonstrated by NHibernate's PersistentGenericMap
 			// (which wraps a nongeneric PersistentMap).
 			public class GenericWrappedDictionary<TKey, TValue> :
-				IDictionary<TKey, TValue>, IDictionary
+				System.Collections.Generic.IDictionary<TKey, TValue>, IDictionary
 			{
 				IDictionary inner = new Hashtable();
 

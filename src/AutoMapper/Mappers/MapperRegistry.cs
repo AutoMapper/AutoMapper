@@ -23,7 +23,8 @@ namespace AutoMapper.Mappers
 #if !SILVERLIGHT
             new ListSourceMapper(),
 #endif
-            new ReadOnlyCollectionMapper(), 
+            new ReadOnlyCollectionMapper(),
+            new HashSetMapper(), 
             new CollectionMapper(),
             new EnumerableMapper(),
             new AssignableMapper(),

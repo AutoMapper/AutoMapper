@@ -10,6 +10,8 @@ namespace AutoMapper.UnitTests
 	[TestFixture]
 	public class DelegateFactoryTests
 	{
+        protected IDelegateFactory DelegateFactory { get { return new DelegateFactory(); } }
+
 		[Test]
 		public void MethodTests()
 		{
@@ -171,43 +173,6 @@ namespace AutoMapper.UnitTests
 
 		}
 
-		[Test, Explicit]
-		public void Test_with_DynamicMethod2()
-		{
-			var sourceType = typeof(DelegateFactoryTests);
-			MethodInfo property = sourceType.GetMethod("SetValue2", BindingFlags.Static | BindingFlags.NonPublic);
-
-			var d = (LateBoundValueTypePropertySet)Delegate.CreateDelegate(typeof(LateBoundValueTypePropertySet), property);
-
-			object othersource = new ValueSource();
-			DoIt4(othersource, "Asdf");
-
-			var source = new ValueSource();
-
-			var value = (object) source;
-
-			d(ref value, "hello");
-
-			source.Value.ShouldEqual("hello");
-		}
-
-		[Test, Explicit]
-		public void Test_with_CreateDelegate()
-		{
-			var sourceType = typeof(ValueSource);
-			PropertyInfo property = sourceType.GetProperty("Value");
-
-			LateBoundValueTypePropertySet callback = DelegateFactory.CreateValueTypeSet(property);
-
-			var source = new ValueSource();
-
-			var target = ((object)source);
-
-			callback(ref target, "hello");
-
-			source.Value.ShouldEqual("hello");
-		}
-
 		[Test]
 		public void Test_with_create_ctor()
 		{
@@ -236,40 +201,6 @@ namespace AutoMapper.UnitTests
 		{
 			return new ValueSource();
 		}
-
-#if !SILVERLIGHT
-		[Test, Explicit]
-		public void Test_with_DynamicMethod()
-		{
-			var sourceType = typeof(ValueSource);
-			PropertyInfo property = sourceType.GetProperty("Value");
-
-			var setter = property.GetSetMethod(true);
-			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, false);
-			var gen = method.GetILGenerator();
-
-			method.InitLocals = true;
-			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
-			gen.Emit(OpCodes.Ldind_Ref);
-			gen.Emit(OpCodes.Unbox_Any, sourceType); // Unbox the source to its correct type
-			gen.Emit(OpCodes.Stloc_0); // Store the unboxed input on the stack
-			gen.Emit(OpCodes.Ldloca_S, 0);
-			gen.Emit(OpCodes.Ldarg_1); // Load value to stack
-			gen.Emit(OpCodes.Castclass, property.PropertyType); // Unbox the value to its proper value type
-			gen.Emit(OpCodes.Call, setter); // Call the setter method
-			gen.Emit(OpCodes.Ret);
-
-			var result = (LateBoundValueTypePropertySet)method.CreateDelegate(typeof(LateBoundValueTypePropertySet));
-
-			var source = new ValueSource();
-
-			var value = (object) source;
-
-			result(ref value, "hello");
-
-			source.Value.ShouldEqual("hello");
-		}
-#endif
 
 		public delegate void SetValueDelegate(ref ValueSource source, string value);
 

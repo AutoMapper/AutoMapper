@@ -95,12 +95,12 @@ namespace AutoMapper
 
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
     	{
-            return GetAllPublicMembers(PropertyReadable, BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+            return GetAllPublicMembers(PropertyReadable, BindingFlags.Instance | BindingFlags.Public);
     	}
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
         {
-            return GetAllPublicMembers(PropertyWritable, BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty);
+            return GetAllPublicMembers(PropertyWritable, BindingFlags.Instance | BindingFlags.Public);
         }
 
         private bool PropertyReadable(PropertyInfo propertyInfo)
@@ -128,17 +128,14 @@ namespace AutoMapper
             // Scan all types for public properties and fields
             return typesToScan
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-                .SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
-                                               bindingAttr, 
-                                               (m, f) =>
-                                               m is FieldInfo ||
-                                               (m is PropertyInfo && propertyAvailableFor.Invoke((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any()), null));
+                .SelectMany(x => x.GetMembers(bindingAttr)
+                    .Where(m => m is FieldInfo || (m is PropertyInfo && propertyAvailableFor((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any())));
         }
 
         private MethodInfo[] BuildPublicNoArgMethods()
         {
             return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
+                .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))
                 .ToArray();
         }
     }

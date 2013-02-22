@@ -1,9 +1,12 @@
-using System;
-using System.Collections.Generic;
+﻿
+using System.Linq;
 
 namespace AutoMapper.Mappers
 {
-    public class CollectionMapper : IObjectMapper
+    using System;
+    using System.Collections.Generic;
+
+    public class HashSetMapper : IObjectMapper
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
@@ -11,7 +14,7 @@ namespace AutoMapper.Mappers
 
             var collectionType = context.DestinationType;
             var elementType = TypeHelper.GetElementType(context.DestinationType);
-            
+
             var enumerableMapper = genericType.MakeGenericType(collectionType, elementType);
 
             var objectMapper = (IObjectMapper)Activator.CreateInstance(enumerableMapper);
@@ -21,15 +24,29 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(ResolutionContext context)
         {
-            var isMatch = context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
+            var isMatch = context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
             return isMatch;
         }
 
-        #region Nested type: EnumerableMapper
+        private static bool IsSetType(Type type)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ISet<>))
+            {
+                return true;
+            }
+
+            IEnumerable<Type> genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType);
+            IEnumerable<Type> baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
+
+            var isCollectionType = baseDefinitions.Any(t => t == typeof(ISet<>));
+
+            return isCollectionType;
+        }
+
 
         private class EnumerableMapper<TCollection, TElement> : EnumerableMapperBase<TCollection>
-            where TCollection : ICollection<TElement>
+            where TCollection : ISet<TElement>
         {
             public override bool IsMatch(ResolutionContext context)
             {
@@ -49,10 +66,10 @@ namespace AutoMapper.Mappers
             protected override TCollection CreateDestinationObjectBase(Type destElementType, int sourceLength)
             {
                 Object collection;
-                
+
                 if (typeof(TCollection).IsInterface)
                 {
-                    collection = new List<TElement>();
+                    collection = new HashSet<TElement>();
                 }
                 else
                 {
@@ -63,6 +80,5 @@ namespace AutoMapper.Mappers
             }
         }
 
-        #endregion
     }
 }

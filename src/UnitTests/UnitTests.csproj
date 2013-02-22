@@ -12,8 +12,9 @@
     <AssemblyName>AutoMapper.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>AutoMapper.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -205,10 +206,13 @@
       <Project>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</Project>
       <Name>AutoMapper</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.Net4.csproj">
+      <Project>{8c955148-fa96-4f0d-880d-abb6770f54e9}</Project>
+      <Name>AutoMapper.Net4</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="AutoMapper.snk" />
     <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <ItemGroup>

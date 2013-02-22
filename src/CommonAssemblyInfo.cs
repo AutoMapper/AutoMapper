@@ -12,7 +12,6 @@ using System.Runtime.InteropServices;
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: ComVisibleAttribute(false)]
 [assembly: AssemblyVersionAttribute("2.0.0.0")]
 [assembly: AssemblyFileVersionAttribute("2.0.0.0")]
 [assembly: AssemblyCopyrightAttribute("Copyright Jimmy Bogard 2008-2011")]

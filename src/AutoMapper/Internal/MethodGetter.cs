@@ -16,7 +16,7 @@ namespace AutoMapper.Impl
 			_methodInfo = methodInfo;
 			_name = _methodInfo.Name;
 			_memberType = _methodInfo.ReturnType;
-			_lateBoundMethod = DelegateFactory.CreateGet(methodInfo);
+            _lateBoundMethod = DelegateFactory.CreateGet(methodInfo);
 		}
 
 		public override MemberInfo MemberInfo

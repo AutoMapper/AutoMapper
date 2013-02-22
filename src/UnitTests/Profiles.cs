@@ -78,7 +78,7 @@ namespace AutoMapper.UnitTests
 
 			public class CustomProfile1 : Profile
 			{
-				protected internal override void Configure()
+				protected override void Configure()
 				{
 					AddFormatter<Formatter>();
 
@@ -88,7 +88,7 @@ namespace AutoMapper.UnitTests
 
 			public class CustomProfile2 : Profile
 			{
-				protected internal override void Configure()
+				protected override void Configure()
 				{
 					AddFormatter<Formatter>();
 

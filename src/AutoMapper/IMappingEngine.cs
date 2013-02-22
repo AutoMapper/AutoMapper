@@ -1,10 +1,11 @@
 using System;
-using System.Linq.Expressions;
 
 namespace AutoMapper
 {
     public interface IMappingEngine : IDisposable
     {
+        IConfigurationProvider ConfigurationProvider { get; }
+
         TDestination Map<TDestination>(object source);
         TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts);
         TDestination Map<TSource, TDestination>(TSource source);
@@ -20,7 +21,6 @@ namespace AutoMapper
     	object DynamicMap(object source, Type sourceType, Type destinationType);
 		void DynamicMap<TSource, TDestination>(TSource source, TDestination destination);
     	void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
-        Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>();
     }
 }
 

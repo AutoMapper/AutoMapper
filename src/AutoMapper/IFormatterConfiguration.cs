@@ -7,7 +7,7 @@ namespace AutoMapper
 	public interface IFormatterConfiguration : IProfileConfiguration
 	{
 		IValueFormatter[] GetFormatters();
-		IDictionary<Type, IFormatterConfiguration> GetTypeSpecificFormatters();
+		System.Collections.Generic.IDictionary<Type, IFormatterConfiguration> GetTypeSpecificFormatters();
 		Type[] GetFormatterTypesToSkip();
 	    IEnumerable<IValueFormatter> GetFormattersToApply(ResolutionContext context);
 	}

@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8C955148-FA96-4F0D-880D-ABB6770F54E9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AutoMapper</RootNamespace>
+    <AssemblyName>AutoMapper.Net4</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\NET4\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\NET4\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\AutoMapper\Internal\PropertyEmitter.cs">
+      <Link>Internal\PropertyEmitter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ProxyGenerator.cs">
+      <Link>Internal\ProxyGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\DataReaderMapper.cs">
+      <Link>Mappers\DataReaderMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ListSourceMapper.cs">
+      <Link>Mappers\ListSourceMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\NameValueCollectionMapper.cs">
+      <Link>Mappers\NameValueCollectionMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\TypeConverterMapper.cs">
+      <Link>Mappers\TypeConverterMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Internal\CollectionFactory.cs" />
+    <Compile Include="Internal\DelegateFactory.cs" />
+    <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
+    <Compile Include="Internal\NullableConverterFactory.cs" />
+    <Compile Include="Internal\PropertyEmitter.cs" />
+    <Compile Include="Internal\ProxyGenerator.cs" />
+    <Compile Include="Internal\ProxyGeneratorFactory.cs" />
+    <Compile Include="Internal\ReaderWriterLockSlimFactory.cs" />
+    <Compile Include="Mapper.cs" />
+    <Compile Include="Mappers\DataReaderMapper.cs" />
+    <Compile Include="Mappers\HashSetMapper.cs" />
+    <Compile Include="Mappers\ListSourceMapper.cs" />
+    <Compile Include="Mappers\MapperRegistry.cs" />
+    <Compile Include="Mappers\NameValueCollectionMapper.cs" />
+    <Compile Include="Mappers\TypeConverterMapper.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryableExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
+      <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
+      <Name>AutoMapper</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
