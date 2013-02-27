@@ -84,9 +84,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Rhino.Mocks.dll</HintPath>
     </Reference>
-    <Reference Include="Should">
-      <HintPath>..\..\lib\Should.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -190,6 +187,51 @@
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Assert.cs" />
+    <Compile Include="Should\Should.Core\Assertions\AssertComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\AssertEqualityComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Assertions.cs" />
+    <Compile Include="Should\Should.Core\Assertions\EnumerableEqualityComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Record.cs" />
+    <Compile Include="Should\Should.Core\DatePrecision.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\AssertActualExpectedException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\AssertException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ComparisonException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ContainsException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\DoesNotContainException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\DoesNotThrowException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\EmptyException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\EqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\FalseException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\GreaterThanException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\GreaterThanOrEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\InRangeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsAssignableFromException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsNotTypeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsTypeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\LessThanException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\LessThanOrEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotEmptyException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotInRangeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotNullException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotSameException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NullException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ParameterCountMismatchException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\SameException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\SingleException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\StartsWithException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ThrowsException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TimeoutException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TraceAssertException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TrueException.cs" />
+    <Compile Include="Should\should\ActionAssertionExtensions.cs" />
+    <Compile Include="Should\should\BooleanAssertionExtensions.cs" />
+    <Compile Include="Should\should\CollectionAssertionExtensions.cs" />
+    <Compile Include="Should\should\DateAssertionExtensions.cs" />
+    <Compile Include="Should\should\DoubleAssertionExtensions.cs" />
+    <Compile Include="Should\should\ObjectAssertExtensions.cs" />
+    <Compile Include="Should\should\StringAssertionExtensions.cs" />
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="ResolutionContextTester.cs" />
@@ -214,6 +256,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="ClassDiagram1.cd" />
+    <None Include="Should\Should.Core\Assertions\Assert.cs.orig" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
