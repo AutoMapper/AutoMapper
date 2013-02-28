@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.2.1' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.3.0' }
 	$version = $pkgVersion -replace "-.*$", ""
 	$buildNumber = $version + '.0'
 	$global:config = "debug"
@@ -32,7 +32,7 @@ task release {
 }
 
 task compile -depends clean { 
-    exec { msbuild /t:Clean /t:Build /p:Configuration=Automated$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
+    exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
 }
 
 task commonAssemblyInfo {
@@ -42,7 +42,7 @@ task commonAssemblyInfo {
 
 task test {
 	create_directory "$build_dir\results"
-    exec { & $tools_dir\nunit\nunit-console-x86.exe $build_dir/$config/UnitTests/AutoMapper.UnitTests.dll /nologo /nodots /xml=$result_dir\AutoMapper.xml }
+    exec { & $lib\xunit.net\xunit.console.clr4.x86.exe $src_dir/UnitTests/bin/$config/AutoMapper.UnitTests.dll /xml $result_dir\AutoMapper.xml }
 }
 
 task dist {

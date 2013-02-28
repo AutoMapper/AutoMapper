@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Should;
-using NUnit.Framework;
+using Xunit;
 using System.Linq;
 
 namespace AutoMapper.UnitTests
@@ -42,13 +42,13 @@ namespace AutoMapper.UnitTests
 				_dest = Mapper.Map<Source, Destination>(_source, _originalDest);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_do_the_translation()
 			{
 				_dest.Value.ShouldEqual(10);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_return_the_destination_object_that_was_passed_in()
 			{
 				_originalDest.ShouldBeSameAs(_dest);
@@ -119,14 +119,14 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Destination>(_source, _originalDest);
             }
 
-            [Test]
+            [Fact]
             public void Should_do_the_translation()
             {
                 _dest.Value.ShouldEqual(10);
                 _dest.Child.Value.ShouldEqual(20);
             }
 
-            [Test]
+            [Fact]
             public void Should_return_the_destination_object_that_was_passed_in()
             {
                 _dest.Name.ShouldEqual("foo");
@@ -151,7 +151,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<SomeEnum, string>(SomeEnum.Two, "test");
 			}
 
-			[Test]
+			[Fact]
 			public void Should_return_the_enum_as_a_string()
 			{
 				_result.ShouldEqual("Two");

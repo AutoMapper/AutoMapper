@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -49,7 +49,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source(10));
 			}
 
-			[Test]
+			[Fact]
 			public void Should_perform_the_mapping_in_the_order_specified()
 			{
 				_result.Value2.ShouldEqual(15);

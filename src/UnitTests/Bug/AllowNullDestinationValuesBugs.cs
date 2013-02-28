@@ -1,11 +1,10 @@
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
     namespace AllowNullDestinationValuesBugs
     {
-        [TestFixture]
         public class When_mapping_to_an_assignable_object_with_nullable_off : AutoMapperSpecBase
         {
             private Destination _destination;
@@ -43,7 +42,7 @@ namespace AutoMapper.UnitTests.Bug
                 _destination = Mapper.Map<Source, Destination>(source);
             }
 
-            [Test]
+            [Fact]
             public void Should_create_the_assingable_member()
             {
                 _destination.ShouldNotBeNull();

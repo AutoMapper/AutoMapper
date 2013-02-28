@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Tests
@@ -71,13 +71,13 @@ namespace AutoMapper.UnitTests.Tests
                     .SourceMember;
         }
 
-        [Test]
+        [Fact]
         public void should_not_be_null()
         {
             sourceMember.ShouldNotBeNull();
         }
 
-        [Test]
+        [Fact]
         public void should_have_the_matching_member_of_the_source_type_as_value()
         {
             sourceMember.ShouldBeSameAs(typeof (Source).GetProperty(memberName));
@@ -97,12 +97,12 @@ namespace AutoMapper.UnitTests.Tests
                     .SourceMember;
         }
 
-        [Test] public void should_not_be_null()
+        [Fact] public void should_not_be_null()
         {
             sourceMember.ShouldNotBeNull();
         }
 
-        [Test] public void should_have_the_member_of_the_nested_source_type_as_value()
+        [Fact] public void should_have_the_member_of_the_nested_source_type_as_value()
         {
             sourceMember.ShouldBeSameAs(typeof (NestedSource).GetField("SomeField"));
         }
@@ -131,12 +131,12 @@ namespace AutoMapper.UnitTests.Tests
                                         
         }
 
-        [Test] public void should_not_throw_an_exception()
+        [Fact] public void should_not_throw_an_exception()
         {
             exception.ShouldBeNull();
         }
 
-        [Test] public void should_be_null()
+        [Fact] public void should_be_null()
         {
             sourceMember.ShouldBeNull();
         }
@@ -155,12 +155,12 @@ namespace AutoMapper.UnitTests.Tests
                     .SourceMember;
         }
 
-        [Test] public void should_not_be_null()
+        [Fact] public void should_not_be_null()
         {
             sourceMember.ShouldNotBeNull();
         }
 
-        [Test] public void should_have_the_projected_member_of_the_source_type_as_value()
+        [Fact] public void should_have_the_projected_member_of_the_source_type_as_value()
         {
             sourceMember.ShouldBeSameAs(typeof (Source).GetProperty("NamedProperty"));
         }
@@ -179,12 +179,12 @@ namespace AutoMapper.UnitTests.Tests
                     .SourceMember;
         }
 
-        [Test] public void should_not_be_null()
+        [Fact] public void should_not_be_null()
         {
             sourceMember.ShouldNotBeNull();
         }
 
-        [Test] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
+        [Fact] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
         {
             sourceMember.ShouldBeSameAs(typeof (Source).GetField("StringField"));
         }
@@ -203,12 +203,12 @@ namespace AutoMapper.UnitTests.Tests
                     .SourceMember;
         }
 
-        [Test] public void should_not_be_null()
+        [Fact] public void should_not_be_null()
         {
             sourceMember.ShouldNotBeNull();
         }
 
-        [Test] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
+        [Fact] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
         {
             sourceMember.ShouldBeSameAs(typeof (Source).GetField("AnotherStringField"));
         }
@@ -227,12 +227,12 @@ namespace AutoMapper.UnitTests.Tests
                     .SourceMember;
         }
 
-        [Test] public void should_not_be_null()
+        [Fact] public void should_not_be_null()
         {
             sourceMember.ShouldNotBeNull();
         }
 
-        [Test] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
+        [Fact] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
         {
             sourceMember.ShouldBeSameAs(typeof (Source).GetField("StringField3"));
         }
@@ -251,12 +251,12 @@ namespace AutoMapper.UnitTests.Tests
                     .SourceMember;
         }
 
-        [Test] public void should_not_be_null()
+        [Fact] public void should_not_be_null()
         {
             sourceMember.ShouldNotBeNull();
         }
 
-        [Test] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
+        [Fact] public void should_have_the_member_of_the_source_type_it_is_resolved_from_as_value()
         {
             sourceMember.ShouldBeSameAs(typeof (Source).GetField("StringField4"));
         }
@@ -294,12 +294,12 @@ namespace AutoMapper.UnitTests.Tests
                     .SourceMember;
         }
 
-        [Test] public void should_not_be_null()
+        [Fact] public void should_not_be_null()
         {
             sourceMember.ShouldNotBeNull();
         }
 
-        [Test]
+        [Fact]
         public void should_have_the_projected_member_of_the_source_type_as_value()
         {
             sourceMember.ShouldBeSameAs(typeof (Source).GetProperty("NamedProperty"));

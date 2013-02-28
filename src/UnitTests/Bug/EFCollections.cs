@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests.Bug
             _dest = Mapper.Map<Source, Dest>(source);
         }
 
-        [Test]
+        [Fact]
         public void Should_map_collection_items()
         {
             _dest.Children.Count.ShouldEqual(2);

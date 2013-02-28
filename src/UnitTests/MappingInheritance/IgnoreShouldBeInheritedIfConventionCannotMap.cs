@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class IgnoreShouldBeInheritedIfConventionCannotMap
     {
         public class BaseDomain
@@ -33,7 +32,7 @@ namespace AutoMapper.UnitTests.Bug
             public string SpecificProperty { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void inhertited_ignore_should_be_overridden_passes_validation()
         {
             Mapper.CreateMap<BaseDomain, Dto>()

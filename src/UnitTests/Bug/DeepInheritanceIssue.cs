@@ -1,11 +1,11 @@
-﻿using NUnit.Framework;
+﻿using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class DeepInheritanceIssue
     {
-        [Test]
+        [Fact]
         public void Example()
         {
             Mapper.Initialize(cfg =>
@@ -32,8 +32,8 @@ namespace AutoMapper.UnitTests.Bug
             var actualContBDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContBSrc); // THROWS
 
             Mapper.AssertConfigurationIsValid();
-            Assert.IsNotNull(actualContBDest);
-            Assert.IsNotNull(actualContCDest);
+            actualContBDest.ShouldNotBeNull();
+            actualContCDest.ShouldNotBeNull();
         }
     }
 

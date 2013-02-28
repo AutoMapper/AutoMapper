@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
@@ -10,11 +10,9 @@ namespace AutoMapper.UnitTests.Bug
             using System;
             using System.Collections.Generic;
             using AutoMapper;
-
-            [TestFixture]
             public class TestProblem
             {
-                [Test]
+                [Fact]
                 public void Example()
                 {
                     Mapper.CreateMap<int?, Entity>()

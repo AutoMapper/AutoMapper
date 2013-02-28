@@ -1,8 +1,8 @@
-﻿using NUnit.Framework;
+﻿using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class OverrideIgnore
     {
         public class DomainBase
@@ -15,7 +15,7 @@ namespace AutoMapper.UnitTests.Bug
             public string SomeDifferentProperty { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void specifying_map_should_override_ignore()
         {
             Mapper.CreateMap<DomainBase, DtoBase>()
@@ -24,10 +24,10 @@ namespace AutoMapper.UnitTests.Bug
 
             var dto = Mapper.Map<DomainBase, DtoBase>(new DomainBase {SomeProperty = "Test"});
 
-            Assert.AreEqual("Test", dto.SomeDifferentProperty);
+            "Test".ShouldEqual(dto.SomeDifferentProperty);
         }
 
-        [Test]
+        [Fact]
         public void specifying_map_should_override_ignore_with_one_parameter()
         {
             Mapper.CreateMap<DomainBase, DtoBase>()
@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests.Bug
 
             var dto = Mapper.Map<DtoBase>(new DomainBase { SomeProperty = "Test" });
 
-            Assert.AreEqual("Test", dto.SomeDifferentProperty);
+            "Test".ShouldEqual(dto.SomeDifferentProperty);
         }
     }
 }

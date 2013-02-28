@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -59,7 +59,7 @@ namespace AutoMapper.UnitTests
 				_modelDto = Mapper.Map<ModelObject, ModelDto>(modelObject);
 			}
 
-			[Test]
+			[Fact]
 			public void It_formats_the_values_in_the_order_declared()
 			{
 				_modelDto.Value.ShouldEqual("Hard 14 Value Soft Rokken Medium");
@@ -108,19 +108,19 @@ namespace AutoMapper.UnitTests
 			    _intResult = Mapper.Map<int, string>(44);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_format_using_concrete_formatter_class()
 			{
 				_result.StartDate.ShouldEqual("12/25/2004");
 			}
 
-			[Test]
+			[Fact]
 			public void Should_format_using_custom_expression_formatter()
 			{
 				_result.OtherValue.ShouldEqual("44");
 			}
 
-		    [Test]
+		    [Fact]
 		    public void Should_use_formatter_outside_of_type_map()
 		    {
 		        _intResult.ShouldEqual("45");
@@ -153,7 +153,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_apply_the_type_specific_formatting_first_then_global_formatting()
 			{
 				_result.OtherValue.ShouldEqual("44 Value");
@@ -195,7 +195,7 @@ namespace AutoMapper.UnitTests
 				_modelDto = Mapper.Map<ModelObject, ModelDto>(modelObject);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_apply_the_global_formatting()
 			{
 				_modelDto.Value.ShouldEqual("14");
@@ -239,13 +239,13 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_preserve_the_existing_formatter()
 			{
 				_result.ValueOne.ShouldEqual("Value 24");
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_format_using_the_skipped_formatter()
 			{
 				_result.ValueTwo.ShouldEqual("42");
@@ -286,7 +286,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_apply_the_skipped_formatting()
 			{
 				_result.ValueOne.ShouldEqual("24");
@@ -326,7 +326,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_apply_formatting_to_that_member()
 			{
 				_result.ValueOne.ShouldEqual("Value 24");
@@ -358,7 +358,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_replace_the_null_value_with_the_substitute()
 			{
 				_result.ValueOne.ShouldEqual("I am null");
@@ -425,7 +425,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Dest>(source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_apply_the_constructor_specified()
 			{
 				_result.Value.ShouldEqual("20 Splorg");
@@ -475,7 +475,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source {Value = 5});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_global_construction_method_for_creation()
 			{
 				_result.Value.ShouldEqual("ctor'd5");

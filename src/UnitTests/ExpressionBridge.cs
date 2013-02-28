@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Should;
-using NUnit.Framework;
+using Xunit;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
 
@@ -94,8 +94,6 @@ namespace AutoMapper.UnitTests
         {
             public int BillOfMaterialsID { set; get; }
         }
-
-        [TestFixture]
         public class When_mapping_using_expressions : NonValidatingSpecBase
         {
             private List<Product> _products;
@@ -169,7 +167,7 @@ namespace AutoMapper.UnitTests
 
             }
 
-            [Test]
+            [Fact]
             public void Should_map_and_flatten()
             {
 
@@ -187,7 +185,7 @@ namespace AutoMapper.UnitTests
                 _extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldEqual(5);
             }
            
-            [Test]
+            [Fact]
             public void Should_use_extension_methods()
             {
 
@@ -218,7 +216,7 @@ namespace AutoMapper.UnitTests
                 complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
             }
 
-            [Test]
+            [Fact]
             public void List_of_abstract_should_be_mapped()
             {
                 var mapped = Mapper.Map<AbstractProductDto>(_products[0]);

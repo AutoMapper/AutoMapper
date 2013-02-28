@@ -1,9 +1,8 @@
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class MultipleInterfaceInheritance : AutoMapperSpecBase
     {
         private ThingDto _thingDto;
@@ -49,7 +48,7 @@ namespace AutoMapper.UnitTests.Bug
             _thingDto = Mapper.Map<Thing, ThingDto>(thing);
         }
 
-        [Test]
+        [Fact]
         public void Should_map_successfully()
         {
             _thingDto.Items.Length.ShouldEqual(1);

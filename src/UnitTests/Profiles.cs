@@ -1,5 +1,5 @@
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -41,7 +41,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Model, Dto>(new Model {Value = 5});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_include_default_profile_configuration_with_profiled_maps()
 			{
 				_result.Value.ShouldEqual("5");
@@ -108,13 +108,13 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Model, Dto>(new Model { Value = 5 });
 			}
 
-		    [Test]
+		    [Fact]
 		    public void Should_default_the_custom_profile_name_to_the_type_name()
 		    {
                 _customProfile.ProfileName.ShouldEqual(typeof(CustomProfile1).FullName);
 		    }
 
-			[Test]
+			[Fact]
 			public void Should_use_the_overridden_configuration_method_to_configure()
 			{
 				_result.Value.ShouldEqual("5 Custom");

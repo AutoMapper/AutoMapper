@@ -3,55 +3,55 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
 	namespace Dictionaries
 	{
-		[Explicit("Need to resolve the assignable collection bug as well")]
-		public class When_mapping_to_a_non_generic_dictionary : AutoMapperSpecBase
-		{
-			private Destination _result;
+        //[Explicit("Need to resolve the assignable collection bug as well")]
+        //public class When_mapping_to_a_non_generic_dictionary : AutoMapperSpecBase
+        //{
+        //    private Destination _result;
 
-			public class Source
-			{
-				public Hashtable Values { get; set; }
-			}
+        //    public class Source
+        //    {
+        //        public Hashtable Values { get; set; }
+        //    }
 
-			public class Destination
-			{
-				public IDictionary Values { get; set; }
-			}
+        //    public class Destination
+        //    {
+        //        public IDictionary Values { get; set; }
+        //    }
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+        //    protected override void Establish_context()
+        //    {
+        //        Mapper.CreateMap<Source, Destination>();
+        //    }
 
-			protected override void Because_of()
-			{
-				var source = new Source
-					{
-						Values = new Hashtable
-							{
-								{"Key1", "Value1"},
-								{"Key2", 4}
-							}
-					};
+        //    protected override void Because_of()
+        //    {
+        //        var source = new Source
+        //            {
+        //                Values = new Hashtable
+        //                    {
+        //                        {"Key1", "Value1"},
+        //                        {"Key2", 4}
+        //                    }
+        //            };
 
-				_result = Mapper.Map<Source, Destination>(source);
-			}
+        //        _result = Mapper.Map<Source, Destination>(source);
+        //    }
 
-			[Test]
-			public void Should_map_the_source_dictionary_with_all_keys_and_values_preserved()
-			{
-				_result.Values.Count.ShouldEqual(2);
+        //    [Fact]
+        //    public void Should_map_the_source_dictionary_with_all_keys_and_values_preserved()
+        //    {
+        //        _result.Values.Count.ShouldEqual(2);
 
-				_result.Values["Key1"].ShouldEqual("Value1");
-				_result.Values["Key2"].ShouldEqual(4);
-			}
-		}
+        //        _result.Values["Key1"].ShouldEqual("Value1");
+        //        _result.Values["Key2"].ShouldEqual(4);
+        //    }
+        //}
 
 		public class When_mapping_to_a_generic_dictionary_with_mapped_value_pairs : SpecBase
 		{
@@ -97,7 +97,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_perform_mapping_for_individual_values()
 			{
 				_result.Values.Count.ShouldEqual(2);
@@ -151,7 +151,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_perform_mapping_for_individual_values()
 			{
 				_result.Values.Count.ShouldEqual(2);
@@ -195,7 +195,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Foo, FooDto>(foo1);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_fill_the_destination_with_an_empty_dictionary()
 			{
 				_result.Bar["lol"].Bar.ShouldNotBeNull();
@@ -240,7 +240,7 @@ namespace AutoMapper.UnitTests
 				_dest = Mapper.Map<System.Collections.Generic.IDictionary<string, string>, System.Collections.Generic.IDictionary<string, string>>(source.Items);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_using_the_nongeneric_dictionaryentry()
 			{
 				_dest.Values.Count.ShouldEqual(3);
@@ -455,7 +455,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<FooDto, FooObject>(source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_perform_mapping_for_individual_values()
 			{
 				_result.Values.Count.ShouldEqual(2);

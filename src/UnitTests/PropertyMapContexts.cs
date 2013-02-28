@@ -1,10 +1,9 @@
 ﻿using System;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
 {
-    [TestFixture]
     public class CustomValueResolverIsNotSuppliedWithContextPropertyMap
     {
 
@@ -57,7 +56,7 @@ namespace AutoMapper.UnitTests
         }
 
 
-        [Test]
+        [Fact]
         public void CustomValueResolver_Should_Be_Supplied_With_Current_PropertyMap()
         {
             Mapper.CreateMap<Source, DestinationDto>()

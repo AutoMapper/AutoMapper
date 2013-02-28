@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_skip_the_mapping_when_the_condition_is_true()
             {
                 var destination = Mapper.Map<Source, Destination>(new Source {Value = -1});
@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests
                 destination.Value.ShouldEqual(0);
             }
 
-            [Test]
+            [Fact]
             public void Should_execute_the_mapping_when_the_condition_is_false()
             {
                 var destination = Mapper.Map<Source, Destination>(new Source { Value = 7 });
@@ -73,7 +73,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_skip_the_mapping_when_the_condition_is_true()
             {
                 var destination = Mapper.Map<Source, Destination>(new Source { Value = -1 });
@@ -81,7 +81,7 @@ namespace AutoMapper.UnitTests
                 destination.Value.ShouldEqual(0);
             }
 
-            [Test]
+            [Fact]
             public void Should_execute_the_mapping_when_the_condition_is_false()
             {
                 Mapper.Map<Source, Destination>(new Source { Value = 7 }).Value.ShouldEqual(10);
@@ -126,13 +126,13 @@ namespace AutoMapper.UnitTests
                 _destination = Mapper.Map<Source, Destination>(new Source {Value = 5, Value2 = 10});
             }
 
-            [Test]
+            [Fact]
             public void Should_include_the_normal_members_by_default()
             {
                 _destination.Value.ShouldEqual(5);
             }
 
-            [Test]
+            [Fact]
             public void Should_skip_any_members_based_on_the_skip_condition()
             {
                 _destination.Value2.ShouldEqual(default(int));

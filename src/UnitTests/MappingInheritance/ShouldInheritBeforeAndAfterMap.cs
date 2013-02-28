@@ -1,9 +1,9 @@
 ﻿using AutoMapper.Mappers;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
 {
-    [TestFixture]
     public class ShouldInheritBeforeAndAfterMap
     {
         public class BaseClass
@@ -18,7 +18,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         }
         public class Dto : BaseDto {}
 
-        [Test]
+        [Fact]
         public void should_inherit_base_beforemap()
         {
             // arrange
@@ -36,10 +36,10 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var dest = mappingEngine.Map<Class, Dto>(source);
 
             // assert
-            Assert.AreEqual("test", dest.DifferentProp);
+            "test".ShouldEqual(dest.DifferentProp);
         }
 
-        [Test]
+        [Fact]
         public void should_inherit_base_aftermap()
         {
             // arrange
@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var dest = mappingEngine.Map<Class, Dto>(source);
 
             // assert
-            Assert.AreEqual("test", dest.DifferentProp);
+            "test".ShouldEqual(dest.DifferentProp);
         }
     }
 }

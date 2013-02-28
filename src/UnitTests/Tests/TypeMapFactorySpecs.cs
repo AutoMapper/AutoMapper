@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
+using Xunit;
 using Rhino.Mocks;
 using Should;
 
@@ -101,7 +101,7 @@ namespace AutoMapper.UnitTests.Tests
 			_factory = new TypeMapFactory();
 		}
 
-		[Test]
+		[Fact]
         public void Should_map_properties_with_same_name()
         {
 			var mappingOptions = new StubMappingOptions();
@@ -155,7 +155,7 @@ namespace AutoMapper.UnitTests.Tests
 			_map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions, MemberList.Destination);
 		}
 
-		[Test]
+		[Fact]
 		public void Should_split_using_naming_convention_rules()
 		{
 			_map.GetPropertyMaps().Count().ShouldEqual(1);
@@ -201,7 +201,7 @@ namespace AutoMapper.UnitTests.Tests
 			_map = _factory.CreateTypeMap(typeof(Source), typeof(Destination), _mappingOptions, MemberList.Destination);
 		}
 
-		[Test]
+		[Fact]
 		public void Should_split_using_naming_convention_rules()
 		{
 			_map.GetPropertyMaps().Count().ShouldEqual(1);

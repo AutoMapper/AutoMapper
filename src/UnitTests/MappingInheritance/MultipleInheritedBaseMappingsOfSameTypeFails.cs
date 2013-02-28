@@ -1,8 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class MultipleMappingsOfSameTypeFails
     {
         public class MyClass
@@ -24,7 +23,7 @@ namespace AutoMapper.UnitTests.Bug
         public class InformationBase{}
         public class InformationClass{}
 
-        [Test]
+        [Fact]
         public void multiple_inherited_base_mappings_of_same_type_fails()
         {
             Mapper.CreateMap<MyClass, MyDto>()

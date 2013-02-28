@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -48,13 +48,13 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5, Bar = 10 });
             }
 
-            [Test]
+            [Fact]
             public void Should_map_the_constructor_argument()
             {
                 _dest.Foo.ShouldEqual(5);
             }
 
-            [Test]
+            [Fact]
             public void Should_map_the_existing_properties()
             {
                 _dest.Bar.ShouldEqual(10);
@@ -95,7 +95,7 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5 });
             }
 
-            [Test]
+            [Fact]
             public void Should_map_the_constructor_argument()
             {
                 _dest.Foo.ShouldEqual(5);
@@ -148,7 +148,7 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5 });
             }
 
-            [Test]
+            [Fact]
             public void Should_map_with_the_custom_constructor()
             {
                 _dest.Foo.ShouldEqual(10);
@@ -201,7 +201,7 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5 }, opt => opt.ConstructServicesUsing(t => new Dest(6)));
             }
 
-            [Test]
+            [Fact]
             public void Should_map_with_the_custom_constructor()
             {
                 _dest.Foo.ShouldEqual(11);
@@ -247,18 +247,16 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5, Bar = 10 });
             }
 
-            [Test]
+            [Fact]
             public void Should_map_the_existing_properties()
             {
                 _dest.Foo.ShouldEqual(5);
                 _dest.Bar.ShouldEqual(10);
             }
         }
-
-        [TestFixture]
         public class UsingMappingEngineToResolveConstructorArguments : AutoMapperSpecBase
         {
-            [Test]
+            [Fact]
             public void Should_resolve_constructor_arguments_using_mapping_engine()
             {
                 Mapper.CreateMap<SourceBar, DestinationBar>();

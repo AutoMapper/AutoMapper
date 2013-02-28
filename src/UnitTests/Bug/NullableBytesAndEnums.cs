@@ -1,5 +1,5 @@
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests.Bug
 			_destination = Mapper.Map<Source, Destination>(new Source {Value = 2});
 		}
 
-		[Test]
+		[Fact]
 		public void Should_map_the_byte_to_the_enum_with_the_same_value()
 		{
 			_destination.Value.ShouldEqual(Foo.Splorg);

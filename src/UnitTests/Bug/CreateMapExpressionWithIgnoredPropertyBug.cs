@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class CreateMapExpressionWithIgnoredPropertyBug : NonValidatingSpecBase
     {
-        [Test]
+        [Fact]
         public void ShouldNotMapPropertyWhenItIsIgnored()
         {
             Mapper.CreateMap<Person, Person>()
@@ -18,7 +18,7 @@ namespace AutoMapper.UnitTests.Bug
 
             List<Person> result = collection.Project().To<Person>().ToList();
 
-            result.ForEach(x => Assert.IsNull(x.Name));
+            result.ForEach(x => x.Name.ShouldBeNull());
         }
 
         private class Person

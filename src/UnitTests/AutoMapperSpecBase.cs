@@ -1,5 +1,6 @@
+using System;
 using Should;
-using NUnit.Framework;
+using Xunit;
 #if !SILVERLIGHT
 using Rhino.Mocks;
 #endif
@@ -8,7 +9,7 @@ namespace AutoMapper.UnitTests
 {
     public class AutoMapperSpecBase : NonValidatingSpecBase
     {
-        [Test]
+        [Fact]
         public void Should_have_valid_configuration()
         {
             Mapper.AssertConfigurationIsValid();
@@ -62,20 +63,26 @@ namespace AutoMapper.UnitTests
         }
 #endif
     }
-
-    [TestFixture]
-    public abstract class SpecBase : SpecBaseBase
+    public abstract class SpecBase : SpecBaseBase, IDisposable
     {
-        [TestFixtureSetUp]
+        protected SpecBase()
+        {
+            MainSetup();
+        }
+
         public override void MainSetup()
         {
             base.MainSetup();
         }
 
-        [TestFixtureTearDown]
         public override void MainTeardown()
         {
             base.MainTeardown();
+        }
+
+        public void Dispose()
+        {
+            MainTeardown();
         }
     }
 

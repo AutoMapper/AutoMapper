@@ -1,5 +1,5 @@
 using AutoMapper.Configuration;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Configuration
 {
@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.Configuration
                 });
             }
 
-            [Test]
+            [Fact]
             public void should_record_the_type_map()
             {
                 //_configuration.TypeMaps.Count().ShouldEqual(1);

@@ -1,12 +1,15 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class SettersInBaseClasses
     {
-        [TestFixtureSetUp]
+        public SettersInBaseClasses()
+        {
+            SetUp();
+        }
+
         public void SetUp(){
             Mapper.CreateMap<Source, GrandGrandChild>();
             Mapper.CreateMap<Source, GrandChild>();
@@ -17,7 +20,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.CreateMap<Source, ChildPrivate>();
         }
 
-        [Test]
+        [Fact]
         public void PublicSetterInParentWorks()
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
@@ -27,7 +30,7 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         
-        [Test]
+        [Fact]
         public void PublicSetterInGrandparentWorks()
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
@@ -36,7 +39,7 @@ namespace AutoMapper.UnitTests.Bug
             target.ChildProperty.ShouldEqual(source.ChildProperty);
         }
 
-        [Test]
+        [Fact]
         public void PublicSetterInGrandGrandparentWorks()
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
@@ -45,7 +48,7 @@ namespace AutoMapper.UnitTests.Bug
             target.ChildProperty.ShouldEqual(source.ChildProperty);
         }
 
-        [Test]
+        [Fact]
 #if SILVERLIGHT
         [Ignore("Not supported in Silverlight 4")]
 #endif
@@ -57,7 +60,7 @@ namespace AutoMapper.UnitTests.Bug
             target.ChildProperty.ShouldEqual(source.ChildProperty);
         }
 
-        [Test]
+        [Fact]
 #if SILVERLIGHT
         [Ignore("Not supported in Silverlight 4")]
 #endif
@@ -69,7 +72,7 @@ namespace AutoMapper.UnitTests.Bug
             target.ChildProperty.ShouldEqual(source.ChildProperty);
         }
 
-        [Test]
+        [Fact]
 #if SILVERLIGHT
         [Ignore("Not supported in Silverlight 4")]
 #endif

@@ -63,8 +63,9 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
-    <Compile Include="Mappers\MapperRegistryInitializer.cs" />
+    <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryableExtensions.cs" />

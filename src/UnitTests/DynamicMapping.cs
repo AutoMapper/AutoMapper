@@ -1,5 +1,5 @@
 using System;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests
 				_resultWithoutGenerics = (Destination) Mapper.DynamicMap(new Source {Value = 5}, typeof(Source), typeof(Destination));
 			}
 
-			[Test]
+			[Fact]
 			public void Should_dynamically_map_the_two_types()
 			{
 				_resultWithGenerics.Value.ShouldEqual(5);
@@ -74,13 +74,13 @@ namespace AutoMapper.UnitTests
                 _resultWithGenerics = Mapper.DynamicMap<Source, Destination>(source);
             }
 
-            [Test]
+            [Fact]
             public void Should_dynamically_map_the_two_types()
             {
                 _resultWithGenerics.Value.ShouldEqual(5);
             }
 
-            [Test]
+            [Fact]
             public void Should_dynamically_map_the_children()
             {
                 _resultWithGenerics.Child.Value2.ShouldEqual("foo");
@@ -99,7 +99,7 @@ namespace AutoMapper.UnitTests
 				public int Valuefff { get; set; }
 			}
 
-			[Test]
+			[Fact]
 			public void Should_ignore_any_members_that_do_not_match()
 			{
 				var destination = Mapper.DynamicMap<Source, Destination>(new Source {Value = 5});
@@ -107,7 +107,7 @@ namespace AutoMapper.UnitTests
 				destination.Valuefff.ShouldEqual(0);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_throw_any_configuration_errors()
 			{
 				typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.DynamicMap<Source, Destination>(new Source { Value = 5 }));
@@ -136,13 +136,13 @@ namespace AutoMapper.UnitTests
 				Mapper.DynamicMap(new Source { Value = 5, Value2 = 3}, _destination);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_preserve_existing_values()
 			{
 				_destination.Valuefff.ShouldEqual(7);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_new_values()
 			{
 				_destination.Value2.ShouldEqual(3);
@@ -163,7 +163,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.DynamicMap<IDestination>(new {value = 5});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_allow_dynamic_mapping()
 			{
 				_result.Value.ShouldEqual(5);
