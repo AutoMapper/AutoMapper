@@ -138,7 +138,7 @@ namespace AutoMapper.UnitTests
                 _destination.Value2.ShouldEqual(default(int));
             }
 
-            public class SkipAttribute : Attribute { }
+            public class SkipAttribute : System.Attribute { }
         }
 
     }

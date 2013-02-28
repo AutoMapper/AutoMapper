@@ -3,111 +3,205 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{002075C5-6517-4794-BC99-9B17B9E884E7}</ProjectGuid>
+    <ProjectGuid>{85F76915-855C-4751-9326-6DCE4DC0CD9C}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
-    <AssemblyName>AutoMapper.UnitTests</AssemblyName>
+    <AssemblyName>AutoMapper.UnitTests.SL4</AssemblyName>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+  </PropertyGroup>
+  <!-- This property group is only here to support building this project using the 
+       MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
+       to set the TargetFrameworkVersion to v3.5 -->
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Rhino.Mocks, Version=3.5.0.1337, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Rhino.Mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
+    <Reference Include="mscorlib" />
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
     <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+      <HintPath>$(TargetFrameworkDirectory)System.Core.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="xunit">
-      <HintPath>..\..\lib\xunit.net\xunit.dll</HintPath>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Browser" />
+    <Reference Include="xunit-silverlight">
+      <HintPath>..\..\lib\xunit.sl\Silverlight-4.0\xunit-silverlight.dll</HintPath>
     </Reference>
-    <Reference Include="xunit.extensions">
-      <HintPath>..\..\lib\xunit.net\xunit.extensions.dll</HintPath>
+    <Reference Include="xunit.extensions-silverlight">
+      <HintPath>..\..\lib\xunit.sl\Silverlight-4.0\xunit.extensions-silverlight.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
-      <Link>CommonAssemblyInfo.cs</Link>
+    <Compile Include="..\UnitTests\ArraysAndLists.cs">
+      <Link>ArraysAndLists.cs</Link>
     </Compile>
-    <Compile Include="ArraysAndLists.cs" />
-    <Compile Include="AssertionExtensions.cs" />
-    <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
-    <Compile Include="AutoMapperSpecBase.cs" />
-    <Compile Include="AutoMapperTester.cs" />
-    <Compile Include="BeforeAfterMapping.cs" />
-    <Compile Include="BidirectionalRelationships.cs" />
+    <Compile Include="..\UnitTests\AssertionExtensions.cs">
+      <Link>AssertionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\AutoMapperSpecBase.cs">
+      <Link>AutoMapperSpecBase.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\AutoMapperTester.cs">
+      <Link>AutoMapperTester.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\BeforeAfterMapping.cs">
+      <Link>BeforeAfterMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\BidirectionalRelationships.cs">
+      <Link>BidirectionalRelationships.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\CollectionMapping.cs">
+      <Link>CollectionMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ConditionalMapping.cs">
+      <Link>ConditionalMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ConfigurationValidation.cs">
+      <Link>ConfigurationValidation.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Constructors.cs">
+      <Link>Constructors.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ConversionOperators.cs">
+      <Link>ConversionOperators.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\CustomFormatters.cs">
+      <Link>CustomFormatters.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\CustomMapping.cs">
+      <Link>CustomMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Dictionaries.cs">
+      <Link>Dictionaries.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\DynamicMapping.cs">
+      <Link>DynamicMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Enumerations.cs">
+      <Link>Enumerations.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ExpressionBridge.cs">
+      <Link>ExpressionBridge.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ExtensionMethods.cs">
+      <Link>ExtensionMethods.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\FillingExistingDestination.cs">
+      <Link>FillingExistingDestination.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\General.cs">
+      <Link>General.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\IgnoreAllTests.cs">
+      <Link>IgnoreAllTests.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Indexers.cs">
+      <Link>Indexers.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\InterfaceMapping.cs">
+      <Link>InterfaceMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Internationalization.cs">
+      <Link>Internationalization.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingExceptions.cs">
+      <Link>MappingExceptions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MappingOrder.cs">
+      <Link>MappingOrder.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MaxDepthTests.cs">
+      <Link>MaxDepthTests.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\MemberResolution.cs">
+      <Link>MemberResolution.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\NestedContainers.cs">
+      <Link>NestedContainers.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\NullBehavior.cs">
+      <Link>NullBehavior.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Profiles.cs">
+      <Link>Profiles.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\PropertyMapContexts.cs">
+      <Link>PropertyMapContexts.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\Regression.cs">
+      <Link>Regression.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ResolutionContextTester.cs">
+      <Link>ResolutionContextTester.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ReverseMapping.cs">
+      <Link>ReverseMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\TesterExtensions.cs">
+      <Link>TesterExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\TypeConverters.cs">
+      <Link>TypeConverters.cs</Link>
+    </Compile>
+    <Compile Include="..\UnitTests\ValueTypes.cs">
+      <Link>ValueTypes.cs</Link>
+    </Compile>
+    <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\AllMembersNullSubstitute.cs" />
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
+    <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
+    <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
     <Compile Include="Bug\ConditionBug.cs" />
     <Compile Include="Bug\ContextValuesIncorrect.cs" />
-    <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
     <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
-    <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
     <Compile Include="Bug\CustomIEnumerableBug.cs" />
-    <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\DeepInheritanceIssue.cs" />
+    <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
     <Compile Include="Bug\EFCollections.cs" />
     <Compile Include="Bug\EnumConditionsBug.cs" />
-    <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\ExistingArrays.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
+    <Compile Include="Bug\LazyCollectionMapping.cs" />
+    <Compile Include="Bug\MappingToAReadOnlyCollection.cs" />
     <Compile Include="Bug\MemberNamedTypeBug.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
-    <Compile Include="Bug\MultiThreadingIssues.cs" />
     <Compile Include="Bug\NamingConventions.cs" />
     <Compile Include="Bug\NullableBytesAndEnums.cs" />
     <Compile Include="Bug\NullableConverterBug.cs" />
@@ -117,42 +211,13 @@
     <Compile Include="Bug\ObjectTypeMapFailure.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
-    <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Bug\SequenceContainsNoElementsTest.cs" />
     <Compile Include="Bug\SubclassMappings.cs" />
-    <Compile Include="CollectionMapping.cs" />
-    <Compile Include="ConditionalMapping.cs" />
     <Compile Include="Configuration\MapperConfigurationSpecs.cs" />
-    <Compile Include="Constructors.cs" />
-    <Compile Include="ConversionOperators.cs" />
-    <Compile Include="CustomFormatters.cs" />
-    <Compile Include="CustomMapping.cs" />
-    <Compile Include="DataReaderMapping.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ExpressionBridge.cs" />
-    <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="IgnoreAllTests.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
-    <Compile Include="Dictionaries.cs" />
-    <Compile Include="DynamicMapping.cs" />
-    <Compile Include="Enumerations.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="FillingExistingDestination.cs" />
-    <Compile Include="General.cs" />
-    <Compile Include="Indexers.cs" />
-    <Compile Include="InterfaceMapping.cs" />
     <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
-    <Compile Include="Internationalization.cs" />
-    <Compile Include="Bug\LazyCollectionMapping.cs" />
-    <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
     <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
-    <Compile Include="Mappers\TypeHelperTests.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MappingExceptions.cs" />
+    <Compile Include="Mappers\TypeHelperTests.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
     <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
@@ -162,15 +227,7 @@
     <Compile Include="MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs" />
     <Compile Include="MappingInheritance\ShouldInheritBeforeAndAfterMap.cs" />
     <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
-    <Compile Include="MappingOrder.cs" />
-    <Compile Include="MaxDepthTests.cs" />
-    <Compile Include="MemberResolution.cs" />
-    <Compile Include="NestedContainers.cs" />
-    <Compile Include="NullBehavior.cs" />
-    <Compile Include="Profiles.cs" />
-    <Compile Include="PropertyMapContexts.cs" />
-    <Compile Include="Regression.cs" />
-    <Compile Include="ReverseMapping.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Should\Should.Core\Assertions\Assert.cs" />
     <Compile Include="Should\Should.Core\Assertions\AssertComparer.cs" />
     <Compile Include="Should\Should.Core\Assertions\AssertEqualityComparer.cs" />
@@ -216,50 +273,31 @@
     <Compile Include="Should\should\DoubleAssertionExtensions.cs" />
     <Compile Include="Should\should\ObjectAssertExtensions.cs" />
     <Compile Include="Should\should\StringAssertionExtensions.cs" />
-    <Compile Include="TesterExtensions.cs" />
-    <Compile Include="ConfigurationValidation.cs" />
-    <Compile Include="ResolutionContextTester.cs" />
-    <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\MapperTests.cs" />
+    <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />
-    <Compile Include="Tests\TypeMapFactorySpecs.cs" />
-    <Compile Include="TypeConverters.cs" />
-    <Compile Include="ValueTypes.cs" />
-    <Compile Include="Bug\MappingToAReadOnlyCollection.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
-      <Project>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</Project>
-      <Name>AutoMapper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.Net4.csproj">
-      <Project>{8c955148-fa96-4f0d-880d-abb6770f54e9}</Project>
-      <Name>AutoMapper.Net4</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="ClassDiagram1.cd" />
     <None Include="Should\Should.Core\Assertions\Assert.cs.orig" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
+      <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
+      <Name>AutoMapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.SL4.csproj">
+      <Project>{a46863c7-1dec-4037-9fc2-c353021f2490}</Project>
+      <Name>AutoMapper.SL4</Name>
+    </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

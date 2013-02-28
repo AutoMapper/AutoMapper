@@ -1397,9 +1397,7 @@ namespace AutoMapper.UnitTests
 
 	}
 
-#if SILVERLIGHT
-    [Ignore("Setting non-public members not supported with Silverlight DynamicMethod ctor")]
-#endif
+#if !SILVERLIGHT
     public class When_destination_type_has_private_members : AutoMapperSpecBase
 	{
 		private IDestination _destination;
@@ -1444,9 +1442,10 @@ namespace AutoMapper.UnitTests
 			_destination.Value.ShouldEqual(5);
 		}
 	}
+#endif
 
 
-	public static class MapFromExtensions
+    public static class MapFromExtensions
 	{
 		public static int Plus(this int left, int right)
 		{

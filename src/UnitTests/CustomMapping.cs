@@ -817,9 +817,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-#if SILVERLIGHT
-        [Ignore("Setting non-public members not supported with Silverlight DynamicMethod ctor")]
-#endif
+#if !SILVERLIGHT
         public class When_destination_property_does_not_have_a_setter : AutoMapperSpecBase
         {
             private Source _source;
@@ -885,6 +883,7 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual("bar");
             }
         }
+#endif
 
         public class When_destination_property_does_not_have_a_getter : AutoMapperSpecBase
         {
@@ -943,7 +942,7 @@ namespace AutoMapper.UnitTests
                 _dest = new Destination();
 
 
-                _sourceWithList = new SourceWithList { SomeList = new ArrayList() { 1, 2} };
+                _sourceWithList = new SourceWithList { SomeList = new [] { 1, 2} };
                 _destWithList = new DestinationWithList();
             }
 
@@ -962,7 +961,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_translate_to_enumerable_properties_that_doesnt_have_a_getter()
             {
-                new ArrayList() { 1, 2 }.ShouldEqual(_destWithList.GetSomeList());
+                new [] { 1, 2 }.ShouldEqual(_destWithList.GetSomeList());
             }
         }
 	

@@ -256,9 +256,9 @@ namespace AutoMapper.UnitTests
 			// This behaviour is demonstrated by NHibernate's PersistentGenericMap
 			// (which wraps a nongeneric PersistentMap).
 			public class GenericWrappedDictionary<TKey, TValue> :
-				System.Collections.Generic.IDictionary<TKey, TValue>, IDictionary
+				System.Collections.Generic.IDictionary<TKey, TValue>, System.Collections.IDictionary
 			{
-				IDictionary inner = new Hashtable();
+                System.Collections.IDictionary inner = new Dictionary<TKey, TValue>();
 
 				public void Add(TKey key, TValue value)
 				{
@@ -359,9 +359,9 @@ namespace AutoMapper.UnitTests
 					throw new NotImplementedException();
 				}
 
-				IDictionaryEnumerator IDictionary.GetEnumerator()
+                IDictionaryEnumerator System.Collections.IDictionary.GetEnumerator()
 				{
-					return ((IDictionary)inner).GetEnumerator();
+					return ((System.Collections.IDictionary)inner).GetEnumerator();
 				}
 
 				public bool IsFixedSize
@@ -369,7 +369,7 @@ namespace AutoMapper.UnitTests
 					get { throw new NotImplementedException(); }
 				}
 
-				ICollection IDictionary.Keys
+				ICollection System.Collections.IDictionary.Keys
 				{
 					get { return inner.Keys; }
 				}
@@ -379,7 +379,7 @@ namespace AutoMapper.UnitTests
 					throw new NotImplementedException();
 				}
 
-				ICollection IDictionary.Values
+                ICollection System.Collections.IDictionary.Values
 				{
 					get { return inner.Values; }
 				}
