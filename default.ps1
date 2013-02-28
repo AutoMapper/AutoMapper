@@ -42,7 +42,7 @@ task commonAssemblyInfo {
 
 task test {
 	create_directory "$build_dir\results"
-    exec { & $lib\xunit.net\xunit.console.clr4.x86.exe $src_dir/UnitTests/bin/$config/AutoMapper.UnitTests.dll /xml $result_dir\AutoMapper.xml }
+    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.dll /xml $result_dir\AutoMapper.xml }
 }
 
 task dist {
