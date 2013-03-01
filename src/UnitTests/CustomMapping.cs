@@ -1081,7 +1081,47 @@ namespace AutoMapper.UnitTests
                 _e.ShouldNotBeNull();
             }
         }
-
-
 	}
+
+    public class When_mapping_from_one_type_to_another : AutoMapperSpecBase
+    {
+        private Dest _dest;
+
+        public class Source
+        {
+            public string Value { get; set; }
+        }
+
+        public class Dest
+        {
+            // AutoMapper tries to map Source.Value to this constructor's parameter,
+            // but does not take its member configuration into account
+            public Dest(int value)
+            {
+                Value = value;
+            }
+            public Dest()
+            {
+            }
+
+            public int Value { get; set; }
+        }
+
+        protected override void Establish_context()
+        {
+            Mapper.CreateMap<Source, Dest>()
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(s => ParseValue(s.Value)));
+        }
+
+        protected override void Because_of()
+        {
+            var source = new Source { Value = "a1" };
+            _dest = Mapper.Map<Source, Dest>(source);
+        }
+
+        private static int ParseValue(string value)
+        {
+            return int.Parse(value.Substring(1));
+        }
+    }
 }
