@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+#if !SILVERLIGHT
 using System.Data;
+#endif
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -16,7 +18,9 @@ namespace AutoMapper
 
         static DelegateFactory()
         {
+#if !SILVERLIGHT
             FeatureDetector.IsIDataRecordType = t => typeof (IDataRecord).IsAssignableFrom(t);
+#endif
         }
 
         private static readonly IDictionary<Type, LateBoundCtor> _ctorCache = CollectionFactory.CreateConcurrentDictionary<Type, LateBoundCtor>();

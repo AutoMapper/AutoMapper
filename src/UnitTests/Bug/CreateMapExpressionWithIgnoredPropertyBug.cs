@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.Bug
             result.ForEach(x => x.Name.ShouldBeNull());
         }
 
-        private class Person
+        public class Person
         {
             public string Name { get; set; }
         }

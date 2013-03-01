@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
                 }
             }
 
-            class IntToEntityConverter : TypeConverter<int, Entity>
+            public class IntToEntityConverter : TypeConverter<int, Entity>
             {
                 protected override Entity ConvertCore(int source)
                 {
@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests.Bug
                 }
             }
 
-            class NullableIntToEntityConverter : TypeConverter<int?, Entity>
+            public class NullableIntToEntityConverter : TypeConverter<int?, Entity>
             {
                 protected override Entity ConvertCore(int? source)
                 {
@@ -55,7 +55,7 @@ namespace AutoMapper.UnitTests.Bug
                 }
             }
 
-            class Entity
+            public class Entity
             {
                 public int Id { get; set; }
 

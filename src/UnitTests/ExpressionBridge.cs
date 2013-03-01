@@ -52,9 +52,9 @@ namespace AutoMapper.UnitTests
         {
             protected override ProductTypeDto ConvertCore(ProductType source)
             {
-                if (source.TypeName == "A")
+                if (source.Name == "A")
                     return new ProdTypeA();
-                if (source.TypeName == "B")
+                if (source.Name == "B")
                     return new ProdTypeB();
                 throw new ArgumentException();
             }
@@ -63,7 +63,7 @@ namespace AutoMapper.UnitTests
 
         public class ProductType
         {
-            public string TypeName { get; set; }
+            public string Name { get; set; }
         }
 
         public class BillOfMaterialsDto
@@ -149,9 +149,9 @@ namespace AutoMapper.UnitTests
                         ,
                         Types = new List<ProductType>
                                     {
-                                        new ProductType() { TypeName = "A" },
-                                        new ProductType() { TypeName = "B" },
-                                        new ProductType() { TypeName = "A" }
+                                        new ProductType() { Name = "A" },
+                                        new ProductType() { Name = "B" },
+                                        new ProductType() { Name = "A" }
                                     }
                     }
                 };
@@ -215,7 +215,7 @@ namespace AutoMapper.UnitTests
                 complexProducts[0].ProductSubcategory.Name.ShouldEqual("Bar");
                 complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
             }
-
+#if !SILVERLIGHT
             [Fact]
             public void List_of_abstract_should_be_mapped()
             {
@@ -231,6 +231,7 @@ namespace AutoMapper.UnitTests
                 abstractProducts[0].Types[1].GetType().ShouldEqual(typeof (ProdTypeB));
                 abstractProducts[0].Types[2].GetType().ShouldEqual(typeof (ProdTypeA));
             }
+#endif
         }
     }
 }

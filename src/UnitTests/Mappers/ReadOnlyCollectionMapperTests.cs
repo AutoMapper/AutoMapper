@@ -112,7 +112,7 @@ namespace AutoMapper.UnitTests.Mappers
 		}
 
 
-		private class SourceAsEnumerable
+		public class SourceAsEnumerable
 		{
 			public IEnumerable<int> ValueInt { get; set; }
 			public IEnumerable<string> ValueString { get; set; }
@@ -120,14 +120,15 @@ namespace AutoMapper.UnitTests.Mappers
 			public IEnumerable<IUser> ValueIUser { get; set; }
 		}
 
-		private class DestinationAsReadOnlyCollectionNull
+	    public class DestinationAsReadOnlyCollectionNull
 		{
 			public ReadOnlyCollection<int> ValueInt { get; set; }
 			public ReadOnlyCollection<string> ValueString { get; set; }
 			public ReadOnlyCollection<UserDestination> ValueUser { get; set; }
 			public ReadOnlyCollection<IUser> ValueIUser { get; set; }
 		}
-		private class DestinationAsReadOnlyCollectionNotNull
+
+	    public class DestinationAsReadOnlyCollectionNotNull
 		{
 			public DestinationAsReadOnlyCollectionNotNull()
 			{
@@ -143,13 +144,13 @@ namespace AutoMapper.UnitTests.Mappers
 			public ReadOnlyCollection<IUser> ValueIUser { get; set; }
 		}
 
-		private interface IUser
+	    public interface IUser
 		{
 			string Name { get; set; }
 			int Age { get; set; }
 		}
 
-		private class UserSource : IUser
+	    public class UserSource : IUser
 		{
 			public UserSource()
 			{
@@ -166,7 +167,7 @@ namespace AutoMapper.UnitTests.Mappers
 			int IUser.Age { get; set; }
 		}
 
-		private class UserDestination : IUser
+	    public class UserDestination : IUser
 		{
 			public string Name { get; set; }
 			int IUser.Age { get; set; }
