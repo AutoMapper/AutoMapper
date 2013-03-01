@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !SILVERLIGHT
+using System;
 using System.Collections.Specialized;
 using AutoMapper;
 using AutoMapper.Mappers;
@@ -98,3 +99,4 @@ namespace Automapper.UnitTests.Mappers
         
     }
 }
+#endif

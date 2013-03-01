@@ -1,4 +1,4 @@
-﻿
+﻿#if !SILVERLIGHT
 using System ;
 using System.Collections.Generic;
 using System.Diagnostics ;
@@ -130,3 +130,4 @@ namespace AutoMapper.UnitTests.Bug
     	}
     }
 }
+#endif

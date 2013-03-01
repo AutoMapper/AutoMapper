@@ -48,9 +48,10 @@ namespace AutoMapper.UnitTests.Bug
             target.ChildProperty.ShouldEqual(source.ChildProperty);
         }
 
-        [Fact]
 #if SILVERLIGHT
-        [Ignore("Not supported in Silverlight 4")]
+        [Fact(Skip = "Not supported in Silverlight 4")]
+#else
+        [Fact]
 #endif
         public void PrivateSetterInParentWorks()
         {
@@ -60,9 +61,10 @@ namespace AutoMapper.UnitTests.Bug
             target.ChildProperty.ShouldEqual(source.ChildProperty);
         }
 
-        [Fact]
 #if SILVERLIGHT
-        [Ignore("Not supported in Silverlight 4")]
+        [Fact(Skip = "Not supported in Silverlight 4")]
+#else
+        [Fact]
 #endif
         public void PrivateSetterInGrandparentWorks()
         {
@@ -72,9 +74,10 @@ namespace AutoMapper.UnitTests.Bug
             target.ChildProperty.ShouldEqual(source.ChildProperty);
         }
 
-        [Fact]
 #if SILVERLIGHT
-        [Ignore("Not supported in Silverlight 4")]
+        [Fact(Skip = "Not supported in Silverlight 4")]
+#else
+        [Fact]
 #endif
         public void PrivateSetterInGrandGrandparentWorks()
         {

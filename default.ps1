@@ -42,8 +42,8 @@ task commonAssemblyInfo {
 
 task test {
 	create_directory "$build_dir\results"
-    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.dll /xml $result_dir\AutoMapper.xml }
-    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.dll /xml $result_dir\AutoMapper.xml }
+    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.dll /xml $result_dir\AutoMapper.NET4.xml }
+    exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.dll --ReportOutputFile=$result_dir\AutoMapper.SL4.xml --ReportOutputFileType=NUnit }
 }
 
 task dist {
@@ -87,11 +87,6 @@ function global:create_directory($directory_name)
 function global:copy_files($source, $destination, $exclude = @()) {
     create_directory $destination
     Get-ChildItem $source -Recurse -Exclude $exclude | Copy-Item -Destination {Join-Path $destination $_.FullName.Substring($source.length)} 
-}
-
-function global:run_nunit ($test_assembly)
-{
-    exec { & $tools_dir\nunit\nunit-console-x86.exe $test_dir$test_assembly /nologo /nodots /xml=$result_dir$test_assembly.xml }
 }
 
 function global:create-commonAssemblyInfo($version, $commit, $filename)

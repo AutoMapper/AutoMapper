@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests
 		[Fact]
 		public void Should_flag_list_as_writable_collection()
 		{
-			typeof(ArrayList).IsListOrDictionaryType().ShouldBeTrue();
+			typeof(int[]).IsListOrDictionaryType().ShouldBeTrue();
 		}
 
 		[Fact]

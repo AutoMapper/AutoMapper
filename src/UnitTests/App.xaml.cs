@@ -2,7 +2,7 @@
 using System.Windows;
 using Microsoft.Silverlight.Testing;
 
-namespace SilverlightTest1
+namespace AutoMapper.UnitTests
 {
     public partial class App : Application
     {

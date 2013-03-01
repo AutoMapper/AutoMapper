@@ -3,9 +3,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-#if SILVERLIGHT
-    [Ignore("Not supported in Silverlight 4")]
-#endif
+#if !SILVERLIGHT
     public class EnumMatchingOnValue : AutoMapperSpecBase
     {
         private SecondClass _result;
@@ -54,4 +52,6 @@ namespace AutoMapper.UnitTests.Bug
             _result.EnumValue.ShouldEqual(SecondEnum.DifferentNamedEnum);
         }
     }
+#endif
+
 }

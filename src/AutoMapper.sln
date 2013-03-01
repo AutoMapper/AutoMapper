@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.WinRT", "AutoMap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.WP75", "AutoMapper\AutoMapper.WP75.csproj", "{B95F2EB2-519E-4BAB-B6B3-6DBBEA7879A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.SL4", "UnitTests.SL4\UnitTests.SL4.csproj", "{BACACF2C-237F-4A48-A891-32B258207095}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.SL4", "UnitTests\UnitTests.SL4.csproj", "{BACACF2C-237F-4A48-A891-32B258207095}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

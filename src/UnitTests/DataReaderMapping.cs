@@ -1,3 +1,4 @@
+#if !SILVERLIGHT
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -437,3 +438,4 @@ namespace AutoMapper.UnitTests
         }
     }
 }
+#endif
