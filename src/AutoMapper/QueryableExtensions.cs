@@ -44,7 +44,7 @@ namespace AutoMapper.QueryableExtensions
             var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(typeIn, typeOut);
 
             // this is the input parameter of this expression with name <variableName>
-            ParameterExpression instanceParameter = Expression.Parameter(typeIn);
+            ParameterExpression instanceParameter = Expression.Parameter(typeIn, "dto");
 
             var bindings = new List<MemberBinding>();
             foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))

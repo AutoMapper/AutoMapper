@@ -1,4 +1,4 @@
-﻿
+﻿#if !WINDOWS_PHONE
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Mappers;
@@ -49,3 +49,4 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 }
+#endif

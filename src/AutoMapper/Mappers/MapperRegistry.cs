@@ -24,7 +24,9 @@ namespace AutoMapper.Mappers
             new ListSourceMapper(),
 #endif
             new ReadOnlyCollectionMapper(),
+#if !WINDOWS_PHONE
             new HashSetMapper(), 
+#endif
             new CollectionMapper(),
             new EnumerableMapper(),
             new AssignableMapper(),

@@ -85,6 +85,7 @@ namespace AutoMapper
 
         public LateBoundFieldSet CreateSet(FieldInfo field)
         {
+#if !WINDOWS_PHONE
             ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
             ParameterExpression valueParameter = Expression.Parameter(typeof(object), "value");
 
@@ -98,10 +99,14 @@ namespace AutoMapper
                 );
 
             return lambda.Compile();
+#else
+            return (target, value) => field.SetValue(target, value);
+#endif
         }
 
         public LateBoundPropertySet CreateSet(PropertyInfo property)
         {
+#if !WINDOWS_PHONE
             ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
             ParameterExpression valueParameter = Expression.Parameter(typeof(object), "value");
 
@@ -115,6 +120,9 @@ namespace AutoMapper
                 );
 
             return lambda.Compile();
+#else
+            return (target, value) => property.SetValue(target, value, null);
+#endif
         }
 
         public LateBoundCtor CreateCtor(Type type)

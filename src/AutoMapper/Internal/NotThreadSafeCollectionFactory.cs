@@ -13,7 +13,11 @@ namespace AutoMapper.Internal
 
         public ISet<T> CreateSet<T>()
         {
+#if WINDOWS_PHONE
+            throw new PlatformNotSupportedException("ISet not available on Windows Phone");
+#else
             return new HashSetImpl<T>(new HashSet<T>());
+#endif
         }
 
         private class ConcurrentDictionaryImpl<TKey, TValue> : IDictionary<TKey, TValue>
@@ -72,6 +76,7 @@ namespace AutoMapper.Internal
             }
         }
     
+#if !WINDOWS_PHONE
         private class HashSetImpl<T> : ISet<T>
         {
             private readonly HashSet<T> _hashSet;
@@ -96,5 +101,6 @@ namespace AutoMapper.Internal
                 return _hashSet.GetEnumerator();
             }
         }
+#endif
     }
 }
