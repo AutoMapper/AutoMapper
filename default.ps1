@@ -107,8 +107,7 @@ using System.Runtime.InteropServices;
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: ComVisibleAttribute(false)]
-[assembly: AssemblyVersionAttribute(""$version"")]
+[assembly: AssemblyVersionAttribute(""$pkgVersion"")]
 [assembly: AssemblyFileVersionAttribute(""$version"")]
 [assembly: AssemblyCopyrightAttribute(""Copyright Jimmy Bogard 2008-" + $date.Year + """)]
 [assembly: AssemblyProductAttribute(""AutoMapper"")]
