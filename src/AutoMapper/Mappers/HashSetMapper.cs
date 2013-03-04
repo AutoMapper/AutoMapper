@@ -1,5 +1,5 @@
-﻿
-using System.Linq;
+﻿using System.Linq;
+using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
@@ -29,6 +29,7 @@ namespace AutoMapper.Mappers
             return isMatch;
         }
 
+#if !NETFX_CORE
         private static bool IsSetType(Type type)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ISet<>))
@@ -80,5 +81,59 @@ namespace AutoMapper.Mappers
             }
         }
 
+#else
+
+        private static bool IsSetType(Type type)
+        {
+            if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(ISet<>))
+            {
+                return true;
+            }
+
+            IEnumerable<Type> genericInterfaces = type.GetTypeInfo().ImplementedInterfaces.Where(t => t.GetTypeInfo().IsGenericType);
+            IEnumerable<Type> baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
+
+            var isCollectionType = baseDefinitions.Any(t => t == typeof(ISet<>));
+
+            return isCollectionType;
+        }
+
+
+        private class EnumerableMapper<TCollection, TElement> : EnumerableMapperBase<TCollection>
+            where TCollection : ISet<TElement>
+        {
+            public override bool IsMatch(ResolutionContext context)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override void SetElementValue(TCollection destination, object mappedValue, int index)
+            {
+                destination.Add((TElement)mappedValue);
+            }
+
+            protected override void ClearEnumerable(TCollection enumerable)
+            {
+                enumerable.Clear();
+            }
+
+            protected override TCollection CreateDestinationObjectBase(Type destElementType, int sourceLength)
+            {
+                Object collection;
+
+                if (typeof(TCollection).GetTypeInfo().IsInterface)
+                {
+                    collection = new HashSet<TElement>();
+                }
+                else
+                {
+                    collection = ObjectCreator.CreateDefaultValue(typeof(TCollection));
+                }
+
+                return (TCollection)collection;
+            }
+        }
+
+#endif
     }
 }

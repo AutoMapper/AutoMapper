@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using AutoMapper.Mappers;
 using Should;
 using Xunit;
+using System.Reflection;
+using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
@@ -551,7 +553,7 @@ namespace AutoMapper.UnitTests
 			[Fact]
 			public void Should_not_report_it_as_unmapped()
 			{
-				Array.ForEach(_allTypeMaps, t => t.GetUnmappedPropertyNames().ShouldBeOfLength(0));
+                _allTypeMaps.AsEnumerable().ForEach(t => t.GetUnmappedPropertyNames().ShouldBeOfLength(0));
 			}
 
 			[Fact]

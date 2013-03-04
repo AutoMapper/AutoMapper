@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq.Expressions;
 
-namespace System.Linq.Expressions
+namespace AutoMapper.Internal
 {
-    public abstract class ExpressionVisitor
+    internal abstract class ExpressionVisitor
     {
         protected ExpressionVisitor()
         {
@@ -204,7 +205,7 @@ namespace System.Linq.Expressions
             }
             if (list != null)
             {
-                return list.AsReadOnly();
+                return new ReadOnlyCollection<Expression>(list);
             }
             return original;
         }

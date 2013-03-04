@@ -55,7 +55,6 @@
     <Compile Include="Internal\ProxyGenerator.cs" />
     <Compile Include="Internal\ProxyGeneratorFactory.cs" />
     <Compile Include="Internal\ReaderWriterLockSlimFactory.cs" />
-    <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\DataReaderMapper.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\ListSourceMapper.cs" />
@@ -63,7 +62,6 @@
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueryableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">

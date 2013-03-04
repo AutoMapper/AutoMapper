@@ -253,7 +253,7 @@ namespace AutoMapper.UnitTests
             originalCollection.ShouldBeSameAs(master.Details);
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
         [Fact]
         public void Should_map_to_NameValueCollection() {
             // initially results in the following exception:
@@ -266,7 +266,7 @@ namespace AutoMapper.UnitTests
         }
 #endif
 
-#if SILVERLIGHT
+#if SILVERLIGHT || NETFX_CORE
         public class HashSet<T> : Collection<T>
         {
             

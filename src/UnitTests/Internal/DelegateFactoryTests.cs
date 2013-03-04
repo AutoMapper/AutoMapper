@@ -119,7 +119,7 @@ namespace AutoMapper.UnitTests
 			var source = ((ValueSource) thing);
 			source.Value = (string)value;
 		}
-
+#if !NETFX_CORE
 		[Fact(Skip="Blarg")]
 		public void WhatIWantToDo()
 		{
@@ -171,7 +171,7 @@ namespace AutoMapper.UnitTests
 			Console.WriteLine("LCG:" + span.Ticks);
 
 		}
-
+#endif
 		[Fact]
 		public void Test_with_create_ctor()
 		{

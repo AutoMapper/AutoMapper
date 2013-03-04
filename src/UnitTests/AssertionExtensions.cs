@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
 using Should.Core.Exceptions;
 using Xunit;
 using Should;

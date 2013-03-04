@@ -64,19 +64,19 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Internal\ExpressionVisitor.cs" />
     <Compile Include="Internal\IDictionary.cs" />
     <Compile Include="Internal\AliasedMember.cs" />
     <Compile Include="Internal\IAdapterResolver.cs" />
     <Compile Include="Internal\PlatformAdapter.cs" />
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
+    <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\IMapperRegistry.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
-    <Compile Include="Configuration\MapperConfiguration.cs" />
-    <Compile Include="Configuration\MapperRegistry.cs" />
-    <Compile Include="Configuration\TypeMapConfiguration.cs" />
     <Compile Include="ConstructorMap.cs" />
     <Compile Include="ConstructorParameterMap.cs" />
     <Compile Include="IgnoreMapAttribute.cs" />
@@ -138,6 +138,7 @@
     <Compile Include="PropertyMap.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
     <Compile Include="Internal\ProxyBase.cs" />
+    <Compile Include="QueryableExtensions.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />

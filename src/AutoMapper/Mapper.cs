@@ -8,7 +8,7 @@ namespace AutoMapper
     public static class Mapper
 	{
 	    private static readonly Func<ConfigurationStore> _configurationInit =
-	        () => new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
+	        () => new ConfigurationStore(new TypeMapFactory(), PlatformAdapter.Resolve<IMapperRegistry>().GetMappers());
         
         private static ILazy<ConfigurationStore> _configuration = LazyFactory.Create(_configurationInit);
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Should.Core.Assertions
 {
@@ -10,7 +11,7 @@ namespace Should.Core.Assertions
             Type type = typeof(T);
 
             // Null?
-            if (!type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Nullable<>))))
+            if (!type.IsValueType() || (type.IsGenericType() && type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Nullable<>))))
             {
                 if (Equals(x, default(T)))
                 {

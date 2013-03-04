@@ -152,7 +152,6 @@
     <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="ConfigurationValidation.cs" />
-    <Compile Include="Configuration\MapperConfigurationSpecs.cs" />
     <Compile Include="Constructors.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomFormatters.cs" />
@@ -246,6 +245,7 @@
     <Compile Include="Tests\TypeMapFactorySpecs.cs" />
     <Compile Include="TypeConverters.cs" />
     <Compile Include="ValueTypes.cs" />
+    <Compile Include="WinRTExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -255,7 +255,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
-    <None Include="Should\Should.Core\Assertions\Assert.cs.orig" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">

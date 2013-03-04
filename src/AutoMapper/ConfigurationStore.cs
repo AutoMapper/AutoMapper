@@ -11,7 +11,7 @@ namespace AutoMapper
 
 	public class ConfigurationStore : IConfigurationProvider, IConfiguration
 	{
-	    private static ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
+	    private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
 	    private readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";

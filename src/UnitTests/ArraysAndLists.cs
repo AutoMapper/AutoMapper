@@ -429,7 +429,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
 		public class When_destination_collection_is_only_a_list_source_and_not_IList : SpecBase
 		{
 			private Destination _destination;

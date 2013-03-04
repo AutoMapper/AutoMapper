@@ -1,7 +1,7 @@
 using System;
 using Should;
 using Xunit;
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
 using Rhino.Mocks;
 #endif
 
@@ -50,7 +50,7 @@ namespace AutoMapper.UnitTests
         {
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
         protected TType CreateDependency<TType>()
             where TType : class
         {

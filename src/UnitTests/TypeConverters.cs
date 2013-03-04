@@ -1,3 +1,4 @@
+#if !NETFX_CORE
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -284,3 +285,4 @@ namespace AutoMapper.UnitTests
 
 	}
 }
+#endif

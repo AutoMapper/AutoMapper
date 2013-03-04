@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
 using System.Data;
 #endif
 using System.Linq;
@@ -18,7 +18,7 @@ namespace AutoMapper
 
         static DelegateFactory()
         {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
             FeatureDetector.IsIDataRecordType = t => typeof (IDataRecord).IsAssignableFrom(t);
 #endif
         }
