@@ -56,7 +56,10 @@ namespace System.Reflection
         }
         public static MethodInfo GetMethod(this Type type, string name, params Type[] parametertypes)
         {
-            return type.GetTypeInfo().GetDeclaredMethod(name);
+            if (!parametertypes.Any())
+                type.GetTypeInfo().GetDeclaredMethod(name);
+
+            return type.GetTypeInfo().GetDeclaredMethods(name).Single(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parametertypes));
         }
 
         public static bool IsInstanceOfType(this Type type, object o)

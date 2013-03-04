@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
         public class When_mapping_a_concrete_type_to_an_interface_type : AutoMapperSpecBase
         {
             private IDestination _result;

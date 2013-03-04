@@ -42,6 +42,7 @@ task commonAssemblyInfo {
 
 task test {
 	create_directory "$build_dir\results"
+    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/WinRT/$config/AppX/AutoMapper.UnitTests.dll /xml $result_dir\AutoMapper.WinRT.xml }
     exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.dll /xml $result_dir\AutoMapper.NET4.xml }
     exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.dll --ReportOutputFile=$result_dir\AutoMapper.SL4.xml --ReportOutputFileType=NUnit }
 }
