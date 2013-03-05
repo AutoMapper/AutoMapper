@@ -211,6 +211,15 @@ namespace AutoMapper
         {
             var typeMap = ConfigurationProvider.FindTypeMapFor(typeIn, typeOut);
 
+			if (typeMap == null)
+			{
+				const string MessageFormat = "Missing map from {0} to {1}. Create using Mapper.CreateMap<{0}, {1}>.";
+
+				var message = string.Format(MessageFormat, typeIn.Name, typeOut.Name);
+
+				throw new InvalidOperationException(message);
+			}
+
             // this is the input parameter of this expression with name <variableName>
             ParameterExpression instanceParameter = Expression.Parameter(typeIn);
 
@@ -276,7 +285,9 @@ namespace AutoMapper
                                 currentChild,
                                 transformedExpression);
 
-                    if (typeof(IList).IsAssignableFrom(prop.PropertyType))
+					var isNullExpression = Expression.Equal(currentChild, Expression.Constant(null, currentChildType));
+
+					if (typeof(IList<>).MakeGenericType(destinationListType).IsAssignableFrom(prop.PropertyType))
                     {
                         MethodCallExpression toListCallExpression = Expression.Call(
                             typeof(Enumerable),
@@ -284,13 +295,25 @@ namespace AutoMapper
                             new Type[] { destinationListType },
                             selectExpression);
 
+						var toListIfSourceIsNotNull =
+							Expression.Condition(
+								isNullExpression,
+								Expression.Constant(null, toListCallExpression.Type),
+								toListCallExpression);
+
                         // todo .ToArray()
-                        bindings.Add(Expression.Bind(destinationMember, toListCallExpression));
+						bindings.Add(Expression.Bind(destinationMember, toListIfSourceIsNotNull));
                     }
                     else
                     {
+						var selectIfSourceIsNotNull =
+							Expression.Condition(
+								isNullExpression,
+								Expression.Constant(null, selectExpression.Type),
+								selectExpression);
+
                         // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
-                        bindings.Add(Expression.Bind(destinationMember, selectExpression));
+						bindings.Add(Expression.Bind(destinationMember, selectIfSourceIsNotNull));
                     }
                 }
                 else
@@ -302,11 +325,15 @@ namespace AutoMapper
                         prop.PropertyType.BaseType != typeof(Enum))
                     {
                         var transformedExpression = CreateMapExpression(currentChildType, prop.PropertyType);
-                        var expr2 = Expression.Invoke(
-                            transformedExpression,
-                            currentChild
-                        );
-                        bindings.Add(Expression.Bind(destinationMember, expr2));
+
+						var transformedInvokeExpression = Expression.Invoke(transformedExpression, currentChild);
+
+						var isNullExpression = Expression.Equal(currentChild, Expression.Constant(null));
+
+						var transformIfIsNotNull =
+							Expression.Condition(isNullExpression, Expression.Constant(null, prop.PropertyType), transformedInvokeExpression);
+
+						bindings.Add(Expression.Bind(destinationMember, transformIfIsNotNull));
                     }
                     else
                     {
