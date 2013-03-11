@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
-    <AssemblyName>AutoMapper.UnitTests</AssemblyName>
+    <AssemblyName>AutoMapper.UnitTests.WP75</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <TargetFrameworkProfile>WindowsPhone71</TargetFrameworkProfile>
@@ -223,6 +223,7 @@
     <Compile Include="Tests\TypeMapFactorySpecs.cs" />
     <Compile Include="TypeConverters.cs" />
     <Compile Include="ValueTypes.cs" />
+    <Compile Include="WinRTExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="App.WP75.xaml">

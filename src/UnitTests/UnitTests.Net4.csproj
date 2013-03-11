@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
-    <AssemblyName>AutoMapper.UnitTests</AssemblyName>
+    <AssemblyName>AutoMapper.UnitTests.Net4</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
