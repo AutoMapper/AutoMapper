@@ -14,6 +14,7 @@ namespace AutoMapper.Mappers
             new StringMapper(),
             new FlagsEnumMapper(),
             new EnumMapper(),
+            new PrimitiveArrayMapper(),
             new ArrayMapper(),
 			new EnumerableToDictionaryMapper(),
 #if !SILVERLIGHT
