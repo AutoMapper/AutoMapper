@@ -1,12 +1,12 @@
+using System;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-	[TestFixture]
-	public class AutoMapperTester
+	public class AutoMapperTester : IDisposable
 	{
-		[Test]
+		[Fact]
 		public void Should_be_able_to_handle_derived_proxy_types()
 		{
 			Mapper.CreateMap<ModelType, DtoType>();
@@ -18,8 +18,7 @@ namespace AutoMapper.UnitTests
 			destination[1].TheProperty.ShouldEqual("Bar");
 		}
 
-		[TearDown]
-		public void Teardown()
+		public void Dispose()
 		{
 			Mapper.Reset();
 		}

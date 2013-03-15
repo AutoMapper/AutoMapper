@@ -1,9 +1,8 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class InterfaceSelfMappingBug
     {
         public interface IFoo
@@ -21,7 +20,7 @@ namespace AutoMapper.UnitTests.Bug
             public int Value { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void Example()
         {
             Mapper.Configuration.AllowNullCollections = true;

@@ -4,7 +4,7 @@ using System.Linq;
 using AutoMapper;
 using AutoMapper.Mappers;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -34,11 +34,9 @@ namespace AutoMapper.UnitTests.Bug
 			return result;
 		}
 	}
-
-	[TestFixture]
 	public class AutoMapperBugTest
 	{
-		[Test]
+		[Fact]
 		public void ShouldMapOneToTwo()
 		{
             var config = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());

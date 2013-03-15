@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AutoMapper.Mappers;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
 {
-    [TestFixture]
     public class DestinationTypePolymorphismTest
     {
         public class Customer
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         }
 
 
-        [Test]
+        [Fact]
         public void Mapper_Should_Allow_Overriding_Of_Destination_Type()
         {
             var order = new Order() { Customer = new Customer() { Id = 1, Name = "A" } };
@@ -47,14 +47,12 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var orderDto = Mapper.Map<Order, OrderDTO>(order);
 
             var customerDto = (CustomerDTO)orderDto.Customer;
-            Assert.AreEqual("A", customerDto.Name);
-            Assert.AreEqual(1, customerDto.Id);
+            "A".ShouldEqual(customerDto.Name);
+            1.ShouldEqual(customerDto.Id);
 
         }
 
     }
-
-    [TestFixture]
     public class DestinationTypePolymorphismTestNonGeneric
     {
         public class Customer
@@ -84,7 +82,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         }
 
 
-        [Test]
+        [Fact]
         public void Mapper_Should_Allow_Overriding_Of_Destination_Type()
         {
             var order = new Order() { Customer = new Customer() { Id = 1, Name = "A" } };
@@ -94,8 +92,8 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var orderDto = Mapper.Map<Order, OrderDTO>(order);
 
             var customerDto = (CustomerDTO)orderDto.Customer;
-            Assert.AreEqual("A", customerDto.Name);
-            Assert.AreEqual(1, customerDto.Id);
+            "A".ShouldEqual(customerDto.Name);
+            1.ShouldEqual(customerDto.Id);
 
         }
 

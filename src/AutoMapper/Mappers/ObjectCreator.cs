@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
     public static class ObjectCreator
-	{
+    {
+        private static readonly IDelegateFactory DelegateFactory = PlatformAdapter.Resolve<IDelegateFactory>();
+
 		public static Array CreateArray(Type elementType, int length)
 		{
 			return Array.CreateInstance(elementType, length);
@@ -44,7 +47,7 @@ namespace AutoMapper.Mappers
 
 		public static object CreateObject(Type type)
 		{
-			return DelegateFactory.CreateCtor(type)();
+            return DelegateFactory.CreateCtor(type)();
 		}
 	}
 }

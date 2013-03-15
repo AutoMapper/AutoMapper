@@ -17,7 +17,7 @@ namespace AutoMapper.Impl
 			_name = _propertyInfo.Name;
 			_memberType = _propertyInfo.PropertyType;
 			if (_propertyInfo.GetGetMethod(true) != null)
-				_lateBoundPropertyGet = DelegateFactory.CreateGet(propertyInfo);
+                _lateBoundPropertyGet = DelegateFactory.CreateGet(propertyInfo);
 			else
 			    _lateBoundPropertyGet = src => null;
 		}
@@ -89,7 +89,7 @@ namespace AutoMapper.Impl
 			_hasSetter = propertyInfo.GetSetMethod(true) != null;
 			if (_hasSetter)
 			{
-				_lateBoundPropertySet = DelegateFactory.CreateSet(propertyInfo);
+                _lateBoundPropertySet = DelegateFactory.CreateSet(propertyInfo);
 			}
 		}
 

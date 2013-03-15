@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests.Bug
             AutoMapper.Mapper.CreateMap<Source, Destination>();
         }
 
-        [Test]
+        [Fact]
         public void TestCase()
         {
 

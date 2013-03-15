@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Mappers
 {
-	[TestFixture]
 	public class ReadOnlyCollectionMapperTests
 	{
 		SourceAsEnumerable _sourceAsEnumerable;
-		[SetUp]
+        public ReadOnlyCollectionMapperTests()
+        {
+            SetUp();
+        }
 		public void SetUp()
 		{
 			_sourceAsEnumerable = new SourceAsEnumerable()
@@ -26,99 +29,90 @@ namespace AutoMapper.UnitTests.Mappers
 			Mapper.CreateMap<UserSource, UserDestination>();
 		}
 
-		[Test]
+		[Fact]
 		public void should_map_to_ReadOnlyCollection_when_destination_properties_are_null()
 		{
 			var destination = Mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
-			Assert.IsNotNull(destination);
-			Assert.AreNotEqual(0, _sourceAsEnumerable.ValueInt);
-			Assert.AreEqual(_sourceAsEnumerable.ValueInt.Count(), destination.ValueInt.Count());
+			destination.ShouldNotBeNull();
+			_sourceAsEnumerable.ValueInt.Count().ShouldEqual(destination.ValueInt.Count());
 			foreach (var item in _sourceAsEnumerable.ValueInt)
 			{
-				Assert.IsTrue(destination.ValueInt.Contains(item));
+				destination.ValueInt.Contains(item).ShouldBeTrue();
 			}
 
-			Assert.AreNotEqual(0, _sourceAsEnumerable.ValueString);
-			Assert.AreEqual(_sourceAsEnumerable.ValueString.Count(), destination.ValueString.Count());
+			_sourceAsEnumerable.ValueString.Count().ShouldEqual(destination.ValueString.Count());
 			foreach (var item in _sourceAsEnumerable.ValueString)
 			{
-				Assert.IsTrue(destination.ValueString.Contains(item));
+				destination.ValueString.Contains(item).ShouldBeTrue();
 			}
 
-			Assert.AreNotEqual(0, _sourceAsEnumerable.ValueUser);
-			Assert.AreEqual(_sourceAsEnumerable.ValueUser.Count(), destination.ValueUser.Count());
+			_sourceAsEnumerable.ValueUser.Count().ShouldEqual(destination.ValueUser.Count());
 			for (int i = 0; i < _sourceAsEnumerable.ValueUser.Count(); i++)
 			{
-				Assert.AreEqual(_sourceAsEnumerable.ValueUser.ElementAt(i).Name, destination.ValueUser.ElementAt(i).Name);
+				_sourceAsEnumerable.ValueUser.ElementAt(i).Name.ShouldEqual(destination.ValueUser.ElementAt(i).Name);
 			}
 
-			Assert.AreNotEqual(0, _sourceAsEnumerable.ValueIUser);
-			Assert.AreEqual(_sourceAsEnumerable.ValueIUser.Count(), destination.ValueIUser.Count());
+			_sourceAsEnumerable.ValueIUser.Count().ShouldEqual(destination.ValueIUser.Count());
 			for (int i = 0; i < _sourceAsEnumerable.ValueIUser.Count(); i++)
 			{
-				Assert.AreEqual(_sourceAsEnumerable.ValueIUser.ElementAt(i).Name, destination.ValueIUser.ElementAt(i).Name);
-				Assert.AreEqual(_sourceAsEnumerable.ValueIUser.ElementAt(i).Age, destination.ValueIUser.ElementAt(i).Age);
+				_sourceAsEnumerable.ValueIUser.ElementAt(i).Name.ShouldEqual(destination.ValueIUser.ElementAt(i).Name);
+				_sourceAsEnumerable.ValueIUser.ElementAt(i).Age.ShouldEqual(destination.ValueIUser.ElementAt(i).Age);
 			}
 
 		}
 
-		[Test]
+		[Fact]
 		public void should_replace_ReadOnlyCollection_when_destination_properties_are_not_null()
 		{
 			var destination = Mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNotNull>(_sourceAsEnumerable);
 
-			Assert.IsNotNull(destination);
-			Assert.AreNotEqual(0, _sourceAsEnumerable.ValueInt);
-			Assert.AreEqual(_sourceAsEnumerable.ValueInt.Count(), destination.ValueInt.Count());
+			destination.ShouldNotBeNull();
+			_sourceAsEnumerable.ValueInt.Count().ShouldEqual(destination.ValueInt.Count());
 			foreach (var item in _sourceAsEnumerable.ValueInt)
 			{
-				Assert.IsTrue(destination.ValueInt.Contains(item));
+				destination.ValueInt.Contains(item).ShouldBeTrue();
 			}
 
-			Assert.AreNotEqual(0, _sourceAsEnumerable.ValueString);
-			Assert.AreEqual(_sourceAsEnumerable.ValueString.Count(), destination.ValueString.Count());
+			_sourceAsEnumerable.ValueString.Count().ShouldEqual(destination.ValueString.Count());
 			foreach (var item in _sourceAsEnumerable.ValueString)
 			{
-				Assert.IsTrue(destination.ValueString.Contains(item));
+				destination.ValueString.Contains(item).ShouldBeTrue();
 			}
 
-			Assert.AreNotEqual(0, _sourceAsEnumerable.ValueUser);
-			Assert.AreEqual(_sourceAsEnumerable.ValueUser.Count(), destination.ValueUser.Count());
 			for (int i = 0; i < _sourceAsEnumerable.ValueUser.Count(); i++)
 			{
-				Assert.AreEqual(_sourceAsEnumerable.ValueUser.ElementAt(i).Name, destination.ValueUser.ElementAt(i).Name);
+				_sourceAsEnumerable.ValueUser.ElementAt(i).Name.ShouldEqual(destination.ValueUser.ElementAt(i).Name);
 			}
 
-			Assert.AreNotEqual(0, _sourceAsEnumerable.ValueIUser);
-			Assert.AreEqual(_sourceAsEnumerable.ValueIUser.Count(), destination.ValueIUser.Count());
+			_sourceAsEnumerable.ValueIUser.Count().ShouldEqual(destination.ValueIUser.Count());
 			for (int i = 0; i < _sourceAsEnumerable.ValueIUser.Count(); i++)
 			{
-				Assert.AreEqual(_sourceAsEnumerable.ValueIUser.ElementAt(i).Name, destination.ValueIUser.ElementAt(i).Name);
-				Assert.AreEqual(_sourceAsEnumerable.ValueIUser.ElementAt(i).Age, destination.ValueIUser.ElementAt(i).Age);
+				_sourceAsEnumerable.ValueIUser.ElementAt(i).Name.ShouldEqual(destination.ValueIUser.ElementAt(i).Name);
+				_sourceAsEnumerable.ValueIUser.ElementAt(i).Age.ShouldEqual(destination.ValueIUser.ElementAt(i).Age);
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void should_set_ReadOnlyCollection_underlying_all_IReadOnlyList()
 		{
 			var destination = Mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
-			Assert.IsNotNull(destination);
-			Assert.IsInstanceOfType(typeof(ReadOnlyCollection<IUser>), destination.ValueIUser);
+			destination.ShouldNotBeNull();
+			destination.ValueIUser.ShouldBeType<ReadOnlyCollection<IUser>>();
 		}
 
-		[Test]
+		[Fact]
 		public void should_set_ReadOnlyCollection_underlying_all_IReadOnlyCollection()
 		{
 			var destination = Mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
-			Assert.IsNotNull(destination);
-			Assert.IsInstanceOfType(typeof(ReadOnlyCollection<UserDestination>), destination.ValueUser);
+			destination.ShouldNotBeNull();
+			destination.ValueUser.ShouldBeType<ReadOnlyCollection<UserDestination>>();
 		}
 
 
-		private class SourceAsEnumerable
+		public class SourceAsEnumerable
 		{
 			public IEnumerable<int> ValueInt { get; set; }
 			public IEnumerable<string> ValueString { get; set; }
@@ -126,14 +120,15 @@ namespace AutoMapper.UnitTests.Mappers
 			public IEnumerable<IUser> ValueIUser { get; set; }
 		}
 
-		private class DestinationAsReadOnlyCollectionNull
+	    public class DestinationAsReadOnlyCollectionNull
 		{
 			public ReadOnlyCollection<int> ValueInt { get; set; }
 			public ReadOnlyCollection<string> ValueString { get; set; }
 			public ReadOnlyCollection<UserDestination> ValueUser { get; set; }
 			public ReadOnlyCollection<IUser> ValueIUser { get; set; }
 		}
-		private class DestinationAsReadOnlyCollectionNotNull
+
+	    public class DestinationAsReadOnlyCollectionNotNull
 		{
 			public DestinationAsReadOnlyCollectionNotNull()
 			{
@@ -149,13 +144,13 @@ namespace AutoMapper.UnitTests.Mappers
 			public ReadOnlyCollection<IUser> ValueIUser { get; set; }
 		}
 
-		private interface IUser
+	    public interface IUser
 		{
 			string Name { get; set; }
 			int Age { get; set; }
 		}
 
-		private class UserSource : IUser
+	    public class UserSource : IUser
 		{
 			public UserSource()
 			{
@@ -172,7 +167,7 @@ namespace AutoMapper.UnitTests.Mappers
 			int IUser.Age { get; set; }
 		}
 
-		private class UserDestination : IUser
+	    public class UserDestination : IUser
 		{
 			public string Name { get; set; }
 			int IUser.Age { get; set; }

@@ -1,11 +1,10 @@
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
     namespace RecognizeIxesBug
     {
-        [TestFixture]
         public class IxesTest : AutoMapperSpecBase
         {
             private Stuff _source;
@@ -31,19 +30,19 @@ namespace AutoMapper.UnitTests.Bug
                 _dest = Mapper.Map<Stuff, StuffView>(_source);
             }
 
-            [Test]
+            [Fact]
             public void Should_recognize_a_full_prefix()
             {
                 _dest.IdCodeKey.ShouldEqual(_source.Id);
             }
 
-            [Test]
+            [Fact]
             public void Should_recognize_a_partial_prefix()
             {
                 _dest.NameKey.ShouldEqual(_source.Name);
             }
 
-            [Test]
+            [Fact]
             public void Should_recognize_a_partial_match_prefix()
             {
                 _dest.RankCodeKey.ShouldEqual(_source.RankCode);

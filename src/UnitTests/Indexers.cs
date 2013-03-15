@@ -1,6 +1,6 @@
 using System;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -31,13 +31,13 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source {Value = "Bob"});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_ignore_indexers_and_map_successfully()
 			{
 				_result.Value.ShouldEqual("Bob");
 			}
 
-			[Test]
+			[Fact]
 			public void Should_pass_configuration_check()
 			{
 				Exception thrown = null;

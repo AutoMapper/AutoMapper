@@ -1,6 +1,6 @@
 using System;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.BeforeAfterMapping
 {
@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
             _src = new Source();
         }
 
-        [Test]
+        [Fact]
         public void Before_and_After_should_be_called()
         {
             var beforeMapCalled = false;
@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
             _src = new Source();
         }
 
-        [Test]
+        [Fact]
         public void Before_and_After_should_be_called()
         {
             var beforeMapCount = 0;
@@ -132,7 +132,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
 			_destination = Mapper.Map<Source, Destination>(new Source {Value = 4});
 		}
 
-		[Test]
+		[Fact]
 		public void Should_use_global_constructor_for_building_mapping_actions()
 		{
 			_destination.Value.ShouldEqual(10);

@@ -1,9 +1,8 @@
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Tests
 {
-	[TestFixture]
 	public class MapperTests : NonValidatingSpecBase
 	{
 		public class Source
@@ -16,7 +15,7 @@ namespace AutoMapper.UnitTests.Tests
 			
 		}
 			
-		[Test]
+		[Fact]
 		public void Should_find_configured_type_map_when_two_types_are_configured()
 		{
 			Mapper.CreateMap<Source, Destination>();

@@ -3,14 +3,15 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-	[TestFixture]
 	public class DelegateFactoryTests
 	{
-		[Test]
+        protected IDelegateFactory DelegateFactory { get { return new DelegateFactory(); } }
+
+		[Fact]
 		public void MethodTests()
 		{
 			MethodInfo method = typeof(String).GetMethod("StartsWith", new[] { typeof(string) });
@@ -22,7 +23,7 @@ namespace AutoMapper.UnitTests
 			result.ShouldBeTrue();
 		}
 
-		[Test]
+		[Fact]
 		public void PropertyTests()
 		{
 			PropertyInfo property = typeof(Source).GetProperty("Value", typeof(int));
@@ -34,7 +35,7 @@ namespace AutoMapper.UnitTests
 			result.ShouldEqual(5);
 		}
 
-		[Test]
+		[Fact]
 		public void FieldTests()
 		{
 			FieldInfo field = typeof(Source).GetField("Value2");
@@ -46,7 +47,7 @@ namespace AutoMapper.UnitTests
 			result.ShouldEqual(15);
 		}
 
-		[Test]
+		[Fact]
 		public void Should_set_field_when_field_is_a_value_type()
 		{
 			var sourceType = typeof (Source);
@@ -59,7 +60,7 @@ namespace AutoMapper.UnitTests
 			source.Value2.ShouldEqual(5);
 		}
 
-		[Test]
+		[Fact]
 		public void Should_set_field_when_field_is_a_reference_type()
 		{
 			var sourceType = typeof (Source);
@@ -72,7 +73,7 @@ namespace AutoMapper.UnitTests
 			source.Value3.ShouldEqual("hello");
 		}
 
-		[Test]
+		[Fact]
 		public void Should_set_property_when_property_is_a_value_type()
 		{
 			var sourceType = typeof (Source);
@@ -85,7 +86,7 @@ namespace AutoMapper.UnitTests
 			source.Value.ShouldEqual(5);
 		}
 
-		[Test]
+		[Fact]
 		public void Should_set_property_when_property_is_a_value_type_and_type_is_interface()
 		{
 			var sourceType = typeof (ISource);
@@ -98,7 +99,7 @@ namespace AutoMapper.UnitTests
 			source.Value.ShouldEqual(5);
 		}
 
-		[Test]
+		[Fact]
 		public void Should_set_property_when_property_is_a_reference_type()
 		{
 			var sourceType = typeof(Source);
@@ -118,8 +119,8 @@ namespace AutoMapper.UnitTests
 			var source = ((ValueSource) thing);
 			source.Value = (string)value;
 		}
-
-		[Test, Explicit]
+#if !NETFX_CORE
+		[Fact(Skip="Blarg")]
 		public void WhatIWantToDo()
 		{
 			var sourceType = typeof(Source);
@@ -170,45 +171,8 @@ namespace AutoMapper.UnitTests
 			Console.WriteLine("LCG:" + span.Ticks);
 
 		}
-
-		[Test, Explicit]
-		public void Test_with_DynamicMethod2()
-		{
-			var sourceType = typeof(DelegateFactoryTests);
-			MethodInfo property = sourceType.GetMethod("SetValue2", BindingFlags.Static | BindingFlags.NonPublic);
-
-			var d = (LateBoundValueTypePropertySet)Delegate.CreateDelegate(typeof(LateBoundValueTypePropertySet), property);
-
-			object othersource = new ValueSource();
-			DoIt4(othersource, "Asdf");
-
-			var source = new ValueSource();
-
-			var value = (object) source;
-
-			d(ref value, "hello");
-
-			source.Value.ShouldEqual("hello");
-		}
-
-		[Test, Explicit]
-		public void Test_with_CreateDelegate()
-		{
-			var sourceType = typeof(ValueSource);
-			PropertyInfo property = sourceType.GetProperty("Value");
-
-			LateBoundValueTypePropertySet callback = DelegateFactory.CreateValueTypeSet(property);
-
-			var source = new ValueSource();
-
-			var target = ((object)source);
-
-			callback(ref target, "hello");
-
-			source.Value.ShouldEqual("hello");
-		}
-
-		[Test]
+#endif
+		[Fact]
 		public void Test_with_create_ctor()
 		{
 			var sourceType = typeof(Source);
@@ -220,7 +184,7 @@ namespace AutoMapper.UnitTests
 			target.ShouldBeType<Source>();
 		}
 
-		[Test]
+		[Fact]
 		public void Test_with_value_object_create_ctor()
 		{
 			var sourceType = typeof(ValueSource);
@@ -236,40 +200,6 @@ namespace AutoMapper.UnitTests
 		{
 			return new ValueSource();
 		}
-
-#if !SILVERLIGHT
-		[Test, Explicit]
-		public void Test_with_DynamicMethod()
-		{
-			var sourceType = typeof(ValueSource);
-			PropertyInfo property = sourceType.GetProperty("Value");
-
-			var setter = property.GetSetMethod(true);
-			var method = new DynamicMethod("Set" + property.Name, null, new[] { typeof(object).MakeByRefType(), typeof(object) }, false);
-			var gen = method.GetILGenerator();
-
-			method.InitLocals = true;
-			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
-			gen.Emit(OpCodes.Ldind_Ref);
-			gen.Emit(OpCodes.Unbox_Any, sourceType); // Unbox the source to its correct type
-			gen.Emit(OpCodes.Stloc_0); // Store the unboxed input on the stack
-			gen.Emit(OpCodes.Ldloca_S, 0);
-			gen.Emit(OpCodes.Ldarg_1); // Load value to stack
-			gen.Emit(OpCodes.Castclass, property.PropertyType); // Unbox the value to its proper value type
-			gen.Emit(OpCodes.Call, setter); // Call the setter method
-			gen.Emit(OpCodes.Ret);
-
-			var result = (LateBoundValueTypePropertySet)method.CreateDelegate(typeof(LateBoundValueTypePropertySet));
-
-			var source = new ValueSource();
-
-			var value = (object) source;
-
-			result(ref value, "hello");
-
-			source.Value.ShouldEqual("hello");
-		}
-#endif
 
 		public delegate void SetValueDelegate(ref ValueSource source, string value);
 

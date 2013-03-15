@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
@@ -34,13 +34,9 @@ namespace AutoMapper.UnitTests.Bug
 				Children.Add(childObject);
 			}
 		}
-
-
-
-		[TestFixture]
 		public class DuplicateValuesIssue : AutoMapperSpecBase
 		{
-			[Test]
+			[Fact]
 			public void Should_map_the_existing_array_elements_over()
 			{
 				var sourceList = new List<SourceObject>();

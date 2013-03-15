@@ -2,14 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
     public class ThreadSafeList<T> : IEnumerable<T>, IDisposable
         where T : class
     {
-        private ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private static readonly IReaderWriterLockSlimFactory ReaderWriterLockSlimFactory =
+            PlatformAdapter.Resolve<IReaderWriterLockSlimFactory>();
+
+        private IReaderWriterLockSlim _lock = ReaderWriterLockSlimFactory.Create();
         private readonly IList<T> _propertyMaps = new List<T>();
         private bool _disposed;
 

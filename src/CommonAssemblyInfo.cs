@@ -12,12 +12,11 @@ using System.Runtime.InteropServices;
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: ComVisibleAttribute(false)]
-[assembly: AssemblyVersionAttribute("2.0.0.0")]
-[assembly: AssemblyFileVersionAttribute("2.0.0.0")]
-[assembly: AssemblyCopyrightAttribute("Copyright Jimmy Bogard 2008-2011")]
+[assembly: AssemblyVersionAttribute("2.3.0")]
+[assembly: AssemblyFileVersionAttribute("2.3.0.0")]
+[assembly: AssemblyCopyrightAttribute("Copyright Jimmy Bogard 2008-2013")]
 [assembly: AssemblyProductAttribute("AutoMapper")]
-[assembly: AssemblyTrademarkAttribute("ae0b9e726dd8a2784cebfba55e7df935c879a2f5")]
+[assembly: AssemblyTrademarkAttribute("AutoMapper")]
 [assembly: AssemblyCompanyAttribute("")]
 [assembly: AssemblyConfigurationAttribute("release")]
-[assembly: AssemblyInformationalVersionAttribute("2.0.0.0")]
+[assembly: AssemblyInformationalVersionAttribute("b21150dddd16bd0a0cd5205b29f0585e2b84961a")]

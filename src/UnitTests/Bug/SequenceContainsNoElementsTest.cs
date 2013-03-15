@@ -3,30 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Collections;
-using NUnit.Framework;
-#if !SILVERLIGHT
-using NUnit.Framework.SyntaxHelpers;
-#endif
+using Xunit;
+using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	[TestFixture]
 	public class SequenceContainsNoElementsTest : AutoMapperSpecBase
 	{
-		[SetUp]
-		public void SetUp()
+        public SequenceContainsNoElementsTest()
+        {
+            SetUp();
+        }
+
+        public void SetUp()
 		{
 			Mapper.CreateMap<Person, PersonModel>();
 		}
 
-		[Test]
+		[Fact]
 		public void should_not_throw_InvalidOperationException()
 		{
 			Person[] personArr = new Person[] { };
 			People people = new People(personArr);
 			var pmc = Mapper.Map<People, List<PersonModel>>(people);
-			Assert.That(pmc, Is.Not.Null);
-			Assert.That(pmc.Count, Is.EqualTo(0));
+		    pmc.ShouldNotBeNull();
+            pmc.Count.ShouldEqual(0);
 		}
 	}
 

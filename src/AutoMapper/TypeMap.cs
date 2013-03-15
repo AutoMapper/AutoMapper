@@ -11,7 +11,7 @@ namespace AutoMapper
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
         private readonly TypeInfo _destinationType;
-        private readonly IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
+        private readonly System.Collections.Generic.IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
 		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
         private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs = new ThreadSafeList<SourceMemberConfig>();
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();

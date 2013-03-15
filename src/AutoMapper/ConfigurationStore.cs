@@ -1,12 +1,4 @@
 using System;
-
-#if !SILVERLIGHT
-using System.Collections.Concurrent;
-using System.Data;
-#else
-using TvdP.Collections;
-#endif
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,16 +7,19 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
+    using Internal;
+
 	public class ConfigurationStore : IConfigurationProvider, IConfiguration
 	{
+	    private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
 	    private readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
 		
 		private readonly ThreadSafeList<TypeMap> _typeMaps = new ThreadSafeList<TypeMap>();
 
-        private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapCache = new ConcurrentDictionary<TypePair, TypeMap>();
-        private readonly ConcurrentDictionary<string, FormatterExpression> _formatterProfiles = new ConcurrentDictionary<string, FormatterExpression>();
+        private readonly IDictionary<TypePair, TypeMap> _typeMapCache = CollectionFactory.CreateConcurrentDictionary<TypePair, TypeMap>();
+        private readonly IDictionary<string, FormatterExpression> _formatterProfiles = CollectionFactory.CreateConcurrentDictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
 	    private readonly List<string> _globalIgnore;
@@ -532,11 +527,7 @@ namespace AutoMapper
 
 	    private static bool ShouldCheckMap(TypeMap typeMap)
 	    {
-#if !SILVERLIGHT
-	        return typeMap.CustomMapper == null && !typeof(IDataRecord).IsAssignableFrom(typeMap.SourceType);
-#else
-            return typeMap.CustomMapper == null;
-#endif
+	        return typeMap.CustomMapper == null && !FeatureDetector.IsIDataRecordType(typeMap.SourceType);
 	    }
 
 	    private TypeMap FindTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)

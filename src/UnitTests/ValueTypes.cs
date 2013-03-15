@@ -1,5 +1,5 @@
 using System;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -29,13 +29,13 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source {Value1 = 4, Value2 = "hello"});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_property_value()
 			{
 				_destination.Value1.ShouldEqual(4);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_field_value()
 			{
 				_destination.Value2.ShouldEqual("hello");
@@ -70,13 +70,13 @@ namespace AutoMapper.UnitTests
                 _destination = Mapper.Map<Source, Destination>(new Source {Value1 = "10", Value2 = "20"});
             }
 
-            [Test]
+            [Fact]
             public void Should_use_map_registered_for_underlying_type()
             {
                 _destination.Value2.ShouldEqual(20);
             }
 
-            [Test]
+            [Fact]
             public void Should_still_map_value_type()
             {
                 _destination.Value1.ShouldEqual(10);

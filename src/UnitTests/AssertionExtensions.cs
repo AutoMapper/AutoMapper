@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Linq;
-using NUnit.Framework;
+using System.Reflection;
+using Should.Core.Exceptions;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -20,7 +22,7 @@ namespace AutoMapper.UnitTests
 			{
 				if (exception.IsInstanceOfType(ex))
 				{
-					throw new AssertionException(string.Format("Expected no exception of type {0} to be thrown.", exception), ex);
+					throw new AssertException(string.Format("Expected no exception of type {0} to be thrown.", exception), ex);
 				}
 			}
 		}

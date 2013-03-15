@@ -1,21 +1,23 @@
 using System;
 using AutoMapper.UnitTests;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.Tests
 {
-	[TestFixture]
 	public class EnumMappingFixture
 	{
-		[SetUp]
-		[TearDown]
-		public void Cleanup()
+        public EnumMappingFixture()
+        {
+            Cleanup();
+        }
+
+        public void Cleanup()
 		{
 			Mapper.Reset();
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapSharedEnum()
 		{
 			Mapper.CreateMap<Order, OrderDto>();
@@ -30,7 +32,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(Status.InProgress);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapToUnderlyingType() {
 			Mapper.CreateMap<Order, OrderDtoInt>();
 
@@ -43,7 +45,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(1);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapToStringType() {
 			Mapper.CreateMap<Order, OrderDtoString>();
 
@@ -56,7 +58,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual("InProgress");
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapFromUnderlyingType() {
 			Mapper.CreateMap<OrderDtoInt, Order>();
 
@@ -69,7 +71,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(Status.InProgress);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapFromStringType() {
 			Mapper.CreateMap<OrderDtoString, Order>();
 
@@ -82,7 +84,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(Status.InProgress);
 		}
 		
-		[Test]
+		[Fact]
 		public void ShouldMapEnumByMatchingNames()
 		{
 			Mapper.CreateMap<Order, OrderDtoWithOwnStatus>();
@@ -97,7 +99,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(StatusForDto.InProgress);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapEnumByMatchingValues()
 		{
 			Mapper.CreateMap<Order, OrderDtoWithOwnStatus>();
@@ -112,7 +114,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(StatusForDto.InProgress);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapSharedNullableEnum() 
 		{
 			Mapper.CreateMap<OrderWithNullableStatus, OrderDtoWithNullableStatus>();
@@ -126,7 +128,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(Status.InProgress);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapNullableEnumByMatchingValues() 
 		{
 			Mapper.CreateMap<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>();
@@ -140,7 +142,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldEqual(StatusForDto.InProgress);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapNullableEnumToNullWhenSourceEnumIsNullAndDestinationWasNotNull() 
 		{
             Mapper.Initialize(cfg =>
@@ -164,7 +166,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldBeNull();
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapNullableEnumToNullWhenSourceEnumIsNull() 
 		{
 			Mapper.CreateMap<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>();
@@ -178,7 +180,7 @@ namespace AutoMapper.Tests
 			dto.Status.ShouldBeNull();
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapEnumUsingCustomResolver()
 		{
 			Mapper.CreateMap<Order, OrderDtoWithOwnStatus>()
@@ -195,7 +197,7 @@ namespace AutoMapper.Tests
 			mappedDto.Status.ShouldEqual(StatusForDto.InProgress);
 		}
 
-		[Test]
+		[Fact]
 		public void ShouldMapEnumUsingGenericEnumResolver()
 		{
 			Mapper.CreateMap<Order, OrderDtoWithOwnStatus>()
@@ -213,7 +215,7 @@ namespace AutoMapper.Tests
 			mappedDto.Status.ShouldEqual(StatusForDto.InProgress);
 		}
 
-        [Test]
+        [Fact]
         public void ShouldMapEnumWithInvalidValue()
         {
             Mapper.CreateMap<Order, OrderDtoWithOwnStatus>();
@@ -296,11 +298,12 @@ namespace AutoMapper.Tests
 			}
 		}
 	}
-
-	[TestFixture]
 	public class When_mapping_from_a_null_object_with_an_enum
 	{
-		[SetUp]
+        public When_mapping_from_a_null_object_with_an_enum()
+        {
+            SetUp();
+        }
 		public void SetUp()
 		{
 			Mapper.AllowNullDestinationValues = false;
@@ -322,7 +325,7 @@ namespace AutoMapper.Tests
 			public EnumValues Values { get; set; }
 		}
 
-		[Test]
+		[Fact]
 		public void Should_set_the_target_enum_to_the_default_value()
 		{
 			SourceClass sourceClass = null;
@@ -330,11 +333,12 @@ namespace AutoMapper.Tests
 			dest.Values.ShouldEqual(default(EnumValues));
 		}
 	}
-
-	[TestFixture]
 	public class When_mapping_from_a_null_object_with_an_enum_on_a_nullable_enum
 	{
-		[SetUp]
+        public When_mapping_from_a_null_object_with_an_enum_on_a_nullable_enum()
+        {
+            SetUp();
+        }
 		public void SetUp()
 		{
 			Mapper.AllowNullDestinationValues = false;
@@ -356,7 +360,7 @@ namespace AutoMapper.Tests
 			public EnumValues Values { get; set; }
 		}
 
-		[Test]
+		[Fact]
 		public void Should_set_the_target_enum_to_null()
 		{
 			SourceClass sourceClass = null;
@@ -364,11 +368,12 @@ namespace AutoMapper.Tests
 			dest.Values.ShouldEqual(null);
 		}
 	}
-
-	[TestFixture]
 	public class When_mapping_from_a_null_object_with_a_nullable_enum
 	{
-		[SetUp]
+        public When_mapping_from_a_null_object_with_a_nullable_enum()
+        {
+            SetUp();
+        }
 		public void SetUp()
 		{
 			Mapper.AllowNullDestinationValues = false;
@@ -390,7 +395,7 @@ namespace AutoMapper.Tests
 			public EnumValues? Values { get; set; }
 		}
 
-		[Test]
+		[Fact]
 		public void Should_set_the_target_enum_to_the_default_value()
 		{
 			SourceClass sourceClass = null;
@@ -398,8 +403,6 @@ namespace AutoMapper.Tests
 			dest.Values.ShouldEqual(default(EnumValues));
 		}
 	}
-
-    [TestFixture]
     public class When_mapping_from_a_null_object_with_a_nullable_enum_as_string : AutoMapperSpecBase
     {
         protected override void Establish_context()
@@ -426,7 +429,7 @@ namespace AutoMapper.Tests
             public string Values3 { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void Should_set_the_target_enum_to_the_default_value()
         {
             var sourceClass = new SourceClass();
@@ -434,7 +437,7 @@ namespace AutoMapper.Tests
             dest.Values1.ShouldEqual(default(EnumValues));
         }
 
-        [Test]
+        [Fact]
         public void Should_set_the_target_nullable_to_null()
         {
             var sourceClass = new SourceClass();
@@ -442,7 +445,7 @@ namespace AutoMapper.Tests
             dest.Values2.ShouldBeNull();
         }
 
-        [Test]
+        [Fact]
         public void Should_set_the_target_empty_to_null()
         {
             var sourceClass = new SourceClass
@@ -489,7 +492,7 @@ namespace AutoMapper.Tests
 			_result = Mapper.Map<SourceFlags, DestinationFlags>(SourceFlags.One | SourceFlags.Four | SourceFlags.Eight);
 		}
 
-		[Test]
+		[Fact]
 		public void Should_include_all_source_enum_values()
 		{
 			_result.ShouldEqual(DestinationFlags.One | DestinationFlags.Four | DestinationFlags.Eight);

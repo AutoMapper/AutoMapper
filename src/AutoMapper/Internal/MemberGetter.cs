@@ -1,10 +1,13 @@
 using System;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Impl
 {
     public abstract class MemberGetter : IMemberGetter
 	{
+        protected static readonly IDelegateFactory DelegateFactory = PlatformAdapter.Resolve<IDelegateFactory>();
+
 		public abstract MemberInfo MemberInfo { get; }
 		public abstract string Name { get; }
 		public abstract Type MemberType { get; }

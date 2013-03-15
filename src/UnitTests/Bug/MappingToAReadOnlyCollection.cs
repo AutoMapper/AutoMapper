@@ -1,7 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests.Bug
             _destination = Mapper.Map<Source, Destination>(source);
         }
 
-        [Test]
+        [Fact]
         public void Should_map_the_list_of_source_items()
         {
             _destination.Values.ShouldNotBeNull();

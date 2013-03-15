@@ -2,21 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AutoMapper.Mappers;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Mappers
 {
-    [TestFixture]
     public class TypeHelperTests
     {
-        [Test]
+        [Fact]
         public void CanReturnElementTypeOnCollectionThatImplementsTheSameGenericInterfaceMultipleTimes()
         {
             Type myType = typeof(ChargeCollection);
 
             Type elementType = TypeHelper.GetElementType(myType);
 
-            Assert.IsNotNull(elementType);
+            elementType.ShouldNotBeNull();
         }
 
         public class Charge { }

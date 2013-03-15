@@ -4,7 +4,7 @@ using System.Linq;
 
 using Should;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -36,14 +36,14 @@ namespace AutoMapper.UnitTests
                 _dto = Mapper.Map<ParentModel, ParentDto>(parent);
             }
 
-            [Test]
+            [Fact]
             public void Should_preserve_the_parent_child_relationship_on_the_destination()
             {
                 _dto.Children[0].Parent.ShouldBeSameAs(_dto);
                 _dto.Children[1].Parent.ShouldBeSameAs(_dto);
             }
 
-            [Test]
+            [Fact]
             public void Before_and_After_for_the_parent_should_be_called_once()
             {
                 _beforeMapCount.ShouldEqual(1);
@@ -88,108 +88,107 @@ namespace AutoMapper.UnitTests
         }
 
 
-		[Ignore("This test breaks the Test Runner")]
-		public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship_using_CustomMapper_StackOverflow : AutoMapperSpecBase
-		{
-			private ParentDto _dto;
-			private ParentModel _parent;
+        //public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship_using_CustomMapper_StackOverflow : AutoMapperSpecBase
+        //{
+        //    private ParentDto _dto;
+        //    private ParentModel _parent;
 
-			protected override void Establish_context()
-			{
-				_parent = new ParentModel
-					{
-						ID = 2
-					};
+        //    protected override void Establish_context()
+        //    {
+        //        _parent = new ParentModel
+        //            {
+        //                ID = 2
+        //            };
 
-				List<ChildModel> childModels = new List<ChildModel>
-					{
-						new ChildModel
-							{
-								ID = 1,
-								Parent = _parent
-							}
-					};
+        //        List<ChildModel> childModels = new List<ChildModel>
+        //            {
+        //                new ChildModel
+        //                    {
+        //                        ID = 1,
+        //                        Parent = _parent
+        //                    }
+        //            };
 
-				Dictionary<int, ParentModel> parents = childModels.ToDictionary(x => x.ID, x => x.Parent);
+        //        Dictionary<int, ParentModel> parents = childModels.ToDictionary(x => x.ID, x => x.Parent);
 
-				Mapper.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
-				Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
+        //        Mapper.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
+        //        Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
 
-				Mapper.CreateMap<ParentModel, ParentDto>()
-					.ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
-				Mapper.CreateMap<ChildModel, ChildDto>();
+        //        Mapper.CreateMap<ParentModel, ParentDto>()
+        //            .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
+        //        Mapper.CreateMap<ChildModel, ChildDto>();
 
-				Mapper.AssertConfigurationIsValid();
-			}
+        //        Mapper.AssertConfigurationIsValid();
+        //    }
 
-			protected override void Because_of()
-			{
-				_dto = Mapper.Map<ParentModel, ParentDto>(_parent);
-			}
+        //    protected override void Because_of()
+        //    {
+        //        _dto = Mapper.Map<ParentModel, ParentDto>(_parent);
+        //    }
 
-			[Test]
-			public void Should_preserve_the_parent_child_relationship_on_the_destination()
-			{
-				_dto.Children[0].Parent.ID.ShouldEqual(_dto.ID);
-			}
+        //    [Fact(Skip = "This test breaks the Test Runner")]
+        //    public void Should_preserve_the_parent_child_relationship_on_the_destination()
+        //    {
+        //        _dto.Children[0].Parent.ID.ShouldEqual(_dto.ID);
+        //    }
 
-			public class ChildIdToParentDtoConverter : TypeConverter<int, ParentDto>
-			{
-				private readonly Dictionary<int, ParentModel> _parentModels;
+        //    public class ChildIdToParentDtoConverter : TypeConverter<int, ParentDto>
+        //    {
+        //        private readonly Dictionary<int, ParentModel> _parentModels;
 
-				public ChildIdToParentDtoConverter(Dictionary<int, ParentModel> parentModels)
-				{
-					_parentModels = parentModels;
-				}
+        //        public ChildIdToParentDtoConverter(Dictionary<int, ParentModel> parentModels)
+        //        {
+        //            _parentModels = parentModels;
+        //        }
 
-				protected override ParentDto ConvertCore(int childId)
-				{
-					ParentModel parentModel = _parentModels[childId];
-					MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
-					return mappingEngine.Map<ParentModel, ParentDto>(parentModel);
-				}
-			}
+        //        protected override ParentDto ConvertCore(int childId)
+        //        {
+        //            ParentModel parentModel = _parentModels[childId];
+        //            MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
+        //            return mappingEngine.Map<ParentModel, ParentDto>(parentModel);
+        //        }
+        //    }
 
-			public class ParentIdToChildDtoListConverter : TypeConverter<int, List<ChildDto>>
-			{
-				private readonly IList<ChildModel> _childModels;
+        //    public class ParentIdToChildDtoListConverter : TypeConverter<int, List<ChildDto>>
+        //    {
+        //        private readonly IList<ChildModel> _childModels;
 
-				public ParentIdToChildDtoListConverter(IList<ChildModel> childModels)
-				{
-					_childModels = childModels;
-				}
+        //        public ParentIdToChildDtoListConverter(IList<ChildModel> childModels)
+        //        {
+        //            _childModels = childModels;
+        //        }
 
-				protected override List<ChildDto> ConvertCore(int childId)
-				{
-					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == childId).ToList();
-					MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
-					return mappingEngine.Map<List<ChildModel>, List<ChildDto>>(childModels);
-				}
-			}
+        //        protected override List<ChildDto> ConvertCore(int childId)
+        //        {
+        //            List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == childId).ToList();
+        //            MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
+        //            return mappingEngine.Map<List<ChildModel>, List<ChildDto>>(childModels);
+        //        }
+        //    }
 
-			public class ParentModel
-			{
-				public int ID { get; set; }
-			}
+        //    public class ParentModel
+        //    {
+        //        public int ID { get; set; }
+        //    }
 
-			public class ChildModel
-			{
-				public int ID { get; set; }
-				public ParentModel Parent { get; set; }
-			}
+        //    public class ChildModel
+        //    {
+        //        public int ID { get; set; }
+        //        public ParentModel Parent { get; set; }
+        //    }
 
-			public class ParentDto
-			{
-				public int ID { get; set; }
-				public List<ChildDto> Children { get; set; }
-			}
+        //    public class ParentDto
+        //    {
+        //        public int ID { get; set; }
+        //        public List<ChildDto> Children { get; set; }
+        //    }
 
-			public class ChildDto
-			{
-				public int ID { get; set; }
-				public ParentDto Parent { get; set; }
-			}
-		}
+        //    public class ChildDto
+        //    {
+        //        public int ID { get; set; }
+        //        public ParentDto Parent { get; set; }
+        //    }
+        //}
 
 		public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship_using_CustomMapper_with_context : AutoMapperSpecBase
 		{
@@ -229,7 +228,7 @@ namespace AutoMapper.UnitTests
 				_dto = Mapper.Map<ParentModel, ParentDto>(_parent);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_preserve_the_parent_child_relationship_on_the_destination()
 			{
 				_dto.Children[0].Parent.ID.ShouldEqual(_dto.ID);
@@ -319,7 +318,7 @@ namespace AutoMapper.UnitTests
 				_dto = Mapper.Map<Foo, FooDto>(foo);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_preserve_the_parent_child_relationship_on_the_destination()
 			{
 				_dto.Bar.Foo.ShouldBeSameAs(_dto);
@@ -368,14 +367,14 @@ namespace AutoMapper.UnitTests
 				_dto = Mapper.Map<FooModel, FooContainerModel>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_preserve_identity_when_destinations_are_incompatible()
 			{
-				Assert.IsInstanceOfType(typeof(FooContainerModel), _dto);
-				Assert.IsInstanceOfType(typeof(FooInputModel), _dto.Input);
-				Assert.IsInstanceOfType(typeof(FooScreenModel), _dto.Screen);
-				Assert.AreEqual(_dto.Input.Id, 3);
-				Assert.AreEqual(_dto.Screen.Id, "3");
+				_dto.ShouldBeType<FooContainerModel>();
+				_dto.Input.ShouldBeType<FooInputModel>();
+				_dto.Screen.ShouldBeType<FooScreenModel>();
+				_dto.Input.Id.ShouldEqual(3);
+				_dto.Screen.Id.ShouldEqual("3");
 			}
 
 			public class FooContainerModel
@@ -419,7 +418,7 @@ namespace AutoMapper.UnitTests
 	            _dtoParent = Mapper.Map<Parent, ParentDto>(parent1);
             }
 
-	        [Test]
+	        [Fact]
 	        public void Should_map_successfully()
 	        {
                 object.ReferenceEquals(_dtoParent.Children[0].Parents[0], _dtoParent).ShouldBeTrue();

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -51,25 +51,25 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_populate_dto_items_with_a_value()
 			{
 				_result.Sub.ShouldNotBeNull();
 			}
 
-			[Test]
+			[Fact]
 			public void Should_provide_empty_array_for_array_type_values()
 			{
 				_result.Sub.Items.ShouldNotBeNull();
 			}
 
-			[Test]
+			[Fact]
 			public void Should_return_default_value_of_property_in_the_chain()
 			{
 				_result.SubSomething.ShouldEqual(0);
 			}
 	
-            [Test]
+            [Fact]
 			public void Default_value_for_string_should_be_empty()
 			{
 				_result.NullString.ShouldEqual(string.Empty);
@@ -121,19 +121,19 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_first_level_items_as_null()
 			{
 				_result.NullString.ShouldBeNull();
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_primitive_items_as_default()
 			{
 				_result.SubSomething.ShouldEqual(0);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_any_sub_mapped_items_as_null()
 			{
 				_result.Sub.ShouldBeNull();
@@ -181,13 +181,13 @@ namespace AutoMapper.UnitTests
 				_nullResult = Mapper.Map<NullSource, NullDestination>(new NullSource());
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_default_behavior_in_default_profile()
 			{
 				_defaultResult.Value.ShouldBeNull();
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_overridden_null_behavior_in_profile()
 			{
 				_nullResult.Value.ShouldNotBeNull();
@@ -231,7 +231,7 @@ namespace AutoMapper.UnitTests
 				_dest = Mapper.Map<Source, Destination>(_source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_perform_the_translation()
 			{
 				_dest.Name.ShouldEqual("jon");
@@ -269,7 +269,7 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Dest>(new Source());
             }
 
-	        [Test]
+	        [Fact]
 	        public void Should_map_to_null_on_destination_values()
 	        {
 	            _dest.OtherValue.ShouldEqual(0);
@@ -321,7 +321,7 @@ namespace AutoMapper.UnitTests
                 _result = Mapper.Map<Foo, FooViewModel>(foo3);
             }
 
-	        [Test]
+	        [Fact]
 	        public void Should_allow_the_resolver_to_handle_null_values()
 	        {
                 _result.IsFooBarred.ShouldEqual("(n/a)");
@@ -366,37 +366,37 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Dest>(new Source());
             }
 
-            [Test]
+            [Fact]
             public void Should_allow_null_ienumerables()
             {
                 _dest.Values1.ShouldBeNull();
             }
 
-            [Test]
+            [Fact]
             public void Should_allow_null_lists()
             {
                 _dest.Values2.ShouldBeNull();
             }
 
-            [Test]
+            [Fact]
             public void Should_allow_null_dictionaries()
             {
                 _dest.Values3.ShouldBeNull();
             }
 
-            [Test]
+            [Fact]
             public void Should_allow_null_arrays()
             {
                 _dest.Values4.ShouldBeNull();
             }
 
-            [Test]
+            [Fact]
             public void Should_allow_null_read_only_collections()
             {
                 _dest.Values5.ShouldBeNull();
             }
 
-            [Test]
+            [Fact]
             public void Should_allow_null_collections()
             {
                 _dest.Values6.ShouldBeNull();

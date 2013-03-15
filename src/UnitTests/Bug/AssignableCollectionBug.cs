@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
@@ -51,11 +51,9 @@ namespace AutoMapper.UnitTests.Bug
 
 			#endregion
 		}
-
-		[TestFixture]
 		public class MappingTests
 		{
-			[Test]
+			[Fact]
 			public void CanMapPersonOneToPersonTwo()
 			{
 				IList<IAddress> adrList = new List<IAddress> { new AddressOne { Street = "Street One" } };
@@ -69,10 +67,10 @@ namespace AutoMapper.UnitTests.Bug
 				var result = Mapper.Map<PersonOne, PersonTwo>(source);
 
 				// These are ok.
-				Assert.AreEqual(source.Name, result.Name);
-				Assert.IsNotNull(result.Addresses);
-				Assert.IsTrue(result.Addresses.Count == 1);
-				Assert.AreEqual(source.Addresses[0].Street, result.Addresses[0].Street);
+				source.Name.ShouldEqual(result.Name);
+				result.Addresses.ShouldNotBeNull();
+				(result.Addresses.Count == 1).ShouldBeTrue();
+				source.Addresses[0].Street.ShouldEqual(result.Addresses[0].Street);
 
 				// This is what I can't get to pass:
 				result.Addresses[0].ShouldBeType<AddressTwo>();

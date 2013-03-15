@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 using Should;
 using System.Linq;
 
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
                 _source = Mapper.Map<Destination, Source>(dest);
             }
 
-            [Test]
+            [Fact]
             public void Should_create_a_map_with_the_reverse_items()
             {
                 _source.Value.ShouldEqual(10);
@@ -64,7 +64,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_only_map_source_members()
             {
                 var typeMap = Mapper.FindTypeMapFor<Source, Destination>();
@@ -72,7 +72,7 @@ namespace AutoMapper.UnitTests
                 typeMap.GetPropertyMaps().Count().ShouldEqual(1);
             }
 
-            [Test]
+            [Fact]
             public void Should_not_throw_any_configuration_validation_errors()
             {
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -99,7 +99,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_throw_a_configuration_validation_error()
             {
                 typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -128,7 +128,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_not_throw_a_configuration_validation_error()
             {
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -158,7 +158,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_not_throw_a_configuration_validation_error()
             {
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
