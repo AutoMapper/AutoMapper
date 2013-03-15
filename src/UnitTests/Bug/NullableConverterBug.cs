@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
@@ -10,11 +10,9 @@ namespace AutoMapper.UnitTests.Bug
             using System;
             using System.Collections.Generic;
             using AutoMapper;
-
-            [TestFixture]
             public class TestProblem
             {
-                [Test]
+                [Fact]
                 public void Example()
                 {
                     Mapper.CreateMap<int?, Entity>()
@@ -36,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
                 }
             }
 
-            class IntToEntityConverter : TypeConverter<int, Entity>
+            public class IntToEntityConverter : TypeConverter<int, Entity>
             {
                 protected override Entity ConvertCore(int source)
                 {
@@ -44,7 +42,7 @@ namespace AutoMapper.UnitTests.Bug
                 }
             }
 
-            class NullableIntToEntityConverter : TypeConverter<int?, Entity>
+            public class NullableIntToEntityConverter : TypeConverter<int?, Entity>
             {
                 protected override Entity ConvertCore(int? source)
                 {
@@ -57,7 +55,7 @@ namespace AutoMapper.UnitTests.Bug
                 }
             }
 
-            class Entity
+            public class Entity
             {
                 public int Id { get; set; }
 

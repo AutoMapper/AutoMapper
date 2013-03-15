@@ -1,11 +1,15 @@
 using System;
-using System.ComponentModel;
-using System.Linq;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
     public class EnumMapper : IObjectMapper
     {
+        private static readonly INullableConverterFactory NullableConverterFactory =
+            PlatformAdapter.Resolve<INullableConverterFactory>();
+        private static readonly IEnumNameValueMapperFactory EnumNameValueMapperFactory =
+            PlatformAdapter.Resolve<IEnumNameValueMapperFactory>(false);
+
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
             bool toEnum = false;
@@ -46,15 +50,15 @@ namespace AutoMapper.Mappers
 					return Enum.ToObject(enumDestinationType, context.SourceValue);
                 }
 
-#if !SILVERLIGHT
-                if (!Enum.GetNames(enumDestinationType).Contains(context.SourceValue.ToString()))
+                if (FeatureDetector.IsEnumGetNamesSupported)
                 {
-                    Type underlyingSourceType = Enum.GetUnderlyingType(enumSourceType);
-                    var underlyingSourceValue = Convert.ChangeType(context.SourceValue, underlyingSourceType);
+                    var enumValueMapper = EnumNameValueMapperFactory.Create();
 
-                    return Enum.ToObject(context.DestinationType, underlyingSourceValue);
+                    if (enumValueMapper.IsMatch(enumDestinationType, context.SourceValue.ToString()))
+                    {
+                        return enumValueMapper.Convert(enumSourceType, enumDestinationType, context);
+                    }
                 }
-#endif
 
 				return Enum.Parse(enumDestinationType, Enum.GetName(enumSourceType, context.SourceValue), true);
             }
@@ -138,7 +142,7 @@ namespace AutoMapper.Mappers
 
         private static object ConvertEnumToNullableType(ResolutionContext context)
         {
-            var nullableConverter = new NullableConverter(context.DestinationType);
+            var nullableConverter = NullableConverterFactory.Create(context.DestinationType);
             
             if (context.IsSourceValueNull)
             {
@@ -146,7 +150,7 @@ namespace AutoMapper.Mappers
             }
 
             var destType = nullableConverter.UnderlyingType;
-            return Convert.ChangeType(context.SourceValue, destType);
+            return Convert.ChangeType(context.SourceValue, destType, null);
         }
 
     }

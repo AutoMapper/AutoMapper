@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Should;
-using NUnit.Framework;
+using Xunit;
 using System.Linq;
 
 namespace AutoMapper.UnitTests
@@ -24,9 +24,12 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<ModelObject, ModelDto>();
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_successfully()
 			{
+#if WINDOWS_PHONE
+                Assert.False(true);
+#endif
 				ModelDto dto = Mapper.Map<ModelObject, ModelDto>(new ModelObject());
 
 				dto.ShouldNotBeNull();
@@ -53,7 +56,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(null);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_always_provide_a_dto()
 			{
 				_result.ShouldNotBeNull();
@@ -90,7 +93,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_the_dto_value()
 			{
 				_result.SomeValue.ShouldEqual("Some value");
@@ -123,7 +126,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_ToString_value_of_the_unmatched_type()
 			{
 				_result.NotAString.ShouldEqual("5");
@@ -156,7 +159,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_the_collection_of_items_in_the_input_to_the_array()
 			{
 				_result.SomeCoolValues[0].ShouldEqual("4");
@@ -182,7 +185,7 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<ModelObject, ModelDto>();
 			}
 
-			[Test]
+			[Fact]
 			public void Should_throw_a_mapping_exception()
 			{
 				var model = new ModelObject();
@@ -215,13 +218,13 @@ namespace AutoMapper.UnitTests
 				_dto = (ModelDto[])Mapper.Map(_model, typeof(ModelObject[]), typeof(ModelDto[]));
 			}
 
-			[Test]
+			[Fact]
 			public void Should_create_an_array_of_ModelDto_objects()
 			{
 				_dto.Length.ShouldEqual(2);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_properties()
 			{
                 _dto.Any(d => d.SomeValue.Contains("First")).ShouldBeTrue();
@@ -252,13 +255,13 @@ namespace AutoMapper.UnitTests
 				_dto = (ModelDto[])Mapper.Map(_model, typeof(ModelObject[]), typeof(ModelDto[]));
 			}
 
-			[Test]
+			[Fact]
 			public void Should_create_an_array_of_ModelDto_objects()
 			{
 				_dto.Length.ShouldEqual(2);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_properties()
 			{
                 _dto.Any(d => d.SomeValue.Contains("First")).ShouldBeTrue();
@@ -294,13 +297,13 @@ namespace AutoMapper.UnitTests
                 _dto = Mapper.Map<ModelObject, ModelDto>(_model);
             }
 
-			[Test]
+			[Fact]
 			public void Should_map_value_if_has_value()
 			{
 				_dto.SomeValue.ShouldEqual(2);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_set_value_if_null()
 			{
 				_dto.SomeNullableValue.ShouldEqual(0);
@@ -336,13 +339,13 @@ namespace AutoMapper.UnitTests
 				_dto = Mapper.Map<ModelObject, ModelDto>(_model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_value_if_has_value()
 			{
 				_dto.SomeValue.ShouldEqual(2);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_set_value_if_null()
 			{
 				_dto.SomeOtherValue.ShouldEqual(0);
@@ -380,13 +383,13 @@ namespace AutoMapper.UnitTests
                 _dto = Mapper.Map<ModelObject, ModelDto>(_model);
             }
 
-            [Test]
+            [Fact]
             public void Should_map_value_if_has_value()
             {
                 _dto.SomeValue.ShouldBeNull();
             }
 
-            [Test]
+            [Fact]
             public void Should_not_set_value_if_null()
             {
                 _dto.SomeOtherValue2.ShouldBeNull();

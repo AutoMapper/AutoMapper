@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class PropertyOnMappingShouldResolveMostSpecificType
     {
         public class ItemBase
@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests.Bug
 #endif
         }
 
-        [Test]
+        [Fact]
         public void container_class_is_caching_too_specific_mapper_for_collection()
         {
             Mapper.CreateMap<ItemBase, ItemDto>()
@@ -89,12 +89,12 @@ namespace AutoMapper.UnitTests.Bug
                                                                       }
                                                               });
 
-            Assert.IsInstanceOfType(typeof(DifferentDescriptionDto), dto.Items[0].Description);
-            Assert.IsInstanceOfType(typeof(SpecificItemDto), dto.Items[1]);
-            Assert.IsInstanceOfType(typeof(SpecificDescriptionDto), dto.Items[1].Description);
+            dto.Items[0].Description.ShouldBeType<DifferentDescriptionDto>();
+            dto.Items[1].ShouldBeType<SpecificItemDto>();
+            dto.Items[1].Description.ShouldBeType<SpecificDescriptionDto>();
         }
 
-        [Test]
+        [Fact]
         public void container_class_is_caching_too_specific_mapper_for_collection_with_one_parameter()
         {
             Mapper.CreateMap<ItemBase, ItemDto>()
@@ -126,12 +126,12 @@ namespace AutoMapper.UnitTests.Bug
                                                                       }
             });
 
-            Assert.IsInstanceOfType(typeof(DifferentDescriptionDto), dto.Items[0].Description);
-            Assert.IsInstanceOfType(typeof(SpecificItemDto), dto.Items[1]);
-            Assert.IsInstanceOfType(typeof(SpecificDescriptionDto), dto.Items[1].Description);
+            dto.Items[0].Description.ShouldBeType<DifferentDescriptionDto>();
+            dto.Items[1].ShouldBeType<SpecificItemDto>();
+            dto.Items[1].Description.ShouldBeType<SpecificDescriptionDto>();
         }
 
-        [Test]
+        [Fact]
         public void property_on_dto_mapped_from_self_should_be_specific_match()
         {
             Mapper.CreateMap<ItemBase, ItemDto>()
@@ -156,11 +156,11 @@ namespace AutoMapper.UnitTests.Bug
 
             var dto = Mapper.Map<ItemBase, ItemDto>(new DifferentItem());
 
-            Assert.IsInstanceOfType(typeof(ItemDto), dto);
-            Assert.IsInstanceOfType(typeof(DifferentDescriptionDto), dto.Description);
+            dto.ShouldBeType<ItemDto>();
+            dto.Description.ShouldBeType<DifferentDescriptionDto>();
         }
 
-        [Test]
+        [Fact]
         public void property_on_dto_mapped_from_self_should_be_specific_match_with_one_parameter()
         {
             Mapper.CreateMap<ItemBase, ItemDto>()
@@ -185,8 +185,8 @@ namespace AutoMapper.UnitTests.Bug
 
             var dto = Mapper.Map<ItemDto>(new DifferentItem());
 
-            Assert.IsInstanceOfType(typeof(ItemDto), dto);
-            Assert.IsInstanceOfType(typeof(DifferentDescriptionDto), dto.Description);
+            dto.ShouldBeType<ItemDto>();
+            dto.Description.ShouldBeType<DifferentDescriptionDto>();
         }
     }
 }

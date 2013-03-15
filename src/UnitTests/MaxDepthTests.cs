@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    [TestFixture]
     public class MaxDepthTests
     {
         public class Source
@@ -37,9 +37,13 @@ namespace AutoMapper.UnitTests
 
         private Source _source;
 
-        [TestFixtureSetUp]
+        public MaxDepthTests()
+        {
+            Initializer();
+        }
         public void Initializer()
         {
+            Mapper.Reset();
             var nest = new Source(1);
 
             nest.AddChild(new Source(2));
@@ -58,64 +62,58 @@ namespace AutoMapper.UnitTests
             _source = nest;
         }
 
-        [SetUp]
-        public void BeforeTest()
-        {
-            Mapper.Reset();
-        }
-
-        [Test]
+        [Fact]
         public void Second_level_children_are_null_with_max_depth_1()
         {
             Mapper.CreateMap<Source, Destination>().MaxDepth(1);
             var destination = Mapper.Map<Source, Destination>(_source);
             foreach (var child in destination.Children)
             {
-                Assert.IsNull(child);
+                child.ShouldBeNull();
             }
         }
 
-        [Test]
+        [Fact]
         public void Second_level_children_are_not_null_with_max_depth_2()
         {
             Mapper.CreateMap<Source, Destination>().MaxDepth(2);
             var destination = Mapper.Map<Source, Destination>(_source);
             foreach (var child in destination.Children)
             {
-                Assert.AreEqual(2, child.Level);
-                Assert.IsNotNull(child);
-                Assert.AreEqual(destination, child.Parent);
+                2.ShouldEqual(child.Level);
+                child.ShouldNotBeNull();
+                destination.ShouldEqual(child.Parent);
             }
         }
 
-        [Test]
+        [Fact]
         public void Third_level_children_are_null_with_max_depth_2()
         {
             Mapper.CreateMap<Source, Destination>().MaxDepth(2);
             var destination = Mapper.Map<Source, Destination>(_source);
             foreach (var child in destination.Children)
             {
-                Assert.IsNotNull(child.Children);
+                child.Children.ShouldNotBeNull();
                 foreach (var subChild in child.Children)
                 {
-                    Assert.IsNull(subChild);
+                    subChild.ShouldBeNull();
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public void Third_level_children_are_not_null_max_depth_3()
         {
             Mapper.CreateMap<Source, Destination>().MaxDepth(3);
             var destination = Mapper.Map<Source, Destination>(_source);
             foreach (var child in destination.Children)
             {
-                Assert.IsNotNull(child.Children);
+                child.Children.ShouldNotBeNull();
                 foreach (var subChild in child.Children)
                 {
-                    Assert.AreEqual(3, subChild.Level);
-                    Assert.IsNotNull(subChild.Children);
-                    Assert.AreEqual(child, subChild.Parent);
+                    3.ShouldEqual(subChild.Level);
+                    subChild.Children.ShouldNotBeNull();
+                    child.ShouldEqual(subChild.Parent);
                 }
             }
         }

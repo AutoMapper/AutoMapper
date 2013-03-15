@@ -12,8 +12,9 @@
     <AssemblyName>AutoMapper</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>AutoMapper.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
@@ -33,7 +34,9 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile88</TargetFrameworkProfile>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,51 +60,23 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\AutoMapper.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedDebug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\..\build\Debug\AutoMapper\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>..\..\build\Debug\AutoMapper\AutoMapper.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\build\Release\AutoMapper\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <Optimize>true</Optimize>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>..\..\build\Release\AutoMapper\AutoMapper.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Internal\ExpressionVisitor.cs" />
+    <Compile Include="Internal\IDictionary.cs" />
     <Compile Include="Internal\AliasedMember.cs" />
+    <Compile Include="Internal\IAdapterResolver.cs" />
+    <Compile Include="Internal\PlatformAdapter.cs" />
+    <Compile Include="Internal\ProbingAdapterResolver.cs" />
+    <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\IMapperRegistry.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="MemberList.cs" />
-    <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
-    <Compile Include="Configuration\MapperConfiguration.cs" />
-    <Compile Include="Configuration\MapperRegistry.cs" />
-    <Compile Include="Configuration\TypeMapConfiguration.cs" />
     <Compile Include="ConstructorMap.cs" />
     <Compile Include="ConstructorParameterMap.cs" />
     <Compile Include="IgnoreMapAttribute.cs" />
@@ -111,7 +86,7 @@
     <Compile Include="INamingConvention.cs" />
     <Compile Include="Internal\DelegateBasedResolver2.cs" />
     <Compile Include="Internal\DeferredInstantiatedConverter.cs" />
-    <Compile Include="Internal\DelegateFactory.cs" />
+    <Compile Include="Internal\IDelegateFactory.cs" />
     <Compile Include="Internal\ITypeMapFactory.cs" />
     <Compile Include="Internal\DefaultResolver.cs" />
     <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
@@ -129,7 +104,6 @@
     <Compile Include="IObjectMapper.cs" />
     <Compile Include="AutoMapperConfigurationException.cs" />
     <Compile Include="ITypeConverter.cs" />
-    <Compile Include="Mapper.cs" />
     <Compile Include="ConfigurationStore.cs" />
     <Compile Include="Internal\EnumerableExtensions.cs" />
     <Compile Include="Internal\FormatterExpression.cs" />
@@ -141,7 +115,6 @@
     <Compile Include="IValueResolver.cs" />
     <Compile Include="Mappers\ArrayMapper.cs" />
     <Compile Include="Mappers\CollectionMapper.cs" />
-    <Compile Include="Mappers\DataReaderMapper.cs" />
     <Compile Include="Mappers\FlagsEnumMapper.cs" />
     <Compile Include="Mappers\DictionaryMapper.cs" />
     <Compile Include="Mappers\EnumerableMapper.cs" />
@@ -149,13 +122,10 @@
     <Compile Include="Mappers\EnumMapper.cs" />
     <Compile Include="Mappers\AssignableMapper.cs" />
     <Compile Include="Mappers\ITypeMapObjectMapper.cs" />
-    <Compile Include="Mappers\ListSourceMapper.cs" />
-    <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\NullableMapper.cs" />
     <Compile Include="Mappers\ObjectCreator.cs" />
     <Compile Include="Mappers\ReadOnlyCollectionMapper.cs" />
     <Compile Include="Mappers\StringMapper.cs" />
-    <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Mappers\TypeHelper.cs" />
     <Compile Include="Mappers\TypeMapMapper.cs" />
     <Compile Include="Mappers\TypeMapObjectMapperRegistry.cs" />
@@ -165,11 +135,9 @@
     <Compile Include="Internal\NullReplacementMethod.cs" />
     <Compile Include="Internal\PrimitiveExtensions.cs" />
     <Compile Include="Profile.cs" />
-    <Compile Include="Internal\PropertyEmitter.cs" />
     <Compile Include="PropertyMap.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
     <Compile Include="Internal\ProxyBase.cs" />
-    <Compile Include="Internal\ProxyGenerator.cs" />
     <Compile Include="QueryableExtensions.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
@@ -183,28 +151,9 @@
     <Compile Include="ValueResolver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AutoMapper.snk" />
     <None Include="SemanticModel.cd" />
   </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

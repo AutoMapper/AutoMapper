@@ -6,9 +6,6 @@ using System.Text;
 
 namespace AutoMapper
 {
-#if !SILVERLIGHT
-	[Serializable]
-#endif
     public class AutoMapperMappingException : Exception
     {
         private string _message;
@@ -46,14 +43,6 @@ namespace AutoMapper
         {
             Context = context;
         }
-
-#if !SILVERLIGHT
-		protected AutoMapperMappingException(
-			SerializationInfo info,
-			StreamingContext context) : base(info, context)
-		{
-		}
-#endif
 
         public AutoMapperMappingException(ResolutionContext context, string message)
             : this(context)

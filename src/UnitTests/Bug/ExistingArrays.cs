@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -9,7 +9,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.CreateMap<Source, Dest>();
         }
 
-        [Test]
+        [Fact]
         public void should_map_array_inside_object()
         {
             var source = new Source { Values = new[] { "1", "2" } };

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -64,7 +64,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_fail_a_configuration_check()
             {
                 typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -92,7 +92,7 @@ namespace AutoMapper.UnitTests
                     .ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
             }
 
-            [Test]
+            [Fact]
             public void Should_pass_an_inspection_of_missing_mappings()
             {
                 Mapper.AssertConfigurationIsValid();
@@ -116,7 +116,7 @@ namespace AutoMapper.UnitTests
                 Mapper.CreateMap<Source, Destination>();
             }
 
-            [Test]
+            [Fact]
             public void Should_fail_a_configuration_check()
             {
                 typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -167,7 +167,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            [Test]
+            [Fact]
             public void Should_pass_a_configuration_check()
             {
                 _exception.ShouldBeNull();
@@ -208,7 +208,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            [Test]
+            [Fact]
             public void Should_pass_a_configuration_check()
             {
                 _exception.ShouldBeNull();
@@ -242,7 +242,7 @@ namespace AutoMapper.UnitTests
                 Mapper.CreateMap<Source, Destination>();
             }
 
-            [Test]
+            [Fact]
             public void Should_fail_a_configuration_check()
             {
                 typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -276,7 +276,7 @@ namespace AutoMapper.UnitTests
                 Mapper.CreateMap<Source, Destination>();
             }
 
-            [Test]
+            [Fact]
             public void Should_fail_a_configuration_check()
             {
                 typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -307,7 +307,7 @@ namespace AutoMapper.UnitTests
                 Mapper.Map<Source, Destination>(new Source { Value = 5 });
             }
 
-            [Test]
+            [Fact]
             public void Should_be_valid()
             {
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -346,7 +346,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_ignore_bad_dtos_in_other_profiles()
             {
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid("Good"));
@@ -377,7 +377,7 @@ namespace AutoMapper.UnitTests
                     .ForMember(dest => dest.Bar, opt => opt.MapFrom(src => src.Barr));
             }
 
-            [Test]
+            [Fact]
             public void Should_fail_a_configuration_check()
             {
                 typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -402,7 +402,7 @@ namespace AutoMapper.UnitTests
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_validate_successfully()
             {
                 typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -426,7 +426,7 @@ namespace AutoMapper.UnitTests
 				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
 			}
 
-			[Test]
+			[Fact]
 			public void Should_fail_a_configuration_check()
 			{
 				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
@@ -452,7 +452,7 @@ namespace AutoMapper.UnitTests
 				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
 			}
 
-			[Test]
+			[Fact]
 			public void Should_fail_a_configuration_check()
 			{
 				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);

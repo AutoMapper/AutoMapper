@@ -1,5 +1,5 @@
 using System;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -66,13 +66,13 @@ namespace AutoMapper.UnitTests
                     opt => opt.ConstructServicesUsing(type => type == typeof(FooResolver) ? new FooResolver(2) : null));
             }
 
-            [Test]
+            [Fact]
             public void Should_use_the_new_ctor()
             {
                 _dest.Value.ShouldEqual(7);
             }
 
-            [Test]
+            [Fact]
             public void Should_use_the_existing_ctor_for_non_overridden_ctors()
             {
                 _dest.Value2.ShouldEqual(7);
@@ -134,7 +134,7 @@ namespace AutoMapper.UnitTests
                     opt => opt.ConstructServicesUsing(type => type == typeof(FooTypeConverter) ? new FooTypeConverter(2) : null));
             }
 
-            [Test]
+            [Fact]
             public void Should_use_the_new_ctor()
             {
                 _dest.Value.ShouldEqual(7);

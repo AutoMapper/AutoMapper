@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using NUnit.Framework;
+using Xunit;
 using Should;
 using System.Linq;
 
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}, Values2 = new List<int> {9, 8, 7, 6}});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_the_list_of_source_items()
 			{
 				_destination.Values.ShouldNotBeNull();
@@ -47,7 +47,7 @@ namespace AutoMapper.UnitTests
 				_destination.Values.ShouldContain(4);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_from_the_generic_list_of_values()
 			{
 				_destination.Values2.ShouldNotBeNull();
@@ -84,7 +84,7 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } });
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_the_list_of_source_items()
 			{
 				_destination.Values.ShouldNotBeNull();
@@ -94,7 +94,7 @@ namespace AutoMapper.UnitTests
 				_destination.Values.ShouldContain(4);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_from_the_generic_list_of_values_with_formatting()
 			{
 				_destination.Values2.ShouldNotBeNull();
@@ -131,7 +131,7 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}, Values2 = new List<int> {9, 8, 7, 6}});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_the_list_of_source_items()
 			{
 				_destination.Values.ShouldNotBeNull();
@@ -141,7 +141,7 @@ namespace AutoMapper.UnitTests
 				_destination.Values.ShouldContain(4);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_from_a_non_array_source()
 			{
 				_destination.Values2.ShouldNotBeNull();
@@ -176,7 +176,7 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_the_list_of_source_items()
 			{
 				_destination.Values.ShouldNotBeNull();
@@ -211,7 +211,7 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_the_list_of_source_items()
 			{
 				_destination.Values.ShouldNotBeNull();
@@ -246,7 +246,7 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_the_list_of_source_items()
 			{
 				_destination.Values.ShouldNotBeNull();
@@ -288,10 +288,10 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(_source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_assign_the_value_directly()
 			{
-				CollectionAssert.AreEqual(_destination.Values, _source.Values);
+				_source.Values.ShouldEqual(_destination.Values);
 			}
 		}
 		
@@ -338,7 +338,7 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(_source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_assign_the_value_directly()
 			{
 				_destination.Values.Count.ShouldEqual(2);
@@ -392,7 +392,7 @@ namespace AutoMapper.UnitTests
 				Mapper.Map(_source, _destination);
 			}
 			
-			[Test]
+			[Fact]
 			public void Should_clear_the_list_before_mapping()
 			{
 				_destination.Values.Count.ShouldEqual(2);
@@ -420,7 +420,7 @@ namespace AutoMapper.UnitTests
                 _mappedStrings = Mapper.Map<IEnumerable<string>, List<string>>(_strings);
             }
 
-            [Test]
+            [Fact]
             public void Should_map_correctly()
             {
                 _mappedStrings.ShouldNotBeNull();
@@ -429,7 +429,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
 		public class When_destination_collection_is_only_a_list_source_and_not_IList : SpecBase
 		{
 			private Destination _destination;
@@ -479,7 +479,7 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3}});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_underlying_list_to_add_values()
 			{
 				_destination.Values.Count().ShouldEqual(3);

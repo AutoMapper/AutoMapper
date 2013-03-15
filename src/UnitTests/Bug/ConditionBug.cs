@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,6 @@ namespace AutoMapper.UnitTests.Bug
 {
     namespace ConditionBug
     {
-        [TestFixture]
         public class Example : AutoMapperSpecBase
         {
             public class SubSource
@@ -38,7 +37,7 @@ namespace AutoMapper.UnitTests.Bug
                                              }));
             }
 
-            [Test]
+            [Fact]
             public void Should_skip_the_mapping_when_the_condition_is_false()
             {
                 var src = new Source();
@@ -48,7 +47,7 @@ namespace AutoMapper.UnitTests.Bug
                 destination.Value.ShouldBeNull();
             }
 
-            [Test]
+            [Fact]
             public void Should_execute_the_mapping_when_the_condition_is_true()
             {
                 var src = new Source();

@@ -2,20 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
     public class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IMappingOptions
-	{
+    {
+        private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
+
 		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
-		private readonly IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
+		private readonly System.Collections.Generic.IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
-	    private readonly HashSet<string> _prefixes = new HashSet<string>();
-	    private readonly HashSet<string> _postfixes = new HashSet<string>();
-	    private readonly HashSet<string> _destinationPrefixes = new HashSet<string>();
-	    private readonly HashSet<string> _destinationPostfixes = new HashSet<string>();
-        private readonly HashSet<AliasedMember> _aliases = new HashSet<AliasedMember>();
+	    private readonly ISet<string> _prefixes = CollectionFactory.CreateSet<string>();
+        private readonly ISet<string> _postfixes = CollectionFactory.CreateSet<string>();
+        private readonly ISet<string> _destinationPrefixes = CollectionFactory.CreateSet<string>();
+        private readonly ISet<string> _destinationPostfixes = CollectionFactory.CreateSet<string>();
+        private readonly ISet<AliasedMember> _aliases = CollectionFactory.CreateSet<AliasedMember>();
 
 	    public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
 		{
@@ -87,7 +90,7 @@ namespace AutoMapper
 			return _formatters.ToArray();
 		}
 
-		public IDictionary<Type, IFormatterConfiguration> GetTypeSpecificFormatters()
+		public System.Collections.Generic.IDictionary<Type, IFormatterConfiguration> GetTypeSpecificFormatters()
 		{
 			return new Dictionary<Type, IFormatterConfiguration>(_typeSpecificFormatters);
 		}

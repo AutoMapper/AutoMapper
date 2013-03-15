@@ -1,0 +1,610 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>xunit.extensions-silverlight4</name>
+    </assembly>
+    <members>
+        <member name="T:Xunit.Extensions.TestClass">
+            <summary>
+            A class which can be derived from for test classes, which bring an overridable version
+            of Assert (using the <see cref="T:Xunit.Extensions.Assertions"/> class.
+            </summary>
+        </member>
+        <member name="P:Xunit.Extensions.TestClass.Assert">
+            <summary>
+            Gets a class which provides assertions.
+            </summary>
+        </member>
+        <member name="T:Xunit.Extensions.TheoryCommand">
+            <summary>
+            Represents a single invocation of a data theory test method.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.TheoryCommand.#ctor(Xunit.Sdk.IMethodInfo,System.Object[])">
+            <summary>
+            Creates a new instance of <see cref="T:Xunit.Extensions.TheoryCommand"/>.
+            </summary>
+            <param name="testMethod">The method under test</param>
+            <param name="parameters">The parameters to be passed to the test method</param>
+        </member>
+        <member name="M:Xunit.Extensions.TheoryCommand.Execute(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Xunit.Extensions.TheoryCommand.Parameters">
+            <summary>
+            Gets the parameter values that are passed to the test method.
+            </summary>
+        </member>
+        <member name="T:Xunit.Extensions.PropertyDataAttribute">
+            <summary>
+            Provides a data source for a data theory, with the data coming from a public static property on the test class.
+            The property must return IEnumerable&lt;object[]&gt; with the test data.
+            </summary>
+        </member>
+        <member name="T:Xunit.Extensions.DataAttribute">
+            <summary>
+            Abstract attribute which represents a data source for a data theory.
+            Data source providers derive from this attribute and implement GetData
+            to return the data for the theory.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.DataAttribute.GetData(System.Reflection.MethodInfo,System.Type[])">
+            <summary>
+            Returns the data to be used to test the theory.
+            </summary>
+            <remarks>
+            The <paramref name="parameterTypes"/> parameter is provided so that the
+            test data can be converted to the destination parameter type when necessary.
+            Generally, data should NOT be automatically converted, UNLESS the source data
+            format does not have rich types (for example, all numbers in Excel spreadsheets
+            are returned as <see cref="T:System.Double"/> even if they are integers). Derivers of
+            this class should NOT throw exceptions for mismatched types or mismatched number
+            of parameters; the test framework will throw these exceptions at the correct
+            time.
+            </remarks>
+            <param name="methodUnderTest">The method that is being tested</param>
+            <param name="parameterTypes">The types of the parameters for the test method</param>
+            <returns>The theory data</returns>
+        </member>
+        <member name="P:Xunit.Extensions.DataAttribute.TypeId">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.Extensions.PropertyDataAttribute.#ctor(System.String)">
+            <summary>
+            Creates a new instance of <see cref="T:Xunit.Extensions.PropertyDataAttribute"/>/
+            </summary>
+            <param name="propertyName">The name of the public static property on the test class that will provide the test data</param>
+        </member>
+        <member name="M:Xunit.Extensions.PropertyDataAttribute.GetData(System.Reflection.MethodInfo,System.Type[])">
+            <summary>
+            Returns the data to be used to test the theory.
+            </summary>
+            <param name="methodUnderTest">The method that is being tested</param>
+            <param name="parameterTypes">The types of the parameters for the test method</param>
+            <returns>The theory data, in table form</returns>
+        </member>
+        <member name="T:Xunit.Extensions.InlineDataAttribute">
+            <summary>
+            Provides a data source for a data theory, with the data coming from inline values.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.InlineDataAttribute.#ctor(System.Object[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.Extensions.InlineDataAttribute"/> class.
+            </summary>
+            <param name="dataValues">The data values to pass to the theory</param>
+        </member>
+        <member name="M:Xunit.Extensions.InlineDataAttribute.GetData(System.Reflection.MethodInfo,System.Type[])">
+            <summary>
+            Returns the data to be used to test the theory.
+            </summary>
+            <param name="methodUnderTest">The method that is being tested</param>
+            <param name="parameterTypes">The types of the parameters for the test method</param>
+            <returns>The theory data, in table form</returns>
+        </member>
+        <member name="T:Xunit.Extensions.TraceAttribute">
+            <summary>
+            Apply to a test method to trace the method begin and end.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.TraceAttribute.Before(System.Reflection.MethodInfo)">
+            <summary>
+            This method is called before the test method is executed.
+            </summary>
+            <param name="methodUnderTest">The method under test</param>
+        </member>
+        <member name="M:Xunit.Extensions.TraceAttribute.After(System.Reflection.MethodInfo)">
+            <summary>
+            This method is called after the test method is executed.
+            </summary>
+            <param name="methodUnderTest">The method under test</param>
+        </member>
+        <member name="T:Xunit.Extensions.Clock">
+            <summary>
+            A wrapper around the static operations on <see cref="T:System.DateTime"/> which allows time
+            to be frozen using the <see cref="T:Xunit.Extensions.FreezeClockAttribute"/>. The clock begins in the
+            thawed state; that is, calls to <see cref="P:Xunit.Extensions.Clock.Now"/>, <see cref="P:Xunit.Extensions.Clock.Today"/>, and
+            <see cref="P:Xunit.Extensions.Clock.UtcNow"/> return current (non-frozen) values.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.Clock.Freeze">
+            <summary>
+            Freezes the clock with the current time.
+            Until <see cref="M:Xunit.Extensions.Clock.Thaw"/> is called, all calls to <see cref="P:Xunit.Extensions.Clock.Now"/>, <see cref="P:Xunit.Extensions.Clock.Today"/>, and
+            <see cref="P:Xunit.Extensions.Clock.UtcNow"/> will return the exact same values.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.Clock.FreezeLocal(System.DateTime)">
+            <summary>
+            Freezes the clock with the given date and time, considered to be local time.
+            Until <see cref="M:Xunit.Extensions.Clock.Thaw"/> is called, all calls to <see cref="P:Xunit.Extensions.Clock.Now"/>, <see cref="P:Xunit.Extensions.Clock.Today"/>, and
+            <see cref="P:Xunit.Extensions.Clock.UtcNow"/> will return the exact same values.
+            </summary>
+            <param name="localDateTime">The local date and time to freeze to</param>
+        </member>
+        <member name="M:Xunit.Extensions.Clock.FreezeUtc(System.DateTime)">
+            <summary>
+            Freezes the clock with the given date and time, considered to be Coordinated Universal Time (UTC).
+            Until <see cref="M:Xunit.Extensions.Clock.Thaw"/> is called, all calls to <see cref="P:Xunit.Extensions.Clock.Now"/>, <see cref="P:Xunit.Extensions.Clock.Today"/>, and
+            <see cref="P:Xunit.Extensions.Clock.UtcNow"/> will return the exact same values.
+            </summary>
+            <param name="utcDateTime">The UTC date and time to freeze to</param>
+        </member>
+        <member name="M:Xunit.Extensions.Clock.Thaw">
+            <summary>
+            Thaws the clock so that <see cref="P:Xunit.Extensions.Clock.Now"/>, <see cref="P:Xunit.Extensions.Clock.Today"/>, and <see cref="P:Xunit.Extensions.Clock.UtcNow"/>
+            return normal values.
+            </summary>
+        </member>
+        <member name="P:Xunit.Extensions.Clock.Now">
+            <summary>
+            Gets a <see cref="T:System.DateTime"/> object that is set to the current date and time on this computer,
+            expressed as the local time.
+            </summary>
+        </member>
+        <member name="P:Xunit.Extensions.Clock.Today">
+            <summary>
+            Gets the current date.
+            </summary>
+        </member>
+        <member name="P:Xunit.Extensions.Clock.UtcNow">
+            <summary>
+            Gets a <see cref="T:System.DateTime"/> object that is set to the current date and time on this computer,
+            expressed as the Coordinated Universal Time (UTC).
+            </summary>
+        </member>
+        <member name="T:Xunit.Extensions.FreezeClockAttribute">
+            <summary>
+            Apply this attribute to your test method to freeze the time represented by the
+            <see cref="T:Xunit.Extensions.Clock"/> class.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.FreezeClockAttribute.#ctor">
+            <summary>
+            Freeze the clock with the current date and time.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.FreezeClockAttribute.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Freeze the clock with the given date, considered to be local time.
+            </summary>
+            <param name="year">The frozen year</param>
+            <param name="month">The frozen month</param>
+            <param name="day">The frozen day</param>
+        </member>
+        <member name="M:Xunit.Extensions.FreezeClockAttribute.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Freeze the clock with the given date and time, considered to be in local time.
+            </summary>
+            <param name="year">The frozen year</param>
+            <param name="month">The frozen month</param>
+            <param name="day">The frozen day</param>
+            <param name="hour">The frozen hour</param>
+            <param name="minute">The frozen minute</param>
+            <param name="second">The frozen second</param>
+        </member>
+        <member name="M:Xunit.Extensions.FreezeClockAttribute.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.DateTimeKind)">
+            <summary>
+            Freeze the clock with the given date and time, with the given kind of time.
+            </summary>
+            <param name="year">The frozen year</param>
+            <param name="month">The frozen month</param>
+            <param name="day">The frozen day</param>
+            <param name="hour">The frozen hour</param>
+            <param name="minute">The frozen minute</param>
+            <param name="second">The frozen second</param>
+            <param name="kind">The frozen time kind</param>
+        </member>
+        <member name="M:Xunit.Extensions.FreezeClockAttribute.After(System.Reflection.MethodInfo)">
+            <summary>
+            Thaws the clock.
+            </summary>
+            <param name="methodUnderTest">The method under test</param>
+        </member>
+        <member name="M:Xunit.Extensions.FreezeClockAttribute.Before(System.Reflection.MethodInfo)">
+            <summary>
+            Freezes the clock.
+            </summary>
+            <param name="methodUnderTest">The method under test</param>
+        </member>
+        <member name="T:Xunit.Extensions.ClassDataAttribute">
+            <summary>
+            Provides a data source for a data theory, with the data coming from a class
+            which must implement IEnumerable&lt;object[]&gt;.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.ClassDataAttribute.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.Extensions.ClassDataAttribute"/> class.
+            </summary>
+            <param name="class">The class that provides the data.</param>
+        </member>
+        <member name="M:Xunit.Extensions.ClassDataAttribute.GetData(System.Reflection.MethodInfo,System.Type[])">
+            <inheritdoc/>
+        </member>
+        <member name="T:Xunit.Extensions.Assertions">
+            <summary>
+            A wrapper for Assert which is used by <see cref="T:Xunit.Extensions.TestClass"/>.
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Contains``1(``0,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Verifies that a collection contains a given object.
+            </summary>
+            <typeparam name="T">The type of the object to be verified</typeparam>
+            <param name="expected">The object expected to be in the collection</param>
+            <param name="collection">The collection to be inspected</param>
+            <exception cref="T:Xunit.Sdk.ContainsException">Thrown when the object is not present in the collection</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Contains``1(``0,System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Verifies that a collection contains a given object, using an equality comparer.
+            </summary>
+            <typeparam name="T">The type of the object to be verified</typeparam>
+            <param name="expected">The object expected to be in the collection</param>
+            <param name="collection">The collection to be inspected</param>
+            <param name="comparer">The comparer used to equate objects in the collection with the expected object</param>
+            <exception cref="T:Xunit.Sdk.ContainsException">Thrown when the object is not present in the collection</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Contains(System.String,System.String)">
+            <summary>
+            Verifies that a string contains a given sub-string, using the current culture.
+            </summary>
+            <param name="expectedSubString">The sub-string expected to be in the string</param>
+            <param name="actualString">The string to be inspected</param>
+            <exception cref="T:Xunit.Sdk.ContainsException">Thrown when the sub-string is not present inside the string</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Contains(System.String,System.String,System.StringComparison)">
+            <summary>
+            Verifies that a string contains a given sub-string, using the given comparison type.
+            </summary>
+            <param name="expectedSubString">The sub-string expected to be in the string</param>
+            <param name="actualString">The string to be inspected</param>
+            <param name="comparisonType">The type of string comparison to perform</param>
+            <exception cref="T:Xunit.Sdk.ContainsException">Thrown when the sub-string is not present inside the string</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.DoesNotContain``1(``0,System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Verifies that a collection does not contain a given object.
+            </summary>
+            <typeparam name="T">The type of the object to be compared</typeparam>
+            <param name="expected">The object that is expected not to be in the collection</param>
+            <param name="collection">The collection to be inspected</param>
+            <exception cref="T:Xunit.Sdk.DoesNotContainException">Thrown when the object is present inside the container</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.DoesNotContain``1(``0,System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Verifies that a collection does not contain a given object, using an equality comparer.
+            </summary>
+            <typeparam name="T">The type of the object to be compared</typeparam>
+            <param name="expected">The object that is expected not to be in the collection</param>
+            <param name="collection">The collection to be inspected</param>
+            <param name="comparer">The comparer used to equate objects in the collection with the expected object</param>
+            <exception cref="T:Xunit.Sdk.DoesNotContainException">Thrown when the object is present inside the container</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.DoesNotContain(System.String,System.String)">
+            <summary>
+            Verifies that a string does not contain a given sub-string, using the current culture.
+            </summary>
+            <param name="expectedSubString">The sub-string which is expected not to be in the string</param>
+            <param name="actualString">The string to be inspected</param>
+            <exception cref="T:Xunit.Sdk.DoesNotContainException">Thrown when the sub-string is present inside the string</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.DoesNotContain(System.String,System.String,System.StringComparison)">
+            <summary>
+            Verifies that a string does not contain a given sub-string, using the current culture.
+            </summary>
+            <param name="expectedSubString">The sub-string which is expected not to be in the string</param>
+            <param name="actualString">The string to be inspected</param>
+            <param name="comparisonType">The type of string comparison to perform</param>
+            <exception cref="T:Xunit.Sdk.DoesNotContainException">Thrown when the sub-string is present inside the given string</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.DoesNotThrow(Xunit.Assert.ThrowsDelegate)">
+            <summary>
+            Verifies that a block of code does not throw any exceptions.
+            </summary>
+            <param name="testCode">A delegate to the code to be tested</param>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Empty(System.Collections.IEnumerable)">
+            <summary>
+            Verifies that a collection is empty.
+            </summary>
+            <param name="collection">The collection to be inspected</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when the collection is null</exception>
+            <exception cref="T:Xunit.Sdk.EmptyException">Thrown when the collection is not empty</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Equal``1(``0,``0)">
+            <summary>
+            Verifies that two objects are equal, using a default comparer.
+            </summary>
+            <typeparam name="T">The type of the objects to be compared</typeparam>
+            <param name="expected">The expected value</param>
+            <param name="actual">The value to be compared against</param>
+            <exception cref="T:Xunit.Sdk.EqualException">Thrown when the objects are not equal</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Equal``1(``0,``0,System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Verifies that two objects are equal, using a custom equatable comparer.
+            </summary>
+            <typeparam name="T">The type of the objects to be compared</typeparam>
+            <param name="expected">The expected value</param>
+            <param name="actual">The value to be compared against</param>
+            <param name="comparer">The comparer used to compare the two objects</param>
+            <exception cref="T:Xunit.Sdk.EqualException">Thrown when the objects are not equal</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.False(System.Boolean)">
+            <summary>
+            Verifies that the condition is false.
+            </summary>
+            <param name="condition">The condition to be tested</param>
+            <exception cref="T:Xunit.Sdk.FalseException">Thrown if the condition is not false</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.False(System.Boolean,System.String)">
+            <summary>
+            Verifies that the condition is false.
+            </summary>
+            <param name="condition">The condition to be tested</param>
+            <param name="userMessage">The message to show when the condition is not false</param>
+            <exception cref="T:Xunit.Sdk.FalseException">Thrown if the condition is not false</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.InRange``1(``0,``0,``0)">
+            <summary>
+            Verifies that a value is within a given range.
+            </summary>
+            <typeparam name="T">The type of the value to be compared</typeparam>
+            <param name="actual">The actual value to be evaluated</param>
+            <param name="low">The (inclusive) low value of the range</param>
+            <param name="high">The (inclusive) high value of the range</param>
+            <exception cref="T:Xunit.Sdk.InRangeException">Thrown when the value is not in the given range</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.InRange``1(``0,``0,``0,System.Collections.Generic.IComparer{``0})">
+            <summary>
+            Verifies that a value is within a given range, using a comparer.
+            </summary>
+            <typeparam name="T">The type of the value to be compared</typeparam>
+            <param name="actual">The actual value to be evaluated</param>
+            <param name="low">The (inclusive) low value of the range</param>
+            <param name="high">The (inclusive) high value of the range</param>
+            <param name="comparer">The comparer used to evaluate the value's range</param>
+            <exception cref="T:Xunit.Sdk.InRangeException">Thrown when the value is not in the given range</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.IsAssignableFrom``1(System.Object)">
+            <summary>
+            Verifies that an object is of the given type or a derived type.
+            </summary>
+            <typeparam name="T">The type the object should be</typeparam>
+            <param name="object">The object to be evaluated</param>
+            <returns>The object, casted to type T when successful</returns>
+            <exception cref="T:Xunit.Sdk.IsAssignableFromException">Thrown when the object is not the given type</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.IsAssignableFrom(System.Type,System.Object)">
+            <summary>
+            Verifies that an object is of the given type or a derived type.
+            </summary>
+            <param name="expectedType">The type the object should be</param>
+            <param name="object">The object to be evaluated</param>
+            <exception cref="T:Xunit.Sdk.IsAssignableFromException">Thrown when the object is not the given type</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.IsNotType``1(System.Object)">
+            <summary>
+            Verifies that an object is not exactly the given type.
+            </summary>
+            <typeparam name="T">The type the object should not be</typeparam>
+            <param name="object">The object to be evaluated</param>
+            <exception cref="T:Xunit.Sdk.IsNotTypeException">Thrown when the object is the given type</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.IsNotType(System.Type,System.Object)">
+            <summary>
+            Verifies that an object is not exactly the given type.
+            </summary>
+            <param name="expectedType">The type the object should not be</param>
+            <param name="object">The object to be evaluated</param>
+            <exception cref="T:Xunit.Sdk.IsNotTypeException">Thrown when the object is the given type</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.IsType``1(System.Object)">
+            <summary>
+            Verifies that an object is exactly the given type (and not a derived type).
+            </summary>
+            <typeparam name="T">The type the object should be</typeparam>
+            <param name="object">The object to be evaluated</param>
+            <returns>The object, casted to type T when successful</returns>
+            <exception cref="T:Xunit.Sdk.IsTypeException">Thrown when the object is not the given type</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.IsType(System.Type,System.Object)">
+            <summary>
+            Verifies that an object is exactly the given type (and not a derived type).
+            </summary>
+            <param name="expectedType">The type the object should be</param>
+            <param name="object">The object to be evaluated</param>
+            <exception cref="T:Xunit.Sdk.IsTypeException">Thrown when the object is not the given type</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.NotEmpty(System.Collections.IEnumerable)">
+            <summary>
+            Verifies that a collection is not empty.
+            </summary>
+            <param name="collection">The collection to be inspected</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when a null collection is passed</exception>
+            <exception cref="T:Xunit.Sdk.NotEmptyException">Thrown when the collection is empty</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.NotEqual``1(``0,``0)">
+            <summary>
+            Verifies that two objects are not equal, using a default comparer.
+            </summary>
+            <typeparam name="T">The type of the objects to be compared</typeparam>
+            <param name="expected">The expected object</param>
+            <param name="actual">The actual object</param>
+            <exception cref="T:Xunit.Sdk.NotEqualException">Thrown when the objects are equal</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.NotEqual``1(``0,``0,System.Collections.Generic.IEqualityComparer{``0})">
+            <summary>
+            Verifies that two objects are not equal, using a custom equality comparer.
+            </summary>
+            <typeparam name="T">The type of the objects to be compared</typeparam>
+            <param name="expected">The expected object</param>
+            <param name="actual">The actual object</param>
+            <param name="comparer">The comparer used to examine the objects</param>
+            <exception cref="T:Xunit.Sdk.NotEqualException">Thrown when the objects are equal</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.NotInRange``1(``0,``0,``0)">
+            <summary>
+            Verifies that a value is not within a given range, using the default comparer.
+            </summary>
+            <typeparam name="T">The type of the value to be compared</typeparam>
+            <param name="actual">The actual value to be evaluated</param>
+            <param name="low">The (inclusive) low value of the range</param>
+            <param name="high">The (inclusive) high value of the range</param>
+            <exception cref="T:Xunit.Sdk.NotInRangeException">Thrown when the value is in the given range</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.NotInRange``1(``0,``0,``0,System.Collections.Generic.IComparer{``0})">
+            <summary>
+            Verifies that a value is not within a given range, using a comparer.
+            </summary>
+            <typeparam name="T">The type of the value to be compared</typeparam>
+            <param name="actual">The actual value to be evaluated</param>
+            <param name="low">The (inclusive) low value of the range</param>
+            <param name="high">The (inclusive) high value of the range</param>
+            <param name="comparer">The comparer used to evaluate the value's range</param>
+            <exception cref="T:Xunit.Sdk.NotInRangeException">Thrown when the value is in the given range</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.NotNull(System.Object)">
+            <summary>
+            Verifies that an object reference is not null.
+            </summary>
+            <param name="object">The object to be validated</param>
+            <exception cref="T:Xunit.Sdk.NotNullException">Thrown when the object is not null</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.NotSame(System.Object,System.Object)">
+            <summary>
+            Verifies that two objects are not the same instance.
+            </summary>
+            <param name="expected">The expected object instance</param>
+            <param name="actual">The actual object instance</param>
+            <exception cref="T:Xunit.Sdk.NotSameException">Thrown when the objects are the same instance</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Null(System.Object)">
+            <summary>
+            Verifies that an object reference is null.
+            </summary>
+            <param name="object">The object to be inspected</param>
+            <exception cref="T:Xunit.Sdk.NullException">Thrown when the object reference is not null</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Same(System.Object,System.Object)">
+            <summary>
+            Verifies that two objects are the same instance.
+            </summary>
+            <param name="expected">The expected object instance</param>
+            <param name="actual">The actual object instance</param>
+            <exception cref="T:Xunit.Sdk.SameException">Thrown when the objects are not the same instance</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Single(System.Collections.IEnumerable)">
+            <summary>
+            Verifies that the given collection contains only a single
+            element of the given type.
+            </summary>
+            <param name="collection">The collection.</param>
+            <returns>The single item in the collection.</returns>
+            <exception cref="T:Xunit.Sdk.SingleException">Thrown when the collection does not contain
+            exactly one element.</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Single``1(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Verifies that the given collection contains only a single
+            element of the given type.
+            </summary>
+            <typeparam name="T">The collection type.</typeparam>
+            <param name="collection">The collection.</param>
+            <returns>The single item in the collection.</returns>
+            <exception cref="T:Xunit.Sdk.SingleException">Thrown when the collection does not contain
+            exactly one element.</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Throws``1(Xunit.Assert.ThrowsDelegate)">
+            <summary>
+            Verifies that the exact exception is thrown (and not a derived exception type).
+            </summary>
+            <typeparam name="T">The type of the exception expected to be thrown</typeparam>
+            <param name="testCode">A delegate to the code to be tested</param>
+            <returns>The exception that was thrown, when successful</returns>
+            <exception cref="T:Xunit.Sdk.ThrowsException">Thrown when an exception was not thrown, or when an exception of the incorrect type is thrown</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Throws``1(Xunit.Assert.ThrowsDelegateWithReturn)">
+            <summary>
+            Verifies that the exact exception is thrown (and not a derived exception type).
+            Generally used to test property accessors.
+            </summary>
+            <typeparam name="T">The type of the exception expected to be thrown</typeparam>
+            <param name="testCode">A delegate to the code to be tested</param>
+            <returns>The exception that was thrown, when successful</returns>
+            <exception cref="T:Xunit.Sdk.ThrowsException">Thrown when an exception was not thrown, or when an exception of the incorrect type is thrown</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Throws(System.Type,Xunit.Assert.ThrowsDelegate)">
+            <summary>
+            Verifies that the exact exception is thrown (and not a derived exception type).
+            </summary>
+            <param name="exceptionType">The type of the exception expected to be thrown</param>
+            <param name="testCode">A delegate to the code to be tested</param>
+            <returns>The exception that was thrown, when successful</returns>
+            <exception cref="T:Xunit.Sdk.ThrowsException">Thrown when an exception was not thrown, or when an exception of the incorrect type is thrown</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.Throws(System.Type,Xunit.Assert.ThrowsDelegateWithReturn)">
+            <summary>
+            Verifies that the exact exception is thrown (and not a derived exception type).
+            Generally used to test property accessors.
+            </summary>
+            <param name="exceptionType">The type of the exception expected to be thrown</param>
+            <param name="testCode">A delegate to the code to be tested</param>
+            <returns>The exception that was thrown, when successful</returns>
+            <exception cref="T:Xunit.Sdk.ThrowsException">Thrown when an exception was not thrown, or when an exception of the incorrect type is thrown</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.True(System.Boolean)">
+            <summary>
+            Verifies that an expression is true.
+            </summary>
+            <param name="condition">The condition to be inspected</param>
+            <exception cref="T:Xunit.Sdk.TrueException">Thrown when the condition is false</exception>
+        </member>
+        <member name="M:Xunit.Extensions.Assertions.True(System.Boolean,System.String)">
+            <summary>
+            Verifies that an expression is true.
+            </summary>
+            <param name="condition">The condition to be inspected</param>
+            <param name="userMessage">The message to be shown when the condition is false</param>
+            <exception cref="T:Xunit.Sdk.TrueException">Thrown when the condition is false</exception>
+        </member>
+        <member name="T:Xunit.Extensions.TheoryAttribute">
+            <summary>
+            Marks a test method as being a data theory. Data theories are tests which are fed
+            various bits of data from a data source, mapping to parameters on the test method.
+            If the data source contains multiple rows, then the test method is executed
+            multiple times (once with each data row).
+            </summary>
+        </member>
+        <member name="M:Xunit.Extensions.TheoryAttribute.EnumerateTestCommands(Xunit.Sdk.IMethodInfo)">
+            <summary>
+            Creates instances of <see cref="T:Xunit.Extensions.TheoryCommand"/> which represent individual intended
+            invocations of the test method, one per data row in the data source.
+            </summary>
+            <param name="method">The method under test</param>
+            <returns>An enumerator through the desired test method invocations</returns>
+        </member>
+    </members>
+</doc>

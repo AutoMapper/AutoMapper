@@ -1,0 +1,8 @@
+<FileList
+  Identity = "XUnit, Version=2.0"
+  DisplayName = "XUnit for Managed Projects"
+  MinVSVersion = "11.0"
+  MinToolsVersion = "4.0"
+  AppliesTo = "WindowsAppContainer + (CSharp | VB)"
+  ReferenceManagerEnumeration = "Files">
+</FileList>

@@ -1,12 +1,11 @@
-﻿
+﻿#if !WINDOWS_PHONE
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Mappers;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class CollectionMapperMapsIEnumerableToISetIncorrectly
     {
         public class TypeWithStringProperty
@@ -24,7 +23,7 @@ namespace AutoMapper.UnitTests.Bug
             public ISet<string> Stuff { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void ShouldMapToNewISet()
         {
             var config = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
@@ -50,3 +49,4 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 }
+#endif

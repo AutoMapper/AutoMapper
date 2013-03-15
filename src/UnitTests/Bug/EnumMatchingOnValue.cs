@@ -1,12 +1,9 @@
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
-#if SILVERLIGHT
-    [Ignore("Not supported in Silverlight 4")]
-#endif
+#if !SILVERLIGHT
     public class EnumMatchingOnValue : AutoMapperSpecBase
     {
         private SecondClass _result;
@@ -49,10 +46,12 @@ namespace AutoMapper.UnitTests.Bug
             _result = Mapper.Map<FirstClass, SecondClass>(source);
         }
 
-        [Test]
+        [Fact]
         public void Should_match_on_the_name_even_if_values_match()
         {
             _result.EnumValue.ShouldEqual(SecondEnum.DifferentNamedEnum);
         }
     }
+#endif
+
 }

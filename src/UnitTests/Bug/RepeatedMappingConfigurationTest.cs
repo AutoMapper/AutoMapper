@@ -1,8 +1,7 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	[TestFixture]
 	public class When_mapping_for_derived_class_is_duplicated : AutoMapperSpecBase
 	{
 		public class ModelObject
@@ -25,7 +24,7 @@ namespace AutoMapper.UnitTests.Bug
 			public string SubString { get; set; }
 		}
 
-		[Test]
+		[Fact]
 		public void should_not_throw_duplicated_key_exception()
 		{
 			Mapper.CreateMap<ModelSubObject, DtoObject>()

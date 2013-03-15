@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -23,11 +24,9 @@ namespace AutoMapper.UnitTests.Bug
             public Enum1 Prop1 { get; set; }
             public Enum2 Prop2 { get; set; }
         }
-
-        [TestFixture]
         public class EnumMapperTest
         {
-            [Test]
+            [Fact]
             public void Mapper_respects_condition()
             {
                 var _c1Called = false;
@@ -45,8 +44,8 @@ namespace AutoMapper.UnitTests.Bug
                     });
                 var src = new EnumTestSource { Prop1 = new[] { Enum1.One }, Prop2 = null };
                 var dest = Mapper.Map<EnumTestDest>(src); // will throw
-                Assert.IsTrue(_c1Called);
-                Assert.IsTrue(_c2Called);
+                _c1Called.ShouldBeTrue();
+                _c2Called.ShouldBeTrue();
             }
         }
     }

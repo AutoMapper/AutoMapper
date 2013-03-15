@@ -8,7 +8,7 @@ namespace AutoMapper
 		Type MemberType { get; }
 	}
 
-	public interface IMemberGetter : IMemberResolver, ICustomAttributeProvider
+	public interface IMemberGetter : IMemberResolver
 	{
 		MemberInfo MemberInfo { get; }
 		string Name { get; }

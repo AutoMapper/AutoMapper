@@ -1,0 +1,1212 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>xunit.runner.utility</name>
+    </assembly>
+    <members>
+        <member name="T:Xunit.Sdk.Guard">
+            <summary>
+            Guard class, used for guard clauses and argument validation
+            </summary>
+        </member>
+        <member name="M:Xunit.Sdk.Guard.ArgumentNotNull(System.String,System.Object)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.Sdk.Guard.ArgumentNotNullOrEmpty(System.String,System.Collections.IEnumerable)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.Sdk.Guard.ArgumentValid(System.String,System.String,System.Boolean)">
+            <summary/>
+        </member>
+        <member name="T:Xunit.ExecutorWrapper">
+            <summary>
+            Wraps calls to the Executor. Used by runners to perform version-resilient test
+            enumeration and execution.
+            </summary>
+        </member>
+        <member name="T:Xunit.IExecutorWrapper">
+            <summary>
+            Wraps calls to the Executor. Used by runners to perform version-resilient test
+            enumeration and execution.
+            </summary>
+        </member>
+        <member name="M:Xunit.IExecutorWrapper.EnumerateTests">
+            <summary>
+            Enumerates the tests in an assembly.
+            </summary>
+            <returns>The fully-formed assembly node of the XML</returns>
+        </member>
+        <member name="M:Xunit.IExecutorWrapper.GetAssemblyTestCount">
+            <summary>
+            Gets a count of the tests in the assembly.
+            </summary>
+            <returns>Returns the number of tests, if known; returns -1 if not known. May not represent
+            an exact count, but should be a best effort guess by the framework.</returns>
+        </member>
+        <member name="M:Xunit.IExecutorWrapper.RunAssembly(System.Predicate{System.Xml.XmlNode})">
+            <summary>
+            Runs all the tests in an assembly.
+            </summary>
+            <param name="callback">The callback which is called as each test/class/assembly is
+            finished, providing XML nodes that are part of the xUnit.net XML output format.
+            Test runs can be cancelled by returning false to the callback. If null, there are
+            no status callbacks (and cancellation isn't possible).</param>
+            <returns>Returns the fully-formed assembly node for the assembly that was just run.</returns>
+        </member>
+        <member name="M:Xunit.IExecutorWrapper.RunClass(System.String,System.Predicate{System.Xml.XmlNode})">
+            <summary>
+            Runs all the tests in the given class.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="callback">The callback which is called as each test/class is
+            finished, providing XML nodes that are part of the xUnit.net XML output format.
+            Test runs can be cancelled by returning false to the callback. If null, there are
+            no status callbacks (and cancellation isn't possible).</param>
+            <returns>Returns the fully-formed class node for the class that was just run.</returns>
+        </member>
+        <member name="M:Xunit.IExecutorWrapper.RunTest(System.String,System.String,System.Predicate{System.Xml.XmlNode})">
+            <summary>
+            Runs a single test in a class.
+            </summary>
+            <param name="type">The type to run.</param>
+            <param name="method">The method to run.</param>
+            <param name="callback">The callback which is called as each test/class is
+            finished, providing XML nodes that are part of the xUnit.net XML output format.
+            Test runs can be cancelled by returning false to the callback. If null, there are
+            no status callbacks (and cancellation isn't possible).</param>
+            <returns>Returns the fully-formed class node for the class of the test that was just run.</returns>
+        </member>
+        <member name="M:Xunit.IExecutorWrapper.RunTests(System.String,System.Collections.Generic.List{System.String},System.Predicate{System.Xml.XmlNode})">
+            <summary>
+            Runs several tests in a single class.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="methods">The methods to run.</param>
+            <param name="callback">The callback which is called as each test/class is
+            finished, providing XML nodes that are part of the xUnit.net XML output format.
+            Test runs can be cancelled by returning false to the callback. If null, there are
+            no status callbacks (and cancellation isn't possible).</param>
+            <returns>Returns the fully-formed class node for the class of the tests that were just run.</returns>
+        </member>
+        <member name="P:Xunit.IExecutorWrapper.AssemblyFilename">
+            <summary>
+            Gets the full pathname to the assembly under test.
+            </summary>
+        </member>
+        <member name="P:Xunit.IExecutorWrapper.ConfigFilename">
+            <summary>
+            Gets the full pathname to the configuration file.
+            </summary>
+        </member>
+        <member name="P:Xunit.IExecutorWrapper.XunitVersion">
+            <summary>
+            Gets the version of xunit.dll used by the test assembly.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.#cctor">
+            <summary>
+            Initializes the <see cref="T:Xunit.ExecutorWrapper"/> class.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.ExecutorWrapper"/> class.
+            </summary>
+            <param name="assemblyFilename">The assembly filename.</param>
+            <param name="configFilename">The config filename. If null, the default config filename will be used.</param>
+            <param name="shadowCopy">Set to true to enable shadow copying; false, otherwise.</param>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.Dispose">
+            <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.EnumerateTests">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.GetAssemblyTestCount">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.RunAssembly(System.Predicate{System.Xml.XmlNode})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.RunClass(System.String,System.Predicate{System.Xml.XmlNode})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.RunTest(System.String,System.String,System.Predicate{System.Xml.XmlNode})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.RunTests(System.String,System.Collections.Generic.List{System.String},System.Predicate{System.Xml.XmlNode})">
+            <inheritdoc/>
+        </member>
+        <member name="P:Xunit.ExecutorWrapper.AssemblyFilename">
+            <inheritdoc/>
+        </member>
+        <member name="P:Xunit.ExecutorWrapper.ConfigFilename">
+            <inheritdoc/>
+        </member>
+        <member name="P:Xunit.ExecutorWrapper.XunitVersion">
+            <inheritdoc/>
+        </member>
+        <member name="T:Xunit.ExecutorWrapper.IntCallbackHandler">
+            <summary>
+            THIS CLASS IS FOR INTERNAL USE ONLY.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.IntCallbackHandler.InitializeLifetimeService">
+            <summary/>
+        </member>
+        <member name="P:Xunit.ExecutorWrapper.IntCallbackHandler.Result">
+            <summary/>
+        </member>
+        <member name="T:Xunit.ExecutorWrapper.IntCallbackHandlerWithIMessageSink">
+            <summary>
+            THIS CLASS IS FOR INTERNAL USE ONLY.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.IntCallbackHandlerWithIMessageSink.System#Runtime#Remoting#Messaging#IMessageSink#AsyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage,System.Runtime.Remoting.Messaging.IMessageSink)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.IntCallbackHandlerWithIMessageSink.System#Runtime#Remoting#Messaging#IMessageSink#SyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage)">
+            <summary/>
+        </member>
+        <member name="P:Xunit.ExecutorWrapper.IntCallbackHandlerWithIMessageSink.System#Runtime#Remoting#Messaging#IMessageSink#NextSink">
+            <summary/>
+        </member>
+        <member name="T:Xunit.ExecutorWrapper.IntCallbackHandlerWithICallbackEventHandler">
+            <summary>
+            THIS CLASS IS FOR INTERNAL USE ONLY.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.IntCallbackHandlerWithICallbackEventHandler.GetCallbackResult">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.IntCallbackHandlerWithICallbackEventHandler.RaiseCallbackEvent(System.String)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.IntCallbackHandlerWithICallbackEventHandler.InitializeLifetimeService">
+            <summary/>
+        </member>
+        <member name="T:Xunit.ExecutorWrapper.XmlNodeCallbackHandler">
+            <summary>
+            THIS CLASS IS FOR INTERNAL USE ONLY.
+            </summary>
+        </member>
+        <member name="F:Xunit.ExecutorWrapper.XmlNodeCallbackHandler.callback">
+            <summary/>
+        </member>
+        <member name="F:Xunit.ExecutorWrapper.XmlNodeCallbackHandler.lastNodeName">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.XmlNodeCallbackHandler.#ctor(System.Predicate{System.Xml.XmlNode},System.String)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.XmlNodeCallbackHandler.InitializeLifetimeService">
+            <summary/>
+        </member>
+        <member name="P:Xunit.ExecutorWrapper.XmlNodeCallbackHandler.LastNode">
+            <summary/>
+        </member>
+        <member name="P:Xunit.ExecutorWrapper.XmlNodeCallbackHandler.LastNodeArrived">
+            <summary/>
+        </member>
+        <member name="T:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithIMessageSink">
+            <summary>
+            THIS CLASS IS FOR INTERNAL USE ONLY.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithIMessageSink.#ctor(System.Predicate{System.Xml.XmlNode},System.String)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithIMessageSink.System#Runtime#Remoting#Messaging#IMessageSink#AsyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage,System.Runtime.Remoting.Messaging.IMessageSink)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithIMessageSink.System#Runtime#Remoting#Messaging#IMessageSink#SyncProcessMessage(System.Runtime.Remoting.Messaging.IMessage)">
+            <summary/>
+        </member>
+        <member name="P:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithIMessageSink.System#Runtime#Remoting#Messaging#IMessageSink#NextSink">
+            <summary/>
+        </member>
+        <member name="T:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithICallbackEventHandler">
+            <summary>
+            THIS CLASS IS FOR INTERNAL USE ONLY.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithICallbackEventHandler.#ctor(System.Predicate{System.Xml.XmlNode},System.String)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithICallbackEventHandler.RaiseCallbackEvent(System.String)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.XmlNodeCallbackHandlerWithICallbackEventHandler.GetCallbackResult">
+            <summary/>
+        </member>
+        <member name="T:Xunit.ExecutorWrapper.OutgoingMessage">
+            <summary>
+            THIS CLASS IS FOR INTERNAL USE ONLY.
+            </summary>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.OutgoingMessage.#ctor(System.Object)">
+            <summary/>
+        </member>
+        <member name="M:Xunit.ExecutorWrapper.OutgoingMessage.InitializeLifetimeService">
+            <summary/>
+        </member>
+        <member name="T:Xunit.ITestMethodRunnerCallback">
+            <summary>
+            The callback object which receives real-time status notifications from the
+            test runner.
+            </summary>
+        </member>
+        <member name="M:Xunit.ITestMethodRunnerCallback.AssemblyFinished(Xunit.TestAssembly,System.Int32,System.Int32,System.Int32,System.Double)">
+            <summary>
+            Called when the assembly has finished running.
+            </summary>
+            <param name="testAssembly">The test assembly.</param>
+            <param name="total">The total number of tests run.</param>
+            <param name="failed">The number of failed tests.</param>
+            <param name="skipped">The number of skipped tests.</param>
+            <param name="time">The time taken to run, in seconds.</param>
+        </member>
+        <member name="M:Xunit.ITestMethodRunnerCallback.AssemblyStart(Xunit.TestAssembly)">
+            <summary>
+            Called when the assembly has started running.
+            </summary>
+            <param name="testAssembly">The test assembly.</param>
+        </member>
+        <member name="M:Xunit.ITestMethodRunnerCallback.ClassFailed(Xunit.TestClass,System.String,System.String,System.String)">
+            <summary>
+            Called when a class failure is encountered (i.e., when a fixture from
+            IUseFixture throws an exception during construction or <see cref="M:System.IDisposable.Dispose"/>.
+            </summary>
+            <param name="testClass">The test class.</param>
+            <param name="exceptionType">The full type name of the exception.</param>
+            <param name="message">The exception message.</param>
+            <param name="stackTrace">The exception stack trace.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Xunit.ITestMethodRunnerCallback.ExceptionThrown(Xunit.TestAssembly,System.Exception)">
+            <summary>
+            Called when an exception is thrown (i.e., a catastrophic failure of the testing system).
+            </summary>
+            <param name="testAssembly">The test assembly.</param>
+            <param name="exception">The exception that was thrown.</param>
+        </member>
+        <member name="M:Xunit.ITestMethodRunnerCallback.TestFinished(Xunit.TestMethod)">
+            <summary>
+            Called when a test has finished running, regardless of what the result was.
+            </summary>
+            <param name="testMethod">The test method.</param>
+            <returns>Return true to continue running tests; return false to stop the test run.</returns>
+        </member>
+        <member name="M:Xunit.ITestMethodRunnerCallback.TestStart(Xunit.TestMethod)">
+            <summary>
+            Called when a test has started running.
+            </summary>
+            <param name="testMethod">The test method.</param>
+            <returns>Return true to continue running tests; return false to stop the test run.</returns>
+        </member>
+        <member name="T:Xunit.MultiAssemblyTestEnvironment">
+            <summary>
+            Represents the ability to load and unload test assemblies, as well as enumerate
+            the test assemblies, the test methods, and run tests.
+            </summary>
+        </member>
+        <member name="T:Xunit.ITestMethodEnumerator">
+            <summary>
+            Represents the ability to enumerate and filter test methods.
+            </summary>
+        </member>
+        <member name="M:Xunit.ITestMethodEnumerator.EnumerateTestMethods">
+            <summary>
+            Enumerates all test methods.
+            </summary>
+        </member>
+        <member name="M:Xunit.ITestMethodEnumerator.EnumerateTestMethods(System.Predicate{Xunit.TestMethod})">
+            <summary>
+            Enumerates test methods which pass the given filter.
+            </summary>
+            <param name="filter">The test method filter.</param>
+        </member>
+        <member name="F:Xunit.MultiAssemblyTestEnvironment.testAssemblies">
+            <summary>
+            The test assemblies loaded into the environment.
+            </summary>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.EnumerateTestAssemblies">
+            <summary>
+            Enumerates the test assemblies in the environment.
+            </summary>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.EnumerateTestMethods">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.EnumerateTestMethods(System.Predicate{Xunit.TestMethod})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.EnumerateTraits">
+            <summary>
+            Enumerates the traits across all the loaded assemblies.
+            </summary>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.Load(System.String)">
+            <summary>
+            Loads the specified assembly, using the default configuration file.
+            </summary>
+            <param name="assemblyFilename">The assembly filename.</param>
+            <returns>The <see cref="T:Xunit.TestAssembly"/> which represents the newly
+            loaded test assembly.</returns>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.Load(System.String,System.String)">
+            <summary>
+            Loads the specified assembly using the specified configuration file.
+            </summary>
+            <param name="assemblyFilename">The assembly filename.</param>
+            <param name="configFilename">The config filename.</param>
+            <returns>The <see cref="T:Xunit.TestAssembly"/> which represents the newly
+            loaded test assembly.</returns>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.Load(System.String,System.String,System.Boolean)">
+            <summary>
+            Loads the specified assembly using the specified configuration file.
+            </summary>
+            <param name="assemblyFilename">The assembly filename.</param>
+            <param name="configFilename">The config filename.</param>
+            <param name="shadowCopy">Whether the DLLs should be shadow copied.</param>
+            <returns>The <see cref="T:Xunit.TestAssembly"/> which represents the newly
+            loaded test assembly.</returns>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.Load(Xunit.IExecutorWrapper)">
+            <summary>
+            Adds the assembly loaded into the given <see cref="T:Xunit.IExecutorWrapper"/>
+            into the environment.
+            </summary>
+            <param name="executorWrapper">The executor wrapper.</param>
+            <returns>The <see cref="T:Xunit.TestAssembly"/> which represents the newly
+            loaded test assembly.</returns>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.Run(System.Collections.Generic.IEnumerable{Xunit.TestMethod},Xunit.ITestMethodRunnerCallback)">
+            <summary>
+            Runs the specified test methods.
+            </summary>
+            <param name="testMethods">The test methods to run.</param>
+            <param name="callback">The run status information callback.</param>
+            <returns>Returns the result as XML.</returns>
+        </member>
+        <member name="M:Xunit.MultiAssemblyTestEnvironment.Unload(Xunit.TestAssembly)">
+            <summary>
+            Unloads the specified assembly.
+            </summary>
+            <param name="assembly">The assembly to unload.</param>
+        </member>
+        <member name="T:Xunit.TestFailedResult">
+            <summary>
+            Represents a failed test run in the object model.
+            </summary>
+        </member>
+        <member name="T:Xunit.TestResult">
+            <summary>
+            Base class for all test results in the object model.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestResult.#ctor(System.Double,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestResult"/> class.
+            </summary>
+            <param name="duration">The duration the test took to run. For skipped tests, should be 0.0.</param>
+            <param name="displayName">The display name of the test result.</param>
+        </member>
+        <member name="P:Xunit.TestResult.DisplayName">
+            <summary>
+            Gets the display name of the test result.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestResult.Duration">
+            <summary>
+            Gets the duration the test took to run.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestFailedResult.#ctor(System.Double,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestFailedResult"/> class.
+            </summary>
+            <param name="duration">The duration the test took to run.</param>
+            <param name="displayName">The display name of the test result.</param>
+            <param name="output">The output that was captured during the test run.</param>
+            <param name="exceptionType">Type of the exception.</param>
+            <param name="exceptionMessage">The exception message.</param>
+            <param name="exceptionStackTrace">The exception stack trace.</param>
+        </member>
+        <member name="P:Xunit.TestFailedResult.Output">
+            <summary>
+            Gets the output that was captured during the test run.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestFailedResult.ExceptionType">
+            <summary>
+            Gets the type of the exception.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestFailedResult.ExceptionMessage">
+            <summary>
+            Gets the exception message.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestFailedResult.ExceptionStackTrace">
+            <summary>
+            Gets the exception stack trace.
+            </summary>
+        </member>
+        <member name="T:Xunit.TestSkippedResult">
+            <summary>
+            Represents a skipped test run in the object model.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestSkippedResult.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestSkippedResult"/> class.
+            </summary>
+            <param name="displayName">The display name of the test result.</param>
+            <param name="reason">The skip reason.</param>
+        </member>
+        <member name="P:Xunit.TestSkippedResult.Reason">
+            <summary>
+            Gets the skip reason.
+            </summary>
+        </member>
+        <member name="T:Xunit.TestClassCallbackDispatcher">
+            <summary>
+            Acts as an <see cref="T:Xunit.IRunnerLogger"/> and adapts the callback messages
+            into calls to an instance of <see cref="T:Xunit.ITestMethodRunnerCallback"/>.
+            </summary>
+        </member>
+        <member name="T:Xunit.IRunnerLogger">
+            <summary>
+            Represents a logger used by <see cref="T:Xunit.TestRunner"/> and <see cref="T:Xunit.XmlLoggerAdapter"/>.
+            </summary>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.AssemblyFinished(System.String,System.Int32,System.Int32,System.Int32,System.Double)">
+            <summary>
+            Called when the assembly has finished running.
+            </summary>
+            <param name="assemblyFilename">The assembly filename.</param>
+            <param name="total">The total number of tests run.</param>
+            <param name="failed">The number of failed tests.</param>
+            <param name="skipped">The number of skipped tests.</param>
+            <param name="time">The time taken to run, in seconds.</param>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.AssemblyStart(System.String,System.String,System.String)">
+            <summary>
+            Called when the assembly has started running.
+            </summary>
+            <param name="assemblyFilename">The assembly filename.</param>
+            <param name="configFilename">The configuration filename, if given; null, otherwise.</param>
+            <param name="xUnitVersion">The version of xunit.dll.</param>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.ClassFailed(System.String,System.String,System.String,System.String)">
+            <summary>
+            Called when a class failure is encountered (i.e., when a fixture from
+            IUseFixture throws an exception during construction or <see cref="M:System.IDisposable.Dispose"/>.
+            </summary>
+            <param name="className">The full type name of the class.</param>
+            <param name="exceptionType">The full type name of the exception.</param>
+            <param name="message">The exception message.</param>
+            <param name="stackTrace">The exception stack trace.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.ExceptionThrown(System.String,System.Exception)">
+            <summary>
+            Called when an exception is thrown (i.e., a catastrophic failure of the testing system).
+            </summary>
+            <param name="assemblyFilename">The assembly filename.</param>
+            <param name="exception">The exception that was thrown.</param>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.TestFailed(System.String,System.String,System.String,System.Double,System.String,System.String,System.String,System.String)">
+            <summary>
+            Called when a test fails.
+            </summary>
+            <param name="name">The description name of the test.</param>
+            <param name="type">The full type name of the test class.</param>
+            <param name="method">The name of the method.</param>
+            <param name="duration">The time spent running the test, in seconds.</param>
+            <param name="output">The output of the test during its run.</param>
+            <param name="exceptionType">The full type name of the exception.</param>
+            <param name="message">The exception message.</param>
+            <param name="stackTrace">The exception stack trace.</param>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.TestFinished(System.String,System.String,System.String)">
+            <summary>
+            Called when a test has finished running, regardless of what the result was.
+            </summary>
+            <param name="name">The description name of the test.</param>
+            <param name="type">The full type name of the test class.</param>
+            <param name="method">The name of the method.</param>
+            <returns>Return true to continue running tests; return false to stop the test run.</returns>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.TestPassed(System.String,System.String,System.String,System.Double,System.String)">
+            <summary>
+            Called when a test has passed.
+            </summary>
+            <param name="name">The description name of the test.</param>
+            <param name="type">The full type name of the test class.</param>
+            <param name="method">The name of the method.</param>
+            <param name="duration">The time spent running the test, in seconds.</param>
+            <param name="output">The output of the test during its run.</param>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.TestSkipped(System.String,System.String,System.String,System.String)">
+            <summary>
+            Called when a test was finished.
+            </summary>
+            <param name="name">The description name of the test.</param>
+            <param name="type">The full type name of the test class.</param>
+            <param name="method">The name of the method.</param>
+            <param name="reason">The skip reason.</param>
+        </member>
+        <member name="M:Xunit.IRunnerLogger.TestStart(System.String,System.String,System.String)">
+            <summary>
+            Called when a test has started running.
+            </summary>
+            <param name="name">The description name of the test.</param>
+            <param name="type">The full type name of the test class.</param>
+            <param name="method">The name of the method.</param>
+            <returns>Return true to continue running tests; return false to stop the test run.</returns>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.#ctor(Xunit.TestClass,Xunit.ITestMethodRunnerCallback)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestClassCallbackDispatcher"/> class.
+            </summary>
+            <param name="testClass">The test class.</param>
+            <param name="callback">The run status information callback.</param>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.AssemblyFinished(System.String,System.Int32,System.Int32,System.Int32,System.Double)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.AssemblyStart(System.String,System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.ClassFailed(System.String,System.String,System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.ExceptionThrown(System.String,System.Exception)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.TestFailed(System.String,System.String,System.String,System.Double,System.String,System.String,System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.TestFinished(System.String,System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.TestPassed(System.String,System.String,System.String,System.Double,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.TestSkipped(System.String,System.String,System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClassCallbackDispatcher.TestStart(System.String,System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Xunit.TestPassedResult">
+            <summary>
+            Represents a passed test run in the object model.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestPassedResult.#ctor(System.Double,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestPassedResult"/> class.
+            </summary>
+            <param name="duration">The duration the test took to run.</param>
+            <param name="displayName">The display name of the test result.</param>
+            <param name="output">The output that was captured during the test run.</param>
+        </member>
+        <member name="P:Xunit.TestPassedResult.Output">
+            <summary>
+            Gets the output that was captured during the test run.
+            </summary>
+        </member>
+        <member name="T:Xunit.TestStatus">
+            <summary>
+            Indicates the composite test method status
+            </summary>
+        </member>
+        <member name="F:Xunit.TestStatus.NotRun">
+            <summary>
+            The method has not been run
+            </summary>
+        </member>
+        <member name="F:Xunit.TestStatus.Passed">
+            <summary>
+            All test results for the last run passed
+            </summary>
+        </member>
+        <member name="F:Xunit.TestStatus.Failed">
+            <summary>
+            At least one test result for the last run failed
+            </summary>
+        </member>
+        <member name="F:Xunit.TestStatus.Skipped">
+            <summary>
+            At least one test result for the last run was skipped, and none failed
+            </summary>
+        </member>
+        <member name="T:Xunit.XunitFilters">
+            <summary>
+            Represents a set of filters for an <see cref="T:Xunit.XunitProject"/>.
+            </summary>
+        </member>
+        <member name="M:Xunit.XunitFilters.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.XunitFilters"/> class.
+            </summary>
+        </member>
+        <member name="M:Xunit.XunitFilters.Filter(Xunit.TestMethod)">
+            <summary>
+            Filters the given methods using the defined filter values.
+            </summary>
+            <param name="methods">The methods to filter.</param>
+            <returns>The filtered methods.</returns>
+        </member>
+        <member name="P:Xunit.XunitFilters.ExcludedTraits">
+            <summary>
+            Gets the set of trait filters for tests to exclude.
+            </summary>
+        </member>
+        <member name="P:Xunit.XunitFilters.IncludedTraits">
+            <summary>
+            Gets the set of trait filters for tests to include.
+            </summary>
+        </member>
+        <member name="T:Xunit.XunitProject">
+            <summary>
+            Represents an xUnit Test Project file (.xunit file)
+            </summary>
+        </member>
+        <member name="M:Xunit.XunitProject.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.XunitProject"/> class.
+            </summary>
+        </member>
+        <member name="M:Xunit.XunitProject.AddAssembly(Xunit.XunitProjectAssembly)">
+            <summary>
+            Adds an assembly to the project
+            </summary>
+            <param name="assembly">The assembly to be added</param>
+        </member>
+        <member name="M:Xunit.XunitProject.Load(System.String)">
+            <summary>
+            Loads an xUnit.net Test Project file from disk.
+            </summary>
+            <param name="filename">The test project filename</param>
+        </member>
+        <member name="M:Xunit.XunitProject.RemoveAssembly(Xunit.XunitProjectAssembly)">
+            <summary>
+            Removes assembly from the assembly list
+            </summary>
+            <param name="assembly">The assembly to be removed</param>
+        </member>
+        <member name="M:Xunit.XunitProject.Save">
+            <summary>
+            Saves the xUnit.net Test Project file to disk using the project's filename.
+            </summary>
+        </member>
+        <member name="M:Xunit.XunitProject.SaveAs(System.String)">
+            <summary>
+            Saves the xUnit.net Test Project file to disk using the provided filename.
+            The projects filename is updated to match this new name.
+            </summary>
+            <param name="filename">The test project filename</param>
+        </member>
+        <member name="P:Xunit.XunitProject.Assemblies">
+            <summary>
+            Gets or sets the assemblies in the project.
+            </summary>
+        </member>
+        <member name="P:Xunit.XunitProject.Filename">
+            <summary>
+            Gets or set the filename of the project.
+            </summary>
+        </member>
+        <member name="P:Xunit.XunitProject.Filters">
+            <summary>
+            Gets the filters applied to this project.
+            </summary>
+        </member>
+        <member name="P:Xunit.XunitProject.IsDirty">
+            <summary>
+            Gets or sets a flag which indicates if this project has been modified since
+            the last time it was loaded or saved.
+            </summary>
+        </member>
+        <member name="T:Xunit.XunitProjectAssembly">
+            <summary>
+            Represents an assembly in an <see cref="T:Xunit.XunitProject"/>.
+            </summary>
+        </member>
+        <member name="M:Xunit.XunitProjectAssembly.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.XunitProjectAssembly"/> class.
+            </summary>
+        </member>
+        <member name="P:Xunit.XunitProjectAssembly.AssemblyFilename">
+            <summary>
+            Gets or sets the assembly filename.
+            </summary>
+        </member>
+        <member name="P:Xunit.XunitProjectAssembly.ConfigFilename">
+            <summary>
+            Gets or sets the config filename.
+            </summary>
+        </member>
+        <member name="P:Xunit.XunitProjectAssembly.ShadowCopy">
+            <summary>
+            Gets or sets a value indicating whether to shadow copy the assembly
+            when running the tests.
+            </summary>
+            <remarks>
+            The xUnit.net GUI runner does not support this field.
+            </remarks>
+        </member>
+        <member name="P:Xunit.XunitProjectAssembly.Output">
+            <summary>
+            Gets or sets the output filenames. The dictionary key is the type
+            of the file to be output; the dictionary value is the filename to
+            write the output to.
+            </summary>
+            <remarks>
+            The xUnit.net GUI runner does not support this field. The MSBuild
+            runner only supports output of type 'xml', 'html', and 'nunit'.
+            </remarks>
+        </member>
+        <member name="T:Xunit.ITestRunner">
+            <summary>
+            Interface which represents a high level test runner.
+            </summary>
+        </member>
+        <member name="M:Xunit.ITestRunner.RunAssembly">
+            <summary>
+            Executes the tests in the assembly.
+            </summary>
+            <returns>Returns true if there were no failures; return false otherwise.</returns>
+        </member>
+        <member name="M:Xunit.ITestRunner.RunAssembly(System.Collections.Generic.IEnumerable{Xunit.IResultXmlTransform})">
+            <summary>
+            Executes the tests in the assembly, and then executes the transforms with the
+            resulting assembly XML.
+            </summary>
+            <param name="transforms">The transforms to execute.</param>
+            <returns>Returns true if there were no failures; return false otherwise.</returns>
+        </member>
+        <member name="M:Xunit.ITestRunner.RunClass(System.String)">
+            <summary>
+            Runs the class.
+            </summary>
+            <param name="type">The type.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Xunit.ITestRunner.RunTest(System.String,System.String)">
+            <summary>
+            Runs a single test in a test class.
+            </summary>
+            <param name="type">The full name of the class.</param>
+            <param name="method">The name of the method.</param>
+        </member>
+        <member name="M:Xunit.ITestRunner.RunTests(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            Runs the list of tests in a test class.
+            </summary>
+            <param name="type">The full name of the class.</param>
+            <param name="methods">The names of the methods to run.</param>
+        </member>
+        <member name="T:Xunit.TestAssembly">
+            <summary>
+            Represents a single test assembly with test classes.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestAssembly.#ctor(Xunit.IExecutorWrapper,System.Collections.Generic.IEnumerable{Xunit.TestClass})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestAssembly"/> class.
+            </summary>
+            <param name="executorWrapper">The executor wrapper.</param>
+            <param name="testClasses">The test classes.</param>
+        </member>
+        <member name="M:Xunit.TestAssembly.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestAssembly.EnumerateClasses">
+            <summary>
+            Enumerates the test classes in the assembly.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestAssembly.EnumerateTestMethods">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestAssembly.EnumerateTestMethods(System.Predicate{Xunit.TestMethod})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestAssembly.Run(System.Collections.Generic.IEnumerable{Xunit.TestMethod},Xunit.ITestMethodRunnerCallback)">
+            <summary>
+            Runs the specified test methods.
+            </summary>
+            <param name="testMethods">The test methods to run.</param>
+            <param name="callback">The run status information callback.</param>
+            <returns>Returns the result as XML.</returns>
+        </member>
+        <member name="P:Xunit.TestAssembly.AssemblyFilename">
+            <summary>
+            Gets the assembly filename.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestAssembly.ConfigFilename">
+            <summary>
+            Gets the config filename.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestAssembly.ExecutorWrapper">
+            <summary>
+            Gets the executor wrapper.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestAssembly.XunitVersion">
+            <summary>
+            Gets the version of xunit.dll that the tests are linked against.
+            </summary>
+        </member>
+        <member name="T:Xunit.TestClass">
+            <summary>
+            Represents a single class with test methods.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestClass.#ctor(System.String,System.Collections.Generic.IEnumerable{Xunit.TestMethod})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestClass"/> class.
+            </summary>
+            <param name="typeName">The namespace-qualified type name that
+            this class represents.</param>
+            <param name="testMethods">The test methods inside this test class.</param>
+        </member>
+        <member name="M:Xunit.TestClass.EnumerateTestMethods">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClass.EnumerateTestMethods(System.Predicate{Xunit.TestMethod})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestClass.Run(System.Collections.Generic.IEnumerable{Xunit.TestMethod},Xunit.ITestMethodRunnerCallback)">
+            <summary>
+            Runs the specified test methods.
+            </summary>
+            <param name="testMethods">The test methods to run.</param>
+            <param name="callback">The run status information callback.</param>
+            <returns>Returns the result as XML.</returns>
+        </member>
+        <member name="M:Xunit.TestClass.RunTests(System.Collections.Generic.List{System.String},Xunit.ITestMethodRunnerCallback)">
+            <summary>
+            Runs the specified tests in the given type, calling the callback as appropriate.
+            This override point exists primarily for unit testing purposes.
+            </summary>
+            <param name="methods">The test methods to run</param>
+            <param name="callback">The run status information callback.</param>
+        </member>
+        <member name="P:Xunit.TestClass.TestAssembly">
+            <summary>
+            Gets the test assembly that this class belongs to.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestClass.TypeName">
+            <summary>
+            Gets the namespace-qualified type name of this class.
+            </summary>
+        </member>
+        <member name="T:Xunit.TestMethod">
+            <summary>
+            Represents a single test method.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestMethod.#ctor(System.String,System.String,Xunit.MultiValueDictionary{System.String,System.String})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestMethod"/> class.
+            </summary>
+            <param name="methodName">The method name.</param>
+            <param name="displayName">The method's display name.</param>
+            <param name="traits">The method's traits.</param>
+        </member>
+        <member name="P:Xunit.TestMethod.DisplayName">
+            <summary>
+            Gets the method's display name.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestMethod.MethodName">
+            <summary>
+            Gets the method's name.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestMethod.RunResults">
+            <summary>
+            Gets the run results for the last run.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestMethod.RunStatus">
+            <summary>
+            Gets the composite run status for all the results of the last run.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestMethod.TestClass">
+            <summary>
+            Gets the test class this test method belongs to.
+            </summary>
+        </member>
+        <member name="P:Xunit.TestMethod.Traits">
+            <summary>
+            Gets the method's traits.
+            </summary>
+        </member>
+        <member name="T:Xunit.TestRunnerResult">
+            <summary>
+            The result of a test run via <see cref="T:Xunit.TestRunner"/>.
+            </summary>
+        </member>
+        <member name="F:Xunit.TestRunnerResult.Passed">
+            <summary>
+            All tests passed, with no class-level failures
+            </summary>
+        </member>
+        <member name="F:Xunit.TestRunnerResult.Failed">
+            <summary>
+            At least one test failed, or there was a class-level failure
+            </summary>
+        </member>
+        <member name="F:Xunit.TestRunnerResult.NoTests">
+            <summary>
+            There were no tests to run
+            </summary>
+        </member>
+        <member name="T:Xunit.IResultXmlTransform">
+            <summary>
+            Represents a transformation of the resulting assembly XML into some output format.
+            </summary>
+        </member>
+        <member name="M:Xunit.IResultXmlTransform.Transform(System.String)">
+            <summary>
+            Transforms the given assembly XML into the destination format.
+            </summary>
+            <param name="xml">The assembly XML.</param>
+        </member>
+        <member name="P:Xunit.IResultXmlTransform.OutputFilename">
+            <summary>
+            Gets the output filename, if known; returns null if the output isn't done to file.
+            </summary>
+        </member>
+        <member name="T:Xunit.TestRunner">
+            <summary>
+            Runs tests in an assembly, and transforms the XML results into calls to
+            the provided <see cref="T:Xunit.IRunnerLogger"/>.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestRunner.#ctor(Xunit.IExecutorWrapper,Xunit.IRunnerLogger)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.TestRunner"/> class.
+            </summary>
+            <param name="executorWrapper">The executor wrapper.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:Xunit.TestRunner.RunAssembly">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestRunner.RunAssembly(System.Collections.Generic.IEnumerable{Xunit.IResultXmlTransform})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestRunner.RunClass(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestRunner.RunTest(System.String,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Xunit.TestRunner.RunTests(System.String,System.Collections.Generic.List{System.String})">
+            <inheritdoc/>
+        </member>
+        <member name="T:Xunit.NullTransformer">
+            <summary>
+            An implementation of <see cref="T:Xunit.IResultXmlTransform"/> which writes the
+            XML to a file without any transformation applied.
+            </summary>
+        </member>
+        <member name="M:Xunit.NullTransformer.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.NullTransformer"/> class.
+            </summary>
+            <param name="filename">The output filename.</param>
+        </member>
+        <member name="M:Xunit.NullTransformer.Transform(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Xunit.NullTransformer.OutputFilename">
+            <inheritdoc/>
+        </member>
+        <member name="T:Xunit.XslStreamTransformer">
+            <summary>
+            An implementation of <see cref="T:Xunit.IResultXmlTransform"/> which writes the
+            XML to a file after applying the XSL stylesheet in the given stream.
+            </summary>
+        </member>
+        <member name="M:Xunit.XslStreamTransformer.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.XslStreamTransformer"/> class.
+            </summary>
+            <param name="xslFilename">The XSL filename.</param>
+            <param name="outputFilename">The output filename.</param>
+        </member>
+        <member name="M:Xunit.XslStreamTransformer.#ctor(System.IO.Stream,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Xunit.XslStreamTransformer"/> class.
+            </summary>
+            <param name="xslStream">The stream with the XSL stylesheet.</param>
+            <param name="outputFilename">The output filename.</param>
+        </member>
+        <member name="M:Xunit.XslStreamTransformer.Transform(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Xunit.XslStreamTransformer.OutputFilename">
+            <inheritdoc/>
+        </member>
+        <member name="P:Xunit.XslStreamTransformer.XslFilename">
+            <summary>
+            Gets or sets the XSL filename.
+            </summary>
+        </member>
+        <member name="P:Xunit.XslStreamTransformer.XslStream">
+            <summary>
+            Gets or sets the XSL stream.
+            </summary>
+        </member>
+        <member name="T:Xunit.MultiValueDictionary`2">
+            <summary>
+            A dictionary which contains multiple unique values for each key.
+            </summary>
+            <typeparam name="TKey">The type of the key.</typeparam>
+            <typeparam name="TValue">The type of the value.</typeparam>
+        </member>
+        <member name="M:Xunit.MultiValueDictionary`2.AddValue(`0,`1)">
+            <summary>
+            Adds the value for the given key. If the key does not exist in the
+            dictionary yet, it will add it.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="value">The value.</param>
+        </member>
+        <member name="M:Xunit.MultiValueDictionary`2.Clear">
+            <summary>
+            Removes all keys and values from the dictionary.
+            </summary>
+        </member>
+        <member name="M:Xunit.MultiValueDictionary`2.Contains(`0,`1)">
+            <summary>
+            Determines whether the dictionary contains to specified key and value.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="value">The value.</param>
+        </member>
+        <member name="M:Xunit.MultiValueDictionary`2.ForEach(Xunit.MultiValueDictionary{`0,`1}.ForEachDelegate)">
+            <summary>
+            Calls the delegate once for each key/value pair in the dictionary.
+            </summary>
+        </member>
+        <member name="M:Xunit.MultiValueDictionary`2.Remove(`0)">
+            <summary>
+            Removes the given key and all of its values.
+            </summary>
+        </member>
+        <member name="M:Xunit.MultiValueDictionary`2.RemoveValue(`0,`1)">
+            <summary>
+            Removes the given value from the given key. If this was the
+            last value for the key, then the key is removed as well.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="value">The value.</param>
+        </member>
+        <member name="P:Xunit.MultiValueDictionary`2.Item(`0)">
+            <summary>
+            Gets the values for the given key.
+            </summary>
+        </member>
+        <member name="P:Xunit.MultiValueDictionary`2.Count">
+            <summary>
+            Gets the count of the keys in the dictionary.
+            </summary>
+        </member>
+        <member name="P:Xunit.MultiValueDictionary`2.Keys">
+            <summary>
+            Gets the keys.
+            </summary>
+        </member>
+        <member name="T:Xunit.MultiValueDictionary`2.ForEachDelegate">
+            <summary/>
+        </member>
+        <member name="T:Xunit.TestAssemblyBuilder">
+            <summary>
+            Responsible for building <see cref="T:Xunit.TestAssembly"/> instances. Uses an instance
+            of <see cref="T:Xunit.IExecutorWrapper"/> to interrogate the list of available tests
+            and create the entire object model tree.
+            </summary>
+        </member>
+        <member name="M:Xunit.TestAssemblyBuilder.Build(Xunit.IExecutorWrapper)">
+            <summary>
+            Creates a <see cref="T:Xunit.TestAssembly"/> which is a complete object model over
+            the tests inside of instance of <see cref="T:Xunit.IExecutorWrapper"/>.
+            </summary>
+            <param name="executorWrapper">The executor wrapper</param>
+            <returns>The fully populated object model</returns>
+        </member>
+        <member name="T:Xunit.XmlLoggerAdapter">
+            <summary>
+            Parses the XML nodes from the version resilient runner facility and converts
+            them into calls against the provided <see cref="T:Xunit.IRunnerLogger"/>.
+            </summary>
+        </member>
+        <member name="M:Xunit.XmlLoggerAdapter.LogNode(System.Xml.XmlNode,Xunit.IRunnerLogger)">
+            <summary>
+            Logs a result XML node. Maybe be any kind of XML node.
+            </summary>
+            <param name="node">The node to be logged.</param>
+            <param name="logger">The logger.</param>
+            <returns>Returns true if the user wishes to continue running tests; returns false otherwise.</returns>
+        </member>
+        <member name="M:Xunit.XmlLoggerAdapter.LogAssemblyNode(System.Xml.XmlNode,Xunit.IRunnerLogger)">
+            <summary>
+            Logs the assembly node by calling <see cref="M:Xunit.IRunnerLogger.AssemblyFinished(System.String,System.Int32,System.Int32,System.Int32,System.Double)"/>.
+            </summary>
+            <param name="assemblyNode">The assembly node.</param>
+            <param name="logger">The logger.</param>
+        </member>
+        <member name="M:Xunit.XmlLoggerAdapter.LogClassNode(System.Xml.XmlNode,Xunit.IRunnerLogger)">
+            <summary>
+            Logs the class node by calling <see cref="M:Xunit.IRunnerLogger.ClassFailed(System.String,System.String,System.String,System.String)"/> (if the class failed).
+            The exception type was added in xUnit.net 1.1, so when the test assembly is linked against
+            xUnit.net versions prior to 1.1, the exception type will be null.
+            </summary>
+            <param name="classNode">The class node.</param>
+            <param name="logger">The logger.</param>
+            <returns>Returns true if the user wishes to continue running tests; returns false otherwise.</returns>
+        </member>
+        <member name="M:Xunit.XmlLoggerAdapter.LogStartNode(System.Xml.XmlNode,Xunit.IRunnerLogger)">
+            <summary>
+            Logs the start node by calling <see cref="M:Xunit.IRunnerLogger.TestStart(System.String,System.String,System.String)"/>. The start node was added
+            in xUnit.net 1.1, so it will only be present when the test assembly is linked against xunit.dll
+            version 1.1 or later.
+            </summary>
+            <param name="startNode">The start node.</param>
+            <param name="logger">The logger.</param>
+            <returns>Returns true if the user wishes to continue running tests; returns false otherwise.</returns>
+        </member>
+        <member name="M:Xunit.XmlLoggerAdapter.LogTestNode(System.Xml.XmlNode,Xunit.IRunnerLogger)">
+            <summary>
+            Logs the test node by calling <see cref="M:Xunit.IRunnerLogger.TestFinished(System.String,System.String,System.String)"/>. It will also call
+            <see cref="M:Xunit.IRunnerLogger.TestPassed(System.String,System.String,System.String,System.Double,System.String)"/>, <see cref="M:Xunit.IRunnerLogger.TestFailed(System.String,System.String,System.String,System.Double,System.String,System.String,System.String,System.String)"/>, or
+            <see cref="M:Xunit.IRunnerLogger.TestSkipped(System.String,System.String,System.String,System.String)"/> as appropriate.
+            </summary>
+            <param name="testNode">The test node.</param>
+            <param name="logger">The logger.</param>
+            <returns>Returns true if the user wishes to continue running tests; returns false otherwise.</returns>
+        </member>
+    </members>
+</doc>

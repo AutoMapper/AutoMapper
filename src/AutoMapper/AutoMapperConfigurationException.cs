@@ -1,13 +1,9 @@
 using System;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Linq;
 
 namespace AutoMapper
 {
-#if !SILVERLIGHT
-    [Serializable]
-#endif
     public class AutoMapperConfigurationException : Exception
     {
         public TypeMapConfigErrors[] Errors { get; private set; }
@@ -102,7 +98,8 @@ namespace AutoMapper
                     return string.Join(Environment.NewLine, 
                         base.StackTrace
                             .Split(new[] {Environment.NewLine}, StringSplitOptions.None)
-                            .Where(str => !str.TrimStart().StartsWith("at AutoMapper.")));
+                            .Where(str => !str.TrimStart().StartsWith("at AutoMapper."))
+                            .ToArray());
 
                 return base.StackTrace;
             }

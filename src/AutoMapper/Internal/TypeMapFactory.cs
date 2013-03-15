@@ -1,21 +1,18 @@
 using System;
-#if !SILVERLIGHT
-using System.Collections.Concurrent;
-#else
-using TvdP.Collections;
-#endif
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using AutoMapper.Impl;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
     public class TypeMapFactory : ITypeMapFactory
     {
-        private static readonly ConcurrentDictionary<Type, TypeInfo> _typeInfos =
-            new ConcurrentDictionary<Type, TypeInfo>();
+        private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
+        private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos =
+            CollectionFactory.CreateConcurrentDictionary<Type, TypeInfo>();
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
         {
@@ -32,11 +29,8 @@ namespace AutoMapper
                 {
                     var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
-#if !SILVERLIGHT
-                    typeMap.AddPropertyMap(destPropertyAccessor, resolvers);
-#else
+
                     typeMap.AddPropertyMap(destPropertyAccessor, resolvers.Cast<IValueResolver>());
-#endif
                 }
             }
             if (!destinationType.IsAbstract && destinationType.IsClass)

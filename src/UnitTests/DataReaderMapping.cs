@@ -1,9 +1,10 @@
+#if !SILVERLIGHT && !NETFX_CORE
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+using Rhino.Mocks.Constraints;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -22,70 +23,70 @@ namespace AutoMapper.UnitTests
                 _result = _results.FirstOrDefault();
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_small_integer_should_be_read()
             {
-                Assert.That(_result.SmallInteger, Is.EqualTo(_dataReader[FieldName.SmallInt]));  
+                _result.SmallInteger.ShouldEqual(_dataReader[FieldName.SmallInt]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_an_integer_should_be_read()
             {
-                Assert.That(_result.Integer, Is.EqualTo(_dataReader[FieldName.Int]));
+                _result.Integer.ShouldEqual(_dataReader[FieldName.Int]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_big_integer_should_be_read()
             {
-                Assert.That(_result.BigInteger, Is.EqualTo(_dataReader[FieldName.BigInt]));
+                _result.BigInteger.ShouldEqual(_dataReader[FieldName.BigInt]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_GUID_should_be_read()
             {
-                Assert.That(_result.Guid, Is.EqualTo(_dataReader[FieldName.Guid]));
+                _result.Guid.ShouldEqual(_dataReader[FieldName.Guid]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_float_should_be_read()
             {
-                Assert.That(_result.Float, Is.EqualTo(_dataReader[FieldName.Float]));
+                _result.Float.ShouldEqual(_dataReader[FieldName.Float]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_double_should_be_read()
             {
-                Assert.That(_result.Double, Is.EqualTo(_dataReader[FieldName.Double]));
+                _result.Double.ShouldEqual(_dataReader[FieldName.Double]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_decimal_should_be_read()
             {
-                Assert.That(_result.Decimal, Is.EqualTo(_dataReader[FieldName.Decimal]));
+                _result.Decimal.ShouldEqual(_dataReader[FieldName.Decimal]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_date_and_time_should_be_read()
             {
-                Assert.That(_result.DateTime, Is.EqualTo(_dataReader[FieldName.DateTime]));
+                _result.DateTime.ShouldEqual(_dataReader[FieldName.DateTime]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_byte_should_be_read()
             {
-                Assert.That(_result.Byte, Is.EqualTo(_dataReader[FieldName.Byte]));
+                _result.Byte.ShouldEqual(_dataReader[FieldName.Byte]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_boolean_should_be_read()
             {
-                Assert.That(_result.Boolean, Is.EqualTo(_dataReader[FieldName.Boolean]));   
+                _result.Boolean.ShouldEqual(_dataReader[FieldName.Boolean]);   
             }
 
-            [Test]
+            [Fact]
             public void Then_a_projected_column_should_be_read()
             {
-                Assert.That(_result.Else, Is.EqualTo(_dataReader.GetDateTime(10)));
+                _result.Else.ShouldEqual(_dataReader.GetDateTime(10));
             }
 
             protected DTOObject _result;
@@ -110,10 +111,10 @@ namespace AutoMapper.UnitTests
 
         public class When_mapping_a_data_reader_using_the_default_coniguration : When_mapping_a_data_reader_to_a_dto
         {
-            [Test]
+            [Fact]
             public void Then_the_enumerable_should_be_a_list()
             {
-                Assert.That(_results, Is.InstanceOfType(typeof(IList<DTOObject>)));
+                _results.ShouldImplement<IList<DTOObject>>();
             }
         }
 
@@ -125,10 +126,10 @@ namespace AutoMapper.UnitTests
                 base.Establish_context();
             }
 
-            [Test]
+            [Fact]
             public void Then_the_enumerable_should_not_be_a_list()
             {
-                Assert.That(_results, Is.Not.InstanceOfType(typeof(IList<DTOObject>)));
+                _results.ShouldNotBeInstanceOf<IList<DTOObject>>();
             }
         }
 
@@ -139,7 +140,7 @@ namespace AutoMapper.UnitTests
                 _dataReader = new DataBuilder().BuildDataReader();
             }
 
-            [Test]
+            [Fact]
             public void Then_an_automapper_exception_should_be_thrown()
             {
                 typeof (AutoMapperMappingException).ShouldBeThrownBy(
@@ -161,70 +162,70 @@ namespace AutoMapper.UnitTests
                 _result = Mapper.Map<IDataRecord, DTOObject>(_dataRecord);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_small_integer_should_be_read()
             {
-                Assert.That(_result.SmallInteger, Is.EqualTo(_dataRecord[FieldName.SmallInt]));
+                _result.SmallInteger.ShouldEqual(_dataRecord[FieldName.SmallInt]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_an_integer_should_be_read()
             {
-                Assert.That(_result.Integer, Is.EqualTo(_dataRecord[FieldName.Int]));
+                _result.Integer.ShouldEqual(_dataRecord[FieldName.Int]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_big_integer_should_be_read()
             {
-                Assert.That(_result.BigInteger, Is.EqualTo(_dataRecord[FieldName.BigInt]));
+                _result.BigInteger.ShouldEqual(_dataRecord[FieldName.BigInt]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_GUID_should_be_read()
             {
-                Assert.That(_result.Guid, Is.EqualTo(_dataRecord[FieldName.Guid]));
+                _result.Guid.ShouldEqual(_dataRecord[FieldName.Guid]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_float_should_be_read()
             {
-                Assert.That(_result.Float, Is.EqualTo(_dataRecord[FieldName.Float]));
+                _result.Float.ShouldEqual(_dataRecord[FieldName.Float]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_double_should_be_read()
             {
-                Assert.That(_result.Double, Is.EqualTo(_dataRecord[FieldName.Double]));
+                _result.Double.ShouldEqual(_dataRecord[FieldName.Double]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_decimal_should_be_read()
             {
-                Assert.That(_result.Decimal, Is.EqualTo(_dataRecord[FieldName.Decimal]));
+                _result.Decimal.ShouldEqual(_dataRecord[FieldName.Decimal]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_date_and_time_should_be_read()
             {
-                Assert.That(_result.DateTime, Is.EqualTo(_dataRecord[FieldName.DateTime]));
+                _result.DateTime.ShouldEqual(_dataRecord[FieldName.DateTime]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_byte_should_be_read()
             {
-                Assert.That(_result.Byte, Is.EqualTo(_dataRecord[FieldName.Byte]));
+                _result.Byte.ShouldEqual(_dataRecord[FieldName.Byte]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_column_containing_a_boolean_should_be_read()
             {
-                Assert.That(_result.Boolean, Is.EqualTo(_dataRecord[FieldName.Boolean]));
+                _result.Boolean.ShouldEqual(_dataRecord[FieldName.Boolean]);
             }
 
-            [Test]
+            [Fact]
             public void Then_a_projected_column_should_be_read()
             {
-                Assert.That(_result.Else, Is.EqualTo(_dataRecord[FieldName.Something]));
+                _result.Else.ShouldEqual(_dataRecord[FieldName.Something]);
             }
 
             private DTOObject _result;
@@ -269,7 +270,7 @@ namespace AutoMapper.UnitTests
                 _dataReader = new DataBuilder().BuildDataReaderWithNullableField();
             }
 
-            [Test]
+            [Fact]
             public void Then_results_should_be_as_expected()
             {
                 while (_dataReader.Read())
@@ -277,13 +278,13 @@ namespace AutoMapper.UnitTests
                     var dto = Mapper.Map<IDataReader, DtoWithSingleNullableField>(_dataReader);
 
                     if (_dataReader.IsDBNull(0))
-                        Assert.That(dto.Integer.HasValue, Is.EqualTo(false));
+                        dto.Integer.HasValue.ShouldEqual(false);
                     else
                     {
                         // uncomment the following line to see some strange fail message that might be the key to the problem
-                        Assert.That(dto.Integer.HasValue, Is.EqualTo(true));
+                        dto.Integer.HasValue.ShouldEqual(true);
 
-                        Assert.That(dto.Integer.Value, Is.EqualTo(FieldValue));
+                        dto.Integer.Value.ShouldEqual(FieldValue);
                     }
                 }
             }
@@ -338,7 +339,7 @@ namespace AutoMapper.UnitTests
 				_dataReader = new DataBuilder().BuildDataReaderWithNullableField();
 			}
 
-			[Test]
+			[Fact]
 			public void Then_results_should_be_as_expected()
 			{
 				while (_dataReader.Read())
@@ -437,3 +438,4 @@ namespace AutoMapper.UnitTests
         }
     }
 }
+#endif

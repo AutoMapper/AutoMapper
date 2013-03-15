@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Order, OrderDto>(new Order {Customer = new Customer {Æøå = "Bob"}});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_match_to_identical_property_name_on_destination()
 			{
 				_result.CustomerÆøå.ShouldEqual("Bob");

@@ -1,5 +1,5 @@
-﻿using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+﻿using Xunit;
+using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -15,12 +15,12 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.CreateMap<Src, Dst>();
         }
 
-        [Test]
+        [Fact]
         public void TestNullableEnum()
         {
             var d = Mapper.Map(new Src { A = null }, new Dst { A = EnumType.One });
 
-            Assert.That(d.A, Is.Null);
+            d.A.ShouldBeNull();
         } 
     }
 }

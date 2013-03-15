@@ -1,5 +1,5 @@
 using System;
-using NUnit.Framework;
+using Xunit;
 using Should;
 using System.Reflection;
 
@@ -29,7 +29,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(config => config.SourceExtensionMethodSearch = new Assembly[] { Assembly.GetExecutingAssembly() });
+				Mapper.Initialize(config => config.SourceExtensionMethodSearch = new System.Reflection.Assembly[] { Assembly.GetExecutingAssembly() });
 				Mapper.CreateMap<Source, Destination>();
 			}
 
@@ -38,13 +38,13 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source { Value1 = 3 });
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_extension_method()
 			{
 				_destination.Value2.ShouldEqual("hello from extension");
 			}
 
-			[Test]
+			[Fact]
 			public void Should_still_map_value_type()
 			{
 				_destination.Value1.ShouldEqual(3);
@@ -81,7 +81,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(config => config.SourceExtensionMethodSearch = new Assembly[] { Assembly.GetExecutingAssembly() });
+				Mapper.Initialize(config => config.SourceExtensionMethodSearch = new[] { Assembly.GetExecutingAssembly() });
 				Mapper.CreateMap<Source, Destination>();
 			}
 
@@ -90,13 +90,13 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source { Value1 = 7 });
 			}
 
-			[Test]
+			[Fact]
 			public void Should_flatten_using_extension_method()
 			{
 				_destination.InsideThingProperty.ShouldEqual(17);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_still_map_value_type()
 			{
 				_destination.Value1.ShouldEqual(7);

@@ -1,11 +1,14 @@
-﻿using NUnit.Framework;
+﻿using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class IncludedMappingShouldInheritBaseMappings
     {
-        [SetUp]
+        public IncludedMappingShouldInheritBaseMappings()
+        {
+            SetUp();
+        }
         public void SetUp()
         {
             Mapper.Reset();
@@ -36,7 +39,7 @@ namespace AutoMapper.UnitTests.Bug
             public string SubString { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void included_mapping_should_inherit_base_mappings_should_not_throw()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -47,7 +50,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.AssertConfigurationIsValid();
         }
 
-        [Test]
+        [Fact]
         public void included_mapping_should_inherit_base_ignore_mappings_should_not_throw()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -58,7 +61,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.AssertConfigurationIsValid();
         }
 
-        [Test]
+        [Fact]
         public void more_specific_map_should_override_base_ignore_passes_validation()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -70,7 +73,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.AssertConfigurationIsValid();
         }
 
-        [Test]
+        [Fact]
         public void more_specific_map_should_override_base_ignore_with_one_parameter()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -85,11 +88,11 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            Assert.AreEqual("123", dto.BaseString);
-            Assert.AreEqual("456", dto.SubString);
+            "123".ShouldEqual(dto.BaseString);
+            "456".ShouldEqual(dto.SubString);
         }
 
-        [Test]
+        [Fact]
         public void more_specific_map_should_override_base_ignore()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -104,11 +107,11 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            Assert.AreEqual("123", dto.BaseString);
-            Assert.AreEqual("456", dto.SubString);
+            "123".ShouldEqual(dto.BaseString);
+            "456".ShouldEqual(dto.SubString);
         }
 
-        [Test]
+        [Fact]
         public void more_specific_map_should_override_base_mapping_passes_validation()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -119,7 +122,7 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.AssertConfigurationIsValid();
         }
-        [Test]
+        [Fact]
         public void more_specific_map_should_override_base_mapping_with_one_parameter()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -134,11 +137,11 @@ namespace AutoMapper.UnitTests.Bug
                                                                        SubString = "456"
                                                                    });
 
-            Assert.AreEqual("789", dto.BaseString);
-            Assert.AreEqual("456", dto.SubString);
+            "789".ShouldEqual(dto.BaseString);
+            "456".ShouldEqual(dto.SubString);
         }
         
-        [Test]
+        [Fact]
         public void more_specific_map_should_override_base_mapping()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -153,11 +156,11 @@ namespace AutoMapper.UnitTests.Bug
                                                                        SubString = "456"
                                                                    });
 
-            Assert.AreEqual("789", dto.BaseString);
-            Assert.AreEqual("456", dto.SubString);
+            "789".ShouldEqual(dto.BaseString);
+            "456".ShouldEqual(dto.SubString);
         }
 
-        [Test]
+        [Fact]
         public void included_mapping_should_not_inherit_base_mappings_for_other_with_one_parameter()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -172,10 +175,10 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            Assert.AreEqual("456", dto.SubString);
+            "456".ShouldEqual(dto.SubString);
         }
 
-        [Test]
+        [Fact]
         public void included_mapping_should_not_inherit_base_mappings_for_other()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -190,10 +193,10 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            Assert.AreEqual("456", dto.SubString);
+            "456".ShouldEqual(dto.SubString);
         }
 
-        [Test]
+        [Fact]
         public void included_mapping_should_not_inherit_base_mappings_for_other_should_not_throw()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -204,7 +207,7 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.AssertConfigurationIsValid();
         }
-        [Test]
+        [Fact]
         public void include_should_allow_automapper_to_select_more_specific_included_type_with_one_parameter()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -219,10 +222,10 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            Assert.IsInstanceOfType(typeof(DtoSubObject), dto);
+            dto.ShouldBeType<DtoSubObject>();
         }
         
-        [Test]
+        [Fact]
         public void include_should_allow_automapper_to_select_more_specific_included_type()
         {
             Mapper.CreateMap<ModelObject, DtoObject>()
@@ -237,7 +240,7 @@ namespace AutoMapper.UnitTests.Bug
                 SubString = "456"
             });
 
-            Assert.IsInstanceOfType(typeof(DtoSubObject), dto);
+            dto.ShouldBeType<DtoSubObject>();
         }
     }
 }

@@ -1,10 +1,8 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
     using System;
-
-    [TestFixture]
     public class CorrectCtorIsPickedOnDestinationType : AutoMapperSpecBase
     {
         public class SourceClass { }
@@ -24,7 +22,7 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         // https://github.com/AutoMapper/AutoMapper/issues/154 
-        [Test, Ignore("Until fixed")]
+        [Fact(Skip="Until fixed")]
         public void Should_pick_a_ctor_which_best_matches()
         {
             Mapper.CreateMap<SourceClass, DestinationClass>();
