@@ -45,11 +45,15 @@ task test {
     exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll /xml $result_dir\AutoMapper.UnitTests.Net4.xml }
     exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.SL4.dll --ReportOutputFile=$result_dir\AutoMapper.UnitTests.SL4.xml --ReportOutputFileType=NUnit }
     exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/WinRT/$config/AutoMapper.UnitTests.WinRT.dll /xml $result_dir\AutoMapper.UnitTests.WinRT.xml }
+    #exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/WP75/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/WP75/$config/AutoMapper.UnitTests.WP75.dll --ReportOutputFile=$result_dir\AutoMapper.UnitTests.WP75.xml --ReportOutputFileType=NUnit }
 }
 
 task dist {
 	create_directory $dist_dir
-	copy_files "$build_dir\$config\AutoMapper" "$dist_dir\net40-client"
+	copy_files "$source_dir\AutoMapper\bin\Net4\$config" "$dist_dir\net40"
+	copy_files "$source_dir\AutoMapper\bin\sl4\$config" "$dist_dir\sl4"
+	copy_files "$source_dir\AutoMapper\bin\wp75\$config" "$dist_dir\wp71"
+	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows8"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
@@ -134,9 +138,26 @@ function global:create-nuspec($version, $fileName)
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
   </metadata>
   <files>
-    <file src=""$dist_dir\net40-client\AutoMapper.dll"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-client\AutoMapper.pdb"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-client\AutoMapper.xml"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.Net4.dll"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.Net4.pdb"" target=""lib\net40"" />
+    <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.Net4.dll"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.Net4.pdb"" target=""lib\sl4"" />
+    <file src=""$dist_dir\wp71\AutoMapper.dll"" target=""lib\wp71"" />
+    <file src=""$dist_dir\wp71\AutoMapper.pdb"" target=""lib\wp71"" />
+    <file src=""$dist_dir\wp71\AutoMapper.xml"" target=""lib\wp71"" />
+    <file src=""$dist_dir\wp71\AutoMapper.Net4.dll"" target=""lib\wp71"" />
+    <file src=""$dist_dir\wp71\AutoMapper.Net4.pdb"" target=""lib\wp71"" />
+    <file src=""$dist_dir\windows8\AutoMapper.dll"" target=""lib\windows8"" />
+    <file src=""$dist_dir\windows8\AutoMapper.pdb"" target=""lib\windows8"" />
+    <file src=""$dist_dir\windows8\AutoMapper.xml"" target=""lib\windows8"" />
+    <file src=""$dist_dir\windows8\AutoMapper.Net4.dll"" target=""lib\windows8"" />
+    <file src=""$dist_dir\windows8\AutoMapper.Net4.pdb"" target=""lib\windows8"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"

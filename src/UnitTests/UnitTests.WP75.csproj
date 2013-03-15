@@ -48,8 +48,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Phone" />
-    <Reference Include="Microsoft.Phone.Interop" />
+    <Reference Include="Microsoft.Phone">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Phone.Interop">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Silverlight.Testing, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\xunitcontrib-silverlight.0.2\MicrosoftSilverlightTesting-04-2010-SL4\Microsoft.Silverlight.Testing.dll</HintPath>
@@ -58,14 +62,34 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\xunitcontrib-silverlight.0.2\MicrosoftSilverlightTesting-04-2010-SL4\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll</HintPath>
     </Reference>
-    <Reference Include="System.Windows" />
-    <Reference Include="system" />
-    <Reference Include="System.Core">
-      <Private>False</Private>
+    <Reference Include="System.Device">
+      <Private>True</Private>
     </Reference>
-    <Reference Include="System.Net" />
-    <Reference Include="System.Xml" />
-    <Reference Include="mscorlib.extensions" />
+    <Reference Include="System.Windows">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="system">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="mscorlib.extensions">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Serialization">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="xunit-silverlight-wp7">
       <HintPath>..\..\lib\xunitcontrib-silverlight.0.2\WindowsPhone7\xunit-silverlight-wp7.dll</HintPath>
     </Reference>
