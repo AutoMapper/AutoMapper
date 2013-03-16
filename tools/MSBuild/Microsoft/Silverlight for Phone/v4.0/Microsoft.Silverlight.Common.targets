@@ -41,7 +41,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </PropertyGroup>
 
     <PropertyGroup>
-        <!-- Extract out the Background Image for Tile Background and IconPath for ApplicationIcon by reading the WMAppManifest.xml -->
+        <!-- Extract out the Background Image for Tile Background and IconPath for ApplicationIcon by reading the WMAppManifest.xml
         <TokenBackgroundImage Condition="Exists('$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(PathOfWMAppManifestRelativeToProject)))')">$([System.Text.RegularExpressions.Regex]::Match(
            $([System.Text.RegularExpressions.Regex]::Match(
            $([System.IO.File]::ReadAllText('$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(PathOfWMAppManifestRelativeToProject)))')),
@@ -50,6 +50,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
            $([System.Text.RegularExpressions.Regex]::Match(
            $([System.IO.File]::ReadAllText('$([System.IO.Path]::Combine($(MSBuildProjectDirectory),$(PathOfWMAppManifestRelativeToProject)))')),
            "(IconPath)\b[^&gt;]*&gt;.*?&lt;/\1&gt;").Value), "&gt;[^&lt;]*?&lt;").Value.Replace('&lt;','').Replace('&gt;',''))</ApplicationIconImage>
+		    -->
     </PropertyGroup>
 
     <!--

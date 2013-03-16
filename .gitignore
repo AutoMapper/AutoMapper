@@ -12,3 +12,4 @@ _ReSharper*
 *.cache
 TestResult.xml
 AppPackages/
+*.bak
