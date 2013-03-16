@@ -1,0 +1,45 @@
+﻿<!--
+Copyright (c) Microsoft Corporation.  All rights reserved.
+-->
+<!--
+***********************************************************************************************
+Microsoft.Phone.PreImport.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="Microsoft.Phone.Build.Tasks.ValidateWMAppManifest" AssemblyFile="Microsoft.Phone.Build.Tasks.dll" />
+
+  <PropertyGroup>
+    <PrepareForRunDependsOn>
+      $(PrepareForRunDependsOn);
+      ValidateWMAppManifest;
+    </PrepareForRunDependsOn>
+  </PropertyGroup>
+  
+  <!--
+    ============================================================
+                    ValidateWMAppManifest
+    ============================================================
+    -->
+    <PropertyGroup>
+        <ValidateWMAppManifestDependsOn>CreateSilverlightAppManifest</ValidateWMAppManifestDependsOn>
+    </PropertyGroup>
+    <Target
+        Name="ValidateWMAppManifest"
+        DependsOnTargets="$(CreateSilverlightAppManifestDependsOn)">
+
+        <ValidateWMAppManifest RuntimeDir="$([System.IO.Path]::Combine($(WindowsPhone7SdkInstallPath), 'Tools', 'CapDetect'))"
+                               WMAppManifest="$(ProjectDir)$(PathOfWMAppManifestRelativeToProject)"
+                               TargetDir="$(TargetDir)"
+                               AppPlatformVersion="$(WindowsPhone7SdkVersion)"
+                               />
+    </Target>
+
+</Project>

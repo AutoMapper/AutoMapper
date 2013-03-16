@@ -1,0 +1,640 @@
+﻿<!--
+***********************************************************************************************
+Microsoft.Silverlight.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.GetSilverlightFrameworkPath" AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.CompileXaml"  AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.ValidateXaml" AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.XapPackager"  AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.CreateSilverlightAppManifest" AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.CreateHtmlTestPage" AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.ValidateSilverlightFrameworkPaths" AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.ValidateXapFilenames" AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.CategorizeSilverlightReferences" AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+    <UsingTask TaskName="Microsoft.Silverlight.Build.Tasks.PackagePlatformExtensions" AssemblyFile="Microsoft.Silverlight.Build.Tasks.dll" />
+
+    <PropertyGroup>
+        <ValidateXaml Condition="'$(ValidateXaml)' == ''">true</ValidateXaml>
+        <ThrowErrorsInValidation Condition="'$(ThrowErrorsInValidation)' == ''">true</ThrowErrorsInValidation>
+        <ValidateXapFilenames Condition="'$(ValidateXapFilenames)' == ''">false</ValidateXapFilenames>
+        <ExtMapFileValidationAsError Condition="'$(ExtMapFileValidationAsError)' == ''">false</ExtMapFileValidationAsError>
+        <OutOfBrowserPlusAppCachingIsSupported Condition="'$(OutOfBrowserPlusAppCachingIsSupported)' == ''">false</OutOfBrowserPlusAppCachingIsSupported>
+        <TargetFrameworkMonikerDisplayName>Silverlight 4</TargetFrameworkMonikerDisplayName>
+        <!--If the path to the sign tool is not set, assume the SDK path -->
+        <SignToolPath Condition="'$(SignToolPath)' == ''">$(FrameworkSDKRoot)bin</SignToolPath>
+    </PropertyGroup>
+
+    <!--
+    ============================================================
+    Adds all SilverlightPages to the $(Resource) collection
+    ============================================================
+    -->
+    <ItemGroup>
+        <!-- Add Silverlight Page items to $(Resource) -->
+        <Resource Include="@(Page)" />            
+        <Resource Include="@(ApplicationDefinition)" />            
+    </ItemGroup>
+      
+
+
+    <!-- 
+    ================================================================
+                        _CreateSLProperties
+                        
+    Creates some silverlight dependent properties
+    ================================================================
+     -->
+    <Target
+        Name="_CreateSLProperties"
+     >
+        <CreateProperty Value="@(_OutputPathItem->'%(FullPath)$(XapFilename)')" Condition="'$(XapOutputs)'=='true'">
+            <Output TaskParameter="Value" PropertyName="XapOutputFile"/>
+        </CreateProperty>
+    </Target>
+
+    <!-- 
+    ================================================================
+                        GetFrameworkPaths
+                        
+    Override GetFrameworkPaths in Microsoft.Common.targets so that 
+    references resolve to the silverlight assemblies rather than the 
+    desktop CLR assemblies
+    ================================================================
+     -->
+    <Target
+        Name="GetFrameworkPaths"
+        DependsOnTargets="$(GetFrameworkPathsDependsOn)"
+     >
+
+        <GetSilverlightFrameworkPath 
+            RegistryBase="$(FrameworkRegistryBase)"
+        >
+            <Output TaskParameter="SilverlightPath" PropertyName="TargetFrameworkDirectory" Condition="'$(TargetFrameworkDirectory)' == ''"/>
+            <Output TaskParameter="SilverlightSDKPaths" ItemName="_TargetFrameworkSDKDirectoryItem" Condition="'$(TargetFrameworkSDKDirectory)' == ''"/>
+            <Output TaskParameter="SilverlightRuntimeVersion" PropertyName="SilverlightRuntimeVersion" Condition="'$(SilverlightRuntimeVersion)' == ''"/>
+        </GetSilverlightFrameworkPath>
+
+        <PropertyGroup>
+            <FrameworkPathOverride>$(TargetFrameworkDirectory)</FrameworkPathOverride>
+            <TargetFrameworkSDKDirectory Condition="'$(TargetFrameworkSDKDirectory)' == ''">@(_TargetFrameworkSDKDirectoryItem)</TargetFrameworkSDKDirectory>
+            <SdkPath>$(TargetFrameworkSDKDirectory)</SdkPath>
+        </PropertyGroup>
+        
+        <ItemGroup>
+            <_TargetFrameworkDirectoryItem Include="$(TargetFrameworkDirectory)"/>
+        </ItemGroup>
+	    <ItemGroup>
+            <_TargetFrameworkSDKDirectoryItem Include="$(TargetFrameworkSDKDirectory)" Condition="'@(_TargetFrameworkSDKDirectoryItem)' == ''"/>
+        </ItemGroup>
+        
+        <!-- Create the assembly search paths property. This defines where\how references are resolved -->
+        <CreateProperty Value="{CandidateAssemblyFiles};$(ReferencePath);{HintPathFromItem};{TargetFrameworkDirectory};$(TargetFrameworkSDKDirectory);{RawFileName};$(OutDir)">
+            <Output TaskParameter="Value" PropertyName="AssemblySearchPaths"/>
+        </CreateProperty>
+
+        <ValidateSilverlightFrameworkPaths
+            TargetFrameworkDirectory = "$(TargetFrameworkDirectory)"
+        />
+        
+    </Target>
+
+
+   <!--
+    ================================================================
+                        GetReferenceAssemblyPaths
+
+    We override to do nothing. This prevents the default implementation
+    from setting the V3.0 and v3.5 framework paths
+    ================================================================
+    -->
+    <Target
+        Name="GetReferenceAssemblyPaths"
+        DependsOnTargets="$(GetReferenceAssemblyPathsDependsOn)">
+    </Target>
+
+    <!-- 
+    We want to zip after the project has built everything.
+    -->
+    <PropertyGroup>
+        <PrepareForRunDependsOn>
+            CategorizeSilverlightReferences;
+            ValidateXapFilenames;
+            $(PrepareForRunDependsOn);
+            ValidateXaml;
+            CreateSilverlightAppManifest;
+            PackagePlatformExtensions;
+            XapPackager;
+            CreateHtmlTestPage;
+        </PrepareForRunDependsOn>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <BuiltProjectOutputGroupDependsOn>
+            $(BuiltProjectOutputGroupDependsOn);
+            CategorizeSilverlightReferences;
+        </BuiltProjectOutputGroupDependsOn>
+    </PropertyGroup>
+
+    <!-- 
+    We want to add the silverlight page files to the $(Resource) collection
+    -->
+    <PropertyGroup>
+        <PrepareResourcesDependsOn>
+            $(PrepareResourcesDependsOn)
+        </PrepareResourcesDependsOn>
+    </PropertyGroup>
+
+    <!--   
+    ================================================================
+                         MarkupCompilePass1
+    ================================================================
+    -->
+    <PropertyGroup>
+        <CompileXamlDependsOn>
+            GetFrameworkPaths;
+        </CompileXamlDependsOn>
+    </PropertyGroup>
+    
+    <Target Name="MarkupCompilePass1"
+          DependsOnTargets="$(CompileXamlDependsOn)" 
+          Condition="'@(Page)@(ApplicationDefinition)' != '' " >
+
+        <CompileXaml 
+               LanguageSourceExtension="$(DefaultLanguageSourceExtension)"
+               Language="$(Language)" 
+               SilverlightPages="@(Page)" 
+               SilverlightApplications="@(ApplicationDefinition)" 
+               ProjectPath="$(MSBuildProjectFullPath)"
+               RootNamespace="$(RootNamespace)"
+               AssemblyName="$(AssemblyName)" 
+               OutputPath="$(IntermediateOutputPath)"
+               SkipLoadingAssembliesInXamlCompiler="$(SkipLoadingAssembliesInXamlCompiler)"
+               TargetFrameworkDirectory="$(TargetFrameworkDirectory)" 
+               TargetFrameworkSDKDirectory="$(TargetFrameworkSDKDirectory)"
+               ReferenceAssemblies ="@(ReferencePath);@(InferredReference->'$(TargetFrameworkDirectory)\%(Identity)')"
+               >
+
+            <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
+
+            <!-- Add to the list list of files written. It is used in Microsoft.Common.Targets to clean up 
+                 for a next clean build 
+              -->
+            <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
+            <Output ItemName="_GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
+
+        </CompileXaml>
+
+        <Message Text="(Out) GeneratedCodeFiles: '@(_GeneratedCodeFiles)'" Condition="'$(MSBuildTargetsVerbose)'=='true'"/>
+    </Target>
+
+    <!--   
+    ================================================================
+                           ValidateXaml
+    ================================================================
+    -->
+  <PropertyGroup>
+        <ValidateXamlDependsOn>
+            Compile;
+        </ValidateXamlDependsOn>
+    </PropertyGroup>
+
+    <Target Name="ValidateXaml"
+          DependsOnTargets="$(ValidateXamlDependsOn)" 
+          Condition="'@(Page)@(ApplicationDefinition)' != '' and '$(ValidateXaml)' == 'true'" >
+
+        <ValidateXaml 
+               ReferenceAssemblies ="@(ReferencePath);@(InferredReference->'$(TargetFrameworkDirectory)\%(Identity)')"
+               ProjectAssemblies = "@(BuiltProjectOutputGroupKeyOutput)"
+               SilverlightPages="@(Page)" 
+               SilverlightApplications="@(ApplicationDefinition)" 
+               ProjectPath="$(MSBuildProjectFullPath)"
+               AssemblyName="$(AssemblyName)" 
+               OutputPath="$(IntermediateOutputPath)" 
+               ShouldThrow="$(ThrowErrorsInValidation)"
+               TargetFrameworkDirectory="$(TargetFrameworkDirectory)" 
+               TargetFrameworkSDKDirectory="$(TargetFrameworkSDKDirectory)"
+               >
+        </ValidateXaml>
+    </Target>
+
+    <!--   
+    ================================================================
+                           XapPackager
+    This task packages the outputs of the project into a single xap
+    file. It relies on the fact that the InputFiles item collection has
+    the FullPath and TargetPath metadata associated with them.
+    ================================================================
+    -->
+    <PropertyGroup>
+        <XapPackagerDependsOn>
+            _CreateSLProperties;
+            MarkupCompilePass1;
+            ValidateXaml;
+            FilesToXap;
+            CreateSilverlightAppManifest;
+        </XapPackagerDependsOn>
+    </PropertyGroup>
+
+    <Target Name="XapPackager"
+          DependsOnTargets="$(XapPackagerDependsOn)" 
+          Condition="'$(XapOutputs)'=='true'"
+          Outputs="$(XapOutputFile)">
+
+        <XapPackager 
+            InputFiles="@(XapFilesInputCollection)" 
+            ProjectPath="$(MSBuildProjectFullPath)"
+            XapFileName="$(XapFilename)"
+            OutputPath="$(OutDir)" 
+            IntermediateOutputPath="$(IntermediateOutputPath)"
+            SignToolPath="$(SignToolPath)"
+            SignXap="$(SignManifests)"
+            CertificateThumbprint="$(_DeploymentResolvedManifestCertificateThumbprint)"
+            TimestampUrl="$(ManifestTimestampUrl)"
+            IsRFC3161TimestampUrl="$(IsRFC3161TimestampUrl)"
+            >
+            
+            <!--Add to Clean-->
+            <Output ItemName="FileWrites" TaskParameter="XapOutputFile" />
+            <Output ItemName="FileWrites" TaskParameter="XapFileCache" />
+
+        </XapPackager>
+    </Target>
+
+    <!--
+    ============================================================
+                            GetXapOutputFile
+
+    This stand-alone target returns the name of the built xap file.It
+    only makes sense to call this after a build
+    ============================================================
+    -->
+    <Target
+        Name="GetXapOutputFile"
+        DependsOnTargets="BuiltProjectOutputGroup" 
+        Outputs="@(SilverlightDeployableOutputs)"
+    >
+        <ItemGroup>
+            <SilverlightDeployableOutputs Include="@(BuiltProjectOutputGroupOutput)"  Condition="'%(BuiltProjectOutputGroupOutput.DeployableSilverlightFile)' == 'true'">
+                <SilverlightSourceProject>$(MSBuildProjectFullPath)</SilverlightSourceProject>
+            </SilverlightDeployableOutputs>
+        </ItemGroup>
+    </Target>
+    
+    <!--
+    ============================================================
+                              AssignTargetPaths
+
+    This target is overriden so that we can add the  <TargetPath> tags for 
+    items of type SilverlighPage.
+    ============================================================
+    -->
+    <Target
+        Name="AssignTargetPaths"
+        DependsOnTargets="$(AssignTargetPathsDependsOn);_CreateSLProperties">
+
+        <ItemGroup>
+            <_Temporary Remove="@(_Temporary)" />
+        </ItemGroup>
+
+        <!-- AssignTargetPath generates TargetPath metadata that is consumed by CreateManifestResourceNames target for manifest name generation 
+             We include SilverlightPages here as well
+        -->
+        <AssignTargetPath Files="@(EmbeddedResource)" RootFolder="$(MSBuildProjectDirectory)">
+            <Output TaskParameter="AssignedFiles" ItemName="_Temporary" />
+        </AssignTargetPath>
+        
+                            
+        <ItemGroup>
+            <!-- Replace items in EmbeddedResource with the items emitted by the AssignTargetPath task that have the TargetPath metadata -->
+            <EmbeddedResource Remove="@(_Temporary)" />            
+            <EmbeddedResource Include="@(_Temporary)" />            
+            <_Temporary Remove="@(_Temporary)" />
+        </ItemGroup>
+
+        <AssignTargetPath Files="@(Content)" RootFolder="$(MSBuildProjectDirectory)">
+            <Output TaskParameter="AssignedFiles" ItemName="ContentWithTargetPath" />
+        </AssignTargetPath>
+
+        <AssignTargetPath Files="@(None)" RootFolder="$(MSBuildProjectDirectory)">
+            <Output TaskParameter="AssignedFiles" ItemName="_NoneWithTargetPath" />
+        </AssignTargetPath>
+
+        <AssignTargetPath Files="@(BaseApplicationManifest)" RootFolder="$(MSBuildProjectDirectory)">
+            <Output TaskParameter="AssignedFiles" ItemName="_DeploymentBaseManifestWithTargetPath"/>
+        </AssignTargetPath>
+        
+        <AssignTargetPath Files="@(None)" RootFolder="$(MSBuildProjectDirectory)" Condition="'@(_DeploymentBaseManifestWithTargetPath)'=='' and '%(None.Extension)'=='.manifest'">
+            <Output TaskParameter="AssignedFiles" ItemName="_DeploymentBaseManifestWithTargetPath" />
+        </AssignTargetPath>
+
+       <!-- The following adds the appManifest.xaml and xap output files to the built outputs group. -->
+       <ItemGroup>
+            <BuiltProjectOutputGroupOutput Include="$(OutDir)AppManifest.xaml" Condition="'$(GenerateSilverlightManifest)'=='true'">
+                <TargetPath>AppManifest.xaml</TargetPath>
+            </BuiltProjectOutputGroupOutput>
+            <BuiltProjectOutputGroupOutput Include="$(XapOutputFile)" Condition="'$(XapOutputs)'=='true'">
+                <DeployableSilverlightFile>true</DeployableSilverlightFile>
+                <TargetPath>$(XapFilename)</TargetPath>
+            </BuiltProjectOutputGroupOutput>
+        </ItemGroup>
+
+     </Target>
+     
+    <!--
+    ============================================================
+                    FilesToXap
+
+    This target collects the files from the Built, Satellite, and 
+    content output groups to create a collection of files to be
+    zipped
+    ============================================================
+    -->
+    <PropertyGroup>
+        <FilesToXapDependsOn>CreateSilverlightAppManifest;CategorizeSilverlightReferences</FilesToXapDependsOn>
+    </PropertyGroup>
+    <Target
+        Name="FilesToXap"
+        Outputs="@(XapFilesInputCollection)"
+        DependsOnTargets="$(FilesToXapDependsOn)">
+
+        <ItemGroup>
+            <!-- Include the built output, satellites and content files-->
+            <XapFilesInputCollection Include="@(BuiltProjectOutputGroupKeyOutput)"/>
+            <XapFilesInputCollection Include="@(_SilverlightPackagedAssemblies)" />
+            <XapFilesInputCollection Include="@(_SilverlightPackagedSatelliteAssemblies)" />
+            <XapFilesInputCollection Include="@(ContentWithTargetPath)"/>
+            <XapFilesInputCollection Include="$(AppManifestFilename)"/>
+        </ItemGroup>
+        
+    </Target>
+
+    <!--
+    ============================================================
+                    CreateSilverlightAppManifest
+
+    This target creates an AppManifest.xaml file in the output
+    folder.
+    ============================================================
+    -->
+    <PropertyGroup>
+        <CreateSilverlightAppManifestDependsOn>AssignTargetPaths;CategorizeSilverlightReferences</CreateSilverlightAppManifestDependsOn>
+    </PropertyGroup>
+    <Target
+        Name="CreateSilverlightAppManifest"
+        DependsOnTargets="$(CreateSilverlightAppManifestDependsOn)"
+        Condition="'$(GenerateSilverlightManifest)'=='true'">
+
+        <CreateSilverlightAppManifest 
+            PackagedAssemblies="@(_SilverlightPackagedAssemblies)"
+            SatelliteAssemblies="@(_SilverlightPackagedSatelliteAssemblies)" 
+            PlatformExtensionAssemblies="@(_SilverlightPlatformExtensions)" 
+            EntryPointAssembly="@(IntermediateAssembly->'%(FileName)')"
+            EntryPointType="$(SilverlightAppEntry)" 
+            ProjectPath="$(MSBuildProjectFullPath)"
+            SupportedCultures="$(SupportedCultures)"
+            SilverlightRuntimeVersion="$(SilverlightRuntimeVersion)"
+            AppManifestTemplateFile="$(SilverlightManifestTemplate)" 
+            UsePlatformExtensions="$(UsePlatformExtensions)" 
+            EnableOutOfBrowser="$(EnableOutOfBrowser)" 
+            OutOfBrowserSettingsFile="$(OutOfBrowserSettingsFile)" 
+            OutOfBrowserPlusAppCachingIsSupported="$(OutOfBrowserPlusAppCachingIsSupported)"
+            OutputPath="$(OutDir)" 
+            >
+            <Output PropertyName="AppManifestFilename" TaskParameter="AppManifestFilename" />
+
+            <!--Add output to Clean-->
+            <Output ItemName="FileWrites" TaskParameter="AppManifestFilename" />
+
+        </CreateSilverlightAppManifest>
+       
+    </Target>
+
+        <!--
+    ============================================================
+                    _PreCategorizeSilverlightReferences
+
+    This is here to make sure the variable BuildingProject is
+    set to true. This is necessary for CategorizeSilverlightReferences
+    to work correctly. ResolveReferences will not calculate 
+    dependencies without it when asking for output groups.
+    ============================================================
+    -->
+    <Target Name="_PreCategorizeSilverlightReferences">
+    
+        <PropertyGroup>
+            <!-- Remember the value. It will be set back in CategorizeSilverlightReferences -->
+            <_OriginalBuildingProject>$(BuildingProject)</_OriginalBuildingProject>
+            <BuildingProject>true</BuildingProject>
+        </PropertyGroup>
+        
+     </Target>
+
+    <!--
+        The ComputeIntermediateSatelliteAssembliesDependsOn is missing the PrepareResourceNames
+        dependency. We fix it here since CategorizeSilverlightReferences is dependentant on  
+        determination of the satellite assemblies
+    -->
+    <PropertyGroup>
+        <ComputeIntermediateSatelliteAssembliesDependsOn>
+            PrepareResourceNames;
+            $(ComputeIntermediateSatelliteAssembliesDependsOn);
+        </ComputeIntermediateSatelliteAssembliesDependsOn>
+    </PropertyGroup>
+
+    <!--
+    ============================================================
+                    CategorizeSilverlightReferences
+
+       Looks at all references and splits them into 3 lists: 
+            Satellites which match the specified cultures list
+            packagedAssemblies
+            platformExtensions
+    ============================================================
+    -->
+    <PropertyGroup>
+        <CategorizeSilverlightReferencesDependsOn>
+            _CreateSLProperties;
+            AssignTargetPaths;
+            _PreCategorizeSilverlightReferences;
+            ResolveReferences;
+            ComputeIntermediateSatelliteAssemblies;
+        </CategorizeSilverlightReferencesDependsOn>
+    </PropertyGroup>
+    <Target
+        Name="CategorizeSilverlightReferences"
+        DependsOnTargets="$(CategorizeSilverlightReferencesDependsOn)">
+
+        <CategorizeSilverlightReferences 
+            ReferencedCopyLocalAssemblies="@(ReferenceCopyLocalPaths);@(ReferenceComWrappersToCopyLocal);"
+            BuiltSatellites="@(IntermediateSatelliteAssembliesWithTargetPath)" 
+            SupportedCultures="$(SupportedCultures)"
+            UsePlatformExtensions="$(UsePlatformExtensions)" 
+            OutputPath="$(OutDir)" 
+            ProjectPath="$(MSBuildProjectFullPath)"
+            ExtMapFileValidationAsError="$(ExtMapFileValidationAsError)"
+            >
+            <Output ItemName="_SilverlightPackagedAssemblies" TaskParameter="SilverlightPackagedAssemblies" />
+            <Output ItemName="_SilverlightPackagedSatelliteAssemblies" TaskParameter="SilverlightPackagedSatelliteAssemblies" />
+            <Output ItemName="_SilverlightPlatformExtensions" TaskParameter="SilverlightPlatformExtensions" />
+            <Output ItemName="_SilverlightPlatformExtensionSatellites" TaskParameter="SilverlightPlatformExtensionSatellites" />
+            <Output ItemName="SilverlightExtensionPackages" TaskParameter="SilverlightExtensionPackages" />
+        </CategorizeSilverlightReferences>
+
+        <!--Add to built output group and set the PlatformExtension metaproperty-->
+        <ItemGroup>
+            <BuiltProjectOutputGroupOutput Include="@(SilverlightExtensionPackages->'%(FullPath)')" Condition="'$(UsePlatformExtensions)' == 'true'">
+                <DeployableSilverlightFile>true</DeployableSilverlightFile>
+                <TargetPath>%(Filename)%(Extension)</TargetPath>
+            </BuiltProjectOutputGroupOutput>
+        </ItemGroup>
+        <PropertyGroup>
+            <!-- Reset the variable back to the original value -->
+            <BuildingProject>$(_OriginalBuildingProject)</BuildingProject>
+        </PropertyGroup>
+
+    </Target>
+
+    <!--   
+    ================================================================
+                           PackagePlatformExtensions
+    This task packages the platform extensions into .zip files
+    and places them in the output folder.
+    ================================================================
+    -->
+    <PropertyGroup>
+        <PackagePlatformExtensionsDependsOn>
+            _CreateSLProperties;
+            CategorizeSilverlightReferences;
+            CreateSilverlightAppManifest;
+        </PackagePlatformExtensionsDependsOn>
+    </PropertyGroup>
+
+    <Target Name="PackagePlatformExtensions"
+          DependsOnTargets="$(XapPackagerDependsOn)" 
+          Condition="'$(UsePlatformExtensions)'=='true'"
+          >
+
+        <PackagePlatformExtensions
+            PlatformExtensions="@(_SilverlightPlatformExtensions)" 
+            PlatformExtensionSatellites="@(_SilverlightPlatformExtensionSatellites)" 
+            OutputPath="$(OutDir)" 
+            ProjectPath="$(MSBuildProjectFullPath)"
+            IntermediateOutputPath="$(IntermediateOutputPath)"
+            >
+            <Output ItemName="_CreatedSilverlightExtensionPackages" TaskParameter="CreatedSilverlightExtensionPackages" />
+            
+            <!--Add outputs to Clean-->
+            <Output ItemName="FileWrites" TaskParameter="CreatedSilverlightExtensionPackages" />
+
+        </PackagePlatformExtensions>
+
+    </Target>
+    
+    <!--
+    ============================================================
+                        CreateHtmlTestPage
+
+    This target creates a TestPage.Html file in the output
+    folder. This is used by ViewInBrowser and F5 scenarios
+    ============================================================
+    -->
+    <Target
+        Name="CreateHtmlTestPage"
+        Condition="'$(CreateTestPage)'=='true'">
+
+        <CreateHtmlTestPage 
+            PackageFileName="$(XapFilename)" 
+            ProjectPath="$(MSBuildProjectFullPath)"
+            OutputPath="$(OutDir)"
+            TestPageFileName="$(TestPageFileName)"
+            SilverlightRuntimeVersion="$(SilverlightRuntimeVersion)"
+            >
+            <Output ItemName="TestPageFile" TaskParameter="TestPageFile" />
+
+            <!--Add output to Clean-->
+            <Output ItemName="FileWrites" TaskParameter="TestPageFile" />
+
+        </CreateHtmlTestPage>
+       
+    </Target>
+
+    <!--
+    ============================================================
+                     MainResourcesGeneration
+    This is here temporarily to fix an issue in the WinFx 
+    targets file where adding and removing resources does not
+    cause a resource generation unless the images hapeen to have
+    a newer timestamp than the generated .resources file
+    ============================================================
+    -->
+    <Target Name="MainResourcesGeneration" Inputs="@(MainEmbeddedFiles);$(MSBuildProjectFile)" Outputs="$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)" Condition="'@(MainEmbeddedFiles)'!=''">
+
+    <!--
+        This generates .resources file containing all the resources that are to be 
+        embedded in the main assembly and dont need to be localized
+    -->
+      
+    <Message Text="(in) EmbeddedFiles: '@(MainEmbeddedFiles)'" Condition="'$(MSBuildTargetsVerbose)'=='true'"/>
+      
+    <ResourcesGenerator 
+                   ResourceFiles="@(MainEmbeddedFiles)" 
+                   OutputPath="$(IntermediateOutputPath)" 
+                   OutputResourcesFile="$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)" 
+                   Condition="'@(MainEmbeddedFiles)' != ''">
+
+          <!-- Put the generated files in item FileWrites so that they can be cleaned up appropriately in a next Rebuild -->
+          <Output ItemName="FileWrites" TaskParameter="OutputResourcesFile" />
+
+    </ResourcesGenerator>
+
+    <ItemGroup>
+          <EmbeddedResource Include="$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)">
+                <GenerateResource>false</GenerateResource>
+                <Type>Resx</Type>
+                <WithCulture>false</WithCulture>
+                <OutputResource>$(IntermediateOutputPath)$(_ResourceNameInMainAssembly)</OutputResource>
+          </EmbeddedResource>
+    </ItemGroup>
+
+  </Target>
+
+    <!--   
+    ================================================================
+                           ValidateXapFilenames
+    This task validates that the files that will be packaged into
+    the XAP are ascii compliant. It can be disabled by setting the
+    ValidateXapFilenames property to false in the project file.
+    ================================================================
+    -->
+    <PropertyGroup>
+        <ValidateXapFilenamesDependsOn>
+            _CreateSLProperties;
+            FilesToXap;
+        </ValidateXapFilenamesDependsOn>
+    </PropertyGroup>
+
+    <Target Name="ValidateXapFilenames"
+          DependsOnTargets="$(ValidateXapFilenamesDependsOn)" 
+          Condition="'$(ValidateXapFilenames)'=='true' and '$(XapOutputs)'=='true'"
+          >
+
+        <ValidateXapFilenames 
+            InputFiles="@(XapFilesInputCollection)" 
+            XapFileName="$(XapFilename)"
+            SupportedCultures="$(SupportedCultures)" 
+        />
+    </Target>
+    
+    <!-- Import the Ria client targets file if it exists -->
+    <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v4.0\Microsoft.Ria.Client.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\Silverlight\v4.0\Microsoft.Ria.Client.targets')"/>
+
+</Project>
