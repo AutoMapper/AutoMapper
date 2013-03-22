@@ -10,8 +10,8 @@ properties {
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
 	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.3.0' }
-	$version = $pkgVersion -replace "-.*$", ""
-	$buildNumber = $version + '.0'
+	$assemblyVersion = $pkgVersion -replace "\.[0-9]*-.*$", ".0.0"
+	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
 	$framework_dir = Get-FrameworkDirectory
 }
@@ -37,7 +37,7 @@ task compile -depends clean {
 
 task commonAssemblyInfo {
     $commit = if ($env:BUILD_VCS_NUMBER -ne $NULL) { $env:BUILD_VCS_NUMBER } else { git log -1 --pretty=format:%H }
-    create-commonAssemblyInfo "$buildNumber" "$commit" "$source_dir\CommonAssemblyInfo.cs"
+    create-commonAssemblyInfo "$commit" "$source_dir\CommonAssemblyInfo.cs"
 }
 
 task test {
@@ -94,7 +94,7 @@ function global:copy_files($source, $destination, $exclude = @()) {
     Get-ChildItem $source -Recurse -Exclude $exclude | Copy-Item -Destination {Join-Path $destination $_.FullName.Substring($source.length)} 
 }
 
-function global:create-commonAssemblyInfo($version, $commit, $filename)
+function global:create-commonAssemblyInfo($commit, $filename)
 {
 	$date = Get-Date
     "using System;
@@ -111,8 +111,8 @@ using System.Runtime.InteropServices;
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: AssemblyVersionAttribute(""$pkgVersion"")]
-[assembly: AssemblyFileVersionAttribute(""$version"")]
+[assembly: AssemblyVersionAttribute(""$assemblyVersion"")]
+[assembly: AssemblyFileVersionAttribute(""$assemblyFileVersion"")]
 [assembly: AssemblyCopyrightAttribute(""Copyright Jimmy Bogard 2008-" + $date.Year + """)]
 [assembly: AssemblyProductAttribute(""AutoMapper"")]
 [assembly: AssemblyTrademarkAttribute(""AutoMapper"")]
