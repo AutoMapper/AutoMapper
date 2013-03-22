@@ -146,18 +146,18 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.Net4.dll"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.Net4.pdb"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.SL4.dll"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.SL4.pdb"" target=""lib\sl4"" />
     <file src=""$dist_dir\wp71\AutoMapper.dll"" target=""lib\wp71"" />
     <file src=""$dist_dir\wp71\AutoMapper.pdb"" target=""lib\wp71"" />
     <file src=""$dist_dir\wp71\AutoMapper.xml"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.Net4.dll"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.Net4.pdb"" target=""lib\wp71"" />
+    <file src=""$dist_dir\wp71\AutoMapper.WP75.dll"" target=""lib\wp71"" />
+    <file src=""$dist_dir\wp71\AutoMapper.WP75.pdb"" target=""lib\wp71"" />
     <file src=""$dist_dir\windows8\AutoMapper.dll"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.pdb"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.xml"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8\AutoMapper.Net4.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8\AutoMapper.Net4.pdb"" target=""lib\windows8"" />
+    <file src=""$dist_dir\windows8\AutoMapper.WinRT.dll"" target=""lib\windows8"" />
+    <file src=""$dist_dir\windows8\AutoMapper.WinRT.pdb"" target=""lib\windows8"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
