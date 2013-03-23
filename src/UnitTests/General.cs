@@ -27,9 +27,6 @@ namespace AutoMapper.UnitTests
 			[Fact]
 			public void Should_map_successfully()
 			{
-#if WINDOWS_PHONE
-                Assert.False(true);
-#endif
 				ModelDto dto = Mapper.Map<ModelObject, ModelDto>(new ModelObject());
 
 				dto.ShouldNotBeNull();

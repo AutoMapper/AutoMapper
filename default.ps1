@@ -45,7 +45,7 @@ task test {
     exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll /xml $result_dir\AutoMapper.UnitTests.Net4.xml }
     exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.SL4.dll --ReportOutputFile=$result_dir\AutoMapper.UnitTests.SL4.xml --ReportOutputFileType=NUnit }
     exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/WinRT/$config/AutoMapper.UnitTests.WinRT.dll /xml $result_dir\AutoMapper.UnitTests.WinRT.xml }
-    #exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/WP75/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/WP75/$config/AutoMapper.UnitTests.WP75.dll --ReportOutputFile=$result_dir\AutoMapper.UnitTests.WP75.xml --ReportOutputFileType=NUnit }
+    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/WP8/$config/AutoMapper.UnitTests.WP8.dll /xml $result_dir\AutoMapper.UnitTests.WP8.xml }
 }
 
 task dist {
