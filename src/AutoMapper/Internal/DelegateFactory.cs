@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-#if !SILVERLIGHT && !NETFX_CORE
-using System.Data;
-#endif
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -15,13 +12,6 @@ namespace AutoMapper
     public class DelegateFactory : IDelegateFactory
     {
         private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
-
-        static DelegateFactory()
-        {
-#if !SILVERLIGHT && !NETFX_CORE
-            FeatureDetector.IsIDataRecordType = t => typeof (IDataRecord).IsAssignableFrom(t);
-#endif
-        }
 
         private static readonly IDictionary<Type, LateBoundCtor> _ctorCache = CollectionFactory.CreateConcurrentDictionary<Type, LateBoundCtor>();
 
@@ -83,46 +73,14 @@ namespace AutoMapper
             return lambda.Compile();
         }
 
-        public LateBoundFieldSet CreateSet(FieldInfo field)
+        public virtual LateBoundFieldSet CreateSet(FieldInfo field)
         {
-#if !WINDOWS_PHONE
-            ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
-            ParameterExpression valueParameter = Expression.Parameter(typeof(object), "value");
-
-            MemberExpression member = Expression.Field(Expression.Convert(instanceParameter, field.DeclaringType), field);
-            BinaryExpression assignExpression = Expression.Assign(member, Expression.Convert(valueParameter, field.FieldType));
-
-            Expression<LateBoundFieldSet> lambda = Expression.Lambda<LateBoundFieldSet>(
-                assignExpression,
-                instanceParameter,
-                valueParameter
-                );
-
-            return lambda.Compile();
-#else
             return (target, value) => field.SetValue(target, value);
-#endif
         }
 
-        public LateBoundPropertySet CreateSet(PropertyInfo property)
+        public virtual LateBoundPropertySet CreateSet(PropertyInfo property)
         {
-#if !WINDOWS_PHONE
-            ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
-            ParameterExpression valueParameter = Expression.Parameter(typeof(object), "value");
-
-            MemberExpression member = Expression.Property(Expression.Convert(instanceParameter, property.DeclaringType), property);
-            BinaryExpression assignExpression = Expression.Assign(member, Expression.Convert(valueParameter, property.PropertyType));
-
-            Expression<LateBoundPropertySet> lambda = Expression.Lambda<LateBoundPropertySet>(
-                assignExpression,
-                instanceParameter,
-                valueParameter
-                );
-
-            return lambda.Compile();
-#else
             return (target, value) => property.SetValue(target, value, null);
-#endif
         }
 
         public LateBoundCtor CreateCtor(Type type)

@@ -52,7 +52,6 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\ExpressionVisitor.cs">
       <SubType>Code</SubType>
     </Compile>
