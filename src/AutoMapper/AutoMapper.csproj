@@ -65,12 +65,14 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Internal\DelegateFactory.cs" />
+    <Compile Include="Internal\DictionaryFactory.cs" />
     <Compile Include="Internal\ExpressionVisitor.cs" />
     <Compile Include="Internal\IDictionary.cs" />
     <Compile Include="Internal\AliasedMember.cs" />
     <Compile Include="Internal\IAdapterResolver.cs" />
     <Compile Include="Internal\PlatformAdapter.cs" />
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
+    <Compile Include="Internal\SetFactory.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\IMapperRegistry.cs" />

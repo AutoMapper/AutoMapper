@@ -11,10 +11,10 @@ namespace AutoMapper.QueryableExtensions
 {
     public static class Extensions
     {
-        private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
+        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
 
         private static readonly Internal.IDictionary<TypePair, LambdaExpression> _expressionCache 
-            = CollectionFactory.CreateConcurrentDictionary<TypePair, LambdaExpression>();
+            = DictionaryFactory.CreateDictionary<TypePair, LambdaExpression>();
 
         public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(this IMappingEngine mappingEngine)
         {

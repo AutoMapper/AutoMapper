@@ -1,22 +1,10 @@
-﻿#if !SILVERLIGHT && !NETFX_CORE
-using System.Data;
-#endif
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 
 namespace AutoMapper
 {
-    using Internal;
-
     public class DelegateFactoryOverride : DelegateFactory
     {
-        static DelegateFactoryOverride()
-        {
-#if !SILVERLIGHT && !NETFX_CORE
-            FeatureDetector.IsIDataRecordType = t => typeof (IDataRecord).IsAssignableFrom(t);
-#endif
-        }
-
         public override LateBoundFieldSet CreateSet(FieldInfo field)
         {
             ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
@@ -47,6 +35,7 @@ namespace AutoMapper
                 instanceParameter,
                 valueParameter
                 );
+
 
             return lambda.Compile();
         }

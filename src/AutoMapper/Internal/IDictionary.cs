@@ -79,10 +79,13 @@ namespace AutoMapper.Internal
         object Convert(Type enumSourceType, Type enumDestinationType, ResolutionContext context);
     }
 
-    public interface ICollectionFactory
+    public interface IDictionaryFactory
     {
-        IDictionary<TKey, TValue> CreateConcurrentDictionary<TKey, TValue>();
+        IDictionary<TKey, TValue> CreateDictionary<TKey, TValue>();
+    }
 
+    public interface ISetFactory
+    {
         ISet<T> CreateSet<T>();
     }
 

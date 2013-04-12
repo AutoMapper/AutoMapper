@@ -7,11 +7,18 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
     public class DataReaderMapper : IObjectMapper
     {
+        static DataReaderMapper()
+        {
+#if !SILVERLIGHT && !NETFX_CORE
+            FeatureDetector.IsIDataRecordType = t => typeof(IDataRecord).IsAssignableFrom(t);
+#endif
+        }
         private static ConcurrentDictionary<BuilderKey, Build> _builderCache = new ConcurrentDictionary<BuilderKey, Build>();
         private static ConcurrentDictionary<Type, CreateEnumerableAdapter> _enumerableAdapterCache = new ConcurrentDictionary<Type, CreateEnumerableAdapter>();
 

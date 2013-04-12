@@ -63,11 +63,11 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Internal\HashSetFactory.cs" />
     <Compile Include="Internal\ManualNullableConverterFactory.cs" />
     <Compile Include="Internal\NoOpReaderWriterLockFactory.cs" />
     <Compile Include="Internal\NotSupportedEnumNameValueMappingFactory.cs" />
     <Compile Include="Internal\NotSupportedProxyGeneratorFactory.cs" />
-    <Compile Include="Internal\NotThreadSafeCollectionFactory.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />

@@ -11,9 +11,9 @@ namespace AutoMapper
 
     public class DelegateFactory : IDelegateFactory
     {
-        private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
+        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
 
-        private static readonly IDictionary<Type, LateBoundCtor> _ctorCache = CollectionFactory.CreateConcurrentDictionary<Type, LateBoundCtor>();
+        private static readonly IDictionary<Type, LateBoundCtor> _ctorCache = DictionaryFactory.CreateDictionary<Type, LateBoundCtor>();
 
         public LateBoundMethod CreateGet(MethodInfo method)
         {
