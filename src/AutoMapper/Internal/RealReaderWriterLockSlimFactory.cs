@@ -2,7 +2,7 @@
 
 namespace AutoMapper.Internal
 {
-    public class ReaderWriterLockSlimFactory : IReaderWriterLockSlimFactory
+    public class ReaderWriterLockSlimFactoryOverride : IReaderWriterLockSlimFactory
     {
         public IReaderWriterLockSlim Create()
         {

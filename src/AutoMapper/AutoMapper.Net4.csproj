@@ -56,7 +56,7 @@
     <Compile Include="Internal\PropertyEmitter.cs" />
     <Compile Include="Internal\ProxyGenerator.cs" />
     <Compile Include="Internal\ProxyGeneratorFactory.cs" />
-    <Compile Include="Internal\ReaderWriterLockSlimFactory.cs" />
+    <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
     <Compile Include="Internal\HashSetFactory.cs" />
     <Compile Include="Mappers\DataReaderMapper.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
