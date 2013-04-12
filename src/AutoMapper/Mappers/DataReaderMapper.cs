@@ -20,9 +20,7 @@ namespace AutoMapper.Mappers
 =======
         static DataReaderMapper()
         {
-#if !SILVERLIGHT && !NETFX_CORE
             FeatureDetector.IsIDataRecordType = t => typeof(IDataRecord).IsAssignableFrom(t);
-#endif
         }
 >>>>>>> Collection factory default good
         private static ConcurrentDictionary<BuilderKey, Build> _builderCache = new ConcurrentDictionary<BuilderKey, Build>();
