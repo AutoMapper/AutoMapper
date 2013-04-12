@@ -10,9 +10,15 @@ namespace AutoMapper
 {
     public class TypeMapFactory : ITypeMapFactory
     {
+<<<<<<< HEAD
         private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
         private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos =
             CollectionFactory.CreateConcurrentDictionary<Type, TypeInfo>();
+=======
+        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
+        private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos =
+            DictionaryFactory.CreateDictionary<Type, TypeInfo>();
+>>>>>>> Collection factory default good
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
         {

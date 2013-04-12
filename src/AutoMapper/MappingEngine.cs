@@ -8,12 +8,20 @@ namespace AutoMapper
 {
 	public class MappingEngine : IMappingEngine, IMappingEngineRunner
 	{
+<<<<<<< HEAD
 	    private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
+=======
+	    private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
+>>>>>>> Collection factory default good
 	    private static readonly IProxyGeneratorFactory ProxyGeneratorFactory = PlatformAdapter.Resolve<IProxyGeneratorFactory>();
 	    private bool _disposed;
 		private readonly IConfigurationProvider _configurationProvider;
 		private readonly IObjectMapper[] _mappers;
+<<<<<<< HEAD
         private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = CollectionFactory.CreateConcurrentDictionary<TypePair, IObjectMapper>();
+=======
+        private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>();
+>>>>>>> Collection factory default good
 
 		public MappingEngine(IConfigurationProvider configurationProvider)
 		{

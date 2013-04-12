@@ -5,18 +5,27 @@ using System.Collections.Generic;
 
 namespace AutoMapper.Internal
 {
+<<<<<<< HEAD:src/AutoMapper/Internal/CollectionFactory.cs
     public class CollectionFactory : ICollectionFactory
     {
         public IDictionary<TKey, TValue> CreateConcurrentDictionary<TKey, TValue>()
+=======
+    public class DictionaryFactoryOverride : IDictionaryFactory
+    {
+        public IDictionary<TKey, TValue> CreateDictionary<TKey, TValue>()
+>>>>>>> Collection factory default good:src/AutoMapper/Internal/ConcurrentDictionaryFactory.cs
         {
             return new ConcurrentDictionaryImpl<TKey, TValue>(new ConcurrentDictionary<TKey, TValue>());
         }
 
+<<<<<<< HEAD:src/AutoMapper/Internal/CollectionFactory.cs
         public ISet<T> CreateSet<T>()
         {
             return new HashSetImpl<T>(new HashSet<T>());
         }
 
+=======
+>>>>>>> Collection factory default good:src/AutoMapper/Internal/ConcurrentDictionaryFactory.cs
         private class ConcurrentDictionaryImpl<TKey, TValue> : IDictionary<TKey, TValue>
         {
             private readonly ConcurrentDictionary<TKey, TValue> _dictionary;
@@ -53,6 +62,7 @@ namespace AutoMapper.Internal
                 return _dictionary.TryRemove(key, out value);
             }
         }
+<<<<<<< HEAD:src/AutoMapper/Internal/CollectionFactory.cs
     
         private class HashSetImpl<T> : ISet<T>
         {
@@ -78,5 +88,7 @@ namespace AutoMapper.Internal
                 return _hashSet.GetEnumerator();
             }
         }
+=======
+>>>>>>> Collection factory default good:src/AutoMapper/Internal/ConcurrentDictionaryFactory.cs
     }
 }
