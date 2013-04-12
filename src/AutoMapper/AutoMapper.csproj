@@ -70,6 +70,7 @@
     <Compile Include="Internal\IDictionary.cs" />
     <Compile Include="Internal\AliasedMember.cs" />
     <Compile Include="Internal\IAdapterResolver.cs" />
+    <Compile Include="Internal\NoOpReaderWriterLockFactory.cs" />
     <Compile Include="Internal\NotSupportedEnumNameValueMappingFactory.cs" />
     <Compile Include="Internal\NotSupportedProxyGeneratorFactory.cs" />
     <Compile Include="Internal\PlatformAdapter.cs" />

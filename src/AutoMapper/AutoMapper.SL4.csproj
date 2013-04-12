@@ -65,7 +65,6 @@
     </Compile>
     <Compile Include="Internal\HashSetFactory.cs" />
     <Compile Include="Internal\ManualNullableConverterFactory.cs" />
-    <Compile Include="Internal\NoOpReaderWriterLockFactory.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\MapperRegistryOverride.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
