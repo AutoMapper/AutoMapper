@@ -8,17 +8,17 @@ namespace AutoMapper
 {
     public class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IMappingOptions
     {
-        private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
+        private static readonly ISetFactory SetFactory = PlatformAdapter.Resolve<ISetFactory>();
 
 		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly System.Collections.Generic.IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
-	    private readonly ISet<string> _prefixes = CollectionFactory.CreateSet<string>();
-        private readonly ISet<string> _postfixes = CollectionFactory.CreateSet<string>();
-        private readonly ISet<string> _destinationPrefixes = CollectionFactory.CreateSet<string>();
-        private readonly ISet<string> _destinationPostfixes = CollectionFactory.CreateSet<string>();
-        private readonly ISet<AliasedMember> _aliases = CollectionFactory.CreateSet<AliasedMember>();
+	    private readonly ISet<string> _prefixes = SetFactory.CreateSet<string>();
+        private readonly ISet<string> _postfixes = SetFactory.CreateSet<string>();
+        private readonly ISet<string> _destinationPrefixes = SetFactory.CreateSet<string>();
+        private readonly ISet<string> _destinationPostfixes = SetFactory.CreateSet<string>();
+        private readonly ISet<AliasedMember> _aliases = SetFactory.CreateSet<AliasedMember>();
 
 	    public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
 		{

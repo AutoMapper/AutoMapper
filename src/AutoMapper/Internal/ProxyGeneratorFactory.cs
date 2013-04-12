@@ -2,7 +2,7 @@
 
 namespace AutoMapper.Internal
 {
-    public class ProxyGeneratorFactory : IProxyGeneratorFactory
+    public class ProxyGeneratorFactoryOverride : IProxyGeneratorFactory
     {
         public IProxyGenerator Create()
         {

@@ -51,14 +51,21 @@ namespace AutoMapper.Internal
 
             try
             {
-                Type type = assembly.GetType(typeName);
+                // Is there an override?
+                Type type = assembly.GetType(typeName + "Override");
                 if (type != null)
                     return Activator.CreateInstance(type);
+
+                // Fall back to a default implementation
+                type = assembly.GetType(typeName);
+                if (type != null)
+                    return Activator.CreateInstance(type);
+
 
                 // Fallback to looking in this assembly for a default
                 type = typeof(ProbingAdapterResolver).Assembly.GetType(typeName);
                 
-                return type != null ? Activator.CreateInstance(type) : type;
+                return type != null ? Activator.CreateInstance(type) : null;
             }
             catch
             {
