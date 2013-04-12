@@ -49,19 +49,16 @@
   <ItemGroup>
     <Compile Include="Internal\CollectionFactory.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
-    <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
     <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
-    <Compile Include="Internal\ExpressionOnlyDelegateFactory.cs" />
     <Compile Include="Internal\NullableConverterFactory.cs" />
     <Compile Include="Internal\PropertyEmitter.cs" />
     <Compile Include="Internal\ProxyGenerator.cs" />
     <Compile Include="Internal\ProxyGeneratorFactory.cs" />
-    <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
-    <Compile Include="Internal\HashSetFactory.cs" />
+    <Compile Include="Internal\ReaderWriterLockSlimFactory.cs" />
     <Compile Include="Mappers\DataReaderMapper.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\ListSourceMapper.cs" />
-    <Compile Include="Mappers\MapperRegistryOverride.cs" />
+    <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -11,24 +11,15 @@ namespace AutoMapper
 
 	public class ConfigurationStore : IConfigurationProvider, IConfiguration
 	{
-<<<<<<< HEAD
 	    private static readonly ICollectionFactory CollectionFactory = PlatformAdapter.Resolve<ICollectionFactory>();
-=======
-	    private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
->>>>>>> Collection factory default good
 	    private readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
 		
 		private readonly ThreadSafeList<TypeMap> _typeMaps = new ThreadSafeList<TypeMap>();
 
-<<<<<<< HEAD
         private readonly IDictionary<TypePair, TypeMap> _typeMapCache = CollectionFactory.CreateConcurrentDictionary<TypePair, TypeMap>();
         private readonly IDictionary<string, FormatterExpression> _formatterProfiles = CollectionFactory.CreateConcurrentDictionary<string, FormatterExpression>();
-=======
-        private readonly IDictionary<TypePair, TypeMap> _typeMapCache = DictionaryFactory.CreateDictionary<TypePair, TypeMap>();
-        private readonly IDictionary<string, FormatterExpression> _formatterProfiles = DictionaryFactory.CreateDictionary<string, FormatterExpression>();
->>>>>>> Collection factory default good
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
 	    private readonly List<string> _globalIgnore;

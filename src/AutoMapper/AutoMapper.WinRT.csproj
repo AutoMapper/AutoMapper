@@ -105,14 +105,11 @@
     <Compile Include="Internal\CollectionFactory.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
-    <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
-    <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
-    <Compile Include="Internal\ExpressionOnlyDelegateFactory.cs" />
-    <Compile Include="Internal\HashSetFactory.cs" />
     <Compile Include="Internal\ManualNullableConverterFactory.cs" />
-    <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
+    <Compile Include="Internal\NotSupportedProxyGeneratorFactory.cs" />
+    <Compile Include="Internal\ReaderWriterLockSlimFactory.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
-    <Compile Include="Mappers\MapperRegistryOverride.cs" />
+    <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

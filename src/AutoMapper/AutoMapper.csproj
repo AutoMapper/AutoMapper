@@ -64,23 +64,16 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Internal\DelegateFactory.cs" />
-    <Compile Include="Internal\DictionaryFactory.cs" />
     <Compile Include="Internal\ExpressionVisitor.cs" />
     <Compile Include="Internal\IDictionary.cs" />
     <Compile Include="Internal\AliasedMember.cs" />
     <Compile Include="Internal\IAdapterResolver.cs" />
-    <Compile Include="Internal\NoOpReaderWriterLockFactory.cs" />
-    <Compile Include="Internal\NotSupportedEnumNameValueMappingFactory.cs" />
-    <Compile Include="Internal\NotSupportedProxyGeneratorFactory.cs" />
     <Compile Include="Internal\PlatformAdapter.cs" />
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
-    <Compile Include="Internal\SetFactory.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\IMapperRegistry.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
-    <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />

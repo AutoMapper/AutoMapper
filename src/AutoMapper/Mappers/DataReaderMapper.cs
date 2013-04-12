@@ -7,22 +7,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
-<<<<<<< HEAD
-=======
-using AutoMapper.Internal;
->>>>>>> Collection factory default good
 
 namespace AutoMapper.Mappers
 {
     public class DataReaderMapper : IObjectMapper
     {
-<<<<<<< HEAD
-=======
-        static DataReaderMapper()
-        {
-            FeatureDetector.IsIDataRecordType = t => typeof(IDataRecord).IsAssignableFrom(t);
-        }
->>>>>>> Collection factory default good
         private static ConcurrentDictionary<BuilderKey, Build> _builderCache = new ConcurrentDictionary<BuilderKey, Build>();
         private static ConcurrentDictionary<Type, CreateEnumerableAdapter> _enumerableAdapterCache = new ConcurrentDictionary<Type, CreateEnumerableAdapter>();
 

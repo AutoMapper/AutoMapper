@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace AutoMapper.Internal
@@ -8,23 +9,19 @@ namespace AutoMapper.Internal
     {
         public IDictionary<TKey, TValue> CreateConcurrentDictionary<TKey, TValue>()
         {
-            return new ConcurrentDictionaryImpl<TKey, TValue>(new Dictionary<TKey, TValue>());
+            return new ConcurrentDictionaryImpl<TKey, TValue>(new ConcurrentDictionary<TKey, TValue>());
         }
 
         public ISet<T> CreateSet<T>()
         {
-#if WINDOWS_PHONE
-            return new HashSetImpl<T>();
-#else
             return new HashSetImpl<T>(new HashSet<T>());
-#endif
         }
 
         private class ConcurrentDictionaryImpl<TKey, TValue> : IDictionary<TKey, TValue>
         {
-            private readonly Dictionary<TKey, TValue> _dictionary;
+            private readonly ConcurrentDictionary<TKey, TValue> _dictionary;
 
-            public ConcurrentDictionaryImpl(Dictionary<TKey, TValue> dictionary)
+            public ConcurrentDictionaryImpl(ConcurrentDictionary<TKey, TValue> dictionary)
             {
                 _dictionary = dictionary;
             }
@@ -32,9 +29,7 @@ namespace AutoMapper.Internal
 
             public TValue AddOrUpdate(TKey key, TValue addValue, Func<TKey, TValue, TValue> updateValueFactory)
             {
-                TValue value = _dictionary.ContainsKey(key) ? updateValueFactory(key, addValue) : addValue;
-                _dictionary[key] = value;
-                return value;
+                return _dictionary.AddOrUpdate(key, addValue, updateValueFactory);
             }
 
             public bool TryGetValue(TKey key, out TValue value)
@@ -44,14 +39,7 @@ namespace AutoMapper.Internal
 
             public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
             {
-                if (_dictionary.ContainsKey(key))
-                    return _dictionary[key];
-
-                var value = valueFactory(key);
-
-                _dictionary[key] = value;
-
-                return value;
+                return _dictionary.GetOrAdd(key, valueFactory);
             }
 
             public TValue this[TKey key]
@@ -62,21 +50,10 @@ namespace AutoMapper.Internal
 
             public bool TryRemove(TKey key, out TValue value)
             {
-                if (!_dictionary.ContainsKey(key))
-                {
-                    value = default(TValue);
-                    return false;
-                }
-
-                value = _dictionary[key];
-
-                _dictionary.Remove(key);
-
-                return true;
+                return _dictionary.TryRemove(key, out value);
             }
         }
-
-#if !WINDOWS_PHONE
+    
         private class HashSetImpl<T> : ISet<T>
         {
             private readonly HashSet<T> _hashSet;
@@ -101,36 +78,5 @@ namespace AutoMapper.Internal
                 return _hashSet.GetEnumerator();
             }
         }
-#else
-
-        private class HashSetImpl<T> : ISet<T>
-        {
-            private readonly Dictionary<T, short> _dict;
-
-            public HashSetImpl()
-            {
-                _dict = new Dictionary<T, short>();
-            }
-
-            public bool Add(T item)
-            {
-                if (_dict.ContainsKey(item))
-                    return false;
-                _dict.Add(item, 0);
-                return true;
-            }
-
-            public IEnumerator<T> GetEnumerator()
-            {
-                return _dict.Keys.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return _dict.Keys.GetEnumerator();
-            }
-        }
-
-#endif
     }
 }

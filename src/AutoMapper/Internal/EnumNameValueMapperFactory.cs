@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AutoMapper.Internal
 {
-    public class EnumNameValueMapperFactoryOverride : IEnumNameValueMapperFactory
+    public class EnumNameValueMapperFactory : IEnumNameValueMapperFactory
     {
         public IEnumNameValueMapper Create()
         {

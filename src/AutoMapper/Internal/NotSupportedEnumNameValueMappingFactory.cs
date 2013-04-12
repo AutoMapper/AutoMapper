@@ -19,7 +19,7 @@ namespace AutoMapper.Internal
 
             public object Convert(Type enumSourceType, Type enumDestinationType, ResolutionContext context)
             {
-                throw new PlatformNotSupportedException("Mapping enum names to values not supported on this platform.");
+                throw new NotSupportedException();
             }
         }
     }
