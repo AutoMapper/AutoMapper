@@ -5,6 +5,9 @@ namespace AutoMapper
 {
     using Internal;
 
+    /// <summary>
+    /// Main entry point for AutoMapper, for both creating maps and performing maps.
+    /// </summary>
     public static class Mapper
 	{
 	    private static readonly Func<ConfigurationStore> _configurationInit =
@@ -17,57 +20,139 @@ namespace AutoMapper
 
         private static ILazy<IMappingEngine> _mappingEngine = LazyFactory.Create(_mappingEngineInit);
 
+        /// <summary>
+        /// When set, destination can have null values. Defaults to true.
+        /// This does not affect simple types, only complex ones.
+        /// </summary>
 		public static bool AllowNullDestinationValues
 		{
 			get { return Configuration.AllowNullDestinationValues; }
 			set { Configuration.AllowNullDestinationValues = value; }
 		}
 
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object.
+        /// The source type is inferred from the source object.
+        /// </summary>
+        /// <typeparam name="TDestination">Destination type to create</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <returns>Mapped destination object</returns>
         public static TDestination Map<TDestination>(object source)
         {
             return Engine.Map<TDestination>(source);
         }
 
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object with supplied mapping options.
+        /// </summary>
+        /// <typeparam name="TDestination">Destination type to create</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="opts">Mapping options</param>
+        /// <returns>Mapped destination object</returns>
         public static TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
             return Engine.Map<TDestination>(source, opts);
         }
 
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object.
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use, regardless of the runtime type</typeparam>
+        /// <typeparam name="TDestination">Destination type to create</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <returns>Mapped destination object</returns>
 		public static TDestination Map<TSource, TDestination>(TSource source)
 		{
 			return Engine.Map<TSource, TDestination>(source);
 		}
 
+        /// <summary>
+        /// Execute a mapping from the source object to the existing destination object.
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use</typeparam>
+        /// <typeparam name="TDestination">Dsetination type</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="destination">Destination object to map into</param>
+        /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
 		public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
 		{
 			return Engine.Map(source, destination);
 		}
 
+        /// <summary>
+        /// Execute a mapping from the source object to the existing destination object with supplied mapping options.
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="destination">Destination object to map into</param>
+        /// <param name="opts">Mapping options</param>
+        /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
         {
             return Engine.Map(source, destination, opts);
         }
 
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object with supplied mapping options.
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use</typeparam>
+        /// <typeparam name="TDestination">Destination type to create</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="opts">Mapping options</param>
+        /// <returns>Mapped destination object</returns>
 		public static TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
 		{
             return Engine.Map<TSource, TDestination>(source, opts);
 		}
 
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects
+        /// </summary>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="sourceType">Source type to use</param>
+        /// <param name="destinationType">Destination type to create</param>
+        /// <returns>Mapped destination object</returns>
 		public static object Map(object source, Type sourceType, Type destinationType)
 		{
 			return Engine.Map(source, sourceType, destinationType);
 		}
 
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects and supplied mapping options.
+        /// </summary>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="sourceType">Source type to use</param>
+        /// <param name="destinationType">Destination type to create</param>
+        /// <param name="opts">Mapping options</param>
+        /// <returns>Mapped destination object</returns>
         public static object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
             return Engine.Map(source, sourceType, destinationType, opts);
         }
 
+        /// <summary>
+        /// Execute a mapping from the source object to existing destination object with explicit <see cref="System.Type"/> objects
+        /// </summary>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="destination">Destination object to map into</param>
+        /// <param name="sourceType">Source type to use</param>
+        /// <param name="destinationType">Destination type to use</param>
+        /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
 		public static object Map(object source, object destination, Type sourceType, Type destinationType)
 		{
 			return Engine.Map(source, destination, sourceType, destinationType);
 		}
 
+        /// <summary>
+        /// Execute a mapping from the source object to existing destination object with supplied mapping options and explicit <see cref="System.Type"/> objects
+        /// </summary>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="destination">Destination object to map into</param>
+        /// <param name="sourceType">Source type to use</param>
+        /// <param name="destinationType">Destination type to use</param>
+        /// <param name="opts">Mapping options</param>
+        /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
         public static object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
             return Engine.Map(source, destination, sourceType, destinationType, opts);
