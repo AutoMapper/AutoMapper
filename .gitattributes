@@ -13,7 +13,8 @@
 *.png 	binary
 *.gif 	binary
 
-core.eol crlf
+* text=auto
+*.sln text eol=crlf
 
 *.cs diff=csharp 
 
@@ -21,4 +22,4 @@ core.eol crlf
 *.vbproj merge=union 
 *.fsproj merge=union 
 *.dbproj merge=union 
-*.sln merge=union 
+*.sln merge=union
