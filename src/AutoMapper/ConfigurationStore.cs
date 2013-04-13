@@ -173,7 +173,6 @@ namespace AutoMapper
 		    return CreateMap<TSource, TDestination>(DefaultProfileName, memberList);
 		}
 
-
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName)
         {
             return CreateMap<TSource, TDestination>(profileName, MemberList.Destination);

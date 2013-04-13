@@ -142,9 +142,19 @@ namespace AutoMapper
 			return Configuration.CreateMap<TSource, TDestination>();
 		}
 
+        public static IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
+        {
+            return Configuration.CreateMap<TSource, TDestination>(memberList);
+        }
+
 		public static IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
 			return Configuration.CreateMap(sourceType, destinationType);
+		}
+
+		public static IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
+		{
+			return Configuration.CreateMap(sourceType, destinationType, memberList);
 		}
 
 		public static IProfileExpression CreateProfile(string profileName)
