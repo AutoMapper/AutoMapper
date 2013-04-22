@@ -76,9 +76,17 @@ namespace AutoMapper.QueryableExtensions
                         var converter = new ConversionVisitor(newParameter, oldParameter);
                         currentChild = converter.Visit(((LambdaExpression)propertyMap.CustomExpression).Body);
                         var propertyInfo = propertyMap.SourceMember as PropertyInfo;
+                        
                         if (propertyInfo != null)
                         {
                             currentChildType = propertyInfo.PropertyType;
+                        }
+                        else if (propertyMap.CustomExpression != null &&
+                                 propertyMap.CustomExpression.Body.NodeType == ExpressionType.Call &&
+                                 (((MethodCallExpression)propertyMap.CustomExpression.Body).Method.Name == "OrderBy") ||
+                                 (((MethodCallExpression)propertyMap.CustomExpression.Body).Method.Name == "ThenBy"))
+                        {
+                            currentChildType = ((MethodCallExpression)propertyMap.CustomExpression.Body).Method.ReturnParameter.ParameterType;
                         }
                     }
                 }
