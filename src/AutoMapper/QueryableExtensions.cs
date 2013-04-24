@@ -79,13 +79,15 @@ namespace AutoMapper.QueryableExtensions
                         
                         if (propertyInfo != null)
                         {
+                            // If we're mapping from a property, the destination type
+                            // is known
                             currentChildType = propertyInfo.PropertyType;
                         }
                         else if (propertyMap.CustomExpression != null &&
-                                 propertyMap.CustomExpression.Body.NodeType == ExpressionType.Call &&
-                                 (((MethodCallExpression)propertyMap.CustomExpression.Body).Method.Name == "OrderBy") ||
-                                 (((MethodCallExpression)propertyMap.CustomExpression.Body).Method.Name == "ThenBy"))
+                                 propertyMap.CustomExpression.Body.NodeType == ExpressionType.Call)
                         {
+                            // If we're mapping from a method call, the destination type can
+                            // be inferred from its return type.
                             currentChildType = ((MethodCallExpression)propertyMap.CustomExpression.Body).Method.ReturnParameter.ParameterType;
                         }
                     }
