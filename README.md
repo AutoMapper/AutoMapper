@@ -7,7 +7,7 @@ AutoMapper is a simple little library built to solve a deceptively complex probl
 
 How do I get started?
 --------------------------------
-Check out the [getting started guide](https://github.com/AutoMapper/AutoMapper/wiki/Getting-started). When you're done there, the [wiki](/AutoMapper/AutoMapper/wiki/Getting-started) goes in to the nitty-gritty details. Finally, check out the [dnrTV episode](http://www.dnrtv.com/default.aspx?showNum=155) for a full walkthrough. If you have questions, you can post them to the [Mailing List](http://groups.google.com/group/automapper-users).
+Check out the [getting started guide](https://github.com/AutoMapper/AutoMapper/wiki/Getting-started). When you're done there, the [wiki](https://github.com/AutoMapper/AutoMapper/wiki) goes in to the nitty-gritty details. Finally, check out the [dnrTV episode](http://www.dnrtv.com/default.aspx?showNum=155) for a full walkthrough. If you have questions, you can post them to the [Mailing List](http://groups.google.com/group/automapper-users).
 
 Where can I get it?
 --------------------------------
