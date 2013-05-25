@@ -427,6 +427,16 @@ namespace AutoMapper
             _typeMap.DestinationTypeOverride = typeof(T);
         }
 
+        public IMappingExpression<TSource, TDestination> IgnoreAllNonExisting()
+        {
+            foreach (string property in Mapper.FindTypeMapFor<TSource, TDestination>().GetUnmappedPropertyNames())
+            {
+                this.ForMember(property, opt => opt.Ignore());
+            }
+            
+            return this;
+        }
+
         private Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)
         {
             return context =>

@@ -35,6 +35,7 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> ConstructUsingServiceLocator();
         IMappingExpression<TDestination, TSource> ReverseMap();
         IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
+        IMappingExpression<TSource, TDestination> IgnoreAllNonExisting();
     }
 
     public interface IMemberConfigurationExpression
