@@ -3,12 +3,43 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Mapping configuration options for non-generic maps
+    /// </summary>
     public interface IMappingExpression
     {
+        /// <summary>
+        /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping
+        /// </summary>
+        /// <typeparam name="TTypeConverter">Type converter type</typeparam>
         void ConvertUsing<TTypeConverter>();
+
+        /// <summary>
+        /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping
+        /// Use this method if you need to specify the converter type at runtime
+        /// </summary>
+        /// <param name="typeConverterType">Type converter type</param>
         void ConvertUsing(Type typeConverterType);
+
+        /// <summary>
+        /// Override the destination type mapping for looking up configuration and instantiation
+        /// </summary>
+        /// <param name="typeOverride"></param>
         void As(Type typeOverride);
+
+        /// <summary>
+        /// Assign a profile to the current type map
+        /// </summary>
+        /// <param name="profileName">Profile name</param>
+        /// <returns>Itself</returns>
         IMappingExpression WithProfile(string profileName);
+
+        /// <summary>
+        /// Customize individual members
+        /// </summary>
+        /// <param name="name">Name of the member</param>
+        /// <param name="memberOptions">Callback for configuring member</param>
+        /// <returns>Itself</returns>
         IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions);
     }
 

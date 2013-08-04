@@ -122,13 +122,13 @@ namespace AutoMapper
 			return profileExpression;
 		}
 
-		public void CreateProfile(string profileName, Action<IProfileExpression> initializationExpression)
+		public void CreateProfile(string profileName, Action<IProfileExpression> profileConfiguration)
 		{
 			var profileExpression = new Profile(profileName);
 
 			profileExpression.Initialize(this);
 
-			initializationExpression(profileExpression);
+			profileConfiguration(profileExpression);
 		}
 
 		public void AddProfile(Profile profile)

@@ -403,10 +403,10 @@ namespace AutoMapper
         /// <summary>
         /// Dry run single type map
         /// </summary>
-        /// <param name="tm">Type map to check</param>
-		public static void AssertConfigurationIsValid(TypeMap tm)
+        /// <param name="typeMap">Type map to check</param>
+		public static void AssertConfigurationIsValid(TypeMap typeMap)
 		{
-			ConfigurationProvider.AssertConfigurationIsValid(tm);
+			ConfigurationProvider.AssertConfigurationIsValid(typeMap);
 		}
 
         /// <summary>
