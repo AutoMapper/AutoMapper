@@ -1,5 +1,10 @@
 namespace AutoMapper
 {
+<<<<<<< HEAD
+    public enum MemberList
+    {
+        Destination = 0,
+=======
     /// <summary>
     /// Member list to check for configuration validation
     /// </summary>
@@ -13,6 +18,7 @@ namespace AutoMapper
         /// <summary>
         /// Check that all source members are mapped
         /// </summary>
+>>>>>>> Documentation
         Source = 1
     }
 }

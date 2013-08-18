@@ -2,9 +2,12 @@ using System;
 
 namespace AutoMapper
 {
+<<<<<<< HEAD
+=======
     /// <summary>
     /// Represents the result of resolving a value
     /// </summary>
+>>>>>>> Documentation
 	public class ResolutionResult
 	{
 		private readonly object _value;
@@ -12,10 +15,13 @@ namespace AutoMapper
 		private readonly Type _type;
 		private readonly Type _memberType;
 
+<<<<<<< HEAD
+=======
         /// <summary>
         /// Create a resolution result based on source values of a resolution context
         /// </summary>
         /// <param name="context">Resolution context</param>
+>>>>>>> Documentation
 		public ResolutionResult(ResolutionContext context)
 			: this(context.SourceValue, context, context.SourceType)
 		{
@@ -37,6 +43,13 @@ namespace AutoMapper
             _memberType = _type;
         }
 
+<<<<<<< HEAD
+		public object Value { get { return _value; } }
+		public Type Type { get { return _type; } }
+		public Type MemberType { get { return _memberType; } }
+		public ResolutionContext Context { get { return _context; } }
+
+=======
         /// <summary>
         /// Resultant value
         /// </summary>
@@ -60,6 +73,7 @@ namespace AutoMapper
         /// <summary>
         /// Directs mappers to ignore this value
         /// </summary>
+>>>>>>> Documentation
         public bool ShouldIgnore { get; set; }
 
 	    private Type ResolveType(object value, Type memberType)
@@ -69,32 +83,41 @@ namespace AutoMapper
 
             return value.GetType();
         }
+<<<<<<< HEAD
+=======
 
         /// <summary>
         /// Create a new resolution result representing ignoring the value
         /// </summary>
         /// <returns>New resolution result based on this context with ignored value</returns>
+>>>>>>> Documentation
         public ResolutionResult Ignore()
         {
             return new ResolutionResult(Context) { ShouldIgnore = true };
         }
 
+<<<<<<< HEAD
+=======
         /// <summary>
         /// Create a new resolution result representing the value provided
         /// </summary>
         /// <param name="value">Resolved value</param>
         /// <returns>Resolution result containing resolved value</returns>
+>>>>>>> Documentation
 		public ResolutionResult New(object value)
 		{
 			return new ResolutionResult(value, Context);
 		}
 
+<<<<<<< HEAD
+=======
         /// <summary>
         /// Constructs a new resolution result based on the context of this value result
         /// </summary>
         /// <param name="value">Value resolved</param>
         /// <param name="memberType">Type of value as reference in case value is null</param>
         /// <returns>New resolutino result</returns>
+>>>>>>> Documentation
 		public ResolutionResult New(object value, Type memberType)
 		{
 			return new ResolutionResult(value, Context, memberType);

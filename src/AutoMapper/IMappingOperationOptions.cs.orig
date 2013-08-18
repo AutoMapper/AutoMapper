@@ -2,6 +2,11 @@
 
 namespace AutoMapper
 {
+<<<<<<< HEAD
+    public interface IMappingOperationOptions
+    {
+        void ConstructServicesUsing(Func<Type, object> constructor);
+=======
     /// <summary>
     /// Options for a single map operation
     /// </summary>
@@ -16,6 +21,7 @@ namespace AutoMapper
         /// <summary>
         /// Create any missing type maps, if found
         /// </summary>
+>>>>>>> Documentation
         bool CreateMissingTypeMaps { get; set; }
     }
 

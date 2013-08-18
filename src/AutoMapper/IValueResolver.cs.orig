@@ -2,6 +2,10 @@ using System;
 
 namespace AutoMapper
 {
+<<<<<<< HEAD
+	public interface IValueResolver
+	{
+=======
     /// <summary>
     /// Extension point to provide custom resolution for a destination value
     /// </summary>
@@ -13,6 +17,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="source">Source resolution result</param>
         /// <returns>Result, typically build from the source resolution result</returns>
+>>>>>>> Documentation
 		ResolutionResult Resolve(ResolutionResult source);
 	}
 }

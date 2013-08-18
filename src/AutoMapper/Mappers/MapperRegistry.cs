@@ -5,6 +5,9 @@ namespace AutoMapper.Mappers
 {
     public class MapperRegistry : IMapperRegistry
     {
+        /// <summary>
+        /// Extension point for modifying list of object mappers
+        /// </summary>
         public static Func<IEnumerable<IObjectMapper>> AllMappers = () => new IObjectMapper[]
         {
             new TypeMapMapper(TypeMapObjectMapperRegistry.AllMappers()),

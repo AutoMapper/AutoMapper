@@ -4,17 +4,30 @@ using System.Collections.Generic;
 
 namespace AutoMapper
 {
+<<<<<<< HEAD
+	public interface IFormatterConfiguration : IProfileConfiguration
+	{
+		IValueFormatter[] GetFormatters();
+		System.Collections.Generic.IDictionary<Type, IFormatterConfiguration> GetTypeSpecificFormatters();
+		Type[] GetFormatterTypesToSkip();
+	    IEnumerable<IValueFormatter> GetFormattersToApply(ResolutionContext context);
+	}
+
+	public interface IProfileConfiguration
+	{
+		bool MapNullSourceValuesAsNull { get; }
+=======
     [Obsolete("Formatters should not be used")]
 	public interface IFormatterConfiguration : IProfileConfiguration
 	{
         [Obsolete("Formatters should not be used")]
-		IValueFormatter[] GetFormatters();
+        IValueFormatter[] GetFormatters();
         [Obsolete("Formatters should not be used")]
         IDictionary<Type, IFormatterConfiguration> GetTypeSpecificFormatters();
         [Obsolete("Formatters should not be used")]
-		Type[] GetFormatterTypesToSkip();
+        Type[] GetFormatterTypesToSkip();
         [Obsolete("Formatters should not be used")]
-	    IEnumerable<IValueFormatter> GetFormattersToApply(ResolutionContext context);
+        IEnumerable<IValueFormatter> GetFormattersToApply(ResolutionContext context);
 	}
 
     /// <summary>
@@ -30,6 +43,7 @@ namespace AutoMapper
         /// <summary>
         /// Indicates that null source collections should be mapped as null
         /// </summary>
+>>>>>>> Documentation
 		bool MapNullSourceCollectionsAsNull { get; }
 	}
 }

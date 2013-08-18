@@ -1,5 +1,10 @@
 namespace AutoMapper
 {
+<<<<<<< HEAD
+	public interface IObjectMapper
+	{
+		object Map(ResolutionContext context, IMappingEngineRunner mapper);
+=======
     /// <summary>
     /// Mapping execution strategy, as a chain of responsibility
     /// </summary>
@@ -18,6 +23,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="context">Resolution context</param>
         /// <returns>Is match</returns>
+>>>>>>> Documentation
 		bool IsMatch(ResolutionContext context);
 	}
 }

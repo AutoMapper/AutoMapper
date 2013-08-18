@@ -3,6 +3,19 @@ using System.Collections.Generic;
 
 namespace AutoMapper
 {
+<<<<<<< HEAD
+	public class ResolutionContext : IEquatable<ResolutionContext>
+	{
+	    public MappingOperationOptions Options { get; private set; }
+	    public TypeMap TypeMap { get; private set; }
+	    public PropertyMap PropertyMap { get; private set; }
+	    public Type SourceType { get; private set; }
+	    public Type DestinationType { get; private set; }
+	    public int? ArrayIndex { get; private set; }
+	    public object SourceValue { get; private set; }
+	    public object DestinationValue { get; private set; }
+	    public ResolutionContext Parent { get; private set; }
+=======
     /// <summary>
     /// Context information regarding resolution of a destination value
     /// </summary>
@@ -56,6 +69,7 @@ namespace AutoMapper
         /// <summary>
         /// Instance cache for resolving circular references
         /// </summary>
+>>>>>>> Documentation
 	    public Dictionary<ResolutionContext, object> InstanceCache { get; private set; }
 
 	    public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType, MappingOperationOptions options)

@@ -5,9 +5,12 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
+<<<<<<< HEAD
+=======
     /// <summary>
     /// Instantiates objects
     /// </summary>
+>>>>>>> Documentation
     public static class ObjectCreator
     {
         private static readonly IDelegateFactory DelegateFactory = PlatformAdapter.Resolve<IDelegateFactory>();

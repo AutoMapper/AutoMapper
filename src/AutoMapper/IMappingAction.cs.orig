@@ -1,5 +1,9 @@
 namespace AutoMapper
 {
+<<<<<<< HEAD
+	public interface IMappingAction<TSource, TDestination>
+	{
+=======
     /// <summary>
     /// Custom mapping action
     /// </summary>
@@ -12,6 +16,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="source">Source object</param>
         /// <param name="destination">Destination object</param>
+>>>>>>> Documentation
 		void Process(TSource source, TDestination destination);
 	}
 }

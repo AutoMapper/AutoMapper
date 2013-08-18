@@ -1,5 +1,12 @@
 namespace AutoMapper
 {
+<<<<<<< HEAD
+	public interface ITypeConverter<in TSource, out TDestination>
+	{
+		TDestination Convert(ResolutionContext context);
+	}
+
+=======
     /// <summary>
     /// Converts source type to destination type instead of normal member mapping
     /// </summary>
@@ -21,6 +28,7 @@ namespace AutoMapper
     /// </summary>
     /// <typeparam name="TSource">Source type</typeparam>
     /// <typeparam name="TDestination">Destination type</typeparam>
+>>>>>>> Documentation
 	public abstract class TypeConverter<TSource, TDestination> : ITypeConverter<TSource, TDestination> 
 	{
 		public TDestination Convert(ResolutionContext context)
@@ -33,11 +41,14 @@ namespace AutoMapper
 			return ConvertCore((TSource)context.SourceValue);
 		}
 
+<<<<<<< HEAD
+=======
         /// <summary>
         /// When overridden in a base class, this method is provided the casted source object extracted from the <see cref="ResolutionContext"/>
         /// </summary>
         /// <param name="source">Source object</param>
         /// <returns>Destination object</returns>
+>>>>>>> Documentation
 		protected abstract TDestination ConvertCore(TSource source);
 	}
 }
