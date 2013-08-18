@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Provides a named configuration for maps. Naming conventions become scoped per profile.
+    /// </summary>
 	public class Profile : IProfileExpression
 	{
         private ConfigurationStore _configurator;
@@ -169,6 +172,10 @@ namespace AutoMapper
 	        _configurator.AddGlobalIgnore(propertyNameStartingWith);
 	    }
 
+        /// <summary>
+        /// Override this method in a derived class and call the CreateMap method to associate that map with this profile.
+        /// Avoid calling the <see cref="Mapper"/> class from this method.
+        /// </summary>
 	    protected internal virtual void Configure()
 		{
 			// override in a derived class for custom configuration behavior

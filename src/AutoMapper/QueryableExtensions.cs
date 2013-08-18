@@ -16,6 +16,14 @@ namespace AutoMapper.QueryableExtensions
         private static readonly Internal.IDictionary<TypePair, LambdaExpression> _expressionCache 
             = DictionaryFactory.CreateDictionary<TypePair, LambdaExpression>();
 
+        /// <summary>
+        /// Create an expression tree representing a mapping from the <typeparamref name="TSource"/> type to <typeparamref name="TDestination"/> type
+        /// Includes flattening and expressions inside MapFrom member configuration
+        /// </summary>
+        /// <typeparam name="TSource">Source Type</typeparam>
+        /// <typeparam name="TDestination">Destination Type</typeparam>
+        /// <param name="mappingEngine">Mapping engine instance</param>
+        /// <returns>Expression tree mapping source to destination type</returns>
         public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(this IMappingEngine mappingEngine)
         {
             return (Expression<Func<TSource, TDestination>>)
@@ -26,13 +34,29 @@ namespace AutoMapper.QueryableExtensions
         }
 
 
-
+        /// <summary>
+        /// Extention method to project from a queryable using the static <see cref="Mapper.Engine"/> property
+        /// Due to generic parameter inference, you need to call Project().To to execute the map
+        /// </summary>
+        /// <remarks>Projections are only calculated once and cached</remarks>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <param name="source">Queryable source</param>
+        /// <returns>Expression to project into</returns>
         public static IProjectionExpression Project<TSource>(
             this IQueryable<TSource> source)
         {
             return source.Project(Mapper.Engine);
         }
 
+        /// <summary>
+        /// Extention method to project from a queryable using the provided mapping engine
+        /// Due to generic parameter inference, you need to call Project().To to execute the map
+        /// </summary>
+        /// <remarks>Projections are only calculated once and cached</remarks>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <param name="source">Queryable source</param>
+        /// <param name="mappingEngine">Mapping engine instance</param>
+        /// <returns>Expression to project into</returns>
         public static IProjectionExpression Project<TSource>(
             this IQueryable<TSource> source, IMappingEngine mappingEngine)
         {
@@ -230,8 +254,16 @@ namespace AutoMapper.QueryableExtensions
 
     }
 
+    /// <summary>
+    /// Continuation to execute projection
+    /// </summary>
     public interface IProjectionExpression
     {
+        /// <summary>
+        /// Projects the source type to the destination type given the mapping configuration
+        /// </summary>
+        /// <typeparam name="TResult">Destination type to map to</typeparam>
+        /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
         IQueryable<TResult> To<TResult>();
     }
 

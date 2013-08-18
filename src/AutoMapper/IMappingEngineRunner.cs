@@ -2,6 +2,9 @@ using System;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Main entry point for executing maps
+    /// </summary>
 	public interface IMappingEngineRunner
 	{
 		object Map(ResolutionContext context);

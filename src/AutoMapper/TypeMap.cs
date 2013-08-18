@@ -6,6 +6,9 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Main configuration object holding all mapping configuration for a source and destination type
+    /// </summary>
     public class TypeMap
     {
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();

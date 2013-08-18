@@ -1,6 +1,9 @@
+using System;
+
 namespace AutoMapper
 {
-	public interface IValueFormatter
+    [Obsolete("Formatters should not be used")]
+    public interface IValueFormatter
 	{
 		string FormatValue(ResolutionContext context);
 	}

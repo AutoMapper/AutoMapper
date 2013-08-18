@@ -1,5 +1,10 @@
 namespace AutoMapper
 {
+    /// <summary>
+    /// Type-safe implementation of <see cref="IValueResolver"/>
+    /// </summary>
+    /// <typeparam name="TSource">Source type</typeparam>
+    /// <typeparam name="TDestination">Destination type</typeparam>
 	public abstract class ValueResolver<TSource, TDestination> : IValueResolver
 	{
 		public ResolutionResult Resolve(ResolutionResult source)
@@ -12,6 +17,11 @@ namespace AutoMapper
 			return source.New(ResolveCore((TSource) source.Value), typeof (TDestination));
 		}
 
+        /// <summary>
+        /// Implementors override this method to resolve the destination value based on the provided source value
+        /// </summary>
+        /// <param name="source">Source value</param>
+        /// <returns>Destination</returns>
 		protected abstract TDestination ResolveCore(TSource source);
 	}
 }

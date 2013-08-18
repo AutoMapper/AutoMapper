@@ -5,6 +5,9 @@ namespace AutoMapper.Mappers
 {
 	public class TypeMapObjectMapperRegistry
 	{
+        /// <summary>
+        /// Extension point for mappers matching based on types configured by CreateMap
+        /// </summary>
 		public static Func<IEnumerable<ITypeMapObjectMapper>> AllMappers =
 			() => new ITypeMapObjectMapper[]
             {

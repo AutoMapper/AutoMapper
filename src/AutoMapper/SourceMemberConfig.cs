@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Contains member configuration relating to source members
+    /// </summary>
     public class SourceMemberConfig
     {
         private bool _ignored;

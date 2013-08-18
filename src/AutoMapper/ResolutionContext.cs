@@ -3,17 +3,59 @@ using System.Collections.Generic;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Context information regarding resolution of a destination value
+    /// </summary>
 	public class ResolutionContext : IEquatable<ResolutionContext>
 	{
+        /// <summary>
+        /// Mapping operation options
+        /// </summary>
 	    public MappingOperationOptions Options { get; private set; }
+
+        /// <summary>
+        /// Current type map
+        /// </summary>
 	    public TypeMap TypeMap { get; private set; }
+        
+        /// <summary>
+        /// Current property map
+        /// </summary>
 	    public PropertyMap PropertyMap { get; private set; }
+
+        /// <summary>
+        /// Current source type
+        /// </summary>
 	    public Type SourceType { get; private set; }
+
+        /// <summary>
+        /// Current attempted destination type
+        /// </summary>
 	    public Type DestinationType { get; private set; }
+
+        /// <summary>
+        /// Index of current collection mapping
+        /// </summary>
 	    public int? ArrayIndex { get; private set; }
+
+        /// <summary>
+        /// Source value
+        /// </summary>
 	    public object SourceValue { get; private set; }
+
+        /// <summary>
+        /// Destination value
+        /// </summary>
 	    public object DestinationValue { get; private set; }
+
+        /// <summary>
+        /// Parent resolution context
+        /// </summary>
 	    public ResolutionContext Parent { get; private set; }
+
+        /// <summary>
+        /// Instance cache for resolving circular references
+        /// </summary>
 	    public Dictionary<ResolutionContext, object> InstanceCache { get; private set; }
 
 	    public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType, MappingOperationOptions options)

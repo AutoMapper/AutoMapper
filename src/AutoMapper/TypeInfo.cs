@@ -7,6 +7,9 @@ using System.Runtime.CompilerServices;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Contains cached reflection information for easy retrieval
+    /// </summary>
     public class TypeInfo
     {
         private readonly MemberInfo[] _publicGetters;
