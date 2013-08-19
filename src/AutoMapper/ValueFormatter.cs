@@ -1,3 +1,5 @@
+using AutoMapper.Internal;
+
 namespace AutoMapper
 {
 	public abstract class ValueFormatter<T> : IValueFormatter

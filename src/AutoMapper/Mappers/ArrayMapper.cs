@@ -1,4 +1,5 @@
 using System;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {

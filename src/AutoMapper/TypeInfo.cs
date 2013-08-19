@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -87,7 +88,7 @@ namespace AutoMapper
                 .GroupBy(x => x.Name) // group properties of the same name together
                 .Select(x =>
                     x.Any(y => y.CanWrite && y.CanRead) ? // favor the first property that can both read & write - otherwise pick the first one
-						x.Where(y => y.CanWrite && y.CanRead).First() :
+						x.First(y => y.CanWrite && y.CanRead) :
                         x.First())
 				.Where(pi => pi.CanWrite || pi.PropertyType.IsListOrDictionaryType())
                 .OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects

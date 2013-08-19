@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
 	public static class PrimitiveExtensions
 	{
