@@ -1,0 +1,72 @@
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Should;
+
+namespace AutoMapper.UnitTests.Bug
+{
+	namespace ConditionPropertyBug
+	{
+		[TestFixture]
+		public class Example : AutoMapperSpecBase
+		{
+			public class Source
+			{
+				private int basePrice;
+				
+				public bool HasBasePrice {get; private set;}
+				
+				public int BasePrice
+				{
+					get 
+					{
+    					if( !HasBasePrice )
+        					throw new InvalidOperationException( "Has no base price" );
+
+					    return basePrice;
+					}
+					set
+					{
+						basePrice = value;
+						HasBasePrice = true;
+					}
+				}
+			}
+			
+			public class Destination
+			{
+				public int BasePrice{get;set;}
+			}
+			
+			protected override void Establish_context()
+            		{
+				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
+					.ForMember( itemDTO => itemDTO.BasePrice,
+					           config => {
+					           	config.Condition( item => item.HasBasePrice );
+					           	config.MapFrom( item => item.BasePrice );
+					           }));
+			}
+			
+			[Test]
+			public void Should_skip_the_mapping_when_the_condition_property_is_false()
+			{
+				var src = new Source();
+				var dest = Mapper.Map<Source, Destination>(src);
+				
+				dest.BasePrice.ShouldEqual(0);
+			}
+			
+			[Test]
+			public void Should_execute_the_mapping_when_the_condition_property_is_true()
+			{
+				var src = new Source { BasePrice=15 };
+				var dest = Mapper.Map<Source, Destination>(src);
+				
+				dest.BasePrice.ShouldEqual(src.BasePrice);
+			}
+		}
+	}
+}
