@@ -167,6 +167,7 @@
     <Compile Include="NestedContainers.cs" />
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
+    <Compile Include="Projection\MapFromTest.cs" />
     <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
     <Compile Include="Projection\ProjectCollectionListTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
