@@ -65,6 +65,16 @@ namespace AutoMapper.QueryableExtensions
 
         private static LambdaExpression CreateMapExpression(IMappingEngine mappingEngine, Type typeIn, Type typeOut)
         {
+            // this is the input parameter of this expression with name <variableName>
+            ParameterExpression instanceParameter = Expression.Parameter(typeIn, "dto");
+
+            var total = CreateMapExpression(mappingEngine, typeIn, typeOut, instanceParameter);
+
+            return Expression.Lambda(total, instanceParameter);
+        }
+
+        private static Expression CreateMapExpression(IMappingEngine mappingEngine, Type typeIn, Type typeOut, Expression instanceParameter)
+        {
             var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(typeIn, typeOut);
 
             if (typeMap == null)
@@ -76,136 +86,15 @@ namespace AutoMapper.QueryableExtensions
                 throw new InvalidOperationException(message);
             }
 
+            var bindings = CreateMemberBindings(mappingEngine, typeIn, typeMap, instanceParameter);
 
-            // this is the input parameter of this expression with name <variableName>
-            ParameterExpression instanceParameter = Expression.Parameter(typeIn, "dto");
-
-            var bindings = new List<MemberBinding>();
-            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
-            {
-                var destinationProperty = propertyMap.DestinationProperty;
-                var destinationMember = destinationProperty.MemberInfo;
-
-                Expression currentChild = instanceParameter;
-                Type currentChildType = typeIn;
-                foreach (var resolver in propertyMap.GetSourceValueResolvers())
-                {
-                    var getter = resolver as IMemberGetter;
-                    if (getter != null)
-                    {
-                        var memberInfo = getter.MemberInfo;
-
-                        var propertyInfo = memberInfo as PropertyInfo;
-                        if (propertyInfo != null)
-                        {
-                            currentChild = Expression.Property(currentChild, propertyInfo);
-                            currentChildType = propertyInfo.PropertyType;
-                        }
-                    }
-                    else
-                    {
-                        var oldParameter =
-                            ((LambdaExpression)propertyMap.CustomExpression).Parameters.Single();
-                        var newParameter = instanceParameter;
-                        var converter = new ConversionVisitor(newParameter, oldParameter);
-                        currentChild = converter.Visit(((LambdaExpression)propertyMap.CustomExpression).Body);
-                        var propertyInfo = propertyMap.SourceMember as PropertyInfo;
-                        if (propertyInfo != null)
-                        {
-                            currentChildType = propertyInfo.PropertyType;
-                        }
-                    }
-                }
-
-                var prop = destinationProperty.MemberInfo as PropertyInfo;
-
-                // next to lists, also arrays
-                // and objects!!!
-                if (prop != null &&
-                    prop.PropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
-                    prop.PropertyType != typeof(string))
-                {
-
-                    Type destinationListType = prop.PropertyType.GetGenericArguments().First();
-                    Type sourceListType = null;
-                    // is list
-
-                    sourceListType = currentChildType.GetGenericArguments().First();
-
-                    //var newVariableName = "t" + (i++);
-                    var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
-
-                    MethodCallExpression selectExpression = Expression.Call(
-                                typeof(Enumerable),
-                                "Select",
-                                new[] { sourceListType, destinationListType },
-                                currentChild,
-                                transformedExpression);
-
-                    var isNullExpression = Expression.Equal(currentChild, Expression.Constant(null, currentChildType));
-
-                    if (typeof(IList<>).MakeGenericType(destinationListType).IsAssignableFrom(prop.PropertyType))
-                    {
-                        MethodCallExpression toListCallExpression = Expression.Call(
-                            typeof(Enumerable),
-                            "ToList",
-                            new Type[] { destinationListType },
-                            selectExpression);
-
-                        var toListIfSourceIsNotNull =
-                            Expression.Condition(
-                                isNullExpression,
-                                Expression.Constant(null, toListCallExpression.Type),
-                                toListCallExpression);
-                        
-                        // todo .ToArray()
-
-                        bindings.Add(Expression.Bind(destinationMember, toListIfSourceIsNotNull));
-                    }
-                    else
-                    {
-                        var selectIfSourceIsNotNull =
-                            Expression.Condition(
-                                isNullExpression,
-                                Expression.Constant(null, selectExpression.Type),
-                                selectExpression);
-
-                        // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
-                        bindings.Add(Expression.Bind(destinationMember, selectIfSourceIsNotNull));
-                    }
-                }
-                else
-                {
-                    // does of course not work for subclasses etc./generic ...
-                    if (currentChildType != prop.PropertyType &&
-                        // avoid nullable etc.
-                        prop.PropertyType.BaseType != typeof(ValueType) &&
-                        prop.PropertyType.BaseType != typeof(Enum))
-                    {
-                        var transformedExpression = CreateMapExpression(mappingEngine, currentChildType, prop.PropertyType);
-
-                        var transformedInvokeExpression = Expression.Invoke(transformedExpression, currentChild);
-
-                        var isNullExpression = Expression.Equal(currentChild, Expression.Constant(null));
-
-                        var transformIfIsNotNull =
-                            Expression.Condition(isNullExpression, Expression.Constant(null, prop.PropertyType), transformedInvokeExpression);
-
-                        bindings.Add(Expression.Bind(destinationMember, transformIfIsNotNull));
-                    }
-                    else
-                    {
-                        bindings.Add(Expression.Bind(destinationMember, currentChild));
-                    }
-                }
-
-            }
             Expression total;
             if (typeOut.IsAbstract)
             {
                 if (typeMap.CustomMapper == null)
                     throw new AutoMapperMappingException(
-                        String.Format("Abstract type {0} can not be mapped without custom mapper (tip: use ConvertUsing)", typeOut.Name));
+                        String.Format("Abstract type {0} can not be mapped without custom mapper (tip: use ConvertUsing)",
+                                      typeOut.Name));
                 // We are going to return roughly following expression
                 // typeOut (typeIn)x => (typeOut)(typeMap.CustomMapper.Invoke(new ResolutionContext(typeMap, x, typeIn, typeOut, options)))
 
@@ -235,7 +124,7 @@ namespace AutoMapper.QueryableExtensions
                 var customMapper = Expression.Invoke(method, Expression.Constant(typeMap));
                 // This expression calls the Invoke method from the CustomMapper func
                 var invoke = Expression.Call(customMapper,
-                                typeof(Func<ResolutionContext, object>).GetMethod("Invoke"), context);
+                                             typeof (Func<ResolutionContext, object>).GetMethod("Invoke"), context);
                 // We have to convert the object from Invoke to typeOut
                 total = Expression.Convert(invoke, typeOut);
             }
@@ -243,9 +132,131 @@ namespace AutoMapper.QueryableExtensions
                 total = Expression.MemberInit(
                     Expression.New(typeOut),
                     bindings.ToArray()
-                );
+                    );
+            return total;
+        }
 
-            return Expression.Lambda(total, instanceParameter);
+        private static List<MemberBinding> CreateMemberBindings(IMappingEngine mappingEngine, Type typeIn, TypeMap typeMap,
+                                                 Expression instanceParameter)
+        {
+            var bindings = new List<MemberBinding>();
+            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
+            {
+                var destinationProperty = propertyMap.DestinationProperty;
+                var destinationMember = destinationProperty.MemberInfo;
+
+                Expression currentChild = instanceParameter;
+                Type currentChildType = typeIn;
+                foreach (var resolver in propertyMap.GetSourceValueResolvers())
+                {
+                    var getter = resolver as IMemberGetter;
+                    if (getter != null)
+                    {
+                        var memberInfo = getter.MemberInfo;
+
+                        var propertyInfo = memberInfo as PropertyInfo;
+                        if (propertyInfo != null)
+                        {
+                            currentChild = Expression.Property(currentChild, propertyInfo);
+                            currentChildType = propertyInfo.PropertyType;
+                        }
+                    }
+                    else
+                    {
+                        var oldParameter =
+                            ((LambdaExpression) propertyMap.CustomExpression).Parameters.Single();
+                        var newParameter = instanceParameter;
+                        var converter = new ConversionVisitor(newParameter, oldParameter);
+                        currentChild = converter.Visit(((LambdaExpression) propertyMap.CustomExpression).Body);
+                        var propertyInfo = propertyMap.SourceMember as PropertyInfo;
+                        if (propertyInfo != null)
+                        {
+                            currentChildType = propertyInfo.PropertyType;
+                        }
+                    }
+                }
+
+                var prop = destinationProperty.MemberInfo as PropertyInfo;
+
+                // next to lists, also arrays
+                // and objects!!!
+                if (prop != null &&
+                    prop.PropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
+                    prop.PropertyType != typeof (string))
+                {
+                    Type destinationListType = prop.PropertyType.GetGenericArguments().First();
+                    Type sourceListType = null;
+                    // is list
+
+                    sourceListType = currentChildType.GetGenericArguments().First();
+
+                    //var newVariableName = "t" + (i++);
+                    var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
+
+                    MethodCallExpression selectExpression = Expression.Call(
+                        typeof (Enumerable),
+                        "Select",
+                        new[] {sourceListType, destinationListType},
+                        currentChild,
+                        transformedExpression);
+
+                    var isNullExpression = Expression.Equal(currentChild, Expression.Constant(null, currentChildType));
+
+                    if (typeof (IList<>).MakeGenericType(destinationListType).IsAssignableFrom(prop.PropertyType))
+                    {
+                        MethodCallExpression toListCallExpression = Expression.Call(
+                            typeof (Enumerable),
+                            "ToList",
+                            new Type[] {destinationListType},
+                            selectExpression);
+
+                        var toListIfSourceIsNotNull =
+                            Expression.Condition(
+                                isNullExpression,
+                                Expression.Constant(null, toListCallExpression.Type),
+                                toListCallExpression);
+
+                        // todo .ToArray()
+
+                        bindings.Add(Expression.Bind(destinationMember, toListIfSourceIsNotNull));
+                    }
+                    else
+                    {
+                        var selectIfSourceIsNotNull =
+                            Expression.Condition(
+                                isNullExpression,
+                                Expression.Constant(null, selectExpression.Type),
+                                selectExpression);
+
+                        // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
+                        bindings.Add(Expression.Bind(destinationMember, selectIfSourceIsNotNull));
+                    }
+                }
+                else
+                {
+                    // does of course not work for subclasses etc./generic ...
+                    if (currentChildType != prop.PropertyType &&
+                        // avoid nullable etc.
+                        prop.PropertyType.BaseType != typeof (ValueType) &&
+                        prop.PropertyType.BaseType != typeof (Enum))
+                    {
+                        var transformedExpression = CreateMapExpression(mappingEngine, currentChildType, prop.PropertyType, currentChild);
+
+                        var isNullExpression = Expression.Equal(currentChild, Expression.Constant(null));
+
+                        var transformIfIsNotNull =
+                            Expression.Condition(isNullExpression, Expression.Constant(null, prop.PropertyType),
+                                                 transformedExpression);
+
+                        bindings.Add(Expression.Bind(destinationMember, transformIfIsNotNull));
+                    }
+                    else
+                    {
+                        bindings.Add(Expression.Bind(destinationMember, currentChild));
+                    }
+                }
+            }
+            return bindings;
         }
 
         /// <summary>
@@ -255,10 +266,10 @@ namespace AutoMapper.QueryableExtensions
         /// </summary>
         private class ConversionVisitor : ExpressionVisitor
         {
-            private readonly ParameterExpression newParameter;
+            private readonly Expression newParameter;
             private readonly ParameterExpression oldParameter;
 
-            public ConversionVisitor(ParameterExpression newParameter, ParameterExpression oldParameter)
+            public ConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
             {
                 this.newParameter = newParameter;
                 this.oldParameter = oldParameter;
