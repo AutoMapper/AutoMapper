@@ -169,9 +169,19 @@ namespace AutoMapper.QueryableExtensions
                         var converter = new ConversionVisitor(newParameter, oldParameter);
                         currentChild = converter.Visit(((LambdaExpression) propertyMap.CustomExpression).Body);
                         var propertyInfo = propertyMap.SourceMember as PropertyInfo;
+                        
                         if (propertyInfo != null)
                         {
+                            // If we're mapping from a property, the destination type
+                            // is known
                             currentChildType = propertyInfo.PropertyType;
+                        }
+                        else if (propertyMap.CustomExpression != null &&
+                                 propertyMap.CustomExpression.Body.NodeType == ExpressionType.Call)
+                        {
+                            // If we're mapping from a method call, the destination type can
+                            // be inferred from its return type.
+                            currentChildType = ((MethodCallExpression)propertyMap.CustomExpression.Body).Method.ReturnParameter.ParameterType;
                         }
                     }
                 }
