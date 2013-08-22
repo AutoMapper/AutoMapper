@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Impl;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -29,6 +30,7 @@ namespace AutoMapper
         }
 
         public IMemberAccessor DestinationProperty { get; private set; }
+        public Type DestinationPropertyType { get { return DestinationProperty.MemberType; } }
         public LambdaExpression CustomExpression { get; private set; }
 
         public MemberInfo SourceMember
@@ -242,6 +244,96 @@ namespace AutoMapper
         public object GetDestinationValue(object mappedObject)
         {
             return DestinationProperty.GetValue(mappedObject);
+        }
+
+        public ExpressionResolutionResult ResolveExpression(Type currentType, Expression instanceParameter)
+        {
+            Expression currentChild = instanceParameter;
+            Type currentChildType = currentType;
+            foreach (var resolver in GetSourceValueResolvers())
+            {
+                var getter = resolver as IMemberGetter;
+                if (getter != null)
+                {
+                    var memberInfo = getter.MemberInfo;
+
+                    var propertyInfo = memberInfo as PropertyInfo;
+                    if (propertyInfo != null)
+                    {
+                        currentChild = Expression.Property(currentChild, propertyInfo);
+                        currentChildType = propertyInfo.PropertyType;
+                    }
+                }
+                else
+                {
+                    var oldParameter = CustomExpression.Parameters.Single();
+                    var newParameter = instanceParameter;
+                    var converter = new ConversionVisitor(newParameter, oldParameter);
+                    currentChild = converter.Visit(CustomExpression.Body);
+                    var propertyInfo = SourceMember as PropertyInfo;
+
+                    if (propertyInfo != null)
+                    {
+                        // If we're mapping from a property, the destination type
+                        // is known
+                        currentChildType = propertyInfo.PropertyType;
+                    }
+                    else if (CustomExpression != null && CustomExpression.Body.NodeType == ExpressionType.Call)
+                    {
+                        // If we're mapping from a method call, the destination type can
+                        // be inferred from its return type.
+                        currentChildType = ((MethodCallExpression)CustomExpression.Body).Method.ReturnParameter.ParameterType;
+                    }
+                }
+            }
+
+            return new ExpressionResolutionResult(currentChild, currentChildType);
+        }
+
+        /// <summary>
+        /// This expression visitor will replace an input parameter by another one
+        /// 
+        /// see http://stackoverflow.com/questions/4601844/expression-tree-copy-or-convert
+        /// </summary>
+        private class ConversionVisitor : ExpressionVisitor
+        {
+            private readonly Expression newParameter;
+            private readonly ParameterExpression oldParameter;
+
+            public ConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
+            {
+                this.newParameter = newParameter;
+                this.oldParameter = oldParameter;
+            }
+
+            protected override Expression VisitParameter(ParameterExpression node)
+            {
+                // replace all old param references with new ones
+                return node.Type == oldParameter.Type ? newParameter : node;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node.Expression != oldParameter) // if instance is not old parameter - do nothing
+                    return base.VisitMember(node);
+
+                var newObj = Visit(node.Expression);
+                var newMember = newParameter.Type.GetMember(node.Member.Name).First();
+                return Expression.MakeMemberAccess(newObj, newMember);
+            }
+        }
+
+    }
+
+    public class ExpressionResolutionResult
+    {
+        public Expression ResolutionExpression { get; private set; }
+        public Type Type { get; private set; }
+
+        public ExpressionResolutionResult(Expression resolutionExpression, Type type)
+        {
+            ResolutionExpression = resolutionExpression;
+            Type = type;
         }
     }
 }

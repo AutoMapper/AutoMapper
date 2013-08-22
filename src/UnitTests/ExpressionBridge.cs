@@ -216,7 +216,7 @@ namespace AutoMapper.UnitTests
                 complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
             }
 #if !SILVERLIGHT
-            [Fact]
+            [Fact(Skip = "Won't work for normal query providers")]
             public void List_of_abstract_should_be_mapped()
             {
                 var mapped = Mapper.Map<AbstractProductDto>(_products[0]);
