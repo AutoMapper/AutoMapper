@@ -13,7 +13,7 @@ namespace AutoMapper.QueryableExtensions
     {
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
 
-        private static readonly Internal.IDictionary<TypePair, LambdaExpression> _expressionCache 
+        private static readonly Internal.IDictionary<TypePair, LambdaExpression> _expressionCache
             = DictionaryFactory.CreateDictionary<TypePair, LambdaExpression>();
 
         /// <summary>
@@ -106,10 +106,13 @@ namespace AutoMapper.QueryableExtensions
 
                 var destinationMember = propertyMap.DestinationProperty.MemberInfo;
 
-                MemberAssignment bindExpression = null;
-                // next to lists, also arrays
-                // and objects!!!
-                if (propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
+                MemberAssignment bindExpression;
+
+                if (propertyMap.DestinationPropertyType.IsAssignableFrom(result.Type))
+                {
+                    bindExpression = Expression.Bind(destinationMember, result.ResolutionExpression);
+                }
+                else if (propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
                     propertyMap.DestinationPropertyType != typeof(string))
                 {
                     Type destinationListType = propertyMap.DestinationPropertyType.GetGenericArguments().First();
@@ -122,9 +125,9 @@ namespace AutoMapper.QueryableExtensions
                     var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
 
                     MethodCallExpression selectExpression = Expression.Call(
-                        typeof (Enumerable),
+                        typeof(Enumerable),
                         "Select",
-                        new[] {sourceListType, destinationListType},
+                        new[] { sourceListType, destinationListType },
                         result.ResolutionExpression,
                         transformedExpression);
 
@@ -133,9 +136,9 @@ namespace AutoMapper.QueryableExtensions
                     if (typeof(IList<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType))
                     {
                         MethodCallExpression toListCallExpression = Expression.Call(
-                            typeof (Enumerable),
+                            typeof(Enumerable),
                             "ToList",
-                            new Type[] {destinationListType},
+                            new Type[] { destinationListType },
                             selectExpression);
 
                         var toListIfSourceIsNotNull =
@@ -160,29 +163,29 @@ namespace AutoMapper.QueryableExtensions
                         bindExpression = Expression.Bind(destinationMember, selectIfSourceIsNotNull);
                     }
                 }
+                else if (result.Type != propertyMap.DestinationPropertyType &&
+                         // avoid nullable etc.
+                         propertyMap.DestinationPropertyType.BaseType != typeof (ValueType) &&
+                         propertyMap.DestinationPropertyType.BaseType != typeof (Enum))
+                {
+                    var transformedExpression = CreateMapExpression(mappingEngine, result.Type,
+                                                                    propertyMap.DestinationPropertyType,
+                                                                    result.ResolutionExpression);
+
+                    var isNullExpression = Expression.Equal(result.ResolutionExpression, Expression.Constant(null));
+
+                    var transformIfIsNotNull =
+                        Expression.Condition(isNullExpression,
+                                             Expression.Constant(null, propertyMap.DestinationPropertyType),
+                                             transformedExpression);
+
+                    bindExpression = Expression.Bind(destinationMember, transformIfIsNotNull);
+                }
                 else
                 {
-                    // does of course not work for subclasses etc./generic ...
-                    if (result.Type != propertyMap.DestinationPropertyType &&
-                        // avoid nullable etc.
-                        propertyMap.DestinationPropertyType.BaseType != typeof(ValueType) &&
-                        propertyMap.DestinationPropertyType.BaseType != typeof(Enum))
-                    {
-                        var transformedExpression = CreateMapExpression(mappingEngine, result.Type, propertyMap.DestinationPropertyType, result.ResolutionExpression);
-
-                        var isNullExpression = Expression.Equal(result.ResolutionExpression, Expression.Constant(null));
-
-                        var transformIfIsNotNull =
-                            Expression.Condition(isNullExpression, Expression.Constant(null, propertyMap.DestinationPropertyType),
-                                                 transformedExpression);
-
-                        bindExpression = Expression.Bind(destinationMember, transformIfIsNotNull);
-                    }
-                    else
-                    {
-                        bindExpression = Expression.Bind(destinationMember, result.ResolutionExpression);
-                    }
+                    throw new AutoMapperMappingException("Unable to create a map expression from " + result.Type + " to " + propertyMap.DestinationPropertyType);
                 }
+
                 bindings.Add(bindExpression);
             }
             return bindings;
