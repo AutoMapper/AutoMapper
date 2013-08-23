@@ -13,3 +13,4 @@ _ReSharper*
 TestResult.xml
 AppPackages/
 *.bak
+packages

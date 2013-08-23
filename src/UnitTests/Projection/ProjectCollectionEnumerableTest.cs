@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.Projection
 			Mapper.CreateMap<Customer, CustomerDto>();
 		}
 
-		[Fact]
+		[Fact(Skip = "EF doesn't support null assignments in expressions")]
 		public void ProjectWithNullCollectionSourceProperty()
 		{
 			var customers = new[] { new Customer() }.AsQueryable();
