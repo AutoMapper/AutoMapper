@@ -18,7 +18,7 @@ namespace AutoMapper.UnitTests.Projection
 			Mapper.CreateMap<Customer, CustomerDto>();
         }
 
-		[Fact]
+		[Fact(Skip = "EF doesn't support null values in expressions")]
 		public void SelectUsingProjectToWithNullComplexSourceProperty()
 		{
 			var customers = new[] { new Customer { FirstName = "Bill", LastName = "White" } }.AsQueryable();

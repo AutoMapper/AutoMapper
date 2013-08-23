@@ -131,8 +131,6 @@ namespace AutoMapper.QueryableExtensions
                         result.ResolutionExpression,
                         transformedExpression);
 
-                    var isNullExpression = Expression.Equal(result.ResolutionExpression, Expression.Constant(null, result.Type));
-
                     if (typeof(IList<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType))
                     {
                         MethodCallExpression toListCallExpression = Expression.Call(
@@ -141,26 +139,14 @@ namespace AutoMapper.QueryableExtensions
                             new Type[] { destinationListType },
                             selectExpression);
 
-                        var toListIfSourceIsNotNull =
-                            Expression.Condition(
-                                isNullExpression,
-                                Expression.Constant(null, toListCallExpression.Type),
-                                toListCallExpression);
-
                         // todo .ToArray()
 
-                        bindExpression = Expression.Bind(destinationMember, toListIfSourceIsNotNull);
+                        bindExpression = Expression.Bind(destinationMember, toListCallExpression);
                     }
                     else
                     {
-                        var selectIfSourceIsNotNull =
-                            Expression.Condition(
-                                isNullExpression,
-                                Expression.Constant(null, selectExpression.Type),
-                                selectExpression);
-
                         // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
-                        bindExpression = Expression.Bind(destinationMember, selectIfSourceIsNotNull);
+                        bindExpression = Expression.Bind(destinationMember, selectExpression);
                     }
                 }
                 else if (result.Type != propertyMap.DestinationPropertyType &&
@@ -172,14 +158,7 @@ namespace AutoMapper.QueryableExtensions
                                                                     propertyMap.DestinationPropertyType,
                                                                     result.ResolutionExpression);
 
-                    var isNullExpression = Expression.Equal(result.ResolutionExpression, Expression.Constant(null));
-
-                    var transformIfIsNotNull =
-                        Expression.Condition(isNullExpression,
-                                             Expression.Constant(null, propertyMap.DestinationPropertyType),
-                                             transformedExpression);
-
-                    bindExpression = Expression.Bind(destinationMember, transformIfIsNotNull);
+                    bindExpression = Expression.Bind(destinationMember, transformedExpression);
                 }
                 else
                 {
