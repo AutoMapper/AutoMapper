@@ -80,10 +80,7 @@ namespace AutoMapper.IntegrationTests.Net4
             {
                 Mapper.CreateMap<Customer, CustomerViewModel>()
                       .ForMember(x => x.FullAddress,
-                                 o => o.MapFrom(s => String.Format("{0}, {1} {2}", 
-                                                            s.Address.Street, 
-                                                            s.Address.City, 
-                                                            s.Address.State))); 
+                                 o => o.MapFrom(c => c.Address.Street + ", " + c.Address.City + " " + c.Address.State)); 
 
                 Mapper.AssertConfigurationIsValid();
             }
@@ -98,22 +95,6 @@ namespace AutoMapper.IntegrationTests.Net4
                         FirstName = c.FirstName,
                         LastName = c.LastName,
                         FullAddress = c.Address.Street + ", " + c.Address.City + " " + c.Address.State
-                    }).ToList();
-
-                    customerVms.ForEach(x =>
-                    {
-                        x.FullAddress.ShouldNotBeNull();
-                        x.FullAddress.ShouldNotBeEmpty();
-                    });
-
-                    customerVms = context.Customers.Select(c => new CustomerViewModel
-                    {
-                        FirstName = c.FirstName,
-                        LastName = c.LastName,
-                        FullAddress = String.Format("{0}, {1} {2}",
-                                                    c.Address.Street,
-                                                    c.Address.City,
-                                                    c.Address.State)
                     }).ToList();
 
                     customerVms.ForEach(x =>
