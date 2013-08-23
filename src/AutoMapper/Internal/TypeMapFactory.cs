@@ -52,7 +52,7 @@ namespace AutoMapper
             var parameters = new List<ConstructorParameterMap>();
             var ctorParameters = destCtor.GetParameters();
 
-            if (ctorParameters.Length > 0 && !options.ConstructorMappingEnabled)
+            if (ctorParameters.Length == 0 || !options.ConstructorMappingEnabled)
                 return false;
 
             foreach (var parameter in ctorParameters)

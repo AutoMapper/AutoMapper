@@ -186,7 +186,7 @@ namespace AutoMapper
             Type destinationType = typeof(TDestination);
             Type sourceType = typeof(TSource);
             TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType);
-            var context = parentContext.CreateTypeContext(typeMap, source, sourceType, destinationType);
+            var context = parentContext.CreateTypeContext(typeMap, source, null, sourceType, destinationType);
             return (TDestination)((IMappingEngineRunner)this).Map(context);
         }
 
@@ -206,7 +206,7 @@ namespace AutoMapper
                     {
                         var typeMap = ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType);
 
-                        context = context.CreateTypeContext(typeMap, context.SourceValue, context.SourceType, context.DestinationType);
+                        context = context.CreateTypeContext(typeMap, context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
 
                         mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
                     }

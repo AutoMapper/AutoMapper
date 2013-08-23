@@ -35,7 +35,7 @@ namespace AutoMapper
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 
-                var newContext = context.CreateTypeContext(typeMap, result.Value, targetSourceType, destinationType);
+                var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType, destinationType);
 
                 var value = mappingEngine.Map(newContext);
 

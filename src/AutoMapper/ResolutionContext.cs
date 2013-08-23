@@ -115,10 +115,11 @@ namespace AutoMapper
             Options = context.Options;
         }
 
-        private ResolutionContext(ResolutionContext context, TypeMap memberTypeMap, object sourceValue, Type sourceType, Type destinationType)
+        private ResolutionContext(ResolutionContext context, TypeMap memberTypeMap, object sourceValue, object destinationValue, Type sourceType, Type destinationType)
         {
             TypeMap = memberTypeMap;
             SourceValue = sourceValue;
+            DestinationValue = destinationValue;
             Parent = context;
             AssignTypes(memberTypeMap, sourceType, destinationType);
             InstanceCache = context.InstanceCache;
@@ -189,9 +190,9 @@ namespace AutoMapper
 			return new ResolutionContext(this, sourceValue, sourceType);
 		}
 
-        public ResolutionContext CreateTypeContext(TypeMap memberTypeMap, object sourceValue, Type sourceType, Type destinationType)
+        public ResolutionContext CreateTypeContext(TypeMap memberTypeMap, object sourceValue, object destinationValue, Type sourceType, Type destinationType)
         {
-            return new ResolutionContext(this, memberTypeMap, sourceValue, sourceType, destinationType);
+            return new ResolutionContext(this, memberTypeMap, sourceValue, destinationValue, sourceType, destinationType);
         }
 
         public ResolutionContext CreatePropertyMapContext(PropertyMap propertyMap)
