@@ -97,6 +97,19 @@ namespace AutoMapper.IntegrationTests.Net4
                     {
                         FirstName = c.FirstName,
                         LastName = c.LastName,
+                        FullAddress = c.Address.Street + ", " + c.Address.City + " " + c.Address.State
+                    }).ToList();
+
+                    customerVms.ForEach(x =>
+                    {
+                        x.FullAddress.ShouldNotBeNull();
+                        x.FullAddress.ShouldNotBeEmpty();
+                    });
+
+                    customerVms = context.Customers.Select(c => new CustomerViewModel
+                    {
+                        FirstName = c.FirstName,
+                        LastName = c.LastName,
                         FullAddress = String.Format("{0}, {1} {2}",
                                                     c.Address.Street,
                                                     c.Address.City,
