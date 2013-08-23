@@ -263,27 +263,19 @@ namespace AutoMapper
                         currentChild = Expression.Property(currentChild, propertyInfo);
                         currentChildType = propertyInfo.PropertyType;
                     }
+                    else
+                    {
+                        throw new NotImplementedException("Expressions mapping from methods not supported yet.");
+                    }
                 }
                 else
                 {
                     var oldParameter = CustomExpression.Parameters.Single();
                     var newParameter = instanceParameter;
                     var converter = new ConversionVisitor(newParameter, oldParameter);
+                    
                     currentChild = converter.Visit(CustomExpression.Body);
-                    var propertyInfo = SourceMember as PropertyInfo;
-
-                    if (propertyInfo != null)
-                    {
-                        // If we're mapping from a property, the destination type
-                        // is known
-                        currentChildType = propertyInfo.PropertyType;
-                    }
-                    else if (CustomExpression != null && CustomExpression.Body.NodeType == ExpressionType.Call)
-                    {
-                        // If we're mapping from a method call, the destination type can
-                        // be inferred from its return type.
-                        currentChildType = ((MethodCallExpression)CustomExpression.Body).Method.ReturnParameter.ParameterType;
-                    }
+                    currentChildType = currentChild.Type;
                 }
             }
 
