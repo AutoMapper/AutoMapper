@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -70,31 +70,31 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_ignore_the_mapping_for_normal_members()
 			{
 				_result.Value3.ShouldEqual(42);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_custom_generic_mapping_for_custom_dto_members()
 			{
 				_result.Value.ShouldEqual(43);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_instance_based_mapping_for_custom_dto_members()
 			{
 				_result.Value2.ShouldEqual(44);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_type_object_based_mapping_for_custom_dto_members()
 			{
 				_result.Value4.ShouldEqual(46);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_func_based_mapping_for_custom_dto_members()
 			{
 				_result.Value5.ShouldEqual(47);
@@ -144,7 +144,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<ModelObject, ModelDto>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_specified_model_member_to_resolve_from()
 			{
 				_result.SomeValue.ShouldEqual(47);
@@ -188,7 +188,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Dest>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_override_the_existing_match_to_the_new_custom_resolved_member()
 			{
 				_result.SomeValue.ShouldEqual(58);
@@ -230,7 +230,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Dest>(model);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_override_the_existing_match_to_the_new_custom_resolved_member()
 			{
 				_result.Type.ShouldEqual(5);
@@ -291,7 +291,7 @@ namespace AutoMapper.UnitTests
 				_dest = Mapper.Map<Source, Destination>(_source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_custom_constructor()
 			{
 				_dest.Value.ShouldEqual(25);
@@ -353,7 +353,7 @@ namespace AutoMapper.UnitTests
 				_dest = Mapper.Map<Source, Destination>(_source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_custom_constructor()
 			{
 				_dest.Value.ShouldEqual(25);
@@ -387,7 +387,7 @@ namespace AutoMapper.UnitTests
 				};
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_custom_translator()
 			{
 				Mapper.CreateMap<Source, Destination>()
@@ -397,7 +397,7 @@ namespace AutoMapper.UnitTests
 				_dest.Value.ShouldEqual(20);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_ignore_other_mapping_rules()
 			{
 				Mapper.CreateMap<Source, Destination>()
@@ -441,7 +441,7 @@ namespace AutoMapper.UnitTests
 								  };
 			}
 
-			[Test]
+			[Fact]
 			public void Should_resolve_to_the_destination_object_from_the_custom_translator()
 			{
 				Mapper.CreateMap<Source, Destination>()
@@ -451,7 +451,7 @@ namespace AutoMapper.UnitTests
 				_dest.Value.ShouldEqual(20);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_ignore_other_mapping_rules()
 			{
 				Mapper.CreateMap<Source, Destination>()
@@ -498,7 +498,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_custom_translator()
 			{
 				Mapper.CreateMap<Source, Destination>()
@@ -508,7 +508,7 @@ namespace AutoMapper.UnitTests
 				_dest.Value.ShouldEqual(20);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_ignore_other_mapping_rules()
 			{
 				Mapper.CreateMap<Source, Destination>()
@@ -566,7 +566,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source { Value = 5 });
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_custom_constructor_function()
 			{
 				_result.Value.ShouldEqual(15);
@@ -593,7 +593,7 @@ namespace AutoMapper.UnitTests
 					.ConvertUsing(s => new Destination { Value2 = s.Value1 + 10 });
 			}
 
-			[Test]
+			[Fact]
 			public void Should_pass_all_configuration_checks()
 			{
 				Exception thrown = null;
@@ -654,7 +654,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source { Value = 5 });
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_the_specified_constructor()
 			{
 				_result.Value.ShouldEqual(10);
@@ -695,7 +695,7 @@ namespace AutoMapper.UnitTests
                 _result = Mapper.Map(new Source { Value = 5 }, _result);
             }
 
-            [Test]
+            [Fact]
             public void Should_not_overwrite_destination_value()
             {
                 _result.Value.ShouldEqual(55);
@@ -742,7 +742,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source { SourceValue = 5 });
 			}
 
-			[Test]
+			[Fact]
 			public void Should_translate_the_property()
 			{
 				_result.DestinationValue.ShouldEqual(10);
@@ -766,7 +766,7 @@ namespace AutoMapper.UnitTests
 				public int Value { get; set; }
 			}
 
-			[Test]
+			[Fact]
 			public void Should_fail_with_an_exception_during_configuration()
 			{
 				typeof(ArgumentException).ShouldBeThrownBy(() =>
@@ -810,16 +810,14 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Destination>(_source);
             }
 
-            [Test]
+            [Fact]
             public void Should_perform_the_translation()
             {
                 _dest.Name.ShouldEqual("jon");
             }
         }
 
-#if SILVERLIGHT
-        [Ignore("Setting non-public members not supported with Silverlight DynamicMethod ctor")]
-#endif
+#if !SILVERLIGHT
         public class When_destination_property_does_not_have_a_setter : AutoMapperSpecBase
         {
             private Source _source;
@@ -861,30 +859,31 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Destination>(_source);
             }
 
-            [Test]
+            [Fact]
             public void Should_copy_to_properties_that_have_setters()
             {
                 _dest.Value.ShouldEqual("value");
             }
 
-            [Test]
+            [Fact]
             public void Should_not_attempt_to_translate_to_properties_that_do_not_have_a_setter()
             {
                 _dest.Today.ShouldEqual(DateTime.Today);
             }
 
-            [Test]
+            [Fact]
             public void Should_translate_to_properties_that_have_a_private_setters()
             {
                 _dest.Name.ShouldEqual("jon");
             }
 
-            [Test]
+            [Fact]
             public void Should_translate_to_properties_that_have_a_protected_setters()
             {
                 _dest.Foo.ShouldEqual("bar");
             }
         }
+#endif
 
         public class When_destination_property_does_not_have_a_getter : AutoMapperSpecBase
         {
@@ -943,7 +942,7 @@ namespace AutoMapper.UnitTests
                 _dest = new Destination();
 
 
-                _sourceWithList = new SourceWithList { SomeList = new ArrayList() { 1, 2} };
+                _sourceWithList = new SourceWithList { SomeList = new [] { 1, 2} };
                 _destWithList = new DestinationWithList();
             }
 
@@ -953,16 +952,16 @@ namespace AutoMapper.UnitTests
                 _destWithList = Mapper.Map<SourceWithList, DestinationWithList>(_sourceWithList);
             }
 
-            [Test]
+            [Fact]
             public void Should_translate_to_properties_that_doesnt_have_a_getter()
             {
                 _dest.GetValue().ShouldEqual("jon");
             }
 
-            [Test]
+            [Fact]
             public void Should_translate_to_enumerable_properties_that_doesnt_have_a_getter()
             {
-                Assert.AreEqual(new ArrayList() { 1, 2 }, _destWithList.GetSomeList());
+                new [] { 1, 2 }.ShouldEqual(_destWithList.GetSomeList());
             }
         }
 	
@@ -999,13 +998,13 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_supplied_constructor_to_map()
 			{
 				_destination.OtherValue.ShouldEqual(9);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_other_members()
 			{
 				_destination.Value.ShouldEqual(5);
@@ -1037,7 +1036,7 @@ namespace AutoMapper.UnitTests
 				_dest = Mapper.Map<Source, Dest>(new Source());
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_from_that_constant_value()
 			{
 				_dest.Value.ShouldEqual(5);
@@ -1075,7 +1074,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            [Test]
+            [Fact]
             public void Should_map_from_that_constant_value()
             {
                 _e.ShouldNotBeNull();

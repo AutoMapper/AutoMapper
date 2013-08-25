@@ -1,0 +1,53 @@
+<!--
+***********************************************************************************************
+Microsoft.Silverlight.WindowsPhone.Overrides.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+      created a backup copy.  Incorrect changes to this file will make it
+      impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    ============================================================
+    Windows Phone profile overrides for SL Build System
+    ============================================================
+  -->
+  <PropertyGroup>
+    <RuntimePathRegistryKey Condition="'$(RuntimePathRegistryKey)' == ''">Software\Microsoft\Microsoft SDKs\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\ReferenceAssemblies</RuntimePathRegistryKey>
+    <CreateTestPage>false</CreateTestPage>
+    <TargetFrameworkMonikerDisplayName>Silverlight 4.0 Windows Phone 7.1 Profile</TargetFrameworkMonikerDisplayName>
+    <WindowsPhone7RegistryBase>Software\Microsoft\Microsoft SDKs\Silverlight for Phone</WindowsPhone7RegistryBase>
+    <WindowsPhone7RegistryBaseVersion>$(TargetFrameworkVersion)</WindowsPhone7RegistryBaseVersion>    
+    <TargetCompactFramework Condition = "'$(MSBuildProjectExtension)'=='.vbproj'">true</TargetCompactFramework>   
+  </PropertyGroup>
+
+
+  <!--
+    ============================================================
+    Adds all WMAppManifest.xml to the $(XapFilesInputCollection) collection
+    ============================================================
+  -->
+  <ItemGroup>
+    <!-- If this is a CSharp project then WMAppManifest is under the Properties directory -->
+    <XapFilesInputCollection Include="$(MSBuildProjectDirectory)\Properties\WMAppManifest.xml" Condition = "'$(MSBuildProjectExtension)'=='.csproj'"  />
+ 
+    <!-- Else if it is a VB Project then it is under the My Project directory -->
+    <XapFilesInputCollection Include="$(MSBuildProjectDirectory)\My Project\WMAppManifest.xml" Condition = "'$(MSBuildProjectExtension)'=='.vbproj'"  />
+
+    <!-- Include the background and application image file path for copying to Xap explicitly --> 
+    <XapFilesInputCollection Include="$(TokenBackgroundImage)" Condition = "'$(TokenBackgroundImage)'!=''">
+	   <TargetPath>$(TokenBackgroundImage)</TargetPath>
+    </XapFilesInputCollection>
+    <XapFilesInputCollection Include="$(ApplicationIconImage)" Condition = "'$(ApplicationIconImage)'!=''">
+	   <TargetPath>$(ApplicationIconImage)</TargetPath>
+    </XapFilesInputCollection>
+
+    <Reference Include="mscorlib" />
+  </ItemGroup>
+
+</Project>

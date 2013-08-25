@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BACACF2C-237F-4A48-A891-32B258207095}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AutoMapper.UnitTests</RootNamespace>
+    <AssemblyName>AutoMapper.UnitTests.SL4</AssemblyName>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <SilverlightApplication>true</SilverlightApplication>
+    <SupportedCultures />
+    <XapOutputs>true</XapOutputs>
+    <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
+    <XapFilename>AutoMapper.UnitTests.xap</XapFilename>
+    <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
+    <SilverlightAppEntry>AutoMapper.UnitTests.App</SilverlightAppEntry>
+    <TestPageFileName>TestPage.html</TestPageFileName>
+    <CreateTestPage>true</CreateTestPage>
+    <ValidateXaml>true</ValidateXaml>
+    <EnableOutOfBrowser>false</EnableOutOfBrowser>
+    <OutOfBrowserSettingsFile>Properties\OutOfBrowserSettings.xml</OutOfBrowserSettingsFile>
+    <UsePlatformExtensions>false</UsePlatformExtensions>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <LinkedServerProject />
+  </PropertyGroup>
+  <!--
+  //
+  // Silverlight Code Coverage Instrumentation
+  // List any libraries or assemblies that you would like to instrument during
+  // a code coverage pass. An example, for ClassLibrary1, is provided, and
+  // commented out below as a starting point:
+  //
+  -->
+  <!--
+  <ItemGroup>
+    <InstrumentSilverlightAssemblies Include="SilverlightClassLibrary1">
+      <Visible>false</Visible>
+    </InstrumentSilverlightAssemblies>
+  </ItemGroup>
+  -->
+  <!-- This property group is only here to support building this project using the 
+       MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
+       to set the TargetFrameworkVersion to v3.5 -->
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\SL4\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\SL4\Release\</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Silverlight.Testing">
+      <HintPath>..\..\lib\xunitcontrib-silverlight.0.2\MicrosoftSilverlightTesting-04-2010-SL4\Microsoft.Silverlight.Testing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\xunitcontrib-silverlight.0.2\MicrosoftSilverlightTesting-04-2010-SL4\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="mscorlib" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Browser" />
+    <Reference Include="xunit-silverlight4">
+      <HintPath>..\..\lib\xunitcontrib-silverlight.0.2\Silverlight4\xunit-silverlight4.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.extensions-silverlight4">
+      <HintPath>..\..\lib\xunitcontrib-silverlight.0.2\Silverlight4\xunit.extensions-silverlight4.dll</HintPath>
+    </Reference>
+    <Reference Include="xunitcontrib.runner.silverlight.toolkit-sl4">
+      <HintPath>..\..\lib\xunitcontrib-silverlight.0.2\Silverlight4\xunitcontrib.runner.silverlight.toolkit-sl4.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ArraysAndLists.cs" />
+    <Compile Include="AssertionExtensions.cs" />
+    <Compile Include="AutoMapperSpecBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AutoMapperTester.cs" />
+    <Compile Include="BeforeAfterMapping.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BidirectionalRelationships.cs" />
+    <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
+    <Compile Include="Bug\AllMembersNullSubstitute.cs" />
+    <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
+    <Compile Include="Bug\AssignableCollectionBug.cs" />
+    <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
+    <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
+    <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
+    <Compile Include="Bug\ConditionBug.cs" />
+    <Compile Include="Bug\ContextValuesIncorrect.cs" />
+    <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
+    <Compile Include="Bug\CustomIEnumerableBug.cs" />
+    <Compile Include="Bug\DeepInheritanceIssue.cs" />
+    <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
+    <Compile Include="Bug\DuplicateValuesBug.cs" />
+    <Compile Include="Bug\EFCollections.cs" />
+    <Compile Include="Bug\EnumConditionsBug.cs" />
+    <Compile Include="Bug\EnumMatchingOnValue.cs" />
+    <Compile Include="Bug\ExistingArrays.cs" />
+    <Compile Include="Bug\IgnoreAll.cs" />
+    <Compile Include="Bug\InheritanceIssue.cs" />
+    <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
+    <Compile Include="Bug\LazyCollectionMapping.cs" />
+    <Compile Include="Bug\MappingToAReadOnlyCollection.cs" />
+    <Compile Include="Bug\MemberNamedTypeBug.cs" />
+    <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
+    <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
+    <Compile Include="Bug\MultiThreadingIssues.cs" />
+    <Compile Include="Bug\NamingConventions.cs" />
+    <Compile Include="Bug\NullableBytesAndEnums.cs" />
+    <Compile Include="Bug\NullableConverterBug.cs" />
+    <Compile Include="Bug\NullableEnums.cs" />
+    <Compile Include="Bug\NullableEnumToNullableValueType.cs" />
+    <Compile Include="Bug\NullablePropertiesBug.cs" />
+    <Compile Include="Bug\ObjectTypeMapFailure.cs" />
+    <Compile Include="Bug\RecognizeIxesBug.cs" />
+    <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
+    <Compile Include="Bug\SequenceContainsNoElementsTest.cs" />
+    <Compile Include="Bug\SubclassMappings.cs" />
+    <Compile Include="CollectionMapping.cs" />
+    <Compile Include="ConditionalMapping.cs" />
+    <Compile Include="ConfigurationValidation.cs" />
+    <Compile Include="Constructors.cs" />
+    <Compile Include="ConversionOperators.cs" />
+    <Compile Include="CustomFormatters.cs" />
+    <Compile Include="CustomMapping.cs" />
+    <Compile Include="DataReaderMapping.cs" />
+    <Compile Include="Dictionaries.cs" />
+    <Compile Include="DynamicMapping.cs" />
+    <Compile Include="Enumerations.cs" />
+    <Compile Include="ExpressionBridge.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FillingExistingDestination.cs" />
+    <Compile Include="General.cs" />
+    <Compile Include="IgnoreAllTests.cs" />
+    <Compile Include="Indexers.cs" />
+    <Compile Include="InterfaceMapping.cs" />
+    <Compile Include="Internal\DelegateFactoryTests.cs" />
+    <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
+    <Compile Include="Internationalization.cs" />
+    <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
+    <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
+    <Compile Include="Mappers\TypeHelperTests.cs" />
+    <Compile Include="MappingExceptions.cs" />
+    <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
+    <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
+    <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
+    <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
+    <Compile Include="MappingInheritance\OverrideIgnore.cs" />
+    <Compile Include="MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs" />
+    <Compile Include="MappingInheritance\ShouldInheritBeforeAndAfterMap.cs" />
+    <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
+    <Compile Include="MappingOrder.cs" />
+    <Compile Include="MaxDepthTests.cs" />
+    <Compile Include="MemberResolution.cs" />
+    <Compile Include="NestedContainers.cs" />
+    <Compile Include="NullBehavior.cs" />
+    <Compile Include="Profiles.cs" />
+    <Compile Include="Projection\MapFromTest.cs" />
+    <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
+    <Compile Include="Projection\ProjectCollectionListTest.cs" />
+    <Compile Include="Projection\ProjectTest.cs" />
+    <Compile Include="PropertyMapContexts.cs" />
+    <Compile Include="Regression.cs" />
+    <Compile Include="ResolutionContextTester.cs" />
+    <Compile Include="ReverseMapping.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Assert.cs" />
+    <Compile Include="Should\Should.Core\Assertions\AssertComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\AssertEqualityComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Assertions.cs" />
+    <Compile Include="Should\Should.Core\Assertions\EnumerableEqualityComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Record.cs" />
+    <Compile Include="Should\Should.Core\DatePrecision.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\AssertActualExpectedException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\AssertException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ComparisonException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ContainsException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\DoesNotContainException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\DoesNotThrowException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\EmptyException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\EqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\FalseException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\GreaterThanException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\GreaterThanOrEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\InRangeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsAssignableFromException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsNotTypeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsTypeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\LessThanException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\LessThanOrEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotEmptyException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotInRangeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotNullException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotSameException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NullException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ParameterCountMismatchException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\SameException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\SingleException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\StartsWithException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ThrowsException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TimeoutException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TraceAssertException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TrueException.cs" />
+    <Compile Include="Should\should\ActionAssertionExtensions.cs" />
+    <Compile Include="Should\should\BooleanAssertionExtensions.cs" />
+    <Compile Include="Should\should\CollectionAssertionExtensions.cs" />
+    <Compile Include="Should\should\DateAssertionExtensions.cs" />
+    <Compile Include="Should\should\DoubleAssertionExtensions.cs" />
+    <Compile Include="Should\should\ObjectAssertExtensions.cs" />
+    <Compile Include="Should\should\StringAssertionExtensions.cs" />
+    <Compile Include="TesterExtensions.cs" />
+    <Compile Include="Tests\MapperTests.cs" />
+    <Compile Include="Tests\PropertyMapSpecs.cs" />
+    <Compile Include="Tests\TypeInfoSpecs.cs" />
+    <Compile Include="Tests\TypeMapFactorySpecs.cs" />
+    <Compile Include="TypeConverters.cs" />
+    <Compile Include="ValueTypes.cs" />
+    <Compile Include="WinRTExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\AppManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
+      <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
+      <Name>AutoMapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.SL4.csproj">
+      <Project>{a46863c7-1dec-4037-9fc2-c353021f2490}</Project>
+      <Name>AutoMapper.SL4</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\..\tools\MSBuild\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

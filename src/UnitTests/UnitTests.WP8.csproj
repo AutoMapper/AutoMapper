@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{70D99BDC-6B9E-49AD-96FD-AEC193D27B55}</ProjectGuid>
+    <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AutoMapper.UnitTests.WP8</RootNamespace>
+    <AssemblyName>AutoMapper.UnitTests.WP8</AssemblyName>
+    <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
+    <SilverlightVersion>
+    </SilverlightVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkIdentifier>WindowsPhone</TargetFrameworkIdentifier>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\WP8\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\WP8\Release\</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>Bin\x86\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>
+    </PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>Bin\x86\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>
+    </PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>Bin\ARM\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>full</DebugType>
+    <PlatformTarget>
+    </PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <OutputPath>Bin\ARM\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoStdLib>true</NoStdLib>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>
+    </PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ArraysAndLists.cs" />
+    <Compile Include="AssertionExtensions.cs" />
+    <Compile Include="AutoMapperSpecBase.cs" />
+    <Compile Include="AutoMapperTester.cs" />
+    <Compile Include="BeforeAfterMapping.cs" />
+    <Compile Include="BidirectionalRelationships.cs" />
+    <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
+    <Compile Include="Bug\AllMembersNullSubstitute.cs" />
+    <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
+    <Compile Include="Bug\AssignableCollectionBug.cs" />
+    <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
+    <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
+    <Compile Include="Bug\CollectionMapperMapsISetIncorrectly.cs" />
+    <Compile Include="Bug\ConditionBug.cs" />
+    <Compile Include="Bug\ContextValuesIncorrect.cs" />
+    <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
+    <Compile Include="Bug\CustomIEnumerableBug.cs" />
+    <Compile Include="Bug\DeepInheritanceIssue.cs" />
+    <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
+    <Compile Include="Bug\DuplicateValuesBug.cs" />
+    <Compile Include="Bug\EFCollections.cs" />
+    <Compile Include="Bug\EnumConditionsBug.cs" />
+    <Compile Include="Bug\EnumMatchingOnValue.cs" />
+    <Compile Include="Bug\ExistingArrays.cs" />
+    <Compile Include="Bug\IgnoreAll.cs" />
+    <Compile Include="Bug\InheritanceIssue.cs" />
+    <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
+    <Compile Include="Bug\LazyCollectionMapping.cs" />
+    <Compile Include="Bug\MappingToAReadOnlyCollection.cs" />
+    <Compile Include="Bug\MemberNamedTypeBug.cs" />
+    <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
+    <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
+    <Compile Include="Bug\MultiThreadingIssues.cs" />
+    <Compile Include="Bug\NamingConventions.cs" />
+    <Compile Include="Bug\NullableBytesAndEnums.cs" />
+    <Compile Include="Bug\NullableConverterBug.cs" />
+    <Compile Include="Bug\NullableEnums.cs" />
+    <Compile Include="Bug\NullableEnumToNullableValueType.cs" />
+    <Compile Include="Bug\NullablePropertiesBug.cs" />
+    <Compile Include="Bug\ObjectTypeMapFailure.cs" />
+    <Compile Include="Bug\RecognizeIxesBug.cs" />
+    <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
+    <Compile Include="Bug\SequenceContainsNoElementsTest.cs" />
+    <Compile Include="Bug\SubclassMappings.cs" />
+    <Compile Include="CollectionMapping.cs" />
+    <Compile Include="ConditionalMapping.cs" />
+    <Compile Include="ConfigurationValidation.cs" />
+    <Compile Include="Constructors.cs" />
+    <Compile Include="ConversionOperators.cs" />
+    <Compile Include="CustomFormatters.cs" />
+    <Compile Include="CustomMapping.cs" />
+    <Compile Include="DataReaderMapping.cs" />
+    <Compile Include="Dictionaries.cs" />
+    <Compile Include="DynamicMapping.cs" />
+    <Compile Include="Enumerations.cs" />
+    <Compile Include="ExpressionBridge.cs" />
+    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="FillingExistingDestination.cs" />
+    <Compile Include="General.cs" />
+    <Compile Include="IgnoreAllTests.cs" />
+    <Compile Include="Indexers.cs" />
+    <Compile Include="InterfaceMapping.cs" />
+    <Compile Include="Internal\DelegateFactoryTests.cs" />
+    <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
+    <Compile Include="Internationalization.cs" />
+    <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
+    <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
+    <Compile Include="Mappers\TypeHelperTests.cs" />
+    <Compile Include="MappingExceptions.cs" />
+    <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
+    <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
+    <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
+    <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
+    <Compile Include="MappingInheritance\OverrideIgnore.cs" />
+    <Compile Include="MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs" />
+    <Compile Include="MappingInheritance\ShouldInheritBeforeAndAfterMap.cs" />
+    <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
+    <Compile Include="MappingOrder.cs" />
+    <Compile Include="MaxDepthTests.cs" />
+    <Compile Include="MemberResolution.cs" />
+    <Compile Include="NestedContainers.cs" />
+    <Compile Include="NullBehavior.cs" />
+    <Compile Include="Profiles.cs" />
+    <Compile Include="Projection\MapFromTest.cs" />
+    <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
+    <Compile Include="Projection\ProjectCollectionListTest.cs" />
+    <Compile Include="Projection\ProjectTest.cs" />
+    <Compile Include="PropertyMapContexts.cs" />
+    <Compile Include="Regression.cs" />
+    <Compile Include="ResolutionContextTester.cs" />
+    <Compile Include="ReverseMapping.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Assert.cs" />
+    <Compile Include="Should\Should.Core\Assertions\AssertComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\AssertEqualityComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Assertions.cs" />
+    <Compile Include="Should\Should.Core\Assertions\EnumerableEqualityComparer.cs" />
+    <Compile Include="Should\Should.Core\Assertions\Record.cs" />
+    <Compile Include="Should\Should.Core\DatePrecision.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\AssertActualExpectedException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\AssertException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ComparisonException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ContainsException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\DoesNotContainException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\DoesNotThrowException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\EmptyException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\EqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\FalseException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\GreaterThanException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\GreaterThanOrEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\InRangeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsAssignableFromException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsNotTypeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\IsTypeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\LessThanException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\LessThanOrEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotEmptyException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotEqualException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotInRangeException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotNullException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NotSameException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\NullException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ParameterCountMismatchException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\SameException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\SingleException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\StartsWithException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\ThrowsException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TimeoutException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TraceAssertException.cs" />
+    <Compile Include="Should\Should.Core\Exceptions\TrueException.cs" />
+    <Compile Include="Should\should\ActionAssertionExtensions.cs" />
+    <Compile Include="Should\should\BooleanAssertionExtensions.cs" />
+    <Compile Include="Should\should\CollectionAssertionExtensions.cs" />
+    <Compile Include="Should\should\DateAssertionExtensions.cs" />
+    <Compile Include="Should\should\DoubleAssertionExtensions.cs" />
+    <Compile Include="Should\should\ObjectAssertExtensions.cs" />
+    <Compile Include="Should\should\StringAssertionExtensions.cs" />
+    <Compile Include="TesterExtensions.cs" />
+    <Compile Include="Tests\MapperTests.cs" />
+    <Compile Include="Tests\PropertyMapSpecs.cs" />
+    <Compile Include="Tests\TypeInfoSpecs.cs" />
+    <Compile Include="Tests\TypeMapFactorySpecs.cs" />
+    <Compile Include="TypeConverters.cs" />
+    <Compile Include="ValueTypes.cs" />
+    <Compile Include="WinRTExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
+      <Project>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</Project>
+      <Name>AutoMapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.WP75.csproj">
+      <Project>{B95F2EB2-519E-4BAB-B6B3-6DBBEA7879A6}</Project>
+      <Name>AutoMapper.WP75</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <!--A reference to the entire .Net Framework and Windows SDK are automatically included-->
+    <SDKReference Include="XUnit, Version=2.0">
+      <Name>XUnit for Managed Projects</Name>
+    </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
+  <ProjectExtensions />
+  <PropertyGroup>
+    <SDKReferenceDirectoryRoot>$(ProjectDir)\libs;$(SDKReferenceDirectoryRoot)</SDKReferenceDirectoryRoot>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

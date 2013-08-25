@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
@@ -61,7 +62,7 @@ namespace AutoMapper.Mappers
         {
             try
             {
-                return enumerableType.GetInterface("IEnumerable`1", false);
+                return enumerableType.GetInterfaces().FirstOrDefault(t => t.Name == "IEnumerable`1");
             }
             catch (System.Reflection.AmbiguousMatchException)
             {

@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests
 {
-    [TestFixture]
     public class IgnoreAllTests
     {
         public class Source
@@ -20,7 +19,7 @@ namespace AutoMapper.UnitTests
             public string AnotherString_ShouldBeNullAfterwards { get; set; }
         }
 
-        [Test]
+        [Fact]
         public void GlobalIgnore_ignores_all_properties_beginning_with_string()
         {
 			Mapper.Initialize(cfg =>
@@ -34,7 +33,7 @@ namespace AutoMapper.UnitTests
             Mapper.AssertConfigurationIsValid();
         }
 
-        [Test]
+        [Fact]
         public void Ignored_properties_should_be_default_value()
         {
 			Mapper.Initialize(cfg =>
@@ -49,7 +48,7 @@ namespace AutoMapper.UnitTests
             destination.StartingWith_ShouldNotBeMapped.ShouldEqual(null);
         }
 
-        [Test]
+        [Fact]
         public void Ignore_supports_two_different_values()
         {
 			Mapper.Initialize(cfg =>
@@ -64,8 +63,6 @@ namespace AutoMapper.UnitTests
             destination.StartingWith_ShouldNotBeMapped.ShouldEqual(null);
         }
     }
-
-	[TestFixture]
 	public class IgnoreAttributeTests
 	{
 		public class Source
@@ -81,7 +78,7 @@ namespace AutoMapper.UnitTests
 			public string ShouldNotBeMapped { get; set; }
 		}
 
-		[Test]
+		[Fact]
 		public void Ignore_On_Source_Field()
 		{
 			Mapper.CreateMap<Source, Destination>();

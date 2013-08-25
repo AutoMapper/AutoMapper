@@ -4,9 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Contains cached reflection information for easy retrieval
+    /// </summary>
     public class TypeInfo
     {
         private readonly MemberInfo[] _publicGetters;
@@ -84,7 +88,7 @@ namespace AutoMapper
                 .GroupBy(x => x.Name) // group properties of the same name together
                 .Select(x =>
                     x.Any(y => y.CanWrite && y.CanRead) ? // favor the first property that can both read & write - otherwise pick the first one
-						x.Where(y => y.CanWrite && y.CanRead).First() :
+						x.First(y => y.CanWrite && y.CanRead) :
                         x.First())
 				.Where(pi => pi.CanWrite || pi.PropertyType.IsListOrDictionaryType())
                 .OfType<MemberInfo>() // cast back to MemberInfo so we can add back FieldInfo objects
@@ -95,12 +99,12 @@ namespace AutoMapper
 
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
     	{
-            return GetAllPublicMembers(PropertyReadable, BindingFlags.Instance | BindingFlags.Public | BindingFlags.GetProperty);
+            return GetAllPublicMembers(PropertyReadable, BindingFlags.Instance | BindingFlags.Public);
     	}
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
         {
-            return GetAllPublicMembers(PropertyWritable, BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty);
+            return GetAllPublicMembers(PropertyWritable, BindingFlags.Instance | BindingFlags.Public);
         }
 
         private bool PropertyReadable(PropertyInfo propertyInfo)
@@ -128,17 +132,14 @@ namespace AutoMapper
             // Scan all types for public properties and fields
             return typesToScan
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-                .SelectMany(x => x.FindMembers(MemberTypes.Property | MemberTypes.Field,
-                                               bindingAttr, 
-                                               (m, f) =>
-                                               m is FieldInfo ||
-                                               (m is PropertyInfo && propertyAvailableFor.Invoke((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any()), null));
+                .SelectMany(x => x.GetMembers(bindingAttr)
+                    .Where(m => m is FieldInfo || (m is PropertyInfo && propertyAvailableFor((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any())));
         }
 
         private MethodInfo[] BuildPublicNoArgMethods()
         {
             return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0) && (m.MemberType == MemberTypes.Method))
+                .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))
                 .ToArray();
         }
     }

@@ -2,9 +2,20 @@
 
 namespace AutoMapper
 {
+    /// <summary>
+    /// Options for a single map operation
+    /// </summary>
     public interface IMappingOperationOptions
     {
+        /// <summary>
+        /// Construct services using this callback. Use this for child/nested containers
+        /// </summary>
+        /// <param name="constructor"></param>
         void ConstructServicesUsing(Func<Type, object> constructor);
+
+        /// <summary>
+        /// Create any missing type maps, if found
+        /// </summary>
         bool CreateMissingTypeMaps { get; set; }
     }
 

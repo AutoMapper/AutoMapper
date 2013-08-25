@@ -1,9 +1,9 @@
 ﻿using AutoMapper.Mappers;
-using NUnit.Framework;
+using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
 {
-    [TestFixture]
     public class ShouldInheritBeforeAndAfterMap
     {
         public class BaseClass
@@ -18,12 +18,12 @@ namespace AutoMapper.UnitTests.MappingInheritance
         }
         public class Dto : BaseDto {}
 
-        [Test]
+        [Fact]
         public void should_inherit_base_beforemap()
         {
             // arrange
             var source = new Class{ Prop = "test" };
-            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
+            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistryOverride.AllMappers());
             configurationProvider
                 .CreateMap<BaseClass, BaseDto>()
                 .BeforeMap((s, d) => d.DifferentProp = s.Prop)
@@ -36,15 +36,15 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var dest = mappingEngine.Map<Class, Dto>(source);
 
             // assert
-            Assert.AreEqual("test", dest.DifferentProp);
+            "test".ShouldEqual(dest.DifferentProp);
         }
 
-        [Test]
+        [Fact]
         public void should_inherit_base_aftermap()
         {
             // arrange
             var source = new Class { Prop = "test" };
-            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.AllMappers());
+            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistryOverride.AllMappers());
             configurationProvider
                 .CreateMap<BaseClass, BaseDto>()
                 .AfterMap((s, d) => d.DifferentProp = s.Prop)
@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var dest = mappingEngine.Map<Class, Dto>(source);
 
             // assert
-            Assert.AreEqual("test", dest.DifferentProp);
+            "test".ShouldEqual(dest.DifferentProp);
         }
     }
 }

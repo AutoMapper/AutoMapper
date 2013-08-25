@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using AutoMapper;
 
 namespace AutoMapper.Impl
 {
@@ -16,7 +15,7 @@ namespace AutoMapper.Impl
 			_fieldInfo = fieldInfo;
 			_name = fieldInfo.Name;
 			_memberType = fieldInfo.FieldType;
-			_lateBoundFieldGet = DelegateFactory.CreateGet(fieldInfo);
+            _lateBoundFieldGet = DelegateFactory.CreateGet(fieldInfo);
 		}
 
 		public override MemberInfo MemberInfo
@@ -82,7 +81,7 @@ namespace AutoMapper.Impl
 		public FieldAccessor(FieldInfo fieldInfo)
 			: base(fieldInfo)
 		{
-			_lateBoundFieldSet = DelegateFactory.CreateSet(fieldInfo);
+            _lateBoundFieldSet = DelegateFactory.CreateSet(fieldInfo);
 		}
 
 		public void SetValue(object destination, object value)

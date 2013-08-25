@@ -1,0 +1,34 @@
+<!--
+***********************************************************************************************
+Microsoft.Windows.UI.Xaml.VisualBasic.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+      <TargetFrameworkIdentifier Condition="'$(TargetFrameworkIdentifier)' == ''">.NETCore</TargetFrameworkIdentifier>
+      <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.5</TargetFrameworkVersion>
+      <TargetPlatformVersion Condition="'$(TargetPlatformVersion)' == ''">8.0</TargetPlatformVersion>
+
+      <ImplicitlyExpandTargetPlatform Condition="'$(ImplicitlyExpandTargetPlatform)' == '' ">true</ImplicitlyExpandTargetPlatform>
+      <ImplicitlyExpandTargetFramework Condition="'$(ImplicitlyExpandTargetFramework)' == '' ">true</ImplicitlyExpandTargetFramework>
+      <NoStdLib Condition="'$(NoStdLib)' == ''">true</NoStdLib>
+      <UseVSHostingProcess>false</UseVSHostingProcess>
+      <WindowsAppContainer>true</WindowsAppContainer>
+      
+      <AppxPackage Condition="'$(OutputType)' == 'AppContainerExe'">True</AppxPackage>
+
+      <SuppressWarningsInPass1 Condition="'$(SuppressWarningsInPass1)' == '' ">true</SuppressWarningsInPass1>
+      <ExplicitResetWarningSuppression>true</ExplicitResetWarningSuppression>   
+
+    </PropertyGroup>
+    
+    <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.Targets" />
+    <Import Project="Microsoft.Windows.UI.Xaml.Common.targets" />
+</Project>

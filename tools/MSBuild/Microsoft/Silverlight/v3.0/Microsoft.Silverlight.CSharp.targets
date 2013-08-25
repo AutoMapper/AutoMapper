@@ -1,0 +1,22 @@
+﻿<!--
+***********************************************************************************************
+Microsoft.Silverlight.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <!-- Indicate we are the Silverlight platform and set the registry base. This needs to be done
+             prior to importing the common targets -->
+        <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+        <FrameworkRegistryBase>Software\Microsoft\Microsoft SDKs\$(TargetFrameworkIdentifier)</FrameworkRegistryBase>
+    </PropertyGroup>
+    <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
+    <Import Project="Microsoft.Silverlight.Common.targets" />
+</Project>

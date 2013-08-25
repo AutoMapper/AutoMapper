@@ -1,6 +1,6 @@
 using System;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.Bug
                 });
             }
 
-            [Test]
+            [Fact]
             public void Should_show_configuration_error()
             {
                 typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);

@@ -4,11 +4,10 @@ using System.Linq;
 using AutoMapper;
 using AutoMapper.Mappers;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	[TestFixture]
 	public class AllMembersNullSubstituteBug : AutoMapperSpecBase
 	{
         public class Source
@@ -25,7 +24,7 @@ namespace AutoMapper.UnitTests.Bug
             public string Value3 { get; set; }
         }
 
-		[Test]
+		[Fact]
 		public void Should_map_all_null_values_to_its_substitute()
 		{
             Mapper.CreateMap<Source, Destination>()

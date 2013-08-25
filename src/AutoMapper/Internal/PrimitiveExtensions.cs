@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
 	public static class PrimitiveExtensions
 	{
@@ -55,20 +55,20 @@ namespace AutoMapper
 
 		public static bool IsDictionaryType(this Type type)
 		{
-			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>))
 				return true;
 
 			var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType);
 			var baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
-			return baseDefinitions.Any(t => t == typeof(IDictionary<,>));
+			return baseDefinitions.Any(t => t == typeof(System.Collections.Generic.IDictionary<,>));
 		}
 
 		public static Type GetDictionaryType(this Type type)
 		{
-			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>))
 				return type;
 
-			var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+			var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>));
 			return genericInterfaces.FirstOrDefault();
 		}
 	}

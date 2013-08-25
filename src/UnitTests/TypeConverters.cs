@@ -1,8 +1,9 @@
+#if !NETFX_CORE
 using System;
 using System.ComponentModel;
 using System.Reflection;
 using Should;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests
 {
@@ -61,19 +62,19 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_convert_type_using_expression()
 			{
 				_result.Value1.ShouldEqual(5);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_convert_type_using_instance()
 			{
 				_result.Value2.ShouldEqual(new DateTime(2000, 1, 1));
 			}
 
-			[Test]
+			[Fact]
 			public void Should_convert_type_using_Func_that_returns_instance()
 			{
 				_result.Value3.ShouldEqual(typeof(Destination));
@@ -117,7 +118,7 @@ namespace AutoMapper.UnitTests
                 _result = Mapper.Map<ParentSource, ParentDestination>(source);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_convert_type_using_expression()
 			{
                 _result.Value.Type.ShouldEqual(5);
@@ -161,7 +162,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			[Test]
+			[Fact]
 			public void Should_convert_from_type_using_the_custom_type_converter()
 			{
 				var source = new Source
@@ -173,7 +174,7 @@ namespace AutoMapper.UnitTests
 				destination.OtherValue.ShouldEqual(15);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_convert_to_type_using_the_custom_type_converter()
 			{
 				var source = new Destination()
@@ -221,13 +222,13 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source {Value = 5});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_converter_specified()
 			{
 				_result.OtherValue.ShouldEqual(15);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_pass_configuration_validation()
 			{
 				Mapper.AssertConfigurationIsValid();
@@ -269,13 +270,13 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source {Value = 5});
 			}
 
-			[Test]
+			[Fact]
 			public void Should_use_converter_specified()
 			{
 				_result.OtherValue.ShouldEqual(15);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_pass_configuration_validation()
 			{
 				Mapper.AssertConfigurationIsValid();
@@ -284,3 +285,4 @@ namespace AutoMapper.UnitTests
 
 	}
 }
+#endif

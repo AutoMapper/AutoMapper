@@ -1,0 +1,173 @@
+<!--
+***********************************************************************************************
+Microsoft.Windows.UI.Xaml.Cpp.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <BeforeClCompileTargets>
+            MarkupCompilePass1;
+            $(BeforeClCompileTargets)
+        </BeforeClCompileTargets>
+
+        <ComputeCompileInputsTargets>
+            ComputeXamlGeneratedCompileInputs;
+            $(ComputeCompileInputsTargets)
+        </ComputeCompileInputsTargets>
+        
+        <AfterBuildCompileTargets>
+            $(ComputeLinkInputsTargets);
+            CreateWinMD;
+            ComputeGeneratedWinMD;
+            MarkupCompilePass2;
+            ComputeInvalidXamlGenerated;
+            CompileXamlGeneratedFiles;
+            $(AfterBuildCompileTargets)
+        </AfterBuildCompileTargets>
+        
+        <XamlPreLinkDependsOn>
+            $(XamlPreLinkDependsOn);
+            ComputeXamlGeneratedCLOutputs
+        </XamlPreLinkDependsOn>
+        
+        <GenerateProjectionAssembly>True</GenerateProjectionAssembly>
+        <OnlyCreateWinMD>true</OnlyCreateWinMD>
+        <ImplicitlyExpandTargetPlatform Condition="'$(ImplicitlyExpandTargetPlatform)' == '' ">true</ImplicitlyExpandTargetPlatform>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <ValidatePresenceOfAppxManifestItemsDependsOn>
+            $(ValidatePresenceOfAppxManifestItemsDependsOn);
+            _CreateContentItemOutOfCustomAppxManifest
+        </ValidatePresenceOfAppxManifestItemsDependsOn>
+    </PropertyGroup>
+   
+   <!-- This is a proxy target that holds stuff that runs before the final Link -->
+    <Target Name="XamlPreLink" BeforeTargets="Link" DependsOnTargets="$(XamlPreLinkDependsOn)" />
+    
+    <Target Name="ComputeGeneratedWinMD" >
+      <PropertyGroup>
+        <LocalAssembly Condition="'$(LocalAssembly)' == '' and '%(Link.WindowsMetadataFile)' != ''">%(Link.WindowsMetadataFile)</LocalAssembly>
+      </PropertyGroup>
+    </Target>
+    
+    <!-- Change AppxManifest.xml override item to be of Content type. -->
+    <Target Name="_CreateContentItemOutOfCustomAppxManifest">
+        <ItemGroup>
+            <Content Include="@(Xml)" Condition="'%(Identity)' == 'AppxManifest.xml'" />
+            <Xml Remove="@(Xml)" Condition="'%(Identity)' == 'AppxManifest.xml'" />
+        </ItemGroup>
+    </Target>
+    
+    <PropertyGroup>
+      <GeneratedFilesDir Condition=" '$(GeneratedFilesDir)' == ''">Generated Files\</GeneratedFilesDir>
+      <XamlGeneratedOutputPath>$(GeneratedFilesDir)</XamlGeneratedOutputPath>
+        <ExtensionsToDeleteOnClean>$(ExtensionsToDeleteOnClean);*.g.h;*.g.cpp;*.xaml</ExtensionsToDeleteOnClean>
+    </PropertyGroup>
+
+    <Import Project="Microsoft.Windows.UI.Xaml.Common.targets" />
+
+    <!-- Generated files output group population -->
+    <PropertyGroup>
+        <GeneratedFilesOutputGroupDependsOn>XamlGeneratedFilesOutputGroup;$(GeneratedFilesOutputGroupDependsOn)</GeneratedFilesOutputGroupDependsOn>
+    </PropertyGroup>
+
+    <Target Name="XamlGeneratedFilesOutputGroup"
+            DependsOnTargets="$(XamlGeneratedFilesOutputGroupDependsOn)"
+            Condition="'@(Page)@(ApplicationDefinition)' != ''">
+        <ItemGroup>
+            <GeneratedFilesOutputGroup Condition="'%(Page.ExcludedFromBuild)'!='true'" Include="@(Page->'$(XamlGeneratedOutputPath)%(Filename).g.h')" />
+            <GeneratedFilesOutputGroup Condition="'%(Page.ExcludedFromBuild)'!='true'" Include="@(Page->'$(XamlGeneratedOutputPath)%(Filename).g.cpp')" />
+            <GeneratedFilesOutputGroup Condition="'%(ApplicationDefinition.ExcludedFromBuild)'!='true'" Include="@(ApplicationDefinition->'$(XamlGeneratedOutputPath)%(Filename).g.h')" />
+            <GeneratedFilesOutputGroup Condition="'%(ApplicationDefinition.ExcludedFromBuild)'!='true'" Include="@(ApplicationDefinition->'$(XamlGeneratedOutputPath)%(Filename).g.cpp')" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="ComputeXamlGeneratedCompileInputs"
+            DependsOnTargets="$(ComputeXamlGeneratedCompileInputsDependsOn)"
+            Condition="'@(Page)@(ApplicationDefinition)' != ''">
+        <ItemGroup>
+            <ClCompile Condition="'%(Page.ExcludedFromBuild)'!='true'" Include="@(Page->'$(XamlGeneratedOutputPath)%(Filename).g.cpp')" >
+                <CompilerIteration>XamlGenerated</CompilerIteration>
+            </ClCompile>
+            <ClCompile Condition="'%(ApplicationDefinition.ExcludedFromBuild)'!='true'" Include="@(ApplicationDefinition->'$(XamlGeneratedOutputPath)%(Filename).g.cpp')" >
+                <CompilerIteration>XamlGenerated</CompilerIteration>
+            </ClCompile>
+            <ClCompile Include="$(XamlGeneratedOutputPath)XamlTypeInfo.g.cpp" >
+                <CompilerIteration>XamlGenerated</CompilerIteration>
+            </ClCompile>
+            <ClCompile Include="$(XamlGeneratedOutputPath)XamlTypeInfo.Impl.g.cpp" />
+            <ClCompile Condition="'$(OutputType)' == 'Library'"  Include="$(XamlGeneratedOutputPath)XamlLibMetadataProvider.g.cpp" />
+        </ItemGroup>
+        
+         <!-- The build only wants to generate winmd once, either during Link target or Createwinmd target, not both.  
+        Link and Createwinmd targets will execute link.exe, so it is best to run link.exe only once.
+        However, there are two cases where that isn't possible.
+        1) when build is building XAML and 
+        2) when building in passes.  -->
+        <PropertyGroup>
+            <GenerateBuildCompilePassWinMD Condition="'$(GenerateBuildCompilePassWinMD)' == ''">true</GenerateBuildCompilePassWinMD>
+        </PropertyGroup>
+    </Target>
+
+  <Target Name="ComputeInvalidXamlGenerated" >
+      <ItemGroup>
+          <!-- Some files dont exists because XAML files do not always generate .g.cpp -->
+          <ClCompile Remove="@(ClCompile)" Condition="'%(ClCompile.CompilerIteration)' == 'XamlGenerated' and !Exists('%(Identity)')"/>
+      </ItemGroup>
+  </Target>
+
+  <!-- Add CL generates .obj files to Obj item group, it will be used by lib or link -->
+  <Target Name="ComputeXamlGeneratedCLOutputs"
+          DependsOnTargets="ComputeXamlGeneratedCompileInputs;ComputeInvalidXamlGenerated"
+          Condition="'@(ClCompile)' != ''">
+
+      <ItemGroup>
+          <!-- Some files dont exists because XAML files do not always generate .g.cpp -->
+          <ClCompile Remove="@(ClCompile)" Condition="'%(ClCompile.CompilerIteration)' == 'XamlGenerated' and !Exists('%(Identity)')"/>
+          <!-- No object file name defined: filename.obj -->
+          <Obj Condition="'%(ClCompile.ObjectFileName)'=='' and '%(ClCompile.ExcludedFromBuild)'!='true'" Include="@(ClCompile->'%(Filename).obj')" />
+          <!-- Object file name is a directory (has trailing slash): ofn\filename.obj -->
+          <Obj Condition="HasTrailingSlash('%(ClCompile.ObjectFileName)') and '%(ClCompile.ExcludedFromBuild)'!='true'" Include="@(ClCompile->'%(ObjectFileName)%(Filename).obj')" />
+          <!-- Object file name is a file (does not has trailing slash): ofn -->
+          <Obj Condition="'%(ClCompile.ObjectFileName)' != '' and !HasTrailingSlash('%(ClCompile.ObjectFileName)') and '%(ClCompile.ExcludedFromBuild)'!='true'" Include="@(ClCompile->'%(ObjectFileName)')"  />
+
+          <Link Include="@(Obj->WithMetadataValue('CompilerIteration', 'XamlGenerated')->ClearMetadata())" />
+      </ItemGroup>
+  </Target>
+
+    <!-- Enable design time build as well as selected file(s) compile support -->
+    <PropertyGroup>
+        <EnableDesignTimeBuild>true</EnableDesignTimeBuild>
+    </PropertyGroup>
+  
+    <ItemDefinitionGroup>
+        <Page>
+            <GeneratorTarget>DesignTimeMarkupCompilation</GeneratorTarget>
+        </Page>
+        <ApplicationDefinition>
+            <GeneratorTarget>DesignTimeMarkupCompilation</GeneratorTarget>
+        </ApplicationDefinition>
+    </ItemDefinitionGroup>
+
+    <PropertyGroup>
+        <MarkupCompilePass1DependsOn>CppDesignTimeMarkupCompilation;$(MarkupCompilePass1DependsOn)</MarkupCompilePass1DependsOn>
+    </PropertyGroup>
+
+    <Target Name="CppDesignTimeMarkupCompilation"
+            DependsOnTargets="_SelectedFiles;SelectCustomBuild;ResolveReferences">
+	<!-- Ideally we'd like to be able to build just the requested files (if it makes sense). -->
+        <!--<ItemGroup Condition="'@(SelectedFiles)'!=''">
+          <Page Remove="@(Page)" Condition="'%(Identity)'!='@(SelectedFiles)'"/>
+          <ApplicationDefinition Remove="@(ApplicationDefinition)" Condition="'%(Identity)'!='@(SelectedFiles)'"/>
+        </ItemGroup>-->
+    </Target>
+
+</Project>

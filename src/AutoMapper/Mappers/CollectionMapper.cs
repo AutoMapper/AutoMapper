@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
@@ -52,14 +53,7 @@ namespace AutoMapper.Mappers
                 
                 if (typeof(TCollection).IsInterface)
                 {
-                    if (typeof(TCollection).IsGenericType && (typeof(TCollection).GetGenericTypeDefinition() == typeof(ISet<>)))
-                    {
-                        collection = new HashSet<TElement>();
-                    }
-                    else
-                    {
-                        collection = new List<TElement>();
-                    }
+                    collection = new List<TElement>();
                 }
                 else
                 {

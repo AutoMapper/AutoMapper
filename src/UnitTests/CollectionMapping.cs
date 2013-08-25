@@ -2,40 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using NUnit.Framework;
+using Xunit;
 using Should;
-#if !SILVERLIGHT
-using NUnit.Framework.SyntaxHelpers;
-#endif
 
 namespace AutoMapper.UnitTests
 {
-    [TestFixture]
     public class CollectionMapping
     {
-        #region Setup/Teardown
-
-        [SetUp]
+        public CollectionMapping()
+        {
+            SetUp();
+        }
         public void SetUp()
         {
             Mapper.Reset();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-        }
-
-        #endregion
-
-        [TestFixtureSetUp]
-        public void TestFixtureSetUp()
-        {
-        }
-
-        [TestFixtureTearDown]
-        public void TestFixtureTearDown()
-        {
         }
 
 
@@ -99,7 +79,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        [Test]
+        [Fact]
         public void Should_keep_and_fill_destination_collection_when_collection_is_implemented_as_list()
         {
             Mapper.CreateMap<MasterDto, MasterWithCollection>()
@@ -121,11 +101,11 @@ namespace AutoMapper.UnitTests
 
             Mapper.Map(dto, master);
 
-            Assert.That(master.Details, Is.SameAs(originalCollection));
-            Assert.That(master.Details.Count, Is.EqualTo(originalCollection.Count));
+            originalCollection.ShouldBeSameAs(master.Details);
+            originalCollection.Count.ShouldEqual(master.Details.Count);
         }
 
-        [Test]
+        [Fact]
         public void Should_keep_and_fill_destination_collection_when_collection_is_implemented_as_set()
         {
             Mapper.CreateMap<MasterDto, MasterWithCollection>()
@@ -147,11 +127,11 @@ namespace AutoMapper.UnitTests
 
             Mapper.Map(dto, master);
 
-            Assert.That(master.Details, Is.SameAs(originalCollection));
-            Assert.That(master.Details.Count, Is.EqualTo(originalCollection.Count));
+            originalCollection.ShouldBeSameAs(master.Details);
+            originalCollection.Count.ShouldEqual(master.Details.Count);
         }
 
-        [Test]
+        [Fact]
         public void Should_keep_and_fill_destination_collection_when_collection_is_implemented_as_set_with_aftermap()
         {
             Mapper.CreateMap<MasterDto, MasterWithCollection>()
@@ -174,11 +154,11 @@ namespace AutoMapper.UnitTests
 
             Mapper.Map(dto, master);
 
-            Assert.That(master.Details, Is.SameAs(originalCollection));
-            Assert.That(master.Details.Count, Is.EqualTo(originalCollection.Count));
+            originalCollection.ShouldBeSameAs(master.Details);
+            originalCollection.Count.ShouldEqual(master.Details.Count);
         }
 
-        [Test]
+        [Fact]
         public void Should_keep_and_fill_destination_list()
         {
             Mapper.CreateMap<MasterDto, MasterWithList>()
@@ -200,11 +180,11 @@ namespace AutoMapper.UnitTests
 
             Mapper.Map(dto, master);
 
-            Assert.That(master.Details, Is.SameAs(originalCollection));
-            Assert.That(master.Details.Count, Is.EqualTo(originalCollection.Count));
+            originalCollection.ShouldBeSameAs(master.Details);
+            originalCollection.Count.ShouldEqual(master.Details.Count);
         }
 
-        [Test]
+        [Fact]
         public void Should_not_replace_destination_collection()
         {
             Mapper.CreateMap<MasterDto, MasterWithCollection>();
@@ -225,10 +205,10 @@ namespace AutoMapper.UnitTests
 
             Mapper.Map(dto, master);
 
-            Assert.That(master.Details, Is.SameAs(originalCollection));
+            originalCollection.ShouldBeSameAs(master.Details);
         }
 
-        [Test]
+        [Fact]
         public void Should_be_able_to_map_to_a_collection_type_that_implements_ICollection_of_T()
         {
             Mapper.CreateMap<MasterDto, MasterWithNoExistingCollection>();
@@ -249,7 +229,7 @@ namespace AutoMapper.UnitTests
             master.Details.Count.ShouldEqual(2);
         }
 
-        [Test]
+        [Fact]
         public void Should_not_replace_destination_list()
         {
             Mapper.CreateMap<MasterDto, MasterWithList>();
@@ -270,11 +250,11 @@ namespace AutoMapper.UnitTests
 
             Mapper.Map(dto, master);
 
-            Assert.That(master.Details, Is.SameAs(originalCollection));
+            originalCollection.ShouldBeSameAs(master.Details);
         }
 
-#if !SILVERLIGHT
-        [Test]
+#if !SILVERLIGHT && !NETFX_CORE
+        [Fact]
         public void Should_map_to_NameValueCollection() {
             // initially results in the following exception:
             // ----> System.InvalidCastException : Unable to cast object of type 'System.Collections.Specialized.NameValueCollection' to type 'System.Collections.IList'.
@@ -282,11 +262,11 @@ namespace AutoMapper.UnitTests
             var c = new NameValueCollection();
             var mappedCollection = Mapper.Map<NameValueCollection, NameValueCollection>(c);
 
-            Assert.IsNotNull(mappedCollection);
+            mappedCollection.ShouldNotBeNull();
         }
 #endif
 
-#if SILVERLIGHT
+#if SILVERLIGHT || NETFX_CORE
         public class HashSet<T> : Collection<T>
         {
             

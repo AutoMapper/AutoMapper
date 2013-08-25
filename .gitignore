@@ -11,3 +11,6 @@ _ReSharper*
 *.suo
 *.cache
 TestResult.xml
+AppPackages/
+*.bak
+packages

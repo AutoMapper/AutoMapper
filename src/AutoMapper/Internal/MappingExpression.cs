@@ -284,7 +284,7 @@ namespace AutoMapper
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            return _configurationContainer.CreateMap<TDestination, TSource>();
+            return _configurationContainer.CreateMap<TDestination, TSource>(MemberList.Source);
         }
 
         public IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions)

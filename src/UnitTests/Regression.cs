@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Should;
-using NUnit.Framework;
+using Xunit;
 using System.Linq;
 
 namespace AutoMapper.UnitTests
@@ -24,17 +24,18 @@ namespace AutoMapper.UnitTests
 		{
 			public Guid Id { get; set; }
 		}
-
-		[TestFixture]
 		public class automapper_fails_to_map_custom_mappings_when_mapping_collections_for_an_interface
 		{
-			[SetUp]
+            public automapper_fails_to_map_custom_mappings_when_mapping_collections_for_an_interface()
+            {
+                Setup();
+            }
 			public void Setup()
 			{
 				Mapper.Reset();
 			}
 
-			[Test]
+			[Fact]
 			public void should_map_the_id_property()
 			{
 				var domainItems = new List<ITestDomainItem>
@@ -49,7 +50,7 @@ namespace AutoMapper.UnitTests
 
 				var dtos = Mapper.Map<IEnumerable<ITestDomainItem>, TestDtoItem[]>(domainItems);
 
-				Assert.AreEqual(domainItems[0].ItemId, dtos[0].Id);
+				domainItems[0].ItemId.ShouldEqual(dtos[0].Id);
 			}
 		}
 
@@ -93,13 +94,13 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Source, Destination>(new Source { SomeDate = new DateTime(2005, 12, 1) });
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_a_date_with_a_value()
 			{
 				_result.SomeDate.Day.ShouldEqual(1);
 			}
 
-			[Test]
+			[Fact]
 			public void Should_map_null_to_null()
 			{
 				var destination = Mapper.Map<Source, Destination>(new Source());
@@ -120,7 +121,7 @@ namespace AutoMapper.UnitTests
 				public string ProductName { get; set; }
 			}
 
-			[Test]
+			[Fact]
 			public void Should_not_use_AssignableMapper_when_mappings_are_specified_on_the_fly()
 			{
 				Mapper.CreateMap<Order, Order>();
@@ -156,7 +157,7 @@ namespace AutoMapper.UnitTests
 				Mapper.CreateMap<Person, PersonModel>();
 			}
 
-			[Test]
+			[Fact]
 			public void MapsEnumerableTypes()
 			{
 				Person[] personArr = new[] {new Person() {Name = "Name"}};
@@ -164,8 +165,8 @@ namespace AutoMapper.UnitTests
 				
 				var pmc = Mapper.Map<People, List<PersonModel>>(people);
 				
-				Assert.IsNotNull(pmc);
-				Assert.IsTrue(pmc.Count == 1);
+				pmc.ShouldNotBeNull();
+				(pmc.Count == 1).ShouldBeTrue();
 			}
 
 			public class People : IEnumerable

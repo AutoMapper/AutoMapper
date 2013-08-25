@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Should;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -27,14 +28,14 @@ namespace AutoMapper.UnitTests.Bug
                 Mapper.CreateMap<DummySource, DummyDestination>();
             }
 
-            [Test]
+            [Fact]
             public void Should_map_null_enum_to_nullable_base_type()
             {
                 DummySource src = new DummySource() { Dummy = null };
 
                 var destination = Mapper.Map<DummySource, DummyDestination>(src);
 
-                Assert.IsNull(destination.Dummy);
+                destination.Dummy.ShouldBeNull();
             }
         } 
     }

@@ -1,0 +1,539 @@
+<!--
+***********************************************************************************************
+Microsoft.Windows.UI.Xaml.Common.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    
+    <!-- Need the path to vcmeta.dll -->
+    <PropertyGroup>
+        <VCInstallDir_110 Condition="'$(VCInstallDir_110)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VC@ProductDir)</VCInstallDir_110>
+        <VCInstallDir_110 Condition="'$(VCInstallDir_110)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\Setup\VC@ProductDir)</VCInstallDir_110>
+        <VCInstallDir_110 Condition="'$(VCInstallDir_110)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Win8Express\11.0\Setup\VC@ProductDir)</VCInstallDir_110>
+        <VCInstallDir_110 Condition="'$(VCInstallDir_110)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Win8Express\11.0\Setup\VC@ProductDir)</VCInstallDir_110>
+        <VCInstallDir>$(VCInstallDir_110)</VCInstallDir>
+
+        <XAMLFingerprint Condition="'$(XAMLFingerprint)' == ''">true</XAMLFingerprint>
+
+        <XAMLFingerprintIgnorePaths Condition="'$(XAMLFingerprintIgnorePaths)'==''">
+            @(ReferenceAssemblyPaths);
+            $(WindowsSDK80Path)
+        </XAMLFingerprintIgnorePaths>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
+        <AvailableItemName Include="PRIResource" />
+        <AvailableItemName Include="AppxManifest" />
+        <AvailableItemName Include="ApplicationDefinition" />
+        <AvailableItemName Include="Page" />
+    </ItemGroup>
+   
+    <!-- Setting PRI index name.  The XAML compiler use this in the LoadComponent() string.
+         It must match the name of the directoy the AppX Packaging system uses -->
+    <PropertyGroup>
+        <!-- Exe's don't have an PriIndexName -->
+        <PriIndexName Condition="'$(AppxPackage)' == 'true'"></PriIndexName>
+        <!-- Managed Dll's use the "safe" name of the project as the App Package Name -->
+        <PriIndexName Condition="'$(AppxPackage)' != 'true' and '$(ManagedAssembly)' != 'false' and '$(OutputType)' != 'winmdobj'">$(TargetName)</PriIndexName>
+        <!-- Winmd library targets (managed or native) use the default root namespace of the project for the App package name -->
+        <PriIndexName Condition="'$(AppxPackage)' != 'true' and '$(ManagedAssembly)' != 'false' and '$(OutputType)' == 'winmdobj'">$(RootNamespace)</PriIndexName>
+        <PriIndexName Condition="'$(AppxPackage)' != 'true' and '$(ManagedAssembly)' == 'false' and '$(RootNamespace)' != ''">$(RootNamespace)</PriIndexName>
+        <!-- If RootNamespace is empty fall back to TargetName -->
+        <PriIndexName Condition="'$(AppxPackage)' != 'true' and $(PriIndexName) == ''">$(TargetName)</PriIndexName>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <AvailablePlatforms>$(AvailablePlatforms),ARM</AvailablePlatforms>
+       
+        <!-- this Property is used only for the Managed build.
+            See Microsoft.Windows.UI.Xaml.Cpp.Targets for Native build rules -->
+        <PrepareResourcesDependsOn>
+            ResolveKeySource;
+            MarkupCompilePass1;
+            XamlPreCompile;
+            MarkupCompilePass2;
+            $(PrepareResourcesDependsOn)
+        </PrepareResourcesDependsOn>
+
+        <Prefer32Bit Condition="'$(Prefer32Bit)' == '' and ('$(OutputType)' == 'exe' or '$(OutputType)' == 'winexe' or '$(OutputType)' == 'appcontainerexe')">true</Prefer32Bit>
+        <HighEntropyVA Condition="'$(HighEntropyVA)' == ''">true</HighEntropyVA>
+        <SubsystemVersion Condition="'$(SubsystemVersion)' == '' and ('$(PlatformTarget)' == 'ARM' or '$(OutputType)' == 'appcontainerexe' or '$(OutputType)' == 'winmdobj')">6.02</SubsystemVersion>
+        <SubsystemVersion Condition="'$(SubsystemVersion)' == ''">6.00</SubsystemVersion>
+       
+        <OnXamlPreCompileErrorTarget Condition="'$(OnXamlPreCompileErrorTarget)' == ''">_OnXamlPreCompileError</OnXamlPreCompileErrorTarget>
+
+        <!-- Allow App Domain to be shared between Pass1/Pass2 Xaml Markup Compile -->
+        <XamlShareAppDomains Condition="'$(XamlShareAppDomains)' == ''">true</XamlShareAppDomains>
+
+        <!-- Use Intermediate dir if XamlGeneratedOutputPath is not defined -->
+        <XamlGeneratedOutputPath Condition="'$(XamlGeneratedOutputPath)' == ''">$(IntermediateOutputPath)</XamlGeneratedOutputPath>
+    </PropertyGroup>
+
+    <UsingTask TaskName="Microsoft.Windows.UI.Xaml.Build.Tasks.CompileXaml"  AssemblyFile="Microsoft.Windows.UI.Xaml.Build.Tasks.dll" />
+
+    <PropertyGroup>
+        <!--If the path to the sign tool is not set, assume the SDK path -->
+        <SignToolPath Condition="'$(SignToolPath)' == ''">$(FrameworkSDKRoot)bin</SignToolPath>
+
+        <!--Integration with packaging for GeneratedXamlFilesOutputGroupOutput -->
+        <IncludeCustomOutputGroupForPackaging>true</IncludeCustomOutputGroupForPackaging>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <XamlIntermediateAssembly Condition="'$(ManagedAssembly)'!='false'" Include="$(XamlGeneratedOutputPath)intermediatexaml\$(TargetName)$(TargetExt)"/>
+        <XamlIntermediateAssembly Condition="'$(ManagedAssembly)'=='false'" Include="$(OutDir)$(TargetName).winmd"/>
+    </ItemGroup>
+
+    <!--
+    ============================================================
+    Adds all XAML Pages to the $(Resource) collection
+    ============================================================
+    -->
+    <ItemGroup Condition=" '$(ManagedAssembly)'=='' ">
+        <!-- Add XAML Page items to $(Resource) -->
+        <Resource Include="@(Page)" />
+        <Resource Include="@(ApplicationDefinition)" />
+    </ItemGroup>
+
+    <!-- Manifest metadata items.                       -->
+    <!-- See Microsoft.AppxPackage.targets for details. -->
+    <ItemGroup Label="AppxManifestMetadata">
+        <AppxManifestMetadata Include="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.Build.Tasks.dll" />
+    </ItemGroup>
+
+    <!-- 
+    ================================================================
+                        DesignTimeMarkupCompilation
+                        
+    Support for the Intellisense build
+    ================================================================
+     -->
+    <PropertyGroup>
+        <CoreCompileDependsOn Condition="'$(BuildingInsideVisualStudio)' == 'true' ">
+          DesignTimeMarkupCompilation;
+          $(CoreCompileDependsOn)
+        </CoreCompileDependsOn>
+    </PropertyGroup>
+
+    <Target Name="DesignTimeMarkupCompilation">
+        <!-- BuildingProject is used in Managed builds (always true in Native) -->
+        <!-- DesignTimeBuild is used in Native builds (always false in Managed) -->
+        <CallTarget Condition="'$(BuildingProject)' != 'true' Or $(DesignTimeBuild) == 'true'" Targets="DesignTimeMarkupCompilationCT" />
+    </Target>
+ 
+    <!-- A copy of the first pass, without the WarningLevel manipulation -->
+    <Target Name="DesignTimeMarkupCompilationCT"
+          DependsOnTargets="$(MarkupCompilePass1DependsOn)"
+          Condition="'@(Page)' != '' Or '@(ApplicationDefinition)' != '' " >        
+
+        <MakeDir Directories="$(XamlGeneratedOutputPath)intermediatexaml\" />
+
+        <CompileXaml
+                LanguageSourceExtension="$(DefaultLanguageSourceExtension)"
+                Language="$(Language)"
+                RootNamespace="$(RootNamespace)"
+                XamlPages="@(Page)"
+                XamlApplications="@(ApplicationDefinition)"
+                PriIndexName="$(PriIndexName)"
+                ProjectName="$(MsBuildProjectName)"
+                IsPass1="True"
+                CodeGenerationControlFlags="$(XamlCodeGenerationControlFlags)"
+                ProjectPath="$(MSBuildProjectFullPath)"
+                OutputPath="$(XamlGeneratedOutputPath)"
+                OutputType="$(OutputType)"
+                TargetPlatformWinMDLocation="$(TargetPlatformWinMDLocation)"
+                ReferenceAssemblyPaths="@(ReferenceAssemblyPaths)"
+                ReferenceAssemblies ="@(ReferencePath)"
+                ShareAppDomains="$(XamlShareAppDomains)"
+                ForceSharedAppDomainShutdown="False"
+                ContinueOnError="True"
+                CompileMode="DesignTimeBuild"
+                XAMLFingerprint="$(XAMLFingerprint)"
+                FingerprintIgnorePaths="$(XAMLFingerprintIgnorePaths)"
+                VCInstallDir="$(VCInstallDir_110)"
+            >
+            <Output Condition=" '$(ManagedAssembly)'!='false' " ItemName="Compile"   TaskParameter="GeneratedCodeFiles" />
+
+            <!-- Add to the list list of files written. It is used in Microsoft.Common.Targets to clean up 
+                 for a next clean build 
+              -->
+            <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
+            <Output ItemName="FileWrites" TaskParameter="GeneratedXamlFiles" />
+            <Output ItemName="_GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
+        </CompileXaml>
+       
+        <Message Text="(Out) ISenseCodeFiles: '@(_GeneratedCodeFiles)'" />
+        <Message Text="(Out) ISenseXamlFiles: '@(_GeneratedXamlFiles)'" />
+        <Message Text="(Out) ClCompile: '@(ClCompile)'" Condition="'%(ClCompile.CompilerIteration)' != 'XamlGenerated'"/>
+        <Message Text="(Out) Compile: '@(Compile)'" />
+    </Target>
+
+    <!--   
+    ================================================================
+                         MarkupCompilePass1
+    ================================================================
+    -->
+
+    <Target Name="MarkupCompilePass1"
+          DependsOnTargets="$(MarkupCompilePass1DependsOn)"
+          Condition="'@(Page)' != '' Or '@(ApplicationDefinition)' != '' " >        
+
+        <MakeDir Directories="$(XamlGeneratedOutputPath)intermediatexaml\" />
+
+        <CompileXaml
+                LanguageSourceExtension="$(DefaultLanguageSourceExtension)"
+                Language="$(Language)"
+                RootNamespace="$(RootNamespace)"
+                XamlPages="@(Page)"
+                XamlApplications="@(ApplicationDefinition)"
+                PriIndexName="$(PriIndexName)"
+                ProjectName="$(MsBuildProjectName)"
+                IsPass1="True"
+                CodeGenerationControlFlags="$(XamlCodeGenerationControlFlags)"
+                ProjectPath="$(MSBuildProjectFullPath)"
+                OutputPath="$(XamlGeneratedOutputPath)"
+                OutputType="$(OutputType)"
+                TargetPlatformWinMDLocation="$(TargetPlatformWinMDLocation)"
+                ReferenceAssemblyPaths="@(ReferenceAssemblyPaths)"
+                ReferenceAssemblies ="@(ReferencePath)"
+                ShareAppDomains="$(XamlShareAppDomains)"
+                ForceSharedAppDomainShutdown="False"
+                CompileMode="RealBuildPass1"
+                XAMLFingerprint="$(XAMLFingerprint)"
+                FingerprintIgnorePaths="$(XAMLFingerprintIgnorePaths)"
+                VCInstallDir="$(VCInstallDir_110)"
+             >
+
+            <Output Condition=" '$(ManagedAssembly)'!='false' " ItemName="Compile"   TaskParameter="GeneratedCodeFiles" />
+
+            <!-- Add to the list list of files written. It is used in Microsoft.Common.Targets to clean up 
+                 for a next clean build 
+              -->
+            <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
+            <Output ItemName="FileWrites" TaskParameter="GeneratedXamlFiles" />
+            <Output ItemName="_GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
+        </CompileXaml>
+       
+        <Message Text="(Out) GeneratedCodeFiles: '@(_GeneratedCodeFiles)'" />
+        <Message Text="(Out) GeneratedXamlFiles: '@(_GeneratedXamlFiles)'" />
+        <Message Text="(Out) ClCompile: '@(ClCompile)'" Condition="'%(ClCompile.CompilerIteration)' != 'XamlGenerated'"/>
+        <Message Text="(Out) Compile: '@(Compile)'" />
+
+        <PropertyGroup>
+            <PrevWarningLevel>$(WarningLevel)</PrevWarningLevel>
+            <WarningLevel Condition="'$(SuppressWarningsInPass1)'=='true'">0</WarningLevel>
+        </PropertyGroup>
+    </Target>
+
+    <!--   
+    ================================================================
+                         MarkupCompilePass2
+    ================================================================
+    -->
+    
+    <Target Name="MarkupCompilePass2"
+            DependsOnTargets="$(MarkupCompilePass2DependsOn)"
+            Condition="'@(Page)' != '' Or '@(ApplicationDefinition)' != '' " >
+            
+        <PropertyGroup>
+            <WarningLevel>$(PrevWarningLevel)</WarningLevel>
+            <WarningLevel Condition="'$(WarningLevel)' == '' and '$(ExplicitResetWarningSuppression)' == 'true'">1</WarningLevel>
+        </PropertyGroup>
+
+        <!-- The Name of the Local Assembly in Managed and Native -->    
+        <PropertyGroup>
+            <LocalAssembly Condition="'$(LocalAssembly)' == '' and Exists(@(XamlIntermediateAssembly))">
+                @(XamlIntermediateAssembly->'%(Identity)')
+            </LocalAssembly>
+        </PropertyGroup>
+
+        <ItemGroup>
+            <!-- C++ provides a filtered Item that eliminates any Managed Assemblies on the ReferencePath (from SDKs for example) -->
+            <XamlReferencesToCompile Condition="'$(Language)'=='C++'" Include="@(WinMDReferenceToCompile)" />
+            <XamlReferencesToCompile Condition="'$(Language)'!='C++'" Include="@(ReferencePath)" />
+        </ItemGroup>
+
+        <CompileXaml
+                LanguageSourceExtension="$(DefaultLanguageSourceExtension)"
+                Language="$(Language)"
+                RootNamespace="$(RootNamespace)"
+                XamlPages="@(Page)"
+                XamlApplications="@(ApplicationDefinition)"
+                PriIndexName="$(PriIndexName)"
+                ProjectName="$(MsBuildProjectName)"
+                IsPass1="False"
+                CodeGenerationControlFlags="$(XamlCodeGenerationControlFlags)"
+                ClIncludeFiles="@(ClInclude)"
+                LocalAssembly="$(LocalAssembly)"
+                ProjectPath="$(MSBuildProjectFullPath)"
+                OutputPath="$(XamlGeneratedOutputPath)"
+                OutputType="$(OutputType)"
+                TargetPlatformWinMDLocation="$(TargetPlatformWinMDLocation)"
+                ReferenceAssemblyPaths="@(ReferenceAssemblyPaths)"
+                ReferenceAssemblies ="@(XamlReferencesToCompile)"
+                ShareAppDomains="$(XamlShareAppDomains)"
+                ForceSharedAppDomainShutdown="False"
+                CompileMode="RealBuildPass2"
+                XAMLFingerprint="$(XAMLFingerprint)"
+                FingerprintIgnorePaths="$(XAMLFingerprintIgnorePaths)"
+                VCInstallDir="$(VCInstallDir_110)"
+                >
+            <Output Condition=" '$(ManagedAssembly)'!='false' " ItemName="Compile"   TaskParameter="GeneratedCodeFiles" />
+            <Output Condition=" '$(ManagedAssembly)'=='false' " ItemName="XamlGFiles" TaskParameter="GeneratedCodeFiles" />
+
+            <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
+            <Output ItemName="FileWrites" TaskParameter="GeneratedXamlFiles" />
+            <Output ItemName="_GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
+            <Output ItemName="_GeneratedXamlFiles" TaskParameter="GeneratedXamlFiles" />
+        </CompileXaml>
+
+        <Message Text="(Out) GeneratedCodeFiles: '@(_GeneratedCodeFiles)'" />
+        <Message Text="(Out) GeneratedXamlFiles: '@(_GeneratedXamlFiles)'" />
+        <Message Text="(Out) ClCompile: '@(ClCompile)'" />
+        <Message Text="(Out) Compile: '@(Compile)'" />
+   </Target>
+
+    
+    <Target Name="_OnXamlPreCompileError"
+            DependsOnTargets="$(_OnXamlPrecompileErrorDependsOn)" >
+
+        <CompileXaml
+                ProjectPath="$(MSBuildProjectFullPath)"
+                Language="$(Language)"
+                LanguageSourceExtension="$(DefaultLanguageSourceExtension)"
+                OutputPath="$(XamlGeneratedOutputPath)"
+                ReferenceAssemblies="@(ReferencePath)"
+                TargetPlatformWinMDLocation="$(TargetPlatformWinMDLocation)"
+                ReferenceAssemblyPaths="@(ReferenceAssemblyPaths)"
+                XamlPages="@(Page)"
+                XamlApplications="@(ApplicationDefinition)"
+                ShareAppDomains="$(XamlShareAppDomains)"
+                ForceSharedAppDomainShutdown="True"
+                CompileMode="OnErrorShutdown"
+                >
+        </CompileXaml>
+    </Target>
+
+    <!-- This is the 'standard' Bin folder layout  -->
+    <!-- if $GenerateLibraryLayout is True this is skipped and see the PrepareLibraryLayout target -->
+    <Target Name="CopyGeneratedXaml" BeforeTargets="CopyFilesToOutputDirectory" DependsOnTargets="MarkupCompilePass2"
+            Condition="'$(GenerateLibraryLayout)' != 'true'">
+        <!-- Build the paths from the OBJ src to the BIN dest.  Check for <Link> attributes -->
+        <ItemGroup>
+            <AppGeneratedSrc Condition="'%(ApplicationDefinition.Link)'!=''"
+                    Include="@(ApplicationDefinition->'$(XamlGeneratedOutputPath)%(Link)')" />
+            <AppGeneratedSrc Condition="'%(ApplicationDefinition.Link)'==''"
+                    Include="@(ApplicationDefinition->'$(XamlGeneratedOutputPath)%(Identity)')" />
+            <AppBinPath Condition="'%(ApplicationDefinition.Link)'!=''"
+                    Include="@(ApplicationDefinition->'$(OutDir)%(Link)')" />
+            <AppBinPath Condition="'%(ApplicationDefinition.Link)'==''"
+                    Include="@(ApplicationDefinition->'$(OutDir)%(Identity)')" />
+            <PageGeneratedSrc Condition="'%(Page.Link)'!=''"
+                    Include="@(Page->'$(XamlGeneratedOutputPath)%(Link)')" />
+            <PageGeneratedSrc Condition="'%(Page.Link)'==''"
+                    Include="@(Page->'$(XamlGeneratedOutputPath)%(Identity)')" />
+            <PageBinPath Condition="'%(Page.Link)'!=''"
+                    Include="@(Page->'$(OutDir)%(Link)')" />
+            <PageBinPath Condition="'%(Page.Link)'==''"
+                    Include="@(Page->'$(OutDir)%(Identity)')" />
+        </ItemGroup>
+
+        <!--  Copy the Application XAML file.  Exclude From Build is a Condition on the copy -->
+        <Copy
+            SourceFiles="@(AppGeneratedSrc)"
+            DestinationFiles="@(AppBinPath)"
+            SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+            OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+            Retries="$(CopyRetryCount)"
+            RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+            UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+            Condition="'%(ApplicationDefinition.ExcludedFromBuild)'!='true'"
+            >
+        </Copy>
+
+        <!-- Copy all the non-App.xaml XAML pages. Exclude From Build is a Condition on the copy -->
+        <Copy
+            SourceFiles="@(PageGeneratedSrc)"
+            DestinationFiles="@(PageBinPath)"
+            SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+            OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+            Retries="$(CopyRetryCount)"
+            RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+            UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+            Condition="'%(Page.ExcludedFromBuild)'!='true'"
+            >
+        </Copy>
+    </Target>
+    
+    <Target Name="ComputeProcessXamlFiles" Returns="@(ProcessedXamlFiles)" >
+
+        <!-- In the normal (non-SDK) build, AppX Packaging picks up the files from the bin aka OutDir folder -->
+        <ItemGroup Condition="'$(GenerateLibraryLayout)' != 'true'">
+            <ProcessedXamlFiles Condition="'%(ApplicationDefinition.ExcludedFromBuild)'!='true' AND '%(ApplicationDefinition.Link)'!=''"
+                    Include="@(ApplicationDefinition->'$(OutDir)%(Link)')" />
+            <ProcessedXamlFiles Condition="'%(ApplicationDefinition.ExcludedFromBuild)'!='true' AND '%(ApplicationDefinition.Link)'==''"
+                    Include="@(ApplicationDefinition->'$(OutDir)%(Identity)')" />
+            <ProcessedXamlFiles Condition="'%(Page.ExcludedFromBuild)'!='true' AND '%(Page.Link)'!=''"
+                    Include="@(Page->'$(OutDir)%(Link)')" />
+            <ProcessedXamlFiles Condition="'%(Page.ExcludedFromBuild)'!='true' AND '%(Page.Link)'==''"
+                    Include="@(Page->'$(OutDir)%(Identity)')" />
+        </ItemGroup>
+
+        <!-- In the SDK build, AppX Packaging picks up the files from the XamlGeneratedOutput folder -->
+        <ItemGroup Condition="'$(GenerateLibraryLayout)' == 'true'">
+            <ProcessedXamlFiles Condition="'%(ApplicationDefinition.ExcludedFromBuild)'!='true' AND '%(ApplicationDefinition.Link)'!=''"
+                    Include="@(ApplicationDefinition->'$(XamlGeneratedOutputPath)%(Link)')" />
+            <ProcessedXamlFiles Condition="'%(ApplicationDefinition.ExcludedFromBuild)'!='true' AND '%(ApplicationDefinition.Link)'==''"
+                    Include="@(ApplicationDefinition->'$(XamlGeneratedOutputPath)%(Identity)')" />
+            <ProcessedXamlFiles Condition="'%(Page.ExcludedFromBuild)'!='true' AND '%(Page.Link)'!=''"
+                    Include="@(Page->'$(XamlGeneratedOutputPath)%(Link)')" />
+            <ProcessedXamlFiles Condition="'%(Page.ExcludedFromBuild)'!='true' AND '%(Page.Link)'==''"
+                    Include="@(Page->'$(XamlGeneratedOutputPath)%(Identity)')" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="CleanXamlFilesFromOutputDirectory" AfterTargets="Clean"
+            DependsOnTargets="ComputeProcessXamlFiles"
+            Condition="'$(GenerateLibraryLayout)' != 'true'">
+
+        <Delete Condition="Exists('$(OutDir)')" Files="@(ProcessedXamlFiles)"/>
+    </Target>
+
+    <Target Name="CustomOutputGroupForPackaging"
+            DependsOnTargets="ComputeProcessXamlFiles"
+            Returns="@(CustomOutputGroupForPackagingOutput)"
+            >
+        <ItemGroup>
+            <ProcessedXamlFilesFullPath Include="@(ProcessedXamlFiles->'%(FullPath)')" />
+        </ItemGroup>
+        <PropertyGroup>
+            <XamlPackagingRootFolder Condition="'$(GenerateLibraryLayout)' == 'true'">$(XamlGeneratedOutputPath)</XamlPackagingRootFolder>
+            <XamlPackagingRootFolder Condition="'$(GenerateLibraryLayout)' != 'true'">$(OutDir)</XamlPackagingRootFolder>
+        </PropertyGroup>
+
+        <AssignTargetPath Files="@(ProcessedXamlFilesFullPath)" RootFolder="$(XamlPackagingRootFolder)"> 
+            <Output TaskParameter="AssignedFiles" ItemName="CustomOutputGroupForPackagingOutput" />
+        </AssignTargetPath>
+    </Target>
+
+    <PropertyGroup>
+        <PrepareLibraryLayoutDependsOn>
+            GetPackagingOutputs;
+            $(PrepareLibraryLayoutDependsOn)
+        </PrepareLibraryLayoutDependsOn>
+    </PropertyGroup>
+
+    <!-- This builds the Bin Folder for DLL's that wish to have the SDK type layout -->
+    <Target Name="PrepareLibraryLayout"
+            Condition="'$(GenerateLibraryLayout)' == 'true'"
+            DependsOnTargets="$(PrepareLibraryLayoutDependsOn)"
+            BeforeTargets="CopyFilesToOutputDirectory"
+            >
+
+        <ItemGroup>
+            <_LayoutFile Include="@(PackagingOutputs)" Condition="'%(OutputGroup)' == 'ContentFilesProjectOutputGroup'" />
+            <_LayoutFile Include="@(PackagingOutputs)" Condition="'%(OutputGroup)' == 'CustomOutputGroupForPackaging'" />
+        </ItemGroup>
+
+        <Copy SourceFiles="@(_LayoutFile)"
+              DestinationFiles="@(_LayoutFile->'$(OutDir)%(TargetPath)')"
+              SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+              OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+              Retries="$(CopyRetryCount)"
+              RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+              UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+              />
+    </Target>
+
+    <!--
+    ============================================================
+    Properties and Targets Common to Managed .NETCore projects
+    ============================================================
+    -->
+
+    <!--
+      The ImplicitlyExpandTargetFramework target will expand all 
+      of the dll reference assemblies in the TargetFrameworkDirectory 
+      for the project and place the items into the ReferencePath itemgroup 
+      which contains resolved items.
+    -->
+    <PropertyGroup>
+      <ResolveReferencesDependsOn>
+        $(ResolveReferencesDependsOn);
+        ImplicitlyExpandTargetFramework;
+        ImplicitlyExpandTargetPlatform
+      </ResolveReferencesDependsOn>
+
+      <ImplicitlyExpandTargetFrameworkDependsOn>
+        $(ImplicitlyExpandTargetFrameworkDependsOn);
+        GetReferenceAssemblyPaths
+      </ImplicitlyExpandTargetFrameworkDependsOn>
+    </PropertyGroup>
+
+    <Target Name="ImplicitlyExpandTargetFramework"
+        Condition="'$(ImplicitlyExpandTargetFramework)' == 'true'"
+        DependsOnTargets="$(ImplicitlyExpandTargetFrameworkDependsOn)"
+    >
+      <ItemGroup>
+        <ReferenceAssemblyPaths Include="$(_TargetFrameworkDirectories)"/>
+        <ReferencePath Include="%(ReferenceAssemblyPaths.Identity)*.dll">
+          <WinMDFile>false</WinMDFile>
+          <CopyLocal>false</CopyLocal>
+          <ReferenceGroupingDisplayName>$(TargetFrameworkMonikerDisplayName)</ReferenceGroupingDisplayName>
+          <ReferenceGrouping>$(TargetFrameworkMoniker)</ReferenceGrouping>
+          <ResolvedFrom>ImplicitlyExpandTargetFramework</ResolvedFrom>
+          <IsSystemReference>True</IsSystemReference>
+        </ReferencePath>
+      </ItemGroup>
+
+      <Message Importance="Low" Text="TargetMonikerDisplayName: $(TargetFrameworkMonikerDisplayName) ReferenceAssemblyPaths: @(ReferenceAssemblyPaths)"/>
+
+      <Message Importance="Low" Text="Including @(ReferencePath)" 
+        Condition="'%(ReferencePath.ResolvedFrom)' == 'ImplicitlyExpandTargetFramework'"/>
+
+      <ItemGroup>
+        <_ResolveAssemblyReferenceResolvedFiles Include="@(ReferencePath)" 
+          Condition="'%(ReferencePath.ResolvedFrom)' == 'ImplicitlyExpandTargetFramework'"/>
+      </ItemGroup>
+    </Target>
+
+    <!--
+      The ImplicitlyExpandTargetPlatform target will expand all
+      of the winmd files in the windowsSDK and add them the the
+      ReferencePath item which is the itemgroup which contains
+      resolved items.
+    -->
+    <Target Name="ImplicitlyExpandTargetPlatform"
+       Condition="'$(ImplicitlyExpandTargetPlatform)' == 'true'"
+    >
+      <ItemGroup>
+        <ReferencePath Include="$(TargetPlatformWinMDLocation)\*.winmd">
+          <WinMDFile>true</WinMDFile>
+          <CopyLocal>false</CopyLocal>
+          <ReferenceGrouping>$(TargetPlatformMoniker)</ReferenceGrouping>
+          <ReferenceGroupingDisplayName>$(TargetPlatformIdentifier)</ReferenceGroupingDisplayName>
+          <ResolvedFrom>ImplicitlyExpandTargetPlatform</ResolvedFrom>
+          <IsSystemReference>True</IsSystemReference>
+        </ReferencePath>
+      </ItemGroup>
+      
+      <Warning Condition="!Exists($(TargetPlatformWinMDLocation))" 
+        Text="The path to the $(TargetPlatformIdentifier) SDK [$(TargetPlatformWinMDLocation)] was not found!"/>
+
+      <Message Importance="Low" Text="Including @(ReferencePath)" 
+        Condition="'%(ReferencePath.ResolvedFrom)' == 'ImplicitlyExpandTargetPlatform'"/>
+
+      <ItemGroup>
+        <_ResolveAssemblyReferenceResolvedFiles Include="@(ReferencePath)" 
+          Condition="'%(ReferencePath.ResolvedFrom)' == 'ImplicitlyExpandTargetPlatform'"/>
+      </ItemGroup>
+    </Target>
+
+</Project>

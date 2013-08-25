@@ -1,4 +1,4 @@
-﻿
+﻿#if !SILVERLIGHT && !NETFX_CORE
 using System ;
 using System.Collections.Generic;
 using System.Diagnostics ;
@@ -6,11 +6,10 @@ using System.Linq;
 using System.Threading ;
 using System.Threading.Tasks ;
 using AutoMapper.Mappers;
-using NUnit.Framework;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class MultiThreadingIssues
     {
 		public class Type1
@@ -50,7 +49,7 @@ namespace AutoMapper.UnitTests.Bug
     	static int _done ;
     	readonly ManualResetEvent _allDone = new ManualResetEvent( false );
 
-		[Test]
+		[Fact]
         public void ShouldMapToNewISet()
         {
 			const int threadCount = 130 ;
@@ -131,3 +130,4 @@ namespace AutoMapper.UnitTests.Bug
     	}
     }
 }
+#endif

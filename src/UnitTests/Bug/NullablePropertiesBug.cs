@@ -1,15 +1,14 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    [TestFixture]
     public class NullablePropertiesBug
     {
         public class Source { public int? A { get; set; } }
         public class Target { public int? A { get; set; } }
 
-        [Test]
+        [Fact]
         public void Example()
         {
             Mapper.CreateMap<Source, Target>();
