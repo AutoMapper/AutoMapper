@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
     {
         public static Func<IEnumerable<IObjectMapper>> AllMappers = () => new IObjectMapper[]
         {
-#if !SILVERLIGHT && !NETFX_CORE
+#if !SILVERLIGHT && !NETFX_CORE && !MONODROID
             new DataReaderMapper(),
 #endif
             new TypeMapMapper(TypeMapObjectMapperRegistry.AllMappers()),
