@@ -39,6 +39,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
     <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
     <Compile Include="Internal\ExpressionOnlyDelegateFactory.cs" />
@@ -54,7 +57,6 @@
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -67,6 +69,9 @@
       <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
       <Name>AutoMapper</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

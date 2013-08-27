@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
     <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
     <Compile Include="Internal\ExpressionOnlyDelegateFactory.cs" />
