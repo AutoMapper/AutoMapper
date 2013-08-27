@@ -50,7 +50,7 @@ namespace AutoMapper.Mappers
 
 		public static object CreateObject(Type type)
 		{
-            return DelegateFactory.CreateCtor(type)();
+            return type.IsArray ? CreateArray(type.GetElementType(), 0) : DelegateFactory.CreateCtor(type)();
 		}
 	}
 }
