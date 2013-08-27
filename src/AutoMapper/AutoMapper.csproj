@@ -83,7 +83,6 @@
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\PrimitiveArrayMapper.cs" />
     <Compile Include="MemberList.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="ConstructorMap.cs" />
     <Compile Include="ConstructorParameterMap.cs" />

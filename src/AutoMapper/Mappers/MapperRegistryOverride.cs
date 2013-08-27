@@ -7,11 +7,12 @@ namespace AutoMapper.Mappers
     {
         public static Func<IEnumerable<IObjectMapper>> AllMappers = () => new IObjectMapper[]
         {
-#if !SILVERLIGHT && !NETFX_CORE
+#if !SILVERLIGHT && !NETFX_CORE && !MONODROID && !MONOTOUCH
             new DataReaderMapper(),
 #endif
             new TypeMapMapper(TypeMapObjectMapperRegistry.AllMappers()),
             new StringMapper(),
+            new AssignableMapper(),
             new FlagsEnumMapper(),
             new EnumMapper(),
             new ArrayMapper(),
@@ -29,7 +30,6 @@ namespace AutoMapper.Mappers
 #endif
             new CollectionMapper(),
             new EnumerableMapper(),
-            new AssignableMapper(),
 #if !NETFX_CORE
             new TypeConverterMapper(),
 #endif

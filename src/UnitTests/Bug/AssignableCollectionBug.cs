@@ -53,7 +53,7 @@ namespace AutoMapper.UnitTests.Bug
 		}
 		public class MappingTests
 		{
-			[Fact]
+			[Fact(Skip = "This sounds like really bad behavior to support, at least this way.")]
 			public void CanMapPersonOneToPersonTwo()
 			{
 				IList<IAddress> adrList = new List<IAddress> { new AddressOne { Street = "Street One" } };

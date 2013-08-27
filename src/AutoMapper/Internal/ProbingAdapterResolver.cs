@@ -34,8 +34,6 @@ namespace AutoMapper.Internal
                 if (!_adapters.TryGetValue(type, out instance))
                 {
                     Assembly assembly = GetPlatformSpecificAssembly();
-                    if (assembly == null)
-                        return null;
 
                     instance = ResolveAdapter(assembly, type);
                     _adapters.Add(type, instance);
@@ -51,15 +49,20 @@ namespace AutoMapper.Internal
 
             try
             {
-                // Is there an override?
-                Type type = assembly.GetType(typeName + "Override");
-                if (type != null)
-                    return Activator.CreateInstance(type);
+                Type type;
 
-                // Fall back to a default implementation
-                type = assembly.GetType(typeName);
-                if (type != null)
-                    return Activator.CreateInstance(type);
+                // Is there an override?
+                if (assembly != null)
+                {
+                    type = assembly.GetType(typeName + "Override");
+                    if (type != null)
+                        return Activator.CreateInstance(type);
+
+                    // Fall back to a default implementation
+                    type = assembly.GetType(typeName);
+                    if (type != null)
+                        return Activator.CreateInstance(type);
+                }
 
 
                 // Fallback to looking in this assembly for a default
