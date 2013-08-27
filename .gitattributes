@@ -13,8 +13,7 @@
 *.png 	binary
 *.gif 	binary
 
-* text=auto
-*.sln text eol=crlf
+core.eol crlf
 
 *.cs diff=csharp 
 
