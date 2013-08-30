@@ -115,7 +115,7 @@ namespace AutoMapper.QueryableExtensions
                 else if (propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
                     propertyMap.DestinationPropertyType != typeof(string))
                 {
-                    Type destinationListType = propertyMap.DestinationPropertyType.GetGenericArguments().First();
+                    Type destinationListType = GetDestinationListTypeFor(propertyMap);
                     Type sourceListType = null;
                     // is list
 
@@ -133,14 +133,7 @@ namespace AutoMapper.QueryableExtensions
 
                     if (typeof(IList<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType))
                     {
-                        MethodCallExpression toListCallExpression = Expression.Call(
-                            typeof(Enumerable),
-                            "ToList",
-                            new Type[] { destinationListType },
-                            selectExpression);
-
-                        // todo .ToArray()
-
+                        var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType, selectExpression);
                         bindExpression = Expression.Bind(destinationMember, toListCallExpression);
                     }
                     else
@@ -150,9 +143,9 @@ namespace AutoMapper.QueryableExtensions
                     }
                 }
                 else if (result.Type != propertyMap.DestinationPropertyType &&
-                         // avoid nullable etc.
-                         propertyMap.DestinationPropertyType.BaseType != typeof (ValueType) &&
-                         propertyMap.DestinationPropertyType.BaseType != typeof (Enum))
+                    // avoid nullable etc.
+                         propertyMap.DestinationPropertyType.BaseType != typeof(ValueType) &&
+                         propertyMap.DestinationPropertyType.BaseType != typeof(Enum))
                 {
                     var transformedExpression = CreateMapExpression(mappingEngine, result.Type,
                                                                     propertyMap.DestinationPropertyType,
@@ -170,7 +163,24 @@ namespace AutoMapper.QueryableExtensions
             return bindings;
         }
 
+        private static Type GetDestinationListTypeFor(PropertyMap propertyMap)
+        {
+            Type destinationListType;
+            if (propertyMap.DestinationPropertyType.IsArray)
+                destinationListType = propertyMap.DestinationPropertyType.GetElementType();
+            else
+                destinationListType = propertyMap.DestinationPropertyType.GetGenericArguments().First();
+            return destinationListType;
+        }
 
+        private static MethodCallExpression GetToListCallExpression(PropertyMap propertyMap, Type destinationListType, MethodCallExpression selectExpression)
+        {
+            return Expression.Call(
+                typeof(Enumerable),
+                propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList",
+                new Type[] { destinationListType },
+                selectExpression);
+        }
     }
 
     /// <summary>
