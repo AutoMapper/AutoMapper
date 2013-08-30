@@ -178,8 +178,10 @@
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="Projection\MapFromTest.cs" />
+    <Compile Include="Projection\PrimitiveArraysTest.cs" />
     <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
     <Compile Include="Projection\ProjectCollectionListTest.cs" />
+    <Compile Include="Projection\ProjectEnumerableToArrayTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
