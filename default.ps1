@@ -213,8 +213,8 @@ function global:create-sn-nuspec($version, $fileName)
     <file src=""$dist_dir\net40\AutoMapper.Net4.pdb"" target=""lib\net40"" />
     <file src=""$dist_dir\net40-sn\AutoMapper.dll"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4-sn\AutoMapper.xml"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.SL4.dll"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4-sn\AutoMapper.SL4.dll"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.SL4.pdb"" target=""lib\sl4"" />
     <file src=""$dist_dir\net40-sn\AutoMapper.dll"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.pdb"" target=""lib\windows8"" />
