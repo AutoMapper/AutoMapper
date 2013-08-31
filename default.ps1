@@ -221,7 +221,6 @@ function global:create-sn-nuspec($version, $fileName)
     <file src=""$dist_dir\windows8\AutoMapper.xml"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8-sn\AutoMapper.WinRT.dll"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.WinRT.pdb"" target=""lib\windows8"" />
-    <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
 }
