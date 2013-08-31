@@ -179,8 +179,8 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\MonoAndroid22\AutoMapper.dll"" target=""lib\MonoAndroid22"" />
     <file src=""$dist_dir\MonoAndroid22\AutoMapper.pdb"" target=""lib\MonoAndroid22"" />
     <file src=""$dist_dir\MonoAndroid22\AutoMapper.xml"" target=""lib\MonoAndroid22"" />
-    <file src=""$dist_dir\MonoAndroid22\AutoMapper.WinRT.dll"" target=""lib\MonoAndroid22"" />
-    <file src=""$dist_dir\MonoAndroid22\AutoMapper.WinRT.pdb"" target=""lib\MonoAndroid22"" />
+    <file src=""$dist_dir\MonoAndroid22\AutoMapper.Android.dll"" target=""lib\MonoAndroid22"" />
+    <file src=""$dist_dir\MonoAndroid22\AutoMapper.Android.pdb"" target=""lib\MonoAndroid22"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
