@@ -64,8 +64,6 @@ task dist {
     exec { & $tools_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\net40-sn\AutoMapper.Net4.dll" /RESOURCE="$dist_dir\net40-sn\AutoMapper.Net4.res" "$dist_dir\net40-sn\AutoMapper.Net4.il" }
     exec { & $tools_dir\ildasm.exe /NOBAR /OUT="$dist_dir\sl4-sn\AutoMapper.SL4.il" "$dist_dir\sl4\AutoMapper.SL4.dll" }
     exec { & $tools_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\sl4-sn\AutoMapper.SL4.dll" /RESOURCE="$dist_dir\sl4-sn\AutoMapper.SL4.res" "$dist_dir\sl4-sn\AutoMapper.SL4.il" }
-    exec { & $tools_dir\ildasm.exe /NOBAR /OUT="$dist_dir\sl4-sn\AutoMapper.SL4.il" "$dist_dir\sl4\AutoMapper.SL4.dll" }
-    exec { & $tools_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\sl4-sn\AutoMapper.SL4.dll" /RESOURCE="$dist_dir\sl4-sn\AutoMapper.SL4.res" "$dist_dir\sl4-sn\AutoMapper.SL4.il" }
     exec { & $tools_dir\ildasm.exe /NOBAR /OUT="$dist_dir\windows8-sn\AutoMapper.WinRT.il" "$dist_dir\windows8\AutoMapper.WinRT.dll" }
     exec { & $tools_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\windows8-sn\AutoMapper.WinRT.dll" /RESOURCE="$dist_dir\windows8-sn\AutoMapper.WinRT.res" "$dist_dir\windows8-sn\AutoMapper.WinRT.il" }
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
