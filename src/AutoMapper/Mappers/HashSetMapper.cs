@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Reflection;
 using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers

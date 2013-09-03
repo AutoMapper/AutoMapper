@@ -1,5 +1,3 @@
-using System;
-
 namespace AutoMapper
 {
 	public class NullReplacementMethod : IValueResolver

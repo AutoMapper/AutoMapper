@@ -114,7 +114,7 @@ namespace AutoMapper.Mappers
                     if (result.ShouldIgnore) 
                         return;
 
-					object destinationValue = propertyMap.GetDestinationValue(mappedObject);;
+					object destinationValue = propertyMap.GetDestinationValue(mappedObject);
 
 					var sourceType = result.Type;
 					var destinationType = propertyMap.DestinationProperty.MemberType;
