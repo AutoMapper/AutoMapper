@@ -36,7 +36,7 @@ namespace AutoMapper.Mappers
             new NullableSourceMapper(),
             new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
-            new ExplicitConversionOperatorMapper(),
+            new ExplicitConversionOperatorMapper()
         };
 
         public IEnumerable<IObjectMapper> GetMappers()
