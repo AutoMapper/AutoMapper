@@ -159,7 +159,6 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.Net4.dll"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.Net4.pdb"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40\AutoMapper.Net4.dll"" target=""content\net40"" />
     <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
