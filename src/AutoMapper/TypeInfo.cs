@@ -132,7 +132,7 @@ namespace AutoMapper
             // Scan all types for public properties and fields
             return typesToScan
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-                .SelectMany(x => x.GetMembers(bindingAttr)
+                .SelectMany(x => x.GetMembers(bindingAttr | BindingFlags.DeclaredOnly)
                     .Where(m => m is FieldInfo || (m is PropertyInfo && propertyAvailableFor((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any())));
         }
 
