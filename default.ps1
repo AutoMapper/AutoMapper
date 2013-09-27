@@ -67,7 +67,7 @@ task dist {
     exec { & $tools_dir\ildasm.exe /NOBAR /OUT="$dist_dir\windows8\AutoMapper.WinRT.il" "$dist_dir\windows8-un\AutoMapper.WinRT.dll" }
     exec { & $framework_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\windows8\AutoMapper.WinRT.dll" /RESOURCE="$dist_dir\windows8\AutoMapper.WinRT.res" "$dist_dir\windows8\AutoMapper.WinRT.il" }
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
-    create-un-nuspec "$pkgVersion" "AutoMapper.StrongNamed.nuspec"
+    create-un-nuspec "$pkgVersion" "AutoMapper.Unsigned.nuspec"
 }
 
 # -------------------------------------------------------------------------------------------------------------
