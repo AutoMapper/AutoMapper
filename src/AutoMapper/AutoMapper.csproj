@@ -154,6 +154,10 @@
     <Compile Include="TypeInfo.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
+    <Compile Include="Utility\IMapping.cs" />
+    <Compile Include="Utility\MappingResolver.cs" />
+    <Compile Include="Utility\OneWayMapping.cs" />
+    <Compile Include="Utility\TwoWayMapping.cs" />
     <Compile Include="ValueFormatter.cs" />
     <Compile Include="ValueResolver.cs" />
   </ItemGroup>
