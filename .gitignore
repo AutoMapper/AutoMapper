@@ -14,3 +14,4 @@ TestResult.xml
 AppPackages/
 *.bak
 packages
+*.orig
