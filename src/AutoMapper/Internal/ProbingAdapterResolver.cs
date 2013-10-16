@@ -47,33 +47,26 @@ namespace AutoMapper.Internal
         {
             string typeName = MakeAdapterTypeName(interfaceType);
 
-            try
+            Type type;
+
+            // Is there an override?
+            if (assembly != null)
             {
-                Type type;
+                type = assembly.GetType(typeName + "Override");
+                if (type != null)
+                    return Activator.CreateInstance(type);
 
-                // Is there an override?
-                if (assembly != null)
-                {
-                    type = assembly.GetType(typeName + "Override");
-                    if (type != null)
-                        return Activator.CreateInstance(type);
-
-                    // Fall back to a default implementation
-                    type = assembly.GetType(typeName);
-                    if (type != null)
-                        return Activator.CreateInstance(type);
-                }
+                // Fall back to a default implementation
+                type = assembly.GetType(typeName);
+                if (type != null)
+                    return Activator.CreateInstance(type);
+            }
 
 
-                // Fallback to looking in this assembly for a default
-                type = typeof(ProbingAdapterResolver).Assembly.GetType(typeName);
+            // Fallback to looking in this assembly for a default
+            type = typeof(ProbingAdapterResolver).Assembly.GetType(typeName);
                 
-                return type != null ? Activator.CreateInstance(type) : null;
-            }
-            catch
-            {
-                return null;
-            }
+            return type != null ? Activator.CreateInstance(type) : null;
         }
 
         private static string MakeAdapterTypeName(Type interfaceType)

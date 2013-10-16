@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.3.0' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '3.1.0' }
 	$assemblyVersion = $pkgVersion -replace "\.[0-9]*-.*$", ".0.0"
 	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
@@ -49,25 +49,14 @@ task test {
 }
 
 task dist {
+	create_directory $build_dir
 	create_directory $dist_dir
-	copy_files "$source_dir\AutoMapper\bin\Net4\$config" "$dist_dir\net40-un"
-	copy_files "$source_dir\AutoMapper\bin\sl4\$config" "$dist_dir\sl4-un"
+	copy_files "$source_dir\AutoMapper\bin\Net4\$config" "$dist_dir\net40"
+	copy_files "$source_dir\AutoMapper\bin\sl4\$config" "$dist_dir\sl4"
 	copy_files "$source_dir\AutoMapper\bin\wp75\$config" "$dist_dir\wp71"
-	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows8-un"
+	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows8"
 	copy_files "$source_dir\AutoMapper\bin\Android\$config" "$dist_dir\MonoAndroid22"
-    create_directory "$dist_dir\net40"
-    create_directory "$dist_dir\sl4"
-    create_directory "$dist_dir\windows8"
-    exec { & $tools_dir\ildasm.exe /NOBAR /OUT="$dist_dir\net40\AutoMapper.il" "$dist_dir\net40-un\AutoMapper.dll" }
-    exec { & $framework_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\net40\AutoMapper.dll" /RESOURCE="$dist_dir\net40\AutoMapper.res" "$dist_dir\net40\AutoMapper.il" }
-    exec { & $tools_dir\ildasm.exe /NOBAR /OUT="$dist_dir\net40\AutoMapper.Net4.il" "$dist_dir\net40-un\AutoMapper.Net4.dll" }
-    exec { & $framework_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\net40\AutoMapper.Net4.dll" /RESOURCE="$dist_dir\net40\AutoMapper.Net4.res" "$dist_dir\net40\AutoMapper.Net4.il" }
-    exec { & $tools_dir\ildasm.exe /NOBAR /OUT="$dist_dir\sl4\AutoMapper.SL4.il" "$dist_dir\sl4-un\AutoMapper.SL4.dll" }
-    exec { & $framework_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\sl4\AutoMapper.SL4.dll" /RESOURCE="$dist_dir\sl4\AutoMapper.SL4.res" "$dist_dir\sl4\AutoMapper.SL4.il" }
-    exec { & $tools_dir\ildasm.exe /NOBAR /OUT="$dist_dir\windows8\AutoMapper.WinRT.il" "$dist_dir\windows8-un\AutoMapper.WinRT.dll" }
-    exec { & $framework_dir\ilasm.exe /QUIET /KEY="$source_dir\AutoMapper.snk" /DLL="$dist_dir\windows8\AutoMapper.WinRT.dll" /RESOURCE="$dist_dir\windows8\AutoMapper.WinRT.res" "$dist_dir\windows8\AutoMapper.WinRT.il" }
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
-    create-un-nuspec "$pkgVersion" "AutoMapper.Unsigned.nuspec"
 }
 
 # -------------------------------------------------------------------------------------------------------------
@@ -152,20 +141,20 @@ function global:create-nuspec($version, $fileName)
   </metadata>
   <files>
     <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
     <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.pdb"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.xml"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.Net4.dll"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.Net4.pdb"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.Net4.pdb"" target=""lib\net40"" />
     <file src=""$source_dir\install.ps1"" target=""tools\net40"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\sl4"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.pdb"" target=""lib\sl4"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.xml"" target=""lib\sl4"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\sl4"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\sl4"" />
     <file src=""$dist_dir\sl4\AutoMapper.SL4.dll"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4-un\AutoMapper.SL4.pdb"" target=""lib\sl4"" />
+    <file src=""$dist_dir\sl4\AutoMapper.SL4.pdb"" target=""lib\sl4"" />
     <file src=""$source_dir\install.ps1"" target=""tools\sl4"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\sl4"" />
     <file src=""$dist_dir\wp71\AutoMapper.dll"" target=""lib\wp71"" />
@@ -176,10 +165,10 @@ function global:create-nuspec($version, $fileName)
     <file src=""$source_dir\install.ps1"" target=""tools\wp71"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\wp71"" />
     <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.pdb"" target=""lib\windows8"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.xml"" target=""lib\windows8"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\windows8"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.WinRT.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8-un\AutoMapper.WinRT.pdb"" target=""lib\windows8"" />
+    <file src=""$dist_dir\windows8\AutoMapper.WinRT.pdb"" target=""lib\windows8"" />
     <file src=""$source_dir\install.ps1"" target=""tools\windows8"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\windows8"" />
     <file src=""$dist_dir\MonoAndroid22\AutoMapper.dll"" target=""lib\MonoAndroid22"" />
@@ -193,64 +182,3 @@ function global:create-nuspec($version, $fileName)
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
 }
-
-function global:create-un-nuspec($version, $fileName)
-{
-    "<?xml version=""1.0""?>
-<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
-  <metadata>
-    <id>AutoMapper.Unsigned</id>
-    <version>$version</version>
-    <authors>Jimmy Bogard</authors>
-    <owners>Jimmy Bogard</owners>
-    <licenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</licenseUrl>
-    <projectUrl>http://automapper.org</projectUrl>
-    <iconUrl>https://s3.amazonaws.com/automapper/icon.png</iconUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>A convention-based object-object mapper (strong named version)</summary>
-    <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
-  </metadata>
-  <files>
-    <file src=""$dist_dir\net40-un\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.dll"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.pdb"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.xml"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.Net4.dll"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40-un\AutoMapper.Net4.pdb"" target=""lib\net40"" />
-    <file src=""$source_dir\install.ps1"" target=""tools\net40"" />
-    <file src=""$source_dir\uninstall.ps1"" target=""tools\net40"" />
-    <file src=""$dist_dir\sl4-un\AutoMapper.dll"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4-un\AutoMapper.pdb"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4-un\AutoMapper.xml"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4-un\AutoMapper.SL4.dll"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4-un\AutoMapper.SL4.pdb"" target=""lib\sl4"" />
-    <file src=""$source_dir\install.ps1"" target=""tools\sl4"" />
-    <file src=""$source_dir\uninstall.ps1"" target=""tools\sl4"" />
-    <file src=""$dist_dir\wp71\AutoMapper.dll"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.pdb"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.xml"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.WP75.dll"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.WP75.pdb"" target=""lib\wp71"" />
-    <file src=""$source_dir\install.ps1"" target=""tools\wp71"" />
-    <file src=""$source_dir\uninstall.ps1"" target=""tools\wp71"" />
-    <file src=""$dist_dir\windows8-un\AutoMapper.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8-un\AutoMapper.pdb"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8-un\AutoMapper.xml"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8-un\AutoMapper.WinRT.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8-un\AutoMapper.WinRT.pdb"" target=""lib\windows8"" />
-    <file src=""$source_dir\install.ps1"" target=""tools\windows8"" />
-    <file src=""$source_dir\uninstall.ps1"" target=""tools\windows8"" />
-    <file src=""$dist_dir\MonoAndroid22\AutoMapper.dll"" target=""lib\MonoAndroid22"" />
-    <file src=""$dist_dir\MonoAndroid22\AutoMapper.pdb"" target=""lib\MonoAndroid22"" />
-    <file src=""$dist_dir\MonoAndroid22\AutoMapper.xml"" target=""lib\MonoAndroid22"" />
-    <file src=""$dist_dir\MonoAndroid22\AutoMapper.Android.dll"" target=""lib\MonoAndroid22"" />
-    <file src=""$dist_dir\MonoAndroid22\AutoMapper.Android.pdb"" target=""lib\MonoAndroid22"" />
-    <file src=""$source_dir\install.ps1"" target=""tools\MonoAndroid22"" />
-    <file src=""$source_dir\uninstall.ps1"" target=""tools\MonoAndroid22"" />
-    <file src=""**\*.cs"" target=""src"" />
-  </files>
-</package>" | out-file $build_dir\$fileName -encoding "ASCII"
-}
-
