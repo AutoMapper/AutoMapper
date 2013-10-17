@@ -108,6 +108,20 @@ namespace AutoMapper.Internal
             catch (FileNotFoundException)
             {
             }
+            catch (Exception) // Probably FileIOException due to not SN assembly
+            {
+                // Try to load a non-SN version of the assembly
+                assemblyName.SetPublicKey(null);
+                assemblyName.SetPublicKeyToken(null);
+                try
+                {
+                    return _assemblyLoader(assemblyName.ToString());
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
 
             return null;
         }

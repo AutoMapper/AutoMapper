@@ -125,7 +125,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-#if !SILVERLIGHT
 		public class When_specifying_mapping_with_the_BCL_type_converter_class : AutoMapperSpecBase
 		{
 			[TypeConverter(typeof(CustomTypeConverter))]
@@ -187,7 +186,6 @@ namespace AutoMapper.UnitTests
 				destination.Value.ShouldEqual(5);
 			}
 		}
-#endif
 
 		public class When_specifying_a_type_converter_for_a_non_generic_configuration : SpecBase
 		{
