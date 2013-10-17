@@ -55,7 +55,6 @@
     <Compile Include="Internal\ExpressionVisitor.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Internal\ManualNullableConverterFactory.cs" />
     <Compile Include="Mappers\MapperRegistryOverride.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

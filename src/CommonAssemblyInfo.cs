@@ -12,8 +12,8 @@ using System.Runtime.InteropServices;
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: AssemblyVersionAttribute("2.3.0")]
-[assembly: AssemblyFileVersionAttribute("2.3.0")]
+[assembly: AssemblyVersionAttribute("0.0.0")]
+[assembly: AssemblyFileVersionAttribute("0.0.0")]
 [assembly: AssemblyCopyrightAttribute("Copyright Jimmy Bogard 2008-2013")]
 [assembly: AssemblyProductAttribute("AutoMapper")]
 [assembly: AssemblyTrademarkAttribute("AutoMapper")]
