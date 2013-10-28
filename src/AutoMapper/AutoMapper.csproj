@@ -73,6 +73,7 @@
     <Compile Include="Internal\NoOpReaderWriterLockFactory.cs" />
     <Compile Include="Internal\NotSupportedEnumNameValueMappingFactory.cs" />
     <Compile Include="Internal\NotSupportedProxyGeneratorFactory.cs" />
+    <Compile Include="Internal\NullReferenceExceptionSwallowingResolver.cs" />
     <Compile Include="Internal\PlatformAdapter.cs" />
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
     <Compile Include="Internal\SetFactory.cs" />
