@@ -6,14 +6,12 @@ namespace AutoMapper
 	public class PropertyNameResolver : IValueResolver
 	{
 	    private readonly Type _sourceType;
-	    private readonly string _propertyName;
-		private PropertyInfo _propertyInfo;
+	    private readonly PropertyInfo _propertyInfo;
 
 		public PropertyNameResolver(Type sourceType, string propertyName)
 		{
 		    _sourceType = sourceType;
-		    _propertyName = propertyName;
-            _propertyInfo = sourceType.GetProperty(_propertyName);
+		    _propertyInfo = sourceType.GetProperty(propertyName);
 		}
 
 
@@ -26,15 +24,7 @@ namespace AutoMapper
 		    if (!(_sourceType.IsAssignableFrom(valueType)))
                 throw new ArgumentException("Expected obj to be of type " + _sourceType + " but was " + valueType);
 
-			object result;
-			try
-			{
-				result = _propertyInfo.GetValue(source.Value, null);
-			}
-			catch (NullReferenceException)
-			{
-				result = null;
-			}
+		    var result = _propertyInfo.GetValue(source.Value, null);
 
 			return source.New(result);
 		}
