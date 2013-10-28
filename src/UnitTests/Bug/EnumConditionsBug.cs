@@ -35,12 +35,12 @@ namespace AutoMapper.UnitTests.Bug
                     .ForMember(m => m.Prop1, o =>
                     {
                         o.Condition(c => { _c1Called = true; return !c.IsSourceValueNull; });
-                        o.ResolveUsing(f => f.Prop1.Aggregate((current, next) => current | next));
+                        o.ResolveUsing(f => f.Prop1 == null ? (object) null : f.Prop1.Aggregate((current, next) => current | next));
                     })
                     .ForMember(m => m.Prop2, o =>
                     {
                         o.Condition(c => { _c2Called = true; return !c.IsSourceValueNull; });
-                        o.ResolveUsing(f => f.Prop2.Aggregate((current, next) => current | next));
+                        o.ResolveUsing(f => f.Prop2 == null ? (object)null : f.Prop2.Aggregate((current, next) => current | next));
                     });
                 var src = new EnumTestSource { Prop1 = new[] { Enum1.One }, Prop2 = null };
                 var dest = Mapper.Map<EnumTestDest>(src); // will throw
