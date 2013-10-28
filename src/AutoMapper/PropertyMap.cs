@@ -238,7 +238,11 @@ namespace AutoMapper
                 SourceMember = ((MemberExpression) sourceMember.Body).Member;
             }
             CustomExpression = sourceMember;
-            AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile()));
+            AssignCustomValueResolver(
+                new NullReferenceExceptionSwallowingResolver(
+                    new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())
+                )
+            );
         }
 
         public object GetDestinationValue(object mappedObject)
