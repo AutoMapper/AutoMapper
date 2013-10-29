@@ -1110,8 +1110,12 @@ namespace AutoMapper.UnitTests
 
         protected override void Establish_context()
         {
-            Mapper.CreateMap<Source, Dest>()
-                .ForMember(dest => dest.Value, opt => opt.MapFrom(s => ParseValue(s.Value)));
+            Mapper.Initialize(cfg =>
+            {
+                cfg.DisableConstructorMapping();
+                cfg.CreateMap<Source, Dest>()
+                    .ForMember(dest => dest.Value, opt => opt.MapFrom(s => ParseValue(s.Value)));
+            });
         }
 
         protected override void Because_of()
