@@ -1,22 +1,28 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
 namespace AutoMapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using Impl;
+    using Internal;
+
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
     /// </summary>
     public class TypeMap
     {
+        private static readonly ISetFactory SetFactory = PlatformAdapter.Resolve<ISetFactory>();
+
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
         private readonly TypeInfo _destinationType;
-        private readonly System.Collections.Generic.IDictionary<Type, Type> _includedDerivedTypes = new Dictionary<Type, Type>();
-		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
-        private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs = new ThreadSafeList<SourceMemberConfig>();
+        private readonly ISet<TypePair> _includedDerivedTypes = SetFactory.CreateSet<TypePair>();
+        private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
+
+        private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs =
+            new ThreadSafeList<SourceMemberConfig>();
+
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private readonly TypeInfo _sourceType;
@@ -55,10 +61,10 @@ namespace AutoMapper
             get
             {
                 return (src, dest) =>
-                        {
-                            foreach (var action in _beforeMapActions)
-                                action(src, dest);
-                        };
+                {
+                    foreach (var action in _beforeMapActions)
+                        action(src, dest);
+                };
             }
         }
 
@@ -67,10 +73,10 @@ namespace AutoMapper
             get
             {
                 return (src, dest) =>
-                        {
-                            foreach (var action in _afterMapActions)
-                                action(src, dest);
-                        };
+                {
+                    foreach (var action in _afterMapActions)
+                        action(src, dest);
+                };
             }
         }
 
@@ -169,24 +175,20 @@ namespace AutoMapper
 
         public void IncludeDerivedTypes(Type derivedSourceType, Type derivedDestinationType)
         {
-            _includedDerivedTypes[derivedSourceType] = derivedDestinationType;
+            _includedDerivedTypes.Add(new TypePair(derivedSourceType, derivedDestinationType));
         }
 
         public Type GetDerivedTypeFor(Type derivedSourceType)
         {
-            if (!_includedDerivedTypes.ContainsKey(derivedSourceType))
-            {
-                return DestinationType;
-            }
+            // This might need to be fixed for multiple derived source types to different dest types
+            var match = _includedDerivedTypes.FirstOrDefault(tp => tp.SourceType == derivedSourceType);
 
-            return _includedDerivedTypes[derivedSourceType];
+            return match.Equals(default(TypePair)) ? DestinationType : match.DestinationType;
         }
 
         public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
         {
-            if (_includedDerivedTypes.ContainsKey(derivedSourceType))
-                return _includedDerivedTypes[derivedSourceType].IsAssignableFrom(derivedDestinationType);
-            return false;
+            return _includedDerivedTypes.Contains(new TypePair(derivedSourceType, derivedDestinationType));
         }
 
         public bool HasDerivedTypesToInclude()
@@ -217,8 +219,8 @@ namespace AutoMapper
 
             _orderedPropertyMaps =
                 _propertyMaps
-                .Union(_inheritedMaps)
-                .OrderBy(map => map.GetMappingOrder()).ToArray();
+                    .Union(_inheritedMaps)
+                    .OrderBy(map => map.GetMappingOrder()).ToArray();
 
             _orderedPropertyMaps.Each(pm => pm.Seal());
 
