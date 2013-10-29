@@ -23,6 +23,11 @@ namespace AutoMapper
 
 	    public virtual string ProfileName { get; private set; }
 
+        protected void DisableConstructorMapping()
+        {
+            GetProfile().ConstructorMappingEnabled = false;
+        }
+
 	    public bool AllowNullDestinationValues
 		{
 			get { return GetProfile().AllowNullDestinationValues; }
