@@ -23,7 +23,7 @@ namespace AutoMapper
 
 	    public virtual string ProfileName { get; private set; }
 
-        protected void DisableConstructorMapping()
+        public void DisableConstructorMapping()
         {
             GetProfile().ConstructorMappingEnabled = false;
         }
