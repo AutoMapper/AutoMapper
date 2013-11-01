@@ -14,11 +14,19 @@ namespace AutoMapper
 		private readonly IConfigurationProvider _configurationProvider;
 		private readonly IObjectMapper[] _mappers;
         private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>();
+	    private readonly Func<Type, object> _serviceCtor;
 
-		public MappingEngine(IConfigurationProvider configurationProvider)
+	    public MappingEngine(IConfigurationProvider configurationProvider)
+            : this(configurationProvider, DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>(), configurationProvider.ServiceCtor)
+		{
+		}
+
+		public MappingEngine(IConfigurationProvider configurationProvider, IDictionary<TypePair, IObjectMapper> objectMapperCache, Func<Type, object> serviceCtor)
 		{
 			_configurationProvider = configurationProvider;
-			_mappers = configurationProvider.GetMappers();
+		    _objectMapperCache = objectMapperCache;
+		    _serviceCtor = serviceCtor;
+		    _mappers = configurationProvider.GetMappers();
             _configurationProvider.TypeMapCreated += ClearTypeMap;
 		}
 
@@ -49,7 +57,7 @@ namespace AutoMapper
 
 	    public TDestination Map<TDestination>(object source)
         {
-            return Map<TDestination>(source, opts => { });
+            return Map<TDestination>(source, DefaultMappingOptions);
         }
 
         public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
@@ -70,7 +78,7 @@ namespace AutoMapper
 			Type modelType = typeof(TSource);
 			Type destinationType = typeof(TDestination);
 
-			return (TDestination)Map(source, modelType, destinationType, opts => {});
+            return (TDestination)Map(source, modelType, destinationType, DefaultMappingOptions);
 		}
 
         public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
@@ -83,7 +91,7 @@ namespace AutoMapper
 
 	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
 		{
-		    return Map(source, destination, opts => { });
+            return Map(source, destination, DefaultMappingOptions);
 		}
 
 	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
@@ -96,7 +104,7 @@ namespace AutoMapper
 
 	    public object Map(object source, Type sourceType, Type destinationType)
 	    {
-	        return Map(source, sourceType, destinationType, opt => { });
+            return Map(source, sourceType, destinationType, DefaultMappingOptions);
 	    }
 
 	    public object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
@@ -114,7 +122,7 @@ namespace AutoMapper
 
 	    public object Map(object source, object destination, Type sourceType, Type destinationType)
 	    {
-	        return Map(source, destination, sourceType, destinationType, opts => { });
+            return Map(source, destination, sourceType, destinationType, DefaultMappingOptions);
         }
 
 	    public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
@@ -264,10 +272,8 @@ namespace AutoMapper
             if (typeMap != null)
                 if (typeMap.DestinationCtor != null)
                     return typeMap.DestinationCtor(context);
-                else if (typeMap.ConstructDestinationUsingServiceLocator && context.Options.ServiceCtor != null)
-                    return context.Options.ServiceCtor(destinationType);
                 else if (typeMap.ConstructDestinationUsingServiceLocator)
-                    return _configurationProvider.ServiceCtor(destinationType);
+                    return context.Options.ServiceCtor(destinationType);
                 else if (typeMap.ConstructorMap != null)
                     return typeMap.ConstructorMap.ResolveValue(context, this);
 
@@ -308,6 +314,9 @@ namespace AutoMapper
 		    _objectMapperCache.TryRemove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType), out existing);
 		}
 
-
+	    private void DefaultMappingOptions(IMappingOperationOptions opts)
+	    {
+	        opts.ConstructServicesUsing(_serviceCtor);
+	    }
 	}
 }
