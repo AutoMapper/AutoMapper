@@ -126,6 +126,7 @@
     <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="Constructors.cs" />
+    <Compile Include="ContextItems.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />

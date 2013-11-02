@@ -140,6 +140,7 @@
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Constructors.cs" />
+    <Compile Include="ContextItems.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
