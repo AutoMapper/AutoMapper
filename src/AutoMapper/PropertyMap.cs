@@ -26,6 +26,7 @@ namespace AutoMapper
 
         public PropertyMap(IMemberAccessor destinationProperty)
         {
+            UseDestinationValue = true; 
             DestinationProperty = destinationProperty;
         }
 
@@ -247,7 +248,9 @@ namespace AutoMapper
 
         public object GetDestinationValue(object mappedObject)
         {
-            return DestinationProperty.GetValue(mappedObject);
+		     return UseDestinationValue
+                ? DestinationProperty.GetValue(mappedObject)
+                : null;
         }
 
         public ExpressionResolutionResult ResolveExpression(Type currentType, Expression instanceParameter)
