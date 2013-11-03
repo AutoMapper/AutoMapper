@@ -29,6 +29,23 @@ namespace AutoMapper
             DestinationProperty = destinationProperty;
         }
 
+        public PropertyMap(PropertyMap inheritedMappedProperty)
+            : this(inheritedMappedProperty.DestinationProperty)
+        {
+            if (inheritedMappedProperty.IsIgnored())
+                Ignore();
+            else
+            {
+                foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
+                {
+                    ChainResolver(sourceValueResolver);
+                }
+            }
+            ApplyCondition(inheritedMappedProperty._condition);
+            SetNullSubstitute(inheritedMappedProperty._nullSubstitute);
+            SetMappingOrder(inheritedMappedProperty._mappingOrder);
+        }
+
         public IMemberAccessor DestinationProperty { get; private set; }
         public Type DestinationPropertyType { get { return DestinationProperty.MemberType; } }
         public LambdaExpression CustomExpression { get; private set; }
@@ -235,7 +252,7 @@ namespace AutoMapper
         {
             if (sourceMember.Body is MemberExpression)
             {
-                SourceMember = ((MemberExpression) sourceMember.Body).Member;
+                SourceMember = ((MemberExpression)sourceMember.Body).Member;
             }
             CustomExpression = sourceMember;
             AssignCustomValueResolver(
@@ -277,7 +294,7 @@ namespace AutoMapper
                     var oldParameter = CustomExpression.Parameters.Single();
                     var newParameter = instanceParameter;
                     var converter = new ConversionVisitor(newParameter, oldParameter);
-                    
+
                     currentChild = converter.Visit(CustomExpression.Body);
                     currentChildType = currentChild.Type;
                 }

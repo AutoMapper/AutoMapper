@@ -272,17 +272,7 @@ namespace AutoMapper
                         conventionPropertyMap.AssignCustomValueResolver(inheritedMappedProperty.GetSourceValueResolvers().First());
                     else if (conventionPropertyMap == null)
                     {
-                        var propertyMap = new PropertyMap(inheritedMappedProperty.DestinationProperty);
-
-                        if (inheritedMappedProperty.IsIgnored())
-                            propertyMap.Ignore();
-                        else
-                        {
-                            foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
-                            {
-                                propertyMap.ChainResolver(sourceValueResolver);
-                            }
-                        }
+                        var propertyMap = new PropertyMap(inheritedMappedProperty);
 
                         typeMap.AddInheritedPropertyMap(propertyMap);
                     }
