@@ -70,7 +70,7 @@ namespace AutoMapper
         /// <summary>
         /// Assemblies to search for extension methods
         /// </summary>
-	    Assembly[] SourceExtensionMethodSearch { get; set; }
+	    IEnumerable<Assembly> SourceExtensionMethodSearch { get; set; }
 	}
 
 	public class PascalCaseNamingConvention : INamingConvention

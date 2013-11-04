@@ -16,8 +16,8 @@ namespace AutoMapper
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
         {
-            var sourceTypeInfo = GetTypeInfo(sourceType);
-            var destTypeInfo = GetTypeInfo(destinationType);
+            var sourceTypeInfo = GetTypeInfo(sourceType, options.SourceExtensionMethodSearch);
+            var destTypeInfo = GetTypeInfo(destinationType, Enumerable.Empty<Assembly>());
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
 
@@ -74,9 +74,9 @@ namespace AutoMapper
             return true;
         }
 
-        private static TypeInfo GetTypeInfo(Type type)
+        private static TypeInfo GetTypeInfo(Type type, IEnumerable<Assembly> extensionMethodsToSearch)
         {
-            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type));
+            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, extensionMethodsToSearch));
 
             return typeInfo;
         }
@@ -119,7 +119,7 @@ namespace AutoMapper
                         resolvers.AddLast(valueResolver);
 
                         foundMatch = MapDestinationPropertyToSource(resolvers,
-                                                                    GetTypeInfo(valueResolver.GetMemberType()),
+                                                                    GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethodSearch),
                                                                     snippet.Second, mappingOptions);
 
                         if (!foundMatch)

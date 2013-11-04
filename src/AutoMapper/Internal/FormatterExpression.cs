@@ -41,7 +41,7 @@ namespace AutoMapper
         public IEnumerable<AliasedMember> Aliases { get { return _aliases; } }
         public bool ConstructorMappingEnabled { get; set; }
         public bool DataReaderMapperYieldReturnEnabled { get; set; }
-        public Assembly[] SourceExtensionMethodSearch { get; set; }
+        public IEnumerable<Assembly> SourceExtensionMethodSearch { get; set; }
 
         public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{

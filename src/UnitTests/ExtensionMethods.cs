@@ -7,7 +7,11 @@ namespace AutoMapper.UnitTests
 {
 	namespace ExtensionMethods
 	{
-		public static class When_extension_method_returns_value_type_SourceExtensions
+	    using System.Collections;
+	    using System.Collections.Generic;
+	    using System.Linq;
+
+	    public static class When_extension_method_returns_value_type_SourceExtensions
 		{
 			public static string GetValue2(this When_extension_method_returns_value_type.Source source) { return "hello from extension"; }
 		}
@@ -102,5 +106,36 @@ namespace AutoMapper.UnitTests
 				_destination.Value1.ShouldEqual(7);
 			}
 		}
+
+	    public class When_extension_contains_LINQ_methods : AutoMapperSpecBase
+	    {
+	        private Destination _destination;
+
+	        public class Source
+	        {
+	            public IEnumerable<int> Values { get; set; }
+	        }
+
+	        public class Destination
+	        {
+	            public int ValuesCount { get; set; }
+	        }
+
+	        protected override void Establish_context()
+	        {
+	            Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
+	        }
+
+	        protected override void Because_of()
+	        {
+	            _destination = Mapper.Map<Source, Destination>(new Source {Values = Enumerable.Repeat(1, 10)});
+	        }
+
+	        [Fact]
+	        public void Should_resolve_LINQ_method_automatically()
+	        {
+	            _destination.ValuesCount.ShouldEqual(10);
+	        }
+	    }
 	}
 }

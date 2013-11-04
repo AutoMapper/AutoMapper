@@ -17,10 +17,16 @@ namespace AutoMapper
         private readonly MemberInfo[] _publicAccessors;
         private readonly MethodInfo[] _publicGetMethods;
         private readonly ConstructorInfo[] _constructors;
+        private readonly MethodInfo[] _extensionMethods;
 
         public Type Type { get; private set; }
 
         public TypeInfo(Type type)
+            : this (type, Enumerable.Empty<Assembly>())
+        {
+        }
+        
+        public TypeInfo(Type type, IEnumerable<Assembly> extensionMethodsToSearch)
         {
             Type = type;
         	var publicReadableMembers = GetAllPublicReadableMembers();
@@ -29,6 +35,7 @@ namespace AutoMapper
             _publicAccessors = BuildPublicAccessors(publicWritableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
             _constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            _extensionMethods = BuildPublicNoArgExtensionMethods(extensionMethodsToSearch);
         }
 
         public IEnumerable<ConstructorInfo> GetConstructors()
@@ -51,23 +58,51 @@ namespace AutoMapper
             return _publicGetMethods;
         }
 
-		public IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(Assembly[] sourceExtensionMethodSearch)
+		public IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(IEnumerable<Assembly> sourceExtensionMethodSearch)
 		{
-			if (sourceExtensionMethodSearch == null)
-			{
-				return new MethodInfo[] { };
-			}
-
-			//http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
-			return sourceExtensionMethodSearch
-				.SelectMany(assembly => assembly.GetTypes())
-				.Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
-				.SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-				.Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
-				.Where(method => method.GetParameters()[0].ParameterType == this.Type);
+		    return _extensionMethods;
 		}
 
-		private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
+        private MethodInfo[] BuildPublicNoArgExtensionMethods(IEnumerable<Assembly> sourceExtensionMethodSearch)
+        {
+            //http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
+            var extensionMethods = (sourceExtensionMethodSearch ?? Enumerable.Empty<Assembly>())
+                .Concat(new[] {typeof (Enumerable).Assembly})
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
+                .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                .Where(method => method.IsDefined(typeof (ExtensionAttribute), false))
+                .Where(method => method.GetParameters().Length == 1)
+                .ToArray();
+
+            var explicitExtensionMethods = extensionMethods
+                .Where(method => method.GetParameters()[0].ParameterType == Type)
+                .ToList();
+
+            var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType).ToList();
+
+            if (Type.IsInterface && Type.IsGenericType)
+                genericInterfaces.Add(Type);
+
+            foreach (var method in extensionMethods
+                .Where(method => method.IsGenericMethodDefinition))
+            {
+                var parameterType = method.GetParameters()[0].ParameterType;
+
+                var interfaceMatch = genericInterfaces
+                    .Where(t => t.GetGenericTypeDefinition().GetGenericArguments().Length == parameterType.GetGenericArguments().Length)
+                    .FirstOrDefault(t => method.MakeGenericMethod(t.GetGenericArguments()).GetParameters()[0].ParameterType.IsAssignableFrom(t));
+
+                if (interfaceMatch != null)
+                {
+                    explicitExtensionMethods.Add(method.MakeGenericMethod(interfaceMatch.GetGenericArguments()));
+                }
+            }
+
+            return explicitExtensionMethods.ToArray();
+        }
+
+        private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
         {
 			// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
             var filteredMembers = allMembers

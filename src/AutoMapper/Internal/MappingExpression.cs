@@ -5,6 +5,8 @@ using System.Linq;
 
 namespace AutoMapper
 {
+    using System.Reflection;
+
     public class MappingExpression : IMappingExpression, IMemberConfigurationExpression
     {
         private readonly TypeMap _typeMap;

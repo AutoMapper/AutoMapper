@@ -97,7 +97,7 @@ namespace AutoMapper
             get { return GetProfile(DefaultProfileName).DataReaderMapperYieldReturnEnabled; }
 	    }
 
-	    public Assembly[] SourceExtensionMethodSearch
+	    public IEnumerable<Assembly> SourceExtensionMethodSearch
 		{
 			get { return GetProfile(DefaultProfileName).SourceExtensionMethodSearch; }
 			set { GetProfile(DefaultProfileName).SourceExtensionMethodSearch = value; }
