@@ -5,6 +5,7 @@ namespace AutoMapper.Mappers
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
 
     public class HashSetMapper : IObjectMapper
     {
