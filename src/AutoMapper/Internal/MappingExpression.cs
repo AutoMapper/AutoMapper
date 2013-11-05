@@ -339,9 +339,9 @@ namespace AutoMapper
             _propertyMap.UseDestinationValue = true;
         }
 
-        public void UseDestinationValue(bool value)
+        public void DoNotUseDestinationValue()
         {
-            _propertyMap.UseDestinationValue = value;
+            _propertyMap.UseDestinationValue = false;
         }
 
         public void SetMappingOrder(int mappingOrder)

@@ -308,9 +308,9 @@ namespace AutoMapper
         void UseDestinationValue();
 
         /// <summary>
-        /// Use the destination value instead of mapping from the source value or creating a new instance
+        /// Do not use the destination value instead of mapping from the source value or creating a new instance
         /// </summary>        
-		void UseDestinationValue(bool value);
+        void DoNotUseDestinationValue();
         
         /// <summary>
         /// Use a custom value
