@@ -31,11 +31,11 @@
             protected override void Establish_context()
             {
                 Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
-                    .ForMember(dest => dest.Value, opt =>
-                    {
-                        opt.Condition(src => src.Value.Count > 1);
-                        opt.ResolveUsing(src => src.Value[1].SubValue);
-                    }));
+                                             .ForMember(dest => dest.Value, opt =>
+                                             {
+                                                 opt.Condition(src => src.Value.Count > 1);
+                                                 opt.ResolveUsing(src => src.Value[1].SubValue);
+                                             }));
             }
 
             [Fact]

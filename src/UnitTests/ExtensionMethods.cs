@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests
 	    using System.Collections.Generic;
 	    using System.Linq;
 
-	    public static class When_extension_method_returns_value_type_SourceExtensions
+		public static class When_extension_method_returns_value_type_SourceExtensions
 		{
 			public static string GetValue2(this When_extension_method_returns_value_type.Source source) { return "hello from extension"; }
 		}
