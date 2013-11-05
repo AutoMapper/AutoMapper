@@ -5,7 +5,7 @@ namespace AutoMapper.Mappers
 {
     using Internal;
 
-    public class TypeConverterMapper : IObjectMapper
+	public class TypeConverterMapper : IObjectMapper
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
@@ -23,7 +23,7 @@ namespace AutoMapper.Mappers
 				return () => typeConverter.ConvertTo(context.SourceValue, context.DestinationType);
             if (context.DestinationType.IsNullableType() && typeConverter.CanConvertTo(Nullable.GetUnderlyingType(context.DestinationType)))
                 return () => typeConverter.ConvertTo(context.SourceValue, Nullable.GetUnderlyingType(context.DestinationType));
-            
+
 			typeConverter = GetTypeConverter(context.DestinationType);
 			if(typeConverter.CanConvertFrom(context.SourceType))
 				return () => typeConverter.ConvertFrom(context.SourceValue);

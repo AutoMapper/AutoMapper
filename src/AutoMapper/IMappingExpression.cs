@@ -308,11 +308,16 @@ namespace AutoMapper
         void UseDestinationValue();
 
         /// <summary>
+        /// Do not use the destination value instead of mapping from the source value or creating a new instance
+        /// </summary>        
+        void DoNotUseDestinationValue();
+        
+        /// <summary>
         /// Use a custom value
         /// </summary>
         /// <typeparam name="TValue">Value type</typeparam>
         /// <param name="value">Value to use</param>
-        void UseValue<TValue>(TValue value);
+		 void UseValue<TValue>(TValue value);
 
         /// <summary>
         /// Use a custom value
