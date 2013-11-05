@@ -1,4 +1,3 @@
-using System;
 using AutoMapper;
 using NUnit.Framework;
 

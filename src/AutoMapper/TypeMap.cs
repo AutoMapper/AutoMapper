@@ -18,7 +18,7 @@ namespace AutoMapper
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
         private readonly TypeInfo _destinationType;
         private readonly ISet<TypePair> _includedDerivedTypes = SetFactory.CreateSet<TypePair>();
-        private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
+		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
 
         private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs =
             new ThreadSafeList<SourceMemberConfig>();
@@ -61,10 +61,10 @@ namespace AutoMapper
             get
             {
                 return (src, dest) =>
-                {
-                    foreach (var action in _beforeMapActions)
-                        action(src, dest);
-                };
+                        {
+                            foreach (var action in _beforeMapActions)
+                                action(src, dest);
+                        };
             }
         }
 
@@ -73,10 +73,10 @@ namespace AutoMapper
             get
             {
                 return (src, dest) =>
-                {
-                    foreach (var action in _afterMapActions)
-                        action(src, dest);
-                };
+                        {
+                            foreach (var action in _afterMapActions)
+                                action(src, dest);
+                        };
             }
         }
 
@@ -219,8 +219,8 @@ namespace AutoMapper
 
             _orderedPropertyMaps =
                 _propertyMaps
-                    .Union(_inheritedMaps)
-                    .OrderBy(map => map.GetMappingOrder()).ToArray();
+                .Union(_inheritedMaps)
+                .OrderBy(map => map.GetMappingOrder()).ToArray();
 
             _orderedPropertyMaps.Each(pm => pm.Seal());
 

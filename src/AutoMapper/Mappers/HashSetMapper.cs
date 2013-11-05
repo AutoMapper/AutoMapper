@@ -1,11 +1,11 @@
 ﻿using System.Linq;
-using System.Reflection;
 using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
 
     public class HashSetMapper : IObjectMapper
     {
