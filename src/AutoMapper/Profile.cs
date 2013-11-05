@@ -40,7 +40,12 @@ namespace AutoMapper
             set { GetProfile().AllowNullCollections = value; }
 		}
 
-	    public INamingConvention SourceMemberNamingConvention
+        public void IncludeSourceExtensionMethods(Assembly assembly)
+        {
+            GetProfile().IncludeSourceExtensionMethods(assembly);
+        }
+
+        public INamingConvention SourceMemberNamingConvention
 		{
 			get { return GetProfile().SourceMemberNamingConvention; } 
 			set { GetProfile().SourceMemberNamingConvention = value; }
@@ -87,11 +92,10 @@ namespace AutoMapper
             get { return _configurator.DataReaderMapperYieldReturnEnabled; }
 	    }
 
-	    public IEnumerable<Assembly> SourceExtensionMethodSearch
-		{
-			get { return GetProfile().SourceExtensionMethodSearch; }
-			set { GetProfile().SourceExtensionMethodSearch = value; }
-		}
+        public IEnumerable<MethodInfo> SourceExtensionMethods
+        {
+            get { return GetProfile().SourceExtensionMethods; }
+        }
 
 		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{

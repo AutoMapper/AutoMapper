@@ -50,7 +50,12 @@ namespace AutoMapper
 			set { GetProfile(DefaultProfileName).AllowNullCollections = value; }
 		}
 
-		public INamingConvention SourceMemberNamingConvention
+	    public void IncludeSourceExtensionMethods(Assembly assembly)
+	    {
+	        GetProfile(DefaultProfileName).IncludeSourceExtensionMethods(assembly);
+	    }
+
+	    public INamingConvention SourceMemberNamingConvention
 		{
 			get { return GetProfile(DefaultProfileName).SourceMemberNamingConvention; }
 			set { GetProfile(DefaultProfileName).SourceMemberNamingConvention = value; }
@@ -97,11 +102,13 @@ namespace AutoMapper
             get { return GetProfile(DefaultProfileName).DataReaderMapperYieldReturnEnabled; }
 	    }
 
-	    public IEnumerable<Assembly> SourceExtensionMethodSearch
-		{
-			get { return GetProfile(DefaultProfileName).SourceExtensionMethodSearch; }
-			set { GetProfile(DefaultProfileName).SourceExtensionMethodSearch = value; }
-		}
+	    public IEnumerable<MethodInfo> SourceExtensionMethods
+	    {
+	        get
+	        {
+	            return GetProfile(DefaultProfileName).SourceExtensionMethods;
+	        }
+	    }
 
 		bool IProfileConfiguration.MapNullSourceValuesAsNull
 		{

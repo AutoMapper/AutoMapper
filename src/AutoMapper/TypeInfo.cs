@@ -22,11 +22,11 @@ namespace AutoMapper
         public Type Type { get; private set; }
 
         public TypeInfo(Type type)
-            : this (type, Enumerable.Empty<Assembly>())
+            : this (type, new MethodInfo[0])
         {
         }
-        
-        public TypeInfo(Type type, IEnumerable<Assembly> extensionMethodsToSearch)
+
+        public TypeInfo(Type type, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
             Type = type;
         	var publicReadableMembers = GetAllPublicReadableMembers();
@@ -35,7 +35,7 @@ namespace AutoMapper
             _publicAccessors = BuildPublicAccessors(publicWritableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
             _constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            _extensionMethods = BuildPublicNoArgExtensionMethods(extensionMethodsToSearch);
+            _extensionMethods = BuildPublicNoArgExtensionMethods(sourceExtensionMethodSearch);
         }
 
         public IEnumerable<ConstructorInfo> GetConstructors()
@@ -58,24 +58,16 @@ namespace AutoMapper
             return _publicGetMethods;
         }
 
-		public IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(IEnumerable<Assembly> sourceExtensionMethodSearch)
+		public IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods()
 		{
 		    return _extensionMethods;
 		}
 
-        private MethodInfo[] BuildPublicNoArgExtensionMethods(IEnumerable<Assembly> sourceExtensionMethodSearch)
+        private MethodInfo[] BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
-            //http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
-            var extensionMethods = (sourceExtensionMethodSearch ?? Enumerable.Empty<Assembly>())
-                .Concat(new[] {typeof (Enumerable).Assembly})
-                .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
-                .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-                .Where(method => method.IsDefined(typeof (ExtensionAttribute), false))
-                .Where(method => method.GetParameters().Length == 1)
-                .ToArray();
+            var sourceExtensionMethodSearchArray = sourceExtensionMethodSearch.ToArray();
 
-            var explicitExtensionMethods = extensionMethods
+            var explicitExtensionMethods = sourceExtensionMethodSearchArray
                 .Where(method => method.GetParameters()[0].ParameterType == Type)
                 .ToList();
 
@@ -84,7 +76,7 @@ namespace AutoMapper
             if (Type.IsInterface && Type.IsGenericType)
                 genericInterfaces.Add(Type);
 
-            foreach (var method in extensionMethods
+            foreach (var method in sourceExtensionMethodSearchArray
                 .Where(method => method.IsGenericMethodDefinition))
             {
                 var parameterType = method.GetParameters()[0].ParameterType;

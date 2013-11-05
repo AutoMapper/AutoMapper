@@ -68,9 +68,9 @@ namespace AutoMapper
 	    bool DataReaderMapperYieldReturnEnabled { get; }
 
         /// <summary>
-        /// Assemblies to search for extension methods
+        /// Source extension methods included for search
         /// </summary>
-	    IEnumerable<Assembly> SourceExtensionMethodSearch { get; set; }
+	    IEnumerable<MethodInfo> SourceExtensionMethods { get; }
 	}
 
 	public class PascalCaseNamingConvention : INamingConvention

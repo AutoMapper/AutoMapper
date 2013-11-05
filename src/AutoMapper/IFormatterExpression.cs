@@ -2,6 +2,8 @@ using System;
 
 namespace AutoMapper
 {
+    using System.Reflection;
+
     [Obsolete("Formatters should not be used.")]
     public interface IFormatterExpression
 	{
@@ -120,7 +122,13 @@ namespace AutoMapper
         /// Allow null destination collections. If true, null source collections result in null destination collections. Default false.
         /// </summary>
         bool AllowNullCollections { get; set; }
-    }
+
+        /// <summary>
+        /// Include an assembly to search for extension methods to match
+        /// </summary>
+        /// <param name="assembly">Assembly containing extension methods</param>
+        void IncludeSourceExtensionMethods(Assembly assembly);
+	}
 
 	public interface IConfiguration : IProfileExpression
 	{

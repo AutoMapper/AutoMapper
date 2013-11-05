@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(config => config.SourceExtensionMethodSearch = new System.Reflection.Assembly[] { Assembly.GetExecutingAssembly() });
+                Mapper.Initialize(config => config.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly()));
 				Mapper.CreateMap<Source, Destination>();
 			}
 
@@ -85,7 +85,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(config => config.SourceExtensionMethodSearch = new[] { Assembly.GetExecutingAssembly() });
+				Mapper.Initialize(config => config.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly()));
 				Mapper.CreateMap<Source, Destination>();
 			}
 

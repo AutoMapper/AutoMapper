@@ -32,6 +32,7 @@ namespace AutoMapper.UnitTests.Tests
         private IEnumerable<AliasedMember> _aliases = new List<AliasedMember>();
 
         private IEnumerable<Assembly> _sourceExtensionMethodSearch = null;
+        private IEnumerable<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
         public INamingConvention SourceMemberNamingConvention
         {
@@ -80,10 +81,9 @@ namespace AutoMapper.UnitTests.Tests
             get { return false; }
         }
 
-        public IEnumerable<Assembly> SourceExtensionMethodSearch
+        public IEnumerable<MethodInfo> SourceExtensionMethods
         {
-            get { return _sourceExtensionMethodSearch; }
-            set { _sourceExtensionMethodSearch = value; }
+            get { return _sourceExtensionMethods; }
         }
     }
 
