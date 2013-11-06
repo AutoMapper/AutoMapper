@@ -39,7 +39,7 @@ namespace AutoMapper.UnitTests.Bug
 		[Fact]
 		public void ShouldMapOneToTwo()
 		{
-            var config = new ConfigurationStore(new TypeMapFactory(), MapperRegistryOverride.AllMappers());
+            var config = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
 			config.CreateMap<One, Two>();
 
 			config.CreateMap<IEnumerable<string>, IEnumerable<Item>>().ConvertUsing<StringToItemConverter>();

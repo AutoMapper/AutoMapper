@@ -3,21 +3,18 @@ using System.Collections.Generic;
 
 namespace AutoMapper.Mappers
 {
-    public class MapperRegistry : IMapperRegistry
+    public static class MapperRegistry
     {
-        /// <summary>
-        /// Extension point for modifying list of object mappers
-        /// </summary>
-        public static Func<IEnumerable<IObjectMapper>> AllMappers = () => new IObjectMapper[]
+        private static readonly IList<IObjectMapper> _mappers = new List<IObjectMapper>
         {
-            new TypeMapMapper(TypeMapObjectMapperRegistry.AllMappers()),
+            new TypeMapMapper(TypeMapObjectMapperRegistry.Mappers),
             new StringMapper(),
             new FlagsEnumMapper(),
             new AssignableMapper(),
             new EnumMapper(),
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
-			new EnumerableToDictionaryMapper(),
+            new EnumerableToDictionaryMapper(),
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
             new CollectionMapper(),
@@ -26,11 +23,15 @@ namespace AutoMapper.Mappers
             new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper()
+
         };
 
-        public IEnumerable<IObjectMapper> GetMappers()
+        /// <summary>
+        /// Extension point for modifying list of object mappers
+        /// </summary>
+        public static IList<IObjectMapper> Mappers
         {
-            return AllMappers();
+            get { return _mappers; }
         }
     }
 }
