@@ -41,6 +41,14 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for configuring member</param>
         /// <returns>Itself</returns>
         IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions);
+
+        /// <summary>
+        /// Customize configuration for an individual source member
+        /// </summary>
+        /// <param name="sourceMemberName">Expression to source member. Must be a member of the <typeparamref name="TSource"/> type</param>
+        /// <param name="memberOptions">Callback for member configuration options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions);
     }
 
     /// <summary>
@@ -181,6 +189,14 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member configuration options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
+
+        /// <summary>
+        /// Customize configuration for an individual source member. Member name not known until runtime
+        /// </summary>
+        /// <param name="sourceMemberName">Expression to source member. Must be a member of the <typeparamref name="TSource"/> type</param>
+        /// <param name="memberOptions">Callback for member configuration options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
     }
 
     /// <summary>
@@ -224,13 +240,20 @@ namespace AutoMapper
     /// <summary>
     /// Source member configuration options
     /// </summary>
-    /// <typeparam name="TSource">Source type</typeparam>
-    public interface ISourceMemberConfigurationExpression<TSource>
+    public interface ISourceMemberConfigurationExpression
     {
         /// <summary>
         /// Ignore this member for configuration validation and skip during mapping
         /// </summary>
         void Ignore();
+    }
+
+    /// <summary>
+    /// Source member configuration options
+    /// </summary>
+    /// <typeparam name="TSource">Source type</typeparam>
+    public interface ISourceMemberConfigurationExpression<TSource> : ISourceMemberConfigurationExpression
+    {
     }
 
     /// <summary>

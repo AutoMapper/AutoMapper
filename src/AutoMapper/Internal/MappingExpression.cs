@@ -62,6 +62,17 @@ namespace AutoMapper
             return new MappingExpression(_typeMap, _typeConverterCtor);
         }
 
+        public IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
+        {
+            MemberInfo srcMember = _typeMap.SourceType.GetMember(sourceMemberName).First();
+
+            var srcConfig = new SourceMappingExpression(_typeMap, srcMember);
+
+            memberOptions(srcConfig);
+
+            return new MappingExpression(_typeMap, _typeConverterCtor);
+        }
+
         private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression> memberOptions)
         {
             _propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
@@ -122,6 +133,22 @@ namespace AutoMapper
                 return (TServiceType)_typeConverterCtor(type);
             };
         }
+
+        private class SourceMappingExpression : ISourceMemberConfigurationExpression
+        {
+            private readonly SourceMemberConfig _sourcePropertyConfig;
+
+            public SourceMappingExpression(TypeMap typeMap, MemberInfo sourceMember)
+            {
+                _sourcePropertyConfig = typeMap.FindOrCreateSourceMemberConfigFor(sourceMember);
+            }
+
+            public void Ignore()
+            {
+                _sourcePropertyConfig.Ignore();
+            }
+        }
+
     }
 
     public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
@@ -291,7 +318,20 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var srcConfig = new SourceMappingExpression(_typeMap, sourceMember);
+            var memberInfo = ReflectionHelper.FindProperty(sourceMember);
+
+            var srcConfig = new SourceMappingExpression(_typeMap, memberInfo);
+
+            memberOptions(srcConfig);
+
+            return this;
+        }
+
+        public IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions)
+        {
+            var memberInfo = _typeMap.SourceType.GetMember(sourceMemberName).First();
+
+            var srcConfig = new SourceMappingExpression(_typeMap, memberInfo);
 
             memberOptions(srcConfig);
 
@@ -452,10 +492,8 @@ namespace AutoMapper
         {
             private readonly SourceMemberConfig _sourcePropertyConfig;
 
-            public SourceMappingExpression(TypeMap typeMap, LambdaExpression sourceMember)
+            public SourceMappingExpression(TypeMap typeMap, MemberInfo memberInfo)
             {
-                var memberInfo = ReflectionHelper.FindProperty(sourceMember);
-
                 _sourcePropertyConfig = typeMap.FindOrCreateSourceMemberConfigFor(memberInfo);
             }
 
