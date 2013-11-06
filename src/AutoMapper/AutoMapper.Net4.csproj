@@ -58,7 +58,7 @@
     <Compile Include="Mappers\DataReaderMapper.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\ListSourceMapper.cs" />
-    <Compile Include="Mappers\MapperRegistryOverride.cs" />
+    <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

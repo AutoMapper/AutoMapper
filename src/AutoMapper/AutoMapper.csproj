@@ -79,8 +79,8 @@
     <Compile Include="Internal\SetFactory.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
-    <Compile Include="Mappers\IMapperRegistry.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\PrimitiveArrayMapper.cs" />
     <Compile Include="MemberList.cs" />
