@@ -428,7 +428,8 @@ namespace AutoMapper
         /// Clear out all existing configuration
         /// </summary>
 		public static void Reset()
-		{
+        {
+            MapperRegistry.Reset();
             _configuration = LazyFactory.Create(_configurationInit);
             _mappingEngine = LazyFactory.Create(_mappingEngineInit);
 		}

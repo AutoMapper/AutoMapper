@@ -1,16 +1,15 @@
-using System;
 using System.Collections.Generic;
 
 namespace AutoMapper.Mappers
 {
     public static class MapperRegistry
     {
-        private static readonly IList<IObjectMapper> _mappers = new List<IObjectMapper>
+        private static readonly IObjectMapper[] _initialMappers =
         {
             new TypeMapMapper(TypeMapObjectMapperRegistry.Mappers),
             new StringMapper(),
-            new FlagsEnumMapper(),
             new AssignableMapper(),
+            new FlagsEnumMapper(),
             new EnumMapper(),
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
@@ -23,8 +22,9 @@ namespace AutoMapper.Mappers
             new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper()
-
         };
+
+        private static readonly List<IObjectMapper> _mappers = new List<IObjectMapper>(_initialMappers);
 
         /// <summary>
         /// Extension point for modifying list of object mappers
@@ -32,6 +32,15 @@ namespace AutoMapper.Mappers
         public static IList<IObjectMapper> Mappers
         {
             get { return _mappers; }
+        }
+
+        /// <summary>
+        /// Reset mapper registry to built-in values
+        /// </summary>
+        public static void Reset()
+        {
+            _mappers.Clear();
+            _mappers.AddRange(_initialMappers);
         }
     }
 }
