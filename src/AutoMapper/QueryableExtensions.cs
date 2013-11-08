@@ -161,13 +161,20 @@ namespace AutoMapper.QueryableExtensions
                     }
                 }
                 else if (result.Type != propertyMap.DestinationPropertyType &&
-                         // avoid nullable etc.
+                    // avoid nullable etc.
                          propertyMap.DestinationPropertyType.BaseType != typeof (ValueType) &&
                          propertyMap.DestinationPropertyType.BaseType != typeof (Enum))
                 {
                     var transformedExpression = CreateMapExpression(mappingEngine,
                         new TypePair(result.Type, propertyMap.DestinationPropertyType),
                         result.ResolutionExpression, typePairCount);
+                      // Handles null source property so it will not create an object with possible non-nullable properties
+                      // which would result in an exception.
+                      if (mappingEngine.ConfigurationProvider.MapNullSourceValuesAsNull)
+                      {
+                          var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
+                          transformedExpression = Expression.Condition(Expression.NotEqual(result.ResolutionExpression, Expression.Constant(null)), transformedExpression, expressionNull);
+                      }
 
                     bindExpression = Expression.Bind(destinationMember, transformedExpression);
                 }
