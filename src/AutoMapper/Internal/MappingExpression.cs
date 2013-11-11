@@ -76,6 +76,7 @@ namespace AutoMapper
         private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression> memberOptions)
         {
             _propertyMap = _typeMap.FindOrCreatePropertyMapFor(destinationProperty);
+            _typeMap.AddPropertyMap(_propertyMap);
 
             memberOptions(this);
         }
