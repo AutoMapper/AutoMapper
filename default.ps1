@@ -56,6 +56,7 @@ task dist {
 	copy_files "$source_dir\AutoMapper\bin\wp75\$config" "$dist_dir\wp71"
 	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows8"
 	copy_files "$source_dir\AutoMapper\bin\Android\$config" "$dist_dir\MonoAndroid22"
+	copy_files "$source_dir\AutoMapper\bin\iOS\$config" "$dist_dir\MonoTOuch40"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
@@ -140,9 +141,9 @@ function global:create-nuspec($version, $fileName)
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
   </metadata>
   <files>
-    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
-    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
-    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22"" />
+    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22+MonoTouch40"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22+MonoTouch40"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp71+sl4+MonoAndroid22+MonoTouch40"" />
     <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\net40"" />
@@ -178,6 +179,13 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\MonoAndroid22\AutoMapper.Android.pdb"" target=""lib\MonoAndroid22"" />
     <file src=""$source_dir\install.ps1"" target=""tools\MonoAndroid22"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\MonoAndroid22"" />
+    <file src=""$dist_dir\MonoTouch40\AutoMapper.dll"" target=""lib\MonoTouch40"" />
+    <file src=""$dist_dir\MonoTouch40\AutoMapper.pdb"" target=""lib\MonoTouch40"" />
+    <file src=""$dist_dir\MonoTouch40\AutoMapper.xml"" target=""lib\MonoTouch40"" />
+    <file src=""$dist_dir\MonoTouch40\AutoMapper.iOS.dll"" target=""lib\MonoTouch40"" />
+    <file src=""$dist_dir\MonoTouch40\AutoMapper.iOS.pdb"" target=""lib\MonoTouch40"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\MonoTouch40"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\MonoTouch40"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
