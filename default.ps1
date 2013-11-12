@@ -56,7 +56,7 @@ task dist {
 	copy_files "$source_dir\AutoMapper\bin\wp75\$config" "$dist_dir\wp71"
 	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows8"
 	copy_files "$source_dir\AutoMapper\bin\Android\$config" "$dist_dir\MonoAndroid22"
-	copy_files "$source_dir\AutoMapper\bin\iOS\$config" "$dist_dir\MonoTOuch40"
+	copy_files "$source_dir\AutoMapper\bin\iPhone\$config" "$dist_dir\MonoTouch40"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
