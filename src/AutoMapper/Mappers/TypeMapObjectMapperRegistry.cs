@@ -3,22 +3,23 @@ using System.Collections.Generic;
 
 namespace AutoMapper.Mappers
 {
-	public class TypeMapObjectMapperRegistry
+	public static class TypeMapObjectMapperRegistry
 	{
         /// <summary>
         /// Extension point for mappers matching based on types configured by CreateMap
         /// </summary>
-		public static Func<IEnumerable<ITypeMapObjectMapper>> AllMappers =
-			() => new ITypeMapObjectMapper[]
-            {
-                new CustomMapperStrategy(),
-                new NullMappingStrategy(),
-                new CacheMappingStrategy(),
-                new NewObjectPropertyMapMappingStrategy(),
-                new ExistingObjectMappingStrategy()
-            };
+        public static IList<ITypeMapObjectMapper> Mappers { get { return _mappers; } }
+		
+	    private static readonly IList<ITypeMapObjectMapper> _mappers = new List<ITypeMapObjectMapper>
+	    {
+	        new CustomMapperStrategy(),
+	        new NullMappingStrategy(),
+	        new CacheMappingStrategy(),
+	        new NewObjectPropertyMapMappingStrategy(),
+	        new ExistingObjectMappingStrategy()
+	    };
 
-		private class CustomMapperStrategy : ITypeMapObjectMapper
+	    private class CustomMapperStrategy : ITypeMapObjectMapper
 		{
 			public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 			{
@@ -114,7 +115,7 @@ namespace AutoMapper.Mappers
                     if (result.ShouldIgnore) 
                         return;
 
-					object destinationValue = propertyMap.GetDestinationValue(mappedObject);;
+					object destinationValue = propertyMap.GetDestinationValue(mappedObject);
 
 					var sourceType = result.Type;
 					var destinationType = propertyMap.DestinationProperty.MemberType;
@@ -152,7 +153,7 @@ namespace AutoMapper.Mappers
 
 			protected virtual void AssignValue(PropertyMap propertyMap, object mappedObject, object propertyValueToAssign)
 			{
-				if (!propertyMap.UseDestinationValue && propertyMap.CanBeSet)
+				if (propertyMap.CanBeSet)
 					propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
 			}
 

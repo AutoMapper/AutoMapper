@@ -105,6 +105,7 @@
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
+    <Compile Include="Bug\MappingInheritance.cs" />
     <Compile Include="Bug\MemberNamedTypeBug.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="Constructors.cs" />
+    <Compile Include="ContextItems.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
@@ -147,6 +149,7 @@
     <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
     <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
+    <Compile Include="Mappers\CustomMapperTests.cs" />
     <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
     <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
     <Compile Include="Mappers\TypeHelperTests.cs">
@@ -172,6 +175,7 @@
     <Compile Include="Projection\PrimitiveArraysTest.cs" />
     <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
     <Compile Include="Projection\ProjectCollectionListTest.cs" />
+    <Compile Include="Projection\ProjectEnumerableToArrayTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
@@ -266,11 +270,4 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

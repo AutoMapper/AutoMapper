@@ -13,11 +13,12 @@ namespace AutoMapper
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
         private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos =
             DictionaryFactory.CreateDictionary<Type, TypeInfo>();
+        //private readonly MemberInfo[] 
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
         {
-            var sourceTypeInfo = GetTypeInfo(sourceType);
-            var destTypeInfo = GetTypeInfo(destinationType);
+            var sourceTypeInfo = GetTypeInfo(sourceType, options.SourceExtensionMethods);
+            var destTypeInfo = GetTypeInfo(destinationType, new MethodInfo[0]);
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
 
@@ -74,9 +75,9 @@ namespace AutoMapper
             return true;
         }
 
-        private static TypeInfo GetTypeInfo(Type type)
+        private static TypeInfo GetTypeInfo(Type type, IEnumerable<MethodInfo> extensionMethodsToSearch)
         {
-            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type));
+            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, extensionMethodsToSearch));
 
             return typeInfo;
         }
@@ -89,7 +90,7 @@ namespace AutoMapper
 
             var sourceProperties = sourceType.GetPublicReadAccessors();
             var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
-			var sourceNoArgExtensionMethods = sourceType.GetPublicNoArgExtensionMethods(mappingOptions.SourceExtensionMethodSearch);
+			var sourceNoArgExtensionMethods = sourceType.GetPublicNoArgExtensionMethods();
 
 			MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, nameToSearch, mappingOptions);
 
@@ -119,7 +120,7 @@ namespace AutoMapper
                         resolvers.AddLast(valueResolver);
 
                         foundMatch = MapDestinationPropertyToSource(resolvers,
-                                                                    GetTypeInfo(valueResolver.GetMemberType()),
+                                                                    GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethods),
                                                                     snippet.Second, mappingOptions);
 
                         if (!foundMatch)

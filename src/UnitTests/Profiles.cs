@@ -1,3 +1,4 @@
+using System;
 using Should;
 using Xunit;
 
@@ -120,6 +121,58 @@ namespace AutoMapper.UnitTests
 				_result.Value.ShouldEqual("5 Custom");
 			}
 		}
+
+
+        public class When_disabling_constructor_mapping_with_profiles : AutoMapperSpecBase
+        {
+            private B _b;
+
+            public class AProfile : Profile
+            {
+                protected override void Configure()
+                {
+                    DisableConstructorMapping();
+                    CreateMap<A, B>();
+                }
+            }
+
+            public class A
+            {
+                public string Value { get; set; }
+            }
+
+            public class B
+            {
+
+                public B()
+                {
+                }
+
+                public B(string value)
+                {
+                    throw new Exception();
+                }
+
+                public string Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.AddProfile<AProfile>();
+            }
+
+            protected override void Because_of()
+            {
+                _b = Mapper.Map<B>(new A { Value = "BLUEZ" });
+            }
+
+            [Fact]
+            public void When_using_profile_and_no_constructor_mapping()
+            {
+                Assert.Equal("BLUEZ", _b.Value);
+            }
+        }
+
 
 	}
 }

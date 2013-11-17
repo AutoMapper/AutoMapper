@@ -105,11 +105,10 @@
     <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
     <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
     <Compile Include="Internal\ExpressionOnlyDelegateFactory.cs" />
-    <Compile Include="Internal\HashSetFactory.cs" />
     <Compile Include="Internal\ManualNullableConverterFactory.cs" />
     <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
-    <Compile Include="Mappers\MapperRegistryOverride.cs" />
+    <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -118,15 +117,19 @@
       <Name>AutoMapper</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\AutoMapper.snk">
+      <Link>AutoMapper.snk</Link>
+    </None>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\AutoMapper.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="..\..\tools\MSBuild\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

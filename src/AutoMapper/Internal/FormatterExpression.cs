@@ -6,19 +6,20 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
+    using System.Runtime.CompilerServices;
+
     public class FormatterExpression : IFormatterExpression, IFormatterConfiguration, IFormatterCtorConfigurator, IMappingOptions
     {
-        private static readonly ISetFactory SetFactory = PlatformAdapter.Resolve<ISetFactory>();
-
 		private readonly Func<Type, IValueFormatter> _formatterCtor;
 		private readonly IList<IValueFormatter> _formatters = new List<IValueFormatter>();
 		private readonly System.Collections.Generic.IDictionary<Type, IFormatterConfiguration> _typeSpecificFormatters = new Dictionary<Type, IFormatterConfiguration>();
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
-	    private readonly ISet<string> _prefixes = SetFactory.CreateSet<string>();
-        private readonly ISet<string> _postfixes = SetFactory.CreateSet<string>();
-        private readonly ISet<string> _destinationPrefixes = SetFactory.CreateSet<string>();
-        private readonly ISet<string> _destinationPostfixes = SetFactory.CreateSet<string>();
-        private readonly ISet<AliasedMember> _aliases = SetFactory.CreateSet<AliasedMember>();
+	    private readonly ISet<string> _prefixes = new HashSet<string>();
+        private readonly ISet<string> _postfixes = new HashSet<string>();
+        private readonly ISet<string> _destinationPrefixes = new HashSet<string>();
+        private readonly ISet<string> _destinationPostfixes = new HashSet<string>();
+        private readonly ISet<AliasedMember> _aliases = new HashSet<AliasedMember>();
+        private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
 	    public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
 		{
@@ -28,6 +29,7 @@ namespace AutoMapper
 		    RecognizePrefixes("Get");
 			AllowNullDestinationValues = true;
 	        ConstructorMappingEnabled = true;
+            IncludeSourceExtensionMethods(typeof(Enumerable).Assembly);
 		}
 
 		public bool AllowNullDestinationValues { get; set; }
@@ -41,7 +43,7 @@ namespace AutoMapper
         public IEnumerable<AliasedMember> Aliases { get { return _aliases; } }
         public bool ConstructorMappingEnabled { get; set; }
         public bool DataReaderMapperYieldReturnEnabled { get; set; }
-        public Assembly[] SourceExtensionMethodSearch { get; set; }
+        public IEnumerable<MethodInfo> SourceExtensionMethods { get { return _sourceExtensionMethods; } }
 
         public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
 		{
@@ -163,7 +165,17 @@ namespace AutoMapper
 			get { return AllowNullCollections; }
 		}
 
-		public void RecognizePrefixes(params string[] prefixes)
+        public void IncludeSourceExtensionMethods(Assembly assembly)
+        {
+            //http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
+            _sourceExtensionMethods.AddRange(assembly.GetTypes()
+                .Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
+                .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
+                .Where(method => method.GetParameters().Length == 1));
+        }
+
+        public void RecognizePrefixes(params string[] prefixes)
 		{
 		    foreach (var prefix in prefixes)
 		    {

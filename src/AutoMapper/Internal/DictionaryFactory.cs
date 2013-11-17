@@ -19,50 +19,73 @@ namespace AutoMapper.Internal
                 _dictionary = dictionary;
             }
 
-
             public TValue AddOrUpdate(TKey key, TValue addValue, Func<TKey, TValue, TValue> updateValueFactory)
             {
-                TValue value = _dictionary.ContainsKey(key) ? updateValueFactory(key, addValue) : addValue;
-                _dictionary[key] = value;
-                return value;
+                lock (_dictionary)
+                {
+                    var value = _dictionary.ContainsKey(key) ? updateValueFactory(key, addValue) : addValue;
+                    _dictionary[key] = value;
+                    return value;
+                }
             }
 
             public bool TryGetValue(TKey key, out TValue value)
             {
-                return _dictionary.TryGetValue(key, out value);
+                lock (_dictionary)
+                {
+                    return _dictionary.TryGetValue(key, out value);
+                }
             }
 
             public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
             {
-                if (_dictionary.ContainsKey(key))
-                    return _dictionary[key];
+                lock (_dictionary)
+                {
+                    if (_dictionary.ContainsKey(key))
+                        return _dictionary[key];
 
-                var value = valueFactory(key);
+                    var value = valueFactory(key);
 
-                _dictionary[key] = value;
+                    _dictionary[key] = value;
 
-                return value;
+                    return value;
+                }
             }
 
             public TValue this[TKey key]
             {
-                get { return _dictionary[key]; }
-                set { _dictionary[key] = value; }
+                get
+                {
+                    lock (_dictionary)
+                    {
+                        return _dictionary[key];
+                    }
+                }
+                set
+                {
+                    lock (_dictionary)
+                    {
+                        _dictionary[key] = value;
+                    }
+                }
             }
 
             public bool TryRemove(TKey key, out TValue value)
             {
-                if (!_dictionary.ContainsKey(key))
+                lock (_dictionary)
                 {
-                    value = default(TValue);
-                    return false;
+                    if (!_dictionary.ContainsKey(key))
+                    {
+                        value = default(TValue);
+                        return false;
+                    }
+
+                    value = _dictionary[key];
+
+                    _dictionary.Remove(key);
+
+                    return true;
                 }
-
-                value = _dictionary[key];
-
-                _dictionary.Remove(key);
-
-                return true;
             }
         }
     }

@@ -1,7 +1,7 @@
-using System;
-
 namespace AutoMapper
 {
+    using System;
+
 	public class DelegateBasedResolver<TSource> : IValueResolver
 	{
 		private readonly Func<TSource, object> _method;
@@ -15,22 +15,11 @@ namespace AutoMapper
 		{
 			if (source.Value != null && ! (source.Value is TSource))
 			{
-				throw new ArgumentException("Expected obj to be of type " + typeof(TSource) + " but was " + source.Value.GetType());
+                throw new ArgumentException("Expected obj to be of type " + typeof (TSource) + " but was " +
+                                            source.Value.GetType());
 			}
 
-			object result;
-			try
-			{
-				result = _method((TSource)source.Value);
-			}
-			catch (NullReferenceException)
-			{
-				result = null;
-			}
-			catch (ArgumentNullException)
-			{
-				result = null;
-			}
+            var result = _method((TSource) source.Value);
 
 			return source.New(result);
 		}

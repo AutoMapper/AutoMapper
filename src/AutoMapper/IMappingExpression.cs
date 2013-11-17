@@ -41,6 +41,14 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for configuring member</param>
         /// <returns>Itself</returns>
         IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions);
+
+        /// <summary>
+        /// Customize configuration for an individual source member
+        /// </summary>
+        /// <param name="sourceMemberName">Source member name</param>
+        /// <param name="memberOptions">Callback for member configuration options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions);
     }
 
     /// <summary>
@@ -181,6 +189,14 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member configuration options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
+
+        /// <summary>
+        /// Customize configuration for an individual source member. Member name not known until runtime
+        /// </summary>
+        /// <param name="sourceMemberName">Expression to source member. Must be a member of the <typeparamref name="TSource"/> type</param>
+        /// <param name="memberOptions">Callback for member configuration options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
     }
 
     /// <summary>
@@ -224,13 +240,20 @@ namespace AutoMapper
     /// <summary>
     /// Source member configuration options
     /// </summary>
-    /// <typeparam name="TSource">Source type</typeparam>
-    public interface ISourceMemberConfigurationExpression<TSource>
+    public interface ISourceMemberConfigurationExpression
     {
         /// <summary>
         /// Ignore this member for configuration validation and skip during mapping
         /// </summary>
         void Ignore();
+    }
+
+    /// <summary>
+    /// Source member configuration options
+    /// </summary>
+    /// <typeparam name="TSource">Source type</typeparam>
+    public interface ISourceMemberConfigurationExpression<TSource> : ISourceMemberConfigurationExpression
+    {
     }
 
     /// <summary>
@@ -285,6 +308,7 @@ namespace AutoMapper
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
         /// This method can be used in mapping to LINQ query projections, while ResolveUsing cannot.
+        /// Any null reference exceptions in this expression will be ignored (similar to flattening behavior)
         /// </summary>
         /// <typeparam name="TMember">Member type of the source member to use</typeparam>
         /// <param name="sourceMember">Expression referencing the source member to map against</param>
@@ -307,11 +331,16 @@ namespace AutoMapper
         void UseDestinationValue();
 
         /// <summary>
+        /// Do not use the destination value instead of mapping from the source value or creating a new instance
+        /// </summary>        
+        void DoNotUseDestinationValue();
+        
+        /// <summary>
         /// Use a custom value
         /// </summary>
         /// <typeparam name="TValue">Value type</typeparam>
         /// <param name="value">Value to use</param>
-        void UseValue<TValue>(TValue value);
+		 void UseValue<TValue>(TValue value);
 
         /// <summary>
         /// Use a custom value

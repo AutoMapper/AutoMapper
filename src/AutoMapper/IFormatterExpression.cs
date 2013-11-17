@@ -2,7 +2,10 @@ using System;
 
 namespace AutoMapper
 {
-	public interface IFormatterExpression
+    using System.Reflection;
+
+    [Obsolete("Formatters should not be used.")]
+    public interface IFormatterExpression
 	{
         [Obsolete("Formatters should not be used.")]
         IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
@@ -14,17 +17,8 @@ namespace AutoMapper
         void AddFormatExpression(Func<ResolutionContext, string> formatExpression);
         [Obsolete("Formatters should not be used.")]
         void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
-		IFormatterExpression ForSourceType<TSource>();
-
-        /// <summary>
-        /// Allow null destination values. If false, destination objects will be created for deep object graphs. Default true.
-        /// </summary>
-		bool AllowNullDestinationValues { get; set; }
-
-        /// <summary>
-        /// Allow null destination collections. If true, null source collections result in null destination collections. Default false.
-        /// </summary>
-        bool AllowNullCollections { get; set; }
+        [Obsolete("Formatters should not be used.")]
+        IFormatterExpression ForSourceType<TSource>();
     }
 
     [Obsolete("Formatters should not be used.")]
@@ -118,6 +112,22 @@ namespace AutoMapper
         /// </summary>
         /// <param name="propertyNameStartingWith">Property name to match against</param>
         void AddGlobalIgnore(string propertyNameStartingWith);
+
+        /// <summary>
+        /// Allow null destination values. If false, destination objects will be created for deep object graphs. Default true.
+        /// </summary>
+        bool AllowNullDestinationValues { get; set; }
+
+        /// <summary>
+        /// Allow null destination collections. If true, null source collections result in null destination collections. Default false.
+        /// </summary>
+        bool AllowNullCollections { get; set; }
+
+        /// <summary>
+        /// Include an assembly to search for extension methods to match
+        /// </summary>
+        /// <param name="assembly">Assembly containing extension methods</param>
+        void IncludeSourceExtensionMethods(Assembly assembly);
 	}
 
 	public interface IConfiguration : IProfileExpression

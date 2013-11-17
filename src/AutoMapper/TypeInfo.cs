@@ -17,10 +17,16 @@ namespace AutoMapper
         private readonly MemberInfo[] _publicAccessors;
         private readonly MethodInfo[] _publicGetMethods;
         private readonly ConstructorInfo[] _constructors;
+        private readonly MethodInfo[] _extensionMethods;
 
         public Type Type { get; private set; }
 
         public TypeInfo(Type type)
+            : this (type, new MethodInfo[0])
+        {
+        }
+
+        public TypeInfo(Type type, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
             Type = type;
         	var publicReadableMembers = GetAllPublicReadableMembers();
@@ -29,6 +35,7 @@ namespace AutoMapper
             _publicAccessors = BuildPublicAccessors(publicWritableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
             _constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            _extensionMethods = BuildPublicNoArgExtensionMethods(sourceExtensionMethodSearch);
         }
 
         public IEnumerable<ConstructorInfo> GetConstructors()
@@ -51,23 +58,43 @@ namespace AutoMapper
             return _publicGetMethods;
         }
 
-		public IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods(Assembly[] sourceExtensionMethodSearch)
+		public IEnumerable<MethodInfo> GetPublicNoArgExtensionMethods()
 		{
-			if (sourceExtensionMethodSearch == null)
-			{
-				return new MethodInfo[] { };
-			}
-
-			//http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
-			return sourceExtensionMethodSearch
-				.SelectMany(assembly => assembly.GetTypes())
-				.Where(type => type.IsSealed && !type.IsGenericType && !type.IsNested)
-				.SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-				.Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
-				.Where(method => method.GetParameters()[0].ParameterType == this.Type);
+		    return _extensionMethods;
 		}
 
-		private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
+        private MethodInfo[] BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+        {
+            var sourceExtensionMethodSearchArray = sourceExtensionMethodSearch.ToArray();
+
+            var explicitExtensionMethods = sourceExtensionMethodSearchArray
+                .Where(method => method.GetParameters()[0].ParameterType == Type)
+                .ToList();
+
+            var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType).ToList();
+
+            if (Type.IsInterface && Type.IsGenericType)
+                genericInterfaces.Add(Type);
+
+            foreach (var method in sourceExtensionMethodSearchArray
+                .Where(method => method.IsGenericMethodDefinition))
+            {
+                var parameterType = method.GetParameters()[0].ParameterType;
+
+                var interfaceMatch = genericInterfaces
+                    .Where(t => t.GetGenericTypeDefinition().GetGenericArguments().Length == parameterType.GetGenericArguments().Length)
+                    .FirstOrDefault(t => method.MakeGenericMethod(t.GetGenericArguments()).GetParameters()[0].ParameterType.IsAssignableFrom(t));
+
+                if (interfaceMatch != null)
+                {
+                    explicitExtensionMethods.Add(method.MakeGenericMethod(interfaceMatch.GetGenericArguments()));
+                }
+            }
+
+            return explicitExtensionMethods.ToArray();
+        }
+
+        private MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)
         {
 			// Multiple types may define the same property (e.g. the class and multiple interfaces) - filter this to one of those properties
             var filteredMembers = allMembers
@@ -132,7 +159,7 @@ namespace AutoMapper
             // Scan all types for public properties and fields
             return typesToScan
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-                .SelectMany(x => x.GetMembers(bindingAttr)
+                .SelectMany(x => x.GetMembers(bindingAttr | BindingFlags.DeclaredOnly)
                     .Where(m => m is FieldInfo || (m is PropertyInfo && propertyAvailableFor((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any())));
         }
 

@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '2.3.0' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '0.0.0' }
 	$assemblyVersion = $pkgVersion -replace "\.[0-9]*-.*$", ".0.0"
 	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
@@ -43,17 +43,20 @@ task commonAssemblyInfo {
 task test {
 	create_directory "$build_dir\results"
     exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll /xml $result_dir\AutoMapper.UnitTests.Net4.xml }
-    exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/SL4/$config/AutoMapper.UnitTests.SL4.dll --ReportOutputFile=$result_dir\AutoMapper.UnitTests.SL4.xml --ReportOutputFileType=NUnit }
+    exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/SL5/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/SL5/$config/AutoMapper.UnitTests.SL5.dll --ReportOutputFile=$result_dir\AutoMapper.UnitTests.SL5.xml --ReportOutputFileType=NUnit }
     exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/WinRT/$config/AutoMapper.UnitTests.WinRT.dll /xml $result_dir\AutoMapper.UnitTests.WinRT.xml }
     exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/WP8/$config/AutoMapper.UnitTests.WP8.dll /xml $result_dir\AutoMapper.UnitTests.WP8.xml }
 }
 
 task dist {
+	create_directory $build_dir
 	create_directory $dist_dir
 	copy_files "$source_dir\AutoMapper\bin\Net4\$config" "$dist_dir\net40"
-	copy_files "$source_dir\AutoMapper\bin\sl4\$config" "$dist_dir\sl4"
-	copy_files "$source_dir\AutoMapper\bin\wp75\$config" "$dist_dir\wp71"
+	copy_files "$source_dir\AutoMapper\bin\sl5\$config" "$dist_dir\sl5"
+	copy_files "$source_dir\AutoMapper\bin\wp8\$config" "$dist_dir\wp8"
 	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows8"
+	copy_files "$source_dir\AutoMapper\bin\Android\$config" "$dist_dir\MonoAndroid"
+	copy_files "$source_dir\AutoMapper\bin\iPhone\$config" "$dist_dir\MonoTouch"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
@@ -138,31 +141,52 @@ function global:create-nuspec($version, $fileName)
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
   </metadata>
   <files>
-    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp71+sl4"" />
-    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp71+sl4"" />
-    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp71+sl4"" />
+    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch"" />
     <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.Net4.dll"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.Net4.pdb"" target=""lib\net40"" />
-    <file src=""$dist_dir\sl4\AutoMapper.dll"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.pdb"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.xml"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.SL4.dll"" target=""lib\sl4"" />
-    <file src=""$dist_dir\sl4\AutoMapper.SL4.pdb"" target=""lib\sl4"" />
-    <file src=""$dist_dir\wp71\AutoMapper.dll"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.pdb"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.xml"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.WP75.dll"" target=""lib\wp71"" />
-    <file src=""$dist_dir\wp71\AutoMapper.WP75.pdb"" target=""lib\wp71"" />
-    <file src=""$dist_dir\windows8\AutoMapper.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8\AutoMapper.pdb"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8\AutoMapper.xml"" target=""lib\windows8"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\net40"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\sl5"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\sl5"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\sl5"" />
+    <file src=""$dist_dir\sl5\AutoMapper.SL5.dll"" target=""lib\sl5"" />
+    <file src=""$dist_dir\sl5\AutoMapper.SL5.pdb"" target=""lib\sl5"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\sl5"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\sl5"" />
+    <file src=""$dist_dir\wp8\AutoMapper.dll"" target=""lib\wp8"" />
+    <file src=""$dist_dir\wp8\AutoMapper.pdb"" target=""lib\wp8"" />
+    <file src=""$dist_dir\wp8\AutoMapper.xml"" target=""lib\wp8"" />
+    <file src=""$dist_dir\wp8\AutoMapper.WP8.dll"" target=""lib\wp8"" />
+    <file src=""$dist_dir\wp8\AutoMapper.WP8.pdb"" target=""lib\wp8"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\wp8"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\wp8"" />
+    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\windows8"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\windows8"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.WinRT.dll"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.WinRT.pdb"" target=""lib\windows8"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\windows8"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\windows8"" />
+    <file src=""$dist_dir\MonoAndroid\AutoMapper.dll"" target=""lib\MonoAndroid"" />
+    <file src=""$dist_dir\MonoAndroid\AutoMapper.pdb"" target=""lib\MonoAndroid"" />
+    <file src=""$dist_dir\MonoAndroid\AutoMapper.xml"" target=""lib\MonoAndroid"" />
+    <file src=""$dist_dir\MonoAndroid\AutoMapper.Android.dll"" target=""lib\MonoAndroid"" />
+    <file src=""$dist_dir\MonoAndroid\AutoMapper.Android.pdb"" target=""lib\MonoAndroid"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\MonoAndroid"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\MonoAndroid"" />
+    <file src=""$dist_dir\MonoTouch\AutoMapper.dll"" target=""lib\MonoTouch"" />
+    <file src=""$dist_dir\MonoTouch\AutoMapper.pdb"" target=""lib\MonoTouch"" />
+    <file src=""$dist_dir\MonoTouch\AutoMapper.xml"" target=""lib\MonoTouch"" />
+    <file src=""$dist_dir\MonoTouch\AutoMapper.iOS.dll"" target=""lib\MonoTouch"" />
+    <file src=""$dist_dir\MonoTouch\AutoMapper.iOS.pdb"" target=""lib\MonoTouch"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\MonoTouch"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\MonoTouch"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
 }
-

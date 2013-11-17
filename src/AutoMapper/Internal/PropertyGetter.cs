@@ -1,6 +1,5 @@
 using System;
 using System.Reflection;
-using AutoMapper;
 
 namespace AutoMapper.Impl
 {

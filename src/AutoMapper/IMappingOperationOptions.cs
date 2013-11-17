@@ -2,6 +2,8 @@
 
 namespace AutoMapper
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Options for a single map operation
     /// </summary>
@@ -17,22 +19,27 @@ namespace AutoMapper
         /// Create any missing type maps, if found
         /// </summary>
         bool CreateMissingTypeMaps { get; set; }
+
+        /// <summary>
+        /// Add context items to be accessed at map time inside an <see cref="IValueResolver"/> or <see cref="ITypeConverter{TSource, TDestination}"/>
+        /// </summary>
+        IDictionary<string, object> Items { get; }
     }
 
     public class MappingOperationOptions : IMappingOperationOptions
     {
-        private Func<Type, object> _serviceCtor;
-
-        public Func<Type, object> ServiceCtor
+        public MappingOperationOptions()
         {
-            get { return _serviceCtor; }
+            Items = new Dictionary<string, object>();
         }
 
+        public Func<Type, object> ServiceCtor { get; private set; }
         public bool CreateMissingTypeMaps { get; set; }
+        public IDictionary<string, object> Items { get; private set; }
 
-        public void ConstructServicesUsing(Func<Type, object> constructor)
+        void IMappingOperationOptions.ConstructServicesUsing(Func<Type, object> constructor)
         {
-            _serviceCtor = constructor;
+            ServiceCtor = constructor;
         }
     }
 }

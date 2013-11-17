@@ -1,14 +1,11 @@
-﻿using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Should;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
     namespace ConditionBug
     {
+        using System.Collections.Generic;
+        using Should;
+        using Xunit;
+
         public class Example : AutoMapperSpecBase
         {
             public class SubSource
@@ -18,7 +15,11 @@ namespace AutoMapper.UnitTests.Bug
 
             public class Source
             {
-                public Source() { Value = new List<SubSource>(); }
+                public Source()
+                {
+                    Value = new List<SubSource>();
+                }
+
                 public List<SubSource> Value { get; set; }
             }
 
@@ -41,7 +42,7 @@ namespace AutoMapper.UnitTests.Bug
             public void Should_skip_the_mapping_when_the_condition_is_false()
             {
                 var src = new Source();
-                src.Value.Add(new SubSource { SubValue = "x" });
+                src.Value.Add(new SubSource {SubValue = "x"});
                 var destination = Mapper.Map<Source, Destination>(src);
 
                 destination.Value.ShouldBeNull();
@@ -51,11 +52,43 @@ namespace AutoMapper.UnitTests.Bug
             public void Should_execute_the_mapping_when_the_condition_is_true()
             {
                 var src = new Source();
-                src.Value.Add(new SubSource { SubValue = "x" });
-                src.Value.Add(new SubSource { SubValue = "x" });
+                src.Value.Add(new SubSource {SubValue = "x"});
+                src.Value.Add(new SubSource {SubValue = "x"});
                 var destination = Mapper.Map<Source, Destination>(src);
 
                 destination.Value.ShouldEqual("x");
+            }
+        }
+
+        public class PrimitiveExample : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                public int? Value { get; set; }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
+                    .ForMember(d => d.Value, opt =>
+                    {
+                        opt.Condition(src => src.Value.HasValue);
+                        opt.MapFrom(src => src.Value.Value + 10);
+                    }));
+            }
+
+
+            [Fact]
+            public void Should_skip_when_condition_not_met()
+            {
+                var dest = Mapper.Map<Source, Destination>(new Source());
+
+                dest.Value.ShouldEqual(0);
             }
         }
     }

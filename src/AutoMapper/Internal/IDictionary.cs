@@ -58,10 +58,10 @@ namespace AutoMapper.Internal
     }
 
 
-    public interface ISet<T> : IEnumerable<T>
-    {
-        bool Add(T item);
-    }
+    //public interface ISet<T> : IEnumerable<T>
+    //{
+    //    bool Add(T item);
+    //}
 
     public interface INullableConverterFactory
     {
@@ -82,11 +82,6 @@ namespace AutoMapper.Internal
     public interface IDictionaryFactory
     {
         IDictionary<TKey, TValue> CreateDictionary<TKey, TValue>();
-    }
-
-    public interface ISetFactory
-    {
-        ISet<T> CreateSet<T>();
     }
 
     public interface IReaderWriterLockSlimFactory

@@ -11,7 +11,7 @@ namespace AutoMapper
         /// <summary>
         /// Mapping operation options
         /// </summary>
-	    public MappingOperationOptions Options { get; private set; }
+        public MappingOperationOptions Options { get; private set; }
 
         /// <summary>
         /// Current type map
@@ -58,7 +58,7 @@ namespace AutoMapper
         /// </summary>
 	    public Dictionary<ResolutionContext, object> InstanceCache { get; private set; }
 
-	    public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType, MappingOperationOptions options)
+        public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType, MappingOperationOptions options)
 			: this(typeMap, source, null, sourceType, destinationType, options)
 	    {
 	    }

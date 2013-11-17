@@ -7,6 +7,8 @@ using Should;
 
 namespace AutoMapper.UnitTests.Tests
 {
+    using Assembly = System.Reflection.Assembly;
+
     public class StubNamingConvention : INamingConvention
     {
         public Regex SplittingExpression { get; set; }
@@ -29,7 +31,8 @@ namespace AutoMapper.UnitTests.Tests
 
         private IEnumerable<AliasedMember> _aliases = new List<AliasedMember>();
 
-        private System.Reflection.Assembly[] _sourceExtensionMethodSearch = null;
+        private IEnumerable<Assembly> _sourceExtensionMethodSearch = null;
+        private IEnumerable<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
         public INamingConvention SourceMemberNamingConvention
         {
@@ -78,10 +81,9 @@ namespace AutoMapper.UnitTests.Tests
             get { return false; }
         }
 
-        public System.Reflection.Assembly[] SourceExtensionMethodSearch
+        public IEnumerable<MethodInfo> SourceExtensionMethods
         {
-            get { return _sourceExtensionMethodSearch; }
-            set { _sourceExtensionMethodSearch = value; }
+            get { return _sourceExtensionMethods; }
         }
     }
 

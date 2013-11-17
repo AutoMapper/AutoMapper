@@ -26,7 +26,25 @@ namespace AutoMapper
 
         public PropertyMap(IMemberAccessor destinationProperty)
         {
+            UseDestinationValue = true; 
             DestinationProperty = destinationProperty;
+        }
+
+        public PropertyMap(PropertyMap inheritedMappedProperty)
+            : this(inheritedMappedProperty.DestinationProperty)
+        {
+            if (inheritedMappedProperty.IsIgnored())
+                Ignore();
+            else
+            {
+                foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
+                {
+                    ChainResolver(sourceValueResolver);
+                }
+            }
+            ApplyCondition(inheritedMappedProperty._condition);
+            SetNullSubstitute(inheritedMappedProperty._nullSubstitute);
+            SetMappingOrder(inheritedMappedProperty._mappingOrder);
         }
 
         public IMemberAccessor DestinationProperty { get; private set; }
@@ -235,15 +253,21 @@ namespace AutoMapper
         {
             if (sourceMember.Body is MemberExpression)
             {
-                SourceMember = ((MemberExpression) sourceMember.Body).Member;
+                SourceMember = ((MemberExpression)sourceMember.Body).Member;
             }
             CustomExpression = sourceMember;
-            AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile()));
+            AssignCustomValueResolver(
+                new NullReferenceExceptionSwallowingResolver(
+                    new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())
+                )
+            );
         }
 
         public object GetDestinationValue(object mappedObject)
         {
-            return DestinationProperty.GetValue(mappedObject);
+		     return UseDestinationValue
+                ? DestinationProperty.GetValue(mappedObject)
+                : null;
         }
 
         public ExpressionResolutionResult ResolveExpression(Type currentType, Expression instanceParameter)

@@ -242,5 +242,47 @@ namespace AutoMapper.UnitTests.Bug
 
             dto.ShouldBeType<DtoSubObject>();
         }
+
+        [Fact]
+        public void include_should_apply_condition()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m =>
+                {
+                    m.Condition(src => !string.IsNullOrWhiteSpace(src.DifferentBaseString));
+                    m.MapFrom(s => s.DifferentBaseString);
+                })
+                .Include<ModelSubObject, DtoSubObject>();
+
+            Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+
+            var dest = new DtoSubObject
+            {
+                BaseString = "12345"
+            };
+            Mapper.Map(new ModelSubObject
+            {
+                DifferentBaseString = "",
+            }, dest);
+
+            dest.BaseString.ShouldEqual("12345");
+        }
+        [Fact]
+        public void include_should_apply_null_substitute()
+        {
+            Mapper.CreateMap<ModelObject, DtoObject>()
+                .ForMember(d => d.BaseString, m =>
+                {
+                    m.MapFrom(s => s.DifferentBaseString);
+                    m.NullSubstitute("12345");
+                })
+                .Include<ModelSubObject, DtoSubObject>();
+
+            Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+
+            var dest = Mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject());
+
+            dest.BaseString.ShouldEqual("12345");
+        }
     }
 }

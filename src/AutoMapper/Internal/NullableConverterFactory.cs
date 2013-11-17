@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace AutoMapper.Internal
 {
-    public class NullableConverterFactory : INullableConverterFactory
+    public class NullableConverterFactoryOverride : INullableConverterFactory
     {
         public INullableConverter Create(Type nullableType)
         {

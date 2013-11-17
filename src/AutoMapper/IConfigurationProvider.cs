@@ -2,7 +2,9 @@ using System;
 
 namespace AutoMapper
 {
-	public class TypeMapCreatedEventArgs : EventArgs
+    using System.Reflection;
+
+    public class TypeMapCreatedEventArgs : EventArgs
 	{
 		public TypeMap TypeMap { get; private set; }
 
