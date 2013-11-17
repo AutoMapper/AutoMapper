@@ -33,7 +33,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile>Profile88</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile136</TargetFrameworkProfile>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
   </PropertyGroup>
@@ -47,7 +47,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Debug\AutoMapper.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
+    <NoWarn>1591,0618</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -65,7 +65,6 @@
     </Compile>
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\DictionaryFactory.cs" />
-    <Compile Include="Internal\ExpressionVisitor.cs" />
     <Compile Include="Internal\IDictionary.cs" />
     <Compile Include="Internal\AliasedMember.cs" />
     <Compile Include="Internal\IAdapterResolver.cs" />
@@ -76,7 +75,6 @@
     <Compile Include="Internal\NullReferenceExceptionSwallowingResolver.cs" />
     <Compile Include="Internal\PlatformAdapter.cs" />
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
-    <Compile Include="Internal\SetFactory.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />

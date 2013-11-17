@@ -45,7 +45,7 @@ namespace AutoMapper
         /// <summary>
         /// Customize configuration for an individual source member
         /// </summary>
-        /// <param name="sourceMemberName">Expression to source member. Must be a member of the <typeparamref name="TSource"/> type</param>
+        /// <param name="sourceMemberName">Source member name</param>
         /// <param name="memberOptions">Callback for member configuration options</param>
         /// <returns>Itself</returns>
         IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions);

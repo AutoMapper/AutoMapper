@@ -25,13 +25,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B84E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.Net4", "AutoMapper\AutoMapper.Net4.csproj", "{8C955148-FA96-4F0D-880D-ABB6770F54E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.SL4", "AutoMapper\AutoMapper.SL4.csproj", "{A46863C7-1DEC-4037-9FC2-C353021F2490}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.SL5", "AutoMapper\AutoMapper.SL5.csproj", "{A46863C7-1DEC-4037-9FC2-C353021F2490}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.WinRT", "AutoMapper\AutoMapper.WinRT.csproj", "{B80D950D-CC8D-4287-96B1-EEA037825E90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.WP75", "AutoMapper\AutoMapper.WP75.csproj", "{B95F2EB2-519E-4BAB-B6B3-6DBBEA7879A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.WP8", "AutoMapper\AutoMapper.WP8.csproj", "{B95F2EB2-519E-4BAB-B6B3-6DBBEA7879A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.SL4", "UnitTests\UnitTests.SL4.csproj", "{BACACF2C-237F-4A48-A891-32B258207095}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.SL5", "UnitTests\UnitTests.SL5.csproj", "{BACACF2C-237F-4A48-A891-32B258207095}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.WinRT", "UnitTests\UnitTests.WinRT.csproj", "{19CF22A3-AA57-458B-9D72-1D8AD069F428}"
 EndProject

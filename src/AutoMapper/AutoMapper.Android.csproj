@@ -46,7 +46,6 @@
     <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
     <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
     <Compile Include="Internal\ExpressionOnlyDelegateFactory.cs" />
-    <Compile Include="Internal\HashSetFactory.cs" />
     <Compile Include="Internal\NullableConverterFactory.cs" />
     <Compile Include="Internal\PropertyEmitter.cs" />
     <Compile Include="Internal\ProxyGenerator.cs" />

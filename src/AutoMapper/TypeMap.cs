@@ -12,12 +12,10 @@ namespace AutoMapper
     /// </summary>
     public class TypeMap
     {
-        private static readonly ISetFactory SetFactory = PlatformAdapter.Resolve<ISetFactory>();
-
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
         private readonly TypeInfo _destinationType;
-        private readonly ISet<TypePair> _includedDerivedTypes = SetFactory.CreateSet<TypePair>();
+        private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
 		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
 
         private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs =

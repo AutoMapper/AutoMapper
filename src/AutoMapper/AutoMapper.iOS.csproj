@@ -40,7 +40,6 @@
     </Compile>
     <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
     <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
-    <Compile Include="Internal\HashSetFactory.cs" />
     <Compile Include="Internal\NullableConverterFactory.cs" />
     <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />

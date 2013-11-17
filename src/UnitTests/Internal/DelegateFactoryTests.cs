@@ -119,60 +119,8 @@ namespace AutoMapper.UnitTests
 			var source = ((ValueSource) thing);
 			source.Value = (string)value;
 		}
-#if !NETFX_CORE
-		[Fact(Skip="Blarg")]
-		public void WhatIWantToDo()
-		{
-			var sourceType = typeof(Source);
-			var property = sourceType.GetProperty("Value");
-			var setter = property.GetSetMethod();
-			var method = new DynamicMethod("GetValue", null, new[] { typeof(object), typeof(object) }, sourceType);
-			var gen = method.GetILGenerator();
 
-			//gen.Emit(OpCodes.Ldarg_0); // Load input to stack
-			//gen.Emit(OpCodes.Ldarg_1); // Load value to stack
-			//gen.Emit(OpCodes.Stfld, field); // Set the value to the input field
-			//gen.Emit(OpCodes.Ret);
-			gen.Emit(OpCodes.Ldarg_0); // Load input to stack
-			gen.Emit(OpCodes.Castclass, sourceType); // Cast to source type
-			gen.Emit(OpCodes.Ldarg_1); // Load value to stack
-			gen.Emit(OpCodes.Unbox_Any, property.PropertyType); // Unbox the value to its proper value type
-			gen.Emit(OpCodes.Callvirt, property.GetSetMethod()); // Set the value to the input field
-			gen.Emit(OpCodes.Ret);
-
-			var result = (LateBoundPropertySet)method.CreateDelegate(typeof(LateBoundPropertySet));
-
-			var source = new Source();
-			DateTime start = DateTime.Now;
-
-			for (int i = 0; i < 1000000; i++)
-			{
-				source.Value = 5;
-			}
-			var span = DateTime.Now - start;
-
-			Console.WriteLine("Raw:" + span.Ticks);
-
-			start = DateTime.Now;
-			for (int i = 0; i < 1000000; i++)
-			{
-				setter.Invoke(source, new object[] { 5 });
-			}
-			span = DateTime.Now - start;
-			Console.WriteLine("MethodInfo:" + span.Ticks);
-
-
-			start = DateTime.Now;
-			for (int i = 0; i < 1000000; i++)
-			{
-				result(source, 5);
-			}
-			span = DateTime.Now - start;
-			Console.WriteLine("LCG:" + span.Ticks);
-
-		}
-#endif
-		[Fact]
+        [Fact]
 		public void Test_with_create_ctor()
 		{
 			var sourceType = typeof(Source);
