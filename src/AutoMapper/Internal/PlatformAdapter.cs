@@ -4,7 +4,7 @@ namespace AutoMapper.Internal
 {
     public static class PlatformAdapter
     {
-        private static readonly string[] KnownPlatformNames = new[] { "Net4", "WinRT", "SL4", "WP75", "Android", "iOS" };
+        private static readonly string[] KnownPlatformNames = new[] { "Net4", "WinRT", "SL5", "WP8", "Android", "iOS" };
         private static IAdapterResolver _resolver = new ProbingAdapterResolver(KnownPlatformNames);
 
         public static T Resolve<T>(bool throwIfNotFound = true)
