@@ -15,3 +15,4 @@ AppPackages/
 *.bak
 packages
 *.orig
+*.DotSettings
