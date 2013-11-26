@@ -101,7 +101,7 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual(5);
             }
         }
-       
+
         public class When_mapping_to_an_object_using_service_location : AutoMapperSpecBase
         {
             private Dest _dest;
@@ -154,7 +154,7 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual(10);
             }
         }
-       
+
         public class When_mapping_to_an_object_using_contextual_service_location : AutoMapperSpecBase
         {
             private Dest _dest;
@@ -284,6 +284,232 @@ namespace AutoMapper.UnitTests
                 public DestinationFoo(DestinationBar bar)
                 {
                     _bar = bar;
+                }
+            }
+
+            public class DestinationBar
+            {
+                private readonly string _fooBar;
+
+                public string FooBar
+                {
+                    get { return _fooBar; }
+                }
+
+                public DestinationBar(string fooBar)
+                {
+                    _fooBar = fooBar;
+                }
+            }
+
+            public class SourceFoo
+            {
+                public SourceBar Bar { get; private set; }
+
+                public SourceFoo(SourceBar bar)
+                {
+                    Bar = bar;
+                }
+            }
+
+            public class SourceBar
+            {
+                public string FooBar { get; private set; }
+
+                public SourceBar(string fooBar)
+                {
+                    FooBar = fooBar;
+                }
+            }
+        }
+
+        public class When_mapping_to_an_object_with_a_constructor_with_multiple_optional_arguments : AutoMapperSpecBase
+        {
+            [Fact]
+            public void Should_resolve_constructor_when_args_are_optional()
+            {
+
+                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+
+                var sourceBar = new SourceBar("fooBar");
+                var sourceFoo = new SourceFoo(sourceBar);
+
+                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+
+                destinationFoo.Bar.ShouldBeNull();
+                destinationFoo.Str.ShouldEqual("hello");
+            }
+
+
+            public class DestinationFoo
+            {
+                private readonly DestinationBar _bar;
+                private string _str;
+
+                public DestinationBar Bar
+                {
+                    get { return _bar; }
+                }
+
+                public string Str
+                {
+                    get { return _str; }
+                }
+
+                public DestinationFoo(DestinationBar bar=null,string str="hello")
+                {
+                    _bar = bar;
+                    _str = str;
+                }
+            }
+
+            public class DestinationBar
+            {
+                private readonly string _fooBar;
+
+                public string FooBar
+                {
+                    get { return _fooBar; }
+                }
+
+                public DestinationBar(string fooBar)
+                {
+                    _fooBar = fooBar;
+                }
+            }
+
+            public class SourceFoo
+            {
+                public SourceBar Bar { get; private set; }
+
+                public SourceFoo(SourceBar bar)
+                {
+                    Bar = bar;
+                }
+            }
+
+            public class SourceBar
+            {
+                public string FooBar { get; private set; }
+
+                public SourceBar(string fooBar)
+                {
+                    FooBar = fooBar;
+                }
+            }
+        }
+
+
+        public class When_mapping_to_an_object_with_a_constructor_with_single_optional_arguments : AutoMapperSpecBase
+        {
+            [Fact]
+            public void Should_resolve_constructor_when_arg_is_optional()
+            {
+                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+
+                var sourceBar = new SourceBar("fooBar");
+                var sourceFoo = new SourceFoo(sourceBar);
+
+                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+
+                destinationFoo.Bar.ShouldBeNull();
+            }
+
+
+            public class DestinationFoo
+            {
+                private readonly DestinationBar _bar;
+
+                public DestinationBar Bar
+                {
+                    get { return _bar; }
+                }
+
+                public DestinationFoo(DestinationBar bar = null)
+                {
+                    _bar = bar;
+                }
+            }
+
+            public class DestinationBar
+            {
+                private readonly string _fooBar;
+
+                public string FooBar
+                {
+                    get { return _fooBar; }
+                }
+
+                public DestinationBar(string fooBar)
+                {
+                    _fooBar = fooBar;
+                }
+            }
+
+            public class SourceFoo
+            {
+                public SourceBar Bar { get; private set; }
+
+                public SourceFoo(SourceBar bar)
+                {
+                    Bar = bar;
+                }
+            }
+
+            public class SourceBar
+            {
+                public string FooBar { get; private set; }
+
+                public SourceBar(string fooBar)
+                {
+                    FooBar = fooBar;
+                }
+            }
+        }
+
+        public class When_mapping_to_an_object_with_a_constructor_with_string_optional_arguments : AutoMapperSpecBase
+        {
+            [Fact]
+            public void Should_resolve_constructor_when_string_args_are_optional()
+            {
+                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+
+                var sourceBar = new SourceBar("fooBar");
+                var sourceFoo = new SourceFoo(sourceBar);
+
+                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+
+                destinationFoo.A.ShouldEqual("a");
+                destinationFoo.B.ShouldEqual("b");
+                destinationFoo.C.ShouldEqual(3);
+            }
+
+
+            public class DestinationFoo
+            {
+                private string _a;
+                private string _b;
+                private int _c;
+                public string A
+                {
+                    get { return _a; }
+                }
+
+                public string B
+                {
+                    get { return _b; }
+                }
+
+                public int C
+                {
+                    get { return _c; }
+                }
+
+                public DestinationFoo(string a = "a",string b="b", int c = 3)
+                {
+                    _a = a;
+                    _b = b;
+                    _c = c;
                 }
             }
 
