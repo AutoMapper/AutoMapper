@@ -220,5 +220,95 @@ namespace AutoMapper.UnitTests
             }
         }
 
+
+        public class When_configuring_a_reverse_map_to_ignore_all_source_properties_with_an_inaccessible_setter : AutoMapperSpecBase
+        {
+            private Destination _destination;
+            private Source _source;
+
+            public class Source
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+                public int Age { get; set; }
+                public string Force { get; set; }
+                public string ReverseForce { get; private set; }
+                public string Respect { get; private set; }
+                public int Foo { get; private set; }
+                public int Bar { get; protected set; }
+
+                public void Initialize()
+                {
+                    ReverseForce = "You With";
+                    Respect = "R-E-S-P-E-C-T";
+                }
+            }
+
+            public class Destination
+            {
+                public string Name { get; set; }
+                public int Age { get; set; }
+                public bool IsVisible { get; set; }
+                public string Force { get; private set; }
+                public string ReverseForce { get; set; }
+                public string Respect { get; set; }
+                public int Foz { get; private set; }
+                public int Baz { get; protected set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Source, Destination>()
+                        .IgnoreAllPropertiesWithAnInaccessibleSetter()
+                        .ForMember(dest => dest.IsVisible, opt => opt.Ignore())
+                        .ForMember(dest => dest.Force, opt => opt.MapFrom(src => src.Force))
+                        .ReverseMap()
+                        .IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
+                        .ForMember(dest => dest.ReverseForce, opt => opt.MapFrom(src => src.ReverseForce))
+                        .ForSourceMember(dest => dest.IsVisible, opt => opt.Ignore());
+                });
+            }
+
+            protected override void Because_of()
+            {
+                var source = new Source { Id = 5, Name = "Bob", Age = 35, Force = "With You" };
+                source.Initialize();
+                _destination = Mapper.Map<Source, Destination>(source);
+                _source = Mapper.Map<Destination, Source>(_destination);
+            }
+
+            [Fact]
+            public void Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+            }
+
+            [Fact]
+            public void Should_forward_and_reverse_map_a_property_that_is_accessible_on_both_source_and_destination()
+            {
+                _source.Name.ShouldEqual("Bob");
+            }
+
+            [Fact]
+            public void Should_forward_and_reverse_map_an_inaccessible_destination_property_if_a_mapping_is_defined()
+            {
+                _source.Force.ShouldEqual("With You");
+            }
+
+            [Fact]
+            public void Should_forward_and_reverse_map_an_inaccessible_source_property_if_a_mapping_is_defined()
+            {
+                _source.ReverseForce.ShouldEqual("You With");
+            }
+
+            [Fact]
+            public void Should_forward_and_reverse_map_an_inaccessible_source_property_even_if_a_mapping_is_not_defined()
+            {
+                _source.Respect.ShouldEqual("R-E-S-P-E-C-T"); // justification: if the mapping works one way, it should work in reverse
+            }
+        }
+
     }
 }
