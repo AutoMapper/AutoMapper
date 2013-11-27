@@ -87,12 +87,18 @@ namespace AutoMapper
         {
             LateBoundCtor ctor = _ctorCache.GetOrAdd(type, t =>
             {
-                if (type.GetConstructor(new Type[] { }) == null) 
+                //handle valuetypes
+                if (!type.IsClass)
                 {
-                    //this type has no argless ctor
-
+                    var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
+                    return ctorExpression.Compile();
+                }
+                else 
+                {
+                    var constructors = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                    
                     //find a ctor with only optional args
-                    var ctorWithOptionalArgs = type.GetConstructors().FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
+                    var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
                     if (ctorWithOptionalArgs == null)
                         throw new ArgumentException("Type needs to have a constructor with 0 args or only optional args", "type");
 
@@ -103,11 +109,6 @@ namespace AutoMapper
 
                     //create the ctor expression
                     var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(ctorWithOptionalArgs,args), typeof(object)));
-                    return ctorExpression.Compile();
-                }
-                else
-                {
-                    var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
                     return ctorExpression.Compile();
                 }
             });
