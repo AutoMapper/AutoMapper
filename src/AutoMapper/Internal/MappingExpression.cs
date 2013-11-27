@@ -199,6 +199,20 @@ namespace AutoMapper
             typeInfo.GetPublicWriteAccessors().Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }
 
+        public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
+        {
+            var properties = typeof(TDestination).GetProperties().Where(HasAnInaccessibleSetter);
+            foreach (var property in properties)
+                ForMember(property.Name, opt => opt.Ignore());
+            return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor, _configurationContainer);
+        }
+
+        private bool HasAnInaccessibleSetter(PropertyInfo property)
+        {
+            var setMethod = property.GetSetMethod(true);
+            return setMethod == null || setMethod.IsPrivate || setMethod.IsFamily;
+        }
+
         public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
             where TOtherDestination : TDestination
