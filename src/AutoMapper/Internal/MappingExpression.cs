@@ -207,6 +207,14 @@ namespace AutoMapper
             return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor, _configurationContainer);
         }
 
+        public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
+        {
+            var properties = typeof(TSource).GetProperties().Where(HasAnInaccessibleSetter);
+            foreach (var property in properties)
+                ForSourceMember(property.Name, opt => opt.Ignore());
+            return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor, _configurationContainer);
+        }
+
         private bool HasAnInaccessibleSetter(PropertyInfo property)
         {
             var setMethod = property.GetSetMethod(true);
