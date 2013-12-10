@@ -109,7 +109,7 @@ namespace AutoMapper.UnitTests.Bug
 
             protected override void Because_of()
             {
-                _source = new Picture {ImageData = new byte[1000000]};
+                _source = new Picture {ImageData = new byte[100]};
                 _dest = Mapper.Map<Picture, PictureDto>(_source);
             }
 
@@ -118,6 +118,39 @@ namespace AutoMapper.UnitTests.Bug
             {
                 _dest.ImageData.ShouldBeSameAs(_source.ImageData);
             }
+        }
+    }
+
+    namespace AssignableLists
+    {
+        public class AutoMapperTests
+        {
+            [Fact]
+            public void ListShouldNotMapAsReference()
+            {
+                // arrange
+                Mapper.Reset();
+                Mapper.CreateMap<A, B>();
+                var source = new A { Images = new List<string>() };
+
+                // act
+                var destination = Mapper.Map<B>(source);
+                destination.Images.Add("test");
+
+                // assert
+                destination.Images.Count.ShouldEqual(1);
+                source.Images.Count.ShouldEqual(0); // in 3.1.0 source.Images.Count is 1
+            }
+        }
+
+        public class A
+        {
+            public IList<string> Images { get; set; }
+        }
+
+        public class B
+        {
+            public IList<string> Images { get; set; }
         }
     }
 }

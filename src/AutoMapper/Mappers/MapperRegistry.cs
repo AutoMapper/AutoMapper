@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
         {
             new TypeMapMapper(TypeMapObjectMapperRegistry.Mappers),
             new StringMapper(),
-            new AssignableMapper(),
+            new AssignableArrayMapper(), 
             new FlagsEnumMapper(),
             new EnumMapper(),
             new PrimitiveArrayMapper(),
@@ -18,6 +18,7 @@ namespace AutoMapper.Mappers
             new ReadOnlyCollectionMapper(),
             new CollectionMapper(),
             new EnumerableMapper(),
+            new AssignableMapper(),
             new NullableSourceMapper(),
             new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
