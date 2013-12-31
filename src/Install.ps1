@@ -11,7 +11,7 @@ param($installPath, $toolsPath, $package, $project)
 
 	if ($platformSpecificRef)
 	{
-		$refPath = $platformSpecificRef.Metadata.Where({ $_.Name -eq "HintPath" }).Value
+		$refPath = ($platformSpecificRef.Metadata | Where-Object { $_.Name -eq "HintPath" } | Select-Object -First 1).Value
 
 		$item = $msbuild.Xml.AddItem("Content", $refPath)
 		$item.AddMetadata("Link", [System.IO.Path]::GetFileName($refPath))

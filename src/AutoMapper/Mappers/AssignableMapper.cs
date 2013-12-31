@@ -1,6 +1,6 @@
 namespace AutoMapper.Mappers
 {
-	public class AssignableMapper : IObjectMapper
+    public class AssignableMapper : IObjectMapper
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 		{
