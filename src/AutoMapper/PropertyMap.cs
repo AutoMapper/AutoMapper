@@ -48,6 +48,7 @@ namespace AutoMapper
             ApplyCondition(inheritedMappedProperty._condition);
             SetNullSubstitute(inheritedMappedProperty._nullSubstitute);
             SetMappingOrder(inheritedMappedProperty._mappingOrder);
+            CustomExpression = inheritedMappedProperty.CustomExpression;
         }
 
         public IMemberAccessor DestinationProperty { get; private set; }
@@ -157,7 +158,12 @@ namespace AutoMapper
         {
             return _valueFormatters.ToArray();
         }
-
+        
+        public void AssignCustomExpression(LambdaExpression customExpression)
+        {
+            CustomExpression = customExpression;
+        }
+        
         public void AssignCustomValueResolver(IValueResolver valueResolver)
         {
             _ignored = false;
