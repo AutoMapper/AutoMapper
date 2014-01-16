@@ -54,7 +54,20 @@ namespace AutoMapper.Mappers
 
 	    protected virtual object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper, Type destElementType, int sourceLength)
 	    {
-	        return (context.DestinationValue ?? CreateDestinationObject(context, destElementType, sourceLength, mapper));
+            if (context.DestinationValue != null)
+            {
+                // If the source is not an array, assume we can add to it...
+                if (!(context.DestinationValue is object[]))
+                    return context.DestinationValue;
+
+                // If the source is an array, ensure that we have enough room...
+                var array = context.DestinationValue as object[];
+
+                if (array != null && array.Length >= sourceLength)
+                    return context.DestinationValue;
+            }
+
+	        return CreateDestinationObject(context, destElementType, sourceLength, mapper);
 	    }
 
 	    protected virtual TEnumerable GetEnumerableFor(object destination)
