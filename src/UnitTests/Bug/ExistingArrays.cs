@@ -1,4 +1,7 @@
-﻿using Xunit;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -7,6 +10,7 @@ namespace AutoMapper.UnitTests.Bug
         protected override void Establish_context()
         {
             Mapper.CreateMap<Source, Dest>();
+            Mapper.CreateMap<Source, DestWithIEnumerableInitializer>();
         }
 
         [Fact]
@@ -14,6 +18,14 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source { Values = new[] { "1", "2" } };
             var dest = Mapper.Map<Dest>(source);
+        }
+
+
+        [Fact]
+        public void should_map_over_enumerable_empty()
+        {
+            var source = new Source { Values = new[] { "1", "2" } };
+            var dest = Mapper.Map<DestWithIEnumerableInitializer>(source);
         }
 
         public class Source
@@ -35,6 +47,17 @@ namespace AutoMapper.UnitTests.Bug
             }
 
             public string[] Values { get; set; }
+        }
+
+        public class DestWithIEnumerableInitializer
+        {
+            public DestWithIEnumerableInitializer()
+            {
+                // remove this line will get it fixed. 
+                Values = Enumerable.Empty<string>();
+            }
+
+            public IEnumerable<string> Values { get; set; }
         }
     }
 }
