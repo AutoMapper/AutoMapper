@@ -148,7 +148,7 @@ namespace AutoMapper.QueryableExtensions
                     var transformedExpression = CreateMapExpression(mappingEngine, result.Type,
                                                                     propertyMap.DestinationPropertyType,
                                                                     result.ResolutionExpression);
-                      // Handles null source property so it will not create an object with possible non-nullable propeerties
+                      // Handles null source property so it will not create an object with possible non-nullable properties
                       // which would result in an exception.
                       if (mappingEngine.ConfigurationProvider.MapNullSourceValuesAsNull)
                       {
