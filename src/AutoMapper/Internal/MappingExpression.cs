@@ -275,6 +275,11 @@ namespace AutoMapper
 
         public void ResolveUsing(Func<TSource, object> resolver)
         {
+            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver((TSource)r.Value)));
+        }
+
+        public void ResolveUsing(Func<ResolutionResult, object> resolver)
+        {
             _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver));
         }
 

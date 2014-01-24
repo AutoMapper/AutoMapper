@@ -66,7 +66,7 @@ namespace AutoMapper.UnitTests
                         .ForMember(dest => dest.Value, opt =>
                         {
                             opt.Condition(src => src.Value > 0);
-                            opt.ResolveUsing(src =>
+                            opt.ResolveUsing((Source src) =>
                             {
                                 return 10;
                             });
