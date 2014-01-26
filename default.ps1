@@ -186,6 +186,7 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\MonoTouch\AutoMapper.iOS.pdb"" target=""lib\MonoTouch"" />
     <file src=""$source_dir\install.ps1"" target=""tools\MonoTouch"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\MonoTouch"" />
+    <file src=""$source_dir\AutoMapper.targets"" target=""tools"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
