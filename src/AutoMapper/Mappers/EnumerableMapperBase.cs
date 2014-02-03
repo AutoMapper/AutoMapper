@@ -57,11 +57,11 @@ namespace AutoMapper.Mappers
             if (context.DestinationValue != null)
             {
                 // If the source is not an array, assume we can add to it...
-                if (!(context.DestinationValue is object[]))
+                if (!(context.DestinationValue is Array))
                     return context.DestinationValue;
 
                 // If the source is an array, ensure that we have enough room...
-                var array = context.DestinationValue as object[];
+                var array = context.DestinationValue as Array;
 
                 if (array != null && array.Length >= sourceLength)
                     return context.DestinationValue;
