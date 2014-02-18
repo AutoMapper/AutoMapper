@@ -10,7 +10,9 @@ namespace AutoMapper.Mappers
 	{
 		public override bool IsMatch(ResolutionContext context)
 		{
-			return (context.DestinationType.IsEnumerableType()) && (context.SourceType.IsEnumerableType());
+			// destination type must be IEnumerable interface or a class implementing at least IList 
+			return ((context.DestinationType.IsInterface && context.DestinationType.IsEnumerableType()) || context.DestinationType.IsListType())
+				&& (context.SourceType.IsEnumerableType());
 		}
 
 		protected override void SetElementValue(IList destination, object mappedValue, int index)
@@ -35,7 +37,7 @@ namespace AutoMapper.Mappers
 
 		public bool IsMatch(ResolutionContext context)
 		{
-			return (context.DestinationType.IsDictionaryType()) 
+			return (context.DestinationType.IsDictionaryType())
 				&& (context.SourceType.IsEnumerableType())
 				&& (!context.SourceType.IsDictionaryType());
 		}
@@ -66,11 +68,11 @@ namespace AutoMapper.Mappers
 				object mappedValue = mapper.Map(newContext);
 				var keyProperty = mappedValue.GetType().GetProperty("Key");
 				object destKey = keyProperty.GetValue(mappedValue, null);
-				
+
 				var valueProperty = mappedValue.GetType().GetProperty("Value");
 				object destValue = valueProperty.GetValue(mappedValue, null);
 
-				genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] {destKey, destValue});
+				genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
 
 				count++;
 			}
