@@ -3,7 +3,7 @@
 
   <!-- Build sequence modification -->
   <Target Name="CopyAutoMapperAssembly"
-          DependsOnTargets="ResolveAssemblyReferences">
+          AfterTargets="ResolveAssemblyReferences">
     <CreateItem Include="%(ReferencePath.FullPath)"
                 Condition="$([System.String]::new('%(ReferencePath.Filename)').StartsWith('AutoMapper.'))">
       <Output TaskParameter="Include"
@@ -12,16 +12,10 @@
 
     <Message Importance="low" Text="AutoMapper Platform Extension Assembly: %(_AutoMapperReference.FullPath)"/>
 
-    <CreateItem Include="%(_AutoMapperReference.FullPath)" AdditionalMetadata="CopyToOutputDirectory=PreserveNewest">
-      <Output ItemName="Content" TaskParameter="Include"  />
-    </CreateItem>
+    <ItemGroup>
+      <Content Include="%(_AutoMapperReference.FullPath)" Condition="'%(_AutoMapperReference.FullPath)' != ''">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
   </Target>
-
-  <PropertyGroup>
-    <CoreBuildDependsOn>
-      CopyAutoMapperAssembly;
-      $(CoreBuildDependsOn)
-    </CoreBuildDependsOn>
-  </PropertyGroup>
-
 </Project>
