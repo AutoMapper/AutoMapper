@@ -117,6 +117,7 @@
     <Compile Include="Bug\NullableEnumToNullableValueType.cs" />
     <Compile Include="Bug\NullablePropertiesBug.cs" />
     <Compile Include="Bug\ObjectTypeMapFailure.cs" />
+    <Compile Include="Bug\ProjectCollectionsBug.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">

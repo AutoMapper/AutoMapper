@@ -134,6 +134,11 @@ namespace AutoMapper.QueryableExtensions
                         var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType, selectExpression);
                         bindExpression = Expression.Bind(destinationMember, toListCallExpression);
                     }
+                    else if (typeof(ICollection<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType))
+                    {
+                        var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType, selectExpression);
+                        bindExpression = Expression.Bind(destinationMember, toListCallExpression);
+                    }
                     else
                     {
                         // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
