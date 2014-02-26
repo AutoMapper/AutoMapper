@@ -1,14 +1,10 @@
-using System;
 using System.Reflection;
 using System.Resources;
-using System.Runtime.CompilerServices;
-using System.Security;
 
 [assembly: AssemblyTitle("AutoMapper")]
 [assembly: AssemblyDescription("AutoMapper")]
 
 [assembly: AssemblyDelaySign(false)]
-[assembly: CLSCompliant(true)]
 
 [assembly: NeutralResourcesLanguage("en-US")]
 

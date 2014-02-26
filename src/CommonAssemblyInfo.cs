@@ -20,3 +20,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompanyAttribute("")]
 [assembly: AssemblyConfigurationAttribute("release")]
 [assembly: AssemblyInformationalVersionAttribute("0cad39ead8fc7f657871693156785719d9993b2c")]
+[assembly: CLSCompliant(true)]
