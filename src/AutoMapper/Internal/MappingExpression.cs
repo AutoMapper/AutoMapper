@@ -305,7 +305,7 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
         {
-            _typeMap.SetCondition(o => PassesDepthCheck(o, depth));
+            _typeMap.MaxDepth = depth;
             return this;
         }
 
@@ -343,31 +343,6 @@ namespace AutoMapper
             return this;
         }
 
-        private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
-        {
-            if (context.InstanceCache.ContainsKey(context))
-            {
-                // return true if we already mapped this value and it's in the cache
-                return true;
-            }
-
-            ResolutionContext contextCopy = context;
-
-            int currentDepth = 1;
-
-            // walk parents to determine current depth
-            while (contextCopy.Parent != null)
-            {
-                if (contextCopy.SourceType == context.TypeMap.SourceType &&
-                    contextCopy.DestinationType == context.TypeMap.DestinationType)
-                {
-                    // same source and destination types appear higher up in the hierarchy
-                    currentDepth++;
-                }
-                contextCopy = contextCopy.Parent;
-            }
-            return currentDepth <= maxDepth;
-        }
 
         public void Condition(Func<ResolutionContext, bool> condition)
         {

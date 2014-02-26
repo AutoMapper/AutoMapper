@@ -233,5 +233,77 @@ namespace AutoMapper.UnitTests
             }
 #endif
         }
+
+#if !NETFX_CORE
+        namespace CircularReferences
+        {
+            public class A
+            {
+                public int AP1 { get; set; }
+                public string AP2 { get; set; }
+                public virtual B B { get; set; }
+            }
+
+            public class B
+            {
+                public B()
+                {
+                    BP2 = new HashSet<A>();
+                }
+                public int BP1 { get; set; }
+                public virtual ICollection<A> BP2 { get; set; }
+            }
+
+            public class AEntity
+            {
+                public int AP1 { get; set; }
+                public string AP2 { get; set; }
+                public virtual BEntity B { get; set; }
+            }
+            public class BEntity
+            {
+                public BEntity()
+                {
+                    BP2 = new HashSet<AEntity>();
+                }
+                public int BP1 { get; set; }
+                public virtual ICollection<AEntity> BP2 { get; set; }
+            }
+
+            public class C
+            {
+                public C Value { get; set; }
+            }
+
+            public class When_mapping_circular_references : AutoMapperSpecBase
+            {
+                private IQueryable<BEntity> _bei;
+
+                protected override void Establish_context()
+                {
+                    Mapper.CreateMap<BEntity, B>().MaxDepth(3);
+                    Mapper.CreateMap<AEntity, A>().MaxDepth(3);
+                }
+
+                protected override void Because_of()
+                {
+                    var be = new BEntity();
+                    be.BP1 = 3;
+                    be.BP2.Add(new AEntity() { AP1 = 1, AP2 = "hello", B = be });
+                    be.BP2.Add(new AEntity() { AP1 = 2, AP2 = "two", B = be });
+
+                    var belist = new List<BEntity>();
+                    belist.Add(be);
+                    _bei = belist.AsQueryable();
+                }
+
+                [Fact]
+                public void Should_not_throw_exception()
+                {
+                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.Project().To<B>());
+                }
+            }
+        }
+#endif
     }
 }
