@@ -27,6 +27,7 @@ namespace AutoMapper
         private bool _sealed;
         private Func<ResolutionContext, bool> _condition;
         private ConstructorMap _constructorMap;
+        private int _maxDepth = Int32.MaxValue;
 
         public TypeMap(TypeInfo sourceType, TypeInfo destinationType, MemberList memberList)
         {
@@ -87,6 +88,16 @@ namespace AutoMapper
         public bool ConstructDestinationUsingServiceLocator { get; set; }
 
         public MemberList ConfiguredMemberList { get; private set; }
+
+        public int MaxDepth
+        {
+            get { return _maxDepth; }
+            set
+            {
+                _maxDepth = value;
+                SetCondition(o => PassesDepthCheck(o, value));
+            }
+        }
 
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {
@@ -295,6 +306,32 @@ namespace AutoMapper
             }
 
             return config;
+        }
+
+        private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
+        {
+            if (context.InstanceCache.ContainsKey(context))
+            {
+                // return true if we already mapped this value and it's in the cache
+                return true;
+            }
+
+            ResolutionContext contextCopy = context;
+
+            int currentDepth = 1;
+
+            // walk parents to determine current depth
+            while (contextCopy.Parent != null)
+            {
+                if (contextCopy.SourceType == context.TypeMap.SourceType &&
+                    contextCopy.DestinationType == context.TypeMap.DestinationType)
+                {
+                    // same source and destination types appear higher up in the hierarchy
+                    currentDepth++;
+                }
+                contextCopy = contextCopy.Parent;
+            }
+            return currentDepth <= maxDepth;
         }
     }
 }

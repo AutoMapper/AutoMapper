@@ -270,6 +270,11 @@ namespace AutoMapper.UnitTests
                 public virtual ICollection<AEntity> BP2 { get; set; }
             }
 
+            public class C
+            {
+                public C Value { get; set; }
+            }
+
             public class When_mapping_circular_references : AutoMapperSpecBase
             {
                 private IQueryable<BEntity> _bei;
