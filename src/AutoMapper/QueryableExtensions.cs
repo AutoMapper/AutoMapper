@@ -25,10 +25,7 @@ namespace AutoMapper.QueryableExtensions
         public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(this IMappingEngine mappingEngine)
         {
             return (Expression<Func<TSource, TDestination>>)
-                _expressionCache.GetOrAdd(new TypePair(typeof(TSource), typeof(TDestination)), tp =>
-                {
-                    return CreateMapExpression(mappingEngine, tp.SourceType, tp.DestinationType);
-                });
+                _expressionCache.GetOrAdd(new TypePair(typeof(TSource), typeof(TDestination)), tp => CreateMapExpression(mappingEngine, tp));
         }
 
 
@@ -61,33 +58,33 @@ namespace AutoMapper.QueryableExtensions
             return new ProjectionExpression<TSource>(source, mappingEngine);
         }
 
-        private static LambdaExpression CreateMapExpression(IMappingEngine mappingEngine, Type typeIn, Type typeOut)
+        private static LambdaExpression CreateMapExpression(IMappingEngine mappingEngine, TypePair typePair)
         {
             // this is the input parameter of this expression with name <variableName>
-            ParameterExpression instanceParameter = Expression.Parameter(typeIn, "dto");
+            ParameterExpression instanceParameter = Expression.Parameter(typePair.SourceType, "dto");
 
-            var total = CreateMapExpression(mappingEngine, typeIn, typeOut, instanceParameter);
+            var total = CreateMapExpression(mappingEngine, typePair, instanceParameter);
 
             return Expression.Lambda(total, instanceParameter);
         }
 
-        private static Expression CreateMapExpression(IMappingEngine mappingEngine, Type typeIn, Type typeOut, Expression instanceParameter)
+        private static Expression CreateMapExpression(IMappingEngine mappingEngine, TypePair typePair, Expression instanceParameter)
         {
-            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(typeIn, typeOut);
+            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(typePair.SourceType, typePair.DestinationType);
 
             if (typeMap == null)
             {
                 const string MessageFormat = "Missing map from {0} to {1}. Create using Mapper.CreateMap<{0}, {1}>.";
 
-                var message = string.Format(MessageFormat, typeIn.Name, typeOut.Name);
+                var message = string.Format(MessageFormat, typePair.SourceType.Name, typePair.DestinationType.Name);
 
                 throw new InvalidOperationException(message);
             }
 
-            var bindings = CreateMemberBindings(mappingEngine, typeIn, typeMap, instanceParameter);
+            var bindings = CreateMemberBindings(mappingEngine, typePair.SourceType, typeMap, instanceParameter);
 
             Expression total = Expression.MemberInit(
-                Expression.New(typeOut),
+                Expression.New(typePair.DestinationType),
                 bindings.ToArray()
                 );
 
@@ -118,9 +115,10 @@ namespace AutoMapper.QueryableExtensions
                     // is list
 
                     sourceListType = result.Type.GetGenericArguments().First();
+                    var listTypePair = new TypePair(sourceListType, destinationListType);
 
                     //var newVariableName = "t" + (i++);
-                    var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
+                    var transformedExpression = CreateMapExpression(mappingEngine, listTypePair);
 
                     MethodCallExpression selectExpression = Expression.Call(
                         typeof(Enumerable),
@@ -150,8 +148,7 @@ namespace AutoMapper.QueryableExtensions
                          propertyMap.DestinationPropertyType.BaseType != typeof(ValueType) &&
                          propertyMap.DestinationPropertyType.BaseType != typeof(Enum))
                 {
-                    var transformedExpression = CreateMapExpression(mappingEngine, result.Type,
-                                                                    propertyMap.DestinationPropertyType,
+                    var transformedExpression = CreateMapExpression(mappingEngine, new TypePair(result.Type, propertyMap.DestinationPropertyType),
                                                                     result.ResolutionExpression);
 
                     bindExpression = Expression.Bind(destinationMember, transformedExpression);
