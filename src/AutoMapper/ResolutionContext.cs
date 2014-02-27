@@ -77,7 +77,12 @@ namespace AutoMapper
 			InstanceCache = new Dictionary<ResolutionContext, object>();
             Options = options;
             Engine = engine;
-		}
+        }
+
+        public void SetResolvedDestinationValue(object destintationValue)
+        {
+            DestinationValue = destintationValue;
+        }
 
         private void AssignTypes(TypeMap typeMap, Type sourceType, Type destinationType)
         {
@@ -193,7 +198,7 @@ namespace AutoMapper
 		}
 
 
-        public ResolutionContext CreateValueContext(object sourceValue)
+		public ResolutionContext CreateValueContext(object sourceValue)
 		{
 			return new ResolutionContext(this, sourceValue);
 		}
