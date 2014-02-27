@@ -180,7 +180,9 @@ namespace AutoMapper.Mappers
 
 			protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
 			{
-				return mapper.CreateObject(context);
+				var result = mapper.CreateObject(context);
+				context.SetResolvedDestinationValue(result);
+				return result;
 			}
 		}
 
@@ -193,7 +195,9 @@ namespace AutoMapper.Mappers
 
 			protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
 			{
-				return context.DestinationValue;
+				var result = context.DestinationValue;
+				context.SetResolvedDestinationValue(result);
+				return result;
 			}
 		}
 	}

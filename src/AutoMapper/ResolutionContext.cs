@@ -73,6 +73,11 @@ namespace AutoMapper
             Options = options;
         }
 
+        public void SetResolvedDestinationValue(object destintationValue)
+        {
+            DestinationValue = destintationValue;
+        }
+
         private void AssignTypes(TypeMap typeMap, Type sourceType, Type destinationType)
         {
             if (typeMap != null)
