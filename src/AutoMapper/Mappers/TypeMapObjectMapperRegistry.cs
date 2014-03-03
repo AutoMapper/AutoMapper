@@ -55,7 +55,7 @@ namespace AutoMapper.Mappers
 
 			public bool IsMatch(ResolutionContext context, IMappingEngineRunner mapper)
 			{
-				return context.DestinationValue == null && context.InstanceCache.ContainsKey(context);
+				return !context.Options.DisableCache && context.DestinationValue == null && context.InstanceCache.ContainsKey(context);
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace AutoMapper.Mappers
 			public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 			{
 				var mappedObject = GetMappedObject(context, mapper);
-				if (context.SourceValue != null)
+				if (context.SourceValue != null && !context.Options.DisableCache)
                     context.InstanceCache[context] = mappedObject;
 
 				context.TypeMap.BeforeMap(context.SourceValue, mappedObject);

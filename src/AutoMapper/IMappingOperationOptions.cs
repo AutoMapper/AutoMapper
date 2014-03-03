@@ -24,6 +24,11 @@ namespace AutoMapper
         /// Add context items to be accessed at map time inside an <see cref="IValueResolver"/> or <see cref="ITypeConverter{TSource, TDestination}"/>
         /// </summary>
         IDictionary<string, object> Items { get; }
+
+        /// <summary>
+        /// Disable the cache used to re-use destination instances based on equality
+        /// </summary>
+        bool DisableCache { get; set; }
     }
 
     public class MappingOperationOptions : IMappingOperationOptions
@@ -36,6 +41,7 @@ namespace AutoMapper
         public Func<Type, object> ServiceCtor { get; private set; }
         public bool CreateMissingTypeMaps { get; set; }
         public IDictionary<string, object> Items { get; private set; }
+        public bool DisableCache { get; set; }
 
         void IMappingOperationOptions.ConstructServicesUsing(Func<Type, object> constructor)
         {

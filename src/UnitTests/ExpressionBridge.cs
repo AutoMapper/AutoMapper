@@ -234,7 +234,7 @@ namespace AutoMapper.UnitTests
 #endif
         }
 
-#if !NETFX_CORE
+#if !NETFX_CORE && !SILVERLIGHT
         namespace CircularReferences
         {
             public class A
