@@ -1,14 +1,14 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using AutoMapper.Impl;
-using AutoMapper.Internal;
-
 namespace AutoMapper.QueryableExtensions
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using AutoMapper.Impl;
+    using AutoMapper.Internal;
+    
     public static class Extensions
     {
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
