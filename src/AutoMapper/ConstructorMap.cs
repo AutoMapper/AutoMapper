@@ -37,9 +37,16 @@ namespace AutoMapper
 
                 var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType, destinationType);
 
-                var value = mappingEngine.Map(newContext);
-
-                ctorArgs.Add(value);
+                if (typeMap == null && map.Parameter.IsOptional)
+                {
+                    object value = map.Parameter.DefaultValue;
+                    ctorArgs.Add(value);
+                }
+                else
+                {
+                    var value = mappingEngine.Map(newContext);
+                    ctorArgs.Add(value);
+                }
             }
 
             return _runtimeCtor(ctorArgs.ToArray());
