@@ -13,7 +13,7 @@
     <Message Importance="low" Text="AutoMapper Platform Extension Assembly: %(_AutoMapperReference.FullPath)"/>
 
     <ItemGroup>
-      <Content Include="%(_AutoMapperReference.FullPath)" Condition="'%(_AutoMapperReference.FullPath)' != ''">
+      <Content Include="$([MSBuild]::MakeRelative($(MSBuildProjectDirectory), %(_AutoMapperReference.FullPath)))" Condition="'%(_AutoMapperReference.FullPath)' != ''">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
