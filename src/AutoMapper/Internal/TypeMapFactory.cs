@@ -188,7 +188,7 @@ namespace AutoMapper
 
                 foreach (var nameReplacer in memberNameReplacers)
                 {
-                    aliasName = aliasName.Replace(nameReplacer.OrginalValue, nameReplacer.Alias);
+                    aliasName = aliasName.Replace(nameReplacer.OrginalValue, nameReplacer.NewValue);
                 }
 
                 yield return aliasName;

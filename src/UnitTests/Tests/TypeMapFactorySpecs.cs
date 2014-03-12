@@ -94,9 +94,9 @@ namespace AutoMapper.UnitTests.Tests
             get { return _sourceExtensionMethods; }
         }
 
-        public void RecognizePartialAlias(string original, string alias)
+        public void ReplaceMemberName(string original, string newValue)
         {
-            _memberNameReplacers.Add(new MemberNameReplacer(original, alias));
+            _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
         }
     }
 
@@ -256,9 +256,9 @@ namespace AutoMapper.UnitTests.Tests
         public void Should_map_properties_with_same_name()
         {
             var mappingOptions = new StubMappingOptions();
-            mappingOptions.RecognizePartialAlias("Ä", "A");
-            mappingOptions.RecognizePartialAlias("í", "i");
-            mappingOptions.RecognizePartialAlias("Airlina", "Airline");
+            mappingOptions.ReplaceMemberName("Ä", "A");
+            mappingOptions.ReplaceMemberName("í", "i");
+            mappingOptions.ReplaceMemberName("Airlina", "Airline");
             
             var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions, MemberList.Destination);
 
