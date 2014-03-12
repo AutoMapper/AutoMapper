@@ -7,13 +7,13 @@ namespace AutoMapper.Internal
 {
     public class MemberNameReplacer
     {
-        public MemberNameReplacer(string originalValue, string alias)
+        public MemberNameReplacer(string originalValue, string newValue)
         {
             OrginalValue = originalValue;
-            Alias = alias;
+            NewValue = newValue;
         }
 
         public string OrginalValue { get; private set; }
-        public string Alias { get; private set; }
+        public string NewValue { get; private set; }
     }
 }
