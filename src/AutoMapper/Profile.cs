@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -77,7 +78,12 @@ namespace AutoMapper
 	        get { return GetProfile().DestinationPostfixes; }
 	    }
 
-	    public IEnumerable<AliasedMember> Aliases
+        public IEnumerable<MemberNameReplacer> MemberNameReplacers
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public IEnumerable<AliasedMember> Aliases
 	    {
 	        get { throw new NotImplementedException(); }
 	    }

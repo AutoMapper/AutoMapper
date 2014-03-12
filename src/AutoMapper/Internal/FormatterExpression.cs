@@ -19,6 +19,7 @@ namespace AutoMapper
         private readonly ISet<string> _destinationPrefixes = new HashSet<string>();
         private readonly ISet<string> _destinationPostfixes = new HashSet<string>();
         private readonly ISet<AliasedMember> _aliases = new HashSet<AliasedMember>();
+        private readonly ISet<MemberNameReplacer> _memberNameReplacers = new HashSet<MemberNameReplacer>();
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
 	    public FormatterExpression(Func<Type, IValueFormatter> formatterCtor)
@@ -40,6 +41,7 @@ namespace AutoMapper
         public IEnumerable<string> Postfixes { get { return _postfixes; } }
         public IEnumerable<string> DestinationPrefixes { get { return _destinationPrefixes; } }
         public IEnumerable<string> DestinationPostfixes { get { return _destinationPostfixes; } }
+        public IEnumerable<MemberNameReplacer> MemberNameReplacers { get { return _memberNameReplacers; } }
         public IEnumerable<AliasedMember> Aliases { get { return _aliases; } }
         public bool ConstructorMappingEnabled { get; set; }
         public bool DataReaderMapperYieldReturnEnabled { get; set; }
@@ -195,6 +197,11 @@ namespace AutoMapper
 		{
 		    _aliases.Add(new AliasedMember(original, alias));
 		}
+
+        public void RecognizePartialAlias(string original, string alias)
+        {
+            _memberNameReplacers.Add(new MemberNameReplacer(original, alias));
+        }
 
 		public void RecognizeDestinationPrefixes(params string[] prefixes)
 		{
