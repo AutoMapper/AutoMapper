@@ -198,9 +198,9 @@ namespace AutoMapper
 		    _aliases.Add(new AliasedMember(original, alias));
 		}
 
-        public void RecognizePartialAlias(string original, string alias)
+        public void ReplaceMemberName(string original, string newValue)
         {
-            _memberNameReplacers.Add(new MemberNameReplacer(original, alias));
+            _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
         }
 
 		public void RecognizeDestinationPrefixes(params string[] prefixes)

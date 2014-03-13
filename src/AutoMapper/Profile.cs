@@ -162,7 +162,12 @@ namespace AutoMapper
 			GetProfile().RecognizeAlias(original, alias);
 		}
 
-		public void RecognizePrefixes(params string[] prefixes)
+        public void ReplaceMemberName(string original, string newValue)
+        {
+            GetProfile().ReplaceMemberName(original, newValue);
+        }
+
+        public void RecognizePrefixes(params string[] prefixes)
 		{
 			GetProfile().RecognizePrefixes(prefixes);
 		}

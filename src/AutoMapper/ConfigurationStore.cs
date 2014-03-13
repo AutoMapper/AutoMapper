@@ -229,9 +229,9 @@ namespace AutoMapper
 			GetProfile(DefaultProfileName).RecognizeAlias(original, alias);
 		}
 
-        public void RecognizePartialAlias(string original, string alias)
+        public void ReplaceMemberName(string original, string newValue)
         {
-            GetProfile(DefaultProfileName).RecognizePartialAlias(original, alias);
+            GetProfile(DefaultProfileName).ReplaceMemberName(original, newValue);
         }
 
         public void RecognizeDestinationPrefixes(params string[] prefixes)
