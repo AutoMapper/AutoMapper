@@ -39,6 +39,7 @@ namespace AutoMapper.UnitTests
                 SubAirlinaFlight = 4
             };
 
+            Mapper.CreateMap<Source, Destination>();
             var destination = Mapper.Map<Source, Destination>(source);
 
             Assert.Equal(source.Value, destination.Value);
