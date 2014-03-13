@@ -253,7 +253,7 @@ namespace AutoMapper.UnitTests.Tests
         }
 
         [Fact]
-        public void Should_map_properties_with_same_name()
+        public void Should_map_properties_with_different_names()
         {
             var mappingOptions = new StubMappingOptions();
             mappingOptions.ReplaceMemberName("Ä", "A");
