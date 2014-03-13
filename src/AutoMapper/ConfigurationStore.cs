@@ -87,6 +87,11 @@ namespace AutoMapper
             get { return GetProfile(DefaultProfileName).DestinationPostfixes; }
 	    }
 
+	    public IEnumerable<MemberNameReplacer> MemberNameReplacers
+        {
+            get { return GetProfile(DefaultProfileName).MemberNameReplacers; }
+        }
+
 	    public IEnumerable<AliasedMember> Aliases
 	    {
 	        get { return GetProfile(DefaultProfileName).Aliases; }
@@ -223,6 +228,11 @@ namespace AutoMapper
 		{
 			GetProfile(DefaultProfileName).RecognizeAlias(original, alias);
 		}
+
+        public void ReplaceMemberName(string original, string newValue)
+        {
+            GetProfile(DefaultProfileName).ReplaceMemberName(original, newValue);
+        }
 
         public void RecognizeDestinationPrefixes(params string[] prefixes)
         {
