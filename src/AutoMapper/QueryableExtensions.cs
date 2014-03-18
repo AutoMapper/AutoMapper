@@ -119,7 +119,14 @@ namespace AutoMapper.QueryableExtensions
                     Type sourceListType = null;
                     // is list
 
-                    sourceListType = result.Type.GetGenericArguments().First();
+                    if (result.Type.IsArray)
+                    {
+                        sourceListType = result.Type.GetElementType();
+                    }
+                    else
+                    {
+                        sourceListType = result.Type.GetGenericArguments().First();
+                    }
 
                     //var newVariableName = "t" + (i++);
                     var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
