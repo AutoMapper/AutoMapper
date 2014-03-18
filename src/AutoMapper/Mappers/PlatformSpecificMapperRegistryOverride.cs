@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AutoMapper.Mappers
 {
     using System.Linq;
@@ -26,9 +28,12 @@ namespace AutoMapper.Mappers
         private void InsertBefore<TObjectMapper>(IObjectMapper mapper)
             where TObjectMapper : IObjectMapper
         {
-            var targetMapper = MapperRegistry.Mappers.FirstOrDefault(om => om is TObjectMapper);
-            var index = targetMapper == null ? 0 : MapperRegistry.Mappers.IndexOf(targetMapper);
-            MapperRegistry.Mappers.Insert(index, mapper);
+            MapperRegistry.Mappers.SyncChange(maps =>
+            {
+                var targetMapper = maps.FirstOrDefault(om => om is TObjectMapper);
+                var index = targetMapper == null ? 0 : maps.IndexOf(targetMapper);
+                maps.Insert(index, mapper);
+            });
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.UnitTests.Mappers
+﻿using System.Collections.Generic;
+
+namespace AutoMapper.UnitTests.Mappers
 {
     namespace CustomMapperTests
     {
@@ -9,7 +11,7 @@
         {
             protected override void Establish_context()
             {
-                MapperRegistry.Mappers.Insert(0, new TestObjectMapper());
+                MapperRegistry.Mappers.SyncChange(mappers => mappers.Insert(0, new TestObjectMapper()));
 
                 Mapper.CreateMap<ClassA, ClassB>()
                     .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
