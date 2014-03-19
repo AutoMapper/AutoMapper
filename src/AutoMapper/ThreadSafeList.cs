@@ -13,15 +13,8 @@ namespace AutoMapper
             PlatformAdapter.Resolve<IReaderWriterLockSlimFactory>();
 
         private IReaderWriterLockSlim _lock = ReaderWriterLockSlimFactory.Create();
-        private readonly List<T> _propertyMaps = new List<T>();
+        private readonly IList<T> _propertyMaps = new List<T>();
         private bool _disposed;
-
-        public ThreadSafeList() { }
-
-        public ThreadSafeList(IEnumerable<T> collection)
-        {
-            _propertyMaps.AddRange(collection);
-        }
 
         public void Add(T propertyMap)
         {
@@ -121,24 +114,6 @@ namespace AutoMapper
 
                 _lock = null;
                 _disposed = true;
-            }
-        }
-
-        /// <summary>
-        /// Synchronized update action
-        /// </summary>
-        /// <param name="updateAction">Update action</param>
-        public void SyncChange(Action<List<T>> updateAction)
-        {
-            _lock.EnterReadLock();
-            try
-            {
-                if (updateAction != null)
-                    updateAction(_propertyMaps);
-            }
-            finally
-            {
-                _lock.ExitReadLock();
             }
         }
     }

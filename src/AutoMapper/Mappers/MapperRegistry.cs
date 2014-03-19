@@ -25,12 +25,12 @@ namespace AutoMapper.Mappers
             new ExplicitConversionOperatorMapper()
         };
 
-        private static readonly ThreadSafeList<IObjectMapper> _mappers = new ThreadSafeList<IObjectMapper>(_initialMappers);
+        private static readonly List<IObjectMapper> _mappers = new List<IObjectMapper>(_initialMappers);
 
         /// <summary>
         /// Extension point for modifying list of object mappers
         /// </summary>
-        public static ThreadSafeList<IObjectMapper> Mappers
+        public static IList<IObjectMapper> Mappers
         {
             get { return _mappers; }
         }
@@ -41,7 +41,7 @@ namespace AutoMapper.Mappers
         public static void Reset()
         {
             _mappers.Clear();
-            _mappers.SyncChange(a => a.AddRange(_initialMappers));
+            _mappers.AddRange(_initialMappers);
         }
     }
 }
