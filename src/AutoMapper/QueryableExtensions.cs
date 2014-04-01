@@ -129,14 +129,19 @@ namespace AutoMapper.QueryableExtensions
                     var listTypePair = new TypePair(sourceListType, destinationListType);
 
                     //var newVariableName = "t" + (i++);
-                    var transformedExpression = CreateMapExpression(mappingEngine, listTypePair, typePairCount);
+                    MethodCallExpression selectExpression;
+                    if(sourceListType == destinationListType){
+                        selectExpression = result.ResolutionExpression as MethodCallExpression;
+                    }else{
+                        var transformedExpression = CreateMapExpression(mappingEngine, listTypePair, typePairCount);
 
-                    MethodCallExpression selectExpression = Expression.Call(
-                        typeof (Enumerable),
-                        "Select",
-                        new[] {sourceListType, destinationListType},
-                        result.ResolutionExpression,
-                        transformedExpression);
+                        selectExpression = Expression.Call(
+                            typeof(Enumerable),
+                            "Select",
+                            new[] { sourceListType, destinationListType },
+                            result.ResolutionExpression,
+                            transformedExpression);
+                    }
 
                     if (
                         typeof (IList<>).MakeGenericType(destinationListType)
