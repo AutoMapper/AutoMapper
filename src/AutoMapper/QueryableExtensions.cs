@@ -1,12 +1,14 @@
 namespace AutoMapper.QueryableExtensions
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using Impl;
-    using Internal;
-
+    using System.Reflection;
+    using AutoMapper.Impl;
+    using AutoMapper.Internal;
+    
     public static class Extensions
     {
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
@@ -22,12 +24,13 @@ namespace AutoMapper.QueryableExtensions
         /// <typeparam name="TDestination">Destination Type</typeparam>
         /// <param name="mappingEngine">Mapping engine instance</param>
         /// <returns>Expression tree mapping source to destination type</returns>
-        public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(
-            this IMappingEngine mappingEngine)
+        public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(this IMappingEngine mappingEngine)
         {
             return (Expression<Func<TSource, TDestination>>)
-                _expressionCache.GetOrAdd(new TypePair(typeof (TSource), typeof (TDestination)),
-                    tp => CreateMapExpression(mappingEngine, tp, DictionaryFactory.CreateDictionary<TypePair, int>()));
+                _expressionCache.GetOrAdd(new TypePair(typeof(TSource), typeof(TDestination)), tp =>
+                {
+                    return CreateMapExpression(mappingEngine, tp.SourceType, tp.DestinationType);
+                });
         }
 
 
@@ -60,55 +63,46 @@ namespace AutoMapper.QueryableExtensions
             return new ProjectionExpression<TSource>(source, mappingEngine);
         }
 
-        private static LambdaExpression CreateMapExpression(IMappingEngine mappingEngine, TypePair typePair,
-            Internal.IDictionary<TypePair, int> typePairCount)
+        private static LambdaExpression CreateMapExpression(IMappingEngine mappingEngine, Type typeIn, Type typeOut)
         {
             // this is the input parameter of this expression with name <variableName>
-            ParameterExpression instanceParameter = Expression.Parameter(typePair.SourceType, "dto");
+            ParameterExpression instanceParameter = Expression.Parameter(typeIn, "dto");
 
-            var total = CreateMapExpression(mappingEngine, typePair, instanceParameter, typePairCount);
+            var total = CreateMapExpression(mappingEngine, typeIn, typeOut, instanceParameter);
 
             return Expression.Lambda(total, instanceParameter);
         }
 
-        private static Expression CreateMapExpression(IMappingEngine mappingEngine, TypePair typePair, Expression instanceParameter, Internal.IDictionary<TypePair, int> typePairCount)
+        private static Expression CreateMapExpression(IMappingEngine mappingEngine, Type typeIn, Type typeOut, Expression instanceParameter)
         {
-            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(typePair.SourceType,
-                typePair.DestinationType);
+            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(typeIn, typeOut);
 
             if (typeMap == null)
             {
                 const string MessageFormat = "Missing map from {0} to {1}. Create using Mapper.CreateMap<{0}, {1}>.";
 
-                var message = string.Format(MessageFormat, typePair.SourceType.Name, typePair.DestinationType.Name);
+                var message = string.Format(MessageFormat, typeIn.Name, typeOut.Name);
 
                 throw new InvalidOperationException(message);
             }
 
-            var bindings = CreateMemberBindings(mappingEngine, typePair, typeMap, instanceParameter, typePairCount);
+            var bindings = CreateMemberBindings(mappingEngine, typeIn, typeMap, instanceParameter);
 
             Expression total = Expression.MemberInit(
-                Expression.New(typePair.DestinationType),
+                Expression.New(typeOut),
                 bindings.ToArray()
                 );
 
             return total;
         }
 
-        private static List<MemberBinding> CreateMemberBindings(IMappingEngine mappingEngine, TypePair typePair,
-            TypeMap typeMap,
-            Expression instanceParameter, Internal.IDictionary<TypePair, int> typePairCount)
+        private static List<MemberBinding> CreateMemberBindings(IMappingEngine mappingEngine, Type typeIn, TypeMap typeMap,
+                                                 Expression instanceParameter)
         {
             var bindings = new List<MemberBinding>();
-
-            var visitCount = typePairCount.AddOrUpdate(typePair, 0, (tp, i) => i + 1);
-
-            if (visitCount >= typeMap.MaxDepth)
-                return bindings;
-
             foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
             {
-                var result = propertyMap.ResolveExpression(typePair.SourceType, instanceParameter);
+                var result = propertyMap.ResolveExpression(typeIn, instanceParameter);
 
                 var destinationMember = propertyMap.DestinationProperty.MemberInfo;
 
@@ -119,39 +113,41 @@ namespace AutoMapper.QueryableExtensions
                     bindExpression = Expression.Bind(destinationMember, result.ResolutionExpression);
                 }
                 else if (propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
-                         propertyMap.DestinationPropertyType != typeof (string))
+                    propertyMap.DestinationPropertyType != typeof(string))
                 {
-                    Type destinationListType = GetDestinationListTypeFor(propertyMap);
+                    Type destinationListType = propertyMap.DestinationPropertyType.GetGenericArguments().First();
                     Type sourceListType = null;
                     // is list
 
-                    sourceListType = result.Type.GetGenericArguments().First();
-                    var listTypePair = new TypePair(sourceListType, destinationListType);
+                    if (result.Type.IsArray)
+                    {
+                        sourceListType = result.Type.GetElementType();
+                    }
+                    else
+                    {
+                        sourceListType = result.Type.GetGenericArguments().First();
+                    }
 
                     //var newVariableName = "t" + (i++);
-                    var transformedExpression = CreateMapExpression(mappingEngine, listTypePair, typePairCount);
+                    var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
 
                     MethodCallExpression selectExpression = Expression.Call(
-                        typeof (Enumerable),
+                        typeof(Enumerable),
                         "Select",
-                        new[] {sourceListType, destinationListType},
+                        new[] { sourceListType, destinationListType },
                         result.ResolutionExpression,
                         transformedExpression);
 
-                    if (
-                        typeof (IList<>).MakeGenericType(destinationListType)
-                            .IsAssignableFrom(propertyMap.DestinationPropertyType))
+                    if (typeof(IList<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType))
                     {
-                        var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType,
+                        MethodCallExpression toListCallExpression = Expression.Call(
+                            typeof(Enumerable),
+                            "ToList",
+                            new Type[] { destinationListType },
                             selectExpression);
-                        bindExpression = Expression.Bind(destinationMember, toListCallExpression);
-                    }
-                    else if (
-                        typeof (ICollection<>).MakeGenericType(destinationListType)
-                            .IsAssignableFrom(propertyMap.DestinationPropertyType))
-                    {
-                        var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType,
-                            selectExpression);
+
+                        // todo .ToArray()
+
                         bindExpression = Expression.Bind(destinationMember, toListCallExpression);
                     }
                     else
@@ -161,27 +157,27 @@ namespace AutoMapper.QueryableExtensions
                     }
                 }
                 else if (result.Type != propertyMap.DestinationPropertyType &&
-                    // avoid nullable etc.
+                         // avoid nullable etc.
                          propertyMap.DestinationPropertyType.BaseType != typeof (ValueType) &&
                          propertyMap.DestinationPropertyType.BaseType != typeof (Enum))
                 {
-                    var transformedExpression = CreateMapExpression(mappingEngine,
-                        new TypePair(result.Type, propertyMap.DestinationPropertyType),
-                        result.ResolutionExpression, typePairCount);
-                      // Handles null source property so it will not create an object with possible non-nullable properties
-                      // which would result in an exception.
-                      if (mappingEngine.ConfigurationProvider.MapNullSourceValuesAsNull)
-                      {
-                          var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
-                          transformedExpression = Expression.Condition(Expression.NotEqual(result.ResolutionExpression, Expression.Constant(null)), transformedExpression, expressionNull);
-                      }
+                    var transformedExpression = CreateMapExpression(mappingEngine, result.Type,
+                                                                    propertyMap.DestinationPropertyType,
+                                                                    result.ResolutionExpression);
+                    
+                    // Handles null source property so it will not create an object with possible non-nullable propeerties 
+                    // which would result in an exception.
+                    if (mappingEngine.ConfigurationProvider.MapNullSourceValuesAsNull)
+                    {
+                        var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
+                        transformedExpression = Expression.Condition(Expression.NotEqual(result.ResolutionExpression, Expression.Constant(null)), transformedExpression, expressionNull);
+                    }
 
                     bindExpression = Expression.Bind(destinationMember, transformedExpression);
                 }
                 else
                 {
-                    throw new AutoMapperMappingException("Unable to create a map expression from " + result.Type +
-                                                         " to " + propertyMap.DestinationPropertyType);
+                    throw new AutoMapperMappingException("Unable to create a map expression from " + result.Type + " to " + propertyMap.DestinationPropertyType);
                 }
 
                 bindings.Add(bindExpression);
@@ -189,25 +185,7 @@ namespace AutoMapper.QueryableExtensions
             return bindings;
         }
 
-        private static Type GetDestinationListTypeFor(PropertyMap propertyMap)
-        {
-            Type destinationListType;
-            if (propertyMap.DestinationPropertyType.IsArray)
-                destinationListType = propertyMap.DestinationPropertyType.GetElementType();
-            else
-                destinationListType = propertyMap.DestinationPropertyType.GetGenericArguments().First();
-            return destinationListType;
-        }
 
-        private static MethodCallExpression GetToListCallExpression(PropertyMap propertyMap, Type destinationListType,
-            MethodCallExpression selectExpression)
-        {
-            return Expression.Call(
-                typeof (Enumerable),
-                propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList",
-                new[] {destinationListType},
-                selectExpression);
-        }
     }
 
     /// <summary>
