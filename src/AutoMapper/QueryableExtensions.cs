@@ -1,13 +1,12 @@
 namespace AutoMapper.QueryableExtensions
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using AutoMapper.Impl;
-    using AutoMapper.Internal;
+    using Impl;
+    using Internal;
     
     public static class Extensions
     {
@@ -108,72 +107,26 @@ namespace AutoMapper.QueryableExtensions
 
                 MemberAssignment bindExpression;
 
-                if (propertyMap.DestinationPropertyType.IsAssignableFrom(result.Type))
+                if (propertyMap.DestinationPropertyType.IsNullableType()
+                    && !result.Type.IsNullableType())
                 {
-                    bindExpression = Expression.Bind(destinationMember, result.ResolutionExpression);
+                    bindExpression = BindNullableExpression(mappingEngine, propertyMap, result, destinationMember);
+                }
+                else if (propertyMap.DestinationPropertyType.IsAssignableFrom(result.Type))
+                {
+                    bindExpression = BindAssignableExpression(destinationMember, result);
                 }
                 else if (propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
                     propertyMap.DestinationPropertyType != typeof(string))
                 {
-                    Type destinationListType = propertyMap.DestinationPropertyType.GetGenericArguments().First();
-                    Type sourceListType = null;
-                    // is list
-
-                    if (result.Type.IsArray)
-                    {
-                        sourceListType = result.Type.GetElementType();
-                    }
-                    else
-                    {
-                        sourceListType = result.Type.GetGenericArguments().First();
-                    }
-
-                    //var newVariableName = "t" + (i++);
-                    var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
-
-                    MethodCallExpression selectExpression = Expression.Call(
-                        typeof(Enumerable),
-                        "Select",
-                        new[] { sourceListType, destinationListType },
-                        result.ResolutionExpression,
-                        transformedExpression);
-
-                    if (typeof(IList<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType))
-                    {
-                        MethodCallExpression toListCallExpression = Expression.Call(
-                            typeof(Enumerable),
-                            "ToList",
-                            new Type[] { destinationListType },
-                            selectExpression);
-
-                        // todo .ToArray()
-
-                        bindExpression = Expression.Bind(destinationMember, toListCallExpression);
-                    }
-                    else
-                    {
-                        // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
-                        bindExpression = Expression.Bind(destinationMember, selectExpression);
-                    }
+                    bindExpression = BindEnumerableExpression(mappingEngine, propertyMap, result, destinationMember);
                 }
                 else if (result.Type != propertyMap.DestinationPropertyType &&
                          // avoid nullable etc.
                          propertyMap.DestinationPropertyType.BaseType != typeof (ValueType) &&
                          propertyMap.DestinationPropertyType.BaseType != typeof (Enum))
                 {
-                    var transformedExpression = CreateMapExpression(mappingEngine, result.Type,
-                                                                    propertyMap.DestinationPropertyType,
-                                                                    result.ResolutionExpression);
-                    
-                    // Handles null source property so it will not create an object with possible non-nullable propeerties 
-                    // which would result in an exception.
-                    if (mappingEngine.ConfigurationProvider.MapNullSourceValuesAsNull)
-                    {
-                        var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
-                        transformedExpression = Expression.Condition(Expression.NotEqual(result.ResolutionExpression, Expression.Constant(null)), transformedExpression, expressionNull);
-                    }
-
-                    bindExpression = Expression.Bind(destinationMember, transformedExpression);
+                    bindExpression = BindMappedTypeExpression(mappingEngine, propertyMap, result, destinationMember);
                 }
                 else
                 {
@@ -185,7 +138,105 @@ namespace AutoMapper.QueryableExtensions
             return bindings;
         }
 
+        private static MemberAssignment BindNullableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionResolutionResult result, MemberInfo destinationMember)
+        {
+            if (result.ResolutionExpression.NodeType == ExpressionType.MemberAccess
+                && ((MemberExpression) result.ResolutionExpression).Expression.NodeType == ExpressionType.MemberAccess)
+            {
+                var destType = propertyMap.DestinationPropertyType;
+                var memberExpr = (MemberExpression) result.ResolutionExpression;
+                var parentExpr = memberExpr.Expression;
+                Expression expressionToBind = Expression.Convert(memberExpr, destType);
+                var nullExpression = Expression.Convert(Expression.Constant(null), destType);
+                while (parentExpr.NodeType != ExpressionType.Parameter)
+                {
+                    memberExpr = (MemberExpression) memberExpr.Expression;
+                    parentExpr = memberExpr.Expression;
+                    expressionToBind = Expression.Condition(
+                        Expression.Equal(memberExpr, Expression.Constant(null)),
+                        nullExpression,
+                        expressionToBind
+                        );
+                }
 
+                return Expression.Bind(destinationMember, expressionToBind);
+            }
+
+            return Expression.Bind(destinationMember, Expression.Convert(result.ResolutionExpression, propertyMap.DestinationPropertyType));
+        }
+
+        private static MemberAssignment BindMappedTypeExpression(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionResolutionResult result, MemberInfo destinationMember)
+        {
+            MemberAssignment bindExpression;
+            var transformedExpression = CreateMapExpression(mappingEngine, result.Type,
+                propertyMap.DestinationPropertyType,
+                result.ResolutionExpression);
+
+            // Handles null source property so it will not create an object with possible non-nullable propeerties 
+            // which would result in an exception.
+            if (mappingEngine.ConfigurationProvider.MapNullSourceValuesAsNull)
+            {
+                var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
+                transformedExpression =
+                    Expression.Condition(Expression.NotEqual(result.ResolutionExpression, Expression.Constant(null)),
+                        transformedExpression, expressionNull);
+            }
+
+            bindExpression = Expression.Bind(destinationMember, transformedExpression);
+            return bindExpression;
+        }
+
+        private static MemberAssignment BindAssignableExpression(MemberInfo destinationMember, ExpressionResolutionResult result)
+        {
+            return Expression.Bind(destinationMember, result.ResolutionExpression);
+        }
+
+        private static MemberAssignment BindEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
+            ExpressionResolutionResult result, MemberInfo destinationMember)
+        {
+            MemberAssignment bindExpression;
+            Type destinationListType = propertyMap.DestinationPropertyType.GetGenericArguments().First();
+            Type sourceListType = null;
+            // is list
+
+            if (result.Type.IsArray)
+            {
+                sourceListType = result.Type.GetElementType();
+            }
+            else
+            {
+                sourceListType = result.Type.GetGenericArguments().First();
+            }
+
+            //var newVariableName = "t" + (i++);
+            var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
+
+            MethodCallExpression selectExpression = Expression.Call(
+                typeof (Enumerable),
+                "Select",
+                new[] {sourceListType, destinationListType},
+                result.ResolutionExpression,
+                transformedExpression);
+
+            if (typeof (IList<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType))
+            {
+                MethodCallExpression toListCallExpression = Expression.Call(
+                    typeof (Enumerable),
+                    "ToList",
+                    new Type[] {destinationListType},
+                    selectExpression);
+
+                // todo .ToArray()
+
+                bindExpression = Expression.Bind(destinationMember, toListCallExpression);
+            }
+            else
+            {
+                // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
+                bindExpression = Expression.Bind(destinationMember, selectExpression);
+            }
+            return bindExpression;
+        }
     }
 
     /// <summary>
