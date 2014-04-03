@@ -236,6 +236,7 @@
     <Compile Include="Tests\TypeInfoSpecs.cs" />
     <Compile Include="Tests\TypeMapFactorySpecs.cs" />
     <Compile Include="TypeConverters.cs" />
+    <Compile Include="UsingEngineInsideMap.cs" />
     <Compile Include="ValueTypes.cs" />
     <Compile Include="Bug\MappingToAReadOnlyCollection.cs" />
     <Compile Include="WinRTExtensions.cs" />

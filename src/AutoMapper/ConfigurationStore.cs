@@ -517,7 +517,7 @@ namespace AutoMapper
 
 			foreach (var typeMap in _typeMaps)
 			{
-				DryRunTypeMap(typeMapsChecked, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType, new MappingOperationOptions()));
+				DryRunTypeMap(typeMapsChecked, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType, new MappingOperationOptions(), Mapper.Engine));
 			}
 		}
 

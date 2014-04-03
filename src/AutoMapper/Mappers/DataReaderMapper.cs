@@ -58,7 +58,7 @@ namespace AutoMapper.Mappers
             {
                 var configurationProvider = mapper.ConfigurationProvider;
                 TypeMap typeMap = configurationProvider.FindTypeMapFor(context.SourceValue, context.DestinationValue, context.SourceType, destinationElementType);
-                resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType, new MappingOperationOptions());
+                resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType, new MappingOperationOptions(), (IMappingEngine)mapper);
             }
 
             var buildFrom = CreateBuilder(destinationElementType, dataReader);
