@@ -173,6 +173,7 @@
     <Compile Include="NullBehavior.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="Projection\MapFromTest.cs" />
+    <Compile Include="Projection\NestedExpressionsMapFromTests.cs" />
     <Compile Include="Projection\NullableItemsTests.cs" />
     <Compile Include="Projection\PrimitiveArraysTest.cs" />
     <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
