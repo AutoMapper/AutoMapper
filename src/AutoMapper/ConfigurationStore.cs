@@ -467,8 +467,11 @@ namespace AutoMapper
 		{
 			IMappingExpression<TSource, TDestination> mappingExp =
 				new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, this);
-			// Custom Hack
-			var destInfo = new TypeInfo(typeof(TDestination));
+
+		    TypeInfo destInfo = typeMap.ConfiguredMemberList == MemberList.Destination 
+		        ? new TypeInfo(typeof(TDestination)) 
+		        : new TypeInfo(typeof(TSource));
+
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
 			{
 				object[] attrs = destProperty.GetCustomAttributes(true);
