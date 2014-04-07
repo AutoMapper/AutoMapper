@@ -92,4 +92,69 @@
             }
         }
     }
+
+    namespace ConditionPropertyBug
+    {
+        using System;
+        using Should;
+        using Xunit;
+
+        public class Example : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                private int basePrice;
+                public bool HasBasePrice { get; set; }
+                public int BasePrice
+                {
+                    get
+                    {
+                        if (!HasBasePrice)
+                            throw new InvalidOperationException("Has no base price");
+
+                        return basePrice;
+                    }
+                    set
+                    {
+                        basePrice = value;
+                        HasBasePrice = true;
+                    }
+                }
+            }
+
+            public class Destination
+            {
+                public int BasePrice { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
+                    .ForMember(itemDTO => itemDTO.BasePrice,
+                        config =>
+                        {
+                            config.Condition(item => item.HasBasePrice);
+                            config.MapFrom(item => item.BasePrice);
+                        }));
+            }
+
+            [Fact]
+            public void Should_skip_the_mapping_when_the_condition_property_is_false()
+            {
+                var src = new Source();
+                var dest = Mapper.Map<Source, Destination>(src);
+
+                dest.BasePrice.ShouldEqual(0);
+            }
+
+            [Fact]
+            public void Should_execute_the_mapping_when_the_condition_property_is_true()
+            {
+                var src = new Source {BasePrice = 15};
+                var dest = Mapper.Map<Source, Destination>(src);
+
+                dest.BasePrice.ShouldEqual(src.BasePrice);
+            }
+        }
+    }
 }
