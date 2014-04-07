@@ -157,4 +157,46 @@
             }
         }
     }
+
+
+    namespace SourceValueConditionPropertyBug
+    {
+        using Should;
+        using Xunit;
+
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public int? Value { get; set; }
+        }
+
+        public class ConditionTests : AutoMapperSpecBase
+        {
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Value, opt => opt.Condition(rc => rc.DestinationValue == null)));
+            }
+
+            [Fact]
+            public void Should_map_value_when_null()
+            {
+                var destination = new Dest();
+                Mapper.Map(new Source {Value = 5}, destination);
+                destination.Value.ShouldEqual(5);
+            }
+
+            [Fact]
+            public void Should_not_map_value_when_not_null()
+            {
+                var destination = new Dest { Value = 6};
+                Mapper.Map(new Source {Value = 5}, destination);
+                destination.Value.ShouldEqual(6);
+            }
+        }
+    }
 }
