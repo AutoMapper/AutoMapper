@@ -171,6 +171,7 @@
     <Compile Include="MemberResolution.cs" />
     <Compile Include="NestedContainers.cs" />
     <Compile Include="NullBehavior.cs" />
+    <Compile Include="ObjectSubstitution.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="Projection\MapFromTest.cs" />
     <Compile Include="Projection\NestedAndArraysTests.cs" />

@@ -197,6 +197,14 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member configuration options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
+
+        /// <summary>
+        /// Replace the original runtime instance with a new source instance. Useful when ORMs return proxy types with no relationships to runtime types.
+        /// The returned source object will be mapped instead of what was supplied in the original source object.
+        /// </summary>
+        /// <param name="substituteFunc">Substitution function</param>
+        /// <returns>New source object to map.</returns>
+        IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc);
     }
 
     /// <summary>

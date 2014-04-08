@@ -343,6 +343,13 @@ namespace AutoMapper
             return this;
         }
 
+        public IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc)
+        {
+            _typeMap.Substitution = src => substituteFunc((TSource) src);
+
+            return this;
+        }
+
 
         public void Condition(Func<ResolutionContext, bool> condition)
         {

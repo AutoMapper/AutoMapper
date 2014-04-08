@@ -12,6 +12,7 @@ namespace AutoMapper.Mappers
 		
 	    private static readonly IList<ITypeMapObjectMapper> _mappers = new List<ITypeMapObjectMapper>
 	    {
+	        new SubstutitionMapperStrategy(),
 	        new CustomMapperStrategy(),
 	        new NullMappingStrategy(),
 	        new CacheMappingStrategy(),
@@ -31,6 +32,21 @@ namespace AutoMapper.Mappers
 				return context.TypeMap.CustomMapper != null;
 			}
 		}
+
+	    private class SubstutitionMapperStrategy : ITypeMapObjectMapper
+	    {
+	        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+	        {
+	            var newSource = context.TypeMap.Substitution(context.SourceValue);
+	            var substitutionContext = context.CreateValueContext(newSource, newSource.GetType());
+	            return mapper.Map(substitutionContext);
+	        }
+
+	        public bool IsMatch(ResolutionContext context, IMappingEngineRunner mapper)
+	        {
+	            return context.TypeMap.Substitution != null;
+	        }
+	    }
 
 		private class NullMappingStrategy : ITypeMapObjectMapper
 		{

@@ -99,6 +99,8 @@ namespace AutoMapper
             }
         }
 
+        public Func<object, object> Substitution { get; set; }
+
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {
             if (_sealed)
