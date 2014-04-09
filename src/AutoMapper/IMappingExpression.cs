@@ -81,6 +81,18 @@ namespace AutoMapper
         void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
 
         /// <summary>
+        /// Ignores all <typeparamref name="TDestination"/> properties that have either a private or protected setter, forcing the mapper to respect encapsulation (note: order matters, so place this before explicit configuration of any properties with an inaccessible setter)
+        /// </summary>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter();
+
+        /// <summary>
+        /// When using ReverseMap, ignores all <typeparamref name="TSource"/> properties that have either a private or protected setter, keeping the reverse mapping consistent with the forward mapping (note: <typeparamref name="TDestination"/> properties with an inaccessible setter may still be mapped unless IgnoreAllPropertiesWithAnInaccessibleSetter is also used)
+        /// </summary>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+
+        /// <summary>
         /// Include this configuration in derived types' maps
         /// </summary>
         /// <typeparam name="TOtherSource">Derived source type</typeparam>
