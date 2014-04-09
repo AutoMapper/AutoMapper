@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 
-    public class When_configuring_all_non_source_value_null_members : AutoMapperSpecBase
+    public class When_configuring_all_non_source_value_null_members : NonValidatingSpecBase
     {
         private Dest _destination;
 
