@@ -94,6 +94,29 @@ namespace AutoMapper.UnitTests
             protected IDataReader _dataReader;
         }
 
+        public class When_mapping_a_data_reader_to_matching_dtos : AutoMapperSpecBase
+        {
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<IDataReader, DTOObject>()
+                    .ForMember(dest => dest.Else, options => options.MapFrom(src => src.GetDateTime(10)));
+                Mapper.CreateMap<IDataReader, DerivedDTOObject>()
+                    .ForMember(dest => dest.Else, options => options.MapFrom(src => src.GetDateTime(10)));
+
+            }
+
+            protected override void Because_of()
+            {
+                Mapper.Map<IDataReader, IEnumerable<DTOObject>>(new DataBuilder().BuildDataReader()).ToArray();
+            }
+
+            [Fact]
+            public void Should_map_successfully()
+            {
+                var result = Mapper.Map<IDataReader, IEnumerable<DerivedDTOObject>>(new DataBuilder().BuildDataReader());
+                result.Count().ShouldEqual(1);
+            }
+        }
         /// <summary>
         /// The purpose of this test is to exercise the internal caching logic of DataReaderMapper.
         /// </summary>
@@ -436,6 +459,8 @@ namespace AutoMapper.UnitTests
             public Boolean Boolean { get; private set; }
             public DateTime Else { get; private set; }
         }
+
+        public class DerivedDTOObject : DTOObject { }
     }
 }
 #endif
