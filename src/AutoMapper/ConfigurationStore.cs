@@ -456,6 +456,12 @@ namespace AutoMapper
 			AssertConfigurationIsValid(_typeMaps.Where(typeMap => typeMap.Profile == profileName));
 		}
 
+		public void AssertConfigurationIsValid<TProfile>()
+            where TProfile : Profile, new()
+		{
+			AssertConfigurationIsValid(new TProfile().ProfileName);
+		}
+
 		public void AssertConfigurationIsValid()
 		{
 			AssertConfigurationIsValid(_typeMaps);

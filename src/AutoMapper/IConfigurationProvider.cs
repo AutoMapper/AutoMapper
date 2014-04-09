@@ -74,6 +74,12 @@ namespace AutoMapper
 		void AssertConfigurationIsValid(string profileName);
 
         /// <summary>
+        /// Dry run all type maps in given profile
+        /// </summary>
+        /// <typeparam name="TProfile">Profile type</typeparam>
+		void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new();
+
+        /// <summary>
         /// Get all configured mappers
         /// </summary>
         /// <returns>List of mappers</returns>
