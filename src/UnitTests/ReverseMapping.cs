@@ -165,6 +165,36 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_reverse_mapping_and_ignoring_via_method : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public int Value { get; set; }
+            }
+
+            public class Dest
+            {
+                public int Value { get; set; }
+                public int Ignored { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Source, Dest>()
+                        .ForMember(d => d.Ignored, opt => opt.Ignore())
+                        .ReverseMap();
+                });
+            }
+
+            [Fact]
+            public void Should_show_valid()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid());
+            }
+        }
+
         public class When_reverse_mapping_and_ignoring : AutoMapperSpecBase
         {
             public class Foo

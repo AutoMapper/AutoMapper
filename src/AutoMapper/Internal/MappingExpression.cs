@@ -318,7 +318,14 @@ namespace AutoMapper
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            return _configurationContainer.CreateMap<TDestination, TSource>(MemberList.Source);
+            var mappingExpression = _configurationContainer.CreateMap<TDestination, TSource>(MemberList.Source);
+
+            foreach (var destProperty in _typeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
+            {
+                mappingExpression.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
+            }
+
+            return mappingExpression;
         }
 
         public IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions)
