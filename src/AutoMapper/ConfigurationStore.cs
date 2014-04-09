@@ -276,7 +276,10 @@ namespace AutoMapper
                                          m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
 
                     if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
+                    {
                         conventionPropertyMap.AssignCustomValueResolver(inheritedMappedProperty.GetSourceValueResolvers().First());
+                        conventionPropertyMap.AssignCustomExpression(inheritedMappedProperty.CustomExpression);
+                    }
                     else if (conventionPropertyMap == null)
                     {
                         var propertyMap = new PropertyMap(inheritedMappedProperty);
