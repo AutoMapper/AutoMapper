@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}, Values2 = new List<int> {9, 8, 7, 6}});
+				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } });
 			}
 
 			[Fact]
@@ -128,7 +128,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}, Values2 = new List<int> {9, 8, 7, 6}});
+				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } });
 			}
 
 			[Fact]
@@ -173,7 +173,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}});
+				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 } });
 			}
 
 			[Fact]
@@ -208,7 +208,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}});
+				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 } });
 			}
 
 			[Fact]
@@ -243,7 +243,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3, 4}});
+				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 } });
 			}
 
 			[Fact]
@@ -264,7 +264,6 @@ namespace AutoMapper.UnitTests
 
 			public class ValueCollection : Collection<int>
 			{
-				
 			}
 
 			public class Source
@@ -294,21 +293,81 @@ namespace AutoMapper.UnitTests
 				_source.Values.ShouldEqual(_destination.Values);
 			}
 		}
-		
-        public class When_mapping_to_a_collection_with_instantiation_managed_by_the_destination : AutoMapperSpecBase
+
+		public class When_mapping_to_a_custom_collection_with_the_same_type_not_implementing_IList : SpecBase
+		{
+			private Source _source;
+
+			private Destination _destination;
+
+			public class ValueCollection : IEnumerable<int>
+			{
+				private List<int> implementation = new List<int>();
+
+				public ValueCollection(IEnumerable<int> items)
+				{
+					implementation = items.ToList();
+				}
+
+				public IEnumerator<int> GetEnumerator()
+				{
+					return implementation.GetEnumerator();
+				}
+
+				IEnumerator IEnumerable.GetEnumerator()
+				{
+					return ((IEnumerable)implementation).GetEnumerator();
+				}
+			}
+
+			public class Source
+			{
+				public ValueCollection Values { get; set; }
+			}
+
+			public class Destination
+			{
+				public ValueCollection Values { get; set; }
+			}
+
+			protected override void Establish_context()
+			{
+				Mapper.CreateMap<Source, Destination>();
+				_source = new Source { Values = new ValueCollection(new[] { 1, 2, 3, 4 }) };
+			}
+
+			protected override void Because_of()
+			{
+				_destination = Mapper.Map<Source, Destination>(_source);
+			}
+
+			[Fact]
+			public void Should_map_the_list_of_source_items()
+			{
+				// here not the EnumerableMapper is used, but just the AssignableMapper!
+				_destination.Values.ShouldBeSameAs(_source.Values);
+				_destination.Values.ShouldNotBeNull();
+				_destination.Values.ShouldContain(1);
+				_destination.Values.ShouldContain(2);
+				_destination.Values.ShouldContain(3);
+				_destination.Values.ShouldContain(4);
+			}
+		}
+
+		public class When_mapping_to_a_collection_with_instantiation_managed_by_the_destination : AutoMapperSpecBase
 		{
 			private Destination _destination;
 			private Source _source;
 
 			public class SourceItem
-		    {
-		        public int Value { get; set; }
-            }
+			{
+				public int Value { get; set; }
+			}
 
-            public class DestItem
-            {
-                public int Value { get; set; }
-            }
+			public class DestItem
+			{
+				public int Value { get; set; }
+			}
 
 			public class Source
 			{
@@ -317,24 +376,24 @@ namespace AutoMapper.UnitTests
 
 			public class Destination
 			{
-                private List<DestItem> _values = new List<DestItem>();
-				
-                public List<DestItem> Values
+				private List<DestItem> _values = new List<DestItem>();
+
+				public List<DestItem> Values
 				{
-                    get { return _values; }
+					get { return _values; }
 				}
 			}
 
 			protected override void Establish_context()
 			{
-			    Mapper.CreateMap<Source, Destination>()
-			        .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
-			    Mapper.CreateMap<SourceItem, DestItem>();
+				Mapper.CreateMap<Source, Destination>()
+					.ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
+				Mapper.CreateMap<SourceItem, DestItem>();
 			}
 
 			protected override void Because_of()
 			{
-				_source = new Source { Values = new List<SourceItem>{ new SourceItem { Value = 5}, new SourceItem { Value = 10 }} };
+				_source = new Source { Values = new List<SourceItem> { new SourceItem { Value = 5 }, new SourceItem { Value = 10 } } };
 				_destination = Mapper.Map<Source, Destination>(_source);
 			}
 
@@ -342,8 +401,8 @@ namespace AutoMapper.UnitTests
 			public void Should_assign_the_value_directly()
 			{
 				_destination.Values.Count.ShouldEqual(2);
-                _destination.Values[0].Value.ShouldEqual(5);
-                _destination.Values[1].Value.ShouldEqual(10);
+				_destination.Values[0].Value.ShouldEqual(5);
+				_destination.Values[1].Value.ShouldEqual(10);
 			}
 		}
 
@@ -391,7 +450,7 @@ namespace AutoMapper.UnitTests
 				_destination.Values.Add(new DestItem());
 				Mapper.Map(_source, _destination);
 			}
-			
+
 			[Fact]
 			public void Should_clear_the_list_before_mapping()
 			{
@@ -399,35 +458,35 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-        public class When_mapping_a_collection_with_null_members : AutoMapperSpecBase
-        {
-            const string FirstString = null;
+		public class When_mapping_a_collection_with_null_members : AutoMapperSpecBase
+		{
+			const string FirstString = null;
 
-            private IEnumerable<string> _strings;
-            private List<string> _mappedStrings;
+			private IEnumerable<string> _strings;
+			private List<string> _mappedStrings;
 
-            protected override void Establish_context()
-            {
-                Mapper.Initialize(x => x.AllowNullDestinationValues = true);
+			protected override void Establish_context()
+			{
+				Mapper.Initialize(x => x.AllowNullDestinationValues = true);
 
-                _strings = new List<string> { FirstString };
+				_strings = new List<string> { FirstString };
 
-                _mappedStrings = new List<string>();
-            }
+				_mappedStrings = new List<string>();
+			}
 
-            protected override void Because_of()
-            {
-                _mappedStrings = Mapper.Map<IEnumerable<string>, List<string>>(_strings);
-            }
+			protected override void Because_of()
+			{
+				_mappedStrings = Mapper.Map<IEnumerable<string>, List<string>>(_strings);
+			}
 
-            [Fact]
-            public void Should_map_correctly()
-            {
-                _mappedStrings.ShouldNotBeNull();
-                _mappedStrings.Count.ShouldEqual(1);
-                _mappedStrings[0].ShouldBeNull();
-            }
-        }
+			[Fact]
+			public void Should_map_correctly()
+			{
+				_mappedStrings.ShouldNotBeNull();
+				_mappedStrings.Count.ShouldEqual(1);
+				_mappedStrings[0].ShouldBeNull();
+			}
+		}
 
 #if !SILVERLIGHT && !NETFX_CORE
 		public class When_destination_collection_is_only_a_list_source_and_not_IList : SpecBase
@@ -476,7 +535,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_destination = Mapper.Map<Source, Destination>(new Source {Values = new[] {1, 2, 3}});
+				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3 } });
 			}
 
 			[Fact]
@@ -486,5 +545,5 @@ namespace AutoMapper.UnitTests
 			}
 		}
 #endif
-    }
+	}
 }
