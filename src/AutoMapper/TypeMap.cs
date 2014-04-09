@@ -91,6 +91,11 @@ namespace AutoMapper
 
         public MemberList ConfiguredMemberList { get; private set; }
 
+        public IEnumerable<TypePair> IncludedDerivedTypes
+        {
+            get {  return _includedDerivedTypes; }
+        } 
+
         public int MaxDepth
         {
             get { return _maxDepth; }

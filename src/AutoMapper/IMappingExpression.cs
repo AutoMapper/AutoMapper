@@ -97,10 +97,18 @@ namespace AutoMapper
         /// </summary>
         /// <typeparam name="TOtherSource">Derived source type</typeparam>
         /// <typeparam name="TOtherDestination">Derived destination type</typeparam>
-        /// <returns></returns>
+        /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
             where TOtherDestination : TDestination;
+
+        /// <summary>
+        /// Include this configuration in derived types' maps
+        /// </summary>
+        /// <param name="derivedSourceType">Derived source type</param>
+        /// <param name="derivedDestinationType">Derived destination type</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> Include(Type derivedSourceType, Type derivedDestinationType);
 
         /// <summary>
         /// Assign a profile to the current type map

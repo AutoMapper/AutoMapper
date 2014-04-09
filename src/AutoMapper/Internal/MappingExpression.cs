@@ -225,7 +225,12 @@ namespace AutoMapper
             where TOtherSource : TSource
             where TOtherDestination : TDestination
         {
-            _typeMap.IncludeDerivedTypes(typeof(TOtherSource), typeof(TOtherDestination));
+            return Include(typeof(TOtherSource), typeof(TOtherDestination));
+        }
+
+        public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
+        {
+            _typeMap.IncludeDerivedTypes(otherSourceType, otherDestinationType);
 
             return this;
         }
@@ -345,6 +350,11 @@ namespace AutoMapper
             foreach (var destProperty in _typeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
             {
                 mappingExpression.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
+            }
+
+            foreach (var includedDerivedType in _typeMap.IncludedDerivedTypes)
+            {
+                mappingExpression.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
             }
 
             return mappingExpression;

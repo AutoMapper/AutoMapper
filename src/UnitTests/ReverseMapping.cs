@@ -248,6 +248,61 @@ namespace AutoMapper.UnitTests
 
         }
 
+        public class When_reverse_mapping_with_inheritance : AutoMapperSpecBase
+        {
+            private ASrc _bsrcResult;
+
+            public class ASrc
+            {
+                public string A { get; set; }
+            }
+
+            public class BSrc : ASrc
+            {
+                public string B { get; set; }
+            }
+
+            public class ADest
+            {
+                public string A { get; set; }
+            }
+
+            public class BDest : ADest
+            {
+                public string B { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<ASrc, ADest>()
+                        .Include<BSrc, BDest>()
+                        .ReverseMap();
+
+                    cfg.CreateMap<BSrc, BDest>()
+                        .ReverseMap();
+                });
+            }
+
+            protected override void Because_of()
+            {
+                var bdest = new BDest
+                {
+                    A = "A",
+                    B = "B"
+                };
+
+                _bsrcResult = Mapper.Map<ADest, ASrc>(bdest);
+            }
+
+            [Fact]
+            public void Should_create_derived_reverse_map()
+            {
+                _bsrcResult.ShouldBeType<BSrc>();
+            }
+        }
+
         public static class AutoMapperExtensions
         {
             // from http://stackoverflow.com/questions/954480/automapper-ignore-the-rest/6474397#6474397
