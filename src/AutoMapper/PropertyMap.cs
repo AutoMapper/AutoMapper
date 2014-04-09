@@ -8,6 +8,9 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
+    using System.Diagnostics;
+
+    [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
         private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();

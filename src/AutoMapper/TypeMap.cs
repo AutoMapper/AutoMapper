@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using Impl;
@@ -10,6 +11,7 @@ namespace AutoMapper
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
     /// </summary>
+    [DebuggerDisplay("{_sourceType.Type.Name} -> {_destinationType.Type.Name}")]
     public class TypeMap
     {
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
@@ -263,9 +265,34 @@ namespace AutoMapper
 
         public PropertyMap GetExistingPropertyMapFor(IMemberAccessor destinationProperty)
         {
-            return _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name))
-                   ??
-                   _inheritedMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+            var propertyMap =
+                _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+
+            if (propertyMap != null)
+                return propertyMap;
+
+            propertyMap =
+                _inheritedMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+
+            if (propertyMap == null)
+                return null;
+
+            var propertyInfo = propertyMap.DestinationProperty.MemberInfo as PropertyInfo;
+
+            if (propertyInfo == null)
+                return propertyMap;
+
+            var baseAccessor = propertyInfo.GetAccessors()[0];
+
+            if (baseAccessor.IsAbstract || baseAccessor.IsVirtual)
+                return propertyMap;
+
+            var accessor = ((PropertyInfo)destinationProperty.MemberInfo).GetAccessors()[0];
+
+            if (baseAccessor.DeclaringType == accessor.DeclaringType)
+                return propertyMap;
+
+            return null;
         }
 
         public void AddInheritedPropertyMap(PropertyMap mappedProperty)
