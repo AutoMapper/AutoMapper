@@ -330,6 +330,21 @@ namespace AutoMapper
             Condition(context => condition((TSource)context.Parent.SourceValue));
         }
 
+        public void Condition(Func<ResolutionContext, bool> condition)
+        {
+            _propertyMap.ApplyCondition(condition);
+        }
+
+        public void PreCondition(Func<TSource, bool> condition)
+        {
+            PreCondition(context => condition((TSource)context.Parent.SourceValue));
+        }
+
+        public void PreCondition(Func<ResolutionContext, bool> condition)
+        {
+            _propertyMap.ApplyPreCondition(condition);
+        }
+
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
         {
             _typeMap.MaxDepth = depth;
@@ -387,12 +402,6 @@ namespace AutoMapper
             _typeMap.Substitution = src => substituteFunc((TSource) src);
 
             return this;
-        }
-
-
-        public void Condition(Func<ResolutionContext, bool> condition)
-        {
-            _propertyMap.ApplyCondition(condition);
         }
 
         public void Ignore()

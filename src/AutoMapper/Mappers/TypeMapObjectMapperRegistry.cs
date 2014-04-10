@@ -107,7 +107,7 @@ namespace AutoMapper.Mappers
 
 			private void MapPropertyValue(ResolutionContext context, IMappingEngineRunner mapper, object mappedObject, PropertyMap propertyMap)
 			{
-				if (propertyMap.CanResolveValue())
+				if (propertyMap.CanResolveValue() && propertyMap.ShouldAssignValuePreResolving(context))
                 {
                     ResolutionResult result;
 

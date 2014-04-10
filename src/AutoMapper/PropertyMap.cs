@@ -25,6 +25,7 @@ namespace AutoMapper
         private bool _sealed;
         private IValueResolver[] _cachedResolvers;
         private Func<ResolutionContext, bool> _condition;
+        private Func<ResolutionContext, bool> _preCondition;
         private MemberInfo _sourceMember;
 
         public PropertyMap(IMemberAccessor destinationProperty)
@@ -253,9 +254,19 @@ namespace AutoMapper
             _condition = condition;
         }
 
+        public void ApplyPreCondition(Func<ResolutionContext, bool> condition)
+        {
+            _preCondition = condition;
+        }
+
         public bool ShouldAssignValue(ResolutionContext context)
         {
             return _condition == null || _condition(context);
+        }
+
+        public bool ShouldAssignValuePreResolving(ResolutionContext context)
+        {
+            return _preCondition == null || _preCondition(context);
         }
 
         public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)

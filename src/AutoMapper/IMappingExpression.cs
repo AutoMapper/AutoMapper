@@ -395,6 +395,18 @@ namespace AutoMapper
         /// </summary>
         /// <param name="condition">Condition to evaluate using the current resolution context</param>
         void Condition(Func<ResolutionContext, bool> condition);
+       
+        /// <summary>
+        /// Conditionally map this member, evaluated before accessing the source value
+        /// </summary>
+        /// <param name="condition">Condition to evaluate using the source object</param>
+        void PreCondition(Func<TSource, bool> condition);
+
+        /// <summary>
+        /// Conditionally map this member, evaluated before accessing the source value
+        /// </summary>
+        /// <param name="condition">Condition to evaluate using the current resolution context</param>
+        void PreCondition(Func<ResolutionContext, bool> condition);
     }
 
     /// <summary>

@@ -199,4 +199,47 @@
             }
         }
     }
+
+    namespace SourceValueExceptionConditionPropertyBug
+    {
+        using System;
+        using Should;
+        using Xunit;
+
+        public class Source
+        {
+            public bool Accessed = false;
+            public int Value
+            {
+                get
+                {
+                    Accessed = true;
+                    return 5;
+                }
+            }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+        public class ConditionTests : NonValidatingSpecBase
+        {
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Value, opt => opt.PreCondition((ResolutionContext rc) => false)));
+            }
+
+            [Fact]
+            public void Should_not_map()
+            {
+                var source = new Source();
+                Mapper.Map<Source, Dest>(source);
+                source.Accessed.ShouldBeFalse();
+            }
+        }
+    }
+
 }
