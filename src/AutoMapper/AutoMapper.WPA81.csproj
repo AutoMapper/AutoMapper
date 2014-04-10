@@ -98,6 +98,7 @@
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\AutoMapper.snk">

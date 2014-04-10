@@ -145,7 +145,6 @@
     <Compile Include="PropertyMap.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
     <Compile Include="Internal\ProxyBase.cs" />
-    <Compile Include="QueryableExtensions.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />
