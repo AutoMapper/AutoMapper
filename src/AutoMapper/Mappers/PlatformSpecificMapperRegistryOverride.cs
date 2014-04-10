@@ -26,9 +26,12 @@ namespace AutoMapper.Mappers
         private void InsertBefore<TObjectMapper>(IObjectMapper mapper)
             where TObjectMapper : IObjectMapper
         {
-            var targetMapper = MapperRegistry.Mappers.FirstOrDefault(om => om is TObjectMapper);
-            var index = targetMapper == null ? 0 : MapperRegistry.Mappers.IndexOf(targetMapper);
-            MapperRegistry.Mappers.Insert(index, mapper);
+            MapperRegistry.Mappers.SyncChange(list =>
+            {
+                var targetMapper = list.FirstOrDefault(om => om is TObjectMapper);
+                var index = targetMapper == null ? 0 : list.IndexOf(targetMapper);
+                list.Insert(index, mapper);
+            });
         }
     }
 }
