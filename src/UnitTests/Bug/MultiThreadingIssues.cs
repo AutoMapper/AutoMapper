@@ -10,6 +10,8 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
+    using Should;
+
     public class MultiThreadingIssues
     {
 		public class Type1
@@ -128,6 +130,126 @@ namespace AutoMapper.UnitTests.Bug
     		
 			throw new Exception();
     	}
+    }
+
+    public class DynamicMapThreadingIssues
+    {
+        public class SomeDtoA
+        {
+            private string Property1 { get; set; }
+            private string Property21 { get; set; }
+            private string Property3 { get; set; }
+            private string Property4 { get; set; }
+            private string Property5 { get; set; }
+            private string Property6 { get; set; }
+            private string Property7 { get; set; }
+            private string Property8 { get; set; }
+            private string Property9 { get; set; }
+            private string Property10 { get; set; }
+            private string Property11 { get; set; }
+        }
+
+        public class SomeDtoB
+        {
+            private string Property1 { get; set; }
+            private string Property21 { get; set; }
+            private string Property3 { get; set; }
+            private string Property4 { get; set; }
+            private string Property5 { get; set; }
+            private string Property6 { get; set; }
+            private string Property7 { get; set; }
+            private string Property8 { get; set; }
+            private string Property9 { get; set; }
+            private string Property10 { get; set; }
+            private string Property11 { get; set; }
+        }
+
+        public class SomeDtoC
+        {
+            private string Property1 { get; set; }
+            private string Property21 { get; set; }
+            private string Property3 { get; set; }
+            private string Property4 { get; set; }
+            private string Property5 { get; set; }
+            private string Property6 { get; set; }
+            private string Property7 { get; set; }
+            private string Property8 { get; set; }
+            private string Property9 { get; set; }
+            private string Property10 { get; set; }
+            private string Property11 { get; set; }
+        }
+
+        public class SomeDtoD
+        {
+            private string Property1 { get; set; }
+            private string Property21 { get; set; }
+            private string Property3 { get; set; }
+            private string Property4 { get; set; }
+            private string Property5 { get; set; }
+            private string Property6 { get; set; }
+            private string Property7 { get; set; }
+            private string Property8 { get; set; }
+            private string Property9 { get; set; }
+            private string Property10 { get; set; }
+            private string Property11 { get; set; }
+        }
+
+        [Fact]
+        public void Should_not_fail()
+        {
+            Mapper.Reset();
+
+            var tasks = Enumerable.Range(0, 5).Select(
+          i =>
+              Task.Factory.StartNew(
+                  () =>
+                  {
+                      Mapper.DynamicMap<SomeDtoA, SomeDtoB>(new SomeDtoA());
+                      Mapper.DynamicMap<SomeDtoB, SomeDtoA>(new SomeDtoB());
+                      Mapper.DynamicMap<SomeDtoC, SomeDtoD>(new SomeDtoC());
+                      Mapper.DynamicMap<SomeDtoD, SomeDtoC>(new SomeDtoD());
+                  }))
+          .ToArray();
+            Exception exception = null;
+            try
+            {
+                Task.WaitAll(tasks);
+            }
+            catch (Exception e)
+            {
+                exception = e;
+            }
+            exception.ShouldBeNull();
+            //typeof(Exception).ShouldNotBeThrownBy(() => Task.WaitAll(tasks));
+        }
+        [Fact]
+        public void Should_not_fail_with_create_map()
+        {
+            Mapper.Reset();
+
+            var tasks = Enumerable.Range(0, 5).Select(
+          i =>
+              Task.Factory.StartNew(
+                  () =>
+                  {
+                      Mapper.CreateMap<SomeDtoA, SomeDtoB>();
+                      Mapper.CreateMap<SomeDtoB, SomeDtoA>();
+                      Mapper.CreateMap<SomeDtoC, SomeDtoD>();
+                      Mapper.CreateMap<SomeDtoD, SomeDtoC>();
+                  }))
+          .ToArray();
+            Exception exception = null;
+            try
+            {
+                Task.WaitAll(tasks);
+            }
+            catch (Exception e)
+            {
+                exception = e;
+            }
+            exception.ShouldBeNull();
+            //typeof(Exception).ShouldNotBeThrownBy(() => Task.WaitAll(tasks));
+        }
     }
 }
 #endif
