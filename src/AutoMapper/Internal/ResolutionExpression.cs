@@ -22,7 +22,8 @@ namespace AutoMapper
             {
                 _propertyMap.SourceMember = (sourceMember.Body as MemberExpression).Member;
             }
-            _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember.Compile()));
+	        var func = sourceMember.Compile();
+            _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(r => func((TSource) r.Value)));
 		}
 
 		public void FromMember(string sourcePropertyName)
@@ -65,7 +66,8 @@ namespace AutoMapper
             {
                 _propertyMap.SourceMember = ((MemberExpression) sourceMember.Body).Member;
             }
-            _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(sourceMember.Compile()));
+            var func = sourceMember.Compile();
+            _propertyMap.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(r => func((TSource)r.Value)));
 
 			return this;
 		}

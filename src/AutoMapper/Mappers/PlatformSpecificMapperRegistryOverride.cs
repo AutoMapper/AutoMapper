@@ -4,6 +4,8 @@ namespace AutoMapper.Mappers
 
     public class PlatformSpecificMapperRegistryOverride : IPlatformSpecificMapperRegistry
     {
+        private object mapperLock = new object();
+
         public void Initialize()
         {
 #if !SILVERLIGHT && !NETFX_CORE && !MONODROID && !MONOTOUCH
@@ -26,9 +28,12 @@ namespace AutoMapper.Mappers
         private void InsertBefore<TObjectMapper>(IObjectMapper mapper)
             where TObjectMapper : IObjectMapper
         {
-            var targetMapper = MapperRegistry.Mappers.FirstOrDefault(om => om is TObjectMapper);
-            var index = targetMapper == null ? 0 : MapperRegistry.Mappers.IndexOf(targetMapper);
-            MapperRegistry.Mappers.Insert(index, mapper);
+            lock (mapperLock)
+            {
+                var targetMapper = MapperRegistry.Mappers.FirstOrDefault(om => om is TObjectMapper);
+                var index = targetMapper == null ? 0 : MapperRegistry.Mappers.IndexOf(targetMapper);
+                MapperRegistry.Mappers.Insert(index, mapper);
+            }
         }
     }
 }

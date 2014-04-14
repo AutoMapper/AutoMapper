@@ -4,9 +4,9 @@ namespace AutoMapper
 
 	public class DelegateBasedResolver<TSource> : IValueResolver
 	{
-		private readonly Func<TSource, object> _method;
+        private readonly Func<ResolutionResult, object> _method;
 
-		public DelegateBasedResolver(Func<TSource, object> method)
+        public DelegateBasedResolver(Func<ResolutionResult, object> method)
 		{
 			_method = method;
 		}
@@ -19,7 +19,7 @@ namespace AutoMapper
                                             source.Value.GetType());
 			}
 
-            var result = _method((TSource) source.Value);
+            var result = _method(source);
 
 			return source.New(result);
 		}

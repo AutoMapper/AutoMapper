@@ -12,6 +12,7 @@ namespace AutoMapper.Mappers
 		
 	    private static readonly IList<ITypeMapObjectMapper> _mappers = new List<ITypeMapObjectMapper>
 	    {
+	        new SubstutitionMapperStrategy(),
 	        new CustomMapperStrategy(),
 	        new NullMappingStrategy(),
 	        new CacheMappingStrategy(),
@@ -31,6 +32,21 @@ namespace AutoMapper.Mappers
 				return context.TypeMap.CustomMapper != null;
 			}
 		}
+
+	    private class SubstutitionMapperStrategy : ITypeMapObjectMapper
+	    {
+	        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+	        {
+	            var newSource = context.TypeMap.Substitution(context.SourceValue);
+	            var substitutionContext = context.CreateValueContext(newSource, newSource.GetType());
+	            return mapper.Map(substitutionContext);
+	        }
+
+	        public bool IsMatch(ResolutionContext context, IMappingEngineRunner mapper)
+	        {
+	            return context.TypeMap.Substitution != null;
+	        }
+	    }
 
 		private class NullMappingStrategy : ITypeMapObjectMapper
 		{
@@ -55,7 +71,7 @@ namespace AutoMapper.Mappers
 
 			public bool IsMatch(ResolutionContext context, IMappingEngineRunner mapper)
 			{
-				return context.DestinationValue == null && context.InstanceCache.ContainsKey(context);
+				return !context.Options.DisableCache && context.DestinationValue == null && context.InstanceCache.ContainsKey(context);
 			}
 		}
 
@@ -64,7 +80,7 @@ namespace AutoMapper.Mappers
 			public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 			{
 				var mappedObject = GetMappedObject(context, mapper);
-				if (context.SourceValue != null)
+				if (context.SourceValue != null && !context.Options.DisableCache)
                     context.InstanceCache[context] = mappedObject;
 
 				context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
@@ -91,7 +107,7 @@ namespace AutoMapper.Mappers
 
 			private void MapPropertyValue(ResolutionContext context, IMappingEngineRunner mapper, object mappedObject, PropertyMap propertyMap)
 			{
-				if (propertyMap.CanResolveValue())
+				if (propertyMap.CanResolveValue() && propertyMap.ShouldAssignValuePreResolving(context))
                 {
                     ResolutionResult result;
 
@@ -180,7 +196,9 @@ namespace AutoMapper.Mappers
 
 			protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
 			{
-				return mapper.CreateObject(context);
+				var result = mapper.CreateObject(context);
+				context.SetResolvedDestinationValue(result);
+				return result;
 			}
 		}
 
@@ -193,7 +211,9 @@ namespace AutoMapper.Mappers
 
 			protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
 			{
-				return context.DestinationValue;
+				var result = context.DestinationValue;
+				context.SetResolvedDestinationValue(result);
+				return result;
 			}
 		}
 	}

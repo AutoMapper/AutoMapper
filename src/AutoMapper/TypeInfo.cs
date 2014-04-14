@@ -8,9 +8,12 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
+    using System.Diagnostics;
+
     /// <summary>
     /// Contains cached reflection information for easy retrieval
     /// </summary>
+    [DebuggerDisplay("{Type}")]
     public class TypeInfo
     {
         private readonly MemberInfo[] _publicGetters;

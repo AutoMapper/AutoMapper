@@ -425,6 +425,15 @@ namespace AutoMapper
 		}
 
         /// <summary>
+        /// Dry run all type maps in given profile
+        /// </summary>
+        /// <typeparam name="TProfile">Profile type</typeparam>
+        public static void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new()
+        {
+			ConfigurationProvider.AssertConfigurationIsValid<TProfile>();
+		}
+
+        /// <summary>
         /// Clear out all existing configuration
         /// </summary>
 		public static void Reset()

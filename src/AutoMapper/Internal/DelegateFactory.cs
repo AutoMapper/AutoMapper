@@ -13,7 +13,7 @@ namespace AutoMapper
     {
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
 
-        private static readonly IDictionary<Type, LateBoundCtor> _ctorCache = DictionaryFactory.CreateDictionary<Type, LateBoundCtor>();
+        private readonly IDictionary<Type, LateBoundCtor> _ctorCache = DictionaryFactory.CreateDictionary<Type, LateBoundCtor>();
 
         public LateBoundMethod CreateGet(MethodInfo method)
         {
@@ -87,9 +87,30 @@ namespace AutoMapper
         {
             LateBoundCtor ctor = _ctorCache.GetOrAdd(type, t =>
             {
-                var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
+                //handle valuetypes
+                if (!type.IsClass)
+                {
+                    var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
+                    return ctorExpression.Compile();
+                }
+                else 
+                {
+                    var constructors = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                    
+                    //find a ctor with only optional args
+                    var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
+                    if (ctorWithOptionalArgs == null)
+                        throw new ArgumentException("Type needs to have a constructor with 0 args or only optional args", "type");
 
-                return ctorExpression.Compile();
+                    //get all optional default values
+                    var args = ctorWithOptionalArgs
+                        .GetParameters()
+                        .Select(p => Expression.Constant(p.DefaultValue,p.ParameterType)).ToArray();
+
+                    //create the ctor expression
+                    var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(ctorWithOptionalArgs,args), typeof(object)));
+                    return ctorExpression.Compile();
+                }
             });
 
             return ctor;

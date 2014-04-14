@@ -58,7 +58,7 @@ namespace AutoMapper.Mappers
             {
                 var configurationProvider = mapper.ConfigurationProvider;
                 TypeMap typeMap = configurationProvider.FindTypeMapFor(context.SourceValue, context.DestinationValue, context.SourceType, destinationElementType);
-                resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType, new MappingOperationOptions());
+                resolveUsingContext = new ResolutionContext(typeMap, context.SourceValue, context.SourceType, destinationElementType, new MappingOperationOptions(), (IMappingEngine)mapper);
             }
 
             var buildFrom = CreateBuilder(destinationElementType, dataReader);
@@ -268,7 +268,10 @@ namespace AutoMapper.Mappers
                 if (builderKey == null)
                     return false;
 
-                if (this._dataRecordNames.Count != builderKey._dataRecordNames.Count)
+                if (_dataRecordNames.Count != builderKey._dataRecordNames.Count)
+                    return false;
+
+                if (_destinationType != builderKey._destinationType)
                     return false;
 
                 for (int i = 0; i < _dataRecordNames.Count; i++)

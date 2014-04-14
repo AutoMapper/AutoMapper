@@ -92,4 +92,154 @@
             }
         }
     }
+
+    namespace ConditionPropertyBug
+    {
+        using System;
+        using Should;
+        using Xunit;
+
+        public class Example : AutoMapperSpecBase
+        {
+            public class Source
+            {
+                private int basePrice;
+                public bool HasBasePrice { get; set; }
+                public int BasePrice
+                {
+                    get
+                    {
+                        if (!HasBasePrice)
+                            throw new InvalidOperationException("Has no base price");
+
+                        return basePrice;
+                    }
+                    set
+                    {
+                        basePrice = value;
+                        HasBasePrice = true;
+                    }
+                }
+            }
+
+            public class Destination
+            {
+                public int BasePrice { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
+                    .ForMember(itemDTO => itemDTO.BasePrice,
+                        config =>
+                        {
+                            config.Condition(item => item.HasBasePrice);
+                            config.MapFrom(item => item.BasePrice);
+                        }));
+            }
+
+            [Fact]
+            public void Should_skip_the_mapping_when_the_condition_property_is_false()
+            {
+                var src = new Source();
+                var dest = Mapper.Map<Source, Destination>(src);
+
+                dest.BasePrice.ShouldEqual(0);
+            }
+
+            [Fact]
+            public void Should_execute_the_mapping_when_the_condition_property_is_true()
+            {
+                var src = new Source {BasePrice = 15};
+                var dest = Mapper.Map<Source, Destination>(src);
+
+                dest.BasePrice.ShouldEqual(src.BasePrice);
+            }
+        }
+    }
+
+
+    namespace SourceValueConditionPropertyBug
+    {
+        using Should;
+        using Xunit;
+
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public int? Value { get; set; }
+        }
+
+        public class ConditionTests : AutoMapperSpecBase
+        {
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Value, opt => opt.Condition(rc => rc.DestinationValue == null)));
+            }
+
+            [Fact]
+            public void Should_map_value_when_null()
+            {
+                var destination = new Dest();
+                Mapper.Map(new Source {Value = 5}, destination);
+                destination.Value.ShouldEqual(5);
+            }
+
+            [Fact]
+            public void Should_not_map_value_when_not_null()
+            {
+                var destination = new Dest { Value = 6};
+                Mapper.Map(new Source {Value = 5}, destination);
+                destination.Value.ShouldEqual(6);
+            }
+        }
+    }
+
+    namespace SourceValueExceptionConditionPropertyBug
+    {
+        using System;
+        using Should;
+        using Xunit;
+
+        public class Source
+        {
+            public bool Accessed = false;
+            public int Value
+            {
+                get
+                {
+                    Accessed = true;
+                    return 5;
+                }
+            }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+        public class ConditionTests : NonValidatingSpecBase
+        {
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Value, opt => opt.PreCondition((ResolutionContext rc) => false)));
+            }
+
+            [Fact]
+            public void Should_not_map()
+            {
+                var source = new Source();
+                Mapper.Map<Source, Dest>(source);
+                source.Accessed.ShouldBeFalse();
+            }
+        }
+    }
+
 }

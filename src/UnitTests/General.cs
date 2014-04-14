@@ -393,5 +393,41 @@ namespace AutoMapper.UnitTests
             }
 
         }
+
+	    public class When_mapping_tuples : AutoMapperSpecBase
+	    {
+	        private Dest _dest;
+
+	        public class Source
+	        {
+	            public Tuple<int, int> Value { get; set; }
+	        }
+	        public class Dest
+	        {
+	            public Tuple<int, int> Value { get; set; }
+	        }
+
+	        protected override void Establish_context()
+	        {
+	            Mapper.CreateMap<Source, Dest>();
+	        }
+
+	        protected override void Because_of()
+	        {
+	            var source = new Source
+	            {
+	                Value = new Tuple<int, int>(10, 11)
+	            };
+	            _dest = Mapper.Map<Source, Dest>(source);
+	        }
+
+	        [Fact]
+	        public void Should_map_tuple()
+	        {
+	            _dest.Value.ShouldNotBeNull();
+                _dest.Value.Item1.ShouldEqual(10);
+                _dest.Value.Item2.ShouldEqual(11);
+	        }
+	    }
     }
 }

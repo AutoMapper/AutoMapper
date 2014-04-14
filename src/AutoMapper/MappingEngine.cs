@@ -115,7 +115,7 @@ namespace AutoMapper
 
             opts(options);
 
-	        var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options);
+	        var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, this);
 
             return ((IMappingEngineRunner)this).Map(context);
 	    }
@@ -133,7 +133,7 @@ namespace AutoMapper
 
             opts(options);
 
-	        var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options);
+	        var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, this);
 
             return ((IMappingEngineRunner)this).Map(context);
         }
@@ -171,7 +171,7 @@ namespace AutoMapper
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions
 			{
 			    CreateMissingTypeMaps = true
-			});
+			}, this);
 
 			return ((IMappingEngineRunner)this).Map(context);
 		}
@@ -184,7 +184,7 @@ namespace AutoMapper
 			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions
 			{
 			    CreateMissingTypeMaps = true
-			});
+			}, this);
 
 			((IMappingEngineRunner)this).Map(context);
 		}

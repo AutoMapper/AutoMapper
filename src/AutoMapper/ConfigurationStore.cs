@@ -276,7 +276,10 @@ namespace AutoMapper
                                          m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
 
                     if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
+                    {
                         conventionPropertyMap.AssignCustomValueResolver(inheritedMappedProperty.GetSourceValueResolvers().First());
+                        conventionPropertyMap.AssignCustomExpression(inheritedMappedProperty.CustomExpression);
+                    }
                     else if (conventionPropertyMap == null)
                     {
                         var propertyMap = new PropertyMap(inheritedMappedProperty);
@@ -453,6 +456,12 @@ namespace AutoMapper
 			AssertConfigurationIsValid(_typeMaps.Where(typeMap => typeMap.Profile == profileName));
 		}
 
+		public void AssertConfigurationIsValid<TProfile>()
+            where TProfile : Profile, new()
+		{
+			AssertConfigurationIsValid(new TProfile().ProfileName);
+		}
+
 		public void AssertConfigurationIsValid()
 		{
 			AssertConfigurationIsValid(_typeMaps);
@@ -467,8 +476,11 @@ namespace AutoMapper
 		{
 			IMappingExpression<TSource, TDestination> mappingExp =
 				new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, this);
-			// Custom Hack
-			var destInfo = new TypeInfo(typeof(TDestination));
+
+		    TypeInfo destInfo = typeMap.ConfiguredMemberList == MemberList.Destination 
+		        ? new TypeInfo(typeof(TDestination)) 
+		        : new TypeInfo(typeof(TSource));
+
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
 			{
 				object[] attrs = destProperty.GetCustomAttributes(true);
@@ -517,7 +529,7 @@ namespace AutoMapper
 
 			foreach (var typeMap in _typeMaps)
 			{
-				DryRunTypeMap(typeMapsChecked, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType, new MappingOperationOptions()));
+				DryRunTypeMap(typeMapsChecked, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType, new MappingOperationOptions(), Mapper.Engine));
 			}
 		}
 

@@ -10,10 +10,8 @@ namespace AutoMapper
 {
     public class TypeMapFactory : ITypeMapFactory
     {
-        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
-        private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos =
-            DictionaryFactory.CreateDictionary<Type, TypeInfo>();
-        //private readonly MemberInfo[] 
+        private readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
+            = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeInfo>();
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
         {
@@ -75,7 +73,7 @@ namespace AutoMapper
             return true;
         }
 
-        private static TypeInfo GetTypeInfo(Type type, IEnumerable<MethodInfo> extensionMethodsToSearch)
+        private TypeInfo GetTypeInfo(Type type, IEnumerable<MethodInfo> extensionMethodsToSearch)
         {
             TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, extensionMethodsToSearch));
 

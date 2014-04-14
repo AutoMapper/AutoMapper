@@ -58,12 +58,17 @@ namespace AutoMapper
         /// </summary>
 	    public Dictionary<ResolutionContext, object> InstanceCache { get; private set; }
 
-        public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType, MappingOperationOptions options)
-			: this(typeMap, source, null, sourceType, destinationType, options)
+        /// <summary>
+        /// Current mapping engine
+        /// </summary>
+        public IMappingEngine Engine { get; private set; }
+
+        public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType, MappingOperationOptions options, IMappingEngine engine)
+			: this(typeMap, source, null, sourceType, destinationType, options, engine)
 	    {
 	    }
 
-        public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType, Type destinationType, MappingOperationOptions options)
+        public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType, Type destinationType, MappingOperationOptions options, IMappingEngine engine)
 		{
 			TypeMap = typeMap;
 			SourceValue = source;
@@ -71,6 +76,12 @@ namespace AutoMapper
             AssignTypes(typeMap, sourceType, destinationType);
 			InstanceCache = new Dictionary<ResolutionContext, object>();
             Options = options;
+            Engine = engine;
+        }
+
+        public void SetResolvedDestinationValue(object destintationValue)
+        {
+            DestinationValue = destintationValue;
         }
 
         private void AssignTypes(TypeMap typeMap, Type sourceType, Type destinationType)
@@ -99,6 +110,7 @@ namespace AutoMapper
 			DestinationType = context.DestinationType;
 			InstanceCache = context.InstanceCache;
             Options = context.Options;
+		    Engine = context.Engine;
 		}
 
 		private ResolutionContext(ResolutionContext context, object sourceValue, Type sourceType)
@@ -113,6 +125,7 @@ namespace AutoMapper
 			DestinationType = context.DestinationType;
 			InstanceCache = context.InstanceCache;
             Options = context.Options;
+            Engine = context.Engine;
         }
 
         private ResolutionContext(ResolutionContext context, TypeMap memberTypeMap, object sourceValue, object destinationValue, Type sourceType, Type destinationType)
@@ -124,6 +137,7 @@ namespace AutoMapper
             AssignTypes(memberTypeMap, sourceType, destinationType);
             InstanceCache = context.InstanceCache;
             Options = context.Options;
+            Engine = context.Engine;
         }
 
 	    private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, TypeMap memberTypeMap, PropertyMap propertyMap)
@@ -137,6 +151,7 @@ namespace AutoMapper
             SourceType = memberTypeMap.SourceType;
             DestinationType = memberTypeMap.DestinationType;
             Options = context.Options;
+            Engine = context.Engine;
         }
 
 		private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, Type sourceType, PropertyMap propertyMap)
@@ -149,6 +164,7 @@ namespace AutoMapper
 			DestinationType = propertyMap.DestinationProperty.MemberType;
 			InstanceCache = context.InstanceCache;
             Options = context.Options;
+            Engine = context.Engine;
         }
 
 		private ResolutionContext(ResolutionContext context, object sourceValue, TypeMap typeMap, Type sourceType, Type destinationType, int arrayIndex)
@@ -161,6 +177,7 @@ namespace AutoMapper
 			InstanceCache = context.InstanceCache;
             AssignTypes(typeMap, sourceType, destinationType);
             Options = context.Options;
+            Engine = context.Engine;
         }
 
 		public string MemberName
@@ -179,6 +196,7 @@ namespace AutoMapper
 		{
 			get { return Equals(null, SourceValue); }
 		}
+
 
 		public ResolutionContext CreateValueContext(object sourceValue)
 		{
@@ -270,7 +288,7 @@ namespace AutoMapper
 
 		public static ResolutionContext New<TSource>(TSource sourceValue)
 		{
-			return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions());
+			return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions(), Mapper.Engine);
 		}
 	}
 

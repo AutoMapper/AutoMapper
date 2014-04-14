@@ -151,6 +151,7 @@
     <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs" />
+    <Compile Include="Bug\SetterOnlyBug.cs" />
     <Compile Include="Bug\SubclassMappings.cs" />
     <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />

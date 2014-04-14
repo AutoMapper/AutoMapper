@@ -81,14 +81,34 @@ namespace AutoMapper
         void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
 
         /// <summary>
+        /// Ignores all <typeparamref name="TDestination"/> properties that have either a private or protected setter, forcing the mapper to respect encapsulation (note: order matters, so place this before explicit configuration of any properties with an inaccessible setter)
+        /// </summary>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter();
+
+        /// <summary>
+        /// When using ReverseMap, ignores all <typeparamref name="TSource"/> properties that have either a private or protected setter, keeping the reverse mapping consistent with the forward mapping (note: <typeparamref name="TDestination"/> properties with an inaccessible setter may still be mapped unless IgnoreAllPropertiesWithAnInaccessibleSetter is also used)
+        /// </summary>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+
+        /// <summary>
         /// Include this configuration in derived types' maps
         /// </summary>
         /// <typeparam name="TOtherSource">Derived source type</typeparam>
         /// <typeparam name="TOtherDestination">Derived destination type</typeparam>
-        /// <returns></returns>
+        /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
             where TOtherDestination : TDestination;
+
+        /// <summary>
+        /// Include this configuration in derived types' maps
+        /// </summary>
+        /// <param name="derivedSourceType">Derived source type</param>
+        /// <param name="derivedDestinationType">Derived destination type</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> Include(Type derivedSourceType, Type derivedDestinationType);
 
         /// <summary>
         /// Assign a profile to the current type map
@@ -197,6 +217,14 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member configuration options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
+
+        /// <summary>
+        /// Replace the original runtime instance with a new source instance. Useful when ORMs return proxy types with no relationships to runtime types.
+        /// The returned source object will be mapped instead of what was supplied in the original source object.
+        /// </summary>
+        /// <param name="substituteFunc">Substitution function</param>
+        /// <returns>New source object to map.</returns>
+        IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc);
     }
 
     /// <summary>
@@ -306,6 +334,14 @@ namespace AutoMapper
         void ResolveUsing(Func<TSource, object> resolver);
 
         /// <summary>
+        /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
+        /// Access both the source object and current resolution context for additional mapping, context items and parent objects
+        /// This method cannot be used in conjunction with LINQ query projection
+        /// </summary>
+        /// <param name="resolver">Callback function to resolve against source type</param>
+        void ResolveUsing(Func<ResolutionResult, object> resolver);
+
+        /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
         /// This method can be used in mapping to LINQ query projections, while ResolveUsing cannot.
         /// Any null reference exceptions in this expression will be ignored (similar to flattening behavior)
@@ -359,6 +395,18 @@ namespace AutoMapper
         /// </summary>
         /// <param name="condition">Condition to evaluate using the current resolution context</param>
         void Condition(Func<ResolutionContext, bool> condition);
+       
+        /// <summary>
+        /// Conditionally map this member, evaluated before accessing the source value
+        /// </summary>
+        /// <param name="condition">Condition to evaluate using the source object</param>
+        void PreCondition(Func<TSource, bool> condition);
+
+        /// <summary>
+        /// Conditionally map this member, evaluated before accessing the source value
+        /// </summary>
+        /// <param name="condition">Condition to evaluate using the current resolution context</param>
+        void PreCondition(Func<ResolutionContext, bool> condition);
     }
 
     /// <summary>

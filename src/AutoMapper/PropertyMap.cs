@@ -8,6 +8,9 @@ using AutoMapper.Internal;
 
 namespace AutoMapper
 {
+    using System.Diagnostics;
+
+    [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
         private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
@@ -22,6 +25,7 @@ namespace AutoMapper
         private bool _sealed;
         private IValueResolver[] _cachedResolvers;
         private Func<ResolutionContext, bool> _condition;
+        private Func<ResolutionContext, bool> _preCondition;
         private MemberInfo _sourceMember;
 
         public PropertyMap(IMemberAccessor destinationProperty)
@@ -45,6 +49,7 @@ namespace AutoMapper
             ApplyCondition(inheritedMappedProperty._condition);
             SetNullSubstitute(inheritedMappedProperty._nullSubstitute);
             SetMappingOrder(inheritedMappedProperty._mappingOrder);
+            CustomExpression = inheritedMappedProperty.CustomExpression;
         }
 
         public IMemberAccessor DestinationProperty { get; private set; }
@@ -154,7 +159,12 @@ namespace AutoMapper
         {
             return _valueFormatters.ToArray();
         }
-
+        
+        public void AssignCustomExpression(LambdaExpression customExpression)
+        {
+            CustomExpression = customExpression;
+        }
+        
         public void AssignCustomValueResolver(IValueResolver valueResolver)
         {
             _ignored = false;
@@ -244,9 +254,19 @@ namespace AutoMapper
             _condition = condition;
         }
 
+        public void ApplyPreCondition(Func<ResolutionContext, bool> condition)
+        {
+            _preCondition = condition;
+        }
+
         public bool ShouldAssignValue(ResolutionContext context)
         {
             return _condition == null || _condition(context);
+        }
+
+        public bool ShouldAssignValuePreResolving(ResolutionContext context)
+        {
+            return _preCondition == null || _preCondition(context);
         }
 
         public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
@@ -270,86 +290,6 @@ namespace AutoMapper
                 : null;
         }
 
-        public ExpressionResolutionResult ResolveExpression(Type currentType, Expression instanceParameter)
-        {
-            Expression currentChild = instanceParameter;
-            Type currentChildType = currentType;
-            foreach (var resolver in GetSourceValueResolvers())
-            {
-                var getter = resolver as IMemberGetter;
-                if (getter != null)
-                {
-                    var memberInfo = getter.MemberInfo;
-
-                    var propertyInfo = memberInfo as PropertyInfo;
-                    if (propertyInfo != null)
-                    {
-                        currentChild = Expression.Property(currentChild, propertyInfo);
-                        currentChildType = propertyInfo.PropertyType;
-                    }
-                    else
-                    {
-                        throw new NotImplementedException("Expressions mapping from methods not supported yet.");
-                    }
-                }
-                else
-                {
-                    var oldParameter = CustomExpression.Parameters.Single();
-                    var newParameter = instanceParameter;
-                    var converter = new ConversionVisitor(newParameter, oldParameter);
-                    
-                    currentChild = converter.Visit(CustomExpression.Body);
-                    currentChildType = currentChild.Type;
-                }
-            }
-
-            return new ExpressionResolutionResult(currentChild, currentChildType);
-        }
-
-        /// <summary>
-        /// This expression visitor will replace an input parameter by another one
-        /// 
-        /// see http://stackoverflow.com/questions/4601844/expression-tree-copy-or-convert
-        /// </summary>
-        private class ConversionVisitor : ExpressionVisitor
-        {
-            private readonly Expression newParameter;
-            private readonly ParameterExpression oldParameter;
-
-            public ConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
-            {
-                this.newParameter = newParameter;
-                this.oldParameter = oldParameter;
-            }
-
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                // replace all old param references with new ones
-                return node.Type == oldParameter.Type ? newParameter : node;
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node.Expression != oldParameter) // if instance is not old parameter - do nothing
-                    return base.VisitMember(node);
-
-                var newObj = Visit(node.Expression);
-                var newMember = newParameter.Type.GetMember(node.Member.Name).First();
-                return Expression.MakeMemberAccess(newObj, newMember);
-            }
-        }
-
     }
 
-    public class ExpressionResolutionResult
-    {
-        public Expression ResolutionExpression { get; private set; }
-        public Type Type { get; private set; }
-
-        public ExpressionResolutionResult(Expression resolutionExpression, Type type)
-        {
-            ResolutionExpression = resolutionExpression;
-            Type = type;
-        }
-    }
 }

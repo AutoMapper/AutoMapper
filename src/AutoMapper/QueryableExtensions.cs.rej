@@ -1,0 +1,19 @@
+diff a/src/AutoMapper/QueryableExtensions.cs b/src/AutoMapper/QueryableExtensions.cs	(rejected hunks)
+@@ -115,15 +115,14 @@
+                 else if (propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
+                     propertyMap.DestinationPropertyType != typeof(string))
+                 {
+-                    Type destinationListType = GetDestinationListTypeFor(propertyMap);
++                    Type destinationListType = propertyMap.DestinationPropertyType.GetGenericArguments().First();
+                     Type sourceListType = null;
+                     // is list
+ 
+                     sourceListType = result.Type.GetGenericArguments().First();
+-                    var listTypePair = new TypePair(sourceListType, destinationListType);
+ 
+                     //var newVariableName = "t" + (i++);
+-                    var transformedExpression = CreateMapExpression(mappingEngine, listTypePair, typePairCount);
++                    var transformedExpression = CreateMapExpression(mappingEngine, sourceListType, destinationListType);
+ 
+                     MethodCallExpression selectExpression = Expression.Call(
+                         typeof(Enumerable),

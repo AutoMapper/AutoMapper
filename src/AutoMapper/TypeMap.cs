@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using Impl;
@@ -10,6 +11,7 @@ namespace AutoMapper
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
     /// </summary>
+    [DebuggerDisplay("{_sourceType.Type.Name} -> {_destinationType.Type.Name}")]
     public class TypeMap
     {
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
@@ -27,6 +29,7 @@ namespace AutoMapper
         private bool _sealed;
         private Func<ResolutionContext, bool> _condition;
         private ConstructorMap _constructorMap;
+        private int _maxDepth = Int32.MaxValue;
 
         public TypeMap(TypeInfo sourceType, TypeInfo destinationType, MemberList memberList)
         {
@@ -87,6 +90,23 @@ namespace AutoMapper
         public bool ConstructDestinationUsingServiceLocator { get; set; }
 
         public MemberList ConfiguredMemberList { get; private set; }
+
+        public IEnumerable<TypePair> IncludedDerivedTypes
+        {
+            get {  return _includedDerivedTypes; }
+        } 
+
+        public int MaxDepth
+        {
+            get { return _maxDepth; }
+            set
+            {
+                _maxDepth = value;
+                SetCondition(o => PassesDepthCheck(o, value));
+            }
+        }
+
+        public Func<object, object> Substitution { get; set; }
 
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {
@@ -250,9 +270,34 @@ namespace AutoMapper
 
         public PropertyMap GetExistingPropertyMapFor(IMemberAccessor destinationProperty)
         {
-            return _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name))
-                   ??
-                   _inheritedMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+            var propertyMap =
+                _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+
+            if (propertyMap != null)
+                return propertyMap;
+
+            propertyMap =
+                _inheritedMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
+
+            if (propertyMap == null)
+                return null;
+
+            var propertyInfo = propertyMap.DestinationProperty.MemberInfo as PropertyInfo;
+
+            if (propertyInfo == null)
+                return propertyMap;
+
+            var baseAccessor = propertyInfo.GetAccessors()[0];
+
+            if (baseAccessor.IsAbstract || baseAccessor.IsVirtual)
+                return propertyMap;
+
+            var accessor = ((PropertyInfo)destinationProperty.MemberInfo).GetAccessors()[0];
+
+            if (baseAccessor.DeclaringType == accessor.DeclaringType)
+                return propertyMap;
+
+            return null;
         }
 
         public void AddInheritedPropertyMap(PropertyMap mappedProperty)
@@ -295,6 +340,32 @@ namespace AutoMapper
             }
 
             return config;
+        }
+
+        private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
+        {
+            if (context.InstanceCache.ContainsKey(context))
+            {
+                // return true if we already mapped this value and it's in the cache
+                return true;
+            }
+
+            ResolutionContext contextCopy = context;
+
+            int currentDepth = 1;
+
+            // walk parents to determine current depth
+            while (contextCopy.Parent != null)
+            {
+                if (contextCopy.SourceType == context.TypeMap.SourceType &&
+                    contextCopy.DestinationType == context.TypeMap.DestinationType)
+                {
+                    // same source and destination types appear higher up in the hierarchy
+                    currentDepth++;
+                }
+                contextCopy = contextCopy.Parent;
+            }
+            return currentDepth <= maxDepth;
         }
     }
 }

@@ -1,4 +1,4 @@
-<img src="http://automapper.org/img/white_logo.png" alt="AutoMapper" width="498" height="51">
+<img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper">
 ================================
 
 What is AutoMapper?

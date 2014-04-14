@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Build sequence modification -->
+  <Target Name="CopyAutoMapperAssembly"
+          AfterTargets="ResolveAssemblyReferences">
+    <CreateItem Include="%(ReferencePath.FullPath)"
+                Condition="$([System.String]::new('%(ReferencePath.Filename)').StartsWith('AutoMapper.'))">
+      <Output TaskParameter="Include"
+              ItemName="_AutoMapperReference"/>
+    </CreateItem>
+
+    <Message Importance="low" Text="AutoMapper Platform Extension Assembly: %(_AutoMapperReference.FullPath)"/>
+
+    <ItemGroup>
+      <Content Include="$([MSBuild]::MakeRelative($(MSBuildProjectDirectory), %(_AutoMapperReference.FullPath)))" Condition="'%(_AutoMapperReference.FullPath)' != ''">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+  </Target>
+</Project>

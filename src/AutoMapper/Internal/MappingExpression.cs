@@ -199,11 +199,38 @@ namespace AutoMapper
             typeInfo.GetPublicWriteAccessors().Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }
 
+        public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
+        {
+            var properties = typeof(TDestination).GetProperties().Where(HasAnInaccessibleSetter);
+            foreach (var property in properties)
+                ForMember(property.Name, opt => opt.Ignore());
+            return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor, _configurationContainer);
+        }
+
+        public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
+        {
+            var properties = typeof(TSource).GetProperties().Where(HasAnInaccessibleSetter);
+            foreach (var property in properties)
+                ForSourceMember(property.Name, opt => opt.Ignore());
+            return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor, _configurationContainer);
+        }
+
+        private bool HasAnInaccessibleSetter(PropertyInfo property)
+        {
+            var setMethod = property.GetSetMethod(true);
+            return setMethod == null || setMethod.IsPrivate || setMethod.IsFamily;
+        }
+
         public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
             where TOtherDestination : TDestination
         {
-            _typeMap.IncludeDerivedTypes(typeof(TOtherSource), typeof(TOtherDestination));
+            return Include(typeof(TOtherSource), typeof(TOtherDestination));
+        }
+
+        public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
+        {
+            _typeMap.IncludeDerivedTypes(otherSourceType, otherDestinationType);
 
             return this;
         }
@@ -275,6 +302,11 @@ namespace AutoMapper
 
         public void ResolveUsing(Func<TSource, object> resolver)
         {
+            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver((TSource)r.Value)));
+        }
+
+        public void ResolveUsing(Func<ResolutionResult, object> resolver)
+        {
             _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver));
         }
 
@@ -298,9 +330,24 @@ namespace AutoMapper
             Condition(context => condition((TSource)context.Parent.SourceValue));
         }
 
+        public void Condition(Func<ResolutionContext, bool> condition)
+        {
+            _propertyMap.ApplyCondition(condition);
+        }
+
+        public void PreCondition(Func<TSource, bool> condition)
+        {
+            PreCondition(context => condition((TSource)context.Parent.SourceValue));
+        }
+
+        public void PreCondition(Func<ResolutionContext, bool> condition)
+        {
+            _propertyMap.ApplyPreCondition(condition);
+        }
+
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
         {
-            _typeMap.SetCondition(o => PassesDepthCheck(o, depth));
+            _typeMap.MaxDepth = depth;
             return this;
         }
 
@@ -313,7 +360,19 @@ namespace AutoMapper
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            return _configurationContainer.CreateMap<TDestination, TSource>(MemberList.Source);
+            var mappingExpression = _configurationContainer.CreateMap<TDestination, TSource>(MemberList.Source);
+
+            foreach (var destProperty in _typeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
+            {
+                mappingExpression.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
+            }
+
+            foreach (var includedDerivedType in _typeMap.IncludedDerivedTypes)
+            {
+                mappingExpression.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
+            }
+
+            return mappingExpression;
         }
 
         public IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions)
@@ -338,35 +397,11 @@ namespace AutoMapper
             return this;
         }
 
-        private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
+        public IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc)
         {
-            if (context.InstanceCache.ContainsKey(context))
-            {
-                // return true if we already mapped this value and it's in the cache
-                return true;
-            }
+            _typeMap.Substitution = src => substituteFunc((TSource) src);
 
-            ResolutionContext contextCopy = context;
-
-            int currentDepth = 1;
-
-            // walk parents to determine current depth
-            while (contextCopy.Parent != null)
-            {
-                if (contextCopy.SourceType == context.TypeMap.SourceType &&
-                    contextCopy.DestinationType == context.TypeMap.DestinationType)
-                {
-                    // same source and destination types appear higher up in the hierarchy
-                    currentDepth++;
-                }
-                contextCopy = contextCopy.Parent;
-            }
-            return currentDepth <= maxDepth;
-        }
-
-        public void Condition(Func<ResolutionContext, bool> condition)
-        {
-            _propertyMap.ApplyCondition(condition);
+            return this;
         }
 
         public void Ignore()

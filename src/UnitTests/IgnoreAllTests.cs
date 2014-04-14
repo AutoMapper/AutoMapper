@@ -94,4 +94,38 @@ namespace AutoMapper.UnitTests
             destination.ShouldNotBeMapped.ShouldEqual(null);
 		}
 	}
+
+    public class ReverseMapIgnoreAttributeTests
+    {
+        public class Source
+        {
+            public string ShouldBeMapped { get; set; }
+            public string ShouldNotBeMapped { get; set; }
+        }
+
+        public class Destination
+        {
+            public string ShouldBeMapped { get; set; }
+            [IgnoreMap]
+            public string ShouldNotBeMapped { get; set; }
+        }
+
+        [Fact]
+        public void Ignore_On_Source_Field()
+        {
+            Mapper.CreateMap<Source, Destination>()
+                .ReverseMap();
+            Mapper.AssertConfigurationIsValid();
+
+            Destination source = new Destination
+            {
+                ShouldBeMapped = "Value1",
+                ShouldNotBeMapped = "Value2"
+            };
+
+            Source destination = Mapper.Map<Destination, Source>(source);
+            destination.ShouldNotBeMapped.ShouldEqual(null);
+
+        }
+    }
 }

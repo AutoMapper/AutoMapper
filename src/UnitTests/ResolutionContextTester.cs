@@ -12,7 +12,7 @@ namespace AutoMapper.UnitTests
 		{
 			var map = new TypeMap(new TypeInfo(typeof(int)), new TypeInfo(typeof(string)), MemberList.Destination);
 
-			var context = new ResolutionContext(map, 5, typeof(int), typeof(string), new MappingOperationOptions());
+			var context = new ResolutionContext(map, 5, typeof(int), typeof(string), new MappingOperationOptions(), Mapper.Engine);
 
 			ResolutionContext newContext = context.CreateValueContext(10);
 
