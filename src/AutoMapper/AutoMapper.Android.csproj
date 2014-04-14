@@ -56,7 +56,6 @@
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
-    <Compile Include="QueryableExtensions.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
   </ItemGroup>
   <ItemGroup>
