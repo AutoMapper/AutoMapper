@@ -117,6 +117,7 @@ using System.Runtime.InteropServices;
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+[assembly: CLSCompliant(true)]
 [assembly: AssemblyVersionAttribute(""$assemblyVersion"")]
 [assembly: AssemblyFileVersionAttribute(""$assemblyFileVersion"")]
 [assembly: AssemblyCopyrightAttribute(""Copyright Jimmy Bogard 2008-" + $date.Year + """)]
