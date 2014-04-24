@@ -33,6 +33,7 @@ task release {
 
 task compile -depends clean { 
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
+    exec { msbuild /t:Clean /t:Build /p:Configuration=ReleaseWin8 /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
 }
 
 task commonAssemblyInfo {
@@ -52,6 +53,7 @@ task dist {
 	create_directory $build_dir
 	create_directory $dist_dir
 	copy_files "$source_dir\AutoMapper\bin\Net4\$config" "$dist_dir\net40"
+	copy_files "$source_dir\AutoMapper\bin\Profile136\$config" "$dist_dir\Profile136"
 	copy_files "$source_dir\AutoMapper\bin\sl5\$config" "$dist_dir\sl5"
 	copy_files "$source_dir\AutoMapper\bin\wp8\$config" "$dist_dir\wp8"
 	copy_files "$source_dir\AutoMapper\bin\wpa81\$config" "$dist_dir\wpa81"
@@ -142,26 +144,29 @@ function global:create-nuspec($version, $fileName)
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
   </metadata>
   <files>
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch"" />
     <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp8+wpa81+sl5+MonoAndroid+MonoTouch"" />
     <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp8+wpa81+sl5+MonoAndroid+MonoTouch"" />
     <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp8+wpa81+sl5+MonoAndroid+MonoTouch"" />
-    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\net40"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\net40"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\net40"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.Net4.dll"" target=""lib\net40"" />
     <file src=""$dist_dir\net40\AutoMapper.Net4.pdb"" target=""lib\net40"" />
     <file src=""$source_dir\install.ps1"" target=""tools\net40"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\net40"" />
-    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\sl5"" />
-    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\sl5"" />
-    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\sl5"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\sl5"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\sl5"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\sl5"" />
     <file src=""$dist_dir\sl5\AutoMapper.SL5.dll"" target=""lib\sl5"" />
     <file src=""$dist_dir\sl5\AutoMapper.SL5.pdb"" target=""lib\sl5"" />
     <file src=""$source_dir\install.ps1"" target=""tools\sl5"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\sl5"" />
-    <file src=""$dist_dir\wp8\AutoMapper.dll"" target=""lib\wp8"" />
-    <file src=""$dist_dir\wp8\AutoMapper.pdb"" target=""lib\wp8"" />
-    <file src=""$dist_dir\wp8\AutoMapper.xml"" target=""lib\wp8"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\wp8"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\wp8"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\wp8"" />
     <file src=""$dist_dir\wp8\AutoMapper.WP8.dll"" target=""lib\wp8"" />
     <file src=""$dist_dir\wp8\AutoMapper.WP8.pdb"" target=""lib\wp8"" />
     <file src=""$source_dir\install.ps1"" target=""tools\wp8"" />
@@ -173,23 +178,23 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\wpa81\AutoMapper.WPA81.pdb"" target=""lib\wpa81"" />
     <file src=""$source_dir\install.ps1"" target=""tools\wpa81"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\wpa81"" />
-    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\windows8"" />
-    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\windows8"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\windows8"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\windows8"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.WinRT.dll"" target=""lib\windows8"" />
     <file src=""$dist_dir\windows8\AutoMapper.WinRT.pdb"" target=""lib\windows8"" />
     <file src=""$source_dir\install.ps1"" target=""tools\windows8"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\windows8"" />
-    <file src=""$dist_dir\MonoAndroid\AutoMapper.dll"" target=""lib\MonoAndroid"" />
-    <file src=""$dist_dir\MonoAndroid\AutoMapper.pdb"" target=""lib\MonoAndroid"" />
-    <file src=""$dist_dir\MonoAndroid\AutoMapper.xml"" target=""lib\MonoAndroid"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\MonoAndroid"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\MonoAndroid"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\MonoAndroid"" />
     <file src=""$dist_dir\MonoAndroid\AutoMapper.Android.dll"" target=""lib\MonoAndroid"" />
     <file src=""$dist_dir\MonoAndroid\AutoMapper.Android.pdb"" target=""lib\MonoAndroid"" />
     <file src=""$source_dir\install.ps1"" target=""tools\MonoAndroid"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\MonoAndroid"" />
-    <file src=""$dist_dir\MonoTouch\AutoMapper.dll"" target=""lib\MonoTouch"" />
-    <file src=""$dist_dir\MonoTouch\AutoMapper.pdb"" target=""lib\MonoTouch"" />
-    <file src=""$dist_dir\MonoTouch\AutoMapper.xml"" target=""lib\MonoTouch"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\MonoTouch"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\MonoTouch"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\MonoTouch"" />
     <file src=""$dist_dir\MonoTouch\AutoMapper.iOS.dll"" target=""lib\MonoTouch"" />
     <file src=""$dist_dir\MonoTouch\AutoMapper.iOS.pdb"" target=""lib\MonoTouch"" />
     <file src=""$source_dir\install.ps1"" target=""tools\MonoTouch"" />
