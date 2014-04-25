@@ -33,7 +33,6 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
   </PropertyGroup>
@@ -48,6 +47,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Debug\AutoMapper.xml</DocumentationFile>
     <NoWarn>1591,0618</NoWarn>
+    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,6 +58,18 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\AutoMapper.xml</DocumentationFile>
+    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseWin8|AnyCPU'">
+    <OutputPath>bin\Profile136\Release</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\AutoMapper.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworkProfile>Profile136</TargetFrameworkProfile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
