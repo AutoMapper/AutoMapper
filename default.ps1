@@ -10,7 +10,7 @@ properties {
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
 	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '0.0.0' }
-	$assemblyVersion = $pkgVersion -replace "\.[0-9]*-.*$", ".0.0"
+	$assemblyVersion = $pkgVersion -replace "\-.*$", ".0"
 	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
 	$framework_dir = Get-FrameworkDirectory
