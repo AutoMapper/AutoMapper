@@ -478,5 +478,15 @@ namespace AutoMapper
 	    {
             Configuration.AddGlobalIgnore(startingwith);
 	    }
+
+        /// <summary>
+        /// Creates a new mapper with an independant configuration
+        /// </summary>
+        /// <returns>A new IMapper instance</returns>
+        public static IMapper CreateMapper()
+        {
+            return new MapperWithConfiguration(new TypeMapFactory(), MapperRegistry.Mappers);
+        }
+
 	}
 }
