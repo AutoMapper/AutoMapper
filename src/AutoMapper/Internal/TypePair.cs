@@ -1,47 +1,64 @@
-using System;
+    using System;
 
-namespace AutoMapper.Impl
-{
-    public struct TypePair : IEquatable<TypePair>
+    namespace AutoMapper.Impl
     {
-
-        public TypePair(Type sourceType, Type destinationType)
-            : this()
+        public struct TypePair : IEquatable<TypePair>
         {
-            _sourceType = sourceType;
-            _destinationType = destinationType;
-            _hashcode = unchecked((_sourceType.GetHashCode() * 397) ^ _destinationType.GetHashCode());
-        }
 
-        private readonly Type _destinationType;
-        private readonly int _hashcode;
-        private readonly Type _sourceType;
+            public TypePair(Type sourceType, Type destinationType)
+                : this()
+            {
+                _sourceType = sourceType;
+                _destinationType = destinationType;
+                _hashcode = unchecked((_sourceType.GetHashCode() * 397) ^ _destinationType.GetHashCode());
+                _projectionExpandMembers = null;
+            }
 
-        public Type SourceType
-        {
-            get { return _sourceType; }
-        }
+            public TypePair(Type sourceType, Type destinationType, string projectionExpandMembers)
+                : this()
+            {
+                _sourceType = sourceType;
+                _destinationType = destinationType;
+                _hashcode = unchecked((_sourceType.GetHashCode() * 397) ^ _destinationType.GetHashCode());
+                _projectionExpandMembers = projectionExpandMembers;
+            }
 
-        public Type DestinationType
-        {
-            get { return _destinationType; }
-        }
+            private readonly Type _destinationType;
+            private readonly int _hashcode;
+            private readonly Type _sourceType;
+            private readonly string _projectionExpandMembers;
 
-        public bool Equals(TypePair other)
-        {
-            return Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType);
-        }
+            public Type SourceType
+            {
+                get { return _sourceType; }
+            }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (obj.GetType() != typeof(TypePair)) return false;
-            return Equals((TypePair)obj);
-        }
+            public Type DestinationType
+            {
+                get { return _destinationType; }
+            }
 
-        public override int GetHashCode()
-        {
-            return _hashcode;
+            public string ProjectionExpandMembers
+            {
+                get { return _projectionExpandMembers; }
+
+            }
+
+            public bool Equals(TypePair other)
+            {
+                return Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType) && Equals(other.ProjectionExpandMembers, _projectionExpandMembers);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (obj.GetType() != typeof(TypePair)) return false;
+                return Equals((TypePair)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return _hashcode;
+            }
         }
     }
-}

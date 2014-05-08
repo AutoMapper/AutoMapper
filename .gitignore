@@ -16,3 +16,4 @@ AppPackages/
 packages
 *.orig
 *.DotSettings
+src/UpgradeLog.htm

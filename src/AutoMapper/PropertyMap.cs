@@ -23,6 +23,7 @@ namespace AutoMapper
         private IValueResolver[] _cachedResolvers;
         private Func<ResolutionContext, bool> _condition;
         private MemberInfo _sourceMember;
+        private bool _ignoreProjectionUnlessExpanded;
 
         public PropertyMap(IMemberAccessor destinationProperty)
         {
@@ -50,6 +51,12 @@ namespace AutoMapper
         public IMemberAccessor DestinationProperty { get; private set; }
         public Type DestinationPropertyType { get { return DestinationProperty.MemberType; } }
         public LambdaExpression CustomExpression { get; private set; }
+
+        public bool IgnoreProjectionUnlessExpanded
+        {
+            get { return _ignoreProjectionUnlessExpanded; }
+            set { _ignoreProjectionUnlessExpanded = value; }
+        }
 
         public MemberInfo SourceMember
         {

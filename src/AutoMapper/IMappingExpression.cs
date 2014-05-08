@@ -323,6 +323,17 @@ namespace AutoMapper
         void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
 
         /// <summary>
+        /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
+        /// This method can be used in mapping to LINQ query projections, while ResolveUsing cannot.
+        /// Any null reference exceptions in this expression will be ignored (similar to flattening behavior).
+        /// And the specified member will be ignored unless explicitly expanded.
+        /// </summary>
+        /// <typeparam name="TMember">Member type of the source member to use</typeparam>
+        /// <param name="sourceMember">Expression referencing the source member to map against</param>
+        /// <param name="ignoreProjectionUnlessExpanded">Specify if the mapped type should be ignored unless explicity expanded on Projections</param>
+        void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember, bool ignoreProjectionUnlessExpanded);
+
+        /// <summary>
         /// Ignore this member for configuration validation and skip during mapping
         /// </summary>
         void Ignore();

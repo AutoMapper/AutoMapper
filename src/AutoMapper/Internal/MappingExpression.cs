@@ -288,6 +288,12 @@ namespace AutoMapper
             _propertyMap.SetCustomValueResolverExpression(sourceMember);
         }
 
+        public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember, bool ignoreProjectionUnlessExpanded)
+        {
+            _propertyMap.IgnoreProjectionUnlessExpanded = ignoreProjectionUnlessExpanded;
+            MapFrom(sourceMember);
+        }
+
         public void UseValue<TValue>(TValue value)
         {
             MapFrom(src => value);
