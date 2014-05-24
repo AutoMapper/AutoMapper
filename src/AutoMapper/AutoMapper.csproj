@@ -75,6 +75,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="IMapper.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\DictionaryFactory.cs" />
     <Compile Include="Internal\IDictionary.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\PrimitiveArrayMapper.cs" />
+    <Compile Include="MapperWithConfiguration.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="ConstructorMap.cs" />
