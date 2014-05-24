@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using AutoMapper.Mappers;
 using Xunit;
 using Should;
 using System.Linq;
@@ -256,6 +257,68 @@ namespace AutoMapper.UnitTests
 				_destination.Values.ShouldContain("4");
 			}
 		}
+
+        public class When_mapping_to_a_concrete_generic_ilist_with_conditions : AutoMapperSpecBase
+        {
+            private List<DestType> _items;
+            private Destination _destination;
+
+            public class Source
+            {
+                public SourceType[] Values { get; set; }
+            }
+
+            public class SourceType
+            {
+                public SourceType(int id)
+                {
+                    ID = id;
+                }
+
+                public int ID { get; set; }
+                public string Value { get; set; }
+            }
+
+            public class Destination
+            {
+                public IList<DestType> Values { get; set; }
+            }
+
+            public class DestType
+            {
+                public DestType(int id)
+                {
+                    ID = id;
+                }
+
+                public int ID { get; set; }
+                public string Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                MapperRegistry.Mappers.Insert(0,new UniqueComparisonMapper<IList>());
+                Mapper.CreateMap<SourceType, DestType>().EqualityComparision((s, d) => s.ID == d.ID);
+                Mapper.CreateMap<Source, Destination>();
+            }
+
+            protected override void Because_of()
+            {
+                var source = new Source {Values = new[] {new SourceType(1), new SourceType(2) {Value = "Added"}}};
+                _destination = new Destination { Values = new List<DestType> { new DestType(2), new DestType(3) } };
+                _items = _destination.Values.ToList();
+                Mapper.Map(source, _destination);
+            }
+
+            [Fact]
+            public void Should_map_the_list_of_source_items()
+            {
+                _destination.Values.ShouldNotBeNull();
+                _destination.Values[0].ShouldBeSameAs(_items[0]);
+                _items[0].Value.ShouldEqual("Added");
+                Assert.Equal(_items.Count,2);
+            }
+        }
 
 		public class When_mapping_to_a_custom_list_with_the_same_type : AutoMapperSpecBase
 		{

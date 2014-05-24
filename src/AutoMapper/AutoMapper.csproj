@@ -94,6 +94,7 @@
     <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\PrimitiveArrayMapper.cs" />
+    <Compile Include="Mappers\UniqueComparisonMapper.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="ConstructorMap.cs" />
