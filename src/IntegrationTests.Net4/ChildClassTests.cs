@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
+using AutoMapper.EquivilencyExpression;
 using AutoMapper.Mappers;
 using AutoMapper.QueryableExtensions;
 using Xunit;
@@ -202,7 +203,7 @@ namespace AutoMapper.IntegrationTests.Net4
             [Fact]
             public void AutoMapperEFRelationsTest()
             {
-                EquivilentExpressions.GenerateEquality.Add(new GenerateEquivilentExpressionsBasedOnEntityFrameworkPrimaryKeys<Context>());
+                EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<Context>());
                 Mapper.CreateMap<Base, BaseDTO>().ReverseMap();
                 Mapper.CreateMap<Sub, SubDTO>().ReverseMap();
                 Mapper.AssertConfigurationIsValid();
@@ -213,6 +214,7 @@ namespace AutoMapper.IntegrationTests.Net4
                     baseDTO.ShouldNotBeNull();
                     baseDTO.Subs[1].Sub1 = "sub2 (modified)";
                     baseDTO.Subs.Add(new SubDTO{BaseId = 3});
+                    var first = baseDTO.Subs[0];
 
                     var baseObj = context.Bases.First();
                     Mapper.Map(baseDTO, baseObj);
@@ -221,7 +223,6 @@ namespace AutoMapper.IntegrationTests.Net4
                     var modified = changes.Where(c => c.State == EntityState.Modified).ToList();
                     modified.Count().ShouldEqual(1);
                     modified[0].Entity.ShouldBeSameAs(baseObj.Subs.ElementAt(1));
-
 
                     var added = changes.Where(c => c.State == EntityState.Added).ToList();
                     added.Count().ShouldEqual(1);

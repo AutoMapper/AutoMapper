@@ -48,7 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mappers\EntityFrameworkConditionalStatements.cs" />
+    <Compile Include="Mappers\GenerateEntityFrameworkPrimaryKeyEquivilentExpressions.cs" />
+    <Compile Include="Mappers\GenerateEntityFrameworkPrimaryKeyPropertyMatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

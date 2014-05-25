@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Linq;
+using AutoMapper.EquivilencyExpression;
 using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
@@ -14,32 +14,28 @@ namespace AutoMapper.Mappers
             var equivilencyExpression = GetEquivilentExpression(context);
 
             var sourceEnumerable = context.SourceValue as IEnumerable;
-            var destinationCollection = (IEnumerable) context.DestinationValue;
-            var destItems = destinationCollection.Cast<object>().ToList();
-            var comparisionDictionary = sourceEnumerable.Cast<object>()
-                .ToDictionary(s => s, s => destItems.FirstOrDefault(d => equivilencyExpression.IsEquivlent(s, d)));
+            var destEnumerable = (IEnumerable) context.DestinationValue;
 
-            foreach (var keypair in comparisionDictionary)
+            var destItems = destEnumerable.Cast<object>().ToList();
+            var sourceItems = sourceEnumerable.Cast<object>().ToList();
+            var compareSourceToDestination = sourceItems.ToDictionary(s => s, s => destItems.FirstOrDefault(d => equivilencyExpression.IsEquivlent(s, d)));
+
+            var actualDestType = destEnumerable.GetType();
+
+            var addMethod = actualDestType.GetMethod("Add");
+            foreach (var keypair in compareSourceToDestination)
             {
                 if (keypair.Value == null)
-                    Add(destinationCollection, destinationElementType, Mapper.Map(keypair.Key, sourceElementType, destinationElementType));
+                    addMethod.Invoke(destEnumerable, new[] {Mapper.Map(keypair.Key, sourceElementType, destinationElementType)});
                 else
                     Mapper.Map(keypair.Key, keypair.Value, sourceElementType, destinationElementType);
             }
-            foreach (var removedItem in destItems.Except(comparisionDictionary.Values))
-                Remove(destinationCollection, destinationElementType, removedItem);
 
-            return destinationCollection;
-        }
+            var removeMethod = actualDestType.GetMethod("Remove");
+            foreach (var removedItem in destItems.Except(compareSourceToDestination.Values))
+                removeMethod.Invoke(destEnumerable, new[] { removedItem });
 
-        private void Add(IEnumerable enumerable, Type type, object item)
-        {
-            enumerable.GetType().GetMethod("Add").Invoke(enumerable, new [] {item});
-        }
-
-        private void Remove(IEnumerable enumerable, Type type, object item)
-        {
-            enumerable.GetType().GetMethod("Remove").Invoke(enumerable, new[] { item });
+            return destEnumerable;
         }
 
         public bool IsMatch(ResolutionContext context)

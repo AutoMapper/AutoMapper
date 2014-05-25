@@ -75,6 +75,12 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressions.cs" />
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionsBasedOnGeneratePropertyMatches.cs" />
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionsBasedOnPropertyConstraints.cs" />
+    <Compile Include="Equivilency Expression\IGenerateEquivilentExpressions.cs" />
+    <Compile Include="Equivilency Expression\IGeneratePropertyMatches.cs" />
+    <Compile Include="Equivilency Expression\UserDefinedEquivilentExpressions.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\DictionaryFactory.cs" />
     <Compile Include="Internal\IDictionary.cs" />
@@ -89,15 +95,15 @@
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\AssignableArrayMapper.cs" />
-    <Compile Include="Mappers\EquivilentExpression.cs" />
-    <Compile Include="Mappers\EquivilentExpressions.cs" />
+    <Compile Include="Equivilency Expression\EquivilentExpression.cs" />
+    <Compile Include="Equivilency Expression\EquivilentExpressions.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
-    <Compile Include="Mappers\IEquivilentExpression.cs" />
+    <Compile Include="Equivilency Expression\IEquivilentExpression.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
     <Compile Include="Mappers\PrimitiveArrayMapper.cs" />
-    <Compile Include="Mappers\UniqueComparisonMapper.cs" />
+    <Compile Include="Mappers\EquivlentExpressionAddRemoveCollectionMapper.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="ConstructorMap.cs" />

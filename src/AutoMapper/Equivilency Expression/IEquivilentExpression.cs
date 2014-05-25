@@ -1,4 +1,4 @@
-namespace AutoMapper.Mappers
+namespace AutoMapper.EquivilencyExpression
 {
     public interface IEquivilentExpression
     {

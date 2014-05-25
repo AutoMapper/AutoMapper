@@ -1,8 +1,23 @@
 using System;
 using System.Linq.Expressions;
 
-namespace AutoMapper.Mappers
+namespace AutoMapper.EquivilencyExpression
 {
+    internal class EquivilentExpression : IEquivilentExpression
+    {
+        internal static IEquivilentExpression BadValue { get; private set; }
+
+        static EquivilentExpression()
+        {
+            BadValue = new EquivilentExpression();
+        }
+
+        public bool IsEquivlent(object source, object destination)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     internal class EquivilentExpression<TSource,TDestination> : IEquivilentExpression 
         where TSource : class 
         where TDestination : class

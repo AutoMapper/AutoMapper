@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reflection;
+using AutoMapper.EquivilencyExpression;
 using AutoMapper.Mappers;
 using Xunit;
 using Should;
@@ -297,25 +299,24 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                EquivilentExpressions.GenerateEquality.Add(new GenerateEquivilentExpressionsBasedOnProperties((s, d) => s.Name == d.Name));
-                Mapper.CreateMap<SourceType, DestType>();//.EqualityComparision((s, d) => s.ID == d.ID);
+                Mapper.CreateMap<SourceType, DestType>().EqualityComparision((s, d) => s.ID == d.ID);
                 Mapper.CreateMap<Source, Destination>();
             }
 
             protected override void Because_of()
             {
-                var source = new Source {Values = new[] {new SourceType(1), new SourceType(2) {Value = "Added"}}};
+                var source = new Source {Values = new[] {new SourceType(1), new SourceType(2) {Value = "Added (modified)"}}};
                 _destination = new Destination { Values = new List<DestType> { new DestType(2) { Value = "Added" }, new DestType(3) } };
                 _items = _destination.Values.ToList();
                 Mapper.Map(source, _destination);
             }
 
             [Fact]
-            public void Should_map_the_list_of_source_items()
+            public void Should_map_matching_items_instead_of_replacing_them()
             {
                 _destination.Values.ShouldNotBeNull();
                 _destination.Values[0].ShouldBeSameAs(_items[0]);
-                _items[0].Value.ShouldEqual("Added");
+                _items[0].Value.ShouldEqual("Added (modified)");
                 Assert.Equal(_items.Count,2);
             }
         }
