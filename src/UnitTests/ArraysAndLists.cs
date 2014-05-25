@@ -297,15 +297,15 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                MapperRegistry.Mappers.Insert(0,new UniqueComparisonMapper<IList>());
-                Mapper.CreateMap<SourceType, DestType>().EqualityComparision((s, d) => s.ID == d.ID);
+                EquivilentExpressions.GenerateEquality.Add(new GenerateEquivilentExpressionsBasedOnProperties((s, d) => s.Name == d.Name));
+                Mapper.CreateMap<SourceType, DestType>();//.EqualityComparision((s, d) => s.ID == d.ID);
                 Mapper.CreateMap<Source, Destination>();
             }
 
             protected override void Because_of()
             {
                 var source = new Source {Values = new[] {new SourceType(1), new SourceType(2) {Value = "Added"}}};
-                _destination = new Destination { Values = new List<DestType> { new DestType(2), new DestType(3) } };
+                _destination = new Destination { Values = new List<DestType> { new DestType(2) { Value = "Added" }, new DestType(3) } };
                 _items = _destination.Values.ToList();
                 Mapper.Map(source, _destination);
             }

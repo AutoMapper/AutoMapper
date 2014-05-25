@@ -47,7 +47,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Debug\AutoMapper.xml</DocumentationFile>
     <NoWarn>1591,0618</NoWarn>
-    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile3</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -89,7 +89,10 @@
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\AssignableArrayMapper.cs" />
+    <Compile Include="Mappers\EquivilentExpression.cs" />
+    <Compile Include="Mappers\EquivilentExpressions.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\IEquivilentExpression.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />

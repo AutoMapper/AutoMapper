@@ -64,6 +64,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AutoMapper.EntityFramework\AutoMapper.EntityFramework.csproj">
+      <Project>{ef6c64b3-4731-49c9-855a-e7e9db4171c4}</Project>
+      <Name>AutoMapper.EntityFramework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
       <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
       <Name>AutoMapper</Name>

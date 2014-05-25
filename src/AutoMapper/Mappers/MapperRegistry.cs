@@ -16,6 +16,7 @@ namespace AutoMapper.Mappers
             new EnumerableToDictionaryMapper(),
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
+            new EquivlentExpressionAddRemoveCollectionMapper(), 
             new CollectionMapper(),
             new EnumerableMapper(),
             new AssignableMapper(),
