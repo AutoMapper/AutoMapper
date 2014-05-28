@@ -49,6 +49,12 @@ namespace AutoMapper
         {
             ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
 
+            if (property.DeclaringType.IsGenericType)
+            {
+                return o => o.GetType().GetProperty(property.Name, property.PropertyType).GetValue(o, null);
+            }
+
+
             MemberExpression member = Expression.Property(Expression.Convert(instanceParameter, property.DeclaringType), property);
 
             Expression<LateBoundPropertyGet> lambda = Expression.Lambda<LateBoundPropertyGet>(

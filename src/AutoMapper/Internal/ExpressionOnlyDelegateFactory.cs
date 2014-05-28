@@ -27,6 +27,11 @@ namespace AutoMapper
             ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
             ParameterExpression valueParameter = Expression.Parameter(typeof(object), "value");
 
+            if (property.DeclaringType.IsGenericType)
+            {
+                return (o,v) => o.GetType().GetProperty(property.Name, property.PropertyType).SetValue(o,v, null);
+            }
+
             MemberExpression member = Expression.Property(Expression.Convert(instanceParameter, property.DeclaringType), property);
             BinaryExpression assignExpression = Expression.Assign(member, Expression.Convert(valueParameter, property.PropertyType));
 
