@@ -77,7 +77,7 @@
     </Compile>
     <Compile Include="Equivilency Expression\GenerateEquivilentExpressions.cs" />
     <Compile Include="Equivilency Expression\GenerateEquivilentExpressionsBasedOnGeneratePropertyMatches.cs" />
-    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionsBasedOnPropertyConstraints.cs" />
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionOnPropertyMaps.cs" />
     <Compile Include="Equivilency Expression\IGenerateEquivilentExpressions.cs" />
     <Compile Include="Equivilency Expression\IGeneratePropertyMatches.cs" />
     <Compile Include="Equivilency Expression\UserDefinedEquivilentExpressions.cs" />

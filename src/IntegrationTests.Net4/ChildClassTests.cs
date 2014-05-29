@@ -152,7 +152,7 @@ namespace AutoMapper.IntegrationTests.Net4
 
         public class SubDTO
         {
-            public int BaseId { get; set; }
+            public int BaseID2 { get; set; }
             public string Sub1 { get; set; }
         }
 
@@ -205,7 +205,8 @@ namespace AutoMapper.IntegrationTests.Net4
             {
                 EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<Context>());
                 Mapper.CreateMap<Base, BaseDTO>().ReverseMap();
-                Mapper.CreateMap<Sub, SubDTO>().ReverseMap();
+                Mapper.CreateMap<Sub, SubDTO>().ForMember(dest => dest.BaseID2, opt => opt.MapFrom(src => src.BaseId))
+                    .ReverseMap().ForMember(dest => dest.BaseId, opt => opt.MapFrom(src => src.BaseID2));
                 Mapper.AssertConfigurationIsValid();
 
                 using (var context = new Context())
@@ -213,10 +214,42 @@ namespace AutoMapper.IntegrationTests.Net4
                     var baseDTO = context.Bases.Project().To<BaseDTO>().FirstOrDefault();
                     baseDTO.ShouldNotBeNull();
                     baseDTO.Subs[1].Sub1 = "sub2 (modified)";
-                    baseDTO.Subs.Add(new SubDTO{BaseId = 3});
+                    baseDTO.Subs.Add(new SubDTO{BaseID2 = 3});
                     var first = baseDTO.Subs[0];
 
                     var baseObj = context.Bases.First();
+                    Mapper.Map(baseDTO, baseObj);
+                    var changes = context.ChangeTracker.Entries();
+
+                    var modified = changes.Where(c => c.State == EntityState.Modified).ToList();
+                    modified.Count().ShouldEqual(1);
+                    modified[0].Entity.ShouldBeSameAs(baseObj.Subs.ElementAt(1));
+
+                    var added = changes.Where(c => c.State == EntityState.Added).ToList();
+                    added.Count().ShouldEqual(1);
+                    added[0].Entity.ShouldBeSameAs(baseObj.Subs.ElementAt(2));
+                }
+            }
+
+            [Fact]
+            public void AutoMapperEFRelationsTestPlus()
+            {
+                EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<Context>());
+                Mapper.CreateMap<Base, BaseDTO>().ReverseMap();
+                Mapper.CreateMap<Sub, SubDTO>().ForMember(dest => dest.BaseID2, opt => opt.MapFrom(src => src.BaseId))
+                    .ReverseMap().ForMember(dest => dest.BaseId, opt => opt.MapFrom(src => src.BaseID2 + 10));
+                //Mapper.AssertConfigurationIsValid();
+
+                using (var context = new Context())
+                {
+                    var baseDTO = context.Bases.Project().To<BaseDTO>().FirstOrDefault();
+                    baseDTO.ShouldNotBeNull();
+                    baseDTO.Subs[1].Sub1 = "sub2 (modified)";
+                    baseDTO.Subs.Add(new SubDTO { BaseID2 = 3 });
+
+                    var baseObj = context.Bases.First();
+                    foreach (var sub in baseDTO.Subs)
+                        sub.BaseID2 -= 10;
                     Mapper.Map(baseDTO, baseObj);
                     var changes = context.ChangeTracker.Entries();
 
