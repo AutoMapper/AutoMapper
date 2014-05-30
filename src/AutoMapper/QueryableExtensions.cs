@@ -33,7 +33,7 @@ namespace AutoMapper.QueryableExtensions
 
 
         /// <summary>
-        /// Extention method to project from a queryable using the static <see cref="Mapper.Engine"/> property
+        /// Extention method to project from a queryable using the static <see cref="Mapper.Engine"/> property.
         /// Due to generic parameter inference, you need to call Project().To to execute the map
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
