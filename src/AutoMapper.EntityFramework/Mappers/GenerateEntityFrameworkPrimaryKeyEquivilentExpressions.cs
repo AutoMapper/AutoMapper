@@ -3,11 +3,11 @@ using AutoMapper.EquivilencyExpression;
 
 namespace AutoMapper.Mappers
 {
-    public class GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<TDatabaseContext> : GenerateEquivilentExpressionsBasedOnGeneratePropertyMatches
+    public class GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<TDatabaseContext> : GenerateEquivilentExpressionsBasedOnGeneratePropertyMaps
         where TDatabaseContext : IObjectContextAdapter, new() 
     {
         public GenerateEntityFrameworkPrimaryKeyEquivilentExpressions()
-            : base(new GenerateEntityFrameworkPrimaryKeyPropertyMatches<TDatabaseContext>())
+            : base(new GenerateEntityFrameworkPrimaryKeyPropertyMaps<TDatabaseContext>())
         {
         }
     }

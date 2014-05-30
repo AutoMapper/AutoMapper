@@ -76,10 +76,10 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Equivilency Expression\GenerateEquivilentExpressions.cs" />
-    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionsBasedOnGeneratePropertyMatches.cs" />
     <Compile Include="Equivilency Expression\GenerateEquivilentExpressionOnPropertyMaps.cs" />
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionsBasedOnGeneratePropertyMaps.cs" />
     <Compile Include="Equivilency Expression\IGenerateEquivilentExpressions.cs" />
-    <Compile Include="Equivilency Expression\IGeneratePropertyMatches.cs" />
+    <Compile Include="Equivilency Expression\IGeneratePropertyMaps.cs" />
     <Compile Include="Equivilency Expression\UserDefinedEquivilentExpressions.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\DictionaryFactory.cs" />
