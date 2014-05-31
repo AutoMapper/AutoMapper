@@ -29,7 +29,7 @@ namespace AutoMapper
 
             if (property.DeclaringType.IsGenericType)
             {
-                return (o,v) => o.GetType().GetProperty(property.Name, property.PropertyType).SetValue(o,v, null);
+                return (o,v) => o.GetType().GetProperty(property.Name).SetValue(o,v, null);
             }
 
             MemberExpression member = Expression.Property(Expression.Convert(instanceParameter, property.DeclaringType), property);

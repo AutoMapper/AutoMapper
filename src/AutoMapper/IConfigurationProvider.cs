@@ -87,6 +87,8 @@ namespace AutoMapper
         /// <returns>Type map configuration</returns>
 		TypeMap CreateTypeMap(Type sourceType, Type destinationType);
 
+	    TypeMap CreateTypeMap(Type source, Type destination, string profileName, MemberList memberList);
+
         /// <summary>
         /// Fired each time a type map is created
         /// </summary>

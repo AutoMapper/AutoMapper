@@ -7,21 +7,23 @@ namespace AutoMapper.UnitTests
     public class OpenGenericTypes : AutoMapperSpecBase
     {
         public class Src<T> { public T A { get; set; } }
-        public class Dst<T> { public T A { get; set; } }
+        public class Dest<T> { public T A { get; set; } }
 
         public enum EnumType { One, Two }
 
         protected override void Establish_context()
         {
-            Mapper.CreateMap(typeof(Src<>), typeof(Dst<>));
+            Mapper.GetAllTypeMaps();
+            Mapper.CreateMap(typeof(Src<>), typeof(Dest<>));
         }
 
         [Fact]
         public void ThrowException()
         {
-            var d = Mapper.Map(new Src<string> { A = null }, new Dst<string> { A = "a" });
+            var value = new Src<string> {A = "b"};
+            var d = Mapper.Map<Src<string>,Dest<string>>(value);
 
-            d.A.ShouldBeNull();
+            d.A.ShouldEqual("b");
         }
     }
 }

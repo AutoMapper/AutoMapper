@@ -229,7 +229,7 @@ namespace AutoMapper
 
 				return mapperToUse.Map(context, this);
 			}
-            catch (AutoMapperMappingException)
+            catch (AutoMapperMappingException ex)
             {
                 throw;
             }

@@ -15,6 +15,8 @@ namespace AutoMapper
 	    private readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
+
+	    private readonly IList<IGetTypeMaps> _getTypeMaps;
 		
 		private readonly ThreadSafeList<TypeMap> _typeMaps = new ThreadSafeList<TypeMap>();
 
@@ -29,6 +31,11 @@ namespace AutoMapper
 		    _typeMapFactory = typeMapFactory;
 		    _mappers = mappers;
             _globalIgnore = new List<string>();
+	        _getTypeMaps = new IGetTypeMaps[]
+	        {
+	             new GetNormalTypeMap(this), new GetNullableTypeMap(this), new GetSourceDerivivedTypeMap(this), new GetFirstInterfaceWithTypeMap(this),
+	            new GetSourceBaseTypeTypeMap(this), new GetGenericTypeMap(this)
+	        };
 		}
 
 	    public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
@@ -527,40 +534,15 @@ namespace AutoMapper
 	    }
 
 	    private TypeMap FindTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
-        {
-            TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType);
-
-            if (typeMap == null && destinationType.IsNullableType())
+        {   
+            TypeMap tm2 = null;
+	        foreach (var getTM in _getTypeMaps.Where(tm => tm.CanAttemptToGetType(source,  destination,  sourceType,  destinationType,  profileName)))
             {
-                typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType.GetTypeOfNullable());
+                tm2 = getTM.GetTypeMap(source,  destination,  sourceType,  destinationType,  profileName);
+                if(tm2 != null)
+                    break;
             }
-
-            if (typeMap == null)
-            {
-                typeMap = _typeMaps.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
-
-                if (typeMap == null)
-                {
-                    foreach (var sourceInterface in sourceType.GetInterfaces())
-                    {
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceInterface, destinationType);
-
-                        if (typeMap == null) continue;
-
-                        var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
-                        if (derivedTypeFor != destinationType)
-                        {
-                            typeMap = CreateTypeMap(sourceType, derivedTypeFor, profileName, typeMap.ConfiguredMemberList);
-                        }
-
-                        break;
-                    }
-
-                    if ((sourceType.BaseType != null) && (typeMap == null))
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceType.BaseType, destinationType);
-                }
-            }
-            return typeMap;
+	        return tm2;
         }
 
 		private TypeMap FindExplicitlyDefinedTypeMap(Type sourceType, Type destinationType)
@@ -649,4 +631,157 @@ namespace AutoMapper
 	        _globalIgnore.Add(startingwith);
 	    }
 	}
+
+    internal interface IGetTypeMaps
+    {
+        bool CanAttemptToGetType(object source, object destination, Type sourceType, Type destinationType, string profileName);
+        TypeMap GetTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName);
+    }
+
+    internal abstract class GetTypeMapsBase : IGetTypeMaps
+    {
+        protected readonly IConfigurationProvider _configurationProvider;
+
+        protected GetTypeMapsBase(IConfigurationProvider configurationProvider)
+        {
+            _configurationProvider = configurationProvider;
+        }
+
+        public virtual bool CanAttemptToGetType(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            return true;
+        }
+
+        public abstract TypeMap GetTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName);
+    }
+
+    class GetNormalTypeMap : GetTypeMapsBase
+    {
+        public GetNormalTypeMap(IConfigurationProvider configurationProvider) : base(configurationProvider)
+        {
+        }
+
+        public override TypeMap GetTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            return _configurationProvider.GetAllTypeMaps().FirstOrDefault(x => x.DestinationType == destinationType && x.SourceType == sourceType);
+        }
+    }
+
+    class GetNullableTypeMap : GetTypeMapsBase
+    {
+        public GetNullableTypeMap(IConfigurationProvider configurationProvider) : base(configurationProvider)
+        {
+        }
+
+        public override bool CanAttemptToGetType(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            return destinationType.IsNullableType();
+        }
+
+        public override TypeMap GetTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            return _configurationProvider.GetAllTypeMaps().FirstOrDefault(x => x.DestinationType == destinationType.GetTypeOfNullable() && x.SourceType == sourceType);
+        }
+    }
+
+    class GetSourceDerivivedTypeMap : GetTypeMapsBase
+    {
+        public GetSourceDerivivedTypeMap(IConfigurationProvider configurationProvider) : base(configurationProvider)
+        {
+        }
+
+        public override TypeMap GetTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            return _configurationProvider.GetAllTypeMaps().FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
+        }
+    }
+
+    class GetFirstInterfaceWithTypeMap : GetTypeMapsBase
+    {
+        public GetFirstInterfaceWithTypeMap(IConfigurationProvider configurationProvider)
+            :base(configurationProvider)
+        {
+        }
+
+        public override TypeMap GetTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            TypeMap typeMap = null;
+            foreach (var sourceInterface in sourceType.GetInterfaces())
+            {
+                typeMap = _configurationProvider.FindTypeMapFor(source, destination, sourceInterface, destinationType);
+
+                if (typeMap == null)
+                    continue;
+
+                var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
+                if (derivedTypeFor != destinationType)
+                {
+                    typeMap = _configurationProvider.CreateTypeMap(sourceType, derivedTypeFor, profileName, typeMap.ConfiguredMemberList);
+                }
+                break;
+            }
+
+                return typeMap;
+        }
+    }
+
+    class GetSourceBaseTypeTypeMap : GetTypeMapsBase
+    {
+        public GetSourceBaseTypeTypeMap(IConfigurationProvider configurationProvider)
+            :base(configurationProvider)
+        {
+        }
+
+        public override bool CanAttemptToGetType(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            return sourceType.BaseType != null;
+        }
+
+        public override TypeMap GetTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            if (sourceType.BaseType != null)
+                return _configurationProvider.FindTypeMapFor(source, destination, sourceType.BaseType, destinationType);
+            return null;
+        }
+    }
+
+    class GetGenericTypeMap : GetTypeMapsBase
+    {
+        public GetGenericTypeMap(IConfigurationProvider configurationProvider)
+            :base(configurationProvider)
+        {
+        }
+
+        public override bool CanAttemptToGetType(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            return AreBothGenerTypesWithSameGenerics(sourceType, destinationType);
+        }
+
+        private static bool AreBothGenerTypesWithSameGenerics(Type sourceType, Type destinationType)
+        {
+            return !sourceType.IsNullableType() && !destinationType.IsNullableType() 
+                && !sourceType.IsEnumerableType() && !destinationType.IsEnumerableType() 
+                && sourceType.IsGenericType && destinationType.IsGenericType 
+                && !sourceType.ContainsGenericParameters && !destinationType.ContainsGenericParameters
+                && BothHaveSameGenericAruguments(sourceType, destinationType);
+        }
+
+        private static bool BothHaveSameGenericAruguments(Type sourceType, Type destinationType)
+        {
+            return !sourceType.GetGenericArguments().Except(destinationType.GetGenericArguments()).Any();
+        }
+
+        public override TypeMap GetTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
+        {
+            var genericSourceType = sourceType.GetGenericTypeDefinition();
+            var genericDestinationType = destinationType.GetGenericTypeDefinition();
+            var genericTypeMap = _configurationProvider.GetAllTypeMaps().FirstOrDefault(tm => tm.SourceType == genericSourceType && tm.DestinationType == genericDestinationType);
+            var specificTypeMap = new TypeMap(new TypeInfo(sourceType), new TypeInfo(destinationType), genericTypeMap.ConfiguredMemberList);
+            foreach (var propertyMap in genericTypeMap.GetPropertyMaps())
+            {
+                specificTypeMap.AddPropertyMap(propertyMap.DestinationProperty.MakeMemberAccessorGeneric(destinationType.GetGenericArguments()), propertyMap.GetSourceValueResolvers());
+            }
+            return specificTypeMap;
+        }
+    }
 }

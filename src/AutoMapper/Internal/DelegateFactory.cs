@@ -51,7 +51,7 @@ namespace AutoMapper
 
             if (property.DeclaringType.IsGenericType)
             {
-                return o => o.GetType().GetProperty(property.Name, property.PropertyType).GetValue(o, null);
+                return o => o.GetType().GetProperty(property.Name).GetValue(o, null);
             }
 
 

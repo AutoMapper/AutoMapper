@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using AutoMapper.Mappers;
 
 namespace AutoMapper.Impl
 {
@@ -129,4 +130,13 @@ namespace AutoMapper.Impl
 			_lateBoundPropertySet.Invoke(destination, new[] { value });
 		}
 	}
+
+    public static class MemberAccessorExtentions
+    {
+        public static IMemberAccessor MakeMemberAccessorGeneric(this IMemberAccessor memberAccessor, params Type[] genericParameters)
+        {
+            var genericMember = memberAccessor.MemberInfo.ReflectedType.MakeGenericType(genericParameters).GetProperty(memberAccessor.MemberInfo.Name);
+            return Activator.CreateInstance(memberAccessor.GetType(), genericMember) as IMemberAccessor;
+        }
+    }
 }
