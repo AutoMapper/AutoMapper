@@ -1,8 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using AutoMapper.EquivilencyExpression;
 using AutoMapper.Mappers;
 using AutoMapper.QueryableExtensions;
@@ -179,7 +182,6 @@ namespace AutoMapper.IntegrationTests.Net4
             }
         }
 
-
         public class UnitTest
         {
             public UnitTest()
@@ -229,6 +231,38 @@ namespace AutoMapper.IntegrationTests.Net4
                     added.Count().ShouldEqual(1);
                     added[0].Entity.ShouldBeSameAs(baseObj.Subs.ElementAt(2));
                 }
+            }
+
+            [Fact]
+            public void AutoMapperEFQuniqueExpressionTest()
+            {
+                EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<Context>());
+                MapperRegistry.Mappers.Add(new DTOToEFObjectEquivilencyMapper<Context>());
+                Mapper.CreateMap<Base, BaseDTO>().ReverseMap();
+                Mapper.CreateMap<Sub, SubDTO>().ForMember(dest => dest.BaseID2, opt => opt.MapFrom(src => src.BaseId))
+                    .ReverseMap().ForMember(dest => dest.BaseId, opt => opt.MapFrom(src => src.BaseID2));
+                Mapper.AssertConfigurationIsValid();
+                
+                var expression = Mapper.Map<BaseDTO,Expression<Func<Base,bool>>>(new BaseDTO{BaseID = 4});
+
+                var values = new object[5].Select((o, i) => new Base {BaseID = i}).ToList();
+                values.AsQueryable().FirstOrDefault(expression).ShouldEqual(values[4]);
+            }
+
+            [Fact]
+            public void AutoMapperEFExpressionConverterTest()
+            {
+                EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<Context>());
+                MapperRegistry.Mappers.Add(new DTOExpressionToExpressionMapper());
+                Mapper.CreateMap<Base, BaseDTO>().ReverseMap();
+                Mapper.CreateMap<Sub, SubDTO>().ForMember(dest => dest.BaseID2, opt => opt.MapFrom(src => src.BaseId))
+                    .ReverseMap().ForMember(dest => dest.BaseId, opt => opt.MapFrom(src => src.BaseID2));
+                Mapper.AssertConfigurationIsValid();
+
+                var expression = Mapper.Map<Expression<Func<BaseDTO, bool>>, Expression<Func<Base, bool>>>(dto => dto.BaseID == 4);
+
+                var values = new object[5].Select((o, i) => new Base {BaseID = i}).ToList();
+                values.AsQueryable().FirstOrDefault(expression).ShouldEqual(values[4]);
             }
 
             [Fact]
