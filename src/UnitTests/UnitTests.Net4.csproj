@@ -99,6 +99,7 @@
     <Compile Include="Bug\DeepInheritanceIssue.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
     <Compile Include="Bug\EFCollections.cs" />
+    <Compile Include="Bug\EmptyNullSubstituteBug.cs" />
     <Compile Include="Bug\EnumConditionsBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\ExistingArrays.cs" />

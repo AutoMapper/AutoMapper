@@ -211,7 +211,7 @@ namespace AutoMapper
 
         public bool CanResolveValue()
         {
-            return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
+            return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver) && !_ignored;
         }
 
         public void RemoveLastFormatter()
