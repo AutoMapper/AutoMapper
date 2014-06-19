@@ -114,7 +114,7 @@ namespace AutoMapper.IntegrationTests.Net4
                     baseDTO.Sub.Sub1.ShouldEqual("sub1");
 
 
-                    baseDTO = context.Bases.Project().To<BaseDTO>().FirstOrDefault();
+                    baseDTO = Mapper.Map<BaseDTO>(context.Bases.FirstOrDefault());
                     baseDTO.ShouldNotBeNull();
                     baseDTO.BaseID.ShouldEqual(1);
                     baseDTO.Sub.Sub1.ShouldEqual("sub1");
@@ -176,7 +176,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             protected override void Seed(Context context)
             {
-                context.Bases.Add(new Base() { BaseID = 1, Base1 = "base1", Subs = new List<Sub> { new Sub { BaseId = 1, Sub1 = "sub1" }, new Sub { BaseId = 2, Sub1 = "sub2" } } });
+                context.Bases.Add(new Base() { BaseID = 1, Base1 = "base1", Subs = new List<Sub> { new Sub { BaseId = 1, Sub1 = "sub1" }, new Sub { BaseId = 2, Sub1 = "sub2" } }});
 
                 base.Seed(context);
             }
@@ -237,7 +237,6 @@ namespace AutoMapper.IntegrationTests.Net4
             public void AutoMapperEFQuniqueExpressionTest()
             {
                 EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<Context>());
-                MapperRegistry.Mappers.Add(new DTOToEFObjectEquivilencyMapper<Context>());
                 Mapper.CreateMap<Base, BaseDTO>().ReverseMap();
                 Mapper.CreateMap<Sub, SubDTO>().ForMember(dest => dest.BaseID2, opt => opt.MapFrom(src => src.BaseId))
                     .ReverseMap().ForMember(dest => dest.BaseId, opt => opt.MapFrom(src => src.BaseID2));
@@ -253,7 +252,6 @@ namespace AutoMapper.IntegrationTests.Net4
             public void AutoMapperEFExpressionConverterTest()
             {
                 EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<Context>());
-                MapperRegistry.Mappers.Add(new DTOExpressionToExpressionMapper());
                 Mapper.CreateMap<Base, BaseDTO>().ReverseMap();
                 Mapper.CreateMap<Sub, SubDTO>().ForMember(dest => dest.BaseID2, opt => opt.MapFrom(src => src.BaseId))
                     .ReverseMap().ForMember(dest => dest.BaseId, opt => opt.MapFrom(src => src.BaseID2));
@@ -263,38 +261,6 @@ namespace AutoMapper.IntegrationTests.Net4
 
                 var values = new object[5].Select((o, i) => new Base {BaseID = i}).ToList();
                 values.AsQueryable().FirstOrDefault(expression).ShouldEqual(values[4]);
-            }
-
-            [Fact]
-            public void AutoMapperEFRelationsTestPlus()
-            {
-                EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<Context>());
-                Mapper.CreateMap<Base, BaseDTO>().ReverseMap();
-                Mapper.CreateMap<Sub, SubDTO>().ForMember(dest => dest.BaseID2, opt => opt.MapFrom(src => src.BaseId))
-                    .ReverseMap().ForMember(dest => dest.BaseId, opt => opt.MapFrom(src => src.BaseID2 + 10));
-                //Mapper.AssertConfigurationIsValid();
-
-                using (var context = new Context())
-                {
-                    var baseDTO = context.Bases.Project().To<BaseDTO>().FirstOrDefault();
-                    baseDTO.ShouldNotBeNull();
-                    baseDTO.Subs[1].Sub1 = "sub2 (modified)";
-                    baseDTO.Subs.Add(new SubDTO { BaseID2 = 3 });
-
-                    var baseObj = context.Bases.First();
-                    foreach (var sub in baseDTO.Subs)
-                        sub.BaseID2 -= 10;
-                    Mapper.Map(baseDTO, baseObj);
-                    var changes = context.ChangeTracker.Entries();
-
-                    var modified = changes.Where(c => c.State == EntityState.Modified).ToList();
-                    modified.Count().ShouldEqual(1);
-                    modified[0].Entity.ShouldBeSameAs(baseObj.Subs.ElementAt(1));
-
-                    var added = changes.Where(c => c.State == EntityState.Added).ToList();
-                    added.Count().ShouldEqual(1);
-                    added[0].Entity.ShouldBeSameAs(baseObj.Subs.ElementAt(2));
-                }
             }
         }
 

@@ -1,5 +1,7 @@
 using System;
 using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Impl;
 
 namespace AutoMapper.EquivilencyExpression
 {
@@ -18,7 +20,7 @@ namespace AutoMapper.EquivilencyExpression
         }
     }
 
-    internal class EquivilentExpression<TSource,TDestination> : IEquivilentExpression 
+    internal class EquivilentExpression<TSource,TDestination> : IEquivilentExpression , IToSingleSourceEquivalentExpression
         where TSource : class 
         where TDestination : class
     {
@@ -38,6 +40,19 @@ namespace AutoMapper.EquivilencyExpression
             return _equivilentExpression.Compile()(source as TSource, destination as TDestination);
         }
 
+        public Expression ToSingleSourceExpression(object source)
+        {
+            if (source == null)
+                throw new Exception("Invalid somehow");
+            return GetSourceOnlyExpresison(source as TSource);
+        }
+
+        internal Expression GetSourceOnlyExpresison<TSource>(TSource source)
+        {
+            var expression = new ParametersToConstantVisitor<TSource>(source).Visit(_equivilentExpression) as LambdaExpression;
+            return Expression.Lambda(expression.Body, _equivilentExpression.Parameters[1]);
+        }
+
         private class EquivilentExpressionNotOfTypeException : Exception
         {
             private readonly Type _objectType;
@@ -53,6 +68,31 @@ namespace AutoMapper.EquivilencyExpression
             {
                 get { return string.Format("{0} does not equal or inherit from {1}", _objectType.Name, _expectedType.Name); }
             }
+        }
+    }
+
+    internal class ParametersToConstantVisitor<T> : ExpressionVisitor
+    {
+        private readonly T _value;
+
+        public ParametersToConstantVisitor(T value)
+        {
+            _value = value;
+        }
+
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            return node;
+        }
+
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            if (node.Member is PropertyInfo && node.Member.DeclaringType == typeof(T))
+            {
+                var memberExpression = Expression.Constant(node.Member.ToMemberGetter().GetValue(_value));
+                return memberExpression;
+            }
+            return base.VisitMember(node);
         }
     }
 }

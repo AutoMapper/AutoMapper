@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AutoMapper.EquivilencyExpression;
 
 namespace AutoMapper.Mappers
 {
@@ -16,7 +17,9 @@ namespace AutoMapper.Mappers
             new EnumerableToDictionaryMapper(),
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
-            new EquivlentExpressionAddRemoveCollectionMapper(), 
+            new EquivlentExpressionAddRemoveCollectionMapper(),
+            new ObjectToEquivalencyExpressionByEquivalencyExistingMapper(),
+            new ExpressionOfTypeToExpressionOfDifferentTypeMapper(), 
             new CollectionMapper(),
             new EnumerableMapper(),
             new AssignableMapper(),
