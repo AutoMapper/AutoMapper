@@ -14,23 +14,27 @@ namespace AutoMapper
         static DBRepository()
         {
             EquivilentExpressions.GenerateEquality.Add(new GenerateEntityFrameworkPrimaryKeyEquivilentExpressions<TDatabase>());
-            MapperRegistry.Mappers.Add(new DTOToEFObjectEquivilencyMapper<TDatabase>());
         }
 
-        public void Save<T>(object value) 
+        public void Save<T,TI>(object value) 
             where T : class
+            where TI : class, T
         {
             using (var db = new TDatabase())
             {
-                var equivExpr = Mapper.Map(value, value.GetType(), typeof (Expression<Func<T, bool>>)) as Expression<Func<T,bool>>;
+                var equivExpr = Mapper.Map(value, value.GetNonDynamicProxyType(), typeof (Expression<Func<T, bool>>)) as Expression<Func<T,bool>>;
                 if(equivExpr == null)
                     return;
-                var equivilent = db.Set<T>().FirstOrDefault(equivExpr);
+
+                var set = db.Set<T>();
+                var equivilent = set.FirstOrDefault(equivExpr);
 
                 if (equivilent == null)
-                    db.Set<T>().Add(Mapper.Map(value, value.GetType(), typeof (T)) as T);
-                else
-                    Mapper.Map(value, equivilent, value.GetType(), typeof (T));
+                {
+                    equivilent = set.Create<TI>();
+                    set.Add(equivilent);
+                }
+                Mapper.Map(value, equivilent, value.GetNonDynamicProxyType(), typeof(T));
                 db.SaveChanges();
             }
         }
@@ -40,7 +44,7 @@ namespace AutoMapper
         {
             using (var db = new TDatabase())
             {
-                var equivExpr = Mapper.Map(value, value.GetType(), typeof(Expression<Func<T, bool>>)) as Expression<Func<T, bool>>;
+                var equivExpr = Mapper.Map(value, value.GetNonDynamicProxyType(), typeof(Expression<Func<T, bool>>)) as Expression<Func<T, bool>>;
                 if (equivExpr == null)
                     return;
                 var equivilent = db.Set<T>().FirstOrDefault(equivExpr);
@@ -76,6 +80,27 @@ namespace AutoMapper
                 var equivilent = db.Set<T>().Where(equivExpr2);
                 return equivilent.Select(e => Mapper.Map<T, TDTO>(e)).ToList();
             }
+        }
+    }
+
+    public static class TypeExtensions
+    {
+        public static Type GetNonDynamicProxyType(this object item)
+        {
+            return item.GetType().GetNonDynamicProxyType();
+        }
+
+        public static Type GetNonDynamicProxyType(this Type item)
+        {
+            var type = item;
+            if (IsDynamicProxy(type))
+                type = type.BaseType;
+            return type;
+        }
+
+        private static bool IsDynamicProxy(Type type)
+        {
+            return type.Namespace == "System.Data.Entity.DynamicProxies";
         }
     }
 }

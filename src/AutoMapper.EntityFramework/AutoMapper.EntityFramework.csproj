@@ -35,24 +35,12 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.0\lib\net40\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework.SqlServer">
-      <HintPath>..\packages\EntityFramework.6.1.0\lib\net40\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="StructureMap">
-      <HintPath>..\..\lib\StructureMap\StructureMap.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IDBRepository.cs" />
-    <Compile Include="Mappers\DTOObjectToObjectEquivilencyMapper.cs" />
     <Compile Include="Mappers\GenerateEntityFrameworkPrimaryKeyEquivilentExpressions.cs" />
     <Compile Include="Mappers\GenerateEntityFrameworkPrimaryKeyPropertyMatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

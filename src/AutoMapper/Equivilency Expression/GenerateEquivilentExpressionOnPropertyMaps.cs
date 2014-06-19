@@ -9,7 +9,6 @@ namespace AutoMapper.EquivilencyExpression
     public class GenerateEquivilentExpressionOnPropertyMaps : IGenerateEquivilentExpressions
     {
         private readonly IEnumerable<PropertyMap> _propertyMaps;
-        private readonly MethodInfo _getValueMethod = typeof(IMemberGetter).GetMethod("GetValue");
 
         public GenerateEquivilentExpressionOnPropertyMaps(IEnumerable<PropertyMap> propertyMaps)
         {
@@ -44,10 +43,9 @@ namespace AutoMapper.EquivilencyExpression
 
         private BinaryExpression SourceEqualsDestinationExpression(PropertyMap propertyMap, Expression srcExpr, Expression destExpr)
         {
-            var srcPropExpr = Expression.Invoke(propertyMap.CustomExpression, srcExpr);
-            var destPropExpr = Expression.Call(Expression.Constant(propertyMap.DestinationProperty), _getValueMethod, destExpr);
-            var destPropExprToSrcPropType = Expression.Convert(destPropExpr, srcPropExpr.Type);
-            return Expression.Equal(srcPropExpr, destPropExprToSrcPropType);
+            var srcPropExpr = Expression.Property(srcExpr, propertyMap.SourceMember as PropertyInfo);
+            var destPropExpr = Expression.Property(destExpr, propertyMap.DestinationProperty.MemberInfo as PropertyInfo);
+            return Expression.Equal(srcPropExpr, destPropExpr);
         }
     }
 }

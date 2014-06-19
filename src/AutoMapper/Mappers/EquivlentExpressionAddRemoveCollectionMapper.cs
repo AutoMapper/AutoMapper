@@ -9,8 +9,8 @@ namespace AutoMapper.Mappers
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
-            var sourceElementType = TypeHelper.GetElementType(context.SourceType);
-            var destinationElementType = TypeHelper.GetElementType(context.DestinationType);
+            var sourceElementType = TypeHelper.GetElementType(context.SourceValue.GetType());
+            var destinationElementType = TypeHelper.GetElementType(context.DestinationValue.GetType());
             var equivilencyExpression = GetEquivilentExpression(context);
 
             var sourceEnumerable = context.SourceValue as IEnumerable;
@@ -40,8 +40,8 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(ResolutionContext context)
         {
-            return context.SourceType.IsEnumerableType() && context.SourceValue != null
-                && context.DestinationType.IsCollectionType() && context.DestinationValue != null
+            return context.SourceValue != null && context.SourceValue.GetType().IsEnumerableType()
+                && context.DestinationValue != null && context.DestinationValue.GetType().IsCollectionType() 
                 && GetEquivilentExpression(context) != null;
         }
 
