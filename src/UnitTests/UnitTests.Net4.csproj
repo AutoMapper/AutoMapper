@@ -178,6 +178,7 @@
     <Compile Include="NullBehavior.cs" />
     <Compile Include="ObjectSubstitution.cs" />
     <Compile Include="Profiles.cs" />
+    <Compile Include="Projection\ExplicitExpansion.cs" />
     <Compile Include="Projection\InheritedMaps.cs" />
     <Compile Include="Projection\MapFromTest.cs" />
     <Compile Include="Projection\NestedAndArraysTests.cs" />
