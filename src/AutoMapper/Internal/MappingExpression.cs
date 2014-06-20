@@ -345,6 +345,11 @@ namespace AutoMapper
             _propertyMap.ApplyPreCondition(condition);
         }
 
+        public void ExplicitExpansion()
+        {
+            _propertyMap.ExplicitExpansion = true;
+        }
+
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
         {
             _typeMap.MaxDepth = depth;

@@ -93,6 +93,8 @@ namespace AutoMapper
             get { return _hasCustomValueResolver; }
         }
 
+        public bool ExplicitExpansion { get; set; }
+
         public IEnumerable<IValueResolver> GetSourceValueResolvers()
         {
             if (_customMemberResolver != null)
@@ -211,7 +213,7 @@ namespace AutoMapper
 
         public bool CanResolveValue()
         {
-            return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
+            return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver) && !_ignored;
         }
 
         public void RemoveLastFormatter()

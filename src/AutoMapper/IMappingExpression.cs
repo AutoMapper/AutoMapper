@@ -407,6 +407,11 @@ namespace AutoMapper
         /// </summary>
         /// <param name="condition">Condition to evaluate using the current resolution context</param>
         void PreCondition(Func<ResolutionContext, bool> condition);
+
+        /// <summary>
+        /// Ignore this member for LINQ projections unless explicitly expanded during projection
+        /// </summary>
+        void ExplicitExpansion();
     }
 
     /// <summary>
