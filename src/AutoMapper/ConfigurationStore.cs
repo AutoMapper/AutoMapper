@@ -366,17 +366,9 @@ namespace AutoMapper
                 var potentialSourceType = source.GetType();
                 //Try and get the most specific type map possible
                 var potentialTypes = _typeMaps
-                    .Where(t =>
-                    {
-                        return destinationType.IsAssignableFrom(t.DestinationType) &&
-                               t.SourceType.IsAssignableFrom(source.GetType()) &&
-                               (
-                                   destinationType.IsAssignableFrom(t.DestinationType) ||
-                                   t.GetDerivedTypeFor(potentialSourceType) != null
-                               )
-                            ;
-                    }
-                    );
+                    .Where(t => ((destination == null && destinationType.IsAssignableFrom(t.DestinationType))
+                                 || (destination != null && t.DestinationType.IsInstanceOfType(destination))) &&
+                                t.SourceType.IsInstanceOfType(source));
 
                 var potentialDestTypeMap =
                     potentialTypes
