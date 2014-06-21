@@ -3,6 +3,7 @@ namespace AutoMapper
 	public class NullReplacementMethod : IValueResolver
 	{
 		private readonly object _nullSubstitute;
+        public object NullSubstitute {get { return _nullSubstitute; }}
 
 		public NullReplacementMethod(object nullSubstitute)
 		{
