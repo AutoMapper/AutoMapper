@@ -242,6 +242,11 @@ namespace AutoMapper
             return this;
         }
 
+        public void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression)
+        {
+            _typeMap.UseCustomProjection(projectionExpression);
+        }
+
         public void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
         {
             _propertyMap.AddFormatterToSkip<TValueFormatter>();
