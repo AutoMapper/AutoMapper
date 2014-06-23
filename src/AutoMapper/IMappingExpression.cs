@@ -3,6 +3,8 @@ using System.Linq.Expressions;
 
 namespace AutoMapper
 {
+    using System.ComponentModel;
+
     /// <summary>
     /// Mapping configuration options for non-generic maps
     /// </summary>
@@ -231,6 +233,12 @@ namespace AutoMapper
         /// <param name="substituteFunc">Substitution function</param>
         /// <returns>New source object to map.</returns>
         IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc);
+
+        /// <summary>
+        /// The current TypeMap being configured
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        TypeMap TypeMap { get; }
     }
 
     /// <summary>
