@@ -10,26 +10,13 @@
         public ProjectEnumTest()
         {
             Mapper.CreateMap<Customer, CustomerDto>();
-            Mapper.CreateMap<CustomerType, string>().ConvertUsing(ct => ct.ToString().ToUpper());
-        }
-
-        [Fact]
-        public void RegularMappingWorks()
-        {
-            var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
-
-            var projected = Mapper.Map<CustomerDto[]>(customers);
-
-            projected.ShouldNotBeNull();
-            Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
+            Mapper.CreateMap<CustomerType, string>().ProjectUsing(ct => ct.ToString().ToUpper());
         }
 
         [Fact]
         public void ProjectingEnumToString()
         {
             var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
-
-            Mapper.Map<CustomerDto[]>(customers);
 
             var projected = customers.Project().To<CustomerDto>();
             projected.ShouldNotBeNull();

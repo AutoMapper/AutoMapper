@@ -118,6 +118,12 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> WithProfile(string profileName);
 
         /// <summary>
+        /// Skip member mapping and use a custom expression during LINQ projection
+        /// </summary>
+        /// <param name="projectionExpression">Projection expression</param>
+        void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression);
+
+        /// <summary>
         /// Skip member mapping and use a custom function to convert to the destination type
         /// </summary>
         /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
