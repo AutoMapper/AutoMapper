@@ -290,51 +290,139 @@ namespace AutoMapper.QueryableExtensions
                 selectExpression);
         }
 
+        private static readonly IList<IExpressionResultConverter> ExpressionResultConverters =
+            new IExpressionResultConverter[]
+            {
+                new MemberGetterExpressionResultConverter(),
+                new MemberResolverExpressionResultConverter(),
+                new NullSubstitutionExpressionResultConverter(), 
+            };
+
         private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType, Expression instanceParameter)
         {
-            Expression currentChild = instanceParameter;
-            Type currentChildType = currentType;
+            var result = new ExpressionResolutionResult(instanceParameter, currentType);
             foreach (var resolver in propertyMap.GetSourceValueResolvers())
             {
-                var getter = resolver as IMemberGetter;
-                if (getter != null)
-                {
-                    var memberInfo = getter.MemberInfo;
-
-                    var propertyInfo = memberInfo as PropertyInfo;
-                    if (propertyInfo != null)
-                    {
-                        currentChild = Expression.Property(currentChild, propertyInfo);
-                        currentChildType = propertyInfo.PropertyType;
-                    }
-                    else
-                        currentChildType = currentChild.Type;
-                }
-                else
-                {
-                    var oldParameter = propertyMap.CustomExpression.Parameters.Single();
-                    var newParameter = instanceParameter;
-                    var converter = new ConversionVisitor(newParameter, oldParameter);
-
-                    currentChild = converter.Visit(propertyMap.CustomExpression.Body);
-                    currentChildType = currentChild.Type;
-                }
+                var matchingExpressionConverter = ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
+                if (matchingExpressionConverter == null)
+                    throw new Exception("Can't resolve this to Queryable Expression");
+                result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, resolver);
             }
-
-            return new ExpressionResolutionResult(currentChild, currentChildType);
+            return result;
         }
 
+        private interface IExpressionResultConverter
+        {
+            ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver);
+            bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver);
+        }
+
+        private class MemberGetterExpressionResultConverter : IExpressionResultConverter
+        {
+            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+            {
+                Expression currentChild = expressionResolutionResult.ResolutionExpression;
+                Type currentChildType = expressionResolutionResult.Type;
+                var getter = valueResolver as IMemberGetter;
+                var memberInfo = getter.MemberInfo;
+
+                var propertyInfo = memberInfo as PropertyInfo;
+                if (propertyInfo != null)
+                {
+                    currentChild = Expression.Property(currentChild, propertyInfo);
+                    currentChildType = propertyInfo.PropertyType;
+                }
+                else
+                    currentChildType = currentChild.Type;
+
+                return new ExpressionResolutionResult(currentChild, currentChildType);
+            }
+
+            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
+            {
+                return valueResolver is IMemberGetter;
+            }
+        }
+
+        private class NullSubstitutionExpressionResultConverter : IExpressionResultConverter
+        {
+            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+            {
+                Expression currentChild = expressionResolutionResult.ResolutionExpression;
+                Type currentChildType = expressionResolutionResult.Type;
+                var nullSubstitute = propertyMap.NullSubstitute;
+
+                var newParameter = expressionResolutionResult.ResolutionExpression;
+                var converter = new NullSubstitutionConversionVisitor(newParameter, nullSubstitute);
+
+                currentChild = converter.Visit(currentChild);
+                currentChildType = currentChildType.GetTypeOfNullable();
+
+                return new ExpressionResolutionResult(currentChild, currentChildType);
+            }
+
+            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
+            {
+                return valueResolver is NullReplacementMethod && expressionResolutionResult.Type.IsNullableType();
+            }
+        }
+
+        private class NullSubstitutionConversionVisitor : ExpressionVisitor
+        {
+            private readonly Expression newParameter;
+            private readonly object _nullSubstitute;
+
+            public NullSubstitutionConversionVisitor(Expression newParameter, object nullSubstitute)
+            {
+                this.newParameter = newParameter;
+                _nullSubstitute = nullSubstitute;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node == newParameter)
+                {
+                    var equalsNull = Expression.Property(newParameter, "HasValue");
+                    var nullConst = Expression.Condition(equalsNull, Expression.Property(newParameter, "Value"), Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+                    return nullConst;
+                }
+                return node;
+            }
+        }
+
+        private class MemberResolverExpressionResultConverter : IExpressionResultConverter
+        {
+            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+            {
+                Expression currentChild = expressionResolutionResult.ResolutionExpression;
+                Type currentChildType = expressionResolutionResult.Type;
+
+                var oldParameter = propertyMap.CustomExpression.Parameters.Single();
+                var newParameter = expressionResolutionResult.ResolutionExpression;
+                var converter = new ParameterConversionVisitor(newParameter, oldParameter);
+
+                currentChild = converter.Visit(propertyMap.CustomExpression.Body);
+                currentChildType = currentChild.Type;
+
+                return new ExpressionResolutionResult(currentChild, currentChildType);
+            }
+
+            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
+            {
+                return valueResolver is IMemberResolver;
+            }
+        }
         /// <summary>
         /// This expression visitor will replace an input parameter by another one
         /// 
         /// see http://stackoverflow.com/questions/4601844/expression-tree-copy-or-convert
         /// </summary>
-        private class ConversionVisitor : ExpressionVisitor
+        private class ParameterConversionVisitor : ExpressionVisitor
         {
             private readonly Expression newParameter;
             private readonly ParameterExpression oldParameter;
 
-            public ConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
+            public ParameterConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
             {
                 this.newParameter = newParameter;
                 this.oldParameter = oldParameter;

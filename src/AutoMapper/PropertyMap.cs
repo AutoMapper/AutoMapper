@@ -21,7 +21,6 @@ namespace AutoMapper
         private bool _hasCustomValueResolver;
         private IValueResolver _customResolver;
         private IValueResolver _customMemberResolver;
-        private object _nullSubstitute;
         private bool _sealed;
         private IValueResolver[] _cachedResolvers;
         private Func<ResolutionContext, bool> _condition;
@@ -47,7 +46,7 @@ namespace AutoMapper
                 }
             }
             ApplyCondition(inheritedMappedProperty._condition);
-            SetNullSubstitute(inheritedMappedProperty._nullSubstitute);
+            SetNullSubstitute(inheritedMappedProperty.NullSubstitute);
             SetMappingOrder(inheritedMappedProperty._mappingOrder);
             CustomExpression = inheritedMappedProperty.CustomExpression;
         }
@@ -95,6 +94,8 @@ namespace AutoMapper
 
         public bool ExplicitExpansion { get; set; }
 
+        public object NullSubstitute { get; private set; }
+
         public IEnumerable<IValueResolver> GetSourceValueResolvers()
         {
             if (_customMemberResolver != null)
@@ -108,8 +109,8 @@ namespace AutoMapper
                 yield return resolver;
             }
 
-            if (_nullSubstitute != null)
-                yield return new NullReplacementMethod(_nullSubstitute);
+            if (NullSubstitute != null)
+                yield return new NullReplacementMethod(NullSubstitute);
         }
 
         public void RemoveLastResolver()
@@ -223,7 +224,7 @@ namespace AutoMapper
 
         public void SetNullSubstitute(object nullSubstitute)
         {
-            _nullSubstitute = nullSubstitute;
+            NullSubstitute = nullSubstitute;
         }
 
         private void ResetSourceMemberChain()

@@ -184,6 +184,7 @@
     <Compile Include="Projection\NestedAndArraysTests.cs" />
     <Compile Include="Projection\NestedExpressionsMapFromTests.cs" />
     <Compile Include="Projection\NullableItemsTests.cs" />
+    <Compile Include="Projection\NullSubstitutes.cs" />
     <Compile Include="Projection\PrimitiveArraysTest.cs" />
     <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
     <Compile Include="Projection\ProjectCollectionListTest.cs" />
