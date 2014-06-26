@@ -277,6 +277,11 @@ namespace AutoMapper
         /// Ignore this member for configuration validation and skip during mapping
         /// </summary>
         void Ignore();
+
+        /// <summary>
+        /// Use the destination value instead of mapping from the source value or creating a new instance
+        /// </summary>
+        void UseDestinationValue();
     }
 
     /// <summary>

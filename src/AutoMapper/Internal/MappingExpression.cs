@@ -120,6 +120,11 @@ namespace AutoMapper
             _propertyMap.Ignore();
         }
 
+        public void UseDestinationValue()
+        {
+            _propertyMap.UseDestinationValue = true;
+        }
+
         private Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)
         {
             return context =>
