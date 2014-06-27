@@ -81,12 +81,15 @@ namespace AutoMapper
             return (TDestination)Map(source, modelType, destinationType, DefaultMappingOptions);
 		}
 
-        public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
+        public TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             Type modelType = typeof (TSource);
             Type destinationType = typeof (TDestination);
 
-            return (TDestination) Map(source, modelType, destinationType, opts);
+            var options = new MappingOperationOptions<TSource, TDestination>();
+            opts(options);
+
+            return (TDestination)MapCore(source, modelType, destinationType, options);
         }
 
 	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
@@ -94,12 +97,15 @@ namespace AutoMapper
             return Map(source, destination, DefaultMappingOptions);
 		}
 
-	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
+	    public TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
 	    {
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            return (TDestination)Map(source, destination, modelType, destinationType, opts);
+            var options = new MappingOperationOptions<TSource, TDestination>();
+            opts(options);
+
+            return (TDestination)MapCore(source, destination, modelType, destinationType, options);
         }
 
 	    public object Map(object source, Type sourceType, Type destinationType)
@@ -109,11 +115,16 @@ namespace AutoMapper
 
 	    public object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
 	    {
-            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType);
-
-	        var options = new MappingOperationOptions();
+            var options = new MappingOperationOptions();
 
             opts(options);
+            
+            return MapCore(source, sourceType, destinationType, options);
+	    }
+
+	    private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
+	    {
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType);
 
 	        var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, this);
 
@@ -127,11 +138,16 @@ namespace AutoMapper
 
 	    public object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
 	    {
-            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, destination, sourceType, destinationType);
-
-	        var options = new MappingOperationOptions();
+            var options = new MappingOperationOptions();
 
             opts(options);
+
+            return MapCore(source, destination, sourceType, destinationType, options);
+        }
+
+	    private object MapCore(object source, object destination, Type sourceType, Type destinationType, MappingOperationOptions options)
+	    {
+            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, destination, sourceType, destinationType);
 
 	        var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, this);
 

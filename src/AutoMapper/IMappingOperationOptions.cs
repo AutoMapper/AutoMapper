@@ -29,6 +29,24 @@ namespace AutoMapper
         /// Disable the cache used to re-use destination instances based on equality
         /// </summary>
         bool DisableCache { get; set; }
+
+        /// <summary>
+        /// Execute a custom function to the source and/or destination types before member mapping
+        /// </summary>
+        /// <param name="beforeFunction">Callback for the source/destination types</param>
+        /// <returns>Itself</returns>
+        void BeforeMap(Action<object, object> beforeFunction);
+    }
+
+    public interface IMappingOperationOptions<TSource, TDestination> : IMappingOperationOptions
+    {
+        /// <summary>
+        /// Execute a custom function to the source and/or destination types before member mapping
+        /// </summary>
+        /// <param name="beforeFunction">Callback for the source/destination types</param>
+        /// <returns>Itself</returns>
+        void BeforeMap(Action<TSource, TDestination> beforeFunction);
+        //void AfterMap(Action<TSource, TDestination> beforeMapAction);
     }
 
     public class MappingOperationOptions : IMappingOperationOptions
@@ -36,16 +54,31 @@ namespace AutoMapper
         public MappingOperationOptions()
         {
             Items = new Dictionary<string, object>();
+            BeforeMapAction = (src, dest) => { };
         }
 
         public Func<Type, object> ServiceCtor { get; private set; }
         public bool CreateMissingTypeMaps { get; set; }
         public IDictionary<string, object> Items { get; private set; }
         public bool DisableCache { get; set; }
+        public Action<object, object> BeforeMapAction { get; protected set; }
+
+        public void BeforeMap(Action<object, object> beforeFunction)
+        {
+            BeforeMapAction = beforeFunction;
+        }
 
         void IMappingOperationOptions.ConstructServicesUsing(Func<Type, object> constructor)
         {
             ServiceCtor = constructor;
+        }
+    }
+
+    public class MappingOperationOptions<TSource, TDestination> : MappingOperationOptions, IMappingOperationOptions<TSource, TDestination>
+    {
+        public void BeforeMap(Action<TSource, TDestination> beforeFunction)
+        {
+            BeforeMapAction = (src, dest) => beforeFunction((TSource) src, (TDestination) dest);
         }
     }
 }
