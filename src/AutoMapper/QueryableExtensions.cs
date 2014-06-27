@@ -142,6 +142,10 @@ namespace AutoMapper.QueryableExtensions
                 {
                     bindExpression = BindCustomProjectionExpression(propertyMap, propertyTypeMap, result);
                 }
+                else if (propertyMap.DestinationPropertyType == typeof (string))
+                {
+                    bindExpression = BindStringExpression(propertyMap, result);
+                }
                 else
                 {
                     throw new AutoMapperMappingException("Unable to create a map expression from " + result.Type + " to " + propertyMap.DestinationPropertyType);
@@ -150,6 +154,11 @@ namespace AutoMapper.QueryableExtensions
                 bindings.Add(bindExpression);
             }
             return bindings;
+        }
+
+        private static MemberAssignment BindStringExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
+        {
+            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, Expression.Call(result.ResolutionExpression, "ToString", null, null));
         }
 
         private static MemberAssignment BindCustomProjectionExpression(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
