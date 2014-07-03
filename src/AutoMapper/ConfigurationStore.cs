@@ -33,7 +33,7 @@ namespace AutoMapper
             _globalIgnore = new List<string>();
 	        _getTypeMaps = new IGetTypeMaps[]
 	        {
-	             new GetNormalTypeMap(this), new GetNullableTypeMap(this), new GetSourceDerivivedTypeMap(this), new GetFirstInterfaceWithTypeMap(this),
+	            new GetNormalTypeMap(this), new GetNullableTypeMap(this), new GetSourceDerivivedTypeMap(this), new GetFirstInterfaceWithTypeMap(this),
 	            new GetSourceBaseTypeTypeMap(this), new GetGenericTypeMap(this)
 	        };
 		}
@@ -552,6 +552,9 @@ namespace AutoMapper
 
 		private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
 		{
+            if (context.DestinationType.IsGenericParameter && context.SourceType.IsGenericParameter)
+                return;
+
             if (context.TypeMap != null)
             {
                 typeMapsChecked.Add(context.TypeMap);
@@ -775,11 +778,20 @@ namespace AutoMapper
         {
             var genericSourceType = sourceType.GetGenericTypeDefinition();
             var genericDestinationType = destinationType.GetGenericTypeDefinition();
-            var genericTypeMap = _configurationProvider.GetAllTypeMaps().FirstOrDefault(tm => tm.SourceType == genericSourceType && tm.DestinationType == genericDestinationType);
-            var specificTypeMap = new TypeMap(new TypeInfo(sourceType), new TypeInfo(destinationType), genericTypeMap.ConfiguredMemberList);
-            foreach (var propertyMap in genericTypeMap.GetPropertyMaps())
+            var allMaps = _configurationProvider.GetAllTypeMaps();
+            var genericTypeMap = allMaps.FirstOrDefault(tm => tm.SourceType == genericSourceType && tm.DestinationType == genericDestinationType);
+            if (genericTypeMap == null)
+                return null;
+            var specificTypeMap = allMaps.FirstOrDefault(tm => tm.SourceType == sourceType && tm.DestinationType == destinationType);
+            if (specificTypeMap == null)
             {
-                specificTypeMap.AddPropertyMap(propertyMap.DestinationProperty.MakeMemberAccessorGeneric(destinationType.GetGenericArguments()), propertyMap.GetSourceValueResolvers());
+                specificTypeMap = _configurationProvider.CreateTypeMap(sourceType, destinationType, "", genericTypeMap.ConfiguredMemberList);
+                foreach (var propertyMap in genericTypeMap.GetPropertyMaps())
+                {
+                    specificTypeMap.AddPropertyMap(
+                        propertyMap.DestinationProperty.MakeMemberAccessorGeneric(destinationType.GetGenericArguments()),
+                        propertyMap.GetSourceValueResolvers());
+                }
             }
             return specificTypeMap;
         }
