@@ -505,9 +505,13 @@ namespace AutoMapper
             return AfterMap(afterFunction);
         }
 
-        public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)
+        public IMappingExpression<TSource, TDestination> ConstructUsing(Expression<Func<TSource, TDestination>> ctor)
         {
-            return ConstructUsing(ctxt => ctor((TSource) ctxt.SourceValue));
+            var func = ctor.Compile();
+
+            TypeMap.ConstructExpression = ctor;
+
+            return ConstructUsing(ctxt => func((TSource)ctxt.SourceValue));
         }
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<ResolutionContext, TDestination> ctor)

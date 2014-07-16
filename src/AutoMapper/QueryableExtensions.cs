@@ -89,8 +89,10 @@ namespace AutoMapper.QueryableExtensions
 
             var bindings = CreateMemberBindings(mappingEngine, request, typeMap, instanceParameter, typePairCount);
 
+            var ctorExpr = Expression.New(request.DestinationType);
+
             var expression = Expression.MemberInit(
-                Expression.New(request.DestinationType),
+                ctorExpr,
                 bindings.ToArray()
                 );
 
