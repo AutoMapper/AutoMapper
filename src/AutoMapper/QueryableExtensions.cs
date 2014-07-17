@@ -188,11 +188,11 @@ namespace AutoMapper.QueryableExtensions
 
         private static MemberAssignment BindNullableExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
         {
+            var memberExpr = (MemberExpression)result.ResolutionExpression;
             if (result.ResolutionExpression.NodeType == ExpressionType.MemberAccess
-                && ((MemberExpression)result.ResolutionExpression).Expression.NodeType == ExpressionType.MemberAccess)
+                && memberExpr.Expression != null && memberExpr.Expression.NodeType == ExpressionType.MemberAccess)
             {
                 var destType = propertyMap.DestinationPropertyType;
-                var memberExpr = (MemberExpression)result.ResolutionExpression;
                 var parentExpr = memberExpr.Expression;
                 Expression expressionToBind = Expression.Convert(memberExpr, destType);
                 var nullExpression = Expression.Convert(Expression.Constant(null), destType);
