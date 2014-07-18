@@ -38,6 +38,7 @@ namespace AutoMapper
             _destinationType = destinationType;
             Profile = ConfigurationStore.DefaultProfileName;
             ConfiguredMemberList = memberList;
+            ConstructExpression = Expression.Lambda(Expression.New(destinationType.Type));
         }
 
         public ConstructorMap ConstructorMap
@@ -109,7 +110,7 @@ namespace AutoMapper
         }
 
         public Func<object, object> Substitution { get; set; }
-        public Expression<Func<object, object>> ConstructExpression { get; set; }
+        public LambdaExpression ConstructExpression { get; set; }
 
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {

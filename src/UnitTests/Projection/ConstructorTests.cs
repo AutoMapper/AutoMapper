@@ -32,7 +32,7 @@
         protected override void Establish_context()
         {
             Mapper.CreateMap<Source, Dest>()
-                .ConstructUsing(src => new Dest(src.Value + 10));
+                .ConstructProjectionUsing(src => new Dest(src.Value + 10));
         }
 
         protected override void Because_of()

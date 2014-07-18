@@ -505,13 +505,9 @@ namespace AutoMapper
             return AfterMap(afterFunction);
         }
 
-        public IMappingExpression<TSource, TDestination> ConstructUsing(Expression<Func<TSource, TDestination>> ctor)
+        public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)
         {
-            var func = ctor.Compile();
-
-            TypeMap.ConstructExpression = ctor;
-
-            return ConstructUsing(ctxt => func((TSource)ctxt.SourceValue));
+            return ConstructUsing(ctxt => ctor((TSource)ctxt.SourceValue));
         }
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<ResolutionContext, TDestination> ctor)
@@ -519,6 +515,15 @@ namespace AutoMapper
             TypeMap.DestinationCtor = ctxt => ctor(ctxt);
 
             return this;
+        }
+
+        public IMappingExpression<TSource, TDestination> ConstructProjectionUsing(Expression<Func<TSource, TDestination>> ctor)
+        {
+            var func = ctor.Compile();
+
+            TypeMap.ConstructExpression = ctor;
+
+            return ConstructUsing(ctxt => func((TSource)ctxt.SourceValue));
         }
 
         private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)

@@ -176,7 +176,14 @@ namespace AutoMapper
         /// </summary>
         /// <param name="ctor">Callback to create the destination type given the source object</param>
         /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> ConstructUsing(Expression<Func<TSource, TDestination>> ctor);
+        IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor);
+
+        /// <summary>
+        /// Supply a custom instantiation expression for the destination type for LINQ projection
+        /// </summary>
+        /// <param name="ctor">Callback to create the destination type given the source object</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ConstructProjectionUsing(Expression<Func<TSource, TDestination>> ctor);
 
         /// <summary>
         /// Supply a custom instantiation function for the destination type, based on the entire resolution context
