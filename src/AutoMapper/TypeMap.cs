@@ -109,6 +109,7 @@ namespace AutoMapper
         }
 
         public Func<object, object> Substitution { get; set; }
+        public LambdaExpression ConstructExpression { get; set; }
 
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {

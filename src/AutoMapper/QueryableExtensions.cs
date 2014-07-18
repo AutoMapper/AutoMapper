@@ -89,12 +89,28 @@ namespace AutoMapper.QueryableExtensions
 
             var bindings = CreateMemberBindings(mappingEngine, request, typeMap, instanceParameter, typePairCount);
 
+            var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
+            var visitor = new NewFinderVisitor();
+            var ctorExpr = typeMap.ConstructExpression ?? Expression.Lambda(Expression.New(request.DestinationType));
+            visitor.Visit(parameterReplacer.Visit(ctorExpr));
+
             var expression = Expression.MemberInit(
-                Expression.New(request.DestinationType),
+                visitor.NewExpression,
                 bindings.ToArray()
                 );
 
             return expression;
+        }
+
+        private class NewFinderVisitor : ExpressionVisitor
+        {
+            public NewExpression NewExpression { get; private set; }
+
+            protected override Expression VisitNew(NewExpression node)
+            {
+                NewExpression = node;
+                return base.VisitNew(node);
+            }
         }
 
         private static List<MemberBinding> CreateMemberBindings(IMappingEngine mappingEngine, ExpressionRequest request,
