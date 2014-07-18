@@ -91,7 +91,8 @@ namespace AutoMapper.QueryableExtensions
 
             var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
             var visitor = new NewFinderVisitor();
-            visitor.Visit(parameterReplacer.Visit(typeMap.ConstructExpression));
+            var ctorExpr = typeMap.ConstructExpression ?? Expression.Lambda(Expression.New(request.DestinationType));
+            visitor.Visit(parameterReplacer.Visit(ctorExpr));
 
             var expression = Expression.MemberInit(
                 visitor.NewExpression,

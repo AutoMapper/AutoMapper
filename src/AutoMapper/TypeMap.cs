@@ -38,7 +38,6 @@ namespace AutoMapper
             _destinationType = destinationType;
             Profile = ConfigurationStore.DefaultProfileName;
             ConfiguredMemberList = memberList;
-            ConstructExpression = Expression.Lambda(Expression.New(destinationType.Type));
         }
 
         public ConstructorMap ConstructorMap

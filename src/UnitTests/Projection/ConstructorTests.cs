@@ -26,6 +26,7 @@
             }
 
             public int Value { get; set; }
+            [IgnoreMap]
             public int Other { get; set; }
         }
 
