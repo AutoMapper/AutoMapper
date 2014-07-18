@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.UnitTests.Projection
+﻿using System;
+
+namespace AutoMapper.UnitTests.Projection
 {
     namespace NullableItemsTests
     {
@@ -33,11 +35,38 @@
             }
         }
 
+        public class CustomMapFromTest
+        {
+            public CustomMapFromTest()
+            {
+                Mapper.CreateMap<Parent, ParentDto>()
+                    .ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.UtcNow));
+            }
+
+            [Fact]
+            public void Should_not_fail()
+            {
+                var items = new[]
+                {
+                    new Parent
+                    {
+                        Value = 5
+                    }
+                };
+
+                var projected = items.AsQueryable().Project().To<ParentDto>().ToList();
+
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().Project().To<ParentDto>().ToList());
+                Assert.NotNull(projected[0].Date);
+            }
+        }
+
         public class ParentDto
         {
             public int? Value { get; set; }
             public int? ChildValue { get; set; }
             public int? ChildGrandChildValue { get; set; }
+            public DateTime? Date { get; set; }
         }
 
 
