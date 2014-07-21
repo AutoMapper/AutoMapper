@@ -47,4 +47,29 @@
             Vip,
         }
     }
+
+    public class ProjectionOverrides : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+        protected override void Establish_context()
+        {
+            Mapper.CreateMap<Source, Dest>()
+                .ProjectUsing(src => new Dest {Value = 10});
+        }
+
+        [Fact]
+        public void Should_validate_because_of_overridden_projection()
+        {
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+        }
+    }
 }
