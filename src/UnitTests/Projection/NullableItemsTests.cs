@@ -33,14 +33,52 @@ namespace AutoMapper.UnitTests.Projection
                 projected[0].ChildValue.ShouldBeNull();
                 projected[0].ChildGrandChildValue.ShouldBeNull();
             }
+
+
+            public class ParentDto
+            {
+                public int? Value { get; set; }
+                public int? ChildValue { get; set; }
+                public int? ChildGrandChildValue { get; set; }
+                public DateTime? Date { get; set; }
+            }
+
+
+            public class Parent
+            {
+                public int Value { get; set; }
+                public Child Child { get; set; }
+            }
+
+            public class Child
+            {
+                public int Value { get; set; }
+                public GrandChild GrandChild { get; set; }
+            }
+
+            public class GrandChild
+            {
+                public int Value { get; set; }
+            }
         }
 
         public class CustomMapFromTest
         {
+            public class Parent
+            {
+                public int Value { get; set; }
+                
+            }
+
+            public class ParentDto
+            {
+                public int? Value { get; set; }
+                public DateTime? Date { get; set; }
+            }
             public CustomMapFromTest()
             {
-                Mapper.CreateMap<Parent, ParentDto>()
-                    .ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.UtcNow));
+                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>()
+                    .ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.UtcNow)));
             }
 
             [Fact]
@@ -59,32 +97,6 @@ namespace AutoMapper.UnitTests.Projection
                 typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().Project().To<ParentDto>().ToList());
                 Assert.NotNull(projected[0].Date);
             }
-        }
-
-        public class ParentDto
-        {
-            public int? Value { get; set; }
-            public int? ChildValue { get; set; }
-            public int? ChildGrandChildValue { get; set; }
-            public DateTime? Date { get; set; }
-        }
-
-
-        public class Parent
-        {
-            public int Value { get; set; }
-            public Child Child { get; set; }
-        }
-
-        public class Child
-        {
-            public int Value { get; set; }
-            public GrandChild GrandChild { get; set; }
-        }
-
-        public class GrandChild
-        {
-            public int Value { get; set; }
         }
     }
 }
