@@ -78,7 +78,8 @@ namespace AutoMapper
                         message.AppendLine(error.TypeMap.SourceType.FullName + " -> " +
                                            error.TypeMap.DestinationType.FullName + " (" + 
                                            error.TypeMap.ConfiguredMemberList + " member list)");
-                        message.AppendLine(new string('-', len));
+                        message.AppendLine();
+                        message.AppendLine("Unmapped properties:");
                         foreach (var name in error.UnmappedPropertyNames)
                         {
                             message.AppendLine(name);
