@@ -13,9 +13,9 @@
     <Message Importance="low" Text="AutoMapper Platform Extension Assembly: %(_AutoMapperReference.FullPath)"/>
 
     <ItemGroup>
-      <Content Include="$([MSBuild]::MakeRelative($(MSBuildProjectDirectory), %(_AutoMapperReference.FullPath)))" Condition="'%(_AutoMapperReference.FullPath)' != ''">
+      <None Include="$([MSBuild]::MakeRelative($(MSBuildProjectDirectory), %(_AutoMapperReference.FullPath)))" Condition="'%(_AutoMapperReference.FullPath)' != ''">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+      </None>
     </ItemGroup>
   </Target>
 </Project>
