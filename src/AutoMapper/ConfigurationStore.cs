@@ -512,8 +512,9 @@ namespace AutoMapper
 
 		private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
 		{
-			var badTypeMaps =
-				(from typeMap in typeMaps
+		    var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
+		    var badTypeMaps =
+				(from typeMap in maps
 				where ShouldCheckMap(typeMap)
 				let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
 				where unmappedPropertyNames.Length > 0
@@ -527,7 +528,7 @@ namespace AutoMapper
 
 			var typeMapsChecked = new List<TypeMap>();
 
-			foreach (var typeMap in _typeMaps)
+			foreach (var typeMap in maps)
 			{
 				DryRunTypeMap(typeMapsChecked, new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType, new MappingOperationOptions(), Mapper.Engine));
 			}
