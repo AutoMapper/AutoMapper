@@ -94,7 +94,7 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             return Engine.Map(source, destination, opts);
         }
@@ -107,9 +107,9 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-		public static TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
+		public static TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
 		{
-            return Engine.Map<TSource, TDestination>(source, opts);
+            return Engine.Map(source, opts);
 		}
 
         /// <summary>

@@ -4,6 +4,8 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.BeforeAfterMapping
 {
+    using Bug;
+
     public class When_configuring_before_and_after_methods : AutoMapperSpecBase
     {
         private Source _src;
@@ -138,5 +140,77 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
 			_destination.Value.ShouldEqual(10);
 		}
 	}
+
+    public class MappingSpecificBeforeMapping : AutoMapperSpecBase
+    {
+        private Dest _dest;
+
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+
+        protected override void Establish_context()
+        {
+            Mapper.CreateMap<Source, Dest>()
+                .BeforeMap((src, dest) => src.Value += 10);
+        }
+
+        protected override void Because_of()
+        {
+            _dest = Mapper.Map<Source, Dest>(new Source
+            {
+                Value = 5
+            }, opt => opt.BeforeMap((src, dest) => src.Value += 10));
+        }
+
+        [Fact]
+        public void Should_execute_typemap_and_scoped_beforemap()
+        {
+            _dest.Value.ShouldEqual(25);
+        }
+    }
+
+    public class MappingSpecificAfterMapping : AutoMapperSpecBase
+    {
+        private Dest _dest;
+
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public int Value { get; set; }
+        }
+
+
+        protected override void Establish_context()
+        {
+            Mapper.CreateMap<Source, Dest>()
+                .AfterMap((src, dest) => dest.Value += 10);
+        }
+
+        protected override void Because_of()
+        {
+            _dest = Mapper.Map<Source, Dest>(new Source
+            {
+                Value = 5
+            }, opt => opt.AfterMap((src, dest) => dest.Value += 10));
+        }
+
+        [Fact]
+        public void Should_execute_typemap_and_scoped_aftermap()
+        {
+            _dest.Value.ShouldEqual(25);
+        }
+    }
 
 }

@@ -84,6 +84,7 @@ namespace AutoMapper.Mappers
                     context.InstanceCache[context] = mappedObject;
 
 				context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
+			    context.Options.BeforeMapAction(context.SourceValue, mappedObject);
 
                 foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
                 {
@@ -91,6 +92,7 @@ namespace AutoMapper.Mappers
                 }
                 mappedObject = ReassignValue(context, mappedObject);
 
+                context.Options.AfterMapAction(context.SourceValue, mappedObject);
                 context.TypeMap.AfterMap(context.SourceValue, mappedObject);
 
                 return mappedObject;
