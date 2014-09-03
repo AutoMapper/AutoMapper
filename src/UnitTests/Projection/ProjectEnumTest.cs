@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.UnitTests.Projection
+﻿using AutoMapper.UnitTests.AnotherAssembly;
+
+namespace AutoMapper.UnitTests.Projection
 {
     using AutoMapper.QueryableExtensions;
     using Should;
@@ -11,6 +13,10 @@
         {
             Mapper.CreateMap<Customer, CustomerDto>();
             Mapper.CreateMap<CustomerType, string>().ProjectUsing(ct => ct.ToString().ToUpper());
+
+            Mapper.CreateMap<Customer, CustomerViewModel>();
+
+            Mapper.CreateMap<Customer, Client>();
         }
 
         [Fact]
@@ -21,6 +27,36 @@
             var projected = customers.Project().To<CustomerDto>();
             projected.ShouldNotBeNull();
             Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
+        }
+
+        [Fact]
+        public void ProjectingEnumToEnum()
+        {
+            var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
+
+            var projected = customers.Project().To<CustomerViewModel>();
+            projected.ShouldNotBeNull();
+            Assert.Equal(customers.Single().CustomerType.ToString(), projected.Single().CustomerType.ToString());
+        }
+
+
+        [Fact]
+        public void ProjectingEnumToEnumInAnotherAssembly()
+        {
+            var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
+
+            var projected = customers.Project().To<Client>();
+            projected.ShouldNotBeNull();
+            Assert.Equal(customers.Single().CustomerType.ToString(), projected.Single().CustomerType.ToString());
+        }
+
+        public class CustomerViewModel
+        {
+            public string FirstName { get; set; }
+
+            public string LastName { get; set; }
+
+            public CustomerType CustomerType { get; set; }
         }
 
         public class Customer

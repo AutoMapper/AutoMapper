@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30324.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0691ABF2-B3C7-43BF-9862-2D8D1299CE58}"
 	ProjectSection(SolutionItems) = preProject
@@ -54,6 +54,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.iOS", "AutoMapper\AutoMapper.iOS.csproj", "{693983C2-F4DE-44CB-A1D3-2AB00DF159DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.WPA81", "AutoMapper\AutoMapper.WPA81.csproj", "{F0D56AA4-806C-4D76-9227-5078CC44A68C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.AnotherAssembly", "UnitTests\UnitTests.AnotherAssembly.csproj", "{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -317,6 +319,21 @@ Global
 		{F0D56AA4-806C-4D76-9227-5078CC44A68C}.ReleaseWin8|x64.ActiveCfg = Release|Any CPU
 		{F0D56AA4-806C-4D76-9227-5078CC44A68C}.ReleaseWin8|x86.ActiveCfg = Release|x86
 		{F0D56AA4-806C-4D76-9227-5078CC44A68C}.ReleaseWin8|x86.Build.0 = Release|x86
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Release|ARM.ActiveCfg = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Release|x64.ActiveCfg = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.Release|x86.ActiveCfg = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.ReleaseWin8|Any CPU.ActiveCfg = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.ReleaseWin8|Any CPU.Build.0 = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.ReleaseWin8|ARM.ActiveCfg = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.ReleaseWin8|x64.ActiveCfg = Release|Any CPU
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E}.ReleaseWin8|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -337,5 +354,6 @@ Global
 		{DFE156BE-4D3D-4A6A-9E23-747DFD46920D} = {C1930F52-C66E-4E56-B7DB-FD42E497FFF0}
 		{693983C2-F4DE-44CB-A1D3-2AB00DF159DE} = {C1930F52-C66E-4E56-B7DB-FD42E497FFF0}
 		{F0D56AA4-806C-4D76-9227-5078CC44A68C} = {C1930F52-C66E-4E56-B7DB-FD42E497FFF0}
+		{2BBC22F0-1421-4D52-B465-3F4D292B8C2E} = {1BCC7A00-6382-4891-936A-F164614D26A4}
 	EndGlobalSection
 EndGlobal
