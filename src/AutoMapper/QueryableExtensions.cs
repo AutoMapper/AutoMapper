@@ -22,14 +22,27 @@ namespace AutoMapper.QueryableExtensions
         /// <typeparam name="TSource">Source Type</typeparam>
         /// <typeparam name="TDestination">Destination Type</typeparam>
         /// <param name="mappingEngine">Mapping engine instance</param>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Expand members explicitly previously marked as members to explicitly expand</param>
         /// <returns>Expression tree mapping source to destination type</returns>
         public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(
-            this IMappingEngine mappingEngine, params string[] membersToExpand)
+            this IMappingEngine mappingEngine, object parameters = null, params string[] membersToExpand)
         {
-            return (Expression<Func<TSource, TDestination>>)
+            //Expression.const
+            var cachedExpression = (Expression<Func<TSource, TDestination>>)
                 _expressionCache.GetOrAdd(new ExpressionRequest(typeof(TSource), typeof(TDestination), membersToExpand),
                     tp => CreateMapExpression(mappingEngine, tp, DictionaryFactory.CreateDictionary<ExpressionRequest, int>()));
+
+            if (parameters != null)
+            {
+                var paramValues = parameters.GetType()
+                    .GetProperties()
+                    .ToDictionary(pi => pi.Name, pi => pi.GetValue(parameters, null));
+                var visitor = new ConstantExpressionReplacementVisitor(paramValues);
+                return (Expression<Func<TSource, TDestination>>) visitor.Visit(cachedExpression);
+            }
+
+            return cachedExpression;
         }
 
 
@@ -487,6 +500,30 @@ namespace AutoMapper.QueryableExtensions
                 //return base.VisitParameter(node);
             }
         }
+
+        private class ConstantExpressionReplacementVisitor : ExpressionVisitor
+        {
+            private readonly System.Collections.Generic.IDictionary<string, object> _paramValues;
+
+            public ConstantExpressionReplacementVisitor(System.Collections.Generic.IDictionary<string, object> paramValues)
+            {
+                _paramValues = paramValues;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (!node.Member.DeclaringType.Name.Contains("<>"))
+                    return base.VisitMember(node);
+
+                if (!_paramValues.ContainsKey(node.Member.Name))
+                    return base.VisitMember(node);
+
+                return Expression.Convert(
+                    Expression.Constant(_paramValues[node.Member.Name]),
+                    node.Member.GetMemberType());
+            }
+        }
+
         private class ExpressionResolutionResult
         {
             public Expression ResolutionExpression { get; private set; }
@@ -564,24 +601,27 @@ namespace AutoMapper.QueryableExtensions
         /// Projects the source type to the destination type given the mapping configuration
         /// </summary>
         /// <typeparam name="TResult">Destination type to map to</typeparam>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        IQueryable<TResult> To<TResult>();
+        IQueryable<TResult> To<TResult>(object parameters = null);
 
         /// <summary>
         /// Projects the source type to the destination type given the mapping configuration
         /// </summary>
         /// <typeparam name="TResult">Destination type to map to</typeparam>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        IQueryable<TResult> To<TResult>(params string[] membersToExpand);
+        IQueryable<TResult> To<TResult>(object parameters = null, params string[] membersToExpand);
 
         /// <summary>
         /// Projects the source type to the destination type given the mapping configuration
         /// </summary>
         /// <typeparam name="TResult">Destination type to map to</typeparam>
         /// <param name="membersToExpand">>Explicit members to expand</param>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        IQueryable<TResult> To<TResult>(params Expression<Func<TResult, object>>[] membersToExpand);
+        IQueryable<TResult> To<TResult>(object parameters = null, params Expression<Func<TResult, object>>[] membersToExpand);
     }
 
     public class ProjectionExpression<TSource> : IProjectionExpression
@@ -595,19 +635,19 @@ namespace AutoMapper.QueryableExtensions
             _mappingEngine = mappingEngine;
         }
 
-        public IQueryable<TResult> To<TResult>()
+        public IQueryable<TResult> To<TResult>(object parameters = null)
         {
-            return To<TResult>(new string[0]);
+            return To<TResult>(parameters, new string[0]);
         }
 
-        public IQueryable<TResult> To<TResult>(params string[] membersToExpand)
+        public IQueryable<TResult> To<TResult>(object parameters = null, params string[] membersToExpand)
         {
-            Expression<Func<TSource, TResult>> expr = _mappingEngine.CreateMapExpression<TSource, TResult>(membersToExpand);
+            Expression<Func<TSource, TResult>> expr = _mappingEngine.CreateMapExpression<TSource, TResult>(parameters, membersToExpand);
 
             return _source.Select(expr);
         }
 
-        public IQueryable<TResult> To<TResult>(params Expression<Func<TResult, object>>[] membersToExpand)
+        public IQueryable<TResult> To<TResult>(object parameters = null, params Expression<Func<TResult, object>>[] membersToExpand)
         {
             var members = membersToExpand.Select(expr =>
             {
@@ -616,7 +656,7 @@ namespace AutoMapper.QueryableExtensions
                 return visitor.MemberName;
             })
                 .ToArray();
-            return To<TResult>(members);
+            return To<TResult>(parameters, members);
         }
 
         private class MemberVisitor : ExpressionVisitor
