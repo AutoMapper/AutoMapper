@@ -53,7 +53,7 @@
                 }
             };
 
-            _dests = sourceList.AsQueryable().Project().To<Dest>(d => d.Child2).ToArray();
+            _dests = sourceList.AsQueryable().Project().To<Dest>(membersToExpand: d => d.Child2).ToArray();
         }
 
         [Fact]
