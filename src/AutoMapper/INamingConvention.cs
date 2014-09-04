@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -51,6 +52,11 @@ namespace AutoMapper
         /// Destination member naem prefixes to ignore/drop
         /// </summary>
 	    IEnumerable<string> DestinationPostfixes { get; }
+
+        /// <summary>
+        /// Source/destination member name replacers
+        /// </summary>
+        IEnumerable<MemberNameReplacer> MemberNameReplacers { get; }
 
         /// <summary>
         /// Source/destination member aliases

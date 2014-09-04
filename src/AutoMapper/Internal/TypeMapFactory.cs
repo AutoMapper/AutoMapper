@@ -155,10 +155,11 @@ namespace AutoMapper
 
         private static bool NameMatches(string memberName, string nameToMatch, IMappingOptions mappingOptions)
         {
-            var possibleSourceNames = PossibleNames(memberName, mappingOptions.Aliases, mappingOptions.Prefixes,
-                                                          mappingOptions.Postfixes);
-            var possibleDestNames = PossibleNames(nameToMatch, mappingOptions.Aliases, mappingOptions.DestinationPrefixes,
-                                                          mappingOptions.DestinationPostfixes);
+            var possibleSourceNames = PossibleNames(memberName, mappingOptions.Aliases, mappingOptions.MemberNameReplacers,
+                mappingOptions.Prefixes, mappingOptions.Postfixes);
+
+            var possibleDestNames = PossibleNames(nameToMatch, mappingOptions.Aliases, mappingOptions.MemberNameReplacers,
+                mappingOptions.DestinationPrefixes, mappingOptions.DestinationPostfixes);
 
             var all =
                 from sourceName in possibleSourceNames
@@ -168,7 +169,8 @@ namespace AutoMapper
             return all.Any(pair => String.Compare(pair.sourceName, pair.destName, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
-        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases, IEnumerable<string> prefixes, IEnumerable<string> postfixes)
+        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases, 
+            IEnumerable<MemberNameReplacer> memberNameReplacers, IEnumerable<string> prefixes, IEnumerable<string> postfixes)
         {
             if (string.IsNullOrEmpty(memberName))
                 yield break;
@@ -178,6 +180,18 @@ namespace AutoMapper
             foreach (var alias in aliases.Where(alias => String.Equals(memberName, alias.Member, StringComparison.Ordinal)))
             {
                 yield return alias.Alias;
+            }
+
+            if (memberNameReplacers.Any())
+            {
+                string aliasName = memberName;
+
+                foreach (var nameReplacer in memberNameReplacers)
+                {
+                    aliasName = aliasName.Replace(nameReplacer.OrginalValue, nameReplacer.NewValue);
+                }
+
+                yield return aliasName;
             }
 
             foreach (var prefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.Ordinal)))
