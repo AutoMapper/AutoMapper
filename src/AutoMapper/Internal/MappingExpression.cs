@@ -245,6 +245,15 @@ namespace AutoMapper
             return this;
         }
 
+        public IMappingExpression<TSource, TDestination> IncludeBase<TSourceBase, TDestinationBase>()
+        {
+            TypeMap baseTypeMap = _configurationContainer.CreateMap<TSourceBase, TDestinationBase>().TypeMap;
+            baseTypeMap.IncludeDerivedTypes(typeof(TSource), typeof(TDestination));
+            TypeMap.ApplyInheritedMap(baseTypeMap);
+
+            return this;
+        }
+
         public IMappingExpression<TSource, TDestination> WithProfile(string profileName)
         {
             TypeMap.Profile = profileName;

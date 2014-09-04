@@ -376,5 +376,34 @@ namespace AutoMapper
             CustomProjection = projectionExpression;
             _propertyMaps.Clear();
         }
+
+        public void ApplyInheritedMap(TypeMap inheritedTypeMap)
+        {
+            foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
+            {
+                var conventionPropertyMap = GetPropertyMaps()
+                    .SingleOrDefault(m =>
+                        m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
+
+                if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
+                {
+                    conventionPropertyMap.AssignCustomValueResolver(inheritedMappedProperty.GetSourceValueResolvers().First());
+                    conventionPropertyMap.AssignCustomExpression(inheritedMappedProperty.CustomExpression);
+                }
+                else if (conventionPropertyMap == null)
+                {
+                    var propertyMap = new PropertyMap(inheritedMappedProperty);
+
+                    AddInheritedPropertyMap(propertyMap);
+                }
+            }
+
+            //Include BeforeMap
+            if (inheritedTypeMap.BeforeMap != null)
+                AddBeforeMapAction(inheritedTypeMap.BeforeMap);
+            //Include AfterMap
+            if (inheritedTypeMap.AfterMap != null)
+                AddAfterMapAction(inheritedTypeMap.AfterMap);
+        }
     }
 }

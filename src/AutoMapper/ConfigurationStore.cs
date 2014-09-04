@@ -269,31 +269,7 @@ namespace AutoMapper
         {
             foreach (var inheritedTypeMap in _typeMaps.Where(t => t.TypeHasBeenIncluded(source, destination)))
             {
-                foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
-                {
-                    var conventionPropertyMap = typeMap.GetPropertyMaps()
-                        .SingleOrDefault(m =>
-                                         m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
-
-                    if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
-                    {
-                        conventionPropertyMap.AssignCustomValueResolver(inheritedMappedProperty.GetSourceValueResolvers().First());
-                        conventionPropertyMap.AssignCustomExpression(inheritedMappedProperty.CustomExpression);
-                    }
-                    else if (conventionPropertyMap == null)
-                    {
-                        var propertyMap = new PropertyMap(inheritedMappedProperty);
-
-                        typeMap.AddInheritedPropertyMap(propertyMap);
-                    }
-                }
-
-                //Include BeforeMap
-                if (inheritedTypeMap.BeforeMap != null)
-                    typeMap.AddBeforeMapAction(inheritedTypeMap.BeforeMap);
-                //Include AfterMap
-                if (inheritedTypeMap.AfterMap != null)
-                    typeMap.AddAfterMapAction(inheritedTypeMap.AfterMap);
+                typeMap.ApplyInheritedMap(inheritedTypeMap);
             }
         }
 
