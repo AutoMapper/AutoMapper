@@ -97,7 +97,7 @@ namespace AutoMapper
 
         
         /// <summary>
-        /// Provide a newvalue for a part of a members name
+        /// Provide a new value for a part of a members name
         /// </summary>
         /// <param name="original">Original member value</param>
         /// <param name="newValue">New member value</param>
