@@ -91,6 +91,7 @@
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\AssignableArrayMapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\ExpressionMapper.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
@@ -158,7 +159,23 @@
     <Compile Include="PropertyMap.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
     <Compile Include="Internal\ProxyBase.cs" />
-    <Compile Include="QueryableExtensions.cs" />
+    <Compile Include="QueryableExtensions\ExpressionRequest.cs" />
+    <Compile Include="QueryableExtensions\ExpressionResolutionResult.cs" />
+    <Compile Include="QueryableExtensions\Extensions.cs" />
+    <Compile Include="QueryableExtensions\IExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\IExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\AssignableExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\CustomProjectionExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\EnumerableExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\MappedTypeExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\MemberGetterExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\NullableExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\ParameterReplacementVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\StringExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
+    <Compile Include="QueryableExtensions\ProjectionExpression.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />
@@ -176,6 +193,7 @@
     </None>
     <None Include="SemanticModel.cd" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
