@@ -6,6 +6,7 @@ namespace AutoMapper.Mappers
     {
         private static readonly IObjectMapper[] _initialMappers =
         {
+            new ExpressionMapper(), 
             new TypeMapMapper(TypeMapObjectMapperRegistry.Mappers),
             new StringMapper(),
             new AssignableArrayMapper(), 
