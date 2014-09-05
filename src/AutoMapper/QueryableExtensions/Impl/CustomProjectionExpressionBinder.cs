@@ -4,7 +4,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
     public class CustomProjectionExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap)
+        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
             return propertyTypeMap != null && propertyTypeMap.CustomProjection != null;
         }

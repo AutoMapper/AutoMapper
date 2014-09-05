@@ -5,7 +5,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
     public class StringExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap)
+        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
             return propertyMap.DestinationPropertyType == typeof(string);
         }

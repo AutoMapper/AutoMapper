@@ -144,6 +144,7 @@ namespace AutoMapper.QueryableExtensions
                 var propertyTypeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
 
+                var assignableExpressionBinder = new AssignableExpressionBinder();
                 var enumerableExpressionBinder = new EnumerableExpressionBinder();
                 var stringBinder = new StringExpressionBinder();
                 var customBinder = new CustomProjectionExpressionBinder();
@@ -155,11 +156,11 @@ namespace AutoMapper.QueryableExtensions
                 {
                     bindExpression = BindNullableExpression(propertyMap, result);
                 }
-                else if (propertyMap.DestinationPropertyType.IsAssignableFrom(result.Type))
+                else if (assignableExpressionBinder.IsMatch(propertyMap, propertyTypeMap, result))
                 {
-                    bindExpression = BindAssignableExpression(propertyMap, result);
+                    bindExpression = assignableExpressionBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
-                else if (enumerableExpressionBinder.IsMatch(propertyMap, propertyTypeMap))
+                else if (enumerableExpressionBinder.IsMatch(propertyMap, propertyTypeMap, result))
                 {
                     bindExpression = enumerableExpressionBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
@@ -167,11 +168,11 @@ namespace AutoMapper.QueryableExtensions
                 {
                     bindExpression = BindMappedTypeExpression(mappingEngine, propertyMap, propertyRequest, result, typePairCount);
                 }
-                else if (customBinder.IsMatch(propertyMap, propertyTypeMap))
+                else if (customBinder.IsMatch(propertyMap, propertyTypeMap, result))
                 {
                     bindExpression = customBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
-                else if (stringBinder.IsMatch(propertyMap, propertyTypeMap))
+                else if (stringBinder.IsMatch(propertyMap, propertyTypeMap, result))
                 {
                     bindExpression = stringBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
@@ -233,11 +234,6 @@ namespace AutoMapper.QueryableExtensions
 
             bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, transformedExpression);
             return bindExpression;
-        }
-
-        private static MemberAssignment BindAssignableExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
-        {
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, result.ResolutionExpression);
         }
 
         private static readonly IList<IExpressionResultConverter> ExpressionResultConverters =

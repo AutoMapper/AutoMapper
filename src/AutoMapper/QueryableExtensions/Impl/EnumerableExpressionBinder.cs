@@ -7,7 +7,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
     public class EnumerableExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap)
+        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
             return propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
                    propertyMap.DestinationPropertyType != typeof(string);
