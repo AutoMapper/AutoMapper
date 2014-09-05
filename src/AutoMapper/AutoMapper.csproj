@@ -158,7 +158,11 @@
     <Compile Include="PropertyMap.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
     <Compile Include="Internal\ProxyBase.cs" />
-    <Compile Include="QueryableExtensions.cs" />
+    <Compile Include="QueryableExtensions\ExpressionRequest.cs" />
+    <Compile Include="QueryableExtensions\ExpressionResolutionResult.cs" />
+    <Compile Include="QueryableExtensions\Extensions.cs" />
+    <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
+    <Compile Include="QueryableExtensions\ProjectionExpression.cs" />
     <Compile Include="ResolutionContext.cs" />
     <Compile Include="Internal\ResolutionExpression.cs" />
     <Compile Include="ResolutionResult.cs" />
@@ -175,6 +179,9 @@
       <Link>AutoMapper.snk</Link>
     </None>
     <None Include="SemanticModel.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="QueryableExtensions\Impl\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

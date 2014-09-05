@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.UnitTests.Projection
 {
-    using AutoMapper.QueryableExtensions;
+    using QueryableExtensions;
     using Should;
     using System.Linq;
     using Xunit;

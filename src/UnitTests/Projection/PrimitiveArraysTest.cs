@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using AutoMapper.QueryableExtensions;
 using Xunit;
 using System.Linq;
 using Should;
@@ -9,6 +8,8 @@ namespace AutoMapper.UnitTests.Projection
 {
     namespace PrimitiveArrays
     {
+        using QueryableExtensions;
+
         public class PrimitiveArraysExpressionTest
         {
             [Fact]

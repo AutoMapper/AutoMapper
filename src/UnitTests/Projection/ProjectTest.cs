@@ -8,7 +8,7 @@ namespace AutoMapper.UnitTests.Projection
 	using System.Linq;
 
 	using AutoMapper;
-	using AutoMapper.QueryableExtensions;
+	using QueryableExtensions;
 
     public class ProjectTest
 	{

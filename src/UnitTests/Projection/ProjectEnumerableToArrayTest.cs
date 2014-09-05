@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xunit;
-using AutoMapper.QueryableExtensions;
-﻿using Should;
+using Should;
 
 namespace AutoMapper.UnitTests.Projection
 {
+    using QueryableExtensions;
+
     public class ProjectEnumerableToArrayTest
     {
         public ProjectEnumerableToArrayTest()

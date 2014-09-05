@@ -4,12 +4,13 @@ using System.Linq.Expressions;
 using Should;
 using Xunit;
 using System.Linq;
-using AutoMapper.QueryableExtensions;
 
 namespace AutoMapper.UnitTests
 {
     namespace ExpressionBridge
     {
+        using QueryableExtensions;
+
         public class SimpleProductDto
         {
             public string Name { set; get; }
