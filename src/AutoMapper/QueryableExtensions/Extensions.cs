@@ -145,6 +145,7 @@ namespace AutoMapper.QueryableExtensions
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
 
                 var stringBinder = new StringExpressionBinder();
+                var customBinder = new CustomProjectionExpressionBinder();
 
                 MemberAssignment bindExpression;
 
@@ -166,13 +167,13 @@ namespace AutoMapper.QueryableExtensions
                 {
                     bindExpression = BindMappedTypeExpression(mappingEngine, propertyMap, propertyRequest, result, typePairCount);
                 }
-                else if (propertyTypeMap != null && propertyTypeMap.CustomProjection != null)
+                else if (customBinder.IsMatch(propertyMap, propertyTypeMap))
                 {
-                    bindExpression = BindCustomProjectionExpression(propertyMap, propertyTypeMap, result);
+                    bindExpression = customBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
                 else if (stringBinder.IsMatch(propertyMap, propertyTypeMap))
                 {
-                    bindExpression = stringBinder.Build(mappingEngine, propertyMap, propertyRequest, result, typePairCount);
+                    bindExpression = stringBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
                 else
                 {
@@ -182,15 +183,6 @@ namespace AutoMapper.QueryableExtensions
                 bindings.Add(bindExpression);
             }
             return bindings;
-        }
-
-        private static MemberAssignment BindCustomProjectionExpression(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
-        {
-            var visitor = new ParameterReplacementVisitor(result.ResolutionExpression);
-
-            var replaced = visitor.Visit(propertyTypeMap.CustomProjection.Body);
-
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, replaced);
         }
 
         private static MemberAssignment BindNullableExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
@@ -345,22 +337,6 @@ namespace AutoMapper.QueryableExtensions
             return result;
         }
 
-        private class ParameterReplacementVisitor : ExpressionVisitor
-        {
-            private readonly Expression _memberExpression;
-
-            public ParameterReplacementVisitor(Expression memberExpression)
-            {
-                _memberExpression = memberExpression;
-            }
-
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                return _memberExpression;
-                //return base.VisitParameter(node);
-            }
-        }
-
         private class ConstantExpressionReplacementVisitor : ExpressionVisitor
         {
             private readonly System.Collections.Generic.IDictionary<string, object> _paramValues;
@@ -385,30 +361,18 @@ namespace AutoMapper.QueryableExtensions
         }
     }
 
-    public class StringExpressionBinder : IExpressionBinder
+    internal class ParameterReplacementVisitor : ExpressionVisitor
     {
-        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap)
+        private readonly Expression _memberExpression;
+
+        public ParameterReplacementVisitor(Expression memberExpression)
         {
-            return propertyMap.DestinationPropertyType == typeof(string);
+            _memberExpression = memberExpression;
         }
 
-        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionRequest request,
-            ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        protected override Expression VisitParameter(ParameterExpression node)
         {
-            return BindStringExpression(propertyMap, result);
+            return _memberExpression;
         }
-
-        private static MemberAssignment BindStringExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
-        {
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, Expression.Call(result.ResolutionExpression, "ToString", null, null));
-        }
-    }
-
-    public interface IExpressionBinder
-    {
-        bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap);
-
-        MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionRequest request,
-            ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount);
     }
 }

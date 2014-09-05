@@ -161,10 +161,13 @@
     <Compile Include="QueryableExtensions\ExpressionRequest.cs" />
     <Compile Include="QueryableExtensions\ExpressionResolutionResult.cs" />
     <Compile Include="QueryableExtensions\Extensions.cs" />
+    <Compile Include="QueryableExtensions\IExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\IExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\CustomProjectionExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\Impl\MemberGetterExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\StringExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
     <Compile Include="QueryableExtensions\ProjectionExpression.cs" />
     <Compile Include="ResolutionContext.cs" />
