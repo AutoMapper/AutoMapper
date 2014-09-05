@@ -144,17 +144,7 @@ namespace AutoMapper.QueryableExtensions
                 var propertyTypeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
 
-                var binders = new IExpressionBinder[]
-                {
-                    new NullableExpressionBinder(),
-                    new AssignableExpressionBinder(),
-                    new EnumerableExpressionBinder(),
-                    new MappedTypeExpressionBinder(),
-                    new CustomProjectionExpressionBinder(), 
-                    new StringExpressionBinder(),
-                };
-
-                var binder = binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
+                var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
                 if (binder == null)
                     throw new AutoMapperMappingException("Unable to create a map expression from " + result.Type + " to " + propertyMap.DestinationPropertyType);
@@ -173,6 +163,16 @@ namespace AutoMapper.QueryableExtensions
                 new MemberResolverExpressionResultConverter(),
                 new NullSubstitutionExpressionResultConverter(), 
             };
+
+        private static readonly IExpressionBinder[] Binders =
+        {
+            new NullableExpressionBinder(),
+            new AssignableExpressionBinder(),
+            new EnumerableExpressionBinder(),
+            new MappedTypeExpressionBinder(),
+            new CustomProjectionExpressionBinder(), 
+            new StringExpressionBinder(),
+        };
 
         private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType, Expression instanceParameter)
         {
