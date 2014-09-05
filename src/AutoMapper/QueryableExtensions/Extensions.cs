@@ -5,7 +5,6 @@ namespace AutoMapper.QueryableExtensions
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using AutoMapper.Impl;
     using Impl;
     using Internal;
 
@@ -435,29 +434,6 @@ namespace AutoMapper.QueryableExtensions
             {
                 return _memberExpression;
                 //return base.VisitParameter(node);
-            }
-        }
-
-        private class ConstantExpressionReplacementVisitor : ExpressionVisitor
-        {
-            private readonly System.Collections.Generic.IDictionary<string, object> _paramValues;
-
-            public ConstantExpressionReplacementVisitor(System.Collections.Generic.IDictionary<string, object> paramValues)
-            {
-                _paramValues = paramValues;
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (!node.Member.DeclaringType.Name.Contains("<>"))
-                    return base.VisitMember(node);
-
-                if (!_paramValues.ContainsKey(node.Member.Name))
-                    return base.VisitMember(node);
-
-                return Expression.Convert(
-                    Expression.Constant(_paramValues[node.Member.Name]),
-                    node.Member.GetMemberType());
             }
         }
     }

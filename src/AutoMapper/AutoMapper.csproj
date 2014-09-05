@@ -162,6 +162,7 @@
     <Compile Include="QueryableExtensions\ExpressionResolutionResult.cs" />
     <Compile Include="QueryableExtensions\Extensions.cs" />
     <Compile Include="QueryableExtensions\IExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\ConstantExpressionReplacementVisitor.cs" />
     <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
     <Compile Include="QueryableExtensions\ProjectionExpression.cs" />
