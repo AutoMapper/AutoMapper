@@ -83,7 +83,7 @@ namespace AutoMapper.QueryableExtensions
             return Expression.Lambda(total, instanceParameter);
         }
 
-        private static Expression CreateMapExpression(IMappingEngine mappingEngine, ExpressionRequest request, Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        internal static Expression CreateMapExpression(IMappingEngine mappingEngine, ExpressionRequest request, Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(request.SourceType,
                 request.DestinationType);
@@ -146,6 +146,7 @@ namespace AutoMapper.QueryableExtensions
 
                 var assignableExpressionBinder = new AssignableExpressionBinder();
                 var enumerableExpressionBinder = new EnumerableExpressionBinder();
+                var mappedTypeExpressionBinder = new MappedTypeExpressionBinder();
                 var stringBinder = new StringExpressionBinder();
                 var customBinder = new CustomProjectionExpressionBinder();
 
@@ -164,9 +165,9 @@ namespace AutoMapper.QueryableExtensions
                 {
                     bindExpression = enumerableExpressionBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
-                else if (propertyTypeMap != null && propertyTypeMap.CustomProjection == null)
+                else if (mappedTypeExpressionBinder.IsMatch(propertyMap, propertyTypeMap, result))
                 {
-                    bindExpression = BindMappedTypeExpression(mappingEngine, propertyMap, propertyRequest, result, typePairCount);
+                    bindExpression = mappedTypeExpressionBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
                 else if (customBinder.IsMatch(propertyMap, propertyTypeMap, result))
                 {
@@ -213,27 +214,6 @@ namespace AutoMapper.QueryableExtensions
             }
 
             return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, Expression.Convert(result.ResolutionExpression, propertyMap.DestinationPropertyType));
-        }
-
-        private static MemberAssignment BindMappedTypeExpression(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
-        {
-            MemberAssignment bindExpression;
-            var transformedExpression = CreateMapExpression(mappingEngine, request,
-                result.ResolutionExpression,
-                typePairCount);
-
-            // Handles null source property so it will not create an object with possible non-nullable propeerties 
-            // which would result in an exception.
-            if (mappingEngine.ConfigurationProvider.MapNullSourceValuesAsNull)
-            {
-                var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
-                transformedExpression =
-                    Expression.Condition(Expression.NotEqual(result.ResolutionExpression, Expression.Constant(null)),
-                        transformedExpression, expressionNull);
-            }
-
-            bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, transformedExpression);
-            return bindExpression;
         }
 
         private static readonly IList<IExpressionResultConverter> ExpressionResultConverters =
