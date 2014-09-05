@@ -11,6 +11,7 @@
         public class Source
         {
             public int Value { get; set; }
+            public int Foo { get; set; }
             public ChildSrc Child { get; set; }
         }
 
@@ -22,6 +23,7 @@
         public class Dest
         {
             public int Value { get; set; }
+            public int Bar { get; set; }
             public int ChildValue { get; set; }
         }
 
@@ -58,6 +60,25 @@
                 new Source {Child = new ChildSrc {Value = 10}},
                 new Source {Child = new ChildSrc {Value = 10}},
                 new Source {Child = new ChildSrc {Value = 15}}
+            };
+
+            items.AsQueryable().Where(mapped).Count().ShouldEqual(2);
+        }
+
+        [Fact]
+        public void Can_map_custom_mapped_properties()
+        {
+            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
+
+            Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
+
+            var mapped = Mapper.Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
+
+            var items = new[]
+            {
+                new Source {Foo = 10},
+                new Source {Foo = 10},
+                new Source {Foo = 15}
             };
 
             items.AsQueryable().Where(mapped).Count().ShouldEqual(2);

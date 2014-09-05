@@ -1,6 +1,5 @@
 ﻿namespace AutoMapper.Mappers
 {
-    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using Impl;
@@ -14,7 +13,8 @@
             var expression = (LambdaExpression) context.SourceValue;
 
             if (sourceDelegateType.GetGenericArguments().Length != destDelegateType.GetGenericArguments().Length)
-                throw new AutoMapperMappingException("Source and destination expressions must have same number of generic arguments.");
+                throw new AutoMapperMappingException(
+                    "Source and destination expressions must have same number of generic arguments.");
 
             var parameters = expression.Parameters.ToArray();
             var body = expression.Body;
@@ -30,7 +30,10 @@
                 var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(destParamType, sourceParamType);
 
                 if (typeMap == null)
-                    throw new AutoMapperMappingException(string.Format("Could not find type map from destination type {0} to source type {1}. Use CreateMap to create a map from the source to destination types.", destParamType, sourceParamType));
+                    throw new AutoMapperMappingException(
+                        string.Format(
+                            "Could not find type map from destination type {0} to source type {1}. Use CreateMap to create a map from the source to destination types.",
+                            destParamType, sourceParamType));
 
                 var oldParam = expression.Parameters[i];
                 var newParam = Expression.Parameter(typeMap.SourceType, oldParam.Name);
@@ -43,10 +46,10 @@
 
         public bool IsMatch(ResolutionContext context)
         {
-            return typeof(LambdaExpression).IsAssignableFrom(context.SourceType)
-                && context.SourceType != typeof(LambdaExpression)
-                && typeof(LambdaExpression).IsAssignableFrom(context.DestinationType)
-                && context.DestinationType != typeof(LambdaExpression);
+            return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
+                   && context.SourceType != typeof (LambdaExpression)
+                   && typeof (LambdaExpression).IsAssignableFrom(context.DestinationType)
+                   && context.DestinationType != typeof (LambdaExpression);
         }
 
         private class MappingVisitor : ExpressionVisitor
@@ -71,14 +74,38 @@
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                var replacedExpression = Visit(node.Expression);
-
                 var memberAccessor = node.Member.ToMemberAccessor();
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
 
+
+                if (propertyMap.CustomExpression != null)
+                {
+                    var replaced = new ParameterReplacementVisitor(_newParam);
+                    var newBody = replaced.Visit(propertyMap.CustomExpression.Body);
+                    return newBody;
+                }
+
+                var replacedExpression = Visit(node.Expression);
+
                 return propertyMap.GetSourceValueResolvers()
                     .OfType<IMemberGetter>()
-                    .Aggregate(replacedExpression, (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo));
+                    .Aggregate(replacedExpression,
+                        (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo));
+            }
+        }
+
+        private class ParameterReplacementVisitor : ExpressionVisitor
+        {
+            private readonly ParameterExpression _newParam;
+
+            public ParameterReplacementVisitor(ParameterExpression newParam)
+            {
+                _newParam = newParam;
+            }
+
+            protected override Expression VisitParameter(ParameterExpression node)
+            {
+                return _newParam;
             }
         }
     }
