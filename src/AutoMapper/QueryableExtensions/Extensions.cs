@@ -5,6 +5,7 @@ namespace AutoMapper.QueryableExtensions
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using AutoMapper.Impl;
     using Impl;
     using Internal;
 
@@ -39,7 +40,7 @@ namespace AutoMapper.QueryableExtensions
                 return cachedExpression;
 
             var visitor = new ConstantExpressionReplacementVisitor(parameters);
-            return (Expression<Func<TSource, TDestination>>) visitor.Visit(cachedExpression);
+            return (Expression<Func<TSource, TDestination>>)visitor.Visit(cachedExpression);
         }
 
 
@@ -143,7 +144,7 @@ namespace AutoMapper.QueryableExtensions
 
                 var propertyTypeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
-                
+
                 MemberAssignment bindExpression;
 
                 if (propertyMap.DestinationPropertyType.IsNullableType()
@@ -168,7 +169,7 @@ namespace AutoMapper.QueryableExtensions
                 {
                     bindExpression = BindCustomProjectionExpression(propertyMap, propertyTypeMap, result);
                 }
-                else if (propertyMap.DestinationPropertyType == typeof (string))
+                else if (propertyMap.DestinationPropertyType == typeof(string))
                 {
                     bindExpression = BindStringExpression(propertyMap, result);
                 }
@@ -209,7 +210,7 @@ namespace AutoMapper.QueryableExtensions
                     var nullExpression = Expression.Convert(Expression.Constant(null), destType);
                     while (parentExpr.NodeType != ExpressionType.Parameter)
                     {
-                        memberExpr = (MemberExpression) memberExpr.Expression;
+                        memberExpr = (MemberExpression)memberExpr.Expression;
                         parentExpr = memberExpr.Expression;
                         expressionToBind = Expression.Condition(
                             Expression.Equal(memberExpr, Expression.Constant(null)),
@@ -251,7 +252,7 @@ namespace AutoMapper.QueryableExtensions
             return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, result.ResolutionExpression);
         }
 
-        private static MemberAssignment BindEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,  ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        private static MemberAssignment BindEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             MemberAssignment bindExpression;
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
@@ -274,14 +275,14 @@ namespace AutoMapper.QueryableExtensions
             {
                 var transformedExpression = CreateMapExpression(mappingEngine, listTypePair, typePairCount);
                 selectExpression = Expression.Call(
-                    typeof (Enumerable),
+                    typeof(Enumerable),
                     "Select",
-                    new[] {sourceListType, destinationListType},
+                    new[] { sourceListType, destinationListType },
                     result.ResolutionExpression,
                     transformedExpression);
             }
 
-            if (typeof (IList<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType)
+            if (typeof(IList<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType)
                 || typeof(ICollection<>).MakeGenericType(destinationListType).IsAssignableFrom(propertyMap.DestinationPropertyType))
             {
                 // Call .ToList() on IEnumerable
@@ -298,7 +299,7 @@ namespace AutoMapper.QueryableExtensions
                     new Type[] { destinationListType },
                     selectExpression);
                 bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, toArrayCallExpression);
-            }           
+            }
             else
             {
                 // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
@@ -346,12 +347,6 @@ namespace AutoMapper.QueryableExtensions
                 result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, resolver);
             }
             return result;
-        }
-
-        private interface IExpressionResultConverter
-        {
-            ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver);
-            bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver);
         }
 
         private class MemberGetterExpressionResultConverter : IExpressionResultConverter
@@ -424,61 +419,6 @@ namespace AutoMapper.QueryableExtensions
                     return nullConst;
                 }
                 return node;
-            }
-        }
-
-        private class MemberResolverExpressionResultConverter : IExpressionResultConverter
-        {
-            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
-            {
-                Expression currentChild = expressionResolutionResult.ResolutionExpression;
-                Type currentChildType = expressionResolutionResult.Type;
-
-                var oldParameter = propertyMap.CustomExpression.Parameters.Single();
-                var newParameter = expressionResolutionResult.ResolutionExpression;
-                var converter = new ParameterConversionVisitor(newParameter, oldParameter);
-
-                currentChild = converter.Visit(propertyMap.CustomExpression.Body);
-                currentChildType = currentChild.Type;
-
-                return new ExpressionResolutionResult(currentChild, currentChildType);
-            }
-
-            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
-            {
-                return valueResolver is IMemberResolver;
-            }
-        }
-        /// <summary>
-        /// This expression visitor will replace an input parameter by another one
-        /// 
-        /// see http://stackoverflow.com/questions/4601844/expression-tree-copy-or-convert
-        /// </summary>
-        private class ParameterConversionVisitor : ExpressionVisitor
-        {
-            private readonly Expression newParameter;
-            private readonly ParameterExpression oldParameter;
-
-            public ParameterConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
-            {
-                this.newParameter = newParameter;
-                this.oldParameter = oldParameter;
-            }
-
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                // replace all old param references with new ones
-                return node.Type == oldParameter.Type ? newParameter : node;
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node.Expression != oldParameter) // if instance is not old parameter - do nothing
-                    return base.VisitMember(node);
-
-                var newObj = Visit(node.Expression);
-                var newMember = newParameter.Type.GetMember(node.Member.Name).First();
-                return Expression.MakeMemberAccess(newObj, newMember);
             }
         }
 

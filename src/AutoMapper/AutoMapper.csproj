@@ -161,6 +161,8 @@
     <Compile Include="QueryableExtensions\ExpressionRequest.cs" />
     <Compile Include="QueryableExtensions\ExpressionResolutionResult.cs" />
     <Compile Include="QueryableExtensions\Extensions.cs" />
+    <Compile Include="QueryableExtensions\IExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
     <Compile Include="QueryableExtensions\ProjectionExpression.cs" />
     <Compile Include="ResolutionContext.cs" />
@@ -180,9 +182,7 @@
     </None>
     <None Include="SemanticModel.cd" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="QueryableExtensions\Impl\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
