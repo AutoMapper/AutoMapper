@@ -164,6 +164,7 @@
     <Compile Include="QueryableExtensions\IExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\ConstantExpressionReplacementVisitor.cs" />
     <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
     <Compile Include="QueryableExtensions\ProjectionExpression.cs" />
     <Compile Include="ResolutionContext.cs" />
