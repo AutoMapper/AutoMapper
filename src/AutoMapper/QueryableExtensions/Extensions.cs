@@ -144,6 +144,8 @@ namespace AutoMapper.QueryableExtensions
                 var propertyTypeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
 
+                var stringBinder = new StringExpressionBinder();
+
                 MemberAssignment bindExpression;
 
                 if (propertyMap.DestinationPropertyType.IsNullableType()
@@ -168,9 +170,9 @@ namespace AutoMapper.QueryableExtensions
                 {
                     bindExpression = BindCustomProjectionExpression(propertyMap, propertyTypeMap, result);
                 }
-                else if (propertyMap.DestinationPropertyType == typeof(string))
+                else if (stringBinder.IsMatch(propertyMap, propertyTypeMap))
                 {
-                    bindExpression = BindStringExpression(propertyMap, result);
+                    bindExpression = stringBinder.Build(mappingEngine, propertyMap, propertyRequest, result, typePairCount);
                 }
                 else
                 {
@@ -180,11 +182,6 @@ namespace AutoMapper.QueryableExtensions
                 bindings.Add(bindExpression);
             }
             return bindings;
-        }
-
-        private static MemberAssignment BindStringExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
-        {
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, Expression.Call(result.ResolutionExpression, "ToString", null, null));
         }
 
         private static MemberAssignment BindCustomProjectionExpression(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
@@ -386,5 +383,32 @@ namespace AutoMapper.QueryableExtensions
                     node.Member.GetMemberType());
             }
         }
+    }
+
+    public class StringExpressionBinder : IExpressionBinder
+    {
+        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap)
+        {
+            return propertyMap.DestinationPropertyType == typeof(string);
+        }
+
+        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionRequest request,
+            ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        {
+            return BindStringExpression(propertyMap, result);
+        }
+
+        private static MemberAssignment BindStringExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
+        {
+            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, Expression.Call(result.ResolutionExpression, "ToString", null, null));
+        }
+    }
+
+    public interface IExpressionBinder
+    {
+        bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap);
+
+        MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionRequest request,
+            ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount);
     }
 }
