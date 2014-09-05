@@ -164,6 +164,7 @@
     <Compile Include="QueryableExtensions\IExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\IExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\CustomProjectionExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\EnumerableExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\Impl\MemberGetterExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
