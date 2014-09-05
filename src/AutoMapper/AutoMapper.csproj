@@ -171,6 +171,7 @@
     <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\NullableExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\ParameterReplacementVisitor.cs" />
     <Compile Include="QueryableExtensions\Impl\StringExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
     <Compile Include="QueryableExtensions\ProjectionExpression.cs" />

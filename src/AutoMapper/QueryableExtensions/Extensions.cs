@@ -15,6 +15,23 @@ namespace AutoMapper.QueryableExtensions
         private static readonly Internal.IDictionary<ExpressionRequest, LambdaExpression> _expressionCache
             = DictionaryFactory.CreateDictionary<ExpressionRequest, LambdaExpression>();
 
+        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
+        {
+            new MemberGetterExpressionResultConverter(),
+            new MemberResolverExpressionResultConverter(),
+            new NullSubstitutionExpressionResultConverter(), 
+        };
+
+        private static readonly IExpressionBinder[] Binders =
+        {
+            new NullableExpressionBinder(),
+            new AssignableExpressionBinder(),
+            new EnumerableExpressionBinder(),
+            new MappedTypeExpressionBinder(),
+            new CustomProjectionExpressionBinder(), 
+            new StringExpressionBinder(),
+        };
+
         /// <summary>
         /// Create an expression tree representing a mapping from the <typeparamref name="TSource"/> type to <typeparamref name="TDestination"/> type
         /// Includes flattening and expressions inside MapFrom member configuration
@@ -156,24 +173,6 @@ namespace AutoMapper.QueryableExtensions
             return bindings;
         }
 
-        private static readonly IList<IExpressionResultConverter> ExpressionResultConverters =
-            new IExpressionResultConverter[]
-            {
-                new MemberGetterExpressionResultConverter(),
-                new MemberResolverExpressionResultConverter(),
-                new NullSubstitutionExpressionResultConverter(), 
-            };
-
-        private static readonly IExpressionBinder[] Binders =
-        {
-            new NullableExpressionBinder(),
-            new AssignableExpressionBinder(),
-            new EnumerableExpressionBinder(),
-            new MappedTypeExpressionBinder(),
-            new CustomProjectionExpressionBinder(), 
-            new StringExpressionBinder(),
-        };
-
         private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType, Expression instanceParameter)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
@@ -208,21 +207,6 @@ namespace AutoMapper.QueryableExtensions
                     Expression.Constant(_paramValues[node.Member.Name]),
                     node.Member.GetMemberType());
             }
-        }
-    }
-
-    internal class ParameterReplacementVisitor : ExpressionVisitor
-    {
-        private readonly Expression _memberExpression;
-
-        public ParameterReplacementVisitor(Expression memberExpression)
-        {
-            _memberExpression = memberExpression;
-        }
-
-        protected override Expression VisitParameter(ParameterExpression node)
-        {
-            return _memberExpression;
         }
     }
 }
