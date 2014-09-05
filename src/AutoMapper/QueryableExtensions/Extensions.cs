@@ -4,7 +4,7 @@ namespace AutoMapper.QueryableExtensions
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
+    using AutoMapper.Impl;
     using Impl;
     using Internal;
 
@@ -348,33 +348,6 @@ namespace AutoMapper.QueryableExtensions
             return result;
         }
 
-        private class MemberGetterExpressionResultConverter : IExpressionResultConverter
-        {
-            public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
-            {
-                Expression currentChild = expressionResolutionResult.ResolutionExpression;
-                Type currentChildType = expressionResolutionResult.Type;
-                var getter = valueResolver as IMemberGetter;
-                var memberInfo = getter.MemberInfo;
-
-                var propertyInfo = memberInfo as PropertyInfo;
-                if (propertyInfo != null)
-                {
-                    currentChild = Expression.Property(currentChild, propertyInfo);
-                    currentChildType = propertyInfo.PropertyType;
-                }
-                else
-                    currentChildType = currentChild.Type;
-
-                return new ExpressionResolutionResult(currentChild, currentChildType);
-            }
-
-            public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
-            {
-                return valueResolver is IMemberGetter;
-            }
-        }
-
         private class ParameterReplacementVisitor : ExpressionVisitor
         {
             private readonly Expression _memberExpression;
@@ -388,6 +361,29 @@ namespace AutoMapper.QueryableExtensions
             {
                 return _memberExpression;
                 //return base.VisitParameter(node);
+            }
+        }
+
+        private class ConstantExpressionReplacementVisitor : ExpressionVisitor
+        {
+            private readonly System.Collections.Generic.IDictionary<string, object> _paramValues;
+
+            public ConstantExpressionReplacementVisitor(System.Collections.Generic.IDictionary<string, object> paramValues)
+            {
+                _paramValues = paramValues;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (!node.Member.DeclaringType.Name.Contains("<>"))
+                    return base.VisitMember(node);
+
+                if (!_paramValues.ContainsKey(node.Member.Name))
+                    return base.VisitMember(node);
+
+                return Expression.Convert(
+                    Expression.Constant(_paramValues[node.Member.Name]),
+                    node.Member.GetMemberType());
             }
         }
     }
