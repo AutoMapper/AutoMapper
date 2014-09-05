@@ -169,6 +169,7 @@
     <Compile Include="QueryableExtensions\Impl\MappedTypeExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\Impl\MemberGetterExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\NullableExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\StringExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\IProjectionExpression.cs" />

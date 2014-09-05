@@ -144,6 +144,7 @@ namespace AutoMapper.QueryableExtensions
                 var propertyTypeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
 
+                var nullableExpressionBinder = new NullableExpressionBinder();
                 var assignableExpressionBinder = new AssignableExpressionBinder();
                 var enumerableExpressionBinder = new EnumerableExpressionBinder();
                 var mappedTypeExpressionBinder = new MappedTypeExpressionBinder();
@@ -152,10 +153,9 @@ namespace AutoMapper.QueryableExtensions
 
                 MemberAssignment bindExpression;
 
-                if (propertyMap.DestinationPropertyType.IsNullableType()
-                    && !result.Type.IsNullableType())
+                if (nullableExpressionBinder.IsMatch(propertyMap, propertyTypeMap, result))
                 {
-                    bindExpression = BindNullableExpression(propertyMap, result);
+                    bindExpression = nullableExpressionBinder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 }
                 else if (assignableExpressionBinder.IsMatch(propertyMap, propertyTypeMap, result))
                 {
@@ -185,35 +185,6 @@ namespace AutoMapper.QueryableExtensions
                 bindings.Add(bindExpression);
             }
             return bindings;
-        }
-
-        private static MemberAssignment BindNullableExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
-        {
-            if (result.ResolutionExpression.NodeType == ExpressionType.MemberAccess)
-            {
-                var memberExpr = (MemberExpression)result.ResolutionExpression;
-                if (memberExpr.Expression != null && memberExpr.Expression.NodeType == ExpressionType.MemberAccess)
-                {
-                    var destType = propertyMap.DestinationPropertyType;
-                    var parentExpr = memberExpr.Expression;
-                    Expression expressionToBind = Expression.Convert(memberExpr, destType);
-                    var nullExpression = Expression.Convert(Expression.Constant(null), destType);
-                    while (parentExpr.NodeType != ExpressionType.Parameter)
-                    {
-                        memberExpr = (MemberExpression)memberExpr.Expression;
-                        parentExpr = memberExpr.Expression;
-                        expressionToBind = Expression.Condition(
-                            Expression.Equal(memberExpr, Expression.Constant(null)),
-                            nullExpression,
-                            expressionToBind
-                            );
-                    }
-
-                    return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, expressionToBind);
-                }
-            }
-
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, Expression.Convert(result.ResolutionExpression, propertyMap.DestinationPropertyType));
         }
 
         private static readonly IList<IExpressionResultConverter> ExpressionResultConverters =
