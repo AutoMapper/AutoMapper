@@ -11,11 +11,18 @@
         public class Source
         {
             public int Value { get; set; }
+            public ChildSrc Child { get; set; }
+        }
+
+        public class ChildSrc
+        {
+            public int Value { get; set; }
         }
 
         public class Dest
         {
             public int Value { get; set; }
+            public int ChildValue { get; set; }
         }
 
         [Fact]
@@ -32,6 +39,25 @@
                 new Source {Value = 10},
                 new Source {Value = 10},
                 new Source {Value = 15}
+            };
+
+            items.AsQueryable().Where(mapped).Count().ShouldEqual(2);
+        }
+
+        [Fact]
+        public void Can_map_flattened_properties()
+        {
+            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+
+            Expression<Func<Dest, bool>> expr = d => d.ChildValue == 10;
+
+            var mapped = Mapper.Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
+
+            var items = new[]
+            {
+                new Source {Child = new ChildSrc {Value = 10}},
+                new Source {Child = new ChildSrc {Value = 10}},
+                new Source {Child = new ChildSrc {Value = 15}}
             };
 
             items.AsQueryable().Where(mapped).Count().ShouldEqual(2);

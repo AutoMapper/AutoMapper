@@ -1,5 +1,6 @@
 ﻿namespace AutoMapper.Mappers
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using Impl;
@@ -75,15 +76,9 @@
                 var memberAccessor = node.Member.ToMemberAccessor();
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
 
-                var dudes = propertyMap.GetSourceValueResolvers().OfType<IMemberGetter>().ToArray();
-
-                return Expression.MakeMemberAccess(replacedExpression, dudes[0].MemberInfo);
-                //return base.VisitMember(node);
-            }
-
-            protected override MemberBinding VisitMemberBinding(MemberBinding node)
-            {
-                return base.VisitMemberBinding(node);
+                return propertyMap.GetSourceValueResolvers()
+                    .OfType<IMemberGetter>()
+                    .Aggregate(replacedExpression, (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo));
             }
         }
     }
