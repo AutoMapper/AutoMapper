@@ -16,6 +16,7 @@ namespace AutoMapper
     [DebuggerDisplay("{Type}")]
     public class TypeInfo
     {
+        private readonly BindingFlags _bindingFlags;
         private readonly MemberInfo[] _publicGetters;
         private readonly MemberInfo[] _publicAccessors;
         private readonly MethodInfo[] _publicGetMethods;
@@ -24,13 +25,14 @@ namespace AutoMapper
 
         public Type Type { get; private set; }
 
-        public TypeInfo(Type type)
-            : this (type, new MethodInfo[0])
+        public TypeInfo(Type type, BindingFlags bindingFlags)
+            : this (type, bindingFlags, new MethodInfo[0])
         {
         }
 
-        public TypeInfo(Type type, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+        public TypeInfo(Type type, BindingFlags bindingFlags, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
+            _bindingFlags = bindingFlags;
             Type = type;
         	var publicReadableMembers = GetAllPublicReadableMembers();
             var publicWritableMembers = GetAllPublicWritableMembers();
@@ -129,12 +131,12 @@ namespace AutoMapper
 
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
     	{
-            return GetAllPublicMembers(PropertyReadable, BindingFlags.Instance | BindingFlags.Public);
+            return GetAllPublicMembers(PropertyReadable);
     	}
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
         {
-            return GetAllPublicMembers(PropertyWritable, BindingFlags.Instance | BindingFlags.Public);
+            return GetAllPublicMembers(PropertyWritable);
         }
 
         private bool PropertyReadable(PropertyInfo propertyInfo)
@@ -150,7 +152,7 @@ namespace AutoMapper
             return propertyInfo.CanWrite || propertyIsEnumerable;
         }
 
-        private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor, BindingFlags bindingAttr)
+        private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor)
         {
             var typesToScan = new List<Type>();
             for (var t = Type; t != null; t = t.BaseType)
@@ -162,13 +164,13 @@ namespace AutoMapper
             // Scan all types for public properties and fields
             return typesToScan
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-                .SelectMany(x => x.GetMembers(bindingAttr | BindingFlags.DeclaredOnly)
+                .SelectMany(x => x.GetMembers(_bindingFlags | BindingFlags.DeclaredOnly)
                     .Where(m => m is FieldInfo || (m is PropertyInfo && propertyAvailableFor((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any())));
         }
 
         private MethodInfo[] BuildPublicNoArgMethods()
         {
-            return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            return Type.GetMethods(_bindingFlags)
                 .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))
                 .ToArray();
         }

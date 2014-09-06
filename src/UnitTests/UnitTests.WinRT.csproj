@@ -239,7 +239,6 @@
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="WinRTExtensions.cs" />
     <Compile Include="Regression.cs" />
-    <Compile Include="ResolutionContextTester.cs" />
     <Compile Include="ReverseMapping.cs" />
     <Compile Include="Should\Should.Core\Assertions\Assert.cs" />
     <Compile Include="Should\Should.Core\Assertions\AssertComparer.cs" />
@@ -290,7 +289,6 @@
     <Compile Include="Tests\MapperTests.cs" />
     <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />
-    <Compile Include="Tests\TypeMapFactorySpecs.cs" />
     <Compile Include="TypeConverters.cs" />
     <Compile Include="ValueTypes.cs" />
   </ItemGroup>

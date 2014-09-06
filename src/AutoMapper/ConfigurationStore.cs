@@ -67,6 +67,12 @@ namespace AutoMapper
 			set { GetProfile(DefaultProfileName).DestinationMemberNamingConvention = value; }
 		}
 
+		public BindingFlags BindingFlags
+		{
+			get { return GetProfile(DefaultProfileName).BindingFlags; }
+			set { GetProfile(DefaultProfileName).BindingFlags = value; }
+		}
+
 	    public IEnumerable<string> Prefixes
 	    {
             get { return GetProfile(DefaultProfileName).Prefixes; }
@@ -463,9 +469,9 @@ namespace AutoMapper
 			IMappingExpression<TSource, TDestination> mappingExp =
 				new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, this);
 
-		    TypeInfo destInfo = typeMap.ConfiguredMemberList == MemberList.Destination 
-		        ? new TypeInfo(typeof(TDestination)) 
-		        : new TypeInfo(typeof(TSource));
+		    TypeInfo destInfo = typeMap.ConfiguredMemberList == MemberList.Destination
+                ? new TypeInfo(typeof(TDestination), BindingFlags)
+                : new TypeInfo(typeof(TSource), BindingFlags);
 
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
 			{
@@ -483,7 +489,7 @@ namespace AutoMapper
 		{
 			IMappingExpression mappingExp = new MappingExpression(typeMap, _serviceCtor);
 
-			TypeInfo destInfo = new TypeInfo(destinationType);
+            TypeInfo destInfo = new TypeInfo(destinationType, BindingFlags);
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
 			{
 				object[] attrs = destProperty.GetCustomAttributes(true);

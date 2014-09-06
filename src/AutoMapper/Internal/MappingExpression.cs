@@ -204,7 +204,7 @@ namespace AutoMapper
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var typeInfo = new TypeInfo(TypeMap.DestinationType);
+            var typeInfo = new TypeInfo(TypeMap.DestinationType, _configurationContainer.BindingFlags);
 
             typeInfo.GetPublicWriteAccessors().Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }

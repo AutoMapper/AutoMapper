@@ -77,6 +77,11 @@ namespace AutoMapper
         /// Source extension methods included for search
         /// </summary>
 	    IEnumerable<MethodInfo> SourceExtensionMethods { get; }
+
+        /// <summary>
+        /// Binding flags used to search for members. Defaults to public instance methods
+        /// </summary>
+        BindingFlags BindingFlags { get; set; }
 	}
 
 	public class PascalCaseNamingConvention : INamingConvention
