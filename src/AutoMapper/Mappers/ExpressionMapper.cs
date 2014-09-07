@@ -12,14 +12,13 @@
             var destDelegateType = context.DestinationType.GetGenericArguments()[0];
             var expression = (LambdaExpression) context.SourceValue;
 
-            if (sourceDelegateType.GetGenericArguments().Length != destDelegateType.GetGenericArguments().Length)
-                throw new AutoMapperMappingException(
-                    "Source and destination expressions must have same number of generic arguments.");
+            if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
+                throw new AutoMapperMappingException("Source and destination expressions must be of the same type.");
 
             var parameters = expression.Parameters.ToArray();
             var body = expression.Body;
 
-            for (int i = 0; i < sourceDelegateType.GetGenericArguments().Length; i++)
+            for (int i = 0; i < expression.Parameters.Count; i++)
             {
                 var sourceParamType = sourceDelegateType.GetGenericArguments()[i];
                 var destParamType = destDelegateType.GetGenericArguments()[i];

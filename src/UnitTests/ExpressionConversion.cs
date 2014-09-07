@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.UnitTests
+﻿using Xunit.Sdk;
+
+namespace AutoMapper.UnitTests
 {
     using System;
     using System.Linq;
@@ -82,6 +84,35 @@
             };
 
             items.AsQueryable().Where(mapped).Count().ShouldEqual(2);
+        }
+
+        [Fact]
+        public void Throw_AutoMapperMappingException_if_expression_types_dont_match()
+        {
+            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+
+            Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
+
+            Assert.Throws<AutoMapperMappingException>(() => Mapper.Map<Expression<Func<Dest, bool>>, Expression<Action<Source, bool>>>(expr));
+        }
+
+        [Fact]
+        public void Can_map_with_different_destination_types()
+        {
+            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
+
+            Expression<Func<Dest, Dest>> expr = d => d;
+
+            var mapped = Mapper.Map<Expression<Func<Dest, Dest>>, Expression<Func<Source, Source>>>(expr);
+
+            var items = new[]
+            {
+                new Source {Foo = 10},
+                new Source {Foo = 10},
+                new Source {Foo = 15}
+            };
+
+            var items2 = items.AsQueryable().Select(mapped).ToList();
         }
     }
 }
