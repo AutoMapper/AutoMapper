@@ -365,7 +365,7 @@ namespace AutoMapper
             {
                 var potentialSourceType = source.GetType();
                 //Try and get the most specific type map possible
-                var potentialTypes = _typeMaps
+                var potentialTypes = _typeMaps.Where(IsTypeMapOrIncludedDerivedType(typeMap))
                     .Where(t => ((destination == null && destinationType.IsAssignableFrom(t.DestinationType))
                                  || (destination != null && t.DestinationType.IsInstanceOfType(destination))) &&
                                 t.SourceType.IsInstanceOfType(source));
@@ -402,7 +402,12 @@ namespace AutoMapper
 		    return typeMap;
 		}
 
-        private static int GetInheritanceDepth(Type type)
+	    private static Func<TypeMap, bool> IsTypeMapOrIncludedDerivedType(TypeMap typeMap)
+	    {
+	        return tm => tm == typeMap || typeMap.IncludedDerivedTypes.Any(itm => itm.SourceType == tm.SourceType && itm.DestinationType == tm.DestinationType);
+	    }
+
+	    private static int GetInheritanceDepth(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException("type");
