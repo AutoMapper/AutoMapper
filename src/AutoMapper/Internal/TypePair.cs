@@ -44,4 +44,46 @@ namespace AutoMapper.Impl
             return _hashcode;
         }
     }
+
+    public struct ObjectPair : IEquatable<ObjectPair>
+    {
+        public ObjectPair(object sourceObject, object destinationObject)
+            : this()
+        {
+            _sourceObject = sourceObject;
+            _destinationObject = destinationObject;
+            _hashcode = unchecked(((_sourceObject == null ? 0 : _sourceObject.GetHashCode()) * 397) ^ (_destinationObject == null ? 0 : destinationObject.GetHashCode()));
+        }
+
+        private readonly object _destinationObject;
+        private readonly int _hashcode;
+        private readonly object _sourceObject;
+
+        public object Source
+        {
+            get { return _sourceObject; }
+        }
+
+        public object Destination
+        {
+            get { return _destinationObject; }
+        }
+
+        public bool Equals(ObjectPair other)
+        {
+            return Equals(other._sourceObject, _sourceObject) && Equals(other._destinationObject, _destinationObject);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (obj.GetType() != typeof(TypePair)) return false;
+            return Equals((TypePair)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashcode;
+        }
+    }
 }

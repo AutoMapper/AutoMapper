@@ -365,10 +365,8 @@ namespace AutoMapper
             {
                 var potentialSourceType = source.GetType();
                 //Try and get the most specific type map possible
-                var potentialTypes = _typeMaps.Where(IsTypeMapOrIncludedDerivedType(typeMap))
-                    .Where(t => ((destination == null && destinationType.IsAssignableFrom(t.DestinationType))
-                                 || (destination != null && t.DestinationType.IsInstanceOfType(destination))) &&
-                                t.SourceType.IsInstanceOfType(source));
+                var objectMapPair = new ObjectPair(source, destination);
+                var potentialTypes = _typeMaps.Where(tm => IsTypeMapOrIncludedDerivedType(tm, typeMap, objectMapPair));
 
                 var potentialDestTypeMap =
                     potentialTypes
@@ -402,9 +400,12 @@ namespace AutoMapper
 		    return typeMap;
 		}
 
-	    private static Func<TypeMap, bool> IsTypeMapOrIncludedDerivedType(TypeMap typeMap)
+	    private static bool IsTypeMapOrIncludedDerivedType(TypeMap potentialIncludeTypeMap, TypeMap baseTypeMap, ObjectPair objectPair)
 	    {
-	        return tm => tm == typeMap || typeMap.IncludedDerivedTypes.Any(itm => itm.SourceType == tm.SourceType && itm.DestinationType == tm.DestinationType);
+	        if (potentialIncludeTypeMap == baseTypeMap)
+	            return true;
+	        var includedTypePair = new TypePair(potentialIncludeTypeMap.SourceType, potentialIncludeTypeMap.DestinationType);
+            return baseTypeMap.IncludedDerivedTypes.Where(itm => itm.Key.Equals(includedTypePair)).Any(itm => itm.Value(itm.Key, objectPair));
 	    }
 
 	    private static int GetInheritanceDepth(Type type)

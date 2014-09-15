@@ -18,7 +18,7 @@ namespace AutoMapper
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
         private readonly TypeInfo _destinationType;
-        private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
+        private readonly ISet<KeyValuePair<TypePair, Func<TypePair, ObjectPair, bool>>> _includedDerivedTypes = new HashSet<KeyValuePair<TypePair, Func<TypePair, ObjectPair, bool>>>();
 		private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
 
         private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs =
@@ -93,7 +93,7 @@ namespace AutoMapper
 
         public MemberList ConfiguredMemberList { get; private set; }
 
-        public IEnumerable<TypePair> IncludedDerivedTypes
+        public IEnumerable<KeyValuePair<TypePair, Func<TypePair, ObjectPair, bool>>> IncludedDerivedTypes
         {
             get {  return _includedDerivedTypes; }
         } 
@@ -194,22 +194,22 @@ namespace AutoMapper
             return propertyMap;
         }
 
-        public void IncludeDerivedTypes(Type derivedSourceType, Type derivedDestinationType)
+        public void IncludeDerivedTypeUnderCondition(Type derivedSourceType, Type derivedDestinationType, Func<TypePair,ObjectPair,bool> condition)
         {
-            _includedDerivedTypes.Add(new TypePair(derivedSourceType, derivedDestinationType));
+            _includedDerivedTypes.Add(new KeyValuePair<TypePair, Func<TypePair, ObjectPair, bool>>(new TypePair(derivedSourceType, derivedDestinationType),condition));
         }
 
         public Type GetDerivedTypeFor(Type derivedSourceType)
         {
             // This might need to be fixed for multiple derived source types to different dest types
-            var match = _includedDerivedTypes.FirstOrDefault(tp => tp.SourceType == derivedSourceType);
+            var match = _includedDerivedTypes.Select(kp => kp.Key).FirstOrDefault(tp => tp.SourceType == derivedSourceType);
 
             return match.Equals(default(TypePair)) ? DestinationType : match.DestinationType;
         }
 
         public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
         {
-            return _includedDerivedTypes.Contains(new TypePair(derivedSourceType, derivedDestinationType));
+            return _includedDerivedTypes.Select(kp => kp.Key).Contains(new TypePair(derivedSourceType, derivedDestinationType));
         }
 
         public bool HasDerivedTypesToInclude()

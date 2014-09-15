@@ -231,6 +231,14 @@ namespace AutoMapper
             return setMethod == null || setMethod.IsPrivate || setMethod.IsFamily;
         }
 
+        public static Func<TypePair, ObjectPair, bool> TypesInheritFromBase(Type destinationType)
+        {
+            return (tp, op) =>
+                ((op.Destination == null && destinationType.IsAssignableFrom(tp.DestinationType))
+                 || (op.Destination != null && tp.DestinationType.IsInstanceOfType(op.Destination))) &&
+                tp.SourceType.IsInstanceOfType(op.Source);
+        }
+
         public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
             where TOtherDestination : TDestination
@@ -240,7 +248,7 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
         {
-            TypeMap.IncludeDerivedTypes(otherSourceType, otherDestinationType);
+            TypeMap.IncludeDerivedTypeUnderCondition(otherSourceType, otherDestinationType, TypesInheritFromBase(typeof(TDestination)));
 
             return this;
         }
@@ -248,7 +256,7 @@ namespace AutoMapper
         public IMappingExpression<TSource, TDestination> IncludeBase<TSourceBase, TDestinationBase>()
         {
             TypeMap baseTypeMap = _configurationContainer.CreateMap<TSourceBase, TDestinationBase>().TypeMap;
-            baseTypeMap.IncludeDerivedTypes(typeof(TSource), typeof(TDestination));
+            baseTypeMap.IncludeDerivedTypeUnderCondition(typeof(TSource), typeof(TDestination), TypesInheritFromBase(typeof(TDestinationBase)));
             TypeMap.ApplyInheritedMap(baseTypeMap);
 
             return this;
@@ -396,7 +404,7 @@ namespace AutoMapper
                 mappingExpression.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
             }
 
-            foreach (var includedDerivedType in TypeMap.IncludedDerivedTypes)
+            foreach (var includedDerivedType in TypeMap.IncludedDerivedTypes.Select(kp => kp.Key))
             {
                 mappingExpression.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
             }
