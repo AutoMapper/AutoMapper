@@ -105,6 +105,15 @@ namespace AutoMapper
             where TOtherDestination : TDestination;
 
         /// <summary>
+        /// Include this configuration in derived types' maps under condition being applied
+        /// </summary>
+        /// <typeparam name="TOtherDestination">Derived destination type</typeparam>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> IncludeOnSourceType<TOtherDestination>(Func<TSource, bool> condition)
+            where TOtherDestination : TDestination;
+        
+
+        /// <summary>
         /// Include the base type map's configuration in this map
         /// </summary>
         /// <typeparam name="TSourceBase">Base source type</typeparam>

@@ -359,7 +359,7 @@ namespace AutoMapper
                 return FindTypeMapFor(source, destination, sourceType, typeMap.DestinationTypeOverride);
             }
             // Check for runtime derived types
-		    var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null) && (source.GetType() != sourceType);
+		    var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null);
 		    
             if (shouldCheckDerivedType)
             {

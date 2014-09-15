@@ -246,9 +246,20 @@ namespace AutoMapper
             return Include(typeof(TOtherSource), typeof(TOtherDestination));
         }
 
+        public IMappingExpression<TSource, TDestination> IncludeOnSourceType<TOtherDestination>(Func<TSource, bool> condition)
+            where TOtherDestination : TDestination
+        {
+            return IncludeOnCondition(typeof(TSource), typeof(TOtherDestination), (tp, op) => condition((TSource)op.Source));
+        }
+
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
         {
-            TypeMap.IncludeDerivedTypeUnderCondition(otherSourceType, otherDestinationType, TypesInheritFromBase(typeof(TDestination)));
+            return IncludeOnCondition(otherSourceType, otherDestinationType, TypesInheritFromBase(typeof(TDestination)));
+        }
+
+        private IMappingExpression<TSource, TDestination> IncludeOnCondition(Type otherSourceType, Type otherDestinationType, Func<TypePair, ObjectPair, bool> condition)
+        {
+            TypeMap.IncludeDerivedTypeUnderCondition(otherSourceType, otherDestinationType, condition);
 
             return this;
         }
