@@ -249,7 +249,7 @@ namespace AutoMapper
         public IMappingExpression<TSource, TDestination> IncludeOnSourceType<TOtherDestination>(Func<TSource, bool> condition)
             where TOtherDestination : TDestination
         {
-            return IncludeOnCondition(typeof(TSource), typeof(TOtherDestination), (tp, op) => condition((TSource)op.Source));
+            return IncludeOnCondition(typeof(TSource), typeof(TOtherDestination), (tp, op) => condition((TSource)op.Source) && op.Destination == null || op.Destination is TDestination);
         }
 
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
