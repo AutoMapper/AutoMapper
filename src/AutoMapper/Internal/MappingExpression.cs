@@ -199,6 +199,21 @@ namespace AutoMapper
             typeInfo.GetPublicWriteAccessors().Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }
 
+        public IMappingExpression<TSource, TDestination> ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions) {
+
+            var typeInfo = new TypeInfo(_typeMap.DestinationType);
+
+            typeInfo.GetPublicWriteAccessors().Each(acc => {
+                var existingMap = _typeMap.GetExistingPropertyMapFor(acc.ToMemberAccessor());
+                if (existingMap == null || (!existingMap.IsIgnored() && !existingMap.IsMapped())) {
+                    // If not mapped and not ignored, then map it manually
+                    ForDestinationMember(acc.ToMemberAccessor(), memberOptions);
+                }
+            });
+            return new MappingExpression<TSource, TDestination>(_typeMap, _serviceCtor, _configurationContainer);
+
+        }
+
         public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
             var properties = typeof(TDestination).GetProperties().Where(HasAnInaccessibleSetter);

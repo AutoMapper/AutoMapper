@@ -81,6 +81,13 @@ namespace AutoMapper
         void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
 
         /// <summary>
+        /// Customize configuration for all members that have not been explicitly mapped already.
+        /// </summary>
+        /// <param name="memberOptions">Callback for member options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
+
+        /// <summary>
         /// Ignores all <typeparamref name="TDestination"/> properties that have either a private or protected setter, forcing the mapper to respect encapsulation (note: order matters, so place this before explicit configuration of any properties with an inaccessible setter)
         /// </summary>
         /// <returns>Itself</returns>
