@@ -10,6 +10,9 @@ namespace AutoMapper.EquivilencyExpression
         private static readonly UserDefinedEquivilentExpressions UserDefinedEquivilentExpressions = new UserDefinedEquivilentExpressions();
         private static readonly IList<IGenerateEquivilentExpressions> GenerateEquivilentExpressions = new List<IGenerateEquivilentExpressions>{UserDefinedEquivilentExpressions};
 
+        /// <summary>
+        /// Equality List for Generating Equality Comparisons between two types
+        /// </summary>
         public static ICollection<IGenerateEquivilentExpressions> GenerateEquality
         {
             get { return GenerateEquivilentExpressions; }
@@ -23,6 +26,14 @@ namespace AutoMapper.EquivilencyExpression
             return generate.GeneratEquivilentExpression(sourceType, destinationType);
         }
 
+        /// <summary>
+        /// Make Comparison between <typeparamref name="TSource"/> and <typeparamref name="TDestination"/>
+        /// </summary>
+        /// <typeparam name="TSource">Compared type</typeparam>
+        /// <typeparam name="TDestination">Type being compared to</typeparam>
+        /// <param name="mappingExpression">Base Mapping Expression</param>
+        /// <param name="equivilentExpression">Equivilent Expression between <typeparamref name="TSource"/> and <typeparamref name="TDestination"/></param>
+        /// <returns></returns>
         public static IMappingExpression<TSource, TDestination> EqualityComparision<TSource, TDestination>(this IMappingExpression<TSource, TDestination> mappingExpression, Expression<Func<TSource, TDestination, bool>> equivilentExpression) 
             where TSource : class 
             where TDestination : class
