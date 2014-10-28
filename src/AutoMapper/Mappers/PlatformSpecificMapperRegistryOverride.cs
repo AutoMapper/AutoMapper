@@ -15,7 +15,7 @@ namespace AutoMapper.Mappers
             InsertBefore<DictionaryMapper>(new NameValueCollectionMapper());
 #endif
 #if !SILVERLIGHT && !NETFX_CORE
-            InsertBefore<ReadOnlyCollectionMapper>(new ListSourceMapper());
+            InsertBefore<AssignableMapper>(new ListSourceMapper());
 #endif
 #if !WINDOWS_PHONE
             InsertBefore<CollectionMapper>(new HashSetMapper());

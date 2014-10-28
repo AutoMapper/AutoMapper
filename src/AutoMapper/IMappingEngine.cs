@@ -47,7 +47,7 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts);
+        TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts);
 
         /// <summary>
         /// Execute a mapping from the source object to the existing destination object.
@@ -68,7 +68,7 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts);
+        TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts);
 
         /// <summary>
         /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects

@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
-using AutoMapper.QueryableExtensions;
 using Xunit;
 using Should;
 
@@ -9,6 +8,8 @@ namespace AutoMapper.IntegrationTests.Net4
 {
     namespace ChildClassTests
     {
+        using QueryableExtensions;
+
         public class Base
         {
             public int BaseID { get; set; }

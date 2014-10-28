@@ -11,7 +11,7 @@ namespace AutoMapper.EquivilencyExpression
         private static readonly IList<IGenerateEquivilentExpressions> GenerateEquivilentExpressions = new List<IGenerateEquivilentExpressions>{UserDefinedEquivilentExpressions};
 
         /// <summary>
-        /// Equality List for Generating Equality Comparisons between two types
+        /// 
         /// </summary>
         public static ICollection<IGenerateEquivilentExpressions> GenerateEquality
         {

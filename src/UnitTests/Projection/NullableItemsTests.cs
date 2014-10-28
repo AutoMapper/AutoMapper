@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.UnitTests.Projection
+﻿using System;
+
+namespace AutoMapper.UnitTests.Projection
 {
     namespace NullableItemsTests
     {
@@ -31,31 +33,70 @@
                 projected[0].ChildValue.ShouldBeNull();
                 projected[0].ChildGrandChildValue.ShouldBeNull();
             }
+
+
+            public class ParentDto
+            {
+                public int? Value { get; set; }
+                public int? ChildValue { get; set; }
+                public int? ChildGrandChildValue { get; set; }
+                public DateTime? Date { get; set; }
+            }
+
+
+            public class Parent
+            {
+                public int Value { get; set; }
+                public Child Child { get; set; }
+            }
+
+            public class Child
+            {
+                public int Value { get; set; }
+                public GrandChild GrandChild { get; set; }
+            }
+
+            public class GrandChild
+            {
+                public int Value { get; set; }
+            }
         }
 
-        public class ParentDto
+        public class CustomMapFromTest
         {
-            public int? Value { get; set; }
-            public int? ChildValue { get; set; }
-            public int? ChildGrandChildValue { get; set; }
-        }
+            public class Parent
+            {
+                public int Value { get; set; }
+                
+            }
 
+            public class ParentDto
+            {
+                public int? Value { get; set; }
+                public DateTime? Date { get; set; }
+            }
+            public CustomMapFromTest()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>()
+                    .ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.UtcNow)));
+            }
 
-        public class Parent
-        {
-            public int Value { get; set; }
-            public Child Child { get; set; }
-        }
+            [Fact]
+            public void Should_not_fail()
+            {
+                var items = new[]
+                {
+                    new Parent
+                    {
+                        Value = 5
+                    }
+                };
 
-        public class Child
-        {
-            public int Value { get; set; }
-            public GrandChild GrandChild { get; set; }
-        }
+                var projected = items.AsQueryable().Project().To<ParentDto>().ToList();
 
-        public class GrandChild
-        {
-            public int Value { get; set; }
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().Project().To<ParentDto>().ToList());
+                Assert.NotNull(projected[0].Date);
+            }
         }
     }
 }

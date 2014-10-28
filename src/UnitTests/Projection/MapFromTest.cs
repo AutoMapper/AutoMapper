@@ -1,11 +1,12 @@
 ﻿using System;
-using AutoMapper.QueryableExtensions;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Projection
 {
     namespace MapFromTest
     {
+        using QueryableExtensions;
+
         public class CustomMapFromExpressionTest
         {
             [Fact]
