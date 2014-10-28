@@ -103,7 +103,6 @@
     <Compile Include="Equivilency Expression\EquivilentExpressions.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
     <Compile Include="Equivilency Expression\IEquivilentExpression.cs" />
-    <Compile Include="Mappers\ExpressionOfTypeToExpressionOfDifferentTypeMapper.cs" />
     <Compile Include="Mappers\ExpressionMapper.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />

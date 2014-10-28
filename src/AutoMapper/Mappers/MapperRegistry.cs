@@ -20,7 +20,6 @@ namespace AutoMapper.Mappers
             new ReadOnlyCollectionMapper(),
             new EquivlentExpressionAddRemoveCollectionMapper(),
             new ObjectToEquivalencyExpressionByEquivalencyExistingMapper(),
-            new ExpressionOfTypeToExpressionOfDifferentTypeMapper(), 
             new CollectionMapper(),
             new EnumerableMapper(),
             new AssignableMapper(),
