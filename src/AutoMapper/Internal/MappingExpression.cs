@@ -334,6 +334,11 @@ namespace AutoMapper
             _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver));
         }
 
+        public void ResolveUsing(Func<ResolutionResult, TSource, object> resolver)
+        {
+            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver(r, (TSource)r.Value)));
+        }
+
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
             _propertyMap.SetCustomValueResolverExpression(sourceMember);

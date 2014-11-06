@@ -61,7 +61,7 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                Mapper.CreateMap<string, int>().ConvertUsing(Convert.ToInt32);
+                Mapper.CreateMap<string, int>().ConvertUsing((string s) => Convert.ToInt32(s));
                 Mapper.CreateMap<Source, Destination>();
             }
 

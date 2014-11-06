@@ -140,6 +140,18 @@ namespace AutoMapper
         void ConvertUsing(Func<TSource, TDestination> mappingFunction);
 
         /// <summary>
+        /// Skip member mapping and use a custom function to convert to the destination type
+        /// </summary>
+        /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
+        void ConvertUsing(Func<ResolutionContext, TDestination> mappingFunction);
+
+        /// <summary>
+        /// Skip member mapping and use a custom function to convert to the destination type
+        /// </summary>
+        /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
+        void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction);
+
+        /// <summary>
         /// Skip member mapping and use a custom type converter instance to convert to the destination type
         /// </summary>
         /// <param name="converter">Type converter instance</param>
@@ -374,6 +386,14 @@ namespace AutoMapper
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
         void ResolveUsing(Func<ResolutionResult, object> resolver);
+
+        /// <summary>
+        /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
+        /// Access both the source object and current resolution context for additional mapping, context items and parent objects
+        /// This method cannot be used in conjunction with LINQ query projection
+        /// </summary>
+        /// <param name="resolver">Callback function to resolve against source type</param>
+        void ResolveUsing(Func<ResolutionResult, TSource, object> resolver);
 
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
