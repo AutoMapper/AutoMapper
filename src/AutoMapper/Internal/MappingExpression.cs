@@ -408,6 +408,7 @@ namespace AutoMapper
         public IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression<TSource>> memberOptions)
         {
             var memberInfo = ReflectionHelper.FindProperty(sourceMember);
+            memberInfo = ReflectionHelper.TryGetImplementedMember(TypeMap.SourceType, memberInfo);
 
             var srcConfig = new SourceMappingExpression(TypeMap, memberInfo);
 
