@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using Xunit;
 using Should;
+using AutoMapper.Impl;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class ForMemberWrappedInAGenericExtensionMethodBug : SpecBase
+    public class ForMemberAndForSourceMemberGenericsBug : SpecBase
     {
         abstract class DestinationModelBase
         {
@@ -44,8 +45,23 @@ namespace AutoMapper.UnitTests.Bug
             public string DstLastName { get; set; }
         }
 
+        interface ISourceModelWithExtraProperties
+        {
+            string A { get; }
+            string B { get; }
+            string C { get; }
+        }
+
+        class SourceWithExtraProperties : ISourceModelWithExtraProperties
+        {
+            public int Id { get; set; }
+            public string A { get; set; }
+            public string B { get; set; }
+            public string C { get; set; }
+        }
+
         [Fact]
-        public void maps_all_properties_when_destination_properties_are_from_abstract_class()
+        public void ForMember_maps_all_properties_when_destination_properties_are_from_abstract_class()
         {
             Mapper.Initialize(mapper =>
             {
@@ -70,7 +86,7 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         [Fact]
-        public void maps_all_properties_when_destination_properties_are_from_interface()
+        public void ForMember_maps_all_properties_when_destination_properties_are_from_interface()
         {
             Mapper.Initialize(mapper =>
             {
@@ -92,6 +108,36 @@ namespace AutoMapper.UnitTests.Bug
             return expression.ForMember(dst => dst.DstId, cfg => cfg.MapFrom(src => src.Id))
                              .ForMember(dst => dst.DstFirstName, cfg => cfg.MapFrom(src => src.FirstName))
                              .ForMember(dst => dst.DstLastName, cfg => cfg.MapFrom(src => src.LastName));
+        }
+
+        [Fact]
+        public void ForSourceMember_maps_all_properties_when_destination_properties_are_from_interface()
+        {
+            Mapper.Initialize(mapper =>
+            {
+                var expression = mapper.CreateMap<SourceWithExtraProperties, DestinationModelFromInterface>()
+                    .ForMember(dst => dst.DstId, cfg => cfg.MapFrom(src => src.Id))
+                    .ForMember(dst => dst.DstFirstName, cfg => cfg.UseValue("John"))
+                    .ForMember(dst => dst.DstLastName, cfg => cfg.UseValue("Doe"));
+                ExtensionForSourceMemberInterface(expression);
+            });
+            var source = new SourceWithExtraProperties() { Id = 12345, A = "a", B = "b", C = "c" };
+
+            var typeMap = Mapper.FindTypeMapFor(typeof(SourceWithExtraProperties), typeof(DestinationModelFromInterface));
+            var aConfig = typeMap.FindOrCreateSourceMemberConfigFor(typeof(SourceWithExtraProperties).GetProperty("A"));
+            aConfig.IsIgnored().ShouldBeTrue();
+            var bConfig = typeMap.FindOrCreateSourceMemberConfigFor(typeof(SourceWithExtraProperties).GetProperty("B"));
+            bConfig.IsIgnored().ShouldBeTrue();
+            var cConfig = typeMap.FindOrCreateSourceMemberConfigFor(typeof(SourceWithExtraProperties).GetProperty("C"));
+            cConfig.IsIgnored().ShouldBeTrue();
+        }
+
+        private static IMappingExpression<TSource, TDestination> ExtensionForSourceMemberInterface<TSource, TDestination>(IMappingExpression<TSource, TDestination> expression)
+            where TSource : ISourceModelWithExtraProperties
+        {
+            return expression.ForSourceMember(src => src.A, cfg => cfg.Ignore())
+                             .ForSourceMember(src => src.B, cfg => cfg.Ignore())
+                             .ForSourceMember(src => src.C, cfg => cfg.Ignore());
         }
     }
 }
