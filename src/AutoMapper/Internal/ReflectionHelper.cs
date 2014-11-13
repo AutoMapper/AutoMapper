@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Linq;
 
 namespace AutoMapper.Impl
 {
@@ -41,6 +42,35 @@ namespace AutoMapper.Impl
             }
 
             throw new AutoMapperConfigurationException("Custom configuration for members is only supported for top-level individual members on a type.");
+        }
+
+        public static MemberInfo TryGetImplementedMember(Type implementationType, MemberInfo memberInfo)
+        {
+            var isImplementedMember = memberInfo != null &&
+                                      implementationType != memberInfo.DeclaringType &&
+                                      memberInfo.DeclaringType.IsAssignableFrom(implementationType);
+            if (!isImplementedMember)
+            {
+                return memberInfo;
+            }
+
+            var propertyInfo = memberInfo as PropertyInfo;
+            if (propertyInfo != null)
+            {
+                var implementedProperty = implementationType.GetProperties()
+                    .SingleOrDefault(p => p.Name == propertyInfo.Name && p.PropertyType == propertyInfo.PropertyType);
+                return implementedProperty;
+            }
+
+            var fieldInfo = memberInfo as FieldInfo;
+            if (fieldInfo != null)
+            {
+                var implementedField = implementationType.GetFields()
+                    .SingleOrDefault(f => f.Name == fieldInfo.Name && f.FieldType == fieldInfo.FieldType);
+                return implementedField;
+            }
+
+            return memberInfo;
         }
 
         public static Type GetMemberType(this MemberInfo memberInfo)

@@ -179,6 +179,7 @@ namespace AutoMapper
                                                                    Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
             var memberInfo = ReflectionHelper.FindProperty(destinationMember);
+            memberInfo = ReflectionHelper.TryGetImplementedMember(TypeMap.DestinationType, memberInfo);
             IMemberAccessor destProperty = memberInfo.ToMemberAccessor();
             ForDestinationMember(destProperty, memberOptions);
             return new MappingExpression<TSource, TDestination>(TypeMap, _serviceCtor, _configurationContainer);
