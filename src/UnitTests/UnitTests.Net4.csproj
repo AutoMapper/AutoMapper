@@ -184,6 +184,7 @@
     <Compile Include="NestedContainers.cs" />
     <Compile Include="NullBehavior.cs" />
     <Compile Include="ObjectSubstitution.cs" />
+    <Compile Include="OpenGenerics.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="Projection\ConstructorTests.cs" />
     <Compile Include="Projection\ExplicitExpansion.cs" />

@@ -7,9 +7,10 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
+    using Configuration;
     using Internal;
 
-	public class ConfigurationStore : IConfigurationProvider, IConfiguration
+    public class ConfigurationStore : IConfigurationProvider, IConfiguration
 	{
 	    private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
 	    private readonly ITypeMapFactory _typeMapFactory;
@@ -19,6 +20,7 @@ namespace AutoMapper
 		private readonly ThreadSafeList<TypeMap> _typeMaps = new ThreadSafeList<TypeMap>();
 
         private readonly IDictionary<TypePair, TypeMap> _typeMapCache = DictionaryFactory.CreateDictionary<TypePair, TypeMap>();
+        private readonly IDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache = DictionaryFactory.CreateDictionary<TypePair, CreateTypeMapExpression>();
         private readonly IDictionary<string, FormatterExpression> _formatterProfiles = DictionaryFactory.CreateDictionary<string, FormatterExpression>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
@@ -215,7 +217,16 @@ namespace AutoMapper
 
 	    public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
 		{
-			var typeMap = CreateTypeMap(sourceType, destinationType, profileName, memberList);
+	        if (sourceType.IsGenericTypeDefinition && destinationType.IsGenericTypeDefinition)
+	        {
+	            var typePair = new TypePair(sourceType, destinationType);
+
+                var expression = _typeMapExpressionCache.GetOrAdd(typePair, tp => new CreateTypeMapExpression(tp, memberList, profileName));
+
+	            return expression;
+	        }
+
+	        var typeMap = CreateTypeMap(sourceType, destinationType, profileName, memberList);
 
 			return CreateMappingExpression(typeMap, destinationType);
 		}
@@ -557,6 +568,27 @@ namespace AutoMapper
                         typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceType.BaseType, destinationType);
                 }
             }
+	        if (typeMap == null && sourceType.IsGenericType && destinationType.IsGenericType)
+	        {
+	            var sourceGenericDefinition = sourceType.GetGenericTypeDefinition();
+	            var destGenericDefinition = destinationType.GetGenericTypeDefinition();
+	            if (sourceGenericDefinition == null || destGenericDefinition == null)
+	            {
+	                return null;
+	            }
+                var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
+	            CreateTypeMapExpression genericTypeMapExpression;
+
+	            if (_typeMapExpressionCache.TryGetValue(genericTypePair, out genericTypeMapExpression))
+	            {
+	                typeMap = CreateTypeMap(sourceType, destinationType, genericTypeMapExpression.ProfileName,
+	                    genericTypeMapExpression.MemberList);
+
+	                var mappingExpression = CreateMappingExpression(typeMap, destinationType);
+
+	                genericTypeMapExpression.Accept(mappingExpression);
+	            }
+	        }
             return typeMap;
         }
 
