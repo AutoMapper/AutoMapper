@@ -155,6 +155,7 @@
     <Compile Include="Internal\DelegateBasedResolver.cs" />
     <Compile Include="Internal\NullReplacementMethod.cs" />
     <Compile Include="Internal\PrimitiveExtensions.cs" />
+    <Compile Include="Configuration\CreateTypeMapExpression.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="PropertyMap.cs" />
     <Compile Include="Internal\ReflectionHelper.cs" />
