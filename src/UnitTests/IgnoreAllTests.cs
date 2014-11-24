@@ -47,7 +47,7 @@ namespace AutoMapper.UnitTests
                 cfg.CreateMap<Source, DestinationWrongType>();
             });
 
-            Mapper.Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
+            Mapper.Map<Source, DestinationWrongType>(new Source { ShouldBeMapped = "true" });
             Mapper.AssertConfigurationIsValid();
         }
 
