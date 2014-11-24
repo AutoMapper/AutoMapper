@@ -504,7 +504,11 @@ namespace AutoMapper
 				{
 					mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
 				}
-			}
+                if (_globalIgnore.Contains(destProperty.Name))
+                {
+                    mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
+                }
+            }
 
 			return mappingExp;
 		}
