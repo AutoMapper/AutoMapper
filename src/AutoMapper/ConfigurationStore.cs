@@ -539,7 +539,7 @@ namespace AutoMapper
 
 	    private static bool ShouldCheckMap(TypeMap typeMap)
 	    {
-	        return (typeMap.CustomMapper == null && typeMap.CustomProjection == null) && !FeatureDetector.IsIDataRecordType(typeMap.SourceType);
+	        return (typeMap.CustomMapper == null && typeMap.CustomProjection == null && typeMap.DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(typeMap.SourceType);
 	    }
 
 	    private TypeMap FindTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
