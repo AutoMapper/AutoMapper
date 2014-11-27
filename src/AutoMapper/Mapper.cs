@@ -4,6 +4,7 @@ using AutoMapper.Mappers;
 namespace AutoMapper
 {
     using Internal;
+    using QueryableExtensions;
 
     /// <summary>
     /// Main entry point for AutoMapper, for both creating maps and performing maps.
@@ -439,6 +440,7 @@ namespace AutoMapper
 		public static void Reset()
         {
             MapperRegistry.Reset();
+            Extensions.ClearExpressionCache();
             _configuration = LazyFactory.Create(_configurationInit);
             _mappingEngine = LazyFactory.Create(_mappingEngineInit);
 		}

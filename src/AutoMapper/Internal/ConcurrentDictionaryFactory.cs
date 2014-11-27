@@ -45,6 +45,11 @@ namespace AutoMapper.Internal
             {
                 return _dictionary.TryRemove(key, out value);
             }
+
+            public void Clear()
+            {
+                _dictionary.Clear();
+            }
         }
     }
 }

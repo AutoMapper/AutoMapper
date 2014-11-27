@@ -32,6 +32,11 @@ namespace AutoMapper.QueryableExtensions
             new StringExpressionBinder(),
         };
 
+        public static void ClearExpressionCache()
+        {
+            _expressionCache.Clear();
+        }
+
         /// <summary>
         /// Create an expression tree representing a mapping from the <typeparamref name="TSource"/> type to <typeparamref name="TDestination"/> type
         /// Includes flattening and expressions inside MapFrom member configuration
