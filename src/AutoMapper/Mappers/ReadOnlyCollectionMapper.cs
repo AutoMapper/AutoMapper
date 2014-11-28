@@ -17,7 +17,10 @@ namespace AutoMapper.Mappers
 
             var objectMapper = (IObjectMapper)Activator.CreateInstance(enumerableMapper);
 
-            var nullDestinationValueSoTheReadOnlyCollectionMapperWorks = context.CreateMemberContext(context.TypeMap, context.SourceValue, null, context.SourceType, context.PropertyMap);
+            var nullDestinationValueSoTheReadOnlyCollectionMapperWorks =
+                context.PropertyMap != null
+                    ? context.CreateMemberContext(context.TypeMap, context.SourceValue, null, context.SourceType, context.PropertyMap)
+                    : context;
 
             return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks, mapper);
         }

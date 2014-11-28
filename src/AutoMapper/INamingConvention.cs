@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using AutoMapper.Internal;
 
 namespace AutoMapper
 {
@@ -53,6 +54,11 @@ namespace AutoMapper
 	    IEnumerable<string> DestinationPostfixes { get; }
 
         /// <summary>
+        /// Source/destination member name replacers
+        /// </summary>
+        IEnumerable<MemberNameReplacer> MemberNameReplacers { get; }
+
+        /// <summary>
         /// Source/destination member aliases
         /// </summary>
 	    IEnumerable<AliasedMember> Aliases { get; }
@@ -71,6 +77,11 @@ namespace AutoMapper
         /// Source extension methods included for search
         /// </summary>
 	    IEnumerable<MethodInfo> SourceExtensionMethods { get; }
+
+        /// <summary>
+        /// Binding flags used to search for members. Defaults to public instance methods
+        /// </summary>
+        BindingFlags BindingFlags { get; set; }
 	}
 
 	public class PascalCaseNamingConvention : INamingConvention

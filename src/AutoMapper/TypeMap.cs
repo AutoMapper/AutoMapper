@@ -4,6 +4,7 @@ namespace AutoMapper
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using Impl;
     using Internal;
@@ -56,6 +57,7 @@ namespace AutoMapper
 
         public string Profile { get; set; }
         public Func<ResolutionContext, object> CustomMapper { get; private set; }
+        public LambdaExpression CustomProjection { get; private set; }
 
         public Action<object, object> BeforeMap
         {
@@ -107,6 +109,7 @@ namespace AutoMapper
         }
 
         public Func<object, object> Substitution { get; set; }
+        public LambdaExpression ConstructExpression { get; set; }
 
         public IEnumerable<PropertyMap> GetPropertyMaps()
         {
@@ -366,6 +369,41 @@ namespace AutoMapper
                 contextCopy = contextCopy.Parent;
             }
             return currentDepth <= maxDepth;
+        }
+
+        public void UseCustomProjection(LambdaExpression projectionExpression)
+        {
+            CustomProjection = projectionExpression;
+            _propertyMaps.Clear();
+        }
+
+        public void ApplyInheritedMap(TypeMap inheritedTypeMap)
+        {
+            foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
+            {
+                var conventionPropertyMap = GetPropertyMaps()
+                    .SingleOrDefault(m =>
+                        m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
+
+                if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
+                {
+                    conventionPropertyMap.AssignCustomValueResolver(inheritedMappedProperty.GetSourceValueResolvers().First());
+                    conventionPropertyMap.AssignCustomExpression(inheritedMappedProperty.CustomExpression);
+                }
+                else if (conventionPropertyMap == null)
+                {
+                    var propertyMap = new PropertyMap(inheritedMappedProperty);
+
+                    AddInheritedPropertyMap(propertyMap);
+                }
+            }
+
+            //Include BeforeMap
+            if (inheritedTypeMap.BeforeMap != null)
+                AddBeforeMapAction(inheritedTypeMap.BeforeMap);
+            //Include AfterMap
+            if (inheritedTypeMap.AfterMap != null)
+                AddAfterMapAction(inheritedTypeMap.AfterMap);
         }
     }
 }

@@ -4,6 +4,7 @@ using AutoMapper.Mappers;
 namespace AutoMapper
 {
     using Internal;
+    using QueryableExtensions;
 
     /// <summary>
     /// Main entry point for AutoMapper, for both creating maps and performing maps.
@@ -94,7 +95,7 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions> opts)
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             return Engine.Map(source, destination, opts);
         }
@@ -107,9 +108,9 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-		public static TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions> opts)
+		public static TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
 		{
-            return Engine.Map<TSource, TDestination>(source, opts);
+            return Engine.Map(source, opts);
 		}
 
         /// <summary>
@@ -439,6 +440,7 @@ namespace AutoMapper
 		public static void Reset()
         {
             MapperRegistry.Reset();
+            Extensions.ClearExpressionCache();
             _configuration = LazyFactory.Create(_configurationInit);
             _mappingEngine = LazyFactory.Create(_mappingEngineInit);
 		}

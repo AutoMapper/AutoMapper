@@ -79,6 +79,7 @@
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
+    <Compile Include="BindingFlagsConfiguration.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
     <Compile Include="AutoMapperTester.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
+    <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
     <Compile Include="Bug\ConditionBug.cs" />
     <Compile Include="Bug\ContextValuesIncorrect.cs" />
     <Compile Include="Bug\DestinationCtorCalledTwice.cs" />
@@ -99,12 +101,16 @@
     <Compile Include="Bug\DeepInheritanceIssue.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
     <Compile Include="Bug\EFCollections.cs" />
+    <Compile Include="Bug\EmptyNullSubstituteBug.cs" />
     <Compile Include="Bug\EnumConditionsBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\ExistingArrays.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
+    <Compile Include="Bug\ListSourceMapperBug.cs" />
+    <Compile Include="Bug\NullArrayBug.cs" />
+    <Compile Include="Bug\ReadOnlyCollectionMappingBug.cs" />
     <Compile Include="Bug\MappingInheritance.cs" />
     <Compile Include="Bug\MappingToAProtectedCollection.cs" />
     <Compile Include="Bug\MemberNamedTypeBug.cs" />
@@ -122,6 +128,7 @@
     <Compile Include="Bug\ProjectCollectionsBug.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
+    <Compile Include="Bug\SelectiveConfigurationValidation.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -137,6 +144,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ExpressionBridge.cs" />
+    <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IgnoreAllTests.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
@@ -161,6 +169,7 @@
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludedBaseMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
     <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
@@ -170,21 +179,30 @@
     <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
     <Compile Include="MappingOrder.cs" />
     <Compile Include="MaxDepthTests.cs" />
+    <Compile Include="MemberNameReplacers.cs" />
     <Compile Include="MemberResolution.cs" />
     <Compile Include="NestedContainers.cs" />
     <Compile Include="NullBehavior.cs" />
     <Compile Include="ObjectSubstitution.cs" />
+    <Compile Include="OpenGenerics.cs" />
     <Compile Include="Profiles.cs" />
+    <Compile Include="Projection\ConstructorTests.cs" />
+    <Compile Include="Projection\ExplicitExpansion.cs" />
+    <Compile Include="Projection\ExplicitValues.cs" />
     <Compile Include="Projection\InheritedMaps.cs" />
     <Compile Include="Projection\MapFromTest.cs" />
     <Compile Include="Projection\NestedAndArraysTests.cs" />
     <Compile Include="Projection\NestedExpressionsMapFromTests.cs" />
     <Compile Include="Projection\NullableItemsTests.cs" />
+    <Compile Include="Projection\NullSubstitutes.cs" />
+    <Compile Include="Projection\ParameterizedQueriesTests.cs" />
     <Compile Include="Projection\PrimitiveArraysTest.cs" />
     <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
     <Compile Include="Projection\ProjectCollectionListTest.cs" />
     <Compile Include="Projection\ProjectEnumerableToArrayTest.cs" />
+    <Compile Include="Projection\ProjectEnumTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
+    <Compile Include="Projection\ToStringTests.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />

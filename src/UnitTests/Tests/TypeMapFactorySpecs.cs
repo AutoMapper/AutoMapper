@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using AutoMapper.Internal;
 using Xunit;
 using Should;
 
@@ -17,6 +18,10 @@ namespace AutoMapper.UnitTests.Tests
 
     public class StubMappingOptions : IMappingOptions
     {
+        public StubMappingOptions()
+        {
+            BindingFlags = BindingFlags.Public | BindingFlags.Instance;
+        }
         private INamingConvention _sourceMemberNamingConvention;
 
         private INamingConvention _destinationMemberNamingConvention;
@@ -30,6 +35,8 @@ namespace AutoMapper.UnitTests.Tests
         private IEnumerable<string> _destinationPostfixes = new List<string>();
 
         private IEnumerable<AliasedMember> _aliases = new List<AliasedMember>();
+
+        private HashSet<MemberNameReplacer> _memberNameReplacers = new HashSet<MemberNameReplacer>();
 
         private IEnumerable<Assembly> _sourceExtensionMethodSearch = null;
         private IEnumerable<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
@@ -66,6 +73,11 @@ namespace AutoMapper.UnitTests.Tests
             get { return _destinationPostfixes; }
         }
 
+        public IEnumerable<MemberNameReplacer> MemberNameReplacers
+        {
+            get { return _memberNameReplacers; }
+        }
+
         public IEnumerable<AliasedMember> Aliases
         {
             get { return _aliases; }
@@ -84,6 +96,13 @@ namespace AutoMapper.UnitTests.Tests
         public IEnumerable<MethodInfo> SourceExtensionMethods
         {
             get { return _sourceExtensionMethods; }
+        }
+
+        public BindingFlags BindingFlags { get; set; }
+
+        public void ReplaceMemberName(string original, string newValue)
+        {
+            _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
         }
     }
 
@@ -213,6 +232,45 @@ namespace AutoMapper.UnitTests.Tests
         public void Should_split_using_naming_convention_rules()
         {
             _map.GetPropertyMaps().Count().ShouldEqual(1);
+        }
+    }
+
+    public class When_using_a_source_member_name_replacer : SpecBase
+    {
+        private TypeMapFactory _factory;
+
+        public class Source
+        {
+            public int Value { get; set; }
+            public int Ävíator { get; set; }
+            public int SubAirlinaFlight { get; set; }
+        }
+
+        public class Destination
+        {
+            public int Value { get; set; }
+            public int Aviator { get; set; }
+            public int SubAirlineFlight { get; set; }
+        }
+
+        protected override void Establish_context()
+        {
+            _factory = new TypeMapFactory();
+        }
+
+        [Fact]
+        public void Should_map_properties_with_different_names()
+        {
+            var mappingOptions = new StubMappingOptions();
+            mappingOptions.ReplaceMemberName("Ä", "A");
+            mappingOptions.ReplaceMemberName("í", "i");
+            mappingOptions.ReplaceMemberName("Airlina", "Airline");
+            
+            var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions, MemberList.Destination);
+
+            var propertyMaps = typeMap.GetPropertyMaps();
+
+            propertyMaps.Count().ShouldEqual(3);
         }
     }
 }

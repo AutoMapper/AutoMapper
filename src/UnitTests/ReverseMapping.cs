@@ -306,17 +306,17 @@ namespace AutoMapper.UnitTests
         public static class AutoMapperExtensions
         {
             // from http://stackoverflow.com/questions/954480/automapper-ignore-the-rest/6474397#6474397
-            public static IMappingExpression<TSource, TDestination> IgnoreAllNonExisting<TSource, TDestination>(this AutoMapper.IMappingExpression<TSource, TDestination> expression)
-            {
-                var sourceType = typeof(TSource);
-                var destinationType = typeof(TDestination);
-                var existingMaps = AutoMapper.Mapper.GetAllTypeMaps().First(x => x.SourceType.Equals(sourceType) && x.DestinationType.Equals(destinationType));
-                foreach (var property in existingMaps.GetUnmappedPropertyNames())
-                {
-                    expression.ForMember(property, opt => opt.Ignore());
-                }
-                return expression;
-            }
+public static IMappingExpression<TSource, TDestination> IgnoreAllNonExisting<TSource, TDestination>(this AutoMapper.IMappingExpression<TSource, TDestination> expression)
+{
+    var sourceType = typeof(TSource);
+    var destinationType = typeof(TDestination);
+    var existingMaps = AutoMapper.Mapper.GetAllTypeMaps().First(x => x.SourceType.Equals(sourceType) && x.DestinationType.Equals(destinationType));
+    foreach (var property in existingMaps.GetUnmappedPropertyNames())
+    {
+        expression.ForMember(property, opt => opt.Ignore());
+    }
+    return expression;
+}
 
             public static IMappingExpression<TSource, TDestination> IgnoreAllNonExistingSource<TSource, TDestination>(this AutoMapper.IMappingExpression<TSource, TDestination> expression)
             {

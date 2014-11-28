@@ -7,9 +7,9 @@ namespace AutoMapper.UnitTests.Projection
 	using System.Linq;
 
 	using AutoMapper;
-	using AutoMapper.QueryableExtensions;
+	using QueryableExtensions;
 
-	public class ProjectCollectionEnumerableTest
+    public class ProjectCollectionEnumerableTest
 	{
 		private const string Street1 = "Street1";
 		private const string Street2 = "Street2";

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
-using AutoMapper.QueryableExtensions;
 using Xunit;
 using Assert = Should.Core.Assertions.Assert;
 using Should;
@@ -12,6 +11,8 @@ namespace AutoMapper.IntegrationTests.Net4
 {
     namespace CustomMapFromTest
     {
+        using QueryableExtensions;
+
         public class Customer
         {
             [Key]

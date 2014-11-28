@@ -49,6 +49,7 @@ namespace AutoMapper.Internal
 
         TValue this[TKey key] { get; set; }
         bool TryRemove(TKey key, out TValue value);
+        void Clear();
     }
 
     public interface INullableConverter
