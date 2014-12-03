@@ -11,7 +11,7 @@ Check out the [getting started guide](https://github.com/AutoMapper/AutoMapper/w
 
 Where can I get it?
 --------------------------------
-First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install AutoMapper from the package manager console:
+First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [AutoMapper](https://www.nuget.org/packages/AutoMapper/) from the package manager console:
 
     PM> Install-Package AutoMapper
 
