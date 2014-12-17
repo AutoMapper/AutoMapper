@@ -68,7 +68,7 @@ namespace AutoMapper.Mappers
 
             private MethodCallExpression GetConvertedMethodCall(MethodCallExpression node)
             {
-                var convertedArguments = node.Arguments.Select(e => base.Visit(e)).ToList();
+                var convertedArguments = Visit(node.Arguments);
                 var convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select(t => GetConvertingTypeIfExists(node.Arguments, t, convertedArguments)).ToArray();
                 var convertedMethodCall = node.Method.GetGenericMethodDefinition().MakeGenericMethod(convertedMethodArgumentTypes);
                 return Expression.Call(convertedMethodCall, convertedArguments);
@@ -108,7 +108,6 @@ namespace AutoMapper.Mappers
 
             private Expression VisitAllParametersExpression<T>(Expression<T> expression)
             {
-                var parameters = expression.Parameters.ToArray();
                 var visitors = new List<ExpressionVisitor>();
                 for (var i = 0; i < expression.Parameters.Count; i++)
                 {
@@ -129,7 +128,6 @@ namespace AutoMapper.Mappers
 
                     var oldParam = expression.Parameters[i];
                     var newParam = Expression.Parameter(typeMap.SourceType, oldParam.Name);
-                    parameters[i] = newParam;
                     visitors.Add(new MappingVisitor(typeMap, oldParam, newParam));
                 }
                 return visitors.Aggregate(expression as Expression, (e, v) => v.Visit(e));
