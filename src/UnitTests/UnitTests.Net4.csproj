@@ -187,6 +187,7 @@
     <Compile Include="OpenGenerics.cs" />
     <Compile Include="Profiles.cs" />
     <Compile Include="Projection\ConstructorTests.cs" />
+    <Compile Include="Projection\NestedExplicitExpansion.cs" />
     <Compile Include="Projection\ExplicitExpansion.cs" />
     <Compile Include="Projection\ExplicitValues.cs" />
     <Compile Include="Projection\InheritedMaps.cs" />
@@ -295,6 +296,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

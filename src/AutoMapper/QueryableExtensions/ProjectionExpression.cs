@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AutoMapper.QueryableExtensions
 {
     using System;
@@ -43,9 +45,9 @@ namespace AutoMapper.QueryableExtensions
         {
             var members = membersToExpand.Select(expr =>
             {
-                var visitor = new MemberVisitor();
+                var visitor = new PathVisitor();
                 visitor.Visit(expr);
-                return visitor.MemberName;
+                return visitor.Path;
             })
                 .ToArray();
             return To<TResult>(parameters, members);
@@ -55,23 +57,35 @@ namespace AutoMapper.QueryableExtensions
         {
             var members = membersToExpand.Select(expr =>
             {
-                var visitor = new MemberVisitor();
+                var visitor = new PathVisitor();
                 visitor.Visit(expr);
-                return visitor.MemberName;
+                return visitor.Path;
             })
                 .ToArray();
             return _source.Select(_mappingEngine.CreateMapExpression<TSource, TResult>(parameters, members));
         }
 
-        private class MemberVisitor : ExpressionVisitor
+        private class PathVisitor : ExpressionVisitor
         {
-            protected override Expression VisitMember(MemberExpression node)
+            private readonly Stack<string> _segments = new Stack<string>();
+            public string Path { get { return string.Join(".", _segments.ToArray()); } }
+
+            protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                MemberName = node.Member.Name;
-                return base.VisitMember(node);
+                if (node.Method.Name == "Select")
+                {
+                    Visit(node.Arguments[1]);
+                    Visit(node.Arguments[0]);
+                }
+                return node;
             }
 
-            public string MemberName { get; private set; }
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                _segments.Push(node.Member.Name);
+
+                return base.VisitMember(node);
+            }
         }
     }
 }

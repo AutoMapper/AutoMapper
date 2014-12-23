@@ -164,7 +164,13 @@ namespace AutoMapper.QueryableExtensions
                     continue;
 
                 var propertyTypeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationPropertyType);
-                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
+
+                var prefix = propertyMap.DestinationProperty.Name + ".";
+                var scopedIncludedMembers =
+                    request.IncludedMembers.Where(m => m.StartsWith(prefix))
+                        .Select(m => m.Substring(prefix.Length))
+                        .ToArray();
+                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, scopedIncludedMembers);
 
                 var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
