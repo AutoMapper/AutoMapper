@@ -1,4 +1,4 @@
-$framework = '3.5x86'
+Framework '4.0x86'
 
 task default -depends MsBuild
 

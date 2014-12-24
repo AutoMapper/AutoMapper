@@ -6,6 +6,8 @@ properties {
 
 task default -depends Test
 
+formatTaskName "-------{0}-------"
+
 task Test -depends Compile, Clean { 
   $testMessage
 }
@@ -16,8 +18,4 @@ task Compile -depends Clean {
 
 task Clean { 
   $cleanMessage
-}
-
-task ? -Description "Helper to display task info" {
-	Write-Documentation
 }

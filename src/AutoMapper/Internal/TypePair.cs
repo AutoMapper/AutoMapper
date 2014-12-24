@@ -8,28 +8,20 @@ namespace AutoMapper.Impl
         public TypePair(Type sourceType, Type destinationType)
             : this()
         {
-            _sourceType = sourceType;
-            _destinationType = destinationType;
-            _hashcode = unchecked((_sourceType.GetHashCode() * 397) ^ _destinationType.GetHashCode());
+            SourceType = sourceType;
+            DestinationType = destinationType;
+            _hashcode = unchecked((SourceType.GetHashCode() * 397) ^ DestinationType.GetHashCode());
         }
 
-        private readonly Type _destinationType;
         private readonly int _hashcode;
-        private readonly Type _sourceType;
 
-        public Type SourceType
-        {
-            get { return _sourceType; }
-        }
+        public Type SourceType { get; }
 
-        public Type DestinationType
-        {
-            get { return _destinationType; }
-        }
+        public Type DestinationType { get; }
 
         public bool Equals(TypePair other)
         {
-            return Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType);
+            return Equals(other.SourceType, SourceType) && Equals(other.DestinationType, DestinationType);
         }
 
         public override bool Equals(object obj)

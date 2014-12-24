@@ -1,4 +1,4 @@
-$framework = '4.0x86'
+$framework = '4.5.1x86'
 
 properties {
 	$base_dir = resolve-path .
@@ -57,7 +57,7 @@ task dist {
 	copy_files "$source_dir\AutoMapper\bin\sl5\$config" "$dist_dir\sl5"
 	copy_files "$source_dir\AutoMapper\bin\wp8\$config" "$dist_dir\wp8"
 	copy_files "$source_dir\AutoMapper\bin\wpa81\$config" "$dist_dir\wpa81"
-	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows8"
+	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows81"
 	copy_files "$source_dir\AutoMapper\bin\Android\$config" "$dist_dir\MonoAndroid"
 	copy_files "$source_dir\AutoMapper\bin\iPhone\$config" "$dist_dir\MonoTouch"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
@@ -179,13 +179,13 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\wpa81\AutoMapper.WPA81.pdb"" target=""lib\wpa81"" />
     <file src=""$source_dir\install.ps1"" target=""tools\wpa81"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\wpa81"" />
-    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\windows8"" />
-    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8\AutoMapper.WinRT.dll"" target=""lib\windows8"" />
-    <file src=""$dist_dir\windows8\AutoMapper.WinRT.pdb"" target=""lib\windows8"" />
-    <file src=""$source_dir\install.ps1"" target=""tools\windows8"" />
-    <file src=""$source_dir\uninstall.ps1"" target=""tools\windows8"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\windows81"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\windows81"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\windows81"" />
+    <file src=""$dist_dir\windows81\AutoMapper.WinRT.dll"" target=""lib\windows81"" />
+    <file src=""$dist_dir\windows81\AutoMapper.WinRT.pdb"" target=""lib\windows81"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\windows81"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\windows81"" />
     <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\MonoAndroid"" />
     <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\MonoAndroid"" />
     <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\MonoAndroid"" />
