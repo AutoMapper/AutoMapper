@@ -203,6 +203,8 @@
     <Compile Include="Projection\ProjectEnumTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="Projection\ToStringTests.cs" />
+    <Compile Include="Query\NestedProperties.cs" />
+    <Compile Include="Query\StringPropertyMethodsCall.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
