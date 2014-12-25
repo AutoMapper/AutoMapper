@@ -225,6 +225,8 @@
     <Compile Include="Projection\ProjectEnumTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="Projection\ToStringTests.cs" />
+    <Compile Include="Query\NestedProperties.cs" />
+    <Compile Include="Query\StringPropertyMethodsCall.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
@@ -324,4 +326,5 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+</Project>
 </Project>
