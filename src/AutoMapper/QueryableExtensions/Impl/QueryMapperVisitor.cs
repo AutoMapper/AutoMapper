@@ -72,14 +72,14 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            var method = changeMethodArgTypeFormSourceToDest(node.Method);
+            var method = ChangeMethodArgTypeFormSourceToDest(node.Method);
             var args = node.Arguments.Select(Visit);
             var target = Visit(node.Object);
             var newMethodCall = Expression.Call(target, method, args);
             return newMethodCall;
         }
 
-        private MethodInfo changeMethodArgTypeFormSourceToDest(MethodInfo mi)
+        private MethodInfo ChangeMethodArgTypeFormSourceToDest(MethodInfo mi)
         {
             if (!mi.IsGenericMethod)
                 return mi;
