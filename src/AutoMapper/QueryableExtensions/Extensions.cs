@@ -63,7 +63,12 @@ namespace AutoMapper.QueryableExtensions
             var visitor = new ConstantExpressionReplacementVisitor(parameters);
             return (Expression<Func<TSource, TDestination>>)visitor.Visit(cachedExpression);
         }
-
+        
+        public static IQueryable<TDestination> Map<TSource, TDestination>(this IQueryable<TSource> sourceQuery,
+            IQueryable<TDestination> destQuery)
+        {
+            return QueryMapperVisitor.Map<TSource, TDestination>(sourceQuery, destQuery, Mapper.Engine);
+        }
 
         /// <summary>
         /// Extention method to project from a queryable using the static <see cref="Mapper.Engine"/> property.
