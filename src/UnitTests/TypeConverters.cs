@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.CreateMap<string, int>().ConvertUsing(arg => Convert.ToInt32(arg));
+				Mapper.CreateMap<string, int>().ConvertUsing((string arg) => Convert.ToInt32(arg));
 				Mapper.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
 				Mapper.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
 
