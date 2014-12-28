@@ -324,15 +324,6 @@ namespace AutoMapper
     /// <typeparam name="TSource">Source type for this member</typeparam>
     public interface IMemberConfigurationExpression<TSource>
     {
-        [Obsolete("Formatters should not be used.")]
-        void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
-        [Obsolete("Formatters should not be used.")]
-        IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
-        [Obsolete("Formatters should not be used.")]
-        IFormatterCtorExpression AddFormatter(Type valueFormatterType);
-        [Obsolete("Formatters should not be used.")]
-        void AddFormatter(IValueFormatter formatter);
-
         /// <summary>
         /// Substitute a custom value when the source member resolves as null
         /// </summary>

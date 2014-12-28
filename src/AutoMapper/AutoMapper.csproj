@@ -115,7 +115,7 @@
     <Compile Include="Internal\ExpressionValueFormatter.cs" />
     <Compile Include="Internal\FieldGetter.cs" />
     <Compile Include="Internal\FormatterCtorExpression.cs" />
-    <Compile Include="IFormatterConfiguration.cs" />
+    <Compile Include="IProfileConfiguration.cs" />
     <Compile Include="Internal\MemberGetter.cs" />
     <Compile Include="Internal\MethodGetter.cs" />
     <Compile Include="Internal\PropertyGetter.cs" />
@@ -132,7 +132,6 @@
     <Compile Include="IFormatterExpression.cs" />
     <Compile Include="IMappingEngine.cs" />
     <Compile Include="IMappingExpression.cs" />
-    <Compile Include="IValueFormatter.cs" />
     <Compile Include="IValueResolver.cs" />
     <Compile Include="Mappers\ArrayMapper.cs" />
     <Compile Include="Mappers\CollectionMapper.cs" />
@@ -185,7 +184,6 @@
     <Compile Include="TypeInfo.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
-    <Compile Include="ValueFormatter.cs" />
     <Compile Include="ValueResolver.cs" />
   </ItemGroup>
   <ItemGroup>

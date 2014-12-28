@@ -4,40 +4,10 @@ namespace AutoMapper
 {
     using System.Reflection;
 
-    [Obsolete("Formatters should not be used.")]
-    public interface IFormatterExpression
-	{
-        [Obsolete("Formatters should not be used.")]
-        IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
-        [Obsolete("Formatters should not be used.")]
-        IFormatterCtorExpression AddFormatter(Type valueFormatterType);
-        [Obsolete("Formatters should not be used.")]
-        void AddFormatter(IValueFormatter formatter);
-        [Obsolete("Formatters should not be used.")]
-        void AddFormatExpression(Func<ResolutionContext, string> formatExpression);
-        [Obsolete("Formatters should not be used.")]
-        void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter;
-        [Obsolete("Formatters should not be used.")]
-        IFormatterExpression ForSourceType<TSource>();
-    }
-
-    [Obsolete("Formatters should not be used.")]
-	public interface IFormatterCtorExpression
-	{
-		void ConstructedBy(Func<IValueFormatter> constructor);
-	}
-
-    [Obsolete("Formatters should not be used.")]
-    public interface IFormatterCtorExpression<TValueFormatter>
-		where TValueFormatter : IValueFormatter
-	{
-		void ConstructedBy(Func<TValueFormatter> constructor);
-	}
-
     /// <summary>
     /// Configuration for profile-specific maps
     /// </summary>
-	public interface IProfileExpression : IFormatterExpression, IMappingOptions
+	public interface IProfileExpression : IMappingOptions
 	{
         /// <summary>
         /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type

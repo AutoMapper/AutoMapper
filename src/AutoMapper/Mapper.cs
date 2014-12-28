@@ -241,36 +241,6 @@ namespace AutoMapper
 			Configuration.Seal();
 		}
 
-        [Obsolete("Formatters should not be used.")]
-		public static IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			return Configuration.AddFormatter<TValueFormatter>();
-		}
-
-        [Obsolete("Formatters should not be used.")]
-        public static IFormatterCtorExpression AddFormatter(Type valueFormatterType)
-		{
-			return Configuration.AddFormatter(valueFormatterType);
-		}
-
-        [Obsolete("Formatters should not be used.")]
-        public static void AddFormatter(IValueFormatter formatter)
-		{
-			Configuration.AddFormatter(formatter);
-		}
-
-        [Obsolete("Formatters should not be used.")]
-        public static void AddFormatExpression(Func<ResolutionContext, string> formatExpression)
-		{
-			Configuration.AddFormatExpression(formatExpression);
-		}
-
-        [Obsolete("Formatters should not be used.")]
-        public static void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			Configuration.SkipFormatter<TValueFormatter>();
-		}
-
         /// <summary>
         /// Configuration starter for specific source types
         /// </summary>
