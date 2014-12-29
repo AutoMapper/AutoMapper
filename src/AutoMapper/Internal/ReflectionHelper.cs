@@ -4,8 +4,8 @@ namespace AutoMapper.Internal
     using System.Linq.Expressions;
     using System.Reflection;
 
-    public static class ReflectionHelper
-    {
+	public static class ReflectionHelper
+	{
         public static string GetPropertyName(this LambdaExpression expression)
         {
             var memberExpression = expression.Body as MemberExpression;
@@ -66,39 +66,64 @@ namespace AutoMapper.Internal
                 return ((FieldInfo) memberInfo).FieldType;
             return null;
         }
+        
+		public static IMemberGetter ToMemberGetter(this MemberInfo accessorCandidate)
+		{
+			if (accessorCandidate == null)
+				return null;
 
-        public static IMemberGetter ToMemberGetter(this MemberInfo accessorCandidate)
-        {
-            if (accessorCandidate == null)
-                return null;
-
-            if (accessorCandidate is PropertyInfo)
+			if (accessorCandidate is PropertyInfo)
                 return new PropertyGetter((PropertyInfo) accessorCandidate);
 
-            if (accessorCandidate is FieldInfo)
+			if (accessorCandidate is FieldInfo)
                 return new FieldGetter((FieldInfo) accessorCandidate);
 
-            if (accessorCandidate is MethodInfo)
+			if (accessorCandidate is MethodInfo)
                 return new MethodGetter((MethodInfo) accessorCandidate);
 
-            return null;
-        }
-
-        public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
-        {
-            var fieldInfo = accessorCandidate as FieldInfo;
-            if (fieldInfo != null)
+			return null;
+		}
+        
+		public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
+		{
+			var fieldInfo = accessorCandidate as FieldInfo;
+			if (fieldInfo != null)
                 return accessorCandidate.DeclaringType.IsValueType()
                     ? (IMemberAccessor) new ValueTypeFieldAccessor(fieldInfo)
                     : new FieldAccessor(fieldInfo);
 
-            var propertyInfo = accessorCandidate as PropertyInfo;
-            if (propertyInfo != null)
+			var propertyInfo = accessorCandidate as PropertyInfo;
+			if (propertyInfo != null)
                 return accessorCandidate.DeclaringType.IsValueType()
                     ? (IMemberAccessor) new ValueTypePropertyAccessor(propertyInfo)
                     : new PropertyAccessor(propertyInfo);
 
-            return null;
+			return null;
+		}
+
+        /// <summary>
+        /// if targetType is oldType, method will return newType
+        /// if targetType is not oldType, method will return targetType
+        /// if targetType is generic type with oldType arguments, method will replace all oldType arguments on newType
+        /// </summary>
+        /// <param name="mainType"></param>
+        /// <param name="newType"></param>
+        /// <returns></returns>
+        public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)
+        {
+            if (targetType == oldType)
+                return newType;
+
+            if (targetType.IsGenericType)
+            {
+                var genSubArgs = targetType.GetGenericArguments();
+                var newGenSubArgs = new Type[genSubArgs.Length];
+                for (int i = 0; i < genSubArgs.Length; i++)
+                    newGenSubArgs[i] = ReplaceItemType(genSubArgs[i], oldType, newType);
+                return targetType.GetGenericTypeDefinition().MakeGenericType(newGenSubArgs);
+            }
+
+            return targetType;
         }
-    }
+	}
 }
