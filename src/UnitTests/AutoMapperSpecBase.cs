@@ -5,6 +5,8 @@ using Xunit;
 using Rhino.Mocks;
 #endif
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace AutoMapper.UnitTests
 {
     public class AutoMapperSpecBase : NonValidatingSpecBase
