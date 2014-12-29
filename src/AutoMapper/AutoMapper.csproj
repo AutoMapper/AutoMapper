@@ -47,7 +47,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Debug\AutoMapper.xml</DocumentationFile>
     <NoWarn>1591,0618</NoWarn>
-    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile3</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -75,6 +75,15 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Equivilency Expression\ExpressionExtentions.cs" />
+    <Compile Include="Equivilency Expression\CustomExpressionVisitor.cs" />
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionFromTypeMap.cs" />
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressions.cs" />
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionOnPropertyMaps.cs" />
+    <Compile Include="Equivilency Expression\GenerateEquivilentExpressionsBasedOnGeneratePropertyMaps.cs" />
+    <Compile Include="Equivilency Expression\IGenerateEquivilentExpressions.cs" />
+    <Compile Include="Equivilency Expression\IGeneratePropertyMaps.cs" />
+    <Compile Include="Equivilency Expression\UserDefinedEquivilentExpressions.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\DictionaryFactory.cs" />
     <Compile Include="Internal\IDictionary.cs" />
@@ -90,12 +99,17 @@
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\AssignableArrayMapper.cs" />
+    <Compile Include="Equivilency Expression\EquivilentExpression.cs" />
+    <Compile Include="Equivilency Expression\EquivilentExpressions.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
+    <Compile Include="Equivilency Expression\IEquivilentExpression.cs" />
     <Compile Include="Mappers\ExpressionMapper.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
+    <Compile Include="Mappers\ObjectToEquivalencyExpressionByEquivalencyExistingMapper.cs" />
     <Compile Include="Mappers\PrimitiveArrayMapper.cs" />
+    <Compile Include="Mappers\EquivlentExpressionAddRemoveCollectionMapper.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="ConstructorMap.cs" />
