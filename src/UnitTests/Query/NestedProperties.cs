@@ -40,11 +40,10 @@ namespace AutoMapper.UnitTests.Query
 
         protected override void Establish_context()
         {
+            Mapper.CreateMap<SourceChild, DestChild>();
             Mapper.CreateMap<Source, Dest>()
                 .ForMember(m => m.Child1, opt => opt.ExplicitExpansion())
-                .ForMember(m => m.Child2, opt => opt.ExplicitExpansion())
-                ;
-            Mapper.CreateMap<SourceChild, DestChild>();
+                .ForMember(m => m.Child2, opt => opt.ExplicitExpansion());
         }
 
         protected override void Because_of()
