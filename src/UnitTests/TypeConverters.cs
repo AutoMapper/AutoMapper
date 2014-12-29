@@ -264,7 +264,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.CreateMap(typeof(Source), typeof(Destination)).ConvertUsing(typeof(CustomConverter));
+				Mapper.Initialize(cfg => cfg.CreateMap(typeof(Source), typeof(Destination)).ConvertUsing(typeof(CustomConverter)));
 			}
 
 			protected override void Because_of()

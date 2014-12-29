@@ -8,9 +8,6 @@ namespace AutoMapper.Mappers
 
         public void Initialize()
         {
-#if !SILVERLIGHT && !NETFX_CORE && !MONODROID && !MONOTOUCH
-            InsertBefore<TypeMapMapper>(new DataReaderMapper());
-#endif
 #if !SILVERLIGHT && !NETFX_CORE
             InsertBefore<DictionaryMapper>(new NameValueCollectionMapper());
 #endif

@@ -145,7 +145,6 @@
     <Compile Include="ContextItems.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
-    <Compile Include="DataReaderMapping.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="DynamicMapping.cs" />
     <Compile Include="Enumerations.cs" />
