@@ -45,12 +45,14 @@ namespace AutoMapper.Mappers
             if (type == typeof(string))
                 return string.Empty;
 
-			return Activator.CreateInstance(type);
+			return CreateObject(type);
 		}
 
 		public static object CreateObject(Type type)
 		{
-            return type.IsArray ? CreateArray(type.GetElementType(), 0) : DelegateFactory.CreateCtor(type)();
+            return type.IsArray ? CreateArray(type.GetElementType(), 0) :
+                type == typeof(string) ? null
+                : DelegateFactory.CreateCtor(type)();
 		}
 	}
 }

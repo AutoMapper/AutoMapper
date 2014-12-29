@@ -242,16 +242,6 @@ namespace AutoMapper
 		}
 
         /// <summary>
-        /// Configuration starter for specific source types
-        /// </summary>
-        /// <typeparam name="TSource">Source type</typeparam>
-        /// <returns>Configuration options</returns>
-		public static IFormatterExpression ForSourceType<TSource>()
-		{
-			return Configuration.ForSourceType<TSource>();
-		}
-
-        /// <summary>
         /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
         /// </summary>
         /// <typeparam name="TSource">Source type</typeparam>

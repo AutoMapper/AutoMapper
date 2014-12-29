@@ -16,11 +16,11 @@ namespace AutoMapper.UnitTests.Bug
 
         }
 
-        public class _Source : Source
+        public class OtherSource : Source
         {
         }
 
-        public class _Child : Child
+        public class OtherChild : Child
         {
 
         }
@@ -43,12 +43,12 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Because_of()
         {
-            var source = new _Source
+            var source = new OtherSource
             {
                 Children = new Collection<Child>
                 {
-                    new _Child(),
-                    new _Child()
+                    new OtherChild(),
+                    new OtherChild()
                 }
             };
             _dest = Mapper.Map<Source, Dest>(source);

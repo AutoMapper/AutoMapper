@@ -43,10 +43,10 @@ task commonAssemblyInfo {
 
 task test {
 	create_directory "$build_dir\results"
-    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll /xml $result_dir\AutoMapper.UnitTests.Net4.xml }
+    exec { & $source_dir\packages\xunit.runners.2.0.0-beta5-build2785\tools\xunit.console.x86.exe $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll -xml $result_dir\AutoMapper.UnitTests.Net4.xml -parallel none }
     exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/SL5/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/SL5/$config/AutoMapper.UnitTests.SL5.dll --ReportOutputFile=$result_dir\AutoMapper.UnitTests.SL5.xml --ReportOutputFileType=NUnit }
-    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/WinRT/$config/AutoMapper.UnitTests.WinRT.dll /xml $result_dir\AutoMapper.UnitTests.WinRT.xml }
-    exec { & $lib_dir\xunit.net\xunit.console.clr4.x86.exe $source_dir/UnitTests/bin/WP8/$config/AutoMapper.UnitTests.WP8.dll /xml $result_dir\AutoMapper.UnitTests.WP8.xml }
+    exec { & $source_dir\packages\xunit.runners.2.0.0-beta5-build2785\tools\xunit.console.x86.exe $source_dir/UnitTests/bin/WinRT/$config/AutoMapper.UnitTests.WinRT.dll -xml $result_dir\AutoMapper.UnitTests.WinRT.xml -parallel none }
+    exec { & $source_dir\packages\xunit.runners.2.0.0-beta5-build2785\tools\xunit.console.x86.exe $source_dir/UnitTests/bin/WP8/$config/AutoMapper.UnitTests.WP8.dll -xml $result_dir\AutoMapper.UnitTests.WP8.xml -parallel none }
 }
 
 task dist {

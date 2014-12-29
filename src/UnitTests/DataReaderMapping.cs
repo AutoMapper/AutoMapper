@@ -18,80 +18,80 @@ namespace AutoMapper.UnitTests
                 Mapper.CreateMap<IDataReader, DTOObject>()
                     .ForMember(dest => dest.Else, options => options.MapFrom(src => src.GetDateTime(10)));
 
-                _dataReader = new DataBuilder().BuildDataReader();
-                _results = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader); 
-                _result = _results.FirstOrDefault();
+                DataReader = new DataBuilder().BuildDataReader();
+                Results = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(DataReader); 
+                Result = Results.FirstOrDefault();
             }
 
             [Fact]
             public void Then_a_column_containing_a_small_integer_should_be_read()
             {
-                _result.SmallInteger.ShouldEqual(_dataReader[FieldName.SmallInt]);
+                Result.SmallInteger.ShouldEqual(DataReader[FieldName.SmallInt]);
             }
 
             [Fact]
             public void Then_a_column_containing_an_integer_should_be_read()
             {
-                _result.Integer.ShouldEqual(_dataReader[FieldName.Int]);
+                Result.Integer.ShouldEqual(DataReader[FieldName.Int]);
             }
 
             [Fact]
             public void Then_a_column_containing_a_big_integer_should_be_read()
             {
-                _result.BigInteger.ShouldEqual(_dataReader[FieldName.BigInt]);
+                Result.BigInteger.ShouldEqual(DataReader[FieldName.BigInt]);
             }
 
             [Fact]
             public void Then_a_column_containing_a_GUID_should_be_read()
             {
-                _result.Guid.ShouldEqual(_dataReader[FieldName.Guid]);
+                Result.Guid.ShouldEqual(DataReader[FieldName.Guid]);
             }
 
             [Fact]
             public void Then_a_column_containing_a_float_should_be_read()
             {
-                _result.Float.ShouldEqual(_dataReader[FieldName.Float]);
+                Result.Float.ShouldEqual(DataReader[FieldName.Float]);
             }
 
             [Fact]
             public void Then_a_column_containing_a_double_should_be_read()
             {
-                _result.Double.ShouldEqual(_dataReader[FieldName.Double]);
+                Result.Double.ShouldEqual(DataReader[FieldName.Double]);
             }
 
             [Fact]
             public void Then_a_column_containing_a_decimal_should_be_read()
             {
-                _result.Decimal.ShouldEqual(_dataReader[FieldName.Decimal]);
+                Result.Decimal.ShouldEqual(DataReader[FieldName.Decimal]);
             }
 
             [Fact]
             public void Then_a_column_containing_a_date_and_time_should_be_read()
             {
-                _result.DateTime.ShouldEqual(_dataReader[FieldName.DateTime]);
+                Result.DateTime.ShouldEqual(DataReader[FieldName.DateTime]);
             }
 
             [Fact]
             public void Then_a_column_containing_a_byte_should_be_read()
             {
-                _result.Byte.ShouldEqual(_dataReader[FieldName.Byte]);
+                Result.Byte.ShouldEqual(DataReader[FieldName.Byte]);
             }
 
             [Fact]
             public void Then_a_column_containing_a_boolean_should_be_read()
             {
-                _result.Boolean.ShouldEqual(_dataReader[FieldName.Boolean]);   
+                Result.Boolean.ShouldEqual(DataReader[FieldName.Boolean]);   
             }
 
             [Fact]
             public void Then_a_projected_column_should_be_read()
             {
-                _result.Else.ShouldEqual(_dataReader.GetDateTime(10));
+                Result.Else.ShouldEqual(DataReader.GetDateTime(10));
             }
 
-            protected DTOObject _result;
-            protected IEnumerable<DTOObject> _results;
-            protected IDataReader _dataReader;
+            protected DTOObject Result { get; set; }
+            protected IEnumerable<DTOObject> Results { get; set; }
+            protected IDataReader DataReader { get; set; }
         }
 
         public class When_mapping_a_data_reader_to_matching_dtos : AutoMapperSpecBase
@@ -126,9 +126,9 @@ namespace AutoMapper.UnitTests
             {
                 base.Establish_context();
 
-                _dataReader = new DataBuilder().BuildDataReader();
-                _results = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(_dataReader);
-                _result = _results.FirstOrDefault();
+                DataReader = new DataBuilder().BuildDataReader();
+                Results = Mapper.Map<IDataReader, IEnumerable<DTOObject>>(DataReader);
+                Result = Results.FirstOrDefault();
             }
         }
 
@@ -137,7 +137,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Then_the_enumerable_should_be_a_list()
             {
-                _results.ShouldImplement<IList<DTOObject>>();
+                Results.ShouldImplement<IList<DTOObject>>();
             }
         }
 
@@ -152,7 +152,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Then_the_enumerable_should_not_be_a_list()
             {
-                _results.ShouldNotBeInstanceOf<IList<DTOObject>>();
+                Results.ShouldNotBeInstanceOf<IList<DTOObject>>();
             }
         }
 

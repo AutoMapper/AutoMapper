@@ -1,12 +1,11 @@
 ﻿#if !SILVERLIGHT && !NETFX_CORE
 using System;
 using System.Collections.Specialized;
-using AutoMapper;
 using AutoMapper.Mappers;
 using Should;
 using Xunit;
 
-namespace Automapper.UnitTests.Mappers
+namespace AutoMapper.UnitTests.Mappers
 {
     public class NameValueCollectionMapperTests
     {

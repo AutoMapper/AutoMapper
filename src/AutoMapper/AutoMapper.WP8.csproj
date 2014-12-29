@@ -50,6 +50,7 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
+    <Compile Include="Mappers\StringMapper.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

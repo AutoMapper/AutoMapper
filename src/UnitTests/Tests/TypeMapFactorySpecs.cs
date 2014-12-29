@@ -38,7 +38,6 @@ namespace AutoMapper.UnitTests.Tests
 
         private HashSet<MemberNameReplacer> _memberNameReplacers = new HashSet<MemberNameReplacer>();
 
-        private IEnumerable<Assembly> _sourceExtensionMethodSearch = null;
         private IEnumerable<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
         public INamingConvention SourceMemberNamingConvention

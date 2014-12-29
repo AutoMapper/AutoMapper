@@ -70,16 +70,6 @@ namespace AutoMapper.UnitTests
             MainSetup();
         }
 
-        public override void MainSetup()
-        {
-            base.MainSetup();
-        }
-
-        public override void MainTeardown()
-        {
-            base.MainTeardown();
-        }
-
         public void Dispose()
         {
             MainTeardown();

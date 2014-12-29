@@ -140,8 +140,11 @@ namespace AutoMapper.UnitTests.Bug
 
 		protected override void Establish_context()
 		{
-			MapperRegistry.Mappers.Insert(0, new ProtectedCollectionMapper());
-			Mapper.CreateMap<Source, Destination>();
+            Mapper.Initialize(cfg =>
+            {
+                MapperRegistry.Mappers.Insert(0, new ProtectedCollectionMapper());
+                cfg.CreateMap<Source, Destination>();
+            });
 		}
 
 		protected override void Because_of()

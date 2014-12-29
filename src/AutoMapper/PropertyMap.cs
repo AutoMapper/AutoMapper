@@ -15,7 +15,6 @@ namespace AutoMapper
     {
         private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
         private readonly IList<Type> _valueFormattersToSkip = new List<Type>();
-        private readonly IList<IValueFormatter> _valueFormatters = new List<IValueFormatter>();
         private bool _ignored;
         private int _mappingOrder;
         private bool _hasCustomValueResolver;
@@ -143,26 +142,6 @@ namespace AutoMapper
             _sourceValueResolvers.AddLast(IValueResolver);
         }
 
-        public void AddFormatterToSkip<TValueFormatter>() where TValueFormatter : IValueFormatter
-        {
-            _valueFormattersToSkip.Add(typeof(TValueFormatter));
-        }
-
-        public bool FormattersToSkipContains(Type valueFormatterType)
-        {
-            return _valueFormattersToSkip.Contains(valueFormatterType);
-        }
-
-        public void AddFormatter(IValueFormatter valueFormatter)
-        {
-            _valueFormatters.Add(valueFormatter);
-        }
-
-        public IValueFormatter[] GetFormatters()
-        {
-            return _valueFormatters.ToArray();
-        }
-        
         public void AssignCustomExpression(LambdaExpression customExpression)
         {
             CustomExpression = customExpression;
@@ -215,11 +194,6 @@ namespace AutoMapper
         public bool CanResolveValue()
         {
             return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver) && !_ignored;
-        }
-
-        public void RemoveLastFormatter()
-        {
-            _valueFormatters.RemoveAt(_valueFormatters.Count - 1);
         }
 
         public void SetNullSubstitute(object nullSubstitute)

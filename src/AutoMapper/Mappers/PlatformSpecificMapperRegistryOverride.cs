@@ -23,6 +23,9 @@ namespace AutoMapper.Mappers
 #if !NETFX_CORE
             InsertBefore<NullableSourceMapper>(new TypeConverterMapper());
 #endif
+#if SILVERLIGHT || NETFX_CORE
+            InsertBefore<AssignableMapper>(new StringMapper());
+#endif
         }
 
         private void InsertBefore<TObjectMapper>(IObjectMapper mapper)

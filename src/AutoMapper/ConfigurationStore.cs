@@ -300,36 +300,6 @@ namespace AutoMapper
             }
         }
 
-	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			return GetProfile(DefaultProfileName).AddFormatter<TValueFormatter>();
-		}
-
-		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
-		{
-			return GetProfile(DefaultProfileName).AddFormatter(valueFormatterType);
-		}
-
-		public void AddFormatter(IValueFormatter formatter)
-		{
-			GetProfile(DefaultProfileName).AddFormatter(formatter);
-		}
-
-		public void AddFormatExpression(Func<ResolutionContext, string> formatExpression)
-		{
-			GetProfile(DefaultProfileName).AddFormatExpression(formatExpression);
-		}
-
-		public void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			GetProfile(DefaultProfileName).SkipFormatter<TValueFormatter>();
-		}
-
-		public IFormatterExpression ForSourceType<TSource>()
-		{
-			return GetProfile(DefaultProfileName).ForSourceType<TSource>();
-		}
-
 		public TypeMap[] GetAllTypeMaps()
 		{
 			return _typeMaps.ToArray();
@@ -436,7 +406,7 @@ namespace AutoMapper
 			       FindTypeMapFor(resolutionResult.Value, null, resolutionResult.MemberType, destinationType);
 		}
 
-		public IFormatterConfiguration GetProfileConfiguration(string profileName)
+		public IProfileConfiguration GetProfileConfiguration(string profileName)
 		{
 			return GetProfile(profileName);
 		}
@@ -676,7 +646,7 @@ namespace AutoMapper
 		internal FormatterExpression GetProfile(string profileName)
 		{
 		    FormatterExpression expr = _formatterProfiles.GetOrAdd(profileName,
-		                                                           name => new FormatterExpression(t => (IValueFormatter) _serviceCtor(t)));
+		                                                           name => new FormatterExpression());
 
 		    return expr;
 		}
