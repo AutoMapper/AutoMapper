@@ -14,7 +14,8 @@ namespace AutoMapper.Mappers
 
 		public bool IsMatch(ResolutionContext context)
 		{
-			return context.DestinationType.IsAssignableFrom(context.SourceType);
+			return (context.DestinationValue == null || context.Parent != null)
+				&& context.DestinationType.IsAssignableFrom(context.SourceType);
 		}
 	}
 
