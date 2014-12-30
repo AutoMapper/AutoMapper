@@ -1,3 +1,5 @@
+using AutoMapper.QueryableExtensions.Impl.QueryMapper;
+
 namespace AutoMapper.QueryableExtensions
 {
     using System;

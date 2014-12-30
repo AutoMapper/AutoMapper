@@ -174,10 +174,13 @@
     <Compile Include="QueryableExtensions\Impl\NullableExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\ParameterReplacementVisitor.cs" />
-    <Compile Include="QueryableExtensions\Impl\QueryDataSourceInjection.cs" />
-    <Compile Include="QueryableExtensions\Impl\QueryMapperVisitor.cs" />
-    <Compile Include="QueryableExtensions\Impl\SourceInjectedQuery.cs" />
-    <Compile Include="QueryableExtensions\Impl\SourceInjectedQueryProvider.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapper\MemberAccessQueryMapperVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapper\OrderByQueryMapperVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapper\QueryDataSourceInjection.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapper\QueryMapperHelper.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapper\QueryMapperVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapper\SourceInjectedQuery.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapper\SourceInjectedQueryProvider.cs" />
     <Compile Include="QueryableExtensions\Impl\StringExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
     <Compile Include="QueryableExtensions\ProjectionExpression.cs" />

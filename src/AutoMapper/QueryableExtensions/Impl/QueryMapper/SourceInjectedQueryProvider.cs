@@ -4,36 +4,34 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Impl;
 
-namespace AutoMapper.QueryableExtensions.Impl
+namespace AutoMapper.QueryableExtensions.Impl.QueryMapper
 {
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider
     {
         private readonly IQueryable<TDestination> _rootQuery;
         private readonly IMappingEngine _mappingEngine;
         private readonly IQueryable<TSource> _dataSource;
-        private readonly IQueryable<TDestination> _destQuery;
 
         public SourceInjectedQueryProvider(IQueryable<TDestination> rootQuery,
             IMappingEngine mappingEngine,
-            IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery)
+            IQueryable<TSource> dataSource)
         {
             _rootQuery = rootQuery;
             _mappingEngine = mappingEngine;
             _dataSource = dataSource;
-            _destQuery = destQuery;
         }
 
         public SourceInjectedQueryInspector Inspector { get; set; }
 
         public IQueryable CreateQuery(Expression expression)
         {
-            return new SourceInjectedQuery<TSource, TDestination>(this, expression);
+            return new SourceInjectedQuery<TSource, TDestination>(this, expression, _dataSource);
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
             return (IQueryable<TElement>)
-                new SourceInjectedQuery<TSource, TDestination>(this, expression);
+                new SourceInjectedQuery<TSource, TDestination>(this, expression, _dataSource);
         }
 
         public object Execute(Expression expression)
@@ -92,7 +90,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return sourceResultType;
         }
 
-        private Expression ConvertDestinationExpressionToSourceExpression(Expression expression)
+        public Expression ConvertDestinationExpressionToSourceExpression(Expression expression)
         {
             var visitor = new QueryMapperVisitor(typeof(TDestination),
                 typeof(TSource), _dataSource, _mappingEngine);

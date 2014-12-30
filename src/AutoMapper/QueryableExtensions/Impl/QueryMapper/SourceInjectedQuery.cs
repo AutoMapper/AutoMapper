@@ -3,10 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 
-namespace AutoMapper.QueryableExtensions.Impl
+namespace AutoMapper.QueryableExtensions.Impl.QueryMapper
 {
     public class SourceInjectedQueryInspector
     {
@@ -21,29 +19,41 @@ namespace AutoMapper.QueryableExtensions.Impl
         public Action<Type, Expression> StartQueryExecuteInterceptor { get; set; }
 
     }
+
     public class SourceInjectedQuery<TSource, TDestination> : IQueryable<TDestination>, IOrderedQueryable<TDestination>
     {
+        private readonly IQueryable<TSource> _dataSource;
+        private SourceInjectedQueryProvider<TSource, TDestination> _provider;
+
         public SourceInjectedQuery(IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
                 IMappingEngine mappingEngine, SourceInjectedQueryInspector inspector = null)
         {
+            _dataSource = dataSource;
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
-            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(this, mappingEngine, dataSource, destQuery)
+            _provider = new SourceInjectedQueryProvider<TSource, TDestination>(this, mappingEngine, dataSource)
             {
                 Inspector = inspector ?? new SourceInjectedQueryInspector()
             };
         }
 
-        internal SourceInjectedQuery(IQueryProvider provider, Expression expression)
+        internal SourceInjectedQuery(SourceInjectedQueryProvider<TSource, TDestination> provider, Expression expression,
+            IQueryable<TSource> dataSource)
         {
-            Provider = provider;
+            _provider = provider;
+            _dataSource = dataSource;
             Expression = expression;
             ElementType = typeof(TDestination);
         }
 
         public IEnumerator<TDestination> GetEnumerator()
         {
-            return Provider.Execute<IEnumerable<TDestination>>(Expression).GetEnumerator();
+            System.Diagnostics.Debugger.Break();
+            var sourceExpression = _provider.ConvertDestinationExpressionToSourceExpression(Expression);
+            IQueryable<TSource> query = _dataSource.Provider.CreateQuery<TSource>(sourceExpression);
+            return query.Project().To<TDestination>().GetEnumerator();
+
+            //return Provider.Execute<IEnumerable<TDestination>>(Expression).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -53,7 +63,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public Type ElementType { get; private set; }
         public Expression Expression { get; private set; }
-        public IQueryProvider Provider { get; private set; }
+        public IQueryProvider Provider { get { return _provider; } }
     }
 
 

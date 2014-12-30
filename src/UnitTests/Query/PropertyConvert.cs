@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper.QueryableExtensions;
+using AutoMapper.QueryableExtensions.Impl.QueryMapper;
 using Should;
 using Xunit;
 
@@ -59,7 +61,7 @@ namespace AutoMapper.UnitTests.Query
         }
 
         [Fact]
-        public void Should_convert_binary_operations()
+        public void Should_convert_binary_operation_constant_operant_if_property_type_is_changed_by_mapper()
         {
             var query = new Source[0].AsQueryable()
                 .UseAsDataSource().For<Source>()
@@ -71,7 +73,7 @@ namespace AutoMapper.UnitTests.Query
         }
 
         [Fact]
-        public void Should_convert_lambda_return_value()
+        public void Should_convert_lambda_return_value_type_if_property_type_is_changed_by_mapper()
         {
             var query = new Source[0].AsQueryable()
                 .UseAsDataSource().For<Source>()
