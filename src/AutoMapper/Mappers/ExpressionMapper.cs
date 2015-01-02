@@ -68,6 +68,8 @@ namespace AutoMapper.Mappers
 
             private MethodCallExpression GetConvertedMethodCall(MethodCallExpression node)
             {
+                if (!node.Method.IsGenericMethod)
+                    return node;
                 var convertedArguments = Visit(node.Arguments);
                 var convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select(t => GetConvertingTypeIfExists(node.Arguments, t, convertedArguments)).ToArray();
                 var convertedMethodCall = node.Method.GetGenericMethodDefinition().MakeGenericMethod(convertedMethodArgumentTypes);
