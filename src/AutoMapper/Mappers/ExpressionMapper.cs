@@ -163,7 +163,11 @@ namespace AutoMapper.Mappers
                 var baseExpression = Visit(node.Expression);
                 var propertyMap = FindPropertyMapOfExpression(node.Expression as MemberExpression);
 
-                var typeMap = Mapper.FindTypeMapFor(propertyMap.SourceMember.GetMemberType(), propertyMap.DestinationPropertyType);
+                var sourceType = propertyMap.SourceMember.GetMemberType();
+                var destType = propertyMap.DestinationPropertyType;
+                if (sourceType == destType)
+                    return Expression.MakeMemberAccess(baseExpression, node.Member);
+                var typeMap = Mapper.FindTypeMapFor(sourceType, destType);
                 var memberExpression = new MappingVisitor(typeMap, node.Expression, baseExpression).Visit(node) as MemberExpression;
 
                 return Expression.MakeMemberAccess(baseExpression,memberExpression.Member);
