@@ -13,6 +13,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             public ICollection<ChildDTO> Children { get; set; }
             public ChildDTO Child { get; set; }
+            public DateTime DateTime { get; set; }
         }
 
         public class ChildDTO
@@ -37,6 +38,7 @@ namespace AutoMapper.UnitTests.Bug
                     _child.Parent = this;
                 }
             }
+            public DateTime DateTime { get; set; }
         }
 
         public class Child
@@ -171,6 +173,27 @@ namespace AutoMapper.UnitTests.Bug
                 {
                     new Parent {Child = new Child {GrandChild = new Child {GrandChild = new Child {IDs = 4}}},Children = new[] {new Child {GrandChild = new Child {GrandChild = new Child {ID = 4}}}}},
                     new Parent {Child = new Child {GrandChild = new Child {GrandChild = new Child {IDs = 5}}},Children = new[] {new Child {GrandChild = new Child {GrandChild = new Child {ID = 5}}}}}
+                }.AsQueryable();
+
+            parents.Where(expression).Count().ShouldEqual(1);
+        }
+
+        [Fact]
+        public void DateTimeExample()
+        {
+            Mapper.CreateMap<Parent, ParentDTO>().ReverseMap();
+            Mapper.CreateMap<Child, ChildDTO>()
+                .ForMember(d => d.ID2, opt => opt.MapFrom(s => s.ID))
+                .ReverseMap()
+                .ForMember(d => d.ID, opt => opt.MapFrom(s => s.ID2));
+            var year = DateTime.Now.Year;
+            Expression<Func<ParentDTO, bool>> dtoExpression = p => p.DateTime.Year == year;
+            var expression = Mapper.Map<Expression<Func<Parent, bool>>>(dtoExpression);
+            var parents =
+                new[]
+                {
+                    new Parent {DateTime = DateTime.Now},
+                    new Parent {DateTime = DateTime.Now.AddYears(1)}
                 }.AsQueryable();
 
             parents.Where(expression).Count().ShouldEqual(1);
