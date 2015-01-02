@@ -198,6 +198,27 @@ namespace AutoMapper.UnitTests.Bug
 
             parents.Where(expression).Count().ShouldEqual(1);
         }
+
+        [Fact]
+        public void EqualsDateTimeExample()
+        {
+            Mapper.CreateMap<Parent, ParentDTO>().ReverseMap();
+            Mapper.CreateMap<Child, ChildDTO>()
+                .ForMember(d => d.ID2, opt => opt.MapFrom(s => s.ID))
+                .ReverseMap()
+                .ForMember(d => d.ID, opt => opt.MapFrom(s => s.ID2));
+            var year = DateTime.Now.Year;
+            Expression<Func<ParentDTO, bool>> dtoExpression = p => p.DateTime.Year.Equals(year);
+            var expression = Mapper.Map<Expression<Func<Parent, bool>>>(dtoExpression);
+            var parents =
+                new[]
+                {
+                    new Parent {DateTime = DateTime.Now},
+                    new Parent {DateTime = DateTime.Now.AddYears(1)}
+                }.AsQueryable();
+
+            parents.Where(expression).Count().ShouldEqual(1);
+        }
     }
 
 }
