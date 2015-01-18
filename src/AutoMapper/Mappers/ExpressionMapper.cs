@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.Mappers
@@ -35,23 +36,25 @@ namespace AutoMapper.Mappers
 
         private class MappingVisitor : ExpressionVisitor
         {
-            private IList<Type> _destSubTypes;
+            private IList<Type> _destSubTypes = new Type[0];
 
             private readonly TypeMap _typeMap;
             private readonly Expression _oldParam;
             private readonly Expression _newParam;
+            private readonly MappingVisitor _parentMappingVisitor;
 
             public MappingVisitor(IList<Type> destSubTypes)
-                : this(null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)) )
+                : this(null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)), null)
             {
                 _destSubTypes = destSubTypes;
             }
 
-            private MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam)
+            private MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor)
             {
                 _typeMap = typeMap;
                 _oldParam = oldParam;
                 _newParam = newParam;
+                _parentMappingVisitor = parentMappingVisitor;
             }
 
             protected override Expression VisitParameter(ParameterExpression node)
@@ -94,6 +97,68 @@ namespace AutoMapper.Mappers
                 return arguments[index2].Type.GetGenericArguments()[0];
             }
 
+            protected override Expression VisitBinary(BinaryExpression node)
+            {
+                var newLeft = base.Visit(node.Left);
+                var newRight = base.Visit(node.Right);
+
+                CheckNullableToNonNullableChanges(node.Left, node.Right, ref newLeft, ref newRight);
+                CheckNullableToNonNullableChanges(node.Right, node.Left, ref newRight, ref newLeft);
+                return Expression.MakeBinary(node.NodeType, newLeft, newRight);
+            }
+
+            private static void CheckNullableToNonNullableChanges(Expression left, Expression right, ref Expression newLeft, ref Expression newRight)
+            {
+                if (GoingFromNonNullableToNullable(left, newLeft))
+                    if (BothAreNonNullable(right, newRight))
+                        UpdateToNullableExpression(right, out newRight);
+                    else if (BothAreNullable(right, newRight))
+                        UpdateToNonNullableExpression(right, out newRight);
+
+                if (GoingFromNonNullableToNullable(newLeft, left))
+                    if (BothAreNonNullable(right, newRight))
+                        UpdateToNullableExpression(right, out newRight);
+                    else if (BothAreNullable(right, newRight))
+                        UpdateToNonNullableExpression(right, out newRight);
+            }
+
+            private static void UpdateToNullableExpression(Expression right, out Expression newRight)
+            {
+                if (right is ConstantExpression)
+                    newRight = Expression.Constant((right as ConstantExpression).Value,
+                        typeof (Nullable<>).MakeGenericType(right.Type));
+                else
+                    throw new AutoMapperMappingException(
+                        "Mapping a BinaryExpression where one side is nullable and the other isn't");
+            }
+
+            private static void UpdateToNonNullableExpression(Expression right, out Expression newRight)
+            {
+                if (right is ConstantExpression)
+                    newRight = Expression.Constant((right as ConstantExpression).Value,
+                        typeof(Nullable<>).MakeGenericType(right.Type));
+                else if (right is UnaryExpression)
+                    newRight = (right as UnaryExpression).Operand;
+                else
+                    throw new AutoMapperMappingException(
+                        "Mapping a BinaryExpression where one side is nullable and the other isn't");
+            }
+
+            private static bool GoingFromNonNullableToNullable(Expression node, Expression newLeft)
+            {
+                return !node.Type.IsNullableType() && newLeft.Type.IsNullableType();
+            }
+
+            private static bool BothAreNullable(Expression node, Expression newLeft)
+            {
+                return node.Type.IsNullableType() && newLeft.Type.IsNullableType();
+            }
+
+            private static bool BothAreNonNullable(Expression node, Expression newLeft)
+            {
+                return !node.Type.IsNullableType() && !newLeft.Type.IsNullableType();
+            }
+
             protected override Expression VisitLambda<T>(Expression<T> expression)
             {
                 if (expression.Parameters.Any(b => b.Type == _oldParam.Type))
@@ -114,23 +179,17 @@ namespace AutoMapper.Mappers
                 for (var i = 0; i < expression.Parameters.Count; i++)
                 {
                     var sourceParamType = expression.Parameters[i].Type;
-                    if (_destSubTypes.Count <= i)
-                        continue;
-                    var destParamType = _destSubTypes[i];
-                    if (sourceParamType == destParamType)
-                        continue;
-
+                    foreach (var destParamType in _destSubTypes.Where(dt => dt != sourceParamType))
+                    {
                     var typeMap = Mapper.FindTypeMapFor(destParamType, sourceParamType);
 
                     if (typeMap == null)
-                        throw new AutoMapperMappingException(
-                            string.Format(
-                                "Could not find type map from destination type {0} to source type {1}. Use CreateMap to create a map from the source to destination types.",
-                                destParamType, sourceParamType));
+                            continue;
 
                     var oldParam = expression.Parameters[i];
                     var newParam = Expression.Parameter(typeMap.SourceType, oldParam.Name);
-                    visitors.Add(new MappingVisitor(typeMap, oldParam, newParam));
+                        visitors.Add(new MappingVisitor(typeMap, oldParam, newParam, this));
+                    }
                 }
                 return visitors.Aggregate(expression as Expression, (e, v) => v.Visit(e));
             }
@@ -150,14 +209,27 @@ namespace AutoMapper.Mappers
                 SetSorceSubTypes(propertyMap);
 
                 var replacedExpression = Visit(node.Expression);
+                if (replacedExpression == node.Expression)
+                    replacedExpression = _parentMappingVisitor.Visit(node.Expression);
 
                 if (propertyMap.CustomExpression != null)
                     return ConvertCustomExpression(replacedExpression, propertyMap);
                 
+                Func<Expression,IMemberGetter,Expression> getExpression = (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo);
+
+                //if (propertyMap.SourceMember.ToMemberGetter().MemberType.IsNullableType())
+                //{
+                //    var expression = getExpression;
+                //    getExpression = (current, memberGetter) => Expression.Call(expression.Invoke(current,memberGetter), "GetValueOrDefault", new Type[0], new Expression[0]);
+                //}
+                //else if (propertyMap.DestinationPropertyType.IsNullableType())
+                //{
+
+                //}
+
                 return propertyMap.GetSourceValueResolvers()
                     .OfType<IMemberGetter>()
-                    .Aggregate(replacedExpression,
-                        (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo));
+                    .Aggregate(replacedExpression, getExpression);
             }
 
             private Expression GetConvertedSubMemberCall(MemberExpression node)
@@ -170,10 +242,9 @@ namespace AutoMapper.Mappers
                 if (sourceType == destType)
                     return Expression.MakeMemberAccess(baseExpression, node.Member);
                 var typeMap = Mapper.FindTypeMapFor(sourceType, destType);
-                var memberExpression = new MappingVisitor(typeMap, node.Expression, baseExpression).Visit(node) as MemberExpression;
-
-                return Expression.MakeMemberAccess(baseExpression,memberExpression.Member);
-        }
+                var newExpression = new MappingVisitor(typeMap, node.Expression, baseExpression, this).Visit(node);
+                return newExpression;
+            }
 
             private PropertyMap FindPropertyMapOfExpression(MemberExpression expression)
             {
@@ -184,7 +255,7 @@ namespace AutoMapper.Mappers
             }
 
             private PropertyMap PropertyMap(MemberExpression node)
-        {
+            {
                 var memberAccessor = node.Member.ToMemberAccessor();
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
                 return propertyMap;
@@ -193,7 +264,7 @@ namespace AutoMapper.Mappers
             private void SetSorceSubTypes(PropertyMap propertyMap)
             {
                 if (propertyMap.SourceMember is PropertyInfo)
-                    _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetGenericArguments();
+                    _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetGenericArguments().Concat(new []{ (propertyMap.SourceMember as PropertyInfo).PropertyType }).ToList();
                 else if (propertyMap.SourceMember is FieldInfo)
                     _destSubTypes = (propertyMap.SourceMember as FieldInfo).FieldType.GetGenericArguments();
             }
