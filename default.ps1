@@ -205,8 +205,8 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\Xamarin.iOS10"" />
     <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\Xamarin.iOS10"" />
     <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\Xamarin.iOS10"" />
-    <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.iOS.dll"" target=""lib\Xamarin.iOS10"" />
-    <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.iOS.pdb"" target=""lib\Xamarin.iOS10"" />
+    <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.iOS10.dll"" target=""lib\Xamarin.iOS10"" />
+    <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.iOS10.pdb"" target=""lib\Xamarin.iOS10"" />
     <file src=""$source_dir\install.ps1"" target=""tools\Xamarin.iOS10"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\Xamarin.iOS10"" />
     <file src=""$source_dir\AutoMapper.targets"" target=""tools"" />
