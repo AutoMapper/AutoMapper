@@ -61,6 +61,7 @@ task dist {
 	copy_files "$source_dir\AutoMapper\bin\WinRT\$config" "$dist_dir\windows81"
 	copy_files "$source_dir\AutoMapper\bin\Android\$config" "$dist_dir\MonoAndroid"
 	copy_files "$source_dir\AutoMapper\bin\iPhone\$config" "$dist_dir\MonoTouch"
+	copy_files "$source_dir\AutoMapper\bin\iPhone10\$config" "$dist_dir\Xamarin.iOS10"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
@@ -201,6 +202,13 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\MonoTouch\AutoMapper.iOS.pdb"" target=""lib\MonoTouch"" />
     <file src=""$source_dir\install.ps1"" target=""tools\MonoTouch"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\MonoTouch"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\Xamarin.iOS10"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.pdb"" target=""lib\Xamarin.iOS10"" />
+    <file src=""$dist_dir\Profile136\AutoMapper.xml"" target=""lib\Xamarin.iOS10"" />
+    <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.iOS.dll"" target=""lib\Xamarin.iOS10"" />
+    <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.iOS.pdb"" target=""lib\Xamarin.iOS10"" />
+    <file src=""$source_dir\install.ps1"" target=""tools\Xamarin.iOS10"" />
+    <file src=""$source_dir\uninstall.ps1"" target=""tools\Xamarin.iOS10"" />
     <file src=""$source_dir\AutoMapper.targets"" target=""tools"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>

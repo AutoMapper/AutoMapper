@@ -22,8 +22,8 @@
 
         protected override void Establish_context()
         {
-            Mapper.CreateMap<Source, Dest>()
-                .ForMember(dest => dest.Value, opt => opt.UseValue(5));
+            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>()
+                .ForMember(dest => dest.Value, opt => opt.UseValue(5)));
         }
 
         protected override void Because_of()
