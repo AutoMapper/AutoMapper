@@ -6,7 +6,9 @@ namespace AutoMapper.UnitTests
 {
 	namespace Profiles
 	{
-		public class When_segregating_configuration_through_a_profile : NonValidatingSpecBase
+	    using Should.Core.Assertions;
+
+	    public class When_segregating_configuration_through_a_profile : NonValidatingSpecBase
 		{
 			private Dto _result;
 

@@ -3,7 +3,6 @@ using Should;
 using Xunit;
 #if !SILVERLIGHT && !NETFX_CORE
 using Rhino.Mocks;
-[assembly: CollectionBehavior(DisableTestParallelization = true)]
 #endif
 
 namespace AutoMapper.UnitTests
