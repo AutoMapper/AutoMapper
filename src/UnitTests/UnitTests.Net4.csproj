@@ -81,7 +81,6 @@
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
-    <Compile Include="BindingFlagsConfiguration.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
     <Compile Include="AutoMapperTester.cs" />

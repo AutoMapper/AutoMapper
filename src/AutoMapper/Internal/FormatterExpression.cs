@@ -27,7 +27,6 @@ namespace AutoMapper
 			AllowNullDestinationValues = true;
 	        ConstructorMappingEnabled = true;
             IncludeSourceExtensionMethods(typeof(Enumerable).Assembly);
-	        BindingFlags = BindingFlags.Public | BindingFlags.Instance;
 		}
 
 		public bool AllowNullDestinationValues { get; set; }
@@ -43,7 +42,6 @@ namespace AutoMapper
         public bool ConstructorMappingEnabled { get; set; }
         public bool DataReaderMapperYieldReturnEnabled { get; set; }
         public IEnumerable<MethodInfo> SourceExtensionMethods { get { return _sourceExtensionMethods; } }
-        public BindingFlags BindingFlags { get; set; }
 
 
 		public Type[] GetFormatterTypesToSkip()
