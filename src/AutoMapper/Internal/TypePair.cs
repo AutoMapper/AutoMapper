@@ -2,11 +2,10 @@ using System;
 
 namespace AutoMapper.Impl
 {
-    public struct TypePair : IEquatable<TypePair>
+    public class TypePair : IEquatable<TypePair>
     {
 
         public TypePair(Type sourceType, Type destinationType)
-            : this()
         {
             SourceType = sourceType;
             DestinationType = destinationType;
