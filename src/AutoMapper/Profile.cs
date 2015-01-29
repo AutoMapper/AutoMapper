@@ -41,12 +41,6 @@ namespace AutoMapper
             set { GetProfile().AllowNullCollections = value; }
 		}
 
-	    public BindingFlags BindingFlags
-		{
-            get { return GetProfile().BindingFlags; }
-            set { GetProfile().BindingFlags = value; }
-		}
-
         public void IncludeSourceExtensionMethods(Assembly assembly)
         {
             GetProfile().IncludeSourceExtensionMethods(assembly);

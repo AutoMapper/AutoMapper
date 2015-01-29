@@ -18,10 +18,6 @@ namespace AutoMapper.UnitTests.Tests
 
     public class StubMappingOptions : IMappingOptions
     {
-        public StubMappingOptions()
-        {
-            BindingFlags = BindingFlags.Public | BindingFlags.Instance;
-        }
         private INamingConvention _sourceMemberNamingConvention;
 
         private INamingConvention _destinationMemberNamingConvention;
@@ -97,8 +93,6 @@ namespace AutoMapper.UnitTests.Tests
         {
             get { return _sourceExtensionMethods; }
         }
-
-        public BindingFlags BindingFlags { get; set; }
 
         public void ReplaceMemberName(string original, string newValue)
         {
