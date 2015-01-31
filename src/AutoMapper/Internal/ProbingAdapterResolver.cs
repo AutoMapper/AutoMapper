@@ -17,7 +17,7 @@ namespace AutoMapper.Internal
         private bool _probed;
 
         public ProbingAdapterResolver(params string[] platformNames)
-            : this(name => Assembly.Load(new AssemblyName(name)), platformNames)
+            : this(Assembly.Load, platformNames)
         {
         }
 
