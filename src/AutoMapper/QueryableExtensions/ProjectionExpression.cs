@@ -3,6 +3,7 @@ namespace AutoMapper.QueryableExtensions
     using System;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     public class ProjectionExpression<TSource> : IProjectionExpression
     {

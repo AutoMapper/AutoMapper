@@ -16,7 +16,11 @@ namespace AutoMapper.Internal
         private bool _probed;
 
         public ProbingAdapterResolver(params string[] platformNames)
+#if ASPNETCORE50
+            : this(name => Assembly.Load(new AssemblyName(name)), platformNames)
+#else
             : this(Assembly.Load, platformNames)
+#endif
         {
         }
 
@@ -64,7 +68,7 @@ namespace AutoMapper.Internal
 
 
             // Fallback to looking in this assembly for a default
-            type = typeof(ProbingAdapterResolver).Assembly.GetType(typeName);
+            type = typeof(ProbingAdapterResolver).Assembly().GetType(typeName);
                 
             return type != null ? Activator.CreateInstance(type) : null;
         }
@@ -96,7 +100,7 @@ namespace AutoMapper.Internal
 
         private Assembly ProbeForPlatformSpecificAssembly(string platformName)
         {
-            var assemblyName = new AssemblyName(GetType().Assembly.FullName)
+            var assemblyName = new AssemblyName(GetType().Assembly().FullName)
             {
                 Name = "AutoMapper." + platformName
             };

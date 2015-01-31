@@ -32,7 +32,7 @@ namespace AutoMapper
                     typeMap.AddPropertyMap(destPropertyAccessor, resolvers.Cast<IValueResolver>());
                 }
             }
-            if (!destinationType.IsAbstract && destinationType.IsClass)
+            if (!destinationType.IsAbstract() && destinationType.IsClass())
             {
                 foreach (var destCtor in destTypeInfo.GetConstructors().OrderByDescending(ci => ci.GetParameters().Length))
                 {

@@ -74,9 +74,9 @@ namespace AutoMapper
                 .Where(method => method.GetParameters()[0].ParameterType == Type)
                 .ToList();
 
-            var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType).ToList();
+            var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType()).ToList();
 
-            if (Type.IsInterface && Type.IsGenericType)
+            if (Type.IsInterface() && Type.IsGenericType())
                 genericInterfaces.Add(Type);
 
             foreach (var method in sourceExtensionMethodSearchArray
@@ -153,10 +153,10 @@ namespace AutoMapper
         private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor, BindingFlags bindingAttr)
         {
             var typesToScan = new List<Type>();
-            for (var t = Type; t != null; t = t.BaseType)
+            for (var t = Type; t != null; t = t.BaseType())
                 typesToScan.Add(t);
 
-            if (Type.IsInterface)
+            if (Type.IsInterface())
                 typesToScan.AddRange(Type.GetInterfaces());
 
             // Scan all types for public properties and fields

@@ -51,18 +51,12 @@
     <Compile Include="Internal\ProxyGenerator.cs" />
     <Compile Include="Internal\ProxyGeneratorFactory.cs" />
     <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
+    <Compile Include="Internal\TypeExtensions.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\ListSourceMapper.cs" />
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />
     <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
     <Compile Include="Mappers\TypeConverterMapper.cs" />
-    <Compile Include="Resources\Resource.Designer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AboutResources.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\Values\Strings.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">

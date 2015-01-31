@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Internal;
+using System.Reflection;
 
 namespace AutoMapper.Mappers
 {

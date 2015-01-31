@@ -3,6 +3,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using Impl;
+    using System.Reflection;
 
     public class ExpressionMapper : IObjectMapper
     {

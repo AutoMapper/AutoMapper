@@ -1,0 +1,32 @@
+{
+    "version": "1.0.0-*",
+    "dependencies": {
+    },
+
+    "frameworks" : {
+        "aspnet50" : { 
+            "dependencies": {
+            }
+        },
+        "aspnetcore50" : { 
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-22231",
+"System.Linq.Expressions": "4.0.0.0-beta-22526",
+"System.Linq": "4.0.0.0-beta-22526",
+"System.Reflection": "4.0.10.0-beta-22526",
+"System.Text.RegularExpressions": "4.0.10.0-beta-22526",
+"System.Reflection.TypeExtensions": "4.0.0.0-beta-22526",
+"System.Reflection.Emit": "4.0.0.0-beta-22526",
+"System.Threading": "4.0.10.0-beta-22526",
+"System.Runtime.Extensions": "4.0.10.0-beta-22526",
+"System.Reflection.Extensions": "4.0.0.0-beta-22526",
+"System.Collections.Specialized": "4.0.0.0-beta-22526",
+"System.Collections.Concurrent": "4.0.10.0-beta-22526",
+"System.ComponentModel.TypeConverter": "4.0.0.0-beta-22526",
+"System.Reflection.Primitives": "4.0.0.0-beta-22526",
+"System.Linq.Queryable": "4.0.0.0-beta-22526",
+"System.Diagnostics.Debug": "4.0.10.0-beta-22526",
+"System.ObjectModel": "4.0.10.0-beta-22526"          }
+        }
+    }
+}

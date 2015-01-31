@@ -65,6 +65,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Internal\TypeExtensions.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
     <Compile Include="Mappers\StringMapper.cs" />
@@ -82,7 +83,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Internal\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="..\..\tools\MSBuild\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />

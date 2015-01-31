@@ -1,3 +1,4 @@
+#if MONODROID || NETFX_CORE || NET4
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -62,3 +63,4 @@ namespace AutoMapper.Impl {
 		}
 	}
 }
+#endif
