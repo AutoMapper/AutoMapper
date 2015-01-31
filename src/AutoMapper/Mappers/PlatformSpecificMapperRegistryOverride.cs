@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
 #if !SILVERLIGHT && !NETFX_CORE
             InsertBefore<DictionaryMapper>(new NameValueCollectionMapper());
 #endif
-#if !SILVERLIGHT && !NETFX_CORE
+#if MONODROID || MONOTOUCH || __IOS__ || NET4
             InsertBefore<AssignableMapper>(new ListSourceMapper());
 #endif
 #if !WINDOWS_PHONE

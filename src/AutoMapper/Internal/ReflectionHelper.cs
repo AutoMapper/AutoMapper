@@ -1,3 +1,4 @@
+using AutoMapper.Internal;
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -75,11 +76,11 @@ namespace AutoMapper.Impl
 		{
 			var fieldInfo = accessorCandidate as FieldInfo;
 			if (fieldInfo != null)
-				return accessorCandidate.DeclaringType.IsValueType ? (IMemberAccessor)new ValueTypeFieldAccessor(fieldInfo) : new FieldAccessor(fieldInfo);
+				return accessorCandidate.DeclaringType.IsValueType() ? (IMemberAccessor)new ValueTypeFieldAccessor(fieldInfo) : new FieldAccessor(fieldInfo);
 
 			var propertyInfo = accessorCandidate as PropertyInfo;
 			if (propertyInfo != null)
-				return accessorCandidate.DeclaringType.IsValueType ? (IMemberAccessor)new ValueTypePropertyAccessor(propertyInfo) : new PropertyAccessor(propertyInfo);
+				return accessorCandidate.DeclaringType.IsValueType() ? (IMemberAccessor)new ValueTypePropertyAccessor(propertyInfo) : new PropertyAccessor(propertyInfo);
 
 			return null;
 		}

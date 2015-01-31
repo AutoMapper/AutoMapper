@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace AutoMapper.Mappers
 {
     public class AssignableArrayMapper : IObjectMapper

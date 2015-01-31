@@ -268,7 +268,7 @@ namespace AutoMapper
 			if (context.DestinationValue != null)
 				return context.DestinationValue;
 
-            if (destinationType.IsInterface)
+            if (destinationType.IsInterface())
                 destinationType = ProxyGeneratorFactory.Create().GetProxyType(destinationType);
 
 			return !ConfigurationProvider.MapNullSourceValuesAsNull ?
@@ -278,7 +278,7 @@ namespace AutoMapper
 
         bool IMappingEngineRunner.ShouldMapSourceValueAsNull(ResolutionContext context)
 		{
-            if (context.DestinationType.IsValueType && !context.DestinationType.IsNullableType())
+            if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
                 return false;
 
 			var typeMap = context.GetContextTypeMap();

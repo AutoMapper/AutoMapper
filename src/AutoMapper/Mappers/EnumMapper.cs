@@ -1,5 +1,6 @@
 using System;
 using AutoMapper.Internal;
+using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
@@ -131,7 +132,7 @@ namespace AutoMapper.Mappers
 
         private static bool EnumToNullableTypeMapping(ResolutionContext context)
         {
-            if (!context.DestinationType.IsGenericType)
+            if (!context.DestinationType.IsGenericType())
             {
                 return false;
             }

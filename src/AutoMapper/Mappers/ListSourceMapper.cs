@@ -1,3 +1,4 @@
+#if MONODROID || MONOTOUCH || __IOS__ || NET4
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -33,3 +34,4 @@ namespace AutoMapper.Mappers
 		}
 	}
 }
+#endif

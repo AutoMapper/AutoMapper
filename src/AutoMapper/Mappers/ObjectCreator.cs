@@ -25,7 +25,7 @@ namespace AutoMapper.Mappers
 
 		public static object CreateDictionary(Type dictionaryType, Type keyType, Type valueType)
 		{
-			var type = dictionaryType.IsInterface
+			var type = dictionaryType.IsInterface()
 			           	? typeof(Dictionary<,>).MakeGenericType(keyType, valueType)
 			           	: dictionaryType;
 
@@ -34,12 +34,12 @@ namespace AutoMapper.Mappers
 
 		public static object CreateDefaultValue(Type type)
 		{
-			return type.IsValueType ? CreateObject(type) : null;
+			return type.IsValueType() ? CreateObject(type) : null;
 		}
 
 		public static object CreateNonNullValue(Type type)
 		{
-            if (type.IsValueType)
+            if (type.IsValueType())
                 return CreateObject(type);
 
             if (type == typeof(string))

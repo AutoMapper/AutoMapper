@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper.Internal;
+using System;
 
 namespace AutoMapper.Mappers
 {
@@ -33,7 +34,7 @@ namespace AutoMapper.Mappers
 			if(type.IsArray)
 			{
 				Type elementType = TypeHelper.GetElementType(type);
-				return elementType.IsPrimitive || elementType.Equals(typeof(string));
+				return elementType.IsPrimitive() || elementType.Equals(typeof(string));
 			}
 			
 			return false;

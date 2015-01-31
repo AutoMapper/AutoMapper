@@ -51,7 +51,7 @@ namespace AutoMapper.Mappers
             {
                 Object collection;
                 
-                if (typeof(TCollection).IsInterface)
+                if (typeof(TCollection).IsInterface())
                 {
                     collection = new List<TElement>();
                 }

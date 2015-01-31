@@ -88,6 +88,7 @@
     <Compile Include="Internal\NullReferenceExceptionSwallowingResolver.cs" />
     <Compile Include="Internal\PlatformAdapter.cs" />
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
+    <Compile Include="Internal\TypeExtensions.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\AssignableArrayMapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />

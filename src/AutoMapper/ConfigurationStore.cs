@@ -211,7 +211,7 @@ namespace AutoMapper
 
 	    public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
 		{
-	        if (sourceType.IsGenericTypeDefinition && destinationType.IsGenericTypeDefinition)
+	        if (sourceType.IsGenericTypeDefinition() && destinationType.IsGenericTypeDefinition())
 	        {
 	            var typePair = new TypePair(sourceType, destinationType);
 
@@ -390,7 +390,7 @@ namespace AutoMapper
             while (type != null)
             {
                 yield return type;
-                type = type.BaseType;
+                type = type.BaseType();
             }
         }
 
@@ -442,7 +442,7 @@ namespace AutoMapper
 
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
 			{
-				object[] attrs = destProperty.GetCustomAttributes(true);
+				var attrs = destProperty.GetCustomAttributes(true);
 				if (attrs.Any(x => x is IgnoreMapAttribute))
 				{
 					mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
@@ -463,7 +463,7 @@ namespace AutoMapper
 			TypeInfo destInfo = new TypeInfo(destinationType);
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
 			{
-				object[] attrs = destProperty.GetCustomAttributes(true);
+				var attrs = destProperty.GetCustomAttributes(true);
 				if (attrs.Any(x => x is IgnoreMapAttribute))
 				{
 					mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
@@ -536,11 +536,11 @@ namespace AutoMapper
                         break;
                     }
 
-                    if ((sourceType.BaseType != null) && (typeMap == null))
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceType.BaseType, destinationType);
+                    if ((sourceType.BaseType() != null) && (typeMap == null))
+                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceType.BaseType(), destinationType);
                 }
             }
-	        if (typeMap == null && sourceType.IsGenericType && destinationType.IsGenericType)
+	        if (typeMap == null && sourceType.IsGenericType() && destinationType.IsGenericType())
 	        {
 	            var sourceGenericDefinition = sourceType.GetGenericTypeDefinition();
 	            var destGenericDefinition = destinationType.GetGenericTypeDefinition();

@@ -42,6 +42,7 @@
     <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
     <Compile Include="Internal\NullableConverterFactory.cs" />
     <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
+    <Compile Include="Internal\TypeExtensions.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\ListSourceMapper.cs" />
     <Compile Include="Mappers\NameValueCollectionMapper.cs" />

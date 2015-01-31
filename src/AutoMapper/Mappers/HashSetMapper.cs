@@ -33,12 +33,12 @@ namespace AutoMapper.Mappers
 #if !NETFX_CORE
         private static bool IsSetType(Type type)
         {
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ISet<>))
+            if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(ISet<>))
             {
                 return true;
             }
 
-            IEnumerable<Type> genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType);
+            IEnumerable<Type> genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType());
             IEnumerable<Type> baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
 
             var isCollectionType = baseDefinitions.Any(t => t == typeof(ISet<>));
@@ -69,7 +69,7 @@ namespace AutoMapper.Mappers
             {
                 Object collection;
 
-                if (typeof(TCollection).IsInterface)
+                if (typeof(TCollection).IsInterface())
                 {
                     collection = new HashSet<TElement>();
                 }
