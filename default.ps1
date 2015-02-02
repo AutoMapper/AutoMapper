@@ -35,6 +35,7 @@ task compile -depends clean {
     exec { & $source_dir\.nuget\Nuget.exe restore $source_dir }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
     exec { msbuild /t:Clean /t:Build /p:Configuration=ReleaseWin8 /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
+    exec { kpm build $source_dir\AutoMapper }
 }
 
 task commonAssemblyInfo {
@@ -62,6 +63,8 @@ task dist {
 	copy_files "$source_dir\AutoMapper\bin\Android\$config" "$dist_dir\MonoAndroid"
 	copy_files "$source_dir\AutoMapper\bin\iPhone\$config" "$dist_dir\MonoTouch"
 	copy_files "$source_dir\AutoMapper\bin\iPhone10\$config" "$dist_dir\Xamarin.iOS10"
+	copy_files "$source_dir\Artifacts\bin\AutoMapper.CoreCLR\$config\aspnet50" "$dist_dir\aspnet50"
+	copy_files "$source_dir\Artifacts\bin\AutoMapper.CoreCLR\$config\aspnetcore50" "$dist_dir\aspnetcore50"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
@@ -145,6 +148,33 @@ function global:create-nuspec($version, $fileName)
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A convention-based object-object mapper</summary>
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
+    <dependencies>
+      <group targetFramework=""Asp.NetCore5.0"">
+        <dependency id=""System.Runtime"" version=""4.0.20-beta-22530"" />
+        <dependency id=""System.Linq.Expressions"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Linq"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Reflection"" version=""4.0.10-beta-22530"" />
+        <dependency id=""System.Text.RegularExpressions"" version=""4.0.10-beta-22530"" />
+        <dependency id=""System.Reflection.TypeExtensions"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Reflection.Emit"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Threading"" version=""4.0.10-beta-22530"" />
+        <dependency id=""System.Runtime.Extensions"" version=""4.0.10-beta-22530"" />
+        <dependency id=""System.Reflection.Extensions"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Collections.Specialized"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Collections.Concurrent"" version=""4.0.10-beta-22530"" />
+        <dependency id=""System.ComponentModel.TypeConverter"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Reflection.Primitives"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Linq.Queryable"" version=""4.0.0-beta-22530"" />
+        <dependency id=""System.Diagnostics.Debug"" version=""4.0.10-beta-22530"" />
+        <dependency id=""System.ObjectModel"" version=""4.0.10-beta-22530"" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName=""mscorlib"" targetFramework=""Asp.Net5.0"" />
+      <frameworkAssembly assemblyName=""System"" targetFramework=""Asp.Net5.0"" />
+      <frameworkAssembly assemblyName=""System.Core"" targetFramework=""Asp.Net5.0"" />
+      <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework=""Asp.Net5.0"" />
+    </frameworkAssemblies>
   </metadata>
   <files>
     <file src=""$dist_dir\Profile136\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp8+sl5+MonoAndroid+MonoTouch"" />
@@ -210,6 +240,12 @@ function global:create-nuspec($version, $fileName)
     <file src=""$source_dir\install.ps1"" target=""tools\Xamarin.iOS10"" />
     <file src=""$source_dir\uninstall.ps1"" target=""tools\Xamarin.iOS10"" />
     <file src=""$source_dir\AutoMapper.targets"" target=""tools"" />
+    <file src=""$dist_dir\aspnet50\AutoMapper.dll"" target=""lib\aspnet50"" />
+    <file src=""$dist_dir\aspnet50\AutoMapper.pdb"" target=""lib\aspnet50"" />
+    <file src=""$dist_dir\aspnet50\AutoMapper.xml"" target=""lib\aspnet50"" />
+    <file src=""$dist_dir\aspnetcore50\AutoMapper.dll"" target=""lib\aspnetcore50"" />
+    <file src=""$dist_dir\aspnetcore50\AutoMapper.pdb"" target=""lib\aspnetcore50"" />
+    <file src=""$dist_dir\aspnetcore50\AutoMapper.xml"" target=""lib\aspnetcore50"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
