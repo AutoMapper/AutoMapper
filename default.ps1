@@ -65,8 +65,8 @@ task dist {
 	copy_files "$source_dir\AutoMapper\bin\Android\$config" "$dist_dir\MonoAndroid"
 	copy_files "$source_dir\AutoMapper\bin\iPhone\$config" "$dist_dir\MonoTouch"
 	copy_files "$source_dir\AutoMapper\bin\iPhone10\$config" "$dist_dir\Xamarin.iOS10"
-	copy_files "$source_dir\Artifacts\bin\AutoMapper.CoreCLR\$config\aspnet50" "$dist_dir\aspnet50"
-	copy_files "$source_dir\Artifacts\bin\AutoMapper.CoreCLR\$config\aspnetcore50" "$dist_dir\aspnetcore50"
+	copy_files "$source_dir\AutoMapper\bin\$config\aspnet50" "$dist_dir\aspnet50"
+	copy_files "$source_dir\AutoMapper\bin\$config\aspnetcore50" "$dist_dir\aspnetcore50"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
