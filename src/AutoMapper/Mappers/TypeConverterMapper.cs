@@ -1,3 +1,4 @@
+#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || ASPNET50 || ASPNETCORE50
 using System;
 using System.ComponentModel;
 
@@ -56,3 +57,4 @@ namespace AutoMapper.Mappers
 		}
 	}
 }
+#endif

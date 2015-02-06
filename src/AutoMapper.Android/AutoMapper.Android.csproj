@@ -9,8 +9,8 @@
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AutoMapper.Android</RootNamespace>
-    <AssemblyName>AutoMapper.Android</AssemblyName>
+    <RootNamespace>AutoMapper</RootNamespace>
+    <AssemblyName>AutoMapper</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
@@ -20,18 +20,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Android\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;MONODROID</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Android\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;MONODROID</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\AutoMapper.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
@@ -43,26 +36,23 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
-    <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
-    <Compile Include="Internal\ExpressionOnlyDelegateFactory.cs" />
-    <Compile Include="Internal\NullableConverterFactory.cs" />
-    <Compile Include="Internal\PropertyEmitter.cs" />
-    <Compile Include="Internal\ProxyGenerator.cs" />
-    <Compile Include="Internal\ProxyGeneratorFactory.cs" />
-    <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
-    <Compile Include="Internal\TypeExtensions.cs" />
-    <Compile Include="Mappers\HashSetMapper.cs" />
-    <Compile Include="Mappers\ListSourceMapper.cs" />
-    <Compile Include="Mappers\NameValueCollectionMapper.cs" />
-    <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
-    <Compile Include="Mappers\TypeConverterMapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
-      <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
-      <Name>AutoMapper</Name>
-    </ProjectReference>
+    <Compile Include="..\AutoMapper\*.cs">
+      <Link>%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Configuration\**\*.cs">
+      <Link>Configuration\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\**\*.cs">
+      <Link>Internal\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\**\*.cs">
+      <Link>Mappers\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\**\*.cs">
+      <Link>QueryableExtensions\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

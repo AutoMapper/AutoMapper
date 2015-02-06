@@ -3,6 +3,8 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+    using Internal;
+
 	public class DeferredInstantiatedConverter : ITypeConverter<object, object>
 	{
         private readonly Func<ResolutionContext, object> _instantiator;

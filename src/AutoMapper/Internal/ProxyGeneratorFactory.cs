@@ -1,4 +1,4 @@
-﻿#if MONODROID || NETFX_CORE || NET4
+﻿#if MONODROID || NET4
 using AutoMapper.Impl;
 
 namespace AutoMapper.Internal

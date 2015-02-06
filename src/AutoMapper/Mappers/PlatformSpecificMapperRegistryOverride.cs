@@ -8,16 +8,16 @@ namespace AutoMapper.Mappers
 
         public void Initialize()
         {
-#if !SILVERLIGHT && !NETFX_CORE
+#if NET4 || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
             InsertBefore<DictionaryMapper>(new NameValueCollectionMapper());
 #endif
 #if MONODROID || MONOTOUCH || __IOS__ || NET4
             InsertBefore<AssignableMapper>(new ListSourceMapper());
 #endif
-#if !WINDOWS_PHONE
+#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || ASPNET50 || ASPNETCORE50
             InsertBefore<CollectionMapper>(new HashSetMapper());
 #endif
-#if !NETFX_CORE
+#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || ASPNET50 || ASPNETCORE50
             InsertBefore<NullableSourceMapper>(new TypeConverterMapper());
 #endif
 #if SILVERLIGHT || NETFX_CORE

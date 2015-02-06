@@ -5,6 +5,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Internal;
 
     public class EnumerableExpressionBinder : IExpressionBinder
     {
@@ -41,7 +42,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             var selectExpression = result.ResolutionExpression;
             if (sourceListType != destinationListType)
             {
-                var transformedExpression = Extensions.CreateMapExpression(mappingEngine, listTypePair, typePairCount);
+                var transformedExpression = AutoMapper.QueryableExtensions.Extensions.CreateMapExpression(mappingEngine, listTypePair, typePairCount);
                 selectExpression = Expression.Call(
                     typeof(Enumerable),
                     "Select",

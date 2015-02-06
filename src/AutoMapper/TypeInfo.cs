@@ -22,7 +22,7 @@ namespace AutoMapper
         private readonly ConstructorInfo[] _constructors;
         private readonly MethodInfo[] _extensionMethods;
 
-        public Type Type { get; private set; }
+        public Type Type { get; }
 
         public TypeInfo(Type type)
             : this (type, new MethodInfo[0])
@@ -37,7 +37,7 @@ namespace AutoMapper
 			_publicGetters = BuildPublicReadAccessors(publicReadableMembers);
             _publicAccessors = BuildPublicAccessors(publicWritableMembers);
             _publicGetMethods = BuildPublicNoArgMethods();
-            _constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            _constructors = type.GetDeclaredConstructors().Where(ci => !ci.IsStatic).ToArray();
             _extensionMethods = BuildPublicNoArgExtensionMethods(sourceExtensionMethodSearch);
         }
 
@@ -129,12 +129,12 @@ namespace AutoMapper
 
     	private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
     	{
-            return GetAllPublicMembers(PropertyReadable, BindingFlags.Instance | BindingFlags.Public);
+            return GetAllPublicMembers(PropertyReadable, mi => !mi.IsStatic() && mi.IsPublic());
     	}
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
         {
-            return GetAllPublicMembers(PropertyWritable, BindingFlags.Instance | BindingFlags.Public);
+            return GetAllPublicMembers(PropertyWritable, mi => !mi.IsStatic() && mi.IsPublic());
         }
 
         private bool PropertyReadable(PropertyInfo propertyInfo)
@@ -150,7 +150,7 @@ namespace AutoMapper
             return propertyInfo.CanWrite || propertyIsEnumerable;
         }
 
-        private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor, BindingFlags bindingAttr)
+        private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor, Func<MemberInfo, bool> memberAvailableFor)
         {
             var typesToScan = new List<Type>();
             for (var t = Type; t != null; t = t.BaseType())
@@ -162,13 +162,14 @@ namespace AutoMapper
             // Scan all types for public properties and fields
             return typesToScan
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-                .SelectMany(x => x.GetMembers(bindingAttr | BindingFlags.DeclaredOnly)
+                .SelectMany(x => x.GetDeclaredMembers().Where(mi => mi.DeclaringType != null && mi.DeclaringType == x).Where(memberAvailableFor)
                     .Where(m => m is FieldInfo || (m is PropertyInfo && propertyAvailableFor((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any())));
         }
 
         private MethodInfo[] BuildPublicNoArgMethods()
         {
-            return Type.GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            return Type.GetDeclaredMethods()
+                .Where(mi => mi.IsPublic && !mi.IsStatic)
                 .Where(m => (m.ReturnType != typeof(void)) && (m.GetParameters().Length == 0))
                 .ToArray();
         }

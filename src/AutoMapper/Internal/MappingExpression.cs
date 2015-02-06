@@ -6,6 +6,7 @@ using System.Linq;
 namespace AutoMapper
 {
     using System.Reflection;
+    using Internal;
 
     public class MappingExpression : IMappingExpression, IMemberConfigurationExpression
     {
@@ -211,7 +212,7 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
-            var properties = typeof(TDestination).GetProperties().Where(HasAnInaccessibleSetter);
+            var properties = typeof(TDestination).GetDeclaredProperties().Where(HasAnInaccessibleSetter);
             foreach (var property in properties)
                 ForMember(property.Name, opt => opt.Ignore());
             return new MappingExpression<TSource, TDestination>(TypeMap, _serviceCtor, _configurationContainer);
@@ -219,7 +220,7 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
-            var properties = typeof(TSource).GetProperties().Where(HasAnInaccessibleSetter);
+            var properties = typeof(TSource).GetDeclaredProperties().Where(HasAnInaccessibleSetter);
             foreach (var property in properties)
                 ForSourceMember(property.Name, opt => opt.Ignore());
             return new MappingExpression<TSource, TDestination>(TypeMap, _serviceCtor, _configurationContainer);

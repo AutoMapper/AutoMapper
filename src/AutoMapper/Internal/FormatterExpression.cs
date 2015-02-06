@@ -64,7 +64,7 @@ namespace AutoMapper
             //http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
             _sourceExtensionMethods.AddRange(assembly.GetTypes()
                 .Where(type => type.IsSealed() && !type.IsGenericType() && !type.IsNested)
-                .SelectMany(type => type.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+                .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
                 .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
                 .Where(method => method.GetParameters().Length == 1));
         }

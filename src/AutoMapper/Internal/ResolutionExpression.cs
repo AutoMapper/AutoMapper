@@ -4,6 +4,8 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+    using Internal;
+
 	public class ResolutionExpression<TSource> : IResolverConfigurationExpression<TSource>, IResolverConfigurationExpression
 	{
 	    private readonly Type _sourceType;

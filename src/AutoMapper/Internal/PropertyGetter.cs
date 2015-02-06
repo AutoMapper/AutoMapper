@@ -4,6 +4,7 @@ using System.Reflection;
 namespace AutoMapper.Impl
 {
     using System.Collections.Generic;
+    using Internal;
 
     public class PropertyGetter : MemberGetter
 	{

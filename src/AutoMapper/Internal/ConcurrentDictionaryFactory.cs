@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+using System;
 using System.Collections.Concurrent;
 
 namespace AutoMapper.Internal
@@ -53,3 +54,4 @@ namespace AutoMapper.Internal
         }
     }
 }
+#endif

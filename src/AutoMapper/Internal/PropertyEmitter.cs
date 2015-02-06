@@ -1,4 +1,4 @@
-#if MONODROID || NETFX_CORE || NET4
+#if NET4 || MONODROID
 using System;
 using System.ComponentModel;
 using System.Reflection;
