@@ -95,7 +95,9 @@ namespace AutoMapper
                 }
                 else 
                 {
-                    var constructors = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                    var constructors = type
+                        .GetDeclaredConstructors()
+                        .Where(ci => !ci.IsStatic);
                     
                     //find a ctor with only optional args
                     var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));

@@ -242,16 +242,6 @@
     <Compile Include="WinRTExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
-      <Project>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</Project>
-      <Name>AutoMapper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.WP8.csproj">
-      <Project>{B95F2EB2-519E-4BAB-B6B3-6DBBEA7879A6}</Project>
-      <Name>AutoMapper.WP8</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <!--A reference to the entire .Net Framework and Windows SDK are automatically included-->
     <SDKReference Include="XUnit, Version=2.0">
       <Name>XUnit for Managed Projects</Name>
@@ -259,6 +249,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoMapper.WP8\AutoMapper.WP8.csproj">
+      <Project>{b95f2eb2-519e-4bab-b6b3-6dbbea7879a6}</Project>
+      <Name>AutoMapper.WP8</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />

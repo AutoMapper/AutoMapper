@@ -3,6 +3,8 @@ using System.Reflection;
 
 namespace AutoMapper
 {
+    using Internal;
+
 	public class PropertyNameResolver : IValueResolver
 	{
 	    private readonly Type _sourceType;

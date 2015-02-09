@@ -1,4 +1,4 @@
-﻿#if !SILVERLIGHT && !NETFX_CORE
+﻿#if NET4 || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
 using System;
 using System.Collections.Specialized;
 using AutoMapper.Mappers;

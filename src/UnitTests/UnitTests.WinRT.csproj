@@ -31,6 +31,7 @@
     <DefineConstants>DEBUG;TRACE;NETFX_CORE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -39,6 +40,7 @@
     <DefineConstants>TRACE;NETFX_CORE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -138,19 +140,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
-      <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
-      <Name>AutoMapper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.WinRT.csproj">
-      <Project>{b80d950d-cc8d-4287-96b1-eea037825e90}</Project>
-      <Name>AutoMapper.WinRT</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AutoMapper\Internal\TypeExtensions.cs">
+      <Link>TypeExtensions.cs</Link>
+    </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
@@ -241,6 +236,7 @@
     <Compile Include="Projection\ProjectEnumerableToArrayTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="PropertyMapContexts.cs" />
+    <Compile Include="TypeExtensionsTests.cs" />
     <Compile Include="WinRTExtensions.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ResolutionContextTester.cs" />
@@ -297,6 +293,12 @@
     <Compile Include="Tests\TypeMapFactorySpecs.cs" />
     <Compile Include="TypeConverters.cs" />
     <Compile Include="ValueTypes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoMapper.WinRT\AutoMapper.WinRT.csproj">
+      <Project>{b80d950d-cc8d-4287-96b1-eea037825e90}</Project>
+      <Name>AutoMapper.WinRT</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

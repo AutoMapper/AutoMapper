@@ -5,64 +5,67 @@
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{693983C2-F4DE-44CB-A1D3-2AB00DF159DE}</ProjectGuid>
-    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{D4CBC84B-1A59-4DB5-BEB9-225F54C0442F}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>AutoMapper.iOS</RootNamespace>
+    <RootNamespace>AutoMapper</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>AutoMapper.iOS</AssemblyName>
+    <AssemblyName>AutoMapper</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\iPhone\Debug</OutputPath>
-    <DefineConstants>DEBUG;MONOTOUCH</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchDebug>true</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <DocumentationFile>bin\Debug\AutoMapper.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\iPhone\Release</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <DefineConstants>MONOTOUCH</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+    <DocumentationFile>bin\Release\AutoMapper.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
-    <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
-    <Compile Include="Internal\NullableConverterFactory.cs" />
-    <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
-    <Compile Include="Internal\TypeExtensions.cs" />
-    <Compile Include="Mappers\HashSetMapper.cs" />
-    <Compile Include="Mappers\ListSourceMapper.cs" />
-    <Compile Include="Mappers\NameValueCollectionMapper.cs" />
-    <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
-    <Compile Include="Mappers\TypeConverterMapper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="AutoMapper.csproj">
-      <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
-      <Name>AutoMapper</Name>
-    </ProjectReference>
+    <Compile Include="..\AutoMapper\*.cs">
+      <Link>%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Configuration\**\*.cs">
+      <Link>Configuration\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\**\*.cs">
+      <Link>Internal\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\**\*.cs">
+      <Link>Mappers\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\**\*.cs">
+      <Link>QueryableExtensions\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
+    <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

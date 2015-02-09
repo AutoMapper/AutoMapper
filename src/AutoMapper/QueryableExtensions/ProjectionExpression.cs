@@ -3,6 +3,7 @@ namespace AutoMapper.QueryableExtensions
     using System;
     using System.Linq;
     using System.Linq.Expressions;
+    using Internal;
     using System.Reflection;
 
     public class ProjectionExpression<TSource> : IProjectionExpression
@@ -24,7 +25,7 @@ namespace AutoMapper.QueryableExtensions
         public IQueryable<TResult> To<TResult>(object parameters = null, params string[] membersToExpand)
         {
             var paramValues = (parameters ?? new object()).GetType()
-                .GetProperties()
+                .GetDeclaredProperties()
                 .ToDictionary(pi => pi.Name, pi => pi.GetValue(parameters, null));
 
             return To<TResult>(paramValues, membersToExpand);
