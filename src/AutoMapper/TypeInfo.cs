@@ -84,9 +84,17 @@ namespace AutoMapper
             {
                 var parameterType = method.GetParameters()[0].ParameterType;
 
-                var interfaceMatch = genericInterfaces
-                    .Where(t => t.GetGenericTypeDefinition().GetGenericArguments().Length == parameterType.GetGenericArguments().Length)
-                    .FirstOrDefault(t => method.MakeGenericMethod(t.GetGenericArguments()).GetParameters()[0].ParameterType.IsAssignableFrom(t));
+                var matchingLength = genericInterfaces
+                    .Where(t =>
+                    {
+                        var length = t.GetGenericParameters().Length;
+                        var otherLength = parameterType.GetGenericArguments().Length;
+                        return length ==
+                               otherLength;
+                    }).ToArray();
+                var interfaceMatch = matchingLength
+                    .Where(t => method.MakeGenericMethod(t.GetGenericArguments()).GetParameters()[0].ParameterType.IsAssignableFrom(t))
+                    .FirstOrDefault();
 
                 if (interfaceMatch != null)
                 {
@@ -162,8 +170,15 @@ namespace AutoMapper
             // Scan all types for public properties and fields
             return typesToScan
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
-                .SelectMany(x => x.GetDeclaredMembers().Where(mi => mi.DeclaringType != null && mi.DeclaringType == x).Where(memberAvailableFor)
-                    .Where(m => m is FieldInfo || (m is PropertyInfo && propertyAvailableFor((PropertyInfo)m) && !((PropertyInfo)m).GetIndexParameters().Any())));
+                .SelectMany(x => x.GetDeclaredMembers()
+                        .Where(mi => mi.DeclaringType != null && mi.DeclaringType == x)
+                        .Where(memberAvailableFor)
+                        .Where(
+                            m =>
+                                m is FieldInfo ||
+                                (m is PropertyInfo && propertyAvailableFor((PropertyInfo) m) &&
+                                 !((PropertyInfo) m).GetIndexParameters().Any()))
+                );
         }
 
         private MethodInfo[] BuildPublicNoArgMethods()

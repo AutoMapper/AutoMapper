@@ -7,6 +7,15 @@
 
     internal static class TypeExtensions
     {
+        public static Type[] GetGenericParameters(this Type type)
+        {
+#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+            return type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
+#else
+            return type.GetGenericTypeDefinition().GetGenericArguments();
+#endif
+        }
+
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type)
         {
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
@@ -189,7 +198,7 @@
 #if NETFX_CORE
         public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo, bool ignored)
         {
-            return propertyInfo.SetMethod;
+            return propertyInfo.GetMethod;
         }
 
         public static MethodInfo[] GetAccessors(this PropertyInfo propertyInfo)
@@ -244,20 +253,27 @@
             return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
         }
 
-        public static Type[] GetGenericArguments(this Type type)
-        {
-            return type.GetTypeInfo().GenericTypeArguments;
-        }
-
         public static ConstructorInfo[] GetConstructors(this Type type)
         {
             return type.GetTypeInfo().DeclaredConstructors.ToArray();
         }
 
-
-        public static Type[] GetInterfaces(this Type type)
+        public static Type[] GetGenericArguments(this Type type)
         {
-            return type.GetTypeInfo().ImplementedInterfaces.ToArray();
+            return type.GetTypeInfo().GenericTypeArguments;
+        }
+
+        public static IEnumerable<Type> GetInterfaces(this Type type)
+        {
+            return type.GetTypeInfo().ImplementedInterfaces;
+
+            //if (type.IsInterface())
+            //    yield return type;
+
+            //foreach (var @interface in type.GetTypeInfo().ImplementedInterfaces)
+            //{
+            //    yield return @interface;
+            //}
         }
 
 #endif
