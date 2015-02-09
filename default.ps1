@@ -60,7 +60,7 @@ task dist {
 	copy_files "$source_dir\AutoMapper\bin\$config" "$dist_dir\Portable"
 	copy_files "$source_dir\AutoMapper.SL5\bin\$config" "$dist_dir\sl5"
 	copy_files "$source_dir\AutoMapper.WP8\bin\$config" "$dist_dir\wp8"
-	copy_files "$source_dir\AutoMapper.WP81\bin\$config" "$dist_dir\wpa81"
+	copy_files "$source_dir\AutoMapper.WPA81\bin\$config" "$dist_dir\wpa81"
 	copy_files "$source_dir\AutoMapper.WinRT\bin\$config" "$dist_dir\windows81"
 	copy_files "$source_dir\AutoMapper.Android\bin\$config" "$dist_dir\MonoAndroid"
 	copy_files "$source_dir\AutoMapper.iOS\bin\$config" "$dist_dir\MonoTouch"
