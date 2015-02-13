@@ -53,20 +53,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\AutoMapper\*.cs">
-      <Link>%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\AutoMapper\Configuration\**\*.cs">
-      <Link>Configuration\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\AutoMapper\Internal\**\*.cs">
-      <Link>Internal\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\AutoMapper\Mappers\**\*.cs">
-      <Link>Mappers\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\AutoMapper\QueryableExtensions\**\*.cs">
-      <Link>QueryableExtensions\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    <Compile Include="..\AutoMapper\**\*.cs">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
