@@ -458,6 +458,40 @@ namespace AutoMapper.UnitTests
 				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
 			}
 		}
+
+        public class When_redirecting_types : NonValidatingSpecBase
+        {
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<ConcreteSource, ConcreteDest>()
+                        .ForMember(d => d.DifferentName, opt => opt.MapFrom(s => s.Name));
+                    cfg.CreateMap<ConcreteSource, IAbstractDest>().As<ConcreteDest>();
+                });
+            }
+
+            [Fact]
+            public void Should_pass_configuration_check()
+            {
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+            }
+
+            class ConcreteSource
+            {
+                public string Name { get; set; }
+            }
+
+            class ConcreteDest : IAbstractDest
+            {
+                public string DifferentName { get; set; }
+            }
+
+            interface IAbstractDest
+            {
+                string DifferentName { get; set; }
+            }
+        }
     }
 
 }

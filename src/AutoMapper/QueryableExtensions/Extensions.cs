@@ -32,6 +32,11 @@ namespace AutoMapper.QueryableExtensions
             new StringExpressionBinder(),
         };
 
+        public static void ClearExpressionCache()
+        {
+            _expressionCache.Clear();
+        }
+
         /// <summary>
         /// Create an expression tree representing a mapping from the <typeparamref name="TSource"/> type to <typeparamref name="TDestination"/> type
         /// Includes flattening and expressions inside MapFrom member configuration
@@ -59,6 +64,16 @@ namespace AutoMapper.QueryableExtensions
             return (Expression<Func<TSource, TDestination>>)visitor.Visit(cachedExpression);
         }
 
+        public static IQueryable<TDestination> Map<TSource, TDestination>(this IQueryable<TSource> sourceQuery,
+            IQueryable<TDestination> destQuery)
+        {
+            return QueryMapperVisitor.Map<TSource, TDestination>(sourceQuery, destQuery, Mapper.Engine);
+        }
+
+        public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource)
+        {
+            return new QueryDataSourceInjection<TSource>(dataSource);
+        }
 
         /// <summary>
         /// Extention method to project from a queryable using the static <see cref="Mapper.Engine"/> property.

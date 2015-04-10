@@ -83,5 +83,30 @@ namespace AutoMapper.Impl
 
 			return null;
 		}
+
+        /// <summary>
+        /// if targetType is oldType, method will return newType
+        /// if targetType is not oldType, method will return targetType
+        /// if targetType is generic type with oldType arguments, method will replace all oldType arguments on newType
+        /// </summary>
+        /// <param name="mainType"></param>
+        /// <param name="newType"></param>
+        /// <returns></returns>
+        public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)
+        {
+            if (targetType == oldType)
+                return newType;
+
+            if (targetType.IsGenericType)
+            {
+                var genSubArgs = targetType.GetGenericArguments();
+                var newGenSubArgs = new Type[genSubArgs.Length];
+                for (int i = 0; i < genSubArgs.Length; i++)
+                    newGenSubArgs[i] = ReplaceItemType(genSubArgs[i], oldType, newType);
+                return targetType.GetGenericTypeDefinition().MakeGenericType(newGenSubArgs);
+            }
+
+            return targetType;
+        }
 	}
 }

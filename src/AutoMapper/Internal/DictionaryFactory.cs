@@ -87,6 +87,11 @@ namespace AutoMapper.Internal
                     return true;
                 }
             }
+
+            public void Clear()
+            {
+                _dictionary.Clear();
+            }
         }
     }
 }
