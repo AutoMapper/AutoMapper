@@ -44,17 +44,25 @@ namespace AutoMapper.Mappers
             private readonly MappingVisitor _parentMappingVisitor;
 
             public MappingVisitor(IList<Type> destSubTypes)
-                : this(null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)), null)
+                : this(null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)), null, destSubTypes)
             {
-                _destSubTypes = destSubTypes;
             }
 
-            private MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor)
+            private MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor, IList<Type> destSubTypes = null)
             {
                 _typeMap = typeMap;
                 _oldParam = oldParam;
                 _newParam = newParam;
                 _parentMappingVisitor = parentMappingVisitor;
+                if(destSubTypes != null)
+                    _destSubTypes = destSubTypes;
+            }
+
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                if (ReferenceEquals(node, _oldParam))
+                    return _newParam;
+                return node;
             }
 
             protected override Expression VisitParameter(ParameterExpression node)
