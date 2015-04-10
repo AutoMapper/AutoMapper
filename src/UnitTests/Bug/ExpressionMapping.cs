@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using AutoMapper.QueryableExtensions;
 using Should;
 using Xunit;
 
@@ -103,6 +105,8 @@ namespace AutoMapper.UnitTests.Bug
             var expression = Mapper.Map<Expression<Func<Parent, bool>>>(_predicateExpression);
             var items = new[] {_valid}.AsQueryable();
             items.Where(expression).ShouldContain(_valid);
+            var items2 = items.UseAsDataSource().For<ParentDTO>().Where(_predicateExpression);
+            items2.Count().ShouldEqual(1);
         }
 
         [Fact]
@@ -246,4 +250,21 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 
+
+    public class A<T> : IQueryable<T>
+    {
+        public IEnumerator<T> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public Expression Expression { get; private set; }
+        public Type ElementType { get; private set; }
+        public IQueryProvider Provider { get; private set; }
+    }
 }

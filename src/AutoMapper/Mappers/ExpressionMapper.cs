@@ -33,7 +33,7 @@ namespace AutoMapper.Mappers
                    && context.DestinationType != typeof (LambdaExpression);
         }
 
-        private class MappingVisitor : ExpressionVisitor
+        internal class MappingVisitor : ExpressionVisitor
         {
             private IList<Type> _destSubTypes = new Type[0];
 
@@ -47,7 +47,7 @@ namespace AutoMapper.Mappers
             {
             }
 
-            private MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor, IList<Type> destSubTypes = null)
+            internal MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor, IList<Type> destSubTypes = null)
             {
                 _typeMap = typeMap;
                 _oldParam = oldParam;
