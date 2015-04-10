@@ -77,6 +77,13 @@ namespace AutoMapper.Mappers
                 return base.VisitMethodCall(GetConvertedMethodCall(node));
             }
 
+            protected override Expression VisitExtension(Expression node)
+            {
+                if ((int)node.NodeType == 10000)
+                    return node;
+                return base.VisitExtension(node);
+            }
+
             private MethodCallExpression GetConvertedMethodCall(MethodCallExpression node)
             {
                 if (!node.Method.IsGenericMethod)
