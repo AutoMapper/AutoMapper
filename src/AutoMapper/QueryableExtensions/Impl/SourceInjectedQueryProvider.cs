@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Impl;
+using AutoMapper.Mappers;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -33,7 +34,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
             return (IQueryable<TElement>)
-                new SourceInjectedQuery<TSource, TDestination>(this, expression);
+                new SourceInjectedQuery<TSource, TElement>(this, expression);
         }
 
         public object Execute(Expression expression)
@@ -94,8 +95,11 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private Expression ConvertDestinationExpressionToSourceExpression(Expression expression)
         {
-            var visitor = new QueryMapperVisitor(typeof(TDestination),
-                typeof(TSource), _dataSource, _mappingEngine);
+            var typeMap = _mappingEngine.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
+            var visitor = new ExpressionMapper.MappingVisitor(typeMap, _destQuery.Expression, _dataSource.Expression, null,
+                new[] {typeof (TSource)});
+            //var visitor = new QueryMapperVisitor(typeof(TDestination),
+            //    typeof(TSource), _dataSource, _mappingEngine);
             var sourceExpression = visitor.Visit(expression);
             return sourceExpression;
         }

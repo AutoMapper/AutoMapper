@@ -97,5 +97,17 @@ namespace AutoMapper.UnitTests.Query
 
             result.First().DestValue.ShouldEqual(_source.Max(s => s.SrcValue));
         }
+
+        [Fact]
+        public void Shoud_support_any_stupid_thing_you_can_throw_at_it()
+        {
+            var result = _source.AsQueryable()
+              .UseAsDataSource().For<Destination>()
+              .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
+              .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
+              .OrderByDescending(s => s.DestValue).Select(s => s.DestValue);
+
+            result.First().ShouldEqual(_source.Max(s => s.SrcValue));
+        }
     }
 }

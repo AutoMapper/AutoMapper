@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -21,7 +19,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public Action<Type, Expression> StartQueryExecuteInterceptor { get; set; }
 
     }
-    public class SourceInjectedQuery<TSource, TDestination> : IQueryable<TDestination>, IOrderedQueryable<TDestination>
+    public class SourceInjectedQuery<TSource, TDestination> : IOrderedQueryable<TDestination>
     {
         public SourceInjectedQuery(IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
                 IMappingEngine mappingEngine, SourceInjectedQueryInspector inspector = null)
