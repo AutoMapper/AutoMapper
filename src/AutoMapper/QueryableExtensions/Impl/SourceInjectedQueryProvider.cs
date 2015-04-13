@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -69,21 +70,9 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private object InvokeSourceQuery(Type sourceResultType, Expression sourceExpression)
         {
-            MethodInfo executeMi = null;
-            if (sourceResultType != null)
-            {
-                var mi = typeof(IQueryProvider)
-                    .GetMethods()
-                    .First(m => m.IsGenericMethod && m.Name == "Execute");
-
-                executeMi = mi.MakeGenericMethod(sourceResultType);
-            }
-            else
-                executeMi = typeof(IQueryProvider)
-                        .GetMethods()
-                        .First(m => !m.IsGenericMethod && m.Name == "Execute");
-
-            var result = executeMi.Invoke(_dataSource.Provider, new object[] { sourceExpression });
+            var result = sourceResultType.GetInterfaces().Contains(typeof (IEnumerable))
+                ? _dataSource.Provider.CreateQuery(sourceExpression)
+                : _dataSource.Provider.Execute(sourceExpression);
             return result;
         }
 
