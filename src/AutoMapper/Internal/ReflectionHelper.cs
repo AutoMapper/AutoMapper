@@ -84,6 +84,7 @@ namespace AutoMapper.Impl
 			return null;
 		}
 
+<<<<<<< HEAD
         /// <summary>
         /// if targetType is oldType, method will return newType
         /// if targetType is not oldType, method will return targetType
@@ -107,6 +108,19 @@ namespace AutoMapper.Impl
             }
 
             return targetType;
+=======
+        public static bool IsStatic(this MemberInfo accessorCandidate)
+        {
+            var fieldInfo = accessorCandidate as FieldInfo;
+            if (fieldInfo != null && fieldInfo.IsStatic)
+                return true;
+
+            var propertyInfo = accessorCandidate as PropertyInfo;
+            if (propertyInfo != null && ((propertyInfo.CanRead && propertyInfo.GetGetMethod().IsStatic) || (propertyInfo.CanWrite && propertyInfo.GetSetMethod().IsStatic)))
+                return true;
+
+            return false;
+>>>>>>> Expression_Error
         }
 	}
 }
