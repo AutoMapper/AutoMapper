@@ -106,7 +106,7 @@ namespace AutoMapper.UnitTests.Bug
             var items = new[] {_valid}.AsQueryable();
             items.Where(expression).ShouldContain(_valid);
             var items2 = items.UseAsDataSource().For<ParentDTO>().Where(_predicateExpression);
-            var a = items2.ToList();
+            //var a = items2.ToList();
             items2.Count().ShouldEqual(1);
         }
 

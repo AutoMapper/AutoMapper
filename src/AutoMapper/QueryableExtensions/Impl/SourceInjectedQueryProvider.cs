@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Impl;
+using AutoMapper.Internal;
 using AutoMapper.Mappers;
 
 namespace AutoMapper.QueryableExtensions.Impl
@@ -51,7 +52,8 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public TResult Execute<TResult>(Expression expression)
         {
-            Inspector.StartQueryExecuteInterceptor(typeof(TResult), expression);
+            var resultType = typeof (TResult);
+            Inspector.StartQueryExecuteInterceptor(resultType, expression);
 
             var sourceExpression = ConvertDestinationExpressionToSourceExpression(expression);
 
@@ -62,7 +64,11 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             Inspector.SourceResult(sourceExpression, sourceResult);
 
-            var destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
+            object destResult;
+            if (resultType.IsEnumerableType() && resultType.GetGenericArguments()[0] == typeof (TDestination))
+                destResult = new ProjectionExpression<TSource>(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>();
+            else
+                destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
             Inspector.DestResult(sourceResult);
 
             return (TResult)destResult;
