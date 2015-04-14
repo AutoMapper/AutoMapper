@@ -249,6 +249,13 @@ namespace AutoMapper.UnitTests.Bug
             _predicateExpression = p => p.DateTime.Year == year && p.Child.Parent.Child.GrandChild.Parent.Child.GrandChild.GrandChild.ID_ == 4 && p.Children.Any(c => c.GrandChild.GrandChild.ID_ == 4);
             _valid = new Parent { DateTime = DateTime.Now, Child = new Child { GrandChild = new Child { GrandChild = new Child { ID = 4 } } }, Children = new[] { new Child { GrandChild = new Child { GrandChild = new Child { ID = 4 } } } } };
         }
+
+        [Fact]
+        public void When_Using_Static_Constants()
+        {
+            _predicateExpression = p => p.DateTime.Year.ToString() != string.Empty;
+            _valid = new Parent { DateTime = DateTime.Now };
+        }
     }
 
 

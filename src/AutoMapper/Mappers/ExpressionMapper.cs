@@ -271,6 +271,9 @@ namespace AutoMapper.Mappers
 
             private PropertyMap PropertyMap(MemberExpression node)
             {
+                if (node.Member.IsStatic())
+                    return null;
+
                 var memberAccessor = node.Member.ToMemberAccessor();
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
                 return propertyMap;
