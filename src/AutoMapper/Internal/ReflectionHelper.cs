@@ -84,32 +84,32 @@ namespace AutoMapper.Impl
 			return null;
 		}
 
-<<<<<<< HEAD
-        /// <summary>
-        /// if targetType is oldType, method will return newType
-        /// if targetType is not oldType, method will return targetType
-        /// if targetType is generic type with oldType arguments, method will replace all oldType arguments on newType
-        /// </summary>
-        /// <param name="mainType"></param>
-        /// <param name="newType"></param>
-        /// <returns></returns>
-        public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)
-        {
-            if (targetType == oldType)
-                return newType;
+	    /// <summary>
+	    /// if targetType is oldType, method will return newType
+	    /// if targetType is not oldType, method will return targetType
+	    /// if targetType is generic type with oldType arguments, method will replace all oldType arguments on newType
+	    /// </summary>
+	    /// <param name="mainType"></param>
+	    /// <param name="newType"></param>
+	    /// <returns></returns>
+	    public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)
+	    {
+	        if (targetType == oldType)
+	            return newType;
 
-            if (targetType.IsGenericType)
-            {
-                var genSubArgs = targetType.GetGenericArguments();
-                var newGenSubArgs = new Type[genSubArgs.Length];
-                for (int i = 0; i < genSubArgs.Length; i++)
-                    newGenSubArgs[i] = ReplaceItemType(genSubArgs[i], oldType, newType);
-                return targetType.GetGenericTypeDefinition().MakeGenericType(newGenSubArgs);
-            }
+	        if (targetType.IsGenericType)
+	        {
+	            var genSubArgs = targetType.GetGenericArguments();
+	            var newGenSubArgs = new Type[genSubArgs.Length];
+	            for (int i = 0; i < genSubArgs.Length; i++)
+	                newGenSubArgs[i] = ReplaceItemType(genSubArgs[i], oldType, newType);
+	            return targetType.GetGenericTypeDefinition().MakeGenericType(newGenSubArgs);
+	        }
 
-            return targetType;
-=======
-        public static bool IsStatic(this MemberInfo accessorCandidate)
+	        return targetType;
+	    }
+
+	    public static bool IsStatic(this MemberInfo accessorCandidate)
         {
             var fieldInfo = accessorCandidate as FieldInfo;
             if (fieldInfo != null && fieldInfo.IsStatic)
@@ -120,7 +120,6 @@ namespace AutoMapper.Impl
                 return true;
 
             return false;
->>>>>>> Expression_Error
         }
 	}
 }
