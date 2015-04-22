@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace AutoMapper
 {
     using System;
@@ -5,7 +7,6 @@ namespace AutoMapper
     using System.Diagnostics;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using Impl;
     using Internal;
 

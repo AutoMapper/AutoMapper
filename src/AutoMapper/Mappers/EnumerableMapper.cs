@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper.Internal;
 using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
+    using Internal;
+
 	public class EnumerableMapper : EnumerableMapperBase<IList>
 	{
 		public override bool IsMatch(ResolutionContext context)

@@ -2,15 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper.Internal;
 using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
-	// So IEnumerable<T> inherits IEnumerable
-	// but IDictionary<TKey, TValue> DOES NOT inherit IDictionary
-	// Fiddlesticks.
-	public class DictionaryMapper : IObjectMapper
+    using Internal;
+
+    // So IEnumerable<T> inherits IEnumerable
+    // but IDictionary<TKey, TValue> DOES NOT inherit IDictionary
+    // Fiddlesticks.
+    public class DictionaryMapper : IObjectMapper
 	{
 		private static readonly Type KvpType = typeof(KeyValuePair<,>);
 

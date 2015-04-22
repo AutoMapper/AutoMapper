@@ -5,7 +5,6 @@ namespace AutoMapper.QueryableExtensions
     using System.Linq.Expressions;
     using Internal;
     using System.Reflection;
-    using System.Threading.Tasks;
 
     public class ProjectionExpression : IProjectionExpression
     {

@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper.Internal;
 using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
+    using Internal;
+
     public static class TypeHelper
 	{
 		public static Type GetElementType(Type enumerableType)

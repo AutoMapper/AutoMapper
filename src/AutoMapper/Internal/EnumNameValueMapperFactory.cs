@@ -1,4 +1,4 @@
-﻿#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+﻿#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
 using System;
 using System.Linq;
 
