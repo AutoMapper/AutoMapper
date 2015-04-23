@@ -267,12 +267,6 @@
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AutoMapper.SL5\AutoMapper.SL5.csproj">
-      <Project>{a46863c7-1dec-4037-9fc2-c353021f2490}</Project>
-      <Name>AutoMapper.SL5</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="..\..\tools\MSBuild\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>

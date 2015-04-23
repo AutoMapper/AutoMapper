@@ -29,6 +29,40 @@
         "net45": {
             "compilationOptions": { "define": [ "NOT_PCL" ] }
         },
+        "dnx451": { },
+        "wpa81": {
+            "frameworkAssemblies": {
+                "System.Collections": "",
+                "System.Runtime": "",
+                "System.Linq": "",
+                "System.Linq.Expressions": "",
+                "System.Linq.Queryable": "",
+                "System.Text.RegularExpressions": "",
+                "System.Reflection": "",
+                "System.Reflection.Extensions": "",
+                "System.Diagnostics.Debug": "",
+                "System.ObjectModel": "",
+                "System.Runtime.Extensions": "",
+                "System.Threading": ""
+            }
+        },
+        "wp8": {
+            "frameworkAssemblies": {
+                "System.Collections": "",
+                "System.Runtime": "",
+                "System.Linq": "",
+                "System.Linq.Expressions": "",
+                "System.Linq.Queryable": "",
+                "System.Text.RegularExpressions": "",
+                "System.Reflection": "",
+                "System.Reflection.Extensions": "",
+                "System.Diagnostics.Debug": "",
+                "System.ObjectModel": "",
+                "System.Runtime.Extensions": "",
+                "System.Threading": "",
+                "mscorlib": ""
+            }
+        },
         "dnxcore50": {
             "dependencies": {
                 "System.Runtime": "4.0.20-beta-*",
