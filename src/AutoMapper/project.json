@@ -18,14 +18,6 @@
                 "System.Threading": ""
             }
         },
-        "MonoAndroid10": {
-            "dependencies": {
-                "Mono.Android": "",
-                "Mono.Android.mscorlib": "",
-                "Mono.Android.System": "",
-                "Mono.Android.System.Core": ""
-            }
-        },
         "net45": {
             "compilationOptions": { "define": [ "NOT_PCL" ] }
         },
@@ -44,23 +36,6 @@
                 "System.ObjectModel": "",
                 "System.Runtime.Extensions": "",
                 "System.Threading": ""
-            }
-        },
-        "wp8": {
-            "frameworkAssemblies": {
-                "System.Collections": "",
-                "System.Runtime": "",
-                "System.Linq": "",
-                "System.Linq.Expressions": "",
-                "System.Linq.Queryable": "",
-                "System.Text.RegularExpressions": "",
-                "System.Reflection": "",
-                "System.Reflection.Extensions": "",
-                "System.Diagnostics.Debug": "",
-                "System.ObjectModel": "",
-                "System.Runtime.Extensions": "",
-                "System.Threading": "",
-                "mscorlib": ""
             }
         },
         "dnxcore50": {

@@ -117,6 +117,12 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutoMapper.Net4\AutoMapper.Net4.csproj">
+      <Project>{8c955148-fa96-4f0d-880d-abb6770f54e9}</Project>
+      <Name>AutoMapper.Net4</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

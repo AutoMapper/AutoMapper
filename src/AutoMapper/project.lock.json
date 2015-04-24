@@ -17,13 +17,22 @@
       "framework/System.Runtime.Extensions ",
       "framework/System.Threading "
     ],
-    "MonoAndroid,Version=v1.0": [
-      "Mono.Android ",
-      "Mono.Android.mscorlib ",
-      "Mono.Android.System ",
-      "Mono.Android.System.Core "
-    ],
     ".NETFramework,Version=v4.5": [],
+    "DNX,Version=v4.5.1": [],
+    "WindowsPhoneApp,Version=v8.1": [
+      "framework/System.Collections ",
+      "framework/System.Runtime ",
+      "framework/System.Linq ",
+      "framework/System.Linq.Expressions ",
+      "framework/System.Linq.Queryable ",
+      "framework/System.Text.RegularExpressions ",
+      "framework/System.Reflection ",
+      "framework/System.Reflection.Extensions ",
+      "framework/System.Diagnostics.Debug ",
+      "framework/System.ObjectModel ",
+      "framework/System.Runtime.Extensions ",
+      "framework/System.Threading "
+    ],
     "DNXCore,Version=v5.0": [
       "System.Runtime >= 4.0.20-beta-*",
       "System.Linq.Expressions >= 4.0.10-beta-*",
@@ -57,7 +66,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        "MonoAndroid,Version=v1.0": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231"
           },
@@ -65,7 +74,15 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22231"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
+        "WindowsPhoneApp,Version=v8.1": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231"
           },
@@ -95,23 +112,14 @@
         "lib/contract/System.Collections.dll"
       ]
     },
-    "System.Collections.Concurrent/4.0.10-beta-22811": {
+    "System.Collections.Concurrent/4.0.10-beta-22822": {
       "serviceable": false,
-      "sha": "DI7Q2hArcm5IGRdW3+dMj6f0SVkQcfnkF1A08keqnSO0pGKZedlgy88VeHAFIWqAicWXKFVmfdbHAL3uw4eA0A==",
+      "sha": "hRO/RSFbcy0ckEdSqVTk9bQ4aK+8hfvGNs947nqh3iFoIGMQrk/kOH5ute4UORnHpGDSgwhsZivtXqMww+1Byg==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811",
-            "System.Threading.Tasks": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811",
-            "System.Threading.Tasks": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -119,8 +127,8 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811",
-            "System.Threading.Tasks": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -130,10 +138,36 @@
             "lib/net45/System.Collections.Concurrent.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Collections.Concurrent.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Collections.Concurrent.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Collections.Concurrent.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Collections.Concurrent.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811",
-            "System.Threading.Tasks": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -146,8 +180,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Collections.Concurrent.4.0.10-beta-22811.nupkg",
-        "System.Collections.Concurrent.4.0.10-beta-22811.nupkg.sha512",
+        "System.Collections.Concurrent.4.0.10-beta-22822.nupkg",
+        "System.Collections.Concurrent.4.0.10-beta-22822.nupkg.sha512",
         "System.Collections.Concurrent.nuspec",
         "lib/aspnetcore50/System.Collections.Concurrent.dll",
         "lib/contract/System.Collections.Concurrent.dll",
@@ -155,21 +189,13 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Collections.Concurrent.dll"
       ]
     },
-    "System.Collections.Specialized/4.0.0-beta-22811": {
+    "System.Collections.Specialized/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "Bq8JJZ2pNw9e2q9KtM4nCnBIE5JW22bK1ykz0OF0lSGx5Sye1Jl346hDjU4F1Xv9omZNBk+34mUUHwdqG6BMQg==",
+      "sha": "EIAFwQ2TF/rfiVmZFbi8lzO6ORgGcWcAaoIXs3bmd2yTzsTSpse1i+oRXAU6Zl97ScLunDypW4K3um3h5/2hsw==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -177,7 +203,7 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -187,9 +213,33 @@
             "lib/net45/System.Collections.Specialized.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Collections.Specialized.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Collections.Specialized.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Collections.Specialized.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Collections.Specialized.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -202,8 +252,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Collections.Specialized.4.0.0-beta-22811.nupkg",
-        "System.Collections.Specialized.4.0.0-beta-22811.nupkg.sha512",
+        "System.Collections.Specialized.4.0.0-beta-22822.nupkg",
+        "System.Collections.Specialized.4.0.0-beta-22822.nupkg.sha512",
         "System.Collections.Specialized.nuspec",
         "lib/aspnetcore50/System.Collections.Specialized.dll",
         "lib/contract/System.Collections.Specialized.dll",
@@ -211,21 +261,13 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Collections.Specialized.dll"
       ]
     },
-    "System.ComponentModel/4.0.0-beta-22811": {
+    "System.ComponentModel/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "5B0WZNURseOMynicmOb7+iaU/eb6wNCc5TyJ9c6q5E6mfNSvaj9LWgGuyESkxTvhMWWHnzldTJr7Wjg/wjjrUA==",
+      "sha": "0Iaex5cWbBuYhoLObW+ijk9xvjaFvsooYP3c1odqy8Cnd41og07Z2GdWQKsn0LVu1wlVUivNWYuvBW3dBoNchA==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -233,7 +275,7 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -243,9 +285,33 @@
             "lib/net45/System.ComponentModel.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.ComponentModel.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.ComponentModel.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ComponentModel.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.ComponentModel.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -258,8 +324,8 @@
       },
       "files": [
         "License.rtf",
-        "System.ComponentModel.4.0.0-beta-22811.nupkg",
-        "System.ComponentModel.4.0.0-beta-22811.nupkg.sha512",
+        "System.ComponentModel.4.0.0-beta-22822.nupkg",
+        "System.ComponentModel.4.0.0-beta-22822.nupkg.sha512",
         "System.ComponentModel.nuspec",
         "lib/aspnetcore50/System.ComponentModel.dll",
         "lib/contract/System.ComponentModel.dll",
@@ -267,23 +333,14 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ComponentModel.dll"
       ]
     },
-    "System.ComponentModel.Primitives/4.0.0-beta-22811": {
+    "System.ComponentModel.Primitives/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "cyFzpEaHNWoG9UoNnOJ6OaaFv6Wq8o/LfWeELkE1+2T/Pmzhvz11J1YW6Ejt8qrmZOvLbBsj3AALwpK8dfvHwg==",
+      "sha": "3OjmkOvTU02zATU+r1p7vuiN2l8CM15c0RRro/gm8OiZNKOwaZwgApdrrYmJ//yr3OtZF477Xw0twDCa6zRotg==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.ComponentModel": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.ComponentModel": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -291,8 +348,8 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.ComponentModel": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -302,10 +359,36 @@
             "lib/net45/System.ComponentModel.Primitives.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.ComponentModel.Primitives.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.ComponentModel.Primitives.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ComponentModel.Primitives.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.ComponentModel.Primitives.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.ComponentModel": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -318,8 +401,8 @@
       },
       "files": [
         "License.rtf",
-        "System.ComponentModel.Primitives.4.0.0-beta-22811.nupkg",
-        "System.ComponentModel.Primitives.4.0.0-beta-22811.nupkg.sha512",
+        "System.ComponentModel.Primitives.4.0.0-beta-22822.nupkg",
+        "System.ComponentModel.Primitives.4.0.0-beta-22822.nupkg.sha512",
         "System.ComponentModel.Primitives.nuspec",
         "lib/aspnetcore50/System.ComponentModel.Primitives.dll",
         "lib/contract/System.ComponentModel.Primitives.dll",
@@ -327,27 +410,16 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ComponentModel.Primitives.dll"
       ]
     },
-    "System.ComponentModel.TypeConverter/4.0.0-beta-22811": {
+    "System.ComponentModel.TypeConverter/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "s69xsR8pahmY1DHn9U3gBSlfpoRDAXdPygieq1LLvGfdX3uKh7MGUdmt1904DNOIA0fS1JQPG+uOOMXSkt1vjg==",
+      "sha": "aQczeu7ygGuz1RtTK0Wxfo01P8/AFNphpwAlnujTKDvYJXwbk7mksrZDzh8xm9WfSVqXUXyP2bLI3W/EhseoFg==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.ComponentModel": "4.0.0-beta-22811",
-            "System.ComponentModel.Primitives": "4.0.0-beta-22811",
-            "System.Globalization": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.ComponentModel": "4.0.0-beta-22811",
-            "System.ComponentModel.Primitives": "4.0.0-beta-22811",
-            "System.Globalization": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.ComponentModel.Primitives": "4.0.0-beta-22822",
+            "System.Globalization": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -355,10 +427,10 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.ComponentModel": "4.0.0-beta-22811",
-            "System.ComponentModel.Primitives": "4.0.0-beta-22811",
-            "System.Globalization": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.ComponentModel.Primitives": "4.0.0-beta-22822",
+            "System.Globalization": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -368,12 +440,42 @@
             "lib/net45/System.ComponentModel.TypeConverter.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.ComponentModel.Primitives": "4.0.0-beta-22822",
+            "System.Globalization": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.ComponentModel.TypeConverter.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.ComponentModel.TypeConverter.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.ComponentModel.Primitives": "4.0.0-beta-22822",
+            "System.Globalization": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ComponentModel.TypeConverter.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.ComponentModel.TypeConverter.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.ComponentModel": "4.0.0-beta-22811",
-            "System.ComponentModel.Primitives": "4.0.0-beta-22811",
-            "System.Globalization": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.ComponentModel": "4.0.0-beta-22822",
+            "System.ComponentModel.Primitives": "4.0.0-beta-22822",
+            "System.Globalization": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -386,8 +488,8 @@
       },
       "files": [
         "License.rtf",
-        "System.ComponentModel.TypeConverter.4.0.0-beta-22811.nupkg",
-        "System.ComponentModel.TypeConverter.4.0.0-beta-22811.nupkg.sha512",
+        "System.ComponentModel.TypeConverter.4.0.0-beta-22822.nupkg",
+        "System.ComponentModel.TypeConverter.4.0.0-beta-22822.nupkg.sha512",
         "System.ComponentModel.TypeConverter.nuspec",
         "lib/aspnetcore50/System.ComponentModel.TypeConverter.dll",
         "lib/contract/System.ComponentModel.TypeConverter.dll",
@@ -395,21 +497,13 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ComponentModel.TypeConverter.dll"
       ]
     },
-    "System.Diagnostics.Debug/4.0.10-beta-22811": {
+    "System.Diagnostics.Debug/4.0.10-beta-22822": {
       "serviceable": false,
-      "sha": "Kgu76b5DavDxwzRNBIgQzsKS+h8JS922vnk2KIfspIe9DIOw42B7DgA9TJahBfS0xe8rp5YK9TYhMTJHjkkFYA==",
+      "sha": "iW6nM1MyQ80l45ZcFACBWU+BiXZ3jcs+bpzAbXEYMZuS4ayQU7fB9rbaW09tx7j7rmOYVxvJymDsmohzcgq1yw==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -417,7 +511,7 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -427,9 +521,33 @@
             "lib/net45/System.Diagnostics.Debug.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Diagnostics.Debug.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Diagnostics.Debug.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Diagnostics.Debug.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Diagnostics.Debug.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -442,8 +560,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Diagnostics.Debug.4.0.10-beta-22811.nupkg",
-        "System.Diagnostics.Debug.4.0.10-beta-22811.nupkg.sha512",
+        "System.Diagnostics.Debug.4.0.10-beta-22822.nupkg",
+        "System.Diagnostics.Debug.4.0.10-beta-22822.nupkg.sha512",
         "System.Diagnostics.Debug.nuspec",
         "lib/aspnetcore50/System.Diagnostics.Debug.dll",
         "lib/contract/System.Diagnostics.Debug.dll",
@@ -463,7 +581,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        "MonoAndroid,Version=v1.0": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231"
           },
@@ -471,7 +589,15 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22231"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
+        "WindowsPhoneApp,Version=v8.1": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231"
           },
@@ -515,7 +641,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        "MonoAndroid,Version=v1.0": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231",
             "System.Text.Encoding": "4.0.0-beta-22231",
@@ -525,7 +651,17 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22231",
+            "System.Text.Encoding": "4.0.0-beta-22231",
+            "System.Threading.Tasks": "4.0.0-beta-22231"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
+        "WindowsPhoneApp,Version=v8.1": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231",
             "System.Text.Encoding": "4.0.0-beta-22231",
@@ -559,23 +695,14 @@
         "lib/contract/System.IO.dll"
       ]
     },
-    "System.Linq/4.0.0-beta-22811": {
+    "System.Linq/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "cqytc2OMAgUWr868W3/j6o05sZdhnRYM8B7FDA3Ss3S5jSgXpIqCzf7z/89Z5eXZpZXULrUknrBPjO2jD43qew==",
+      "sha": "Yn3hk+eOCyRyV8Iv6UfrrdKED2NMnaEq47j3YIk/0kEtTnMhQUi06rUIOtA8BadFIadVlPni0cjESxbIYoSmVw==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Collections": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Collections": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Collections": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -583,8 +710,8 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Collections": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Collections": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -594,10 +721,36 @@
             "lib/net45/System.Linq.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Collections": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Linq.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Linq.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Collections": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Linq.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Linq.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Collections": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Collections": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -610,8 +763,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Linq.4.0.0-beta-22811.nupkg",
-        "System.Linq.4.0.0-beta-22811.nupkg.sha512",
+        "System.Linq.4.0.0-beta-22822.nupkg",
+        "System.Linq.4.0.0-beta-22822.nupkg.sha512",
         "System.Linq.nuspec",
         "lib/aspnetcore50/System.Linq.dll",
         "lib/contract/System.Linq.dll",
@@ -619,23 +772,14 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Linq.dll"
       ]
     },
-    "System.Linq.Expressions/4.0.10-beta-22811": {
+    "System.Linq.Expressions/4.0.10-beta-22822": {
       "serviceable": false,
-      "sha": "KqjktGh0YOCq2JKjzaY68ihNt35bAzPgeJOUGCzdagdB4sOMs1bOcJQHR+6JOAzh+i9ZJ0kEZq+vm0TnjCTe3g==",
+      "sha": "iW1fasXnp6aAypMWuaI/oHiMpWjmLYxXEANjkf3hY6/KsIxGGhWfW6cGBqfFnbYsXYjRtD3ACcjmXvYN8daeDw==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -643,8 +787,8 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -654,10 +798,36 @@
             "lib/net45/System.Linq.Expressions.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Linq.Expressions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Linq.Expressions.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Linq.Expressions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Linq.Expressions.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -670,8 +840,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Linq.Expressions.4.0.10-beta-22811.nupkg",
-        "System.Linq.Expressions.4.0.10-beta-22811.nupkg.sha512",
+        "System.Linq.Expressions.4.0.10-beta-22822.nupkg",
+        "System.Linq.Expressions.4.0.10-beta-22822.nupkg.sha512",
         "System.Linq.Expressions.nuspec",
         "lib/aspnetcore50/System.Linq.Expressions.dll",
         "lib/contract/System.Linq.Expressions.dll",
@@ -679,25 +849,15 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Linq.Expressions.dll"
       ]
     },
-    "System.Linq.Queryable/4.0.0-beta-22811": {
+    "System.Linq.Queryable/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "Eqrjn06oBSeXvCsHltjJ26pcIq6Zmoyn3Zaj6kl9EXCBKQRmXiNlCwvxheTc+X6rBmxVC+n8Qg9if7PKHiXmAg==",
+      "sha": "nPmSgj43li9OIWj6zG9qIcLKFNhyI1f46LO8dp09FYcvtTkUFnR4aRTu3rtPmxdDxa/2AmSlFddzzPbADTlkFA==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Linq": "4.0.0-beta-22811",
-            "System.Linq.Expressions": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Linq": "4.0.0-beta-22811",
-            "System.Linq.Expressions": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Linq": "4.0.0-beta-22822",
+            "System.Linq.Expressions": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -705,9 +865,9 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Linq": "4.0.0-beta-22811",
-            "System.Linq.Expressions": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Linq": "4.0.0-beta-22822",
+            "System.Linq.Expressions": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -717,11 +877,39 @@
             "lib/net45/System.Linq.Queryable.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Linq": "4.0.0-beta-22822",
+            "System.Linq.Expressions": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Linq.Queryable.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Linq.Queryable.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Linq": "4.0.0-beta-22822",
+            "System.Linq.Expressions": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Linq.Queryable.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Linq.Queryable.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Linq": "4.0.0-beta-22811",
-            "System.Linq.Expressions": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Linq": "4.0.0-beta-22822",
+            "System.Linq.Expressions": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -734,8 +922,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Linq.Queryable.4.0.0-beta-22811.nupkg",
-        "System.Linq.Queryable.4.0.0-beta-22811.nupkg.sha512",
+        "System.Linq.Queryable.4.0.0-beta-22822.nupkg",
+        "System.Linq.Queryable.4.0.0-beta-22822.nupkg.sha512",
         "System.Linq.Queryable.nuspec",
         "lib/aspnetcore50/System.Linq.Queryable.dll",
         "lib/contract/System.Linq.Queryable.dll",
@@ -743,21 +931,13 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Linq.Queryable.dll"
       ]
     },
-    "System.ObjectModel/4.0.10-beta-22811": {
+    "System.ObjectModel/4.0.10-beta-22822": {
       "serviceable": false,
-      "sha": "aefnc3zy2LeVtXj9ssddymCwLFDX2YIKM5M261yGh6Y0kiIVocwfeOCT+TB71d+4HH0GbBdbV6aDDcoO17Xqcg==",
+      "sha": "BXYQoEsVQqg0imTeXkI53nOjCViqoLcoIm8ROTUaUquTxtf5zz1qWeCMyKYKlI7gVJjlo6KZniXUHtOiMfRzJg==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -765,7 +945,7 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -775,9 +955,33 @@
             "lib/net45/System.ObjectModel.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.ObjectModel.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.ObjectModel.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ObjectModel.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.ObjectModel.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -790,8 +994,8 @@
       },
       "files": [
         "License.rtf",
-        "System.ObjectModel.4.0.10-beta-22811.nupkg",
-        "System.ObjectModel.4.0.10-beta-22811.nupkg.sha512",
+        "System.ObjectModel.4.0.10-beta-22822.nupkg",
+        "System.ObjectModel.4.0.10-beta-22822.nupkg.sha512",
         "System.ObjectModel.nuspec",
         "lib/aspnetcore50/System.ObjectModel.dll",
         "lib/contract/System.ObjectModel.dll",
@@ -799,25 +1003,15 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.ObjectModel.dll"
       ]
     },
-    "System.Reflection/4.0.10-beta-22811": {
+    "System.Reflection/4.0.10-beta-22822": {
       "serviceable": false,
-      "sha": "SNYYcbpH3Gh/ZcMRQoJtlxRsmLcKxpfORlhpyQ7bT8wW2U7duyjcPxaI9MxeUHGKqXVvecveOmEMgP51meCBog==",
+      "sha": "LcI+4pCdc2kMce3pLmOA1Y6oyScQ+0I5KutRdH5QjAtGXpK8GT/5v8GbCEwkrLVxa6jID7UKs+1op1/mlcja7Q==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.IO": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.20-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.IO": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.20-beta-22811"
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.20-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -825,9 +1019,9 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.IO": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.20-beta-22811"
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.20-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -837,11 +1031,39 @@
             "lib/net45/System.Reflection.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.20-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Reflection.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Reflection.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.20-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Reflection.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.IO": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.20-beta-22811"
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.20-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -854,8 +1076,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Reflection.4.0.10-beta-22811.nupkg",
-        "System.Reflection.4.0.10-beta-22811.nupkg.sha512",
+        "System.Reflection.4.0.10-beta-22822.nupkg",
+        "System.Reflection.4.0.10-beta-22822.nupkg.sha512",
         "System.Reflection.nuspec",
         "lib/aspnetcore50/System.Reflection.dll",
         "lib/contract/System.Reflection.dll",
@@ -863,29 +1085,17 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.dll"
       ]
     },
-    "System.Reflection.Emit/4.0.0-beta-22811": {
+    "System.Reflection.Emit/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "Nqkl535LO1BZtqKBTlw+tV/xDmmh4faNRYQ6nUANZvnzzAu08UREmcrIzpYoKeM7159NHpUKvEw5FMQyPAmErw==",
+      "sha": "T48IK4D0q0ZLD2ugXs5uSlMMGq7x9eLOI1hYdWwj3Oz1s6gnSAeLk70oJZ5rvPox2zL+dINTQAbSqpFksxbl4A==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.IO": "4.0.0-beta-22811",
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.IO": "4.0.0-beta-22811",
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -893,11 +1103,11 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.IO": "4.0.0-beta-22811",
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -907,13 +1117,45 @@
             "lib/net45/System.Reflection.Emit.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Reflection.Emit.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Reflection.Emit.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.Emit.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Reflection.Emit.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.IO": "4.0.0-beta-22811",
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.IO": "4.0.0-beta-22822",
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Emit.ILGeneration": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -926,8 +1168,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Reflection.Emit.4.0.0-beta-22811.nupkg",
-        "System.Reflection.Emit.4.0.0-beta-22811.nupkg.sha512",
+        "System.Reflection.Emit.4.0.0-beta-22822.nupkg",
+        "System.Reflection.Emit.4.0.0-beta-22822.nupkg.sha512",
         "System.Reflection.Emit.nuspec",
         "lib/aspnetcore50/System.Reflection.Emit.dll",
         "lib/contract/System.Reflection.Emit.dll",
@@ -935,25 +1177,15 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.Emit.dll"
       ]
     },
-    "System.Reflection.Emit.ILGeneration/4.0.0-beta-22811": {
+    "System.Reflection.Emit.ILGeneration/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "wYIlEZeJVs7GkRr+KB8SxtHScqVl9dy8mLNJGxOpLRsAANvd7xPt6xMo26K7wqfUX+OEDtvseS1QH2H4RhYZlQ==",
+      "sha": "1jl7yEShybxI1qHaN6pCSM8DOiwFaV0bmrpauf8ft6B0SrQ7g8/otnYVk45h0ttYs8DdkQzRwRGrq7ywpo3zZg==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -961,9 +1193,9 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -973,11 +1205,39 @@
             "lib/net45/System.Reflection.Emit.ILGeneration.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Reflection.Emit.ILGeneration.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Reflection.Emit.ILGeneration.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.Emit.ILGeneration.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Reflection.Emit.ILGeneration.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Reflection.Primitives": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Reflection.Primitives": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -990,8 +1250,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Reflection.Emit.ILGeneration.4.0.0-beta-22811.nupkg",
-        "System.Reflection.Emit.ILGeneration.4.0.0-beta-22811.nupkg.sha512",
+        "System.Reflection.Emit.ILGeneration.4.0.0-beta-22822.nupkg",
+        "System.Reflection.Emit.ILGeneration.4.0.0-beta-22822.nupkg.sha512",
         "System.Reflection.Emit.ILGeneration.nuspec",
         "lib/aspnetcore50/System.Reflection.Emit.ILGeneration.dll",
         "lib/contract/System.Reflection.Emit.ILGeneration.dll",
@@ -999,23 +1259,14 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.Emit.ILGeneration.dll"
       ]
     },
-    "System.Reflection.Extensions/4.0.0-beta-22811": {
+    "System.Reflection.Extensions/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "tyQGDzrGUR1iaQMYE32JNFyrsSEUk1OakEqNszKIMW6/23qQREY5aJHjwZhK2/GSJW6pSV/EOvf2lTS16B/xAg==",
+      "sha": "F9XjPGgTuvcLEdNdyBIACVkAHNHdnvTI69VFDwr2HefjiIUFP6c+uigUgNst/mRnWNVxUgh/B47CFp4IcMRB/w==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1023,8 +1274,8 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1034,10 +1285,36 @@
             "lib/net45/System.Reflection.Extensions.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Reflection.Extensions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Reflection.Extensions.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.Extensions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Reflection.Extensions.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1050,8 +1327,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Reflection.Extensions.4.0.0-beta-22811.nupkg",
-        "System.Reflection.Extensions.4.0.0-beta-22811.nupkg.sha512",
+        "System.Reflection.Extensions.4.0.0-beta-22822.nupkg",
+        "System.Reflection.Extensions.4.0.0-beta-22822.nupkg.sha512",
         "System.Reflection.Extensions.nuspec",
         "lib/aspnetcore50/System.Reflection.Extensions.dll",
         "lib/contract/System.Reflection.Extensions.dll",
@@ -1059,21 +1336,13 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.Extensions.dll"
       ]
     },
-    "System.Reflection.Primitives/4.0.0-beta-22811": {
+    "System.Reflection.Primitives/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "7kThefXW6Z4tDVvK9ecfklfwjpSfwEaYyX9/f0ETsL/a3PopO6Zh2piui2YmjaLuyELsRCTXuhjnzHdTLm8Y7w==",
+      "sha": "7KEig+xJzlUi0dYpOWgyQH3yviUIn6btK3oOjbJj0ePzrn+dyi0636n7LINOXDfq7PPCVedbecNhCsUDtB9fvg==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1081,7 +1350,7 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1091,9 +1360,33 @@
             "lib/net45/System.Reflection.Primitives.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Reflection.Primitives.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Reflection.Primitives.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.Primitives.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Reflection.Primitives.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1106,8 +1399,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Reflection.Primitives.4.0.0-beta-22811.nupkg",
-        "System.Reflection.Primitives.4.0.0-beta-22811.nupkg.sha512",
+        "System.Reflection.Primitives.4.0.0-beta-22822.nupkg",
+        "System.Reflection.Primitives.4.0.0-beta-22822.nupkg.sha512",
         "System.Reflection.Primitives.nuspec",
         "lib/aspnetcore50/System.Reflection.Primitives.dll",
         "lib/contract/System.Reflection.Primitives.dll",
@@ -1115,23 +1408,14 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.Primitives.dll"
       ]
     },
-    "System.Reflection.TypeExtensions/4.0.0-beta-22811": {
+    "System.Reflection.TypeExtensions/4.0.0-beta-22822": {
       "serviceable": false,
-      "sha": "tUSsPfxFe+5+E9OMiGnqmoLv7mB6JeXG4EbMLf7xOejPrXw6MimN7Acsf0ZD3/JCtHGMnY4E1LNKnX5+dfc2+g==",
+      "sha": "FpfCkunk0C2lpdf74Ut9QPURmfljLm5SjDOc2kw5Fr0/tshHhojCkpViaXBD5hvyyj3VRJiH8f5nUZ/AEKD1Dw==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1139,17 +1423,39 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.TypeExtensions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Reflection.TypeExtensions.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Reflection": "4.0.0-beta-22811",
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Reflection": "4.0.0-beta-22822",
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1162,8 +1468,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Reflection.TypeExtensions.4.0.0-beta-22811.nupkg",
-        "System.Reflection.TypeExtensions.4.0.0-beta-22811.nupkg.sha512",
+        "System.Reflection.TypeExtensions.4.0.0-beta-22822.nupkg",
+        "System.Reflection.TypeExtensions.4.0.0-beta-22822.nupkg.sha512",
         "System.Reflection.TypeExtensions.nuspec",
         "lib/aspnetcore50/System.Reflection.TypeExtensions.dll",
         "lib/contract/System.Reflection.TypeExtensions.dll",
@@ -1171,17 +1477,11 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Reflection.TypeExtensions.dll"
       ]
     },
-    "System.Runtime/4.0.20-beta-22811": {
+    "System.Runtime/4.0.20-beta-22822": {
       "serviceable": false,
-      "sha": "lLopLQsddVCgNuoWBlIsNw3JcUQqqobPurqg4pH3/XePOO6Tt9VPEvnpMTp0Whc1yg/Z1g+Omhue2uBE3HA+NA==",
+      "sha": "182cFO808Q59F5FmIsBYKXsk/Z+uHOoIlWqWdn+1uSYEj01NULMKB9gak/ZPbGzhqQWUPJFnazB6L6z7qghIcg==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
-          "dependencies": {},
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
           "dependencies": {},
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1195,6 +1495,26 @@
           ],
           "compileAssemblies": [
             "lib/net45/System.Runtime.dll"
+          ]
+        },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Runtime.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Runtime.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {},
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Runtime.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Runtime.dll"
           ]
         },
         "DNXCore,Version=v5.0": {
@@ -1210,8 +1530,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Runtime.4.0.20-beta-22811.nupkg",
-        "System.Runtime.4.0.20-beta-22811.nupkg.sha512",
+        "System.Runtime.4.0.20-beta-22822.nupkg",
+        "System.Runtime.4.0.20-beta-22822.nupkg.sha512",
         "System.Runtime.nuspec",
         "lib/aspnetcore50/System.Runtime.dll",
         "lib/contract/System.Runtime.dll",
@@ -1219,21 +1539,13 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Runtime.dll"
       ]
     },
-    "System.Runtime.Extensions/4.0.10-beta-22811": {
+    "System.Runtime.Extensions/4.0.10-beta-22822": {
       "serviceable": false,
-      "sha": "4eKDzKKVatg5PNKRxL1MfRLtclpHYsl0A/OaiYApS3Y/iZhgyFYjqnUI3HKUyRf1Gn8ioIp9itT2P8wBWwv+rQ==",
+      "sha": "brdwicQO/3jNwuYmGWeF3leazm0I/KMKQEVHzCtWSepZiTa49ytW5eMP/yKuBRBo2y8woUiouAA9wkg22NQvkw==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.20-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.20-beta-22811"
+            "System.Runtime": "4.0.20-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1241,7 +1553,7 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.20-beta-22811"
+            "System.Runtime": "4.0.20-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1251,9 +1563,33 @@
             "lib/net45/System.Runtime.Extensions.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.20-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Runtime.Extensions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Runtime.Extensions.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.20-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Runtime.Extensions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Runtime.Extensions.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.20-beta-22811"
+            "System.Runtime": "4.0.20-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1266,8 +1602,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Runtime.Extensions.4.0.10-beta-22811.nupkg",
-        "System.Runtime.Extensions.4.0.10-beta-22811.nupkg.sha512",
+        "System.Runtime.Extensions.4.0.10-beta-22822.nupkg",
+        "System.Runtime.Extensions.4.0.10-beta-22822.nupkg.sha512",
         "System.Runtime.Extensions.nuspec",
         "lib/aspnetcore50/System.Runtime.Extensions.dll",
         "lib/contract/System.Runtime.Extensions.dll",
@@ -1287,7 +1623,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        "MonoAndroid,Version=v1.0": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231"
           },
@@ -1295,7 +1631,15 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22231"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
+        "WindowsPhoneApp,Version=v8.1": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231"
           },
@@ -1325,21 +1669,13 @@
         "lib/contract/System.Text.Encoding.dll"
       ]
     },
-    "System.Text.RegularExpressions/4.0.10-beta-22811": {
+    "System.Text.RegularExpressions/4.0.10-beta-22822": {
       "serviceable": false,
-      "sha": "AERZmVDCNr1M+S7pUZuFTWI+jcSMrwftK/Ws+YD3gtrKPpIEOkTuaXvJNHuH0dvbXhNtJirW45xCOMgkUhzZOA==",
+      "sha": "aHUQzDSTBxTFZvksuUPQlq35uCR+ZwipRjyXqWdYvoKbkvrqYZ7pRyCk3sKGmeQXTcW/esUkqdhs5Gn+pnt30Q==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1347,7 +1683,7 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1357,9 +1693,33 @@
             "lib/net45/System.Text.RegularExpressions.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Text.RegularExpressions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Text.RegularExpressions.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Text.RegularExpressions.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Text.RegularExpressions.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1372,8 +1732,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Text.RegularExpressions.4.0.10-beta-22811.nupkg",
-        "System.Text.RegularExpressions.4.0.10-beta-22811.nupkg.sha512",
+        "System.Text.RegularExpressions.4.0.10-beta-22822.nupkg",
+        "System.Text.RegularExpressions.4.0.10-beta-22822.nupkg.sha512",
         "System.Text.RegularExpressions.nuspec",
         "lib/aspnetcore50/System.Text.RegularExpressions.dll",
         "lib/contract/System.Text.RegularExpressions.dll",
@@ -1381,23 +1741,14 @@
         "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Text.RegularExpressions.dll"
       ]
     },
-    "System.Threading/4.0.10-beta-22811": {
+    "System.Threading/4.0.10-beta-22822": {
       "serviceable": false,
-      "sha": "QKnvL9MS3qeimw9RqfXl4iPg4CgPTyLHEpXMcqs7VwSjnKSXta7dmNwtGmnQY/ozSGSA4bDm2hWUBHbfNFTzlg==",
+      "sha": "NrDlA+o/HpW5t4sCztb0ZXsuQ7jXyEDu5PUnFPBSfaxhtUxlUAyHNwolUusqRYkz7O8y7T25VvyGm1wKFAZjJg==",
       "frameworks": {
         ".NETPortable,Version=v4.5,Profile=Profile259": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811",
-            "System.Threading.Tasks": "4.0.0-beta-22811"
-          },
-          "frameworkAssemblies": [],
-          "runtimeAssemblies": [],
-          "compileAssemblies": []
-        },
-        "MonoAndroid,Version=v1.0": {
-          "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811",
-            "System.Threading.Tasks": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [],
@@ -1405,8 +1756,8 @@
         },
         ".NETFramework,Version=v4.5": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811",
-            "System.Threading.Tasks": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1416,10 +1767,36 @@
             "lib/net45/System.Threading.dll"
           ]
         },
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/net45/System.Threading.dll"
+          ],
+          "compileAssemblies": [
+            "lib/net45/System.Threading.dll"
+          ]
+        },
+        "WindowsPhoneApp,Version=v8.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [
+            "lib/portable-wpa81+wp80+win80+net45+aspnetcore50/System.Threading.dll"
+          ],
+          "compileAssemblies": [
+            "lib/contract/System.Threading.dll"
+          ]
+        },
         "DNXCore,Version=v5.0": {
           "dependencies": {
-            "System.Runtime": "4.0.0-beta-22811",
-            "System.Threading.Tasks": "4.0.0-beta-22811"
+            "System.Runtime": "4.0.0-beta-22822",
+            "System.Threading.Tasks": "4.0.0-beta-22822"
           },
           "frameworkAssemblies": [],
           "runtimeAssemblies": [
@@ -1432,8 +1809,8 @@
       },
       "files": [
         "License.rtf",
-        "System.Threading.4.0.10-beta-22811.nupkg",
-        "System.Threading.4.0.10-beta-22811.nupkg.sha512",
+        "System.Threading.4.0.10-beta-22822.nupkg",
+        "System.Threading.4.0.10-beta-22822.nupkg.sha512",
         "System.Threading.nuspec",
         "lib/aspnetcore50/System.Threading.dll",
         "lib/contract/System.Threading.dll",
@@ -1453,7 +1830,7 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        "MonoAndroid,Version=v1.0": {
+        ".NETFramework,Version=v4.5": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231"
           },
@@ -1461,7 +1838,15 @@
           "runtimeAssemblies": [],
           "compileAssemblies": []
         },
-        ".NETFramework,Version=v4.5": {
+        "DNX,Version=v4.5.1": {
+          "dependencies": {
+            "System.Runtime": "4.0.0-beta-22231"
+          },
+          "frameworkAssemblies": [],
+          "runtimeAssemblies": [],
+          "compileAssemblies": []
+        },
+        "WindowsPhoneApp,Version=v8.1": {
           "dependencies": {
             "System.Runtime": "4.0.0-beta-22231"
           },
