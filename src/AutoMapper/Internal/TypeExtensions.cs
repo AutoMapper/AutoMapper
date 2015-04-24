@@ -227,7 +227,7 @@
         }
 
 
-        //#if NETFX_CORE
+#if !SILVERLIGHT
         public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo, bool ignored)
         {
             return propertyInfo.GetMethod;
@@ -308,6 +308,6 @@
             //}
         }
 
-//#endif
+#endif
     }
 }

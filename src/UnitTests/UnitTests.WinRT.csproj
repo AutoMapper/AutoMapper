@@ -15,7 +15,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>UnitTests.WinRT_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>C276A4E8B1DE80E8058C83FA9256F68372B64B49</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>B1307FF365E691B90ABF165DAB06FB4FCF4B720B</PackageCertificateThumbprint>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
     <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
     <TargetFrameworkVersion />
@@ -123,7 +123,6 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="UnitTests.WinRT_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\UnitTestLogo.png">
@@ -299,6 +298,9 @@
       <Project>{b80d950d-cc8d-4287-96b1-eea037825e90}</Project>
       <Name>AutoMapper.WinRT</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="UnitTests.WinRT_TemporaryKey.pfx" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
