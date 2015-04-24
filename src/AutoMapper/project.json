@@ -21,6 +21,26 @@
         "net45": {
             "compilationOptions": { "define": [ "NOT_PCL" ] }
         },
+        "sl5": {
+            "frameworkAssemblies": {
+                "System": "",
+                "System.Core": "",
+                "mscorlib": ""
+            },
+            "compilationOptions": {
+                "define": [ "SILVERLIGHT", "NOT_PCL" ]
+            }
+        },
+        "wp80": {
+            "frameworkAssemblies": {
+                "mscorlib": "",
+                "System": "",
+                "System.Core": ""
+            },
+            "compilationOptions": {
+                "define": [ "SILVERLIGHT", "NOT_PCL" ]
+            }
+        },
         "dnx451": { },
         "wpa81": {
             "frameworkAssemblies": {
