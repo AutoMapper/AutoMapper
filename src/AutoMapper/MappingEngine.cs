@@ -12,8 +12,8 @@ namespace AutoMapper
 	    private static readonly IProxyGeneratorFactory ProxyGeneratorFactory = PlatformAdapter.Resolve<IProxyGeneratorFactory>();
 	    private bool _disposed;
 		private readonly IConfigurationProvider _configurationProvider;
-		private readonly IObjectMapper[] _mappers;
-        private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>();
+	    internal readonly IObjectMapper[] _mappers;
+	    internal readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>();
 	    private readonly Func<Type, object> _serviceCtor;
 
 	    public MappingEngine(IConfigurationProvider configurationProvider)

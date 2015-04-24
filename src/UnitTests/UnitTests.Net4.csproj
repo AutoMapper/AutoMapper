@@ -138,6 +138,7 @@
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="Constructors.cs" />
     <Compile Include="ContextItems.cs" />
+    <Compile Include="ConvensionTest.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
     <Compile Include="ExpressionBridge.cs" />

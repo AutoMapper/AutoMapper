@@ -440,5 +440,19 @@ namespace AutoMapper
 	    {
             Configuration.AddGlobalIgnore(startingwith);
 	    }
+
+        public static CreateMapBasedOnCriteriaMapper AddConvension()
+        {
+            var newMapper = CreateMapBasedOnCriteriaMapper.New;
+            MapperRegistry.Mappers.Add(newMapper);
+            return newMapper;
+        }
+
+        public static CustomizedSourceToDestinationMemberMapper AddMemberConvention()
+        {
+            var newConvention = new CustomizedSourceToDestinationMemberMapper();
+            ((Engine.ConfigurationProvider as ConfigurationStore)._typeMapFactory as TypeMapFactory).sourceToDestinationMemberMappers.Add(newConvention);
+            return newConvention;
+        }
 	}
 }

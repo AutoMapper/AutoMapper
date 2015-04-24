@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace AutoMapper
 {
@@ -157,5 +160,6 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
     	void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
     }
+
 }
 
