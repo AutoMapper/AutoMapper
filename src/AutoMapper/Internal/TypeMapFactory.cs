@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -10,8 +11,16 @@ namespace AutoMapper
 {
     public class TypeMapFactory : ITypeMapFactory
     {
-        private readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
+        private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
             = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeInfo>();
+
+        internal static TypeInfo GetTypeInfo(Type type, IEnumerable<MethodInfo> extensionMethodsToSearch)
+        {
+            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, extensionMethodsToSearch));
+
+            return typeInfo;
+        }
+        internal readonly ICollection<ISourceToDestinationMemberMapper> sourceToDestinationMemberMappers = new Collection<ISourceToDestinationMemberMapper>(){new DefaultPropertyToSourceMappings()};
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
         {
@@ -19,7 +28,7 @@ namespace AutoMapper
             var destTypeInfo = GetTypeInfo(destinationType, new MethodInfo[0]);
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
-
+                
             foreach (var destProperty in destTypeInfo.GetPublicWriteAccessors())
             {
                 var members = new LinkedList<MemberInfo>();
@@ -43,6 +52,11 @@ namespace AutoMapper
                 }
             }
             return typeMap;
+        }
+
+        private bool MapDestinationPropertyToSource(LinkedList<MemberInfo> members, TypeInfo sourceTypeInfo, string name, IMappingOptions options)
+        {
+            return sourceToDestinationMemberMappers.Any(s => s.MapDestinationPropertyToSource(members, sourceTypeInfo, name, options));
         }
 
         private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo,
@@ -73,14 +87,66 @@ namespace AutoMapper
             return true;
         }
 
-        private TypeInfo GetTypeInfo(Type type, IEnumerable<MethodInfo> extensionMethodsToSearch)
-        {
-            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, extensionMethodsToSearch));
+    }
 
-            return typeInfo;
+    public interface ISourceToDestinationMemberMapper
+    {
+        bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeInfo sourceType, string nameToSearch,
+            IMappingOptions mappingOptions);
+    }
+
+    public class CustomizedSourceToDestinationMemberMapper : ISourceToDestinationMemberMapper
+    {
+        private readonly ICollection<Func<TypeInfo, string, IMappingOptions, MemberInfo>> _convensions = new Collection<Func<TypeInfo, string, IMappingOptions, MemberInfo>>();
+
+        public ICollection<Func<TypeInfo, string, IMappingOptions, MemberInfo>> Convensions {
+            get { return _convensions; }
         }
 
-        private bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeInfo sourceType,
+        public bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeInfo sourceType, string nameToSearch,
+            IMappingOptions mappingOptions)
+        {
+            if (string.IsNullOrEmpty(nameToSearch))
+                return true;
+            MemberInfo matchingMemberInfo = null;
+
+            foreach (var convension in _convensions)
+            {
+                matchingMemberInfo = convension(sourceType, nameToSearch, mappingOptions);
+                if(matchingMemberInfo != null)
+                    break;
+            }
+
+            if (matchingMemberInfo != null)
+                resolvers.AddLast(matchingMemberInfo);
+            return matchingMemberInfo != null;
+        }
+    }
+
+    public static class CustomizedMemberMapperExtensions
+    {
+        public static CustomizedSourceToDestinationMemberMapper PropertyPrefix(this CustomizedSourceToDestinationMemberMapper self, string preFix)
+        {
+            self.Convensions.Add((ti, name, mo) => ti.GetPublicReadAccessors().FirstOrDefault(mi => mi.Name == preFix + name || name == preFix + mi.Name));
+            return self;
+        }
+        public static CustomizedSourceToDestinationMemberMapper PropertyPostfix(this CustomizedSourceToDestinationMemberMapper self, string postFix)
+        {
+            self.Convensions.Add((ti, name, mo) => ti.GetPublicReadAccessors().FirstOrDefault(mi => mi.Name == name + postFix || name == mi.Name + postFix));
+            return self;
+        }
+
+        public static CustomizedSourceToDestinationMemberMapper Where(this CustomizedSourceToDestinationMemberMapper self, Func<TypeInfo, string, IMappingOptions, MemberInfo> whereClaulse)
+        {
+            self.Convensions.Add(whereClaulse);
+            return self;
+        }
+    }
+
+    public class DefaultPropertyToSourceMappings : ISourceToDestinationMemberMapper
+    {
+
+        public bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeInfo sourceType,
                                                     string nameToSearch, IMappingOptions mappingOptions)
         {
             if (string.IsNullOrEmpty(nameToSearch))
@@ -88,9 +154,9 @@ namespace AutoMapper
 
             var sourceProperties = sourceType.GetPublicReadAccessors();
             var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
-			var sourceNoArgExtensionMethods = sourceType.GetPublicNoArgExtensionMethods();
+            var sourceNoArgExtensionMethods = sourceType.GetPublicNoArgExtensionMethods();
 
-			MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, nameToSearch, mappingOptions);
+            MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, nameToSearch, mappingOptions);
 
             bool foundMatch = resolver != null;
 
@@ -110,7 +176,7 @@ namespace AutoMapper
                 {
                     NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
 
-					var valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, snippet.First,
+                    var valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, snippet.First,
                                                        mappingOptions);
 
                     if (valueResolver != null)
@@ -118,7 +184,7 @@ namespace AutoMapper
                         resolvers.AddLast(valueResolver);
 
                         foundMatch = MapDestinationPropertyToSource(resolvers,
-                                                                    GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethods),
+                                                                    TypeMapFactory.GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethods),
                                                                     snippet.Second, mappingOptions);
 
                         if (!foundMatch)
@@ -133,10 +199,10 @@ namespace AutoMapper
         }
 
         private static MemberInfo FindTypeMember(IEnumerable<MemberInfo> modelProperties,
-												 IEnumerable<MethodInfo> getMethods,
-												 IEnumerable<MethodInfo> getExtensionMethods,
-												 string nameToSearch,
-												 IMappingOptions mappingOptions)
+                                                 IEnumerable<MethodInfo> getMethods,
+                                                 IEnumerable<MethodInfo> getExtensionMethods,
+                                                 string nameToSearch,
+                                                 IMappingOptions mappingOptions)
         {
             MemberInfo pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch, mappingOptions));
             if (pi != null)
@@ -146,11 +212,11 @@ namespace AutoMapper
             if (mi != null)
                 return mi;
 
-			mi = getExtensionMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
-			if (mi != null)
-				return mi;
+            mi = getExtensionMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
+            if (mi != null)
+                return mi;
 
-			return null;
+            return null;
         }
 
         private static bool NameMatches(string memberName, string nameToMatch, IMappingOptions mappingOptions)
@@ -164,12 +230,12 @@ namespace AutoMapper
             var all =
                 from sourceName in possibleSourceNames
                 from destName in possibleDestNames
-                select new {sourceName, destName};
+                select new { sourceName, destName };
 
             return all.Any(pair => String.Compare(pair.sourceName, pair.destName, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
-        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases, 
+        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases,
             IEnumerable<MemberNameReplacer> memberNameReplacers, IEnumerable<string> prefixes, IEnumerable<string> postfixes)
         {
             if (string.IsNullOrEmpty(memberName))

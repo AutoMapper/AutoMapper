@@ -90,6 +90,7 @@
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\AssignableArrayMapper.cs" />
+    <Compile Include="Mappers\CreateMapBasedOnCriteriaMapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\ExpressionMapper.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />

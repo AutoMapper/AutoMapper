@@ -13,7 +13,7 @@ namespace AutoMapper
     public class ConfigurationStore : IConfigurationProvider, IConfiguration
 	{
 	    private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
-	    private readonly ITypeMapFactory _typeMapFactory;
+	    internal readonly ITypeMapFactory _typeMapFactory;
 	    private readonly IEnumerable<IObjectMapper> _mappers;
 		internal const string DefaultProfileName = "";
 		
