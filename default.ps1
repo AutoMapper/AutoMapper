@@ -37,7 +37,6 @@ task compile -depends clean {
     exec { kpm build $source_dir\AutoMapper --configuration $config }
     exec { & $source_dir\.nuget\Nuget.exe restore $source_dir }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
-    exec { msbuild /t:Clean /t:Build /p:Configuration=ReleaseWin8 /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
 }
 
 task commonAssemblyInfo {
@@ -56,17 +55,17 @@ task test {
 task dist {
 	create_directory $build_dir
 	create_directory $dist_dir
-	copy_files "$source_dir\AutoMapper.Net4\bin\$config" "$dist_dir\net40"
-	copy_files "$source_dir\AutoMapper\bin\$config" "$dist_dir\Portable"
-	copy_files "$source_dir\AutoMapper.SL5\bin\$config" "$dist_dir\sl5"
-	copy_files "$source_dir\AutoMapper.WP8\bin\$config" "$dist_dir\wp8"
-	copy_files "$source_dir\AutoMapper.WPA81\bin\$config" "$dist_dir\wpa81"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\net45" "$dist_dir\net45"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10" "$dist_dir\Portable"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\wp80" "$dist_dir\wp8"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\sl50" "$dist_dir\sl5"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\wpa81" "$dist_dir\wpa81"
 	copy_files "$source_dir\AutoMapper.WinRT\bin\$config" "$dist_dir\windows81"
 	copy_files "$source_dir\AutoMapper.Android\bin\$config" "$dist_dir\MonoAndroid"
 	copy_files "$source_dir\AutoMapper.iOS\bin\$config" "$dist_dir\MonoTouch"
 	copy_files "$source_dir\AutoMapper.iOS10\bin\$config" "$dist_dir\Xamarin.iOS10"
-	copy_files "$source_dir\AutoMapper\bin\$config\aspnet50" "$dist_dir\aspnet50"
-	copy_files "$source_dir\AutoMapper\bin\$config\aspnetcore50" "$dist_dir\aspnetcore50"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dnx451" "$dist_dir\dnx451"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dnxcore50" "$dist_dir\dnxcore50"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
@@ -151,40 +150,68 @@ function global:create-nuspec($version, $fileName)
     <summary>A convention-based object-object mapper</summary>
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
     <dependencies>
-      <group targetFramework=""Asp.NetCore5.0"">
-        <dependency id=""System.Runtime"" version=""4.0.20-beta-22530"" />
-        <dependency id=""System.Linq.Expressions"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Linq"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Reflection"" version=""4.0.10-beta-22530"" />
-        <dependency id=""System.Text.RegularExpressions"" version=""4.0.10-beta-22530"" />
-        <dependency id=""System.Reflection.TypeExtensions"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Reflection.Emit"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Threading"" version=""4.0.10-beta-22530"" />
-        <dependency id=""System.Runtime.Extensions"" version=""4.0.10-beta-22530"" />
-        <dependency id=""System.Reflection.Extensions"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Collections.Specialized"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Collections.Concurrent"" version=""4.0.10-beta-22530"" />
-        <dependency id=""System.ComponentModel.TypeConverter"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Reflection.Primitives"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Linq.Queryable"" version=""4.0.0-beta-22530"" />
-        <dependency id=""System.Diagnostics.Debug"" version=""4.0.10-beta-22530"" />
-        <dependency id=""System.ObjectModel"" version=""4.0.10-beta-22530"" />
+      <group targetFramework=""DNXCore5.0"">
+        <dependency id=""System.Runtime"" version=""4.0.20-beta-22822"" />
+        <dependency id=""System.Linq.Expressions"" version=""4.0.10-beta-22822"" />
+        <dependency id=""System.Linq"" version=""4.0.0-beta-22822"" />
+        <dependency id=""System.Reflection"" version=""4.0.10-beta-22822"" />
+        <dependency id=""System.Text.RegularExpressions"" version=""4.0.10-beta-22822"" />
+        <dependency id=""System.Reflection.TypeExtensions"" version=""4.0.0-beta-22822"" />
+        <dependency id=""System.Reflection.Emit"" version=""4.0.0-beta-22822"" />
+        <dependency id=""System.Threading"" version=""4.0.10-beta-22822"" />
+        <dependency id=""System.Runtime.Extensions"" version=""4.0.10-beta-22822"" />
+        <dependency id=""System.Reflection.Extensions"" version=""4.0.0-beta-22822"" />
+        <dependency id=""System.Collections.Specialized"" version=""4.0.0-beta-22822"" />
+        <dependency id=""System.Collections.Concurrent"" version=""4.0.10-beta-22822"" />
+        <dependency id=""System.ComponentModel.TypeConverter"" version=""4.0.0-beta-22822"" />
+        <dependency id=""System.Reflection.Primitives"" version=""4.0.0-beta-22822"" />
+        <dependency id=""System.Linq.Queryable"" version=""4.0.0-beta-22822"" />
+        <dependency id=""System.Diagnostics.Debug"" version=""4.0.10-beta-22822"" />
+        <dependency id=""System.ObjectModel"" version=""4.0.10-beta-22822"" />
       </group>
     </dependencies>
     <frameworkAssemblies>
-      <frameworkAssembly assemblyName=""mscorlib"" targetFramework=""Asp.Net5.0"" />
-      <frameworkAssembly assemblyName=""System"" targetFramework=""Asp.Net5.0"" />
-      <frameworkAssembly assemblyName=""System.Core"" targetFramework=""Asp.Net5.0"" />
-      <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework=""Asp.Net5.0"" />
+      <frameworkAssembly assemblyName=""System.Collections"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Runtime"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Linq"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Linq.Expressions"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Linq.Queryable"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Text.RegularExpressions"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Reflection"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Reflection.Extensions"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Diagnostics.Debug"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.ObjectModel"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Runtime.Extensions"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""System.Threading"" targetFramework="".NETPortable4.5-Profile259"" />
+      <frameworkAssembly assemblyName=""mscorlib"" targetFramework="".NETFramework4.5"" />
+      <frameworkAssembly assemblyName=""System"" targetFramework="".NETFramework4.5"" />
+      <frameworkAssembly assemblyName=""System.Core"" targetFramework="".NETFramework4.5"" />
+      <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework="".NETFramework4.5"" />
+      <frameworkAssembly assemblyName=""mscorlib"" targetFramework=""DNX4.5.1"" />
+      <frameworkAssembly assemblyName=""System"" targetFramework=""DNX4.5.1"" />
+      <frameworkAssembly assemblyName=""System.Core"" targetFramework=""DNX4.5.1"" />
+      <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework=""DNX4.5.1"" />
+      <frameworkAssembly assemblyName=""System.Collections"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Runtime"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Linq"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Linq.Expressions"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Linq.Queryable"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Text.RegularExpressions"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Reflection"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Reflection.Extensions"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Diagnostics.Debug"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.ObjectModel"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Runtime.Extensions"" targetFramework=""WindowsPhoneApp8.1"" />
+      <frameworkAssembly assemblyName=""System.Threading"" targetFramework=""WindowsPhoneApp8.1"" />
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src=""$dist_dir\Portable\AutoMapper.dll"" target=""lib\portable-windows8+net40+wp8+wpa81+sl5+MonoAndroid+MonoTouch+Xamarin.iOS10"" />
-    <file src=""$dist_dir\Portable\AutoMapper.pdb"" target=""lib\portable-windows8+net40+wp8+wpa81+sl5+MonoAndroid+MonoTouch+Xamarin.iOS10"" />
-    <file src=""$dist_dir\Portable\AutoMapper.xml"" target=""lib\portable-windows8+net40+wp8+wpa81+sl5+MonoAndroid+MonoTouch+Xamarin.iOS10"" />
-    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\net40"" />
-    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\net40"" />
+    <file src=""$dist_dir\Portable\AutoMapper.dll"" target=""lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10"" />
+    <file src=""$dist_dir\Portable\AutoMapper.pdb"" target=""lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10"" />
+    <file src=""$dist_dir\Portable\AutoMapper.xml"" target=""lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10"" />
+    <file src=""$dist_dir\net45\AutoMapper.dll"" target=""lib\net45"" />
+    <file src=""$dist_dir\net45\AutoMapper.pdb"" target=""lib\net45"" />
+    <file src=""$dist_dir\net45\AutoMapper.xml"" target=""lib\net45"" />
     <file src=""$dist_dir\sl5\AutoMapper.dll"" target=""lib\sl5"" />
     <file src=""$dist_dir\sl5\AutoMapper.pdb"" target=""lib\sl5"" />
     <file src=""$dist_dir\sl5\AutoMapper.xml"" target=""lib\sl5"" />
@@ -206,12 +233,12 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.dll"" target=""lib\Xamarin.iOS10"" />
     <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.pdb"" target=""lib\Xamarin.iOS10"" />
     <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.xml"" target=""lib\Xamarin.iOS10"" />
-    <file src=""$dist_dir\aspnet50\AutoMapper.dll"" target=""lib\aspnet50"" />
-    <file src=""$dist_dir\aspnet50\AutoMapper.pdb"" target=""lib\aspnet50"" />
-    <file src=""$dist_dir\aspnet50\AutoMapper.xml"" target=""lib\aspnet50"" />
-    <file src=""$dist_dir\aspnetcore50\AutoMapper.dll"" target=""lib\aspnetcore50"" />
-    <file src=""$dist_dir\aspnetcore50\AutoMapper.pdb"" target=""lib\aspnetcore50"" />
-    <file src=""$dist_dir\aspnetcore50\AutoMapper.xml"" target=""lib\aspnetcore50"" />
+    <file src=""$dist_dir\dnx451\AutoMapper.dll"" target=""lib\dnx451"" />
+    <file src=""$dist_dir\dnx451\AutoMapper.pdb"" target=""lib\dnx451"" />
+    <file src=""$dist_dir\dnx451\AutoMapper.xml"" target=""lib\dnx451"" />
+    <file src=""$dist_dir\dnxcore50\AutoMapper.dll"" target=""lib\dnxcore50"" />
+    <file src=""$dist_dir\dnxcore50\AutoMapper.pdb"" target=""lib\dnxcore50"" />
+    <file src=""$dist_dir\dnxcore50\AutoMapper.xml"" target=""lib\dnxcore50"" />
     <file src=""**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"

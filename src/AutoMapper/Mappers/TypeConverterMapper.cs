@@ -1,4 +1,4 @@
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || ASPNET50 || ASPNETCORE50
+#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || DNXCORE50
 using System;
 using System.ComponentModel;
 

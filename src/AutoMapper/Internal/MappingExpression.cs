@@ -2,10 +2,10 @@ using System;
 using System.Linq.Expressions;
 using AutoMapper.Impl;
 using System.Linq;
+using System.Reflection;
 
 namespace AutoMapper
 {
-    using System.Reflection;
     using Internal;
 
     public class MappingExpression : IMappingExpression, IMemberConfigurationExpression

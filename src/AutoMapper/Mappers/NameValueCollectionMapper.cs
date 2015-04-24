@@ -1,4 +1,4 @@
-﻿#if NET4 || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+﻿#if NET4 || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
 using System.Collections.Specialized;
 
 namespace AutoMapper.Mappers

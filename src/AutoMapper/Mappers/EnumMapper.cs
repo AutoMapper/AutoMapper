@@ -1,9 +1,10 @@
 using System;
-using AutoMapper.Internal;
 using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
+    using Internal;
+
     public class EnumMapper : IObjectMapper
     {
         private static readonly INullableConverterFactory NullableConverterFactory =

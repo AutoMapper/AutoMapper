@@ -1,0 +1,9 @@
+{
+    "frameworks": {
+        "MonoAndroid10": {
+            "bin": {
+                "assembly": "Mono.Android.dll"
+            }
+        }
+    }
+}

@@ -1,9 +1,10 @@
-using System;
-using System.Reflection;
-
 namespace AutoMapper.Impl
 {
+    using Internal;
+    using System;
     using System.Collections.Generic;
+    using System.Reflection;
+
 
     public class FieldGetter : MemberGetter
 	{
