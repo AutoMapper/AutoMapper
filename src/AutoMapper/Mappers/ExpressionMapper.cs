@@ -1,4 +1,10 @@
-﻿namespace AutoMapper.Mappers
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using AutoMapper.Internal;
+using AutoMapper.QueryableExtensions.Impl;
+
+namespace AutoMapper.Mappers
 {
     using System.Linq;
     using System.Linq.Expressions;
@@ -17,32 +23,8 @@
             if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
                 throw new AutoMapperMappingException("Source and destination expressions must be of the same type.");
 
-            var parameters = expression.Parameters.ToArray();
-            var body = expression.Body;
-
-            for (int i = 0; i < expression.Parameters.Count; i++)
-            {
-                var sourceParamType = sourceDelegateType.GetGenericArguments()[i];
-                var destParamType = destDelegateType.GetGenericArguments()[i];
-
-                if (sourceParamType == destParamType)
-                    continue;
-
-                var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(destParamType, sourceParamType);
-
-                if (typeMap == null)
-                    throw new AutoMapperMappingException(
-                        string.Format(
-                            "Could not find type map from destination type {0} to source type {1}. Use CreateMap to create a map from the source to destination types.",
-                            destParamType, sourceParamType));
-
-                var oldParam = expression.Parameters[i];
-                var newParam = Expression.Parameter(typeMap.SourceType, oldParam.Name);
-                parameters[i] = newParam;
-                var visitor = new MappingVisitor(typeMap, oldParam, newParam);
-                body = visitor.Visit(body);
-            }
-            return Expression.Lambda(body, parameters);
+            var mappingVisitor = new MappingVisitor(destDelegateType.GetGenericArguments());
+            return mappingVisitor.Visit(expression);
         }
 
         public bool IsMatch(ResolutionContext context)
@@ -55,15 +37,25 @@
 
         private class MappingVisitor : ExpressionVisitor
         {
-            private readonly TypeMap _typeMap;
-            private readonly ParameterExpression _oldParam;
-            private readonly ParameterExpression _newParam;
+            private IList<Type> _destSubTypes = new Type[0];
 
-            public MappingVisitor(TypeMap typeMap, ParameterExpression oldParam, ParameterExpression newParam)
+            private readonly TypeMap _typeMap;
+            private readonly Expression _oldParam;
+            private readonly Expression _newParam;
+            private readonly MappingVisitor _parentMappingVisitor;
+
+            public MappingVisitor(IList<Type> destSubTypes)
+                : this(null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)), null)
+            {
+                _destSubTypes = destSubTypes;
+            }
+
+            private MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor)
             {
                 _typeMap = typeMap;
                 _oldParam = oldParam;
                 _newParam = newParam;
+                _parentMappingVisitor = parentMappingVisitor;
             }
 
             protected override Expression VisitParameter(ParameterExpression node)
@@ -73,40 +65,219 @@
                 return node;
             }
 
-            protected override Expression VisitMember(MemberExpression node)
+            protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                var memberAccessor = node.Member.ToMemberAccessor();
-                var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
+                return base.VisitMethodCall(GetConvertedMethodCall(node));
+            }
 
+            private MethodCallExpression GetConvertedMethodCall(MethodCallExpression node)
+            {
+                if (!node.Method.IsGenericMethod)
+                    return node;
+                var convertedArguments = Visit(node.Arguments);
+                var convertedMethodArgumentTypes = node.Method.GetGenericArguments().Select(t => GetConvertingTypeIfExists(node.Arguments, t, convertedArguments)).ToArray();
+                var convertedMethodCall = node.Method.GetGenericMethodDefinition().MakeGenericMethod(convertedMethodArgumentTypes);
+                return Expression.Call(convertedMethodCall, convertedArguments);
+            }
 
-                if (propertyMap.CustomExpression != null)
+            private static Type GetConvertingTypeIfExists(IList<Expression> args, Type t, IList<Expression> arguments)
+            {
+                var matchingArgument = args.Where(a => !a.Type.IsGenericType).FirstOrDefault(a => a.Type == t);
+                if (matchingArgument != null)
                 {
-                    var replaced = new ParameterReplacementVisitor(_newParam);
-                    var newBody = replaced.Visit(propertyMap.CustomExpression.Body);
-                    return newBody;
+                    var index = args.IndexOf(matchingArgument);
+                    if (index < 0)
+                        return t;
+                    return arguments[index].Type;
                 }
 
+                var matchingEnumerableArgument = args.Where(a => a.Type.IsGenericType).FirstOrDefault(a => a.Type.GetGenericArguments()[0] == t);
+                var index2 = args.IndexOf(matchingEnumerableArgument);
+                if (index2 < 0) 
+                    return t;
+                return arguments[index2].Type.GetGenericArguments()[0];
+            }
+
+            protected override Expression VisitBinary(BinaryExpression node)
+            {
+                var newLeft = base.Visit(node.Left);
+                var newRight = base.Visit(node.Right);
+
+                CheckNullableToNonNullableChanges(node.Left, node.Right, ref newLeft, ref newRight);
+                CheckNullableToNonNullableChanges(node.Right, node.Left, ref newRight, ref newLeft);
+                return Expression.MakeBinary(node.NodeType, newLeft, newRight);
+            }
+
+            private static void CheckNullableToNonNullableChanges(Expression left, Expression right, ref Expression newLeft, ref Expression newRight)
+            {
+                if (GoingFromNonNullableToNullable(left, newLeft))
+                    if (BothAreNonNullable(right, newRight))
+                        UpdateToNullableExpression(right, out newRight);
+                    else if (BothAreNullable(right, newRight))
+                        UpdateToNonNullableExpression(right, out newRight);
+
+                if (GoingFromNonNullableToNullable(newLeft, left))
+                    if (BothAreNonNullable(right, newRight))
+                        UpdateToNullableExpression(right, out newRight);
+                    else if (BothAreNullable(right, newRight))
+                        UpdateToNonNullableExpression(right, out newRight);
+            }
+
+            private static void UpdateToNullableExpression(Expression right, out Expression newRight)
+            {
+                if (right is ConstantExpression)
+                    newRight = Expression.Constant((right as ConstantExpression).Value,
+                        typeof (Nullable<>).MakeGenericType(right.Type));
+                else
+                    throw new AutoMapperMappingException(
+                        "Mapping a BinaryExpression where one side is nullable and the other isn't");
+            }
+
+            private static void UpdateToNonNullableExpression(Expression right, out Expression newRight)
+            {
+                if (right is ConstantExpression)
+                    newRight = Expression.Constant((right as ConstantExpression).Value,
+                        typeof(Nullable<>).MakeGenericType(right.Type));
+                else if (right is UnaryExpression)
+                    newRight = (right as UnaryExpression).Operand;
+                else
+                    throw new AutoMapperMappingException(
+                        "Mapping a BinaryExpression where one side is nullable and the other isn't");
+            }
+
+            private static bool GoingFromNonNullableToNullable(Expression node, Expression newLeft)
+            {
+                return !node.Type.IsNullableType() && newLeft.Type.IsNullableType();
+            }
+
+            private static bool BothAreNullable(Expression node, Expression newLeft)
+            {
+                return node.Type.IsNullableType() && newLeft.Type.IsNullableType();
+            }
+
+            private static bool BothAreNonNullable(Expression node, Expression newLeft)
+            {
+                return !node.Type.IsNullableType() && !newLeft.Type.IsNullableType();
+            }
+
+            protected override Expression VisitLambda<T>(Expression<T> expression)
+            {
+                if (expression.Parameters.Any(b => b.Type == _oldParam.Type))
+                    return VisitLambdaExpression(expression);
+                return VisitAllParametersExpression(expression);
+            }
+
+            private Expression VisitLambdaExpression<T>(Expression<T> expression)
+            {
+                var convertedBody = base.Visit(expression.Body);
+                var convertedArguments = expression.Parameters.Select(e => base.Visit(e) as ParameterExpression).ToList();
+                return Expression.Lambda(convertedBody, convertedArguments);
+            }
+
+            private Expression VisitAllParametersExpression<T>(Expression<T> expression)
+            {
+                var visitors = new List<ExpressionVisitor>();
+                for (var i = 0; i < expression.Parameters.Count; i++)
+                {
+                    var sourceParamType = expression.Parameters[i].Type;
+                    foreach (var destParamType in _destSubTypes.Where(dt => dt != sourceParamType))
+                    {
+                        var typeMap = Mapper.FindTypeMapFor(destParamType, sourceParamType);
+
+                        if (typeMap == null)
+                            continue;
+
+                        var oldParam = expression.Parameters[i];
+                        var newParam = Expression.Parameter(typeMap.SourceType, oldParam.Name);
+                        visitors.Add(new MappingVisitor(typeMap, oldParam, newParam, this));
+                    }
+                }
+                return visitors.Aggregate(expression as Expression, (e, v) => v.Visit(e));
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node == _oldParam)
+                    return _newParam;
+                var propertyMap = PropertyMap(node);
+
+                if (propertyMap == null)
+                {
+                    if (node.Expression is MemberExpression)
+                        return GetConvertedSubMemberCall(node);
+                    return node;
+                }
+                SetSorceSubTypes(propertyMap);
+
                 var replacedExpression = Visit(node.Expression);
+                if (replacedExpression == node.Expression)
+                    replacedExpression = _parentMappingVisitor.Visit(node.Expression);
+
+                if (propertyMap.CustomExpression != null)
+                    return ConvertCustomExpression(replacedExpression, propertyMap);
+
+                Func<Expression,IMemberGetter,Expression> getExpression = (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo);
+
+                //if (propertyMap.SourceMember.ToMemberGetter().MemberType.IsNullableType())
+                //{
+                //    var expression = getExpression;
+                //    getExpression = (current, memberGetter) => Expression.Call(expression.Invoke(current,memberGetter), "GetValueOrDefault", new Type[0], new Expression[0]);
+                //}
+                //else if (propertyMap.DestinationPropertyType.IsNullableType())
+                //{
+
+                //}
 
                 return propertyMap.GetSourceValueResolvers()
                     .OfType<IMemberGetter>()
-                    .Aggregate(replacedExpression,
-                        (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo));
-            }
-        }
-
-        private class ParameterReplacementVisitor : ExpressionVisitor
-        {
-            private readonly ParameterExpression _newParam;
-
-            public ParameterReplacementVisitor(ParameterExpression newParam)
-            {
-                _newParam = newParam;
+                    .Aggregate(replacedExpression, getExpression);
             }
 
-            protected override Expression VisitParameter(ParameterExpression node)
+            private Expression GetConvertedSubMemberCall(MemberExpression node)
             {
-                return _newParam;
+                var baseExpression = Visit(node.Expression);
+                var propertyMap = FindPropertyMapOfExpression(node.Expression as MemberExpression);
+
+                var sourceType = propertyMap.SourceMember.GetMemberType();
+                var destType = propertyMap.DestinationPropertyType;
+                if (sourceType == destType)
+                    return Expression.MakeMemberAccess(baseExpression, node.Member);
+                var typeMap = Mapper.FindTypeMapFor(sourceType, destType);
+                var newExpression = new MappingVisitor(typeMap, node.Expression, baseExpression, this).Visit(node);
+                return newExpression;
+            }
+
+            private PropertyMap FindPropertyMapOfExpression(MemberExpression expression)
+            {
+                var propertyMap = PropertyMap(expression);
+                if (propertyMap == null && expression.Expression is MemberExpression)
+                    return FindPropertyMapOfExpression(expression.Expression as MemberExpression);
+                return propertyMap;
+            }
+
+            private PropertyMap PropertyMap(MemberExpression node)
+            {
+                if (node.Member.IsStatic())
+                    return null;
+
+                var memberAccessor = node.Member.ToMemberAccessor();
+                var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
+                return propertyMap;
+            }
+
+            private void SetSorceSubTypes(PropertyMap propertyMap)
+            {
+                if (propertyMap.SourceMember is PropertyInfo)
+                    _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetGenericArguments().Concat(new []{ (propertyMap.SourceMember as PropertyInfo).PropertyType }).ToList();
+                else if (propertyMap.SourceMember is FieldInfo)
+                    _destSubTypes = (propertyMap.SourceMember as FieldInfo).FieldType.GetGenericArguments();
+            }
+
+            private Expression ConvertCustomExpression(Expression node, PropertyMap propertyMap)
+            {
+                var replaced = new ParameterReplacementVisitor(node);
+                var newBody = replaced.Visit(propertyMap.CustomExpression.Body);
+                return newBody;
             }
         }
     }
