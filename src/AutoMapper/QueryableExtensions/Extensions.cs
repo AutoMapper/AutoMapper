@@ -213,7 +213,17 @@ namespace AutoMapper.QueryableExtensions
                 var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
                 if (binder == null)
-                    throw new AutoMapperMappingException("Unable to create a map expression from " + result.Type + " to " + propertyMap.DestinationPropertyType);
+                {
+                    var message = string.Format("Unable to create a map expression from {0}.{1} ({2}) to {3}.{4} ({5})",
+                        propertyMap.SourceMember.DeclaringType.Name,
+                        propertyMap.SourceMember.Name,
+                        result.Type,
+                        propertyMap.DestinationProperty.MemberInfo.DeclaringType.Name,
+                        propertyMap.DestinationProperty.Name,
+                        propertyMap.DestinationPropertyType);
+
+                    throw new AutoMapperMappingException(message);
+                }
 
                 var bindExpression = binder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
 
