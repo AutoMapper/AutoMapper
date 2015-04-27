@@ -97,6 +97,12 @@ namespace XpressionMapper
                 if (constantExpression.Value == null)
                     return base.VisitBinary(node.Update(Expression.Constant(null), node.Conversion, node.Right));
             }
+
+            Expression newLeft = this.Visit(node.Left);
+            Expression newRight = this.Visit(node.Right);
+            if ((newLeft.Type.IsGenericType && newLeft.Type.GetGenericTypeDefinition().Equals(typeof(Nullable<>))) ^ (newRight.Type.IsGenericType && newRight.Type.GetGenericTypeDefinition().Equals(typeof(Nullable<>))))
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.cannotCreateBinaryExpressionFormat, newLeft.ToString(), newLeft.Type.Name, newRight.ToString(), newRight.Type.Name));
+
             return base.VisitBinary(node);
         }
 

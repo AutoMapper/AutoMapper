@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="cannotCreateBinaryExpressionFormat" xml:space="preserve">
+    <value>Cannot create a binary expression for the following pair.  Node: {0}, Type: {1} and Node: {2}, Type: {3}.</value>
+    <comment>0=leftNode; 1=leftNodeType; 2=rightNode; 3=rightNodeType</comment>
+  </data>
   <data name="cantRemapExpression" xml:space="preserve">
     <value>Can't rempa expression</value>
   </data>
