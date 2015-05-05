@@ -12,13 +12,7 @@ namespace AutoMapper
     public static class Mapper
 	{
 	    private static readonly Func<ConfigurationStore> _configurationInit =
-	        () =>
-	        {
-	            var platformSpecificRegistry = PlatformAdapter.Resolve<IPlatformSpecificMapperRegistry>();
-                platformSpecificRegistry.Initialize();
-
-	            return new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-	        };
+	        () => new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
         
         private static ILazy<ConfigurationStore> _configuration = LazyFactory.Create(_configurationInit);
 

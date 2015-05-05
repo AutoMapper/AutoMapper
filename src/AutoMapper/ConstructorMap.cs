@@ -7,7 +7,7 @@ namespace AutoMapper
 {
     public class ConstructorMap
     {
-        private static readonly IDelegateFactory DelegateFactory = PlatformAdapter.Resolve<IDelegateFactory>();
+        private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
         private readonly LateBoundParamsCtor _runtimeCtor;
         public ConstructorInfo Ctor { get; private set; }
         public IEnumerable<ConstructorParameterMap> CtorParams { get; private set; }

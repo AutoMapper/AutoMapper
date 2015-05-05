@@ -8,9 +8,9 @@ namespace AutoMapper.Impl
 
     public abstract class MemberGetter : IMemberGetter
 	{
-        protected static readonly IDelegateFactory DelegateFactory = PlatformAdapter.Resolve<IDelegateFactory>();
+        protected static readonly DelegateFactory DelegateFactory = new DelegateFactory();
 
-		public abstract MemberInfo MemberInfo { get; }
+        public abstract MemberInfo MemberInfo { get; }
 		public abstract string Name { get; }
 		public abstract Type MemberType { get; }
 		public abstract object GetValue(object source);

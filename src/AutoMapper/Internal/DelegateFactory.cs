@@ -9,7 +9,7 @@ namespace AutoMapper
 {
     using AutoMapper.Internal;
 
-    public class DelegateFactory : IDelegateFactory
+    public class DelegateFactory
     {
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
 
@@ -73,14 +73,39 @@ namespace AutoMapper
             return lambda.Compile();
         }
 
-        public virtual LateBoundFieldSet CreateSet(FieldInfo field)
+        public LateBoundFieldSet CreateSet(FieldInfo field)
         {
-            return (target, value) => field.SetValue(target, value);
+            ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
+            ParameterExpression valueParameter = Expression.Parameter(typeof(object), "value");
+
+            MemberExpression member = Expression.Field(Expression.Convert(instanceParameter, field.DeclaringType), field);
+            BinaryExpression assignExpression = Expression.Assign(member, Expression.Convert(valueParameter, field.FieldType));
+
+            Expression<LateBoundFieldSet> lambda = Expression.Lambda<LateBoundFieldSet>(
+                assignExpression,
+                instanceParameter,
+                valueParameter
+                );
+
+            return lambda.Compile();
         }
 
-        public virtual LateBoundPropertySet CreateSet(PropertyInfo property)
+        public LateBoundPropertySet CreateSet(PropertyInfo property)
         {
-            return (target, value) => property.SetValue(target, value, null);
+            ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
+            ParameterExpression valueParameter = Expression.Parameter(typeof(object), "value");
+
+            MemberExpression member = Expression.Property(Expression.Convert(instanceParameter, property.DeclaringType), property);
+            BinaryExpression assignExpression = Expression.Assign(member, Expression.Convert(valueParameter, property.PropertyType));
+
+            Expression<LateBoundPropertySet> lambda = Expression.Lambda<LateBoundPropertySet>(
+                assignExpression,
+                instanceParameter,
+                valueParameter
+                );
+
+
+            return lambda.Compile();
         }
 
         public LateBoundCtor CreateCtor(Type type)

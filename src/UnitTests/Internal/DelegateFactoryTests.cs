@@ -9,9 +9,9 @@ namespace AutoMapper.UnitTests
 {
 	public class DelegateFactoryTests
 	{
-        protected IDelegateFactory DelegateFactory { get { return new DelegateFactory(); } }
+        protected DelegateFactory DelegateFactory => new DelegateFactory();
 
-		[Fact]
+	    [Fact]
 		public void MethodTests()
 		{
 			MethodInfo method = typeof(String).GetMethod("StartsWith", new[] { typeof(string) });

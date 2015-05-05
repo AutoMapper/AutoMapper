@@ -13,15 +13,4 @@ namespace AutoMapper
 	public delegate void LateBoundValueTypePropertySet(ref object target, object value);
 	public delegate object LateBoundCtor();
     public delegate object LateBoundParamsCtor(params object[] parameters);
-
-    public interface IDelegateFactory
-    {
-        LateBoundMethod CreateGet(MethodInfo method);
-        LateBoundPropertyGet CreateGet(PropertyInfo property);
-        LateBoundFieldGet CreateGet(FieldInfo field);
-        LateBoundFieldSet CreateSet(FieldInfo field);
-        LateBoundPropertySet CreateSet(PropertyInfo property);
-        LateBoundCtor CreateCtor(Type type);
-        LateBoundParamsCtor CreateCtor(ConstructorInfo constructorInfo, IEnumerable<ConstructorParameterMap> ctorParams);
-    }
 }

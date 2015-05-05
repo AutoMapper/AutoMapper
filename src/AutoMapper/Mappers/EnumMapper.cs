@@ -10,7 +10,7 @@ namespace AutoMapper.Mappers
         private static readonly INullableConverterFactory NullableConverterFactory =
             PlatformAdapter.Resolve<INullableConverterFactory>();
         private static readonly IEnumNameValueMapperFactory EnumNameValueMapperFactory =
-            PlatformAdapter.Resolve<IEnumNameValueMapperFactory>(false);
+            PlatformAdapter.Resolve<IEnumNameValueMapperFactory>();
 
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {

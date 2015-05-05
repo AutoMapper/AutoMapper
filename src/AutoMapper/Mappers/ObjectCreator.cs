@@ -10,9 +10,9 @@ namespace AutoMapper.Mappers
     /// </summary>
     public static class ObjectCreator
     {
-        private static readonly IDelegateFactory DelegateFactory = PlatformAdapter.Resolve<IDelegateFactory>();
+        private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
 
-		public static Array CreateArray(Type elementType, int length)
+        public static Array CreateArray(Type elementType, int length)
 		{
 			return Array.CreateInstance(elementType, length);
 		}
