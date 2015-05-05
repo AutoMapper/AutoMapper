@@ -8,7 +8,7 @@ namespace AutoMapper
     using Internal;
     using System.Runtime.CompilerServices;
 
-    public class FormatterExpression : IProfileConfiguration, IMappingOptions
+    public class ProfileConfiguration : IProfileConfiguration, IMappingOptions
     {
 		private readonly IList<Type> _formattersToSkip = new List<Type>();
 	    private readonly ISet<string> _prefixes = new HashSet<string>();
@@ -19,7 +19,7 @@ namespace AutoMapper
         private readonly ISet<MemberNameReplacer> _memberNameReplacers = new HashSet<MemberNameReplacer>();
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
-	    public FormatterExpression()
+	    public ProfileConfiguration()
 		{
 			SourceMemberNamingConvention = new PascalCaseNamingConvention();
 			DestinationMemberNamingConvention = new PascalCaseNamingConvention();

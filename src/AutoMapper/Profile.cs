@@ -176,7 +176,7 @@ namespace AutoMapper
 			_configurator = configurator;
 		}
 
-		private FormatterExpression GetProfile()
+		private ProfileConfiguration GetProfile()
 		{
 			return _configurator.GetProfile(ProfileName);
 		}

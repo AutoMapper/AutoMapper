@@ -21,7 +21,7 @@ namespace AutoMapper
 
         private readonly IDictionary<TypePair, TypeMap> _typeMapCache = DictionaryFactory.CreateDictionary<TypePair, TypeMap>();
         private readonly IDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache = DictionaryFactory.CreateDictionary<TypePair, CreateTypeMapExpression>();
-        private readonly IDictionary<string, FormatterExpression> _formatterProfiles = DictionaryFactory.CreateDictionary<string, FormatterExpression>();
+        private readonly IDictionary<string, ProfileConfiguration> _formatterProfiles = DictionaryFactory.CreateDictionary<string, ProfileConfiguration>();
 		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
 	    private readonly List<string> _globalIgnore;
@@ -637,10 +637,10 @@ namespace AutoMapper
 				typeMapCreated(this, new TypeMapCreatedEventArgs(typeMap));
 		}
 
-		internal FormatterExpression GetProfile(string profileName)
+		internal ProfileConfiguration GetProfile(string profileName)
 		{
-		    FormatterExpression expr = _formatterProfiles.GetOrAdd(profileName,
-		                                                           name => new FormatterExpression());
+		    ProfileConfiguration expr = _formatterProfiles.GetOrAdd(profileName,
+		                                                           name => new ProfileConfiguration());
 
 		    return expr;
 		}
