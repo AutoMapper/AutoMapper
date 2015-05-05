@@ -60,7 +60,7 @@ task dist {
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\wp80" "$dist_dir\wp8"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\sl50" "$dist_dir\sl5"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\wpa81" "$dist_dir\wpa81"
-	copy_files "$source_dir\AutoMapper.WinRT\bin\$config" "$dist_dir\windows81"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\win" "$dist_dir\win"
 	copy_files "$source_dir\AutoMapper.Android\bin\$config" "$dist_dir\MonoAndroid"
 	copy_files "$source_dir\AutoMapper.iOS\bin\$config" "$dist_dir\MonoTouch"
 	copy_files "$source_dir\AutoMapper.iOS10\bin\$config" "$dist_dir\Xamarin.iOS10"
@@ -221,9 +221,9 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\wpa81\AutoMapper.dll"" target=""lib\wpa81"" />
     <file src=""$dist_dir\wpa81\AutoMapper.pdb"" target=""lib\wpa81"" />
     <file src=""$dist_dir\wpa81\AutoMapper.xml"" target=""lib\wpa81"" />
-    <file src=""$dist_dir\windows81\AutoMapper.dll"" target=""lib\windows81"" />
-    <file src=""$dist_dir\windows81\AutoMapper.pdb"" target=""lib\windows81"" />
-    <file src=""$dist_dir\windows81\AutoMapper.xml"" target=""lib\windows81"" />
+    <file src=""$dist_dir\win\AutoMapper.dll"" target=""lib\win"" />
+    <file src=""$dist_dir\win\AutoMapper.pdb"" target=""lib\win"" />
+    <file src=""$dist_dir\win\AutoMapper.xml"" target=""lib\win"" />
     <file src=""$dist_dir\MonoAndroid\AutoMapper.dll"" target=""lib\MonoAndroid"" />
     <file src=""$dist_dir\MonoAndroid\AutoMapper.pdb"" target=""lib\MonoAndroid"" />
     <file src=""$dist_dir\MonoAndroid\AutoMapper.xml"" target=""lib\MonoAndroid"" />
