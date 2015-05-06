@@ -139,7 +139,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IMappingOptions _mappingOptions;
+        private StubMappingOptions _mappingOptions;
 
 
         private class Source
@@ -186,7 +186,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IMappingOptions _mappingOptions;
+        private StubMappingOptions _mappingOptions;
 
         private class Source
         {

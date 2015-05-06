@@ -7,7 +7,7 @@ namespace AutoMapper
     /// <summary>
     /// Configuration for profile-specific maps
     /// </summary>
-	public interface IProfileExpression : IMappingOptions
+	public interface IProfileExpression
 	{
         /// <summary>
         /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
@@ -106,9 +106,19 @@ namespace AutoMapper
         /// </summary>
         /// <param name="assembly">Assembly containing extension methods</param>
         void IncludeSourceExtensionMethods(Assembly assembly);
-	}
 
-	public interface IConfiguration : IProfileExpression
+        /// <summary>
+        /// Naming convention for source members
+        /// </summary>
+        INamingConvention SourceMemberNamingConvention { get; set; }
+    
+        /// <summary>
+        /// Naming convention for destination members
+        /// </summary>
+        INamingConvention DestinationMemberNamingConvention { get; set; }
+    }
+
+    public interface IConfiguration : IProfileExpression
 	{
         /// <summary>
         /// Create a named profile for grouped mapping configuration

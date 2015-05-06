@@ -29,11 +29,11 @@ namespace AutoMapper
         /// <summary>
         /// Naming convention for source members
         /// </summary>
-        INamingConvention SourceMemberNamingConvention { get; set; }
+        INamingConvention SourceMemberNamingConvention { get; }
         /// <summary>
         /// Naming convention for destination members
         /// </summary>
-        INamingConvention DestinationMemberNamingConvention { get; set; }
+        INamingConvention DestinationMemberNamingConvention { get; }
         /// <summary>
         /// Source member name prefixes to ignore/drop
         /// </summary>
