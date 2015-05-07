@@ -32,9 +32,9 @@ task release {
 }
 
 task compile -depends clean { 
-    #exec { kpm --version }
-    #exec { kpm restore $source_dir\AutoMapper }
-    #exec { kpm build $source_dir\AutoMapper --configuration $config }
+    exec { kpm restore }
+    exec { kpm restore --packages "$env:USERPROFILE\.dnx\packages" }
+    exec { kpm build $source_dir\AutoMapper}
     exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.sln }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
 }
