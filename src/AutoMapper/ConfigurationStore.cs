@@ -334,16 +334,14 @@ namespace AutoMapper
                 return FindTypeMapFor(source, destination, sourceType, typeMap.DestinationTypeOverride);
             }
             // Check for runtime derived types
-		    var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null) && (source.GetType() != sourceType);
+		    var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null);
 		    
             if (shouldCheckDerivedType)
             {
                 var potentialSourceType = source.GetType();
                 //Try and get the most specific type map possible
-                var potentialTypes = _typeMaps
-                    .Where(t => ((destination == null && destinationType.IsAssignableFrom(t.DestinationType))
-                                 || (destination != null && t.DestinationType.IsInstanceOfType(destination))) &&
-                                t.SourceType.IsInstanceOfType(source));
+                var objectMapPair = new ObjectPair(source, destination);
+                var potentialTypes = _typeMaps.Where(tm => IsTypeMapOrIncludedDerivedType(tm, typeMap, objectMapPair));
 
                 var potentialDestTypeMap =
                     potentialTypes
@@ -377,7 +375,15 @@ namespace AutoMapper
 		    return typeMap;
 		}
 
-        private static int GetInheritanceDepth(Type type)
+	    private static bool IsTypeMapOrIncludedDerivedType(TypeMap potentialIncludeTypeMap, TypeMap baseTypeMap, ObjectPair objectPair)
+	    {
+	        if (potentialIncludeTypeMap == baseTypeMap)
+	            return true;
+	        var includedTypePair = new TypePair(potentialIncludeTypeMap.SourceType, potentialIncludeTypeMap.DestinationType);
+            return baseTypeMap.IncludedDerivedTypes.Where(itm => itm.Key.Equals(includedTypePair)).Any(itm => itm.Value(itm.Key, objectPair));
+	    }
+
+	    private static int GetInheritanceDepth(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException("type");

@@ -107,6 +107,7 @@
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\ExistingArrays.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
+    <Compile Include="Bug\IncludeWillMapToUnincludedMappings.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
     <Compile Include="Bug\ListSourceMapperBug.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IgnoreAllTests.cs" />
+    <Compile Include="InheritanceByCondition.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="DynamicMapping.cs" />
