@@ -168,6 +168,17 @@ namespace XpressionMapper
             if (sourceFullName.IndexOf(PERIOD) < 0)
             {
                 PropertyMap propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
+                if (propertyMap.CustomExpression != null)
+                {
+                    if (propertyMap.CustomExpression.ReturnType.IsValueType && typeSource.GetProperty(propertyMap.DestinationProperty.Name).PropertyType != propertyMap.CustomExpression.ReturnType)
+                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.expressionMapValueTypeMustMatchFormat, propertyMap.CustomExpression.ReturnType.Name, propertyMap.CustomExpression.ToString(), typeSource.GetProperty(propertyMap.DestinationProperty.Name).PropertyType.Name, propertyMap.DestinationProperty.Name));
+                }
+                else
+                {
+                    if (((PropertyInfo)propertyMap.SourceMember).PropertyType.IsValueType && typeSource.GetProperty(propertyMap.DestinationProperty.Name).PropertyType != ((PropertyInfo)propertyMap.SourceMember).PropertyType)
+                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.expressionMapValueTypeMustMatchFormat, ((PropertyInfo)propertyMap.SourceMember).PropertyType.Name, propertyMap.SourceMember.Name, typeSource.GetProperty(propertyMap.DestinationProperty.Name).PropertyType.Name, propertyMap.DestinationProperty.Name));
+                }
+
                 propertyMapInfoList.Add(new PropertyMapInfo(propertyMap.CustomExpression, propertyMap.SourceMember));
             }
             else

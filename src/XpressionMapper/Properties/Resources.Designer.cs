@@ -79,6 +79,15 @@ namespace XpressionMapper.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The source and destination types must be the same for expression mapping between value types. Source Type: {0}, Source Description: {1}, Destination Type: {2}, Destination Property: {3}..
+        /// </summary>
+        internal static string expressionMapValueTypeMustMatchFormat {
+            get {
+                return ResourceManager.GetString("expressionMapValueTypeMustMatchFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid expression type for this operation..
         /// </summary>
         internal static string invalidExpErr {

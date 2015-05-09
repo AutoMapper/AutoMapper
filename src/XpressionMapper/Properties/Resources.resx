@@ -124,6 +124,10 @@
   <data name="cantRemapExpression" xml:space="preserve">
     <value>Can't rempa expression</value>
   </data>
+  <data name="expressionMapValueTypeMustMatchFormat" xml:space="preserve">
+    <value>The source and destination types must be the same for expression mapping between value types. Source Type: {0}, Source Description: {1}, Destination Type: {2}, Destination Property: {3}.</value>
+    <comment>0=Source Type; 1=SourceDescription; 2=Destination Type; 3=Destination Property.</comment>
+  </data>
   <data name="invalidExpErr" xml:space="preserve">
     <value>Invalid expression type for this operation.</value>
   </data>
