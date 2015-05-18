@@ -11,7 +11,7 @@ namespace AutoMapper.Impl
 		private readonly PropertyInfo _propertyInfo;
 		private readonly string _name;
 		private readonly Type _memberType;
-		private readonly LateBoundPropertyGet _lateBoundPropertyGet;
+		private readonly ILazy<LateBoundPropertyGet> _lateBoundPropertyGet;
 
 		public PropertyGetter(PropertyInfo propertyInfo)
 		{
@@ -19,9 +19,9 @@ namespace AutoMapper.Impl
 			_name = _propertyInfo.Name;
 			_memberType = _propertyInfo.PropertyType;
 			if (_propertyInfo.GetGetMethod(true) != null)
-                _lateBoundPropertyGet = DelegateFactory.CreateGet(propertyInfo);
+                _lateBoundPropertyGet = LazyFactory.Create(() => DelegateFactory.CreateGet(propertyInfo));
 			else
-			    _lateBoundPropertyGet = src => null;
+			    _lateBoundPropertyGet = LazyFactory.Create<LateBoundPropertyGet>(() => src => null);
 		}
 
 		public override MemberInfo MemberInfo
@@ -41,7 +41,7 @@ namespace AutoMapper.Impl
 
 		public override object GetValue(object source)
 		{
-			return _lateBoundPropertyGet(source);
+			return _lateBoundPropertyGet.Value(source);
 		}
 
 		public override IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit)
@@ -82,7 +82,7 @@ namespace AutoMapper.Impl
 
 	public class PropertyAccessor : PropertyGetter, IMemberAccessor
 	{
-		private readonly LateBoundPropertySet _lateBoundPropertySet;
+		private readonly ILazy<LateBoundPropertySet> _lateBoundPropertySet;
 		private readonly bool _hasSetter;
 
 		public PropertyAccessor(PropertyInfo propertyInfo)
@@ -91,7 +91,7 @@ namespace AutoMapper.Impl
 			_hasSetter = propertyInfo.GetSetMethod(true) != null;
 			if (_hasSetter)
 			{
-                _lateBoundPropertySet = DelegateFactory.CreateSet(propertyInfo);
+                _lateBoundPropertySet = LazyFactory.Create(() => DelegateFactory.CreateSet(propertyInfo));
 			}
 		}
 
@@ -102,7 +102,7 @@ namespace AutoMapper.Impl
 
 		public virtual void SetValue(object destination, object value)
 		{
-			_lateBoundPropertySet(destination, value);
+			_lateBoundPropertySet.Value(destination, value);
 		}
 	}
 

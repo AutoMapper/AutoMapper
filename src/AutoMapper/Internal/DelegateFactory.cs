@@ -112,7 +112,7 @@ namespace AutoMapper
         {
             LateBoundCtor ctor = _ctorCache.GetOrAdd(type, t =>
             {
-                //handle valuetypes
+    //handle valuetypes
                 if (!type.IsClass())
                 {
                     var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));

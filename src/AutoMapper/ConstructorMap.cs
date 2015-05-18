@@ -8,7 +8,7 @@ namespace AutoMapper
     public class ConstructorMap
     {
         private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
-        private readonly LateBoundParamsCtor _runtimeCtor;
+        private readonly ILazy<LateBoundParamsCtor> _runtimeCtor;
         public ConstructorInfo Ctor { get; private set; }
         public IEnumerable<ConstructorParameterMap> CtorParams { get; private set; }
 
@@ -17,7 +17,7 @@ namespace AutoMapper
             Ctor = ctor;
             CtorParams = ctorParams;
 
-            _runtimeCtor = DelegateFactory.CreateCtor(ctor, CtorParams);
+            _runtimeCtor = LazyFactory.Create(() => DelegateFactory.CreateCtor(ctor, CtorParams));
         }
 
         public object ResolveValue(ResolutionContext context, IMappingEngineRunner mappingEngine)
@@ -49,7 +49,7 @@ namespace AutoMapper
                 }
             }
 
-            return _runtimeCtor(ctorArgs.ToArray());
+            return _runtimeCtor.Value(ctorArgs.ToArray());
         }
     }
 }

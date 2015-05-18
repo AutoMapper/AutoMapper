@@ -4,20 +4,21 @@ using System.Reflection;
 namespace AutoMapper.Impl
 {
     using System.Collections.Generic;
+    using Internal;
 
     public class MethodGetter : MemberGetter
 	{
 		private readonly MethodInfo _methodInfo;
 		private readonly string _name;
 		private readonly Type _memberType;
-		private readonly LateBoundMethod _lateBoundMethod;
+		private readonly ILazy<LateBoundMethod> _lateBoundMethod;
 
 		public MethodGetter(MethodInfo methodInfo)
 		{
 			_methodInfo = methodInfo;
 			_name = _methodInfo.Name;
 			_memberType = _methodInfo.ReturnType;
-            _lateBoundMethod = DelegateFactory.CreateGet(methodInfo);
+            _lateBoundMethod = LazyFactory.Create(() => DelegateFactory.CreateGet(methodInfo));
 		}
 
 		public override MemberInfo MemberInfo
@@ -39,7 +40,7 @@ namespace AutoMapper.Impl
 		{
 			return _memberType == null
 					? null
-					: _lateBoundMethod(source, new object[0]);
+					: _lateBoundMethod.Value(source, new object[0]);
 		}
 
 		public override IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit)

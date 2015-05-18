@@ -11,14 +11,14 @@ namespace AutoMapper.Impl
 		private readonly FieldInfo _fieldInfo;
 		private readonly string _name;
 		private readonly Type _memberType;
-		private readonly LateBoundFieldGet _lateBoundFieldGet;
+		private readonly ILazy<LateBoundFieldGet> _lateBoundFieldGet;
 
 		public FieldGetter(FieldInfo fieldInfo)
 		{
 			_fieldInfo = fieldInfo;
 			_name = fieldInfo.Name;
 			_memberType = fieldInfo.FieldType;
-            _lateBoundFieldGet = DelegateFactory.CreateGet(fieldInfo);
+            _lateBoundFieldGet = LazyFactory.Create(() => DelegateFactory.CreateGet(fieldInfo));
 		}
 
 		public override MemberInfo MemberInfo
@@ -38,7 +38,7 @@ namespace AutoMapper.Impl
 
 		public override object GetValue(object source)
 		{
-			return _lateBoundFieldGet(source);
+			return _lateBoundFieldGet.Value(source);
 		}
 
 		public bool Equals(FieldGetter other)
@@ -79,17 +79,17 @@ namespace AutoMapper.Impl
 
 	public class FieldAccessor : FieldGetter, IMemberAccessor
 	{
-		private readonly LateBoundFieldSet _lateBoundFieldSet;
+		private readonly ILazy<LateBoundFieldSet> _lateBoundFieldSet;
 
 		public FieldAccessor(FieldInfo fieldInfo)
 			: base(fieldInfo)
 		{
-            _lateBoundFieldSet = DelegateFactory.CreateSet(fieldInfo);
+            _lateBoundFieldSet = LazyFactory.Create(() => DelegateFactory.CreateSet(fieldInfo));
 		}
 
 		public void SetValue(object destination, object value)
 		{
-			_lateBoundFieldSet(destination, value);
+			_lateBoundFieldSet.Value(destination, value);
 		}
 	}
 
