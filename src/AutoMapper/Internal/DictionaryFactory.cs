@@ -92,6 +92,9 @@ namespace AutoMapper.Internal
             {
                 _dictionary.Clear();
             }
+
+            public ICollection<TValue> Values => _dictionary.Values;
+            public ICollection<TKey> Keys => _dictionary.Keys;
         }
     }
 }

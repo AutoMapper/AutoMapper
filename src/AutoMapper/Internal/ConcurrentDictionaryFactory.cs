@@ -4,6 +4,8 @@ using System.Collections.Concurrent;
 
 namespace AutoMapper.Internal
 {
+    using System.Collections.Generic;
+
     public class DictionaryFactoryOverride : IDictionaryFactory
     {
         public IDictionary<TKey, TValue> CreateDictionary<TKey, TValue>()
@@ -51,6 +53,9 @@ namespace AutoMapper.Internal
             {
                 _dictionary.Clear();
             }
+
+            public ICollection<TValue> Values => _dictionary.Values;
+            public ICollection<TKey> Keys => _dictionary.Keys;
         }
     }
 }
