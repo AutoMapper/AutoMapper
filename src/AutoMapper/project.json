@@ -20,7 +20,7 @@
             }
         },
         "net45": {
-            "compilationOptions": { "define": [ "NOT_PCL" ] }
+            "compilationOptions": { "define": [ "NET4" ] }
         },
         "sl5": {
             "frameworkAssemblies": {
@@ -28,9 +28,7 @@
                 "System.Core": "",
                 "mscorlib": ""
             },
-            "compilationOptions": {
-                "define": [ "SILVERLIGHT", "NOT_PCL" ]
-            }
+            "compilationOptions": { "define": [ "SILVERLIGHT" ] }
         },
         "wp80": {
             "frameworkAssemblies": {
@@ -38,9 +36,7 @@
                 "System": "",
                 "System.Core": ""
             },
-            "compilationOptions": {
-                "define": [ "SILVERLIGHT", "NOT_PCL" ]
-            }
+            "compilationOptions": { "define": [ "SILVERLIGHT" ] }
         },
         "dnx451": { },
         "wpa81": {
@@ -101,9 +97,6 @@
                 "System.Linq.Queryable": "4.0.0-beta-*",
                 "System.Diagnostics.Debug": "4.0.10-beta-*",
                 "System.ObjectModel": "4.0.10-beta-*"
-            },
-            "compilationOptions": {
-                "define": [ "NOT_PCL" ]
             }
         }
     }

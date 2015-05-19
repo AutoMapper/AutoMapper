@@ -120,12 +120,14 @@
 #endif
         }
 
-#if DNXCORE50 || NETFX_CORE || !NOT_PCL
         public static object[] GetCustomAttributes(this Type type, Type attributeType, bool inherit)
         {
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().GetCustomAttributes(attributeType, inherit).ToArray();
-        }
+#else
+            return type.GetCustomAttributes(attributeType, inherit).ToArray();
 #endif
+        }
 
         public static bool IsAbstract(this Type type)
         {
