@@ -41,7 +41,8 @@ namespace AutoMapper.Mappers
             {
                 var dataRecord = context.SourceValue as IDataRecord;
                 var buildFrom = CreateBuilder(context.DestinationType, dataRecord);
-                var result = buildFrom(dataRecord);
+                var o = context.DestinationValue ?? Activator.CreateInstance(context.DestinationType);
+                var result = buildFrom(dataRecord, o);
                 MapPropertyValues(context, mapper, result);
                 return result;
             }
@@ -75,7 +76,8 @@ namespace AutoMapper.Mappers
 
             while (dataReader.Read())
             {
-                var result = buildFrom(dataReader);
+                var o = Activator.CreateInstance(resolveUsingContext.DestinationType);
+                var result = buildFrom(dataReader, o);
                 MapPropertyValues(resolveUsingContext, mapper, result);
                 list.Add(result);
             }
@@ -87,7 +89,8 @@ namespace AutoMapper.Mappers
         {
             while (dataReader.Read())
             {
-                var result = buildFrom(dataReader);
+                var o = Activator.CreateInstance(resolveUsingContext.DestinationType);
+                var result = buildFrom(dataReader, o);
                 MapPropertyValues(resolveUsingContext, mapper, result);
                 yield return result;
             }
@@ -118,11 +121,11 @@ namespace AutoMapper.Mappers
                 return builder;
             }
 
-            var method = new DynamicMethod("DynamicCreate", destinationType, new[] { typeof(IDataRecord) }, destinationType, true);
+            var method = new DynamicMethod("DynamicCreate", destinationType, new[] { typeof(IDataRecord), typeof(object) }, destinationType, true);
             var generator = method.GetILGenerator();
 
             var result = generator.DeclareLocal(destinationType);
-            generator.Emit(OpCodes.Newobj, destinationType.GetConstructor(Type.EmptyTypes));
+            generator.Emit(OpCodes.Ldarg_1);
             generator.Emit(OpCodes.Stloc, result);
 
             for (var i = 0; i < dataRecord.FieldCount; i++)
@@ -231,7 +234,7 @@ namespace AutoMapper.Mappers
             return builder;
         }
 
-        private delegate object Build(IDataRecord dataRecord);
+        private delegate object Build(IDataRecord dataRecord, object o);
         private delegate object CreateEnumerableAdapter(IEnumerable items);
 
         private static readonly MethodInfo getValueMethod = typeof(IDataRecord).GetMethod("get_Item", new[] { typeof(int) });
