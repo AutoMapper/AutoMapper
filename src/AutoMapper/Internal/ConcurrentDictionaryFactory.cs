@@ -56,6 +56,10 @@ namespace AutoMapper.Internal
 
             public ICollection<TValue> Values => _dictionary.Values;
             public ICollection<TKey> Keys => _dictionary.Keys;
+            public bool ContainsKey(TKey key)
+            {
+                return _dictionary.ContainsKey(key);
+            }
         }
     }
 }

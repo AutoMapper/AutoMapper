@@ -3,6 +3,7 @@ using System;
 namespace AutoMapper
 {
     using System.Reflection;
+    using Impl;
 
     public class TypeMapCreatedEventArgs : EventArgs
 	{
@@ -39,6 +40,13 @@ namespace AutoMapper
         /// <param name="destinationType">Configured destination type</param>
         /// <returns>Type map configuration</returns>
 		TypeMap FindTypeMapFor(Type sourceType, Type destinationType);
+
+        /// <summary>
+        /// Find the <see cref="TypeMap"/> for the configured type pair
+        /// </summary>
+        /// <param name="typePair">Type pair</param>
+        /// <returns>Type map configuration</returns>
+		TypeMap FindTypeMapFor(TypePair typePair);
 
         /// <summary>
         /// Find the <see cref="TypeMap"/> for the resolution result and destination type
@@ -102,6 +110,9 @@ namespace AutoMapper
         /// Factory method to create formatters, resolvers and type converters
         /// </summary>
 	    Func<Type, object> ServiceCtor { get; }
+
+	    TypeMap FindClosedGenericTypeMapFor(ResolutionContext context);
+	    bool HasOpenGenericTypeMapDefined(ResolutionContext context);
 	}
 
 }

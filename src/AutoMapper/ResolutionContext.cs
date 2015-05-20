@@ -116,7 +116,7 @@ namespace AutoMapper
 		private ResolutionContext(ResolutionContext context, object sourceValue, Type sourceType)
 		{
 			ArrayIndex = context.ArrayIndex;
-			TypeMap = context.TypeMap;
+		    TypeMap = null;
 			PropertyMap = context.PropertyMap;
 			SourceType = sourceType;
 			SourceValue = sourceValue;
@@ -197,11 +197,6 @@ namespace AutoMapper
 			get { return Equals(null, SourceValue); }
 		}
 
-
-		public ResolutionContext CreateValueContext(object sourceValue)
-		{
-			return new ResolutionContext(this, sourceValue);
-		}
 
 		public ResolutionContext CreateValueContext(object sourceValue, Type sourceType)
 		{

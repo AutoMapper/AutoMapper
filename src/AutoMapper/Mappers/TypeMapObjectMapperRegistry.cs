@@ -38,8 +38,11 @@ namespace AutoMapper.Mappers
 	        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 	        {
 	            var newSource = context.TypeMap.Substitution(context.SourceValue);
-	            var substitutionContext = context.CreateValueContext(newSource, newSource.GetType());
-	            return mapper.Map(substitutionContext);
+	            var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(newSource.GetType(), context.DestinationType);
+
+                var substitutionContext = context.CreateTypeContext(typeMap, newSource, context.DestinationValue, newSource.GetType(), context.DestinationType);
+
+                return mapper.Map(substitutionContext);
 	        }
 
 	        public bool IsMatch(ResolutionContext context, IMappingEngineRunner mapper)

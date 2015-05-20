@@ -37,7 +37,8 @@ namespace AutoMapper.Mappers
             new NullableSourceMapper(),
             new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
-            new ExplicitConversionOperatorMapper()
+            new ExplicitConversionOperatorMapper(),
+            new OpenGenericMapper()
         };
 
         private static readonly List<IObjectMapper> _mappers = new List<IObjectMapper>(_initialMappers);

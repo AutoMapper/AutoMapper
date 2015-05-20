@@ -90,11 +90,21 @@ namespace AutoMapper.Internal
 
             public void Clear()
             {
-                _dictionary.Clear();
+                lock (_dictionary)
+                {
+                    _dictionary.Clear();
+                }
             }
 
             public ICollection<TValue> Values => _dictionary.Values;
             public ICollection<TKey> Keys => _dictionary.Keys;
+            public bool ContainsKey(TKey key)
+            {
+                lock (_dictionary)
+                {
+                    return _dictionary.ContainsKey(key);
+                }
+            }
         }
     }
 }

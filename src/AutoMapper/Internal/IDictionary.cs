@@ -5,6 +5,8 @@ using System.Threading;
 
 namespace AutoMapper.Internal
 {
+    using Impl;
+
     public interface IProxyGenerator
     {
         Type GetProxyType(Type interfaceType);
@@ -52,7 +54,8 @@ namespace AutoMapper.Internal
         bool TryRemove(TKey key, out TValue value);
         void Clear();
         ICollection<TValue> Values { get; } 
-        ICollection<TKey> Keys { get; } 
+        ICollection<TKey> Keys { get; }
+        bool ContainsKey(TKey key);
     }
 
     public interface INullableConverter

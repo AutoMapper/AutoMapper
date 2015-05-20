@@ -126,7 +126,7 @@ namespace AutoMapper
 			get { return AllowNullCollections; }
 		}
 
-		public IProfileExpression CreateProfile(string profileName)
+        public IProfileExpression CreateProfile(string profileName)
 		{
 			var profileExpression = new Profile(profileName);
 
@@ -171,12 +171,49 @@ namespace AutoMapper
 	        GetProfile(DefaultProfileName).DataReaderMapperYieldReturnEnabled = true;
 	    }
 
-	    public void Seal()
-		{
-			_typeMaps.Values.Each(typeMap => typeMap.Seal());
-		}
+        public void Seal()
+        {
+            foreach (var typeMap in _typeMaps.Values)
+            {
+                typeMap.Seal();
 
-		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
+                var typePair = new TypePair(typeMap.SourceType, typeMap.DestinationType);
+                _typeMapCache.AddOrUpdate(typePair, typeMap, (_, _2) => typeMap);
+                if (typeMap.DestinationTypeOverride != null)
+                {
+                    var includedDerivedType = new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride);
+                    var derivedMap = FindTypeMapFor(includedDerivedType);
+                    if (derivedMap != null)
+                    {
+                        _typeMapCache.AddOrUpdate(typePair, derivedMap, (_, _2) => derivedMap);
+                    }
+                }
+                foreach (var derivedMap in GetDerivedTypeMaps(typeMap))
+                {
+                    _typeMapCache.AddOrUpdate(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap, (_, _2) => derivedMap);
+                }
+
+            }
+        }
+
+        private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
+        {
+            if (typeMap == null)
+                yield break;
+
+            foreach (var derivedMap in typeMap.IncludedDerivedTypes.Select(FindTypeMapFor))
+            {
+                if (derivedMap != null)
+                    yield return derivedMap;
+
+                foreach (var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
+                {
+                    yield return derivedTypeMap;
+                }
+            }
+        }
+
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
 		    return CreateMap<TSource, TDestination>(DefaultProfileName);
 		}
@@ -273,8 +310,6 @@ namespace AutoMapper
 
 		        IncludeBaseMappings(source, destination, tm);
 
-                _typeMapCache.AddOrUpdate(typePair, tm, (_, _2) => tm);
-
                 OnTypeMapCreated(tm);
 
 		        return tm;
@@ -298,98 +333,84 @@ namespace AutoMapper
 
 		public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
 		{
-			return FindTypeMapFor( null, null, sourceType, destinationType ) ;
-		}
+            var typePair = new TypePair(sourceType, destinationType);
 
-		public TypeMap FindTypeMapFor(object source, object destination, Type sourceType, Type destinationType)
-		{
-			var typeMapPair = new TypePair(sourceType, destinationType);
-			
-			TypeMap typeMap;
-
-            if (!_typeMapCache.TryGetValue(typeMapPair, out typeMap))
-            {
-                // Cache miss
-                typeMap = FindTypeMap(source, destination, sourceType, destinationType, DefaultProfileName);
-
-                //We don't want to inherit base mappings which may be ambiguous or too specific resulting in cast exceptions
-                if (source == null || source.GetType() == sourceType)
-                    _typeMapCache[typeMapPair] = typeMap;
-            }
-            // Due to the inheritance we can have derrived mapping cached which is not valid for this source object
-            else if (source != null && typeMap != null && !typeMap.SourceType.IsAssignableFrom(source.GetType()))
-            {
-                typeMap = FindTypeMapFor(source, destination, source.GetType(), destinationType);
-            }
-
-            if (typeMap == null && destination != null && destination.GetType() != destinationType)
-            {
-                typeMap = FindTypeMapFor(source, destination, sourceType, destination.GetType());
-            }
-            if (typeMap != null && typeMap.DestinationTypeOverride != null)
-            {
-                return FindTypeMapFor(source, destination, sourceType, typeMap.DestinationTypeOverride);
-            }
-            // Check for runtime derived types
-		    var shouldCheckDerivedType = (typeMap != null) && (typeMap.HasDerivedTypesToInclude()) && (source != null) && (source.GetType() != sourceType);
-		    
-            if (shouldCheckDerivedType)
-            {
-                var potentialSourceType = source.GetType();
-                //Try and get the most specific type map possible
-                var potentialTypes = _typeMaps.Values
-                    .Where(t => ((destination == null && destinationType.IsAssignableFrom(t.DestinationType))
-                                 || (destination != null && t.DestinationType.IsInstanceOfType(destination))) &&
-                                t.SourceType.IsInstanceOfType(source))
-                    .ToList();
-
-                var potentialDestTypeMap =
-                    potentialTypes
-                        .OrderByDescending(t => GetInheritanceDepth(t.DestinationType))
-                        .FirstOrDefault();
-                var ambiguousPotentialTypes = potentialTypes
-                    .Where(t => t.DestinationType == potentialDestTypeMap.DestinationType)
-                    .ToList();
-
-                if (ambiguousPotentialTypes.Any())
-                {
-                    potentialDestTypeMap = ambiguousPotentialTypes
-                        .OrderByDescending(t => GetInheritanceDepth(t.SourceType))
-                        .FirstOrDefault();
-                }
-
-                if (potentialDestTypeMap == typeMap)
-                    return typeMap;
-
-                var targetDestinationType = potentialDestTypeMap.DestinationType;
-
-                TypeMap potentialTypeMap;
-                if (!_typeMaps.TryGetValue(new TypePair(potentialSourceType, targetDestinationType), out potentialTypeMap))
-                {
-                    var targetSourceType = targetDestinationType != destinationType ? potentialSourceType : typeMap.SourceType;
-                    typeMap = FindTypeMap(source, destination, targetSourceType, targetDestinationType, DefaultProfileName);
-                }
-                else
-                    typeMap = potentialTypeMap;
-            }
+		    var typeMap = _typeMapCache.GetOrAdd(typePair, _ => GetRelatedTypePairs(_).Select(FindTypeMapFor).FirstOrDefault(tm => tm != null));
 
 		    return typeMap;
 		}
 
-        private static int GetInheritanceDepth(Type type)
-        {
-            if (type == null)
-                throw new ArgumentNullException("type");
+        public TypeMap FindTypeMapFor(object source, object destination, Type sourceType, Type destinationType)
+		{
+		    return FindTypeMapFor(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
+		}
 
-            return InheritanceTree(type).Count();
+        public TypeMap FindTypeMapFor(TypePair typePair)
+        {
+            TypeMap typeMap;
+            _typeMaps.TryGetValue(typePair, out typeMap);
+            return typeMap;
         }
 
-        private static IEnumerable<Type> InheritanceTree(Type type)
+        public TypeMap FindClosedGenericTypeMapFor(ResolutionContext context)
         {
-            while (type != null)
+            var closedGenericTypePair = new TypePair(context.SourceType, context.DestinationType);
+            var sourceGenericDefinition = context.SourceType.GetGenericTypeDefinition();
+            var destGenericDefinition = context.DestinationType.GetGenericTypeDefinition();
+
+            var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
+            CreateTypeMapExpression genericTypeMapExpression;
+
+            if (!_typeMapExpressionCache.TryGetValue(genericTypePair, out genericTypeMapExpression))
             {
-                yield return type;
-                type = type.BaseType();
+                throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
+            }
+
+            var typeMap = CreateTypeMap(closedGenericTypePair.SourceType, closedGenericTypePair.DestinationType, genericTypeMapExpression.ProfileName,
+                genericTypeMapExpression.MemberList);
+
+            var mappingExpression = CreateMappingExpression(typeMap, closedGenericTypePair.DestinationType);
+
+            genericTypeMapExpression.Accept(mappingExpression);
+
+            return typeMap;
+        }
+
+        public bool HasOpenGenericTypeMapDefined(ResolutionContext context)
+        {
+            var sourceGenericDefinition = context.SourceType.GetGenericTypeDefinition();
+            var destGenericDefinition = context.DestinationType.GetGenericTypeDefinition();
+
+            var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
+
+            return _typeMapExpressionCache.ContainsKey(genericTypePair);
+        }
+
+        private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root)
+        {
+            return 
+                from sourceType in GetAllTypes(root.SourceType)
+                from destinationType in GetAllTypes(root.DestinationType)
+                select new TypePair(sourceType, destinationType);
+        }
+
+        private IEnumerable<Type> GetAllTypes(Type type)
+        {
+            yield return type;
+
+            if (type.IsValueType() && !type.IsNullableType())
+                yield return typeof (Nullable<>).MakeGenericType(type);
+
+            Type baseType = type.BaseType();
+            while (baseType != null)
+            {
+                yield return baseType;
+                baseType = baseType.BaseType();
+            }
+
+            foreach (var interfaceType in type.GetInterfaces())
+            {
+                yield return interfaceType;
             }
         }
 
@@ -504,71 +525,6 @@ namespace AutoMapper
 	    {
 	        return (typeMap.CustomMapper == null && typeMap.CustomProjection == null && typeMap.DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(typeMap.SourceType);
 	    }
-
-        private TypeMap FindExplicitlyDefinedTypeMap(Type sourceType, Type destinationType)
-        {
-            TypeMap typeMap;
-            _typeMaps.TryGetValue(new TypePair(sourceType, destinationType), out typeMap);
-            return typeMap;
-        }
-
-        private TypeMap FindTypeMap(object source, object destination, Type sourceType, Type destinationType, string profileName)
-        {
-            TypeMap typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType);
-
-            if (typeMap == null && destinationType.IsNullableType())
-            {
-                typeMap = FindExplicitlyDefinedTypeMap(sourceType, destinationType.GetTypeOfNullable());
-            }
-
-            if (typeMap == null)
-            {
-                typeMap = _typeMaps.Values.FirstOrDefault(x => x.SourceType == sourceType && x.GetDerivedTypeFor(sourceType) == destinationType);
-
-                if (typeMap == null)
-                {
-                    foreach (var sourceInterface in sourceType.GetInterfaces())
-                    {
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceInterface, destinationType);
-
-                        if (typeMap == null) continue;
-
-                        var derivedTypeFor = typeMap.GetDerivedTypeFor(sourceType);
-                        if (derivedTypeFor != destinationType)
-                        {
-                            typeMap = CreateTypeMap(sourceType, derivedTypeFor, profileName, typeMap.ConfiguredMemberList);
-                        }
-
-                        break;
-                    }
-
-                    if ((sourceType.BaseType() != null) && (typeMap == null))
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceType.BaseType(), destinationType);
-                }
-            }
-	        if (typeMap == null && sourceType.IsGenericType() && destinationType.IsGenericType())
-	        {
-	            var sourceGenericDefinition = sourceType.GetGenericTypeDefinition();
-	            var destGenericDefinition = destinationType.GetGenericTypeDefinition();
-	            if (sourceGenericDefinition == null || destGenericDefinition == null)
-	            {
-	                return null;
-	            }
-                var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
-	            CreateTypeMapExpression genericTypeMapExpression;
-
-	            if (_typeMapExpressionCache.TryGetValue(genericTypePair, out genericTypeMapExpression))
-	            {
-	                typeMap = CreateTypeMap(sourceType, destinationType, genericTypeMapExpression.ProfileName,
-	                    genericTypeMapExpression.MemberList);
-
-	                var mappingExpression = CreateMappingExpression(typeMap, destinationType);
-
-	                genericTypeMapExpression.Accept(mappingExpression);
-	            }
-	        }
-            return typeMap;
-        }
 
 		private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
 		{
