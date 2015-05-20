@@ -173,6 +173,91 @@ namespace AutoMapper.UnitTests
             private IDataReader _dataReader;
         }
 
+        public class When_mapping_an_existing_single_data_record_to_a_dto : AutoMapperSpecBase
+        {
+            protected override void Establish_context()
+            {
+                var mapper1 = Mapper.CreateMap<IDataRecord, DTOObject>()
+                    .ForMember(dest => dest.Else, options => options.MapFrom(src => src.GetDateTime(src.GetOrdinal(FieldName.Something))));
+
+                _dataRecord = new DataBuilder().BuildDataRecord();
+
+                var result = new DTOObject();
+                Mapper.Map<IDataRecord, DTOObject>(_dataRecord, result);
+                _result = result;
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_small_integer_should_be_read()
+            {
+                _result.SmallInteger.ShouldEqual(_dataRecord[FieldName.SmallInt]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_an_integer_should_be_read()
+            {
+                _result.Integer.ShouldEqual(_dataRecord[FieldName.Int]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_big_integer_should_be_read()
+            {
+                _result.BigInteger.ShouldEqual(_dataRecord[FieldName.BigInt]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_GUID_should_be_read()
+            {
+                _result.Guid.ShouldEqual(_dataRecord[FieldName.Guid]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_float_should_be_read()
+            {
+                _result.Float.ShouldEqual(_dataRecord[FieldName.Float]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_double_should_be_read()
+            {
+                _result.Double.ShouldEqual(_dataRecord[FieldName.Double]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_decimal_should_be_read()
+            {
+                _result.Decimal.ShouldEqual(_dataRecord[FieldName.Decimal]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_date_and_time_should_be_read()
+            {
+                _result.DateTime.ShouldEqual(_dataRecord[FieldName.DateTime]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_byte_should_be_read()
+            {
+                _result.Byte.ShouldEqual(_dataRecord[FieldName.Byte]);
+            }
+
+            [Fact]
+            public void Then_a_column_containing_a_boolean_should_be_read()
+            {
+                _result.Boolean.ShouldEqual(_dataRecord[FieldName.Boolean]);
+            }
+
+            [Fact]
+            public void Then_a_projected_column_should_be_read()
+            {
+                _result.Else.ShouldEqual(_dataRecord[FieldName.Something]);
+            }
+
+            private DTOObject _result;
+            private IDataRecord _dataRecord;
+        }
+
+
 
         public class When_mapping_a_single_data_record_to_a_dto : AutoMapperSpecBase
         {
