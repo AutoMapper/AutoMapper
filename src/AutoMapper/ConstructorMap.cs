@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using AutoMapper.Internal;
-
-namespace AutoMapper
+﻿namespace AutoMapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+    using Internal;
+
     public class ConstructorMap
     {
         private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
         private readonly ILazy<LateBoundParamsCtor> _runtimeCtor;
         public ConstructorInfo Ctor { get; private set; }
-        public IEnumerable<ConstructorParameterMap> CtorParams { get; private set; }
+        public IEnumerable<ConstructorParameterMap> CtorParams { get; }
 
         public ConstructorMap(ConstructorInfo ctor, IEnumerable<ConstructorParameterMap> ctorParams)
         {
@@ -35,7 +35,8 @@ namespace AutoMapper
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 
-                var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType, destinationType);
+                var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType,
+                    destinationType);
 
                 if (typeMap == null && map.Parameter.IsOptional)
                 {
