@@ -1,14 +1,13 @@
-using System;
-
 namespace AutoMapper
 {
+    using System;
     using System.Reflection;
 
     /// <summary>
     /// Configuration for profile-specific maps
     /// </summary>
-	public interface IProfileExpression
-	{
+    public interface IProfileExpression
+    {
         /// <summary>
         /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
         /// </summary>
@@ -50,28 +49,28 @@ namespace AutoMapper
         /// Recognize a list of prefixes to be removed from source member names when matching
         /// </summary>
         /// <param name="prefixes">List of prefixes</param>
-		void RecognizePrefixes(params string[] prefixes);
+        void RecognizePrefixes(params string[] prefixes);
 
         /// <summary>
         /// Recognize a list of postfixes to be removed from source member names when matching
         /// </summary>
         /// <param name="postfixes">List of postfixes</param>
-		void RecognizePostfixes(params string[] postfixes);
+        void RecognizePostfixes(params string[] postfixes);
 
         /// <summary>
         /// Provide an alias for a member name when matching source member names
         /// </summary>
         /// <param name="original">Original member name</param>
         /// <param name="alias">Alias to match against</param>
-		void RecognizeAlias(string original, string alias);
+        void RecognizeAlias(string original, string alias);
 
-        
+
         /// <summary>
         /// Provide a new value for a part of a members name
         /// </summary>
         /// <param name="original">Original member value</param>
         /// <param name="newValue">New member value</param>
-		void ReplaceMemberName(string original, string newValue);
+        void ReplaceMemberName(string original, string newValue);
 
         /// <summary>
         /// Recognize a list of prefixes to be removed from destination member names when matching
@@ -111,60 +110,10 @@ namespace AutoMapper
         /// Naming convention for source members
         /// </summary>
         INamingConvention SourceMemberNamingConvention { get; set; }
-    
+
         /// <summary>
         /// Naming convention for destination members
         /// </summary>
         INamingConvention DestinationMemberNamingConvention { get; set; }
     }
-
-    public interface IConfiguration : IProfileExpression
-	{
-        /// <summary>
-        /// Create a named profile for grouped mapping configuration
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <returns>Profile configuration options</returns>
-        IProfileExpression CreateProfile(string profileName);
-
-        /// <summary>
-        /// Create a named profile for grouped mapping configuration, and configure the profile
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <param name="profileConfiguration">Profile configuration callback</param>
-        void CreateProfile(string profileName, Action<IProfileExpression> profileConfiguration);
-
-        /// <summary>
-        /// Add an existing profile
-        /// </summary>
-        /// <param name="profile">Profile to add</param>
-        void AddProfile(Profile profile);
-
-        /// <summary>
-        /// Add an existing profile type. Profile will be instantiated and added to the configuration.
-        /// </summary>
-        /// <typeparam name="TProfile">Profile type</typeparam>
-        void AddProfile<TProfile>() where TProfile : Profile, new();
-		
-        /// <summary>
-        /// Supply a factory method callback for creating formatters, resolvers and type converters
-        /// </summary>
-        /// <param name="constructor">Factory method</param>
-        void ConstructServicesUsing(Func<Type, object> constructor);
-
-        /// <summary>
-        /// Disable constructor mapping. Use this if you don't intend to have AutoMapper try to map to constructors
-        /// </summary>
-	    void DisableConstructorMapping();
-
-        /// <summary>
-        /// Seal the configuration and optimize maps
-        /// </summary>
-		void Seal();
-
-        /// <summary>
-        /// Mapping via a data reader will yield return each item, keeping a data reader open instead of eagerly evaluating
-        /// </summary>
-	    void EnableYieldReturnForDataReaderMapper();
-	}
 }
