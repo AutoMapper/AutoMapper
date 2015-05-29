@@ -154,7 +154,7 @@ namespace AutoMapper
             IEnumerable<string> properties;
 
             if (ConfiguredMemberList == MemberList.Destination)
-                properties = _destinationType.GetPublicWriteAccessors()
+                properties = _destinationType.PublicWriteAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties);
@@ -170,7 +170,7 @@ namespace AutoMapper
                     .Where(smc => smc.IsIgnored())
                     .Select(pm => pm.SourceMember.Name);
 
-                properties = _sourceType.GetPublicReadAccessors()
+                properties = _sourceType.PublicReadAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties)

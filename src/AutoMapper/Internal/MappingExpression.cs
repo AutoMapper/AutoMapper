@@ -207,7 +207,7 @@ namespace AutoMapper
         {
             var typeInfo = new TypeInfo(TypeMap.DestinationType);
 
-            typeInfo.GetPublicWriteAccessors().Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
+            typeInfo.PublicWriteAccessors.Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()

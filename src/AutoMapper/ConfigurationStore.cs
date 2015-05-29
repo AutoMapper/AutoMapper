@@ -452,7 +452,7 @@ namespace AutoMapper
                 ? new TypeInfo(typeof (TDestination))
                 : new TypeInfo(typeof (TSource));
 
-            foreach (var destProperty in destInfo.GetPublicWriteAccessors())
+            foreach (var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);
                 if (attrs.Any(x => x is IgnoreMapAttribute))
@@ -473,7 +473,7 @@ namespace AutoMapper
             IMappingExpression mappingExp = new MappingExpression(typeMap, _serviceCtor);
 
             TypeInfo destInfo = new TypeInfo(destinationType);
-            foreach (var destProperty in destInfo.GetPublicWriteAccessors())
+            foreach (var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);
                 if (attrs.Any(x => x is IgnoreMapAttribute))

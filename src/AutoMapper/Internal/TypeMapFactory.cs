@@ -20,7 +20,7 @@ namespace AutoMapper
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
 
-            foreach (var destProperty in destTypeInfo.GetPublicWriteAccessors())
+            foreach (var destProperty in destTypeInfo.PublicWriteAccessors)
             {
                 var members = new LinkedList<MemberInfo>();
 
@@ -34,7 +34,7 @@ namespace AutoMapper
             }
             if (!destinationType.IsAbstract() && destinationType.IsClass())
             {
-                foreach (var destCtor in destTypeInfo.GetConstructors().OrderByDescending(ci => ci.GetParameters().Length))
+                foreach (var destCtor in destTypeInfo.Constructors.OrderByDescending(ci => ci.GetParameters().Length))
                 {
                     if (MapDestinationCtorToSource(typeMap, destCtor, sourceTypeInfo, options))
                     {
@@ -86,9 +86,9 @@ namespace AutoMapper
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;
 
-            var sourceProperties = sourceType.GetPublicReadAccessors();
-            var sourceNoArgMethods = sourceType.GetPublicNoArgMethods();
-			var sourceNoArgExtensionMethods = sourceType.GetPublicNoArgExtensionMethods();
+            var sourceProperties = sourceType.PublicReadAccessors;
+            var sourceNoArgMethods = sourceType.PublicNoArgMethods;
+			var sourceNoArgExtensionMethods = sourceType.PublicNoArgExtensionMethods;
 
 			MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, nameToSearch, mappingOptions);
 
