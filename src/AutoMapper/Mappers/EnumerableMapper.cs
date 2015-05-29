@@ -60,7 +60,7 @@ namespace AutoMapper.Mappers
 
 			foreach (object item in enumerableValue)
 			{
-				var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(item, null, sourceElementType, destKvpType);
+				var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(item, null, sourceElementType, destKvpType);
 
 				Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
 				Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destKvpType;

@@ -121,7 +121,7 @@ namespace AutoMapper
 
 	    private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
 	    {
-            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType);
+            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
 
 	        var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, this);
 
@@ -144,7 +144,7 @@ namespace AutoMapper
 
 	    private object MapCore(object source, object destination, Type sourceType, Type destinationType, MappingOperationOptions options)
 	    {
-            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, destination, sourceType, destinationType);
+            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
 	        var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, this);
 
@@ -178,7 +178,7 @@ namespace AutoMapper
 
 		public object DynamicMap(object source, Type sourceType, Type destinationType)
 		{
-			var typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType) ??
+			var typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions
@@ -191,7 +191,7 @@ namespace AutoMapper
 
 		public void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
 		{
-			var typeMap = ConfigurationProvider.FindTypeMapFor(source, destination, sourceType, destinationType) ??
+			var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType) ??
 			              ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
 			var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions
@@ -206,7 +206,7 @@ namespace AutoMapper
         {
             Type destinationType = typeof(TDestination);
             Type sourceType = typeof(TSource);
-            TypeMap typeMap = ConfigurationProvider.FindTypeMapFor(source, null, sourceType, destinationType);
+            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
             var context = parentContext.CreateTypeContext(typeMap, source, null, sourceType, destinationType);
             return (TDestination)((IMappingEngineRunner)this).Map(context);
         }

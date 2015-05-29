@@ -35,7 +35,7 @@ namespace AutoMapper.Mappers
 				var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, i);
 				var elementResolutionResult = new ResolutionResult(newContext);
 
-				var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(elementResolutionResult, destElementType);
+				var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(elementResolutionResult, destElementType);
 
 				Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
                 Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;

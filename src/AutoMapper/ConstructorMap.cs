@@ -31,7 +31,7 @@ namespace AutoMapper
                 var sourceType = result.Type;
                 var destinationType = map.Parameter.ParameterType;
 
-                var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result, destinationType);
+                var typeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(result, destinationType);
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 

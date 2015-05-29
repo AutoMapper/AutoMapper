@@ -23,17 +23,7 @@ namespace AutoMapper
         /// <returns>All configured type maps</returns>
 		TypeMap[] GetAllTypeMaps();
 
-        /// <summary>
-        /// Find the <see cref="TypeMap"/> for the configured source and destination type, checking the source/destination object types too
-        /// </summary>
-        /// <param name="source">Source object</param>
-        /// <param name="destination">Destination object</param>
-        /// <param name="sourceType">Configured source type</param>
-        /// <param name="destinationType">Configured destination type</param>
-        /// <returns>Type map configuration</returns>
-		TypeMap FindTypeMapFor(object source, object destination, Type sourceType, Type destinationType);
-
-        /// <summary>
+	    /// <summary>
         /// Find the <see cref="TypeMap"/> for the configured source and destination type
         /// </summary>
         /// <param name="sourceType">Configured source type</param>
@@ -41,20 +31,45 @@ namespace AutoMapper
         /// <returns>Type map configuration</returns>
 		TypeMap FindTypeMapFor(Type sourceType, Type destinationType);
 
-        /// <summary>
+	    /// <summary>
         /// Find the <see cref="TypeMap"/> for the configured type pair
         /// </summary>
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
 		TypeMap FindTypeMapFor(TypePair typePair);
 
+	    /// <summary>
+	    /// Find the <see cref="TypeMap"/> for the configured source and destination type, checking the source/destination object types too
+	    /// </summary>
+	    /// <param name="source">Source object</param>
+	    /// <param name="destination">Destination object</param>
+	    /// <param name="sourceType">Configured source type</param>
+	    /// <param name="destinationType">Configured destination type</param>
+	    /// <returns>Type map configuration</returns>
+	    TypeMap ResolveTypeMap(object source, object destination, Type sourceType, Type destinationType);
+
+	    /// <summary>
+        /// Resolve the <see cref="TypeMap"/> for the configured source and destination type, checking parent types
+        /// </summary>
+        /// <param name="sourceType">Configured source type</param>
+        /// <param name="destinationType">Configured destination type</param>
+        /// <returns>Type map configuration</returns>
+		TypeMap ResolveTypeMap(Type sourceType, Type destinationType);
+
         /// <summary>
-        /// Find the <see cref="TypeMap"/> for the resolution result and destination type
+        /// Resolve the <see cref="TypeMap"/> for the configured type pair, checking parent types
+        /// </summary>
+        /// <param name="typePair">Type pair</param>
+        /// <returns>Type map configuration</returns>
+		TypeMap ResolveTypeMap(TypePair typePair);
+
+        /// <summary>
+        /// Resolve the <see cref="TypeMap"/> for the resolution result and destination type, checking parent types
         /// </summary>
         /// <param name="resolutionResult">Resolution result from the source object</param>
         /// <param name="destinationType">Configured destination type</param>
         /// <returns>Type map configuration</returns>
-		TypeMap FindTypeMapFor(ResolutionResult resolutionResult, Type destinationType);
+		TypeMap ResolveTypeMap(ResolutionResult resolutionResult, Type destinationType);
 
         /// <summary>
         /// Get named profile configuration

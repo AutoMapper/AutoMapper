@@ -151,7 +151,7 @@ namespace AutoMapper.QueryableExtensions
 
         internal static Expression CreateMapExpression(IMappingEngine mappingEngine, ExpressionRequest request, Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
-            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(request.SourceType,
+            var typeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(request.SourceType,
                 request.DestinationType);
 
             if (typeMap == null)
@@ -207,7 +207,7 @@ namespace AutoMapper.QueryableExtensions
                 if (propertyMap.ExplicitExpansion && !request.IncludedMembers.Contains(propertyMap.DestinationProperty.Name))
                     continue;
 
-                var propertyTypeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationPropertyType);
+                var propertyTypeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(result.Type, propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
 
                 var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));

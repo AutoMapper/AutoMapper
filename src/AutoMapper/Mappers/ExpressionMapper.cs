@@ -29,7 +29,7 @@ namespace AutoMapper.Mappers
                 if (sourceParamType == destParamType)
                     continue;
 
-                var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(destParamType, sourceParamType);
+                var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(destParamType, sourceParamType);
 
                 if (typeMap == null)
                     throw new AutoMapperMappingException(

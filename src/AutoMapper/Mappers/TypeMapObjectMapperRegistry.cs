@@ -38,7 +38,7 @@ namespace AutoMapper.Mappers
 	        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
 	        {
 	            var newSource = context.TypeMap.Substitution(context.SourceValue);
-	            var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(newSource.GetType(), context.DestinationType);
+	            var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(newSource.GetType(), context.DestinationType);
 
                 var substitutionContext = context.CreateTypeContext(typeMap, newSource, context.DestinationValue, newSource.GetType(), context.DestinationType);
 
@@ -141,7 +141,7 @@ namespace AutoMapper.Mappers
 					var sourceType = result.Type;
 					var destinationType = propertyMap.DestinationProperty.MemberType;
 
-					var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(result, destinationType);
+					var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(result, destinationType);
 
 					Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 
