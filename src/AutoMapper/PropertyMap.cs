@@ -7,6 +7,7 @@ namespace AutoMapper
     using System.Linq.Expressions;
     using System.Reflection;
     using Impl;
+    using Internal;
 
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap

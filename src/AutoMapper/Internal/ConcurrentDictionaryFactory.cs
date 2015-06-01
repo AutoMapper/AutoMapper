@@ -1,9 +1,8 @@
 ﻿#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
-using System;
-using System.Collections.Concurrent;
-
 namespace AutoMapper.Internal
 {
+    using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
 
     public class DictionaryFactoryOverride : IDictionaryFactory
@@ -56,6 +55,7 @@ namespace AutoMapper.Internal
 
             public ICollection<TValue> Values => _dictionary.Values;
             public ICollection<TKey> Keys => _dictionary.Keys;
+
             public bool ContainsKey(TKey key)
             {
                 return _dictionary.ContainsKey(key);
@@ -63,4 +63,5 @@ namespace AutoMapper.Internal
         }
     }
 }
+
 #endif

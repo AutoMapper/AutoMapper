@@ -1,19 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using AutoMapper.Impl;
-using AutoMapper.Internal;
-
 namespace AutoMapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text.RegularExpressions;
+    using Impl;
+    using Internal;
+
     public class TypeMapFactory : ITypeMapFactory
     {
         private readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
             = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeInfo>();
 
-        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
+        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options,
+            MemberList memberList)
         {
             var sourceTypeInfo = GetTypeInfo(sourceType, options.SourceExtensionMethods);
             var destTypeInfo = GetTypeInfo(destinationType, new MethodInfo[0]);
@@ -46,7 +47,7 @@ namespace AutoMapper
         }
 
         private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo,
-                                                IMappingOptions options)
+            IMappingOptions options)
         {
             var parameters = new List<ConstructorParameterMap>();
             var ctorParameters = destCtor.GetParameters();
@@ -81,16 +82,17 @@ namespace AutoMapper
         }
 
         private bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeInfo sourceType,
-                                                    string nameToSearch, IMappingOptions mappingOptions)
+            string nameToSearch, IMappingOptions mappingOptions)
         {
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;
 
             var sourceProperties = sourceType.PublicReadAccessors;
             var sourceNoArgMethods = sourceType.PublicNoArgMethods;
-			var sourceNoArgExtensionMethods = sourceType.PublicNoArgExtensionMethods;
+            var sourceNoArgExtensionMethods = sourceType.PublicNoArgExtensionMethods;
 
-			MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, nameToSearch, mappingOptions);
+            MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods,
+                nameToSearch, mappingOptions);
 
             bool foundMatch = resolver != null;
 
@@ -110,16 +112,17 @@ namespace AutoMapper
                 {
                     NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
 
-					var valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods, snippet.First,
-                                                       mappingOptions);
+                    var valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods,
+                        snippet.First,
+                        mappingOptions);
 
                     if (valueResolver != null)
                     {
                         resolvers.AddLast(valueResolver);
 
                         foundMatch = MapDestinationPropertyToSource(resolvers,
-                                                                    GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethods),
-                                                                    snippet.Second, mappingOptions);
+                            GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethods),
+                            snippet.Second, mappingOptions);
 
                         if (!foundMatch)
                         {
@@ -133,10 +136,10 @@ namespace AutoMapper
         }
 
         private static MemberInfo FindTypeMember(IEnumerable<MemberInfo> modelProperties,
-												 IEnumerable<MethodInfo> getMethods,
-												 IEnumerable<MethodInfo> getExtensionMethods,
-												 string nameToSearch,
-												 IMappingOptions mappingOptions)
+            IEnumerable<MethodInfo> getMethods,
+            IEnumerable<MethodInfo> getExtensionMethods,
+            string nameToSearch,
+            IMappingOptions mappingOptions)
         {
             MemberInfo pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch, mappingOptions));
             if (pi != null)
@@ -146,19 +149,21 @@ namespace AutoMapper
             if (mi != null)
                 return mi;
 
-			mi = getExtensionMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
-			if (mi != null)
-				return mi;
+            mi = getExtensionMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
+            if (mi != null)
+                return mi;
 
-			return null;
+            return null;
         }
 
         private static bool NameMatches(string memberName, string nameToMatch, IMappingOptions mappingOptions)
         {
-            var possibleSourceNames = PossibleNames(memberName, mappingOptions.Aliases, mappingOptions.MemberNameReplacers,
+            var possibleSourceNames = PossibleNames(memberName, mappingOptions.Aliases,
+                mappingOptions.MemberNameReplacers,
                 mappingOptions.Prefixes, mappingOptions.Postfixes);
 
-            var possibleDestNames = PossibleNames(nameToMatch, mappingOptions.Aliases, mappingOptions.MemberNameReplacers,
+            var possibleDestNames = PossibleNames(nameToMatch, mappingOptions.Aliases,
+                mappingOptions.MemberNameReplacers,
                 mappingOptions.DestinationPrefixes, mappingOptions.DestinationPostfixes);
 
             var all =
@@ -166,18 +171,21 @@ namespace AutoMapper
                 from destName in possibleDestNames
                 select new {sourceName, destName};
 
-            return all.Any(pair => String.Compare(pair.sourceName, pair.destName, StringComparison.OrdinalIgnoreCase) == 0);
+            return
+                all.Any(pair => String.Compare(pair.sourceName, pair.destName, StringComparison.OrdinalIgnoreCase) == 0);
         }
 
-        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases, 
-            IEnumerable<MemberNameReplacer> memberNameReplacers, IEnumerable<string> prefixes, IEnumerable<string> postfixes)
+        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases,
+            IEnumerable<MemberNameReplacer> memberNameReplacers, IEnumerable<string> prefixes,
+            IEnumerable<string> postfixes)
         {
             if (string.IsNullOrEmpty(memberName))
                 yield break;
 
             yield return memberName;
 
-            foreach (var alias in aliases.Where(alias => String.Equals(memberName, alias.Member, StringComparison.Ordinal)))
+            foreach (
+                var alias in aliases.Where(alias => String.Equals(memberName, alias.Member, StringComparison.Ordinal)))
             {
                 yield return alias.Alias;
             }
@@ -188,7 +196,7 @@ namespace AutoMapper
 
                 foreach (var nameReplacer in memberNameReplacers)
                 {
-                    aliasName = aliasName.Replace(nameReplacer.OrginalValue, nameReplacer.NewValue);
+                    aliasName = aliasName.Replace(nameReplacer.OriginalValue, nameReplacer.NewValue);
                 }
 
                 yield return aliasName;
@@ -200,7 +208,9 @@ namespace AutoMapper
 
                 yield return withoutPrefix;
 
-                foreach (var postfix in postfixes.Where(postfix => withoutPrefix.EndsWith(postfix, StringComparison.Ordinal)))
+                foreach (
+                    var postfix in postfixes.Where(postfix => withoutPrefix.EndsWith(postfix, StringComparison.Ordinal))
+                    )
                 {
                     yield return withoutPrefix.Remove(withoutPrefix.Length - postfix.Length);
                 }
@@ -218,10 +228,10 @@ namespace AutoMapper
             {
                 First =
                     String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter,
-                                matches.Take(i).ToArray()),
+                        matches.Take(i).ToArray()),
                 Second =
                     String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter,
-                                matches.Skip(i).ToArray())
+                        matches.Skip(i).ToArray())
             };
         }
 
@@ -230,7 +240,5 @@ namespace AutoMapper
             public string First { get; set; }
             public string Second { get; set; }
         }
-
     }
-
 }

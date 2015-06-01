@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
-    using Internal;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
 
     public class ProfileConfiguration : IProfileConfiguration, IMappingOptions
     {
-		private readonly IList<Type> _formattersToSkip = new List<Type>();
-	    private readonly ISet<string> _prefixes = new HashSet<string>();
+        private readonly ISet<string> _prefixes = new HashSet<string>();
         private readonly ISet<string> _postfixes = new HashSet<string>();
         private readonly ISet<string> _destinationPrefixes = new HashSet<string>();
         private readonly ISet<string> _destinationPostfixes = new HashSet<string>();
@@ -19,45 +16,42 @@ namespace AutoMapper
         private readonly ISet<MemberNameReplacer> _memberNameReplacers = new HashSet<MemberNameReplacer>();
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
-	    public ProfileConfiguration()
-		{
-			SourceMemberNamingConvention = new PascalCaseNamingConvention();
-			DestinationMemberNamingConvention = new PascalCaseNamingConvention();
-		    RecognizePrefixes("Get");
-			AllowNullDestinationValues = true;
-	        ConstructorMappingEnabled = true;
-            IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
-		}
+        public ProfileConfiguration()
+        {
+            SourceMemberNamingConvention = new PascalCaseNamingConvention();
+            DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            RecognizePrefixes("Get");
+            AllowNullDestinationValues = true;
+            ConstructorMappingEnabled = true;
+            IncludeSourceExtensionMethods(typeof (Enumerable).Assembly());
+        }
 
-		public bool AllowNullDestinationValues { get; set; }
-		public bool AllowNullCollections { get; set; }
-		public INamingConvention SourceMemberNamingConvention { get; set; }
-		public INamingConvention DestinationMemberNamingConvention { get; set; }
-        public IEnumerable<string> Prefixes { get { return _prefixes; } }
-        public IEnumerable<string> Postfixes { get { return _postfixes; } }
-        public IEnumerable<string> DestinationPrefixes { get { return _destinationPrefixes; } }
-        public IEnumerable<string> DestinationPostfixes { get { return _destinationPostfixes; } }
-        public IEnumerable<MemberNameReplacer> MemberNameReplacers { get { return _memberNameReplacers; } }
-        public IEnumerable<AliasedMember> Aliases { get { return _aliases; } }
+        public bool AllowNullDestinationValues { get; set; }
+        public bool AllowNullCollections { get; set; }
+        public INamingConvention SourceMemberNamingConvention { get; set; }
+        public INamingConvention DestinationMemberNamingConvention { get; set; }
+
+        public IEnumerable<string> Prefixes => _prefixes;
+
+        public IEnumerable<string> Postfixes => _postfixes;
+
+        public IEnumerable<string> DestinationPrefixes => _destinationPrefixes;
+
+        public IEnumerable<string> DestinationPostfixes => _destinationPostfixes;
+
+        public IEnumerable<MemberNameReplacer> MemberNameReplacers => _memberNameReplacers;
+
+        public IEnumerable<AliasedMember> Aliases => _aliases;
+
         public bool ConstructorMappingEnabled { get; set; }
         public bool DataReaderMapperYieldReturnEnabled { get; set; }
-        public IEnumerable<MethodInfo> SourceExtensionMethods { get { return _sourceExtensionMethods; } }
+
+        public IEnumerable<MethodInfo> SourceExtensionMethods => _sourceExtensionMethods;
 
 
-		public Type[] GetFormatterTypesToSkip()
-		{
-			return _formattersToSkip.ToArray();
-		}
+        public bool MapNullSourceValuesAsNull => AllowNullDestinationValues;
 
-		public bool MapNullSourceValuesAsNull
-		{
-			get { return AllowNullDestinationValues; }
-		}
-
-		public bool MapNullSourceCollectionsAsNull
-		{
-			get { return AllowNullCollections; }
-		}
+        public bool MapNullSourceCollectionsAsNull => AllowNullCollections;
 
         public void IncludeSourceExtensionMethods(Assembly assembly)
         {
@@ -65,50 +59,50 @@ namespace AutoMapper
             _sourceExtensionMethods.AddRange(assembly.GetTypes()
                 .Where(type => type.IsSealed() && !type.IsGenericType() && !type.IsNested)
                 .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
-                .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
+                .Where(method => method.IsDefined(typeof (ExtensionAttribute), false))
                 .Where(method => method.GetParameters().Length == 1));
         }
 
         public void RecognizePrefixes(params string[] prefixes)
-		{
-		    foreach (var prefix in prefixes)
-		    {
+        {
+            foreach (var prefix in prefixes)
+            {
                 _prefixes.Add(prefix);
-		    }
-		}
+            }
+        }
 
-		public void RecognizePostfixes(params string[] postfixes)
-		{
-		    foreach (var postfix in postfixes)
-		    {
+        public void RecognizePostfixes(params string[] postfixes)
+        {
+            foreach (var postfix in postfixes)
+            {
                 _postfixes.Add(postfix);
-		    }
-		}
+            }
+        }
 
-		public void RecognizeAlias(string original, string alias)
-		{
-		    _aliases.Add(new AliasedMember(original, alias));
-		}
+        public void RecognizeAlias(string original, string alias)
+        {
+            _aliases.Add(new AliasedMember(original, alias));
+        }
 
         public void ReplaceMemberName(string original, string newValue)
         {
             _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
         }
 
-		public void RecognizeDestinationPrefixes(params string[] prefixes)
-		{
-		    foreach (var prefix in prefixes)
-		    {
-		        _destinationPrefixes.Add(prefix);
-		    }
-		}
+        public void RecognizeDestinationPrefixes(params string[] prefixes)
+        {
+            foreach (var prefix in prefixes)
+            {
+                _destinationPrefixes.Add(prefix);
+            }
+        }
 
-		public void RecognizeDestinationPostfixes(params string[] postfixes)
-		{
-		    foreach (var postfix in postfixes)
-		    {
-		        _destinationPostfixes.Add(postfix);
-		    }
-		}
-	}
+        public void RecognizeDestinationPostfixes(params string[] postfixes)
+        {
+            foreach (var postfix in postfixes)
+            {
+                _destinationPostfixes.Add(postfix);
+            }
+        }
+    }
 }
