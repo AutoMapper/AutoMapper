@@ -1,25 +1,26 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using AutoMapper.Internal;
-
 namespace AutoMapper.Mappers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using Internal;
+
     public class ReadOnlyCollectionMapper : IObjectMapper
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
-            Type genericType = typeof(EnumerableMapper<>);
+            Type genericType = typeof (EnumerableMapper<>);
 
             var elementType = TypeHelper.GetElementType(context.DestinationType);
-            
+
             var enumerableMapper = genericType.MakeGenericType(elementType);
 
-            var objectMapper = (IObjectMapper)Activator.CreateInstance(enumerableMapper);
+            var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
 
             var nullDestinationValueSoTheReadOnlyCollectionMapperWorks =
                 context.PropertyMap != null
-                    ? context.CreateMemberContext(context.TypeMap, context.SourceValue, null, context.SourceType, context.PropertyMap)
+                    ? context.CreateMemberContext(context.TypeMap, context.SourceValue, null, context.SourceType,
+                        context.PropertyMap)
                     : context;
 
             return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks, mapper);
@@ -27,14 +28,12 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(ResolutionContext context)
         {
-			if(!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType()))
-				return false;
+            if (!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType()))
+                return false;
 
-			  var genericType= context.DestinationType.GetGenericTypeDefinition();
-			  if (genericType == typeof(ReadOnlyCollection<>))
-				  return true;
+            var genericType = context.DestinationType.GetGenericTypeDefinition();
 
-			  return false;
+            return genericType == typeof (ReadOnlyCollection<>);
         }
 
         #region Nested type: EnumerableMapper
@@ -42,7 +41,7 @@ namespace AutoMapper.Mappers
         private class EnumerableMapper<TElement> : EnumerableMapperBase<IList<TElement>>
         {
             private readonly IList<TElement> inner = new List<TElement>();
-            
+
             public override bool IsMatch(ResolutionContext context)
             {
                 throw new NotImplementedException();
@@ -50,7 +49,7 @@ namespace AutoMapper.Mappers
 
             protected override void SetElementValue(IList<TElement> elements, object mappedValue, int index)
             {
-                inner.Add((TElement)mappedValue);
+                inner.Add((TElement) mappedValue);
             }
 
             protected override IList<TElement> GetEnumerableFor(object destination)
@@ -63,7 +62,8 @@ namespace AutoMapper.Mappers
                 throw new NotImplementedException();
             }
 
-            protected override object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count, IMappingEngineRunner mapper)
+            protected override object CreateDestinationObject(ResolutionContext context, Type destinationElementType,
+                int count, IMappingEngineRunner mapper)
             {
                 return new ReadOnlyCollection<TElement>(inner);
             }

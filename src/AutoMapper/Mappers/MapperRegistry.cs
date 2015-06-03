@@ -46,10 +46,7 @@ namespace AutoMapper.Mappers
         /// <summary>
         /// Extension point for modifying list of object mappers
         /// </summary>
-        public static IList<IObjectMapper> Mappers
-        {
-            get { return _mappers; }
-        }
+        public static IList<IObjectMapper> Mappers => _mappers;
 
         /// <summary>
         /// Reset mapper registry to built-in values

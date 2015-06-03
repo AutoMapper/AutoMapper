@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace AutoMapper.Mappers
 {
     using Internal;

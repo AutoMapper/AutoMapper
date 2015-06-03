@@ -1,24 +1,22 @@
-﻿using System.Linq;
-using AutoMapper.Internal;
-
-namespace AutoMapper.Mappers
+﻿namespace AutoMapper.Mappers
 {
     using System;
     using System.Collections.Generic;
-    using System.Reflection;
+    using System.Linq;
+    using Internal;
 
     public class HashSetMapper : IObjectMapper
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
-            Type genericType = typeof(EnumerableMapper<,>);
+            Type genericType = typeof (EnumerableMapper<,>);
 
             var collectionType = context.DestinationType;
             var elementType = TypeHelper.GetElementType(context.DestinationType);
 
             var enumerableMapper = genericType.MakeGenericType(collectionType, elementType);
 
-            var objectMapper = (IObjectMapper)Activator.CreateInstance(enumerableMapper);
+            var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
 
             return objectMapper.Map(context, mapper);
         }
@@ -33,7 +31,7 @@ namespace AutoMapper.Mappers
 #if !NETFX_CORE
         private static bool IsSetType(Type type)
         {
-            if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(ISet<>))
+            if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof (ISet<>))
             {
                 return true;
             }
@@ -41,7 +39,7 @@ namespace AutoMapper.Mappers
             IEnumerable<Type> genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType());
             IEnumerable<Type> baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
 
-            var isCollectionType = baseDefinitions.Any(t => t == typeof(ISet<>));
+            var isCollectionType = baseDefinitions.Any(t => t == typeof (ISet<>));
 
             return isCollectionType;
         }
@@ -57,7 +55,7 @@ namespace AutoMapper.Mappers
 
             protected override void SetElementValue(TCollection destination, object mappedValue, int index)
             {
-                destination.Add((TElement)mappedValue);
+                destination.Add((TElement) mappedValue);
             }
 
             protected override void ClearEnumerable(TCollection enumerable)
@@ -69,16 +67,16 @@ namespace AutoMapper.Mappers
             {
                 Object collection;
 
-                if (typeof(TCollection).IsInterface())
+                if (typeof (TCollection).IsInterface())
                 {
                     collection = new HashSet<TElement>();
                 }
                 else
                 {
-                    collection = ObjectCreator.CreateDefaultValue(typeof(TCollection));
+                    collection = ObjectCreator.CreateDefaultValue(typeof (TCollection));
                 }
 
-                return (TCollection)collection;
+                return (TCollection) collection;
             }
         }
 
