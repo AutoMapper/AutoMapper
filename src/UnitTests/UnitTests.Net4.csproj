@@ -93,6 +93,7 @@
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
     <Compile Include="Bug\ConditionBug.cs" />
     <Compile Include="Bug\ContextValuesIncorrect.cs" />
+    <Compile Include="Bug\MappingToSameTypeWithDestinationBug.cs" />
     <Compile Include="Bug\DestinationCtorCalledTwice.cs" />
     <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
     <Compile Include="Bug\CreateMapExpressionWithIgnoredPropertyBug.cs" />
