@@ -1,10 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using AutoMapper.Internal;
-
 namespace AutoMapper.Mappers
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Reflection;
+    using Internal;
+
     /// <summary>
     /// Instantiates objects
     /// </summary>
@@ -13,46 +14,46 @@ namespace AutoMapper.Mappers
         private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
 
         public static Array CreateArray(Type elementType, int length)
-		{
-			return Array.CreateInstance(elementType, length);
-		}
+        {
+            return Array.CreateInstance(elementType, length);
+        }
 
-		public static IList CreateList(Type elementType)
-		{
-			Type destListType = typeof(List<>).MakeGenericType(elementType);
-			return (IList) CreateObject(destListType);
-		}
+        public static IList CreateList(Type elementType)
+        {
+            Type destListType = typeof (List<>).MakeGenericType(elementType);
+            return (IList) CreateObject(destListType);
+        }
 
-		public static object CreateDictionary(Type dictionaryType, Type keyType, Type valueType)
-		{
-			var type = dictionaryType.IsInterface()
-			           	? typeof(Dictionary<,>).MakeGenericType(keyType, valueType)
-			           	: dictionaryType;
+        public static object CreateDictionary(Type dictionaryType, Type keyType, Type valueType)
+        {
+            var type = dictionaryType.IsInterface()
+                ? typeof (Dictionary<,>).MakeGenericType(keyType, valueType)
+                : dictionaryType;
 
-			return CreateObject(type);
-		}
+            return CreateObject(type);
+        }
 
-		public static object CreateDefaultValue(Type type)
-		{
-			return type.IsValueType() ? CreateObject(type) : null;
-		}
+        public static object CreateDefaultValue(Type type)
+        {
+            return type.IsValueType() ? CreateObject(type) : null;
+        }
 
-		public static object CreateNonNullValue(Type type)
-		{
-            if (type.IsValueType())
-                return CreateObject(type);
+        public static object CreateNonNullValue(Type type)
+        {
+            return type.IsValueType()
+                ? CreateObject(type)
+                : type == typeof (string)
+                    ? string.Empty
+                    : CreateObject(type);
+        }
 
-            if (type == typeof(string))
-                return string.Empty;
-
-			return CreateObject(type);
-		}
-
-		public static object CreateObject(Type type)
-		{
-            return type.IsArray ? CreateArray(type.GetElementType(), 0) :
-                type == typeof(string) ? null
-                : DelegateFactory.CreateCtor(type)();
-		}
-	}
+        public static object CreateObject(Type type)
+        {
+            return type.IsArray
+                ? CreateArray(type.GetElementType(), 0)
+                : type == typeof (string)
+                    ? null
+                    : DelegateFactory.CreateCtor(type)();
+        }
+    }
 }

@@ -1,8 +1,6 @@
-using System.Reflection;
-
 namespace AutoMapper.Mappers
 {
-    using Internal;
+    using System.Reflection;
 
     public class AssignableArrayMapper : IObjectMapper
     {

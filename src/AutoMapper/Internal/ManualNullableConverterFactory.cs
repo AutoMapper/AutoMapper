@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace AutoMapper.Internal
+﻿namespace AutoMapper.Internal
 {
+    using System;
+
     public class NullableConverterFactory : INullableConverterFactory
     {
         public INullableConverter Create(Type nullableType)
@@ -12,12 +12,11 @@ namespace AutoMapper.Internal
         private class NullableConverterImpl : INullableConverter
         {
             private readonly Type _nullableType;
-            private readonly Type _underlyingType;
 
             public NullableConverterImpl(Type nullableType)
             {
                 _nullableType = nullableType;
-                _underlyingType = Nullable.GetUnderlyingType(_nullableType);
+                UnderlyingType = Nullable.GetUnderlyingType(_nullableType);
             }
 
             public object ConvertFrom(object value)
@@ -27,13 +26,11 @@ namespace AutoMapper.Internal
 
                 if (value.GetType() == UnderlyingType)
                     return Activator.CreateInstance(_nullableType, value);
-                
+
                 return Activator.CreateInstance(_nullableType, Convert.ChangeType(value, UnderlyingType, null));
             }
 
-            public Type UnderlyingType { get { return _underlyingType; } }
+            public Type UnderlyingType { get; }
         }
     }
-
-
 }

@@ -8,8 +8,8 @@
             Alias = alias;
         }
 
-        public string Member { get; private set; }
-        public string Alias { get; private set; }
+        public string Member { get; }
+        public string Alias { get; }
 
         public bool Equals(AliasedMember other)
         {

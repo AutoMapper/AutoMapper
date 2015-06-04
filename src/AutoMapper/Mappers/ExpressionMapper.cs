@@ -1,10 +1,8 @@
-﻿using System.Reflection;
-
-namespace AutoMapper.Mappers
+﻿namespace AutoMapper.Mappers
 {
     using System.Linq;
     using System.Linq.Expressions;
-    using Impl;
+    using System.Reflection;
     using Internal;
 
     public class ExpressionMapper : IObjectMapper
@@ -33,9 +31,7 @@ namespace AutoMapper.Mappers
 
                 if (typeMap == null)
                     throw new AutoMapperMappingException(
-                        string.Format(
-                            "Could not find type map from destination type {0} to source type {1}. Use CreateMap to create a map from the source to destination types.",
-                            destParamType, sourceParamType));
+                        $"Could not find type map from destination type {destParamType} to source type {sourceParamType}. Use CreateMap to create a map from the source to destination types.");
 
                 var oldParam = expression.Parameters[i];
                 var newParam = Expression.Parameter(typeMap.SourceType, oldParam.Name);

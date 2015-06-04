@@ -75,7 +75,8 @@
                 "System.Linq.Queryable": "4.0.0-beta-*",
                 "System.Diagnostics.Debug": "4.0.10-beta-*",
                 "System.ObjectModel": "4.0.10-beta-*"
-            }
+            },
+            "compilationOptions": { "define": [ "NETFX_CORE", "WINCORE" ] }
         },
         "dnxcore50": {
             "dependencies": {

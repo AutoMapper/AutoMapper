@@ -1,9 +1,8 @@
-using System.Reflection;
-
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System.Linq.Expressions;
     using Internal;
+    using System.Reflection;
 
     public class AssignableExpressionBinder : IExpressionBinder
     {
@@ -13,12 +12,14 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
-            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            ExpressionRequest request, ExpressionResolutionResult result,
+            IDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindAssignableExpression(propertyMap, result);
         }
 
-        private static MemberAssignment BindAssignableExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
+        private static MemberAssignment BindAssignableExpression(PropertyMap propertyMap,
+            ExpressionResolutionResult result)
         {
             return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, result.ResolutionExpression);
         }

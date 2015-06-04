@@ -1,9 +1,9 @@
 ﻿#if MONODROID || MONOTOUCH || __IOS__ || NET4
-using System;
-using System.ComponentModel;
-
 namespace AutoMapper.Internal
 {
+    using System;
+    using System.ComponentModel;
+
     public class NullableConverterFactoryOverride : INullableConverterFactory
     {
         public INullableConverter Create(Type nullableType)
@@ -25,8 +25,9 @@ namespace AutoMapper.Internal
                 return _nullableConverter.ConvertFrom(value);
             }
 
-            public Type UnderlyingType { get { return _nullableConverter.UnderlyingType; } }
+            public Type UnderlyingType => _nullableConverter.UnderlyingType;
         }
     }
 }
+
 #endif

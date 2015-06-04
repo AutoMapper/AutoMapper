@@ -6,7 +6,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
-            return propertyTypeMap != null && propertyTypeMap.CustomProjection != null;
+            return propertyTypeMap?.CustomProjection != null;
         }
 
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)

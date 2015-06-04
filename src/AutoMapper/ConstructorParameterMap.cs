@@ -1,8 +1,8 @@
-using System.Linq;
-using System.Reflection;
-
 namespace AutoMapper
 {
+    using System.Linq;
+    using System.Reflection;
+
     public class ConstructorParameterMap
     {
         public ConstructorParameterMap(ParameterInfo parameter, IMemberGetter[] sourceResolvers)
@@ -13,7 +13,7 @@ namespace AutoMapper
 
         public ParameterInfo Parameter { get; private set; }
 
-        public IMemberGetter[] SourceResolvers { get; private set; }
+        public IMemberGetter[] SourceResolvers { get; }
 
         public ResolutionResult ResolveValue(ResolutionContext context)
         {
@@ -21,6 +21,5 @@ namespace AutoMapper
 
             return SourceResolvers.Aggregate(result, (current, resolver) => resolver.Resolve(current));
         }
-
     }
 }

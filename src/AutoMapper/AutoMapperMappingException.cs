@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace AutoMapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+
     public class AutoMapperMappingException : Exception
     {
-        private string _message;
+        private readonly string _message;
 
         //
         // For guidelines regarding the creation of new exception types, see
@@ -49,7 +49,7 @@ namespace AutoMapper
             _message = message;
         }
 
-        public ResolutionContext Context { get; private set; }
+        public ResolutionContext Context { get; }
 
         public override string Message
         {
@@ -60,8 +60,10 @@ namespace AutoMapper
                 if (Context != null)
                 {
                     message = _message + newLine + newLine + "Mapping types:";
-                    message += newLine + string.Format("{0} -> {1}", Context.SourceType.Name, Context.DestinationType.Name);
-                    message += newLine + string.Format("{0} -> {1}", Context.SourceType.FullName, Context.DestinationType.FullName);
+                    message += newLine +
+                               $"{Context.SourceType.Name} -> {Context.DestinationType.Name}";
+                    message += newLine +
+                               $"{Context.SourceType.FullName} -> {Context.DestinationType.FullName}";
 
                     var destPath = GetDestPath(Context);
                     message += newLine + newLine + "Destination path:" + newLine + destPath;
@@ -81,37 +83,37 @@ namespace AutoMapper
             }
         }
 
-	    private string GetDestPath(ResolutionContext context)
-	    {
-	        var allContexts = GetContexts(context).Reverse();
+        private string GetDestPath(ResolutionContext context)
+        {
+            var allContexts = GetContexts(context).Reverse();
 
-	        var builder = new StringBuilder(allContexts.First().DestinationType.Name);
+            var builder = new StringBuilder(allContexts.First().DestinationType.Name);
 
-	        foreach (var ctxt in allContexts)
-	        {
-	            if (!string.IsNullOrEmpty(ctxt.MemberName))
-	            {
-	                builder.Append(".");
-	                builder.Append(ctxt.MemberName);
-	            }
+            foreach (var ctxt in allContexts)
+            {
+                if (!string.IsNullOrEmpty(ctxt.MemberName))
+                {
+                    builder.Append(".");
+                    builder.Append(ctxt.MemberName);
+                }
                 if (ctxt.ArrayIndex != null)
                 {
                     builder.AppendFormat("[{0}]", ctxt.ArrayIndex);
                 }
-	        }
-	        return builder.ToString();
-	    }
+            }
+            return builder.ToString();
+        }
 
-	    private static IEnumerable<ResolutionContext> GetContexts(ResolutionContext context)
-	    {
+        private static IEnumerable<ResolutionContext> GetContexts(ResolutionContext context)
+        {
             while (context.Parent != null)
             {
                 yield return context;
 
                 context = context.Parent;
             }
-	        yield return context;
-	    }
+            yield return context;
+        }
 
 #if !DEBUG
 	    public override string StackTrace

@@ -23,6 +23,6 @@ namespace AutoMapper
             }
         }
 
-        public Type MemberType { get { return _inner.MemberType; } }
+        public Type MemberType => _inner.MemberType;
     }
 }
