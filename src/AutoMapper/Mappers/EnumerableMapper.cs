@@ -2,6 +2,7 @@ namespace AutoMapper.Mappers
 {
     using System;
     using System.Collections;
+    using System.Reflection;
     using Internal;
 
     public class EnumerableMapper : EnumerableMapperBase<IList>

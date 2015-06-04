@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Linq;
+    using System.Reflection;
     using Impl;
     using Internal;
     using Mappers;

@@ -1,7 +1,7 @@
 ﻿namespace AutoMapper.Mappers
 {
     using System;
-    using Internal;
+    using System.Reflection;
 
     public class PrimitiveArrayMapper : IObjectMapper
     {

@@ -4,7 +4,6 @@ namespace AutoMapper.Internal
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Impl;
     using TypeInfo = AutoMapper.TypeInfo;
 
     public class MappingExpression : IMappingExpression, IMemberConfigurationExpression

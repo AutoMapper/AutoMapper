@@ -2,6 +2,7 @@ namespace AutoMapper.Internal
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     public class ResolutionExpression<TSource> : IResolverConfigurationExpression<TSource>,
         IResolverConfigurationExpression

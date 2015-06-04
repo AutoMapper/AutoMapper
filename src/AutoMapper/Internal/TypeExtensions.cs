@@ -1,4 +1,4 @@
-﻿namespace AutoMapper.Internal
+﻿namespace System.Reflection
 {
     using System;
     using System.Collections.Generic;
@@ -230,14 +230,25 @@
 
 
 #if !SILVERLIGHT
+        public static bool IsInstanceOfType(this Type type, object o)
+        {
+            return o != null && type.IsAssignableFrom(o.GetType());
+        }
+
+        public static ConstructorInfo[] GetConstructors(this Type type)
+        {
+            return type.GetTypeInfo().DeclaredConstructors.ToArray();
+        }
+
+#if !DNXCORE50 && !WINCORE
+        public static Type[] GetTypes(this Assembly assembly)
+        {
+            return assembly.ExportedTypes.ToArray();
+        }
+
         public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo, bool ignored)
         {
             return propertyInfo.GetMethod;
-        }
-
-        public static MethodInfo[] GetAccessors(this PropertyInfo propertyInfo)
-        {
-            return new[] { propertyInfo.GetMethod, propertyInfo.SetMethod };
         }
 
         public static MethodInfo GetSetMethod(this PropertyInfo propertyInfo, bool ignored)
@@ -245,9 +256,21 @@
             return propertyInfo.SetMethod;
         }
 
-        public static Type[] GetTypes(this Assembly assembly)
+        public static FieldInfo GetField(this Type type, string name)
         {
-            return assembly.ExportedTypes.ToArray();
+            return type.GetTypeInfo().GetDeclaredField(name);
+        }
+
+        public static MemberInfo[] GetMember(this Type type, string name)
+        {
+            return type.GetTypeInfo().DeclaredMembers
+                .Where(m => m.Name == name).ToArray()
+            ;
+        }
+
+        public static MethodInfo[] GetAccessors(this PropertyInfo propertyInfo)
+        {
+            return new[] { propertyInfo.GetMethod, propertyInfo.SetMethod };
         }
 
         public static PropertyInfo GetProperty(this Type type, string name)
@@ -265,31 +288,9 @@
             return type.GetTypeInfo().GetDeclaredMethods(name).FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).ToArray().SequenceEqual(parameterTypes));
         }
 
-        public static FieldInfo GetField(this Type type, string name)
-        {
-            return type.GetTypeInfo().GetDeclaredField(name);
-        }
-
-        public static MemberInfo[] GetMember(this Type type, string name)
-        {
-            return type.GetTypeInfo().DeclaredMembers
-                .Where(m => m.Name == name).ToArray()
-            ;
-        }
-
-        public static bool IsInstanceOfType(this Type type, object o)
-        {
-            return o != null && type.IsAssignableFrom(o.GetType());
-        }
-
         public static bool IsAssignableFrom(this Type type, Type other)
         {
             return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
-        }
-
-        public static ConstructorInfo[] GetConstructors(this Type type)
-        {
-            return type.GetTypeInfo().DeclaredConstructors.ToArray();
         }
 
         public static Type[] GetGenericArguments(this Type type)
@@ -300,15 +301,8 @@
         public static IEnumerable<Type> GetInterfaces(this Type type)
         {
             return type.GetTypeInfo().ImplementedInterfaces;
-
-            //if (type.IsInterface())
-            //    yield return type;
-
-            //foreach (var @interface in type.GetTypeInfo().ImplementedInterfaces)
-            //{
-            //    yield return @interface;
-            //}
         }
+#endif
 
 #endif
     }

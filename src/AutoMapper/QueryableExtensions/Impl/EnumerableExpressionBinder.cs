@@ -4,7 +4,10 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using Internal;
+    using System.Reflection;
+#if MONODROID
+    using Extensions = AutoMapper.QueryableExtensions.Extensions;
+#endif
 
     public class EnumerableExpressionBinder : IExpressionBinder
     {

@@ -4,6 +4,7 @@ namespace AutoMapper.Mappers
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Internal;
 
     // So IEnumerable<T> inherits IEnumerable
