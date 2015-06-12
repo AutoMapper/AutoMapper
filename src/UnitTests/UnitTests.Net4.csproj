@@ -112,6 +112,7 @@
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
+    <Compile Include="Bug\IntToNullableDecimal.cs" />
     <Compile Include="Bug\ListSourceMapperBug.cs" />
     <Compile Include="Bug\NullArrayBug.cs" />
     <Compile Include="Bug\ReadOnlyCollectionMappingBug.cs" />
