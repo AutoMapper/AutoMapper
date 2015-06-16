@@ -75,6 +75,11 @@
                 var memberAccessor = node.Member.ToMemberAccessor();
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
 
+                if (propertyMap == null)
+                {
+                    // No propertyMap found, just use the original expression.
+                    return node;
+                }
 
                 if (propertyMap.CustomExpression != null)
                 {
