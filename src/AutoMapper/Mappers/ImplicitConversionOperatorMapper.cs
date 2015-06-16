@@ -22,15 +22,16 @@ namespace AutoMapper.Mappers
 
         private static MethodInfo GetImplicitConversionOperator(ResolutionContext context)
         {
+            var destinationType = context.DestinationType;
+            if(destinationType.IsNullableType())
+            {
+                destinationType = destinationType.GetTypeOfNullable();
+            }
             var sourceTypeMethod = context.SourceType
                 .GetDeclaredMethods()
-                .Where(mi => mi.IsPublic && mi.IsStatic)
-                .Where(mi => mi.Name == "op_Implicit")
-                .FirstOrDefault(mi => mi.ReturnType == context.DestinationType);
+                .FirstOrDefault(mi => mi.IsPublic && mi.IsStatic && mi.Name == "op_Implicit" && mi.ReturnType == destinationType);
 
-            var destTypeMethod = context.DestinationType.GetMethod("op_Implicit", new[] {context.SourceType});
-
-            return sourceTypeMethod ?? destTypeMethod;
+            return sourceTypeMethod ?? destinationType.GetMethod("op_Implicit", new[] { context.SourceType });
         }
     }
 }

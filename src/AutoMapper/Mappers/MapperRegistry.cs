@@ -35,7 +35,7 @@ namespace AutoMapper.Mappers
             new TypeConverterMapper(),
 #endif
             new NullableSourceMapper(),
-            new NullableMapper(),
+            //new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
             new OpenGenericMapper()
