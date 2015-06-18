@@ -190,6 +190,10 @@ namespace AutoMapper.Internal
             if (destMember == null)
             {
                 var fieldInfo = TypeMap.DestinationType.GetField(name);
+                if(fieldInfo == null)
+                {
+                    throw new ArgumentOutOfRangeException("name", "Cannot find a field or property named " + name);
+                }
                 destMember = new FieldAccessor(fieldInfo);
             }
             ForDestinationMember(destMember, memberOptions);
