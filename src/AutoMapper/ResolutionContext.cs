@@ -150,7 +150,8 @@ namespace AutoMapper
             SourceValue = sourceValue;
             DestinationValue = destinationValue;
             Parent = context;
-            DestinationType = propertyMap.DestinationProperty.MemberType;
+            var destinationMemberType = propertyMap.DestinationProperty.MemberType;
+            DestinationType = destinationMemberType == typeof(object) ? sourceType : destinationMemberType;
             InstanceCache = context.InstanceCache;
             Options = context.Options;
             Engine = context.Engine;
