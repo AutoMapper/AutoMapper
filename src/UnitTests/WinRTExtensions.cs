@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
+﻿
 #if NETFX_CORE
+
 namespace AutoMapper
 {
+    using System;
+    using System.Collections.Generic;
     using System.Reflection;
+
     public static class Assembly
     {
         public static System.Reflection.Assembly GetExecutingAssembly()
@@ -13,10 +15,14 @@ namespace AutoMapper
         }
     }
 }
+
 #endif
 
-namespace System.Reflection
+namespace AutoMapper
 {
+    using System;
+    using System.Collections.Generic;
+
     public static class WinRTExtensions
     {
         public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
@@ -46,6 +52,7 @@ namespace System.Reflection
 //        }
 
 #if NETFX_CORE
+
         public static PropertyInfo GetProperty(this Type type, string name, params Type[] parametertypes)
         {
             return type.GetTypeInfo().GetDeclaredProperty(name);
@@ -131,6 +138,8 @@ namespace System.Reflection
         //    }
         //    return false;
         //}
+
 #endif
+
     }
 }

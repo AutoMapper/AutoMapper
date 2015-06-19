@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                Mapper.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly());
+                Mapper.Initialize(cfg => cfg.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly()));
                 Mapper.CreateMap<Source, Destination>();
             }
 
