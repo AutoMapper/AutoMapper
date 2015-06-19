@@ -1,135 +1,132 @@
 ﻿#if !SILVERLIGHT && !NETFX_CORE
-using System ;
-using System.Collections.Generic;
-using System.Diagnostics ;
+using System;
 using System.Linq;
-using System.Threading ;
-using System.Threading.Tasks ;
-using AutoMapper.Mappers;
-using Xunit;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AutoMapper.UnitTests.Bug
 {
+    using Xunit;
     using Should;
 
     public class MultiThreadingIssues
     {
-		public class Type1
-		{
-			public string FirstName ;
-			public string MiddleName ;
-			public string LastName ;
-			public int Age ;
-		}
-
-		public class Type1Point3
-		{
-			public string FirstName ;
-			public string MiddleName ;
-			public string LastName ;
-		}
-
-		public class Type1Point2
-		{
-			public string FirstName ;
-			public string MiddleName ;
-		}
-
-		public class Type1Point1
-		{
-			public string FirstName ;
-		}
-
-		public class DestType
-		{
-			public string FirstName ;
-			public string MiddleName ;
-			public string LastName ;
-			public int Age ;
-		}
-
-    	static int _done ;
-    	readonly ManualResetEvent _allDone = new ManualResetEvent( false );
-
-		[Fact]
-        public void ShouldMapToNewISet()
+        public class Type1
         {
-			const int threadCount = 130 ;
-
-			for (int i = 0; i < threadCount; i++)
-			{
-				Task.Factory.StartNew( doMapping ).ContinueWith(
-					a =>
-						{
-							if (Interlocked.Increment(ref _done) == threadCount)
-							{
-								_allDone.Set( ) ;
-							}
-
-						} ) ;
-			}
-
-			_allDone.WaitOne( TimeSpan.FromSeconds( 10 ) ) ;
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
+            public int Age;
         }
 
-    	static void doMapping( )
-    	{
-    		var source = createSource( ) ;
+        public class Type1Point3
+        {
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
+        }
 
-    		Console.WriteLine( @"Mapping {0} on thread {1}", source.GetType( ), Thread.CurrentThread.ManagedThreadId ) ;
+        public class Type1Point2
+        {
+            public string FirstName;
+            public string MiddleName;
+        }
 
-    		Mapper.CreateMap( source.GetType( ), typeof( DestType ) ) ;
+        public class Type1Point1
+        {
+            public string FirstName;
+        }
 
-    		DestType t2 = (DestType)Mapper.Map(source, source.GetType(  ), typeof( DestType ) )  ;
-    	}
-    	
-		static readonly Random _random = new Random();
+        public class DestType
+        {
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
+            public int Age;
+        }
 
-    	static object createSource( )
-    	{
-    		
-			int n = _random.Next( 0, 4 ) ;
-    		
-			if( n == 0 )
-			{
-				return new Type1
-					{
-						Age = 12,
-						FirstName = @"Fred",
-						LastName = @"Smith",
-						MiddleName = @"G"
-					} ;
-			}
-    		if( n == 1 )
-    		{
-    			return new Type1Point1( ) 
-					{
-						FirstName = @"Fred",
-					} ;
+        private static int _done;
+        private readonly ManualResetEvent _allDone = new ManualResetEvent(false);
 
-    		}
-    		if( n == 2 )
-    		{
-    			return new Type1Point2( ) 
-					{
-						FirstName = @"Fred",
-						MiddleName = @"G"
-					} ;
+        [Fact]
+        public void ShouldMapToNewISet()
+        {
+            const int threadCount = 130;
 
-    		}
-    		if( n == 3 )
-    		{
-    			return new Type1Point3( ) 
-					{
-						FirstName = @"Fred",
-						LastName = @"Smith",
-						MiddleName = @"G"
-					} ;
+            for (int i = 0; i < threadCount; i++)
+            {
+                Task.Factory.StartNew(doMapping).ContinueWith(
+                    a =>
+                    {
+                        if (Interlocked.Increment(ref _done) == threadCount)
+                        {
+                            _allDone.Set();
+                        }
 
-    		}
-    		
-			throw new Exception();
-    	}
+                    });
+            }
+
+            _allDone.WaitOne(TimeSpan.FromSeconds(10));
+        }
+
+        private static void doMapping()
+        {
+            var source = createSource();
+
+            Console.WriteLine(@"Mapping {0} on thread {1}", source.GetType(), Thread.CurrentThread.ManagedThreadId);
+
+            Mapper.CreateMap(source.GetType(), typeof (DestType));
+
+            DestType t2 = (DestType) Mapper.Map(source, source.GetType(), typeof (DestType));
+        }
+
+        private static readonly Random _random = new Random();
+
+        private static object createSource()
+        {
+
+            int n = _random.Next(0, 4);
+
+            if (n == 0)
+            {
+                return new Type1
+                {
+                    Age = 12,
+                    FirstName = @"Fred",
+                    LastName = @"Smith",
+                    MiddleName = @"G"
+                };
+            }
+            if (n == 1)
+            {
+                return new Type1Point1()
+                {
+                    FirstName = @"Fred",
+                };
+
+            }
+            if (n == 2)
+            {
+                return new Type1Point2()
+                {
+                    FirstName = @"Fred",
+                    MiddleName = @"G"
+                };
+
+            }
+            if (n == 3)
+            {
+                return new Type1Point3()
+                {
+                    FirstName = @"Fred",
+                    LastName = @"Smith",
+                    MiddleName = @"G"
+                };
+
+            }
+
+            throw new Exception();
+        }
     }
 
     public class DynamicMapThreadingIssues
@@ -200,16 +197,16 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.Reset();
 
             var tasks = Enumerable.Range(0, 5).Select(
-          i =>
-              Task.Factory.StartNew(
-                  () =>
-                  {
-                      Mapper.DynamicMap<SomeDtoA, SomeDtoB>(new SomeDtoA());
-                      Mapper.DynamicMap<SomeDtoB, SomeDtoA>(new SomeDtoB());
-                      Mapper.DynamicMap<SomeDtoC, SomeDtoD>(new SomeDtoC());
-                      Mapper.DynamicMap<SomeDtoD, SomeDtoC>(new SomeDtoD());
-                  }))
-          .ToArray();
+                i =>
+                    Task.Factory.StartNew(
+                        () =>
+                        {
+                            Mapper.DynamicMap<SomeDtoA, SomeDtoB>(new SomeDtoA());
+                            Mapper.DynamicMap<SomeDtoB, SomeDtoA>(new SomeDtoB());
+                            Mapper.DynamicMap<SomeDtoC, SomeDtoD>(new SomeDtoC());
+                            Mapper.DynamicMap<SomeDtoD, SomeDtoC>(new SomeDtoD());
+                        }))
+                .ToArray();
             Exception exception = null;
             try
             {
@@ -222,22 +219,23 @@ namespace AutoMapper.UnitTests.Bug
             exception.ShouldBeNull();
             //typeof(Exception).ShouldNotBeThrownBy(() => Task.WaitAll(tasks));
         }
+
         [Fact]
         public void Should_not_fail_with_create_map()
         {
             Mapper.Reset();
 
             var tasks = Enumerable.Range(0, 5).Select(
-          i =>
-              Task.Factory.StartNew(
-                  () =>
-                  {
-                      Mapper.CreateMap<SomeDtoA, SomeDtoB>();
-                      Mapper.CreateMap<SomeDtoB, SomeDtoA>();
-                      Mapper.CreateMap<SomeDtoC, SomeDtoD>();
-                      Mapper.CreateMap<SomeDtoD, SomeDtoC>();
-                  }))
-          .ToArray();
+                i =>
+                    Task.Factory.StartNew(
+                        () =>
+                        {
+                            Mapper.CreateMap<SomeDtoA, SomeDtoB>();
+                            Mapper.CreateMap<SomeDtoB, SomeDtoA>();
+                            Mapper.CreateMap<SomeDtoC, SomeDtoD>();
+                            Mapper.CreateMap<SomeDtoD, SomeDtoC>();
+                        }))
+                .ToArray();
             Exception exception = null;
             try
             {
@@ -252,4 +250,5 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 }
+
 #endif

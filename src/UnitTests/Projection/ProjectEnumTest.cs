@@ -1,26 +1,31 @@
 ﻿namespace AutoMapper.UnitTests.Projection
 {
-    using QueryableExtensions;
-    using Should;
     using System.Linq;
+    using Should;
     using Should.Core.Assertions;
     using Xunit;
+    using QueryableExtensions;
 
     public class ProjectEnumTest
     {
         public ProjectEnumTest()
         {
             Mapper.CreateMap<Customer, CustomerDto>();
-            Mapper.CreateMap<CustomerType, string>().ProjectUsing(ct => ct.ToString().ToUpper());
+            Mapper.CreateMap<CustomerType, string>()
+                .ProjectUsing(ct => ct.ToString().ToUpper());
         }
 
         [Fact]
         public void ProjectingEnumToString()
         {
-            var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
+            var customers = new[]
+            {
+                new Customer {FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip}
+            }.AsQueryable();
 
             var projected = customers.Project().To<CustomerDto>();
             projected.ShouldNotBeNull();
+
             Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
         }
 
@@ -45,7 +50,7 @@
         public enum CustomerType
         {
             Regular,
-            Vip,
+            Vip
         }
     }
 
@@ -53,7 +58,6 @@
     {
         public class Source
         {
-            
         }
 
         public class Dest
@@ -70,7 +74,7 @@
         [Fact]
         public void Should_validate_because_of_overridden_projection()
         {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+            typeof (AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
         }
     }
 }

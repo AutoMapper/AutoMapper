@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using Should;
-using Xunit;
-
 namespace AutoMapper.UnitTests
 {
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
+    using Should;
+    using Xunit;
+
     namespace InterfaceMapping
     {
         public class When_mapping_an_interface_to_an_abstract_type : AutoMapperSpecBase
@@ -56,7 +55,7 @@ namespace AutoMapper.UnitTests
                     cfg.CreateMap<ModelObject, DtoObject>();
 
                     cfg.CreateMap<IChildModelObject, DtoChildObject>()
-                          .Include<SubChildModelObject, SubDtoChildObject>();
+                        .Include<SubChildModelObject, SubDtoChildObject>();
 
                     cfg.CreateMap<SubChildModelObject, SubDtoChildObject>();
                 });
@@ -79,7 +78,8 @@ namespace AutoMapper.UnitTests
             }
         }
 
-#if !SILVERLIGHT && !NETFX_CORE
+#if !(SILVERLIGHT || NETFX_CORE)
+
         public class When_mapping_a_concrete_type_to_an_interface_type : AutoMapperSpecBase
         {
             private IDestination _result;
@@ -113,11 +113,12 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_not_derive_from_INotifyPropertyChanged()
             {
-                _result.ShouldNotBeInstanceOf<INotifyPropertyChanged>();    
+                _result.ShouldNotBeInstanceOf<INotifyPropertyChanged>();
             }
         }
 
-        public class When_mapping_a_concrete_type_to_an_interface_type_that_derives_from_INotifyPropertyChanged : AutoMapperSpecBase
+        public class When_mapping_a_concrete_type_to_an_interface_type_that_derives_from_INotifyPropertyChanged :
+            AutoMapperSpecBase
         {
             private IDestination _result;
 
@@ -160,9 +161,10 @@ namespace AutoMapper.UnitTests
             public void Should_notify_property_changes()
             {
                 var count = 0;
-                _result.PropertyChanged += (o, e) => {
+                _result.PropertyChanged += (o, e) =>
+                {
                     count++;
-                    o.ShouldBeSameAs(_result); 
+                    o.ShouldBeSameAs(_result);
                     e.PropertyName.ShouldEqual("Value");
                 };
 
@@ -187,14 +189,17 @@ namespace AutoMapper.UnitTests
                 _count.ShouldEqual(1);
             }
 
-            private void MyHandler(object sender, PropertyChangedEventArgs e) {
+            private void MyHandler(object sender, PropertyChangedEventArgs e)
+            {
                 _count++;
             }
         }
+
 #endif
+
         public class When_mapping_a_derived_interface_to_an_derived_concrete_type : AutoMapperSpecBase
         {
-            private Destination _result = null;
+            private Destination _result;
 
             public interface ISourceBase
             {
@@ -254,7 +259,7 @@ namespace AutoMapper.UnitTests
         public class When_mapping_a_derived_interface_to_an_derived_concrete_type_with_readonly_interface_members :
             AutoMapperSpecBase
         {
-            private Destination _result = null;
+            private Destination _result;
 
             public interface ISourceBase
             {
@@ -368,12 +373,29 @@ namespace AutoMapper.UnitTests
         {
             private BaseDto[] _baseDtos;
 
-            public interface IBase { }
-            public interface IDerived : IBase { }
-            public class Base : IBase { }
-            public class Derived : Base, IDerived { }
-            public class BaseDto { }
-            public class DerivedDto : BaseDto { }
+            public interface IBase
+            {
+            }
+
+            public interface IDerived : IBase
+            {
+            }
+
+            public class Base : IBase
+            {
+            }
+
+            public class Derived : Base, IDerived
+            {
+            }
+
+            public class BaseDto
+            {
+            }
+
+            public class DerivedDto : BaseDto
+            {
+            }
 
             //and following mappings:
             protected override void Establish_context()
@@ -386,9 +408,10 @@ namespace AutoMapper.UnitTests
                     cfg.CreateMap<IDerived, DerivedDto>();
                 });
             }
+
             protected override void Because_of()
             {
-                List<Base> list = new List<Base>() { new Derived() };
+                var list = new List<Base> {new Derived()};
                 _baseDtos = Mapper.Map<IEnumerable<Base>, BaseDto[]>(list);
             }
 
@@ -397,7 +420,6 @@ namespace AutoMapper.UnitTests
             {
                 _baseDtos.First().ShouldBeType<DerivedDto>();
             }
-
         }
 
         //[TestFixture, Explicit]

@@ -1,61 +1,64 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
-using AutoMapper.Mappers;
-using Should;
-using Xunit;
-
 namespace AutoMapper.UnitTests.Bug
 {
-	public class One
-	{
-		public IEnumerable<string> Stuff { get; set; }
-	}
+    using System.Collections.Generic;
+    using System.Linq;
+    using Should;
+    using Xunit;
 
-	public class Two
-	{
-		public IEnumerable<Item> Stuff { get; set; }
-	}
+    public class One
+    {
+        public IEnumerable<string> Stuff { get; set; }
+    }
 
-	public class Item
-	{
-		public string Value { get; set; }
-	}
+    public class Two
+    {
+        public IEnumerable<Item> Stuff { get; set; }
+    }
 
-	public class StringToItemConverter : TypeConverter<IEnumerable<string>, IEnumerable<Item>>
-	{
-		protected override IEnumerable<Item> ConvertCore(IEnumerable<string> source)
-		{
-			var result = new List<Item>();
-			foreach (string s in source)
-				if (!String.IsNullOrEmpty(s))
-					result.Add(new Item { Value = s });
-			return result;
-		}
-	}
-	public class AutoMapperBugTest
-	{
-		[Fact]
-		public void ShouldMapOneToTwo()
-		{
-            var config = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-			config.CreateMap<One, Two>();
+    public class Item
+    {
+        public string Value { get; set; }
+    }
 
-			config.CreateMap<IEnumerable<string>, IEnumerable<Item>>().ConvertUsing<StringToItemConverter>();
+    public class StringToItemConverter : TypeConverter<IEnumerable<string>, IEnumerable<Item>>
+    {
+        protected override IEnumerable<Item> ConvertCore(IEnumerable<string> source)
+        {
+            var result = new List<Item>();
+            foreach (var s in source)
+                if (!string.IsNullOrEmpty(s))
+                    result.Add(new Item {Value = s});
+            return result;
+        }
+    }
 
-			config.AssertConfigurationIsValid();
+    public class AutoMapperBugTest
+    {
+        /// <summary>
+        /// This is now very <see cref="MapperContext"/> oriented. Everything flows through its context.
+        /// </summary>
+        [Fact]
+        public void Should_map_one_to_two()
+        {
+            //TODO: may want to run this through MapperContextFactory, at least PlatformAdapter ...
+            var context = new MapperContext();
 
-			var engine = new MappingEngine(config);
-			var one = new One
-			{
-				Stuff = new List<string> { "hi", "", "mom" }
-			};
+            context.Configuration.CreateMap<One, Two>();
 
-			var two = engine.Map<One, Two>(one);
+            context.Configuration.CreateMap<IEnumerable<string>, IEnumerable<Item>>()
+                .ConvertUsing<StringToItemConverter>();
 
-			two.ShouldNotBeNull();
-			two.Stuff.Count().ShouldEqual(2);
-		}
-	}
+            context.AssertConfigurationIsValid();
+
+            var one = new One
+            {
+                Stuff = new List<string> {"hi", "", "mom"}
+            };
+
+            var two = context.Engine.Map<One, Two>(one);
+
+            two.ShouldNotBeNull();
+            two.Stuff.Count().ShouldEqual(2);
+        }
+    }
 }

@@ -1,7 +1,7 @@
-﻿using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
+    using Xunit;
+
     public class SubclassMappings : AutoMapperSpecBase
     {
         public class Source
@@ -27,15 +27,14 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestCase()
         {
-
-            var source = new Source() { Name = "Test" };
+            var source = new Source { Name = "Test" };
             var destination = new Destination();
 
-            AutoMapper.Mapper.Map<Source, Destination>(source, destination); // Works
+            Mapper.Map(source, destination); // Works
 
             var subDestination = new SubDestination();
 
-            AutoMapper.Mapper.Map<Source, Destination>(source, subDestination); // Fails
+            Mapper.Map<Source, Destination>(source, subDestination); // Fails
         }
     }
 }

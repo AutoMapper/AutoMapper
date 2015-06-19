@@ -1,17 +1,30 @@
 ﻿namespace AutoMapper
 {
-    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using Internal;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ConstructorMap
     {
         private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
         private readonly ILazy<LateBoundParamsCtor> _runtimeCtor;
+        /// <summary>
+        /// 
+        /// </summary>
         public ConstructorInfo Ctor { get; private set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<ConstructorParameterMap> CtorParams { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctor"></param>
+        /// <param name="ctorParams"></param>
         public ConstructorMap(ConstructorInfo ctor, IEnumerable<ConstructorParameterMap> ctorParams)
         {
             Ctor = ctor;
@@ -20,8 +33,15 @@
             _runtimeCtor = LazyFactory.Create(() => DelegateFactory.CreateCtor(ctor, CtorParams));
         }
 
-        public object ResolveValue(ResolutionContext context, IMappingEngineRunner mappingEngine)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object ResolveValue(ResolutionContext context)
         {
+            var runner = context.MapperContext.Runner;
+
             var ctorArgs = new List<object>();
 
             foreach (var map in CtorParams)
@@ -31,21 +51,21 @@
                 var sourceType = result.Type;
                 var destinationType = map.Parameter.ParameterType;
 
-                var typeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(result, destinationType);
+                var typeMap = context.MapperContext.ConfigurationProvider.ResolveTypeMap(result, destinationType);
 
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
+                var targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 
                 var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType,
                     destinationType);
 
                 if (typeMap == null && map.Parameter.IsOptional)
                 {
-                    object value = map.Parameter.DefaultValue;
+                    var value = map.Parameter.DefaultValue;
                     ctorArgs.Add(value);
                 }
                 else
                 {
-                    var value = mappingEngine.Map(newContext);
+                    var value = runner.Map(newContext);
                     ctorArgs.Add(value);
                 }
             }

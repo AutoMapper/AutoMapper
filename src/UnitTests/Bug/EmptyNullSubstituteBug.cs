@@ -24,8 +24,8 @@
         protected override void Establish_context()
         {
             Mapper.CreateMap<Model, Entity>()
-                            .ForMember(e => e.ClientIPAddress, opts => opts.NullSubstitute(""))
-                            .ForMember(e => e.NotifyEmail, opts => opts.NullSubstitute(""));
+                .ForMember(e => e.ClientIPAddress, opts => opts.NullSubstitute(""))
+                .ForMember(e => e.NotifyEmail, opts => opts.NullSubstitute(""));
         }
 
         protected override void Because_of()

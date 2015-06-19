@@ -2,17 +2,29 @@ namespace AutoMapper.Mappers
 {
     using System.Linq;
     using System.Reflection;
-    using Internal;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ExplicitConversionOperatorMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
             var implicitOperator = GetExplicitConversionOperator(context);
 
             return implicitOperator.Invoke(null, new[] {context.SourceValue});
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
             var methodInfo = GetExplicitConversionOperator(context);
@@ -20,6 +32,11 @@ namespace AutoMapper.Mappers
             return methodInfo != null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private static MethodInfo GetExplicitConversionOperator(ResolutionContext context)
         {
             var sourceTypeMethod = context.SourceType

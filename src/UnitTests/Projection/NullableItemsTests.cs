@@ -1,32 +1,25 @@
-﻿using System;
-
-namespace AutoMapper.UnitTests.Projection
+﻿namespace AutoMapper.UnitTests.Projection
 {
+    using System;
+    using System.Linq;
+    using Should;
+    using Should.Core.Assertions;
+    using Xunit;
+    using QueryableExtensions;
+
     namespace NullableItemsTests
     {
-        using System.Linq;
-        using QueryableExtensions;
-        using Should;
-        using Should.Core.Assertions;
-        using Xunit;
-
         public class NullChildItemTest
         {
             public NullChildItemTest()
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>());
+                Mapper.CreateMap<Parent, ParentDto>();
             }
 
             [Fact]
             public void Should_project_null_value()
             {
-                var items = new[]
-                {
-                    new Parent
-                    {
-                        Value = 5
-                    }
-                };
+                var items = new[] {new Parent {Value = 5}};
 
                 var projected = items.AsQueryable().Project().To<ParentDto>().ToList();
 
@@ -35,7 +28,6 @@ namespace AutoMapper.UnitTests.Projection
                 projected[0].ChildGrandChildValue.ShouldBeNull();
             }
 
-
             public class ParentDto
             {
                 public int? Value { get; set; }
@@ -43,7 +35,6 @@ namespace AutoMapper.UnitTests.Projection
                 public int? ChildGrandChildValue { get; set; }
                 public DateTime? Date { get; set; }
             }
-
 
             public class Parent
             {
@@ -68,7 +59,6 @@ namespace AutoMapper.UnitTests.Projection
             public class Parent
             {
                 public int Value { get; set; }
-                
             }
 
             public class ParentDto
@@ -76,26 +66,23 @@ namespace AutoMapper.UnitTests.Projection
                 public int? Value { get; set; }
                 public DateTime? Date { get; set; }
             }
+
             public CustomMapFromTest()
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>()
-                    .ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.UtcNow)));
+                Mapper.CreateMap<Parent, ParentDto>()
+                    .ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.UtcNow));
             }
 
             [Fact]
             public void Should_not_fail()
             {
-                var items = new[]
-                {
-                    new Parent
-                    {
-                        Value = 5
-                    }
-                };
+                var items = new[] {new Parent {Value = 5}};
 
                 var projected = items.AsQueryable().Project().To<ParentDto>().ToList();
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().Project().To<ParentDto>().ToList());
+                typeof (NullReferenceException).ShouldNotBeThrownBy(
+                    () => items.AsQueryable().Project().To<ParentDto>().ToList());
+
                 Assert.NotNull(projected[0].Date);
             }
         }

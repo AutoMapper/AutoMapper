@@ -2,67 +2,133 @@ namespace AutoMapper
 {
     using System;
     using System.Linq;
-    using System.Reflection;
+    using System.Linq.Expressions;
     using Impl;
     using Internal;
     using Mappers;
+    using QueryableExtensions;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class MappingEngine : IMappingEngine, IMappingEngineRunner
     {
-        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
+        /// <summary>
+        /// Gets the runner.
+        /// </summary>
+        public IMappingEngineRunner Runner => this;
 
-        private static readonly IProxyGeneratorFactory ProxyGeneratorFactory =
-            PlatformAdapter.Resolve<IProxyGeneratorFactory>();
+        /// <summary>
+        /// Gets the configuration provider.
+        /// </summary>
+        public IConfigurationProvider ConfigurationProvider => _mapperContext.ConfigurationProvider;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly IMapperContext _mapperContext;
+
+        /// <summary>
+        /// Gets the cache.
+        /// </summary>
+        public IDictionary<ExpressionRequest, LambdaExpression> ExpressionCache { get; }
+            = DictionaryFactory.CreateDictionary<ExpressionRequest, LambdaExpression>();
+
+        /// <summary>
+        /// Gets the dictionary factory.
+        /// </summary>
+        private static IDictionaryFactory DictionaryFactory { get; }
+            = PlatformAdapter.Resolve<IDictionaryFactory>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static IProxyGeneratorFactory ProxyGeneratorFactory { get; }
+            = PlatformAdapter.Resolve<IProxyGeneratorFactory>();
 
         private bool _disposed;
-        private readonly IObjectMapper[] _mappers;
         private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache;
         private readonly Func<Type, object> _serviceCtor;
 
-        public MappingEngine(IConfigurationProvider configurationProvider)
-            : this(
-                configurationProvider, DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>(),
-                configurationProvider.ServiceCtor)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mapperContext"></param>
+        public MappingEngine(IMapperContext mapperContext)
+            : this(mapperContext, DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>(),
+                mapperContext.ConfigurationProvider.ServiceCtor)
         {
         }
 
-        public MappingEngine(IConfigurationProvider configurationProvider,
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mapperContext"></param>
+        /// <param name="objectMapperCache"></param>
+        /// <param name="serviceCtor"></param>
+        public MappingEngine(IMapperContext mapperContext,
             IDictionary<TypePair, IObjectMapper> objectMapperCache, Func<Type, object> serviceCtor)
         {
-            ConfigurationProvider = configurationProvider;
+            _mapperContext = mapperContext;
             _objectMapperCache = objectMapperCache;
             _serviceCtor = serviceCtor;
-            _mappers = configurationProvider.GetMappers();
-            ConfigurationProvider.TypeMapCreated += ClearTypeMap;
+            _mapperContext.ConfigurationProvider.TypeMapCreated += ClearTypeMap;
         }
 
-        public IConfigurationProvider ConfigurationProvider { get; }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (!_disposed)
             {
                 if (disposing)
                 {
-                    if (ConfigurationProvider != null)
-                        ConfigurationProvider.TypeMapCreated -= ClearTypeMap;
+                    if (_mapperContext.ConfigurationProvider != null)
+                        _mapperContext.ConfigurationProvider.TypeMapCreated -= ClearTypeMap;
                 }
 
                 _disposed = true;
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IDictionary<ExpressionRequest, int> GetNewTypePairCount()
+        {
+            return DictionaryFactory.CreateDictionary<ExpressionRequest, int>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public TDestination Map<TDestination>(object source)
         {
             return Map<TDestination>(source, DefaultMappingOptions);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="opts"></param>
+        /// <returns></returns>
         public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
             var mappedObject = default(TDestination);
@@ -76,19 +142,34 @@ namespace AutoMapper
             return mappedObject;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public TDestination Map<TSource, TDestination>(TSource source)
         {
-            Type modelType = typeof (TSource);
-            Type destinationType = typeof (TDestination);
+            var modelType = typeof (TSource);
+            var destinationType = typeof (TDestination);
 
             return (TDestination) Map(source, modelType, destinationType, DefaultMappingOptions);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="opts"></param>
+        /// <returns></returns>
         public TDestination Map<TSource, TDestination>(TSource source,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            Type modelType = typeof (TSource);
-            Type destinationType = typeof (TDestination);
+            var modelType = typeof (TSource);
+            var destinationType = typeof (TDestination);
 
             var options = new MappingOperationOptions<TSource, TDestination>();
             opts(options);
@@ -96,16 +177,33 @@ namespace AutoMapper
             return (TDestination) MapCore(source, modelType, destinationType, options);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <returns></returns>
         public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
         {
             return Map(source, destination, DefaultMappingOptions);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="opts"></param>
+        /// <returns></returns>
         public TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            Type modelType = typeof (TSource);
-            Type destinationType = typeof (TDestination);
+            var modelType = typeof (TSource);
+            var destinationType = typeof (TDestination);
 
             var options = new MappingOperationOptions<TSource, TDestination>();
             opts(options);
@@ -113,11 +211,26 @@ namespace AutoMapper
             return (TDestination) MapCore(source, destination, modelType, destinationType, options);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <returns></returns>
         public object Map(object source, Type sourceType, Type destinationType)
         {
             return Map(source, sourceType, destinationType, DefaultMappingOptions);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <param name="opts"></param>
+        /// <returns></returns>
         public object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
             var options = new MappingOperationOptions();
@@ -127,20 +240,38 @@ namespace AutoMapper
             return MapCore(source, sourceType, destinationType, options);
         }
 
+        //
         private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
         {
-            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+            var typeMap = _mapperContext.ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
 
-            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, this);
+            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, _mapperContext);
 
-            return ((IMappingEngineRunner) this).Map(context);
+            return Runner.Map(context);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <returns></returns>
         public object Map(object source, object destination, Type sourceType, Type destinationType)
         {
             return Map(source, destination, sourceType, destinationType, DefaultMappingOptions);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <param name="opts"></param>
+        /// <returns></returns>
         public object Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
@@ -151,78 +282,130 @@ namespace AutoMapper
             return MapCore(source, destination, sourceType, destinationType, options);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
         private object MapCore(object source, object destination, Type sourceType, Type destinationType,
             MappingOperationOptions options)
         {
-            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+            var typeMap = _mapperContext.ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
-            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, this);
+            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, _mapperContext);
 
-            return ((IMappingEngineRunner) this).Map(context);
+            return Runner.Map(context);
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public TDestination DynamicMap<TSource, TDestination>(TSource source)
         {
-            Type modelType = typeof (TSource);
-            Type destinationType = typeof (TDestination);
+            var modelType = typeof (TSource);
+            var destinationType = typeof (TDestination);
 
             return (TDestination) DynamicMap(source, modelType, destinationType);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
         public void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
         {
-            Type modelType = typeof (TSource);
-            Type destinationType = typeof (TDestination);
+            var modelType = typeof (TSource);
+            var destinationType = typeof (TDestination);
 
             DynamicMap(source, destination, modelType, destinationType);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public TDestination DynamicMap<TDestination>(object source)
         {
-            Type modelType = source?.GetType() ?? typeof (object);
-            Type destinationType = typeof (TDestination);
+            //TODO: ruh roh! another C# 6.0 "language feature" ... interesting, but isn't there a better way?
+            //Type modelType = source?.GetType() ?? typeof (object);
+            var modelType = source != null ? source.GetType() : typeof (object);
+            var destinationType = typeof (TDestination);
 
             return (TDestination) DynamicMap(source, modelType, destinationType);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <returns></returns>
         public object DynamicMap(object source, Type sourceType, Type destinationType)
         {
-            var typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType) ??
-                          ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
+            var typeMap = _mapperContext.ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType)
+                          ?? _mapperContext.ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, sourceType, destinationType,
-                new MappingOperationOptions
-                {
-                    CreateMissingTypeMaps = true
-                }, this);
+                new MappingOperationOptions {CreateMissingTypeMaps = true}, _mapperContext);
 
-            return ((IMappingEngineRunner) this).Map(context);
+            return Runner.Map(context);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
         public void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
         {
-            var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType) ??
-                          ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
+            var typeMap = _mapperContext.ConfigurationProvider.ResolveTypeMap(source, destination, sourceType,
+                destinationType)
+                          ?? _mapperContext.ConfigurationProvider.CreateTypeMap(sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType,
-                new MappingOperationOptions
-                {
-                    CreateMissingTypeMaps = true
-                }, this);
+                new MappingOperationOptions{CreateMissingTypeMaps = true}, _mapperContext);
 
-            ((IMappingEngineRunner) this).Map(context);
+            Runner.Map(context);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="parentContext"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public TDestination Map<TSource, TDestination>(ResolutionContext parentContext, TSource source)
         {
-            Type destinationType = typeof (TDestination);
-            Type sourceType = typeof (TSource);
-            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+            var destinationType = typeof (TDestination);
+            var sourceType = typeof (TSource);
+            var typeMap = _mapperContext.ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
             var context = parentContext.CreateTypeContext(typeMap, source, null, sourceType, destinationType);
             return (TDestination) ((IMappingEngineRunner) this).Map(context);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         object IMappingEngineRunner.Map(ResolutionContext context)
         {
             try
@@ -230,15 +413,15 @@ namespace AutoMapper
                 var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
                 Func<TypePair, IObjectMapper> missFunc =
-                    tp => _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
+                    tp => _mapperContext.ObjectMappers.FirstOrDefault(mapper => mapper.IsMatch(context));
 
-                IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
+                var mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
 
                 if (mapperToUse == null)
                 {
                     if (context.Options.CreateMissingTypeMaps)
                     {
-                        var typeMap = ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType);
+                        var typeMap = _mapperContext.ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType);
 
                         context = context.CreateTypeContext(typeMap, context.SourceValue, context.DestinationValue,
                             context.SourceType, context.DestinationType);
@@ -255,7 +438,7 @@ namespace AutoMapper
                     }
                 }
 
-                return mapperToUse.Map(context, this);
+                return mapperToUse.Map(context);
             }
             catch (AutoMapperMappingException)
             {
@@ -267,6 +450,11 @@ namespace AutoMapper
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         object IMappingEngineRunner.CreateObject(ResolutionContext context)
         {
             var typeMap = context.TypeMap;
@@ -278,7 +466,7 @@ namespace AutoMapper
                 else if (typeMap.ConstructDestinationUsingServiceLocator)
                     return context.Options.ServiceCtor(destinationType);
                 else if (typeMap.ConstructorMap != null)
-                    return typeMap.ConstructorMap.ResolveValue(context, this);
+                    return typeMap.ConstructorMap.ResolveValue(context);
 
             if (context.DestinationValue != null)
                 return context.DestinationValue;
@@ -286,11 +474,16 @@ namespace AutoMapper
             if (destinationType.IsInterface())
                 destinationType = ProxyGeneratorFactory.Create().GetProxyType(destinationType);
 
-            return !ConfigurationProvider.MapNullSourceValuesAsNull
+            return !_mapperContext.ConfigurationProvider.MapNullSourceValuesAsNull
                 ? ObjectCreator.CreateNonNullValue(destinationType)
                 : ObjectCreator.CreateObject(destinationType);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         bool IMappingEngineRunner.ShouldMapSourceValueAsNull(ResolutionContext context)
         {
             if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
@@ -298,18 +491,23 @@ namespace AutoMapper
 
             var typeMap = context.GetContextTypeMap();
             if (typeMap != null)
-                return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
+                return _mapperContext.ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
 
-            return ConfigurationProvider.MapNullSourceValuesAsNull;
+            return _mapperContext.ConfigurationProvider.MapNullSourceValuesAsNull;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         bool IMappingEngineRunner.ShouldMapSourceCollectionAsNull(ResolutionContext context)
         {
             var typeMap = context.GetContextTypeMap();
             if (typeMap != null)
-                return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceCollectionsAsNull;
+                return _mapperContext.ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceCollectionsAsNull;
 
-            return ConfigurationProvider.MapNullSourceCollectionsAsNull;
+            return _mapperContext.ConfigurationProvider.MapNullSourceCollectionsAsNull;
         }
 
         private void ClearTypeMap(object sender, TypeMapCreatedEventArgs e)
@@ -319,6 +517,10 @@ namespace AutoMapper
             _objectMapperCache.TryRemove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType), out existing);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="opts"></param>
         private void DefaultMappingOptions(IMappingOperationOptions opts)
         {
             opts.ConstructServicesUsing(_serviceCtor);

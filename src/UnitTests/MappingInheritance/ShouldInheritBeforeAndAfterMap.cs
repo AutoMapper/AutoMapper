@@ -1,39 +1,43 @@
-﻿using AutoMapper.Mappers;
-using Should;
-using Xunit;
-
-namespace AutoMapper.UnitTests.MappingInheritance
+﻿namespace AutoMapper.UnitTests.MappingInheritance
 {
+    using Should;
+    using Xunit;
+
     public class ShouldInheritBeforeAndAfterMap
     {
         public class BaseClass
         {
             public string Prop { get; set; }
-        } 
-        public class Class : BaseClass {}
+        }
+
+        public class Class : BaseClass
+        {
+        }
 
         public class BaseDto
         {
-            public string DifferentProp { get; set; }            
+            public string DifferentProp { get; set; }
         }
-        public class Dto : BaseDto {}
+
+        public class Dto : BaseDto
+        {
+        }
 
         [Fact]
         public void should_inherit_base_beforemap()
         {
             // arrange
-            var source = new Class{ Prop = "test" };
-            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-            configurationProvider
-                .CreateMap<BaseClass, BaseDto>()
+            var mc = new MapperContext();
+            var source = new Class {Prop = "test"};
+
+            mc.CreateMap<BaseClass, BaseDto>()
                 .BeforeMap((s, d) => d.DifferentProp = s.Prop)
                 .Include<Class, Dto>();
 
-            configurationProvider.CreateMap<Class, Dto>();
-            var mappingEngine = new MappingEngine(configurationProvider);
+            mc.CreateMap<Class, Dto>();
 
             // act
-            var dest = mappingEngine.Map<Class, Dto>(source);
+            var dest = mc.Map<Class, Dto>(source);
 
             // assert
             "test".ShouldEqual(dest.DifferentProp);
@@ -43,18 +47,17 @@ namespace AutoMapper.UnitTests.MappingInheritance
         public void should_inherit_base_aftermap()
         {
             // arrange
-            var source = new Class { Prop = "test" };
-            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-            configurationProvider
-                .CreateMap<BaseClass, BaseDto>()
+            var mc = new MapperContext();
+            var source = new Class {Prop = "test"};
+
+            mc.CreateMap<BaseClass, BaseDto>()
                 .AfterMap((s, d) => d.DifferentProp = s.Prop)
                 .Include<Class, Dto>();
 
-            configurationProvider.CreateMap<Class, Dto>();
-            var mappingEngine = new MappingEngine(configurationProvider);
+            mc.CreateMap<Class, Dto>();
 
             // act
-            var dest = mappingEngine.Map<Class, Dto>(source);
+            var dest = mc.Map<Class, Dto>(source);
 
             // assert
             "test".ShouldEqual(dest.DifferentProp);

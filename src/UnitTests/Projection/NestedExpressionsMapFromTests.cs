@@ -5,7 +5,6 @@
         using System.Collections.Generic;
         using System.Linq;
         using QueryableExtensions;
-        using Rhino.Mocks.Constraints;
         using Should;
         using Xunit;
 
@@ -13,9 +12,9 @@
         {
             public NestedExpressionMapFromTests()
             {
-                Mapper.Initialize(cfg => 
-                    cfg.CreateMap<Parent, ParentDto>()
-                    .ForMember(dest => dest.TotalSum, opt => opt.MapFrom(p => p.Children.Sum(child => child.Value))));
+                Mapper.CreateMap<Parent, ParentDto>()
+                    .ForMember(dest => dest.TotalSum,
+                        opt => opt.MapFrom(p => p.Children.Sum(child => child.Value)));
             }
 
             [Fact]
@@ -25,10 +24,10 @@
                 {
                     new Parent
                     {
-                        Children = new List<Child>()
+                        Children = new List<Child>
                         {
-                            new Child() { Value = 4 },
-                            new Child() { Value = 5 },
+                            new Child {Value = 4},
+                            new Child {Value = 5}
                         }
                     }
                 };
@@ -43,7 +42,6 @@
         {
             public int TotalSum { get; set; }
         }
-
 
         public class Parent
         {

@@ -1,15 +1,16 @@
-using System;
-
+ // ReSharper disable once CheckNamespace
 namespace Should.Core
 {
+    using System;
+
     public abstract class DatePrecision
     {
-        public static DatePrecision Second = new SecondPrecision();
-        public static DatePrecision Minute = new MinutePrecision();
-        public static DatePrecision Hour = new HourPrecision();
-        public static DatePrecision Date = new DayPrecision();
-        public static DatePrecision Month = new MonthPrecision();
-        public static DatePrecision Year = new YearPrecision();
+        public static readonly DatePrecision Second = new SecondPrecision();
+        public static readonly DatePrecision Minute = new MinutePrecision();
+        public static readonly DatePrecision Hour = new HourPrecision();
+        public static readonly DatePrecision Date = new DayPrecision();
+        public static readonly DatePrecision Month = new MonthPrecision();
+        public static readonly DatePrecision Year = new YearPrecision();
 
         public abstract DateTime Truncate(DateTime date);
 

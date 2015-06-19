@@ -1,9 +1,10 @@
-using Should;
-using Xunit;
+#if !SILVERLIGHT
 
 namespace AutoMapper.UnitTests.Bug
 {
-#if !SILVERLIGHT
+    using Should;
+    using Xunit;
+
     public class EnumMatchingOnValue : AutoMapperSpecBase
     {
         private SecondClass _result;
@@ -29,6 +30,7 @@ namespace AutoMapper.UnitTests.Bug
             DifferentNamedEnum = 1,
             SecondNameEnum = 2
         }
+
         protected override void Establish_context()
         {
             Mapper.Initialize(cfg =>
@@ -39,10 +41,7 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Because_of()
         {
-            var source = new FirstClass
-            {
-                EnumValue = FirstEnum.NamedEnum
-            };
+            var source = new FirstClass {EnumValue = FirstEnum.NamedEnum};
             _result = Mapper.Map<FirstClass, SecondClass>(source);
         }
 
@@ -52,6 +51,6 @@ namespace AutoMapper.UnitTests.Bug
             _result.EnumValue.ShouldEqual(SecondEnum.DifferentNamedEnum);
         }
     }
-#endif
-
 }
+
+#endif

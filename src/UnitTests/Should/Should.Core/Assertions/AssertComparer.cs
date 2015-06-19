@@ -1,14 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
+// ReSharper disable CheckNamespace
+// ReSharper disable UseStringInterpolation
 namespace Should.Core.Assertions
 {
+    using System;
+    using System.Collections.Generic;
+    //TODO: might consider whether "Should" shouldn't just be AutoMapper(.Should), with non-appending folder name...
+    using AutoMapper;
+
     internal class AssertComparer<T> : IComparer<T>
     {
         public int Compare(T x, T y)
         {
-            Type type = typeof(T);
+            var  type = typeof(T);
 
             // Null?
             if (!type.IsValueType() || (type.IsGenericType() && type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Nullable<>))))
@@ -22,7 +25,10 @@ namespace Should.Core.Assertions
                     return -1;
             }
 
+            //TODO: IsInstanceOfType is suggested by R#, but I'm guessing that this is not available for all targets.
+            // ReSharper disable once UseMethodIsInstanceOfType
             var xIsAssignableFromY = x.GetType().IsAssignableFrom(y.GetType());
+            // ReSharper disable once UseMethodIsInstanceOfType
             var yIsAssignableFromX = y.GetType().IsAssignableFrom(x.GetType());
 
             if (!xIsAssignableFromY && !yIsAssignableFromX)
@@ -79,7 +85,7 @@ namespace Should.Core.Assertions
         }
 
         //Note: Handles edge case of a class where operators are overloaded but niether IComparable or IComparable<T> are implemented
-        private int? CompareUsingOperators(T x, T y, Type type)
+        private static int? CompareUsingOperators(T x, T y, Type type)
         {
             var greaterThan = type.GetMethod("op_GreaterThan");
             if (greaterThan != null)

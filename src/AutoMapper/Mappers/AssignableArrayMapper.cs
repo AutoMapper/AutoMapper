@@ -1,24 +1,36 @@
 namespace AutoMapper.Mappers
 {
-    using System.Reflection;
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class AssignableArrayMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
-            if (context.SourceValue == null && !mapper.ShouldMapSourceCollectionAsNull(context))
+            var runner = context.MapperContext.Runner;
+            if (context.SourceValue == null && !runner.ShouldMapSourceCollectionAsNull(context))
             {
-                return mapper.CreateObject(context);
+                return runner.CreateObject(context);
             }
 
             return context.SourceValue;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
-            return context.DestinationType.IsAssignableFrom(context.SourceType)
-                   && context.DestinationType.IsArray
-                   && context.SourceType.IsArray;
+            return context.DestinationType.IsArray
+                   && context.SourceType.IsArray
+                   && context.DestinationType.IsAssignableFrom(context.SourceType);
         }
     }
 }

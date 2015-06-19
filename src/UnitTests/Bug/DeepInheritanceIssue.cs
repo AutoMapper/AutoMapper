@@ -1,8 +1,8 @@
-﻿using Should;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
+    using Should;
+    using Xunit;
+
     public class DeepInheritanceIssue
     {
         [Fact]
@@ -22,11 +22,11 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<CSrc, CDest>();
             });
 
-            var expectedCSrc = new CSrc() {StringA = "A", StringB = "B", StringC = "C"};
-            var expectedBSrc = new BSrc() {StringA = "A", StringB = "B"};
+            var expectedCSrc = new CSrc {StringA = "A", StringB = "B", StringC = "C"};
+            var expectedBSrc = new BSrc {StringA = "A", StringB = "B"};
 
-            var expectedContCSrc = new ContainsASrc() {A = expectedCSrc};
-            var expectedContBSrc = new ContainsASrc() {A = expectedBSrc};
+            var expectedContCSrc = new ContainsASrc {A = expectedCSrc};
+            var expectedContBSrc = new ContainsASrc {A = expectedBSrc};
 
             var actualContCDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContCSrc);
             var actualContBDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContBSrc); // THROWS

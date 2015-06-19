@@ -1,6 +1,9 @@
 namespace AutoMapper
 {
     using System;
+    using System.Linq.Expressions;
+    using Internal;
+    using QueryableExtensions;
 
     /// <summary>
     /// Performs mapping based on configuration
@@ -8,9 +11,25 @@ namespace AutoMapper
     public interface IMappingEngine : IDisposable
     {
         /// <summary>
-        /// Configuration provider for performaing maps
+        /// Gets the configuration provider.
         /// </summary>
         IConfigurationProvider ConfigurationProvider { get; }
+
+        /// <summary>
+        /// Gets the mapping Runner.
+        /// </summary>
+        IMappingEngineRunner Runner { get; }
+
+        /// <summary>
+        /// Gets the expression Cache.
+        /// </summary>
+        IDictionary<ExpressionRequest, LambdaExpression> ExpressionCache { get; }
+
+        /// <summary>
+        /// Returns a new TypePairCount dictionary.
+        /// </summary>
+        /// <returns></returns>
+        IDictionary<ExpressionRequest, int> GetNewTypePairCount();
 
         /// <summary>
         /// Execute a mapping from the source object to a new destination object.

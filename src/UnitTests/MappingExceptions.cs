@@ -1,11 +1,10 @@
-using System;
-using Xunit;
-using Should;
-
 namespace AutoMapper.UnitTests
 {
-	namespace MappingExceptions
-	{
+    using Should;
+    using Xunit;
+
+    namespace MappingExceptions
+    {
         public class When_encountering_a_member_mapping_problem_during_mapping : NonValidatingSpecBase
         {
             public class Source
@@ -26,24 +25,24 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_provide_a_contextual_exception()
             {
-                var source = new Source { Value = "adsf" };
-                typeof(AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<Source, Dest>(source));
+                var source = new Source {Value = "adsf"};
+                typeof (AutoMapperMappingException).ShouldBeThrownBy(() => Mapper.Map<Source, Dest>(source));
             }
 
             [Fact]
             public void Should_have_contextual_mapping_information()
             {
-                var source = new Source { Value = "adsf" };
-                AutoMapperMappingException thrown = null;
+                var source = new Source {Value = "adsf"};
+                AutoMapperMappingException thrownException = null;
                 try
                 {
                     Mapper.Map<Source, Dest>(source);
                 }
                 catch (AutoMapperMappingException ex)
                 {
-                    thrown = ex;
+                    thrownException = ex;
                 }
-                thrown.ShouldNotBeNull();
+                thrownException.ShouldNotBeNull();
             }
         }
     }

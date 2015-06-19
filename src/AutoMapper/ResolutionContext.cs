@@ -3,6 +3,7 @@ namespace AutoMapper
     using System;
     using System.Collections.Generic;
 
+    //TODO: may want to make ResolutionContext disposable if it makes sense to do so...
     /// <summary>
     /// Context information regarding resolution of a destination value
     /// </summary>
@@ -59,18 +60,37 @@ namespace AutoMapper
         public Dictionary<ResolutionContext, object> InstanceCache { get; }
 
         /// <summary>
-        /// Current mapping engine
+        /// Current mapper context
         /// </summary>
-        public IMappingEngine Engine { get; }
+        public IMapperContext MapperContext { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="typeMap"></param>
+        /// <param name="source"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <param name="options"></param>
+        /// <param name="mapperContext"></param>
         public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType,
-            MappingOperationOptions options, IMappingEngine engine)
-            : this(typeMap, source, null, sourceType, destinationType, options, engine)
+            MappingOperationOptions options, IMapperContext mapperContext)
+            : this(typeMap, source, null, sourceType, destinationType, options, mapperContext)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="typeMap"></param>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <param name="options"></param>
+        /// <param name="mapperContext"></param>
         public ResolutionContext(TypeMap typeMap, object source, object destination, Type sourceType,
-            Type destinationType, MappingOperationOptions options, IMappingEngine engine)
+            Type destinationType, MappingOperationOptions options, IMapperContext mapperContext)
         {
             TypeMap = typeMap;
             SourceValue = source;
@@ -87,7 +107,7 @@ namespace AutoMapper
             }
             InstanceCache = new Dictionary<ResolutionContext, object>();
             Options = options;
-            Engine = engine;
+            MapperContext = mapperContext;
         }
 
         private ResolutionContext(ResolutionContext context, object sourceValue, Type sourceType)
@@ -102,7 +122,7 @@ namespace AutoMapper
             DestinationType = context.DestinationType;
             InstanceCache = context.InstanceCache;
             Options = context.Options;
-            Engine = context.Engine;
+            MapperContext = context.MapperContext;
         }
 
         private ResolutionContext(ResolutionContext context, TypeMap memberTypeMap, object sourceValue,
@@ -124,7 +144,7 @@ namespace AutoMapper
             }
             InstanceCache = context.InstanceCache;
             Options = context.Options;
-            Engine = context.Engine;
+            MapperContext = context.MapperContext;
         }
 
         private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue,
@@ -139,7 +159,7 @@ namespace AutoMapper
             SourceType = memberTypeMap.SourceType;
             DestinationType = memberTypeMap.DestinationType;
             Options = context.Options;
-            Engine = context.Engine;
+            MapperContext = context.MapperContext;
         }
 
         private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue,
@@ -153,7 +173,7 @@ namespace AutoMapper
             DestinationType = propertyMap.DestinationProperty.MemberType;
             InstanceCache = context.InstanceCache;
             Options = context.Options;
-            Engine = context.Engine;
+            MapperContext = context.MapperContext;
         }
 
         private ResolutionContext(ResolutionContext context, object sourceValue, TypeMap typeMap, Type sourceType,
@@ -176,39 +196,77 @@ namespace AutoMapper
                 DestinationType = destinationType;
             }
             Options = context.Options;
-            Engine = context.Engine;
+            MapperContext = context.MapperContext;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="destintationValue"></param>
         public void SetResolvedDestinationValue(object destintationValue)
         {
             DestinationValue = destintationValue;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string MemberName => PropertyMap == null
             ? string.Empty
             : (ArrayIndex == null
                 ? PropertyMap.DestinationProperty.Name
                 : PropertyMap.DestinationProperty.Name + ArrayIndex.Value);
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsSourceValueNull => Equals(null, SourceValue);
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sourceValue"></param>
+        /// <param name="sourceType"></param>
+        /// <returns></returns>
         public ResolutionContext CreateValueContext(object sourceValue, Type sourceType)
         {
             return new ResolutionContext(this, sourceValue, sourceType);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="memberTypeMap"></param>
+        /// <param name="sourceValue"></param>
+        /// <param name="destinationValue"></param>
+        /// <param name="sourceType"></param>
+        /// <param name="destinationType"></param>
+        /// <returns></returns>
         public ResolutionContext CreateTypeContext(TypeMap memberTypeMap, object sourceValue, object destinationValue,
             Type sourceType, Type destinationType)
         {
             return new ResolutionContext(this, memberTypeMap, sourceValue, destinationValue, sourceType, destinationType);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propertyMap"></param>
+        /// <returns></returns>
         public ResolutionContext CreatePropertyMapContext(PropertyMap propertyMap)
         {
             return new ResolutionContext(this, SourceValue, DestinationValue, SourceType, propertyMap);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="memberTypeMap"></param>
+        /// <param name="memberValue"></param>
+        /// <param name="destinationValue"></param>
+        /// <param name="sourceMemberType"></param>
+        /// <param name="propertyMap"></param>
+        /// <returns></returns>
         public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, object destinationValue,
             Type sourceMemberType, PropertyMap propertyMap)
         {
@@ -217,6 +275,15 @@ namespace AutoMapper
                 : new ResolutionContext(this, memberValue, destinationValue, sourceMemberType, propertyMap);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elementTypeMap"></param>
+        /// <param name="item"></param>
+        /// <param name="sourceElementType"></param>
+        /// <param name="destinationElementType"></param>
+        /// <param name="arrayIndex"></param>
+        /// <returns></returns>
         public ResolutionContext CreateElementContext(TypeMap elementTypeMap, object item, Type sourceElementType,
             Type destinationElementType, int arrayIndex)
         {
@@ -224,11 +291,19 @@ namespace AutoMapper
                 arrayIndex);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return $"Trying to map {SourceType.Name} to {DestinationType.Name}.";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public TypeMap GetContextTypeMap()
         {
             TypeMap typeMap = TypeMap;
@@ -241,6 +316,10 @@ namespace AutoMapper
             return typeMap;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public PropertyMap GetContextPropertyMap()
         {
             PropertyMap propertyMap = PropertyMap;
@@ -253,6 +332,11 @@ namespace AutoMapper
             return propertyMap;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(ResolutionContext other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -261,6 +345,11 @@ namespace AutoMapper
                    Equals(other.DestinationType, DestinationType) && Equals(other.SourceValue, SourceValue);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
@@ -269,6 +358,10 @@ namespace AutoMapper
             return Equals((ResolutionContext) obj);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             unchecked
@@ -280,11 +373,25 @@ namespace AutoMapper
                 return result;
             }
         }
+    }
 
-        public static ResolutionContext New<TSource>(TSource sourceValue)
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class ResolutionContextExtensionMethods
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="mapperContext"></param>
+        /// <param name="sourceValue"></param>
+        /// <returns></returns>
+        [Obsolete]
+        public static ResolutionContext NewResolutionContext<TSource>(this IMapperContext mapperContext, TSource sourceValue)
         {
-            return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions(),
-                Mapper.Engine);
+            return new ResolutionContext(null, sourceValue, typeof(TSource), null, new MappingOperationOptions(),
+                mapperContext);
         }
     }
 }

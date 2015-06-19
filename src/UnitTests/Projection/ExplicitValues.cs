@@ -22,13 +22,13 @@
 
         protected override void Establish_context()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>()
-                .ForMember(dest => dest.Value, opt => opt.UseValue(5)));
+            Mapper.CreateMap<Source, Dest>()
+                .ForMember(dest => dest.Value, opt => opt.UseValue(5));
         }
 
         protected override void Because_of()
         {
-            var source = new[] { new Source { Value = 10 } }.AsQueryable();
+            var source = new[] {new Source {Value = 10}}.AsQueryable();
 
             _dests = source.Project().To<Dest>().ToList();
         }
@@ -56,20 +56,21 @@
 
         protected override void Establish_context()
         {
+            // This is intentionally done apart from Initialize.
             Mapper.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.UseValue(5));
 
-            new[] { new Source { Value = 10 } }.AsQueryable().Project().To<Dest>().ToList();
+            new[] {new Source {Value = 10}}.AsQueryable().Project().To<Dest>().ToList();
 
             Mapper.Reset();
 
             Mapper.CreateMap<Source, Dest>()
-                    .ForMember(dest => dest.Value, opt => opt.UseValue(10));
+                .ForMember(dest => dest.Value, opt => opt.UseValue(10));
         }
 
         protected override void Because_of()
         {
-            var source = new[] { new Source { Value = 10 } }.AsQueryable();
+            var source = new[] {new Source {Value = 10}}.AsQueryable();
 
             _dests = source.Project().To<Dest>().ToList();
         }

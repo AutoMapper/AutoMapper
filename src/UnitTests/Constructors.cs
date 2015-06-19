@@ -1,10 +1,13 @@
-﻿using System;
-using System.Linq.Expressions;
-using Xunit;
-using Should;
-
-namespace AutoMapper.UnitTests
+﻿namespace AutoMapper.UnitTests
 {
+    using System;
+    using System.Linq.Expressions;
+    using Xunit;
+    using Should;
+
+    // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
+    // ReSharper disable ConvertToAutoProperty
+    // ReSharper disable ConvertPropertyToExpressionBody
     namespace Constructors
     {
         public class When_mapping_to_an_object_with_a_constructor_with_a_matching_argument : AutoMapperSpecBase
@@ -41,11 +44,11 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                Expression<Func<object, object>> ctor = (input) => new Dest((int)input);
+                Expression<Func<object, object>> ctor = (input) => new Dest((int) input);
 
                 object o = ctor.Compile()(5);
 
-                _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5, Bar = 10 });
+                _dest = Mapper.Map<Source, Dest>(new Source {Foo = 5, Bar = 10});
             }
 
             [Fact]
@@ -92,7 +95,7 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5 });
+                _dest = Mapper.Map<Source, Dest>(new Source {Foo = 5});
             }
 
             [Fact]
@@ -145,7 +148,7 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5 });
+                _dest = Mapper.Map<Source, Dest>(new Source {Foo = 5});
             }
 
             [Fact]
@@ -198,7 +201,8 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5 }, opt => opt.ConstructServicesUsing(t => new Dest(6)));
+                _dest = Mapper.Map<Source, Dest>(new Source {Foo = 5},
+                    opt => opt.ConstructServicesUsing(t => new Dest(6)));
             }
 
             [Fact]
@@ -208,7 +212,8 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_mapping_to_an_object_with_multiple_constructors_and_constructor_mapping_is_disabled : AutoMapperSpecBase
+        public class When_mapping_to_an_object_with_multiple_constructors_and_constructor_mapping_is_disabled :
+            AutoMapperSpecBase
         {
             private Dest _dest;
 
@@ -229,22 +234,23 @@ namespace AutoMapper.UnitTests
                     throw new NotImplementedException();
                 }
 
-                public Dest() { }
+                public Dest()
+                {
+                }
             }
 
             protected override void Establish_context()
             {
                 Mapper.Initialize(cfg =>
-                                      {
-                                          cfg.DisableConstructorMapping();
-                                          cfg.CreateMap<Source, Dest>();
-                                      }
-                    );
+                {
+                    cfg.DisableConstructorMapping();
+                    cfg.CreateMap<Source, Dest>();
+                });
             }
 
             protected override void Because_of()
             {
-                _dest = Mapper.Map<Source, Dest>(new Source { Foo = 5, Bar = 10 });
+                _dest = Mapper.Map<Source, Dest>(new Source {Foo = 5, Bar = 10});
             }
 
             [Fact]
@@ -254,6 +260,7 @@ namespace AutoMapper.UnitTests
                 _dest.Bar.ShouldEqual(10);
             }
         }
+
         public class UsingMappingEngineToResolveConstructorArguments : AutoMapperSpecBase
         {
             [Fact]
@@ -328,7 +335,6 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_constructor_when_args_are_optional()
             {
-
                 Mapper.CreateMap<SourceFoo, DestinationFoo>();
 
                 var sourceBar = new SourceBar("fooBar");
@@ -340,11 +346,10 @@ namespace AutoMapper.UnitTests
                 destinationFoo.Str.ShouldEqual("hello");
             }
 
-
             public class DestinationFoo
             {
                 private readonly DestinationBar _bar;
-                private string _str;
+                private readonly string _str;
 
                 public DestinationBar Bar
                 {
@@ -356,7 +361,7 @@ namespace AutoMapper.UnitTests
                     get { return _str; }
                 }
 
-                public DestinationFoo(DestinationBar bar=null,string str="hello")
+                public DestinationFoo(DestinationBar bar = null, string str = "hello")
                 {
                     _bar = bar;
                     _str = str;
@@ -487,9 +492,10 @@ namespace AutoMapper.UnitTests
 
             public class DestinationFoo
             {
-                private string _a;
-                private string _b;
-                private int _c;
+                private readonly string _a;
+                private readonly string _b;
+                private readonly int _c;
+
                 public string A
                 {
                     get { return _a; }
@@ -505,7 +511,7 @@ namespace AutoMapper.UnitTests
                     get { return _c; }
                 }
 
-                public DestinationFoo(string a = "a",string b="b", int c = 3)
+                public DestinationFoo(string a = "a", string b = "b", int c = 3)
                 {
                     _a = a;
                     _b = b;
