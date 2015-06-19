@@ -75,10 +75,11 @@ namespace AutoMapperSamples
         {
             public ConfigurationRegistry()
             {
+                //TODO: TBD: may want(/need?) to route the ObjectMapperCollection through static sources...
 				ForRequestedType<ConfigurationStore>()
 					.CacheBy(InstanceScope.Singleton)
 					.TheDefault.Is.OfConcreteType<ConfigurationStore>()
-					.CtorDependency<IEnumerable<IObjectMapper>>().Is(expr => expr.ConstructedBy(() => MapperRegistry.Mappers));
+					.CtorDependency<IEnumerable<IObjectMapper>>().Is(expr => expr.ConstructedBy(() => new ObjectMapperCollection()));
 
                 ForRequestedType<IConfigurationProvider>()
 					.TheDefault.Is.ConstructedBy(ctx => ctx.GetInstance<ConfigurationStore>());
@@ -92,12 +93,15 @@ namespace AutoMapperSamples
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public class MappingEngineRegistry : Registry
         {
             public MappingEngineRegistry()
             {
                 ForRequestedType<IMappingEngine>()
-                    .TheDefault.Is.ConstructedBy(() => Mapper.Engine);
+                    .TheDefault.Is.ConstructedBy(() => Mapper.Context.Engine);
             }
         }
 

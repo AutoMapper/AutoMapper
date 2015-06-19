@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
-
-namespace AutoMapper.UnitTests
+﻿namespace AutoMapper.UnitTests
 {
     using Should.Core.Assertions;
+    using Xunit;
 
     public class When_using_a_member_name_replacer : AutoMapperSpecBase
     {
@@ -27,21 +22,22 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_map_properties_with_different_names()
         {
-            Mapper.Initialize(c =>
+            Mapper.Initialize(cfg =>
             {
-                c.ReplaceMemberName("Ä", "A");
-                c.ReplaceMemberName("í", "i");
-                c.ReplaceMemberName("Airlina", "Airline");
+                cfg.ReplaceMemberName("Ä", "A");
+                cfg.ReplaceMemberName("í", "i");
+                cfg.ReplaceMemberName("Airlina", "Airline");
+
+                cfg.CreateMap<Source, Destination>();
             });
 
-            var source = new Source()
+            var source = new Source
             {
                 Value = 5,
                 Ävíator = 3,
                 SubAirlinaFlight = 4
             };
 
-            Mapper.CreateMap<Source, Destination>();
             var destination = Mapper.Map<Source, Destination>(source);
 
             Assert.Equal(source.Value, destination.Value);
@@ -49,5 +45,4 @@ namespace AutoMapper.UnitTests
             Assert.Equal(source.SubAirlinaFlight, destination.SubAirlineFlight);
         }
     }
-
 }

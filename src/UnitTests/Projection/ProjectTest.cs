@@ -1,81 +1,80 @@
-﻿﻿using Xunit;
-﻿using Should;
-
-namespace AutoMapper.UnitTests.Projection
+﻿namespace AutoMapper.UnitTests.Projection
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-
-	using AutoMapper;
-	using QueryableExtensions;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Should;
+    using Xunit;
+    using QueryableExtensions;
 
     public class ProjectTest
-	{
+    {
         public ProjectTest()
         {
-			Mapper.CreateMap<Address, AddressDto>();
-			Mapper.CreateMap<Customer, CustomerDto>();
+            Mapper.CreateMap<Address, AddressDto>();
+            Mapper.CreateMap<Customer, CustomerDto>();
         }
 
-		[Fact(Skip = "EF doesn't support null values in expressions")]
-		public void SelectUsingProjectToWithNullComplexSourceProperty()
-		{
-			var customers = new[] { new Customer { FirstName = "Bill", LastName = "White" } }.AsQueryable();
+        [Fact(Skip = "EF doesn't support null values in expressions")]
+        public void SelectUsingProjectToWithNullComplexSourceProperty()
+        {
+            var customers = new[] {new Customer {FirstName = "Bill", LastName = "White"}}.AsQueryable();
 
-			var projected = customers.Project().To<CustomerDto>().SingleOrDefault();
-			projected.ShouldNotBeNull();
-			projected.Address.ShouldBeNull();
-		}
+            var projected = customers.Project().To<CustomerDto>().SingleOrDefault();
 
-		[Fact]
-		public void ProjectToWithUnmappedTypeShouldThrowException()
-		{
-			var customers =
-				new[] { new Customer { FirstName = "Bill", LastName = "White", Address = new Address("Street1") } }
-					.AsQueryable();
+            projected.ShouldNotBeNull();
+            projected.Address.ShouldBeNull();
+        }
 
-			IList<Unmapped> projected = null;
+        [Fact]
+        public void ProjectToWithUnmappedTypeShouldThrowException()
+        {
+            var customers = new[]
+            {
+                new Customer {FirstName = "Bill", LastName = "White", Address = new Address("Street1")}
+            }.AsQueryable();
 
-            typeof(InvalidOperationException).ShouldBeThrownBy(() => projected = customers.Project().To<Unmapped>().ToList());
+            IList<Unmapped> projected = null;
 
-			projected.ShouldBeNull();
-		}
+            typeof (InvalidOperationException).ShouldBeThrownBy(
+                () => projected = customers.Project().To<Unmapped>().ToList());
 
-		public class Customer
-		{
-			public string FirstName { get; set; }
+            projected.ShouldBeNull();
+        }
 
-			public string LastName { get; set; }
+        public class Customer
+        {
+            public string FirstName { get; set; }
 
-			public Address Address { get; set; }
-		}
+            public string LastName { get; set; }
 
-		public class Address
-		{
-			public Address(string street)
-			{
-				Street = street;
-			}
+            public Address Address { get; set; }
+        }
 
-			public string Street { get; set; }
-		}
+        public class Address
+        {
+            public Address(string street)
+            {
+                Street = street;
+            }
 
-		public class CustomerDto
-		{
-			public string FirstName { get; set; }
+            public string Street { get; set; }
+        }
 
-			public AddressDto Address { get; set; }
-		}
+        public class CustomerDto
+        {
+            public string FirstName { get; set; }
 
-		public class AddressDto
-		{
-			public string Street { get; set; }
-		}
+            public AddressDto Address { get; set; }
+        }
 
-		public class Unmapped
-		{
-			public string FirstName { get; set; }
-		}
-	}
+        public class AddressDto
+        {
+            public string Street { get; set; }
+        }
+        public class Unmapped
+        {
+            public string FirstName { get; set; }
+        }
+    }
 }

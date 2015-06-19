@@ -1,47 +1,65 @@
 ﻿namespace AutoMapper.Mappers
 {
     using System;
-    using System.Reflection;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class PrimitiveArrayMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
-            if (context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+            var runner = context.MapperContext.Runner;
+            if (context.IsSourceValueNull && runner.ShouldMapSourceCollectionAsNull(context))
             {
                 return null;
             }
 
-            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
-            Type destElementType = TypeHelper.GetElementType(context.DestinationType);
+            var sourceElementType = context.SourceType.GetNullEnumerableElementType();
+            var destElementType = context.DestinationType.GetNullEnumerableElementType();
 
-            Array sourceArray = (Array) context.SourceValue ?? ObjectCreator.CreateArray(sourceElementType, 0);
+            var sourceArray = (Array) context.SourceValue ?? ObjectCreator.CreateArray(sourceElementType, 0);
 
-            int sourceLength = sourceArray.Length;
-            Array destArray = ObjectCreator.CreateArray(destElementType, sourceLength);
+            var sourceLength = sourceArray.Length;
+            var destArray = ObjectCreator.CreateArray(destElementType, sourceLength);
 
             Array.Copy(sourceArray, destArray, sourceLength);
 
             return destArray;
         }
 
-        private bool IsPrimitiveArrayType(Type type)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static bool IsPrimitiveArrayType(Type type)
         {
             if (type.IsArray)
             {
-                Type elementType = TypeHelper.GetElementType(type);
-                return elementType.IsPrimitive() || elementType.Equals(typeof (string));
+                var elementType = type.GetNullEnumerableElementType();
+                //TODO: check this works... I believe it should...
+                return elementType.IsPrimitive() || elementType == typeof (string);
             }
 
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
-            return IsPrimitiveArrayType(context.DestinationType) &&
-                   IsPrimitiveArrayType(context.SourceType) &&
-                   (TypeHelper.GetElementType(context.DestinationType)
-                       .Equals(TypeHelper.GetElementType(context.SourceType)));
+            return IsPrimitiveArrayType(context.DestinationType)
+                   && IsPrimitiveArrayType(context.SourceType)
+                   && context.DestinationType.GetElementType() == context.SourceType.GetElementType();
         }
     }
 }

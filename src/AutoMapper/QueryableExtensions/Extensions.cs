@@ -7,13 +7,13 @@ namespace AutoMapper.QueryableExtensions
     using Impl;
     using Internal;
 
-    public static class Extensions
+    /// <summary>
+    /// These extension methods are focused through the <see cref="IMappingEngine"/> interface alone.
+    /// Any references to resources like <see cref="IConfigurationProvider"/> should be done through
+    /// the engine.
+    /// </summary>
+    public static class MappingEngineExtensions
     {
-        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
-
-        private static readonly Internal.IDictionary<ExpressionRequest, LambdaExpression> _expressionCache
-            = DictionaryFactory.CreateDictionary<ExpressionRequest, LambdaExpression>();
-
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
             new MemberGetterExpressionResultConverter(),
@@ -31,11 +31,6 @@ namespace AutoMapper.QueryableExtensions
             new StringExpressionBinder()
         };
 
-        public static void ClearExpressionCache()
-        {
-            _expressionCache.Clear();
-        }
-
         /// <summary>
         /// Create an expression tree representing a mapping from the <typeparamref name="TSource"/> type to <typeparamref name="TDestination"/> type
         /// Includes flattening and expressions inside MapFrom member configuration
@@ -52,7 +47,7 @@ namespace AutoMapper.QueryableExtensions
         {
             return
                 (Expression<Func<TSource, TDestination>>)
-                    mappingEngine.CreateMapExpression(typeof (TSource), typeof (TDestination), parameters,
+                    mappingEngine.CreateMapExpression(typeof(TSource), typeof(TDestination), parameters,
                         membersToExpand);
         }
 
@@ -73,11 +68,10 @@ namespace AutoMapper.QueryableExtensions
             //Expression.const
             parameters = parameters ?? new Dictionary<string, object>();
 
-            var cachedExpression =
-                _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand),
-                    tp =>
-                        CreateMapExpression(mappingEngine, tp,
-                            DictionaryFactory.CreateDictionary<ExpressionRequest, int>()));
+            var cachedExpression = mappingEngine.ExpressionCache.GetOrAdd(
+                new ExpressionRequest(sourceType, destinationType, membersToExpand),
+                tp =>
+                    CreateMapExpression(mappingEngine, tp, mappingEngine.GetNewTypePairCount()));
 
             if (!parameters.Any())
                 return cachedExpression;
@@ -99,7 +93,7 @@ namespace AutoMapper.QueryableExtensions
         public static IProjectionExpression Project<TSource>(
             this IQueryable<TSource> source)
         {
-            return source.Project(Mapper.Engine);
+            return source.Project(Mapper.Context.Engine);
         }
 
         /// <summary>
@@ -127,7 +121,7 @@ namespace AutoMapper.QueryableExtensions
         public static IQueryable<TDestination> ProjectTo<TDestination>(
             this IQueryable source)
         {
-            return source.ProjectTo<TDestination>(Mapper.Engine);
+            return source.ProjectTo<TDestination>(Mapper.Context.Engine);
         }
 
         /// <summary>
@@ -144,18 +138,18 @@ namespace AutoMapper.QueryableExtensions
             return new ProjectionExpression(source, mappingEngine).To<TDestination>();
         }
 
-        internal static LambdaExpression CreateMapExpression(IMappingEngine mappingEngine, ExpressionRequest request,
-            Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        internal static LambdaExpression CreateMapExpression(this IMappingEngine mappingEngine,
+            ExpressionRequest request, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             // this is the input parameter of this expression with name <variableName>
             ParameterExpression instanceParameter = Expression.Parameter(request.SourceType, "dto");
 
-            var total = CreateMapExpression(mappingEngine, request, instanceParameter, typePairCount);
+            var total = mappingEngine.CreateMapExpression(request, instanceParameter, typePairCount);
 
             return Expression.Lambda(total, instanceParameter);
         }
 
-        internal static Expression CreateMapExpression(IMappingEngine mappingEngine, ExpressionRequest request,
+        internal static Expression CreateMapExpression(this IMappingEngine mappingEngine, ExpressionRequest request,
             Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             var typeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(request.SourceType,
@@ -170,7 +164,7 @@ namespace AutoMapper.QueryableExtensions
                 throw new InvalidOperationException(message);
             }
 
-            var bindings = CreateMemberBindings(mappingEngine, request, typeMap, instanceParameter, typePairCount);
+            var bindings = mappingEngine.CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
 
             var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
             var visitor = new NewFinderVisitor();
@@ -196,8 +190,8 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
-        private static List<MemberBinding> CreateMemberBindings(IMappingEngine mappingEngine, ExpressionRequest request,
-            TypeMap typeMap,
+        private static List<MemberBinding> CreateMemberBindings(this IMappingEngine mappingEngine,
+            ExpressionRequest request, TypeMap typeMap,
             Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             var bindings = new List<MemberBinding>();
@@ -207,7 +201,9 @@ namespace AutoMapper.QueryableExtensions
             if (visitCount >= typeMap.MaxDepth)
                 return bindings;
 
-            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
+            var resolvablePropertyMaps = typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()).ToArray();
+
+            foreach (var propertyMap in resolvablePropertyMaps)
             {
                 var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter);
 

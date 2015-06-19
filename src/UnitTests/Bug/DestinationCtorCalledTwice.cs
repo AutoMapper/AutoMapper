@@ -3,6 +3,7 @@ using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
+    // ReSharper disable ConvertPropertyToExpressionBody
     namespace DestinationCtorCalledTwice
     {
         public class Bug : AutoMapperSpecBase
@@ -11,17 +12,22 @@ namespace AutoMapper.UnitTests.Bug
             {
                 public int Value { get; set; }
             }
+
             public class Destination
             {
                 private static int _callCount = 0;
-                
+
                 public Destination()
                 {
                     _callCount++;
                 }
 
                 public int Value { get; set; }
-                public static int CallCount { get { return _callCount; } }
+
+                public static int CallCount
+                {
+                    get { return _callCount; }
+                }
 
                 public static void Reset()
                 {

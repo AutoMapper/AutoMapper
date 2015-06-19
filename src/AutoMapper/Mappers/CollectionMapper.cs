@@ -2,25 +2,40 @@ namespace AutoMapper.Mappers
 {
     using System;
     using System.Collections.Generic;
-    using System.Reflection;
     using Internal;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class CollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        private Type EnumerableMapperType { get; } = typeof (EnumerableMapper<,>);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
-            Type genericType = typeof (EnumerableMapper<,>);
-
             var collectionType = context.DestinationType;
-            var elementType = TypeHelper.GetElementType(context.DestinationType);
+            var elementType = context.DestinationType.GetNullEnumerableElementType();
 
-            var enumerableMapper = genericType.MakeGenericType(collectionType, elementType);
+            var enumerableMapper = EnumerableMapperType.MakeGenericType(collectionType, elementType);
 
             var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
 
-            return objectMapper.Map(context, mapper);
+            return objectMapper.Map(context);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
             var isMatch = context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
@@ -50,16 +65,9 @@ namespace AutoMapper.Mappers
 
             protected override TCollection CreateDestinationObjectBase(Type destElementType, int sourceLength)
             {
-                Object collection;
-
-                if (typeof (TCollection).IsInterface())
-                {
-                    collection = new List<TElement>();
-                }
-                else
-                {
-                    collection = ObjectCreator.CreateDefaultValue(typeof (TCollection));
-                }
+                var collection = typeof (TCollection).IsInterface()
+                    ? new List<TElement>()
+                    : ObjectCreator.CreateDefaultValue(typeof (TCollection));
 
                 return (TCollection) collection;
             }

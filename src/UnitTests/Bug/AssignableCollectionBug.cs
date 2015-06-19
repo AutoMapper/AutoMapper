@@ -1,86 +1,88 @@
-using System.Collections.Generic;
-using Xunit;
-using Should;
-
 namespace AutoMapper.UnitTests.Bug
 {
-	namespace AssignableCollectionBug
-	{
-		public interface IAddress
-		{
-			string Street { get; set; }
-		}
+    using System.Collections.Generic;
+    using Xunit;
+    using Should;
+
+    namespace AssignableCollectionBug
+    {
+        public interface IAddress
+        {
+            string Street { get; set; }
+        }
 
         public interface IPerson
-		{
-			string Name { get; set; }
-			IList<IAddress> Addresses { get; set; }
-		}
+        {
+            string Name { get; set; }
+            IList<IAddress> Addresses { get; set; }
+        }
 
-		// To keep things as simple as possible, implementations are exactly the same.
+        // To keep things as simple as possible, implementations are exactly the same.
         public class PersonOne : IPerson
-		{
-			#region Implementation of IPerson
+        {
+            #region Implementation of IPerson
 
-			public string Name { get; set; }
-			public IList<IAddress> Addresses { get; set; }
+            public string Name { get; set; }
+            public IList<IAddress> Addresses { get; set; }
 
-			#endregion
-		}
+            #endregion
+        }
 
         public class PersonTwo : IPerson
-		{
-			public string Name { get; set; }
-			public IList<IAddress> Addresses { get; set; }
-		}
+        {
+            public string Name { get; set; }
+            public IList<IAddress> Addresses { get; set; }
+        }
 
         public class AddressOne : IAddress
-		{
-			#region Implementation of IAddress
+        {
+            #region Implementation of IAddress
 
-			public string Street { get; set; }
+            public string Street { get; set; }
 
-			#endregion
-		}
+            #endregion
+        }
 
         public class AddressTwo : IAddress
-		{
-			#region Implementation of IAddress
+        {
+            #region Implementation of IAddress
 
-			public string Street { get; set; }
+            public string Street { get; set; }
 
-			#endregion
-		}
-		public class MappingTests
-		{
-			[Fact(Skip = "This sounds like really bad behavior to support, at least this way.")]
-			public void CanMapPersonOneToPersonTwo()
-			{
-				IList<IAddress> adrList = new List<IAddress> { new AddressOne { Street = "Street One" } };
-				PersonOne source = new PersonOne { Name = "A Name", Addresses = adrList };
+            #endregion
+        }
 
-				// I thought these mappings would be enough. I tried various others, without success.
-				Mapper.CreateMap<PersonOne, PersonTwo>();
-				Mapper.CreateMap<AddressOne, AddressTwo>();
-				Mapper.CreateMap<AddressOne, IAddress>().ConvertUsing(Mapper.Map<AddressOne, AddressTwo>);
-				Mapper.AssertConfigurationIsValid();
-				var result = Mapper.Map<PersonOne, PersonTwo>(source);
+        public class MappingTests
+        {
+            [Fact(Skip = "This sounds like really bad behavior to support, at least this way.")]
+            public void CanMapPersonOneToPersonTwo()
+            {
+                // I thought these mappings would be enough. I tried various others, without success.
+                Mapper.CreateMap<PersonOne, PersonTwo>();
+                Mapper.CreateMap<AddressOne, AddressTwo>();
+                Mapper.CreateMap<AddressOne, IAddress>().ConvertUsing(Mapper.Map<AddressOne, AddressTwo>);
 
-				// These are ok.
-				source.Name.ShouldEqual(result.Name);
-				result.Addresses.ShouldNotBeNull();
-				(result.Addresses.Count == 1).ShouldBeTrue();
-				source.Addresses[0].Street.ShouldEqual(result.Addresses[0].Street);
+                Mapper.AssertConfigurationIsValid();
 
-				// This is what I can't get to pass:
-				result.Addresses[0].ShouldBeType<AddressTwo>();
+                IList<IAddress> adrList = new List<IAddress> {new AddressOne {Street = "Street One"}};
+                var source = new PersonOne {Name = "A Name", Addresses = adrList};
 
-				// Expected: instance of <AutomapperTest.AddressTwo>
-				// But was:  <AutomapperTest.AddressOne>
-			}
-		}
+                var result = Mapper.Map<PersonOne, PersonTwo>(source);
 
-	}
+                // These are ok.
+                source.Name.ShouldEqual(result.Name);
+                result.Addresses.ShouldNotBeNull();
+                (result.Addresses.Count == 1).ShouldBeTrue();
+                source.Addresses[0].Street.ShouldEqual(result.Addresses[0].Street);
+
+                // This is what I can't get to pass:
+                result.Addresses[0].ShouldBeType<AddressTwo>();
+
+                // Expected: instance of <AutomapperTest.AddressTwo>
+                // But was:  <AutomapperTest.AddressOne>
+            }
+        }
+    }
 
     namespace ByteArrayBug
     {
@@ -131,7 +133,7 @@ namespace AutoMapper.UnitTests.Bug
                 // arrange
                 Mapper.Reset();
                 Mapper.CreateMap<A, B>();
-                var source = new A { Images = new List<string>() };
+                var source = new A {Images = new List<string>()};
 
                 // act
                 var destination = Mapper.Map<B>(source);

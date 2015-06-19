@@ -18,7 +18,6 @@
 
         public class ChildSource
         {
-            
         }
 
         public class Dest
@@ -36,8 +35,7 @@
         {
             Mapper.CreateMap<Source, Dest>()
                 .ForMember(m => m.Child1, opt => opt.ExplicitExpansion())
-                .ForMember(m => m.Child2, opt => opt.ExplicitExpansion())
-                ;
+                .ForMember(m => m.Child2, opt => opt.ExplicitExpansion());
             Mapper.CreateMap<ChildSource, ChildDest>();
         }
 
@@ -53,7 +51,8 @@
                 }
             };
 
-            _dests = sourceList.AsQueryable().Project().To<Dest>(membersToExpand: d => d.Child2).ToArray();
+            _dests = sourceList.AsQueryable().Project()
+                .To<Dest>(membersToExpand: d => d.Child2).ToArray();
         }
 
         [Fact]

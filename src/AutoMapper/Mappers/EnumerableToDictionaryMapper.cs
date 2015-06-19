@@ -4,13 +4,23 @@ namespace AutoMapper.Mappers
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using Internal;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class EnumerableToDictionaryMapper : IObjectMapper
     {
-        private static readonly Type KvpType = typeof(KeyValuePair<,>);
+        /// <summary>
+        /// 
+        /// </summary>
+        private Type KvpType { get; } = typeof (KeyValuePair<,>);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
             return (context.DestinationType.IsDictionaryType())
@@ -18,35 +28,41 @@ namespace AutoMapper.Mappers
                    && (!context.SourceType.IsDictionaryType());
         }
 
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
+            var runner = context.MapperContext.Runner;
             var sourceEnumerableValue = (IEnumerable)context.SourceValue ?? new object[0];
-            IEnumerable<object> enumerableValue = sourceEnumerableValue.Cast<object>();
+            var enumerableValue = sourceEnumerableValue.Cast<object>();
 
-            Type sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceEnumerableValue);
-            Type genericDestDictType = context.DestinationType.GetDictionaryType();
-            Type destKeyType = genericDestDictType.GetGenericArguments()[0];
-            Type destValueType = genericDestDictType.GetGenericArguments()[1];
-            Type destKvpType = KvpType.MakeGenericType(destKeyType, destValueType);
+            var sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceEnumerableValue);
+            var genericDestDictType = context.DestinationType.GetDictionaryType();
+            var destKeyType = genericDestDictType.GetGenericArguments()[0];
+            var destValueType = genericDestDictType.GetGenericArguments()[1];
+            var destKvpType = KvpType.MakeGenericType(destKeyType, destValueType);
 
-            object destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
-            int count = 0;
+            var destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
+            var count = 0;
 
-            foreach (object item in enumerableValue)
+            foreach (var item in enumerableValue)
             {
-                var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(item, null, sourceElementType, destKvpType);
+                var typeMap = context.MapperContext.ConfigurationProvider.ResolveTypeMap(item, null, sourceElementType, destKvpType);
 
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
-                Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destKvpType;
+                var targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
+                var targetDestinationType = typeMap != null ? typeMap.DestinationType : destKvpType;
 
                 var newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, count);
 
-                object mappedValue = mapper.Map(newContext);
+                var mappedValue = runner.Map(newContext);
                 var keyProperty = mappedValue.GetType().GetProperty("Key");
-                object destKey = keyProperty.GetValue(mappedValue, null);
+                var destKey = keyProperty.GetValue(mappedValue, null);
 
                 var valueProperty = mappedValue.GetType().GetProperty("Value");
-                object destValue = valueProperty.GetValue(mappedValue, null);
+                var destValue = valueProperty.GetValue(mappedValue, null);
 
                 genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
 

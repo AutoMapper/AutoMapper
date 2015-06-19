@@ -1,11 +1,12 @@
-using System;
-using System.Linq;
-using System.Reflection;
-using Xunit;
-using Should;
-
 namespace AutoMapper.UnitTests
 {
+    using System.Linq;
+    using Xunit;
+    using Should;
+
+    // ReSharper disable ConvertPropertyToExpressionBody
+    // ReSharper disable ConvertToAutoProperty
+    // ReSharper disable UnusedAutoPropertyAccessor.Local
     namespace ConditionalMapping
     {
         public class When_configuring_a_member_to_skip_based_on_the_property_value : AutoMapperSpecBase
@@ -40,13 +41,14 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_execute_the_mapping_when_the_condition_is_false()
             {
-                var destination = Mapper.Map<Source, Destination>(new Source { Value = 7 });
+                var destination = Mapper.Map<Source, Destination>(new Source {Value = 7});
 
                 destination.Value.ShouldEqual(7);
             }
         }
 
-        public class When_configuring_a_member_to_skip_based_on_the_property_value_with_custom_mapping : AutoMapperSpecBase
+        public class When_configuring_a_member_to_skip_based_on_the_property_value_with_custom_mapping :
+            AutoMapperSpecBase
         {
             public class Source
             {
@@ -66,10 +68,7 @@ namespace AutoMapper.UnitTests
                         .ForMember(dest => dest.Value, opt =>
                         {
                             opt.Condition(src => src.Value > 0);
-                            opt.ResolveUsing((Source src) =>
-                            {
-                                return 10;
-                            });
+                            opt.ResolveUsing((Source src) => 10);
                         });
                 });
             }
@@ -77,7 +76,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_skip_the_mapping_when_the_condition_is_true()
             {
-                var destination = Mapper.Map<Source, Destination>(new Source { Value = -1 });
+                var destination = Mapper.Map<Source, Destination>(new Source {Value = -1});
 
                 destination.Value.ShouldEqual(0);
             }
@@ -85,7 +84,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_execute_the_mapping_when_the_condition_is_false()
             {
-                Mapper.Map<Source, Destination>(new Source { Value = 7 }).Value.ShouldEqual(10);
+                Mapper.Map<Source, Destination>(new Source {Value = 7}).Value.ShouldEqual(10);
             }
         }
 
@@ -119,7 +118,9 @@ namespace AutoMapper.UnitTests
 
             private static bool CustomCondition(ResolutionContext context)
             {
-                return !context.PropertyMap.DestinationProperty.MemberInfo.GetCustomAttributes(true).Any(attr => attr is SkipAttribute);
+                return
+                    !context.PropertyMap.DestinationProperty.MemberInfo.GetCustomAttributes(true)
+                        .Any(attr => attr is SkipAttribute);
             }
 
             protected override void Because_of()
@@ -139,10 +140,13 @@ namespace AutoMapper.UnitTests
                 _destination.Value2.ShouldEqual(default(int));
             }
 
-            public class SkipAttribute : System.Attribute { }
+            public class SkipAttribute : System.Attribute
+            {
+            }
         }
 
 #if !SILVERLIGHT
+
         public class When_configuring_a_map_to_ignore_all_properties_with_an_inaccessible_setter : AutoMapperSpecBase
         {
             private Destination _destination;
@@ -158,7 +162,7 @@ namespace AutoMapper.UnitTests
 
             public class Destination
             {
-                private double _height;
+                private readonly double _height;
 
                 public int Id { get; set; }
                 public virtual string Name { get; protected set; }
@@ -192,35 +196,51 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                _destination = Mapper.Map<Source, Destination>(new Source { Id = 5, CodeName = "007", Nickname = "Jimmy", ScreenName = "jbogard" });
+                _destination =
+                    Mapper.Map<Source, Destination>(new Source
+                    {
+                        Id = 5,
+                        CodeName = "007",
+                        Nickname = "Jimmy",
+                        ScreenName = "jbogard"
+                    });
             }
 
             [Fact]
-            public void Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped()
+            public void
+                Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped
+                ()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
 
             [Fact]
-            public void Should_map_a_property_with_an_inaccessible_setter_if_a_specific_mapping_is_configured_after_the_ignore_method()
+            public void
+                Should_map_a_property_with_an_inaccessible_setter_if_a_specific_mapping_is_configured_after_the_ignore_method
+                ()
             {
                 _destination.Nickname.ShouldEqual("Jimmy");
             }
 
             [Fact]
-            public void Should_not_map_a_property_with_an_inaccessible_setter_if_no_specific_mapping_is_configured_even_though_name_and_type_match()
+            public void
+                Should_not_map_a_property_with_an_inaccessible_setter_if_no_specific_mapping_is_configured_even_though_name_and_type_match
+                ()
             {
                 _destination.CodeName.ShouldBeNull();
             }
 
             [Fact]
-            public void Should_not_map_a_property_with_no_public_setter_if_a_specific_mapping_is_configured_before_the_ignore_method()
+            public void
+                Should_not_map_a_property_with_no_public_setter_if_a_specific_mapping_is_configured_before_the_ignore_method
+                ()
             {
                 _destination.ScreenName.ShouldBeNull();
             }
         }
 
-        public class When_configuring_a_reverse_map_to_ignore_all_source_properties_with_an_inaccessible_setter : AutoMapperSpecBase
+        public class When_configuring_a_reverse_map_to_ignore_all_source_properties_with_an_inaccessible_setter :
+            AutoMapperSpecBase
         {
             private Destination _destination;
             private Source _source;
@@ -272,16 +292,18 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                var source = new Source { Id = 5, Name = "Bob", Age = 35, Force = "With You" };
+                var source = new Source {Id = 5, Name = "Bob", Age = 35, Force = "With You"};
                 source.Initialize();
                 _destination = Mapper.Map<Source, Destination>(source);
                 _source = Mapper.Map<Destination, Source>(_destination);
             }
 
             [Fact]
-            public void Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped()
+            public void
+                Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped
+                ()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
 
             [Fact]
@@ -305,9 +327,12 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_forward_and_reverse_map_an_inaccessible_source_property_even_if_a_mapping_is_not_defined()
             {
-                _source.Respect.ShouldEqual("R-E-S-P-E-C-T"); // justification: if the mapping works one way, it should work in reverse
+                // justification: if the mapping works one way, it should work in reverse
+                _source.Respect.ShouldEqual("R-E-S-P-E-C-T");
             }
         }
+
 #endif
+
     }
 }

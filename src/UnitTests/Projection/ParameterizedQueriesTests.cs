@@ -4,10 +4,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using Bug.AssignableLists;
-    using QueryableExtensions;
     using Should;
     using Xunit;
+    using QueryableExtensions;
 
     public class ParameterizedQueriesTests_with_anonymous_object : AutoMapperSpecBase
     {
@@ -25,21 +24,19 @@
 
         protected override void Establish_context()
         {
-            int value = 0;
+            var value = 0;
 
             Expression<Func<Source, int>> sourceMember = src => value + 5;
+
             Mapper.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
         }
 
         protected override void Because_of()
         {
-            _sources = new[]
-            {
-                new Source()
-            }.AsQueryable();
+            _sources = new[] {new Source()}.AsQueryable();
 
-            _dests = _sources.Project().To<Dest>(new { value = 10 }).ToArray();
+            _dests = _sources.Project().To<Dest>(new {value = 10}).ToArray();
         }
 
         [Fact]
@@ -73,21 +70,20 @@
 
         protected override void Establish_context()
         {
-            int value = 0;
+            var value = 0;
 
             Expression<Func<Source, int>> sourceMember = src => value + 5;
+
             Mapper.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
         }
 
         protected override void Because_of()
         {
-            _sources = new[]
-            {
-                new Source()
-            }.AsQueryable();
+            _sources = new[] {new Source()}.AsQueryable();
 
-            _dests = _sources.Project().To<Dest>(new Dictionary<string, object>{{"value", 10}}).ToArray();
+            _dests = _sources.Project().To<Dest>(
+                new Dictionary<string, object> {{"value", 10}}).ToArray();
         }
 
         [Fact]
@@ -99,7 +95,8 @@
         [Fact]
         public void Should_not_cache_parameter_value()
         {
-            var newDests = _sources.Project().To<Dest>(new Dictionary<string, object> { { "value", 15 } }).ToArray();
+            var newDests = _sources.Project().To<Dest>(
+                new Dictionary<string, object> {{"value", 15}}).ToArray();
 
             newDests[0].Value.ShouldEqual(20);
         }

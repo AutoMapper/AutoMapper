@@ -1,10 +1,11 @@
-using System;
-using System.Collections.Generic;
-using Should;
-using Xunit;
-
 namespace AutoMapper.UnitTests
 {
+    using System;
+    using System.Collections.Generic;
+    using Should;
+    using Xunit;
+
+    // ReSharper disable ConvertPropertyToExpressionBody
     namespace ConfigurationValidation
     {
         public class When_testing_a_dto_with_mismatched_members : NonValidatingSpecBase
@@ -53,7 +54,6 @@ namespace AutoMapper.UnitTests
                 public string Bar { get; set; }
             }
 
-
             protected override void Establish_context()
             {
                 Mapper.Initialize(cfg =>
@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
         }
 
@@ -90,7 +90,7 @@ namespace AutoMapper.UnitTests
                 Mapper.Initialize(cfg =>
                 {
                     cfg.CreateMap<ModelObject, ModelDto>()
-                    .ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
+                        .ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
                 });
             }
 
@@ -121,7 +121,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
         }
 
@@ -195,7 +195,7 @@ namespace AutoMapper.UnitTests
             protected override void Establish_context()
             {
                 Mapper.CreateMap<ModelObject, ModelDto>()
-                      .ForMember(dest => dest.Bar, opt => opt.Ignore());
+                    .ForMember(dest => dest.Bar, opt => opt.Ignore());
             }
 
             protected override void Because_of()
@@ -247,7 +247,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
         }
 
@@ -281,7 +281,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
         }
 
@@ -295,8 +295,16 @@ namespace AutoMapper.UnitTests
             public class Destination
             {
                 public int Value { get; set; }
-                public string ValuePlusOne { get { return (Value + 1).ToString(); } }
-                public int ValuePlusTwo { get { return Value + 2; } }
+
+                public string ValuePlusOne
+                {
+                    get { return (Value + 1).ToString(); }
+                }
+
+                public int ValuePlusTwo
+                {
+                    get { return Value + 2; }
+                }
             }
 
             protected override void Establish_context()
@@ -306,13 +314,13 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                Mapper.Map<Source, Destination>(new Source { Value = 5 });
+                Mapper.Map<Source, Destination>(new Source {Value = 5});
             }
 
             [Fact]
             public void Should_be_valid()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
         }
 
@@ -351,15 +359,20 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_ignore_bad_dtos_in_other_profiles()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid("Good"));
+                typeof (AutoMapperConfigurationException).ShouldNotBeThrownBy(
+                    () => Mapper.AssertConfigurationIsValid("Good"));
             }
         }
 
         public class When_testing_a_dto_with_mismatched_custom_member_mapping : NonValidatingSpecBase
         {
-            public class SubBarr { }
+            public class SubBarr
+            {
+            }
 
-            public class SubBar { }
+            public class SubBar
+            {
+            }
 
             public class ModelObject
             {
@@ -382,13 +395,16 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
         }
 
         public class When_testing_a_dto_with_value_specified_members : NonValidatingSpecBase
         {
-            public class Source { }
+            public class Source
+            {
+            }
+
             public class Destination
             {
                 public int Value { get; set; }
@@ -407,59 +423,63 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_validate_successfully()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
         }
-		
-		public class When_testing_a_dto_with_setter_only_peroperty_member : NonValidatingSpecBase
-		{
-			public class Source
-			{
-				public string Value { set { } }
-			}
 
-			public class Destination
-			{
-				public string Value { get; set; }
-			}
+        public class When_testing_a_dto_with_setter_only_peroperty_member : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                // ReSharper disable once ValueParameterNotUsed
+                public string Value
+                {
+                    set { }
+                }
+            }
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
-			}
+            public class Destination
+            {
+                public string Value { get; set; }
+            }
 
-			[Fact]
-			public void Should_fail_a_configuration_check()
-			{
-				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
-			}
-		}
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
+            }
 
-		public class When_testing_a_dto_with_matching_void_method_member : NonValidatingSpecBase
-		{
-			public class Source
-			{
-				public void Method()
-				{
-				}
-			}
+            [Fact]
+            public void Should_fail_a_configuration_check()
+            {
+                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+            }
+        }
 
-			public class Destination
-			{
-				public string Method { get; set; }
-			}
+        public class When_testing_a_dto_with_matching_void_method_member : NonValidatingSpecBase
+        {
+            public class Source
+            {
+                public void Method()
+                {
+                }
+            }
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
-			}
+            public class Destination
+            {
+                public string Method { get; set; }
+            }
 
-			[Fact]
-			public void Should_fail_a_configuration_check()
-			{
-				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
-			}
-		}
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
+            }
+
+            [Fact]
+            public void Should_fail_a_configuration_check()
+            {
+                typeof (AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+            }
+        }
 
         public class When_redirecting_types : NonValidatingSpecBase
         {
@@ -476,24 +496,23 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_pass_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
 
-            class ConcreteSource
+            private class ConcreteSource
             {
                 public string Name { get; set; }
             }
 
-            class ConcreteDest : IAbstractDest
+            private class ConcreteDest : IAbstractDest
             {
                 public string DifferentName { get; set; }
             }
 
-            interface IAbstractDest
+            private interface IAbstractDest
             {
                 string DifferentName { get; set; }
             }
         }
     }
-
 }

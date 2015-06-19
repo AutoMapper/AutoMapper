@@ -1,58 +1,62 @@
-using System;
-using Should;
-using Xunit;
-
 namespace AutoMapper.UnitTests
 {
-	namespace Indexers
-	{
-		public class When_mapping_to_a_destination_with_an_indexer_property : AutoMapperSpecBase
-		{
-			private Destination _result;
+    using System;
+    using Should;
+    using Xunit;
 
-			public class Source
-			{
-				public string Value { get; set; }
-			}
+    // ReSharper disable ConvertPropertyToExpressionBody
+    namespace Indexers
+    {
+        public class When_mapping_to_a_destination_with_an_indexer_property : AutoMapperSpecBase
+        {
+            private Destination _result;
 
-			public class Destination
-			{
-				public string Value { get; set; }
-				public string this[string key] { get { return null; }}
-			}
+            public class Source
+            {
+                public string Value { get; set; }
+            }
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+            public class Destination
+            {
+                public string Value { get; set; }
 
-			protected override void Because_of()
-			{
-				_result = Mapper.Map<Source, Destination>(new Source {Value = "Bob"});
-			}
+                public string this[string key]
+                {
+                    get { return null; }
+                }
+            }
 
-			[Fact]
-			public void Should_ignore_indexers_and_map_successfully()
-			{
-				_result.Value.ShouldEqual("Bob");
-			}
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>();
+            }
 
-			[Fact]
-			public void Should_pass_configuration_check()
-			{
-				Exception thrown = null;
-				try
-				{
-					Mapper.AssertConfigurationIsValid();
-				}
-				catch (Exception ex)
-				{
-					thrown = ex;
-				}
+            protected override void Because_of()
+            {
+                _result = Mapper.Map<Source, Destination>(new Source {Value = "Bob"});
+            }
 
-				thrown.ShouldBeNull();
-			}
-		}
+            [Fact]
+            public void Should_ignore_indexers_and_map_successfully()
+            {
+                _result.Value.ShouldEqual("Bob");
+            }
 
-	}
+            [Fact]
+            public void Should_pass_configuration_check()
+            {
+                Exception thrownException = null;
+                try
+                {
+                    Mapper.AssertConfigurationIsValid();
+                }
+                catch (Exception ex)
+                {
+                    thrownException = ex;
+                }
+
+                thrownException.ShouldBeNull();
+            }
+        }
+    }
 }

@@ -11,19 +11,40 @@ namespace AutoMapper.Mappers
     /// </summary>
     public static class ObjectCreator
     {
-        private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
+        /// <summary>
+        /// 
+        /// </summary>
+        private static DelegateFactory DelegateFactory { get; } = new DelegateFactory();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static Array CreateArray(Type elementType, int length)
         {
             return Array.CreateInstance(elementType, length);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <returns></returns>
         public static IList CreateList(Type elementType)
         {
             Type destListType = typeof (List<>).MakeGenericType(elementType);
             return (IList) CreateObject(destListType);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dictionaryType"></param>
+        /// <param name="keyType"></param>
+        /// <param name="valueType"></param>
+        /// <returns></returns>
         public static object CreateDictionary(Type dictionaryType, Type keyType, Type valueType)
         {
             var type = dictionaryType.IsInterface()
@@ -33,11 +54,21 @@ namespace AutoMapper.Mappers
             return CreateObject(type);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static object CreateDefaultValue(Type type)
         {
             return type.IsValueType() ? CreateObject(type) : null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static object CreateNonNullValue(Type type)
         {
             return type.IsValueType()
@@ -47,6 +78,11 @@ namespace AutoMapper.Mappers
                     : CreateObject(type);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static object CreateObject(Type type)
         {
             return type.IsArray

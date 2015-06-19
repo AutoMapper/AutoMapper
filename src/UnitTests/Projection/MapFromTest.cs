@@ -1,23 +1,25 @@
-﻿using System;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Projection
+﻿namespace AutoMapper.UnitTests.Projection
 {
+    using QueryableExtensions;
+    using System;
+    using Xunit;
+
     namespace MapFromTest
     {
-        using QueryableExtensions;
-
         public class CustomMapFromExpressionTest
         {
             [Fact]
             public void Should_not_fail()
             {
                 Mapper.CreateMap<UserModel, UserDto>()
-                                .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
+                    .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => Mapper.Engine.CreateMapExpression<UserModel, UserDto>()); //null reference exception here
+                // Null reference exception here...
+                typeof (NullReferenceException).ShouldNotBeThrownBy(
+                    () => Mapper.Context.Engine.CreateMapExpression<UserModel, UserDto>());
             }
         }
+
         public class UserModel
         {
             public string FirstName { get; set; }

@@ -1,9 +1,18 @@
 namespace AutoMapper
 {
     using System;
+    using Mappers;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IConfiguration : IProfileExpression
     {
+        /// <summary>
+        /// Get all configured ObjectMappers.
+        /// </summary>
+        IObjectMapperCollection ObjectMappers { get; }
+
         /// <summary>
         /// Create a named profile for grouped mapping configuration
         /// </summary>

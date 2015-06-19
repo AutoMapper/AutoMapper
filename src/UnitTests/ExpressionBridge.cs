@@ -1,22 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using Should;
-using Xunit;
-using System.Linq;
-
 namespace AutoMapper.UnitTests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using QueryableExtensions;
+    using Should;
+    using Xunit;
+
+    // ReSharper disable InconsistentNaming
     namespace ExpressionBridge
     {
-        using QueryableExtensions;
-
         public class SimpleProductDto
         {
             public string Name { set; get; }
             public string ProductSubcategoryName { set; get; }
             public string CategoryName { set; get; }
         }
+
         public class ExtendedProductDto
         {
             public string Name { set; get; }
@@ -24,20 +25,24 @@ namespace AutoMapper.UnitTests
             public string CategoryName { set; get; }
             public List<BillOfMaterialsDto> BOM { set; get; }
         }
+
         public class ComplexProductDto
         {
             public string Name { get; set; }
             public ProductSubcategoryDto ProductSubcategory { get; set; }
         }
+
         public class ProductSubcategoryDto
         {
             public string Name { get; set; }
             public ProductCategoryDto ProductCategory { get; set; }
         }
+
         public class ProductCategoryDto
         {
             public string Name { get; set; }
         }
+
         public class AbstractProductDto
         {
             public string Name { set; get; }
@@ -45,9 +50,18 @@ namespace AutoMapper.UnitTests
             public string CategoryName { set; get; }
             public List<ProductTypeDto> Types { get; set; }
         }
-        public abstract class ProductTypeDto { }
-        public class ProdTypeA : ProductTypeDto {}
-        public class ProdTypeB : ProductTypeDto {}
+
+        public abstract class ProductTypeDto
+        {
+        }
+
+        public class ProdTypeA : ProductTypeDto
+        {
+        }
+
+        public class ProdTypeB : ProductTypeDto
+        {
+        }
 
         public class ProductTypeConverter : TypeConverter<ProductType, ProductTypeDto>
         {
@@ -95,11 +109,13 @@ namespace AutoMapper.UnitTests
         {
             public int BillOfMaterialsID { set; get; }
         }
+
         public class When_mapping_using_expressions : NonValidatingSpecBase
         {
             private List<Product> _products;
             private Expression<Func<Product, SimpleProductDto>> _simpleProductConversionLinq;
             private Expression<Func<Product, ExtendedProductDto>> _extendedProductConversionLinq;
+            // ReSharper disable once NotAccessedField.Local
             private Expression<Func<Product, AbstractProductDto>> _abstractProductConversionLinq;
             private List<SimpleProductDto> _simpleProducts;
             private List<ExtendedProductDto> _extendedProducts;
@@ -109,9 +125,11 @@ namespace AutoMapper.UnitTests
                 Mapper.Initialize(cfg =>
                 {
                     cfg.CreateMap<Product, SimpleProductDto>()
-                        .ForMember(m => m.CategoryName, dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name));
+                        .ForMember(m => m.CategoryName,
+                            dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name));
                     cfg.CreateMap<Product, ExtendedProductDto>()
-                        .ForMember(m => m.CategoryName, dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name))
+                        .ForMember(m => m.CategoryName,
+                            dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name))
                         .ForMember(m => m.BOM, dst => dst.MapFrom(p => p.BillOfMaterials));
                     cfg.CreateMap<BillOfMaterials, BillOfMaterialsDto>();
                     cfg.CreateMap<Product, ComplexProductDto>();
@@ -123,11 +141,11 @@ namespace AutoMapper.UnitTests
                         .ConvertUsing<ProductTypeConverter>();
                 });
 
-                _simpleProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, SimpleProductDto>();
-                _extendedProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, ExtendedProductDto>();
-                _abstractProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, AbstractProductDto>();
+                _simpleProductConversionLinq = Mapper.Context.Engine.CreateMapExpression<Product, SimpleProductDto>();
+                _extendedProductConversionLinq = Mapper.Context.Engine.CreateMapExpression<Product, ExtendedProductDto>();
+                _abstractProductConversionLinq = Mapper.Context.Engine.CreateMapExpression<Product, AbstractProductDto>();
 
-                _products = new List<Product>()
+                _products = new List<Product>
                 {
                     new Product
                     {
@@ -135,25 +153,18 @@ namespace AutoMapper.UnitTests
                         ProductSubcategory = new ProductSubcategory
                         {
                             Name = "Bar",
-                            ProductCategory = new ProductCategory
-                            {
-                                Name = "Baz"
-                            }
+                            ProductCategory = new ProductCategory {Name = "Baz"}
                         },
                         BillOfMaterials = new List<BillOfMaterials>
                         {
-                            new BillOfMaterials
-                            {
-                                BillOfMaterialsID = 5
-                            }
-                        }
-                        ,
+                            new BillOfMaterials {BillOfMaterialsID = 5}
+                        },
                         Types = new List<ProductType>
-                                    {
-                                        new ProductType() { Name = "A" },
-                                        new ProductType() { Name = "B" },
-                                        new ProductType() { Name = "A" }
-                                    }
+                        {
+                            new ProductType {Name = "A"},
+                            new ProductType {Name = "B"},
+                            new ProductType {Name = "A"}
+                        }
                     }
                 };
             }
@@ -171,8 +182,6 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_map_and_flatten()
             {
-
-
                 _simpleProducts.Count.ShouldEqual(1);
                 _simpleProducts[0].Name.ShouldEqual("Foo");
                 _simpleProducts[0].ProductSubcategoryName.ShouldEqual("Bar");
@@ -185,12 +194,10 @@ namespace AutoMapper.UnitTests
                 _extendedProducts[0].BOM.Count.ShouldEqual(1);
                 _extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldEqual(5);
             }
-           
+
             [Fact]
             public void Should_use_extension_methods()
             {
-
-                
                 var queryable = _products.AsQueryable();
 
                 var simpleProducts = queryable.Project().To<SimpleProductDto>().ToList();
@@ -216,7 +223,9 @@ namespace AutoMapper.UnitTests
                 complexProducts[0].ProductSubcategory.Name.ShouldEqual("Bar");
                 complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
             }
+
 #if !SILVERLIGHT
+
             [Fact(Skip = "Won't work for normal query providers")]
             public void List_of_abstract_should_be_mapped()
             {
@@ -232,10 +241,13 @@ namespace AutoMapper.UnitTests
                 abstractProducts[0].Types[1].GetType().ShouldEqual(typeof (ProdTypeB));
                 abstractProducts[0].Types[2].GetType().ShouldEqual(typeof (ProdTypeA));
             }
+
 #endif
+
         }
 
-#if !NETFX_CORE && !SILVERLIGHT
+#if !(SILVERLIGHT || NETFX_CORE)
+
         namespace CircularReferences
         {
             public class A
@@ -251,6 +263,7 @@ namespace AutoMapper.UnitTests
                 {
                     BP2 = new HashSet<A>();
                 }
+
                 public int BP1 { get; set; }
                 public virtual ICollection<A> BP2 { get; set; }
             }
@@ -261,12 +274,14 @@ namespace AutoMapper.UnitTests
                 public string AP2 { get; set; }
                 public virtual BEntity B { get; set; }
             }
+
             public class BEntity
             {
                 public BEntity()
                 {
                     BP2 = new HashSet<AEntity>();
                 }
+
                 public int BP1 { get; set; }
                 public virtual ICollection<AEntity> BP2 { get; set; }
             }
@@ -282,29 +297,35 @@ namespace AutoMapper.UnitTests
 
                 protected override void Establish_context()
                 {
+                    //TODO: it could be me, but I'm not sure that "MaxDepth" is consulted anywhere in the mix of things, gauging from the (passing) baseline...
+                    //yet in this case things are blowing up...
                     Mapper.CreateMap<BEntity, B>().MaxDepth(3);
                     Mapper.CreateMap<AEntity, A>().MaxDepth(3);
                 }
 
                 protected override void Because_of()
                 {
-                    var be = new BEntity();
-                    be.BP1 = 3;
-                    be.BP2.Add(new AEntity() { AP1 = 1, AP2 = "hello", B = be });
-                    be.BP2.Add(new AEntity() { AP1 = 2, AP2 = "two", B = be });
+                    var be = new BEntity {BP1 = 3};
+                    be.BP2.Add(new AEntity {AP1 = 1, AP2 = "hello", B = be});
+                    be.BP2.Add(new AEntity {AP1 = 2, AP2 = "two", B = be});
 
-                    var belist = new List<BEntity>();
-                    belist.Add(be);
+                    var belist = new List<BEntity> {be};
                     _bei = belist.AsQueryable();
                 }
 
                 [Fact]
                 public void Should_not_throw_exception()
                 {
-                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.Project().To<B>());
+                    typeof (StackOverflowException).ShouldNotBeThrownBy(() =>
+                    {
+                        var projection = _bei.Project();
+                        projection.To<B>();
+                    });
                 }
             }
         }
+
 #endif
+
     }
 }

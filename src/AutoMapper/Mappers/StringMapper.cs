@@ -1,15 +1,30 @@
 ﻿namespace AutoMapper.Mappers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class StringMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
             return context.SourceValue?.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
-            return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
+            // So we know that == and != Type equality works...
+            return context.DestinationType == typeof (string)
+                   && context.SourceType != typeof (string);
         }
     }
 }

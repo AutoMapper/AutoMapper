@@ -1,17 +1,20 @@
-﻿using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
     using System;
     using Should;
+    using Xunit;
 
     public class CorrectCtorIsPickedOnDestinationType : AutoMapperSpecBase
     {
-        public class SourceClass { }
+        public class SourceClass
+        {
+        }
 
         public class DestinationClass
         {
-            public DestinationClass() { }
+            public DestinationClass()
+            {
+            }
 
             // Since the name of the parameter is 'type', Automapper.TypeMapFactory chooses SourceClass.GetType()
             // to fulfill the dependency, causing an InvalidCastException during Mapper.Map()
@@ -20,11 +23,15 @@ namespace AutoMapper.UnitTests.Bug
                 Type = type;
             }
 
+            /// <summary>
+            /// Gets an integral encoded Type. The reference to <see cref="Int32"/> is intentional.
+            /// </summary>
+            /// <see cref="Int32"/>
             public Int32 Type { get; private set; }
         }
 
         // https://github.com/AutoMapper/AutoMapper/issues/154 
-        [Fact(Skip="Until fixed")]
+        [Fact(Skip = "Until fixed")]
         public void Should_pick_a_ctor_which_best_matches()
         {
             Mapper.CreateMap<SourceClass, DestinationClass>();
@@ -34,6 +41,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.Map<DestinationClass>(source);
         }
     }
+
     public class MemberNamedTypeWrong : AutoMapperSpecBase
     {
         public class SourceClass
@@ -51,10 +59,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             Mapper.CreateMap<SourceClass, DestinationClass>();
 
-            var source = new SourceClass
-            {
-                Type = "Hello"
-            };
+            var source = new SourceClass {Type = "Hello"};
 
             var result = Mapper.Map<DestinationClass>(source);
             result.Type.ShouldEqual(source.Type);

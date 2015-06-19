@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using Impl;
+    using Mappers;
 
     public interface IConfigurationProvider : IProfileConfiguration
     {
@@ -89,12 +90,6 @@ namespace AutoMapper
         /// </summary>
         /// <typeparam name="TProfile">Profile type</typeparam>
         void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new();
-
-        /// <summary>
-        /// Get all configured mappers
-        /// </summary>
-        /// <returns>List of mappers</returns>
-        IObjectMapper[] GetMappers();
 
         /// <summary>
         /// Creates a <see cref="TypeMap"/> based on a source and destination type

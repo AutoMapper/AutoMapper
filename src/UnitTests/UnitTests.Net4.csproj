@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\xunit.runner.visualstudio.2.0.0\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\packages\xunit.runner.visualstudio.2.0.0\build\net20\xunit.runner.visualstudio.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -37,7 +38,8 @@
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>67828423</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -77,18 +79,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AutoMapper\Internal\TypeExtensions.cs">
-      <Link>TypeExtensions.cs</Link>
+      <Link>Internal\TypeExtensions.cs</Link>
     </Compile>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
+    <Compile Include="BeforeAfterMapping.cs" />
+    <Compile Include="BidirectionalRelationships.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
     <Compile Include="AutoMapperTester.cs" />
-    <Compile Include="BeforeAfterMapping.cs" />
-    <Compile Include="BidirectionalRelationships.cs" />
     <Compile Include="Bug\AllMembersNullSubstitute.cs" />
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
@@ -139,27 +141,27 @@
     <Compile Include="Bug\SubclassMappings.cs" />
     <Compile Include="CollectionMapping.cs" />
     <Compile Include="ConditionalMapping.cs" />
+    <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Constructors.cs" />
     <Compile Include="ContextItems.cs" />
+    <Compile Include="MapperContexts.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
+    <Compile Include="Dictionaries.cs" />
+    <Compile Include="DynamicMapping.cs" />
+    <Compile Include="Enumerations.cs" />
     <Compile Include="ExpressionBridge.cs" />
     <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="IgnoreAllTests.cs" />
-    <Compile Include="Internal\DelegateFactoryTests.cs" />
-    <Compile Include="Dictionaries.cs" />
-    <Compile Include="DynamicMapping.cs" />
-    <Compile Include="Enumerations.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="FillingExistingDestination.cs" />
     <Compile Include="General.cs" />
+    <Compile Include="IgnoreAllTests.cs" />
     <Compile Include="Indexers.cs" />
     <Compile Include="InterfaceMapping.cs" />
+    <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
-    <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
+    <Compile Include="Internationalization.cs" />
     <Compile Include="Mappers\CustomMapperTests.cs" />
     <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
     <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
@@ -254,7 +256,6 @@
     <Compile Include="Should\should\ObjectAssertExtensions.cs" />
     <Compile Include="Should\should\StringAssertionExtensions.cs" />
     <Compile Include="TesterExtensions.cs" />
-    <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\MapperTests.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />
@@ -270,7 +271,6 @@
     <None Include="App.config" />
     <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
-    <None Include="Should\Should.Core\Assertions\Assert.cs.orig" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -295,6 +295,7 @@
       <Name>AutoMapper.Net4</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -302,5 +303,6 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\packages\xunit.runner.visualstudio.2.0.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.visualstudio.2.0.0\build\net20\xunit.runner.visualstudio.props'))" />
   </Target>
 </Project>

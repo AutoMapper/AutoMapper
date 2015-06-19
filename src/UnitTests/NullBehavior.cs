@@ -1,248 +1,246 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Should;
-using Xunit;
-
 namespace AutoMapper.UnitTests
 {
-	namespace NullBehavior
-	{
-		public class When_mapping_a_model_with_null_items : AutoMapperSpecBase
-		{
-			private ModelDto _result;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using Should;
+    using Xunit;
 
-			public class ModelDto
-			{
-				public ModelSubDto Sub { get; set; }
-				public int SubSomething { get; set; }
-				public string NullString { get; set; }
-			}
+    namespace NullBehavior
+    {
+        public class When_mapping_a_model_with_null_items : AutoMapperSpecBase
+        {
+            private ModelDto _result;
 
-			public class ModelSubDto
-			{
-				public int[] Items { get; set; }
-			}
+            public class ModelDto
+            {
+                public ModelSubDto Sub { get; set; }
+                public int SubSomething { get; set; }
+                public string NullString { get; set; }
+            }
 
-			public class ModelObject
-			{
-				public ModelSubObject Sub { get; set; }
-				public string NullString { get; set; }
-			}
+            public class ModelSubDto
+            {
+                public int[] Items { get; set; }
+            }
 
-			public class ModelSubObject
-			{
-				public int[] GetItems()
-				{
-					return new[] { 0, 1, 2, 3 };
-				}
+            public class ModelObject
+            {
+                public ModelSubObject Sub { get; set; }
+                public string NullString { get; set; }
+            }
 
-				public int Something { get; set; }
-			}
+            public class ModelSubObject
+            {
+                public int[] GetItems()
+                {
+                    return new[] {0, 1, 2, 3};
+                }
 
-			protected override void Establish_context()
-			{
-				var model = new ModelObject();
-				model.Sub = null;
+                public int Something { get; set; }
+            }
 
-				Mapper.AllowNullDestinationValues = false;
-				Mapper.CreateMap<ModelObject, ModelDto>();
-				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
+            protected override void Establish_context()
+            {
+                var model = new ModelObject();
+                model.Sub = null;
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
+                Mapper.AllowNullDestinationValues = false;
+                Mapper.CreateMap<ModelObject, ModelDto>();
+                Mapper.CreateMap<ModelSubObject, ModelSubDto>();
 
-			[Fact]
-			public void Should_populate_dto_items_with_a_value()
-			{
-				_result.Sub.ShouldNotBeNull();
-			}
+                _result = Mapper.Map<ModelObject, ModelDto>(model);
+            }
 
-			[Fact]
-			public void Should_provide_empty_array_for_array_type_values()
-			{
-				_result.Sub.Items.ShouldNotBeNull();
-			}
-
-			[Fact]
-			public void Should_return_default_value_of_property_in_the_chain()
-			{
-				_result.SubSomething.ShouldEqual(0);
-			}
-	
             [Fact]
-			public void Default_value_for_string_should_be_empty()
-			{
-				_result.NullString.ShouldEqual(string.Empty);
-			}
+            public void Should_populate_dto_items_with_a_value()
+            {
+                _result.Sub.ShouldNotBeNull();
+            }
+
+            [Fact]
+            public void Should_provide_empty_array_for_array_type_values()
+            {
+                _result.Sub.Items.ShouldNotBeNull();
+            }
+
+            [Fact]
+            public void Should_return_default_value_of_property_in_the_chain()
+            {
+                _result.SubSomething.ShouldEqual(0);
+            }
+
+            [Fact]
+            public void Default_value_for_string_should_be_empty()
+            {
+                _result.NullString.ShouldEqual(string.Empty);
+            }
         }
 
-		public class When_overriding_null_behavior_with_null_source_items : AutoMapperSpecBase
-		{
-			private ModelDto _result;
+        public class When_overriding_null_behavior_with_null_source_items : AutoMapperSpecBase
+        {
+            private ModelDto _result;
 
-			public class ModelDto
-			{
-				public ModelSubDto Sub { get; set; }
-				public int SubSomething { get; set; }
-				public string NullString { get; set; }
-			}
+            public class ModelDto
+            {
+                public ModelSubDto Sub { get; set; }
+                public int SubSomething { get; set; }
+                public string NullString { get; set; }
+            }
 
-			public class ModelSubDto
-			{
-				public int[] Items { get; set; }
-			}
+            public class ModelSubDto
+            {
+                public int[] Items { get; set; }
+            }
 
-			public class ModelObject
-			{
-				public ModelSubObject Sub { get; set; }
-				public string NullString { get; set; }
-			}
+            public class ModelObject
+            {
+                public ModelSubObject Sub { get; set; }
+                public string NullString { get; set; }
+            }
 
-			public class ModelSubObject
-			{
-				public int[] GetItems()
-				{
-					return new[] { 0, 1, 2, 3 };
-				}
+            public class ModelSubObject
+            {
+                public int[] GetItems()
+                {
+                    return new[] {0, 1, 2, 3};
+                }
 
-				public int Something { get; set; }
-			}
+                public int Something { get; set; }
+            }
 
-			protected override void Establish_context()
-			{
-				var model = new ModelObject();
-				model.Sub = null;
-				model.NullString = null;
+            protected override void Establish_context()
+            {
+                var model = new ModelObject {Sub = null, NullString = null};
 
-				Mapper.Initialize(c => c.AllowNullDestinationValues = true);
-				Mapper.CreateMap<ModelObject, ModelDto>();
-				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
+                Mapper.AllowNullDestinationValues = true;
+                Mapper.CreateMap<ModelObject, ModelDto>();
+                Mapper.CreateMap<ModelSubObject, ModelSubDto>();
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
+                _result = Mapper.Map<ModelObject, ModelDto>(model);
+            }
 
-			[Fact]
-			public void Should_map_first_level_items_as_null()
-			{
-				_result.NullString.ShouldBeNull();
-			}
+            [Fact]
+            public void Should_map_first_level_items_as_null()
+            {
+                _result.NullString.ShouldBeNull();
+            }
 
-			[Fact]
-			public void Should_map_primitive_items_as_default()
-			{
-				_result.SubSomething.ShouldEqual(0);
-			}
+            [Fact]
+            public void Should_map_primitive_items_as_default()
+            {
+                _result.SubSomething.ShouldEqual(0);
+            }
 
-			[Fact]
-			public void Should_map_any_sub_mapped_items_as_null()
-			{
-				_result.Sub.ShouldBeNull();
-			}
-		}
+            [Fact]
+            public void Should_map_any_sub_mapped_items_as_null()
+            {
+                _result.Sub.ShouldBeNull();
+            }
+        }
 
-		public class When_overriding_null_behavior_in_a_profile : AutoMapperSpecBase
-		{
-			private DefaultDestination _defaultResult;
-			private NullDestination _nullResult;
+        public class When_overriding_null_behavior_in_a_profile : AutoMapperSpecBase
+        {
+            private DefaultDestination _defaultResult;
+            private NullDestination _nullResult;
 
-			public class DefaultSource
-			{
-				public object Value { get; set; }
-			}
+            public class DefaultSource
+            {
+                public object Value { get; set; }
+            }
 
-			public class DefaultDestination
-			{
-				public object Value { get; set; }
-			}
+            public class DefaultDestination
+            {
+                public object Value { get; set; }
+            }
 
-			public class NullSource
-			{
-				public object Value { get; set; }
-			}
+            public class NullSource
+            {
+                public object Value { get; set; }
+            }
 
-			public class NullDestination
-			{
-				public object Value { get; set; }
-			}
+            public class NullDestination
+            {
+                public object Value { get; set; }
+            }
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateProfile("MapsNulls", p =>
-					{
-						p.AllowNullDestinationValues = false;
-						p.CreateMap<NullSource, NullDestination>();
-					});
-				Mapper.CreateMap<DefaultSource, DefaultDestination>();
-			}
+            protected override void Establish_context()
+            {
+                Mapper.CreateProfile("MapsNulls", p =>
+                {
+                    p.AllowNullDestinationValues = false;
+                    p.CreateMap<NullSource, NullDestination>();
+                });
+                Mapper.CreateMap<DefaultSource, DefaultDestination>();
+            }
 
-			protected override void Because_of()
-			{
-				_defaultResult = Mapper.Map<DefaultSource, DefaultDestination>(new DefaultSource());
-				_nullResult = Mapper.Map<NullSource, NullDestination>(new NullSource());
-			}
+            protected override void Because_of()
+            {
+                _defaultResult = Mapper.Map<DefaultSource, DefaultDestination>(new DefaultSource());
+                _nullResult = Mapper.Map<NullSource, NullDestination>(new NullSource());
+            }
 
-			[Fact]
-			public void Should_use_default_behavior_in_default_profile()
-			{
-				_defaultResult.Value.ShouldBeNull();
-			}
+            [Fact]
+            public void Should_use_default_behavior_in_default_profile()
+            {
+                _defaultResult.Value.ShouldBeNull();
+            }
 
-			[Fact]
-			public void Should_use_overridden_null_behavior_in_profile()
-			{
-				_nullResult.Value.ShouldNotBeNull();
-			}
-		}
+            [Fact]
+            public void Should_use_overridden_null_behavior_in_profile()
+            {
+                _nullResult.Value.ShouldNotBeNull();
+            }
+        }
 
-		public class When_using_a_custom_resolver_and_the_source_value_is_null : NonValidatingSpecBase
-		{
-			public class NullResolver : ValueResolver<Source, string>
-			{
-				protected override string ResolveCore(Source source)
-				{
-					if (source == null)
-						return "jon";
-					return "fail";
-				}
-			}
+        public class When_using_a_custom_resolver_and_the_source_value_is_null : NonValidatingSpecBase
+        {
+            public class NullResolver : ValueResolver<Source, string>
+            {
+                protected override string ResolveCore(Source source)
+                {
+                    if (source == null)
+                        return "jon";
+                    return "fail";
+                }
+            }
 
-			private Source _source;
-			private Destination _dest;
+            private Source _source;
+            private Destination _dest;
 
-			public class Source
-			{
-				public string MyName { get; set; }
-			}
+            public class Source
+            {
+                public string MyName { get; set; }
+            }
 
-			public class Destination
-			{
-				public string Name { get; set; }
-			}
+            public class Destination
+            {
+                public string Name { get; set; }
+            }
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver>().FromMember(src => src.MyName));
-				_source = new Source();
-			}
+            protected override void Establish_context()
+            {
+                Mapper.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver>().FromMember(src => src.MyName));
+                _source = new Source();
+            }
 
-			protected override void Because_of()
-			{
-				_dest = Mapper.Map<Source, Destination>(_source);
-			}
+            protected override void Because_of()
+            {
+                _dest = Mapper.Map<Source, Destination>(_source);
+            }
 
-			[Fact]
-			public void Should_perform_the_translation()
-			{
-				_dest.Name.ShouldEqual("jon");
-			}
-		}
+            [Fact]
+            public void Should_perform_the_translation()
+            {
+                _dest.Name.ShouldEqual("jon");
+            }
+        }
 
-	    public class When_mapping_using_a_custom_member_mapping_and_source_is_null : AutoMapperSpecBase
-	    {
-	        private Dest _dest;
+        public class When_mapping_using_a_custom_member_mapping_and_source_is_null : AutoMapperSpecBase
+        {
+            private Dest _dest;
 
-	        public class Source
+            public class Source
             {
                 public SubSource Sub { get; set; }
             }
@@ -269,30 +267,38 @@ namespace AutoMapper.UnitTests
                 _dest = Mapper.Map<Source, Dest>(new Source());
             }
 
-	        [Fact]
-	        public void Should_map_to_null_on_destination_values()
-	        {
-	            _dest.OtherValue.ShouldEqual(0);
-	        }
-	    }
-
-	    public class When_specifying_a_resolver_for_a_nullable_type : SpecBase
-	    {
-	        private FooViewModel _result;
-
-	        public class NullableBoolToLabel : TypeConverter<bool?, string>
+            [Fact]
+            public void Should_map_to_null_on_destination_values()
             {
+                _dest.OtherValue.ShouldEqual(0);
+            }
+        }
+
+        public class When_specifying_a_resolver_for_a_nullable_type : SpecBase
+        {
+            private FooViewModel _result;
+
+            public class NullableBoolToLabel : TypeConverter<bool?, string>
+            {
+                /// <summary>
+                /// Returns a converted <paramref name="source"/>.
+                /// </summary>
+                /// <param name="source"></param>
+                /// <returns></returns>
                 protected override string ConvertCore(bool? source)
                 {
-                    if (source.HasValue)
+                    // Switch case null should work here but the compiler (or R#) seems a little stricter than it used to be
+                    switch (source)
                     {
-                        if (source.Value)
-                            return "Yes";
-                        else
-                            return "No";
+                        case true:
+                            return @"Yes";
+                        case false:
+                            return @"No";
+                        case null:
+                        default:
+                            return @"(n/a)";
                     }
-                    else
-                        return "(n/a)";
+                    // It is simply enough to include a default case to satisfy R# and/or the compiler
                 }
             }
 
@@ -317,16 +323,16 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                var foo3 = new Foo { IsFooBarred = null };
+                var foo3 = new Foo {IsFooBarred = null};
                 _result = Mapper.Map<Foo, FooViewModel>(foo3);
             }
 
-	        [Fact]
-	        public void Should_allow_the_resolver_to_handle_null_values()
-	        {
+            [Fact]
+            public void Should_allow_the_resolver_to_handle_null_values()
+            {
                 _result.IsFooBarred.ShouldEqual("(n/a)");
             }
-	    }
+        }
 
         public class When_overriding_collection_null_behavior : AutoMapperSpecBase
         {
@@ -402,5 +408,5 @@ namespace AutoMapper.UnitTests
                 _dest.Values6.ShouldBeNull();
             }
         }
-	}
+    }
 }

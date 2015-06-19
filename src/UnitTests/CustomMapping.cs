@@ -1,10 +1,12 @@
-using System;
-using System.Collections;
-using Should;
-using Xunit;
-
 namespace AutoMapper.UnitTests
 {
+    using System;
+    using System.Collections;
+    using Should;
+    using Xunit;
+
+    // ReSharper disable ConvertPropertyToExpressionBody
+    // ReSharper disable ConvertToAutoProperty
     namespace CustomMapping
     {
         public class When_mapping_to_a_dto_member_with_custom_mapping : AutoMapperSpecBase
@@ -33,7 +35,7 @@ namespace AutoMapper.UnitTests
             {
                 public ResolutionResult Resolve(ResolutionResult source)
                 {
-                    return source.New(((ModelObject)source.Value).Value + 1);
+                    return source.New(((ModelObject) source.Value).Value + 1);
                 }
             }
 
@@ -41,7 +43,7 @@ namespace AutoMapper.UnitTests
             {
                 public ResolutionResult Resolve(ResolutionResult source)
                 {
-                    return source.New(((ModelObject)source.Value).Value2fff + 2);
+                    return source.New(((ModelObject) source.Value).Value2fff + 2);
                 }
             }
 
@@ -49,12 +51,12 @@ namespace AutoMapper.UnitTests
             {
                 public ResolutionResult Resolve(ResolutionResult source)
                 {
-                    return source.New(((ModelObject)source.Value).Value4 + 4);
+                    return source.New(((ModelObject) source.Value).Value4 + 4);
                 }
 
                 public Type GetResolvedValueType()
                 {
-                    return typeof(int);
+                    return typeof (int);
                 }
             }
 
@@ -63,10 +65,10 @@ namespace AutoMapper.UnitTests
                 Mapper.CreateMap<ModelObject, ModelDto>()
                     .ForMember(dto => dto.Value, opt => opt.ResolveUsing<CustomResolver>())
                     .ForMember(dto => dto.Value2, opt => opt.ResolveUsing(new CustomResolver2()))
-                    .ForMember(dto => dto.Value4, opt => opt.ResolveUsing(typeof(CustomResolver3)))
+                    .ForMember(dto => dto.Value4, opt => opt.ResolveUsing(typeof (CustomResolver3)))
                     .ForMember(dto => dto.Value5, opt => opt.ResolveUsing(src => src.Value5 + 5));
 
-                var model = new ModelObject { Value = 42, Value2fff = 42, Value3 = 42, Value4 = 42, Value5 = 42 };
+                var model = new ModelObject {Value = 42, Value2fff = 42, Value3 = 42, Value4 = 42, Value5 = 42};
                 _result = Mapper.Map<ModelObject, ModelDto>(model);
             }
 
@@ -124,7 +126,7 @@ namespace AutoMapper.UnitTests
             {
                 public ResolutionResult Resolve(ResolutionResult source)
                 {
-                    return source.New(((ModelSubObject)source.Value).SomeValue + 1);
+                    return source.New(((ModelSubObject) source.Value).SomeValue + 1);
                 }
             }
 
@@ -134,12 +136,12 @@ namespace AutoMapper.UnitTests
                     .ForMember(dto => dto.SomeValue, opt => opt.ResolveUsing<CustomResolver>().FromMember(m => m.Sub));
 
                 var model = new ModelObject
+                {
+                    Sub = new ModelSubObject
                     {
-                        Sub = new ModelSubObject
-                            {
-                                SomeValue = 46
-                            }
-                    };
+                        SomeValue = 46
+                    }
+                };
 
                 _result = Mapper.Map<ModelObject, ModelDto>(model);
             }
@@ -170,20 +172,21 @@ namespace AutoMapper.UnitTests
             {
                 public ResolutionResult Resolve(ResolutionResult source)
                 {
-                    return source.New(((int)source.Value) + 5);
+                    return source.New(((int) source.Value) + 5);
                 }
             }
 
             protected override void Establish_context()
             {
                 Mapper.CreateMap<Source, Dest>()
-                    .ForMember(dto => dto.SomeValue, opt => opt.ResolveUsing<CustomResolver>().FromMember(m => m.SomeOtherValue));
+                    .ForMember(dto => dto.SomeValue,
+                        opt => opt.ResolveUsing<CustomResolver>().FromMember(m => m.SomeOtherValue));
 
                 var model = new Source
-                    {
-                        SomeValue = 36,
-                        SomeOtherValue = 53
-                    };
+                {
+                    SomeValue = 36,
+                    SomeOtherValue = 53
+                };
 
                 _result = Mapper.Map<Source, Dest>(model);
             }
@@ -213,7 +216,7 @@ namespace AutoMapper.UnitTests
             {
                 public ResolutionResult Resolve(ResolutionResult source)
                 {
-                    return source.New(((int)source.Value) + 5);
+                    return source.New(((int) source.Value) + 5);
                 }
             }
 
@@ -223,9 +226,9 @@ namespace AutoMapper.UnitTests
                     .ForMember(dto => dto.Type, opt => opt.MapFrom(m => m.Type));
 
                 var model = new Source
-                    {
-                        Type = 5
-                    };
+                {
+                    Type = 5
+                };
 
                 _result = Mapper.Map<Source, Dest>(model);
             }
@@ -276,14 +279,14 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.CreateMap<Source, Destination>()
                     .ForMember(s => s.Value,
-                               opt => opt.ResolveUsing<CustomResolver>()
-                                        .FromMember(s => s.Value)
-                                        .ConstructedBy(() => new CustomResolver(15)));
+                        opt => opt.ResolveUsing<CustomResolver>()
+                            .FromMember(s => s.Value)
+                            .ConstructedBy(() => new CustomResolver(15)));
 
                 _source = new Source
-                    {
-                        Value = 10
-                    };
+                {
+                    Value = 10
+                };
             }
 
             protected override void Because_of()
@@ -337,15 +340,15 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.CreateMap<Source, Destination>()
                     .ForMember(s => s.Value,
-                               opt => opt.ResolveUsing<CustomResolver>()
-                                        .ConstructedBy(() => new CustomResolver(15))
-                                        .FromMember(s => s.Value)
+                        opt => opt.ResolveUsing<CustomResolver>()
+                            .ConstructedBy(() => new CustomResolver(15))
+                            .FromMember(s => s.Value)
                     );
 
                 _source = new Source
-                    {
-                        Value = 10
-                    };
+                {
+                    Value = 10
+                };
             }
 
             protected override void Because_of()
@@ -391,7 +394,7 @@ namespace AutoMapper.UnitTests
             public void Should_use_the_custom_translator()
             {
                 Mapper.CreateMap<Source, Destination>()
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                    .ConvertUsing(s => new Destination {Value = s.Value + 10});
 
                 _dest = Mapper.Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
@@ -402,7 +405,7 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                    .ConvertUsing(s => new Destination {Value = s.Value + 10});
 
                 _dest = Mapper.Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
@@ -436,16 +439,16 @@ namespace AutoMapper.UnitTests
                 };
 
                 _dest = new Destination
-                                  {
-                                      Value = 2
-                                  };
+                {
+                    Value = 2
+                };
             }
 
             [Fact]
             public void Should_resolve_to_the_destination_object_from_the_custom_translator()
             {
                 Mapper.CreateMap<Source, Destination>()
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                    .ConvertUsing(s => new Destination {Value = s.Value + 10});
 
                 _dest = Mapper.Map(_source, _dest);
                 _dest.Value.ShouldEqual(20);
@@ -456,7 +459,7 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                    .ConvertUsing(s => new Destination {Value = s.Value + 10});
 
                 _dest = Mapper.Map(_source, _dest);
                 _dest.Value.ShouldEqual(20);
@@ -494,7 +497,7 @@ namespace AutoMapper.UnitTests
             {
                 protected override Destination ConvertCore(Source source)
                 {
-                    return new Destination { Value = source.Value + 10 };
+                    return new Destination {Value = source.Value + 10};
                 }
             }
 
@@ -513,7 +516,7 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                    .ConvertUsing(s => new Destination {Value = s.Value + 10});
 
                 _dest = Mapper.Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
@@ -550,20 +553,23 @@ namespace AutoMapper.UnitTests
 
                 protected override Destination ConvertCore(Source source)
                 {
-                    return new Destination { Value = source.Value + _value };
+                    return new Destination {Value = source.Value + _value};
                 }
             }
 
             protected override void Establish_context()
             {
-                Mapper.Initialize(init => init.ConstructServicesUsing(t => new CustomConverter(10)));
-                Mapper.CreateMap<Source, Destination>()
-                    .ConvertUsing<CustomConverter>();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.ConstructServicesUsing(t => new CustomConverter(10));
+                });
+
+                Mapper.CreateMap<Source, Destination>().ConvertUsing<CustomConverter>();
             }
 
             protected override void Because_of()
             {
-                _result = Mapper.Map<Source, Destination>(new Source { Value = 5 });
+                _result = Mapper.Map<Source, Destination>(new Source {Value = 5});
             }
 
             [Fact]
@@ -572,7 +578,6 @@ namespace AutoMapper.UnitTests
                 _result.Value.ShouldEqual(15);
             }
         }
-
 
         public class When_specifying_a_custom_translator_with_mismatched_properties : AutoMapperSpecBase
         {
@@ -590,24 +595,23 @@ namespace AutoMapper.UnitTests
             protected override void Establish_context()
             {
                 Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
-                    .ConvertUsing(s => new Destination { Value2 = s.Value1 + 10 }));
+                    .ConvertUsing(s => new Destination {Value2 = s.Value1 + 10}));
             }
 
             [Fact]
             public void Should_pass_all_configuration_checks()
             {
-                Exception thrown = null;
+                Exception thrownException = null;
                 try
                 {
                     Mapper.AssertConfigurationIsValid();
-
                 }
                 catch (Exception ex)
                 {
-                    thrown = ex;
+                    thrownException = ex;
                 }
 
-                thrown.ShouldBeNull();
+                thrownException.ShouldBeNull();
             }
         }
 
@@ -628,7 +632,11 @@ namespace AutoMapper.UnitTests
             public class CustomValueResolver : ValueResolver<int, int>
             {
                 private readonly int _toAdd;
-                public CustomValueResolver() { _toAdd = 11; }
+
+                public CustomValueResolver()
+                {
+                    _toAdd = 11;
+                }
 
                 public CustomValueResolver(int toAdd)
                 {
@@ -643,15 +651,18 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                Mapper.Initialize(cfg => cfg.ConstructServicesUsing(type => new CustomValueResolver(5)));
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.ConstructServicesUsing(type => new CustomValueResolver(5));
+                });
 
-                Mapper.CreateMap<Source, Destination>()
-                    .ForMember(d => d.Value, opt => opt.ResolveUsing<CustomValueResolver>().FromMember(src => src.Value));
+                Mapper.CreateMap<Source, Destination>().ForMember(d => d.Value,
+                    opt => opt.ResolveUsing<CustomValueResolver>().FromMember(src => src.Value));
             }
 
             protected override void Because_of()
             {
-                _result = Mapper.Map<Source, Destination>(new Source { Value = 5 });
+                _result = Mapper.Map<Source, Destination>(new Source {Value = 5});
             }
 
             [Fact]
@@ -664,7 +675,7 @@ namespace AutoMapper.UnitTests
 
         public class When_custom_resolver_requests_property_to_be_ignored : AutoMapperSpecBase
         {
-            private Destination _result = new Destination() { Value = 55 };
+            private Destination _result = new Destination() {Value = 55};
 
             public class Source
             {
@@ -692,7 +703,7 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                _result = Mapper.Map(new Source { Value = 5 }, _result);
+                _result = Mapper.Map(new Source {Value = 5}, _result);
             }
 
             [Fact]
@@ -701,7 +712,6 @@ namespace AutoMapper.UnitTests
                 _result.Value.ShouldEqual(55);
             }
         }
-
 
         public class When_specifying_member_and_member_resolver_using_string_property_names : AutoMapperSpecBase
         {
@@ -734,12 +744,13 @@ namespace AutoMapper.UnitTests
                 Mapper.Initialize(cfg => cfg.ConstructServicesUsing(type => new CustomValueResolver()));
 
                 Mapper.CreateMap<Source, Destination>()
-                    .ForMember("DestinationValue", opt => opt.ResolveUsing<CustomValueResolver>().FromMember("SourceValue"));
+                    .ForMember("DestinationValue",
+                        opt => opt.ResolveUsing<CustomValueResolver>().FromMember("SourceValue"));
             }
 
             protected override void Because_of()
             {
-                _result = Mapper.Map<Source, Destination>(new Source { SourceValue = 5 });
+                _result = Mapper.Map<Source, Destination>(new Source {SourceValue = 5});
             }
 
             [Fact]
@@ -769,7 +780,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_fail_with_an_exception_during_configuration()
             {
-                typeof(ArgumentException).ShouldBeThrownBy(() =>
+                typeof (ArgumentException).ShouldBeThrownBy(() =>
                 {
                     Mapper.CreateMap<Source, Destination>()
                         .ForMember(dest => dest.Dest.Value, opt => opt.MapFrom(src => src.Value));
@@ -800,9 +811,9 @@ namespace AutoMapper.UnitTests
             protected override void Establish_context()
             {
                 Mapper.CreateMap<Source, Destination>()
-                    .ForMember(dest => ((ISomeInterface)dest).Name, opt => opt.MapFrom(src => src.MyName));
+                    .ForMember(dest => ((ISomeInterface) dest).Name, opt => opt.MapFrom(src => src.MyName));
 
-                _source = new Source { MyName = "jon" };
+                _source = new Source {MyName = "jon"};
             }
 
             protected override void Because_of()
@@ -818,6 +829,7 @@ namespace AutoMapper.UnitTests
         }
 
 #if !SILVERLIGHT
+
         public class When_destination_property_does_not_have_a_setter : AutoMapperSpecBase
         {
             private Source _source;
@@ -832,11 +844,16 @@ namespace AutoMapper.UnitTests
 
             public class Destination
             {
-                private DateTime _today;
+                private readonly DateTime _today;
 
                 public string Name { get; private set; }
                 public string Foo { get; protected set; }
-                public DateTime Today { get { return _today; } }
+
+                public DateTime Today
+                {
+                    get { return _today; }
+                }
+
                 public string Value { get; set; }
 
                 public Destination()
@@ -850,7 +867,7 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.CreateMap<Source, Destination>();
 
-                _source = new Source { Name = "jon", Value = "value", Foo = "bar" };
+                _source = new Source {Name = "jon", Value = "value", Foo = "bar"};
                 _dest = new Destination();
             }
 
@@ -883,6 +900,7 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual("bar");
             }
         }
+
 #endif
 
         public class When_destination_property_does_not_have_a_getter : AutoMapperSpecBase
@@ -895,7 +913,6 @@ namespace AutoMapper.UnitTests
             public class Source
             {
                 public string Value { get; set; }
-
             }
 
             public class Destination
@@ -938,11 +955,11 @@ namespace AutoMapper.UnitTests
                 Mapper.CreateMap<Source, Destination>();
                 Mapper.CreateMap<SourceWithList, DestinationWithList>();
 
-                _source = new Source { Value = "jon" };
+                _source = new Source {Value = "jon"};
                 _dest = new Destination();
 
 
-                _sourceWithList = new SourceWithList { SomeList = new[] { 1, 2 } };
+                _sourceWithList = new SourceWithList {SomeList = new[] {1, 2}};
                 _destWithList = new DestinationWithList();
             }
 
@@ -961,7 +978,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_translate_to_enumerable_properties_that_doesnt_have_a_getter()
             {
-                new[] { 1, 2 }.ShouldEqual(_destWithList.GetSomeList());
+                new[] {1, 2}.ShouldEqual(_destWithList.GetSomeList());
             }
         }
 
@@ -995,7 +1012,7 @@ namespace AutoMapper.UnitTests
 
             protected override void Because_of()
             {
-                _destination = Mapper.Map<Source, Destination>(new Source { Value = 5 });
+                _destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
             }
 
             [Fact]
@@ -1017,7 +1034,6 @@ namespace AutoMapper.UnitTests
 
             public class Source
             {
-
             }
 
             public class Dest
@@ -1045,11 +1061,10 @@ namespace AutoMapper.UnitTests
 
         public class When_building_custom_configuration_mapping_to_itself : NonValidatingSpecBase
         {
-            private Exception _e;
+            private Exception _exception;
 
             public class Source
             {
-
             }
 
             public class Dest
@@ -1068,20 +1083,18 @@ namespace AutoMapper.UnitTests
                     Mapper.CreateMap<Source, Dest>()
                         .ForMember(dest => dest, opt => opt.UseValue(5));
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    _e = e;
+                    _exception = ex;
                 }
             }
 
             [Fact]
             public void Should_map_from_that_constant_value()
             {
-                _e.ShouldNotBeNull();
+                _exception.ShouldNotBeNull();
             }
         }
-
-
     }
 
     public class When_mapping_from_one_type_to_another : AutoMapperSpecBase
@@ -1101,6 +1114,7 @@ namespace AutoMapper.UnitTests
             {
                 Value = value;
             }
+
             public Dest()
             {
             }
@@ -1120,7 +1134,7 @@ namespace AutoMapper.UnitTests
 
         protected override void Because_of()
         {
-            var source = new Source { Value = "a1" };
+            var source = new Source {Value = "a1"};
             _dest = Mapper.Map<Source, Dest>(source);
         }
 

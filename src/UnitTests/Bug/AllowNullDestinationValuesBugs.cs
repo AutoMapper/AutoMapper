@@ -1,8 +1,8 @@
-using Xunit;
-using Should;
-
 namespace AutoMapper.UnitTests.Bug
 {
+    using Xunit;
+    using Should;
+
     namespace AllowNullDestinationValuesBugs
     {
         public class When_mapping_to_an_assignable_object_with_nullable_off : AutoMapperSpecBase
@@ -26,18 +26,18 @@ namespace AutoMapper.UnitTests.Bug
 
             protected override void Establish_context()
             {
-                Mapper.Initialize(config =>
+                Mapper.Initialize(cfg =>
                 {
-                    config.AllowNullDestinationValues = false;
-                    config.CreateMap<Inner, Inner>();
-                    config.CreateMap<Source, Destination>()
+                    cfg.AllowNullDestinationValues = false;
+                    cfg.CreateMap<Inner, Inner>();
+                    cfg.CreateMap<Source, Destination>()
                         .ForMember(dest => dest.SomeOtherProperty, opt => opt.MapFrom(src => src.Property));
                 });
             }
 
             protected override void Because_of()
             {
-                Source source = new Source();
+                var source = new Source();
 
                 _destination = Mapper.Map<Source, Destination>(source);
             }

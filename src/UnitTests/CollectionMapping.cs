@@ -1,23 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using Xunit;
-using Should;
-
 namespace AutoMapper.UnitTests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using Should;
+    using Xunit;
+
     public class CollectionMapping
     {
         public CollectionMapping()
         {
             SetUp();
         }
+
         public void SetUp()
         {
             Mapper.Reset();
         }
-
 
         public class MasterWithList
         {
@@ -25,6 +24,7 @@ namespace AutoMapper.UnitTests
 
             public int Id { get; set; }
 
+            // ReSharper disable once ConvertToAutoProperty
             public IList<Detail> Details
             {
                 get { return _details; }
@@ -71,9 +71,9 @@ namespace AutoMapper.UnitTests
             Func<TSource, IEnumerable<TSourceItem>> getSourceEnum,
             Func<TDestination, ICollection<TDestinationItem>> getDestinationColl)
         {
-            ICollection<TDestinationItem> collection = getDestinationColl(d);
+            var collection = getDestinationColl(d);
             collection.Clear();
-            foreach (TSourceItem sourceItem in getSourceEnum(s))
+            foreach (var sourceItem in getSourceEnum(s))
             {
                 collection.Add(Mapper.Map<TSourceItem, TDestinationItem>(sourceItem));
             }
@@ -97,7 +97,7 @@ namespace AutoMapper.UnitTests
             };
 
             var master = new MasterWithCollection(new List<Detail>());
-            ICollection<Detail> originalCollection = master.Details;
+            var originalCollection = master.Details;
 
             Mapper.Map(dto, master);
 
@@ -123,7 +123,7 @@ namespace AutoMapper.UnitTests
             };
 
             var master = new MasterWithCollection(new HashSet<Detail>());
-            ICollection<Detail> originalCollection = master.Details;
+            var originalCollection = master.Details;
 
             Mapper.Map(dto, master);
 
@@ -150,7 +150,7 @@ namespace AutoMapper.UnitTests
             };
 
             var master = new MasterWithCollection(new HashSet<Detail>());
-            ICollection<Detail> originalCollection = master.Details;
+            var originalCollection = master.Details;
 
             Mapper.Map(dto, master);
 
@@ -176,7 +176,7 @@ namespace AutoMapper.UnitTests
             };
 
             var master = new MasterWithList();
-            IList<Detail> originalCollection = master.Details;
+            var originalCollection = master.Details;
 
             Mapper.Map(dto, master);
 
@@ -201,7 +201,7 @@ namespace AutoMapper.UnitTests
             };
 
             var master = new MasterWithCollection(new List<Detail>());
-            ICollection<Detail> originalCollection = master.Details;
+            var originalCollection = master.Details;
 
             Mapper.Map(dto, master);
 
@@ -246,16 +246,18 @@ namespace AutoMapper.UnitTests
             };
 
             var master = new MasterWithList();
-            IList<Detail> originalCollection = master.Details;
+            var originalCollection = master.Details;
 
             Mapper.Map(dto, master);
 
             originalCollection.ShouldBeSameAs(master.Details);
         }
 
-#if !SILVERLIGHT && !NETFX_CORE
+#if !(SILVERLIGHT || NETFX_CORE)
+
         [Fact]
-        public void Should_map_to_NameValueCollection() {
+        public void Should_map_to_NameValueCollection()
+        {
             // initially results in the following exception:
             // ----> System.InvalidCastException : Unable to cast object of type 'System.Collections.Specialized.NameValueCollection' to type 'System.Collections.IList'.
             // this was fixed by adding NameValueCollectionMapper to the MapperRegistry.
@@ -264,13 +266,16 @@ namespace AutoMapper.UnitTests
 
             mappedCollection.ShouldNotBeNull();
         }
+
 #endif
 
 #if SILVERLIGHT || NETFX_CORE
+
         public class HashSet<T> : Collection<T>
         {
-            
         }
+
 #endif
+
     }
 }

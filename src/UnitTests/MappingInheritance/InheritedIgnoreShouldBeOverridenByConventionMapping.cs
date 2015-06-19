@@ -1,13 +1,12 @@
-﻿using Should;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
+    using Should;
+    using Xunit;
+
     public class InheritedIgnoreShouldBeOverriddenByConventionMapping
     {
         public class BaseDomain
         {
-            
         }
 
         public class SpecificDomain : BaseDomain
@@ -36,7 +35,7 @@ namespace AutoMapper.UnitTests.Bug
         public void inhertited_ignore_should_be_overridden_by_successful_convention_mapping()
         {
             Mapper.CreateMap<BaseDomain, Dto>()
-                .ForMember(d=>d.SpecificProperty, m=>m.Ignore())
+                .ForMember(d => d.SpecificProperty, m => m.Ignore())
                 .Include<SpecificDomain, Dto>();
 
             Mapper.CreateMap<SpecificDomain, Dto>();

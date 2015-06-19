@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
-using Should;
-
-namespace AutoMapper.UnitTests.Projection
+﻿namespace AutoMapper.UnitTests.Projection
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Xunit;
+    using Should;
     using QueryableExtensions;
 
     public class ProjectEnumerableToArrayTest
@@ -20,11 +17,11 @@ namespace AutoMapper.UnitTests.Projection
         [Fact]
         public void EnumerablesAreMappedToArrays()
         {
-            var movies = 
-                new List<Movie>() {
-                new Movie() { Actors = new Actor[] { new Actor() { Name = "Actor 1" }, new Actor() { Name = "Actor 2" } } },
-                new Movie() { Actors = new Actor[] { new Actor() { Name = "Actor 3" }, new Actor() { Name = "Actor 4" } } }
-                }.AsQueryable();
+            var movies = new List<Movie>
+            {
+                new Movie {Actors = new[] {new Actor {Name = "Actor 1"}, new Actor {Name = "Actor 2"}}},
+                new Movie {Actors = new[] {new Actor {Name = "Actor 3"}, new Actor {Name = "Actor 4"}}}
+            }.AsQueryable();
 
             var mapped = movies.Project().To<MovieDto>();
 

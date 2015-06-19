@@ -37,6 +37,24 @@
     <DocumentationFile>bin\Release\AutoMapper.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\AutoMapper\IMapperConfigurationContext.cs">
+      <Link>IMapperConfigurationContext.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMapperContext.cs">
+      <Link>IMapperContext.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMapperMappingContext.cs">
+      <Link>IMapperMappingContext.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\MapperContext.cs">
+      <Link>MapperContext.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\IMapperCollection.cs">
+      <Link>Mappers\IMapperCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\MapperCollection.cs">
+      <Link>Mappers\MapperCollection.cs</Link>
+    </Compile>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
