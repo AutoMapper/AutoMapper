@@ -146,6 +146,7 @@
     <Compile Include="ContextItems.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
+    <Compile Include="EnumToNullableEnum.cs" />
     <Compile Include="ExpressionBridge.cs" />
     <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
