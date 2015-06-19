@@ -4,53 +4,60 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
-#if MONODROID
-    using Extensions = AutoMapper.QueryableExtensions.Extensions;
-#endif
+////TODO: TBD: not sure this would be necessary after all...
+//#if MONODROID
+//    using Extensions = AutoMapper.QueryableExtensions.Extensions;
+//#endif
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class EnumerableExpressionBinder : IExpressionBinder
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propertyMap"></param>
+        /// <param name="propertyTypeMap"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
             return propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
                    propertyMap.DestinationPropertyType != typeof (string);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mappingEngine"></param>
+        /// <param name="propertyMap"></param>
+        /// <param name="propertyTypeMap"></param>
+        /// <param name="request"></param>
+        /// <param name="result"></param>
+        /// <param name="typePairCount"></param>
+        /// <returns></returns>
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
             ExpressionRequest request, ExpressionResolutionResult result,
             Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return BindEnumerableExpression(mappingEngine, propertyMap, request, result, typePairCount);
-        }
-
-        private static MemberAssignment BindEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
-            ExpressionRequest request, ExpressionResolutionResult result,
-            Internal.IDictionary<ExpressionRequest, int> typePairCount)
-        {
             MemberAssignment bindExpression;
-            Type destinationListType = GetDestinationListTypeFor(propertyMap);
-            Type sourceListType = null;
-            // is list
 
-            if (result.Type.IsArray)
-            {
-                sourceListType = result.Type.GetElementType();
-            }
-            else
-            {
-                sourceListType = result.Type.GetGenericArguments().First();
-            }
+            var destinationListType = GetDestinationListTypeFor(propertyMap);
+            var sourceListType = result.Type.IsArray
+                ? result.Type.GetElementType()
+                : result.Type.GetGenericArguments().First();
+
             var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.IncludedMembers);
-
-
             var selectExpression = result.ResolutionExpression;
+
             if (sourceListType != destinationListType)
             {
-                var transformedExpression = Extensions.CreateMapExpression(mappingEngine, listTypePair, typePairCount);
+                const string methodName = nameof(Enumerable.Select);
+                var transformedExpression = mappingEngine.CreateMapExpression(listTypePair, typePairCount);
                 selectExpression = Expression.Call(
                     typeof (Enumerable),
-                    "Select",
+                    methodName,
                     new[] {sourceListType, destinationListType},
                     result.ResolutionExpression,
                     transformedExpression);
@@ -64,15 +71,15 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 // Call .ToList() on IEnumerable
                 var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType, selectExpression);
-
                 bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, toListCallExpression);
             }
             else if (propertyMap.DestinationPropertyType.IsArray)
             {
                 // Call .ToArray() on IEnumerable
-                MethodCallExpression toArrayCallExpression = Expression.Call(
+                const string methodName = nameof(Enumerable.ToArray);
+                var toArrayCallExpression = Expression.Call(
                     typeof (Enumerable),
-                    "ToArray",
+                    methodName,
                     new[] {destinationListType},
                     selectExpression);
                 bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, toArrayCallExpression);
@@ -96,11 +103,11 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static MethodCallExpression GetToListCallExpression(PropertyMap propertyMap, Type destinationListType,
             Expression selectExpression)
         {
-            return Expression.Call(
-                typeof (Enumerable),
-                propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList",
-                new[] {destinationListType},
-                selectExpression);
+            var methodName = propertyMap.DestinationPropertyType.IsArray
+                ? nameof(Enumerable.ToArray)
+                : nameof(Enumerable.ToList);
+            return Expression.Call(typeof (Enumerable), methodName,
+                new[] {destinationListType}, selectExpression);
         }
     }
 }

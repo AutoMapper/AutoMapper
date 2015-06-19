@@ -1,7 +1,7 @@
-﻿using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
+    using Xunit;
+
     public class BaseMapWithIncludesAndUnincludedMappings
     {
         public class ADTO
@@ -16,7 +16,6 @@ namespace AutoMapper.UnitTests.Bug
 
         public class BDTO2 : ADTO
         {
-
         }
 
         public class A
@@ -34,7 +33,9 @@ namespace AutoMapper.UnitTests.Bug
         {
             Mapper.CreateMap<A, ADTO>().Include<B, BDTO>();
             Mapper.CreateMap<B, BDTO>();
-            var a = Mapper.Map<A, ADTO>(new B(), new BDTO2()); // Throws invalid cast exception trying to convert BDTO2 to BDTO
+
+            // Throws invalid cast exception trying to convert BDTO2 to BDTO
+            var a = Mapper.Map<A, ADTO>(new B(), new BDTO2());
         }
     }
 }

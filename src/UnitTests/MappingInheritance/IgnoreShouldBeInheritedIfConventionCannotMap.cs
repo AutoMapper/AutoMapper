@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
+    using Xunit;
+
     public class IgnoreShouldBeInheritedIfConventionCannotMap
     {
         public class BaseDomain
         {
-
         }
 
         public class StandardDomain : BaseDomain
         {
-            
         }
 
         public class SpecificDomain : StandardDomain
@@ -24,7 +18,6 @@ namespace AutoMapper.UnitTests.Bug
 
         public class MoreSpecificDomain : SpecificDomain
         {
-            
         }
 
         public class Dto

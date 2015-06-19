@@ -2,36 +2,53 @@
 {
     namespace CustomMapperTests
     {
-        using AutoMapper.Mappers;
+        //TODO: will start by pulling the static-based tests forward as best I can...
+        //TODO: will want to establish non-static instance-based versions as well...
         using Xunit;
 
         public class When_adding_a_custom_mapper : NonValidatingSpecBase
         {
             protected override void Establish_context()
             {
-                MapperRegistry.Mappers.Insert(0, new TestObjectMapper());
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.ObjectMappers.Insert(0, new TestObjectMapper());
 
-                Mapper.CreateMap<ClassA, ClassB>()
-                    .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
+                    cfg.CreateMap<ClassA, ClassB>()
+                        .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
+                });
             }
 
             [Fact]
             public void Should_have_valid_configuration()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof (AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
             }
 
-
+            /// <summary>
+            /// 
+            /// </summary>
             public class TestObjectMapper : IObjectMapper
             {
-                public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+                /// <summary>
+                /// 
+                /// </summary>
+                /// <param name="context"></param>
+                /// <returns></returns>
+                public object Map(ResolutionContext context)
                 {
                     return new DestinationType();
                 }
 
+                /// <summary>
+                /// 
+                /// </summary>
+                /// <param name="context"></param>
+                /// <returns></returns>
                 public bool IsMatch(ResolutionContext context)
                 {
-                    return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
+                    return context.SourceType == typeof (SourceType)
+                           && context.DestinationType == typeof (DestinationType);
                 }
             }
 
@@ -55,6 +72,5 @@
                 public bool Value { get; set; }
             }
         }
-
     }
 }

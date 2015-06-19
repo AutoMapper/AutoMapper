@@ -23,12 +23,21 @@
             public int Foo { get; set; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public static object ResultSourceResolver(ResolutionResult result)
+        {
+            return result.Context.MapperContext.Map<Source, ChildDest>((Source) result.Value);
+        }
+
         protected override void Establish_context()
         {
             Mapper.Initialize(cfg =>
             {
+                // result.MapperContext.Map<Source, ChildDest>((Source)result.Value))
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(dest => dest.Child, opt => opt.ResolveUsing(result => result.Context.Engine.Map<Source, ChildDest>((Source) result.Value)));
+                    .ForMember(dest => dest.Child, opt => opt.ResolveUsing(ResultSourceResolver));
                 cfg.CreateMap<Source, ChildDest>();
             });
         }

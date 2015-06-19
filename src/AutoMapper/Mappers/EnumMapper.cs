@@ -4,6 +4,9 @@ namespace AutoMapper.Mappers
     using Internal;
     using System.Reflection;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class EnumMapper : IObjectMapper
     {
         private static readonly INullableConverterFactory NullableConverterFactory =
@@ -12,17 +15,23 @@ namespace AutoMapper.Mappers
         private static readonly IEnumNameValueMapperFactory EnumNameValueMapperFactory =
             PlatformAdapter.Resolve<IEnumNameValueMapperFactory>();
 
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
-            bool toEnum = false;
-            Type enumSourceType = TypeHelper.GetEnumerationType(context.SourceType);
-            Type enumDestinationType = TypeHelper.GetEnumerationType(context.DestinationType);
+            var runner = context.MapperContext.Runner;
+            var toEnum = false;
+            var enumSourceType = TypeHelper.GetEnumerationType(context.SourceType);
+            var enumDestinationType = TypeHelper.GetEnumerationType(context.DestinationType);
 
             if (EnumToStringMapping(context, ref toEnum))
             {
                 if (context.SourceValue == null)
                 {
-                    return mapper.CreateObject(context);
+                    return runner.CreateObject(context);
                 }
 
                 if (toEnum)
@@ -30,7 +39,7 @@ namespace AutoMapper.Mappers
                     var stringValue = context.SourceValue.ToString();
                     if (string.IsNullOrEmpty(stringValue))
                     {
-                        return mapper.CreateObject(context);
+                        return runner.CreateObject(context);
                     }
 
                     return Enum.Parse(enumDestinationType, stringValue, true);
@@ -41,10 +50,10 @@ namespace AutoMapper.Mappers
             {
                 if (context.SourceValue == null)
                 {
-                    if (mapper.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
+                    if (runner.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
                         return null;
 
-                    return mapper.CreateObject(context);
+                    return runner.CreateObject(context);
                 }
 
                 if (!Enum.IsDefined(enumSourceType, context.SourceValue))
@@ -81,6 +90,11 @@ namespace AutoMapper.Mappers
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
             bool toEnum = false;
@@ -88,6 +102,11 @@ namespace AutoMapper.Mappers
                    EnumToUnderlyingTypeMapping(context, ref toEnum);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private static bool EnumToEnumMapping(ResolutionContext context)
         {
             // Enum to enum mapping
@@ -96,6 +115,12 @@ namespace AutoMapper.Mappers
             return sourceEnumType != null && destEnumType != null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="toEnum"></param>
+        /// <returns></returns>
         private static bool EnumToUnderlyingTypeMapping(ResolutionContext context, ref bool toEnum)
         {
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
@@ -114,6 +139,12 @@ namespace AutoMapper.Mappers
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="toEnum"></param>
+        /// <returns></returns>
         private static bool EnumToStringMapping(ResolutionContext context, ref bool toEnum)
         {
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
@@ -132,6 +163,11 @@ namespace AutoMapper.Mappers
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private static bool EnumToNullableTypeMapping(ResolutionContext context)
         {
             if (!context.DestinationType.IsGenericType())
@@ -140,9 +176,15 @@ namespace AutoMapper.Mappers
             }
 
             var genericType = context.DestinationType.GetGenericTypeDefinition();
+            // ReSharper disable once CheckForReferenceEqualityInstead.1
             return genericType.Equals(typeof (Nullable<>));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private static object ConvertEnumToNullableType(ResolutionContext context)
         {
             var nullableConverter = NullableConverterFactory.Create(context.DestinationType);

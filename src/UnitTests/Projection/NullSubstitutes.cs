@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using QueryableExtensions;
     using Should;
     using Xunit;
+    using QueryableExtensions;
 
     public class NullSubstitutes : AutoMapperSpecBase
     {
@@ -17,12 +17,13 @@
 
         public class Dest
         {
-            public int? Value { get; set; }            
+            public int? Value { get; set; }
         }
 
         protected override void Establish_context()
         {
-            Mapper.CreateMap<Source, Dest>().ForMember(m => m.Value, opt => opt.NullSubstitute(5));
+            Mapper.CreateMap<Source, Dest>()
+                .ForMember(m => m.Value, opt => opt.NullSubstitute(5));
         }
 
         protected override void Because_of()
@@ -50,16 +51,17 @@
 
         public class Dest
         {
-            public int? ValuePropertyNotMatching { get; set; }            
+            public int? ValuePropertyNotMatching { get; set; }
         }
 
         protected override void Establish_context()
         {
-            Mapper.CreateMap<Source, Dest>().ForMember(m => m.ValuePropertyNotMatching, opt =>
-            {
-                opt.MapFrom(src => src.Value);
-                opt.NullSubstitute(5);
-            });
+            Mapper.CreateMap<Source, Dest>()
+                .ForMember(m => m.ValuePropertyNotMatching, opt =>
+                {
+                    opt.MapFrom(src => src.Value);
+                    opt.NullSubstitute(5);
+                });
         }
 
         protected override void Because_of()

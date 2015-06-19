@@ -2,12 +2,19 @@
 {
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using Internal;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class ExpressionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
             var sourceDelegateType = context.SourceType.GetGenericArguments()[0];
             var destDelegateType = context.DestinationType.GetGenericArguments()[0];
@@ -27,7 +34,7 @@
                 if (sourceParamType == destParamType)
                     continue;
 
-                var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(destParamType, sourceParamType);
+                var typeMap = context.MapperContext.ConfigurationProvider.ResolveTypeMap(destParamType, sourceParamType);
 
                 if (typeMap == null)
                     throw new AutoMapperMappingException(
@@ -42,6 +49,11 @@
             return Expression.Lambda(body, parameters);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
             return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
@@ -50,12 +62,21 @@
                    && context.DestinationType != typeof (LambdaExpression);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private class MappingVisitor : ExpressionVisitor
         {
             private readonly TypeMap _typeMap;
             private readonly ParameterExpression _oldParam;
             private readonly ParameterExpression _newParam;
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="typeMap"></param>
+            /// <param name="oldParam"></param>
+            /// <param name="newParam"></param>
             public MappingVisitor(TypeMap typeMap, ParameterExpression oldParam, ParameterExpression newParam)
             {
                 _typeMap = typeMap;
@@ -63,6 +84,11 @@
                 _newParam = newParam;
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="node"></param>
+            /// <returns></returns>
             protected override Expression VisitParameter(ParameterExpression node)
             {
                 if (ReferenceEquals(node, _oldParam))
@@ -70,11 +96,15 @@
                 return node;
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="node"></param>
+            /// <returns></returns>
             protected override Expression VisitMember(MemberExpression node)
             {
                 var memberAccessor = node.Member.ToMemberAccessor();
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
-
 
                 if (propertyMap.CustomExpression != null)
                 {
@@ -92,15 +122,27 @@
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private class ParameterReplacementVisitor : ExpressionVisitor
         {
             private readonly ParameterExpression _newParam;
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="newParam"></param>
             public ParameterReplacementVisitor(ParameterExpression newParam)
             {
                 _newParam = newParam;
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="node"></param>
+            /// <returns></returns>
             protected override Expression VisitParameter(ParameterExpression node)
             {
                 return _newParam;

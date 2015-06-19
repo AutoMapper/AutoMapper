@@ -1,8 +1,8 @@
-﻿using Should;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
+    using Should;
+    using Xunit;
+
     public class CannotConvertEnumToNullable
     {
         public enum DummyTypes : int
@@ -26,11 +26,11 @@ namespace AutoMapper.UnitTests.Bug
         {
             Mapper.CreateMap<DummySource, DummyDestination>();
             Mapper.AssertConfigurationIsValid();
-            DummySource src = new DummySource() { Dummy = DummyTypes.Bar };
 
+            var src = new DummySource {Dummy = DummyTypes.Bar};
             var destination = Mapper.Map<DummySource, DummyDestination>(src);
 
-            destination.Dummy.ShouldEqual((int)DummyTypes.Bar);
+            destination.Dummy.ShouldEqual((int) DummyTypes.Bar);
         }
     }
 }

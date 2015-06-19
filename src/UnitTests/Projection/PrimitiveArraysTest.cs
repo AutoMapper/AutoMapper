@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Xunit;
-using System.Linq;
-using Should;
-
-namespace AutoMapper.UnitTests.Projection
+﻿namespace AutoMapper.UnitTests.Projection
 {
     namespace PrimitiveArrays
     {
+        using System;
+        using System.Collections.Generic;
+        using System.Linq;
+        using Should;
+        using Xunit;
         using QueryableExtensions;
 
         public class PrimitiveArraysExpressionTest
@@ -17,7 +16,8 @@ namespace AutoMapper.UnitTests.Projection
             {
                 Mapper.CreateMap<Source, Destination>();
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => Mapper.Engine.CreateMapExpression<Source, Destination>());
+                typeof (NullReferenceException).ShouldNotBeThrownBy(
+                    () => Mapper.Context.Engine.CreateMapExpression<Source, Destination>());
             }
 
             [Fact]
@@ -35,13 +35,13 @@ namespace AutoMapper.UnitTests.Projection
                 };
 
                 var expr = sources.AsQueryable().Project().To<Destination>();
-
                 var result = expr.ToList();
 
                 result[0].Value1.ShouldEqual(sources[0].Value1);
                 result[0].Value2.ShouldEqual(sources[0].Value2);
             }
         }
+
         public class Source
         {
             public byte[] Value1 { get; set; }

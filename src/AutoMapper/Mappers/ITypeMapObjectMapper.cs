@@ -1,8 +1,22 @@
 namespace AutoMapper.Mappers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface ITypeMapObjectMapper
     {
-        object Map(ResolutionContext context, IMappingEngineRunner mapper);
-        bool IsMatch(ResolutionContext context, IMappingEngineRunner mapper);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        object Map(ResolutionContext context);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        bool IsMatch(ResolutionContext context);
     }
 }

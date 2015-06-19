@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Should;
-using Xunit;
-
-namespace AutoMapper.UnitTests.Bug
+﻿namespace AutoMapper.UnitTests.Bug
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Should;
+    using Xunit;
     using QueryableExtensions;
 
     public class CreateMapExpressionWithIgnoredPropertyBug : NonValidatingSpecBase
@@ -16,9 +14,9 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.CreateMap<Person, Person>()
                 .ForMember(x => x.Name, x => x.Ignore());
 
-            IQueryable<Person> collection = (new List<Person> { new Person { Name = "Person1" } }).AsQueryable();
+            var collection = (new List<Person> {new Person {Name = "Person1"}}).AsQueryable();
 
-            List<Person> result = collection.Project().To<Person>().ToList();
+            var result = collection.Project().To<Person>().ToList();
 
             result.ForEach(x => x.Name.ShouldBeNull());
         }

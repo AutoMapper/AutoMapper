@@ -1,15 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Data.Entity;
-using System.Linq;
-using Xunit;
-using Should;
-
-namespace AutoMapper.IntegrationTests.Net4
+﻿namespace AutoMapper.IntegrationTests.Net4
 {
+    using System.ComponentModel.DataAnnotations;
+    using System.Data.Entity;
+    using System.Linq;
+    using QueryableExtensions;
+    using Should;
+    using Xunit;
+
+    // ReSharper disable InconsistentNaming
     namespace ChildClassTests
     {
-        using QueryableExtensions;
-
         public class Base
         {
             public int BaseID { get; set; }
@@ -45,26 +45,29 @@ namespace AutoMapper.IntegrationTests.Net4
         public class Context : DbContext
         {
             public Context()
-                : base()
             {
+                // ReSharper disable once RedundantTypeArgumentsOfMethod
                 Database.SetInitializer<Context>(new DatabaseInitializer());
             }
 
             public DbSet<Base> Bases { get; set; }
             public DbSet<Sub> Subs { get; set; }
-
         }
 
         public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
         {
             protected override void Seed(Context context)
             {
-                context.Bases.Add(new Base() { BaseID = 1, Base1 = "base1", Sub = new Sub() { BaseId = 1, Sub1 = "sub1" } });
+                context.Bases.Add(new Base
+                {
+                    BaseID = 1,
+                    Base1 = "base1",
+                    Sub = new Sub {BaseId = 1, Sub1 = "sub1"}
+                });
 
                 base.Seed(context);
             }
         }
-
 
         public class UnitTest
         {
@@ -80,6 +83,7 @@ namespace AutoMapper.IntegrationTests.Net4
                 {
                     var baseEntitiy = context.Bases.FirstOrDefault();
                     baseEntitiy.ShouldNotBeNull();
+                    // ReSharper disable once PossibleNullReferenceException
                     baseEntitiy.BaseID.ShouldEqual(1);
                     baseEntitiy.Sub.Sub1.ShouldEqual("sub1");
                 }
@@ -98,23 +102,23 @@ namespace AutoMapper.IntegrationTests.Net4
                     {
                         Base1 = b.Base1,
                         BaseID = b.BaseID,
-                        Sub = new SubDTO
-                        {
-                            Sub1 = b.Sub.Sub1,
-                        }
+                        Sub = new SubDTO {Sub1 = b.Sub.Sub1}
                     }).FirstOrDefault();
+
                     baseDTO.ShouldNotBeNull();
+                    // ReSharper disable once PossibleNullReferenceException
                     baseDTO.BaseID.ShouldEqual(1);
                     baseDTO.Sub.Sub1.ShouldEqual("sub1");
 
-
-                    baseDTO = context.Bases.Project().To<BaseDTO>().FirstOrDefault();
+                    //TODO: this one was failing before I found it. Sounds like an issue with ProjectionExpression, but this is beyond the scope of what I am interested in right at the moment
+                    var projectedToBaseDTO = context.Bases.Project().To<BaseDTO>();
+                    baseDTO = projectedToBaseDTO.FirstOrDefault();
                     baseDTO.ShouldNotBeNull();
+                    // ReSharper disable once PossibleNullReferenceException
                     baseDTO.BaseID.ShouldEqual(1);
                     baseDTO.Sub.Sub1.ShouldEqual("sub1");
                 }
             }
         }
-
     }
 }

@@ -1,5 +1,4 @@
-﻿
-namespace AutoMapper.UnitTests
+﻿namespace AutoMapper.UnitTests
 {
     using System;
     using System.Linq;
@@ -70,7 +69,11 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_map_custom_mapped_properties()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo));
+            });
 
             Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
 
@@ -93,13 +96,18 @@ namespace AutoMapper.UnitTests
 
             Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
 
-            Assert.Throws<AutoMapperMappingException>(() => Mapper.Map<Expression<Func<Dest, bool>>, Expression<Action<Source, bool>>>(expr));
+            Assert.Throws<AutoMapperMappingException>(
+                () => Mapper.Map<Expression<Func<Dest, bool>>, Expression<Action<Source, bool>>>(expr));
         }
 
         [Fact]
         public void Can_map_with_different_destination_types()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Source, Dest>()
+                    .ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo));
+            });
 
             Expression<Func<Dest, Dest>> expr = d => d;
 

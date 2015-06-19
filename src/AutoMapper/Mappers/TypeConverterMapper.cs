@@ -6,21 +6,35 @@ namespace AutoMapper.Mappers
     using System.ComponentModel;
     using Internal;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class TypeConverterMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public object Map(ResolutionContext context)
         {
+            var runner = context.MapperContext.Runner;
             if (context.SourceValue == null)
             {
-                return mapper.CreateObject(context);
+                return runner.CreateObject(context);
             }
-            Func<object> converter = GetConverter(context);
+            var converter = GetConverter(context);
             return converter?.Invoke();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private static Func<object> GetConverter(ResolutionContext context)
         {
-            TypeConverter typeConverter = GetTypeConverter(context.SourceType);
+            var typeConverter = GetTypeConverter(context.SourceType);
             if (typeConverter.CanConvertTo(context.DestinationType))
                 return () => typeConverter.ConvertTo(context.SourceValue, context.DestinationType);
             if (context.DestinationType.IsNullableType() &&
@@ -36,11 +50,21 @@ namespace AutoMapper.Mappers
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool IsMatch(ResolutionContext context)
         {
             return GetConverter(context) != null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         private static TypeConverter GetTypeConverter(Type type)
         {
 #if !SILVERLIGHT

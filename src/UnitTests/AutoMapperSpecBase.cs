@@ -1,16 +1,17 @@
-using System;
-using Should;
-using Xunit;
-#if !SILVERLIGHT && !NETFX_CORE
-using Rhino.Mocks;
-#endif
-
 namespace AutoMapper.UnitTests
 {
+    using System;
+    using Xunit;
+
+#if !(SILVERLIGHT || NETFX_CORE)
+    using Rhino.Mocks;
+
+#endif
+
     public class AutoMapperSpecBase : NonValidatingSpecBase
     {
         [Fact]
-        public void Should_have_valid_configuration()
+        public virtual void Should_have_valid_configuration()
         {
             Mapper.AssertConfigurationIsValid();
         }
@@ -22,7 +23,6 @@ namespace AutoMapper.UnitTests
         {
             Mapper.Reset();
         }
-
     }
 
     public abstract class SpecBaseBase
@@ -50,7 +50,8 @@ namespace AutoMapper.UnitTests
         {
         }
 
-#if !SILVERLIGHT && !NETFX_CORE
+#if !(SILVERLIGHT || NETFX_CORE)
+
         protected TType CreateDependency<TType>()
             where TType : class
         {
@@ -61,8 +62,11 @@ namespace AutoMapper.UnitTests
         {
             return MockRepository.GenerateStub<TType>();
         }
+
 #endif
+
     }
+
     public abstract class SpecBase : SpecBaseBase, IDisposable
     {
         protected SpecBase()
@@ -75,6 +79,4 @@ namespace AutoMapper.UnitTests
             MainTeardown();
         }
     }
-
 }
-

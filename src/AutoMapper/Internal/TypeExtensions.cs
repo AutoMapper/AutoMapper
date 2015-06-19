@@ -1,14 +1,22 @@
-﻿namespace System.Reflection
+﻿ // ReSharper disable once CheckNamespace
+
+namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
+    /// <summary>
+    /// The extensions are internal for a reason. Note there is also a link to this file from the unit
+    /// test assemblies. That is intentional as well so as not to over expose potentially harmful
+    /// functionality, even via <see cref="System.Runtime.CompilerServices.InternalsVisibleToAttribute"/>.
+    /// </summary>
     internal static class TypeExtensions
     {
         public static Type[] GetGenericParameters(this Type type)
         {
+
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
 #elif SILVERLIGHT
@@ -16,10 +24,12 @@
 #else
             return type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
 #endif
+
         }
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type)
         {
+
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredConstructors;
 #elif SILVERLIGHT
@@ -27,10 +37,12 @@
 #else
             return type.GetTypeInfo().DeclaredConstructors;
 #endif
+
         }
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type)
         {
+
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredMembers;
 #elif SILVERLIGHT
@@ -38,10 +50,12 @@
 #else
             return type.GetTypeInfo().DeclaredMembers;
 #endif
+
         }
 
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type)
         {
+
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredMethods;
 #elif SILVERLIGHT
@@ -49,10 +63,12 @@
 #else
             return type.GetTypeInfo().DeclaredMethods;
 #endif
+
         }
 
         public static IEnumerable<PropertyInfo> GetDeclaredProperties(this Type type)
         {
+
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredProperties;
 #elif SILVERLIGHT
@@ -60,6 +76,7 @@
 #else
             return type.GetTypeInfo().DeclaredProperties;
 #endif
+
         }
 
         public static bool IsStatic(this FieldInfo fieldInfo)
@@ -100,6 +117,7 @@
 
         public static Assembly Assembly(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().Assembly;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -107,10 +125,12 @@
 #else
             return type.GetTypeInfo().Assembly;
 #endif
+
         }
 
         public static Type BaseType(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().BaseType;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -118,19 +138,23 @@
 #else
             return type.GetTypeInfo().BaseType;
 #endif
+
         }
 
         public static object[] GetCustomAttributes(this Type type, Type attributeType, bool inherit)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().GetCustomAttributes(attributeType, inherit).ToArray();
 #else
             return type.GetCustomAttributes(attributeType, inherit).ToArray();
 #endif
+
         }
 
         public static bool IsAbstract(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsAbstract;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -138,10 +162,12 @@
 #else
             return type.GetTypeInfo().IsAbstract;
 #endif
+
         }
 
         public static bool IsClass(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsClass;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -149,10 +175,12 @@
 #else
             return type.GetTypeInfo().IsClass;
 #endif
+
         }
 
         public static bool IsEnum(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsEnum;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -160,10 +188,12 @@
 #else
             return type.GetTypeInfo().IsEnum;
 #endif
+
         }
 
         public static bool IsGenericType(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsGenericType;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -171,10 +201,12 @@
 #else
             return type.GetTypeInfo().IsGenericType;
 #endif
+
         }
 
         public static bool IsGenericTypeDefinition(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsGenericTypeDefinition;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -182,10 +214,12 @@
 #else
             return type.GetTypeInfo().IsGenericTypeDefinition;
 #endif
+
         }
 
         public static bool IsInterface(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsInterface;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -193,10 +227,12 @@
 #else
             return type.GetTypeInfo().IsInterface;
 #endif
+
         }
 
         public static bool IsPrimitive(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsPrimitive;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -204,10 +240,12 @@
 #else
             return type.GetTypeInfo().IsPrimitive;
 #endif
+
         }
 
         public static bool IsSealed(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsSealed;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -215,10 +253,12 @@
 #else
             return type.GetTypeInfo().IsSealed;
 #endif
+
         }
 
         public static bool IsValueType(this Type type)
         {
+
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsValueType;
 #elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
@@ -226,12 +266,15 @@
 #else
             return type.GetTypeInfo().IsValueType;
 #endif
+
         }
 
 
 #if !SILVERLIGHT
+
         public static bool IsInstanceOfType(this Type type, object o)
         {
+            // ReSharper disable once UseMethodIsInstanceOfType
             return o != null && type.IsAssignableFrom(o.GetType());
         }
 
@@ -240,7 +283,8 @@
             return type.GetTypeInfo().DeclaredConstructors.ToArray();
         }
 
-#if !DNXCORE50 && !WINCORE
+#if !(DNXCORE50 || WINCORE)
+
         public static Type[] GetTypes(this Assembly assembly)
         {
             return assembly.ExportedTypes.ToArray();
@@ -302,8 +346,10 @@
         {
             return type.GetTypeInfo().ImplementedInterfaces;
         }
+
 #endif
 
 #endif
+
     }
 }
