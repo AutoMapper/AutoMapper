@@ -3,7 +3,7 @@
 
     "frameworks": {
 
-        "net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10": {
+        ".NETPortable,Version=v4.5,Profile=Profile259": {
             "frameworkAssemblies": {
                 "System.Collections": "",
                 "System.Runtime": "",
@@ -30,7 +30,7 @@
             },
             "compilationOptions": { "define": [ "SILVERLIGHT" ] }
         },
-        "wp80": {
+        "wp8": {
             "frameworkAssemblies": {
                 "mscorlib": "",
                 "System": "",
@@ -38,7 +38,6 @@
             },
             "compilationOptions": { "define": [ "SILVERLIGHT" ] }
         },
-        "dnx451": { },
         "wpa81": {
             "frameworkAssemblies": {
                 "System.Collections": "",
@@ -55,50 +54,42 @@
                 "System.Threading": ""
             }
         },
-        "win": {
-            "dependencies": {
-                "System.Runtime": "4.0.20-beta-*",
-                "System.Linq.Expressions": "4.0.10-beta-*",
-                "System.Linq": "4.0.0-beta-*",
-                "System.Reflection": "4.0.10-beta-*",
-                "System.Text.RegularExpressions": "4.0.10-beta-*",
-                "System.Reflection.TypeExtensions": "4.0.0-beta-*",
-                "System.Reflection.Emit": "4.0.0-beta-*",
-                "System.Threading": "4.0.10-beta-*",
-                "System.Runtime.Extensions": "4.0.10-beta-*",
-                "System.Reflection.Extensions": "4.0.0-beta-*",
-                "System.Collections": "4.0.10-beta-*",
-                "System.Collections.Specialized": "4.0.0-beta-*",
-                "System.Collections.Concurrent": "4.0.10-beta-*",
-                "System.ComponentModel.TypeConverter": "4.0.0-beta-*",
-                "System.Reflection.Primitives": "4.0.0-beta-*",
-                "System.Linq.Queryable": "4.0.0-beta-*",
-                "System.Diagnostics.Debug": "4.0.10-beta-*",
-                "System.ObjectModel": "4.0.10-beta-*"
-            },
-            "compilationOptions": { "define": [ "NETFX_CORE", "WINCORE" ] }
+        "netcore45": {
+            "frameworkAssemblies": {
+                "System.Collections": "",
+                "System.Runtime": "",
+                "System.Linq": "",
+                "System.Linq.Expressions": "",
+                "System.Linq.Queryable": "",
+                "System.Text.RegularExpressions": "",
+                "System.Reflection": "",
+                "System.Reflection.Extensions": "",
+                "System.Diagnostics.Debug": "",
+                "System.ObjectModel": "",
+                "System.Runtime.Extensions": "",
+                "System.Threading": ""
+            }
         },
+        "dnx46": { },
         "dnxcore50": {
             "dependencies": {
-                "System.Runtime": "4.0.20-beta-*",
-                "System.Linq.Expressions": "4.0.10-beta-*",
-                "System.Linq": "4.0.0-beta-*",
-                "System.Reflection": "4.0.10-beta-*",
-                "System.Text.RegularExpressions": "4.0.10-beta-*",
-                "System.Reflection.TypeExtensions": "4.0.0-beta-*",
-                "System.Reflection.Emit": "4.0.0-beta-*",
-                "System.Threading": "4.0.10-beta-*",
-                "System.Runtime.Extensions": "4.0.10-beta-*",
-                "System.Reflection.Extensions": "4.0.0-beta-*",
-                "System.Collections": "4.0.10-beta-*",
-                "System.Collections.Specialized": "4.0.0-beta-*",
-                "System.Collections.Concurrent": "4.0.10-beta-*",
-                "System.ComponentModel.TypeConverter": "4.0.0-beta-*",
-                "System.Reflection.Primitives": "4.0.0-beta-*",
-                "System.Linq.Queryable": "4.0.0-beta-*",
-                "System.Diagnostics.Debug": "4.0.10-beta-*",
-                "System.ObjectModel": "4.0.10-beta-*"
+                "System.Collections": "4.0.10-beta-22816",
+                "System.Collections.Concurrent": "4.0.10-beta-22816",
+                "System.Collections.Specialized": "4.0.0-beta-22816",
+                "System.ObjectModel": "4.0.10-beta-22816",
+                "System.ComponentModel.TypeConverter": "4.0.0-beta-22816",
+                "System.Diagnostics.Debug": "4.0.10-beta-22816",
+                "System.Linq": "4.0.0-beta-22816",
+                "System.Linq.Expressions": "4.0.10-beta-22816",
+                "System.Linq.Queryable": "4.0.0-beta-22816",
+                "System.Text.RegularExpressions": "4.0.10-beta-22816",
+                "System.Threading": "4.0.10-beta-22816",
+                "System.Reflection": "4.0.10-beta-22816",
+                "System.Reflection.Extensions": "4.0.0-beta-22816",
+                "System.Reflection.TypeExtensions": "4.0.0-beta-22816",
+                "System.Runtime.Extensions": "4.0.10-beta-22816"
             }
         }
     }
+    
 }

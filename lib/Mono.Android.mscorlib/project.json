@@ -1,9 +1,0 @@
-{
-    "frameworks": {
-        "MonoAndroid10": {
-            "bin": {
-                "assembly": "mscorlib.dll"
-            }
-        }
-    }
-}

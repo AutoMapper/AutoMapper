@@ -19,3 +19,4 @@ packages
 *.ide/
 .nuget
 project.lock.json
+.vs
