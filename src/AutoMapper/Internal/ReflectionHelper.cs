@@ -6,6 +6,16 @@ namespace AutoMapper.Internal
 
     public static class ReflectionHelper
     {
+        public static string GetPropertyName(this LambdaExpression expression)
+        {
+            var memberExpression = expression.Body as MemberExpression;
+            if(memberExpression == null)
+            {
+                throw new ArgumentOutOfRangeException("expression", "Expected a property/field access expression, not " + expression);
+            }
+            return memberExpression.Member.Name;
+        }
+
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
         {
             Expression expressionToCheck = lambdaExpression;
