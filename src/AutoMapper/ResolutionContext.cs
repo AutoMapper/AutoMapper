@@ -287,5 +287,21 @@ namespace AutoMapper
             return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions(),
                 Mapper.Engine);
         }
+
+        internal void BeforeMap(object destination)
+        {
+            if(Parent == null)
+            {
+                Options.BeforeMapAction(SourceValue, destination);
+            }
+        }
+
+        internal void AfterMap(object destination)
+        {
+            if(Parent == null)
+            {
+                Options.AfterMapAction(SourceValue, destination);
+            }
+        }
     }
 }
