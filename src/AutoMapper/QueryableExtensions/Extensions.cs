@@ -161,7 +161,7 @@ namespace AutoMapper.QueryableExtensions
             var typeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(request.SourceType,
                 request.DestinationType);
 
-            if (typeMap == null)
+            if(typeMap == null)
             {
                 const string MessageFormat = "Missing map from {0} to {1}. Create using Mapper.CreateMap<{0}, {1}>.";
 
@@ -174,8 +174,8 @@ namespace AutoMapper.QueryableExtensions
 
             var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
             var visitor = new NewFinderVisitor();
-            var ctorExpr = typeMap.ConstructExpression ?? Expression.Lambda(Expression.New(request.DestinationType));
-            visitor.Visit(parameterReplacer.Visit(ctorExpr));
+            var constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
+            visitor.Visit(parameterReplacer.Visit(constructorExpression));
 
             var expression = Expression.MemberInit(
                 visitor.NewExpression,

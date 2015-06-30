@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using Internal;
 
@@ -18,6 +20,12 @@
             CtorParams = ctorParams;
 
             _runtimeCtor = LazyFactory.Create(() => DelegateFactory.CreateCtor(ctor, CtorParams));
+        }
+
+        public Expression NewExpression(Expression instanceParameter)
+        {
+            var parameters = CtorParams.Select(map => map.GetExpression(instanceParameter));
+            return Expression.New(Ctor, parameters);
         }
 
         public object ResolveValue(ResolutionContext context, IMappingEngineRunner mappingEngine)
