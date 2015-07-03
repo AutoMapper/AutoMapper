@@ -102,17 +102,22 @@ namespace AutoMapper
 
         private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
         {
-            return GetAllPublicMembers(PropertyReadable, mi => !mi.IsStatic() && mi.IsPublic());
+            return GetAllPublicMembers(PropertyReadable, FieldReadable, mi => !mi.IsStatic() && mi.IsPublic());
         }
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
         {
-            return GetAllPublicMembers(PropertyWritable, mi => !mi.IsStatic() && mi.IsPublic());
+            return GetAllPublicMembers(PropertyWritable, FieldWritable, mi => !mi.IsStatic() && mi.IsPublic());
         }
 
         private static bool PropertyReadable(PropertyInfo propertyInfo)
         {
             return propertyInfo.CanRead;
+        }
+
+        private bool FieldReadable(FieldInfo fieldInfo)
+        {
+            return true;
         }
 
         private static bool PropertyWritable(PropertyInfo propertyInfo)
@@ -123,7 +128,14 @@ namespace AutoMapper
             return propertyInfo.CanWrite || propertyIsEnumerable;
         }
 
-        private IEnumerable<MemberInfo> GetAllPublicMembers(Func<PropertyInfo, bool> propertyAvailableFor,
+        private bool FieldWritable(FieldInfo fieldInfo)
+        {
+            return !fieldInfo.IsInitOnly;
+        }
+
+        private IEnumerable<MemberInfo> GetAllPublicMembers(
+            Func<PropertyInfo, bool> propertyAvailableFor,
+            Func<FieldInfo, bool> fieldAvailableFor,
             Func<MemberInfo, bool> memberAvailableFor)
         {
             var typesToScan = new List<Type>();
@@ -141,7 +153,7 @@ namespace AutoMapper
                     .Where(memberAvailableFor)
                     .Where(
                         m =>
-                            m is FieldInfo ||
+                            (m is FieldInfo && fieldAvailableFor((FieldInfo)m)) ||
                             (m is PropertyInfo && propertyAvailableFor((PropertyInfo) m) &&
                              !((PropertyInfo) m).GetIndexParameters().Any()))
                 );
