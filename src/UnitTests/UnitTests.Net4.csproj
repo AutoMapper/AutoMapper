@@ -135,6 +135,7 @@
     <Compile Include="Bug\ObjectTypeMapFailure.cs" />
     <Compile Include="Bug\ParentChildResolversBug.cs" />
     <Compile Include="Bug\ProjectCollectionsBug.cs" />
+    <Compile Include="Bug\ReadOnlyFieldMappingBug.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SelectiveConfigurationValidation.cs" />
