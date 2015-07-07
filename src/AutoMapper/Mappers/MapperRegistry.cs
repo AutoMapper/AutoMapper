@@ -11,6 +11,7 @@ namespace AutoMapper.Mappers
             new AssignableArrayMapper(), 
             new FlagsEnumMapper(),
             new EnumMapper(),
+            new MultidimensionalArrayMapper(),
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
