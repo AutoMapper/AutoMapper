@@ -34,7 +34,6 @@ namespace AutoMapper.UnitTests.Tests
 
         private HashSet<MemberNameReplacer> _memberNameReplacers = new HashSet<MemberNameReplacer>();
 
-        private IEnumerable<Assembly> _sourceExtensionMethodSearch = null;
         private IEnumerable<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
         public INamingConvention SourceMemberNamingConvention
@@ -140,7 +139,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IMappingOptions _mappingOptions;
+        private StubMappingOptions _mappingOptions;
 
 
         private class Source
@@ -187,7 +186,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IMappingOptions _mappingOptions;
+        private StubMappingOptions _mappingOptions;
 
         private class Source
         {

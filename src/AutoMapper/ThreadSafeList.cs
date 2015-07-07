@@ -1,11 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper.Internal;
-
 namespace AutoMapper
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Internal;
+
     public class ThreadSafeList<T> : IEnumerable<T>, IDisposable
         where T : class
     {
@@ -57,7 +57,6 @@ namespace AutoMapper
             {
                 _lock.ExitUpgradeableReadLock();
             }
-
         }
 
         public void Clear()
@@ -108,8 +107,7 @@ namespace AutoMapper
             {
                 if (disposing)
                 {
-                    if (_lock != null)
-                        _lock.Dispose();
+                    _lock?.Dispose();
                 }
 
                 _lock = null;

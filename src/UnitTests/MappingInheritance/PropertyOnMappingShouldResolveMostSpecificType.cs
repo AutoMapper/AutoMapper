@@ -60,25 +60,28 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void container_class_is_caching_too_specific_mapper_for_collection()
         {
-            Mapper.CreateMap<ItemBase, ItemDto>()
-                .ForMember(d => d.Description, m => m.MapFrom(s => s))
-                .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty))
-                .Include<SpecificItem, SpecificItemDto>();
-            Mapper.CreateMap<SpecificItem, SpecificItemDto>()
-                .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty));
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<ItemBase, ItemDto>()
+                    .ForMember(d => d.Description, m => m.MapFrom(s => s))
+                    .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty))
+                    .Include<SpecificItem, SpecificItemDto>();
+                cfg.CreateMap<SpecificItem, SpecificItemDto>()
+                    .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty));
 
-            Mapper.CreateMap<ItemBase, DescriptionBaseDto>()
-                .Include<GenericItem, GenericDescriptionDto>()
-                .Include<SpecificItem, SpecificDescriptionDto>();
+                cfg.CreateMap<ItemBase, DescriptionBaseDto>()
+                    .Include<GenericItem, GenericDescriptionDto>()
+                    .Include<SpecificItem, SpecificDescriptionDto>();
 
-            Mapper.CreateMap<SpecificItem, SpecificDescriptionDto>();
-            Mapper.CreateMap<GenericItem, GenericDescriptionDto>()
-                .Include<DifferentItem, DifferentDescriptionDto>()
-                .Include<DifferentItem2, DifferentDescriptionDto2>();
-            Mapper.CreateMap<DifferentItem, DifferentDescriptionDto>();
-            Mapper.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
+                cfg.CreateMap<SpecificItem, SpecificDescriptionDto>();
+                cfg.CreateMap<GenericItem, GenericDescriptionDto>()
+                    .Include<DifferentItem, DifferentDescriptionDto>()
+                    .Include<DifferentItem2, DifferentDescriptionDto2>();
+                cfg.CreateMap<DifferentItem, DifferentDescriptionDto>();
+                cfg.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
 
-            Mapper.CreateMap<Container, ContainerDto>();
+                cfg.CreateMap<Container, ContainerDto>();
+            });
 
             var dto = Mapper.Map<Container, ContainerDto>(new Container
                                                               {
@@ -97,25 +100,28 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void container_class_is_caching_too_specific_mapper_for_collection_with_one_parameter()
         {
-            Mapper.CreateMap<ItemBase, ItemDto>()
-                .ForMember(d => d.Description, m => m.MapFrom(s => s))
-                .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty))
-                .Include<SpecificItem, SpecificItemDto>();
-            Mapper.CreateMap<SpecificItem, SpecificItemDto>()
-                .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty));
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<ItemBase, ItemDto>()
+                    .ForMember(d => d.Description, m => m.MapFrom(s => s))
+                    .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty))
+                    .Include<SpecificItem, SpecificItemDto>();
+                cfg.CreateMap<SpecificItem, SpecificItemDto>()
+                    .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty));
 
-            Mapper.CreateMap<ItemBase, DescriptionBaseDto>()
-                .Include<GenericItem, GenericDescriptionDto>()
-                .Include<SpecificItem, SpecificDescriptionDto>();
+                cfg.CreateMap<ItemBase, DescriptionBaseDto>()
+                    .Include<GenericItem, GenericDescriptionDto>()
+                    .Include<SpecificItem, SpecificDescriptionDto>();
 
-            Mapper.CreateMap<SpecificItem, SpecificDescriptionDto>();
-            Mapper.CreateMap<GenericItem, GenericDescriptionDto>()
-                .Include<DifferentItem, DifferentDescriptionDto>()
-                .Include<DifferentItem2, DifferentDescriptionDto2>();
-            Mapper.CreateMap<DifferentItem, DifferentDescriptionDto>();
-            Mapper.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
+                cfg.CreateMap<SpecificItem, SpecificDescriptionDto>();
+                cfg.CreateMap<GenericItem, GenericDescriptionDto>()
+                    .Include<DifferentItem, DifferentDescriptionDto>()
+                    .Include<DifferentItem2, DifferentDescriptionDto2>();
+                cfg.CreateMap<DifferentItem, DifferentDescriptionDto>();
+                cfg.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
 
-            Mapper.CreateMap<Container, ContainerDto>();
+                cfg.CreateMap<Container, ContainerDto>();
+            });
 
             var dto = Mapper.Map<ContainerDto>(new Container
             {
@@ -134,23 +140,26 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void property_on_dto_mapped_from_self_should_be_specific_match()
         {
-            Mapper.CreateMap<ItemBase, ItemDto>()
-                .ForMember(d=>d.Description, m=>m.MapFrom(s=>s))
-                .ForMember(d=>d.SomeProperty, m=>m.MapFrom(s=>s.SomeBaseProperty))
-                .Include<SpecificItem, SpecificItemDto>();
-            Mapper.CreateMap<SpecificItem, SpecificItemDto>()
-                .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty));
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<ItemBase, ItemDto>()
+                    .ForMember(d => d.Description, m => m.MapFrom(s => s))
+                    .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty))
+                    .Include<SpecificItem, SpecificItemDto>();
+                cfg.CreateMap<SpecificItem, SpecificItemDto>()
+                    .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty));
 
-            Mapper.CreateMap<ItemBase, DescriptionBaseDto>()
-                .Include<GenericItem, GenericDescriptionDto>()
-                .Include<SpecificItem, SpecificDescriptionDto>();
+                cfg.CreateMap<ItemBase, DescriptionBaseDto>()
+                    .Include<GenericItem, GenericDescriptionDto>()
+                    .Include<SpecificItem, SpecificDescriptionDto>();
 
-            Mapper.CreateMap<SpecificItem, SpecificDescriptionDto>();
-            Mapper.CreateMap<GenericItem, GenericDescriptionDto>()
-                .Include<DifferentItem, DifferentDescriptionDto>()
-                .Include<DifferentItem2, DifferentDescriptionDto2>();
-            Mapper.CreateMap<DifferentItem, DifferentDescriptionDto>();
-            Mapper.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
+                cfg.CreateMap<SpecificItem, SpecificDescriptionDto>();
+                cfg.CreateMap<GenericItem, GenericDescriptionDto>()
+                    .Include<DifferentItem, DifferentDescriptionDto>()
+                    .Include<DifferentItem2, DifferentDescriptionDto2>();
+                cfg.CreateMap<DifferentItem, DifferentDescriptionDto>();
+                cfg.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
+            });
 
             Mapper.AssertConfigurationIsValid();
 
@@ -163,23 +172,26 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void property_on_dto_mapped_from_self_should_be_specific_match_with_one_parameter()
         {
-            Mapper.CreateMap<ItemBase, ItemDto>()
-                .ForMember(d => d.Description, m => m.MapFrom(s => s))
-                .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty))
-                .Include<SpecificItem, SpecificItemDto>();
-            Mapper.CreateMap<SpecificItem, SpecificItemDto>()
-                .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty));
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<ItemBase, ItemDto>()
+                    .ForMember(d => d.Description, m => m.MapFrom(s => s))
+                    .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty))
+                    .Include<SpecificItem, SpecificItemDto>();
+                cfg.CreateMap<SpecificItem, SpecificItemDto>()
+                    .ForMember(d => d.SomeProperty, m => m.MapFrom(s => s.SomeBaseProperty));
 
-            Mapper.CreateMap<ItemBase, DescriptionBaseDto>()
-                .Include<GenericItem, GenericDescriptionDto>()
-                .Include<SpecificItem, SpecificDescriptionDto>();
+                cfg.CreateMap<ItemBase, DescriptionBaseDto>()
+                    .Include<GenericItem, GenericDescriptionDto>()
+                    .Include<SpecificItem, SpecificDescriptionDto>();
 
-            Mapper.CreateMap<SpecificItem, SpecificDescriptionDto>();
-            Mapper.CreateMap<GenericItem, GenericDescriptionDto>()
-                .Include<DifferentItem, DifferentDescriptionDto>()
-                .Include<DifferentItem2, DifferentDescriptionDto2>();
-            Mapper.CreateMap<DifferentItem, DifferentDescriptionDto>();
-            Mapper.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
+                cfg.CreateMap<SpecificItem, SpecificDescriptionDto>();
+                cfg.CreateMap<GenericItem, GenericDescriptionDto>()
+                    .Include<DifferentItem, DifferentDescriptionDto>()
+                    .Include<DifferentItem2, DifferentDescriptionDto2>();
+                cfg.CreateMap<DifferentItem, DifferentDescriptionDto>();
+                cfg.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
+            });
 
             Mapper.AssertConfigurationIsValid();
 

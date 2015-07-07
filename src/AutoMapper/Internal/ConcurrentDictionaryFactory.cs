@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
-
+﻿#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
 namespace AutoMapper.Internal
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+
     public class DictionaryFactoryOverride : IDictionaryFactory
     {
         public IDictionary<TKey, TValue> CreateDictionary<TKey, TValue>()
@@ -50,6 +52,16 @@ namespace AutoMapper.Internal
             {
                 _dictionary.Clear();
             }
+
+            public ICollection<TValue> Values => _dictionary.Values;
+            public ICollection<TKey> Keys => _dictionary.Keys;
+
+            public bool ContainsKey(TKey key)
+            {
+                return _dictionary.ContainsKey(key);
+            }
         }
     }
 }
+
+#endif

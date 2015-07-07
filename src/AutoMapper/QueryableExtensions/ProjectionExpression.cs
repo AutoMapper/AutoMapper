@@ -3,16 +3,27 @@ namespace AutoMapper.QueryableExtensions
     using System;
     using System.Linq;
     using System.Linq.Expressions;
+    using Internal;
+    using System.Reflection;
 
-    public class ProjectionExpression<TSource> : IProjectionExpression
+    public class ProjectionExpression : IProjectionExpression
     {
-        private readonly IQueryable<TSource> _source;
+        private static readonly MethodInfo QueryableSelectMethod = FindQueryableSelectMethod();
+
+        private readonly IQueryable _source;
         private readonly IMappingEngine _mappingEngine;
 
-        public ProjectionExpression(IQueryable<TSource> source, IMappingEngine mappingEngine)
+        public ProjectionExpression(IQueryable source, IMappingEngine mappingEngine)
         {
             _source = source;
             _mappingEngine = mappingEngine;
+        }
+
+        private static MethodInfo FindQueryableSelectMethod()
+        {
+            Expression<Func<IQueryable<object>>> select = () => Queryable.Select(default(IQueryable<object>), default(Expression<Func<object, object>>));
+            MethodInfo method = ((MethodCallExpression)select.Body).Method.GetGenericMethodDefinition();
+            return method;
         }
 
         public IQueryable<TResult> To<TResult>(object parameters = null)
@@ -23,7 +34,7 @@ namespace AutoMapper.QueryableExtensions
         public IQueryable<TResult> To<TResult>(object parameters = null, params string[] membersToExpand)
         {
             var paramValues = (parameters ?? new object()).GetType()
-                .GetProperties()
+                .GetDeclaredProperties()
                 .ToDictionary(pi => pi.Name, pi => pi.GetValue(parameters, null));
 
             return To<TResult>(paramValues, membersToExpand);
@@ -36,7 +47,15 @@ namespace AutoMapper.QueryableExtensions
 
         public IQueryable<TResult> To<TResult>(System.Collections.Generic.IDictionary<string, object> parameters, params string[] membersToExpand)
         {
-            return _source.Select(_mappingEngine.CreateMapExpression<TSource, TResult>(parameters, membersToExpand));
+            var expr = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
+
+            return _source.Provider.CreateQuery<TResult>(
+                Expression.Call(
+                    null,
+                    QueryableSelectMethod.MakeGenericMethod(_source.ElementType, typeof(TResult)),
+                    new[] { _source.Expression, Expression.Quote(expr) }
+                    )
+                );
         }
 
         public IQueryable<TResult> To<TResult>(object parameters = null, params Expression<Func<TResult, object>>[] membersToExpand)
@@ -60,7 +79,16 @@ namespace AutoMapper.QueryableExtensions
                 return visitor.MemberName;
             })
                 .ToArray();
-            return _source.Select(_mappingEngine.CreateMapExpression<TSource, TResult>(parameters, members));
+
+            var mapExpr = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, members);
+
+            return _source.Provider.CreateQuery<TResult>(
+                Expression.Call(
+                    null,
+                    QueryableSelectMethod.MakeGenericMethod(_source.ElementType, typeof(TResult)),
+                    new[] { _source.Expression, Expression.Quote(mapExpr) }
+                    )
+                );
         }
 
         private class MemberVisitor : ExpressionVisitor

@@ -3,10 +3,12 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     public class MemberResolverExpressionResultConverter : IExpressionResultConverter
     {
-        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+        public ExpressionResolutionResult GetExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
         {
             var oldParameter = propertyMap.CustomExpression.Parameters.Single();
             var newParameter = expressionResolutionResult.ResolutionExpression;
@@ -18,7 +20,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             return new ExpressionResolutionResult(currentChild, currentChildType);
         }
 
-        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            IValueResolver valueResolver)
         {
             return valueResolver is IMemberResolver;
         }
@@ -50,6 +53,5 @@ namespace AutoMapper.QueryableExtensions.Impl
                 return Expression.MakeMemberAccess(newObj, newMember);
             }
         }
-
     }
 }

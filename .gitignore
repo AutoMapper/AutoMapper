@@ -16,3 +16,7 @@ AppPackages/
 packages
 *.orig
 *.DotSettings
+*.ide/
+.nuget
+project.lock.json
+.vs

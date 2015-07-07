@@ -121,7 +121,7 @@ namespace AutoMapper.UnitTests
 				public string ProductName { get; set; }
 			}
 
-			[Fact]
+			[Fact(Skip = "I don't like this scenario, don't create mappings on the fly")]
 			public void Should_not_use_AssignableMapper_when_mappings_are_specified_on_the_fly()
 			{
 				Mapper.CreateMap<Order, Order>();

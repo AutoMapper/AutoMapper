@@ -1,5 +1,7 @@
 namespace AutoMapper.Mappers
 {
+    using System.Reflection;
+
     public class AssignableArrayMapper : IObjectMapper
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)

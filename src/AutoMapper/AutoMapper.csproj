@@ -60,23 +60,15 @@
     <DocumentationFile>bin\Release\AutoMapper.xml</DocumentationFile>
     <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseWin8|AnyCPU'">
-    <OutputPath>bin\Profile136\Release</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>bin\Release\AutoMapper.xml</DocumentationFile>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <TargetFrameworkProfile>Profile136</TargetFrameworkProfile>
-  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Internal\ConcurrentDictionaryFactory.cs" />
     <Compile Include="Internal\DelegateFactory.cs" />
     <Compile Include="Internal\DictionaryFactory.cs" />
+    <Compile Include="Internal\EnumNameValueMapperFactory.cs" />
+    <Compile Include="Internal\ExpressionOnlyDelegateFactory.cs" />
     <Compile Include="Internal\IDictionary.cs" />
     <Compile Include="Internal\AliasedMember.cs" />
     <Compile Include="Internal\IAdapterResolver.cs" />
@@ -85,17 +77,29 @@
     <Compile Include="Internal\NoOpReaderWriterLockFactory.cs" />
     <Compile Include="Internal\NotSupportedEnumNameValueMappingFactory.cs" />
     <Compile Include="Internal\NotSupportedProxyGeneratorFactory.cs" />
+    <Compile Include="Internal\NullableConverterFactory.cs" />
     <Compile Include="Internal\NullReferenceExceptionSwallowingResolver.cs" />
     <Compile Include="Internal\PlatformAdapter.cs" />
     <Compile Include="Internal\ProbingAdapterResolver.cs" />
+    <Compile Include="Internal\PropertyEmitter.cs" />
+    <Compile Include="Internal\ProxyGenerator.cs" />
+    <Compile Include="Internal\ProxyGeneratorFactory.cs" />
+    <Compile Include="Internal\RealReaderWriterLockSlimFactory.cs" />
+    <Compile Include="Internal\TypeExtensions.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\AssignableArrayMapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\ExpressionMapper.cs" />
+    <Compile Include="Mappers\HashSetMapper.cs" />
     <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
+    <Compile Include="Mappers\ListSourceMapper.cs" />
     <Compile Include="Mappers\MapperRegistry.cs" />
+    <Compile Include="Mappers\NameValueCollectionMapper.cs" />
+    <Compile Include="Mappers\PlatformSpecificMapperRegistryOverride.cs" />
     <Compile Include="Mappers\PrimitiveArrayMapper.cs" />
+    <Compile Include="Mappers\StringMapper.cs" />
+    <Compile Include="Mappers\TypeConverterMapper.cs" />
     <Compile Include="MemberList.cs" />
     <Compile Include="AutoMapperMappingException.cs" />
     <Compile Include="ConstructorMap.cs" />
@@ -110,12 +114,9 @@
     <Compile Include="Internal\IDelegateFactory.cs" />
     <Compile Include="Internal\ITypeMapFactory.cs" />
     <Compile Include="Internal\DefaultResolver.cs" />
-    <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
     <Compile Include="Internal\DeferredInstantiatedResolver.cs" />
-    <Compile Include="Internal\ExpressionValueFormatter.cs" />
     <Compile Include="Internal\FieldGetter.cs" />
-    <Compile Include="Internal\FormatterCtorExpression.cs" />
-    <Compile Include="IFormatterConfiguration.cs" />
+    <Compile Include="IProfileConfiguration.cs" />
     <Compile Include="Internal\MemberGetter.cs" />
     <Compile Include="Internal\MethodGetter.cs" />
     <Compile Include="Internal\PropertyGetter.cs" />
@@ -132,7 +133,6 @@
     <Compile Include="IFormatterExpression.cs" />
     <Compile Include="IMappingEngine.cs" />
     <Compile Include="IMappingExpression.cs" />
-    <Compile Include="IValueFormatter.cs" />
     <Compile Include="IValueResolver.cs" />
     <Compile Include="Mappers\ArrayMapper.cs" />
     <Compile Include="Mappers\CollectionMapper.cs" />
@@ -146,7 +146,6 @@
     <Compile Include="Mappers\NullableMapper.cs" />
     <Compile Include="Mappers\ObjectCreator.cs" />
     <Compile Include="Mappers\ReadOnlyCollectionMapper.cs" />
-    <Compile Include="Mappers\StringMapper.cs" />
     <Compile Include="Mappers\TypeHelper.cs" />
     <Compile Include="Mappers\TypeMapMapper.cs" />
     <Compile Include="Mappers\TypeMapObjectMapperRegistry.cs" />
@@ -185,7 +184,6 @@
     <Compile Include="TypeInfo.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
-    <Compile Include="ValueFormatter.cs" />
     <Compile Include="ValueResolver.cs" />
   </ItemGroup>
   <ItemGroup>

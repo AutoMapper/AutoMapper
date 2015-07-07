@@ -6,7 +6,8 @@ namespace AutoMapper.QueryableExtensions.Impl
 
     public class NullSubstitutionExpressionResultConverter : IExpressionResultConverter
     {
-        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+        public ExpressionResolutionResult GetExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
         {
             Expression currentChild = expressionResolutionResult.ResolutionExpression;
             Type currentChildType = expressionResolutionResult.Type;
@@ -21,7 +22,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             return new ExpressionResolutionResult(currentChild, currentChildType);
         }
 
-        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            IValueResolver valueResolver)
         {
             return valueResolver is NullReplacementMethod && expressionResolutionResult.Type.IsNullableType();
         }
@@ -42,12 +44,12 @@ namespace AutoMapper.QueryableExtensions.Impl
                 if (node == newParameter)
                 {
                     var equalsNull = Expression.Property(newParameter, "HasValue");
-                    var nullConst = Expression.Condition(equalsNull, Expression.Property(newParameter, "Value"), Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+                    var nullConst = Expression.Condition(equalsNull, Expression.Property(newParameter, "Value"),
+                        Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
                     return nullConst;
                 }
                 return node;
             }
         }
-
     }
 }

@@ -23,8 +23,11 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Example()
         {
-            Mapper.Configuration.AllowNullCollections = true;
-            Mapper.CreateMap<IFoo, IFoo>();
+            Mapper.Initialize(cfg =>
+            {
+                cfg.AllowNullCollections = true;
+                cfg.CreateMap<IFoo, IFoo>();
+            });
             Mapper.AssertConfigurationIsValid();
 
             IFoo bar = new Bar

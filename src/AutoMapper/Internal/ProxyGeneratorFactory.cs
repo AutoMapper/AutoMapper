@@ -1,5 +1,4 @@
-﻿using AutoMapper.Impl;
-
+﻿#if MONODROID || NET4
 namespace AutoMapper.Internal
 {
     public class ProxyGeneratorFactoryOverride : IProxyGeneratorFactory
@@ -10,3 +9,5 @@ namespace AutoMapper.Internal
         }
     }
 }
+
+#endif

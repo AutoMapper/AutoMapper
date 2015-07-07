@@ -35,7 +35,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-        public class When_mapping_two_non_configured_types_with_nesting : AutoMapperSpecBase
+        public class When_mapping_two_non_configured_types_with_nesting : NonValidatingSpecBase
         {
             private Destination _resultWithGenerics;
 

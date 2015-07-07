@@ -6,8 +6,8 @@ namespace AutoMapper.QueryableExtensions
     public class ExpressionRequest : IEquatable<ExpressionRequest>
     {
         private readonly string _membersForComparison;
-        public Type SourceType { get; private set; }
-        public Type DestinationType { get; private set; }
+        public Type SourceType { get; }
+        public Type DestinationType { get; }
         public string[] IncludedMembers { get; private set; }
 
         public ExpressionRequest(Type sourceType, Type destinationType, params string[] includedMembers)
@@ -24,14 +24,15 @@ namespace AutoMapper.QueryableExtensions
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return String.Equals(_membersForComparison, other._membersForComparison) && SourceType.Equals(other.SourceType) && DestinationType.Equals(other.DestinationType);
+            return String.Equals(_membersForComparison, other._membersForComparison) &&
+                   SourceType == other.SourceType && DestinationType == other.DestinationType;
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((ExpressionRequest) obj);
         }
 

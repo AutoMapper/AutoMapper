@@ -6,6 +6,7 @@
         using QueryableExtensions;
         using Xunit;
         using System.Linq;
+        using Should.Core.Assertions;
 
         public class LinqTests
         {

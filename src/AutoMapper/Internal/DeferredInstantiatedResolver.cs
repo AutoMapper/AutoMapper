@@ -1,21 +1,21 @@
-using System;
-
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
-	public class DeferredInstantiatedResolver : IValueResolver
-	{
+    using System;
+
+    public class DeferredInstantiatedResolver : IValueResolver
+    {
         private readonly Func<ResolutionContext, IValueResolver> _constructor;
 
-		public DeferredInstantiatedResolver(Func<ResolutionContext, IValueResolver> constructor)
-		{
-			_constructor = constructor;
-		}
+        public DeferredInstantiatedResolver(Func<ResolutionContext, IValueResolver> constructor)
+        {
+            _constructor = constructor;
+        }
 
-		public ResolutionResult Resolve(ResolutionResult source)
-		{
-		    var resolver = _constructor(source.Context);
+        public ResolutionResult Resolve(ResolutionResult source)
+        {
+            var resolver = _constructor(source.Context);
 
-		    return resolver.Resolve(source);
-		}
-	}
+            return resolver.Resolve(source);
+        }
+    }
 }

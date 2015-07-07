@@ -7,8 +7,6 @@
 
         public class When_mapping_with_contextual_values : AutoMapperSpecBase
         {
-            private Dest _dest;
-
             public class Source
             {
                 public int Value { get; set; }
@@ -44,8 +42,6 @@
 
         public class When_mapping_with_contextual_values_in_resolve_func : AutoMapperSpecBase
         {
-            private Dest _dest;
-
             public class Source
             {
                 public int Value1 { get; set; }

@@ -589,8 +589,8 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                Mapper.CreateMap<Source, Destination>()
-                    .ConvertUsing(s => new Destination { Value2 = s.Value1 + 10 });
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>()
+                    .ConvertUsing(s => new Destination { Value2 = s.Value1 + 10 }));
             }
 
             [Fact]
