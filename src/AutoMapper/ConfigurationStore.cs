@@ -281,6 +281,10 @@ namespace AutoMapper
 
                 IncludeBaseMappings(source, destination, tm);
 
+                // keep the cache in sync
+                TypeMap _;
+                _typeMapPlanCache.TryRemove(tp, out _);
+
                 OnTypeMapCreated(tm);
 
                 return tm;
