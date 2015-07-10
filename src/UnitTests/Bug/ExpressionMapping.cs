@@ -29,6 +29,10 @@ namespace AutoMapper.UnitTests.Bug
 
     public class ExpressionMapping : NonValidatingSpecBase
     {
+        public class GrandParentDTO
+        {
+            public ParentDTO Parent { get; set; }
+        }
         public class ParentDTO
         {
             public ICollection<ChildDTO> Children { get; set; }
@@ -43,6 +47,11 @@ namespace AutoMapper.UnitTests.Bug
             public int ID_ { get; set; }
             public int? IDs { get; set; }
             public int ID2 { get; set; }
+        }
+
+        public class GrandParent
+        {
+            public Parent Parent { get; set; }
         }
 
         public class Parent
@@ -87,6 +96,7 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Establish_context()
         {
+            Mapper.CreateMap<GrandParent, GrandParentDTO>().ReverseMap();
             Mapper.CreateMap<Parent, ParentDTO>().ReverseMap();
             Mapper.CreateMap<Child, ChildDTO>()
                 .ForMember(d => d.ID_, opt => opt.MapFrom(s => s.ID))
@@ -108,6 +118,18 @@ namespace AutoMapper.UnitTests.Bug
             var items2 = items.UseAsDataSource().For<ParentDTO>().Where(_predicateExpression);
             //var a = items2.ToList();
             items2.Count().ShouldEqual(1);
+        }
+
+        [Fact]
+        public void GrandParent_Mapping_To_Sub_Sub_Property_Condition()
+        {
+            Expression<Func<GrandParentDTO, bool>> _predicateExpression = gp => gp.Parent.Children.Any(c => c.ID2 == 3);
+            var expression = Mapper.Map<Expression<Func<GrandParent, bool>>>(_predicateExpression);
+            var items = new[] {new GrandParent(){Parent = new Parent(){Children = new[]{new Child(){ID2 = 3}}, Child = new Child(){ID2 = 3}}}}.AsQueryable();
+            items.Where(expression).ShouldContain(items.First());
+            var items2 = items.UseAsDataSource().For<GrandParentDTO>().Where(_predicateExpression);
+            items2.Count().ShouldEqual(1);
+            When_Use_Outside_Class_Method_Call();
         }
 
         [Fact]

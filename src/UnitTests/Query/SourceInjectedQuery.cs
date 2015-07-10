@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Should;
 using AutoMapper.QueryableExtensions;
 using Xunit;
@@ -121,5 +122,137 @@ namespace AutoMapper.UnitTests.Query
 
             result.First().A.ShouldEqual(_source.Max(s => s.SrcValue));
         }
+        readonly User[] _source2 = new[]
+                    {
+                        new User { UserId = 2, Account = new Account(){ Id = 4,Things = {new Thing(){Bar = "Bar"}, new Thing(){ Bar ="Bar 2"}}}},
+                        new User { UserId = 1, Account = new Account(){ Id = 3,Things = {new Thing(){Bar = "Bar 3"}, new Thing(){ Bar ="Bar 4"}}}},
+                    };
+        [Fact]
+    public void Map_select_method()
+        {
+            SetupAutoMapper();
+            var result = _source2.AsQueryable()
+              .UseAsDataSource().For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
+
+            (result.First() as IEnumerable<string>).Last().ShouldEqual("Bar 4");
     }
+
+    [Fact]
+    public void Map_orderBy_thenBy_expression()
+    {
+            SetupAutoMapper();
+            var result = _source2.AsQueryable()
+              .UseAsDataSource().For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
+
+            (result.First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
+    }
+
+    private static void SetupAutoMapper()
+    {
+        Mapper.CreateMap<User, UserModel>()
+        .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
+        .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name))
+        .ForMember(d => d.LoggedOn, opt => opt.MapFrom(s => s.IsLoggedOn ? "Y" : "N"))
+        .ForMember(d => d.IsOverEighty, opt => opt.MapFrom(s => s.Age > 80))
+        .ForMember(d => d.AccountName, opt => opt.MapFrom(s => s.Account == null ? string.Empty : string.Concat(s.Account.FirstName, " ", s.Account.LastName)))
+        .ForMember(d => d.AgeInYears, opt => opt.MapFrom(s => s.Age))
+        .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.Active))
+        .ForMember(d => d.AccountModel, opt => opt.MapFrom(s => s.Account));
+
+        Mapper.CreateMap<UserModel, User>()
+            .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName))
+            .ForMember(d => d.IsLoggedOn, opt => opt.MapFrom(s => s.LoggedOn.ToUpper() == "Y"))
+            .ForMember(d => d.Age, opt => opt.MapFrom(s => s.AgeInYears))
+            .ForMember(d => d.Active, opt => opt.MapFrom(s => s.IsActive))
+            .ForMember(d => d.Account, opt => opt.MapFrom(s => s.AccountModel));
+
+        Mapper.CreateMap<Account, AccountModel>()
+            .ForMember(d => d.Bal, opt => opt.MapFrom(s => s.Balance))
+            .ForMember(d => d.DateCreated, opt => opt.MapFrom(s => s.CreateDate))
+            .ForMember(d => d.ComboName, opt => opt.MapFrom(s => string.Concat(s.FirstName, " ", s.LastName)))
+            .ForMember(d => d.ThingModels, opt => opt.MapFrom(s => s.Things));
+
+        Mapper.CreateMap<AccountModel, Account>()
+            .ForMember(d => d.Balance, opt => opt.MapFrom(s => s.Bal))
+            .ForMember(d => d.Things, opt => opt.MapFrom(s => s.ThingModels));
+
+        Mapper.CreateMap<Thing, ThingModel>()
+            .ForMember(d => d.FooModel, opt => opt.MapFrom(s => s.Foo))
+            .ForMember(d => d.BarModel, opt => opt.MapFrom(s => s.Bar));
+
+        Mapper.CreateMap<ThingModel, Thing>()
+            .ForMember(d => d.Foo, opt => opt.MapFrom(s => s.FooModel))
+            .ForMember(d => d.Bar, opt => opt.MapFrom(s => s.BarModel));
+
+        //Mapper.CreateMap<IEnumerable<Thing>, IEnumerable<ThingModel>>();
+        //Mapper.CreateMap<IEnumerable<ThingModel>, IEnumerable<Thing>>();
+        //Mapper.CreateMap<IEnumerable<User>, IEnumerable<UserModel>>();
+        //Mapper.CreateMap<IEnumerable<UserModel>, IEnumerable<User>>();
+    }
+
 }
+
+public class Account
+{
+    public Account()
+    {
+        Things = new List<Thing>();
+    }
+    public int Id { get; set; }
+    public double Balance { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public DateTime CreateDate { get; set; }
+    public ICollection<Thing> Things { get; set; }
+}
+
+public class AccountModel
+{
+    public AccountModel()
+    {
+        ThingModels = new List<ThingModel>();
+    }
+    public int Id { get; set; }
+    public double Bal { get; set; }
+    public string ComboName { get; set; }
+    public DateTime DateCreated { get; set; }
+    public ICollection<ThingModel> ThingModels { get; set; }
+}
+
+public class Thing
+{
+    public int Foo { get; set; }
+    public string Bar { get; set; }
+}
+
+public class ThingModel
+{
+    public int FooModel { get; set; }
+    public string BarModel { get; set; }
+}
+
+public class User
+{
+    public int UserId { get; set; }
+    public string Name { get; set; }
+    public bool IsLoggedOn { get; set; }
+    public int Age { get; set; }
+    public bool Active { get; set; }
+    public Account Account { get; set; }
+}
+
+public class UserModel
+{
+    public int Id { get; set; }
+    public string FullName { get; set; }
+    public string AccountName { get; set; }
+    public bool IsOverEighty { get; set; }
+    public string LoggedOn { get; set; }
+    public int AgeInYears { get; set; }
+    public bool IsActive { get; set; }
+    public AccountModel AccountModel { get; set; }
+}
+    }
+
+

@@ -251,13 +251,16 @@ namespace AutoMapper.Mappers
             {
                 var baseExpression = Visit(node.Expression);
                 var propertyMap = FindPropertyMapOfExpression(node.Expression as MemberExpression);
-
+                if (propertyMap == null)
+                    return node;
                 var sourceType = propertyMap.SourceMember.GetMemberType();
                 var destType = propertyMap.DestinationPropertyType;
                 if (sourceType == destType)
                     return Expression.MakeMemberAccess(baseExpression, node.Member);
                 var typeMap = Mapper.FindTypeMapFor(sourceType, destType);
-                var newExpression = new MappingVisitor(typeMap, node.Expression, baseExpression, this).Visit(node);
+                var subVisitor = new MappingVisitor(typeMap, node.Expression, baseExpression, this);
+                var newExpression = subVisitor.Visit(node);
+                _destSubTypes = _destSubTypes.Concat(subVisitor._destSubTypes).ToArray();
                 return newExpression;
             }
 
