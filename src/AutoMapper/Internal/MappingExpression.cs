@@ -130,6 +130,10 @@ namespace AutoMapper.Internal
         {
             return context =>
             {
+                if(type.IsGenericTypeDefinition())
+                {
+                    type = type.MakeGenericType(context.SourceType.GetGenericArguments());
+                }
                 var obj = context.Options.ServiceCtor?.Invoke(type);
                 if (obj != null)
                     return (TServiceType)obj;
