@@ -18,7 +18,15 @@ namespace AutoMapper.Mappers
         {
             return context.DestinationType.IsAssignableFrom(context.SourceType)
                    && context.DestinationType.IsArray
-                   && context.SourceType.IsArray;
+                   && context.SourceType.IsArray
+                   && !ElementsExplicitlyMapped(context);
+        }
+
+        private bool ElementsExplicitlyMapped(ResolutionContext context)
+        {
+            var sourceElementType = context.SourceType.GetElementType();
+            var destinationElementType = context.DestinationType.GetElementType();
+            return context.Engine.ConfigurationProvider.FindTypeMapFor(sourceElementType, destinationElementType) != null;
         }
     }
 }
