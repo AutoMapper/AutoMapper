@@ -203,6 +203,10 @@ namespace AutoMapper.Mappers
             protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
             {
                 var result = mapper.CreateObject(context);
+                if(result == null)
+                {
+                    throw new InvalidOperationException("Cannot create destination object. " + context);
+                }
                 context.SetResolvedDestinationValue(result);
                 return result;
             }
