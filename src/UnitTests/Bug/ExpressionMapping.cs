@@ -133,6 +133,16 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         [Fact]
+        public void GrandParent_Mapping_To_Sub_Sub_Property_Condition2()
+        {
+            Expression<Func<IQueryable<GrandParentDTO>, bool>> _predicateExpression = gps => gps.Any(gp => gp.Parent.Children.Any(c => c.ID_ == 3));
+            Expression<Func<IQueryable<GrandParentDTO>, IQueryable<GrandParentDTO>>> _predicateExpression2 = gps => gps.Where(gp => gp.Parent.Children.Any(c => c.ID_ == 3));
+            var expression = Mapper.Map<Expression<Func<IQueryable<GrandParent>, bool>>>(_predicateExpression);
+            var expression2 = Mapper.Map<Expression<Func<IQueryable<GrandParent>, IQueryable<GrandParent>>>>(_predicateExpression2);
+            When_Use_Outside_Class_Method_Call();
+        }
+
+        [Fact]
         public void When_Use_Outside_Class_Method_Call()
         {
             var ids = new[] { 4, 5 };
