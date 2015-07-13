@@ -22,8 +22,22 @@ namespace AutoMapper.Mappers
             if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
                 throw new AutoMapperMappingException("Source and destination expressions must be of the same type.");
 
-            var mappingVisitor = new MappingVisitor(destDelegateType.GetGenericArguments());
-            return mappingVisitor.Visit(expression);
+            var destArgType = destDelegateType.GetGenericArguments()[0];
+            if (destArgType.IsGenericType)
+                destArgType = destArgType.GetGenericArguments()[0];
+            var sourceArgType = sourceDelegateType.GetGenericArguments()[0];
+            if (sourceArgType.IsGenericType)
+                sourceArgType = sourceArgType.GetGenericArguments()[0];
+
+            var typeMap = Mapper.FindTypeMapFor(destArgType, sourceArgType);
+
+            var parentMasterVisitor = new MappingVisitor(destDelegateType.GetGenericArguments());
+            var typeMapVisitor = new MappingVisitor(typeMap, expression.Parameters[0], Expression.Parameter(destDelegateType.GetGenericArguments()[0], expression.Parameters[0].Name), parentMasterVisitor, destDelegateType.GetGenericArguments());
+            
+            // Map expression body and variable seperately
+            var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
+            var body = typeMapVisitor.Visit(expression.Body);
+            return Expression.Lambda(body, parameters);
         }
 
         public bool IsMatch(ResolutionContext context)
@@ -48,7 +62,7 @@ namespace AutoMapper.Mappers
             {
             }
 
-            internal MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor, IList<Type> destSubTypes = null)
+            internal MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor = null, IList<Type> destSubTypes = null)
             {
                 _typeMap = typeMap;
                 _oldParam = oldParam;
@@ -196,13 +210,14 @@ namespace AutoMapper.Mappers
                     var sourceParamType = expression.Parameters[i].Type;
                     foreach (var destParamType in _destSubTypes.Where(dt => dt != sourceParamType))
                     {
-                    var typeMap = Mapper.FindTypeMapFor(destParamType, sourceParamType);
+                        var a = destParamType.IsGenericType ? destParamType.GetGenericArguments()[0]: destParamType;
+                        var typeMap = Mapper.FindTypeMapFor(a, sourceParamType);
 
-                    if (typeMap == null)
+                        if (typeMap == null)
                             continue;
 
-                    var oldParam = expression.Parameters[i];
-                    var newParam = Expression.Parameter(typeMap.SourceType, oldParam.Name);
+                        var oldParam = expression.Parameters[i];
+                        var newParam = Expression.Parameter(a, oldParam.Name);
                         visitors.Add(new MappingVisitor(typeMap, oldParam, newParam, this));
                     }
                 }
@@ -229,7 +244,7 @@ namespace AutoMapper.Mappers
 
                 if (propertyMap.CustomExpression != null)
                     return ConvertCustomExpression(replacedExpression, propertyMap);
-                
+
                 Func<Expression,IMemberGetter,Expression> getExpression = (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo);
 
                 //if (propertyMap.SourceMember.ToMemberGetter().MemberType.IsNullableType())
