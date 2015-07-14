@@ -65,7 +65,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             Inspector.SourceResult(sourceExpression, sourceResult);
 
             object destResult;
-            if (resultType.IsEnumerableType() && resultType != typeof(string) && resultType.GetGenericArguments()[0] == typeof (TDestination))
+            if (IsProjection<TDestination>(resultType))
                 destResult = new ProjectionExpression<TSource>(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>();
             else
                 destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
@@ -76,10 +76,15 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private object InvokeSourceQuery(Type sourceResultType, Expression sourceExpression)
         {
-            var result = sourceResultType.GetInterfaces().Contains(typeof (IEnumerable)) && sourceResultType != typeof(string)
+            var result = IsProjection<TSource>(sourceResultType)
                 ? _dataSource.Provider.CreateQuery(sourceExpression)
                 : _dataSource.Provider.Execute(sourceExpression);
             return result;
+        }
+
+        private static bool IsProjection<T>(Type resultType)
+        {
+            return resultType.IsEnumerableType() && !resultType.IsQueryableType() && resultType != typeof(string) && resultType.GetGenericElementType() == typeof(T);
         }
 
         private static Type CreateSourceResultType(Type destResultType)
