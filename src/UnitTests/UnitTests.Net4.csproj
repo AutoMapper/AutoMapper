@@ -115,6 +115,7 @@
     <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
     <Compile Include="Bug\IntToNullableDecimal.cs" />
     <Compile Include="Bug\ListSourceMapperBug.cs" />
+    <Compile Include="Bug\MultidimensionalArrays.cs" />
     <Compile Include="Bug\NullArrayBug.cs" />
     <Compile Include="Bug\ReadOnlyCollectionMappingBug.cs" />
     <Compile Include="Bug\MappingInheritance.cs" />
