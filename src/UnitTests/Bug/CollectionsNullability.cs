@@ -22,10 +22,7 @@ namespace AutoMapper.UnitTests.Bug
         protected override void Establish_context()
         {
             Mapper.CreateMap<Holder, Holder>();
-            Mapper.CreateMap<Container, Container>()
-                //.ForMember(d =>d.Items, o=>o.NullSubstitute(new List<string>()))
-                //.ForMember(d => d.Items, o => o.MapFrom(s => s.Items ?? new List<string>()));
-                ;
+            Mapper.CreateMap<Container, Container>();
         }
 
         protected override void Because_of()
