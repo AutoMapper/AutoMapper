@@ -43,6 +43,11 @@ namespace AutoMapper.Internal
 			return type.GetInterfaces().Contains(typeof (IEnumerable));
 		}
 
+        public static bool IsQueryableType(this Type type)
+        {
+            return type.GetInterfaces().Contains(typeof(IQueryable));
+        }
+
 		public static bool IsListType(this Type type)
 		{
 			return type.GetInterfaces().Contains(typeof (IList));
@@ -71,5 +76,12 @@ namespace AutoMapper.Internal
 			var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>));
 			return genericInterfaces.FirstOrDefault();
 		}
+
+        public static Type GetGenericElementType(this Type type)
+        {
+            if (type.HasElementType)
+                return type.GetElementType();
+            return type.GetGenericArguments()[0];
+        }
 	}
 }
