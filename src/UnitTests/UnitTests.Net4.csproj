@@ -145,6 +145,7 @@
     <Compile Include="Bug\ProjectCollectionsBug.cs" />
     <Compile Include="Bug\ReadOnlyFieldMappingBug.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
+    <Compile Include="Bug\RemovePrefixes.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SelectiveConfigurationValidation.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
