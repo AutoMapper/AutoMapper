@@ -24,7 +24,13 @@ namespace AutoMapper.Internal
             AllowNullDestinationValues = true;
             ConstructorMappingEnabled = true;
             IncludeSourceExtensionMethods(typeof (Enumerable).Assembly());
+            ShouldMapProperty = p => p.IsPublic();
+            ShouldMapField = f => f.IsPublic;
         }
+
+        public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+
+        public Func<FieldInfo, bool> ShouldMapField { get; set; }
 
         public bool AllowNullDestinationValues { get; set; }
         public bool AllowNullCollections { get; set; }

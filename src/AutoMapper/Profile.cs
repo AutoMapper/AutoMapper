@@ -29,6 +29,18 @@ namespace AutoMapper
             GetProfile().ConstructorMappingEnabled = false;
         }
 
+        public Func<PropertyInfo, bool> ShouldMapProperty
+        {
+            get { return GetProfile().ShouldMapProperty; }
+            set { GetProfile().ShouldMapProperty = value; }
+        }
+
+        public Func<FieldInfo, bool> ShouldMapField
+        {
+            get { return GetProfile().ShouldMapField; }
+            set { GetProfile().ShouldMapField = value; }
+        }
+
         public bool AllowNullDestinationValues
         {
             get { return GetProfile().AllowNullDestinationValues; }

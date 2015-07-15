@@ -8,6 +8,7 @@ using Should;
 
 namespace AutoMapper.UnitTests.Tests
 {
+    using System;
     using Assembly = System.Reflection.Assembly;
 
     public class StubNamingConvention : INamingConvention
@@ -91,6 +92,22 @@ namespace AutoMapper.UnitTests.Tests
         public IEnumerable<MethodInfo> SourceExtensionMethods
         {
             get { return _sourceExtensionMethods; }
+        }
+
+        public Func<PropertyInfo, bool> ShouldMapProperty
+        {
+            get
+            {
+                return p => true;
+            }
+        }
+
+        public Func<FieldInfo, bool> ShouldMapField
+        {
+            get
+            {
+                return p => p.IsPublic;
+            }
         }
 
         public void ReplaceMemberName(string original, string newValue)

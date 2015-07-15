@@ -115,5 +115,17 @@ namespace AutoMapper
         /// Naming convention for destination members
         /// </summary>
         INamingConvention DestinationMemberNamingConvention { get; set; }
+
+        /// <summary>
+        /// Specify which properties should be mapped.
+        /// By default only public properties are mapped.
+        /// </summary>
+        Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+
+        /// <summary>
+        /// Specify which fields should be mapped.
+        /// By default only public fields are mapped.
+        /// </summary>
+        Func<FieldInfo, bool> ShouldMapField { get; set; }
     }
 }
