@@ -46,6 +46,11 @@ namespace AutoMapper
         IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList);
 
         /// <summary>
+        /// Clear the list of recognized prefixes.
+        /// </summary>
+        void ClearPrefixes();
+
+        /// <summary>
         /// Recognize a list of prefixes to be removed from source member names when matching
         /// </summary>
         /// <param name="prefixes">List of prefixes</param>

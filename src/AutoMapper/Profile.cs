@@ -106,6 +106,11 @@ namespace AutoMapper
             return map;
         }
 
+        public void ClearPrefixes()
+        {
+            GetProfile().ClearPrefixes();
+        }
+
         public void RecognizeAlias(string original, string alias)
         {
             GetProfile().RecognizeAlias(original, alias);
