@@ -66,7 +66,7 @@ namespace AutoMapper.Mappers
             }
             if (EnumToUnderlyingTypeMapping(context, ref toEnum))
             {
-                if (toEnum)
+                if (toEnum && context.SourceValue != null)
                 {
                     return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
                 }
