@@ -65,7 +65,7 @@ namespace AutoMapper.QueryableExtensions
 
         private string[] GetMemberNames<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
         {
-            return Array.ConvertAll(membersToExpand, ReflectionHelper.GetPropertyName);
+            return membersToExpand.Select(ReflectionHelper.GetPropertyName).ToArray();
         }
 
         public IQueryable<TResult> To<TResult>(System.Collections.Generic.IDictionary<string, object> parameters, params Expression<Func<TResult, object>>[] membersToExpand)
