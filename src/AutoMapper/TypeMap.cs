@@ -385,5 +385,24 @@ namespace AutoMapper
             if (inheritedTypeMap.AfterMap != null)
                 AddAfterMapAction(inheritedTypeMap.AfterMap);
         }
+
+        internal LambdaExpression DestinationConstructorExpression(Expression instanceParameter)
+        {
+            var ctorExpr = ConstructExpression;
+            if(ctorExpr != null)
+            {
+                return ctorExpr;
+            }
+            Expression newExpression;
+            if(ConstructorMap != null)
+            {
+                newExpression = ConstructorMap.NewExpression(instanceParameter);
+            }
+            else
+            {
+                newExpression = Expression.New(DestinationType);
+            }
+            return Expression.Lambda(newExpression);
+        }
     }
 }

@@ -261,6 +261,7 @@
     <Compile Include="Should\should\StringAssertionExtensions.cs" />
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
+    <Compile Include="Bug\ProjectConstructorParameters.cs" />
     <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\MapperTests.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />
