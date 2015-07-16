@@ -246,6 +246,17 @@ namespace AutoMapper
         public static void Initialize(Profile profile)
         {
             Initialize(c => profile.Initialize(_configuration.Value));
+            profile.Configure();
+        }
+
+        /// <summary>
+        /// Initializes the mapper with the supplied profile. Runtime optimization complete after this method is called.
+        /// This is one of the preferred means to configure AutoMapper.
+        /// </summary>
+        /// <typeparam name="TProfile">The profile to use for configuration</typeparam>
+        public static void Initialize<TProfile>() where TProfile : Profile, new()
+        {
+            Initialize(new TProfile());
         }
 
         /// <summary>
