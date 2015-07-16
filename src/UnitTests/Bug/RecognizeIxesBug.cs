@@ -14,6 +14,7 @@ namespace AutoMapper.UnitTests.Bug
             {
                 Mapper.Initialize(cfg =>
                 {
+                    Mapper.AddMemberConvention().AddName<PrePostfixName>(_ => _.SetPostfixs("CodeKey", "Key"));
                     cfg.RecognizeDestinationPostfixes("CodeKey", "Key");
                     cfg.CreateMap<Stuff, StuffView>();
                 });

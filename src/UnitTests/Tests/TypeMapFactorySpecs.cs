@@ -255,16 +255,14 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_map_properties_with_different_names()
         {
-            var mappingOptions = new StubMappingOptions();
-            mappingOptions.ReplaceMemberName("Ä", "A");
-            mappingOptions.ReplaceMemberName("í", "i");
-            mappingOptions.ReplaceMemberName("Airlina", "Airline");
+            Mapper.AddMemberConvention().AddName<ReplaceName>(_ => _.AddReplace("A", "Ä").AddReplace("i", "í").AddReplace("Airline", "Airlina")).SetMemberInfo<FieldPropertyMemberInfo>();
             
-            var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions, MemberList.Destination);
+            Mapper.CreateMap<Source,Destination>();
 
-            var propertyMaps = typeMap.GetPropertyMaps();
-
-            propertyMaps.Count().ShouldEqual(3);
+            var dest = Mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
+            dest.Aviator.ShouldEqual(3);
+            dest.SubAirlineFlight.ShouldEqual(4);
+            dest.Value.ShouldEqual(5);
         }
     }
 }

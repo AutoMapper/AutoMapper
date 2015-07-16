@@ -35,19 +35,22 @@ namespace AutoMapper.UnitTests.Bug
 
             protected override void Establish_context()
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateProfile("MyMapperProfile", prf =>
+                
+                    Mapper.Initialize(cfg =>
                     {
-                        prf.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
-                        prf.CreateMap<Neda, Dario>();
-                    });                   
-                    cfg.CreateProfile("MyMapperProfile2", prf =>
-                    {
-                        prf.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
-                        prf.CreateMap<Dario, Neda>();
+                        Mapper.AddMemberConvention().AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = _.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention());
+                        Mapper.CreateMap<Neda, Dario>().ReverseMap();
+                        //cfg.CreateProfile("MyMapperProfile", prf =>
+                        //{
+                        //    prf.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
+                        //    prf.CreateMap<Neda, Dario>();
+                        //});
+                        //cfg.CreateProfile("MyMapperProfile2", prf =>
+                        //{
+                        //    prf.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
+                        //    prf.CreateMap<Dario, Neda>();
+                        //});
                     });
-                });
             }
 
             protected override void Because_of()
