@@ -153,7 +153,7 @@ namespace AutoMapper
                     .Where(memberAvailableFor)
                     .Where(
                         m =>
-                            (m is FieldInfo && fieldAvailableFor((FieldInfo)m)) ||
+                            (m is FieldInfo && fieldAvailableFor((FieldInfo) m)) ||
                             (m is PropertyInfo && propertyAvailableFor((PropertyInfo) m) &&
                              !((PropertyInfo) m).GetIndexParameters().Any()))
                 );
@@ -161,7 +161,7 @@ namespace AutoMapper
 
         private MethodInfo[] BuildPublicNoArgMethods()
         {
-            return Type.GetDeclaredMethods()
+            return Type.GetAllMethods()
                 .Where(mi => mi.IsPublic && !mi.IsStatic)
                 .Where(m => (m.ReturnType != typeof (void)) && (m.GetParameters().Length == 0))
                 .ToArray();

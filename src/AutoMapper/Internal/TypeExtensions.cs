@@ -1,4 +1,8 @@
-﻿namespace System.Reflection
+﻿#if DNXCORE50
+using ms=System.Reflection.TypeExtensions;
+#endif
+
+namespace System.Reflection
 {
     using System;
     using System.Collections.Generic;
@@ -48,6 +52,19 @@
             return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 #else
             return type.GetTypeInfo().DeclaredMethods;
+#endif
+        }
+
+        public static IEnumerable<MethodInfo> GetAllMethods(this Type type)
+        {
+#if MONODROID || MONOTOUCH || __IOS__
+            return type.GetTypeInfo().GetMethods();
+#elif SILVERLIGHT
+            return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+#elif DNXCORE50
+            return type.GetMethods();
+#else
+            return type.GetRuntimeMethods();
 #endif
         }
 
