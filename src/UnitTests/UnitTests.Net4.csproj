@@ -116,6 +116,7 @@
     <Compile Include="Bug\IntToNullableDecimal.cs" />
     <Compile Include="Bug\ListSourceMapperBug.cs" />
     <Compile Include="Bug\NonExistingProperty.cs" />
+    <Compile Include="Bug\NestedMappingProjectionsExplicitExpanding.cs" />
     <Compile Include="Bug\NullArrayBug.cs" />
     <Compile Include="Bug\ReadOnlyCollectionMappingBug.cs" />
     <Compile Include="Bug\MappingInheritance.cs" />
