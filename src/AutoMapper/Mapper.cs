@@ -226,7 +226,7 @@ namespace AutoMapper
 
         /// <summary>
         /// Initializes the mapper with the supplied configuration. Runtime optimization complete after this method is called.
-        /// This is the preferred means to configure AutoMapper.
+        /// This is one of the preferred means to configure AutoMapper.
         /// </summary>
         /// <param name="action">Initialization callback</param>
         public static void Initialize(Action<IConfiguration> action)
@@ -236,6 +236,16 @@ namespace AutoMapper
             action(Configuration);
 
             Configuration.Seal();
+        }
+
+        /// <summary>
+        /// Initializes the mapper with the supplied profile. Runtime optimization complete after this method is called.
+        /// This is one of the preferred means to configure AutoMapper.
+        /// </summary>
+        /// <param name="profile">The profile containing the configuration</param>
+        public static void Initialize(Profile profile)
+        {
+            Initialize(c => profile.Initialize(_configuration.Value));
         }
 
         /// <summary>
