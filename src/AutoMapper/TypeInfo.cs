@@ -161,7 +161,7 @@ namespace AutoMapper
 
         private MethodInfo[] BuildPublicNoArgMethods()
         {
-            return Type.GetDeclaredMethods()
+            return Type.GetMethods()
                 .Where(mi => mi.IsPublic && !mi.IsStatic)
                 .Where(m => (m.ReturnType != typeof (void)) && (m.GetParameters().Length == 0))
                 .ToArray();
