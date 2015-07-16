@@ -10,9 +10,13 @@ namespace AutoMapper.Mappers
         public override bool IsMatch(ResolutionContext context)
         {
             // destination type must be IEnumerable interface or a class implementing at least IList 
-            return ((context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType()) ||
-                    context.DestinationType.IsListType())
-                   && (context.SourceType.IsEnumerableType());
+            return context.SourceType.IsEnumerableType() && (context.DestinationType.IsListType() || DestinationIListTypedAsIEnumerable(context));
+        }
+
+        private static bool DestinationIListTypedAsIEnumerable(ResolutionContext context)
+        {
+            return context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType() && 
+                        (context.DestinationValue == null || context.DestinationValue is IList);
         }
 
         protected override void SetElementValue(IList destination, object mappedValue, int index)
