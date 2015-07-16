@@ -309,6 +309,14 @@ namespace AutoMapper.Internal
             _propertyMap.SetCustomValueResolverExpression(sourceMember);
         }
 
+        public void MapFrom<TMember>(string property)
+        {
+            var par = Expression.Parameter(typeof (TSource));
+            var prop = Expression.Property(par, property);
+            var lambda = Expression.Lambda<Func<TSource, TMember>>(prop, par);
+            _propertyMap.SetCustomValueResolverExpression(lambda);
+        }
+
         public void UseValue<TValue>(TValue value)
         {
             MapFrom(src => value);
