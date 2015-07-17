@@ -244,6 +244,11 @@ namespace AutoMapper
             return CreateMappingExpression(typeMap, destinationType);
         }
 
+        public void ClearPrefixes()
+        {
+            GetProfile(DefaultProfileName).ClearPrefixes();
+        }
+
         public void RecognizePrefixes(params string[] prefixes)
         {
             GetProfile(DefaultProfileName).RecognizePrefixes(prefixes);

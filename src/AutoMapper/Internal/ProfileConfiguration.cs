@@ -69,6 +69,11 @@ namespace AutoMapper.Internal
                 .Where(method => method.GetParameters().Length == 1));
         }
 
+        public void ClearPrefixes()
+        {
+            _prefixes.Clear();
+        }
+
         public void RecognizePrefixes(params string[] prefixes)
         {
             foreach (var prefix in prefixes)
