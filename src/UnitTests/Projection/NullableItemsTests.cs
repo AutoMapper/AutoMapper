@@ -7,6 +7,7 @@ namespace AutoMapper.UnitTests.Projection
         using System.Linq;
         using QueryableExtensions;
         using Should;
+        using Should.Core.Assertions;
         using Xunit;
 
         public class NullChildItemTest

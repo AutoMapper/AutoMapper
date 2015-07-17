@@ -3,7 +3,9 @@ using System.Reflection;
 
 namespace AutoMapper.Impl
 {
-	public class MethodGetter : MemberGetter
+    using System.Collections.Generic;
+
+    public class MethodGetter : MemberGetter
 	{
 		private readonly MethodInfo _methodInfo;
 		private readonly string _name;
@@ -40,12 +42,12 @@ namespace AutoMapper.Impl
 					: _lateBoundMethod(source, new object[0]);
 		}
 
-		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+		public override IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit)
 		{
 			return _methodInfo.GetCustomAttributes(attributeType, inherit);
 		}
 
-		public override object[] GetCustomAttributes(bool inherit)
+		public override IEnumerable<object> GetCustomAttributes(bool inherit)
 		{
 			return _methodInfo.GetCustomAttributes(inherit);
 		}

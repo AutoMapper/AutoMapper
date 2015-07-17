@@ -1,3 +1,4 @@
+#if MONODROID || NET4
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -125,3 +126,4 @@ namespace AutoMapper.Impl {
         }
 	}
 }
+#endif

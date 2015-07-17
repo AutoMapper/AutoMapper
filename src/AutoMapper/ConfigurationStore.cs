@@ -211,7 +211,7 @@ namespace AutoMapper
 
 	    public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
 		{
-	        if (sourceType.IsGenericTypeDefinition && destinationType.IsGenericTypeDefinition)
+	        if (sourceType.IsGenericTypeDefinition() && destinationType.IsGenericTypeDefinition())
 	        {
 	            var typePair = new TypePair(sourceType, destinationType);
 
@@ -293,36 +293,6 @@ namespace AutoMapper
                 typeMap.ApplyInheritedMap(inheritedTypeMap);
             }
         }
-
-	    public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			return GetProfile(DefaultProfileName).AddFormatter<TValueFormatter>();
-		}
-
-		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
-		{
-			return GetProfile(DefaultProfileName).AddFormatter(valueFormatterType);
-		}
-
-		public void AddFormatter(IValueFormatter formatter)
-		{
-			GetProfile(DefaultProfileName).AddFormatter(formatter);
-		}
-
-		public void AddFormatExpression(Func<ResolutionContext, string> formatExpression)
-		{
-			GetProfile(DefaultProfileName).AddFormatExpression(formatExpression);
-		}
-
-		public void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			GetProfile(DefaultProfileName).SkipFormatter<TValueFormatter>();
-		}
-
-		public IFormatterExpression ForSourceType<TSource>()
-		{
-			return GetProfile(DefaultProfileName).ForSourceType<TSource>();
-		}
 
 		public TypeMap[] GetAllTypeMaps()
 		{
@@ -420,7 +390,7 @@ namespace AutoMapper
             while (type != null)
             {
                 yield return type;
-                type = type.BaseType;
+                type = type.BaseType();
             }
         }
 
@@ -430,7 +400,7 @@ namespace AutoMapper
 			       FindTypeMapFor(resolutionResult.Value, null, resolutionResult.MemberType, destinationType);
 		}
 
-		public IFormatterConfiguration GetProfileConfiguration(string profileName)
+		public IProfileConfiguration GetProfileConfiguration(string profileName)
 		{
 			return GetProfile(profileName);
 		}
@@ -472,7 +442,7 @@ namespace AutoMapper
 
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
 			{
-				object[] attrs = destProperty.GetCustomAttributes(true);
+				var attrs = destProperty.GetCustomAttributes(true);
 				if (attrs.Any(x => x is IgnoreMapAttribute))
 				{
 					mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
@@ -493,7 +463,7 @@ namespace AutoMapper
 			TypeInfo destInfo = new TypeInfo(destinationType);
 			foreach (var destProperty in destInfo.GetPublicWriteAccessors())
 			{
-				object[] attrs = destProperty.GetCustomAttributes(true);
+				var attrs = destProperty.GetCustomAttributes(true);
 				if (attrs.Any(x => x is IgnoreMapAttribute))
 				{
 					mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
@@ -566,11 +536,11 @@ namespace AutoMapper
                         break;
                     }
 
-                    if ((sourceType.BaseType != null) && (typeMap == null))
-                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceType.BaseType, destinationType);
+                    if ((sourceType.BaseType() != null) && (typeMap == null))
+                        typeMap = ((IConfigurationProvider)this).FindTypeMapFor(source, destination, sourceType.BaseType(), destinationType);
                 }
             }
-	        if (typeMap == null && sourceType.IsGenericType && destinationType.IsGenericType)
+	        if (typeMap == null && sourceType.IsGenericType() && destinationType.IsGenericType())
 	        {
 	            var sourceGenericDefinition = sourceType.GetGenericTypeDefinition();
 	            var destGenericDefinition = destinationType.GetGenericTypeDefinition();
@@ -670,7 +640,7 @@ namespace AutoMapper
 		internal FormatterExpression GetProfile(string profileName)
 		{
 		    FormatterExpression expr = _formatterProfiles.GetOrAdd(profileName,
-		                                                           name => new FormatterExpression(t => (IValueFormatter) _serviceCtor(t)));
+		                                                           name => new FormatterExpression());
 
 		    return expr;
 		}

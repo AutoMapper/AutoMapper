@@ -103,36 +103,6 @@ namespace AutoMapper
             get { return GetProfile().SourceExtensionMethods; }
         }
 
-		public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			return GetProfile().AddFormatter<TValueFormatter>();
-		}
-
-		public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
-		{
-			return GetProfile().AddFormatter(valueFormatterType);
-		}
-
-		public void AddFormatter(IValueFormatter formatter)
-		{
-			GetProfile().AddFormatter(formatter);
-		}
-
-		public void AddFormatExpression(Func<ResolutionContext, string> formatExpression)
-		{
-			GetProfile().AddFormatExpression(formatExpression);
-		}
-
-		public void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-		{
-			GetProfile().SkipFormatter<TValueFormatter>();
-		}
-
-		public IFormatterExpression ForSourceType<TSource>()
-		{
-			return GetProfile().ForSourceType<TSource>();
-		}
-
 		public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
 		{
 		    return CreateMap<TSource, TDestination>(MemberList.Destination);

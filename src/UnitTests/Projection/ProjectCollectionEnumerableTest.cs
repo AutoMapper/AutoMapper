@@ -79,6 +79,11 @@ namespace AutoMapper.UnitTests.Projection
 			{
 				return string.Equals(ToString(), obj.ToString());
 			}
+
+		    public override int GetHashCode()
+		    {
+                return Street.GetHashCode();
+		    }
 		}
 	}
 }

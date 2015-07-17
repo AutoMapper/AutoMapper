@@ -87,9 +87,11 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                Mapper
-                    .CreateMap<ModelObject, ModelDto>()
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<ModelObject, ModelDto>()
                     .ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
+                });
             }
 
             [Fact]

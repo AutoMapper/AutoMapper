@@ -6,6 +6,7 @@ using System.Linq;
 namespace AutoMapper
 {
     using System.Reflection;
+    using Internal;
 
     public class MappingExpression : IMappingExpression, IMemberConfigurationExpression
     {
@@ -156,7 +157,7 @@ namespace AutoMapper
 
     }
 
-    public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>, IFormatterCtorConfigurator
+    public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>
     {
         private readonly TypeMap _typeMap;
         private readonly Func<Type, object> _serviceCtor;
@@ -211,7 +212,7 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
-            var properties = typeof(TDestination).GetProperties().Where(HasAnInaccessibleSetter);
+            var properties = typeof(TDestination).GetDeclaredProperties().Where(HasAnInaccessibleSetter);
             foreach (var property in properties)
                 ForMember(property.Name, opt => opt.Ignore());
             return new MappingExpression<TSource, TDestination>(TypeMap, _serviceCtor, _configurationContainer);
@@ -219,7 +220,7 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
-            var properties = typeof(TSource).GetProperties().Where(HasAnInaccessibleSetter);
+            var properties = typeof(TSource).GetDeclaredProperties().Where(HasAnInaccessibleSetter);
             foreach (var property in properties)
                 ForSourceMember(property.Name, opt => opt.Ignore());
             return new MappingExpression<TSource, TDestination>(TypeMap, _serviceCtor, _configurationContainer);
@@ -264,34 +265,6 @@ namespace AutoMapper
         public void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression)
         {
             TypeMap.UseCustomProjection(projectionExpression);
-        }
-
-        public void SkipFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-        {
-            _propertyMap.AddFormatterToSkip<TValueFormatter>();
-        }
-
-        public IFormatterCtorExpression<TValueFormatter> AddFormatter<TValueFormatter>() where TValueFormatter : IValueFormatter
-        {
-            var formatter = new DeferredInstantiatedFormatter(BuildCtor<IValueFormatter>(typeof(TValueFormatter)));
-
-            AddFormatter(formatter);
-
-            return new FormatterCtorExpression<TValueFormatter>(this);
-        }
-
-        public IFormatterCtorExpression AddFormatter(Type valueFormatterType)
-        {
-            var formatter = new DeferredInstantiatedFormatter(BuildCtor<IValueFormatter>(valueFormatterType));
-
-            AddFormatter(formatter);
-
-            return new FormatterCtorExpression(valueFormatterType, this);
-        }
-
-        public void AddFormatter(IValueFormatter formatter)
-        {
-            _propertyMap.AddFormatter(formatter);
         }
 
         public void NullSubstitute(object nullSubstitute)
@@ -451,12 +424,6 @@ namespace AutoMapper
         public void SetMappingOrder(int mappingOrder)
         {
             _propertyMap.SetMappingOrder(mappingOrder);
-        }
-
-        public void ConstructFormatterBy(Type formatterType, Func<IValueFormatter> instantiator)
-        {
-            _propertyMap.RemoveLastFormatter();
-            _propertyMap.AddFormatter(new DeferredInstantiatedFormatter(ctxt => instantiator()));
         }
 
         public void ConvertUsing(Func<TSource, TDestination> mappingFunction)

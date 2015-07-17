@@ -8,22 +8,12 @@ namespace AutoMapper.Internal
 {
     internal class ProbingAdapterResolver : IAdapterResolver
     {
-        private readonly string[] _platformNames;
-        private readonly Func<string, Assembly> _assemblyLoader;
         private readonly object _lock = new object();
         private readonly Dictionary<Type, object> _adapters = new Dictionary<Type, object>();
-        private Assembly _assembly;
-        private bool _probed;
 
-        public ProbingAdapterResolver(params string[] platformNames)
-            : this(Assembly.Load, platformNames)
+        public ProbingAdapterResolver(string[] ignored)
         {
-        }
 
-        public ProbingAdapterResolver(Func<string, Assembly> assemblyLoader, params string[] platformNames)
-        {
-            _platformNames = platformNames;
-            _assemblyLoader = assemblyLoader;
         }
 
         public object Resolve(Type type)
@@ -33,9 +23,7 @@ namespace AutoMapper.Internal
                 object instance;
                 if (!_adapters.TryGetValue(type, out instance))
                 {
-                    Assembly assembly = GetPlatformSpecificAssembly();
-
-                    instance = ResolveAdapter(assembly, type);
+                    instance = ResolveAdapter(type);
                     _adapters.Add(type, instance);
                 }
 
@@ -43,30 +31,24 @@ namespace AutoMapper.Internal
             }
         }
 
-        private static object ResolveAdapter(Assembly assembly, Type interfaceType)
+        private static object ResolveAdapter(Type interfaceType)
         {
             string typeName = MakeAdapterTypeName(interfaceType);
 
             Type type;
+            Assembly assembly = typeof(ProbingAdapterResolver).Assembly();
 
             // Is there an override?
-            if (assembly != null)
-            {
-                type = assembly.GetType(typeName + "Override");
-                if (type != null)
-                    return Activator.CreateInstance(type);
+            type = assembly.GetType(typeName + "Override");
+            if (type != null)
+                return Activator.CreateInstance(type);
 
-                // Fall back to a default implementation
-                type = assembly.GetType(typeName);
-                if (type != null)
-                    return Activator.CreateInstance(type);
-            }
+            // Fall back to a default implementation
+            type = assembly.GetType(typeName);
+            if (type != null)
+                return Activator.CreateInstance(type);
 
-
-            // Fallback to looking in this assembly for a default
-            type = typeof(ProbingAdapterResolver).Assembly.GetType(typeName);
-                
-            return type != null ? Activator.CreateInstance(type) : null;
+            return null;
         }
 
         private static string MakeAdapterTypeName(Type interfaceType)
@@ -74,56 +56,6 @@ namespace AutoMapper.Internal
             // For example, if we're looking for an implementation of System.Security.Cryptography.ICryptographyFactory, 
             // then we'll look for System.Security.Cryptography.CryptographyFactory
             return interfaceType.Namespace + "." + interfaceType.Name.Substring(1);
-        }
-
-        private Assembly GetPlatformSpecificAssembly()
-        {   
-            if (_assembly == null && !_probed)
-            {
-                _probed = true;
-                _assembly = ProbeForPlatformSpecificAssembly();
-            }
-
-            return _assembly;
-        }
-
-        private Assembly ProbeForPlatformSpecificAssembly()
-        {
-            return _platformNames.
-                Select(ProbeForPlatformSpecificAssembly)
-                .FirstOrDefault(assembly => assembly != null);
-        }
-
-        private Assembly ProbeForPlatformSpecificAssembly(string platformName)
-        {
-            var assemblyName = new AssemblyName(GetType().Assembly.FullName)
-            {
-                Name = "AutoMapper." + platformName
-            };
-
-            try
-            {
-                return _assemblyLoader(assemblyName.ToString());
-            }
-            catch (FileNotFoundException)
-            {
-            }
-            catch (Exception) // Probably FileIOException due to not SN assembly
-            {
-                // Try to load a non-SN version of the assembly
-                assemblyName.SetPublicKey(null);
-                assemblyName.SetPublicKeyToken(null);
-                try
-                {
-                    return _assemblyLoader(assemblyName.ToString());
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-
-            return null;
         }
     }
 }

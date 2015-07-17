@@ -3,7 +3,9 @@ using System.Reflection;
 
 namespace AutoMapper.Impl
 {
-	public class FieldGetter : MemberGetter
+    using System.Collections.Generic;
+
+    public class FieldGetter : MemberGetter
 	{
 		private readonly FieldInfo _fieldInfo;
 		private readonly string _name;
@@ -58,12 +60,12 @@ namespace AutoMapper.Impl
 			return _fieldInfo.GetHashCode();
 		}
 
-		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+		public override IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit)
 		{
 			return _fieldInfo.GetCustomAttributes(attributeType, inherit);
 		}
 
-		public override object[] GetCustomAttributes(bool inherit)
+		public override IEnumerable<object> GetCustomAttributes(bool inherit)
 		{
 			return _fieldInfo.GetCustomAttributes(inherit);
 		}

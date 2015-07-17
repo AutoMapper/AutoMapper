@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Internal;
+using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
@@ -20,7 +21,7 @@ namespace AutoMapper.Mappers
 				return enumerableType.GetElementType();
 			}
 
-			if (enumerableType.IsGenericType && enumerableType.GetGenericTypeDefinition().Equals(typeof(IEnumerable<>)))
+			if (enumerableType.IsGenericType() && enumerableType.GetGenericTypeDefinition().Equals(typeof(IEnumerable<>)))
 			{
 				return enumerableType.GetGenericArguments()[0];
 			}
@@ -52,7 +53,7 @@ namespace AutoMapper.Mappers
 				enumType = enumType.GetGenericArguments()[0];
 			}
 
-			if (!enumType.IsEnum)
+			if (!enumType.IsEnum())
 				return null;
 
 			return enumType;
@@ -66,8 +67,8 @@ namespace AutoMapper.Mappers
             }
             catch (System.Reflection.AmbiguousMatchException)
             {
-                if (enumerableType.BaseType != typeof(object))
-                    return GetIEnumerableType(enumerableType.BaseType);
+                if (enumerableType.BaseType() != typeof(object))
+                    return GetIEnumerableType(enumerableType.BaseType());
 
                 return null;
             }

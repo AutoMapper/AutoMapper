@@ -16,3 +16,5 @@ AppPackages/
 packages
 *.orig
 *.DotSettings
+*.ide/
+.nuget

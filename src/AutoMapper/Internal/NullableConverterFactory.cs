@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if MONODROID || MONOTOUCH || __IOS__ || NET4
+using System;
 using System.ComponentModel;
 
 namespace AutoMapper.Internal
@@ -28,3 +29,4 @@ namespace AutoMapper.Internal
         }
     }
 }
+#endif

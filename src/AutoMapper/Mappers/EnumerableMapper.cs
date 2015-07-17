@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Internal;
+using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
@@ -11,7 +12,7 @@ namespace AutoMapper.Mappers
 		public override bool IsMatch(ResolutionContext context)
 		{
 			// destination type must be IEnumerable interface or a class implementing at least IList 
-			return ((context.DestinationType.IsInterface && context.DestinationType.IsEnumerableType()) || context.DestinationType.IsListType())
+			return ((context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType()) || context.DestinationType.IsListType())
 				&& (context.SourceType.IsEnumerableType());
 		}
 

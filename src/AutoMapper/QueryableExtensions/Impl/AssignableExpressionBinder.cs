@@ -1,6 +1,8 @@
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System.Linq.Expressions;
+    using System.Reflection;
+    using Internal;
 
     public class AssignableExpressionBinder : IExpressionBinder
     {

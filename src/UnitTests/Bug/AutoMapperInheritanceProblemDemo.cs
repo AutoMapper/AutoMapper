@@ -11,13 +11,15 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         public void SetUp(){
-            Mapper.CreateMap<Source, GrandGrandChild>();
-            Mapper.CreateMap<Source, GrandChild>();
-            Mapper.CreateMap<Source, Child>();
-
-            Mapper.CreateMap<Source, GrandGrandChildPrivate>();
-            Mapper.CreateMap<Source, GrandChildPrivate>();
-            Mapper.CreateMap<Source, ChildPrivate>();
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Source, GrandGrandChild>();
+                cfg.CreateMap<Source, GrandChild>();
+                cfg.CreateMap<Source, Child>();
+                cfg.CreateMap<Source, GrandGrandChildPrivate>();
+                cfg.CreateMap<Source, GrandChildPrivate>();
+                cfg.CreateMap<Source, ChildPrivate>();
+            });
         }
 
         [Fact]
@@ -46,6 +48,16 @@ namespace AutoMapper.UnitTests.Bug
             var target = Mapper.Map<Source, GrandGrandChild>(source);
             target.ParentProperty.ShouldEqual(source.ParentProperty);
             target.ChildProperty.ShouldEqual(source.ChildProperty);
+        }
+
+#if SILVERLIGHT
+        [Fact(Skip = "Not supported in Silverlight 4")]
+#else
+        [Fact]
+#endif
+        public void HasValidConfiguration()
+        {
+            Mapper.AssertConfigurationIsValid();
         }
 
 #if SILVERLIGHT

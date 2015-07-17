@@ -88,14 +88,16 @@ namespace AutoMapper
             LateBoundCtor ctor = _ctorCache.GetOrAdd(type, t =>
             {
                 //handle valuetypes
-                if (!type.IsClass)
+                if (!type.IsClass())
                 {
                     var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
                     return ctorExpression.Compile();
                 }
                 else 
                 {
-                    var constructors = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                    var constructors = type
+                        .GetDeclaredConstructors()
+                        .Where(ci => !ci.IsStatic);
                     
                     //find a ctor with only optional args
                     var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));

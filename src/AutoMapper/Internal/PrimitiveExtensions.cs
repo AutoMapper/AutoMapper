@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace AutoMapper.Internal
 {
@@ -14,7 +15,7 @@ namespace AutoMapper.Internal
         
 		public static bool IsNullableType(this Type type)
 		{
-			return type.IsGenericType && (type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)));
+			return type.IsGenericType() && (type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)));
 		}
 
         public static Type GetTypeOfNullable(this Type type)
@@ -24,12 +25,12 @@ namespace AutoMapper.Internal
 
         public static bool IsCollectionType(this Type type)
         {
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICollection<>))
+            if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(ICollection<>))
             {
                 return true;
             }
 
-            IEnumerable<Type> genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType);
+            IEnumerable<Type> genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType());
             IEnumerable<Type> baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
             
             var isCollectionType = baseDefinitions.Any(t => t == typeof(ICollection<>));
@@ -55,20 +56,20 @@ namespace AutoMapper.Internal
 
 		public static bool IsDictionaryType(this Type type)
 		{
-			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>))
+			if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>))
 				return true;
 
-			var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType);
+			var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType());
 			var baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
 			return baseDefinitions.Any(t => t == typeof(System.Collections.Generic.IDictionary<,>));
 		}
 
 		public static Type GetDictionaryType(this Type type)
 		{
-			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>))
+			if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>))
 				return type;
 
-			var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>));
+			var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType() && t.GetGenericTypeDefinition() == typeof(System.Collections.Generic.IDictionary<,>));
 			return genericInterfaces.FirstOrDefault();
 		}
 	}

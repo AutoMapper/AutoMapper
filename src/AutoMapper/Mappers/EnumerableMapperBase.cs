@@ -1,3 +1,4 @@
+using AutoMapper.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -81,7 +82,7 @@ namespace AutoMapper.Mappers
 		{
 			var destinationType = context.DestinationType;
 
-			if (!destinationType.IsInterface && !destinationType.IsArray)
+			if (!destinationType.IsInterface() && !destinationType.IsArray)
 			{
 				return mapper.CreateObject(context);
 			}

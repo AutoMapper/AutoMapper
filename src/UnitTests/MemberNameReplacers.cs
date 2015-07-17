@@ -7,6 +7,8 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    using Should.Core.Assertions;
+
     public class When_using_a_member_name_replacer : AutoMapperSpecBase
     {
         public class Source

@@ -53,7 +53,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="profileName">Profile name</param>
         /// <returns></returns>
-		IFormatterConfiguration GetProfileConfiguration(string profileName);
+		IProfileConfiguration GetProfileConfiguration(string profileName);
 
 
         /// <summary>

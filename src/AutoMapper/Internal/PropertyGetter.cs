@@ -3,7 +3,10 @@ using System.Reflection;
 
 namespace AutoMapper.Impl
 {
-	public class PropertyGetter : MemberGetter
+    using System.Collections.Generic;
+    using Internal;
+
+    public class PropertyGetter : MemberGetter
 	{
 		private readonly PropertyInfo _propertyInfo;
 		private readonly string _name;
@@ -41,12 +44,12 @@ namespace AutoMapper.Impl
 			return _lateBoundPropertyGet(source);
 		}
 
-		public override object[] GetCustomAttributes(Type attributeType, bool inherit)
+		public override IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit)
 		{
 			return _propertyInfo.GetCustomAttributes(attributeType, inherit);
 		}
 
-		public override object[] GetCustomAttributes(bool inherit)
+		public override IEnumerable<object> GetCustomAttributes(bool inherit)
 		{
 			return _propertyInfo.GetCustomAttributes(inherit);
 		}

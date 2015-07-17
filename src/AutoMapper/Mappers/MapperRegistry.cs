@@ -8,7 +8,6 @@ namespace AutoMapper.Mappers
         {
             new ExpressionMapper(), 
             new TypeMapMapper(TypeMapObjectMapperRegistry.Mappers),
-            new StringMapper(),
             new AssignableArrayMapper(), 
             new FlagsEnumMapper(),
             new EnumMapper(),

@@ -46,11 +46,13 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.CreateMap<string, int>().ConvertUsing(arg => Convert.ToInt32(arg));
-				Mapper.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
-				Mapper.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
-
-				Mapper.CreateMap<Source, Destination>();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<string, int>().ConvertUsing(arg => Convert.ToInt32(arg));
+                    cfg.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
+                    cfg.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
+                    cfg.CreateMap<Source, Destination>();
+                });
 
 				var source = new Source
 				{
@@ -262,7 +264,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.CreateMap(typeof(Source), typeof(Destination)).ConvertUsing(typeof(CustomConverter));
+				Mapper.Initialize(cfg => cfg.CreateMap(typeof(Source), typeof(Destination)).ConvertUsing(typeof(CustomConverter)));
 			}
 
 			protected override void Because_of()

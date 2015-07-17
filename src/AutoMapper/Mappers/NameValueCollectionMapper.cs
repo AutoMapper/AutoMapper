@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿#if NET4 || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+using System.Collections.Specialized;
 
 namespace AutoMapper.Mappers
 {
@@ -25,3 +26,4 @@ namespace AutoMapper.Mappers
         }
     }
 }
+#endif

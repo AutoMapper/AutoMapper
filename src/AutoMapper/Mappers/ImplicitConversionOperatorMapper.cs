@@ -3,6 +3,8 @@ using System.Linq;
 
 namespace AutoMapper.Mappers
 {
+    using Internal;
+
 	public class ImplicitConversionOperatorMapper : IObjectMapper
 	{
 		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
@@ -21,10 +23,11 @@ namespace AutoMapper.Mappers
 
 	    private static MethodInfo GetImplicitConversionOperator(ResolutionContext context)
 	    {
-	        var sourceTypeMethod = context.SourceType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .Where(mi => mi.Name == "op_Implicit")
-                .Where(mi => mi.ReturnType == context.DestinationType)
-                .FirstOrDefault();
+	        var sourceTypeMethod = context.SourceType
+	            .GetDeclaredMethods()
+	            .Where(mi => mi.IsPublic && mi.IsStatic)
+	            .Where(mi => mi.Name == "op_Implicit")
+                .FirstOrDefault(mi => mi.ReturnType == context.DestinationType);
 
 	        var destTypeMethod = context.DestinationType.GetMethod("op_Implicit", new[] {context.SourceType});
 

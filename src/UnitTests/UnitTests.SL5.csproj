@@ -30,6 +30,8 @@
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <LinkedServerProject />
     <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <!--
   //
@@ -159,9 +161,7 @@
     <Compile Include="Constructors.cs" />
     <Compile Include="ContextItems.cs" />
     <Compile Include="ConversionOperators.cs" />
-    <Compile Include="CustomFormatters.cs" />
     <Compile Include="CustomMapping.cs" />
-    <Compile Include="DataReaderMapping.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="DynamicMapping.cs" />
     <Compile Include="Enumerations.cs" />
@@ -268,11 +268,7 @@
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
-      <Project>{ddf551f9-b27d-4283-bfa0-e7068e05967d}</Project>
-      <Name>AutoMapper</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\AutoMapper\AutoMapper.SL5.csproj">
+    <ProjectReference Include="..\AutoMapper.SL5\AutoMapper.SL5.csproj">
       <Project>{a46863c7-1dec-4037-9fc2-c353021f2490}</Project>
       <Name>AutoMapper.SL5</Name>
     </ProjectReference>
@@ -285,4 +281,11 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
 </Project>

@@ -13,11 +13,11 @@ using System.Runtime.InteropServices;
 //------------------------------------------------------------------------------
 
 [assembly: CLSCompliant(true)]
-[assembly: AssemblyVersionAttribute("3.3.1")]
-[assembly: AssemblyFileVersionAttribute("3.3.1")]
+[assembly: AssemblyVersionAttribute("4.0.0")]
+[assembly: AssemblyFileVersionAttribute("4.0.0")]
 [assembly: AssemblyCopyrightAttribute("Copyright Jimmy Bogard 2008-2015")]
 [assembly: AssemblyProductAttribute("AutoMapper")]
 [assembly: AssemblyTrademarkAttribute("AutoMapper")]
 [assembly: AssemblyCompanyAttribute("")]
 [assembly: AssemblyConfigurationAttribute("release")]
-[assembly: AssemblyInformationalVersionAttribute("bdf5b3a6393466ff15cbdb082b9d1b01f277f4dd")]
+[assembly: AssemblyInformationalVersionAttribute("b79d22801b2144923ffbbfa62d4bb3d83195c4ab")]

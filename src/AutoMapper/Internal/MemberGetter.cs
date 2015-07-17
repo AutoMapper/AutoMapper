@@ -4,6 +4,8 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Impl
 {
+    using System.Collections.Generic;
+
     public abstract class MemberGetter : IMemberGetter
 	{
         protected static readonly IDelegateFactory DelegateFactory = PlatformAdapter.Resolve<IDelegateFactory>();
@@ -20,8 +22,8 @@ namespace AutoMapper.Impl
 			       	: source.New(GetValue(source.Value), MemberType);
 		}
 
-		public abstract object[] GetCustomAttributes(Type attributeType, bool inherit);
-		public abstract object[] GetCustomAttributes(bool inherit);
+		public abstract IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit);
+		public abstract IEnumerable<object> GetCustomAttributes(bool inherit);
 		public abstract bool IsDefined(Type attributeType, bool inherit);
 	}
 }

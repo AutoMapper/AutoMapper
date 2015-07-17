@@ -30,10 +30,7 @@ namespace AutoMapper
             _configurationProvider.TypeMapCreated += ClearTypeMap;
 		}
 
-		public IConfigurationProvider ConfigurationProvider
-		{
-			get { return _configurationProvider; }
-		}
+		public IConfigurationProvider ConfigurationProvider => _configurationProvider;
 
 	    public void Dispose()
 	    {
@@ -173,7 +170,7 @@ namespace AutoMapper
 
 		public TDestination DynamicMap<TDestination>(object source)
 		{
-			Type modelType = source == null ? typeof(object) : source.GetType();
+			Type modelType = source?.GetType() ?? typeof(object);
 			Type destinationType = typeof(TDestination);
 
 			return (TDestination)DynamicMap(source, modelType, destinationType);
@@ -255,31 +252,6 @@ namespace AutoMapper
 			}
 		}
 
-		string IMappingEngineRunner.FormatValue(ResolutionContext context)
-		{
-			TypeMap contextTypeMap = context.GetContextTypeMap();
-			IFormatterConfiguration configuration = contextTypeMap != null
-												? ConfigurationProvider.GetProfileConfiguration(contextTypeMap.Profile)
-                                                : ConfigurationProvider.GetProfileConfiguration(ConfigurationStore.DefaultProfileName);
-
-            object valueToFormat = context.SourceValue;
-            string formattedValue = context.SourceValue.ToNullSafeString();
-
-            var formatters = configuration.GetFormattersToApply(context);
-
-            foreach (var valueFormatter in formatters)
-            {
-                formattedValue = valueFormatter.FormatValue(context.CreateValueContext(valueToFormat));
-
-                valueToFormat = formattedValue;
-            }
-
-            if (formattedValue == null && !((IMappingEngineRunner)this).ShouldMapSourceValueAsNull(context))
-                return string.Empty;
-
-		    return formattedValue;
-		}
-
 		object IMappingEngineRunner.CreateObject(ResolutionContext context)
 		{
 			var typeMap = context.TypeMap;
@@ -296,15 +268,17 @@ namespace AutoMapper
 			if (context.DestinationValue != null)
 				return context.DestinationValue;
 
-            if (destinationType.IsInterface)
+            if (destinationType.IsInterface())
                 destinationType = ProxyGeneratorFactory.Create().GetProxyType(destinationType);
 
-			return ObjectCreator.CreateObject(destinationType);
+			return !ConfigurationProvider.MapNullSourceValuesAsNull ?
+                ObjectCreator.CreateNonNullValue(destinationType)
+                : ObjectCreator.CreateObject(destinationType);
 		}
 
         bool IMappingEngineRunner.ShouldMapSourceValueAsNull(ResolutionContext context)
 		{
-            if (context.DestinationType.IsValueType && !context.DestinationType.IsNullableType())
+            if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
                 return false;
 
 			var typeMap = context.GetContextTypeMap();

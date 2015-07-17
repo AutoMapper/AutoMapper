@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -11,7 +10,7 @@ namespace AutoMapper
 {
     public class TypeMapFactory : ITypeMapFactory
     {
-        private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
+        private readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
             = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeInfo>();
 
         internal static TypeInfo GetTypeInfo(Type type, IEnumerable<MethodInfo> extensionMethodsToSearch)
@@ -52,7 +51,7 @@ namespace AutoMapper
                     typeMap.AddPropertyMap(destPropertyAccessor, resolvers.Cast<IValueResolver>());
                 }
             }
-            if (!destinationType.IsAbstract && destinationType.IsClass)
+            if (!destinationType.IsAbstract() && destinationType.IsClass())
             {
                 foreach (var destCtor in destTypeInfo.GetConstructors().OrderByDescending(ci => ci.GetParameters().Length))
                 {
@@ -409,7 +408,7 @@ namespace AutoMapper
                         resolvers.AddLast(valueResolver);
 
                         foundMatch = MapDestinationPropertyToSource(resolvers,
-                                                                    TypeMapFactory.GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethods),
+                                                                    GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethods),
                                                                     snippet.Second, mappingOptions);
 
                         if (!foundMatch)
@@ -455,7 +454,7 @@ namespace AutoMapper
             var all =
                 from sourceName in possibleSourceNames
                 from destName in possibleDestNames
-                select new { sourceName, destName };
+                select new {sourceName, destName};
 
             return all.Any(pair => String.Compare(pair.sourceName, pair.destName, StringComparison.OrdinalIgnoreCase) == 0);
         }
