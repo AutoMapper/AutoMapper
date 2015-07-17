@@ -400,7 +400,7 @@ namespace AutoMapper
             }
             else
             {
-                newExpression = Expression.New(DestinationType);
+                newExpression = Expression.New(DestinationTypeOverride ?? DestinationType);
             }
             return Expression.Lambda(newExpression);
         }

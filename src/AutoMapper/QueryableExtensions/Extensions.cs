@@ -181,8 +181,7 @@ namespace AutoMapper.QueryableExtensions
                 visitor.NewExpression,
                 bindings.ToArray()
                 );
-
-            return expression;
+            return Expression.Convert(expression, request.DestinationType);
         }
 
         private class NewFinderVisitor : ExpressionVisitor
