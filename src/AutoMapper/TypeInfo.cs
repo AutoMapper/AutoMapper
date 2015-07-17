@@ -117,12 +117,12 @@ namespace AutoMapper
 
         private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap)
         {
-            return GetAllPublicMembers(PropertyReadable, membersToMap);
+            return GetAllPublicMembers(PropertyReadable, FieldReadable, membersToMap);
         }
 
         private IEnumerable<MemberInfo> GetAllPublicWritableMembers(Func<MemberInfo, bool> membersToMap)
         {
-            return GetAllPublicMembers(PropertyWritable, membersToMap);
+            return GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
         }
 
         private static bool PropertyReadable(PropertyInfo propertyInfo)
