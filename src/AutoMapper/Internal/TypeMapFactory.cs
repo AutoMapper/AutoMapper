@@ -44,7 +44,7 @@ namespace AutoMapper
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (MapDestinationPropertyToSource(sourceTypeInfo, destProperty.Name, members))
+                if (MapDestinationPropertyToSource(sourceTypeInfo, destProperty.GetType(), destProperty.Name, members))
                 {
                     var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
@@ -65,9 +65,9 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private bool MapDestinationPropertyToSource(TypeInfo sourceTypeInfo, string name, LinkedList<MemberInfo> members)
+        private bool MapDestinationPropertyToSource(TypeInfo sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
         {
-            return sourceToDestinationMemberMappers.Any(s => s.MapDestinationPropertyToSource(sourceTypeInfo, name, members));
+            return sourceToDestinationMemberMappers.Any(s => s.MapDestinationPropertyToSource(sourceTypeInfo, destType, destMemberInfo, members));
         }
 
         private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo,
@@ -83,7 +83,7 @@ namespace AutoMapper
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (!MapDestinationPropertyToSource(sourceTypeInfo, parameter.Name, members))
+                if (!MapDestinationPropertyToSource(sourceTypeInfo, parameter.GetType(), parameter.Name, members))
                     return false;
 
                 var resolvers = members.Select(mi => mi.ToMemberGetter());
@@ -170,8 +170,8 @@ namespace AutoMapper
         {
             return new NameSnippet
             {
-                First = String.Join(SourceMemberNamingConvention.SeparatorCharacter,matches.Take(i).ToArray()),
-                Second = String.Join(SourceMemberNamingConvention.SeparatorCharacter,matches.Skip(i).ToArray())
+                First = String.Join("",matches.Take(i).ToArray()),
+                Second = String.Join("",matches.Skip(i).ToArray())
             };
         }
 
@@ -277,11 +277,9 @@ namespace AutoMapper
             return new NameSnippet
             {
                 First =
-                    String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter,
-                                matches.Take(i).ToArray()),
+                    String.Join("",matches.Take(i).ToArray()),
                 Second =
-                    String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter,
-                                matches.Skip(i).ToArray())
+                    String.Join("",matches.Skip(i).ToArray())
             };
         }
 
@@ -512,10 +510,10 @@ namespace AutoMapper
             {
 
                 First =
-                    String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter,
+                    String.Join("",
                                 matches.Take(i).ToArray()),
                 Second =
-                    String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter,
+                    String.Join("",
                                 matches.Skip(i).ToArray())
             };
         }

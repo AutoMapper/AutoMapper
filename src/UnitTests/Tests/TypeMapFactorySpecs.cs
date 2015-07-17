@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,8 +13,20 @@ namespace AutoMapper.UnitTests.Tests
 
     public class StubNamingConvention : INamingConvention
     {
+        private readonly Func<Match, string> _replaceFunc;
+
+        public StubNamingConvention(Func<Match, string> replaceFunc)
+        {
+            _replaceFunc = replaceFunc;
+        }
+
         public Regex SplittingExpression { get; set; }
-        public string SeparatorCharacter { get; set; }
+        public string Splitter { get; set; }
+
+        public string ReplaceValue(Match match)
+        {
+            return _replaceFunc(match);
+        }
     }
 
     public class StubMappingOptions : IMappingOptions
@@ -160,8 +173,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention();
-            namingConvention.SeparatorCharacter = "__";
+            var namingConvention = new StubNamingConvention(s => s.Value){Splitter = "__"};
 
             _mappingOptions = new StubMappingOptions();
             _mappingOptions.SourceMemberNamingConvention = namingConvention;
@@ -206,7 +218,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention();
+            var namingConvention = new StubNamingConvention(s => s.Value);
 
             namingConvention.SplittingExpression = new Regex(@"[\p{Ll}0-9]*(?=_?)");
 

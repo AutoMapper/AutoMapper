@@ -489,6 +489,10 @@ namespace AutoMapper
             MapperRegistry.Mappers.Add(newMapper);
             return newMapper;
         }
+        public static void ClearMemberConventions()
+        {
+            TypeMapFactory.sourceToDestinationMemberMappers.Clear();
+        }
         public static IParentSourceToDestinationMemberMapper AddMemberConvention()
         {
             var a = new ParentSourceToDestinationMemberMapper();

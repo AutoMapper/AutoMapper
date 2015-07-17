@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             public string cmok { get; set; }
 
-            public string mojeIme { get; set; }
+            public string MojeIme { get; set; }
 
             public string MojePrezime { get; set; }
 
@@ -38,7 +38,9 @@ namespace AutoMapper.UnitTests.Bug
                 
                     Mapper.Initialize(cfg =>
                     {
-                        Mapper.AddMemberConvention().AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = _.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention());
+                        Mapper.ClearMemberConventions();
+                        Mapper.AddMemberConvention().AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention()).SetMemberInfo<FieldPropertyMemberInfo>();
+                        Mapper.AddMemberConvention().AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention()).SetMemberInfo<FieldPropertyMemberInfo>();
                         Mapper.CreateMap<Neda, Dario>().ReverseMap();
                         //cfg.CreateProfile("MyMapperProfile", prf =>
                         //{

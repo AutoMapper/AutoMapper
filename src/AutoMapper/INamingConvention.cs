@@ -15,10 +15,9 @@ namespace AutoMapper
         /// </summary>
 		Regex SplittingExpression { get; }
 
-        /// <summary>
-        /// Character to separate on
-        /// </summary>
-		string SeparatorCharacter { get; }
+        string Splitter { get; }
+
+        string ReplaceValue(Match match);
 	}
 
     /// <summary>
@@ -88,24 +87,28 @@ namespace AutoMapper
 			get { return _splittingExpression; }
 		}
 
-		public string SeparatorCharacter
-		{
-			get { return string.Empty; }
-		}
+	    public string Splitter { get { return ""; } }
+
+	    public string ReplaceValue(Match match)
+	    {
+	        return match.Value[0].ToString().ToUpper() + match.Value.Substring(1);
+	    }
 	}
 
 	public class LowerUnderscoreNamingConvention : INamingConvention
 	{
-		private readonly Regex _splittingExpression = new Regex(@"[\p{Ll}0-9]+(?=_?)");
+        private readonly Regex _splittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=_?)");
 
 		public Regex SplittingExpression
 		{
 			get { return _splittingExpression; }
 		}
 
-		public string SeparatorCharacter
-		{
-			get { return "_"; }
-		}
+	    public string Splitter { get { return "_"; } }
+
+	    public string ReplaceValue(Match match)
+	    {
+	        return match.Value.ToLowerInvariant();
+	    }
 	}
 }
