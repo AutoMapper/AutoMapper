@@ -162,7 +162,7 @@ namespace AutoMapper.UnitTests.Tests
 
         private class SubSource
         {
-            public int value { get; set; }
+            public int Value { get; set; }
         }
 
         private class Destination
@@ -172,7 +172,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention(s => s.Value){Splitter = "__"};
+            var namingConvention = new StubNamingConvention(s => s.Value[0].ToString().ToUpper() + s.Value.Substring(1)){Splitter = "__"};
 
             _mappingOptions = new StubMappingOptions();
             _mappingOptions.SourceMemberNamingConvention = namingConvention;
