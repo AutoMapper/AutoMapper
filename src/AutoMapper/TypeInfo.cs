@@ -15,21 +15,36 @@ namespace AutoMapper
     public class TypeInfo
     {
 
-        public TypeInfo(Type type)
-            : this(type, new MethodInfo[0])
+        public TypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField)
+            : this(type, shouldMapProperty, shouldMapField, new MethodInfo[0])
         {
         }
 
-        public TypeInfo(Type type, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+        public TypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
             Type = type;
-            var publicReadableMembers = GetAllPublicReadableMembers();
-            var publicWritableMembers = GetAllPublicWritableMembers();
+            var membersToMap = MembersToMap(shouldMapProperty, shouldMapField);
+            var publicReadableMembers = GetAllPublicReadableMembers(membersToMap);
+            var publicWritableMembers = GetAllPublicWritableMembers(membersToMap);
             PublicReadAccessors = BuildPublicReadAccessors(publicReadableMembers);
             PublicWriteAccessors = BuildPublicAccessors(publicWritableMembers);
             PublicNoArgMethods = BuildPublicNoArgMethods();
             Constructors = type.GetDeclaredConstructors().Where(ci => !ci.IsStatic).ToArray();
             PublicNoArgExtensionMethods = BuildPublicNoArgExtensionMethods(sourceExtensionMethodSearch);
+        }
+
+        private Func<MemberInfo, bool> MembersToMap(Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField)
+        {
+            return m =>
+            {
+                var property = m as PropertyInfo;
+                if(property != null)
+                {
+                    return !property.IsStatic() && shouldMapProperty(property);
+                }
+                var field = (FieldInfo)m;
+                return !field.IsStatic && shouldMapField(field);
+            };
         }
 
         public Type Type { get; }
@@ -100,14 +115,14 @@ namespace AutoMapper
             return filteredMembers.ToArray();
         }
 
-        private IEnumerable<MemberInfo> GetAllPublicReadableMembers()
+        private IEnumerable<MemberInfo> GetAllPublicReadableMembers(Func<MemberInfo, bool> membersToMap)
         {
-            return GetAllPublicMembers(PropertyReadable, FieldReadable, mi => !mi.IsStatic() && mi.IsPublic());
+            return GetAllPublicMembers(PropertyReadable, FieldReadable, membersToMap);
         }
 
-        private IEnumerable<MemberInfo> GetAllPublicWritableMembers()
+        private IEnumerable<MemberInfo> GetAllPublicWritableMembers(Func<MemberInfo, bool> membersToMap)
         {
-            return GetAllPublicMembers(PropertyWritable, FieldWritable, mi => !mi.IsStatic() && mi.IsPublic());
+            return GetAllPublicMembers(PropertyWritable, FieldWritable, membersToMap);
         }
 
         private static bool PropertyReadable(PropertyInfo propertyInfo)
@@ -150,12 +165,12 @@ namespace AutoMapper
                 .Where(x => x != null) // filter out null types (e.g. type.BaseType == null)
                 .SelectMany(x => x.GetDeclaredMembers()
                     .Where(mi => mi.DeclaringType != null && mi.DeclaringType == x)
-                    .Where(memberAvailableFor)
                     .Where(
                         m =>
                             (m is FieldInfo && fieldAvailableFor((FieldInfo) m)) ||
                             (m is PropertyInfo && propertyAvailableFor((PropertyInfo) m) &&
                              !((PropertyInfo) m).GetIndexParameters().Any()))
+                    .Where(memberAvailableFor)
                 );
         }
 

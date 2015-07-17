@@ -206,7 +206,7 @@ namespace AutoMapper.Internal
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var typeInfo = new TypeInfo(TypeMap.DestinationType);
+            var typeInfo = new TypeInfo(TypeMap.DestinationType, _configurationContainer.ShouldMapProperty, _configurationContainer.ShouldMapField);
 
             typeInfo.PublicWriteAccessors.Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }

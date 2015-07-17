@@ -43,6 +43,18 @@ namespace AutoMapper
 
         public Func<Type, object> ServiceCtor => _serviceCtor;
 
+        public Func<PropertyInfo, bool> ShouldMapProperty
+        {
+            get { return GetProfile(DefaultProfileName).ShouldMapProperty; }
+            set { GetProfile(DefaultProfileName).ShouldMapProperty = value; }
+        }
+
+        public Func<FieldInfo, bool> ShouldMapField
+        {
+            get { return GetProfile(DefaultProfileName).ShouldMapField; }
+            set { GetProfile(DefaultProfileName).ShouldMapField = value; }
+        }
+
         public bool AllowNullDestinationValues
         {
             get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
@@ -452,10 +464,8 @@ namespace AutoMapper
             IMappingExpression<TSource, TDestination> mappingExp =
                 new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, this);
 
-            TypeInfo destInfo = typeMap.ConfiguredMemberList == MemberList.Destination
-                ? new TypeInfo(typeof (TDestination))
-                : new TypeInfo(typeof (TSource));
-
+            var type = (typeMap.ConfiguredMemberList == MemberList.Destination) ? typeof (TDestination) : typeof (TSource);
+            var destInfo = new TypeInfo(type, ShouldMapProperty, ShouldMapField);
             foreach (var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);
@@ -476,7 +486,7 @@ namespace AutoMapper
         {
             IMappingExpression mappingExp = new MappingExpression(typeMap, _serviceCtor);
 
-            TypeInfo destInfo = new TypeInfo(destinationType);
+            var destInfo = new TypeInfo(destinationType, ShouldMapProperty, ShouldMapField);
             foreach (var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);
