@@ -113,6 +113,7 @@
     <Compile Include="Bug\EnumConditionsBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
     <Compile Include="Bug\GenericTypeConverter.cs" />
+    <Compile Include="Bug\PropertyNamedType.cs" />
     <Compile Include="Bug\NullableIntToNullableEnum.cs" />
     <Compile Include="Bug\ConstructUsingReturnsNull.cs" />
     <Compile Include="Bug\InternalProperties.cs" />
