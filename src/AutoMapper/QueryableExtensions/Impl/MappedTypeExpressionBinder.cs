@@ -1,6 +1,7 @@
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System.Linq.Expressions;
+    using Internal;
 
     public class MappedTypeExpressionBinder : IExpressionBinder
     {
@@ -10,12 +11,15 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
-            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            ExpressionRequest request, ExpressionResolutionResult result,
+            IDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindMappedTypeExpression(mappingEngine, propertyMap, request, result, typePairCount);
         }
 
-        private static MemberAssignment BindMappedTypeExpression(IMappingEngine mappingEngine, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        private static MemberAssignment BindMappedTypeExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
+            ExpressionRequest request, ExpressionResolutionResult result,
+            IDictionary<ExpressionRequest, int> typePairCount)
         {
             var transformedExpression = Extensions.CreateMapExpression(mappingEngine, request,
                 result.ResolutionExpression,

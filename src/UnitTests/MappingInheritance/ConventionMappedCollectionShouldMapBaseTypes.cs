@@ -49,14 +49,15 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void item_collection_should_map_by_base_type()
         {
-            Mapper.CreateMap<Container, ContainerDto>();
-
-            Mapper.CreateMap<ItemBase, ItemDto>()
-                .Include<GeneralItem, GeneralItemDto>()
-                .Include<SpecificItem, SpecificItemDto>();
-
-            Mapper.CreateMap<GeneralItem, GeneralItemDto>();
-            Mapper.CreateMap<SpecificItem, SpecificItemDto>();
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Container, ContainerDto>();
+                cfg.CreateMap<ItemBase, ItemDto>()
+                   .Include<GeneralItem, GeneralItemDto>()
+                   .Include<SpecificItem, SpecificItemDto>();
+                cfg.CreateMap<GeneralItem, GeneralItemDto>();
+                cfg.CreateMap<SpecificItem, SpecificItemDto>();
+            });
 
             var dto = Mapper.Map<Container, ContainerDto>(new Container
                                                     {
@@ -74,14 +75,15 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void item_collection_should_map_by_base_type_for_map_with_one_parameter()
         {
-            Mapper.CreateMap<Container, ContainerDto>();
-
-            Mapper.CreateMap<ItemBase, ItemDto>()
-                .Include<GeneralItem, GeneralItemDto>()
-                .Include<SpecificItem, SpecificItemDto>();
-
-            Mapper.CreateMap<GeneralItem, GeneralItemDto>();
-            Mapper.CreateMap<SpecificItem, SpecificItemDto>();
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Container, ContainerDto>();
+                cfg.CreateMap<ItemBase, ItemDto>()
+                   .Include<GeneralItem, GeneralItemDto>()
+                   .Include<SpecificItem, SpecificItemDto>();
+                cfg.CreateMap<GeneralItem, GeneralItemDto>();
+                cfg.CreateMap<SpecificItem, SpecificItemDto>();
+            });
 
             var dto = Mapper.Map<ContainerDto>(new Container
             {

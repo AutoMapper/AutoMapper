@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
-
 namespace AutoMapper.Internal
 {
+    using System;
+    using System.Collections.Generic;
+
     public class DictionaryFactory : IDictionaryFactory
     {
         public IDictionary<TKey, TValue> CreateDictionary<TKey, TValue>()
@@ -90,7 +90,21 @@ namespace AutoMapper.Internal
 
             public void Clear()
             {
-                _dictionary.Clear();
+                lock (_dictionary)
+                {
+                    _dictionary.Clear();
+                }
+            }
+
+            public ICollection<TValue> Values => _dictionary.Values;
+            public ICollection<TKey> Keys => _dictionary.Keys;
+
+            public bool ContainsKey(TKey key)
+            {
+                lock (_dictionary)
+                {
+                    return _dictionary.ContainsKey(key);
+                }
             }
         }
     }

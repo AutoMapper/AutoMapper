@@ -1,10 +1,10 @@
-using System;
 using System.Linq;
-using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
+    using System;
     using Internal;
+    using Mappers;
     using QueryableExtensions;
 
     /// <summary>
@@ -13,14 +13,8 @@ namespace AutoMapper
     public static class Mapper
 	{
 	    private static readonly Func<ConfigurationStore> _configurationInit =
-	        () =>
-	        {
-	            var platformSpecificRegistry = PlatformAdapter.Resolve<IPlatformSpecificMapperRegistry>();
-                platformSpecificRegistry.Initialize();
+            () => new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
 
-	            return new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-	        };
-        
         private static ILazy<ConfigurationStore> _configuration = LazyFactory.Create(_configurationInit);
 
         private static readonly Func<IMappingEngine> _mappingEngineInit = 
@@ -96,7 +90,8 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
+            Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             return Engine.Map(source, destination, opts);
         }
@@ -109,7 +104,8 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-		public static TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
+        public static TDestination Map<TSource, TDestination>(TSource source,
+            Action<IMappingOperationOptions<TSource, TDestination>> opts)
 		{
             return Engine.Map(source, opts);
 		}
@@ -134,7 +130,8 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to create</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        public static object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+        public static object Map(object source, Type sourceType, Type destinationType,
+            Action<IMappingOperationOptions> opts)
         {
             return Engine.Map(source, sourceType, destinationType, opts);
         }
@@ -161,7 +158,8 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        public static object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+        public static object Map(object source, object destination, Type sourceType, Type destinationType,
+            Action<IMappingOperationOptions> opts)
         {
             return Engine.Map(source, destination, sourceType, destinationType, opts);
         }
@@ -187,7 +185,7 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         public static void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
 		{
-			Engine.DynamicMap<TSource, TDestination>(source, destination);
+            Engine.DynamicMap(source, destination);
 		}
 
         /// <summary>
@@ -348,7 +346,7 @@ namespace AutoMapper
         /// <returns>Type map configuration</returns>
 		public static TypeMap FindTypeMapFor<TSource, TDestination>()
 		{
-			return ConfigurationProvider.FindTypeMapFor(typeof(TSource), typeof(TDestination));
+            return ConfigurationProvider.FindTypeMapFor(typeof (TSource), typeof (TDestination));
 		}
 
         /// <summary>
@@ -410,29 +408,14 @@ namespace AutoMapper
         /// <summary>
         /// Mapping engine used to perform mappings
         /// </summary>
-		public static IMappingEngine Engine
-		{
-			get
-			{
-			    return _mappingEngine.Value;
-			}
-		}
+        public static IMappingEngine Engine => _mappingEngine.Value;
 
         /// <summary>
         /// Store for all configuration
         /// </summary>
-	    public static IConfiguration Configuration
-	    {
-	        get { return (IConfiguration) ConfigurationProvider; }
-	    }
+        public static IConfiguration Configuration => (IConfiguration) ConfigurationProvider;
 
-	    private static IConfigurationProvider ConfigurationProvider
-		{
-			get
-			{
-			    return _configuration.Value;
-			}
-		}
+        private static IConfigurationProvider ConfigurationProvider => _configuration.Value;
 
         /// <summary>
         /// Globally ignore all members starting with a prefix

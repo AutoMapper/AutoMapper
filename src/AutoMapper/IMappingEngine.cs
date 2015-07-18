@@ -5,6 +5,8 @@ using System.Linq;
 
 namespace AutoMapper
 {
+    using System;
+
     /// <summary>
     /// Performs mapping based on configuration
     /// </summary>
@@ -50,7 +52,8 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts);
+        TDestination Map<TSource, TDestination>(TSource source,
+            Action<IMappingOperationOptions<TSource, TDestination>> opts);
 
         /// <summary>
         /// Execute a mapping from the source object to the existing destination object.
@@ -71,7 +74,8 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts);
+        TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
+            Action<IMappingOperationOptions<TSource, TDestination>> opts);
 
         /// <summary>
         /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects
@@ -111,7 +115,8 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts);
+        object Map(object source, object destination, Type sourceType, Type destinationType,
+            Action<IMappingOperationOptions> opts);
 
         /// <summary>
         /// Create a map between the <typeparamref name="TSource"/> and <typeparamref name="TDestination"/> types and execute the map
@@ -162,4 +167,3 @@ namespace AutoMapper
     }
 
 }
-

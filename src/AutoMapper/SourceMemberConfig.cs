@@ -1,7 +1,7 @@
-﻿using System.Reflection;
-
-namespace AutoMapper
+﻿namespace AutoMapper
 {
+    using System.Reflection;
+
     /// <summary>
     /// Contains member configuration relating to source members
     /// </summary>

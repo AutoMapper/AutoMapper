@@ -18,3 +18,5 @@ packages
 *.DotSettings
 *.ide/
 .nuget
+project.lock.json
+.vs

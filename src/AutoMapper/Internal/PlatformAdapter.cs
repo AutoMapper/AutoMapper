@@ -2,25 +2,44 @@
 
 namespace AutoMapper.Internal
 {
+    using System.Collections.Generic;
+
     public static class PlatformAdapter
     {
-        private static readonly string[] KnownPlatformNames = new[] { "Net4", "WinRT", "SL5", "WP8", "WPA81", "Android", "iOS", "iOS10" };
-        private static IAdapterResolver _resolver = new ProbingAdapterResolver(KnownPlatformNames);
-
-        public static T Resolve<T>(bool throwIfNotFound = true)
+        private static readonly System.Collections.Generic.IDictionary<Type, Func<object>> _factories = new Dictionary<Type, Func<object>>
         {
-            var value = (T)_resolver.Resolve(typeof(T));
+#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
+            {typeof(IDictionaryFactory), () => new DictionaryFactoryOverride()},
+#else
+            {typeof(IDictionaryFactory), () => new DictionaryFactory()},
+#endif
+#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
+            {typeof(IEnumNameValueMapperFactory), () => new EnumNameValueMapperFactoryOverride() },
+#else
+            {typeof(IEnumNameValueMapperFactory), () => new EnumNameValueMapperFactory() },
+#endif
+#if MONODROID || MONOTOUCH || __IOS__ || NET4
+            {typeof(INullableConverterFactory), () => new NullableConverterFactoryOverride()},
+#else
+            {typeof(INullableConverterFactory), () => new NullableConverterFactory()},
+#endif
+#if MONODROID || NET4
+            {typeof(IProxyGeneratorFactory), () => new ProxyGeneratorFactoryOverride()},
+#else
+            {typeof(IProxyGeneratorFactory), () => new ProxyGeneratorFactory()},
+#endif
+#if MONODROID || MONOTOUCH || __IOS__ || NETFX_CORE || NET4
+            {typeof(IReaderWriterLockSlimFactory), () => new ReaderWriterLockSlimFactoryOverride()},
+#else
+            {typeof(IReaderWriterLockSlimFactory), () => new ReaderWriterLockSlimFactory()},
+#endif
+        };
 
-            if (value == null && throwIfNotFound)
-                throw new PlatformNotSupportedException("This type is not supported on this platform " + typeof(T).Name);
+        public static T Resolve<T>()
+        {
+            var value = (T)_factories[typeof(T)]();
 
             return value;
-        }
-
-        // Unit testing helper
-        internal static void SetResolver(IAdapterResolver resolver)
-        {
-            _resolver = resolver;
         }
     }
 }

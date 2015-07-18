@@ -44,11 +44,13 @@ namespace AutoMapper.UnitTests
 						new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
 					};
 
-				Mapper
-					.CreateMap<ModelObject, DtoObject>()
-					.Include<ModelSubObject, DtoSubObject>();
+			    Mapper.Initialize(cfg =>
+			    {
+			        cfg.CreateMap<ModelObject, DtoObject>()
+			            .Include<ModelSubObject, DtoSubObject>();
 
-				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+			        cfg.CreateMap<ModelSubObject, DtoSubObject>();
+			    });
 
 				_result = (DtoObject[]) Mapper.Map(model, typeof (ModelObject[]), typeof (DtoObject[]));
 			}
@@ -95,12 +97,13 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper
-					.CreateMap<ModelObject, DtoObject>()
-					.Include<ModelSubObject, DtoSubObject>();
+			    Mapper.Initialize(cfg =>
+			    {
+			        cfg.CreateMap<ModelObject, DtoObject>()
+			            .Include<ModelSubObject, DtoSubObject>();
 
-				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
-
+			        cfg.CreateMap<ModelSubObject, DtoSubObject>();
+			    });
 			}
 
             protected override void Because_of()
@@ -142,19 +145,22 @@ namespace AutoMapper.UnitTests
 				public string SubString { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Reset();
+		    protected override void Establish_context()
+		    {
+		        Mapper.Reset();
 
-				var model = new IModelObject[]
-					{
-						new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
-					};
+		        var model = new IModelObject[]
+		        {
+		            new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
+		        };
 
-				Mapper.CreateMap<IModelObject, DtoObject>()
-					.Include<ModelSubObject, DtoSubObject>();
+		        Mapper.Initialize(cfg =>
+		        {
+                    cfg.CreateMap<IModelObject, DtoObject>()
+                        .Include<ModelSubObject, DtoSubObject>();
 
-				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+                    cfg.CreateMap<ModelSubObject, DtoSubObject>();
+                });
 
 				_result = (DtoObject[]) Mapper.Map(model, typeof (IModelObject[]), typeof (DtoObject[]));
 			}
@@ -211,12 +217,15 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.CreateMap<Model, DtoModel>();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Model, DtoModel>();
 
-				Mapper.CreateMap<IModelObject, DtoObject>()
-					.Include<ModelSubObject, DtoSubObject>();
+                    cfg.CreateMap<IModelObject, DtoObject>()
+                        .Include<ModelSubObject, DtoSubObject>();
 
-				Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+                    cfg.CreateMap<ModelSubObject, DtoSubObject>();
+                });
 			}
 
 			[Fact]

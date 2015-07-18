@@ -5,7 +5,6 @@ namespace AutoMapper.QueryableExtensions
     using System.Linq.Expressions;
     using Internal;
     using System.Reflection;
-    using System.Threading.Tasks;
 
     public class ProjectionExpression : IProjectionExpression
     {
@@ -61,27 +60,18 @@ namespace AutoMapper.QueryableExtensions
 
         public IQueryable<TResult> To<TResult>(object parameters = null, params Expression<Func<TResult, object>>[] membersToExpand)
         {
-            var members = membersToExpand.Select(expr =>
-            {
-                var visitor = new MemberVisitor();
-                visitor.Visit(expr);
-                return visitor.MemberName;
-            })
-                .ToArray();
-            return To<TResult>(parameters, members);
+            return To<TResult>(parameters, GetMemberNames(membersToExpand));
+        }
+
+        private string[] GetMemberNames<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
+        {
+            return membersToExpand.Select(ReflectionHelper.GetPropertyName).ToArray();
         }
 
         public IQueryable<TResult> To<TResult>(System.Collections.Generic.IDictionary<string, object> parameters, params Expression<Func<TResult, object>>[] membersToExpand)
         {
-            var members = membersToExpand.Select(expr =>
-            {
-                var visitor = new MemberVisitor();
-                visitor.Visit(expr);
-                return visitor.MemberName;
-            })
-                .ToArray();
-
-            var mapExpr = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, members);
+            var memberNames = GetMemberNames(membersToExpand);
+            var mapExpr = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, memberNames);
 
             return _source.Provider.CreateQuery<TResult>(
                 Expression.Call(
@@ -90,17 +80,6 @@ namespace AutoMapper.QueryableExtensions
                     new[] { _source.Expression, Expression.Quote(mapExpr) }
                     )
                 );
-        }
-
-        private class MemberVisitor : ExpressionVisitor
-        {
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                MemberName = node.Member.Name;
-                return base.VisitMember(node);
-            }
-
-            public string MemberName { get; private set; }
         }
     }
 }

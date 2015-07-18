@@ -1,9 +1,9 @@
-﻿#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
-using System;
-using System.Linq;
-
+﻿#if NET4 || NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
 namespace AutoMapper.Internal
 {
+    using System;
+    using System.Linq;
+
     public class EnumNameValueMapperFactoryOverride : IEnumNameValueMapperFactory
     {
         public IEnumNameValueMapper Create()
@@ -28,4 +28,5 @@ namespace AutoMapper.Internal
         }
     }
 }
+
 #endif

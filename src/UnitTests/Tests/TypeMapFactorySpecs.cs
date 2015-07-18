@@ -9,6 +9,7 @@ using Should;
 
 namespace AutoMapper.UnitTests.Tests
 {
+    using System;
     using Assembly = System.Reflection.Assembly;
 
     public class StubNamingConvention : INamingConvention
@@ -21,7 +22,7 @@ namespace AutoMapper.UnitTests.Tests
         }
 
         public Regex SplittingExpression { get; set; }
-        public string Splitter { get; set; }
+        public string SeparatorCharacter { get; set; }
 
         public string ReplaceValue(Match match)
         {
@@ -106,6 +107,22 @@ namespace AutoMapper.UnitTests.Tests
             get { return _sourceExtensionMethods; }
         }
 
+        public Func<PropertyInfo, bool> ShouldMapProperty
+        {
+            get
+            {
+                return p => true;
+            }
+        }
+
+        public Func<FieldInfo, bool> ShouldMapField
+        {
+            get
+            {
+                return p => p.IsPublic;
+            }
+        }
+
         public void ReplaceMemberName(string original, string newValue)
         {
             _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
@@ -152,7 +169,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IMappingOptions _mappingOptions;
+        private StubMappingOptions _mappingOptions;
 
 
         private class Source
@@ -172,7 +189,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention(s => s.Value[0].ToString().ToUpper() + s.Value.Substring(1)){Splitter = "__"};
+            var namingConvention = new StubNamingConvention(s => s.Value[0].ToString().ToUpper() + s.Value.Substring(1)){SeparatorCharacter = "__"};
 
             _mappingOptions = new StubMappingOptions();
             _mappingOptions.SourceMemberNamingConvention = namingConvention;
@@ -198,7 +215,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IMappingOptions _mappingOptions;
+        private StubMappingOptions _mappingOptions;
 
         private class Source
         {

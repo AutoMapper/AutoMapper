@@ -17,21 +17,21 @@ namespace AutoMapper
     {
         public IEnumerable<MemberInfo> GetMemberInfos(TypeInfo typeInfo)
         {
-            return typeInfo.GetPublicReadAccessors();
+            return typeInfo.PublicReadAccessors;
         }
     }
     public class MethodsMemberInfo : IGetTypeInfoMembers
     {
         public IEnumerable<MemberInfo> GetMemberInfos(TypeInfo typeInfo)
         {
-            return typeInfo.GetPublicNoArgMethods();
+            return typeInfo.PublicNoArgMethods;
         }
     }
     public class AllMemberInfo : IGetTypeInfoMembers
     {
         public IEnumerable<MemberInfo> GetMemberInfos(TypeInfo typeInfo)
         {
-            return typeInfo.GetPublicReadAccessors().Concat(typeInfo.GetPublicNoArgMethods()).Concat(typeInfo.GetPublicNoArgExtensionMethods());
+            return typeInfo.PublicReadAccessors.Concat(typeInfo.PublicNoArgMethods).Concat(typeInfo.PublicNoArgExtensionMethods);
         }
     }
 
@@ -194,8 +194,8 @@ namespace AutoMapper
         public IEnumerable<string> PossibleNames(string nameToSearch)
         {
             return 
-                MemberNameReplacers.Select(r => nameToSearch.Replace(r.OrginalValue, r.NewValue))
-                    .Concat(new[] { MemberNameReplacers.Aggregate(nameToSearch, (s, r) => s.Replace(r.OrginalValue, r.NewValue)), nameToSearch })
+                MemberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))
+                    .Concat(new[] { MemberNameReplacers.Aggregate(nameToSearch, (s, r) => s.Replace(r.OriginalValue, r.NewValue)), nameToSearch })
                     .ToList();
         }
     }
@@ -273,7 +273,7 @@ namespace AutoMapper
 
         public IEnumerable<MethodInfo> SourceExtensionMethods
         {
-            get { return Mapper.Configuration.SourceExtensionMethods; }
+            get { return (Mapper.Configuration as ConfigurationStore).SourceExtensionMethods; }
         }
 
         public NameSplitMember()
@@ -312,8 +312,8 @@ namespace AutoMapper
         }
         private NameSnippet CreateNameSnippet(IEnumerable<string> matches, int i)
         {
-            var first = String.Join(SourceMemberNamingConvention.Splitter, matches.Take(i).Select(s => SourceMemberNamingConvention.SplittingExpression.Replace(s, SourceMemberNamingConvention.ReplaceValue)).ToArray());
-            var second = String.Join(SourceMemberNamingConvention.Splitter, matches.Skip(i).Select(s => SourceMemberNamingConvention.SplittingExpression.Replace(s, SourceMemberNamingConvention.ReplaceValue)).ToArray());
+            var first = String.Join(SourceMemberNamingConvention.SeparatorCharacter, matches.Take(i).Select(s => SourceMemberNamingConvention.SplittingExpression.Replace(s, SourceMemberNamingConvention.ReplaceValue)).ToArray());
+            var second = String.Join(SourceMemberNamingConvention.SeparatorCharacter, matches.Skip(i).Select(s => SourceMemberNamingConvention.SplittingExpression.Replace(s, SourceMemberNamingConvention.ReplaceValue)).ToArray());
             return new NameSnippet
             {
                 First = first,

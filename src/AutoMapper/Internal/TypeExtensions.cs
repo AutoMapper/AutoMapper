@@ -1,4 +1,8 @@
-﻿namespace AutoMapper.Internal
+﻿#if DNXCORE50
+using ms=System.Reflection.TypeExtensions;
+#endif
+
+namespace System.Reflection
 {
     using System;
     using System.Collections.Generic;
@@ -9,46 +13,69 @@
     {
         public static Type[] GetGenericParameters(this Type type)
         {
-#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
-#else
+#elif SILVERLIGHT
             return type.GetGenericTypeDefinition().GetGenericArguments();
+#else
+            return type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
 #endif
         }
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type)
         {
-#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredConstructors;
-#else
+#elif SILVERLIGHT
             return type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+#else
+            return type.GetTypeInfo().DeclaredConstructors;
 #endif
         }
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type)
         {
-#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredMembers;
-#else
+#elif SILVERLIGHT
             return type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+#else
+            return type.GetTypeInfo().DeclaredMembers;
 #endif
         }
 
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type)
         {
-#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredMethods;
-#else
+#elif SILVERLIGHT
             return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+#else
+            return type.GetTypeInfo().DeclaredMethods;
+#endif
+        }
+
+        public static IEnumerable<MethodInfo> GetAllMethods(this Type type)
+        {
+#if MONODROID || MONOTOUCH || __IOS__
+            return type.GetTypeInfo().GetMethods();
+#elif SILVERLIGHT
+            return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+#elif DNXCORE50
+            return type.GetMethods();
+#else
+            return type.GetRuntimeMethods();
 #endif
         }
 
         public static IEnumerable<PropertyInfo> GetDeclaredProperties(this Type type)
         {
-#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || ASPNET50 || ASPNETCORE50
+#if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredProperties;
-#else
+#elif SILVERLIGHT
             return type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+#else
+            return type.GetTypeInfo().DeclaredProperties;
 #endif
         }
 
@@ -90,120 +117,155 @@
 
         public static Assembly Assembly(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().Assembly;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.Assembly;
+#else
+            return type.GetTypeInfo().Assembly;
 #endif
         }
 
         public static Type BaseType(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().BaseType;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.BaseType;
+#else
+            return type.GetTypeInfo().BaseType;
 #endif
         }
 
-#if ASPNETCORE50 || NETFX_CORE
         public static object[] GetCustomAttributes(this Type type, Type attributeType, bool inherit)
         {
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().GetCustomAttributes(attributeType, inherit).ToArray();
-        }
+#else
+            return type.GetCustomAttributes(attributeType, inherit).ToArray();
 #endif
+        }
 
         public static bool IsAbstract(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsAbstract;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsAbstract;
+#else
+            return type.GetTypeInfo().IsAbstract;
 #endif
         }
 
         public static bool IsClass(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsClass;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsClass;
+#else
+            return type.GetTypeInfo().IsClass;
 #endif
         }
 
         public static bool IsEnum(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsEnum;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsEnum;
+#else
+            return type.GetTypeInfo().IsEnum;
 #endif
         }
 
         public static bool IsGenericType(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsGenericType;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsGenericType;
+#else
+            return type.GetTypeInfo().IsGenericType;
 #endif
         }
 
         public static bool IsGenericTypeDefinition(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsGenericTypeDefinition;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsGenericTypeDefinition;
+#else
+            return type.GetTypeInfo().IsGenericTypeDefinition;
 #endif
         }
 
         public static bool IsInterface(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsInterface;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsInterface;
+#else
+            return type.GetTypeInfo().IsInterface;
 #endif
         }
 
         public static bool IsPrimitive(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsPrimitive;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsPrimitive;
+#else
+            return type.GetTypeInfo().IsPrimitive;
 #endif
         }
 
         public static bool IsSealed(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsSealed;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsSealed;
+#else
+            return type.GetTypeInfo().IsSealed;
 #endif
         }
 
         public static bool IsValueType(this Type type)
         {
-#if ASPNETCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsValueType;
-#else
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
             return type.IsValueType;
+#else
+            return type.GetTypeInfo().IsValueType;
 #endif
         }
 
 
-#if NETFX_CORE
+#if !SILVERLIGHT
+        public static bool IsInstanceOfType(this Type type, object o)
+        {
+            return o != null && type.IsAssignableFrom(o.GetType());
+        }
+
+        public static ConstructorInfo[] GetConstructors(this Type type)
+        {
+            return type.GetTypeInfo().DeclaredConstructors.ToArray();
+        }
+
+#if !DNXCORE50 && !WINCORE
+        public static Type[] GetTypes(this Assembly assembly)
+        {
+            return assembly.ExportedTypes.ToArray();
+        }
+
         public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo, bool ignored)
         {
             return propertyInfo.GetMethod;
-        }
-
-        public static MethodInfo[] GetAccessors(this PropertyInfo propertyInfo)
-        {
-            return new[] { propertyInfo.GetMethod, propertyInfo.SetMethod };
         }
 
         public static MethodInfo GetSetMethod(this PropertyInfo propertyInfo, bool ignored)
@@ -211,9 +273,21 @@
             return propertyInfo.SetMethod;
         }
 
-        public static Type[] GetTypes(this Assembly assembly)
+        public static FieldInfo GetField(this Type type, string name)
         {
-            return assembly.ExportedTypes.ToArray();
+            return type.GetTypeInfo().GetDeclaredField(name);
+        }
+
+        public static MemberInfo[] GetMember(this Type type, string name)
+        {
+            return type.GetTypeInfo().DeclaredMembers
+                .Where(m => m.Name == name).ToArray()
+            ;
+        }
+
+        public static MethodInfo[] GetAccessors(this PropertyInfo propertyInfo)
+        {
+            return new[] { propertyInfo.GetMethod, propertyInfo.SetMethod };
         }
 
         public static PropertyInfo GetProperty(this Type type, string name)
@@ -231,31 +305,9 @@
             return type.GetTypeInfo().GetDeclaredMethods(name).FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).ToArray().SequenceEqual(parameterTypes));
         }
 
-        public static FieldInfo GetField(this Type type, string name)
-        {
-            return type.GetTypeInfo().GetDeclaredField(name);
-        }
-
-        public static MemberInfo[] GetMember(this Type type, string name)
-        {
-            return type.GetTypeInfo().DeclaredMembers
-                .Where(m => m.Name == name).ToArray()
-            ;
-        }
-
-        public static bool IsInstanceOfType(this Type type, object o)
-        {
-            return o != null && type.IsAssignableFrom(o.GetType());
-        }
-
         public static bool IsAssignableFrom(this Type type, Type other)
         {
             return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
-        }
-
-        public static ConstructorInfo[] GetConstructors(this Type type)
-        {
-            return type.GetTypeInfo().DeclaredConstructors.ToArray();
         }
 
         public static Type[] GetGenericArguments(this Type type)
@@ -266,15 +318,8 @@
         public static IEnumerable<Type> GetInterfaces(this Type type)
         {
             return type.GetTypeInfo().ImplementedInterfaces;
-
-            //if (type.IsInterface())
-            //    yield return type;
-
-            //foreach (var @interface in type.GetTypeInfo().ImplementedInterfaces)
-            //{
-            //    yield return @interface;
-            //}
         }
+#endif
 
 #endif
     }

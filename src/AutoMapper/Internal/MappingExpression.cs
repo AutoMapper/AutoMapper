@@ -1,12 +1,10 @@
-using System;
-using System.Linq.Expressions;
-using AutoMapper.Impl;
-using System.Linq;
-
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
+    using System;
+    using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
-    using Internal;
+    using TypeInfo = AutoMapper.TypeInfo;
 
     public class MappingExpression : IMappingExpression, IMemberConfigurationExpression
     {
@@ -84,8 +82,10 @@ namespace AutoMapper
         public void MapFrom(string sourceMember)
         {
             var members = _typeMap.SourceType.GetMember(sourceMember);
-            if (!members.Any()) throw new AutoMapperConfigurationException(string.Format("Unable to find source member {0} on type {1}", sourceMember, _typeMap.SourceType.FullName));
-            if (members.Skip(1).Any()) throw new AutoMapperConfigurationException(string.Format("Source member {0} is ambiguous on type {1}", sourceMember, _typeMap.SourceType.FullName));
+            if (!members.Any()) throw new AutoMapperConfigurationException(
+                $"Unable to find source member {sourceMember} on type {_typeMap.SourceType.FullName}");
+            if (members.Skip(1).Any()) throw new AutoMapperConfigurationException(
+                $"Source member {sourceMember} is ambiguous on type {_typeMap.SourceType.FullName}");
             var member = members.Single();
             _propertyMap.SourceMember = member;
             _propertyMap.AssignCustomValueResolver(member.ToMemberGetter());
@@ -130,12 +130,13 @@ namespace AutoMapper
         {
             return context =>
             {
-                if (context.Options.ServiceCtor != null)
+                if(type.IsGenericTypeDefinition())
                 {
-                    var obj = context.Options.ServiceCtor(type);
-                    if (obj != null)
-                        return (TServiceType)obj;
+                    type = type.MakeGenericType(context.SourceType.GetGenericArguments());
                 }
+                var obj = context.Options.ServiceCtor?.Invoke(type);
+                if (obj != null)
+                    return (TServiceType)obj;
                 return (TServiceType)_typeConverterCtor(type);
             };
         }
@@ -159,22 +160,18 @@ namespace AutoMapper
 
     public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>
     {
-        private readonly TypeMap _typeMap;
         private readonly Func<Type, object> _serviceCtor;
         private readonly IProfileExpression _configurationContainer;
         private PropertyMap _propertyMap;
 
         public MappingExpression(TypeMap typeMap, Func<Type, object> serviceCtor, IProfileExpression configurationContainer)
         {
-            _typeMap = typeMap;
+            TypeMap = typeMap;
             _serviceCtor = serviceCtor;
             _configurationContainer = configurationContainer;
         }
 
-        public TypeMap TypeMap
-        {
-            get { return _typeMap; }
-        }
+        public TypeMap TypeMap { get; }
 
         public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
                                                                    Action<IMemberConfigurationExpression<TSource>> memberOptions)
@@ -197,6 +194,10 @@ namespace AutoMapper
             if (destMember == null)
             {
                 var fieldInfo = TypeMap.DestinationType.GetField(name);
+                if(fieldInfo == null)
+                {
+                    throw new ArgumentOutOfRangeException("name", "Cannot find a field or property named " + name);
+                }
                 destMember = new FieldAccessor(fieldInfo);
             }
             ForDestinationMember(destMember, memberOptions);
@@ -205,9 +206,9 @@ namespace AutoMapper
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var typeInfo = new TypeInfo(TypeMap.DestinationType);
+            var typeInfo = new TypeInfo(TypeMap.DestinationType, _configurationContainer.ShouldMapProperty, _configurationContainer.ShouldMapField);
 
-            typeInfo.GetPublicWriteAccessors().Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
+            typeInfo.PublicWriteAccessors.Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
@@ -310,6 +311,14 @@ namespace AutoMapper
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
             _propertyMap.SetCustomValueResolverExpression(sourceMember);
+        }
+
+        public void MapFrom<TMember>(string property)
+        {
+            var par = Expression.Parameter(typeof (TSource));
+            var prop = Expression.Property(par, property);
+            var lambda = Expression.Lambda<Func<TSource, TMember>>(prop, par);
+            _propertyMap.SetCustomValueResolverExpression(lambda);
         }
 
         public void UseValue<TValue>(TValue value)
@@ -518,12 +527,9 @@ namespace AutoMapper
         {
             return context =>
             {
-                if (context.Options.ServiceCtor != null)
-                {
-                    var obj = context.Options.ServiceCtor(type);
-                    if (obj != null)
-                        return (TServiceType)obj;
-                }
+                var obj = context.Options.ServiceCtor?.Invoke(type);
+                if (obj != null)
+                    return (TServiceType)obj;
                 return (TServiceType)_serviceCtor(type);
             };
         }

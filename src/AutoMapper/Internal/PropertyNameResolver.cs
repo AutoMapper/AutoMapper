@@ -1,35 +1,32 @@
-using System;
-using System.Reflection;
-
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
-    using Internal;
+    using System;
+    using System.Reflection;
 
-	public class PropertyNameResolver : IValueResolver
-	{
-	    private readonly Type _sourceType;
-	    private readonly PropertyInfo _propertyInfo;
+    public class PropertyNameResolver : IValueResolver
+    {
+        private readonly Type _sourceType;
+        private readonly PropertyInfo _propertyInfo;
 
-		public PropertyNameResolver(Type sourceType, string propertyName)
-		{
-		    _sourceType = sourceType;
-		    _propertyInfo = sourceType.GetProperty(propertyName);
-		}
+        public PropertyNameResolver(Type sourceType, string propertyName)
+        {
+            _sourceType = sourceType;
+            _propertyInfo = sourceType.GetProperty(propertyName);
+        }
 
 
-		public ResolutionResult Resolve(ResolutionResult source)
-		{
-			if (source.Value == null)
-				return source;
+        public ResolutionResult Resolve(ResolutionResult source)
+        {
+            if (source.Value == null)
+                return source;
 
-		    var valueType = source.Value.GetType();
-		    if (!(_sourceType.IsAssignableFrom(valueType)))
+            var valueType = source.Value.GetType();
+            if (!(_sourceType.IsAssignableFrom(valueType)))
                 throw new ArgumentException("Expected obj to be of type " + _sourceType + " but was " + valueType);
 
-		    var result = _propertyInfo.GetValue(source.Value, null);
+            var result = _propertyInfo.GetValue(source.Value, null);
 
-			return source.New(result);
-		}
-
-	}
+            return source.New(result);
+        }
+    }
 }

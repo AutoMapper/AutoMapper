@@ -51,12 +51,15 @@ namespace AutoMapper.UnitTests
                     Child = new SubChildModelObject {ChildProperty = "child property value"}
                 };
 
-                Mapper.CreateMap<ModelObject, DtoObject>();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<ModelObject, DtoObject>();
 
-                Mapper.CreateMap<IChildModelObject, DtoChildObject>()
-                    .Include<SubChildModelObject, SubDtoChildObject>();
+                    cfg.CreateMap<IChildModelObject, DtoChildObject>()
+                          .Include<SubChildModelObject, SubDtoChildObject>();
 
-                Mapper.CreateMap<SubChildModelObject, SubDtoChildObject>();
+                    cfg.CreateMap<SubChildModelObject, SubDtoChildObject>();
+                });
 
                 Mapper.AssertConfigurationIsValid();
 
@@ -375,11 +378,13 @@ namespace AutoMapper.UnitTests
             //and following mappings:
             protected override void Establish_context()
             {
-                Mapper.CreateMap<Base, BaseDto>().Include<Derived, DerivedDto>();
-                Mapper.CreateMap<Derived, DerivedDto>();
-                // try with and without the following two lines, also try with just the following two lines
-                Mapper.CreateMap<IBase, BaseDto>().Include<IDerived, DerivedDto>();
-                Mapper.CreateMap<IDerived, DerivedDto>();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Base, BaseDto>().Include<Derived, DerivedDto>();
+                    cfg.CreateMap<Derived, DerivedDto>();
+                    cfg.CreateMap<IBase, BaseDto>().Include<IDerived, DerivedDto>();
+                    cfg.CreateMap<IDerived, DerivedDto>();
+                });
             }
             protected override void Because_of()
             {

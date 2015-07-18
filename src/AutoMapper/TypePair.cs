@@ -1,7 +1,9 @@
-using System;
-
 namespace AutoMapper.Impl
 {
+    using System;
+    using System.Diagnostics;
+
+    [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public class TypePair : IEquatable<TypePair>
     {
 

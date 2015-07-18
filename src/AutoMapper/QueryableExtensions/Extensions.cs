@@ -4,8 +4,6 @@ namespace AutoMapper.QueryableExtensions
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
-    using AutoMapper.Impl;
     using Impl;
     using Internal;
 
@@ -20,7 +18,7 @@ namespace AutoMapper.QueryableExtensions
         {
             new MemberGetterExpressionResultConverter(),
             new MemberResolverExpressionResultConverter(),
-            new NullSubstitutionExpressionResultConverter(), 
+            new NullSubstitutionExpressionResultConverter()
         };
 
         private static readonly IExpressionBinder[] Binders =
@@ -29,8 +27,8 @@ namespace AutoMapper.QueryableExtensions
             new AssignableExpressionBinder(),
             new EnumerableExpressionBinder(),
             new MappedTypeExpressionBinder(),
-            new CustomProjectionExpressionBinder(), 
-            new StringExpressionBinder(),
+            new CustomProjectionExpressionBinder(),
+            new StringExpressionBinder()
         };
 
         public static void ClearExpressionCache()
@@ -49,9 +47,13 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="membersToExpand">Expand members explicitly previously marked as members to explicitly expand</param>
         /// <returns>Expression tree mapping source to destination type</returns>
         public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(
-            this IMappingEngine mappingEngine, System.Collections.Generic.IDictionary<string, object> parameters = null, params string[] membersToExpand)
+            this IMappingEngine mappingEngine, System.Collections.Generic.IDictionary<string, object> parameters = null,
+            params string[] membersToExpand)
         {
-            return (Expression<Func<TSource, TDestination>>)mappingEngine.CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
+            return
+                (Expression<Func<TSource, TDestination>>)
+                    mappingEngine.CreateMapExpression(typeof (TSource), typeof (TDestination), parameters,
+                        membersToExpand);
         }
 
         /// <summary>
@@ -64,14 +66,18 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Expand members explicitly previously marked as members to explicitly expand</param>
         /// <returns>Expression tree mapping source to destination type</returns>
-        public static Expression CreateMapExpression(this IMappingEngine mappingEngine, 
-            Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params string[] membersToExpand)
+        public static Expression CreateMapExpression(this IMappingEngine mappingEngine,
+            Type sourceType, Type destinationType,
+            System.Collections.Generic.IDictionary<string, object> parameters = null, params string[] membersToExpand)
         {
             //Expression.const
             parameters = parameters ?? new Dictionary<string, object>();
 
-            var cachedExpression = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand),
-                    tp => CreateMapExpression(mappingEngine, tp, DictionaryFactory.CreateDictionary<ExpressionRequest, int>()));
+            var cachedExpression =
+                _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand),
+                    tp =>
+                        CreateMapExpression(mappingEngine, tp,
+                            DictionaryFactory.CreateDictionary<ExpressionRequest, int>()));
 
             if (!parameters.Any())
                 return cachedExpression;
@@ -137,7 +143,7 @@ namespace AutoMapper.QueryableExtensions
         {
             return new ProjectionExpression(source, mappingEngine).To<TDestination>();
         }
-        
+
         internal static LambdaExpression CreateMapExpression(IMappingEngine mappingEngine, ExpressionRequest request,
             Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
@@ -149,12 +155,13 @@ namespace AutoMapper.QueryableExtensions
             return Expression.Lambda(total, instanceParameter);
         }
 
-        internal static Expression CreateMapExpression(IMappingEngine mappingEngine, ExpressionRequest request, Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        internal static Expression CreateMapExpression(IMappingEngine mappingEngine, ExpressionRequest request,
+            Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
-            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(request.SourceType,
+            var typeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(request.SourceType,
                 request.DestinationType);
 
-            if (typeMap == null)
+            if(typeMap == null)
             {
                 const string MessageFormat = "Missing map from {0} to {1}. Create using Mapper.CreateMap<{0}, {1}>.";
 
@@ -167,15 +174,14 @@ namespace AutoMapper.QueryableExtensions
 
             var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
             var visitor = new NewFinderVisitor();
-            var ctorExpr = typeMap.ConstructExpression ?? Expression.Lambda(Expression.New(request.DestinationType));
-            visitor.Visit(parameterReplacer.Visit(ctorExpr));
+            var constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
+            visitor.Visit(parameterReplacer.Visit(constructorExpression));
 
             var expression = Expression.MemberInit(
                 visitor.NewExpression,
                 bindings.ToArray()
                 );
-
-            return expression;
+            return Expression.Convert(expression, request.DestinationType);
         }
 
         private class NewFinderVisitor : ExpressionVisitor
@@ -204,30 +210,41 @@ namespace AutoMapper.QueryableExtensions
             {
                 var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter);
 
-                if (propertyMap.ExplicitExpansion && !request.IncludedMembers.Contains(propertyMap.DestinationProperty.Name))
+                if (propertyMap.ExplicitExpansion &&
+                    !request.IncludedMembers.Contains(propertyMap.DestinationProperty.Name))
                     continue;
 
-                var propertyTypeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result.Type, propertyMap.DestinationPropertyType);
-                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.IncludedMembers);
+                var propertyTypeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(result.Type,
+                    propertyMap.DestinationPropertyType);
+                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType,
+                    request.IncludedMembers);
 
                 var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
                 if (binder == null)
-                    throw new AutoMapperMappingException("Unable to create a map expression from " + result.Type + " to " + propertyMap.DestinationPropertyType);
+                {
+                    var message =
+                        $"Unable to create a map expression from {propertyMap.SourceMember.DeclaringType.Name}.{propertyMap.SourceMember.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
 
-                var bindExpression = binder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
+                    throw new AutoMapperMappingException(message);
+                }
+
+                var bindExpression = binder.Build(mappingEngine, propertyMap, propertyTypeMap, propertyRequest, result,
+                    typePairCount);
 
                 bindings.Add(bindExpression);
             }
             return bindings;
         }
 
-        private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType, Expression instanceParameter)
+        private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType,
+            Expression instanceParameter)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
             foreach (var resolver in propertyMap.GetSourceValueResolvers())
             {
-                var matchingExpressionConverter = ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
+                var matchingExpressionConverter =
+                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
                 if (matchingExpressionConverter == null)
                     throw new Exception("Can't resolve this to Queryable Expression");
                 result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, resolver);
@@ -239,7 +256,8 @@ namespace AutoMapper.QueryableExtensions
         {
             private readonly System.Collections.Generic.IDictionary<string, object> _paramValues;
 
-            public ConstantExpressionReplacementVisitor(System.Collections.Generic.IDictionary<string, object> paramValues)
+            public ConstantExpressionReplacementVisitor(
+                System.Collections.Generic.IDictionary<string, object> paramValues)
             {
                 _paramValues = paramValues;
             }

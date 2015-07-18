@@ -4,12 +4,12 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-	public class AutoMapperTester : IDisposable
+    public class AutoMapperTester : IDisposable
 	{
 		[Fact]
 		public void Should_be_able_to_handle_derived_proxy_types()
 		{
-			Mapper.CreateMap<ModelType, DtoType>();
+            Mapper.CreateMap<ModelType, DtoType>();
 			var source = new[] { new DerivedModelType { TheProperty = "Foo" }, new DerivedModelType { TheProperty = "Bar" } };
 
 			var destination = (DtoType[])Mapper.Map(source, typeof(ModelType[]), typeof(DtoType[]));
