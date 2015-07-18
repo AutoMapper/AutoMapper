@@ -132,5 +132,6 @@ namespace AutoMapper
         /// By default only public fields are mapped.
         /// </summary>
         Func<FieldInfo, bool> ShouldMapField { get; set; }
+        IProfileConfiguration ProfileConfiguration { get; }
     }
 }

@@ -12,7 +12,7 @@ namespace AutoMapper
     {
         private ConfigurationStore _configurator;
 
-        public Profile(string profileName)
+        internal Profile(string profileName)
         {
             ProfileName = profileName;
         }
@@ -26,36 +26,36 @@ namespace AutoMapper
 
         public void DisableConstructorMapping()
         {
-            GetProfile.ConstructorMappingEnabled = false;
+            ProfileConfiguration.ConstructorMappingEnabled = false;
         }
 
         public Func<PropertyInfo, bool> ShouldMapProperty
         {
-            get { return GetProfile.ShouldMapProperty; }
-            set { GetProfile.ShouldMapProperty = value; }
+            get { return ProfileConfiguration.ShouldMapProperty; }
+            set { ProfileConfiguration.ShouldMapProperty = value; }
         }
 
         public Func<FieldInfo, bool> ShouldMapField
         {
-            get { return GetProfile.ShouldMapField; }
-            set { GetProfile.ShouldMapField = value; }
+            get { return ProfileConfiguration.ShouldMapField; }
+            set { ProfileConfiguration.ShouldMapField = value; }
         }
 
         public bool AllowNullDestinationValues
         {
-            get { return GetProfile.MapNullSourceValuesAsNull; }
-            set { GetProfile.MapNullSourceValuesAsNull = value; }
+            get { return ProfileConfiguration.MapNullSourceValuesAsNull; }
+            set { ProfileConfiguration.MapNullSourceValuesAsNull = value; }
         }
 
         public bool AllowNullCollections
         {
-            get { return GetProfile.MapNullSourceCollectionsAsNull; }
-            set { GetProfile.MapNullSourceCollectionsAsNull = value; }
+            get { return ProfileConfiguration.MapNullSourceCollectionsAsNull; }
+            set { ProfileConfiguration.MapNullSourceCollectionsAsNull = value; }
         }
 
         public void IncludeSourceExtensionMethods(Assembly assembly)
         {
-            GetProfile.IncludeSourceExtensionMethods(assembly);
+            ProfileConfiguration.IncludeSourceExtensionMethods(assembly);
         }
 
         public INamingConvention SourceMemberNamingConvention
@@ -63,10 +63,10 @@ namespace AutoMapper
             get
             {
                 INamingConvention convention = null;
-                GetProfile.MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
+                ProfileConfiguration.MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
                 return convention;
             }
-            set { GetProfile.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
+            set { ProfileConfiguration.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
         }
 
         public INamingConvention DestinationMemberNamingConvention
@@ -74,10 +74,10 @@ namespace AutoMapper
             get
             {
                 INamingConvention convention = null;
-                GetProfile.MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
+                ProfileConfiguration.MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
                 return convention;
             }
-            set { GetProfile.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
+            set { ProfileConfiguration.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
@@ -106,37 +106,37 @@ namespace AutoMapper
 
         public void ClearPrefixes()
         {
-            GetProfile.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.Prefixes.Clear());
+            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.Prefixes.Clear());
         }
 
         public void RecognizeAlias(string original, string alias)
         {
-            GetProfile.MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, alias));
+            ProfileConfiguration.MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, alias));
         }
 
         public void ReplaceMemberName(string original, string newValue)
         {
-            GetProfile.MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
+            ProfileConfiguration.MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
         }
 
         public void RecognizePrefixes(params string[] prefixes)
         {
-            GetProfile.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, prefixes));
+            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, prefixes));
         }
 
         public void RecognizePostfixes(params string[] postfixes)
         {
-            GetProfile.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Postfixes, postfixes));
+            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Postfixes, postfixes));
         }
 
         public void RecognizeDestinationPrefixes(params string[] prefixes)
         {
-            GetProfile.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPrefixes, prefixes));
+            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPrefixes, prefixes));
         }
 
         public void RecognizeDestinationPostfixes(params string[] postfixes)
         {
-            GetProfile.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
+            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
         }
 
         public void AddGlobalIgnore(string propertyNameStartingWith)
@@ -156,8 +156,11 @@ namespace AutoMapper
         public void Initialize(ConfigurationStore configurator)
         {
             _configurator = configurator;
+            _configurator._formatterProfiles.AddOrUpdate(ProfileName, ProfileConfiguration, (s, configuration) => ProfileConfiguration);
+            if (_configurator._formatterProfiles.Keys.Count == 1)
+                ConfigurationStore.DefaultProfileName = ProfileName;
         }
 
-        public IProfileConfiguration GetProfile => _configurator.GetProfile(ProfileName);
+        public IProfileConfiguration ProfileConfiguration { get; } = new ProfileConfiguration();
     }
 }

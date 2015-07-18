@@ -67,7 +67,7 @@ using System.Text.RegularExpressions;
 
         private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
         {
-            return options.MemberConfigurations[0].MapDestinationPropertyToSource(sourceTypeInfo, destType, destMemberInfo, members);
+            return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(sourceTypeInfo, destType, destMemberInfo, members));
         }
 
         private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo, IProfileConfiguration options)

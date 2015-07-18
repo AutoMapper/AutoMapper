@@ -56,12 +56,10 @@ namespace AutoMapper
             }
         }
 
-        public ICollection<ISourceToDestinationNameMapper> NamedMappers { get; private set; }
+        public ICollection<ISourceToDestinationNameMapper> NamedMappers { get; } = new Collection<ISourceToDestinationNameMapper> {new DefaultName()};
 
         public ParentSourceToDestinationNameMapper()
         {
-            NamedMappers = new Collection<ISourceToDestinationNameMapper>();
-            NamedMappers.Add(new DefaultName());
             GetMembers = SourceToDestinationNameMapperBase.Default;
         }
 
@@ -112,18 +110,10 @@ namespace AutoMapper
     }
     public class PrePostfixName : SourceToDestinationNameMapperBase
     {
-        public ICollection<string> Prefixes { get; }
-        public ICollection<string> Postfixes { get; }
-        public ICollection<string> DestinationPrefixes { get; }
-        public ICollection<string> DestinationPostfixes { get; }
-
-        public PrePostfixName()
-        {
-            Prefixes = new Collection<string>();
-            Postfixes = new Collection<string>();
-            DestinationPrefixes = new Collection<string>();
-            DestinationPostfixes = new Collection<string>();
-        }
+        public ICollection<string> Prefixes { get; } = new Collection<string>();
+        public ICollection<string> Postfixes { get; } = new Collection<string>();
+        public ICollection<string> DestinationPrefixes { get; } = new Collection<string>();
+        public ICollection<string> DestinationPostfixes { get; } = new Collection<string>();
 
         public PrePostfixName AddStrings(Func<PrePostfixName, ICollection<string>> getStringsFunc, params string[] names)
         {
@@ -240,11 +230,10 @@ namespace AutoMapper
             }
         }
 
-        public IList<IChildMemberConfiguration> MemberMappers { get; }
+        public IList<IChildMemberConfiguration> MemberMappers { get; } = new Collection<IChildMemberConfiguration>();
 
         public MemberConfiguration()
         {
-            MemberMappers = new Collection<IChildMemberConfiguration>();
             NameMapper = new ParentSourceToDestinationNameMapper();
             MemberMappers.Add(new DefaultMember { NameMapper = NameMapper });
         }

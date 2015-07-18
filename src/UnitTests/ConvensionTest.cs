@@ -25,11 +25,17 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Fact()
         {
+
             Mapper.AddConvension().Postfix("Dto");
-            Mapper.Initialize(cfg =>
-            {
-                cfg.RecognizePostfixes("Transfer", "Trans");
-            });
+
+            var profile = Mapper.Configuration.CreateProfile("New Profile");
+            profile.ProfileConfiguration.MemberConfigurations.Add(
+                new MemberConfiguration().AddName<PrePostfixName>(
+                    _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
+                        .AddStrings(p => p.Postfixes, "Transfer")
+                        .AddStrings(p => p.DestinationPrefixes, "Trans")
+                        .AddStrings(p => p.Prefixes, "Trans"))
+                        .SetMemberInfo<FieldPropertyMemberInfo>());
 
             var a2 = Mapper.Map<ClientDto>(new Client() { Value= "Test", Transval = "test"});
             a2.ValueTransfer.ShouldEqual("Test");

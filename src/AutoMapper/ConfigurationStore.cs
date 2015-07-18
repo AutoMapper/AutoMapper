@@ -14,7 +14,7 @@ using System.Reflection;
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
         internal readonly ITypeMapFactory _typeMapFactory;
         private readonly IEnumerable<IObjectMapper> _mappers;
-        internal const string DefaultProfileName = "";
+        internal static string DefaultProfileName = "";
 
         private readonly Internal.IDictionary<TypePair, TypeMap> _userDefinedTypeMaps =
             DictionaryFactory.CreateDictionary<TypePair, TypeMap>();
@@ -25,7 +25,7 @@ using System.Reflection;
         private readonly Internal.IDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache =
             DictionaryFactory.CreateDictionary<TypePair, CreateTypeMapExpression>();
 
-        private readonly Internal.IDictionary<string, IProfileConfiguration> _formatterProfiles =
+        internal readonly Internal.IDictionary<string, IProfileConfiguration> _formatterProfiles =
             DictionaryFactory.CreateDictionary<string, IProfileConfiguration>();
 
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
@@ -54,6 +54,8 @@ using System.Reflection;
             get { return GetProfile(DefaultProfileName).ShouldMapField; }
             set { GetProfile(DefaultProfileName).ShouldMapField = value; }
         }
+
+        public IProfileConfiguration ProfileConfiguration => GetProfile(DefaultProfileName);
 
         public bool AllowNullDestinationValues
         {
@@ -622,7 +624,7 @@ using System.Reflection;
         internal IProfileConfiguration GetProfile(string profileName)
         {
             var brandNew = _formatterProfiles.Keys.Count == 0;
-            var expr = _formatterProfiles.GetOrAdd(profileName, name => new ProfileConfig());
+            var expr = _formatterProfiles.GetOrAdd(profileName, name => new ProfileConfiguration());
             if(brandNew)
                 expr.MemberConfigurations[0].AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")).SetMemberInfo<AllMemberInfo>();
 
