@@ -10,12 +10,12 @@ using System.Reflection;
     using Mappers;
 
     public class ConfigurationStore : IConfigurationProvider, IConfiguration
-	{
-	    private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
-	    internal readonly ITypeMapFactory _typeMapFactory;
-	    private readonly IEnumerable<IObjectMapper> _mappers;
-		internal const string DefaultProfileName = "";
-		
+    {
+        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
+        internal readonly ITypeMapFactory _typeMapFactory;
+        private readonly IEnumerable<IObjectMapper> _mappers;
+        internal const string DefaultProfileName = "";
+
         private readonly Internal.IDictionary<TypePair, TypeMap> _userDefinedTypeMaps =
             DictionaryFactory.CreateDictionary<TypePair, TypeMap>();
 
@@ -25,29 +25,29 @@ using System.Reflection;
         private readonly Internal.IDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache =
             DictionaryFactory.CreateDictionary<TypePair, CreateTypeMapExpression>();
 
-        private readonly Internal.IDictionary<string, ProfileConfiguration> _formatterProfiles =
-            DictionaryFactory.CreateDictionary<string, ProfileConfiguration>();
+        private readonly Internal.IDictionary<string, IProfileConfiguration> _formatterProfiles =
+            DictionaryFactory.CreateDictionary<string, IProfileConfiguration>();
 
-		private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
+        private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
-	    private readonly List<string> _globalIgnore;
+        private readonly List<string> _globalIgnore;
 
-	    public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
-		{
-		    _typeMapFactory = typeMapFactory;
-		    _mappers = mappers;
+        public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers)
+        {
+            _typeMapFactory = typeMapFactory;
+            _mappers = mappers;
             _globalIgnore = new List<string>();
-		}
+        }
 
-	    public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
+        public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
 
         public Func<Type, object> ServiceCtor => _serviceCtor;
 
         public Func<PropertyInfo, bool> ShouldMapProperty
-	    {
+        {
             get { return GetProfile(DefaultProfileName).ShouldMapProperty; }
             set { GetProfile(DefaultProfileName).ShouldMapProperty = value; }
-	    }
+        }
 
         public Func<FieldInfo, bool> ShouldMapField
         {
@@ -55,58 +55,68 @@ using System.Reflection;
             set { GetProfile(DefaultProfileName).ShouldMapField = value; }
         }
 
-	    public bool AllowNullDestinationValues
-		{
-			get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
-			set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }
-		}
+        public bool AllowNullDestinationValues
+        {
+            get { return GetProfile(DefaultProfileName).MapNullSourceValuesAsNull; }
+            set { GetProfile(DefaultProfileName).MapNullSourceValuesAsNull = value; }
+        }
 
-	    public bool AllowNullCollections
-		{
-			get { return GetProfile(DefaultProfileName).AllowNullCollections; }
-			set { GetProfile(DefaultProfileName).AllowNullCollections = value; }
-		}
+        public bool AllowNullCollections
+        {
+            get { return GetProfile(DefaultProfileName).MapNullSourceCollectionsAsNull; }
+            set { GetProfile(DefaultProfileName).MapNullSourceCollectionsAsNull = value; }
+        }
 
-	    public void IncludeSourceExtensionMethods(Assembly assembly)
-	    {
-	        GetProfile(DefaultProfileName).IncludeSourceExtensionMethods(assembly);
-	    }
+        public void IncludeSourceExtensionMethods(Assembly assembly)
+        {
+            GetProfile(DefaultProfileName).IncludeSourceExtensionMethods(assembly);
+        }
 
-	    public INamingConvention SourceMemberNamingConvention
-		{
-			get { return GetProfile(DefaultProfileName).SourceMemberNamingConvention; }
-			set { GetProfile(DefaultProfileName).SourceMemberNamingConvention = value; }
-		}
+        public INamingConvention SourceMemberNamingConvention
+        {
+            get
+            {
+                INamingConvention convention = null;
+                GetProfile(DefaultProfileName).MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
+                return convention;
+            }
+            set { GetProfile(DefaultProfileName).MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
+        }
 
-		public INamingConvention DestinationMemberNamingConvention
-		{
-			get { return GetProfile(DefaultProfileName).DestinationMemberNamingConvention; }
-			set { GetProfile(DefaultProfileName).DestinationMemberNamingConvention = value; }
-		}
+        public INamingConvention DestinationMemberNamingConvention
+        {
+            get
+            {
+                INamingConvention convention = null;
+                GetProfile(DefaultProfileName).MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
+                return convention;
+            }
+            set { GetProfile(DefaultProfileName).MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
+        }
 
-        public IEnumerable<string> Prefixes => GetProfile(DefaultProfileName).Prefixes;
-
-        public IEnumerable<string> Postfixes => GetProfile(DefaultProfileName).Postfixes;
-
-        public IEnumerable<string> DestinationPrefixes => GetProfile(DefaultProfileName).DestinationPrefixes;
-
-        public IEnumerable<string> DestinationPostfixes => GetProfile(DefaultProfileName).DestinationPostfixes;
-
-        public IEnumerable<MemberNameReplacer> MemberNameReplacers => GetProfile(DefaultProfileName).MemberNameReplacers;
-
-        public IEnumerable<AliasedMember> Aliases => GetProfile(DefaultProfileName).Aliases;
-
-        public bool ConstructorMappingEnabled => GetProfile(DefaultProfileName).ConstructorMappingEnabled;
-
-        public bool DataReaderMapperYieldReturnEnabled => GetProfile(DefaultProfileName).DataReaderMapperYieldReturnEnabled;
-
+        public bool DataReaderMapperYieldReturnEnabled { get; set; }
         public IEnumerable<MethodInfo> SourceExtensionMethods => GetProfile(DefaultProfileName).SourceExtensionMethods;
 
-        bool IProfileConfiguration.MapNullSourceValuesAsNull => AllowNullDestinationValues;
+        public bool MapNullSourceValuesAsNull
+        {
+            get { return AllowNullDestinationValues; }
+            set { AllowNullDestinationValues = value; }
+        }
 
-        bool IProfileConfiguration.MapNullSourceCollectionsAsNull => AllowNullCollections;
+        public bool MapNullSourceCollectionsAsNull
+        {
+            get { return AllowNullCollections; }
+            set { AllowNullCollections = value; }
+        }
 
-		public IProfileExpression CreateProfile(string profileName)
+        public IList<IMemberConfiguration> MemberConfigurations
+        {
+            get { return GetProfile(DefaultProfileName).MemberConfigurations; }
+        }
+
+        public bool ConstructorMappingEnabled { get; set; }
+
+        public IProfileExpression CreateProfile(string profileName)
 		{
 			var profileExpression = new Profile(profileName);
 
@@ -166,7 +176,7 @@ using System.Reflection;
                     if (derivedMap != null)
                     {
                         _typeMapPlanCache.AddOrUpdate(typePair, derivedMap, (_, _2) => derivedMap);
-		}
+		            }
                 }
                 foreach (var derivedMap in GetDerivedTypeMaps(typeMap))
                 {
@@ -246,40 +256,40 @@ using System.Reflection;
 
         public void ClearPrefixes()
         {
-            GetProfile(DefaultProfileName).ClearPrefixes();
+            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.Prefixes.Clear());
         }
 
-		public void RecognizePrefixes(params string[] prefixes)
-		{
-			GetProfile(DefaultProfileName).RecognizePrefixes(prefixes);
-		}
-
-		public void RecognizePostfixes(params string[] postfixes)
-		{
-			GetProfile(DefaultProfileName).RecognizePostfixes(postfixes);
-		}
-
-		public void RecognizeAlias(string original, string alias)
-		{
-			GetProfile(DefaultProfileName).RecognizeAlias(original, alias);
-		}
+        public void RecognizeAlias(string original, string alias)
+        {
+            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, alias));
+        }
 
         public void ReplaceMemberName(string original, string newValue)
         {
-            GetProfile(DefaultProfileName).ReplaceMemberName(original, newValue);
+            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
+        }
+
+        public void RecognizePrefixes(params string[] prefixes)
+        {
+            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, prefixes));
+        }
+
+        public void RecognizePostfixes(params string[] postfixes)
+        {
+            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Postfixes, postfixes));
         }
 
         public void RecognizeDestinationPrefixes(params string[] prefixes)
         {
-            GetProfile(DefaultProfileName).RecognizeDestinationPrefixes(prefixes);
+            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPrefixes, prefixes));
         }
 
         public void RecognizeDestinationPostfixes(params string[] postfixes)
         {
-            GetProfile(DefaultProfileName).RecognizeDestinationPostfixes(postfixes);
+            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
         }
 
-		public TypeMap CreateTypeMap(Type source, Type destination)
+        public TypeMap CreateTypeMap(Type source, Type destination)
 		{
 		    return CreateTypeMap(source, destination, DefaultProfileName, MemberList.Destination);
 		}
@@ -609,12 +619,14 @@ using System.Reflection;
             TypeMapCreated?.Invoke(this, new TypeMapCreatedEventArgs(typeMap));
 		}
 
-        internal ProfileConfiguration GetProfile(string profileName)
-		{
-            ProfileConfiguration expr = _formatterProfiles.GetOrAdd(profileName,
-                name => new ProfileConfiguration());
+        internal IProfileConfiguration GetProfile(string profileName)
+        {
+            var brandNew = _formatterProfiles.Keys.Count == 0;
+            var expr = _formatterProfiles.GetOrAdd(profileName, name => new ProfileConfig());
+            if(brandNew)
+                expr.MemberConfigurations[0].AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")).SetMemberInfo<AllMemberInfo>();
 
-		    return expr;
+            return expr;
 		}
 
 	    public void AddGlobalIgnore(string startingwith)

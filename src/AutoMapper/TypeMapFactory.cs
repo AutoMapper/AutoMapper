@@ -20,20 +20,20 @@ using System.Text.RegularExpressions;
 
             return typeInfo;
         }
-        internal static ICollection<ISourceToDestinationMemberMapper> sourceToDestinationMemberMappers = new Collection<ISourceToDestinationMemberMapper>
-        {
-            // Need to do it fixie way for prefix and postfix to work together + not specify match explicitly
-            // Have 3 properties for Members, Methods, And External Methods
-            // Parent goes to all
-            new ParentSourceToDestinationMemberMapper().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.SetPrefixs("Get")).SetMemberInfo<AllMemberInfo>(),
-            //new CustomizedSourceToDestinationMemberMapper().MemberNameMatch().ExtensionNameMatch().ExtensionPrefix("Get").MethodPrefix("Get").MethodNameMatch(),
-        };
+        //internal static ICollection<IChildMemberConfiguration> sourceToDestinationMemberMappers = new Collection<IChildMemberConfiguration>
+        //{
+        //    // Need to do it fixie way for prefix and postfix to work together + not specify match explicitly
+        //    // Have 3 properties for Members, Methods, And External Methods
+        //    // Parent goes to all
+        //    new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")).SetMemberInfo<AllMemberInfo>(),
+        //    //new CustomizedSourceToDestinationMemberMapper().MemberNameMatch().ExtensionNameMatch().ExtensionPrefix("Get").MethodPrefix("Get").MethodNameMatch(),
+        //};
 
         
 
-        internal static readonly ICollection<ISourceToDestinationMemberMapper> def = sourceToDestinationMemberMappers.ToList();
+        //internal static readonly ICollection<IChildMemberConfiguration> def = sourceToDestinationMemberMappers.ToList();
 
-        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options, MemberList memberList)
+        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IProfileConfiguration options, MemberList memberList)
         {
             var sourceTypeInfo = GetTypeInfo(sourceType, options.SourceExtensionMethods);
             var destTypeInfo = GetTypeInfo(destinationType, options.SourceExtensionMethods);
@@ -44,7 +44,7 @@ using System.Text.RegularExpressions;
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (MapDestinationPropertyToSource(sourceTypeInfo, destProperty.GetType(), destProperty.Name, members))
+                if (MapDestinationPropertyToSource(options, sourceTypeInfo, destProperty.GetType(), destProperty.Name, members))
                 {
                     var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
@@ -65,13 +65,12 @@ using System.Text.RegularExpressions;
             return typeMap;
         }
 
-        private bool MapDestinationPropertyToSource(TypeInfo sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
+        private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
         {
-            return sourceToDestinationMemberMappers.Any(s => s.MapDestinationPropertyToSource(sourceTypeInfo, destType, destMemberInfo, members));
+            return options.MemberConfigurations[0].MapDestinationPropertyToSource(sourceTypeInfo, destType, destMemberInfo, members);
         }
 
-        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo,
-                                                IMappingOptions options)
+        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo, IProfileConfiguration options)
         {
             var parameters = new List<ConstructorParameterMap>();
             var ctorParameters = destCtor.GetParameters();
@@ -83,7 +82,7 @@ using System.Text.RegularExpressions;
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (!MapDestinationPropertyToSource(sourceTypeInfo, parameter.GetType(), parameter.Name, members))
+                if (!MapDestinationPropertyToSource(options, sourceTypeInfo, parameter.GetType(), parameter.Name, members))
                     return false;
 
                 var resolvers = members.Select(mi => mi.ToMemberGetter());
@@ -114,7 +113,7 @@ using System.Text.RegularExpressions;
             MemberNameReplacers = new Collection<MemberNameReplacer>();
                         }
 
-        public bool MapDestinationPropertyToSource(TypeInfo sourceType, string nameToSearch, LinkedList<MemberInfo> resolvers, ISourceToDestinationMemberMapper parent)
+        public bool MapDestinationPropertyToSource(TypeInfo sourceType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent)
         {
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;

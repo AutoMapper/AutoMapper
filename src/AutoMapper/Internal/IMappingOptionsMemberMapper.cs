@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -111,10 +112,10 @@ namespace AutoMapper
     }
     public class PrePostfixName : SourceToDestinationNameMapperBase
     {
-        public ICollection<string> Prefixes { get; private set; }
-        public ICollection<string> Postfixes { get; private set; }
-        public ICollection<string> DestinationPrefixes { get; private set; }
-        public ICollection<string> DestinationPostfixes { get; private set; }
+        public ICollection<string> Prefixes { get; }
+        public ICollection<string> Postfixes { get; }
+        public ICollection<string> DestinationPrefixes { get; }
+        public ICollection<string> DestinationPostfixes { get; }
 
         public PrePostfixName()
         {
@@ -124,10 +125,18 @@ namespace AutoMapper
             DestinationPostfixes = new Collection<string>();
         }
 
+        public PrePostfixName AddStrings(Func<PrePostfixName, ICollection<string>> getStringsFunc, params string[] names)
+        {
+            var strings = getStringsFunc(this);
+            foreach (var name in names)
+                strings.Add(name);
+            return this;
+        }
+
         public override MemberInfo GetMatchingMemberInfo(TypeInfo typeInfo, Type destType, string nameToSearch)
         {
-            var possibleSourceNames = PossibleNames(nameToSearch, Prefixes, Postfixes);
-            var possibleDestNames = GetMembers.GetMemberInfos(typeInfo).Select(mi => new { mi, possibles = PossibleNames(mi.Name, DestinationPrefixes, DestinationPostfixes) });
+            var possibleSourceNames = PossibleNames(nameToSearch, DestinationPrefixes, DestinationPostfixes);
+            var possibleDestNames = GetMembers.GetMemberInfos(typeInfo).Select(mi => new { mi, possibles = PossibleNames(mi.Name, Prefixes, Postfixes) });
 
             var all =
                 from sourceName in possibleSourceNames
@@ -167,13 +176,18 @@ namespace AutoMapper
     }
     public class ReplaceName : SourceToDestinationNameMapperBase
     {
-        public ICollection<MemberNameReplacer> MemberNameReplacers { get; private set; }
+        private ICollection<MemberNameReplacer> MemberNameReplacers { get; }
 
         public ReplaceName()
         {
             MemberNameReplacers = new Collection<MemberNameReplacer>();
         }
 
+        public ReplaceName AddReplace(string original, string newValue)
+        {
+            MemberNameReplacers.Add(new MemberNameReplacer(original, newValue));
+            return this;
+        }
         public override MemberInfo GetMatchingMemberInfo(TypeInfo typeInfo, Type destType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch);
@@ -191,7 +205,7 @@ namespace AutoMapper
             return match.destName.mi;
         }
 
-        public IEnumerable<string> PossibleNames(string nameToSearch)
+        private IEnumerable<string> PossibleNames(string nameToSearch)
         {
             return 
                 MemberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))
@@ -200,18 +214,18 @@ namespace AutoMapper
         }
     }
 
-    public interface ISourceToDestinationMemberMapper
+    public interface IChildMemberConfiguration
     {
         IParentSourceToDestinationNameMapper NameMapper { get; set; }
-        bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, ISourceToDestinationMemberMapper parent = null);
+        bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null);
     }
 
-    public interface IParentSourceToDestinationMemberMapper : ISourceToDestinationMemberMapper
+    public interface IMemberConfiguration : IChildMemberConfiguration
     {
-        ICollection<ISourceToDestinationMemberMapper> MemberMappers { get; }
+        IList<IChildMemberConfiguration> MemberMappers { get; }
     }
 
-    public class ParentSourceToDestinationMemberMapper : IParentSourceToDestinationMemberMapper
+    public class MemberConfiguration : IMemberConfiguration
     {
         private IParentSourceToDestinationNameMapper _nameMapper;
 
@@ -226,16 +240,16 @@ namespace AutoMapper
             }
         }
 
-        public ICollection<ISourceToDestinationMemberMapper> MemberMappers { get; private set; }
+        public IList<IChildMemberConfiguration> MemberMappers { get; }
 
-        public ParentSourceToDestinationMemberMapper()
+        public MemberConfiguration()
         {
-            MemberMappers = new Collection<ISourceToDestinationMemberMapper>();
+            MemberMappers = new Collection<IChildMemberConfiguration>();
             NameMapper = new ParentSourceToDestinationNameMapper();
             MemberMappers.Add(new DefaultMember { NameMapper = NameMapper });
         }
 
-        public bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, ISourceToDestinationMemberMapper parent = null)
+        public bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null)
         {
             var foundMap = false;
             foreach (var memberMapper in MemberMappers)
@@ -248,7 +262,7 @@ namespace AutoMapper
         }
     }
 
-    public abstract class MemberBase : ISourceToDestinationMemberMapper
+    public abstract class MemberBase : IChildMemberConfiguration
     {
         private IParentSourceToDestinationNameMapper _nameMapper;
 
@@ -263,7 +277,7 @@ namespace AutoMapper
             //NameMapper = new ParentSourceToDestinationNameMapper();
         }
 
-        public abstract bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, ISourceToDestinationMemberMapper parent = null);
+        public abstract bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null);
     }
 
     public class NameSplitMember : MemberBase
@@ -282,7 +296,7 @@ namespace AutoMapper
             DestinationMemberNamingConvention = new PascalCaseNamingConvention();
         }
 
-        public override bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, ISourceToDestinationMemberMapper parent = null)
+        public override bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null)
         {
             string[] matches = DestinationMemberNamingConvention.SplittingExpression
                        .Matches(nameToSearch)
@@ -331,7 +345,7 @@ namespace AutoMapper
     {
         public IParentSourceToDestinationNameMapper NameMapper { get; set; }
 
-        public override bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, ISourceToDestinationMemberMapper parent = null)
+        public override bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null)
         {
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;
@@ -345,62 +359,43 @@ namespace AutoMapper
 
     public static class ConvensionExtensions
     {
-        public static IParentSourceToDestinationMemberMapper AddMember<TMemberMapper>(this IParentSourceToDestinationMemberMapper self, Action<TMemberMapper> setupAction = null)
-            where TMemberMapper : ISourceToDestinationMemberMapper, new()
+        public static IMemberConfiguration AddMember<TMemberMapper>(this IMemberConfiguration self, Action<TMemberMapper> setupAction = null)
+            where TMemberMapper : IChildMemberConfiguration, new()
         {
-            var child = new TMemberMapper();
-            if (setupAction != null)
-                setupAction(child);
-            self.MemberMappers.Add(child);
+            var child = self.GetOrAdd(_ => (IList)_.MemberMappers, setupAction);
             child.NameMapper = self.NameMapper;
             return self;
         }
-        public static IParentSourceToDestinationMemberMapper AddName<TNameMapper>(this IParentSourceToDestinationMemberMapper self, Action<TNameMapper> setupAction = null)
-           where TNameMapper : ISourceToDestinationNameMapper, new()
+
+        public static IMemberConfiguration AddName<TNameMapper>(this IMemberConfiguration self, Action<TNameMapper> setupAction = null)
+            where TNameMapper : ISourceToDestinationNameMapper, new()
         {
-            var nameMapper = new TNameMapper();
-            if(setupAction != null)
-                setupAction(nameMapper);
-            self.NameMapper.NamedMappers.Add(nameMapper);
-            
-            nameMapper.GetMembers = self.NameMapper.GetMembers;
+            var child = self.GetOrAdd(_ => (IList)_.NameMapper.NamedMappers, setupAction);
+            child.GetMembers = self.NameMapper.GetMembers;
             return self;
         }
-        public static IParentSourceToDestinationMemberMapper SetMemberInfo<TMember>(this IParentSourceToDestinationMemberMapper self, Action<TMember> setupAction = null)
-           where TMember : IGetTypeInfoMembers, new()
+
+        public static IMemberConfiguration SetMemberInfo<TMember>(this IMemberConfiguration self, Action<TMember> setupAction = null)
+            where TMember : IGetTypeInfoMembers, new()
         {
             var nameMapper = new TMember();
-            if(setupAction != null)
-                setupAction(nameMapper);
+            setupAction?.Invoke(nameMapper);
             self.NameMapper.GetMembers = nameMapper;
             return self;
         }
 
-        public static PrePostfixName SetPrefixs(this PrePostfixName self, params string[] prefixes)
+        private static TMemberMapper GetOrAdd<TMemberMapper>(this 
+            IMemberConfiguration self, Func<IMemberConfiguration,IList> getList, Action<TMemberMapper> setupAction = null)
+            where TMemberMapper : new()
         {
-            foreach (var prefix in prefixes)
+            var child = getList(self).OfType<TMemberMapper>().FirstOrDefault();
+            if (child == null)
             {
-                self.Prefixes.Add(prefix);
-                self.DestinationPrefixes.Add(prefix);
+                child = new TMemberMapper();
+                getList(self).Add(child);
             }
-
-            return self;
-        }
-
-        public static PrePostfixName SetPostfixs(this PrePostfixName self, params string[] postfixes)
-        {
-            foreach (var postfix in postfixes)
-            {
-                self.Postfixes.Add(postfix);
-                self.DestinationPostfixes.Add(postfix);
-            }
-            return self;
-        }
-
-        public static ReplaceName AddReplace(this ReplaceName self, string originalValue, string newValue)
-        {
-            self.MemberNameReplacers.Add(new MemberNameReplacer(originalValue, newValue));
-            return self;
+            setupAction?.Invoke(child);
+            return child;
         }
     }
 }

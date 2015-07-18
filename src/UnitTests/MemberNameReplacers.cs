@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests
                 SubAirlinaFlight = 4
             };
 
-            Mapper.AddMemberConvention().AddName<ReplaceName>(_ => _.AddReplace("A", "Ä").AddReplace("i", "í").AddReplace("Airline", "Airlina")).SetMemberInfo<FieldPropertyMemberInfo>();
+            //Mapper.AddMemberConvention().AddName<ReplaceName>(_ => _.AddReplace("A", "Ä").AddReplace("i", "í").AddReplace("Airline", "Airlina")).SetMemberInfo<FieldPropertyMemberInfo>();
             Mapper.CreateMap<Source, Destination>();
             var destination = Mapper.Map<Source, Destination>(source);
 

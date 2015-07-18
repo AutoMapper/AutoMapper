@@ -19,6 +19,7 @@ namespace AutoMapper.UnitTests.Tests
         public StubNamingConvention(Func<Match, string> replaceFunc)
         {
             _replaceFunc = replaceFunc;
+            SeparatorCharacter = "";
         }
 
         public Regex SplittingExpression { get; set; }
@@ -153,9 +154,9 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_map_properties_with_same_name()
         {
-            var mappingOptions = new StubMappingOptions();
-            mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
-            mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            var mappingOptions = new ProfileConfig();
+            //mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
+            //mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 
             var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions, MemberList.Destination);
 
@@ -169,9 +170,8 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private StubMappingOptions _mappingOptions;
-
-
+        private IProfileConfiguration _mappingOptions;
+        
         private class Source
         {
             public SubSource some__source { get; set; }
@@ -189,11 +189,11 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention(s => s.Value[0].ToString().ToUpper() + s.Value.Substring(1)){SeparatorCharacter = "__"};
+            var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__"};
 
-            _mappingOptions = new StubMappingOptions();
-            _mappingOptions.SourceMemberNamingConvention = namingConvention;
-            _mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            _mappingOptions = new ProfileConfig();
+            _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = namingConvention);
+            _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = new PascalCaseNamingConvention());
 
             _factory = new TypeMapFactory();
 
@@ -215,7 +215,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private StubMappingOptions _mappingOptions;
+        private IProfileConfiguration _mappingOptions;
 
         private class Source
         {
@@ -238,9 +238,9 @@ namespace AutoMapper.UnitTests.Tests
 
             namingConvention.SplittingExpression = new Regex(@"[\p{Ll}0-9]*(?=_?)");
 
-            _mappingOptions = new StubMappingOptions();
-            _mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
-            _mappingOptions.DestinationMemberNamingConvention = namingConvention;
+            _mappingOptions = new ProfileConfig();
+            _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = new PascalCaseNamingConvention());
+            _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = namingConvention);
 
             _factory = new TypeMapFactory();
         }
@@ -283,7 +283,9 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_map_properties_with_different_names()
         {
-            Mapper.AddMemberConvention().AddName<ReplaceName>(_ => _.AddReplace("A", "Ä").AddReplace("i", "í").AddReplace("Airline", "Airlina")).SetMemberInfo<FieldPropertyMemberInfo>();
+            Mapper.Configuration.ReplaceMemberName("A", "Ä");
+            Mapper.Configuration.ReplaceMemberName("i", "í");
+            Mapper.Configuration.ReplaceMemberName("Airline", "Airlina");
             
             Mapper.CreateMap<Source,Destination>();
 

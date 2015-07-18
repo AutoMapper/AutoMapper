@@ -26,7 +26,10 @@ namespace AutoMapper.UnitTests
         public void Fact()
         {
             Mapper.AddConvension().Postfix("Dto");
-            Mapper.AddMemberConvention().AddName<PrePostfixName>(_ => _.SetPostfixs("Transfer").SetPrefixs("Trans"));
+            Mapper.Initialize(cfg =>
+            {
+                cfg.RecognizePostfixes("Transfer", "Trans");
+            });
 
             var a2 = Mapper.Map<ClientDto>(new Client() { Value= "Test", Transval = "test"});
             a2.ValueTransfer.ShouldEqual("Test");

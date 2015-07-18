@@ -399,7 +399,6 @@ namespace AutoMapper
 		public static void Reset()
         {
             MapperRegistry.Reset();
-            TypeMapFactory.sourceToDestinationMemberMappers = TypeMapFactory.def.ToList();
             Extensions.ClearExpressionCache();
             _configuration = LazyFactory.Create(_configurationInit);
             _mappingEngine = LazyFactory.Create(_mappingEngineInit);
@@ -432,21 +431,5 @@ namespace AutoMapper
             MapperRegistry.Mappers.Add(newMapper);
             return newMapper;
         }
-        public static void ClearMemberConventions()
-        {
-            TypeMapFactory.sourceToDestinationMemberMappers.Clear();
-        }
-        public static IParentSourceToDestinationMemberMapper AddMemberConvention()
-        {
-            var a = new ParentSourceToDestinationMemberMapper();
-            TypeMapFactory.sourceToDestinationMemberMappers.Add(a);
-            return a;
-        }
-        //public static CustomizedSourceToDestinationMemberMapper AddMemberConvention()
-        //{
-        //    var newConvention = new CustomizedSourceToDestinationMemberMapper();
-        //    TypeMapFactory.sourceToDestinationMemberMappers.Add(newConvention);
-        //    return newConvention;
-        //}
 	}
 }

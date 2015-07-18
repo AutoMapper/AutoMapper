@@ -38,20 +38,24 @@ namespace AutoMapper.UnitTests.Bug
                 
                     Mapper.Initialize(cfg =>
                     {
-                        Mapper.ClearMemberConventions();
-                        Mapper.AddMemberConvention().AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention()).SetMemberInfo<FieldPropertyMemberInfo>();
-                        Mapper.AddMemberConvention().AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention()).SetMemberInfo<FieldPropertyMemberInfo>();
-                        Mapper.CreateMap<Neda, Dario>().ReverseMap();
-                        //cfg.CreateProfile("MyMapperProfile", prf =>
-                        //{
-                        //    prf.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
-                        //    prf.CreateMap<Neda, Dario>();
-                        //});
-                        //cfg.CreateProfile("MyMapperProfile2", prf =>
-                        //{
-                        //    prf.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
-                        //    prf.CreateMap<Dario, Neda>();
-                        //});
+                        //var profile = new Profile("New Profile");
+                        //cfg.AddProfile(profile);
+                        //profile.GetProfile.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention()).SetMemberInfo<FieldPropertyMemberInfo>();
+                        
+                        //profile = new Profile("New Profile");
+                        //cfg.AddProfile(profile);
+                        //profile.GetProfile.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention()).SetMemberInfo<FieldPropertyMemberInfo>();
+                        
+                        cfg.CreateProfile("MyMapperProfile", prf =>
+                        {
+                            prf.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
+                            prf.CreateMap<Neda, Dario>();
+                        });
+                        cfg.CreateProfile("MyMapperProfile2", prf =>
+                        {
+                            prf.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
+                            prf.CreateMap<Dario, Neda>();
+                        });
                     });
             }
 

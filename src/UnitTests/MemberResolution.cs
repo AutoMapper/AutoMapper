@@ -1194,7 +1194,6 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.Initialize(cfg =>
                     {
-                        Mapper.AddMemberConvention().AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = _.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention());
 						cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
 						cfg.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
 						cfg.CreateMap<Source, Destination>();
@@ -1236,7 +1235,6 @@ namespace AutoMapper.UnitTests
 			{
 			    Mapper.Initialize(cfg =>
 			    {
-			        Mapper.AddMemberConvention().AddName<PrePostfixName>(_ => _.SetPrefixs("Foo"));
 			        cfg.RecognizePrefixes("Foo");
 			        cfg.CreateMap<Source, Destination>();
 			    });
@@ -1284,7 +1282,6 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.Initialize(cfg =>
 				{
-				    Mapper.AddMemberConvention().AddName<PrePostfixName>(_ => _.SetPrefixs("Foo").SetPostfixs("Bar")).SetMemberInfo<FieldPropertyMemberInfo>();
 					cfg.RecognizePrefixes("Foo");
 					cfg.RecognizePostfixes("Bar");
 					cfg.CreateMap<Source, Destination>();
@@ -1354,7 +1351,6 @@ namespace AutoMapper.UnitTests
 			{
 				Mapper.Initialize(cfg =>
 				{
-                    Mapper.AddMemberConvention().AddName<ReplaceName>(_ => _.AddReplace("Foo","Bar"));
 					cfg.RecognizeAlias("Foo", "Bar");
 					cfg.CreateMap<Source, Destination>();
 				});
@@ -1392,7 +1388,7 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.Initialize(cfg =>
                 {
-                    Mapper.AddMemberConvention().AddName<PrePostfixName>(_ => _.SetPrefixs("Foo", "Bar")).SetMemberInfo<FieldPropertyMemberInfo>();
+                    cfg.RecognizeDestinationPrefixes("Foo", "Bar");
                     cfg.CreateMap<Source, Destination>();
                 });
             }
