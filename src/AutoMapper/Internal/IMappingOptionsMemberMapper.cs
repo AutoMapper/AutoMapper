@@ -207,7 +207,7 @@ namespace AutoMapper
     public interface IChildMemberConfiguration
     {
         IParentSourceToDestinationNameMapper NameMapper { get; set; }
-        bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null);
+        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null);
     }
 
     public interface IMemberConfiguration : IChildMemberConfiguration
@@ -238,12 +238,12 @@ namespace AutoMapper
             MemberMappers.Add(new DefaultMember { NameMapper = NameMapper });
         }
 
-        public bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null)
+        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null)
         {
             var foundMap = false;
             foreach (var memberMapper in MemberMappers)
             {
-                foundMap = memberMapper.MapDestinationPropertyToSource(sourceType, destType, nameToSearch, resolvers,this);
+                foundMap = memberMapper.MapDestinationPropertyToSource(options, sourceType, destType, nameToSearch, resolvers,this);
                 if (foundMap)
                     break;
             }
@@ -266,7 +266,7 @@ namespace AutoMapper
             //NameMapper = new ParentSourceToDestinationNameMapper();
         }
 
-        public abstract bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null);
+        public abstract bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null);
     }
 
     public class NameSplitMember : MemberBase
@@ -285,7 +285,7 @@ namespace AutoMapper
             DestinationMemberNamingConvention = new PascalCaseNamingConvention();
         }
 
-        public override bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null)
+        public override bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null)
         {
             string[] matches = DestinationMemberNamingConvention.SplittingExpression
                        .Matches(nameToSearch)
@@ -303,7 +303,7 @@ namespace AutoMapper
                 {
                     resolvers.AddLast(matchingMemberInfo);
 
-                    var foundMatch = parent.MapDestinationPropertyToSource(TypeMapFactory.GetTypeInfo(matchingMemberInfo.GetMemberType(), SourceExtensionMethods), destType, snippet.Second, resolvers);
+                    var foundMatch = parent.MapDestinationPropertyToSource(options, TypeMapFactory.GetTypeInfo(matchingMemberInfo.GetMemberType(), options), destType, snippet.Second, resolvers);
 
                     if (!foundMatch)
                         resolvers.RemoveLast();
@@ -334,7 +334,7 @@ namespace AutoMapper
     {
         public IParentSourceToDestinationNameMapper NameMapper { get; set; }
 
-        public override bool MapDestinationPropertyToSource(TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent = null)
+        public override bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null)
         {
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;

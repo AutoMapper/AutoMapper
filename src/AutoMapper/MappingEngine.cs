@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AutoMapper
 {
 using System;
@@ -16,7 +18,7 @@ using System.Linq;
 
 	    private bool _disposed;
 		private readonly IConfigurationProvider _configurationProvider;
-	    internal readonly IObjectMapper[] _mappers;
+	    internal readonly IEnumerable<IObjectMapper> _mappers;
 	    internal readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache = DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>();
 	    private readonly Func<Type, object> _serviceCtor;
 
@@ -229,7 +231,7 @@ using System.Linq;
 				var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
                 Func<TypePair, IObjectMapper> missFunc =
-                    tp => _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
+                    tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
 
 			    IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
 

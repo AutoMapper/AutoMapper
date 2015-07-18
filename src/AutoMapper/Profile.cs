@@ -92,12 +92,12 @@ namespace AutoMapper
             return map;
         }
 
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType)
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType, string profileName = ConfigurationStore.DefaultProfileName)
         {
             return CreateMap(sourceType, destinationType, MemberList.Destination);
         }
 
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName = ConfigurationStore.DefaultProfileName)
         {
             var map = _configurator.CreateMap(sourceType, destinationType, memberList, ProfileName);
 
@@ -157,8 +157,6 @@ namespace AutoMapper
         {
             _configurator = configurator;
             _configurator._formatterProfiles.AddOrUpdate(ProfileName, ProfileConfiguration, (s, configuration) => ProfileConfiguration);
-            if (_configurator._formatterProfiles.Keys.Count == 1)
-                ConfigurationStore.DefaultProfileName = ProfileName;
         }
 
         public IProfileConfiguration ProfileConfiguration { get; } = new ProfileConfiguration();

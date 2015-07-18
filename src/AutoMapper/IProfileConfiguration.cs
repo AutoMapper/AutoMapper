@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
@@ -20,6 +21,8 @@ namespace AutoMapper
 		bool MapNullSourceCollectionsAsNull { get; set; }
 
         IList<IMemberConfiguration> MemberConfigurations { get; }
+        IList<IConditionalObjectMapper> TypeConfigurations { get; }
+        IConditionalObjectMapper AddConditionalObjectMapper(string profile = ConfigurationStore.DefaultProfileName);
         bool ConstructorMappingEnabled { get; set; }
         bool DataReaderMapperYieldReturnEnabled { get; set; }
 

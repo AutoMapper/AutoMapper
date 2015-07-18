@@ -424,12 +424,5 @@ namespace AutoMapper
 	    {
             Configuration.AddGlobalIgnore(startingwith);
 	    }
-
-        public static CreateMapBasedOnCriteriaMapper AddConvension()
-        {
-            var newMapper = CreateMapBasedOnCriteriaMapper.New;
-            MapperRegistry.Mappers.Add(newMapper);
-            return newMapper;
-        }
 	}
 }

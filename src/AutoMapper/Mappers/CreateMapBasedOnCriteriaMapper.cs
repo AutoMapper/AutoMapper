@@ -6,13 +6,25 @@ using AutoMapper.Impl;
 
 namespace AutoMapper.Mappers
 {
-    public class CreateMapBasedOnCriteriaMapper : IObjectMapper
+    public interface IConditionalObjectMapper : IObjectMapper
     {
+        ICollection<Func<ResolutionContext, bool>> Conventions { get; }
+    }
+
+    public class ConditionalObjectMapper : IConditionalObjectMapper
+    {
+        private readonly string _profileName;
+
+        public ConditionalObjectMapper(string profileName)
+        {
+            _profileName = profileName;
+        }
+
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
             var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
-            Func<TypePair, IObjectMapper> missFunc = tp => (context.Engine as MappingEngine)._mappers.FirstOrDefault(m => m.IsMatch(context));
-            var typeMap = mapper.ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType);
+            Func<TypePair, IObjectMapper> missFunc = tp => context.Engine.ConfigurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(context));
+            var typeMap = mapper.ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType, _profileName);
 
             context = context.CreateTypeContext(typeMap, context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
 
@@ -22,38 +34,17 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(ResolutionContext context)
         {
-            return _convensions.All(c => c(context));
+            return Conventions.All(c => c(context));
         }
 
-        private readonly ICollection<Func<ResolutionContext, bool>> _convensions = new Collection<Func<ResolutionContext, bool>>();
-
-        public static CreateMapBasedOnCriteriaMapper New { get { return new CreateMapBasedOnCriteriaMapper(); } }
-        private CreateMapBasedOnCriteriaMapper()
-        {
-            
-        }
-
-        public ICollection<Func<ResolutionContext, bool>> Condition
-        {
-            get { return _convensions; }
-        }
-
-        public bool MatchConvension(ResolutionContext resolutionContext)
-        {
-            return Condition.All(c => c(resolutionContext));
-        }
+        public ICollection<Func<ResolutionContext, bool>> Conventions { get; } = new Collection<Func<ResolutionContext, bool>>();
     }
 
     public static class ConventionGeneratorExtensions
     {
-
-        public static CreateMapBasedOnCriteriaMapper Postfix(this CreateMapBasedOnCriteriaMapper self, string postFix)
+        public static IConditionalObjectMapper Where(this IConditionalObjectMapper self, Func<Type, Type, bool> condition)
         {
-            return self.Where((s, d) => d.Name == s.Name + postFix || s.Name == d.Name + postFix);
-        }
-        public static CreateMapBasedOnCriteriaMapper Where(this CreateMapBasedOnCriteriaMapper self, Func<Type, Type, bool> condition)
-        {
-            self.Condition.Add(rc => condition(rc.SourceType, rc.DestinationType));
+            self.Conventions.Add(rc => condition(rc.SourceType, rc.DestinationType));
             return self;
         }
 

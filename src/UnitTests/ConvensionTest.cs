@@ -26,16 +26,19 @@ namespace AutoMapper.UnitTests
         public void Fact()
         {
 
-            Mapper.AddConvension().Postfix("Dto");
+            //Mapper.AddConvension().Postfix("Dto");
 
-            var profile = Mapper.Configuration.CreateProfile("New Profile");
-            profile.ProfileConfiguration.MemberConfigurations.Add(
-                new MemberConfiguration().AddName<PrePostfixName>(
-                    _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
-                        .AddStrings(p => p.Postfixes, "Transfer")
-                        .AddStrings(p => p.DestinationPrefixes, "Trans")
-                        .AddStrings(p => p.Prefixes, "Trans"))
-                        .SetMemberInfo<FieldPropertyMemberInfo>());
+            Mapper.Initialize(cfg =>
+            {
+                var profile = cfg.CreateProfile("New Profile");
+                profile.ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(
+                        _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
+                            .AddStrings(p => p.Postfixes, "Transfer")
+                            .AddStrings(p => p.DestinationPrefixes, "Trans")
+                            .AddStrings(p => p.Prefixes, "Trans"))
+                            .SetMemberInfo<FieldPropertyMemberInfo>();
+                profile.ProfileConfiguration.AddConditionalObjectMapper("New Profile").Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
+            });
 
             var a2 = Mapper.Map<ClientDto>(new Client() { Value= "Test", Transval = "test"});
             a2.ValueTransfer.ShouldEqual("Test");

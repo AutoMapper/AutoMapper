@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AutoMapper
 {
     using System;
@@ -94,7 +96,7 @@ namespace AutoMapper
         /// Get all configured mappers
         /// </summary>
         /// <returns>List of mappers</returns>
-        IObjectMapper[] GetMappers();
+        IEnumerable<IObjectMapper> GetMappers();
 
         /// <summary>
         /// Creates a <see cref="TypeMap"/> based on a source and destination type
@@ -102,7 +104,7 @@ namespace AutoMapper
         /// <param name="sourceType">Source type</param>
         /// <param name="destinationType">Destination type</param>
         /// <returns>Type map configuration</returns>
-        TypeMap CreateTypeMap(Type sourceType, Type destinationType);
+        TypeMap CreateTypeMap(Type sourceType, Type destinationType, string profileName = ConfigurationStore.DefaultProfileName);
 
         /// <summary>
         /// Fired each time a type map is created

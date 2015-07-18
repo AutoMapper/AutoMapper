@@ -14,7 +14,7 @@ using System.Reflection;
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
         internal readonly ITypeMapFactory _typeMapFactory;
         private readonly IEnumerable<IObjectMapper> _mappers;
-        internal static string DefaultProfileName = "";
+        internal const string DefaultProfileName = "";
 
         private readonly Internal.IDictionary<TypePair, TypeMap> _userDefinedTypeMaps =
             DictionaryFactory.CreateDictionary<TypePair, TypeMap>();
@@ -114,6 +114,15 @@ using System.Reflection;
         public IList<IMemberConfiguration> MemberConfigurations
         {
             get { return GetProfile(DefaultProfileName).MemberConfigurations; }
+        }
+
+        public IList<IConditionalObjectMapper> TypeConfigurations => GetProfile(DefaultProfileName).TypeConfigurations;
+
+        public IConditionalObjectMapper AddConditionalObjectMapper(string profile = DefaultProfileName)
+        {
+            var condition = new ConditionalObjectMapper(profile);
+            TypeConfigurations.Add(condition);
+            return condition;
         }
 
         public bool ConstructorMappingEnabled { get; set; }
@@ -228,7 +237,7 @@ using System.Reflection;
             return CreateMappingExpression<TSource, TDestination>(typeMap);
         }
 
-		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
+		public IMappingExpression CreateMap(Type sourceType, Type destinationType, string profileName = DefaultProfileName)
 		{
 		    return CreateMap(sourceType, destinationType, MemberList.Destination);
 		}
@@ -291,9 +300,9 @@ using System.Reflection;
             GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
         }
 
-        public TypeMap CreateTypeMap(Type source, Type destination)
+        public TypeMap CreateTypeMap(Type source, Type destination, string profileName = DefaultProfileName)
 		{
-		    return CreateTypeMap(source, destination, DefaultProfileName, MemberList.Destination);
+		    return CreateTypeMap(source, destination, profileName, MemberList.Destination);
 		}
 
 		public TypeMap CreateTypeMap(Type source, Type destination, string profileName, MemberList memberList)
@@ -471,9 +480,9 @@ using System.Reflection;
             AssertConfigurationIsValid(_userDefinedTypeMaps.Values);
 		}
 
-	    public IObjectMapper[] GetMappers()
+	    public IEnumerable<IObjectMapper> GetMappers()
 	    {
-	        return _mappers.ToArray();
+	        return _mappers.Concat(_formatterProfiles.Values.SelectMany(p => p.TypeConfigurations));
 	    }
 
 		private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(TypeMap typeMap)

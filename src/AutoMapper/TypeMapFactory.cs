@@ -14,9 +14,9 @@ using System.Text.RegularExpressions;
         private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
             = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeInfo>();
 
-        internal static TypeInfo GetTypeInfo(Type type, IEnumerable<MethodInfo> extensionMethodsToSearch)
+        internal static TypeInfo GetTypeInfo(Type type, IProfileConfiguration profileConfiguration)
         {
-            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, Mapper.Configuration.ShouldMapProperty, Mapper.Configuration.ShouldMapField, extensionMethodsToSearch));
+            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, profileConfiguration.ShouldMapProperty, profileConfiguration.ShouldMapField, profileConfiguration.SourceExtensionMethods));
 
             return typeInfo;
         }
@@ -35,8 +35,8 @@ using System.Text.RegularExpressions;
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IProfileConfiguration options, MemberList memberList)
         {
-            var sourceTypeInfo = GetTypeInfo(sourceType, options.SourceExtensionMethods);
-            var destTypeInfo = GetTypeInfo(destinationType, options.SourceExtensionMethods);
+            var sourceTypeInfo = GetTypeInfo(sourceType, options);
+            var destTypeInfo = GetTypeInfo(destinationType, options);
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
 
@@ -67,7 +67,7 @@ using System.Text.RegularExpressions;
 
         private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
         {
-            return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(sourceTypeInfo, destType, destMemberInfo, members));
+            return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(options, sourceTypeInfo, destType, destMemberInfo, members));
         }
 
         private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo, IProfileConfiguration options)

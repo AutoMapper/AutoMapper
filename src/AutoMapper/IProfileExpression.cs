@@ -33,7 +33,7 @@ namespace AutoMapper
         /// <param name="sourceType">Source type</param>
         /// <param name="destinationType">Destination type</param>
         /// <returns>Mapping expression for more configuration options</returns>
-        IMappingExpression CreateMap(Type sourceType, Type destinationType);
+        IMappingExpression CreateMap(Type sourceType, Type destinationType, string profileName = ConfigurationStore.DefaultProfileName);
 
         /// <summary>
         /// Creates a mapping configuration from the source type to the destination type.
@@ -43,7 +43,7 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type</param>
         /// <param name="memberList">Member list to validate</param>
         /// <returns>Mapping expression for more configuration options</returns>
-        IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList);
+        IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName = ConfigurationStore.DefaultProfileName);
 
         /// <summary>
         /// Clear the list of recognized prefixes.
