@@ -114,7 +114,7 @@ namespace AutoMapper.Internal
             if (targetType == oldType)
                 return newType;
 
-            if (targetType.IsGenericType)
+            if (targetType.IsGenericType())
             {
                 var genSubArgs = targetType.GetGenericArguments();
                 var newGenSubArgs = new Type[genSubArgs.Length];
@@ -124,19 +124,6 @@ namespace AutoMapper.Internal
             }
 
             return targetType;
-        }
-
-        public static bool IsStatic(this MemberInfo accessorCandidate)
-        {
-            var fieldInfo = accessorCandidate as FieldInfo;
-            if (fieldInfo != null && fieldInfo.IsStatic)
-                return true;
-
-            var propertyInfo = accessorCandidate as PropertyInfo;
-            if (propertyInfo != null && ((propertyInfo.CanRead && propertyInfo.GetGetMethod().IsStatic) || (propertyInfo.CanWrite && propertyInfo.GetSetMethod().IsStatic)))
-                return true;
-
-            return false;
         }
 	}
 }

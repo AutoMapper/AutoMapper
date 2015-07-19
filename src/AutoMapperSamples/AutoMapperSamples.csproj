@@ -95,7 +95,6 @@
     <Compile Include="Mappers\Arrays.cs" />
     <Compile Include="Mappers\Query.cs" />
     <Compile Include="Mappers\QuerySourceInjection.cs" />
-    <Compile Include="Mappers\Strings.cs" />
     <Compile Include="Mappers\TypeConverters.cs" />
     <Compile Include="NestedMappings.cs" />
     <Compile Include="Projection.cs" />

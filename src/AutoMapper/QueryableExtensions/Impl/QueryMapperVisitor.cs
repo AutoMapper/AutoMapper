@@ -79,7 +79,11 @@ namespace AutoMapper.QueryableExtensions.Impl
             // It is needed when PropertyMap is changing type of property
             if (left.Type != right.Type && right.NodeType == ExpressionType.Constant)
             {
+#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || WINDOWS_PHONE
                 var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, Thread.CurrentThread.CurrentCulture);
+#else
+                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type);
+#endif
                 right = Expression.Constant(value, left.Type);
             }
             //    right = Expression.(right, left.Type);
@@ -152,7 +156,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private Type ChangeLambdaArgTypeFormSourceToDest(Type lambdaType, Type returnType)
         {
-            if (lambdaType.IsGenericType)
+            if (lambdaType.IsGenericType())
             {
                 var genArgs = lambdaType.GetGenericArguments();
                 var newGenArgs = genArgs.Select(t => t.ReplaceItemType(_sourceType, _destinationType)).ToArray();
@@ -164,93 +168,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                 return genericTypeDef.MakeGenericType(newGenArgs);
             }
             return lambdaType;
-        }
-    }
-
-    public class MemberAccessQueryMapperVisitor : ExpressionVisitor
-    {
-        private readonly ExpressionVisitor _rootVisitor;
-        private readonly IMappingEngine _mappingEngine;
-
-        public MemberAccessQueryMapperVisitor(ExpressionVisitor rootVisitor, IMappingEngine mappingEngine)
-        {
-            _rootVisitor = rootVisitor;
-            _mappingEngine = mappingEngine;
-        }
-
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            Expression parentExpr = _rootVisitor.Visit(node.Expression);
-            if (parentExpr != null)
-            {
-                var propertyMap = _mappingEngine.GetPropertyMap(node.Member, parentExpr.Type);
-
-                var newMember = Expression.MakeMemberAccess(parentExpr, propertyMap.DestinationProperty.MemberInfo);
-
-                return newMember;
-            }
-            return node;
-        }
-
-    }
-
-    public class OrderByQueryMapperVisitor : ExpressionVisitor
-    {
-        private readonly ExpressionVisitor _rootVisitor;
-
-        public OrderByQueryMapperVisitor(ExpressionVisitor rootVisitor)
-        {
-            _rootVisitor = rootVisitor;
-        }
-
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            return base.VisitMethodCall(node);
-        }
-
-        protected override Expression VisitLambda<T>(Expression<T> node)
-        {
-            return base.VisitLambda(node);
-        }
-
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            return base.VisitMember(node);
-        }
-
-        protected override Expression VisitParameter(ParameterExpression node)
-        {
-            return base.VisitParameter(node);
-        }
-    }
-
-    public static class QueryMapperHelper
-    {
-        public static PropertyMap GetPropertyMap(this IMappingEngine mappingEngine, MemberInfo sourceMemberInfo, Type destinationMemberType)
-        {
-            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(sourceMemberInfo.ReflectedType, destinationMemberType);
-
-            if (typeMap == null)
-            {
-                const string MessageFormat = "Missing map from {0} to {1}. " +
-                                             "Create using Mapper.CreateMap<{0}, {1}>.";
-                var message = string.Format(MessageFormat, sourceMemberInfo.ReflectedType.Name, destinationMemberType.Name);
-                throw new InvalidOperationException(message);
-            }
-
-            var propertyMap = typeMap.GetPropertyMaps()
-                .FirstOrDefault(pm => pm.CanResolveValue() &&
-                                      pm.SourceMember != null && pm.SourceMember.Name == sourceMemberInfo.Name);
-
-            if (propertyMap == null)
-            {
-                const string MessageFormat = "Missing property map from {0} to {1} for {2} property. " +
-                                             "Create using Mapper.CreateMap<{0}, {1}>.";
-                var message = string.Format(MessageFormat, sourceMemberInfo.ReflectedType.Name, destinationMemberType.Name,
-                    sourceMemberInfo.Name);
-                throw new InvalidOperationException(message);
-            }
-            return propertyMap;
         }
     }
 }

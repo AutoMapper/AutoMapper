@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using AutoMapper.Internal;
-using AutoMapper.QueryableExtensions.Impl;
-
-namespace AutoMapper.Mappers
+﻿namespace AutoMapper.Mappers
 {
+    using System;
+    using System.Collections.Generic;
+    using QueryableExtensions.Impl;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -23,10 +20,10 @@ namespace AutoMapper.Mappers
                 throw new AutoMapperMappingException("Source and destination expressions must be of the same type.");
 
             var destArgType = destDelegateType.GetGenericArguments()[0];
-            if (destArgType.IsGenericType)
+            if (destArgType.IsGenericType())
                 destArgType = destArgType.GetGenericArguments()[0];
             var sourceArgType = sourceDelegateType.GetGenericArguments()[0];
-            if (sourceArgType.IsGenericType)
+            if (sourceArgType.IsGenericType())
                 sourceArgType = sourceArgType.GetGenericArguments()[0];
 
             var typeMap = Mapper.FindTypeMapFor(destArgType, sourceArgType);
@@ -110,7 +107,7 @@ namespace AutoMapper.Mappers
 
             private static Type GetConvertingTypeIfExists(IList<Expression> args, Type t, IList<Expression> arguments)
             {
-                var matchingArgument = args.Where(a => !a.Type.IsGenericType).FirstOrDefault(a => a.Type == t);
+                var matchingArgument = args.Where(a => !a.Type.IsGenericType()).FirstOrDefault(a => a.Type == t);
                 if (matchingArgument != null)
                 {
                     var index = args.IndexOf(matchingArgument);
@@ -119,7 +116,7 @@ namespace AutoMapper.Mappers
                     return arguments[index].Type;
                 }
 
-                var matchingEnumerableArgument = args.Where(a => a.Type.IsGenericType).FirstOrDefault(a => a.Type.GetGenericArguments()[0] == t);
+                var matchingEnumerableArgument = args.Where(a => a.Type.IsGenericType()).FirstOrDefault(a => a.Type.GetGenericArguments()[0] == t);
                 var index2 = args.IndexOf(matchingEnumerableArgument);
                 if (index2 < 0) 
                     return t;
@@ -210,7 +207,7 @@ namespace AutoMapper.Mappers
                     var sourceParamType = expression.Parameters[i].Type;
                     foreach (var destParamType in _destSubTypes.Where(dt => dt != sourceParamType))
                     {
-                        var a = destParamType.IsGenericType ? destParamType.GetGenericArguments()[0]: destParamType;
+                        var a = destParamType.IsGenericType() ? destParamType.GetGenericArguments()[0]: destParamType;
                         var typeMap = Mapper.FindTypeMapFor(a, sourceParamType);
 
                         if (typeMap == null)
