@@ -79,12 +79,12 @@ namespace AutoMapper
             return map;
         }
 
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType, string profileName = ConfigurationStore.DefaultProfileName)
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType)
         {
             return CreateMap(sourceType, destinationType, MemberList.Destination);
         }
 
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName = ConfigurationStore.DefaultProfileName)
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
         {
             var map = _configurator.CreateMap(sourceType, destinationType, memberList, ProfileName);
 
@@ -151,9 +151,9 @@ namespace AutoMapper
 
         public IList<IMemberConfiguration> MemberConfigurations { get; } = new List<IMemberConfiguration>();
         public IList<IConditionalObjectMapper> TypeConfigurations { get; } = new List<IConditionalObjectMapper>();
-        public IConditionalObjectMapper AddConditionalObjectMapper(string profile = ConfigurationStore.DefaultProfileName)
+        public IConditionalObjectMapper AddConditionalObjectMapper()
         {
-            var condition = new ConditionalObjectMapper(profile);
+            var condition = new ConditionalObjectMapper(ProfileName);
             TypeConfigurations.Add(condition);
             return condition;
         }

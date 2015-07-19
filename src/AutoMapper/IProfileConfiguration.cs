@@ -12,7 +12,7 @@ namespace AutoMapper
 	{
         IList<IMemberConfiguration> MemberConfigurations { get; }
         IList<IConditionalObjectMapper> TypeConfigurations { get; }
-        IConditionalObjectMapper AddConditionalObjectMapper(string profile = ConfigurationStore.DefaultProfileName);
+        IConditionalObjectMapper AddConditionalObjectMapper();
         bool ConstructorMappingEnabled { get; set; }
         bool DataReaderMapperYieldReturnEnabled { get; set; }
 

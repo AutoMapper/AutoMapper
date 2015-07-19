@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
                             .AddStrings(p => p.DestinationPrefixes, "Trans")
                             .AddStrings(p => p.Prefixes, "Trans"))
                             .SetMemberInfo<FieldPropertyMemberInfo>();
-                profile.AddConditionalObjectMapper("New Profile").Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
+                profile.AddConditionalObjectMapper().Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
             });
 
             var a2 = Mapper.Map<ClientDto>(new Client() { Value= "Test", Transval = "test"});
@@ -63,7 +63,7 @@ namespace AutoMapper.UnitTests
                             .AddStrings(p => p.DestinationPrefixes, "Trans")
                             .AddStrings(p => p.Prefixes, "Trans"))
                             .SetMemberInfo<FieldPropertyMemberInfo>();
-                AddConditionalObjectMapper("New Profile").Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
+                AddConditionalObjectMapper().Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
             }
         }
         public void Fact2()

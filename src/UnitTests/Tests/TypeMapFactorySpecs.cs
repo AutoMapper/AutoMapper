@@ -234,9 +234,7 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention(s => s.Value.ToLower());
-
-            namingConvention.SplittingExpression = new Regex(@"[\p{Ll}0-9]*(?=__?)");
+            var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
 
             _mappingOptions = new Profile("Test");
             _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = new PascalCaseNamingConvention());

@@ -55,8 +55,6 @@ using System.Reflection;
             set { GetProfile(DefaultProfileName).ShouldMapField = value; }
         }
 
-        public IProfileConfiguration ProfileConfiguration => GetProfile(DefaultProfileName);
-
         public bool AllowNullDestinationValues
         {
             get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
@@ -118,9 +116,9 @@ using System.Reflection;
 
         public IList<IConditionalObjectMapper> TypeConfigurations => GetProfile(DefaultProfileName).TypeConfigurations;
 
-        public IConditionalObjectMapper AddConditionalObjectMapper(string profile = DefaultProfileName)
+        public IConditionalObjectMapper AddConditionalObjectMapper()
         {
-            var condition = new ConditionalObjectMapper(profile);
+            var condition = new ConditionalObjectMapper(DefaultProfileName);
             TypeConfigurations.Add(condition);
             return condition;
         }
@@ -237,7 +235,7 @@ using System.Reflection;
             return CreateMappingExpression<TSource, TDestination>(typeMap);
         }
 
-		public IMappingExpression CreateMap(Type sourceType, Type destinationType, string profileName = DefaultProfileName)
+		public IMappingExpression CreateMap(Type sourceType, Type destinationType)
 		{
 		    return CreateMap(sourceType, destinationType, MemberList.Destination);
 		}
