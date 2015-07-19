@@ -10,12 +10,13 @@ namespace AutoMapper
     /// </summary>
 	public interface IProfileConfiguration
 	{
-        IList<IMemberConfiguration> MemberConfigurations { get; }
-        IList<IConditionalObjectMapper> TypeConfigurations { get; }
+        IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
+        IMemberConfiguration AddMemberConfiguration();
+        IEnumerable<IConditionalObjectMapper> TypeConfigurations { get; }
         IConditionalObjectMapper AddConditionalObjectMapper();
         bool ConstructorMappingEnabled { get; set; }
         bool DataReaderMapperYieldReturnEnabled { get; set; }
-
+        IMemberConfiguration DefaultMemberConfig { get; }
         /// <summary>
         /// Source extension methods included for search
         /// </summary>

@@ -77,10 +77,10 @@ using System.Reflection;
             get
             {
                 INamingConvention convention = null;
-                GetProfile(DefaultProfileName).MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
+                GetProfile(DefaultProfileName).DefaultMemberConfig.AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
                 return convention;
             }
-            set { GetProfile(DefaultProfileName).MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
+            set { GetProfile(DefaultProfileName).DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
         }
 
         public INamingConvention DestinationMemberNamingConvention
@@ -88,38 +88,29 @@ using System.Reflection;
             get
             {
                 INamingConvention convention = null;
-                GetProfile(DefaultProfileName).MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
+                GetProfile(DefaultProfileName).DefaultMemberConfig.AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
                 return convention;
             }
-            set { GetProfile(DefaultProfileName).MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
+            set { GetProfile(DefaultProfileName).DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
         public bool DataReaderMapperYieldReturnEnabled { get; set; }
         public IEnumerable<MethodInfo> SourceExtensionMethods => GetProfile(DefaultProfileName).SourceExtensionMethods;
 
-        public bool MapNullSourceValuesAsNull
+        public IEnumerable<IMemberConfiguration> MemberConfigurations => GetProfile(DefaultProfileName).MemberConfigurations;
+
+        public IMemberConfiguration DefaultMemberConfig => GetProfile(DefaultProfileName).DefaultMemberConfig;
+        public IMemberConfiguration AddMemberConfiguration()
         {
-            get { return AllowNullDestinationValues; }
-            set { AllowNullDestinationValues = value; }
+            return GetProfile(DefaultProfileName).AddMemberConfiguration();
         }
 
-        public bool MapNullSourceCollectionsAsNull
-        {
-            get { return AllowNullCollections; }
-            set { AllowNullCollections = value; }
-        }
-
-        public IList<IMemberConfiguration> MemberConfigurations
-        {
-            get { return GetProfile(DefaultProfileName).MemberConfigurations; }
-        }
-
-        public IList<IConditionalObjectMapper> TypeConfigurations => GetProfile(DefaultProfileName).TypeConfigurations;
+        public IEnumerable<IConditionalObjectMapper> TypeConfigurations => GetProfile(DefaultProfileName).TypeConfigurations;
 
         public IConditionalObjectMapper AddConditionalObjectMapper()
         {
             var condition = new ConditionalObjectMapper(DefaultProfileName);
-            TypeConfigurations.Add(condition);
+            (TypeConfigurations as List<IConditionalObjectMapper>).Add(condition);
             return condition;
         }
 
@@ -265,37 +256,37 @@ using System.Reflection;
 
         public void ClearPrefixes()
         {
-            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.Prefixes.Clear());
+            GetProfile(DefaultProfileName).DefaultMemberConfig.AddName<PrePostfixName>(_ => _.Prefixes.Clear());
         }
 
         public void RecognizeAlias(string original, string alias)
         {
-            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, alias));
+            GetProfile(DefaultProfileName).DefaultMemberConfig.AddName<ReplaceName>(_ => _.AddReplace(original, alias));
         }
 
         public void ReplaceMemberName(string original, string newValue)
         {
-            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
+            GetProfile(DefaultProfileName).DefaultMemberConfig.AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
         }
 
         public void RecognizePrefixes(params string[] prefixes)
         {
-            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, prefixes));
+            GetProfile(DefaultProfileName).DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, prefixes));
         }
 
         public void RecognizePostfixes(params string[] postfixes)
         {
-            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Postfixes, postfixes));
+            GetProfile(DefaultProfileName).DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.Postfixes, postfixes));
         }
 
         public void RecognizeDestinationPrefixes(params string[] prefixes)
         {
-            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPrefixes, prefixes));
+            GetProfile(DefaultProfileName).DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPrefixes, prefixes));
         }
 
         public void RecognizeDestinationPostfixes(params string[] postfixes)
         {
-            GetProfile(DefaultProfileName).MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
+            GetProfile(DefaultProfileName).DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
         }
 
         public TypeMap CreateTypeMap(Type source, Type destination, string profileName = DefaultProfileName)
@@ -632,8 +623,10 @@ using System.Reflection;
         {
             var brandNew = _formatterProfiles.Keys.Count == 0;
             var expr = _formatterProfiles.GetOrAdd(profileName, name => new Profile(profileName));
-            if(brandNew)
-                expr.MemberConfigurations[0].AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")).SetMemberInfo<AllMemberInfo>();
+            if (brandNew)
+            {
+                var temp = expr.DefaultMemberConfig;
+            }
 
             return expr;
 		}

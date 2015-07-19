@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
             Mapper.Initialize(cfg =>
             {
                 var profile = cfg.CreateProfile("New Profile");
-                profile.MemberConfigurations[0].AddName<PrePostfixName>(
+                profile.AddMemberConfiguration().AddName<PrePostfixName>(
                         _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
                             .AddStrings(p => p.Postfixes, "Transfer")
                             .AddStrings(p => p.DestinationPrefixes, "Trans")
@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests
         {
             protected override void Configure()
             {
-                MemberConfigurations[0].AddName<PrePostfixName>(
+                AddMemberConfiguration().AddName<PrePostfixName>(
                         _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
                             .AddStrings(p => p.Postfixes, "Transfer")
                             .AddStrings(p => p.DestinationPrefixes, "Trans")

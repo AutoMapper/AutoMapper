@@ -38,14 +38,6 @@ namespace AutoMapper.UnitTests.Bug
                 
                     Mapper.Initialize(cfg =>
                     {
-                        //var profile = new Profile("New Profile");
-                        //cfg.AddProfile(profile);
-                        //profile.GetProfile.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention()).SetMemberInfo<FieldPropertyMemberInfo>();
-                        
-                        //profile = new Profile("New Profile");
-                        //cfg.AddProfile(profile);
-                        //profile.GetProfile.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention()).SetMemberInfo<FieldPropertyMemberInfo>();
-                        
                         cfg.CreateProfile("MyMapperProfile", prf =>
                         {
                             prf.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();

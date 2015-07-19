@@ -192,8 +192,11 @@ namespace AutoMapper.UnitTests.Tests
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)")};
 
             _mappingOptions = new Profile("Test");
-            _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = namingConvention);
-            _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = new PascalCaseNamingConvention());
+            _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            {
+                _.SourceMemberNamingConvention = namingConvention;
+                _.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            });
 
             _factory = new TypeMapFactory();
 
@@ -237,8 +240,11 @@ namespace AutoMapper.UnitTests.Tests
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
 
             _mappingOptions = new Profile("Test");
-            _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = new PascalCaseNamingConvention());
-            _mappingOptions.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = namingConvention);
+            _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            {
+                _.SourceMemberNamingConvention = new PascalCaseNamingConvention();
+                _.DestinationMemberNamingConvention = namingConvention;
+            });
 
             _factory = new TypeMapFactory();
         }
