@@ -1,24 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-
-namespace AutoMapper.QueryableExtensions.Impl
+﻿namespace AutoMapper.QueryableExtensions.Impl
 {
-    public class SourceInjectedQueryInspector
-    {
-        public SourceInjectedQueryInspector()
-        {
-            SourceResult = (e,o) => { };
-            DestResult = o => { };
-            StartQueryExecuteInterceptor = (t, e) => { };
-        }
-        public Action<Expression, object> SourceResult { get; set; }
-        public Action<object> DestResult { get; set; }
-        public Action<Type, Expression> StartQueryExecuteInterceptor { get; set; }
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
 
-    }
     public class SourceInjectedQuery<TSource, TDestination> : IOrderedQueryable<TDestination>
     {
         public SourceInjectedQuery(IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
@@ -26,7 +13,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
-            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(this, mappingEngine, dataSource, destQuery)
+            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mappingEngine, dataSource, destQuery)
             {
                 Inspector = inspector ?? new SourceInjectedQueryInspector()
             };
@@ -49,9 +36,9 @@ namespace AutoMapper.QueryableExtensions.Impl
             return GetEnumerator();
         }
 
-        public Type ElementType { get; private set; }
-        public Expression Expression { get; private set; }
-        public IQueryProvider Provider { get; private set; }
+        public Type ElementType { get; }
+        public Expression Expression { get; }
+        public IQueryProvider Provider { get; }
     }
 
 

@@ -1,22 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using AutoMapper.Impl;
-using AutoMapper.Internal;
-
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using System.Threading;
+    using Internal;
+
     public class QueryMapperVisitor : ExpressionVisitor
     {
         private readonly IQueryable _destQuery;
         private readonly ParameterExpression _instanceParameter;
-        private readonly IMappingEngine _mappingEngine;
-        private Type _sourceType;
-        private Type _destinationType;
+        private readonly Type _sourceType;
+        private readonly Type _destinationType;
+        private readonly Stack<object> _tree = new Stack<object>();
+        private readonly Stack<object> _newTree = new Stack<object>();
+        private readonly MemberAccessQueryMapperVisitor _memberVisitor;
+
 
         internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery,
             IMappingEngine mappingEngine)
@@ -24,9 +25,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             _sourceType = sourceType;
             _destinationType = destinationType;
             _destQuery = destQuery;
-            _mappingEngine = mappingEngine;
             _instanceParameter = Expression.Parameter(destinationType, "dto");
-            _memberVisitor = new MemberAccessQueryMapperVisitor(this, _mappingEngine);
+            _memberVisitor = new MemberAccessQueryMapperVisitor(this, mappingEngine);
         }
 
         public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery,
@@ -38,10 +38,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             var newDestQuery = destQuery.Provider.CreateQuery<TDestination>(expr);
             return newDestQuery;
         }
-
-        Stack<object> _tree = new Stack<object>();
-        Stack<object> _newTree = new Stack<object>();
-        private MemberAccessQueryMapperVisitor _memberVisitor;
 
         public override Expression Visit(Expression node)
         {
@@ -86,9 +82,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 #endif
                 right = Expression.Constant(value, left.Type);
             }
-            //    right = Expression.(right, left.Type);
 
-            //var newNode = base.VisitBinary(node);
             return Expression.MakeBinary(node.NodeType, left, right);
         }
 
@@ -108,10 +102,10 @@ namespace AutoMapper.QueryableExtensions.Impl
             if (node.Method.Name == "OrderBy" || node.Method.Name == "OrderByDescending" ||
                     node.Method.Name == "ThenBy" || node.Method.Name == "ThenByDescending")
             {
-                // return VisitOrderBy(node);
+                return VisitOrderBy(node);
             }
 
-            var args = node.Arguments.Select(a => Visit(a)).ToList();
+            var args = node.Arguments.Select(Visit).ToList();
             var newObject = Visit(node.Object);
             var method = ChangeMethodArgTypeFormSourceToDest(node.Method);
 

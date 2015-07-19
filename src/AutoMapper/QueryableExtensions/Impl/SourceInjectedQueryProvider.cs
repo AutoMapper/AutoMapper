@@ -1,26 +1,20 @@
-using System;
-using System.Collections;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using AutoMapper.Impl;
-using AutoMapper.Internal;
-using AutoMapper.Mappers;
-
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    using System;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using Internal;
+    using Mappers;
+
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider
     {
-        private readonly IQueryable<TDestination> _rootQuery;
         private readonly IMappingEngine _mappingEngine;
         private readonly IQueryable<TSource> _dataSource;
         private readonly IQueryable<TDestination> _destQuery;
 
-        public SourceInjectedQueryProvider(IQueryable<TDestination> rootQuery,
-            IMappingEngine mappingEngine,
+        public SourceInjectedQueryProvider(IMappingEngine mappingEngine,
             IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery)
         {
-            _rootQuery = rootQuery;
             _mappingEngine = mappingEngine;
             _dataSource = dataSource;
             _destQuery = destQuery;
@@ -35,8 +29,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            return (IQueryable<TElement>)
-                new SourceInjectedQuery<TSource, TElement>(this, expression);
+            return new SourceInjectedQuery<TSource, TElement>(this, expression);
         }
 
         public object Execute(Expression expression)
@@ -98,8 +91,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             var typeMap = _mappingEngine.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
             var visitor = new ExpressionMapper.MappingVisitor(typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] {typeof (TSource)});
-            //var visitor = new QueryMapperVisitor(typeof(TDestination),
-            //    typeof(TSource), _dataSource, _mappingEngine);
             var sourceExpression = visitor.Visit(expression);
             return sourceExpression;
         }
