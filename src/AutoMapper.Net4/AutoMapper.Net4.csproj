@@ -53,8 +53,458 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\AutoMapper\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+    <Compile Include="..\AutoMapper\AliasedMember.cs">
+      <Link>AliasedMember.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\AutoMapperConfigurationException.cs">
+      <Link>AutoMapperConfigurationException.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\AutoMapperMappingException.cs">
+      <Link>AutoMapperMappingException.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ConfigurationStore.cs">
+      <Link>ConfigurationStore.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Configuration\CreateTypeMapExpression.cs">
+      <Link>Configuration\CreateTypeMapExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ConstructorMap.cs">
+      <Link>ConstructorMap.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ConstructorParameterMap.cs">
+      <Link>ConstructorParameterMap.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IConfiguration.cs">
+      <Link>IConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IConfigurationProvider.cs">
+      <Link>IConfigurationProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IgnoreMapAttribute.cs">
+      <Link>IgnoreMapAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMappingAction.cs">
+      <Link>IMappingAction.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMappingEngine.cs">
+      <Link>IMappingEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMappingEngineRunner.cs">
+      <Link>IMappingEngineRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMappingExpression.cs">
+      <Link>IMappingExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMappingOperationOptions.cs">
+      <Link>IMappingOperationOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMappingOptions.cs">
+      <Link>IMappingOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMemberAccessor.cs">
+      <Link>IMemberAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMemberConfigurationExpression.cs">
+      <Link>IMemberConfigurationExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMemberGetter.cs">
+      <Link>IMemberGetter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IMemberResolver.cs">
+      <Link>IMemberResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\INamingConvention.cs">
+      <Link>INamingConvention.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ConcurrentDictionaryFactory.cs">
+      <Link>Internal\ConcurrentDictionaryFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\DefaultResolver.cs">
+      <Link>Internal\DefaultResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\DeferredInstantiatedConverter.cs">
+      <Link>Internal\DeferredInstantiatedConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\DeferredInstantiatedResolver.cs">
+      <Link>Internal\DeferredInstantiatedResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\DelegateBasedResolver.cs">
+      <Link>Internal\DelegateBasedResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\DelegateBasedResolver2.cs">
+      <Link>Internal\DelegateBasedResolver2.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\DelegateFactory.cs">
+      <Link>Internal\DelegateFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\DictionaryFactory.cs">
+      <Link>Internal\DictionaryFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\EnumerableExtensions.cs">
+      <Link>Internal\EnumerableExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\EnumNameValueMapperFactory.cs">
+      <Link>Internal\EnumNameValueMapperFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\FieldAccessor.cs">
+      <Link>Internal\FieldAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\FieldGetter.cs">
+      <Link>Internal\FieldGetter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IDelegateFactory.cs">
+      <Link>Internal\IDelegateFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IDictionary.cs">
+      <Link>Internal\IDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IDictionaryFactory.cs">
+      <Link>Internal\IDictionaryFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IEnumNameValueMapper.cs">
+      <Link>Internal\IEnumNameValueMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IEnumNameValueMapperFactory.cs">
+      <Link>Internal\IEnumNameValueMapperFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ILazy.cs">
+      <Link>Internal\ILazy.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IMappingOptionsMemberMapper.cs">
+      <Link>Internal\IMappingOptionsMemberMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\INullableConverter.cs">
+      <Link>Internal\INullableConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\INullableConverterFactory.cs">
+      <Link>Internal\INullableConverterFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IProxyGenerator.cs">
+      <Link>Internal\IProxyGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IProxyGeneratorFactory.cs">
+      <Link>Internal\IProxyGeneratorFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IReaderWriterLockSlim.cs">
+      <Link>Internal\IReaderWriterLockSlim.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\IReaderWriterLockSlimFactory.cs">
+      <Link>Internal\IReaderWriterLockSlimFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ISourceToDestinationNameMapper.cs">
+      <Link>Internal\ISourceToDestinationNameMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\LazyFactory.cs">
+      <Link>Internal\LazyFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ManualNullableConverterFactory.cs">
+      <Link>Internal\ManualNullableConverterFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\MappingExpression.cs">
+      <Link>Internal\MappingExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\MemberGetter.cs">
+      <Link>Internal\MemberGetter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\MemberNameReplacer.cs">
+      <Link>Internal\MemberNameReplacer.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\MethodGetter.cs">
+      <Link>Internal\MethodGetter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\NoOpReaderWriterLockFactory.cs">
+      <Link>Internal\NoOpReaderWriterLockFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\NotSupportedEnumNameValueMappingFactory.cs">
+      <Link>Internal\NotSupportedEnumNameValueMappingFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\NotSupportedProxyGeneratorFactory.cs">
+      <Link>Internal\NotSupportedProxyGeneratorFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\NullableConverterFactory.cs">
+      <Link>Internal\NullableConverterFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\NullReferenceExceptionSwallowingResolver.cs">
+      <Link>Internal\NullReferenceExceptionSwallowingResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\NullReplacementMethod.cs">
+      <Link>Internal\NullReplacementMethod.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\PlatformAdapter.cs">
+      <Link>Internal\PlatformAdapter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\PrimitiveExtensions.cs">
+      <Link>Internal\PrimitiveExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\PropertyAccessor.cs">
+      <Link>Internal\PropertyAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\PropertyEmitter.cs">
+      <Link>Internal\PropertyEmitter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\PropertyGetter.cs">
+      <Link>Internal\PropertyGetter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\PropertyNameResolver.cs">
+      <Link>Internal\PropertyNameResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ProxyBase.cs">
+      <Link>Internal\ProxyBase.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ProxyGenerator.cs">
+      <Link>Internal\ProxyGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ProxyGeneratorFactory.cs">
+      <Link>Internal\ProxyGeneratorFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\RealReaderWriterLockSlimFactory.cs">
+      <Link>Internal\RealReaderWriterLockSlimFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ReflectionHelper.cs">
+      <Link>Internal\ReflectionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ResolutionExpression.cs">
+      <Link>Internal\ResolutionExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\TypeExtensions.cs">
+      <Link>Internal\TypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ValueTypeFieldAccessor.cs">
+      <Link>Internal\ValueTypeFieldAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Internal\ValueTypePropertyAccessor.cs">
+      <Link>Internal\ValueTypePropertyAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IObjectMapper.cs">
+      <Link>IObjectMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IProfileConfiguration.cs">
+      <Link>IProfileConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IProfileExpression.cs">
+      <Link>IProfileExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IResolutionExpression.cs">
+      <Link>IResolutionExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IResolverConfigurationExpression.cs">
+      <Link>IResolverConfigurationExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ISourceMemberConfigurationExpression.cs">
+      <Link>ISourceMemberConfigurationExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ITypeConverter.cs">
+      <Link>ITypeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ITypeMapFactory.cs">
+      <Link>ITypeMapFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\IValueResolver.cs">
+      <Link>IValueResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\LowerUnderscoreNamingConvention.cs">
+      <Link>LowerUnderscoreNamingConvention.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mapper.cs">
+      <Link>Mapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ArrayMapper.cs">
+      <Link>Mappers\ArrayMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\AssignableArrayMapper.cs">
+      <Link>Mappers\AssignableArrayMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\AssignableMapper.cs">
+      <Link>Mappers\AssignableMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\CollectionMapper.cs">
+      <Link>Mappers\CollectionMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\CreateMapBasedOnCriteriaMapper.cs">
+      <Link>Mappers\CreateMapBasedOnCriteriaMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\DictionaryMapper.cs">
+      <Link>Mappers\DictionaryMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\EnumerableMapper.cs">
+      <Link>Mappers\EnumerableMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\EnumerableMapperBase.cs">
+      <Link>Mappers\EnumerableMapperBase.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\EnumerableToDictionaryMapper.cs">
+      <Link>Mappers\EnumerableToDictionaryMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\EnumMapper.cs">
+      <Link>Mappers\EnumMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ExplicitConversionOperatorMapper.cs">
+      <Link>Mappers\ExplicitConversionOperatorMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ExpressionMapper.cs">
+      <Link>Mappers\ExpressionMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\FlagsEnumMapper.cs">
+      <Link>Mappers\FlagsEnumMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\HashSetMapper.cs">
+      <Link>Mappers\HashSetMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ImplicitConversionOperatorMapper.cs">
+      <Link>Mappers\ImplicitConversionOperatorMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ITypeMapObjectMapper.cs">
+      <Link>Mappers\ITypeMapObjectMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ListSourceMapper.cs">
+      <Link>Mappers\ListSourceMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\MapperRegistry.cs">
+      <Link>Mappers\MapperRegistry.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\MultidimensionalArrayMapper.cs">
+      <Link>Mappers\MultidimensionalArrayMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\NameValueCollectionMapper.cs">
+      <Link>Mappers\NameValueCollectionMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\NullableMapper.cs">
+      <Link>Mappers\NullableMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\NullableSourceMapper.cs">
+      <Link>Mappers\NullableSourceMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ObjectCreator.cs">
+      <Link>Mappers\ObjectCreator.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\OpenGenericMapper.cs">
+      <Link>Mappers\OpenGenericMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\PrimitiveArrayMapper.cs">
+      <Link>Mappers\PrimitiveArrayMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\ReadOnlyCollectionMapper.cs">
+      <Link>Mappers\ReadOnlyCollectionMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\StringMapper.cs">
+      <Link>Mappers\StringMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\TypeConverterMapper.cs">
+      <Link>Mappers\TypeConverterMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\TypeHelper.cs">
+      <Link>Mappers\TypeHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\TypeMapMapper.cs">
+      <Link>Mappers\TypeMapMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Mappers\TypeMapObjectMapperRegistry.cs">
+      <Link>Mappers\TypeMapObjectMapperRegistry.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\MappingEngine.cs">
+      <Link>MappingEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\MappingOperationOptions.cs">
+      <Link>MappingOperationOptions.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\MemberList.cs">
+      <Link>MemberList.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\PascalCaseNamingConvention.cs">
+      <Link>PascalCaseNamingConvention.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Profile.cs">
+      <Link>Profile.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\PropertyMap.cs">
+      <Link>PropertyMap.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\ExpressionRequest.cs">
+      <Link>QueryableExtensions\ExpressionRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\ExpressionResolutionResult.cs">
+      <Link>QueryableExtensions\ExpressionResolutionResult.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Extensions.cs">
+      <Link>QueryableExtensions\Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\IExpressionBinder.cs">
+      <Link>QueryableExtensions\IExpressionBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\IExpressionResultConverter.cs">
+      <Link>QueryableExtensions\IExpressionResultConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\AssignableExpressionBinder.cs">
+      <Link>QueryableExtensions\Impl\AssignableExpressionBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\CustomProjectionExpressionBinder.cs">
+      <Link>QueryableExtensions\Impl\CustomProjectionExpressionBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\EnumerableExpressionBinder.cs">
+      <Link>QueryableExtensions\Impl\EnumerableExpressionBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\MappedTypeExpressionBinder.cs">
+      <Link>QueryableExtensions\Impl\MappedTypeExpressionBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\MemberGetterExpressionResultConverter.cs">
+      <Link>QueryableExtensions\Impl\MemberGetterExpressionResultConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs">
+      <Link>QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\NullableExpressionBinder.cs">
+      <Link>QueryableExtensions\Impl\NullableExpressionBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs">
+      <Link>QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\ParameterReplacementVisitor.cs">
+      <Link>QueryableExtensions\Impl\ParameterReplacementVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\StringExpressionBinder.cs">
+      <Link>QueryableExtensions\Impl\StringExpressionBinder.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\IProjectionExpression.cs">
+      <Link>QueryableExtensions\IProjectionExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\QueryableExtensions\ProjectionExpression.cs">
+      <Link>QueryableExtensions\ProjectionExpression.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ResolutionContext.cs">
+      <Link>ResolutionContext.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ResolutionResult.cs">
+      <Link>ResolutionResult.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Resources\Resource.Designer.cs">
+      <Link>Resources\Resource.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\SourceMemberConfig.cs">
+      <Link>SourceMemberConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ThreadSafeList.cs">
+      <Link>ThreadSafeList.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\TypeConverter.cs">
+      <Link>TypeConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\TypeInfo.cs">
+      <Link>TypeInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\TypeMap.cs">
+      <Link>TypeMap.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\TypeMapCreatedEventArgs.cs">
+      <Link>TypeMapCreatedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\TypeMapFactory.cs">
+      <Link>TypeMapFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\TypePair.cs">
+      <Link>TypePair.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\ValueResolver.cs">
+      <Link>ValueResolver.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -5,7 +5,7 @@ namespace AutoMapper
     using System;
     using Impl;
 
-    public interface IConfigurationProvider : IProfileConfiguration
+    public interface IConfigurationProvider : IConfiguration
     {
         /// <summary>
         /// Get all configured type maps created
@@ -66,7 +66,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="profileName">Profile name</param>
         /// <returns></returns>
-        IProfileConfiguration GetProfileConfiguration(string profileName);
+        IProfileExpression GetProfileConfiguration(string profileName);
 
 
         /// <summary>

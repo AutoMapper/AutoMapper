@@ -10,16 +10,6 @@ namespace AutoMapper
     /// </summary>
 	public interface IProfileConfiguration
 	{
-        /// <summary>
-        /// Indicates that null source values should be mapped as null
-        /// </summary>
-		bool MapNullSourceValuesAsNull { get; set; }
-
-        /// <summary>
-        /// Indicates that null source collections should be mapped as null
-        /// </summary>
-		bool MapNullSourceCollectionsAsNull { get; set; }
-
         IList<IMemberConfiguration> MemberConfigurations { get; }
         IList<IConditionalObjectMapper> TypeConfigurations { get; }
         IConditionalObjectMapper AddConditionalObjectMapper(string profile = ConfigurationStore.DefaultProfileName);

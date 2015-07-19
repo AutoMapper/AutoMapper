@@ -287,7 +287,7 @@ using System.Linq;
             if (destinationType.IsInterface())
                 destinationType = ProxyGeneratorFactory.Create().GetProxyType(destinationType);
 
-            return !ConfigurationProvider.MapNullSourceValuesAsNull
+            return !ConfigurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(destinationType)
                 : ObjectCreator.CreateObject(destinationType);
 		}
@@ -299,18 +299,18 @@ using System.Linq;
 
 			var typeMap = context.GetContextTypeMap();
 			if (typeMap != null)
-				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
+				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).AllowNullDestinationValues;
 
-			return ConfigurationProvider.MapNullSourceValuesAsNull;
+			return ConfigurationProvider.AllowNullDestinationValues;
 		}
 
         bool IMappingEngineRunner.ShouldMapSourceCollectionAsNull(ResolutionContext context)
 		{
 			var typeMap = context.GetContextTypeMap();
 			if (typeMap != null)
-				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceCollectionsAsNull;
+				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).AllowNullCollections;
 
-            return ConfigurationProvider.MapNullSourceCollectionsAsNull;
+            return ConfigurationProvider.AllowNullCollections;
 		}
 
 		private void ClearTypeMap(object sender, TypeMapCreatedEventArgs e)

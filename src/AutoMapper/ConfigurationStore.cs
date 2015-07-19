@@ -9,7 +9,7 @@ using System.Reflection;
     using Internal;
     using Mappers;
 
-    public class ConfigurationStore : IConfigurationProvider, IConfiguration
+    public class ConfigurationStore : IConfigurationProvider
     {
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
         internal readonly ITypeMapFactory _typeMapFactory;
@@ -25,8 +25,8 @@ using System.Reflection;
         private readonly Internal.IDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache =
             DictionaryFactory.CreateDictionary<TypePair, CreateTypeMapExpression>();
 
-        internal readonly Internal.IDictionary<string, IProfileConfiguration> _formatterProfiles =
-            DictionaryFactory.CreateDictionary<string, IProfileConfiguration>();
+        internal readonly Internal.IDictionary<string, IProfileExpression> _formatterProfiles =
+            DictionaryFactory.CreateDictionary<string, IProfileExpression>();
 
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
@@ -59,14 +59,14 @@ using System.Reflection;
 
         public bool AllowNullDestinationValues
         {
-            get { return GetProfile(DefaultProfileName).MapNullSourceValuesAsNull; }
-            set { GetProfile(DefaultProfileName).MapNullSourceValuesAsNull = value; }
+            get { return GetProfile(DefaultProfileName).AllowNullDestinationValues; }
+            set { GetProfile(DefaultProfileName).AllowNullDestinationValues = value; }
         }
 
         public bool AllowNullCollections
         {
-            get { return GetProfile(DefaultProfileName).MapNullSourceCollectionsAsNull; }
-            set { GetProfile(DefaultProfileName).MapNullSourceCollectionsAsNull = value; }
+            get { return GetProfile(DefaultProfileName).AllowNullCollections; }
+            set { GetProfile(DefaultProfileName).AllowNullCollections = value; }
         }
 
         public void IncludeSourceExtensionMethods(Assembly assembly)
@@ -454,7 +454,7 @@ using System.Reflection;
             }
 		}
 
-		public IProfileConfiguration GetProfileConfiguration(string profileName)
+		public IProfileExpression GetProfileConfiguration(string profileName)
 		{
 			return GetProfile(profileName);
 		}
@@ -630,10 +630,10 @@ using System.Reflection;
             TypeMapCreated?.Invoke(this, new TypeMapCreatedEventArgs(typeMap));
 		}
 
-        internal IProfileConfiguration GetProfile(string profileName)
+        internal IProfileExpression GetProfile(string profileName)
         {
             var brandNew = _formatterProfiles.Keys.Count == 0;
-            var expr = _formatterProfiles.GetOrAdd(profileName, name => new ProfileConfiguration());
+            var expr = _formatterProfiles.GetOrAdd(profileName, name => new Profile(profileName));
             if(brandNew)
                 expr.MemberConfigurations[0].AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")).SetMemberInfo<AllMemberInfo>();
 

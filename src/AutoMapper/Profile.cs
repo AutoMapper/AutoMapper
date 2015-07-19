@@ -1,3 +1,7 @@
+using System.Linq;
+using System.Runtime.CompilerServices;
+using AutoMapper.Mappers;
+
 namespace AutoMapper
 {
     using System;
@@ -12,7 +16,8 @@ namespace AutoMapper
     {
         private ConfigurationStore _configurator;
 
-        internal Profile(string profileName)
+        public Profile(string profileName)
+            :this()
         {
             ProfileName = profileName;
         }
@@ -20,53 +25,35 @@ namespace AutoMapper
         protected Profile()
         {
             ProfileName = GetType().FullName;
+
+            MemberConfigurations.Add(new MemberConfiguration());
+            AllowNullDestinationValues = true;
+            ConstructorMappingEnabled = true;
+            IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
+            ShouldMapProperty = p => p.IsPublic();
+            ShouldMapField = f => f.IsPublic;
         }
 
         public string ProfileName { get; }
 
         public void DisableConstructorMapping()
         {
-            ProfileConfiguration.ConstructorMappingEnabled = false;
+            ConstructorMappingEnabled = false;
         }
 
-        public Func<PropertyInfo, bool> ShouldMapProperty
-        {
-            get { return ProfileConfiguration.ShouldMapProperty; }
-            set { ProfileConfiguration.ShouldMapProperty = value; }
-        }
+        public bool AllowNullDestinationValues { get; set; }
 
-        public Func<FieldInfo, bool> ShouldMapField
-        {
-            get { return ProfileConfiguration.ShouldMapField; }
-            set { ProfileConfiguration.ShouldMapField = value; }
-        }
-
-        public bool AllowNullDestinationValues
-        {
-            get { return ProfileConfiguration.MapNullSourceValuesAsNull; }
-            set { ProfileConfiguration.MapNullSourceValuesAsNull = value; }
-        }
-
-        public bool AllowNullCollections
-        {
-            get { return ProfileConfiguration.MapNullSourceCollectionsAsNull; }
-            set { ProfileConfiguration.MapNullSourceCollectionsAsNull = value; }
-        }
-
-        public void IncludeSourceExtensionMethods(Assembly assembly)
-        {
-            ProfileConfiguration.IncludeSourceExtensionMethods(assembly);
-        }
+        public bool AllowNullCollections { get; set; }
 
         public INamingConvention SourceMemberNamingConvention
         {
             get
             {
                 INamingConvention convention = null;
-                ProfileConfiguration.MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
+                MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
                 return convention;
             }
-            set { ProfileConfiguration.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
+            set { MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
         }
 
         public INamingConvention DestinationMemberNamingConvention
@@ -74,10 +61,10 @@ namespace AutoMapper
             get
             {
                 INamingConvention convention = null;
-                ProfileConfiguration.MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
+                MemberConfigurations[0].AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
                 return convention;
             }
-            set { ProfileConfiguration.MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
+            set { MemberConfigurations[0].AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
@@ -106,37 +93,37 @@ namespace AutoMapper
 
         public void ClearPrefixes()
         {
-            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.Prefixes.Clear());
+            MemberConfigurations[0].AddName<PrePostfixName>(_ => _.Prefixes.Clear());
         }
 
         public void RecognizeAlias(string original, string alias)
         {
-            ProfileConfiguration.MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, alias));
+            MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, alias));
         }
 
         public void ReplaceMemberName(string original, string newValue)
         {
-            ProfileConfiguration.MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
+            MemberConfigurations[0].AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
         }
 
         public void RecognizePrefixes(params string[] prefixes)
         {
-            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, prefixes));
+            MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, prefixes));
         }
 
         public void RecognizePostfixes(params string[] postfixes)
         {
-            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Postfixes, postfixes));
+            MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.Postfixes, postfixes));
         }
 
         public void RecognizeDestinationPrefixes(params string[] prefixes)
         {
-            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPrefixes, prefixes));
+            MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPrefixes, prefixes));
         }
 
         public void RecognizeDestinationPostfixes(params string[] postfixes)
         {
-            ProfileConfiguration.MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
+            MemberConfigurations[0].AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
         }
 
         public void AddGlobalIgnore(string propertyNameStartingWith)
@@ -156,9 +143,37 @@ namespace AutoMapper
         public void Initialize(ConfigurationStore configurator)
         {
             _configurator = configurator;
-            _configurator._formatterProfiles.AddOrUpdate(ProfileName, ProfileConfiguration, (s, configuration) => ProfileConfiguration);
+            _configurator._formatterProfiles.AddOrUpdate(ProfileName, this, (s, configuration) => this);
         }
 
-        public IProfileConfiguration ProfileConfiguration { get; } = new ProfileConfiguration();
+        
+        private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
+
+        public IList<IMemberConfiguration> MemberConfigurations { get; } = new List<IMemberConfiguration>();
+        public IList<IConditionalObjectMapper> TypeConfigurations { get; } = new List<IConditionalObjectMapper>();
+        public IConditionalObjectMapper AddConditionalObjectMapper(string profile = ConfigurationStore.DefaultProfileName)
+        {
+            var condition = new ConditionalObjectMapper(profile);
+            TypeConfigurations.Add(condition);
+            return condition;
+        }
+
+        public bool ConstructorMappingEnabled { get; set; }
+        public bool DataReaderMapperYieldReturnEnabled { get; set; }
+        public IEnumerable<MethodInfo> SourceExtensionMethods => _sourceExtensionMethods;
+
+        public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+
+        public Func<FieldInfo, bool> ShouldMapField { get; set; }
+
+        public void IncludeSourceExtensionMethods(Assembly assembly)
+        {
+            //http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
+            _sourceExtensionMethods.AddRange(assembly.GetTypes()
+                .Where(type => type.IsSealed() && !type.IsGenericType() && !type.IsNested)
+                .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
+                .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
+                .Where(method => method.GetParameters().Length == 1));
+        }
     }
 }

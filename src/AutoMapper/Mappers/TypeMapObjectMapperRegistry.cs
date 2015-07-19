@@ -60,7 +60,7 @@ namespace AutoMapper.Mappers
             public bool IsMatch(ResolutionContext context, IMappingEngineRunner mapper)
             {
                 var profileConfiguration = mapper.ConfigurationProvider.GetProfileConfiguration(context.TypeMap.Profile);
-                return (context.SourceValue == null && profileConfiguration.MapNullSourceValuesAsNull);
+                return (context.SourceValue == null && profileConfiguration.AllowNullDestinationValues);
             }
         }
 

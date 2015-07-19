@@ -6,7 +6,7 @@ namespace AutoMapper
     /// <summary>
     /// Configuration for profile-specific maps
     /// </summary>
-    public interface IProfileExpression
+    public interface IProfileExpression : IProfileConfiguration
     {
         /// <summary>
         /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
@@ -132,6 +132,5 @@ namespace AutoMapper
         /// By default only public fields are mapped.
         /// </summary>
         Func<FieldInfo, bool> ShouldMapField { get; set; }
-        IProfileConfiguration ProfileConfiguration { get; }
     }
 }

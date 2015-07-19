@@ -15,15 +15,11 @@ namespace AutoMapper.Internal
         public ProfileConfiguration()
         {
             MemberConfigurations.Add(new MemberConfiguration());
-            MapNullSourceValuesAsNull = true;
             ConstructorMappingEnabled = true;
             IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
             ShouldMapProperty = p => p.IsPublic();
             ShouldMapField = f => f.IsPublic;
         }
-
-        public bool MapNullSourceValuesAsNull { get; set; }
-        public bool MapNullSourceCollectionsAsNull { get; set; }
 
         public IList<IMemberConfiguration> MemberConfigurations { get; } = new List<IMemberConfiguration>();
         public IList<IConditionalObjectMapper> TypeConfigurations { get; } = new List<IConditionalObjectMapper>();
