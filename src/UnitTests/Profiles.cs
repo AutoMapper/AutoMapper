@@ -76,7 +76,6 @@ namespace AutoMapper.UnitTests
 				protected override void Configure()
 				{
                     RecognizeDestinationPrefixes("Foo");
-
 					CreateMap<Model, Dto>();
 				}
 			}
