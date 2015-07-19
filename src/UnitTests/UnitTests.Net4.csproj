@@ -121,6 +121,7 @@
     <Compile Include="Bug\ProjectToAbstractType.cs" />
     <Compile Include="Bug\ObjectEnumToObjectEnum.cs" />
     <Compile Include="Bug\ExistingArrays.cs" />
+    <Compile Include="Bug\ExpressionMapping.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
@@ -224,6 +225,7 @@
     <Compile Include="Projection\ProjectEnumTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="Projection\ToStringTests.cs" />
+    <Compile Include="Query\SourceInjectedQuery.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
