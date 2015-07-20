@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace AutoMapper.Internal
+﻿namespace AutoMapper.Internal
 {
+    using System;
+
     public class EnumNameValueMapperFactory : IEnumNameValueMapperFactory
     {
         public IEnumNameValueMapper Create()

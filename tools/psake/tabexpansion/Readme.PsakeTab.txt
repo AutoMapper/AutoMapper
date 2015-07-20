@@ -12,7 +12,7 @@ Push-Location (Split-Path -Path $MyInvocation.MyCommand.Definition -Parent)
 . ./PsakeTabExpansion.ps1
 Pop-Location
 
-if(-not (Test-Path Function:\DefaultTabExpansion)) {
+if((Test-Path Function:\TabExpansion) -and (-not (Test-Path Function:\DefaultTabExpansion))) {
     Rename-Item Function:\TabExpansion DefaultTabExpansion
 }
 

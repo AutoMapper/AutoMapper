@@ -19,6 +19,11 @@ namespace AutoMapper.UnitTests
             public string AnotherString_ShouldBeNullAfterwards { get; set; }
         }
 
+        public class DestinationWrongType
+        {
+            public Destination ShouldBeMapped { get; set; }
+        }
+
         [Fact]
         public void GlobalIgnore_ignores_all_properties_beginning_with_string()
         {
@@ -30,6 +35,19 @@ namespace AutoMapper.UnitTests
 			});
             
             Mapper.Map<Source, Destination>(new Source{ShouldBeMapped = "true"});
+            Mapper.AssertConfigurationIsValid();
+        }
+
+        [Fact]
+        public void GlobalIgnore_ignores_properties_with_names_matching_but_different_types()
+        {
+            Mapper.Initialize(cfg =>
+            {
+                cfg.AddGlobalIgnore("ShouldBeMapped");
+                cfg.CreateMap<Source, DestinationWrongType>();
+            });
+
+            Mapper.Map<Source, DestinationWrongType>(new Source { ShouldBeMapped = "true" });
             Mapper.AssertConfigurationIsValid();
         }
 

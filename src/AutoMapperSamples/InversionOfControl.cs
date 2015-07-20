@@ -78,7 +78,7 @@ namespace AutoMapperSamples
 				ForRequestedType<ConfigurationStore>()
 					.CacheBy(InstanceScope.Singleton)
 					.TheDefault.Is.OfConcreteType<ConfigurationStore>()
-					.CtorDependency<IEnumerable<IObjectMapper>>().Is(expr => expr.ConstructedBy(MapperRegistry.AllMappers));
+					.CtorDependency<IEnumerable<IObjectMapper>>().Is(expr => expr.ConstructedBy(() => MapperRegistry.Mappers));
 
                 ForRequestedType<IConfigurationProvider>()
 					.TheDefault.Is.ConstructedBy(ctx => ctx.GetInstance<ConfigurationStore>());

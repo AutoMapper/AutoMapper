@@ -24,21 +24,13 @@ namespace AutoMapperSamples.Configuration
 				public string Amount { get; set; }
 			}
 
-			public class MoneyFormatter : ValueFormatter<decimal>
-			{
-				protected override string FormatValueCore(decimal value)
-				{
-					return value.ToString("c");
-				}
-			}
-
 			public class ViewModelProfile : Profile
 			{
 				protected override void Configure()
 				{
 					CreateMap<Order, OrderListViewModel>();
 
-					ForSourceType<decimal>().AddFormatter<MoneyFormatter>();
+					CreateMap<decimal, string>().ConvertUsing(value => value.ToString("c"));
 				}
 			}
 

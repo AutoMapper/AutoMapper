@@ -17,3 +17,7 @@ task Compile -depends Clean {
 task Clean { 
   $cleanMessage
 }
+
+task ? -Description "Helper to display task info" {
+	Write-Documentation
+}

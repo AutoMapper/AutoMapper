@@ -7,9 +7,9 @@ namespace AutoMapper.UnitTests.Projection
 	using System.Linq;
 
 	using AutoMapper;
-	using AutoMapper.QueryableExtensions;
+	using QueryableExtensions;
 
-	public class ProjectCollectionEnumerableTest
+    public class ProjectCollectionEnumerableTest
 	{
 		private const string Street1 = "Street1";
 		private const string Street2 = "Street2";
@@ -79,6 +79,11 @@ namespace AutoMapper.UnitTests.Projection
 			{
 				return string.Equals(ToString(), obj.ToString());
 			}
+
+		    public override int GetHashCode()
+		    {
+                return Street.GetHashCode();
+		    }
 		}
 	}
 }

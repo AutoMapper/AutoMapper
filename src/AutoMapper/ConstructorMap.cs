@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using AutoMapper.Internal;
-
-namespace AutoMapper
+﻿namespace AutoMapper
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+    using Internal;
+
     public class ConstructorMap
     {
-        private static readonly IDelegateFactory DelegateFactory = PlatformAdapter.Resolve<IDelegateFactory>();
-        private readonly LateBoundParamsCtor _runtimeCtor;
+        private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
+        private readonly ILazy<LateBoundParamsCtor> _runtimeCtor;
         public ConstructorInfo Ctor { get; private set; }
-        public IEnumerable<ConstructorParameterMap> CtorParams { get; private set; }
+        public IEnumerable<ConstructorParameterMap> CtorParams { get; }
 
         public ConstructorMap(ConstructorInfo ctor, IEnumerable<ConstructorParameterMap> ctorParams)
         {
             Ctor = ctor;
             CtorParams = ctorParams;
 
-            _runtimeCtor = DelegateFactory.CreateCtor(ctor, CtorParams);
+            _runtimeCtor = LazyFactory.Create(() => DelegateFactory.CreateCtor(ctor, CtorParams));
         }
 
         public object ResolveValue(ResolutionContext context, IMappingEngineRunner mappingEngine)
@@ -31,11 +31,12 @@ namespace AutoMapper
                 var sourceType = result.Type;
                 var destinationType = map.Parameter.ParameterType;
 
-                var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(result, destinationType);
+                var typeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(result, destinationType);
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 
-                var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType, destinationType);
+                var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType,
+                    destinationType);
 
                 if (typeMap == null && map.Parameter.IsOptional)
                 {
@@ -49,7 +50,7 @@ namespace AutoMapper
                 }
             }
 
-            return _runtimeCtor(ctorArgs.ToArray());
+            return _runtimeCtor.Value(ctorArgs.ToArray());
         }
     }
 }

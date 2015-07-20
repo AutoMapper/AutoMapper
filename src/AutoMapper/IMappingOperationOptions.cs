@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace AutoMapper
+﻿namespace AutoMapper
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -29,23 +28,32 @@ namespace AutoMapper
         /// Disable the cache used to re-use destination instances based on equality
         /// </summary>
         bool DisableCache { get; set; }
+
+        /// <summary>
+        /// Execute a custom function to the source and/or destination types before member mapping
+        /// </summary>
+        /// <param name="beforeFunction">Callback for the source/destination types</param>
+        void BeforeMap(Action<object, object> beforeFunction);
+
+        /// <summary>
+        /// Execute a custom function to the source and/or destination types before member mapping
+        /// </summary>
+        /// <param name="afterFunction">Callback for the source/destination types</param>
+        void AfterMap(Action<object, object> afterFunction);
     }
 
-    public class MappingOperationOptions : IMappingOperationOptions
+    public interface IMappingOperationOptions<TSource, TDestination> : IMappingOperationOptions
     {
-        public MappingOperationOptions()
-        {
-            Items = new Dictionary<string, object>();
-        }
+        /// <summary>
+        /// Execute a custom function to the source and/or destination types before member mapping
+        /// </summary>
+        /// <param name="beforeFunction">Callback for the source/destination types</param>
+        void BeforeMap(Action<TSource, TDestination> beforeFunction);
 
-        public Func<Type, object> ServiceCtor { get; private set; }
-        public bool CreateMissingTypeMaps { get; set; }
-        public IDictionary<string, object> Items { get; private set; }
-        public bool DisableCache { get; set; }
-
-        void IMappingOperationOptions.ConstructServicesUsing(Func<Type, object> constructor)
-        {
-            ServiceCtor = constructor;
-        }
+        /// <summary>
+        /// Execute a custom function to the source and/or destination types before member mapping
+        /// </summary>
+        /// <param name="afterFunction">Callback for the source/destination types</param>
+        void AfterMap(Action<TSource, TDestination> afterFunction);
     }
 }

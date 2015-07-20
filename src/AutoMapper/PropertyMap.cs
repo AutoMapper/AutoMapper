@@ -1,27 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using AutoMapper.Impl;
-using AutoMapper.Internal;
-
 namespace AutoMapper
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using Impl;
+    using Internal;
 
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
         private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
-        private readonly IList<Type> _valueFormattersToSkip = new List<Type>();
-        private readonly IList<IValueFormatter> _valueFormatters = new List<IValueFormatter>();
         private bool _ignored;
         private int _mappingOrder;
-        private bool _hasCustomValueResolver;
         private IValueResolver _customResolver;
         private IValueResolver _customMemberResolver;
-        private object _nullSubstitute;
         private bool _sealed;
         private IValueResolver[] _cachedResolvers;
         private Func<ResolutionContext, bool> _condition;
@@ -30,7 +25,7 @@ namespace AutoMapper
 
         public PropertyMap(IMemberAccessor destinationProperty)
         {
-            UseDestinationValue = true; 
+            UseDestinationValue = true;
             DestinationProperty = destinationProperty;
         }
 
@@ -47,51 +42,36 @@ namespace AutoMapper
                 }
             }
             ApplyCondition(inheritedMappedProperty._condition);
-            SetNullSubstitute(inheritedMappedProperty._nullSubstitute);
+            SetNullSubstitute(inheritedMappedProperty.NullSubstitute);
             SetMappingOrder(inheritedMappedProperty._mappingOrder);
             CustomExpression = inheritedMappedProperty.CustomExpression;
         }
 
-        public IMemberAccessor DestinationProperty { get; private set; }
-        public Type DestinationPropertyType { get { return DestinationProperty.MemberType; } }
+        public IMemberAccessor DestinationProperty { get; }
+
+        public Type DestinationPropertyType => DestinationProperty.MemberType;
+
         public LambdaExpression CustomExpression { get; private set; }
 
         public MemberInfo SourceMember
         {
             get
             {
-                if (_sourceMember == null)
-                {
-                    var sourceMemberGetter = GetSourceValueResolvers()
-                        .OfType<IMemberGetter>().LastOrDefault();
-                    return sourceMemberGetter == null ? null : sourceMemberGetter.MemberInfo;
-                }
-                else
-                {
-                    return _sourceMember;
-                }
+                return _sourceMember ?? GetSourceValueResolvers().OfType<IMemberGetter>().LastOrDefault()?.MemberInfo;
             }
-            internal set
-            {
-                _sourceMember = value;
-            }
+            internal set { _sourceMember = value; }
         }
 
-        public bool CanBeSet
-        {
-            get
-            {
-                return !(DestinationProperty is PropertyAccessor) ||
-                       ((PropertyAccessor)DestinationProperty).HasSetter;
-            }
-        }
+        public bool CanBeSet => !(DestinationProperty is PropertyAccessor) ||
+                                ((PropertyAccessor) DestinationProperty).HasSetter;
 
         public bool UseDestinationValue { get; set; }
 
-        internal bool HasCustomValueResolver
-        {
-            get { return _hasCustomValueResolver; }
-        }
+        internal bool HasCustomValueResolver { get; private set; }
+
+        public bool ExplicitExpansion { get; set; }
+
+        public object NullSubstitute { get; private set; }
 
         public IEnumerable<IValueResolver> GetSourceValueResolvers()
         {
@@ -106,8 +86,8 @@ namespace AutoMapper
                 yield return resolver;
             }
 
-            if (_nullSubstitute != null)
-                yield return new NullReplacementMethod(_nullSubstitute);
+            if (NullSubstitute != null)
+                yield return new NullReplacementMethod(NullSubstitute);
         }
 
         public void RemoveLastResolver()
@@ -135,42 +115,22 @@ namespace AutoMapper
             _sealed = true;
         }
 
-        public void ChainResolver(IValueResolver IValueResolver)
+        public void ChainResolver(IValueResolver valueResolver)
         {
-            _sourceValueResolvers.AddLast(IValueResolver);
+            _sourceValueResolvers.AddLast(valueResolver);
         }
 
-        public void AddFormatterToSkip<TValueFormatter>() where TValueFormatter : IValueFormatter
-        {
-            _valueFormattersToSkip.Add(typeof(TValueFormatter));
-        }
-
-        public bool FormattersToSkipContains(Type valueFormatterType)
-        {
-            return _valueFormattersToSkip.Contains(valueFormatterType);
-        }
-
-        public void AddFormatter(IValueFormatter valueFormatter)
-        {
-            _valueFormatters.Add(valueFormatter);
-        }
-
-        public IValueFormatter[] GetFormatters()
-        {
-            return _valueFormatters.ToArray();
-        }
-        
         public void AssignCustomExpression(LambdaExpression customExpression)
         {
             CustomExpression = customExpression;
         }
-        
+
         public void AssignCustomValueResolver(IValueResolver valueResolver)
         {
             _ignored = false;
             _customResolver = valueResolver;
             ResetSourceMemberChain();
-            _hasCustomValueResolver = true;
+            HasCustomValueResolver = true;
         }
 
         public void ChainTypeMemberForResolver(IValueResolver valueResolver)
@@ -206,22 +166,17 @@ namespace AutoMapper
 
         public bool IsMapped()
         {
-            return _sourceValueResolvers.Count > 0 || _hasCustomValueResolver || _ignored;
+            return _sourceValueResolvers.Count > 0 || HasCustomValueResolver || _ignored;
         }
 
         public bool CanResolveValue()
         {
-            return (_sourceValueResolvers.Count > 0 || _hasCustomValueResolver || UseDestinationValue) && !_ignored;
-        }
-
-        public void RemoveLastFormatter()
-        {
-            _valueFormatters.RemoveAt(_valueFormatters.Count - 1);
+            return (_sourceValueResolvers.Count > 0 || HasCustomValueResolver) && !_ignored;
         }
 
         public void SetNullSubstitute(object nullSubstitute)
         {
-            _nullSubstitute = nullSubstitute;
+            NullSubstitute = nullSubstitute;
         }
 
         private void ResetSourceMemberChain()
@@ -240,8 +195,8 @@ namespace AutoMapper
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(PropertyMap)) return false;
-            return Equals((PropertyMap)obj);
+            if (obj.GetType() != typeof (PropertyMap)) return false;
+            return Equals((PropertyMap) obj);
         }
 
         public override int GetHashCode()
@@ -271,25 +226,24 @@ namespace AutoMapper
 
         public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            if (sourceMember.Body is MemberExpression)
+            var body = sourceMember.Body as MemberExpression;
+            if (body != null)
             {
-                SourceMember = ((MemberExpression)sourceMember.Body).Member;
+                SourceMember = body.Member;
             }
             CustomExpression = sourceMember;
             AssignCustomValueResolver(
                 new NullReferenceExceptionSwallowingResolver(
                     new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())
-                )
-            );
+                    )
+                );
         }
 
         public object GetDestinationValue(object mappedObject)
         {
-		     return UseDestinationValue
+            return UseDestinationValue
                 ? DestinationProperty.GetValue(mappedObject)
                 : null;
         }
-
     }
-
 }

@@ -1,27 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-
-namespace AutoMapper
+﻿namespace AutoMapper.Internal
 {
-    using AutoMapper.Internal;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
 
-    public class DelegateFactory : IDelegateFactory
+    public class DelegateFactory
     {
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
 
-        private readonly IDictionary<Type, LateBoundCtor> _ctorCache = DictionaryFactory.CreateDictionary<Type, LateBoundCtor>();
+        private readonly IDictionary<Type, LateBoundCtor> _ctorCache =
+            DictionaryFactory.CreateDictionary<Type, LateBoundCtor>();
 
         public LateBoundMethod CreateGet(MethodInfo method)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
-            ParameterExpression argumentsParameter = Expression.Parameter(typeof(object[]), "arguments");
+            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
+            ParameterExpression argumentsParameter = Expression.Parameter(typeof (object[]), "arguments");
 
             MethodCallExpression call;
-            if (!method.IsDefined(typeof(ExtensionAttribute), false))
+            if (!method.IsDefined(typeof (ExtensionAttribute), false))
             {
                 // instance member method
                 call = Expression.Call(
@@ -38,7 +37,7 @@ namespace AutoMapper
             }
 
             Expression<LateBoundMethod> lambda = Expression.Lambda<LateBoundMethod>(
-                Expression.Convert(call, typeof(object)),
+                Expression.Convert(call, typeof (object)),
                 instanceParameter,
                 argumentsParameter);
 
@@ -47,12 +46,13 @@ namespace AutoMapper
 
         public LateBoundPropertyGet CreateGet(PropertyInfo property)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
+            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
 
-            MemberExpression member = Expression.Property(Expression.Convert(instanceParameter, property.DeclaringType), property);
+            MemberExpression member = Expression.Property(
+                Expression.Convert(instanceParameter, property.DeclaringType), property);
 
             Expression<LateBoundPropertyGet> lambda = Expression.Lambda<LateBoundPropertyGet>(
-                Expression.Convert(member, typeof(object)),
+                Expression.Convert(member, typeof (object)),
                 instanceParameter
                 );
 
@@ -61,26 +61,54 @@ namespace AutoMapper
 
         public LateBoundFieldGet CreateGet(FieldInfo field)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
+            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
 
             MemberExpression member = Expression.Field(Expression.Convert(instanceParameter, field.DeclaringType), field);
 
             Expression<LateBoundFieldGet> lambda = Expression.Lambda<LateBoundFieldGet>(
-                Expression.Convert(member, typeof(object)),
+                Expression.Convert(member, typeof (object)),
                 instanceParameter
                 );
 
             return lambda.Compile();
         }
 
-        public virtual LateBoundFieldSet CreateSet(FieldInfo field)
+        public LateBoundFieldSet CreateSet(FieldInfo field)
         {
-            return (target, value) => field.SetValue(target, value);
+            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
+            ParameterExpression valueParameter = Expression.Parameter(typeof (object), "value");
+
+            MemberExpression member = Expression.Field(Expression.Convert(instanceParameter, field.DeclaringType), field);
+            BinaryExpression assignExpression = Expression.Assign(member,
+                Expression.Convert(valueParameter, field.FieldType));
+
+            Expression<LateBoundFieldSet> lambda = Expression.Lambda<LateBoundFieldSet>(
+                assignExpression,
+                instanceParameter,
+                valueParameter
+                );
+
+            return lambda.Compile();
         }
 
-        public virtual LateBoundPropertySet CreateSet(PropertyInfo property)
+        public LateBoundPropertySet CreateSet(PropertyInfo property)
         {
-            return (target, value) => property.SetValue(target, value, null);
+            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
+            ParameterExpression valueParameter = Expression.Parameter(typeof (object), "value");
+
+            MemberExpression member = Expression.Property(
+                Expression.Convert(instanceParameter, property.DeclaringType), property);
+            BinaryExpression assignExpression = Expression.Assign(member,
+                Expression.Convert(valueParameter, property.PropertyType));
+
+            Expression<LateBoundPropertySet> lambda = Expression.Lambda<LateBoundPropertySet>(
+                assignExpression,
+                instanceParameter,
+                valueParameter
+                );
+
+
+            return lambda.Compile();
         }
 
         public LateBoundCtor CreateCtor(Type type)
@@ -88,27 +116,33 @@ namespace AutoMapper
             LateBoundCtor ctor = _ctorCache.GetOrAdd(type, t =>
             {
                 //handle valuetypes
-                if (!type.IsClass)
+                if (!type.IsClass())
                 {
-                    var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
+                    var ctorExpression =
+                        Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof (object)));
                     return ctorExpression.Compile();
                 }
-                else 
+                else
                 {
-                    var constructors = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-                    
+                    var constructors = type
+                        .GetDeclaredConstructors()
+                        .Where(ci => !ci.IsStatic);
+
                     //find a ctor with only optional args
                     var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
                     if (ctorWithOptionalArgs == null)
-                        throw new ArgumentException("Type needs to have a constructor with 0 args or only optional args", "type");
+                        throw new ArgumentException(
+                            "Type needs to have a constructor with 0 args or only optional args", "type");
 
                     //get all optional default values
                     var args = ctorWithOptionalArgs
                         .GetParameters()
-                        .Select(p => Expression.Constant(p.DefaultValue,p.ParameterType)).ToArray();
+                        .Select(p => Expression.Constant(p.DefaultValue, p.ParameterType)).ToArray();
 
                     //create the ctor expression
-                    var ctorExpression = Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(ctorWithOptionalArgs,args), typeof(object)));
+                    var ctorExpression =
+                        Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(ctorWithOptionalArgs, args),
+                            typeof (object)));
                     return ctorExpression.Compile();
                 }
             });
@@ -116,11 +150,12 @@ namespace AutoMapper
             return ctor;
         }
 
-        private static Expression[] CreateParameterExpressions(MethodInfo method, Expression instanceParameter, Expression argumentsParameter)
+        private static Expression[] CreateParameterExpressions(MethodInfo method, Expression instanceParameter,
+            Expression argumentsParameter)
         {
             var expressions = new List<UnaryExpression>();
             var realMethodParameters = method.GetParameters();
-            if (method.IsDefined(typeof(ExtensionAttribute), false))
+            if (method.IsDefined(typeof (ExtensionAttribute), false))
             {
                 Type extendedType = method.GetParameters()[0].ParameterType;
                 expressions.Add(Expression.Convert(instanceParameter, extendedType));
@@ -135,9 +170,10 @@ namespace AutoMapper
             return expressions.ToArray();
         }
 
-        public LateBoundParamsCtor CreateCtor(ConstructorInfo constructorInfo, IEnumerable<ConstructorParameterMap> ctorParams)
+        public LateBoundParamsCtor CreateCtor(ConstructorInfo constructorInfo,
+            IEnumerable<ConstructorParameterMap> ctorParams)
         {
-            ParameterExpression paramsExpr = Expression.Parameter(typeof(object[]), "parameters");
+            ParameterExpression paramsExpr = Expression.Parameter(typeof (object[]), "parameters");
 
             var convertExprs = ctorParams
                 .Select((ctorParam, i) => Expression.Convert(

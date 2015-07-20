@@ -1,35 +1,36 @@
-using System.Reflection;
-using System.Linq;
-
 namespace AutoMapper.Mappers
 {
-	public class ExplicitConversionOperatorMapper : IObjectMapper
-	{
-		public object Map(ResolutionContext context, IMappingEngineRunner mapper)
-		{
-		    var implicitOperator = GetExplicitConversionOperator(context);
+    using System.Linq;
+    using System.Reflection;
+    using Internal;
 
-		    return implicitOperator.Invoke(null, new[] {context.SourceValue});
-		}
+    public class ExplicitConversionOperatorMapper : IObjectMapper
+    {
+        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        {
+            var implicitOperator = GetExplicitConversionOperator(context);
 
-		public bool IsMatch(ResolutionContext context)
-		{
+            return implicitOperator.Invoke(null, new[] {context.SourceValue});
+        }
+
+        public bool IsMatch(ResolutionContext context)
+        {
             var methodInfo = GetExplicitConversionOperator(context);
 
-		    return methodInfo != null;
-		}
+            return methodInfo != null;
+        }
 
-	    private static MethodInfo GetExplicitConversionOperator(ResolutionContext context)
-	    {
-	        var sourceTypeMethod = context.SourceType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+        private static MethodInfo GetExplicitConversionOperator(ResolutionContext context)
+        {
+            var sourceTypeMethod = context.SourceType
+                .GetDeclaredMethods()
+                .Where(mi => mi.IsPublic && mi.IsStatic)
                 .Where(mi => mi.Name == "op_Explicit")
-                .Where(mi => mi.ReturnType == context.DestinationType)
-                .FirstOrDefault();
+                .FirstOrDefault(mi => mi.ReturnType == context.DestinationType);
 
-            var destTypeMethod = context.DestinationType.GetMethod("op_Explicit", new[] { context.SourceType });
+            var destTypeMethod = context.DestinationType.GetMethod("op_Explicit", new[] {context.SourceType});
 
-	        return sourceTypeMethod ?? destTypeMethod;
-	    }
-	}
-
+            return sourceTypeMethod ?? destTypeMethod;
+        }
+    }
 }
