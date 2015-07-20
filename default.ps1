@@ -1,4 +1,4 @@
-`$framework = '4.5.1x86'
+$framework = '4.5.1x86'
 
 properties {
 	$base_dir = resolve-path .
