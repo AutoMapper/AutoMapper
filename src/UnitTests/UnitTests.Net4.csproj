@@ -133,7 +133,6 @@
     <Compile Include="Bug\NullArrayBug.cs" />
     <Compile Include="Bug\ReadOnlyCollectionMappingBug.cs" />
     <Compile Include="Bug\MappingInheritance.cs" />
-    <Compile Include="Bug\MappingToAProtectedCollection.cs" />
     <Compile Include="Bug\MemberNamedTypeBug.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />

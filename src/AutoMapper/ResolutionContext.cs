@@ -46,7 +46,7 @@ namespace AutoMapper
         /// <summary>
         /// Destination value
         /// </summary>
-        public object DestinationValue { get; private set; }
+        public object DestinationValue { get; }
 
         /// <summary>
         /// Parent resolution context
@@ -178,11 +178,6 @@ namespace AutoMapper
             }
             Options = context.Options;
             Engine = context.Engine;
-        }
-
-        public void SetResolvedDestinationValue(object destintationValue)
-        {
-            DestinationValue = destintationValue;
         }
 
         public string MemberName => PropertyMap == null
