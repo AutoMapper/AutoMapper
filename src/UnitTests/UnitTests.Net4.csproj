@@ -98,6 +98,7 @@
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\CollectionsNullability.cs" />
     <Compile Include="Bug\ConditionBug.cs" />
+    <Compile Include="Bug\ConstructorParameterNamedType.cs" />
     <Compile Include="Bug\ContextValuesIncorrect.cs" />
     <Compile Include="Bug\DestinationCtorCalledTwice.cs" />
     <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
