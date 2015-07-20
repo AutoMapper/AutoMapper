@@ -1,4 +1,4 @@
-$framework = '4.5.1x86'
+`$framework = '4.5.1x86'
 
 properties {
 	$base_dir = resolve-path .
@@ -260,7 +260,7 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\dnxcore50\AutoMapper.dll"" target=""lib\dnxcore50"" />
     <file src=""$dist_dir\dnxcore50\AutoMapper.pdb"" target=""lib\dnxcore50"" />
     <file src=""$dist_dir\dnxcore50\AutoMapper.xml"" target=""lib\dnxcore50"" />
-    <file src=""**\*.cs"" target=""src"" />
+    <file src=""src\**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $build_dir\$fileName -encoding "ASCII"
 }
