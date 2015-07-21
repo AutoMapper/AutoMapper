@@ -8,7 +8,14 @@ namespace AutoMapper.Internal
 
 	public static class PrimitiveExtensions
 	{
-		public static bool IsNullableType(this Type type)
+        public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            TValue value;
+            dictionary.TryGetValue(key, out value);
+            return value;
+        }
+
+        public static bool IsNullableType(this Type type)
 		{
             return type.IsGenericType() && (type.GetGenericTypeDefinition().Equals(typeof (Nullable<>)));
 		}
