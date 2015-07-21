@@ -231,24 +231,25 @@ namespace AutoMapper
                     tp => _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
 
                 IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
-
-                if (mapperToUse == null)
+                if (mapperToUse == null || (context.Options.CreateMissingTypeMaps && !mapperToUse.IsMatch(context)))
                 {
                     if (context.Options.CreateMissingTypeMaps)
                     {
                         var typeMap = ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType);
-
-                        context = context.CreateTypeContext(typeMap, context.SourceValue, context.DestinationValue,
-                            context.SourceType, context.DestinationType);
-
-                        mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
+                        context = context.CreateTypeContext(typeMap, context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
+                        mapperToUse = missFunc(contextTypePair);
+                        if(mapperToUse == null)
+                        {
+                            throw new AutoMapperMappingException(context, "Unsupported mapping.");
+                        }
+                        _objectMapperCache.AddOrUpdate(contextTypePair, mapperToUse, (tp, mapper) => mapperToUse);
                     }
                     else
                     {
-                        if (context.SourceValue != null)
-                            throw new AutoMapperMappingException(context,
-                                "Missing type map configuration or unsupported mapping.");
-
+                        if(context.SourceValue != null)
+                        {
+                            throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
+                        }
                         return ObjectCreator.CreateDefaultValue(context.DestinationType);
                     }
                 }
