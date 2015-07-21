@@ -17,7 +17,8 @@
                 "System.ObjectModel": "",
                 "System.Runtime.Extensions": "",
                 "System.Threading": ""
-            }
+            },
+            "compilationOptions": {"define": ["PORTABLE"]}
         },
         "net45": {
             "compilationOptions": { "define": [ "NET4" ], "keyFile" : "..\\AutoMapper.snk" }
@@ -53,7 +54,7 @@
                 "System.Runtime.Extensions": "",
                 "System.Threading": ""
             },
-            "compilationOptions": { "keyFile" : "..\\AutoMapper.snk" }
+            "compilationOptions": { "define": [ "WINDOWS_PHONE" ], "keyFile" : "..\\AutoMapper.snk" }
         },
         "netcore45": {
             "frameworkAssemblies": {
@@ -69,7 +70,8 @@
                 "System.ObjectModel": "",
                 "System.Runtime.Extensions": "",
                 "System.Threading": ""
-            }
+            },
+            "compilationOptions": { "define": [ "NETCORE45" ], "keyFile" : "..\\AutoMapper.snk" }
         },
         "dnx46": { },
         "dnxcore50": {

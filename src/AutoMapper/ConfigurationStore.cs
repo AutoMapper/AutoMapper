@@ -525,12 +525,29 @@ namespace AutoMapper
             }
 
             var typeMapsChecked = new List<TypeMap>();
+            var configExceptions = new List<Exception>();
 
             foreach (var typeMap in maps)
             {
-                DryRunTypeMap(typeMapsChecked,
-                    new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType,
-                        new MappingOperationOptions(), Mapper.Engine));
+                try
+                {
+                    DryRunTypeMap(typeMapsChecked,
+                        new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType,
+                            new MappingOperationOptions(), Mapper.Engine));
+                }
+                catch (Exception e)
+                {
+                    configExceptions.Add(e);
+                }
+            }
+
+            if (configExceptions.Count > 2)
+            {
+                throw new AggregateException(configExceptions);
+            }
+            if (configExceptions.Count > 1)
+            {
+                throw configExceptions[0];
             }
         }
 
