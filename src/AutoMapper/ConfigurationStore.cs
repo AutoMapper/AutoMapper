@@ -541,11 +541,11 @@ namespace AutoMapper
                 }
             }
 
-            if (configExceptions.Count > 2)
+            if (configExceptions.Count > 1)
             {
                 throw new AggregateException(configExceptions);
             }
-            if (configExceptions.Count > 1)
+            if (configExceptions.Count > 0)
             {
                 throw configExceptions[0];
             }
