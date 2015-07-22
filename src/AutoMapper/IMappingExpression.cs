@@ -1,8 +1,8 @@
 namespace AutoMapper
 {
-    using System;
+using System;
     using System.ComponentModel;
-    using System.Linq.Expressions;
+using System.Linq.Expressions;
 
     /// <summary>
     /// Mapping configuration options for non-generic maps
@@ -83,6 +83,13 @@ namespace AutoMapper
         /// </summary>
         /// <param name="memberOptions">Callback for member options</param>
         void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
+
+        /// <summary>
+        /// Customize configuration for all members that have not been explicitly mapped already.
+        /// </summary>
+        /// <param name="memberOptions">Callback for member options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
 
         /// <summary>
         /// Ignores all <typeparamref name="TDestination"/> properties that have either a private or protected setter, forcing the mapper to respect encapsulation (note: order matters, so place this before explicit configuration of any properties with an inaccessible setter)
@@ -255,9 +262,9 @@ namespace AutoMapper
         /// <returns>New source object to map.</returns>
         IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc);
 
-        /// <summary>
+    /// <summary>
         /// The current TypeMap being configured
-        /// </summary>
+    /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         TypeMap TypeMap { get; }
     }
