@@ -11,17 +11,14 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Establish_context()
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Entity, BaseModel>()
+            Mapper.CreateMap<Entity, ViewModel>();
+            Mapper.CreateMap<Entity, BaseModel>()
                     .ForMember(model => model.Value1, mce => mce.MapFrom(entity => entity.Value2))
                     .ForMember(model => model.Value2, mce => mce.MapFrom(entity => entity.Value1))
                     .Include<Entity, EditModel>()
                     .Include<Entity, ViewModel>();
-                cfg.CreateMap<Entity, EditModel>()
-                    .ForMember(model => model.Value3, mce => mce.MapFrom(entity => entity.Value1 + entity.Value2));
-                cfg.CreateMap<Entity, ViewModel>();
-            });
+            Mapper.CreateMap<Entity, EditModel>()
+                .ForMember(model => model.Value3, mce => mce.MapFrom(entity => entity.Value1 + entity.Value2));
         }
 
         protected override void Because_of()

@@ -45,6 +45,20 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.AssertConfigurationIsValid();
         }
+        [Fact]
+        public void included_mapping_should_not_care_about_order()
+        {
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<ModelSubObject, DtoSubObject>()
+                    .IncludeBase<ModelObject, DtoObject>();
+                cfg.CreateMap<ModelObject, DtoObject>()
+                    .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
+                    ;
+            });
+
+            Mapper.AssertConfigurationIsValid();
+        }
 
         [Fact]
         public void included_mapping_should_inherit_base_ignore_mappings_should_not_throw()
