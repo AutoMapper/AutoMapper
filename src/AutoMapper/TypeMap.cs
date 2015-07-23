@@ -30,6 +30,7 @@ namespace AutoMapper
         private bool _sealed;
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
+        private IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
         public TypeMap(TypeInfo sourceType, TypeInfo destinationType, MemberList memberList)
         {
@@ -217,12 +218,20 @@ namespace AutoMapper
             if (_sealed)
                 return;
 
+            foreach (var inheritedTypeMap in _inheritedTypeMaps)
+            {
+                inheritedTypeMap.Seal();
+                ApplyInheritedTypeMap(inheritedTypeMap);
+            }
+
             _orderedPropertyMaps =
                 _propertyMaps
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.GetMappingOrder()).ToArray();
 
             _orderedPropertyMaps.Each(pm => pm.Seal());
+            foreach (var inheritedMap in _inheritedMaps)
+                inheritedMap.Seal();
 
             _sealed = true;
         }
@@ -358,13 +367,18 @@ namespace AutoMapper
 
         public void ApplyInheritedMap(TypeMap inheritedTypeMap)
         {
+            _inheritedTypeMaps.Add(inheritedTypeMap);
+        }
+
+        private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
+        {
             foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
             {
                 var conventionPropertyMap = GetPropertyMaps()
                     .SingleOrDefault(m =>
                         m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
 
-                if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver)
+                if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver && !conventionPropertyMap.HasCustomValueResolver)
                 {
                     conventionPropertyMap.AssignCustomValueResolver(
                         inheritedMappedProperty.GetSourceValueResolvers().First());
@@ -375,6 +389,10 @@ namespace AutoMapper
                     var propertyMap = new PropertyMap(inheritedMappedProperty);
 
                     AddInheritedPropertyMap(propertyMap);
+                }
+                else
+                {
+                    
                 }
             }
 
