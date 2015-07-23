@@ -351,9 +351,7 @@ namespace AutoMapper
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair,
                 _ =>
                     GetRelatedTypePairs(_)
-                        .Select(
-                            tp =>
-                                FindTypeMapFor(tp) ?? (_typeMapPlanCache.ContainsKey(tp) ? _typeMapPlanCache[tp] : null))
+                        .Select(tp => FindTypeMapFor(tp) ?? _typeMapPlanCache.GetOrDefault(tp))
                         .FirstOrDefault(tm => tm != null));
 
             return typeMap;
