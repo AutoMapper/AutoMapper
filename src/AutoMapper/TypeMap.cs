@@ -418,7 +418,7 @@ namespace AutoMapper
             }
             else
             {
-                newExpression = Expression.New(DestinationTypeOverride ?? DestinationType);
+                newExpression = Expression.New(DestinationType);
             }
             return Expression.Lambda(newExpression);
         }

@@ -299,7 +299,7 @@ namespace AutoMapper
                 visitor.NewExpression,
                 bindings.ToArray()
                 );
-            return Expression.Convert(expression, request.DestinationType);
+            return expression;
         }
 
         private class NewFinderVisitor : ExpressionVisitor
