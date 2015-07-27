@@ -18,36 +18,24 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
-            ExpressionRequest request, ExpressionResolutionResult result,
-            Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindEnumerableExpression(mappingEngine, propertyMap, request, result, typePairCount);
         }
 
         private static MemberAssignment BindEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
-            ExpressionRequest request, ExpressionResolutionResult result,
-            Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             MemberAssignment bindExpression;
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
-            Type sourceListType = null;
-            // is list
 
-            if (result.Type.IsArray)
-            {
-                sourceListType = result.Type.GetElementType();
-            }
-            else
-            {
-                sourceListType = result.Type.GetGenericArguments().First();
-            }
+            var sourceListType = result.Type.IsArray ? result.Type.GetElementType() : result.Type.GetGenericArguments().First();
             var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.IncludedMembers);
-
 
             var selectExpression = result.ResolutionExpression;
             if (sourceListType != destinationListType)
             {
-                var transformedExpression = Extensions.CreateMapExpression(mappingEngine, listTypePair, typePairCount);
+                var transformedExpression = ((IMappingEngineRunner)mappingEngine).CreateMapExpression(listTypePair, typePairCount);
                 selectExpression = Expression.Call(
                     typeof (Enumerable),
                     "Select",

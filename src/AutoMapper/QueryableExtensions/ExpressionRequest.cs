@@ -10,7 +10,7 @@ namespace AutoMapper.QueryableExtensions
         public Type DestinationType { get; }
         public string[] IncludedMembers { get; private set; }
 
-        public ExpressionRequest(Type sourceType, Type destinationType, params string[] includedMembers)
+        public ExpressionRequest(Type sourceType, Type destinationType,  params string[] includedMembers)
         {
             SourceType = sourceType;
             DestinationType = destinationType;

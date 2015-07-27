@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System;
+    using System.Linq.Expressions;
 
     /// <summary>
     /// Performs mapping based on configuration
@@ -159,5 +160,7 @@ namespace AutoMapper
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to use</param>
         void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
+
+        Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params string[] membersToExpand);
     }
 }

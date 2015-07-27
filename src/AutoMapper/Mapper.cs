@@ -397,7 +397,6 @@ namespace AutoMapper
         public static void Reset()
         {
             MapperRegistry.Reset();
-            Extensions.ClearExpressionCache();
             _configuration = LazyFactory.Create(_configurationInit);
             _mappingEngine = LazyFactory.Create(_mappingEngineInit);
         }

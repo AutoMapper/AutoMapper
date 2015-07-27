@@ -1,36 +1,62 @@
 namespace AutoMapper
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using Impl;
     using Internal;
     using Mappers;
+    using QueryableExtensions;
+    using QueryableExtensions.Impl;
 
     public class MappingEngine : IMappingEngine, IMappingEngineRunner
     {
         private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
 
-        private static readonly IProxyGeneratorFactory ProxyGeneratorFactory =
-            PlatformAdapter.Resolve<IProxyGeneratorFactory>();
+        private static readonly IProxyGeneratorFactory ProxyGeneratorFactory = PlatformAdapter.Resolve<IProxyGeneratorFactory>();
+
+        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
+        {
+            new MemberGetterExpressionResultConverter(),
+            new MemberResolverExpressionResultConverter(),
+            new NullSubstitutionExpressionResultConverter()
+        };
+
+        private static readonly IExpressionBinder[] Binders =
+        {
+            new NullableExpressionBinder(),
+            new AssignableExpressionBinder(),
+            new EnumerableExpressionBinder(),
+            new MappedTypeExpressionBinder(),
+            new CustomProjectionExpressionBinder(),
+            new StringExpressionBinder()
+        };
+
 
         private bool _disposed;
         private readonly IObjectMapper[] _mappers;
-        private readonly IDictionary<TypePair, IObjectMapper> _objectMapperCache;
+        private readonly Internal.IDictionary<TypePair, IObjectMapper> _objectMapperCache;
+        private readonly Internal.IDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
+
         private readonly Func<Type, object> _serviceCtor;
 
         public MappingEngine(IConfigurationProvider configurationProvider)
             : this(
-                configurationProvider, DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>(),
+                configurationProvider,
+                DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>(),
+                DictionaryFactory.CreateDictionary<ExpressionRequest, LambdaExpression>(),
                 configurationProvider.ServiceCtor)
         {
         }
 
-        public MappingEngine(IConfigurationProvider configurationProvider,
-            IDictionary<TypePair, IObjectMapper> objectMapperCache, Func<Type, object> serviceCtor)
+        public MappingEngine(IConfigurationProvider configurationProvider, Internal.IDictionary<TypePair, IObjectMapper> objectMapperCache, Internal.IDictionary<ExpressionRequest, LambdaExpression> expressionCache,
+            Func<Type, object> serviceCtor)
         {
             ConfigurationProvider = configurationProvider;
             _objectMapperCache = objectMapperCache;
+            _expressionCache = expressionCache;
             _serviceCtor = serviceCtor;
             _mappers = configurationProvider.GetMappers();
             ConfigurationProvider.TypeMapCreated += ClearTypeMap;
@@ -220,6 +246,153 @@ namespace AutoMapper
             var context = parentContext.CreateTypeContext(typeMap, source, null, sourceType, destinationType);
             return (TDestination) ((IMappingEngineRunner) this).Map(context);
         }
+
+        public Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params string[] membersToExpand)
+        {
+            parameters = parameters ?? new Dictionary<string, object>();
+
+            var cachedExpression =
+                _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand),
+                    tp => CreateMapExpression(tp, DictionaryFactory.CreateDictionary<ExpressionRequest, int>()));
+
+            if (!parameters.Any())
+                return cachedExpression;
+
+            var visitor = new ConstantExpressionReplacementVisitor(parameters);
+
+            return visitor.Visit(cachedExpression);
+        }
+
+        public LambdaExpression CreateMapExpression(ExpressionRequest request, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        {
+            // this is the input parameter of this expression with name <variableName>
+            ParameterExpression instanceParameter = Expression.Parameter(request.SourceType, "dto");
+
+            var total = CreateMapExpression(request, instanceParameter, typePairCount);
+
+            return Expression.Lambda(total, instanceParameter);
+        }
+
+        public Expression CreateMapExpression(ExpressionRequest request,
+            Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        {
+            var typeMap = ConfigurationProvider.ResolveTypeMap(request.SourceType,
+                request.DestinationType);
+
+            if (typeMap == null)
+            {
+                const string MessageFormat = "Missing map from {0} to {1}. Create using Mapper.CreateMap<{0}, {1}>.";
+
+                var message = string.Format(MessageFormat, request.SourceType.Name, request.DestinationType.Name);
+
+                throw new InvalidOperationException(message);
+            }
+
+            var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
+
+            var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
+            var visitor = new NewFinderVisitor();
+            var constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
+            visitor.Visit(parameterReplacer.Visit(constructorExpression));
+
+            var expression = Expression.MemberInit(
+                visitor.NewExpression,
+                bindings.ToArray()
+                );
+            return Expression.Convert(expression, request.DestinationType);
+        }
+
+        private class NewFinderVisitor : ExpressionVisitor
+        {
+            public NewExpression NewExpression { get; private set; }
+
+            protected override Expression VisitNew(NewExpression node)
+            {
+                NewExpression = node;
+                return base.VisitNew(node);
+            }
+        }
+
+        private List<MemberBinding> CreateMemberBindings(ExpressionRequest request,
+            TypeMap typeMap,
+            Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        {
+            var bindings = new List<MemberBinding>();
+
+            var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
+
+            if (visitCount >= typeMap.MaxDepth)
+                return bindings;
+
+            foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
+            {
+                var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter);
+
+                if (propertyMap.ExplicitExpansion &&
+                    !request.IncludedMembers.Contains(propertyMap.DestinationProperty.Name))
+                    continue;
+
+                var propertyTypeMap = ConfigurationProvider.ResolveTypeMap(result.Type,
+                    propertyMap.DestinationPropertyType);
+                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType,
+                    request.IncludedMembers);
+
+                var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
+
+                if (binder == null)
+                {
+                    var message =
+                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
+
+                    throw new AutoMapperMappingException(message);
+                }
+
+                var bindExpression = binder.Build(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
+
+                bindings.Add(bindExpression);
+            }
+            return bindings;
+        }
+
+        private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType,
+            Expression instanceParameter)
+        {
+            var result = new ExpressionResolutionResult(instanceParameter, currentType);
+            foreach (var resolver in propertyMap.GetSourceValueResolvers())
+            {
+                var matchingExpressionConverter =
+                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
+                if (matchingExpressionConverter == null)
+                    throw new Exception("Can't resolve this to Queryable Expression");
+                result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, resolver);
+            }
+            return result;
+        }
+
+        private class ConstantExpressionReplacementVisitor : ExpressionVisitor
+        {
+            private readonly System.Collections.Generic.IDictionary<string, object> _paramValues;
+
+            public ConstantExpressionReplacementVisitor(
+                System.Collections.Generic.IDictionary<string, object> paramValues)
+            {
+                _paramValues = paramValues;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (!node.Member.DeclaringType.Name.Contains("<>"))
+                    return base.VisitMember(node);
+
+                if (!_paramValues.ContainsKey(node.Member.Name))
+                    return base.VisitMember(node);
+
+                return Expression.Convert(
+                    Expression.Constant(_paramValues[node.Member.Name]),
+                    node.Member.GetMemberType());
+            }
+        }
+
 
         object IMappingEngineRunner.Map(ResolutionContext context)
         {

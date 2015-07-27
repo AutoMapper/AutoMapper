@@ -10,16 +10,18 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class QueryDataSourceInjection<TSource> : IQueryDataSourceInjection<TSource>
     {
         private readonly IQueryable<TSource> _dataSource;
+        private readonly IMappingEngine _mappingEngine;
 
-        public QueryDataSourceInjection(IQueryable<TSource> dataSource)
+        public QueryDataSourceInjection(IQueryable<TSource> dataSource, IMappingEngine mappingEngine)
         {
             _dataSource = dataSource;
+            _mappingEngine = mappingEngine;
         }
 
         public IQueryable<TDestination> For<TDestination>(SourceInjectedQueryInspector inspector = null)
         {
             return new SourceInjectedQuery<TSource, TDestination>(_dataSource,
-                new TDestination[0].AsQueryable(), Mapper.Engine, inspector);
+                new TDestination[0].AsQueryable(), _mappingEngine, inspector);
         }
     }
 }
