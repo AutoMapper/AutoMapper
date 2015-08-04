@@ -1,4 +1,4 @@
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || DNXCORE50
+#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT
 
 namespace AutoMapper.Mappers
 {
