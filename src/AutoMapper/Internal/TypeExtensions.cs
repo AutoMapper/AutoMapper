@@ -15,7 +15,7 @@ namespace System.Reflection
         {
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
-#elif SILVERLIGHT
+#elif SILVERLIGHT || NET40
             return type.GetGenericTypeDefinition().GetGenericArguments();
 #else
             return type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;
@@ -26,7 +26,7 @@ namespace System.Reflection
         {
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredConstructors;
-#elif SILVERLIGHT
+#elif SILVERLIGHT || NET40
             return type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 #else
             return type.GetTypeInfo().DeclaredConstructors;
@@ -37,7 +37,7 @@ namespace System.Reflection
         {
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredMembers;
-#elif SILVERLIGHT
+#elif SILVERLIGHT || NET40
             return type.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 #else
             return type.GetTypeInfo().DeclaredMembers;
@@ -48,7 +48,7 @@ namespace System.Reflection
         {
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredMethods;
-#elif SILVERLIGHT
+#elif SILVERLIGHT || NET40
             return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 #else
             return type.GetTypeInfo().DeclaredMethods;
@@ -59,7 +59,7 @@ namespace System.Reflection
         {
 #if MONODROID || MONOTOUCH || __IOS__
             return type.GetTypeInfo().GetMethods();
-#elif SILVERLIGHT
+#elif SILVERLIGHT || NET40
             return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 #elif DNXCORE50
             return type.GetMethods();
@@ -72,7 +72,7 @@ namespace System.Reflection
         {
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
             return type.GetTypeInfo().DeclaredProperties;
-#elif SILVERLIGHT
+#elif SILVERLIGHT || NET40
             return type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 #else
             return type.GetTypeInfo().DeclaredProperties;
@@ -119,7 +119,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().Assembly;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.Assembly;
 #else
             return type.GetTypeInfo().Assembly;
@@ -130,7 +130,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().BaseType;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.BaseType;
 #else
             return type.GetTypeInfo().BaseType;
@@ -150,7 +150,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsAbstract;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsAbstract;
 #else
             return type.GetTypeInfo().IsAbstract;
@@ -161,7 +161,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsClass;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsClass;
 #else
             return type.GetTypeInfo().IsClass;
@@ -172,7 +172,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsEnum;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsEnum;
 #else
             return type.GetTypeInfo().IsEnum;
@@ -183,7 +183,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsGenericType;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsGenericType;
 #else
             return type.GetTypeInfo().IsGenericType;
@@ -194,7 +194,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsGenericTypeDefinition;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsGenericTypeDefinition;
 #else
             return type.GetTypeInfo().IsGenericTypeDefinition;
@@ -205,7 +205,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsInterface;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsInterface;
 #else
             return type.GetTypeInfo().IsInterface;
@@ -216,7 +216,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsPrimitive;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsPrimitive;
 #else
             return type.GetTypeInfo().IsPrimitive;
@@ -227,7 +227,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsSealed;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsSealed;
 #else
             return type.GetTypeInfo().IsSealed;
@@ -238,7 +238,7 @@ namespace System.Reflection
         {
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().IsValueType;
-#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__
+#elif SILVERLIGHT || MONODROID || MONOTOUCH || __IOS__ || NET40
             return type.IsValueType;
 #else
             return type.GetTypeInfo().IsValueType;
@@ -246,7 +246,7 @@ namespace System.Reflection
         }
 
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NET40
         public static bool IsInstanceOfType(this Type type, object o)
         {
             return o != null && type.IsAssignableFrom(o.GetType());

@@ -27,6 +27,17 @@
                 "define": [ "NET4" ]
             }
         },
+        "net40": {
+            "dependencies": {
+                "Microsoft.Bcl": "1.1.9"
+            },
+            "compilationOptions": {
+                "define": [ "NET40" ]
+            }
+        },
+        "net35": {
+
+        },
         "sl5": {
             "frameworkAssemblies": {
                 "System": "",
