@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.0.0' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.0.1' }
 	$assemblyVersion = $pkgVersion -replace "\-.*$", ".0"
 	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
@@ -61,6 +61,7 @@ task dist {
 	create_directory $build_dir
 	create_directory $dist_dir
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\net45" "$dist_dir\net45"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\net40" "$dist_dir\net40"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10" "$dist_dir\Portable"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\sl50" "$dist_dir\sl50"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\wp80" "$dist_dir\wp80"
@@ -69,9 +70,9 @@ task dist {
 	copy_files "$source_dir\AutoMapper.Android\bin\$config" "$dist_dir\MonoAndroid"
 	copy_files "$source_dir\AutoMapper.iOS\bin\$config" "$dist_dir\MonoTouch"
 	copy_files "$source_dir\AutoMapper.iOS10\bin\$config" "$dist_dir\Xamarin.iOS10"
-	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dnx46" "$dist_dir\dnx46"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dotnet" "$dist_dir\dotnet"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
+	exec { & $base_dir\RefGen.exe ".NETPlatform,Version=v5.0" "dotnet" "$base_dir\AutoMapper.nuspec" "$source_dir\AutoMapper\AutoMapper.xproj" "$dist_dir\dotnet\AutoMapper.dll" }
 }
 
 # -------------------------------------------------------------------------------------------------------------
@@ -171,6 +172,10 @@ function global:create-nuspec($version, $fileName)
       <frameworkAssembly assemblyName=""System"" targetFramework="".NETFramework4.5"" />
       <frameworkAssembly assemblyName=""System.Core"" targetFramework="".NETFramework4.5"" />
       <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework="".NETFramework4.5"" />
+      <frameworkAssembly assemblyName=""mscorlib"" targetFramework="".NETFramework4.0"" />
+      <frameworkAssembly assemblyName=""System"" targetFramework="".NETFramework4.0"" />
+      <frameworkAssembly assemblyName=""System.Core"" targetFramework="".NETFramework4.0"" />
+      <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework="".NETFramework4.0"" />
       <frameworkAssembly assemblyName=""System"" targetFramework=""Silverlight5.0"" />
       <frameworkAssembly assemblyName=""System.Core"" targetFramework=""Silverlight5.0"" />
       <frameworkAssembly assemblyName=""mscorlib"" targetFramework=""Silverlight5.0"" />
@@ -201,11 +206,30 @@ function global:create-nuspec($version, $fileName)
       <frameworkAssembly assemblyName=""System.ObjectModel"" targetFramework="".NETCore4.5"" />
       <frameworkAssembly assemblyName=""System.Runtime.Extensions"" targetFramework="".NETCore4.5"" />
       <frameworkAssembly assemblyName=""System.Threading"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""mscorlib"" targetFramework=""DNX4.6"" />
-      <frameworkAssembly assemblyName=""System"" targetFramework=""DNX4.6"" />
-      <frameworkAssembly assemblyName=""System.Core"" targetFramework=""DNX4.6"" />
-      <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework=""DNX4.6"" />
     </frameworkAssemblies>
+	  <dependencies>
+		<group targetFramework=""portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10"">
+		</group>
+		<group targetFramework=""net45"">
+		</group>
+		<group targetFramework=""net40"">
+	      <dependency id=""Microsoft.Bcl"" version=""1.1.9"" />
+		</group>
+		<group targetFramework=""sl50"">
+		</group>
+		<group targetFramework=""wp80"">
+		</group>
+		<group targetFramework=""wpa81"">
+		</group>
+		<group targetFramework=""win"">
+		</group>
+		<group targetFramework=""MonoAndroid"">
+		</group>
+		<group targetFramework=""MonoTouch"">
+		</group>
+		<group targetFramework=""Xamarin.iOS10"">
+		</group>
+	  </dependencies>
   </metadata>
   <files>
     <file src=""$dist_dir\Portable\AutoMapper.dll"" target=""lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10"" />
@@ -214,6 +238,9 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\net45\AutoMapper.dll"" target=""lib\net45"" />
     <file src=""$dist_dir\net45\AutoMapper.pdb"" target=""lib\net45"" />
     <file src=""$dist_dir\net45\AutoMapper.xml"" target=""lib\net45"" />
+    <file src=""$dist_dir\net40\AutoMapper.dll"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.pdb"" target=""lib\net40"" />
+    <file src=""$dist_dir\net40\AutoMapper.xml"" target=""lib\net40"" />
     <file src=""$dist_dir\sl50\AutoMapper.dll"" target=""lib\sl50"" />
     <file src=""$dist_dir\sl50\AutoMapper.pdb"" target=""lib\sl50"" />
     <file src=""$dist_dir\sl50\AutoMapper.xml"" target=""lib\sl50"" />
@@ -235,9 +262,6 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.dll"" target=""lib\Xamarin.iOS10"" />
     <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.pdb"" target=""lib\Xamarin.iOS10"" />
     <file src=""$dist_dir\Xamarin.iOS10\AutoMapper.xml"" target=""lib\Xamarin.iOS10"" />
-    <file src=""$dist_dir\dnx46\AutoMapper.dll"" target=""lib\dnx46"" />
-    <file src=""$dist_dir\dnx46\AutoMapper.pdb"" target=""lib\dnx46"" />
-    <file src=""$dist_dir\dnx46\AutoMapper.xml"" target=""lib\dnx46"" />
     <file src=""$dist_dir\dotnet\AutoMapper.dll"" target=""lib\dotnet"" />
     <file src=""$dist_dir\dotnet\AutoMapper.pdb"" target=""lib\dotnet"" />
     <file src=""$dist_dir\dotnet\AutoMapper.xml"" target=""lib\dotnet"" />

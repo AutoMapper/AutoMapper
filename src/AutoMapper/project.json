@@ -1,5 +1,5 @@
 {
-    "version": "4.0.0-*",
+    "version": "4.0.1-*",
 
     "compilationOptions": { "keyFile": "..\\AutoMapper.snk" },
 
@@ -25,7 +25,7 @@
         "net45": {
             "compilationOptions": {
                 "define": [ "NET4" ]
-            }
+            },
         },
         "net40": {
             "dependencies": {
@@ -93,7 +93,6 @@
                 "define": [ "NETCORE45" ]
             }
         },
-        "dnx46": { },
         "dotnet": {
             "dependencies": {
                 "Microsoft.NETCore": "5.0.0",
