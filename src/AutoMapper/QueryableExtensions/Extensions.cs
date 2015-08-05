@@ -68,7 +68,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the static <see cref="Mapper.Engine"/> property.
+        /// Extension method to project from a queryable using the static <see cref="Mapper.Engine"/> property.
         /// Due to generic parameter inference, you need to call Project().To to execute the map
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
@@ -82,7 +82,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the provided mapping engine
+        /// Extension method to project from a queryable using the provided mapping engine
         /// Due to generic parameter inference, you need to call Project().To to execute the map
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
@@ -97,7 +97,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the static <see cref="Mapper.Engine"/> property.
+        /// Extension method to project from a queryable using the static <see cref="Mapper.Engine"/> property.
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
         /// <typeparam name="TDestination">Destination type</typeparam>
@@ -110,7 +110,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the provided mapping engine
+        /// Extension method to project from a queryable using the provided mapping engine
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
         /// <typeparam name="TDestination">Destination type</typeparam>
