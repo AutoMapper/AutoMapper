@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    using Bug.AssignableLists;
     using QueryableExtensions;
     using Should;
     using Xunit;
@@ -103,5 +102,59 @@
 
             newDests[0].Value.ShouldEqual(20);
         }
+    }
+
+    public class ParameterizedQueriesTests_with_filter : AutoMapperSpecBase
+    {
+        public class User
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public DateTime? DateActivated { get; set; }
+        }
+
+        public class UserViewModel
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public DateTime? DateActivated { get; set; }
+            public int position { get; set; }
+        }
+
+        public class DB
+        {
+            public DB()
+            {
+                Users = new List<User>()
+                {
+                    new User {DateActivated = new DateTime(2000, 1, 1), Id = 1, Name = "Joe Schmoe"},
+                    new User {DateActivated = new DateTime(2000, 2, 1), Id = 2, Name = "John Schmoe"},
+                    new User {DateActivated = new DateTime(2000, 3, 1), Id = 3, Name = "Jim Schmoe"},
+                }.AsQueryable();
+            }
+            public IQueryable<User> Users { get; }
+        }
+
+        protected override void Establish_context()
+        {
+            Mapper.Initialize(cfg =>
+            {
+                DB db = null;
+
+                cfg.CreateMap<User, UserViewModel>()
+                    .ForMember(a => a.position, opt => opt.MapFrom(src => db.Users.Count(u => u.DateActivated < src.DateActivated)));
+            });
+        }
+
+        [Fact]
+        public void Should_only_replace_outer_parameters()
+        {
+            var db = new DB();
+
+            var user = db.Users.Project().To<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == 2);
+
+            user.position.ShouldEqual(1);
+        }
+
     }
 }
