@@ -523,6 +523,17 @@ namespace AutoMapper.Internal
             TypeMap.DestinationTypeOverride = typeof(T);
         }
 
+        public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
+        {
+            var param = TypeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == ctorParamName);
+
+            var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(param);
+
+            paramOptions(ctorParamExpression);
+
+            return this;
+        }
+
         private Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)
         {
             return context =>

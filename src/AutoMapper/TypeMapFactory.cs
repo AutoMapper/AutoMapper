@@ -59,12 +59,11 @@ namespace AutoMapper
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (!MapDestinationPropertyToSource(members, sourceTypeInfo, parameter.Name, options))
-                    return false;
+                var canResolve = MapDestinationPropertyToSource(members, sourceTypeInfo, parameter.Name, options);
 
                 var resolvers = members.Select(mi => mi.ToMemberGetter());
 
-                var param = new ConstructorParameterMap(parameter, resolvers.ToArray());
+                var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), canResolve);
 
                 parameters.Add(param);
             }
