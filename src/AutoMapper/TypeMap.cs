@@ -390,10 +390,6 @@ namespace AutoMapper
 
                     AddInheritedPropertyMap(propertyMap);
                 }
-                else
-                {
-                    
-                }
             }
 
             //Include BeforeMap
@@ -412,7 +408,7 @@ namespace AutoMapper
                 return ctorExpr;
             }
             Expression newExpression;
-            if(ConstructorMap != null)
+            if(ConstructorMap != null && ConstructorMap.CtorParams.All(p => p.CanResolve))
             {
                 newExpression = ConstructorMap.NewExpression(instanceParameter);
             }
