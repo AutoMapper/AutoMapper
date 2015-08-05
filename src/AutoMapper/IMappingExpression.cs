@@ -255,6 +255,12 @@ namespace AutoMapper
         /// <returns>New source object to map.</returns>
         IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc);
 
+        /// <summary>
+        /// Customize configuration for individual constructor parameter
+        /// </summary>
+        /// <param name="ctorParamName">Constructor parameter name</param>
+        /// <param name="paramOptions">Options</param>
+        /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions);
 
         /// <summary>

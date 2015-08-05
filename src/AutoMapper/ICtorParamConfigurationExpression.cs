@@ -7,6 +7,11 @@
 
     public interface ICtorParamConfigurationExpression<TSource>
     {
+        /// <summary>
+        /// Map constructor parameter from member expression
+        /// </summary>
+        /// <typeparam name="TMember">Member type</typeparam>
+        /// <param name="sourceMember">Member expression</param>
         void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
     }
 
