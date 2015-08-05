@@ -35,9 +35,6 @@
                 "define": [ "NET40" ]
             }
         },
-        "net35": {
-
-        },
         "sl5": {
             "frameworkAssemblies": {
                 "System": "",
