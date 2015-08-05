@@ -130,6 +130,10 @@ namespace AutoMapper.Internal
         {
             return context =>
             {
+                if(type.IsGenericTypeDefinition())
+                {
+                    type = type.MakeGenericType(context.SourceType.GetGenericArguments());
+                }
                 var obj = context.Options.ServiceCtor?.Invoke(type);
                 if (obj != null)
                     return (TServiceType)obj;
@@ -190,6 +194,10 @@ namespace AutoMapper.Internal
             if (destMember == null)
             {
                 var fieldInfo = TypeMap.DestinationType.GetField(name);
+                if(fieldInfo == null)
+                {
+                    throw new ArgumentOutOfRangeException("name", "Cannot find a field or property named " + name);
+                }
                 destMember = new FieldAccessor(fieldInfo);
             }
             ForDestinationMember(destMember, memberOptions);
@@ -198,7 +206,7 @@ namespace AutoMapper.Internal
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var typeInfo = new TypeInfo(TypeMap.DestinationType);
+            var typeInfo = new TypeInfo(TypeMap.DestinationType, _configurationContainer.ShouldMapProperty, _configurationContainer.ShouldMapField);
 
             typeInfo.PublicWriteAccessors.Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }
@@ -303,6 +311,14 @@ namespace AutoMapper.Internal
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
             _propertyMap.SetCustomValueResolverExpression(sourceMember);
+        }
+
+        public void MapFrom<TMember>(string property)
+        {
+            var par = Expression.Parameter(typeof (TSource));
+            var prop = Expression.Property(par, property);
+            var lambda = Expression.Lambda<Func<TSource, TMember>>(prop, par);
+            _propertyMap.SetCustomValueResolverExpression(lambda);
         }
 
         public void UseValue<TValue>(TValue value)
@@ -505,6 +521,17 @@ namespace AutoMapper.Internal
         public void As<T>()
         {
             TypeMap.DestinationTypeOverride = typeof(T);
+        }
+
+        public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
+        {
+            var param = TypeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == ctorParamName);
+
+            var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(param);
+
+            paramOptions(ctorParamExpression);
+
+            return this;
         }
 
         private Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)

@@ -84,6 +84,7 @@
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
+    <Compile Include="Bug\AfterMapNestedObjects.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
     <Compile Include="AutoMapperTester.cs" />
@@ -94,7 +95,11 @@
     <Compile Include="Bug\AssignableCollectionBug.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
+    <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
+    <Compile Include="Bug\TargetISet.cs" />
+    <Compile Include="Bug\CollectionsNullability.cs" />
     <Compile Include="Bug\ConditionBug.cs" />
+    <Compile Include="Bug\ConstructorParameterNamedType.cs" />
     <Compile Include="Bug\ContextValuesIncorrect.cs" />
     <Compile Include="Bug\DestinationCtorCalledTwice.cs" />
     <Compile Include="Bug\DestinationValueInitializedByCtorBug.cs" />
@@ -104,19 +109,31 @@
     <Compile Include="Bug\AddingConfigurationForNonMatchingDestinationMemberBug.cs" />
     <Compile Include="Bug\DeepInheritanceIssue.cs" />
     <Compile Include="Bug\DuplicateValuesBug.cs" />
+    <Compile Include="Bug\DynamicMapArrays.cs" />
     <Compile Include="Bug\EFCollections.cs" />
     <Compile Include="Bug\EmptyNullSubstituteBug.cs" />
     <Compile Include="Bug\EnumConditionsBug.cs" />
     <Compile Include="Bug\EnumMatchingOnValue.cs" />
+    <Compile Include="Bug\GenericTypeConverter.cs" />
+    <Compile Include="Bug\PropertyNamedType.cs" />
+    <Compile Include="Bug\NullableIntToNullableEnum.cs" />
+    <Compile Include="Bug\ConstructUsingReturnsNull.cs" />
+    <Compile Include="Bug\InternalProperties.cs" />
+    <Compile Include="Bug\CollectionWhere.cs" />
+    <Compile Include="Bug\ObjectEnumToObjectEnum.cs" />
     <Compile Include="Bug\ExistingArrays.cs" />
+    <Compile Include="Bug\ExpressionMapping.cs" />
     <Compile Include="Bug\IgnoreAll.cs" />
     <Compile Include="Bug\InheritanceIssue.cs" />
     <Compile Include="Bug\InterfaceSelfMappingBug.cs" />
+    <Compile Include="Bug\IntToNullableDecimal.cs" />
     <Compile Include="Bug\ListSourceMapperBug.cs" />
+    <Compile Include="Bug\NonExistingProperty.cs" />
+    <Compile Include="Bug\NestedMappingProjectionsExplicitExpanding.cs" />
+    <Compile Include="Bug\MultidimensionalArrays.cs" />
     <Compile Include="Bug\NullArrayBug.cs" />
     <Compile Include="Bug\ReadOnlyCollectionMappingBug.cs" />
     <Compile Include="Bug\MappingInheritance.cs" />
-    <Compile Include="Bug\MappingToAProtectedCollection.cs" />
     <Compile Include="Bug\MemberNamedTypeBug.cs" />
     <Compile Include="Bug\MultipleInterfaceInheritance.cs" />
     <Compile Include="Bug\MultipleTypeConverterInterfaces.cs" />
@@ -130,7 +147,9 @@
     <Compile Include="Bug\ObjectTypeMapFailure.cs" />
     <Compile Include="Bug\ParentChildResolversBug.cs" />
     <Compile Include="Bug\ProjectCollectionsBug.cs" />
+    <Compile Include="Bug\ReadOnlyFieldMappingBug.cs" />
     <Compile Include="Bug\RecognizeIxesBug.cs" />
+    <Compile Include="Bug\RemovePrefixes.cs" />
     <Compile Include="Bug\RepeatedMappingConfigurationTest.cs" />
     <Compile Include="Bug\SelectiveConfigurationValidation.cs" />
     <Compile Include="Bug\SequenceContainsNoElementsTest.cs">
@@ -143,6 +162,7 @@
     <Compile Include="ContextItems.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
+    <Compile Include="EnumToNullableEnum.cs" />
     <Compile Include="ExpressionBridge.cs" />
     <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
@@ -205,6 +225,7 @@
     <Compile Include="Projection\ProjectEnumTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="Projection\ToStringTests.cs" />
+    <Compile Include="Query\SourceInjectedQuery.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
@@ -255,6 +276,7 @@
     <Compile Include="Should\should\StringAssertionExtensions.cs" />
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
+    <Compile Include="Bug\ProjectConstructorParameters.cs" />
     <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\MapperTests.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />

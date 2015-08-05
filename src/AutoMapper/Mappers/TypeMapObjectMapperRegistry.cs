@@ -87,7 +87,7 @@ namespace AutoMapper.Mappers
                     context.InstanceCache[context] = mappedObject;
 
                 context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
-                context.Options.BeforeMapAction(context.SourceValue, mappedObject);
+                context.BeforeMap(mappedObject);
 
                 foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
                 {
@@ -95,7 +95,7 @@ namespace AutoMapper.Mappers
                 }
                 mappedObject = ReassignValue(context, mappedObject);
 
-                context.Options.AfterMapAction(context.SourceValue, mappedObject);
+                context.AfterMap(mappedObject);
                 context.TypeMap.AfterMap(context.SourceValue, mappedObject);
 
                 return mappedObject;
@@ -203,7 +203,10 @@ namespace AutoMapper.Mappers
             protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
             {
                 var result = mapper.CreateObject(context);
-                context.SetResolvedDestinationValue(result);
+                if(result == null)
+                {
+                    throw new InvalidOperationException("Cannot create destination object. " + context);
+                }
                 return result;
             }
         }
@@ -217,9 +220,7 @@ namespace AutoMapper.Mappers
 
             protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
             {
-                var result = context.DestinationValue;
-                context.SetResolvedDestinationValue(result);
-                return result;
+                return context.DestinationValue;
             }
         }
     }

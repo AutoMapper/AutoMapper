@@ -17,8 +17,14 @@ namespace AutoMapper.Internal
         public object Convert(ResolutionContext context)
         {
             var converter = _instantiator(context);
+            var method = _converterMethod.ContainsGenericParameters ? GetClosedConvertMethod(context) : _converterMethod;
+            return method.Invoke(converter, new[] { context });
+        }
 
-            return _converterMethod.Invoke(converter, new[] {context});
+        private MethodInfo GetClosedConvertMethod(ResolutionContext context)
+        {
+            var interfaceType = typeof(ITypeConverter<,>).MakeGenericType(context.SourceType, context.DestinationType);
+            return interfaceType.GetMethod("Convert");
         }
     }
 

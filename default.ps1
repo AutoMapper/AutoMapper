@@ -19,6 +19,7 @@ properties {
 
 task default -depends local
 task local -depends compile, test
+task lite -depends compile, test-lite
 task full -depends local, dist
 task ci -depends clean, release, commonAssemblyInfo, local, dist
 
@@ -51,6 +52,11 @@ task test {
     exec { & $source_dir\packages\xunit.runners.2.0.0-beta5-build2785\tools\xunit.console.x86.exe $source_dir/UnitTests/bin/WP8/$config/AutoMapper.UnitTests.WP8.dll -xml $result_dir\AutoMapper.UnitTests.WP8.xml -parallel none }
 }
 
+task test-lite {
+	create_directory "$build_dir\results"
+    exec { & $source_dir\packages\Fixie.1.0.0.3\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.UnitTests.Net4.xml $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll }
+}
+
 task dist {
 	create_directory $build_dir
 	create_directory $dist_dir
@@ -64,7 +70,7 @@ task dist {
 	copy_files "$source_dir\AutoMapper.iOS\bin\$config" "$dist_dir\MonoTouch"
 	copy_files "$source_dir\AutoMapper.iOS10\bin\$config" "$dist_dir\Xamarin.iOS10"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dnx46" "$dist_dir\dnx46"
-	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dnxcore50" "$dist_dir\dnxcore50"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dotnet" "$dist_dir\dotnet"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
 }
 
@@ -148,25 +154,6 @@ function global:create-nuspec($version, $fileName)
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A convention-based object-object mapper</summary>
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
-    <dependencies>
-      <group targetFramework=""DNXCore5.0"">
-        <dependency id=""System.Collections"" version=""4.0.10-beta-22816"" />
-        <dependency id=""System.Collections.Concurrent"" version=""4.0.10-beta-22816"" />
-        <dependency id=""System.Collections.Specialized"" version=""4.0.0-beta-22816"" />
-        <dependency id=""System.ObjectModel"" version=""4.0.10-beta-22816"" />
-        <dependency id=""System.ComponentModel.TypeConverter"" version=""4.0.0-beta-22816"" />
-        <dependency id=""System.Diagnostics.Debug"" version=""4.0.10-beta-22816"" />
-        <dependency id=""System.Linq"" version=""4.0.0-beta-22816"" />
-        <dependency id=""System.Linq.Expressions"" version=""4.0.10-beta-22816"" />
-        <dependency id=""System.Linq.Queryable"" version=""4.0.0-beta-22816"" />
-        <dependency id=""System.Text.RegularExpressions"" version=""4.0.10-beta-22816"" />
-        <dependency id=""System.Threading"" version=""4.0.10-beta-22816"" />
-        <dependency id=""System.Reflection"" version=""4.0.10-beta-22816"" />
-        <dependency id=""System.Reflection.Extensions"" version=""4.0.0-beta-22816"" />
-        <dependency id=""System.Reflection.TypeExtensions"" version=""4.0.0-beta-22816"" />
-        <dependency id=""System.Runtime.Extensions"" version=""4.0.10-beta-22816"" />
-      </group>
-    </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName=""System.Collections"" targetFramework="".NETPortable4.5-Profile259"" />
       <frameworkAssembly assemblyName=""System.Runtime"" targetFramework="".NETPortable4.5-Profile259"" />
@@ -251,10 +238,10 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\dnx46\AutoMapper.dll"" target=""lib\dnx46"" />
     <file src=""$dist_dir\dnx46\AutoMapper.pdb"" target=""lib\dnx46"" />
     <file src=""$dist_dir\dnx46\AutoMapper.xml"" target=""lib\dnx46"" />
-    <file src=""$dist_dir\dnxcore50\AutoMapper.dll"" target=""lib\dnxcore50"" />
-    <file src=""$dist_dir\dnxcore50\AutoMapper.pdb"" target=""lib\dnxcore50"" />
-    <file src=""$dist_dir\dnxcore50\AutoMapper.xml"" target=""lib\dnxcore50"" />
-    <file src=""**\*.cs"" target=""src"" />
+    <file src=""$dist_dir\dotnet\AutoMapper.dll"" target=""lib\dotnet"" />
+    <file src=""$dist_dir\dotnet\AutoMapper.pdb"" target=""lib\dotnet"" />
+    <file src=""$dist_dir\dotnet\AutoMapper.xml"" target=""lib\dotnet"" />
+    <file src=""src\**\*.cs"" target=""src"" />
   </files>
-</package>" | out-file $build_dir\$fileName -encoding "ASCII"
+</package>" | out-file $fileName -encoding "ASCII"
 }

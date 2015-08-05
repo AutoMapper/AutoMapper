@@ -16,8 +16,8 @@ namespace AutoMapper
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options,
             MemberList memberList)
         {
-            var sourceTypeInfo = GetTypeInfo(sourceType, options.SourceExtensionMethods);
-            var destTypeInfo = GetTypeInfo(destinationType, new MethodInfo[0]);
+            var sourceTypeInfo = GetTypeInfo(sourceType, options);
+            var destTypeInfo = GetTypeInfo(destinationType, options.ShouldMapProperty, options.ShouldMapField, new MethodInfo[0]);
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
 
@@ -59,12 +59,11 @@ namespace AutoMapper
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (!MapDestinationPropertyToSource(members, sourceTypeInfo, parameter.Name, options))
-                    return false;
+                var canResolve = MapDestinationPropertyToSource(members, sourceTypeInfo, parameter.Name, options);
 
                 var resolvers = members.Select(mi => mi.ToMemberGetter());
 
-                var param = new ConstructorParameterMap(parameter, resolvers.ToArray());
+                var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), canResolve);
 
                 parameters.Add(param);
             }
@@ -74,11 +73,14 @@ namespace AutoMapper
             return true;
         }
 
-        private TypeInfo GetTypeInfo(Type type, IEnumerable<MethodInfo> extensionMethodsToSearch)
+        private TypeInfo GetTypeInfo(Type type, IMappingOptions mappingOptions)
         {
-            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, extensionMethodsToSearch));
+            return GetTypeInfo(type, mappingOptions.ShouldMapProperty, mappingOptions.ShouldMapField, mappingOptions.SourceExtensionMethods);
+        }
 
-            return typeInfo;
+        private TypeInfo GetTypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> extensionMethodsToSearch)
+        {
+            return _typeInfos.GetOrAdd(type, t => new TypeInfo(type, shouldMapProperty, shouldMapField, extensionMethodsToSearch));
         }
 
         private bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeInfo sourceType,
@@ -121,7 +123,7 @@ namespace AutoMapper
                         resolvers.AddLast(valueResolver);
 
                         foundMatch = MapDestinationPropertyToSource(resolvers,
-                            GetTypeInfo(valueResolver.GetMemberType(), mappingOptions.SourceExtensionMethods),
+                            GetTypeInfo(valueResolver.GetMemberType(), mappingOptions),
                             snippet.Second, mappingOptions);
 
                         if (!foundMatch)

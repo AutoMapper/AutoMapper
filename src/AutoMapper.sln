@@ -1,16 +1,14 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0691ABF2-B3C7-43BF-9862-2D8D1299CE58}"
 	ProjectSection(SolutionItems) = preProject
 		AutoMapper.targets = AutoMapper.targets
 		..\default.ps1 = ..\default.ps1
 		..\global.json = ..\global.json
-		Install.ps1 = Install.ps1
 		..\psake.bat = ..\psake.bat
 		..\README.md = ..\README.md
-		uninstall.ps1 = uninstall.ps1
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Net4", "UnitTests\UnitTests.Net4.csproj", "{002075C5-6517-4794-BC99-9B17B9E884E7}"
@@ -86,6 +84,7 @@ Global
 		{002075C5-6517-4794-BC99-9B17B9E884E7}.ReleaseWin8|x64.ActiveCfg = Release|Any CPU
 		{002075C5-6517-4794-BC99-9B17B9E884E7}.ReleaseWin8|x86.ActiveCfg = Release|Any CPU
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Debug|ARM.ActiveCfg = Debug|Any CPU
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -98,6 +97,7 @@ Global
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.ReleaseWin8|x64.ActiveCfg = Release|Any CPU
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.ReleaseWin8|x86.ActiveCfg = Release|Any CPU
 		{B8051389-CB47-46FB-B234-9D49506704AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8051389-CB47-46FB-B234-9D49506704AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8051389-CB47-46FB-B234-9D49506704AA}.Debug|ARM.ActiveCfg = Debug|Any CPU
 		{B8051389-CB47-46FB-B234-9D49506704AA}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{B8051389-CB47-46FB-B234-9D49506704AA}.Debug|x86.ActiveCfg = Debug|Any CPU

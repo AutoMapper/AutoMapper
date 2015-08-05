@@ -46,6 +46,11 @@ namespace AutoMapper
         IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList);
 
         /// <summary>
+        /// Clear the list of recognized prefixes.
+        /// </summary>
+        void ClearPrefixes();
+
+        /// <summary>
         /// Recognize a list of prefixes to be removed from source member names when matching
         /// </summary>
         /// <param name="prefixes">List of prefixes</param>
@@ -115,5 +120,17 @@ namespace AutoMapper
         /// Naming convention for destination members
         /// </summary>
         INamingConvention DestinationMemberNamingConvention { get; set; }
+
+        /// <summary>
+        /// Specify which properties should be mapped.
+        /// By default only public properties are mapped.
+        /// </summary>
+        Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+
+        /// <summary>
+        /// Specify which fields should be mapped.
+        /// By default only public fields are mapped.
+        /// </summary>
+        Func<FieldInfo, bool> ShouldMapField { get; set; }
     }
 }

@@ -46,7 +46,7 @@ namespace AutoMapper
         /// <summary>
         /// Destination value
         /// </summary>
-        public object DestinationValue { get; private set; }
+        public object DestinationValue { get; }
 
         /// <summary>
         /// Parent resolution context
@@ -150,7 +150,8 @@ namespace AutoMapper
             SourceValue = sourceValue;
             DestinationValue = destinationValue;
             Parent = context;
-            DestinationType = propertyMap.DestinationProperty.MemberType;
+            var destinationMemberType = propertyMap.DestinationProperty.MemberType;
+            DestinationType = destinationMemberType == typeof(object) ? sourceType : destinationMemberType;
             InstanceCache = context.InstanceCache;
             Options = context.Options;
             Engine = context.Engine;
@@ -177,11 +178,6 @@ namespace AutoMapper
             }
             Options = context.Options;
             Engine = context.Engine;
-        }
-
-        public void SetResolvedDestinationValue(object destintationValue)
-        {
-            DestinationValue = destintationValue;
         }
 
         public string MemberName => PropertyMap == null
@@ -285,6 +281,22 @@ namespace AutoMapper
         {
             return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions(),
                 Mapper.Engine);
+        }
+
+        internal void BeforeMap(object destination)
+        {
+            if(Parent == null)
+            {
+                Options.BeforeMapAction(SourceValue, destination);
+            }
+        }
+
+        internal void AfterMap(object destination)
+        {
+            if(Parent == null)
+            {
+                Options.AfterMapAction(SourceValue, destination);
+            }
         }
     }
 }

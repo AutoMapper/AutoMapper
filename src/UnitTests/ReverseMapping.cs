@@ -6,6 +6,66 @@ namespace AutoMapper.UnitTests
 {
     namespace ReverseMapping
     {
+        using System;
+        using System.Text.RegularExpressions;
+
+        public class ReverseMapConventions : AutoMapperSpecBase
+        {
+            Rotator_Ad_Run _destination;
+            DateTime _startDate = DateTime.Now, _endDate = DateTime.Now.AddHours(2);
+
+            public class Rotator_Ad_Run
+            {
+                public DateTime Start_Date { get; set; }
+                public DateTime End_Date { get; set; }
+                public bool Enabled { get; set; }
+            }
+
+            public class RotatorAdRunViewModel
+            {
+                public DateTime StartDate { get; set; }
+                public DateTime EndDate { get; set; }
+                public bool Enabled { get; set; }
+            }
+
+            public class UnderscoreNamingConvention : INamingConvention
+            {
+                public Regex SplittingExpression { get; } = new Regex(@"\p{Lu}[a-z0-9]*(?=_?)");
+
+                public string SeparatorCharacter => "_";
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(config =>
+                {
+                    config.CreateProfile("MyMapperProfile", prf =>
+                    {
+                        prf.SourceMemberNamingConvention = new UnderscoreNamingConvention();
+                        prf.CreateMap<Rotator_Ad_Run, RotatorAdRunViewModel>();
+                    });
+                    config.CreateProfile("MyMapperProfile2", prf =>
+                    {
+                        prf.DestinationMemberNamingConvention = new UnderscoreNamingConvention();
+                        prf.CreateMap<RotatorAdRunViewModel, Rotator_Ad_Run>();
+                    });
+                });
+            }
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<RotatorAdRunViewModel, Rotator_Ad_Run>(new RotatorAdRunViewModel { Enabled = true, EndDate = _endDate, StartDate = _startDate });
+            }
+
+            [Fact]
+            public void Should_apply_the_convention_in_reverse()
+            {
+                _destination.Enabled.ShouldBeTrue();
+                _destination.End_Date.ShouldEqual(_endDate);
+                _destination.Start_Date.ShouldEqual(_startDate);
+            }
+        }
+
         public class When_reverse_mapping_classes_with_simple_properties : AutoMapperSpecBase
         {
             private Source _source;

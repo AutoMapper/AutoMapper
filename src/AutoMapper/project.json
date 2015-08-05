@@ -1,6 +1,8 @@
 {
     "version": "4.0.0-*",
 
+    "compilationOptions": { "keyFile": "..\\AutoMapper.snk" },
+
     "frameworks": {
 
         ".NETPortable,Version=v4.5,Profile=Profile259": {
@@ -17,10 +19,21 @@
                 "System.ObjectModel": "",
                 "System.Runtime.Extensions": "",
                 "System.Threading": ""
-            }
+            },
+            "compilationOptions": { "define": [ "PORTABLE" ] }
         },
         "net45": {
-            "compilationOptions": { "define": [ "NET4" ], "keyFile" : "..\\AutoMapper.snk" }
+            "compilationOptions": {
+                "define": [ "NET4" ]
+            }
+        },
+        "net40": {
+            "dependencies": {
+                "Microsoft.Bcl": "1.1.9"
+            },
+            "compilationOptions": {
+                "define": [ "NET40" ]
+            }
         },
         "sl5": {
             "frameworkAssemblies": {
@@ -28,7 +41,9 @@
                 "System.Core": "",
                 "mscorlib": ""
             },
-            "compilationOptions": { "define": [ "SILVERLIGHT" ], "keyFile" : "..\\AutoMapper.snk" }
+            "compilationOptions": {
+                "define": [ "SILVERLIGHT" ]
+            }
         },
         "wp8": {
             "frameworkAssemblies": {
@@ -36,7 +51,9 @@
                 "System": "",
                 "System.Core": ""
             },
-            "compilationOptions": { "define": [ "SILVERLIGHT" ], "keyFile" : "..\\AutoMapper.snk" }
+            "compilationOptions": {
+                "define": [ "SILVERLIGHT" ]
+            }
         },
         "wpa81": {
             "frameworkAssemblies": {
@@ -53,7 +70,9 @@
                 "System.Runtime.Extensions": "",
                 "System.Threading": ""
             },
-            "compilationOptions": { "keyFile" : "..\\AutoMapper.snk" }
+            "compilationOptions": {
+                "define": [ "WINDOWS_PHONE" ]
+            }
         },
         "netcore45": {
             "frameworkAssemblies": {
@@ -69,28 +88,21 @@
                 "System.ObjectModel": "",
                 "System.Runtime.Extensions": "",
                 "System.Threading": ""
+            },
+            "compilationOptions": {
+                "define": [ "NETCORE45" ]
             }
         },
         "dnx46": { },
-        "dnxcore50": {
+        "dotnet": {
             "dependencies": {
-                "System.Collections": "4.0.10-beta-*",
-                "System.Collections.Concurrent": "4.0.10-beta-*",
-                "System.Collections.Specialized": "4.0.0-beta-*",
-                "System.ObjectModel": "4.0.10-beta-*",
-                "System.ComponentModel.TypeConverter": "4.0.0-beta-*",
-                "System.Diagnostics.Debug": "4.0.10-beta-*",
-                "System.Linq": "4.0.0-beta-*",
-                "System.Linq.Expressions": "4.0.10-beta-*",
-                "System.Linq.Queryable": "4.0.0-beta-*",
-                "System.Text.RegularExpressions": "4.0.10-beta-*",
-                "System.Threading": "4.0.10-beta-*",
-                "System.Reflection": "4.0.10-beta-*",
-                "System.Reflection.Extensions": "4.0.0-beta-*",
-                "System.Reflection.TypeExtensions": "4.0.0-beta-*",
-                "System.Runtime.Extensions": "4.0.10-beta-*"
+                "Microsoft.NETCore": "5.0.0",
+                "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+            },
+            "imports": "portable-net452+win81",
+            "compilationOptions": {
+                "define": [ "DNXCORE50" ]
             }
         }
     }
-    
 }

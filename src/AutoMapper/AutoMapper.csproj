@@ -173,6 +173,10 @@
     <Compile Include="QueryableExtensions\Impl\NullableExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
     <Compile Include="QueryableExtensions\Impl\ParameterReplacementVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryDataSourceInjection.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapperVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\SourceInjectedQuery.cs" />
+    <Compile Include="QueryableExtensions\Impl\SourceInjectedQueryProvider.cs" />
     <Compile Include="QueryableExtensions\Impl\StringExpressionBinder.cs" />
     <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
     <Compile Include="QueryableExtensions\ProjectionExpression.cs" />
@@ -184,6 +188,216 @@
     <Compile Include="TypeInfo.cs" />
     <Compile Include="TypeMap.cs" />
     <Compile Include="Internal\TypeMapFactory.cs" />
+    <Compile Include="ValueResolver.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\AutoMapper.snk">
+      <Link>AutoMapper.snk</Link>
+    </None>
+    <None Include="SemanticModel.cd" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DDF551F9-B27D-4283-BFA0-E7068E05967D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AutoMapper</RootNamespace>
+    <AssemblyName>AutoMapper</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\AutoMapper.snk</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\AutoMapper.xml</DocumentationFile>
+    <NoWarn>1591,0618</NoWarn>
+    <TargetFrameworkProfile>Profile3</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Release\AutoMapper.xml</DocumentationFile>
+    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseWin8|AnyCPU'">
+    <OutputPath>bin\Profile136\Release</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\AutoMapper.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworkProfile>Profile136</TargetFrameworkProfile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Internal\DelegateFactory.cs" />
+    <Compile Include="Internal\DictionaryFactory.cs" />
+    <Compile Include="Internal\IDictionary.cs" />
+    <Compile Include="Internal\AliasedMember.cs" />
+    <Compile Include="Internal\IAdapterResolver.cs" />
+    <Compile Include="Internal\ManualNullableConverterFactory.cs" />
+    <Compile Include="Internal\MemberNameReplacer.cs" />
+    <Compile Include="Internal\NoOpReaderWriterLockFactory.cs" />
+    <Compile Include="Internal\NotSupportedEnumNameValueMappingFactory.cs" />
+    <Compile Include="Internal\NotSupportedProxyGeneratorFactory.cs" />
+    <Compile Include="Internal\NullReferenceExceptionSwallowingResolver.cs" />
+    <Compile Include="Internal\PlatformAdapter.cs" />
+    <Compile Include="Internal\ProbingAdapterResolver.cs" />
+    <Compile Include="Mapper.cs" />
+    <Compile Include="Mappers\AssignableArrayMapper.cs" />
+    <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\ExpressionMapper.cs" />
+    <Compile Include="Mappers\ImplicitConversionOperatorMapper.cs" />
+    <Compile Include="Mappers\IPlatformSpecificMapperRegistry.cs" />
+    <Compile Include="Mappers\MapperRegistry.cs" />
+    <Compile Include="Mappers\PrimitiveArrayMapper.cs" />
+    <Compile Include="MemberList.cs" />
+    <Compile Include="AutoMapperMappingException.cs" />
+    <Compile Include="ConstructorMap.cs" />
+    <Compile Include="ConstructorParameterMap.cs" />
+    <Compile Include="IgnoreMapAttribute.cs" />
+    <Compile Include="IMappingAction.cs" />
+    <Compile Include="IMappingEngineRunner.cs" />
+    <Compile Include="IMappingOperationOptions.cs" />
+    <Compile Include="INamingConvention.cs" />
+    <Compile Include="Internal\DelegateBasedResolver2.cs" />
+    <Compile Include="Internal\DeferredInstantiatedConverter.cs" />
+    <Compile Include="Internal\IDelegateFactory.cs" />
+    <Compile Include="Internal\ITypeMapFactory.cs" />
+    <Compile Include="Internal\DefaultResolver.cs" />
+    <Compile Include="Internal\DeferredInstantiatedFormatter.cs" />
+    <Compile Include="Internal\DeferredInstantiatedResolver.cs" />
+    <Compile Include="Internal\ExpressionValueFormatter.cs" />
+    <Compile Include="Internal\FieldGetter.cs" />
+    <Compile Include="Internal\FormatterCtorExpression.cs" />
+    <Compile Include="IFormatterConfiguration.cs" />
+    <Compile Include="Internal\MemberGetter.cs" />
+    <Compile Include="Internal\MethodGetter.cs" />
+    <Compile Include="Internal\PropertyGetter.cs" />
+    <Compile Include="IMemberGetter.cs" />
+    <Compile Include="Internal\PropertyNameResolver.cs" />
+    <Compile Include="Internal\TypePair.cs" />
+    <Compile Include="IObjectMapper.cs" />
+    <Compile Include="AutoMapperConfigurationException.cs" />
+    <Compile Include="ITypeConverter.cs" />
+    <Compile Include="ConfigurationStore.cs" />
+    <Compile Include="Internal\EnumerableExtensions.cs" />
+    <Compile Include="Internal\FormatterExpression.cs" />
+    <Compile Include="IConfigurationProvider.cs" />
+    <Compile Include="IFormatterExpression.cs" />
+    <Compile Include="IMappingEngine.cs" />
+    <Compile Include="IMappingExpression.cs" />
+    <Compile Include="IValueFormatter.cs" />
+    <Compile Include="IValueResolver.cs" />
+    <Compile Include="Mappers\ArrayMapper.cs" />
+    <Compile Include="Mappers\CollectionMapper.cs" />
+    <Compile Include="Mappers\FlagsEnumMapper.cs" />
+    <Compile Include="Mappers\DictionaryMapper.cs" />
+    <Compile Include="Mappers\EnumerableMapper.cs" />
+    <Compile Include="Mappers\EnumerableMapperBase.cs" />
+    <Compile Include="Mappers\EnumMapper.cs" />
+    <Compile Include="Mappers\AssignableMapper.cs" />
+    <Compile Include="Mappers\ITypeMapObjectMapper.cs" />
+    <Compile Include="Mappers\NullableMapper.cs" />
+    <Compile Include="Mappers\ObjectCreator.cs" />
+    <Compile Include="Mappers\ReadOnlyCollectionMapper.cs" />
+    <Compile Include="Mappers\StringMapper.cs" />
+    <Compile Include="Mappers\TypeHelper.cs" />
+    <Compile Include="Mappers\TypeMapMapper.cs" />
+    <Compile Include="Mappers\TypeMapObjectMapperRegistry.cs" />
+    <Compile Include="MappingEngine.cs" />
+    <Compile Include="Internal\MappingExpression.cs" />
+    <Compile Include="Internal\DelegateBasedResolver.cs" />
+    <Compile Include="Internal\NullReplacementMethod.cs" />
+    <Compile Include="Internal\PrimitiveExtensions.cs" />
+    <Compile Include="Configuration\CreateTypeMapExpression.cs" />
+    <Compile Include="Profile.cs" />
+    <Compile Include="PropertyMap.cs" />
+    <Compile Include="Internal\ReflectionHelper.cs" />
+    <Compile Include="Internal\ProxyBase.cs" />
+    <Compile Include="QueryableExtensions\ExpressionRequest.cs" />
+    <Compile Include="QueryableExtensions\ExpressionResolutionResult.cs" />
+    <Compile Include="QueryableExtensions\Extensions.cs" />
+    <Compile Include="QueryableExtensions\IExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\IExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\AssignableExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\CustomProjectionExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\EnumerableExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\MappedTypeExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\MemberGetterExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\MemberResolverExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\NullableExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\Impl\NullSubstitutionExpressionResultConverter.cs" />
+    <Compile Include="QueryableExtensions\Impl\ParameterReplacementVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryDataSourceInjection.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapperVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\SourceInjectedQuery.cs" />
+    <Compile Include="QueryableExtensions\Impl\SourceInjectedQueryProvider.cs" />
+    <Compile Include="QueryableExtensions\Impl\StringExpressionBinder.cs" />
+    <Compile Include="QueryableExtensions\IProjectionExpression.cs" />
+    <Compile Include="QueryableExtensions\ProjectionExpression.cs" />
+    <Compile Include="ResolutionContext.cs" />
+    <Compile Include="Internal\ResolutionExpression.cs" />
+    <Compile Include="ResolutionResult.cs" />
+    <Compile Include="SourceMemberConfig.cs" />
+    <Compile Include="ThreadSafeList.cs" />
+    <Compile Include="TypeInfo.cs" />
+    <Compile Include="TypeMap.cs" />
+    <Compile Include="Internal\TypeMapFactory.cs" />
+    <Compile Include="ValueFormatter.cs" />
     <Compile Include="ValueResolver.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -11,10 +11,11 @@ namespace AutoMapper.Mappers
             new AssignableArrayMapper(), 
             new FlagsEnumMapper(),
             new EnumMapper(),
+            new MultidimensionalArrayMapper(),
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
+#if NET4 || MONODROID || MONOTOUCH || __IOS__
             new NameValueCollectionMapper(),
 #endif
             new DictionaryMapper(),
@@ -31,11 +32,11 @@ namespace AutoMapper.Mappers
             new StringMapper(),
 #endif
             new AssignableMapper(),
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT || DNXCORE50
+#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT
             new TypeConverterMapper(),
 #endif
             new NullableSourceMapper(),
-            new NullableMapper(),
+            //new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
             new OpenGenericMapper()

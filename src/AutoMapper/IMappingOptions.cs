@@ -1,5 +1,6 @@
 namespace AutoMapper
 {
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using Internal;
@@ -9,6 +10,17 @@ namespace AutoMapper
     /// </summary>
     public interface IMappingOptions
     {
+        /// <summary>
+        /// Specify which properties should be mapped.
+        /// By default only public properties are mapped.
+        /// </summary>
+        Func<PropertyInfo, bool> ShouldMapProperty { get; }
+
+        /// <summary>
+        /// Specify which fields should be mapped.
+        /// By default only public fields are mapped.
+        /// </summary>
+        Func<FieldInfo, bool> ShouldMapField { get; }
         /// <summary>
         /// Naming convention for source members
         /// </summary>
