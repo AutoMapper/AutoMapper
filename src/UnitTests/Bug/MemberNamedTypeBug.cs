@@ -22,9 +22,8 @@ namespace AutoMapper.UnitTests.Bug
 
             public Int32 Type { get; private set; }
         }
-
-        // https://github.com/AutoMapper/AutoMapper/issues/154 
-        [Fact(Skip="Until fixed")]
+        
+        [Fact]
         public void Should_pick_a_ctor_which_best_matches()
         {
             Mapper.CreateMap<SourceClass, DestinationClass>();
