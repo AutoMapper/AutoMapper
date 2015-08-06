@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.0.3' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.0.4' }
 	$assemblyVersion = $pkgVersion -replace "\-.*$", ".0"
 	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
@@ -34,7 +34,7 @@ task release {
 
 task compile -depends clean { 
     exec { dnu restore }
-    exec { dnu build $source_dir\AutoMapper}
+    exec { dnu build $source_dir\AutoMapper --configuration $config}
     exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.sln }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
 }
@@ -71,9 +71,8 @@ task dist {
 	copy_files "$source_dir\AutoMapper.iOS\bin\$config" "$dist_dir\MonoTouch"
 	copy_files "$source_dir\AutoMapper.iOS10\bin\$config" "$dist_dir\Xamarin.iOS10"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dotnet" "$dist_dir\dotnet"
-	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\dotnet" "$dist_dir\uap10.0"
     create-nuspec "$pkgVersion" "AutoMapper.nuspec"
-	exec { & $base_dir\RefGen.exe ".NETPlatform,Version=v5.0" "dotnet;uap10.0" "$base_dir\AutoMapper.nuspec" "$source_dir\AutoMapper\AutoMapper.xproj" "$dist_dir\dotnet\AutoMapper.dll;$dist_dir\uap10.0\AutoMapper.dll" }
+	exec { & $base_dir\RefGen.exe ".NETPlatform,Version=v5.0" "dotnet" "$base_dir\AutoMapper.nuspec" "$source_dir\AutoMapper\AutoMapper.xproj" "$dist_dir\dotnet\AutoMapper.dll" }
 }
 
 # -------------------------------------------------------------------------------------------------------------
@@ -266,9 +265,6 @@ function global:create-nuspec($version, $fileName)
     <file src=""$dist_dir\dotnet\AutoMapper.dll"" target=""lib\dotnet"" />
     <file src=""$dist_dir\dotnet\AutoMapper.pdb"" target=""lib\dotnet"" />
     <file src=""$dist_dir\dotnet\AutoMapper.xml"" target=""lib\dotnet"" />
-    <file src=""$dist_dir\uap10.0\AutoMapper.dll"" target=""lib\uap10.0"" />
-    <file src=""$dist_dir\uap10.0\AutoMapper.pdb"" target=""lib\uap10.0"" />
-    <file src=""$dist_dir\uap10.0\AutoMapper.xml"" target=""lib\uap10.0"" />
     <file src=""src\**\*.cs"" target=""src"" />
   </files>
 </package>" | out-file $fileName -encoding "ASCII"
