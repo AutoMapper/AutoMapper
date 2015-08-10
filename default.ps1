@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.0.4' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.1.0' }
 	$assemblyVersion = $pkgVersion -replace "\-.*$", ".0"
 	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
