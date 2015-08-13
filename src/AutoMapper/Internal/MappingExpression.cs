@@ -526,7 +526,7 @@ namespace AutoMapper.Internal
         public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {
             var param = TypeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == ctorParamName);
-
+            param.CanResolve = true;
             var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(param);
 
             paramOptions(ctorParamExpression);
