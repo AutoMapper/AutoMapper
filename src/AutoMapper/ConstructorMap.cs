@@ -14,6 +14,8 @@
         public ConstructorInfo Ctor { get; private set; }
         public IEnumerable<ConstructorParameterMap> CtorParams { get; }
 
+        public bool CanResolveParameters => CtorParams.All(c=>c.CanResolve);
+
         public ConstructorMap(ConstructorInfo ctor, IEnumerable<ConstructorParameterMap> ctorParams)
         {
             Ctor = ctor;

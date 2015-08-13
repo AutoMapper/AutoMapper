@@ -42,6 +42,8 @@ namespace AutoMapper
 
         public ConstructorMap ConstructorMap { get; private set; }
 
+        public bool CanUseConstructorMap => ConstructorMap != null && ConstructorMap.CanResolveParameters;
+
         public Type SourceType => _sourceType.Type;
 
         public Type DestinationType => _destinationType.Type;
@@ -408,7 +410,7 @@ namespace AutoMapper
                 return ctorExpr;
             }
             Expression newExpression;
-            if(ConstructorMap != null && ConstructorMap.CtorParams.All(p => p.CanResolve))
+            if(CanUseConstructorMap)
             {
                 newExpression = ConstructorMap.NewExpression(instanceParameter);
             }
