@@ -266,11 +266,10 @@ namespace AutoMapper
         public LambdaExpression CreateMapExpression(ExpressionRequest request, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             // this is the input parameter of this expression with name <variableName>
-            ParameterExpression instanceParameter = Expression.Parameter(request.SourceType, "dto");
-
+            var instanceParameter = Expression.Parameter(request.SourceType, "dto");
             var total = CreateMapExpression(request, instanceParameter, typePairCount);
-
-            return Expression.Lambda(total, instanceParameter);
+            var delegateType = typeof(Func<,>).MakeGenericType(request.SourceType, request.DestinationType);
+            return Expression.Lambda(delegateType, total, instanceParameter);
         }
 
         public Expression CreateMapExpression(ExpressionRequest request,
