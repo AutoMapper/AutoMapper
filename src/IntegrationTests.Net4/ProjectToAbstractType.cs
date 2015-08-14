@@ -4,7 +4,7 @@ using AutoMapper.QueryableExtensions;
 using Should;
 using Xunit;
 
-namespace AutoMapper.UnitTests.Bug
+namespace AutoMapper.IntegrationTests.Net4
 {
     public class ProjectToAbstractType
     {
@@ -54,8 +54,11 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_project_to_abstract_type()
         {
-            Mapper.CreateMap<DbEntityA, ITypeA>().As<ConcreteTypeA>();
-            Mapper.CreateMap<DbEntityA, ConcreteTypeA>();
+            Mapper.Initialize(c =>
+            {
+                c.CreateMap<DbEntityA, ITypeA>().As<ConcreteTypeA>();
+                c.CreateMap<DbEntityA, ConcreteTypeA>();
+            });
             using(var context = new Context())
             {
                 _destinations = context.EntityA.Project().To<ITypeA>().ToArray();
