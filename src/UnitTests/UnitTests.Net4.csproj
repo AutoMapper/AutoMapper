@@ -96,6 +96,7 @@
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
+    <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
     <Compile Include="Bug\TargetISet.cs" />
     <Compile Include="Bug\CollectionsNullability.cs" />
     <Compile Include="Bug\ConditionBug.cs" />
