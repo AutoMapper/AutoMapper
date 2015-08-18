@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests.Projection
                 new Movie() { Actors = new Actor[] { new Actor() { Name = "Actor 3" }, new Actor() { Name = "Actor 4" } } }
                 }.AsQueryable();
 
-            var mapped = movies.Project().To<MovieDto>();
+            var mapped = movies.ProjectTo<MovieDto>();
 
             mapped.ElementAt(0).Actors.Length.ShouldEqual(2);
             mapped.ElementAt(1).Actors[1].Name.ShouldEqual("Actor 4");

@@ -193,14 +193,14 @@ namespace AutoMapper.UnitTests
                 
                 var queryable = _products.AsQueryable();
 
-                var simpleProducts = queryable.Project().To<SimpleProductDto>().ToList();
+                var simpleProducts = queryable.ProjectTo<SimpleProductDto>().ToList();
 
                 simpleProducts.Count.ShouldEqual(1);
                 simpleProducts[0].Name.ShouldEqual("Foo");
                 simpleProducts[0].ProductSubcategoryName.ShouldEqual("Bar");
                 simpleProducts[0].CategoryName.ShouldEqual("Baz");
 
-                var extendedProducts = queryable.Project().To<ExtendedProductDto>().ToList();
+                var extendedProducts = queryable.ProjectTo<ExtendedProductDto>().ToList();
 
                 extendedProducts.Count.ShouldEqual(1);
                 extendedProducts[0].Name.ShouldEqual("Foo");
@@ -209,7 +209,7 @@ namespace AutoMapper.UnitTests
                 extendedProducts[0].BOM.Count.ShouldEqual(1);
                 extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldEqual(5);
 
-                var complexProducts = queryable.Project().To<ComplexProductDto>().ToList();
+                var complexProducts = queryable.ProjectTo<ComplexProductDto>().ToList();
 
                 complexProducts.Count.ShouldEqual(1);
                 complexProducts[0].Name.ShouldEqual("Foo");
@@ -225,7 +225,7 @@ namespace AutoMapper.UnitTests
 
                 var queryable = _products.AsQueryable();
 
-                var abstractProducts = queryable.Project().To<AbstractProductDto>().ToList();
+                var abstractProducts = queryable.ProjectTo<AbstractProductDto>().ToList();
 
                 abstractProducts[0].Types.Count.ShouldEqual(3);
                 abstractProducts[0].Types[0].GetType().ShouldEqual(typeof (ProdTypeA));
@@ -301,7 +301,7 @@ namespace AutoMapper.UnitTests
                 [Fact]
                 public void Should_not_throw_exception()
                 {
-                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.Project().To<B>());
+                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>());
                 }
             }
         }

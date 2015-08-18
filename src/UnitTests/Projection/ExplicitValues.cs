@@ -30,7 +30,7 @@
         {
             var source = new[] { new Source { Value = 10 } }.AsQueryable();
 
-            _dests = source.Project().To<Dest>().ToList();
+            _dests = source.ProjectTo<Dest>().ToList();
         }
 
         [Fact]
@@ -59,7 +59,7 @@
             Mapper.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.UseValue(5));
 
-            new[] { new Source { Value = 10 } }.AsQueryable().Project().To<Dest>().ToList();
+            new[] { new Source { Value = 10 } }.AsQueryable().ProjectTo<Dest>().ToList();
 
             Mapper.Reset();
 
@@ -71,7 +71,7 @@
         {
             var source = new[] { new Source { Value = 10 } }.AsQueryable();
 
-            _dests = source.Project().To<Dest>().ToList();
+            _dests = source.ProjectTo<Dest>().ToList();
         }
 
         [Fact]

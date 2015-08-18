@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.Projection
 		{
 			var customers = new[] { new Customer { FirstName = "Bill", LastName = "White" } }.AsQueryable();
 
-			var projected = customers.Project().To<CustomerDto>().SingleOrDefault();
+			var projected = customers.ProjectTo<CustomerDto>().SingleOrDefault();
 			projected.ShouldNotBeNull();
 			projected.Address.ShouldBeNull();
 		}
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests.Projection
 
 			IList<Unmapped> projected = null;
 
-            typeof(InvalidOperationException).ShouldBeThrownBy(() => projected = customers.Project().To<Unmapped>().ToList());
+            typeof(InvalidOperationException).ShouldBeThrownBy(() => projected = customers.ProjectTo<Unmapped>().ToList());
 
 			projected.ShouldBeNull();
 		}

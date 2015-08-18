@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests.Bug
         protected override void Because_of()
         {
             var fuEntity = new FuEntity { Man = new ManEntity { Chu = new ChuEntity { Prop = _propValue } } };
-            _destination = new[] { fuEntity }.AsQueryable().Project().To<Fu>(null, m=>m.Man, m=>m.Man.Chu).First();
+            _destination = new[] { fuEntity }.AsQueryable().ProjectTo<Fu>(m=>m.Man, m=>m.Man.Chu).First();
         }
 
         [Fact]
