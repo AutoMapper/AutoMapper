@@ -528,6 +528,7 @@ namespace AutoMapper.Internal
             var param = TypeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == ctorParamName);
 
             var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(param);
+            param.CanResolve = true;
 
             paramOptions(ctorParamExpression);
 
