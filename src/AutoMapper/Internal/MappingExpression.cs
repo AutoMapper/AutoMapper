@@ -371,7 +371,7 @@ namespace AutoMapper.Internal
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            var mappingExpression = _configurationContainer.CreateMap<TDestination, TSource>(MemberList.Source);
+            var mappingExpression = _configurationContainer.CreateMap<TDestination, TSource>(TypeMap.Profile, MemberList.Source);
 
             foreach (var destProperty in TypeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
             {
