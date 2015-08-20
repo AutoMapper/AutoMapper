@@ -101,9 +101,12 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
         {
-            var map = _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
+            return _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
+        }
 
-            return map;
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList)
+        {
+            return _configurator.CreateMap<TSource, TDestination>(profileName, memberList);
         }
 
         public IMappingExpression CreateMap(Type sourceType, Type destinationType)
