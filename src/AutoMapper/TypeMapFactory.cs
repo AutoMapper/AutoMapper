@@ -82,12 +82,11 @@ using System.Collections.ObjectModel;
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (!MapDestinationPropertyToSource(options, sourceTypeInfo, parameter.GetType(), parameter.Name, members))
-                    return false;
+                var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, parameter.GetType(), parameter.Name, members);
 
                 var resolvers = members.Select(mi => mi.ToMemberGetter());
 
-                var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), false);
+                var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), canResolve);
 
                 parameters.Add(param);
             }
