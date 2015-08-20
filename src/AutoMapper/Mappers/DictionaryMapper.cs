@@ -21,12 +21,10 @@ namespace AutoMapper.Mappers
 
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
-            if (context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+            if(context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+            {
                 return null;
-
-            var sourceEnumerableValue = (IEnumerable) context.SourceValue ?? new object[0];
-            IEnumerable<object> keyValuePairs = sourceEnumerableValue.Cast<object>();
-
+            }
             Type genericSourceDictType = context.SourceType.GetDictionaryType();
             Type sourceKeyType = genericSourceDictType.GetGenericArguments()[0];
             Type sourceValueType = genericSourceDictType.GetGenericArguments()[1];
@@ -35,15 +33,12 @@ namespace AutoMapper.Mappers
             Type destKeyType = genericDestDictType.GetGenericArguments()[0];
             Type destValueType = genericDestDictType.GetGenericArguments()[1];
 
-            var dictionaryEntries = keyValuePairs.OfType<DictionaryEntry>();
-            if (dictionaryEntries.Any())
-                keyValuePairs = dictionaryEntries.Select(e => Activator.CreateInstance(sourceKvpType, e.Key, e.Value));
-
-            object destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
+            var kvpEnumerator = GetKeyValuePairEnumerator(context, sourceKvpType);
+            var destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
             int count = 0;
-
-            foreach (object keyValuePair in keyValuePairs)
+            while(kvpEnumerator.MoveNext())
             {
+                var keyValuePair = kvpEnumerator.Current;
                 object sourceKey = sourceKvpType.GetProperty("Key").GetValue(keyValuePair, new object[0]);
                 object sourceValue = sourceKvpType.GetProperty("Value").GetValue(keyValuePair, new object[0]);
 
@@ -60,12 +55,32 @@ namespace AutoMapper.Mappers
                 object destKey = mapper.Map(keyContext);
                 object destValue = mapper.Map(valueContext);
 
-                genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] {destKey, destValue});
+                genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
 
                 count++;
             }
 
             return destDictionary;
+        }
+
+        private static IEnumerator GetKeyValuePairEnumerator(ResolutionContext context, Type sourceKvpType)
+        {
+            if(context.SourceValue == null)
+            {
+                return Enumerable.Empty<object>().GetEnumerator();
+            }
+            var sourceEnumerableValue = (IEnumerable) context.SourceValue;
+            var dictionaryEntries = sourceEnumerableValue.Cast<object>().OfType<DictionaryEntry>().Select(e => Activator.CreateInstance(sourceKvpType, e.Key, e.Value));
+            if(dictionaryEntries.Any())
+            {
+                return dictionaryEntries.GetEnumerator();
+            }
+            var enumerableKvpType = typeof(IEnumerable<>).MakeGenericType(sourceKvpType);
+            if(enumerableKvpType.IsAssignableFrom(sourceEnumerableValue.GetType()))
+            {
+                return (IEnumerator)enumerableKvpType.GetMethod("GetEnumerator").Invoke(sourceEnumerableValue, null);
+            }
+            throw new AutoMapperMappingException(context, "Cannot map dictionary type " + context.SourceType);
         }
     }
 }
