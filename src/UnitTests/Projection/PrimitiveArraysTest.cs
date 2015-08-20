@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var expr = sources.AsQueryable().Project().To<Destination>();
+                var expr = sources.AsQueryable().ProjectTo<Destination>();
 
                 var result = expr.ToList();
 

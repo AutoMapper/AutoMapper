@@ -256,6 +256,14 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc);
 
         /// <summary>
+        /// Customize configuration for individual constructor parameter
+        /// </summary>
+        /// <param name="ctorParamName">Constructor parameter name</param>
+        /// <param name="paramOptions">Options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions);
+
+        /// <summary>
         /// The current TypeMap being configured
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]

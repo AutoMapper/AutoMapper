@@ -48,7 +48,7 @@
                     }
                 }.AsQueryable();
 
-                _dest = sources.Project().To<Dest>().ToArray();
+                _dest = sources.ProjectTo<Dest>().ToArray();
             }
 
             [Fact]

@@ -19,7 +19,7 @@
         {
             var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
 
-            var projected = customers.Project().To<CustomerDto>();
+            var projected = customers.ProjectTo<CustomerDto>();
             projected.ShouldNotBeNull();
             Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
         }

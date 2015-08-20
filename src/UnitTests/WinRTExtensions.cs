@@ -17,7 +17,7 @@ namespace AutoMapper
 
 namespace System.Reflection
 {
-    public static class WinRTExtensions
+    internal static class WinRTExtensions
     {
         public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
         {

@@ -40,7 +40,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             protected override Expression VisitParameter(ParameterExpression node)
             {
                 // replace all old param references with new ones
-                return node.Type == oldParameter.Type ? newParameter : node;
+                return node == oldParameter ? newParameter : node;
             }
 
             protected override Expression VisitMember(MemberExpression node)

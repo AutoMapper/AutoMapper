@@ -1,11 +1,11 @@
 namespace AutoMapper
 {
-using System;
-using System.Collections.Generic;
+    using System;
+    using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text.RegularExpressions;
     using Impl;
     using Internal;
 
@@ -87,7 +87,7 @@ using System.Text.RegularExpressions;
 
                 var resolvers = members.Select(mi => mi.ToMemberGetter());
 
-                var param = new ConstructorParameterMap(parameter, resolvers.ToArray());
+                var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), false);
 
                 parameters.Add(param);
             }

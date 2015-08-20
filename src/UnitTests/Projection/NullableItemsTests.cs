@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var projected = items.AsQueryable().Project().To<ParentDto>().ToList();
+                var projected = items.AsQueryable().ProjectTo<ParentDto>().ToList();
 
                 projected[0].Value.ShouldEqual(5);
                 projected[0].ChildValue.ShouldBeNull();
@@ -93,9 +93,9 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var projected = items.AsQueryable().Project().To<ParentDto>().ToList();
+                var projected = items.AsQueryable().ProjectTo<ParentDto>().ToList();
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().Project().To<ParentDto>().ToList());
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().ProjectTo<ParentDto>().ToList());
                 Assert.NotNull(projected[0].Date);
             }
         }

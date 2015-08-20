@@ -6,12 +6,19 @@ namespace AutoMapper.Internal
     using System.Linq;
     using System.Reflection;
 
-    public static class PrimitiveExtensions
-    {
-        public static bool IsNullableType(this Type type)
+	public static class PrimitiveExtensions
+	{
+        public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
-            return type.IsGenericType() && (type.GetGenericTypeDefinition().Equals(typeof (Nullable<>)));
+            TValue value;
+            dictionary.TryGetValue(key, out value);
+            return value;
         }
+
+        public static bool IsNullableType(this Type type)
+		{
+            return type.IsGenericType() && (type.GetGenericTypeDefinition().Equals(typeof (Nullable<>)));
+		}
 
         public static Type GetTypeOfNullable(this Type type)
         {
@@ -27,44 +34,49 @@ namespace AutoMapper.Internal
 
             IEnumerable<Type> genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType());
             IEnumerable<Type> baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
-
+            
             var isCollectionType = baseDefinitions.Any(t => t == typeof (ICollection<>));
 
             return isCollectionType;
         }
 
 
-        public static bool IsEnumerableType(this Type type)
+		public static bool IsEnumerableType(this Type type)
+		{
+			return type.GetInterfaces().Contains(typeof (IEnumerable));
+		}
+
+        public static bool IsQueryableType(this Type type)
         {
-            return type.GetInterfaces().Contains(typeof (IEnumerable));
+            return type.GetInterfaces().Contains(typeof(IQueryable));
         }
 
-        public static bool IsListType(this Type type)
-        {
-            return type.GetInterfaces().Contains(typeof (IList));
-        }
+		public static bool IsListType(this Type type)
+		{
+			return type.GetInterfaces().Contains(typeof (IList));
+		}
 
-        public static bool IsListOrDictionaryType(this Type type)
-        {
-            return type.IsListType() || type.IsDictionaryType();
-        }
+		public static bool IsListOrDictionaryType(this Type type)
+		{
+			return type.IsListType() || type.IsDictionaryType();
+		}
 
-        public static bool IsDictionaryType(this Type type)
-        {
+		public static bool IsDictionaryType(this Type type)
+		{
             if (type.IsGenericType() &&
                 type.GetGenericTypeDefinition() == typeof (System.Collections.Generic.IDictionary<,>))
-                return true;
+				return true;
 
             var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType());
-            var baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
+			var baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
             return baseDefinitions.Any(t => t == typeof (System.Collections.Generic.IDictionary<,>));
-        }
+		}
 
-        public static Type GetDictionaryType(this Type type)
-        {
+		public static Type GetDictionaryType(this Type type)
+		{
             if (type.IsGenericType() &&
                 type.GetGenericTypeDefinition() == typeof (System.Collections.Generic.IDictionary<,>))
-                return type;
+				return type;
 
             var genericInterfaces =
                 type.GetInterfaces()
@@ -72,7 +84,14 @@ namespace AutoMapper.Internal
                         t =>
                             t.IsGenericType() &&
                             t.GetGenericTypeDefinition() == typeof (System.Collections.Generic.IDictionary<,>));
-            return genericInterfaces.FirstOrDefault();
+			return genericInterfaces.FirstOrDefault();
+		}
+
+        public static Type GetGenericElementType(this Type type)
+        {
+            if (type.HasElementType)
+                return type.GetElementType();
+            return type.GetGenericArguments()[0];
         }
-    }
+	}
 }

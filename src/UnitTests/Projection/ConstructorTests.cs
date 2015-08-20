@@ -46,7 +46,7 @@
                 }
             }.AsQueryable();
 
-            _dest = values.Project().To<Dest>().ToArray();
+            _dest = values.ProjectTo<Dest>().ToArray();
         }
 
         [Fact]

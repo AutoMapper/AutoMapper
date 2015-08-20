@@ -25,7 +25,7 @@ namespace AutoMapper.UnitTests.Projection
 		{
 			var customers = new[] { new Customer() }.AsQueryable();
 
-			var mapped = customers.Project().To<CustomerDto>().SingleOrDefault();
+			var mapped = customers.ProjectTo<CustomerDto>().SingleOrDefault();
 
             mapped.ShouldNotBeNull();
             mapped.Addresses.ShouldBeNull();
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests.Projection
 			var customer = new Customer { Addresses = new List<Address> { new Address(Street1), new Address(Street2) } };
 			var customers = new[] { customer }.AsQueryable();
 
-			var mapped = customers.Project().To<CustomerDto>().SingleOrDefault();
+			var mapped = customers.ProjectTo<CustomerDto>().SingleOrDefault();
 
 			mapped.ShouldNotBeNull();
 

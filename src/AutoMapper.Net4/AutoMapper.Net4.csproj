@@ -24,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\AutoMapper.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,6 +52,14 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ICtorParamConfigurationExpression.cs" />
+    <Compile Include="QueryableExtensions\Impl\MemberAccessQueryMapperVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryDataSourceInjection.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapperHelper.cs" />
+    <Compile Include="QueryableExtensions\Impl\QueryMapperVisitor.cs" />
+    <Compile Include="QueryableExtensions\Impl\SourceInjectedQuery.cs" />
+    <Compile Include="QueryableExtensions\Impl\SourceInjectedQueryInspector.cs" />
+    <Compile Include="QueryableExtensions\Impl\SourceInjectedQueryProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AutoMapper\AliasedMember.cs">

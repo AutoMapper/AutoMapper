@@ -6,6 +6,7 @@ using System.Linq;
 namespace AutoMapper
 {
     using System;
+    using System.Linq.Expressions;
 
     /// <summary>
     /// Performs mapping based on configuration
@@ -125,7 +126,7 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
-    	TDestination DynamicMap<TSource, TDestination>(TSource source);
+        TDestination DynamicMap<TSource, TDestination>(TSource source);
 
         /// <summary>
         /// Create a map between the <paramref name="source"/> object and <typeparamref name="TDestination"/> types and execute the map.
@@ -134,7 +135,7 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
-    	TDestination DynamicMap<TDestination>(object source);
+        TDestination DynamicMap<TDestination>(object source);
 
         /// <summary>
         /// Create a map between the <paramref name="sourceType"/> and <paramref name="destinationType"/> types and execute the map.
@@ -144,7 +145,7 @@ namespace AutoMapper
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to use</param>
         /// <returns>Mapped destination object</returns>
-    	object DynamicMap(object source, Type sourceType, Type destinationType);
+        object DynamicMap(object source, Type sourceType, Type destinationType);
 
         /// <summary>
         /// Create a map between the <typeparamref name="TSource"/> and <typeparamref name="TDestination"/> types and execute the map to the existing destination object
@@ -153,7 +154,7 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <param name="destination">Destination object to map into</param>
-		void DynamicMap<TSource, TDestination>(TSource source, TDestination destination);
+        void DynamicMap<TSource, TDestination>(TSource source, TDestination destination);
 
         /// <summary>
         /// Create a map between the <paramref name="sourceType"/> and <paramref name="destinationType"/> types and execute the map to the existing destination object.
@@ -163,7 +164,9 @@ namespace AutoMapper
         /// <param name="destination"></param>
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to use</param>
-    	void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
+        void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
+
+        Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params string[] membersToExpand);
     }
 
 }

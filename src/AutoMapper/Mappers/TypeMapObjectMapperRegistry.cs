@@ -207,7 +207,6 @@ namespace AutoMapper.Mappers
                 {
                     throw new InvalidOperationException("Cannot create destination object. " + context);
                 }
-                context.SetResolvedDestinationValue(result);
                 return result;
             }
         }
@@ -221,9 +220,7 @@ namespace AutoMapper.Mappers
 
             protected override object GetMappedObject(ResolutionContext context, IMappingEngineRunner mapper)
             {
-                var result = context.DestinationValue;
-                context.SetResolvedDestinationValue(result);
-                return result;
+                return context.DestinationValue;
             }
         }
     }
