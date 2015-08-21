@@ -142,7 +142,8 @@ namespace System.Reflection
 #if DNXCORE50 || NETFX_CORE
             return type.GetTypeInfo().GetCustomAttributes(attributeType, inherit).ToArray();
 #else
-            return type.GetCustomAttributes(attributeType, inherit).ToArray();
+            var mi = (MemberInfo) type;
+            return mi.GetCustomAttributes(attributeType, inherit).ToArray();
 #endif
         }
 
