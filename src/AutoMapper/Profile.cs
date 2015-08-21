@@ -147,14 +147,14 @@ namespace AutoMapper
         
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
-        public IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
+        public readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
 
         public IMemberConfiguration DefaultMemberConfig
         {
             get
             {
                 if(!_memberConfigurations.Any())
-                    _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")).SetMemberInfo<AllMemberInfo>());
+                    _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
                 return _memberConfigurations.First();
             }
         }

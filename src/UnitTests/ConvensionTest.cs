@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using AutoMapper.Mappers;
 using Should;
 using Xunit;
@@ -32,8 +33,7 @@ namespace AutoMapper.UnitTests
                         _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
                             .AddStrings(p => p.Postfixes, "Transfer")
                             .AddStrings(p => p.DestinationPrefixes, "Trans")
-                            .AddStrings(p => p.Prefixes, "Trans"))
-                            .SetMemberInfo<FieldPropertyMemberInfo>();
+                            .AddStrings(p => p.Prefixes, "Trans"));
                 profile.AddConditionalObjectMapper().Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
             });
 
@@ -58,8 +58,7 @@ namespace AutoMapper.UnitTests
                         _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
                             .AddStrings(p => p.Postfixes, "Transfer")
                             .AddStrings(p => p.DestinationPrefixes, "Trans")
-                            .AddStrings(p => p.Prefixes, "Trans"))
-                            .SetMemberInfo<FieldPropertyMemberInfo>();
+                            .AddStrings(p => p.Prefixes, "Trans"));
                 AddConditionalObjectMapper().Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
             }
         }
@@ -70,8 +69,7 @@ namespace AutoMapper.UnitTests
             {
                 AddMemberConfiguration().AddName<PrePostfixName>(
                         _ => _.AddStrings(p => p.Postfixes, "Transfer")
-                            .AddStrings(p => p.DestinationPrefixes, "Trans"))
-                            .SetMemberInfo<FieldPropertyMemberInfo>();
+                            .AddStrings(p => p.DestinationPrefixes, "Trans")).NameMapper.GetMembers.AddCondition(_ => _ is FieldInfo);
                 AddConditionalObjectMapper().Where((s, d) => s.Name == d.Name + "Dto");
             }
         }
@@ -81,8 +79,7 @@ namespace AutoMapper.UnitTests
             {
                 AddMemberConfiguration().AddName<PrePostfixName>(
                         _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
-                            .AddStrings(p => p.Prefixes, "Trans"))
-                            .SetMemberInfo<FieldPropertyMemberInfo>();
+                            .AddStrings(p => p.Prefixes, "Trans")).NameMapper.GetMembers.AddCondition(_ => _ is FieldInfo);
                 AddConditionalObjectMapper().Where((s, d) => d.Name == s.Name + "Dto");
             }
         }

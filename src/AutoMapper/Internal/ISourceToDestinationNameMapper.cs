@@ -5,7 +5,6 @@ namespace AutoMapper
 {
     public interface ISourceToDestinationNameMapper
     {
-        IGetTypeInfoMembers GetMembers { get; set; }
-        MemberInfo GetMatchingMemberInfo(TypeInfo typeInfo, Type destType, string nameToSearch);
+        MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch);
     }
 }
