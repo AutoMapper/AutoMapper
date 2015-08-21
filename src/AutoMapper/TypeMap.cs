@@ -358,13 +358,7 @@ namespace AutoMapper
             }
             return currentDepth <= maxDepth;
         }
-
-        public void UseCustomProjection(LambdaExpression projectionExpression)
-        {
-            CustomProjection = projectionExpression;
-            _propertyMaps.Clear();
-        }
-
+                
         public void ApplyInheritedMap(TypeMap inheritedTypeMap)
         {
             _inheritedTypeMaps.Add(inheritedTypeMap);
@@ -418,5 +412,40 @@ namespace AutoMapper
             }
             return Expression.Lambda(newExpression);
         }
+
+
+        public void UseCustomProjection(LambdaExpression projectionExpression)
+        {
+            CustomProjection = projectionExpression;
+
+            var mapperSetter = (ICustomMapperSetter)Activator.CreateInstance(
+                                                                typeof(CustomMapperSetter<,>).MakeGenericType(_sourceType.Type, _destinationType.Type),
+                                                                this);
+            mapperSetter.Set(projectionExpression);
+
+            _propertyMaps.Clear();
+        }
+
+        interface ICustomMapperSetter
+        {
+            void Set(LambdaExpression projectionExp);
+        }
+
+        class CustomMapperSetter<TSource, TDestination> : ICustomMapperSetter
+        {
+            TypeMap _typeMap;
+
+            public CustomMapperSetter(TypeMap typeMap)
+            {
+                _typeMap = typeMap;
+            }
+
+            public void Set(LambdaExpression projectionExp)
+            {
+                var mapFunc = (Func<TSource, TDestination>)projectionExp.Compile();
+                _typeMap.UseCustomMapper(ctx => mapFunc((TSource)ctx.SourceValue));
+            }
+        }
+
     }
 }
