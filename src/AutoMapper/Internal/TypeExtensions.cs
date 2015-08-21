@@ -139,7 +139,7 @@ namespace System.Reflection
 
         public static object[] GetCustomAttributes(this Type type, Type attributeType, bool inherit)
         {
-#if DNXCORE50 || NETFX_CORE
+#if DNXCORE50 || NETFX_CORE || NETCORE45 || PORTABLE || WINDOWS_PHONE
             return type.GetTypeInfo().GetCustomAttributes(attributeType, inherit).ToArray();
 #else
             var mi = (MemberInfo) type;
@@ -276,7 +276,7 @@ namespace System.Reflection
 
         public static FieldInfo GetField(this Type type, string name)
         {
-            return type.GetTypeInfo().GetDeclaredField(name);
+            return type.GetRuntimeField(name);
         }
 
         public static MemberInfo[] GetMember(this Type type, string name)
@@ -293,17 +293,17 @@ namespace System.Reflection
 
         public static PropertyInfo GetProperty(this Type type, string name)
         {
-            return type.GetTypeInfo().GetDeclaredProperty(name);
+            return type.GetRuntimeProperty(name);
         }
 
         public static MethodInfo GetMethod(this Type type, string name)
         {
-            return type.GetTypeInfo().GetDeclaredMethod(name);
+            return type.GetRuntimeMethod(name, new Type[0]);
         }
 
         public static MethodInfo GetMethod(this Type type, string name, Type[] parameterTypes)
         {
-            return type.GetTypeInfo().GetDeclaredMethods(name).FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).ToArray().SequenceEqual(parameterTypes));
+            return type.GetRuntimeMethods().Where(m => m.Name == name).FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).ToArray().SequenceEqual(parameterTypes));
         }
 
         public static bool IsAssignableFrom(this Type type, Type other)
