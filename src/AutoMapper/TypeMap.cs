@@ -414,24 +414,32 @@ namespace AutoMapper
         }
 
 
-        public void UseCustomProjection(LambdaExpression projectionExpression)
+        public void UseCustomProjection(LambdaExpression projectionExpression, bool useForMapping = false)
         {
             CustomProjection = projectionExpression;
 
-            var mapperSetter = (ICustomMapperSetter)Activator.CreateInstance(
-                                                                typeof(CustomMapperSetter<,>).MakeGenericType(_sourceType.Type, _destinationType.Type),
-                                                                this);
-            mapperSetter.Set(projectionExpression);
+            if(useForMapping)
+            {
+                var mapperSetter = CustomMapperSetter.Create(this);
+                mapperSetter.Set(projectionExpression);
+            }
 
             _propertyMaps.Clear();
         }
 
-        interface ICustomMapperSetter
+        abstract class CustomMapperSetter
         {
-            void Set(LambdaExpression projectionExp);
+            public abstract void Set(LambdaExpression projectionExp);
+
+            public static CustomMapperSetter Create(TypeMap typeMap)
+            {
+                return (CustomMapperSetter)Activator.CreateInstance(
+                                                        typeof(CustomMapperSetter<,>).MakeGenericType(typeMap.SourceType, typeMap.DestinationType),
+                                                        typeMap);
+            }
         }
 
-        class CustomMapperSetter<TSource, TDestination> : ICustomMapperSetter
+        class CustomMapperSetter<TSource, TDestination> : CustomMapperSetter
         {
             TypeMap _typeMap;
 
@@ -440,7 +448,7 @@ namespace AutoMapper
                 _typeMap = typeMap;
             }
 
-            public void Set(LambdaExpression projectionExp)
+            public override void Set(LambdaExpression projectionExp)
             {
                 var mapFunc = (Func<TSource, TDestination>)projectionExp.Compile();
                 _typeMap.UseCustomMapper(ctx => mapFunc((TSource)ctx.SourceValue));

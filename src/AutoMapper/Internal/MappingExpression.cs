@@ -268,6 +268,11 @@ namespace AutoMapper.Internal
             TypeMap.UseCustomProjection(projectionExpression);
         }
 
+        public void ProjectAndMapUsing(Expression<Func<TSource, TDestination>> projectionExpression)
+        {
+            TypeMap.UseCustomProjection(projectionExpression, true);
+        }
+
         public void NullSubstitute(object nullSubstitute)
         {
             _propertyMap.SetNullSubstitute(nullSubstitute);

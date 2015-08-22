@@ -136,6 +136,12 @@ namespace AutoMapper
         void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression);
 
         /// <summary>
+        /// Skip member mapping and use a custom expression for both LINQ projection and regular mapping
+        /// </summary>
+        /// <param name="projectionExpression">Projection expression</param>
+        void ProjectAndMapUsing(Expression<Func<TSource, TDestination>> projectionExpression);
+
+        /// <summary>
         /// Skip member mapping and use a custom function to convert to the destination type
         /// </summary>
         /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
