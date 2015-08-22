@@ -130,16 +130,16 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> WithProfile(string profileName);
 
         /// <summary>
-        /// Skip member mapping and use a custom expression during LINQ projection
+        /// Skip member mapping and use a custom expression for LINQ projection only
         /// </summary>
         /// <param name="projectionExpression">Projection expression</param>
         void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression);
 
         /// <summary>
-        /// Skip member mapping and use a custom expression for both LINQ projection and regular mapping
+        /// Skip member mapping and use a custom expression for both LINQ projection and normal conversion
         /// </summary>
         /// <param name="projectionExpression">Projection expression</param>
-        void ProjectAndMapUsing(Expression<Func<TSource, TDestination>> projectionExpression);
+        void ProjectAndConvertUsing(Expression<Func<TSource, TDestination>> projectionExpression);
 
         /// <summary>
         /// Skip member mapping and use a custom function to convert to the destination type

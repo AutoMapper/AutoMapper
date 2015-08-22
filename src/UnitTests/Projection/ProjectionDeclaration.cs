@@ -14,13 +14,13 @@ namespace AutoMapper.UnitTests.Projection
         public class ProjectionDeclaration
         {          
             [Fact]
-            public void Projection_expression_can_be_used_for_mapping()
+            public void Projection_expression_can_be_used_for_conversion()
             {
                 string friendlyGreeting = "Hello there!";
 
                 Mapper.Initialize(x => {
                     x.CreateMap<Source, Target>()
-                        .ProjectAndMapUsing(s => new Target { String = friendlyGreeting });
+                        .ProjectAndConvertUsing(s => new Target { String = friendlyGreeting });
                 });
                 
                 var target = Mapper.Map<Target>(new Source());
