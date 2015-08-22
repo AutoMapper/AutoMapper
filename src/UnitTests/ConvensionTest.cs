@@ -69,7 +69,7 @@ namespace AutoMapper.UnitTests
             {
                 AddMemberConfiguration().AddName<PrePostfixName>(
                         _ => _.AddStrings(p => p.Postfixes, "Transfer")
-                            .AddStrings(p => p.DestinationPrefixes, "Trans")).NameMapper.GetMembers.AddCondition(_ => _ is FieldInfo);
+                            .AddStrings(p => p.DestinationPrefixes, "Trans")).NameMapper.GetMembers.AddCondition(_ => _ is PropertyInfo);
                 AddConditionalObjectMapper().Where((s, d) => s.Name == d.Name + "Dto");
             }
         }
@@ -79,7 +79,7 @@ namespace AutoMapper.UnitTests
             {
                 AddMemberConfiguration().AddName<PrePostfixName>(
                         _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
-                            .AddStrings(p => p.Prefixes, "Trans")).NameMapper.GetMembers.AddCondition(_ => _ is FieldInfo);
+                            .AddStrings(p => p.Prefixes, "Trans")).NameMapper.GetMembers.AddCondition(_ => _ is PropertyInfo);
                 AddConditionalObjectMapper().Where((s, d) => d.Name == s.Name + "Dto");
             }
         }

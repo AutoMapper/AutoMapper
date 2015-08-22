@@ -35,7 +35,7 @@ namespace AutoMapper.UnitTests
                 public string SeparatorCharacter => "_";
                 public string ReplaceValue(Match match)
                 {
-                    return SeparatorCharacter + match.Value;
+                    return match.Value;
                 }
             }
 
