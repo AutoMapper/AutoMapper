@@ -27,7 +27,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
                 transformedExpression =
-                    Expression.Condition(Expression.NotEqual(result.ResolutionExpression, Expression.Constant(null)),
+                    Expression.Condition(Expression.NotEqual(Expression.TypeAs(result.ResolutionExpression, typeof(object)), Expression.Constant(null)),
                         transformedExpression, expressionNull);
             }
 
