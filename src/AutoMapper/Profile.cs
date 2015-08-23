@@ -46,22 +46,22 @@ namespace AutoMapper
         public INamingConvention SourceMemberNamingConvention
         {
             get
-            {
+        {
                 INamingConvention convention = null;
                 DefaultMemberConfig.AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
                 return convention;
-            }
+        }
             set { DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
         }
 
         public INamingConvention DestinationMemberNamingConvention
         {
             get
-            {
+        {
                 INamingConvention convention = null;
                 DefaultMemberConfig.AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
                 return convention;
-            }
+        }
             set { DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
@@ -72,9 +72,12 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
         {
-            var map = _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
+            return _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
+        }
 
-            return map;
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList)
+        {
+            return _configurator.CreateMap<TSource, TDestination>(profileName, memberList);
         }
 
         public IMappingExpression CreateMap(Type sourceType, Type destinationType)

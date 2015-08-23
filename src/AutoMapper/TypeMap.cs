@@ -133,18 +133,18 @@ namespace AutoMapper
 
             IEnumerable<string> properties;
 
-            if (ConfiguredMemberList == MemberList.Destination)
+            if(ConfiguredMemberList == MemberList.Destination)
+            {
                 properties = _destinationType.PublicWriteAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties);
+            }
             else
             {
                 var redirectedSourceMembers = _propertyMaps
-                    .Where(pm => pm.IsMapped())
-                    .Where(pm => pm.CustomExpression != null)
-                    .Where(pm => pm.SourceMember != null)
-                    .Select(pm => pm.SourceMember.Name).ToList();
+                    .Where(pm => pm.IsMapped() && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationProperty.Name)
+                    .Select(pm => pm.SourceMember.Name);
 
                 var ignoredSourceMembers = _sourceMemberConfigs
                     .Where(smc => smc.IsIgnored())
@@ -155,8 +155,7 @@ namespace AutoMapper
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties)
                     .Except(redirectedSourceMembers)
-                    .Except(ignoredSourceMembers)
-                    ;
+                    .Except(ignoredSourceMembers);
             }
 
             return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
