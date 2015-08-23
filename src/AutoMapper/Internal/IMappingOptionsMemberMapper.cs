@@ -240,11 +240,7 @@ namespace AutoMapper
     {
         bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent);
     }
-    public abstract class MemberBase : IChildMemberConfiguration
-    {
-        public abstract bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent);
-    }
-    public class NameSplitMember : MemberBase
+    public class NameSplitMember : IChildMemberConfiguration
     {
         public INamingConvention SourceMemberNamingConvention { get; set; }
         public INamingConvention DestinationMemberNamingConvention { get; set; }
@@ -257,7 +253,7 @@ namespace AutoMapper
             DestinationMemberNamingConvention = new PascalCaseNamingConvention();
         }
 
-        public override bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent )
+        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent )
         {
             string[] matches = DestinationMemberNamingConvention.SplittingExpression
                        .Matches(nameToSearch)
@@ -301,11 +297,11 @@ namespace AutoMapper
             public string Second { get; set; }
         }
     }
-    public class DefaultMember : MemberBase
+    public class DefaultMember : IChildMemberConfiguration
     {
         public IParentSourceToDestinationNameMapper NameMapper { get; set; }
 
-        public override bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null)
+        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceType, Type destType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent = null)
         {
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;
