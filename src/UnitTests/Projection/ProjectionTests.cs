@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.Projection
         int _niceNumber = 7;
         int _badNumber = 13;
 
-
+        
 		[Fact]
         public void Direct_assignability_shouldnt_trump_custom_projection()
         {
@@ -29,12 +29,13 @@ namespace AutoMapper.UnitTests.Projection
                 x.CreateMap<SourceChild, TargetChild>();
             });
 
-            var target = new[] { new Source() }
+            var target = new[] { new Source() { Greeting = _nastyGreeting, Number = _niceNumber } }
                             .AsQueryable()
                             .Project().To<Target>()
                             .First();
 
             target.Greeting.ShouldEqual(_pleasantGreeting);
+            target.Number.ShouldEqual(_niceNumber, "Direct assignability not working...");
         }
         
 

@@ -30,7 +30,6 @@ namespace AutoMapper
             new AssignableExpressionBinder(),
             new EnumerableExpressionBinder(),
             new MappedTypeExpressionBinder(),
-            new CustomProjectionExpressionBinder(),
             new StringExpressionBinder()
         };
 
