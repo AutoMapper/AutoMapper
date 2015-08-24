@@ -5,6 +5,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Text;
 
+    [Serializable]
     public class AutoMapperMappingException : Exception
     {
         private readonly string _message;
