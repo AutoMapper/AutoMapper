@@ -82,12 +82,12 @@ namespace AutoMapper
         private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue, Type sourceType, 
             Type destinationType = null, TypeMap typeMap = null)
         {
-            if(context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
             if(context != Empty)
             {
+                if(context == null)
+                {
+                    throw new ArgumentNullException(nameof(context));
+                }
                 Parent = context;
                 ArrayIndex = context.ArrayIndex;
                 PropertyMap = context.PropertyMap;
@@ -133,10 +133,9 @@ namespace AutoMapper
         }
 
         private ResolutionContext(ResolutionContext context, TypeMap memberTypeMap, object sourceValue,
-            object destinationValue, Type sourceType, Type destinationType, int? arrayIndex = null) 
+            object destinationValue, Type sourceType, Type destinationType) 
             : this(context, sourceValue, destinationValue, sourceType, destinationType, memberTypeMap)
         {
-            ArrayIndex = arrayIndex;
         }
 
         private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue,
@@ -158,8 +157,9 @@ namespace AutoMapper
         }
 
         private ResolutionContext(ResolutionContext context, object sourceValue, TypeMap typeMap, Type sourceType,
-            Type destinationType, int arrayIndex) : this(context, typeMap, sourceValue, null, sourceType, destinationType, arrayIndex)
+            Type destinationType, int arrayIndex) : this(context, sourceValue, null, sourceType, destinationType, typeMap)
         {
+            ArrayIndex = arrayIndex;
         }
 
         public string MemberName => PropertyMap == null
