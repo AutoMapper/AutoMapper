@@ -2,29 +2,28 @@ namespace AutoMapper.QueryableExtensions
 {
     using System;
     using System.Linq;
+    using System.Reflection;
 
     public class ExpressionRequest : IEquatable<ExpressionRequest>
     {
-        private readonly string _membersForComparison;
         public Type SourceType { get; }
-        public Type DestinationType { get; }
-        public string[] IncludedMembers { get; private set; }
 
-        public ExpressionRequest(Type sourceType, Type destinationType,  params string[] includedMembers)
+        public Type DestinationType { get; }
+
+        public PropertyInfo[] MembersToExpand { get; private set; }
+
+        public ExpressionRequest(Type sourceType, Type destinationType, params PropertyInfo[] membersToExpand)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
-            IncludedMembers = includedMembers;
-            _membersForComparison = includedMembers.Distinct()
-                .OrderBy(s => s)
-                .Aggregate(String.Empty, (prev, curr) => prev + curr);
+            MembersToExpand = membersToExpand.OrderBy(p=>p.Name).ToArray();
         }
 
         public bool Equals(ExpressionRequest other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return String.Equals(_membersForComparison, other._membersForComparison) &&
+            return MembersToExpand.SequenceEqual(other.MembersToExpand) &&
                    SourceType == other.SourceType && DestinationType == other.DestinationType;
         }
 
@@ -40,10 +39,9 @@ namespace AutoMapper.QueryableExtensions
         {
             unchecked
             {
-                var hashCode = _membersForComparison.GetHashCode();
-                hashCode = (hashCode*397) ^ SourceType.GetHashCode();
+                var hashCode = SourceType.GetHashCode();
                 hashCode = (hashCode*397) ^ DestinationType.GetHashCode();
-                return hashCode;
+                return MembersToExpand.Aggregate(hashCode, (currentHash, p) => (currentHash * 397) ^ p.GetHashCode());
             }
         }
 

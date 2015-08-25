@@ -4,6 +4,7 @@ namespace AutoMapper.QueryableExtensions
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Impl;
 
     /// <summary>
@@ -27,8 +28,7 @@ namespace AutoMapper.QueryableExtensions
         {
             return
                 (Expression<Func<TSource, TDestination>>)
-                    mappingEngine.CreateMapExpression(typeof (TSource), typeof (TDestination), parameters,
-                        membersToExpand);
+                    mappingEngine.CreateMapExpression<TSource, TDestination>(parameters, membersToExpand);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace AutoMapper.QueryableExtensions
         /// <returns>Expression tree mapping source to destination type</returns>
         public static Expression CreateMapExpression(this IMappingEngine mappingEngine,
             Type sourceType, Type destinationType,
-            IDictionary<string, object> parameters = null, params string[] membersToExpand)
+            IDictionary<string, object> parameters = null, params PropertyInfo[] membersToExpand)
         {
             return mappingEngine.CreateMapExpression(sourceType, destinationType, parameters, membersToExpand);
         }
