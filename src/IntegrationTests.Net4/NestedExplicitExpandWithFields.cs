@@ -5,45 +5,49 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.QueryableExtensions;
+using AutoMapper.UnitTests;
 using Should;
 using Xunit;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
-    public class NestedExplicitExpandWithFields
+    public class NestedExplicitExpandWithFields : AutoMapperSpecBase
     {
-        public NestedExplicitExpandWithFields()
+        protected override void Establish_context()
         {
-            var mappingClass1 = AutoMapper.Mapper.CreateMap<Class1, Class1DTO>();
-            mappingClass1.ForAllMembers(r => r.Ignore());
-            mappingClass1.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
-            mappingClass1.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
-            mappingClass1.ForMember(dest => dest.Class2DTO, opt =>
+            Mapper.Initialize(cfg =>
             {
-                opt.MapFrom(src => src.Class2);
-                opt.ExplicitExpansion();
-            });
+                var mappingClass1 = cfg.CreateMap<Class1, Class1DTO>();
+                mappingClass1.ForAllMembers(r => r.Ignore());
+                mappingClass1.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
+                mappingClass1.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
+                mappingClass1.ForMember(dest => dest.Class2DTO, opt =>
+                {
+                    opt.MapFrom(src => src.Class2);
+                    opt.ExplicitExpansion();
+                });
 
-            var mappingClass2 = AutoMapper.Mapper.CreateMap<Class2, Class2DTO>();
-            mappingClass2.ForAllMembers(r => r.Ignore());
-            mappingClass2.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
-            mappingClass2.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
-            mappingClass2.ForMember(dest => dest.Class3DTO, opt =>
-            {
-                opt.MapFrom(src => src.Class3);
-                opt.ExplicitExpansion();
-            });
+                var mappingClass2 = cfg.CreateMap<Class2, Class2DTO>();
+                mappingClass2.ForAllMembers(r => r.Ignore());
+                mappingClass2.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
+                mappingClass2.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
+                mappingClass2.ForMember(dest => dest.Class3DTO, opt =>
+                {
+                    opt.MapFrom(src => src.Class3);
+                    opt.ExplicitExpansion();
+                });
 
-            var mappingClass3 = AutoMapper.Mapper.CreateMap<Class3, Class3DTO>();
-            mappingClass3.ForAllMembers(r => r.Ignore());
-            mappingClass3.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
-            mappingClass3.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
+                var mappingClass3 = cfg.CreateMap<Class3, Class3DTO>();
+                mappingClass3.ForAllMembers(r => r.Ignore());
+                mappingClass3.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
+                mappingClass3.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
 
-            //This is the trouble mapping
-            mappingClass3.ForMember(dest => dest.Class2DTO, opt =>
-            {
-                opt.MapFrom(src => src.Class2);
-                opt.ExplicitExpansion();
+                //This is the trouble mapping
+                mappingClass3.ForMember(dest => dest.Class2DTO, opt =>
+                {
+                    opt.MapFrom(src => src.Class2);
+                    opt.ExplicitExpansion();
+                });
             });
         }
 

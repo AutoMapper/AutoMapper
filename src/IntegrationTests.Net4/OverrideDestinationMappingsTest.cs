@@ -3,10 +3,11 @@ using Xunit;
 using System.Linq;
 using Should;
 using System.Data.Entity;
+using AutoMapper.UnitTests;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
-    public class OverrideDestinationMappingsTest
+    public class OverrideDestinationMappingsTest : AutoMapperSpecBase
     {
         public class Context : DbContext
         {
@@ -35,8 +36,6 @@ namespace AutoMapper.IntegrationTests.Net4
         [Fact]
         public void Map_WhenOverrideDestinationTypeAndSourceIsDerived_MustCreateOverriddenDestinationType()
         {
-            InitializeMapper();
-
             Entity entity = LoadEntity();
 
             var model = Mapper.Map<Model>(entity);
@@ -52,7 +51,7 @@ namespace AutoMapper.IntegrationTests.Net4
             }
         }
 
-        private static void InitializeMapper()
+        protected override void Establish_context()
         {
             Mapper.Initialize(c =>
             {
