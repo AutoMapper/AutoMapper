@@ -8,6 +8,7 @@ namespace AutoMapper.IntegrationTests.Net4
 {
     namespace ChildClassTests
     {
+        using AutoMapper.UnitTests;
         using QueryableExtensions;
 
         public class Base
@@ -66,13 +67,8 @@ namespace AutoMapper.IntegrationTests.Net4
         }
 
 
-        public class UnitTest
+        public class UnitTest : AutoMapperSpecBase
         {
-            public UnitTest()
-            {
-                Mapper.Reset();
-            }
-
             [Fact]
             public void EFConfiguredCorrectly()
             {
@@ -85,13 +81,18 @@ namespace AutoMapper.IntegrationTests.Net4
                 }
             }
 
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Base, BaseDTO>();
+                    cfg.CreateMap<Sub, SubDTO>();
+                });
+            }
+
             [Fact]
             public void AutoMapperEFRelationsTest()
             {
-                Mapper.CreateMap<Base, BaseDTO>();
-                Mapper.CreateMap<Sub, SubDTO>();
-                Mapper.AssertConfigurationIsValid();
-
                 using (var context = new Context())
                 {
                     var baseDTO = context.Bases.Select(b => new BaseDTO

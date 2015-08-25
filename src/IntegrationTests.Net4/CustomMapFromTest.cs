@@ -11,6 +11,7 @@ namespace AutoMapper.IntegrationTests.Net4
 {
     namespace CustomMapFromTest
     {
+        using AutoMapper.UnitTests;
         using QueryableExtensions;
 
         public class Customer
@@ -75,15 +76,12 @@ namespace AutoMapper.IntegrationTests.Net4
             }
         }
         
-        public class AutoMapperQueryableExtensionsThrowsNullReferenceExceptionSpec
+        public class AutoMapperQueryableExtensionsThrowsNullReferenceExceptionSpec : AutoMapperSpecBase
         {
-            public AutoMapperQueryableExtensionsThrowsNullReferenceExceptionSpec()
+            protected override void Establish_context()
             {
-                Mapper.CreateMap<Customer, CustomerViewModel>()
-                      .ForMember(x => x.FullAddress,
-                                 o => o.MapFrom(c => c.Address.Street + ", " + c.Address.City + " " + c.Address.State)); 
-
-                Mapper.AssertConfigurationIsValid();
+                Mapper.Initialize(cfg=> cfg.CreateMap<Customer, CustomerViewModel>()
+                .ForMember(x => x.FullAddress, o => o.MapFrom(c => c.Address.Street + ", " + c.Address.City + " " + c.Address.State)));
             }
 
             [Fact]
