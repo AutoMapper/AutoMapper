@@ -24,11 +24,11 @@ namespace AutoMapper.QueryableExtensions
         /// <returns>Expression tree mapping source to destination type</returns>
         public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(
             this IMappingEngine mappingEngine, IDictionary<string, object> parameters = null,
-            params string[] membersToExpand)
+            params MemberInfo[] membersToExpand)
         {
             return
                 (Expression<Func<TSource, TDestination>>)
-                    mappingEngine.CreateMapExpression<TSource, TDestination>(parameters, membersToExpand);
+                    mappingEngine.CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
         }
 
         /// <summary>
