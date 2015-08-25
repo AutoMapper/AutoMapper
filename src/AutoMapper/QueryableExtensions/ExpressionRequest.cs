@@ -10,7 +10,7 @@ namespace AutoMapper.QueryableExtensions
 
         public Type DestinationType { get; }
 
-        public MemberInfo[] MembersToExpand { get; private set; }
+        public MemberInfo[] MembersToExpand { get; }
 
         public ExpressionRequest(Type sourceType, Type destinationType, params MemberInfo[] membersToExpand)
         {
