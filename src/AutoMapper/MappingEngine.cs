@@ -247,7 +247,7 @@ namespace AutoMapper
             return (TDestination) ((IMappingEngineRunner) this).Map(context);
         }
 
-        public Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params PropertyInfo[] membersToExpand)
+        public Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
         {
             parameters = parameters ?? new Dictionary<string, object>();
 

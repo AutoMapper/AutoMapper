@@ -7,19 +7,19 @@ namespace AutoMapper.Internal
 
 	public static class ReflectionHelper
 	{
-        public static PropertyInfo GetProperty(Type type, string memberName)
+        public static MemberInfo GetFieldOrProperty(Type type, string memberName)
         {
-            return memberName.Split('.').Aggregate((PropertyInfo) null, (property, member) => (property?.PropertyType ?? type).GetProperty(member));
+            return memberName.Split('.').Aggregate((MemberInfo) null, (property, member) => (property?.GetMemberType() ?? type).GetMember(member).Single());
         }
 
-        public static PropertyInfo GetProperty(this LambdaExpression expression)
+        public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)
         {
             var memberExpression = expression.Body as MemberExpression;
             if(memberExpression == null)
             {
                 throw new ArgumentOutOfRangeException("expression", "Expected a property/field access expression, not " + expression);
             }
-            return (PropertyInfo) memberExpression.Member;
+            return (MemberInfo) memberExpression.Member;
         }
 
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)

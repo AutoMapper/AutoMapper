@@ -61,14 +61,14 @@ namespace AutoMapper.QueryableExtensions
             return To<TResult>(GetParameters(parameters), GetMembers(membersToExpand));
         }
 
-        private PropertyInfo[] GetMembers(Type type, string[] membersToExpand)
+        private MemberInfo[] GetMembers(Type type, string[] membersToExpand)
         {
-            return membersToExpand.Select(m=>ReflectionHelper.GetProperty(type, m)).ToArray();
+            return membersToExpand.Select(m=>ReflectionHelper.GetFieldOrProperty(type, m)).ToArray();
         }
 
-        private PropertyInfo[] GetMembers<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
+        private MemberInfo[] GetMembers<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
         {
-            return membersToExpand.Select(ReflectionHelper.GetProperty).ToArray();
+            return membersToExpand.Select(ReflectionHelper.GetFieldOrProperty).ToArray();
         }
 
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params Expression<Func<TResult, object>>[] membersToExpand)
@@ -77,7 +77,7 @@ namespace AutoMapper.QueryableExtensions
             return To<TResult>(parameters, members);
         }
 
-        private IQueryable<TResult> To<TResult>(IObjectDictionary parameters, PropertyInfo[] members)
+        private IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberInfo[] members)
         {
             var mapExpr = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, members);
 
