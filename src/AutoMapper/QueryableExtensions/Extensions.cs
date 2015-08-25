@@ -43,7 +43,7 @@ namespace AutoMapper.QueryableExtensions
         /// <returns>Expression tree mapping source to destination type</returns>
         public static Expression CreateMapExpression(this IMappingEngine mappingEngine,
             Type sourceType, Type destinationType,
-            IDictionary<string, object> parameters = null, params PropertyInfo[] membersToExpand)
+            IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
         {
             return mappingEngine.CreateMapExpression(sourceType, destinationType, parameters, membersToExpand);
         }
