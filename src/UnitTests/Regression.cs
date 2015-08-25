@@ -154,7 +154,7 @@ namespace AutoMapper.UnitTests
 		{
 			protected override void Establish_context()
 			{
-				Mapper.CreateMap<Person, PersonModel>();
+                Mapper.Initialize(cfg=>cfg.CreateMap<Person, PersonModel>());
 			}
 
 			[Fact]
