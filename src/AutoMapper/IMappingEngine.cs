@@ -163,6 +163,6 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
 
-        Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params PropertyInfo[] membersToExpand);
+        Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
     }
 }
