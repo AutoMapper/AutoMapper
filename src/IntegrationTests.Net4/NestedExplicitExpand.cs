@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.QueryableExtensions;
@@ -47,18 +48,36 @@ namespace AutoMapper.IntegrationTests.Net4
         }
 
         [Fact]
-        public void Should_handle_nested_explicit_expand()
+        public void Should_handle_nested_explicit_expand_with_expressions()
         {
+            Class1DTO[] dtos;
             using(TestContext context = new TestContext())
             {
-                var fathers = context.Class1Set.ToArray();
-                var fathers2DTO = context.Class2Set.ProjectTo<Class2DTO>(r => r.Class3DTO).ToArray();
-                var fathersDTO = context.Class1Set.ProjectTo<Class1DTO>(r => r.Class2DTO/*, r => r.Class2DTO.Class3DTO*/).ToArray();
-                //IQueryable<Class1DTO> fathersDTO = class1s.ProjectTo<Class1DTO>(membersToExpand: new string[]{ "Class2DTO", "Class3DTO" });
-
-                //var fatherDTOsWithSonsNameAsJohnQueryable = fathersDTO.Where(f => f.Class2DTO.Class3DTO.NameDTO == "SomeValue");
-                //var result = fatherDTOsWithSonsNameAsJohnQueryable.ToList();
+                context.Database.Log = s => Debug.WriteLine(s);
+                dtos = context.Class1Set.ProjectTo<Class1DTO>(r => r.Class2DTO, r => r.Class2DTO.Class3DTO).ToArray();                
             }
+            Check(dtos);
+        }
+
+        [Fact]
+        public void Should_handle_nested_explicit_expand_with_strings()
+        {
+            Class1DTO[] dtos;
+            using(TestContext context = new TestContext())
+            {
+                context.Database.Log = s => Debug.WriteLine(s);
+                dtos = context.Class1Set.ProjectTo<Class1DTO>(null, "Class2DTO", "Class2DTO.Class3DTO").ToArray();
+            }
+            Check(dtos);
+        }
+
+        public void Check(Class1DTO[] dtos)
+        {
+            dtos.Length.ShouldEqual(3);
+            dtos.Select(d => d.IdDTO).ShouldEqual(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.IdDTO).ShouldEqual(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.Class3DTO.IdDTO).ShouldEqual(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.Class3DTO.Class2DTO).ShouldEqual(new Class2DTO[] { null, null, null });
         }
 
         public class TestContext : System.Data.Entity.DbContext
