@@ -9,7 +9,7 @@ namespace AutoMapper.Internal
 	{
         public static PropertyInfo GetProperty(Type type, string memberName)
         {
-            return memberName.Split('.').Aggregate(type.GetProperty(memberName), (property, member) => property.PropertyType.GetProperty(member));
+            return memberName.Split('.').Aggregate((PropertyInfo) null, (property, member) => (property?.PropertyType ?? type).GetProperty(member));
         }
 
         public static PropertyInfo GetProperty(this LambdaExpression expression)
