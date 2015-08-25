@@ -30,7 +30,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
 
             var sourceListType = result.Type.IsArray ? result.Type.GetElementType() : result.Type.GetGenericArguments().First();
-            var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.IncludedMembers);
+            var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand);
 
             var selectExpression = result.ResolutionExpression;
             if (sourceListType != destinationListType)

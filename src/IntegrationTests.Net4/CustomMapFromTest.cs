@@ -104,7 +104,7 @@ namespace AutoMapper.IntegrationTests.Net4
                         x.FullAddress.ShouldNotBeEmpty();
                     });
 
-                    customerVms = context.Customers.Project().To<CustomerViewModel>().ToList();
+                    customerVms = context.Customers.ProjectTo<CustomerViewModel>().ToList();
                     customerVms.ForEach(x =>
                     {
                         x.FullAddress.ShouldNotBeNull();

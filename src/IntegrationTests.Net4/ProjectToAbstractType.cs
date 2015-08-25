@@ -61,7 +61,7 @@ namespace AutoMapper.IntegrationTests.Net4
             });
             using(var context = new Context())
             {
-                _destinations = context.EntityA.Project().To<ITypeA>().ToArray();
+                _destinations = context.EntityA.ProjectTo<ITypeA>().ToArray();
             }
             _destinations.Length.ShouldEqual(3);
             _destinations[2].Name.ShouldEqual("Bill Gates");

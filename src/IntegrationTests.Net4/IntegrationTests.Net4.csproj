@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="ChildClassTests.cs" />
     <Compile Include="CustomMapFromTest.cs" />
+    <Compile Include="NestedExplicitExpand.cs" />
     <Compile Include="OverrideDestinationMappingsTest.cs" />
     <Compile Include="ProjectToAbstractType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

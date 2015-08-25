@@ -108,7 +108,7 @@ namespace AutoMapper.IntegrationTests.Net4
                     baseDTO.Sub.Sub1.ShouldEqual("sub1");
 
 
-                    baseDTO = context.Bases.Project().To<BaseDTO>().FirstOrDefault();
+                    baseDTO = context.Bases.ProjectTo<BaseDTO>().FirstOrDefault();
                     baseDTO.ShouldNotBeNull();
                     baseDTO.BaseID.ShouldEqual(1);
                     baseDTO.Sub.Sub1.ShouldEqual("sub1");
