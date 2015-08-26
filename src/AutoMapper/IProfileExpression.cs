@@ -143,5 +143,11 @@ namespace AutoMapper
         /// By default only public fields are mapped.
         /// </summary>
         Func<FieldInfo, bool> ShouldMapField { get; set; }
+
+        /// <summary>
+        /// Specify common configuration for all type maps.
+        /// </summary>
+        /// <param name="configuration">configuration callback</param>
+        void ForAllMaps(Action<TypeMap, IMappingExpression> configuration);
     }
 }

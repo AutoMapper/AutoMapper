@@ -94,6 +94,11 @@ namespace AutoMapper
 
         public IEnumerable<MethodInfo> SourceExtensionMethods => GetProfile().SourceExtensionMethods;
 
+        public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
+        {
+            _configurator.ForAllMaps(ProfileName, configuration);
+        }
+
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
         {
             return CreateMap<TSource, TDestination>(MemberList.Destination);
