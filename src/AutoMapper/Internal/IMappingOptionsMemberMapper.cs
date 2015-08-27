@@ -169,22 +169,22 @@ namespace AutoMapper
     }
     public class SourceToDestinationNameMapperAttributesMember : ISourceToDestinationNameMapper
     {
-        private static readonly Internal.IDictionary<TypeInfo, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapper>>> Cache = new DictionaryFactory().CreateDictionary<TypeInfo, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapper>>>();
+        private static readonly Internal.IDictionary<TypeInfo, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapperAttribute>>> Cache = new DictionaryFactory().CreateDictionary<TypeInfo, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapperAttribute>>>();
 
         public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch)
         {
-            Cache.GetOrAdd(typeInfo, ti => getTypeInfoMembers.GetMemberInfos(ti).ToDictionary(mi => mi, mi => mi.GetCustomAttributes(typeof(SourceToDestinationMapper)).OfType<SourceToDestinationMapper>()));
+            Cache.GetOrAdd(typeInfo, ti => getTypeInfoMembers.GetMemberInfos(ti).ToDictionary(mi => mi, mi => mi.GetCustomAttributes(typeof(SourceToDestinationMapperAttribute)).OfType<SourceToDestinationMapperAttribute>()));
 
             return Cache[typeInfo].FirstOrDefault(kp => kp.Value.Any(_ => _.IsMatch(typeInfo, kp.Key, destType, nameToSearch))).Key;
         }
     }
 
-    public abstract class SourceToDestinationMapper : Attribute
+    public abstract class SourceToDestinationMapperAttribute : Attribute
     {
         public abstract bool IsMatch(TypeInfo typeInfo, MemberInfo memberInfo, Type destType, string nameToSearch);
     }
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class MapToAttribute : SourceToDestinationMapper
+    public class MapToAttribute : SourceToDestinationMapperAttribute
     {
         public string MatchingName { get; }
 
