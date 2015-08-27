@@ -45,7 +45,7 @@ namespace AutoMapper
     {
         public IGetTypeInfoMembers GetMembers { get; } = new AllMemberInfo();
 
-        public ICollection<ISourceToDestinationNameMapper> NamedMappers { get; } = new Collection<ISourceToDestinationNameMapper> {new DefaultName()};
+        public ICollection<ISourceToDestinationNameMapper> NamedMappers { get; } = new Collection<ISourceToDestinationNameMapper> {new DefaultName(), new SourceToDestinationNameMapperAttributesMember()};
 
         public MemberInfo GetMatchingMemberInfo(TypeInfo typeInfo, Type destType, string nameToSearch)
         {
@@ -61,13 +61,9 @@ namespace AutoMapper
     }
 
     // Source Destination Mapper
-    public abstract class SourceToDestinationNameMapperBase : ISourceToDestinationNameMapper
+    public class DefaultName : ISourceToDestinationNameMapper
     {
-        public abstract MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch);
-    }
-    public class DefaultName : SourceToDestinationNameMapperBase
-    {
-        public override MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch)
         {
             return
                 getTypeInfoMembers.GetMemberInfos(typeInfo)
@@ -78,7 +74,7 @@ namespace AutoMapper
                                 : string.CompareOrdinal(mi.Name, nameToSearch) == 0);
         }
     }
-    public class PrePostfixName : SourceToDestinationNameMapperBase
+    public class PrePostfixName : ISourceToDestinationNameMapper
     {
         public ICollection<string> Prefixes { get; } = new Collection<string>();
         public ICollection<string> Postfixes { get; } = new Collection<string>();
@@ -93,7 +89,7 @@ namespace AutoMapper
             return this;
         }
 
-        public override MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch, DestinationPrefixes, DestinationPostfixes);
             var possibleDestNames = getTypeInfoMembers.GetMemberInfos(typeInfo).Select(mi => new { mi, possibles = PossibleNames(mi.Name, Prefixes, Postfixes) });
@@ -132,7 +128,7 @@ namespace AutoMapper
                     .Select(postfix => name.Remove(name.Length - postfix.Length));
         }
     }
-    public class ReplaceName : SourceToDestinationNameMapperBase
+    public class ReplaceName : ISourceToDestinationNameMapper
     {
         private ICollection<MemberNameReplacer> MemberNameReplacers { get; }
 
@@ -146,7 +142,7 @@ namespace AutoMapper
             MemberNameReplacers.Add(new MemberNameReplacer(original, newValue));
             return this;
         }
-        public override MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch);
             var possibleDestNames = getTypeInfoMembers.GetMemberInfos(typeInfo).Select(mi => new { mi, possibles = PossibleNames(mi.Name) });
@@ -171,7 +167,38 @@ namespace AutoMapper
                     .ToList();
         }
     }
-    
+    public class SourceToDestinationNameMapperAttributesMember : ISourceToDestinationNameMapper
+    {
+        private static readonly Internal.IDictionary<TypeInfo, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapper>>> Cache = new DictionaryFactory().CreateDictionary<TypeInfo, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapper>>>();
+
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeInfo typeInfo, Type destType, string nameToSearch)
+        {
+            Cache.GetOrAdd(typeInfo, ti => getTypeInfoMembers.GetMemberInfos(ti).ToDictionary(mi => mi, mi => mi.GetCustomAttributes(typeof(SourceToDestinationMapper)).OfType<SourceToDestinationMapper>()));
+
+            return Cache[typeInfo].FirstOrDefault(kp => kp.Value.Any(_ => _.IsMatch(typeInfo, kp.Key, destType, nameToSearch))).Key;
+        }
+    }
+
+    public abstract class SourceToDestinationMapper : Attribute
+    {
+        public abstract bool IsMatch(TypeInfo typeInfo, MemberInfo memberInfo, Type destType, string nameToSearch);
+    }
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class MapToAttribute : SourceToDestinationMapper
+    {
+        public string MatchingName { get; }
+
+        public MapToAttribute(string matchingName)
+        {
+            MatchingName = matchingName;
+        }
+
+        public override bool IsMatch(TypeInfo typeInfo, MemberInfo memberInfo, Type destType, string nameToSearch)
+        {
+            return string.CompareOrdinal(MatchingName, nameToSearch) == 0;
+        }
+    }
+
     public interface IMemberConfiguration
     {
         IList<IChildMemberConfiguration> MemberMappers { get; }

@@ -205,6 +205,7 @@
     <Compile Include="MappingInheritance\ShouldInheritBeforeAndAfterMap.cs" />
     <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
     <Compile Include="MappingOrder.cs" />
+    <Compile Include="MapToAttributeTest.cs" />
     <Compile Include="MaxDepthTests.cs" />
     <Compile Include="MemberNameReplacers.cs" />
     <Compile Include="MemberResolution.cs" />
