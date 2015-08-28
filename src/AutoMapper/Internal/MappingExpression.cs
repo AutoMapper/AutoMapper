@@ -12,6 +12,22 @@ namespace AutoMapper.Internal
         {
         }
 
+        public new IMappingExpression ReverseMap()
+        {
+            var mappingExpression = ConfigurationContainer.CreateMap(TypeMap.SourceType, TypeMap.DestinationType, MemberList.Source, TypeMap.Profile);
+            return (IMappingExpression) ConfigureReverseMap((MappingExpression)mappingExpression);
+        }
+
+        public new IMappingExpression Substitute(Func<object, object> substituteFunc)
+        {
+            return (IMappingExpression)base.Substitute(substituteFunc);
+        }
+
+        public new IMappingExpression ConstructUsingServiceLocator()
+        {
+            return (IMappingExpression)base.ConstructUsingServiceLocator();
+        }
+
         public void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions)
         {
             base.ForAllMembers(o => memberOptions((IMemberConfigurationExpression)o));
@@ -69,6 +85,71 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         {
             return (IMappingExpression) base.Include(otherSourceType, otherDestinationType);
         }
+
+        public new IMappingExpression IgnoreAllPropertiesWithAnInaccessibleSetter()
+        {
+            return (IMappingExpression)base.IgnoreAllPropertiesWithAnInaccessibleSetter();
+        }
+
+        public new IMappingExpression IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
+        {
+            return (IMappingExpression)base.IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+        }
+
+        public new IMappingExpression IncludeBase(Type sourceBase, Type destinationBase)
+        {
+            return (IMappingExpression)base.IncludeBase(sourceBase, destinationBase);
+        }
+
+        public void ProjectUsing(LambdaExpression projectionExpression)
+        {
+            TypeMap.UseCustomProjection(projectionExpression);
+        }
+
+        public new IMappingExpression BeforeMap(Action<object, object> beforeFunction)
+        {
+            return (IMappingExpression)base.BeforeMap(beforeFunction);
+        }
+
+        public new IMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<object, object>
+        {
+            return (IMappingExpression)base.BeforeMap<TMappingAction>();
+        }
+
+        public new IMappingExpression AfterMap(Action<object, object> afterFunction)
+        {
+            return (IMappingExpression)base.AfterMap(afterFunction);
+        }
+
+        public new IMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<object, object>
+        {
+            return (IMappingExpression)base.AfterMap<TMappingAction>();
+        }
+
+        public new IMappingExpression ConstructUsing(Func<object, object> ctor)
+        {
+            return (IMappingExpression)base.ConstructUsing(ctor);
+        }
+
+        public new IMappingExpression ConstructUsing(Func<ResolutionContext, object> ctor)
+        {
+            return (IMappingExpression)base.ConstructUsing(ctor);
+        }
+
+        public new IMappingExpression ConstructProjectionUsing(Expression<Func<object, object>> ctor)
+        {
+            return (IMappingExpression)base.ConstructProjectionUsing(ctor);
+        }
+
+        public new IMappingExpression MaxDepth(int depth)
+        {
+            return (IMappingExpression)base.MaxDepth(depth);
+        }
+
+        public new IMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<object>> paramOptions)
+        {
+            return (IMappingExpression)base.ForCtorParam(ctorParamName, paramOptions);
+        }
     }
 
     class SourceMappingExpression : ISourceMemberConfigurationExpression
@@ -102,6 +183,8 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         public TypeMap TypeMap { get; }
 
         public PropertyMap PropertyMap =>_propertyMap;
+
+        public IProfileExpression ConfigurationContainer => _configurationContainer;
 
         public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
                                                                    Action<IMemberConfigurationExpression<TSource>> memberOptions)
@@ -179,10 +262,14 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TSource, TDestination> IncludeBase<TSourceBase, TDestinationBase>()
         {
-            TypeMap baseTypeMap = _configurationContainer.CreateMap<TSourceBase, TDestinationBase>().TypeMap;
+            return IncludeBase(typeof(TSourceBase), typeof(TDestinationBase));
+        }
+
+        public IMappingExpression<TSource, TDestination> IncludeBase(Type sourceBase, Type destinationBase)
+        {
+            TypeMap baseTypeMap = _configurationContainer.CreateMap(sourceBase, destinationBase).TypeMap;
             baseTypeMap.IncludeDerivedTypes(typeof(TSource), typeof(TDestination));
             TypeMap.ApplyInheritedMap(baseTypeMap);
-
             return this;
         }
 
@@ -302,17 +389,19 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
             var mappingExpression = _configurationContainer.CreateMap<TDestination, TSource>(TypeMap.Profile, MemberList.Source);
+            return ConfigureReverseMap(mappingExpression);
+        }
 
-            foreach (var destProperty in TypeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
+        protected IMappingExpression<TDestination, TSource> ConfigureReverseMap(IMappingExpression<TDestination, TSource> mappingExpression)
+        {
+            foreach(var destProperty in TypeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
             {
                 mappingExpression.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
             }
-
-            foreach (var includedDerivedType in TypeMap.IncludedDerivedTypes)
+            foreach(var includedDerivedType in TypeMap.IncludedDerivedTypes)
             {
                 mappingExpression.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
             }
-
             return mappingExpression;
         }
 
@@ -428,7 +517,6 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<ResolutionContext, TDestination> ctor)
         {
             TypeMap.DestinationCtor = ctxt => ctor(ctxt);
-
             return this;
         }
 

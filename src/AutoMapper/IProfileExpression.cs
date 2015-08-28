@@ -57,6 +57,17 @@ namespace AutoMapper
         IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList);
 
         /// <summary>
+        /// Creates a mapping configuration from the source type to the destination type.
+        /// Specify the member list to validate against during configuration validation.
+        /// </summary>
+        /// <param name="sourceType">Source type</param>
+        /// <param name="destinationType">Destination type</param>
+        /// <param name="memberList">Member list to validate</param>
+        /// <param name="profileName">Profile name</param>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName);
+
+        /// <summary>
         /// Clear the list of recognized prefixes.
         /// </summary>
         void ClearPrefixes();
