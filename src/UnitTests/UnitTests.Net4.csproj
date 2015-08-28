@@ -171,6 +171,7 @@
     <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IgnoreAllTests.cs" />
+    <Compile Include="IMappingExpression\NonGenericReverseMapping.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="DynamicMapping.cs" />
