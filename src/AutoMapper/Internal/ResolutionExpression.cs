@@ -10,10 +10,6 @@ namespace AutoMapper.Internal
         private readonly Type _sourceType;
         private readonly PropertyMap _propertyMap;
 
-        public ResolutionExpression(PropertyMap propertyMap) : this(typeof (TSource), propertyMap)
-        {
-        }
-
         public ResolutionExpression(Type sourceType, PropertyMap propertyMap)
         {
             _sourceType = sourceType;
@@ -62,9 +58,11 @@ namespace AutoMapper.Internal
         where TValueResolver : IValueResolver
     {
         private readonly PropertyMap _propertyMap;
+        private readonly Type _sourceType;
 
-        public ResolutionExpression(PropertyMap propertyMap)
+        public ResolutionExpression(Type sourceType, PropertyMap propertyMap)
         {
+            _sourceType = sourceType;
             _propertyMap = propertyMap;
         }
 
@@ -84,8 +82,8 @@ namespace AutoMapper.Internal
 
         public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(string sourcePropertyName)
         {
-            _propertyMap.SourceMember = typeof (TSource).GetMember(sourcePropertyName)[0];
-            _propertyMap.ChainTypeMemberForResolver(new PropertyNameResolver(typeof (TSource), sourcePropertyName));
+            _propertyMap.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
+            _propertyMap.ChainTypeMemberForResolver(new PropertyNameResolver(_sourceType, sourcePropertyName));
 
             return this;
         }

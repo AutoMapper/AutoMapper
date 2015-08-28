@@ -136,7 +136,19 @@ namespace AutoMapper
     /// <summary>
     /// Configuration options for an individual member
     /// </summary>
-    public interface IMemberConfigurationExpression
+    public interface IMemberConfigurationExpression : IMemberConfigurationExpression<object>
+    {
+        /// <summary>
+        /// Map from a specific source member
+        /// </summary>
+        /// <param name="sourceMember">Source member to map from</param>
+        void MapFrom(string sourceMember);
+    }
+
+    /// <summary>
+    /// Configuration options for an individual member
+    /// </summary>
+    public interface IMemberConfigurationExpression2
     {
         /// <summary>
         /// Map from a specific source member

@@ -10,6 +10,27 @@ namespace AutoMapper
     public interface IMappingExpression
     {
         /// <summary>
+        /// Customize configuration for all members
+        /// </summary>
+        /// <param name="memberOptions">Callback for member options</param>
+        void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions);
+
+        /// <summary>
+        /// Customize configuration for an individual source member
+        /// </summary>
+        /// <param name="sourceMemberName">Source member name</param>
+        /// <param name="memberOptions">Callback for member configuration options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions);
+        
+        /// <summary>
+        /// Assign a profile to the current type map
+        /// </summary>
+        /// <param name="profileName">Profile name</param>
+        /// <returns>Itself</returns>
+        IMappingExpression WithProfile(string profileName);
+
+        /// <summary>
         /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping
         /// </summary>
         /// <typeparam name="TTypeConverter">Type converter type</typeparam>
@@ -21,19 +42,12 @@ namespace AutoMapper
         /// </summary>
         /// <param name="typeConverterType">Type converter type</param>
         void ConvertUsing(Type typeConverterType);
-
+        
         /// <summary>
         /// Override the destination type mapping for looking up configuration and instantiation
         /// </summary>
         /// <param name="typeOverride"></param>
         void As(Type typeOverride);
-
-        /// <summary>
-        /// Assign a profile to the current type map
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <returns>Itself</returns>
-        IMappingExpression WithProfile(string profileName);
 
         /// <summary>
         /// Customize individual members
@@ -44,13 +58,12 @@ namespace AutoMapper
         IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions);
 
         /// <summary>
-        /// Customize configuration for an individual source member
+        /// Include this configuration in derived types' maps
         /// </summary>
-        /// <param name="sourceMemberName">Source member name</param>
-        /// <param name="memberOptions">Callback for member configuration options</param>
+        /// <param name="derivedSourceType">Derived source type</param>
+        /// <param name="derivedDestinationType">Derived destination type</param>
         /// <returns>Itself</returns>
-        IMappingExpression ForSourceMember(string sourceMemberName,
-            Action<ISourceMemberConfigurationExpression> memberOptions);
+        IMappingExpression Include(Type derivedSourceType, Type derivedDestinationType);
     }
 
     /// <summary>
@@ -236,7 +249,7 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member configuration options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember,
-            Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
+            Action<ISourceMemberConfigurationExpression> memberOptions);
 
         /// <summary>
         /// Customize configuration for an individual source member. Member name not known until runtime
@@ -245,7 +258,7 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member configuration options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName,
-            Action<ISourceMemberConfigurationExpression<TSource>> memberOptions);
+            Action<ISourceMemberConfigurationExpression> memberOptions);
 
         /// <summary>
         /// Replace the original runtime instance with a new source instance. Useful when ORMs return proxy types with no relationships to runtime types.
