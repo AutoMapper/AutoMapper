@@ -63,5 +63,17 @@
                 action(mappingExpression);
             }
         }
+
+        public IMappingExpression Include(Type derivedSourceType, Type derivedDestinationType)
+        {
+            _actions.Add(me => me.Include(derivedSourceType, derivedDestinationType));
+
+            return this;
+        }
+
+        public void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions)
+        {
+            _actions.Add(me => me.ForAllMembers(memberOptions));
+        }
     }
 }

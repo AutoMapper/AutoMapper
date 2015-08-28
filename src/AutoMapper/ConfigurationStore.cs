@@ -500,7 +500,7 @@ namespace AutoMapper
 
         private IMappingExpression CreateMappingExpression(TypeMap typeMap, Type destinationType)
         {
-            IMappingExpression mappingExp = new MappingExpression(typeMap, _serviceCtor);
+            IMappingExpression mappingExp = new MappingExpression(typeMap, _serviceCtor, this);
 
             var destInfo = new TypeInfo(destinationType, ShouldMapProperty, ShouldMapField);
             foreach (var destProperty in destInfo.PublicWriteAccessors)
