@@ -69,7 +69,7 @@ namespace AutoMapper
         /// Skip member mapping and use a custom expression during LINQ projection
         /// </summary>
         /// <param name="projectionExpression">Projection expression</param>
-        void ProjectUsing(LambdaExpression projectionExpression);
+        void ProjectUsing(Expression<Func<object, object>> projectionExpression);
 
         /// <summary>
         /// Customize configuration for all members

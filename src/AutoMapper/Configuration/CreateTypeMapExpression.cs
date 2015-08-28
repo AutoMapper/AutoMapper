@@ -99,7 +99,7 @@
             return this;
         }
 
-        public void ProjectUsing(LambdaExpression projectionExpression)
+        public void ProjectUsing(Expression<Func<object, object>> projectionExpression)
         {
             _actions.Add(me => me.ProjectUsing(projectionExpression));
         }
