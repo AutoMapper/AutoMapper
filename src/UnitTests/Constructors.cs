@@ -549,7 +549,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-        public class When_configuring_ctor_param_mambers : AutoMapperSpecBase
+        public class When_configuring_ctor_param_members : AutoMapperSpecBase
         {
             public class Source
             {
