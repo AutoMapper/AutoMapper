@@ -171,6 +171,10 @@
     <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IgnoreAllTests.cs" />
+    <Compile Include="IMappingExpression\NonGenericAllMembersNullSubstitute.cs" />
+    <Compile Include="IMappingExpression\ForCtorParam.cs" />
+    <Compile Include="IMappingExpression\NonGenericReverseMapping.cs" />
+    <Compile Include="IMappingExpression\NonGenericProjectEnumTest.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="DynamicMapping.cs" />

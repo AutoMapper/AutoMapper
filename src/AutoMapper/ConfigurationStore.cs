@@ -239,8 +239,7 @@ namespace AutoMapper
             return CreateMap(sourceType, destinationType, memberList, DefaultProfileName);
         }
 
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList,
-            string profileName)
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
         {
             if (sourceType.IsGenericTypeDefinition() && destinationType.IsGenericTypeDefinition())
             {
@@ -477,46 +476,33 @@ namespace AutoMapper
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(TypeMap typeMap)
         {
-            IMappingExpression<TSource, TDestination> mappingExp =
-                new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, this);
+            var mappingExp = new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, this);
+            var type = (typeMap.ConfiguredMemberList == MemberList.Destination) ? typeof(TDestination) : typeof(TSource);
+            return Ignore(mappingExp, type);
+        }
 
-            var type = (typeMap.ConfiguredMemberList == MemberList.Destination) ? typeof (TDestination) : typeof (TSource);
-            var destInfo = new TypeInfo(type, ShouldMapProperty, ShouldMapField);
-            foreach (var destProperty in destInfo.PublicWriteAccessors)
+        private IMappingExpression<TSource, TDestination> Ignore<TSource, TDestination>(IMappingExpression<TSource, TDestination> mappingExp, Type destinationType)
+        {
+            var destInfo = new TypeInfo(destinationType, ShouldMapProperty, ShouldMapField);
+            foreach(var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);
-                if (attrs.Any(x => x is IgnoreMapAttribute))
+                if(attrs.Any(x => x is IgnoreMapAttribute))
                 {
                     mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
                 }
-                if (_globalIgnore.Contains(destProperty.Name))
+                if(_globalIgnore.Contains(destProperty.Name))
                 {
                     mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
                 }
             }
-
             return mappingExp;
         }
 
         private IMappingExpression CreateMappingExpression(TypeMap typeMap, Type destinationType)
         {
-            IMappingExpression mappingExp = new MappingExpression(typeMap, _serviceCtor);
-
-            var destInfo = new TypeInfo(destinationType, ShouldMapProperty, ShouldMapField);
-            foreach (var destProperty in destInfo.PublicWriteAccessors)
-            {
-                var attrs = destProperty.GetCustomAttributes(true);
-                if (attrs.Any(x => x is IgnoreMapAttribute))
-                {
-                    mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
-                }
-                if (_globalIgnore.Contains(destProperty.Name))
-                {
-                    mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
-                }
-            }
-
-            return mappingExp;
+            var mappingExp = new MappingExpression(typeMap, _serviceCtor, this);
+            return (IMappingExpression) Ignore(mappingExp, destinationType);
         }
 
         private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)

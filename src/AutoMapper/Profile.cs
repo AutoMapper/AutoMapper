@@ -184,5 +184,10 @@ namespace AutoMapper
         {
             return _configurator.GetProfile(ProfileName);
         }
+
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
+        {
+            return _configurator.CreateMap(sourceType, destinationType, memberList, profileName);
+        }
     }
 }

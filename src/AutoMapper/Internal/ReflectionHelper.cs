@@ -112,7 +112,8 @@ namespace AutoMapper.Internal
         /// if targetType is not oldType, method will return targetType
         /// if targetType is generic type with oldType arguments, method will replace all oldType arguments on newType
         /// </summary>
-        /// <param name="mainType"></param>
+        /// <param name="targetType"></param>
+        /// <param name="oldType"></param>
         /// <param name="newType"></param>
         /// <returns></returns>
         public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)
