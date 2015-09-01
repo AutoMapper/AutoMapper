@@ -43,6 +43,19 @@ namespace AutoMapper
 
         public Func<Type, object> ServiceCtor => _serviceCtor;
 
+        public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
+        {
+            ForAllMaps(DefaultProfileName, configuration);
+        }
+
+        internal void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration)
+        {
+            foreach(var typeMap in _userDefinedTypeMaps.Values.Where(tm => tm.Profile == profileName))
+            {
+                configuration(typeMap, CreateMappingExpression(typeMap, typeMap.DestinationType));
+            }
+        }
+
         public Func<PropertyInfo, bool> ShouldMapProperty
         {
             get { return GetProfile(DefaultProfileName).ShouldMapProperty; }
