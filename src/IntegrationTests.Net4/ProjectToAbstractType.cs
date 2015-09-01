@@ -1,12 +1,13 @@
 ﻿using System.Data.Entity;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
+using AutoMapper.UnitTests;
 using Should;
 using Xunit;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
-    public class ProjectToAbstractType
+    public class ProjectToAbstractType : AutoMapperSpecBase
     {
         ITypeA[] _destinations;
 
@@ -51,17 +52,21 @@ namespace AutoMapper.IntegrationTests.Net4
             public DbSet<DbEntityA> EntityA { get; set; }
         }
 
-        [Fact]
-        public void Should_project_to_abstract_type()
+        protected override void Establish_context()
         {
             Mapper.Initialize(c =>
             {
                 c.CreateMap<DbEntityA, ITypeA>().As<ConcreteTypeA>();
                 c.CreateMap<DbEntityA, ConcreteTypeA>();
             });
+        }
+
+        [Fact]
+        public void Should_project_to_abstract_type()
+        {
             using(var context = new Context())
             {
-                _destinations = context.EntityA.Project().To<ITypeA>().ToArray();
+                _destinations = context.EntityA.ProjectTo<ITypeA>().ToArray();
             }
             _destinations.Length.ShouldEqual(3);
             _destinations[2].Name.ShouldEqual("Bill Gates");

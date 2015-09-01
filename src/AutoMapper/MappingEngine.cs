@@ -247,7 +247,7 @@ namespace AutoMapper
             return (TDestination) ((IMappingEngineRunner) this).Map(context);
         }
 
-        public Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params string[] membersToExpand)
+        public Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
         {
             parameters = parameters ?? new Dictionary<string, object>();
 
@@ -328,13 +328,12 @@ namespace AutoMapper
                 var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter);
 
                 if (propertyMap.ExplicitExpansion &&
-                    !request.IncludedMembers.Contains(propertyMap.DestinationProperty.Name))
+                    !request.MembersToExpand.Contains(propertyMap.DestinationProperty.MemberInfo))
                     continue;
 
                 var propertyTypeMap = ConfigurationProvider.ResolveTypeMap(result.Type,
                     propertyMap.DestinationPropertyType);
-                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType,
-                    request.IncludedMembers);
+                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.MembersToExpand);
 
                 var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
