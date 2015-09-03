@@ -283,6 +283,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         public void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression)
         {
             TypeMap.UseCustomProjection(projectionExpression);
+            ConvertUsing(projectionExpression.Compile());
         }
 
         public void NullSubstitute(object nullSubstitute)

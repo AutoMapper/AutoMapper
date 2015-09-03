@@ -409,6 +409,55 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_specifying_a_custom_translator_using_projection : AutoMapperSpecBase
+        {
+            private Source _source;
+            private Destination _dest;
+
+            public class Source
+            {
+                public int Value { get; set; }
+                public int AnotherValue { get; set; }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+            }
+
+            protected override void Establish_context()
+            {
+                base.Establish_context();
+
+                _source = new Source
+                {
+                    Value = 10,
+                    AnotherValue = 1000
+                };
+            }
+
+            [Fact]
+            public void Should_use_the_custom_translator()
+            {
+                Mapper.CreateMap<Source, Destination>()
+                    .ProjectUsing(s => new Destination { Value = s.Value + 10 });
+
+                _dest = Mapper.Map<Source, Destination>(_source);
+                _dest.Value.ShouldEqual(20);
+            }
+
+            [Fact]
+            public void Should_ignore_other_mapping_rules()
+            {
+                Mapper.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
+                    .ProjectUsing(s => new Destination { Value = s.Value + 10 });
+
+                _dest = Mapper.Map<Source, Destination>(_source);
+                _dest.Value.ShouldEqual(20);
+            }
+        }
+
         public class When_specifying_a_custom_translator_and_passing_in_the_destination_object : AutoMapperSpecBase
         {
             private Source _source;
