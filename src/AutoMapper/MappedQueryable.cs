@@ -9,10 +9,10 @@ namespace AutoMapper
     public class MappedQueryable<TDestination, TSource> : IOrderedQueryable<TDestination>
     {
         private Expression _expression;
-        private MappedQueryProvider<TSource> _provider;
+        private MappedQueryProvider<TDestination, TSource> _provider;
 
         internal MappedQueryable(
-           MappedQueryProvider<TSource> provider,
+           MappedQueryProvider<TDestination, TSource> provider,
            Expression expression)
         {
             this._provider = provider;
@@ -20,11 +20,11 @@ namespace AutoMapper
         }
         public IEnumerator<TDestination> GetEnumerator()
         {
-            return this._provider.ExecuteQuery<TDestination>(this._expression);
+            return this._provider.ExecuteQuery(this._expression);
         }
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this._provider.ExecuteQuery<TDestination>(this._expression);
+            return this._provider.ExecuteQuery(this._expression);
         }
 
         public Type ElementType

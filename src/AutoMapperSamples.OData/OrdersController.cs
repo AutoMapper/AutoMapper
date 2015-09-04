@@ -18,6 +18,7 @@ namespace AutoMapperSamples.OData
     public class OrdersController : ApiController
     {
         private TestContext context = null;
+        internal static Action<Exception> OnException { get; set; }
 
         public OrdersController()
         {
@@ -35,7 +36,7 @@ namespace AutoMapperSamples.OData
         public IQueryable<OrderDto> Get()
         {
             // return lazily mapped query
-            return MappedQueryProvider<Order>.Map<OrderDto>(context.OrderSet.OrderBy(o => o.Price), Mapper.Engine);
+            return MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(context.OrderSet.OrderBy(o => o.Price), Mapper.Engine, OnException);
         }
 
         protected override void Dispose(bool disposing)

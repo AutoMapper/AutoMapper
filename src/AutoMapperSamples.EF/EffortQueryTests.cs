@@ -94,7 +94,7 @@ namespace AutoMapperSamples.EF
                 // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
                 // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
                 // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(context.OrderSet,
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(context.OrderSet,
                     Mapper.Engine);
                 var dtos3 = lazilyMappedQuery
                     .Where(d => d.FullName.EndsWith("Bestellung")).ToList();
@@ -117,13 +117,7 @@ namespace AutoMapperSamples.EF
 
                 var orders = context.OrderSet.Where(o => o.Price > 85D).OrderBy(o => o.Price);
 
-                // this is our solution:
-                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
-                // so it is completely translated to a DB query
-                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
-                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
-                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(orders,
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(orders,
                     Mapper.Engine, (x) => {Assert.Fail(x.Message);});
                 var dtos3 = lazilyMappedQuery
                     .Where(d => d.FullName.EndsWith("Bestellung")).ToList();
@@ -147,14 +141,8 @@ namespace AutoMapperSamples.EF
                 });
 
                 var orders = context.OrderSet;
-
-                // this is our solution:
-                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
-                // so it is completely translated to a DB query
-                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
-                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
-                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(orders,
+                
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(orders,
                     Mapper.Engine, (x) => { Assert.Fail(x.Message); });
                 var dtos3 = lazilyMappedQuery
                     .OrderBy(dto => dto.FullName).Skip(2).ToList();
@@ -179,14 +167,8 @@ namespace AutoMapperSamples.EF
                 });
 
                 var orders = context.OrderSet;
-
-                // this is our solution:
-                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
-                // so it is completely translated to a DB query
-                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
-                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
-                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(orders,
+                
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(orders,
                     Mapper.Engine, (x) => { Assert.Fail(x.Message); });
                 var dtos3 = lazilyMappedQuery
                     .OrderBy(dto => dto.Price).Skip(2).ToList();
@@ -211,14 +193,8 @@ namespace AutoMapperSamples.EF
                 });
 
                 var orders = context.OrderSet.OrderBy(o => o.Name);
-
-                // this is our solution:
-                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
-                // so it is completely translated to a DB query
-                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
-                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
-                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(orders,
+                
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(orders,
                     Mapper.Engine, (x) => { Assert.Fail(x.Message); });
                 var dtos3 = lazilyMappedQuery
                     .Skip(1).Take(1).ToList();

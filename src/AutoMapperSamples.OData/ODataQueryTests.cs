@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using System.Web.Http.Description;
 using AutoMapperSamples.EF;
 using Microsoft.Owin.Hosting;
@@ -21,11 +22,14 @@ namespace AutoMapperSamples.OData
     {
         private IDisposable _webApp;
         private string _baseAddress;
+        private List<Exception> _exceptions;
 
         [SetUp]
         public void SetUp()
         {
             _baseAddress = "http://localhost:9000/";
+            _exceptions = new List<Exception>();
+            OrdersController.OnException = (x) => _exceptions.Add(x);
 
             // Start OWIN host 
             _webApp = WebApp.Start<Startup>(url: _baseAddress);
@@ -50,6 +54,9 @@ namespace AutoMapperSamples.OData
             Console.WriteLine(response);
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
 
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
@@ -67,6 +74,9 @@ namespace AutoMapperSamples.OData
             // Assert
             Console.WriteLine(response);
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
@@ -87,6 +97,9 @@ namespace AutoMapperSamples.OData
             Console.WriteLine(response);
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
 
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
@@ -95,7 +108,7 @@ namespace AutoMapperSamples.OData
         }
 
         [Test]
-        public void CanSearchFor_FullNameEndsWith()
+        public void CanFilter_FullNameEndsWith()
         {
             // Arrange
             HttpClient client = new HttpClient();
@@ -107,6 +120,74 @@ namespace AutoMapperSamples.OData
             Console.WriteLine(response);
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
 
+            if(_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message+"\n"+_exceptions.First().StackTrace);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
+        }
+        [Test]
+        public void CanFilter_NotFullNameEndsWith()
+        {
+            // Arrange
+            HttpClient client = new HttpClient();
+
+            // Act
+            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=not endswith(FullName,'Bestellung')").Result;
+
+            // Assert
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, dtos.Length, "should be filtered to one dto");
+        }
+
+        [Test]
+        public void CanFilter_FullNameEquals()
+        {
+            // Arrange
+            HttpClient client = new HttpClient();
+
+            // Act
+            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=FullName eq 'Zalando Bestellung'").Result;
+
+            // Assert
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, dtos.Length, "should be filtered to one dtos");
+        }
+
+        [Test]
+        public void CanFilter_PriceGt()
+        {
+            // Arrange
+            HttpClient client = new HttpClient();
+
+            // Act
+            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=Price gt 75.0").Result;
+
+            // Assert
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
@@ -114,36 +195,20 @@ namespace AutoMapperSamples.OData
         }
 
         [Test]
-        public void CanSearchFor_FullNameEquals()
+        public void CanFilter_NotFullNameEquals()
         {
             // Arrange
             HttpClient client = new HttpClient();
 
             // Act
-            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=FulName eq 'Zalando Bestellung'").Result;
+            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=FullName ne 'Zalando Bestellung'").Result;
 
             // Assert
             Console.WriteLine(response);
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-
-            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
-        }
-
-        [Test]
-        public void CanSearchFor_PriceGt()
-        {
-            // Arrange
-            HttpClient client = new HttpClient();
-
-            // Act
-            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=Price gt '75.0M'").Result;
-
-            // Assert
-            Console.WriteLine(response);
-            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
