@@ -108,6 +108,30 @@ namespace AutoMapperSamples.OData
         }
 
         [Test]
+        [Ignore("Not yet supported")]
+        public void CanSkipAndTake_AndGetTotalCount()
+        {
+            // Arrange
+            HttpClient client = new HttpClient();
+
+            // Act
+            var response = client.GetAsync(_baseAddress + "api/Orders?$inlinecount=allpages&$skip=1&$top=1").Result;
+
+            // Assert
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, dtos.Length, "medium priced dto should be there");
+            Assert.AreEqual(85D, dtos.Single().Price);
+        }
+
+        [Test]
         public void CanFilter_FullNameEndsWith()
         {
             // Arrange
@@ -215,5 +239,6 @@ namespace AutoMapperSamples.OData
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
         }
+
     }
 }
