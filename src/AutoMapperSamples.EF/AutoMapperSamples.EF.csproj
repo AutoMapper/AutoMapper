@@ -78,8 +78,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Order.cs" />
+    <Compile Include="OrderDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EffortQueryTests.cs" />
+    <Compile Include="TestContext.cs" />
     <Compile Include="TestContextBase.cs" />
   </ItemGroup>
   <ItemGroup>

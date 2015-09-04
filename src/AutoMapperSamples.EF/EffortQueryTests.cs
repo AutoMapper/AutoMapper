@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Common;
-using System.Data.Entity;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -107,72 +103,130 @@ namespace AutoMapperSamples.EF
             }
         }
 
-
-        #region Models
-
-        public class Order
+        [Test]
+        public void Effort_FilterByMappedQuery_InnerQueryOrderedAndFiltered()
         {
-            public string Name { get; set; }
-
-            [Key]
-            [Required]
-            [DatabaseGenerated(DatabaseGeneratedOption.None)]
-            public Guid Id { get; set; }
-            public DateTime Ordered { get; set; }
-            public double Price { get; set; }
-        }
-
-        public class OrderDto
-        {
-            public string FullName { get; set; }
-            public Guid Id { get; set; }
-            public DateTime Ordered { get; set; }
-            public double Price { get; set; }
-        }
-
-        #endregion
-
-        #region TestContext
-
-        public class TestContext : TestContextBase<TestContext>, ITestContext
-        {
-            public DbSet<Order> OrderSet { get; set; }
-
-            public TestContext(DbConnection dbConnection)
-                : base(dbConnection)
+            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
             {
-            }
-
-            public override void Seed()
-            {
-                System.Diagnostics.Debug.Print("Seeding db");
-                
-                OrderSet.Add(new Order
+                Mapper.Initialize(cfg =>
                 {
-                    Id = Guid.NewGuid(),
-                    Name = "Zalando Bestellung",
-                    Ordered = new DateTime(2015, 01, 14),
-                    Price = 150d
-                });
-                OrderSet.Add(new Order
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Amazon Bestellung",
-                    Ordered = new DateTime(2015, 02, 3),
-                    Price = 85d
-                });
-                OrderSet.Add(new Order
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Universalversand",
-                    Ordered = new DateTime(2015, 04, 20),
-                    Price = 33.9d
+                    cfg.CreateMap<OrderDto, Order>()
+                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName))
+                        .ReverseMap(); // reverse map added
                 });
 
-                SaveChanges();
+                var orders = context.OrderSet.Where(o => o.Price > 85D).OrderBy(o => o.Price);
+
+                // this is our solution:
+                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
+                // so it is completely translated to a DB query
+                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
+                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
+                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(orders,
+                    Mapper.Engine, (x) => {Assert.Fail(x.Message);});
+                var dtos3 = lazilyMappedQuery
+                    .Where(d => d.FullName.EndsWith("Bestellung")).ToList();
+
+                Assert.AreEqual(1, dtos3.Count);
             }
         }
 
-        #endregion
+
+        [Test]
+        public void Effort_OrderByDto_FullName()
+        {
+            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<OrderDto, Order>()
+                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
+                    cfg.CreateMap<Order, OrderDto>()
+                        .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
+                });
+
+                var orders = context.OrderSet;
+
+                // this is our solution:
+                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
+                // so it is completely translated to a DB query
+                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
+                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
+                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(orders,
+                    Mapper.Engine, (x) => { Assert.Fail(x.Message); });
+                var dtos3 = lazilyMappedQuery
+                    .OrderBy(dto => dto.FullName).Skip(2).ToList();
+
+                Assert.AreEqual(1, dtos3.Count);
+                Assert.AreEqual("Zalando Bestellung", dtos3.Single().FullName);
+            }
+        }
+
+
+        [Test]
+        public void Effort_OrderByDto_Price()
+        {
+            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<OrderDto, Order>()
+                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
+                    cfg.CreateMap<Order, OrderDto>()
+                        .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
+                });
+
+                var orders = context.OrderSet;
+
+                // this is our solution:
+                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
+                // so it is completely translated to a DB query
+                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
+                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
+                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(orders,
+                    Mapper.Engine, (x) => { Assert.Fail(x.Message); });
+                var dtos3 = lazilyMappedQuery
+                    .OrderBy(dto => dto.Price).Skip(2).ToList();
+
+                Assert.AreEqual(1, dtos3.Count);
+                Assert.AreEqual("Zalando Bestellung", dtos3.Single().FullName);
+            }
+        }
+
+
+        [Test]
+        public void Effort_FilterByMappedQuery_SkipAndTake()
+        {
+            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<OrderDto, Order>()
+                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
+                    cfg.CreateMap<Order, OrderDto>()
+                        .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
+                });
+
+                var orders = context.OrderSet.OrderBy(o => o.Name);
+
+                // this is our solution:
+                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
+                // so it is completely translated to a DB query
+                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
+                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
+                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
+                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<Order>.Map<OrderDto>(orders,
+                    Mapper.Engine, (x) => { Assert.Fail(x.Message); });
+                var dtos3 = lazilyMappedQuery
+                    .Skip(1).Take(1).ToList();
+
+                Assert.AreEqual(1, dtos3.Count);
+                Assert.AreEqual("Universalversand", dtos3.Single().FullName);
+            }
+        }
+
     }
 }

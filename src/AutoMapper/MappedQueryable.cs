@@ -11,7 +11,7 @@ namespace AutoMapper
         private Expression _expression;
         private MappedQueryProvider<TSource> _provider;
 
-        public MappedQueryable(
+        internal MappedQueryable(
            MappedQueryProvider<TSource> provider,
            Expression expression)
         {
