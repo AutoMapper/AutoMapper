@@ -1,0 +1,6 @@
+﻿[ ] Support handing over "Expand" Expressions to MappedQueryProvider
+[ ] Support modifying the IEnumerable<Dto> collection for e.g. loading some additional stuff from the database (Premissions, ...)
+[ ] Support "inlinecount"
+[ ] have a look into "Select" expressions of Linq
+[ ] Create an attribute that directly throws once an "Expand" call is found (do not support this)
+[ ] create a test-project for BreezeJs
