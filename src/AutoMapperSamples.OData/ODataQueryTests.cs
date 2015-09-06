@@ -20,10 +20,14 @@ namespace AutoMapperSamples.OData
         private IDisposable _webApp;
         private string _baseAddress;
         private List<Exception> _exceptions;
+        private bool _wasEnabled;
 
         [SetUp]
-        public void SetUp()
+        public virtual void SetUp()
         {
+            _wasEnabled = EF.TestContext.DynamicProxiesEnabled;
+            EF.TestContext.DynamicProxiesEnabled = EnableDynamicProxies;
+
             _baseAddress = "http://localhost:9000/";
             _exceptions = new List<Exception>();
             OrdersController.OnException = (x) => _exceptions.Add(x);
@@ -31,12 +35,15 @@ namespace AutoMapperSamples.OData
             // Start OWIN host 
             _webApp = WebApp.Start<Startup>(url: _baseAddress);
         }
-
+        
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
             _webApp.Dispose();
+            EF.TestContext.DynamicProxiesEnabled = _wasEnabled;
         }
+
+        protected virtual bool EnableDynamicProxies { get { return false; } }
 
         [Test]
         public void CanGetAllOrders()
@@ -294,7 +301,6 @@ namespace AutoMapperSamples.OData
         [Ignore("Not supported yet")]
         public void SupportsExpand()
         {
-
             // Arrange
             HttpClient client = new HttpClient();
 

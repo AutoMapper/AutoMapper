@@ -8,6 +8,8 @@ namespace AutoMapperSamples.EF
 {
     public class TestContext : TestContextBase<TestContext>, ITestContext
     {
+        public static bool DynamicProxiesEnabled { get; set; }
+
         public DbSet<Order> OrderSet { get; set; }
 
         public DbSet<Customer> CustomerSet { get; set; }
@@ -15,8 +17,9 @@ namespace AutoMapperSamples.EF
         public TestContext(DbConnection dbConnection)
             : base(dbConnection)
         {
+            Configuration.ProxyCreationEnabled = DynamicProxiesEnabled;
         }
-
+        
         public override void Seed()
         {
             System.Diagnostics.Debug.Print("Seeding db");
