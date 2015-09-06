@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
-using System.Web.Http.Description;
 using AutoMapperSamples.EF;
+using AutoMapperSamples.EF.Dtos;
 using Microsoft.Owin.Hosting;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -108,14 +105,13 @@ namespace AutoMapperSamples.OData
         }
 
         [Test]
-        [Ignore("Not yet supported")]
         public void CanSkipAndTake_AndGetTotalCount()
         {
             // Arrange
             HttpClient client = new HttpClient();
 
             // Act
-            var response = client.GetAsync(_baseAddress + "api/Orders?$inlinecount=allpages&$skip=1&$top=1").Result;
+            var response = client.GetAsync(_baseAddress + "api/Orders?$inlinecount=allpages&$skip=1&$top=1&$orderby=Price").Result;
 
             // Assert
             Console.WriteLine(response);
@@ -152,6 +148,7 @@ namespace AutoMapperSamples.OData
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
         }
+
         [Test]
         public void CanFilter_NotFullNameEndsWith()
         {
@@ -240,5 +237,85 @@ namespace AutoMapperSamples.OData
             Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
         }
 
+        [Test]
+        public void CanFilter_ReturnsDtosThatWereModified_ByEnumeratorInterceptor()
+        {
+            // Arrange
+            HttpClient client = new HttpClient();
+
+            // Act
+            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=endswith(FullName,'Bestellung')").Result;
+
+            // Assert
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
+            foreach (var dto in dtos)
+            {
+                Assert.IsTrue(dto.FullName.StartsWith("Intercepted:"), "dto {0} was not intercepted", dto.FullName);
+            }
+        }
+
+        [Test]
+        [Ignore("Not supported yet")]
+        public void SupportsProjection()
+        {
+            // Arrange
+            HttpClient client = new HttpClient();
+
+            // Act
+            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=endswith(FullName,'Bestellung')&$select=Price,FullName").Result;
+
+            // Assert
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
+            foreach (var dto in dtos)
+            {
+                Assert.IsTrue(dto.FullName.StartsWith("Intercepted:"), "dto {0} was not intercepted", dto.FullName);
+            }
+        }
+
+        [Test]
+        [Ignore("Not supported yet")]
+        public void SupportsExpand()
+        {
+
+            // Arrange
+            HttpClient client = new HttpClient();
+
+            // Act
+            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=endswith(FullName,'Bestellung')&$expand=Customer").Result;
+
+            // Assert
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
+            foreach (var dto in dtos)
+            {
+                Assert.IsTrue(dto.FullName.StartsWith("Intercepted:"), "dto {0} was not intercepted", dto.FullName);
+            }
+        }
     }
 }

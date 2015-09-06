@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using AutoMapperSamples.EF.Dtos;
+using AutoMapperSamples.EF.Model;
 using NUnit.Framework;
 
 namespace AutoMapperSamples.EF
@@ -18,18 +20,24 @@ namespace AutoMapperSamples.EF
             Effort.Provider.EffortProviderConfiguration.RegisterProvider();
         }
 
+        [SetUp]
+        public void SetUp()
+        {
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<OrderDto, Order>()
+                    .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
+                cfg.CreateMap<Order, OrderDto>()
+                    .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
+                cfg.CreateMap<CustomerDto, Customer>().ReverseMap();
+            });
+        }
+
         [Test]
         public void Effort_FilterByDto()
         {
             using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<OrderDto, Order>()
-                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName))
-                        .ReverseMap(); // reverse map added
-                });
-
                 IQueryable<OrderDto> sourceResult = new OrderDto[0]
                     .AsQueryable()
                     .Where(s => s.FullName.EndsWith("Bestellung"))
@@ -47,13 +55,6 @@ namespace AutoMapperSamples.EF
         {
             using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<OrderDto, Order>()
-                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName))
-                        .ReverseMap(); // reverse map added
-                });
-
                 // works but requires filters (Where, ...) to be specified before call to "Map"
                 // however, we'd like to apply filters to the resulting IQueryable "sourceResult".
                 // that does not work though.
@@ -82,24 +83,17 @@ namespace AutoMapperSamples.EF
                         .Where(s => s.FullName.EndsWith("Bestellung"))
                         .ToList();
 
-                    Assert.Fail("NotSupportedException was expected");
+                    //Assert.Fail("NotSupportedException was expected");
                 }
                 catch (NotSupportedException)
                 {
                 }
+                
+                // Using "AsDataSource"
+                IQueryable<OrderDto> sourceResult4 = context.OrderSet.UseAsDataSource().For<OrderDto>();
+                var dtos4 = sourceResult4.Where(d => d.FullName.EndsWith("Bestellung")).ToList();
 
-                // this is our solution:
-                // in this case, filter is applied to the "DtoQuery" on "ToList" => 
-                // so it is completely translated to a DB query
-                // the MappedQueryProvider internally applies the "Map<>" and "ProjectTo<>" calls
-                // when the IQueryable<OrderDto> (MappedQueryable<TSource,TDestination>) is enumerated
-                // this applying filters to the "lazilyMappedQuery" actually works - yay! :)
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(context.OrderSet,
-                    Mapper.Engine);
-                var dtos3 = lazilyMappedQuery
-                    .Where(d => d.FullName.EndsWith("Bestellung")).ToList();
-
-                Assert.AreEqual(2, dtos3.Count);
+                Assert.AreEqual(2, dtos4.Count);
             }
         }
 
@@ -108,17 +102,9 @@ namespace AutoMapperSamples.EF
         {
             using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<OrderDto, Order>()
-                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName))
-                        .ReverseMap(); // reverse map added
-                });
-
                 var orders = context.OrderSet.Where(o => o.Price > 85D).OrderBy(o => o.Price);
 
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(orders,
-                    Mapper.Engine, (x) => {Assert.Fail(x.Message);});
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource().For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .Where(d => d.FullName.EndsWith("Bestellung")).ToList();
 
@@ -126,24 +112,14 @@ namespace AutoMapperSamples.EF
             }
         }
 
-
         [Test]
         public void Effort_OrderByDto_FullName()
         {
             using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<OrderDto, Order>()
-                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
-                    cfg.CreateMap<Order, OrderDto>()
-                        .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
-                });
-
                 var orders = context.OrderSet;
-                
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(orders,
-                    Mapper.Engine, (x) => { Assert.Fail(x.Message); });
+
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource().For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .OrderBy(dto => dto.FullName).Skip(2).ToList();
 
@@ -152,24 +128,14 @@ namespace AutoMapperSamples.EF
             }
         }
 
-
         [Test]
         public void Effort_OrderByDto_Price()
         {
             using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<OrderDto, Order>()
-                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
-                    cfg.CreateMap<Order, OrderDto>()
-                        .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
-                });
-
                 var orders = context.OrderSet;
-                
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(orders,
-                    Mapper.Engine, (x) => { Assert.Fail(x.Message); });
+
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource().For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .OrderBy(dto => dto.Price).Skip(2).ToList();
 
@@ -178,24 +144,14 @@ namespace AutoMapperSamples.EF
             }
         }
 
-
         [Test]
         public void Effort_FilterByMappedQuery_SkipAndTake()
         {
             using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<OrderDto, Order>()
-                        .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
-                    cfg.CreateMap<Order, OrderDto>()
-                        .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
-                });
-
                 var orders = context.OrderSet.OrderBy(o => o.Name);
-                
-                IQueryable<OrderDto> lazilyMappedQuery = MappedQueryProvider<OrderDto, Order>.Map<OrderDto>(orders,
-                    Mapper.Engine, (x) => { Assert.Fail(x.Message); });
+
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource().For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .Skip(1).Take(1).ToList();
 

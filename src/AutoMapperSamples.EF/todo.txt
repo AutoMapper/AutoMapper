@@ -1,6 +1,8 @@
 ﻿[ ] Support handing over "Expand" Expressions to MappedQueryProvider
-[ ] Support modifying the IEnumerable<Dto> collection for e.g. loading some additional stuff from the database (Premissions, ...)
-[ ] Support "inlinecount"
+[x] Support modifying the IEnumerable<Dto> collection for e.g. loading some additional stuff from the database (Premissions, ...)
+[x] Support "inlinecount"
 [ ] have a look into "Select" expressions of Linq
 [ ] Create an attribute that directly throws once an "Expand" call is found (do not support this)
 [ ] create a test-project for BreezeJs
+[ ] support Objec trees (e.g. OrderDto.Customer = CustomerDto) => currently leads to StackOverflowException
+[ ] Problems with dymanic proxies of EF?
