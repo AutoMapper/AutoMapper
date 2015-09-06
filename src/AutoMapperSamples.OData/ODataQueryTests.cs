@@ -65,6 +65,11 @@ namespace AutoMapperSamples.OData
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(3, dtos.Length);
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
         [Test]
         public void CanSkipAndTake()
@@ -86,6 +91,11 @@ namespace AutoMapperSamples.OData
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, dtos.Length, "medium priced dto should be there");
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
 
         [Test]
@@ -109,6 +119,11 @@ namespace AutoMapperSamples.OData
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, dtos.Length, "medium priced dto should be there");
             Assert.AreEqual(85D, dtos.Single().Price);
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
 
         [Test]
@@ -132,6 +147,11 @@ namespace AutoMapperSamples.OData
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, dtos.Length, "medium priced dto should be there");
             Assert.AreEqual(85D, dtos.Single().Price);
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
 
         [Test]
@@ -154,6 +174,11 @@ namespace AutoMapperSamples.OData
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
 
         [Test]
@@ -176,6 +201,11 @@ namespace AutoMapperSamples.OData
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, dtos.Length, "should be filtered to one dto");
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
 
         [Test]
@@ -198,6 +228,11 @@ namespace AutoMapperSamples.OData
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, dtos.Length, "should be filtered to one dtos");
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
 
         [Test]
@@ -220,6 +255,11 @@ namespace AutoMapperSamples.OData
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
 
         [Test]
@@ -242,6 +282,11 @@ namespace AutoMapperSamples.OData
 
             var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
         }
 
         [Test]
@@ -267,6 +312,8 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsTrue(dto.FullName.StartsWith("Intercepted:"), "dto {0} was not intercepted", dto.FullName);
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
             }
         }
 

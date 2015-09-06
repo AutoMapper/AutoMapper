@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -10,6 +11,8 @@ using AutoMapper.QueryableExtensions;
 using AutoMapperSamples.EF;
 using AutoMapperSamples.EF.Dtos;
 using AutoMapperSamples.EF.Model;
+using AutoMapperSamples.EF.Visitors;
+using ExpressionVisitor = System.Linq.Expressions.ExpressionVisitor;
 
 namespace AutoMapperSamples.OData
 {
@@ -28,10 +31,13 @@ namespace AutoMapperSamples.OData
             {
                 cfg.CreateMap<OrderDto, Order>()
                     .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
+                    
                 cfg.CreateMap<Order, OrderDto>()
                     .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
                 
-                cfg.CreateMap<CustomerDto, Customer>().ReverseMap();
+                cfg.CreateMap<Customer, CustomerDto>()
+                    .ForMember(c => c.Orders, opt => opt.Ignore())
+                    .ReverseMap();
             });
 
             context = new TestContext(Effort.DbConnectionFactory.CreateTransient());
@@ -40,15 +46,19 @@ namespace AutoMapperSamples.OData
         [EnableQuery]
         public IQueryable<OrderDto> Get()
         {
-            return context.OrderSet.UseAsDataSource(Mapper.Engine)
+            return context.OrderSet.Include("Customer").UseAsDataSource(Mapper.Engine)
                 // add an optional exceptionhandler that will be invoked
                 // in case an exception is raised upon query execution.
                 // otherwise it would get lost on the WebApi side and all we would get would be
                 // an unspecific "500 internal server error" response
                 .OnError(OnException)
+                // trace out original expression
+                .VisitBeforeMapping(new ExpressionWriter(Console.Out))
                 // add an additional visitor to convert "Queryable.LongCount" calls to "Queryable.Count" calls
                 // as EntityFramework does not support this method
                 .VisitBeforeMapping(new EntityFrameworkCompatibilityVisitor())
+                // trace out mapped expression
+                .VisitAfterMapping(new ExpressionWriter(Console.Out))
                 .For<OrderDto>()
                 // modify the enumerated results before returning them to the client
                 .OnEnumerated((enumerator) =>
@@ -67,6 +77,20 @@ namespace AutoMapperSamples.OData
                             dto.FullName = "Intercepted: " + dto.FullName;
                             list.Add(dto);
                         }
+                        var customerIds = list.Select(o => o.Customer.Id);
+                        // add IDs of orders
+                        var customersOrders = context.CustomerSet
+                                                        .Include("Orders")
+                                                        .Where(c => customerIds.Contains(c.Id))
+                                                        .Select(c => new {CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id)})
+                                                        .ToDictionary(c => c.CustomerId);
+                        // apply the list of IDs to each OrderDto
+                        foreach (var order in list)
+                        {
+                            if (customersOrders.ContainsKey(order.Customer.Id))
+                                order.Customer.Orders = customersOrders[order.Customer.Id].OrderIds.ToArray();
+                        }
+
                         return list.GetEnumerator();
                     }
                     return enumerator;
@@ -91,8 +115,7 @@ namespace AutoMapperSamples.OData
             // replace call to "LongCount" with "Count"            
             if (node.Method.IsGenericMethod && node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == "LongCount")
             {
-                var method = node.Method;
-                method = node.Method.DeclaringType.GetMethods(BindingFlags.Public | BindingFlags.Static).First(m => m.Name == "Count");
+                var method = node.Method.DeclaringType.GetMethods(BindingFlags.Public | BindingFlags.Static).First(m => m.Name == "Count");
                 method = method.MakeGenericMethod(node.Method.GetGenericArguments());
                 return Expression.Call(method, node.Arguments);
             }

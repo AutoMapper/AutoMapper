@@ -14,6 +14,6 @@ namespace AutoMapperSamples.EF.Model
         public virtual Guid Id { get; set; }
         public virtual DateTime Ordered { get; set; }
         public virtual double Price { get; set; }
-        //public virtual Customer Customer { get; set; }
+        public virtual Customer Customer { get; set; }
     }
 }

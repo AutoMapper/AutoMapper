@@ -49,10 +49,12 @@
     <Reference Include="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AutoMapper\QueryableExtensions\Impl\ISourceInjectedQueryable.cs">
+      <Link>QueryableExtensions\Impl\ISourceInjectedQueryable.cs</Link>
+    </Compile>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="QueryableExtensions\Impl\ISourceInjectedQueryable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\AutoMapper\AliasedMember.cs">
