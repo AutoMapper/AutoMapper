@@ -8,6 +8,6 @@ namespace AutoMapperSamples.EF.Dtos
         public Guid Id { get; set; }
         public DateTime Ordered { get; set; }
         public double Price { get; set; }
-        //public CustomerDto Customer { get; set; }
+        public CustomerDto Customer { get; set; }
     }
 }

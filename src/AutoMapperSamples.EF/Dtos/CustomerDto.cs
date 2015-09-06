@@ -11,13 +11,13 @@ namespace AutoMapperSamples.EF.Dtos
 
         public CustomerDto()
         {
-            //Orders = new List<OrderDto>();
+            Orders = new Guid[0];
         }
 
         public string Name { get; set; }
         
         public Guid Id { get; set; }
 
-        //public ICollection<OrderDto> Orders { get; set; }
+        public Guid[] Orders { get; set; }
     }
 }

@@ -24,28 +24,43 @@ namespace AutoMapperSamples.EF
         {
             System.Diagnostics.Debug.Print("Seeding db");
 
+            var alex = CustomerSet.Add(new Customer
+            {
+                Name = "Alex",
+                Id = Guid.NewGuid()
+            });
+
+            var jenny = CustomerSet.Add(new Customer
+            {
+                Name="Jenny",
+                Id = Guid.NewGuid()
+            });
+
             OrderSet.Add(new Order
             {
                 Id = Guid.NewGuid(),
                 Name = "Zalando Bestellung",
                 Ordered = new DateTime(2015, 01, 14),
-                Price = 150d
+                Price = 150d,
+                Customer = jenny,
             });
             OrderSet.Add(new Order
             {
                 Id = Guid.NewGuid(),
                 Name = "Amazon Bestellung",
                 Ordered = new DateTime(2015, 02, 3),
-                Price = 85d
+                Price = 85d,
+                Customer = alex,
             });
             OrderSet.Add(new Order
             {
                 Id = Guid.NewGuid(),
                 Name = "Universalversand",
                 Ordered = new DateTime(2015, 04, 20),
-                Price = 33.9d
+                Price = 33.9d,
+                Customer = jenny
             });
-
+            
             SaveChanges();
         }
     }

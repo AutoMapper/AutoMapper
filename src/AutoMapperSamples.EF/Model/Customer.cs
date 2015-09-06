@@ -9,7 +9,7 @@ namespace AutoMapperSamples.EF.Model
     {
         public Customer()
         {
-            //Orders = new List<Order>();
+            Orders = new List<Order>();
         }
 
         public virtual string Name { get; set; }
@@ -19,6 +19,6 @@ namespace AutoMapperSamples.EF.Model
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public virtual Guid Id { get; set; }
 
-        //public virtual ICollection<Order> Orders { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }
