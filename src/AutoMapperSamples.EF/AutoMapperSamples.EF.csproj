@@ -101,8 +101,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Order.cs" />
-    <Compile Include="OrderDto.cs" />
+    <Compile Include="Dtos\CustomerDto.cs" />
+    <Compile Include="Dtos\OrderDto.cs" />
+    <Compile Include="Model\Customer.cs" />
+    <Compile Include="Model\Order.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EffortQueryTests.cs" />
     <Compile Include="TestContext.cs" />

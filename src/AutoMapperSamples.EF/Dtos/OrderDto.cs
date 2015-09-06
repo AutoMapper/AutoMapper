@@ -1,6 +1,6 @@
 using System;
 
-namespace AutoMapperSamples.EF
+namespace AutoMapperSamples.EF.Dtos
 {
     public class OrderDto
     {
@@ -8,5 +8,6 @@ namespace AutoMapperSamples.EF
         public Guid Id { get; set; }
         public DateTime Ordered { get; set; }
         public double Price { get; set; }
+        //public CustomerDto Customer { get; set; }
     }
 }

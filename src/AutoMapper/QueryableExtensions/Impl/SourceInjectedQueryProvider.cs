@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.ComponentModel;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
@@ -11,60 +14,92 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly IMappingEngine _mappingEngine;
         private readonly IQueryable<TSource> _dataSource;
         private readonly IQueryable<TDestination> _destQuery;
+        private readonly IEnumerable<ExpressionVisitor> _beforeVisitors;
+        private readonly IEnumerable<ExpressionVisitor> _afterVisitors;
+        private readonly Action<Exception> _exceptionHandler;
 
         public SourceInjectedQueryProvider(IMappingEngine mappingEngine,
-            IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery)
+            IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
+                IEnumerable<ExpressionVisitor> beforeVisitors,
+                IEnumerable<ExpressionVisitor> afterVisitors,
+                Action<Exception> exceptionHandler)
         {
             _mappingEngine = mappingEngine;
             _dataSource = dataSource;
             _destQuery = destQuery;
+            _beforeVisitors = beforeVisitors;
+            _afterVisitors = afterVisitors;
+            _exceptionHandler = exceptionHandler;
         }
 
         public SourceInjectedQueryInspector Inspector { get; set; }
+        internal Func<IEnumerator<object>, IEnumerator<object>> EnumerationHandler { get; set; }
 
         public IQueryable CreateQuery(Expression expression)
         {
-            return new SourceInjectedQuery<TSource, TDestination>(this, expression);
+            return new SourceSourceInjectedQuery<TSource, TDestination>(this, expression, EnumerationHandler);
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            return new SourceInjectedQuery<TSource, TElement>(this, expression);
+            return new SourceSourceInjectedQuery<TSource, TElement>(this, expression, (Func<IEnumerator<object>, IEnumerator<object>>)EnumerationHandler);
         }
 
         public object Execute(Expression expression)
         {
-            Inspector.StartQueryExecuteInterceptor(null, expression);
+            try
+            {
+                Inspector.StartQueryExecuteInterceptor(null, expression);
 
-            var sourceExpression = ConvertDestinationExpressionToSourceExpression(expression);
-            var sourceResult = InvokeSourceQuery(null, sourceExpression);
+                var sourceExpression = ConvertDestinationExpressionToSourceExpression(expression);
+                var sourceResult = InvokeSourceQuery(null, sourceExpression);
 
-            Inspector.SourceResult(sourceExpression, sourceResult);
-            return sourceResult;
+                Inspector.SourceResult(sourceExpression, sourceResult);
+                return sourceResult;
+            }
+            catch (Exception x)
+            {
+                _exceptionHandler(x);
+                throw;
+            }
         }
 
         public TResult Execute<TResult>(Expression expression)
         {
-            var resultType = typeof (TResult);
-            Inspector.StartQueryExecuteInterceptor(resultType, expression);
+            try
+            {
+                var resultType = typeof (TResult);
+                Inspector.StartQueryExecuteInterceptor(resultType, expression);
 
-            var sourceExpression = ConvertDestinationExpressionToSourceExpression(expression);
+                var sourceExpression = ConvertDestinationExpressionToSourceExpression(expression);
 
-            var destResultType = typeof(TResult);
-            var sourceResultType = CreateSourceResultType(destResultType);
+                var destResultType = typeof (TResult);
+                var sourceResultType = CreateSourceResultType(destResultType);
 
-            var sourceResult = InvokeSourceQuery(sourceResultType, sourceExpression);
+                var sourceResult = InvokeSourceQuery(sourceResultType, sourceExpression);
 
-            Inspector.SourceResult(sourceExpression, sourceResult);
+                Inspector.SourceResult(sourceExpression, sourceResult);
 
-            object destResult;
-            if (IsProjection<TDestination>(resultType))
-                destResult = new ProjectionExpression(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>();
-            else
-                destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
-            Inspector.DestResult(sourceResult);
+                object destResult;
+                if (IsProjection<TDestination>(resultType))
+                    destResult =
+                        new ProjectionExpression(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>();
+                else
+                    destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
+                Inspector.DestResult(sourceResult);
 
-            return (TResult)destResult;
+                // implicitly convert types in case of valuetypes which cannot be casted explicitly
+                if (typeof (TResult).IsValueType && destResult.GetType() != typeof (TResult))
+                    return (TResult) Convert.ChangeType(destResult, typeof (TResult));
+
+                // if it is not a valuetype, we can safely cast it
+                return (TResult) destResult;
+            }
+            catch (Exception x)
+            {
+                _exceptionHandler(x);
+                throw;
+            }
         }
 
         private object InvokeSourceQuery(Type sourceResultType, Expression sourceExpression)
@@ -88,10 +123,17 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private Expression ConvertDestinationExpressionToSourceExpression(Expression expression)
         {
+            // call beforevisitors
+            expression = _beforeVisitors.Aggregate(expression, (current, before) => before.Visit(current));
+
             var typeMap = _mappingEngine.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
             var visitor = new ExpressionMapper.MappingVisitor(typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] {typeof (TSource)});
             var sourceExpression = visitor.Visit(expression);
+
+            // call aftervisitors
+            sourceExpression = _afterVisitors.Aggregate(sourceExpression, (current, after) => after.Visit(current));
+
             return sourceExpression;
         }
     }
