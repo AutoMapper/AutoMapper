@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ODataQueryTests.cs" />
+    <Compile Include="ODataQueryWithDynamicProxiesTests.cs" />
     <Compile Include="OrdersController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />

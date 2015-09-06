@@ -97,11 +97,12 @@ namespace AutoMapperSamples.OData
                 return Expression.Call(method, node.Arguments);
             }
 
-            // ignore all "Select" calls as we do not support them now
-            if (node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == "Select")
-            {
-                return node.Arguments.First();
-            }
+            //// ignore all "Select" calls as we do not support them now
+            //// but made a mistake - this somehow does not work... :-/
+            //if (node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == "Select")
+            //{
+            //    return node.Arguments.First();
+            //}
 
             // ignore all "Expand" calls as we do NOT want to support them - do we? :)
 
