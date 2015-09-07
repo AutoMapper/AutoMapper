@@ -23,20 +23,13 @@ namespace AutoMapperSamples.EF
         [SetUp]
         public void SetUp()
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<OrderDto, Order>()
-                    .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
-                cfg.CreateMap<Order, OrderDto>()
-                    .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
-                cfg.CreateMap<CustomerDto, Customer>().ReverseMap();
-            });
+            Mapper.Initialize(MappingConfiguration.Configure);
         }
 
         [Test]
         public void Effort_FilterByDto()
         {
-            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            using (var context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient()))
             {
                 IQueryable<OrderDto> sourceResult = new OrderDto[0]
                     .AsQueryable()
@@ -53,7 +46,7 @@ namespace AutoMapperSamples.EF
         [Test]
         public void Effort_FilterByMappedQuery()
         {
-            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            using (var context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient()))
             {
                 // works but requires filters (Where, ...) to be specified before call to "Map"
                 // however, we'd like to apply filters to the resulting IQueryable "sourceResult".
@@ -100,7 +93,7 @@ namespace AutoMapperSamples.EF
         [Test]
         public void Effort_FilterByMappedQuery_InnerQueryOrderedAndFiltered()
         {
-            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            using (var context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient()))
             {
                 var orders = context.OrderSet.Where(o => o.Price > 85D).OrderBy(o => o.Price);
 
@@ -115,7 +108,7 @@ namespace AutoMapperSamples.EF
         [Test]
         public void Effort_OrderByDto_FullName()
         {
-            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            using (var context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient()))
             {
                 var orders = context.OrderSet;
 
@@ -131,7 +124,7 @@ namespace AutoMapperSamples.EF
         [Test]
         public void Effort_OrderByDto_Price()
         {
-            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            using (var context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient()))
             {
                 var orders = context.OrderSet;
 
@@ -147,7 +140,7 @@ namespace AutoMapperSamples.EF
         [Test]
         public void Effort_FilterByMappedQuery_SkipAndTake()
         {
-            using (var context = new TestContext(Effort.DbConnectionFactory.CreateTransient()))
+            using (var context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient()))
             {
                 var orders = context.OrderSet.OrderBy(o => o.Name);
 

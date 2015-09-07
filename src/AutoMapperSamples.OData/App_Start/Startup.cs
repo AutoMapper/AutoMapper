@@ -1,5 +1,4 @@
-﻿
-using System.Web.Http;
+﻿using System.Web.Http;
 using System.Web.Http.OData.Extensions;
 using Owin;
 

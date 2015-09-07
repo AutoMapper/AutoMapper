@@ -6,7 +6,7 @@ using AutoMapperSamples.EF.Model;
 
 namespace AutoMapperSamples.EF
 {
-    public class TestContext : TestContextBase<TestContext>, ITestContext
+    public class TestDbContext : TestContextBase<TestDbContext>, ITestContext
     {
         public static bool DynamicProxiesEnabled { get; set; }
 
@@ -14,7 +14,7 @@ namespace AutoMapperSamples.EF
 
         public DbSet<Customer> CustomerSet { get; set; }
 
-        public TestContext(DbConnection dbConnection)
+        public TestDbContext(DbConnection dbConnection)
             : base(dbConnection)
         {
             Configuration.ProxyCreationEnabled = DynamicProxiesEnabled;

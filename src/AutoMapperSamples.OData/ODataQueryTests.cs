@@ -25,8 +25,8 @@ namespace AutoMapperSamples.OData
         [SetUp]
         public virtual void SetUp()
         {
-            _wasEnabled = EF.TestContext.DynamicProxiesEnabled;
-            EF.TestContext.DynamicProxiesEnabled = EnableDynamicProxies;
+            _wasEnabled = EF.TestDbContext.DynamicProxiesEnabled;
+            EF.TestDbContext.DynamicProxiesEnabled = EnableDynamicProxies;
 
             _baseAddress = "http://localhost:9000/";
             _exceptions = new List<Exception>();
@@ -40,7 +40,7 @@ namespace AutoMapperSamples.OData
         public virtual void TearDown()
         {
             _webApp.Dispose();
-            EF.TestContext.DynamicProxiesEnabled = _wasEnabled;
+            EF.TestDbContext.DynamicProxiesEnabled = _wasEnabled;
         }
 
         protected virtual bool EnableDynamicProxies { get { return false; } }
@@ -53,7 +53,7 @@ namespace AutoMapperSamples.OData
 
             // Act
             var response = client.GetAsync(_baseAddress + "api/Orders").Result;
-            
+
             // Assert
             Console.WriteLine(response);
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
@@ -162,13 +162,13 @@ namespace AutoMapperSamples.OData
 
             // Act
             var response = client.GetAsync(_baseAddress + "api/Orders?$filter=endswith(FullName,'Bestellung')").Result;
-            
+
             // Assert
             Console.WriteLine(response);
             Console.WriteLine(response.Content.ReadAsStringAsync().Result);
 
-            if(_exceptions.Count != 0)
-                Assert.Fail(_exceptions.First().Message+"\n"+_exceptions.First().StackTrace);
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 
