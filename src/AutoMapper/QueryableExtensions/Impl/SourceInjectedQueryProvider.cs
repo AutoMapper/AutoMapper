@@ -29,7 +29,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             _destQuery = destQuery;
             _beforeVisitors = beforeVisitors;
             _afterVisitors = afterVisitors;
-            _exceptionHandler = exceptionHandler;
+            _exceptionHandler = exceptionHandler ?? ((x) => { }); ;
         }
 
         public SourceInjectedQueryInspector Inspector { get; set; }
@@ -37,12 +37,12 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public IQueryable CreateQuery(Expression expression)
         {
-            return new SourceSourceInjectedQuery<TSource, TDestination>(this, expression, EnumerationHandler);
+            return new SourceSourceInjectedQuery<TSource, TDestination>(this, expression, EnumerationHandler, _exceptionHandler);
         }
 
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
-            return new SourceSourceInjectedQuery<TSource, TElement>(this, expression, (Func<IEnumerator<object>, IEnumerator<object>>)EnumerationHandler);
+            return new SourceSourceInjectedQuery<TSource, TElement>(this, expression, EnumerationHandler, _exceptionHandler);
         }
 
         public object Execute(Expression expression)

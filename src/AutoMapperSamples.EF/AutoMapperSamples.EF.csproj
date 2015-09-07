@@ -102,12 +102,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dtos\CustomerDto.cs" />
+    <Compile Include="Dtos\MappingConfiguration.cs" />
     <Compile Include="Dtos\OrderDto.cs" />
     <Compile Include="Model\Customer.cs" />
     <Compile Include="Model\Order.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EffortQueryTests.cs" />
-    <Compile Include="TestContext.cs" />
+    <Compile Include="TestDbContext.cs" />
     <Compile Include="TestContextBase.cs" />
     <Compile Include="Visitors\ExpressionVisitorBase.cs" />
     <Compile Include="Visitors\ExpressionWriter.cs" />

@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.QueryableExtensions.Impl
+﻿using System.Security.Cryptography.X509Certificates;
+
+namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
     using System.Collections;
@@ -8,6 +10,8 @@
 
     public class SourceSourceInjectedQuery<TSource, TDestination> : IOrderedQueryable<TDestination>, ISourceInjectedQueryable<TDestination>
     {
+        private readonly Action<Exception> _exceptionHandler;
+
         public SourceSourceInjectedQuery(IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
                 IMapper mapper, 
                 IEnumerable<ExpressionVisitor> beforeVisitors,
@@ -15,6 +19,7 @@
                 Action<Exception> exceptionHandler,
                 SourceInjectedQueryInspector inspector = null)
         {
+            _exceptionHandler = exceptionHandler ?? ((x)=> {});
             EnumerationHandler = (x => x);
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
@@ -24,8 +29,9 @@
             };
         }
 
-        internal SourceSourceInjectedQuery(IQueryProvider provider, Expression expression, Func<IEnumerator<object>, IEnumerator<object>> enumerationHandler)
+        internal SourceSourceInjectedQuery(IQueryProvider provider, Expression expression, Func<IEnumerator<object>, IEnumerator<object>> enumerationHandler, Action<Exception> exceptionHandler)
         {
+            _exceptionHandler = exceptionHandler ?? ((x) => { });
             Provider = provider;
             Expression = expression;
             EnumerationHandler = enumerationHandler ?? (x => x);
@@ -43,8 +49,16 @@
 
         public IEnumerator<TDestination> GetEnumerator()
         {
-            var enumerator = Provider.Execute<IEnumerable<TDestination>>(Expression).GetEnumerator();
-            return (IEnumerator<TDestination>)EnumerationHandler((IEnumerator<object>)enumerator);
+            try
+            {
+                var enumerator = Provider.Execute<IEnumerable<TDestination>>(Expression).GetEnumerator();
+                return (IEnumerator<TDestination>) EnumerationHandler((IEnumerator<object>) enumerator);
+            }
+            catch (Exception x)
+            {
+                _exceptionHandler(x);
+                throw;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

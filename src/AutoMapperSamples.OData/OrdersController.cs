@@ -22,25 +22,14 @@ namespace AutoMapperSamples.OData
     /// </summary>
     public class OrdersController : ApiController
     {
-        private TestContext context = null;
+        private TestDbContext context = null;
         internal static Action<Exception> OnException { get; set; }
 
         public OrdersController()
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<OrderDto, Order>()
-                    .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));
-                    
-                cfg.CreateMap<Order, OrderDto>()
-                    .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
-                
-                cfg.CreateMap<Customer, CustomerDto>()
-                    .ForMember(c => c.Orders, opt => opt.Ignore())
-                    .ReverseMap();
-            });
+            Mapper.Initialize(MappingConfiguration.Configure);
 
-            context = new TestContext(Effort.DbConnectionFactory.CreateTransient());
+            context = new TestDbContext(Effort.DbConnectionFactory.CreateTransient());
         }
 
         [EnableQuery]
@@ -63,36 +52,36 @@ namespace AutoMapperSamples.OData
                 // modify the enumerated results before returning them to the client
                 .OnEnumerated((enumerator) =>
                 {
-                    // we always pass in an IEnumerator<object> as there could a "select" be issued on the OData client-side
-                    // which would cause the type of the IEnumerator interface to not be OrderDTO but some "System.Web.Http.OData.Query.Expressions.SelectExpandBinder+SelectSome"
-                    var orderEnumerator = enumerator as IEnumerator<OrderDto>;
-                    if (orderEnumerator != null)
-                    {
-                        // transfers the modified DTOs into a new list
-                        // as the LazyEnumerator of EntityFramework does not support a call to "Reset"
-                        var list = new List<OrderDto>();
-                        while (orderEnumerator.MoveNext())
-                        {
-                            var dto = orderEnumerator.Current;
-                            dto.FullName = "Intercepted: " + dto.FullName;
-                            list.Add(dto);
-                        }
-                        var customerIds = list.Select(o => o.Customer.Id);
-                        // add IDs of orders
-                        var customersOrders = context.CustomerSet
-                                                        .Include("Orders")
-                                                        .Where(c => customerIds.Contains(c.Id))
-                                                        .Select(c => new {CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id)})
-                                                        .ToDictionary(c => c.CustomerId);
-                        // apply the list of IDs to each OrderDto
-                        foreach (var order in list)
-                        {
-                            if (customersOrders.ContainsKey(order.Customer.Id))
-                                order.Customer.Orders = customersOrders[order.Customer.Id].OrderIds.ToArray();
-                        }
+                    //// we always pass in an IEnumerator<object> as there could a "select" be issued on the OData client-side
+                    //// which would cause the type of the IEnumerator interface to not be OrderDTO but some "System.Web.Http.OData.Query.Expressions.SelectExpandBinder+SelectSome"
+                    //var orderEnumerator = enumerator as IEnumerator<OrderDto>;
+                    //if (orderEnumerator != null)
+                    //{
+                    //    // transfers the modified DTOs into a new list
+                    //    // as the LazyEnumerator of EntityFramework does not support a call to "Reset"
+                    //    var list = new List<OrderDto>();
+                    //    while (orderEnumerator.MoveNext())
+                    //    {
+                    //        var dto = orderEnumerator.Current;
+                    //        dto.FullName = "Intercepted: " + dto.FullName;
+                    //        list.Add(dto);
+                    //    }
+                    //    var customerIds = list.Select(o => o.Customer.Id);
+                    //    // add IDs of orders
+                    //    var customersOrders = context.CustomerSet
+                    //                                    .Include("Orders")
+                    //                                    .Where(c => customerIds.Contains(c.Id))
+                    //                                    .Select(c => new {CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id)})
+                    //                                    .ToDictionary(c => c.CustomerId);
+                    //    // apply the list of IDs to each OrderDto
+                    //    foreach (var order in list)
+                    //    {
+                    //        if (customersOrders.ContainsKey(order.Customer.Id))
+                    //            order.Customer.Orders = customersOrders[order.Customer.Id].OrderIds.ToArray();
+                    //    }
 
-                        return list.GetEnumerator();
-                    }
+                    //    return list.GetEnumerator();
+                    //}
                     return enumerator;
                 })
                 .OrderBy(o => o.Price);
@@ -101,6 +90,7 @@ namespace AutoMapperSamples.OData
         protected override void Dispose(bool disposing)
         {
             context?.Dispose();
+
             base.Dispose(disposing);
         }
     }

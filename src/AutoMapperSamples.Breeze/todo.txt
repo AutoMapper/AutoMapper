@@ -1,0 +1,5 @@
+﻿[ ] Mapp in "SaveChanges" with automapper
+	see: http://stackoverflow.com/questions/22710711/breeze-js-mixing-dtos-and-entities
+	Indeed! :-). In brief: (1) remove DTO from EntityInfos, (2) retrieve corresponding business model entity from Db (or create such an entity if this is an insert), (3) update this copy from DTO, (4) add this entity to the EntityInfos (don't forget the OriginalValues properties for an update), (5) rinse and repeat for all such DTOs, (6) let it go ... and EF will save it, (7) intercept the "after save" and remap the updated/inserted business entity into its DTO form in the SaveResult so that you send the DTO, not the "real" entity, back to the client. Devil in details I'm sure. –  Ward Mar 29 '14 at 23:47 
+
+[ ] Copy complete Northwind-inspired datamodel from breeze sample (Customer, Order, Product)
