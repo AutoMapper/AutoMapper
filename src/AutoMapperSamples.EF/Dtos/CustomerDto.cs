@@ -14,9 +14,19 @@ namespace AutoMapperSamples.EF.Dtos
             Orders = new Guid[0];
         }
 
-        public string Name { get; set; }
-        
-        public Guid Id { get; set; }
+        public virtual Guid Id { get; set; }
+        public virtual string Name { get; set; }
+        public virtual string CompanyName { get; set; }
+        public virtual string ContactName { get; set; }
+        public virtual string ContactTitle { get; set; }
+        public virtual string Address { get; set; }
+        public virtual string City { get; set; }
+        public virtual string Region { get; set; }
+        public virtual string PostalCode { get; set; }
+        public virtual string Country { get; set; }
+        public virtual string Phone { get; set; }
+        public virtual string Fax { get; set; }
+        public virtual int RowVersion { get; set; }
 
         public Guid[] Orders { get; set; }
     }

@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Data.Entity;
 using System.Runtime.Remoting;
 using AutoMapperSamples.EF.Model;
+using AutoMapperSamples.EF.Model.Configuration;
 
 namespace AutoMapperSamples.EF
 {
@@ -19,7 +20,13 @@ namespace AutoMapperSamples.EF
         {
             Configuration.ProxyCreationEnabled = DynamicProxiesEnabled;
         }
-        
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            //modelBuilder.Configurations.Add(new OrderDetailConfiguration());
+            base.OnModelCreating(modelBuilder);
+        }
+
         public override void Seed()
         {
             System.Diagnostics.Debug.Print("Seeding db");
@@ -40,7 +47,7 @@ namespace AutoMapperSamples.EF
             {
                 Id = Guid.NewGuid(),
                 Name = "Zalando Bestellung",
-                Ordered = new DateTime(2015, 01, 14),
+                OrderDate = new DateTime(2015, 01, 14),
                 Price = 150d,
                 Customer = jenny,
             });
@@ -48,7 +55,7 @@ namespace AutoMapperSamples.EF
             {
                 Id = Guid.NewGuid(),
                 Name = "Amazon Bestellung",
-                Ordered = new DateTime(2015, 02, 3),
+                OrderDate = new DateTime(2015, 02, 3),
                 Price = 85d,
                 Customer = alex,
             });
@@ -56,7 +63,7 @@ namespace AutoMapperSamples.EF
             {
                 Id = Guid.NewGuid(),
                 Name = "Universalversand",
-                Ordered = new DateTime(2015, 04, 20),
+                OrderDate = new DateTime(2015, 04, 20),
                 Price = 33.9d,
                 Customer = jenny
             });
