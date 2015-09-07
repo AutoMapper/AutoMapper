@@ -104,8 +104,11 @@
     <Compile Include="Dtos\CustomerDto.cs" />
     <Compile Include="Dtos\MappingConfiguration.cs" />
     <Compile Include="Dtos\OrderDto.cs" />
+    <Compile Include="Model\Configuration\OrderDetailConfiguration.cs" />
     <Compile Include="Model\Customer.cs" />
     <Compile Include="Model\Order.cs" />
+    <Compile Include="Model\OrderDetail.cs" />
+    <Compile Include="Model\Product.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EffortQueryTests.cs" />
     <Compile Include="TestDbContext.cs" />
