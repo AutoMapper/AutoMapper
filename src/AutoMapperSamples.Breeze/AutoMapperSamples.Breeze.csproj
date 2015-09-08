@@ -141,6 +141,8 @@
   <ItemGroup>
     <Compile Include="App_Start\BreezeWebApiConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
+    <Compile Include="BreezeSaveChangesTests.cs" />
+    <Compile Include="BreezeTestBase.cs" />
     <Compile Include="Dto\CustomerDto.cs" />
     <Compile Include="Dto\OrderDto.cs" />
     <Compile Include="OrdersController.cs" />

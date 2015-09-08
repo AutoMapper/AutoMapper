@@ -11,37 +11,8 @@ using NUnit.Framework;
 namespace AutoMapperSamples.Breeze
 {
     [TestFixture]
-    public class BreezeQueryTests
+    public class BreezeQueryTests : BreezeTestBase
     {
-        private string _baseAddress;
-        private IDisposable _webApp;
-        private EntityManager _entityManager;
-        private List<Exception> _exceptions;
-
-        [SetUp]
-        public void SetUp()
-        {
-            // wire up exceptionhandler for unittesting purpose
-            _exceptions = new List<Exception>();
-            OrdersController.OnException = (x) => _exceptions.Add(x);
-
-            _baseAddress = "http://localhost:9000";
-
-            // Start OWIN host 
-            _webApp = WebApp.Start<Startup>(url: _baseAddress);
-            
-            _entityManager = new EntityManager($"{_baseAddress}/breeze/orders");
-
-            // setting up BreezeSharp - http://breeze.github.io/doc-cs/get-feet-wet.html
-            Configuration.Instance.ProbeAssemblies(typeof(AutoMapperSamples.Breeze.Dto.OrderDto).Assembly);
-        }
-        
-        [TearDown]
-        public void TearDown()
-        {
-            _webApp.Dispose();
-        }
-
         [Test]
         public async Task CanFetchMetadata()
         {
@@ -64,7 +35,7 @@ namespace AutoMapperSamples.Breeze
             {
                 Assert.IsTrue(dto.FullName.StartsWith("Intercepted:"), "dto {0} was not intercepted", dto.FullName);
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -88,7 +59,7 @@ namespace AutoMapperSamples.Breeze
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -114,7 +85,7 @@ namespace AutoMapperSamples.Breeze
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
         
@@ -138,7 +109,7 @@ namespace AutoMapperSamples.Breeze
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -162,7 +133,7 @@ namespace AutoMapperSamples.Breeze
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -186,7 +157,7 @@ namespace AutoMapperSamples.Breeze
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -210,7 +181,7 @@ namespace AutoMapperSamples.Breeze
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -234,7 +205,7 @@ namespace AutoMapperSamples.Breeze
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
         
@@ -259,7 +230,7 @@ namespace AutoMapperSamples.Breeze
             {
                 Assert.IsTrue(dto.FullName.StartsWith("Intercepted:"), "dto {0} was not intercepted", dto.FullName);
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
         

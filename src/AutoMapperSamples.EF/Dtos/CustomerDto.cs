@@ -8,10 +8,10 @@ namespace AutoMapperSamples.EF.Dtos
 {
     public class CustomerDto
     {
-
         public CustomerDto()
         {
-            Orders = new Guid[0];
+            OrderIds = new Guid[0];
+            Orders = new HashSet<OrderDto>();
         }
 
         public virtual Guid Id { get; set; }
@@ -28,6 +28,7 @@ namespace AutoMapperSamples.EF.Dtos
         public virtual string Fax { get; set; }
         public virtual int RowVersion { get; set; }
 
-        public Guid[] Orders { get; set; }
+        public Guid[] OrderIds { get; set; }
+        public ICollection<OrderDto> Orders { get; set; } 
     }
 }

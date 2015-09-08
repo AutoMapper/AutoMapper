@@ -68,7 +68,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
         [Test]
@@ -94,7 +94,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -122,7 +122,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -150,7 +150,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -177,7 +177,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -204,7 +204,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -231,7 +231,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -258,7 +258,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -285,7 +285,7 @@ namespace AutoMapperSamples.OData
             foreach (var dto in dtos)
             {
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 
@@ -313,7 +313,7 @@ namespace AutoMapperSamples.OData
             {
                 Assert.IsTrue(dto.FullName.StartsWith("Intercepted:"), "dto {0} was not intercepted", dto.FullName);
                 Assert.IsNotNull(dto.Customer);
-                Assert.IsNotEmpty(dto.Customer.Orders);
+                Assert.IsNotEmpty(dto.Customer.OrderIds);
             }
         }
 

@@ -7,15 +7,11 @@ using AutoMapper.QueryableExtensions;
 using AutoMapperSamples.Breeze.Dto;
 using AutoMapperSamples.EF;
 using AutoMapperSamples.EF.Dtos;
-using AutoMapperSamples.EF.Model;
 using AutoMapperSamples.EF.Visitors;
-using AutoMapperSamples.OData;
 using Breeze.ContextProvider;
 using Breeze.ContextProvider.EF6;
 using Breeze.WebApi2;
 using Newtonsoft.Json.Linq;
-using CustomerDto = AutoMapperSamples.EF.Dtos.CustomerDto;
-using OrderDto = AutoMapperSamples.EF.Dtos.OrderDto;
 
 namespace AutoMapperSamples.Breeze
 {

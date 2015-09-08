@@ -77,7 +77,7 @@ namespace AutoMapperSamples.OData
                         foreach (var order in list)
                         {
                             if (customersOrders.ContainsKey(order.Customer.Id))
-                                order.Customer.Orders = customersOrders[order.Customer.Id].OrderIds.ToArray();
+                                order.Customer.OrderIds = customersOrders[order.Customer.Id].OrderIds.ToArray();
                         }
 
                         return list.GetEnumerator();

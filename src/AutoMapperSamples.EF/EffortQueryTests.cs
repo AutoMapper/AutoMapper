@@ -152,6 +152,5 @@ namespace AutoMapperSamples.EF
                 Assert.AreEqual("Universalversand", dtos3.Single().FullName);
             }
         }
-
     }
 }

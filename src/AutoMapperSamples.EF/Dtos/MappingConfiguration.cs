@@ -18,6 +18,7 @@ namespace AutoMapperSamples.EF.Dtos
                 .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name));
 
             cfg.CreateMap<Customer, CustomerDto>()
+                .ForMember(c => c.OrderIds, opt => opt.Ignore())
                 .ForMember(c => c.Orders, opt => opt.Ignore())
                 .ReverseMap();
         }
