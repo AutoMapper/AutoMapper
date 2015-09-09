@@ -136,9 +136,11 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
             return (IMappingExpression)base.ConstructUsing(ctor);
         }
 
-        public new IMappingExpression ConstructProjectionUsing(Expression<Func<object, object>> ctor)
+        public IMappingExpression ConstructProjectionUsing(LambdaExpression ctor)
         {
-            return (IMappingExpression)base.ConstructProjectionUsing(ctor);
+            var func = ctor.Compile();
+            TypeMap.ConstructExpression = ctor;
+            return ConstructUsing(ctxt => func.DynamicInvoke(ctxt.SourceValue));
         }
 
         public new IMappingExpression MaxDepth(int depth)
