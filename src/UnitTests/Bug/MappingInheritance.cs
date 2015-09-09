@@ -59,4 +59,44 @@ namespace AutoMapper.UnitTests.Bug
         public class ViewModel : BaseModel { }
     }
 
+    public class MappingInheritanceBug
+    {
+        [Fact]
+        public void TestMethod1()
+        {
+            Mapper.Reset();
+
+            Mapper.CreateMap<Order, OrderDto>()
+                .Include<OnlineOrder, OnlineOrderDto>()
+                .Include<MailOrder, MailOrderDto>();
+            Mapper.CreateMap<OnlineOrder, OnlineOrderDto>();
+            Mapper.CreateMap<MailOrder, MailOrderDto>();
+            Mapper.Configuration.Seal();
+
+            //Mapper.AssertConfigurationIsValid();
+
+            var mailOrder = new MailOrder() { NewId = 1 };
+            var mapped = Mapper.Map<OrderDto>(mailOrder);
+
+            mapped.ShouldBeType<MailOrderDto>();
+        }
+
+        public abstract class Base<T>
+        {
+        }
+
+        public class Order : Base<Order> { }
+        public class OnlineOrder : Order { }
+        public class MailOrder : Order
+        {
+            public int NewId { get; set; }
+        }
+
+        public class OrderDto { }
+        public class OnlineOrderDto : OrderDto { }
+        public class MailOrderDto : OrderDto
+        {
+            public int NewId { get; set; }
+        }
+    }
 }
