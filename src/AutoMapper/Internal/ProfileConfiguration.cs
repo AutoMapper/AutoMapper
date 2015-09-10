@@ -14,24 +14,37 @@ namespace AutoMapper.Internal
 
         public ProfileConfiguration()
         {
-            MemberConfigurations.Add(new MemberConfiguration());
+            _memberConfigurations.Add(new MemberConfiguration());
             ConstructorMappingEnabled = true;
             IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
             ShouldMapProperty = p => p.IsPublic();
             ShouldMapField = f => f.IsPublic;
         }
 
-        public IList<IMemberConfiguration> MemberConfigurations { get; } = new List<IMemberConfiguration>();
-        public IList<IConditionalObjectMapper> TypeConfigurations { get; } = new List<IConditionalObjectMapper>();
-        public IConditionalObjectMapper AddConditionalObjectMapper(string profile = ConfigurationStore.DefaultProfileName)
+        private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
+        public IEnumerable<IMemberConfiguration> MemberConfigurations => _memberConfigurations;
+
+        private readonly IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+        public IEnumerable<IConditionalObjectMapper> TypeConfigurations => _typeConfigurations;
+
+        public IMemberConfiguration AddMemberConfiguration()
         {
-            var condition = new ConditionalObjectMapper(profile);
-            TypeConfigurations.Add(condition);
+            var condition = new MemberConfiguration();
+            _memberConfigurations.Add(condition);
             return condition;
         }
 
+        public IConditionalObjectMapper AddConditionalObjectMapper()
+        {
+            var condition = new ConditionalObjectMapper(ConfigurationStore.DefaultProfileName);
+            _typeConfigurations.Add(condition);
+            return condition;
+        }
+        
+
         public bool ConstructorMappingEnabled { get; set; }
         public bool DataReaderMapperYieldReturnEnabled { get; set; }
+        public IMemberConfiguration DefaultMemberConfig { get; }
         public IEnumerable<MethodInfo> SourceExtensionMethods => _sourceExtensionMethods;
 
         public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }

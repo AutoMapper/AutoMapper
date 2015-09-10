@@ -25,7 +25,7 @@ namespace AutoMapper
         void IncludeSourceExtensionMethods(Assembly assembly);
         /// <summary>
         /// Specify which properties should be mapped.
-        /// By default only public properties are mapped.
+        /// By default only public properties are mapped.e
         /// </summary>
         Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
 
