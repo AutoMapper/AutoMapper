@@ -179,7 +179,7 @@ namespace AutoMapper.UnitTests.Tests
 
         private class SubSource
         {
-            public int Value { get; set; }
+            public int value { get; set; }
         }
 
         private class Destination

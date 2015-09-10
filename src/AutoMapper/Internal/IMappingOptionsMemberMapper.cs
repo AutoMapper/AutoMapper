@@ -285,7 +285,7 @@ namespace AutoMapper
             string[] matches = DestinationMemberNamingConvention.SplittingExpression
                        .Matches(nameToSearch)
                        .Cast<Match>()
-                       .Select(m => m.Value)
+                       .Select(m => SourceMemberNamingConvention.ReplaceValue(m))
                        .ToArray();
             MemberInfo matchingMemberInfo = null;
             for (int i = 1; i <= matches.Length; i++)
