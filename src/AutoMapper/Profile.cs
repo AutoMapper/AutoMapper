@@ -65,12 +65,6 @@ namespace AutoMapper
             set { DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
-        public bool ConstructorMappingEnabled => _configurator.ConstructorMappingEnabled;
-
-        public bool DataReaderMapperYieldReturnEnabled => _configurator.DataReaderMapperYieldReturnEnabled;
-
-        public IEnumerable<MethodInfo> SourceExtensionMethods => GetProfile().SourceExtensionMethods;
-
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
         {
             _configurator.ForAllMaps(ProfileName, configuration);
