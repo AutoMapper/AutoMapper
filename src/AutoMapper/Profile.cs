@@ -65,6 +65,17 @@ namespace AutoMapper
             set { DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
+        public bool ConstructorMappingEnabled => _configurator.ConstructorMappingEnabled;
+
+        public bool DataReaderMapperYieldReturnEnabled => _configurator.DataReaderMapperYieldReturnEnabled;
+
+        public IEnumerable<MethodInfo> SourceExtensionMethods => GetProfile().SourceExtensionMethods;
+
+        public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
+        {
+            _configurator.ForAllMaps(ProfileName, configuration);
+        }
+
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
         {
             return CreateMap<TSource, TDestination>(MemberList.Destination);
@@ -201,6 +212,11 @@ namespace AutoMapper
                 .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
                 .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
                 .Where(method => method.GetParameters().Length == 1));
+        }
+
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
+        {
+            return _configurator.CreateMap(sourceType, destinationType, memberList, profileName);
         }
     }
 }

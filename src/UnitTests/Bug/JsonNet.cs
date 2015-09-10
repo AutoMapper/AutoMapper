@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.Bug
                              select new StringKeyValuePair(items[0], items[1])).ToList();
             }
 
-            public IEnumerator<StringKeyValuePair> GetEnumerator()
+            public new IEnumerator<StringKeyValuePair> GetEnumerator()
             {
                 return (IEnumerator<StringKeyValuePair>)_pairs.GetEnumerator();
             }

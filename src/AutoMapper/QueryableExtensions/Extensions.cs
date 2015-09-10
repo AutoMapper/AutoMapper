@@ -4,6 +4,7 @@ namespace AutoMapper.QueryableExtensions
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Impl;
 
     /// <summary>
@@ -23,12 +24,11 @@ namespace AutoMapper.QueryableExtensions
         /// <returns>Expression tree mapping source to destination type</returns>
         public static Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(
             this IMappingEngine mappingEngine, IDictionary<string, object> parameters = null,
-            params string[] membersToExpand)
+            params MemberInfo[] membersToExpand)
         {
             return
                 (Expression<Func<TSource, TDestination>>)
-                    mappingEngine.CreateMapExpression(typeof (TSource), typeof (TDestination), parameters,
-                        membersToExpand);
+                    mappingEngine.CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace AutoMapper.QueryableExtensions
         /// <returns>Expression tree mapping source to destination type</returns>
         public static Expression CreateMapExpression(this IMappingEngine mappingEngine,
             Type sourceType, Type destinationType,
-            IDictionary<string, object> parameters = null, params string[] membersToExpand)
+            IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
         {
             return mappingEngine.CreateMapExpression(sourceType, destinationType, parameters, membersToExpand);
         }
@@ -88,7 +88,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the static <see cref="Mapper.Engine"/> property.
+        /// Extension method to project from a queryable using the static <see cref="Mapper.Engine"/> property.
         /// Due to generic parameter inference, you need to call Project().To to execute the map
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
@@ -103,7 +103,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the provided mapping engine
+        /// Extension method to project from a queryable using the provided mapping engine
         /// Due to generic parameter inference, you need to call Project().To to execute the map
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
@@ -119,7 +119,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the provided mapping engine
+        /// Extension method to project from a queryable using the provided mapping engine
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
         /// <typeparam name="TDestination">Destination type</typeparam>
@@ -139,7 +139,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the provided mapping engine
+        /// Extension method to project from a queryable using the provided mapping engine
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
         /// <typeparam name="TDestination">Destination type</typeparam>
@@ -157,7 +157,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
         /// <summary>
-        /// Extention method to project from a queryable using the provided mapping engine
+        /// Extension method to project from a queryable using the provided mapping engine
         /// </summary>
         /// <remarks>Projections are only calculated once and cached</remarks>
         /// <typeparam name="TDestination">Destination type</typeparam>

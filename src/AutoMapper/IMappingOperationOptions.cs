@@ -36,7 +36,7 @@
         void BeforeMap(Action<object, object> beforeFunction);
 
         /// <summary>
-        /// Execute a custom function to the source and/or destination types before member mapping
+        /// Execute a custom function to the source and/or destination types after member mapping
         /// </summary>
         /// <param name="afterFunction">Callback for the source/destination types</param>
         void AfterMap(Action<object, object> afterFunction);
@@ -51,7 +51,7 @@
         void BeforeMap(Action<TSource, TDestination> beforeFunction);
 
         /// <summary>
-        /// Execute a custom function to the source and/or destination types before member mapping
+        /// Execute a custom function to the source and/or destination types after member mapping
         /// </summary>
         /// <param name="afterFunction">Callback for the source/destination types</param>
         void AfterMap(Action<TSource, TDestination> afterFunction);

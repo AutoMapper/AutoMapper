@@ -1,19 +1,25 @@
 namespace AutoMapper.Internal
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
 	public static class ReflectionHelper
 	{
-        public static string GetPropertyName(this LambdaExpression expression)
+        public static MemberInfo GetFieldOrProperty(Type type, string memberName)
+        {
+            return memberName.Split('.').Aggregate((MemberInfo) null, (property, member) => (property?.GetMemberType() ?? type).GetMember(member).Single());
+        }
+
+        public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)
         {
             var memberExpression = expression.Body as MemberExpression;
             if(memberExpression == null)
             {
                 throw new ArgumentOutOfRangeException("expression", "Expected a property/field access expression, not " + expression);
             }
-            return memberExpression.Member.Name;
+            return (MemberInfo) memberExpression.Member;
         }
 
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
@@ -106,7 +112,8 @@ namespace AutoMapper.Internal
         /// if targetType is not oldType, method will return targetType
         /// if targetType is generic type with oldType arguments, method will replace all oldType arguments on newType
         /// </summary>
-        /// <param name="mainType"></param>
+        /// <param name="targetType"></param>
+        /// <param name="oldType"></param>
         /// <param name="newType"></param>
         /// <returns></returns>
         public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)

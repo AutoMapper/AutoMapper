@@ -99,6 +99,7 @@
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
+    <Compile Include="Bug\ForAllMaps.cs" />
     <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
     <Compile Include="Bug\JsonNet.cs" />
     <Compile Include="Bug\TargetISet.cs" />
@@ -173,6 +174,10 @@
     <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IgnoreAllTests.cs" />
+    <Compile Include="IMappingExpression\NonGenericAllMembersNullSubstitute.cs" />
+    <Compile Include="IMappingExpression\ForCtorParam.cs" />
+    <Compile Include="IMappingExpression\NonGenericReverseMapping.cs" />
+    <Compile Include="IMappingExpression\NonGenericProjectEnumTest.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="DynamicMapping.cs" />
@@ -284,6 +289,7 @@
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Bug\ProjectConstructorParameters.cs" />
+    <Compile Include="Tests\InitialTypes.cs" />
     <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\MapperTests.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />
