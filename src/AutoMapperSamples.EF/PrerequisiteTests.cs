@@ -93,7 +93,7 @@ namespace AutoMapperSamples.EF
         }
 
         [Test]
-        public void CanMapCaclicExpressionGraph_WithPropertyPathEqualityFilter()
+        public void CanMapCaclicExpressionGraph_WithPropertyPathEqualityFilter_Single()
         {
             // Arrange
             var detailQuery = new List<Detail> { detail }.AsQueryable();
@@ -108,6 +108,60 @@ namespace AutoMapperSamples.EF
             var dto = detailDtoQuery.Single();
 
             AssertValidDtoGraph(dto);
+        }
+
+        [Test]
+        public void CanMapCaclicExpressionGraph_WithPropertyPathEqualityFilter_ToList()
+        {
+            // Arrange
+            var detailQuery = new List<Detail> { detail }.AsQueryable();
+
+            // Act
+            var detailDtoQuery = detailQuery.UseAsDataSource()
+                .OnError(ex => exceptions.Add(ex))
+                .For<DetailDto>()
+                .Where(d => d.Master.Name == "Harry Marry");
+
+            // Assert
+            var dto = detailDtoQuery.ToList();
+
+            AssertValidDtoGraph(dto.Single());
+        }
+        
+        [Test]
+        public void CanMapCaclicExpressionGraph_WithoutResults_Single()
+        {
+            // Arrange
+            var detailQuery = new List<Detail> {  }.AsQueryable();
+
+            // Act
+            var detailDtoQuery = detailQuery.UseAsDataSource()
+                .OnError(ex => exceptions.Add(ex))
+                .For<DetailDto>()
+                .Where(d => d.Master.Name == "Harry Marry");
+
+            // Assert
+            var dto = detailDtoQuery.SingleOrDefault();
+            
+            Assert.IsNull(dto);
+        }
+        
+        [Test]
+        public void CanMapCaclicExpressionGraph_WithoutResults_ToList()
+        {
+            // Arrange
+            var detailQuery = new List<Detail> { }.AsQueryable();
+
+            // Act
+            var detailDtoQuery = detailQuery.UseAsDataSource()
+                .OnError(ex => exceptions.Add(ex))
+                .For<DetailDto>()
+                .Where(d => d.Master.Name == "Harry Marry");
+
+            // Assert
+            var dto = detailDtoQuery.ToList();
+
+            Assert.AreEqual(0, dto.Count);
         }
 
         [Test]
