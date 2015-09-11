@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using Should;
@@ -177,6 +179,27 @@ namespace AutoMapper.UnitTests.Query
             (result.First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
         }
 
+        [Fact]
+        [Description("Fix for issue #882")]
+        public void Should_support_propertypath_expressons_with_equally_named_properties()
+        {
+            // Arrange
+            SetupAutoMapper();
+            
+            var master = new Master {Id = Guid.NewGuid(), Name="Harry Marry"};
+            var detail = new Detail {Id = Guid.NewGuid(), Master = master, Name = "Some detail"};
+            master.Details.Add(detail);
+            var source = new List<Detail> { detail };
+
+            // Act
+            var detailDtoQuery = source.AsQueryable().UseAsDataSource()
+                .For<DetailDto>()
+                .Where(d => d.Master.Name == "Harry Marry");
+
+            // Assert
+            detailDtoQuery.ToList().Count().ShouldEqual(1);
+        }
+
         private static void SetupAutoMapper()
         {
             var config = new MapperConfiguration(cfg =>
@@ -225,6 +248,9 @@ namespace AutoMapper.UnitTests.Query
             //Mapper.CreateMap<IEnumerable<ThingModel>, IEnumerable<Thing>>();
             //Mapper.CreateMap<IEnumerable<User>, IEnumerable<UserModel>>();
             //Mapper.CreateMap<IEnumerable<UserModel>, IEnumerable<User>>();
+
+            Mapper.CreateMap<Master, MasterDto>().ReverseMap();
+            Mapper.CreateMap<Detail, DetailDto>().ReverseMap();
         }
 
     }
@@ -288,6 +314,42 @@ namespace AutoMapper.UnitTests.Query
         public int AgeInYears { get; set; }
         public bool IsActive { get; set; }
         public AccountModel AccountModel { get; set; }
+    }
+
+    public class Master
+    {
+        public Master()
+        {
+            Details = new List<Detail>();
+        }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public ICollection<Detail> Details { get; set; }
+    }
+
+    public class Detail
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public Master Master { get; set; }
+    }
+
+    public class MasterDto
+    {
+        public MasterDto()
+        {
+            Details = new List<DetailDto>();
+        }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public ICollection<DetailDto> Details { get; set; }
+    }
+
+    public class DetailDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public MasterDto Master { get; set; }
     }
 }
 
