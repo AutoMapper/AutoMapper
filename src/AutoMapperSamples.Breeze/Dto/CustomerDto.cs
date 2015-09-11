@@ -80,7 +80,7 @@ namespace AutoMapperSamples.Breeze.Dto
             set { SetValue(value); }
         }
 
-        public Guid[] Orders
+        public Guid[] OrderIds
         {
             get { return GetValue<Guid[]>(); }
             set { SetValue(value); }

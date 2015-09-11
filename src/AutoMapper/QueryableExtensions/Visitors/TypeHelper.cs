@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace AutoMapperSamples.EF.Visitors
+namespace AutoMapper.QueryableExtensions.Visitors
 {
     /// <summary>
     /// Type related helper methods
+    /// copied from: http://iqtoolkit.codeplex.com/SourceControl/latest#Source/IQToolkit/TypeHelper.cs
     /// </summary>
     public static class TypeHelper
     {

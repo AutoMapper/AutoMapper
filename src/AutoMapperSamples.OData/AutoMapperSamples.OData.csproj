@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\Startup.cs" />
+    <Compile Include="EntityFrameworkCompatibilityVisitor.cs" />
     <Compile Include="ODataQueryTests.cs" />
     <Compile Include="ODataQueryWithDynamicProxiesTests.cs" />
     <Compile Include="OrdersController.cs" />
