@@ -290,7 +290,7 @@
                     return null;
 
                 var memberAccessor = node.Member.ToMemberAccessor();
-
+                
                 // in case of a propertypath, the MemberAcessors type and the SourceType may be different
                 if (memberAccessor.MemberInfo.DeclaringType != _typeMap.DestinationType)
                     return null;
