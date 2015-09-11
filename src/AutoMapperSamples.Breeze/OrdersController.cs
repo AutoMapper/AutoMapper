@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using AutoMapper;
@@ -7,9 +6,6 @@ using AutoMapper.QueryableExtensions;
 using AutoMapperSamples.Breeze.Dto;
 using AutoMapperSamples.EF;
 using AutoMapperSamples.EF.Dtos;
-using AutoMapperSamples.EF.Model;
-using AutoMapperSamples.EF.Visitors;
-using AutoMapperSamples.OData;
 using Breeze.ContextProvider;
 using Breeze.ContextProvider.EF6;
 using Breeze.WebApi2;
@@ -59,47 +55,35 @@ namespace AutoMapperSamples.Breeze
                 // an unspecific "500 internal server error" response
                 .OnError(OnException)
                 // trace out original expression
-                .VisitBeforeMapping(new ExpressionWriter(Console.Out))
-                //// add an additional visitor to convert "Queryable.LongCount" calls to "Queryable.Count" calls
-                //// as EntityFramework does not support this method
-                //.VisitBeforeMapping(new EntityFrameworkCompatibilityVisitor())
+                .TraceSourceExpressionTo(Console.Out)
                 // trace out mapped expression
-                .VisitAfterMapping(new ExpressionWriter(Console.Out))
+                .TraceDestinationExpressionTo(Console.Out)
                 .For<EF.Dtos.OrderDto>()
                 // modify the enumerated results before returning them to the client
                 .OnEnumerated((enumerator) =>
                 {
                     // we always pass in an IEnumerator<object> as there could a "select" be issued on the OData client-side
                     // which would cause the type of the IEnumerator interface to not be OrderDTO but some "System.Web.Http.OData.Query.Expressions.SelectExpandBinder+SelectSome"
-                    var orderEnumerator = enumerator as IEnumerator<EF.Dtos.OrderDto>;
-                    if (orderEnumerator != null)
+                    foreach (var dto in enumerator.OfType<OrderDto>())
                     {
-                        // transfers the modified DTOs into a new list
-                        // as the LazyEnumerator of EntityFramework does not support a call to "Reset"
-                        var list = new List<EF.Dtos.OrderDto>();
-                        while (orderEnumerator.MoveNext())
-                        {
-                            var dto = orderEnumerator.Current;
-                            dto.FullName = "Intercepted: " + dto.FullName;
-                            list.Add(dto);
-                        }
-                        var customerIds = list.Select(o => o.Customer.Id);
-                        // add IDs of orders
-                        var customersOrders = _context.CustomerSet
-                                                        .Include("Orders")
-                                                        .Where(c => customerIds.Contains(c.Id))
-                                                        .Select(c => new { CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id) })
-                                                        .ToDictionary(c => c.CustomerId);
-                        // apply the list of IDs to each OrderDto
-                        foreach (var order in list)
-                        {
-                            if (customersOrders.ContainsKey(order.Customer.Id))
-                                order.Customer.Orders = customersOrders[order.Customer.Id].OrderIds.ToArray();
-                        }
-
-                        return list.GetEnumerator();
+                        // modify one of the DTOs
+                        dto.FullName = "Intercepted: " + dto.FullName;
                     }
-                    return enumerator;
+
+                    // load additionl propeties from database
+                    var customerIds = enumerator.OfType<OrderDto>().Select(o => o.Customer.Id);
+                    // add IDs of orders
+                    var customersOrders = _context.CustomerSet
+                                                    .Include("Orders")
+                                                    .Where(c => customerIds.Contains(c.Id))
+                                                    .Select(c => new { CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id) })
+                                                    .ToDictionary(c => c.CustomerId);
+                    // apply the list of IDs to each OrderDto
+                    foreach (var order in enumerator.OfType<OrderDto>())
+                    {
+                        if (customersOrders.ContainsKey(order.Customer.Id))
+                            order.Customer.Orders = customersOrders[order.Customer.Id].OrderIds.ToArray();
+                    }
                 })
                 .OrderBy(o => o.Price);
         }
