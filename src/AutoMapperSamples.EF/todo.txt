@@ -3,9 +3,4 @@
 [x] Support "inlinecount"
 [ ] have a look into "Select" expressions of Linq
 [ ] Create an attribute that directly throws once an "Expand" call is found (do not support this)
-[ ] create a test-project for BreezeJs
 [ ] support Object Graphs instead of just Trees (e.g. OrderDto.Customer <==> CustomerDto.Orders) => currently leads to StackOverflowException
-[ ] Problems with dymanic proxies of EF?
-
-[ ] IdenitfyBy - allow AutoMapper to identify an entity/a dto to see if it has already been created
-[ ] Add MappingContext that keeps mapped objects (identifyable), and accepts methods to create (DbContext.Add) and or Update objects (get from cache)

@@ -10,6 +10,6 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// Called when [enumerated].
         /// </summary>
         /// <param name="enumerationHandler">The enumeration handler.</param>
-        IQueryable<T> OnEnumerated(Func<IEnumerator<object>, IEnumerator<object>> enumerationHandler);
+        IQueryable<T> OnEnumerated(Action<IEnumerable<object>> enumerationHandler);
     }
 }

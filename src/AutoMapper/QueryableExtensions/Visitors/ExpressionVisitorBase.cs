@@ -7,9 +7,13 @@ using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace AutoMapperSamples.EF.Visitors 
+namespace AutoMapper.QueryableExtensions.Visitors 
 {
-    public abstract class ExpressionVisitorBase : ExpressionVisitor
+    /// <summary>
+    /// Required for ExpressionWriter
+    /// copied from: http://iqtoolkit.codeplex.com/SourceControl/latest#Source/IQToolkit/ExpressionVisitor.cs
+    /// </summary>
+    internal abstract class ExpressionVisitorBase : ExpressionVisitor
     {
         protected ExpressionVisitorBase()
         {

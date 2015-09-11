@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography.X509Certificates;
+using AutoMapper.QueryableExtensions.Visitors;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -22,26 +22,26 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// </summary>
         /// <param name="visitors">The visitors.</param>
         /// <returns></returns>
-        IQueryDataSourceInjection<TSource> VisitBeforeMapping(params ExpressionVisitor[] visitors);
+        IQueryDataSourceInjection<TSource> BeforeProjection(params ExpressionVisitor[] visitors);
 
         /// <summary>
         /// ExpressionVisitors called after the MappingVisitor itself is executed
         /// </summary>
         /// <param name="visitors">The visitors.</param>
         /// <returns></returns>
-        IQueryDataSourceInjection<TSource> VisitAfterMapping(params ExpressionVisitor[] visitors);
+        IQueryDataSourceInjection<TSource> AfterProjection(params ExpressionVisitor[] visitors);
 
         /// <summary>
         /// adds an ExpressionVisitor that will trace the source expression.
         /// </summary>
         /// <returns></returns>
-        IQueryDataSourceInjection<TSource> TraceSourceExpression();
+        IQueryDataSourceInjection<TSource> TraceSourceExpressionTo(TextWriter output = null);
 
         /// <summary>
         /// adds an ExpressionVisitor that will trace the destination expression.
         /// </summary>
         /// <returns></returns>
-        IQueryDataSourceInjection<TSource> TraceDestinationExpression();
+        IQueryDataSourceInjection<TSource> TraceDestinationExpressionTo(TextWriter output = null);
 
         /// <summary>
         /// Allows specifying a handler that will be called when the underlying QueryProvider encounters an exception.
@@ -52,22 +52,15 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// <returns></returns>
         IQueryDataSourceInjection<TSource> OnError(Action<Exception> exceptionHandler);
     }
-
-    //
-    // Summary:
-    //     Stellt Funktionen zur Auswertung von Abfragen für eine spezifische Datenquelle
-    //     mit unbekanntem Datentyp bereit.
-    //
-    // Type parameters:
-    //   T:
-    //     Der Datentyp in der Datenquelle.
-
+    
     public class QueryDataSourceInjection<TSource> : IQueryDataSourceInjection<TSource>
     {
         private readonly IQueryable<TSource> _dataSource;
         private readonly IMapper _mapper;
         private readonly List<ExpressionVisitor> _beforeMappingVisitors = new List<ExpressionVisitor>();
         private readonly List<ExpressionVisitor> _afterMappingVisitors = new List<ExpressionVisitor>();
+        private ExpressionVisitor _sourceExpressionTracer = null;
+        private ExpressionVisitor _destinationExpressionTracer = null;
         private Action<Exception> _exceptionHandler = ((x) => { });
 
         public QueryDataSourceInjection(IQueryable<TSource> dataSource, IMapper mapper)
@@ -78,6 +71,11 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public ISourceInjectedQueryable<TDestination> For<TDestination>(SourceInjectedQueryInspector inspector = null)
         {
+            if (_sourceExpressionTracer != null)
+                _beforeMappingVisitors.Insert(0, _sourceExpressionTracer);
+            if (_destinationExpressionTracer != null)
+                _afterMappingVisitors.Add(_destinationExpressionTracer);
+
             return new SourceSourceInjectedQuery<TSource, TDestination>(_dataSource,
                 new TDestination[0].AsQueryable(), _mapper, _beforeMappingVisitors, _afterMappingVisitors, _exceptionHandler, inspector);
         }
@@ -87,7 +85,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// </summary>
         /// <param name="visitors">The visitors.</param>
         /// <returns></returns>
-        public IQueryDataSourceInjection<TSource> VisitBeforeMapping(params ExpressionVisitor[] visitors)
+        public IQueryDataSourceInjection<TSource> BeforeProjection(params ExpressionVisitor[] visitors)
         {
             foreach(var visitor in visitors)
             {
@@ -102,7 +100,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// </summary>
         /// <param name="visitors">The visitors.</param>
         /// <returns></returns>
-        public IQueryDataSourceInjection<TSource> VisitAfterMapping(params ExpressionVisitor[] visitors)
+        public IQueryDataSourceInjection<TSource> AfterProjection(params ExpressionVisitor[] visitors)
         {
             foreach (var visitor in visitors)
             {
@@ -116,8 +114,10 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// adds an ExpressionVisitor that will trace the source expression.
         /// </summary>
         /// <returns></returns>
-        public IQueryDataSourceInjection<TSource> TraceSourceExpression()
+        public IQueryDataSourceInjection<TSource> TraceSourceExpressionTo(TextWriter output = null)
         {
+            output = output ?? Console.Out;
+            _sourceExpressionTracer = new ExpressionWriter(output);
             return this;
         }
 
@@ -125,8 +125,10 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// adds an ExpressionVisitor that will trace the destination expression.
         /// </summary>
         /// <returns></returns>
-        public IQueryDataSourceInjection<TSource> TraceDestinationExpression()
+        public IQueryDataSourceInjection<TSource> TraceDestinationExpressionTo(TextWriter output = null)
         {
+            output = output ?? Console.Out;
+            _destinationExpressionTracer = new ExpressionWriter(output);
             return this;
         }
 

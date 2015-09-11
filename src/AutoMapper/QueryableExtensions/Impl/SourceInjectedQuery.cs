@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace AutoMapper.QueryableExtensions.Impl
+﻿namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
     using System.Collections;
@@ -20,7 +18,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 SourceInjectedQueryInspector inspector = null)
         {
             _exceptionHandler = exceptionHandler ?? ((x)=> {});
-            EnumerationHandler = (x => x);
+            EnumerationHandler = (x => {});
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
             Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mapper, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler)
@@ -29,30 +27,31 @@ namespace AutoMapper.QueryableExtensions.Impl
             };
         }
 
-        internal SourceSourceInjectedQuery(IQueryProvider provider, Expression expression, Func<IEnumerator<object>, IEnumerator<object>> enumerationHandler, Action<Exception> exceptionHandler)
+        internal SourceSourceInjectedQuery(IQueryProvider provider, Expression expression, Action<IEnumerable<object>> enumerationHandler, Action<Exception> exceptionHandler)
         {
-            _exceptionHandler = exceptionHandler ?? ((x) => { });
+            _exceptionHandler = exceptionHandler ?? ((x) => {});
             Provider = provider;
             Expression = expression;
-            EnumerationHandler = enumerationHandler ?? (x => x);
+            EnumerationHandler = enumerationHandler ?? (x => {});
             ElementType = typeof(TDestination);
         }
 
-        public IQueryable<TDestination> OnEnumerated(Func<IEnumerator<object>, IEnumerator<object>> enumerationHandler)
+        public IQueryable<TDestination> OnEnumerated(Action<IEnumerable<object>> enumerationHandler)
         {
-            EnumerationHandler = enumerationHandler ?? (x => x);
+            EnumerationHandler = enumerationHandler ?? (x => {});
             ((SourceInjectedQueryProvider<TSource, TDestination>) Provider).EnumerationHandler = EnumerationHandler;
             return this;
         }
 
-        internal Func<IEnumerator<object>, IEnumerator<object>> EnumerationHandler { get; set; }
+        internal Action<IEnumerable<object>> EnumerationHandler { get; set; }
 
         public IEnumerator<TDestination> GetEnumerator()
         {
             try
             {
-                var enumerator = Provider.Execute<IEnumerable<TDestination>>(Expression).GetEnumerator();
-                return (IEnumerator<TDestination>) EnumerationHandler((IEnumerator<object>) enumerator);
+                var results = Provider.Execute<IEnumerable<TDestination>>(Expression).Cast<object>().ToArray();
+                EnumerationHandler(results);
+                return results.Cast<TDestination>().GetEnumerator();
             }
             catch (Exception x)
             {

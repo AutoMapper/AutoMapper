@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -33,7 +32,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         public SourceInjectedQueryInspector Inspector { get; set; }
-        internal Func<IEnumerator<object>, IEnumerator<object>> EnumerationHandler { get; set; }
+        internal Action<IEnumerable<object>> EnumerationHandler { get; set; }
 
         public IQueryable CreateQuery(Expression expression)
         {

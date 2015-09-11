@@ -10,13 +10,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace AutoMapperSamples.EF.Visitors
+namespace AutoMapper.QueryableExtensions.Visitors
 {
     /// <summary>
     /// Writes out an expression tree in a C#-ish syntax
-    /// copied from: http://iqtoolkit.codeplex.com/SourceControl/latest#Source/IQToolkit/TypeHelper.cs
+    /// copied from: http://iqtoolkit.codeplex.com/SourceControl/latest#Source/IQToolkit/ExpressionWriter.cs
     /// </summary>
-    public class ExpressionWriter : ExpressionVisitorBase
+    internal class ExpressionWriter : ExpressionVisitorBase
     {
         TextWriter writer;
         int indent = 2;

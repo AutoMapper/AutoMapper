@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.OData;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using AutoMapperSamples.EF;
 using AutoMapperSamples.EF.Dtos;
-using AutoMapperSamples.EF.Model;
-using AutoMapperSamples.EF.Visitors;
-using ExpressionVisitor = System.Linq.Expressions.ExpressionVisitor;
 
 namespace AutoMapperSamples.OData
 {
@@ -42,47 +35,38 @@ namespace AutoMapperSamples.OData
                 // an unspecific "500 internal server error" response
                 .OnError(OnException)
                 // trace out original expression
-                .VisitBeforeMapping(new ExpressionWriter(Console.Out))
+                .TraceSourceExpressionTo(Console.Out)
                 // add an additional visitor to convert "Queryable.LongCount" calls to "Queryable.Count" calls
                 // as EntityFramework does not support this method
-                .VisitBeforeMapping(new EntityFrameworkCompatibilityVisitor())
+                .BeforeProjection(new EntityFrameworkCompatibilityVisitor())
                 // trace out mapped expression
-                .VisitAfterMapping(new ExpressionWriter(Console.Out))
+                .TraceDestinationExpressionTo(Console.Out)
                 .For<OrderDto>()
                 // modify the enumerated results before returning them to the client
                 .OnEnumerated((enumerator) =>
                 {
                     // we always pass in an IEnumerator<object> as there could a "select" be issued on the OData client-side
                     // which would cause the type of the IEnumerator interface to not be OrderDTO but some "System.Web.Http.OData.Query.Expressions.SelectExpandBinder+SelectSome"
-                    var orderEnumerator = enumerator as IEnumerator<OrderDto>;
-                    if (orderEnumerator != null)
+                    foreach (var dto in enumerator.OfType<OrderDto>())
                     {
-                        // transfers the modified DTOs into a new list
-                        // as the LazyEnumerator of EntityFramework does not support a call to "Reset"
-                        var list = new List<OrderDto>();
-                        while (orderEnumerator.MoveNext())
-                        {
-                            var dto = orderEnumerator.Current;
-                            dto.FullName = "Intercepted: " + dto.FullName;
-                            list.Add(dto);
-                        }
-                        var customerIds = list.Select(o => o.Customer.Id);
-                        // add IDs of orders
-                        var customersOrders = context.CustomerSet
-                                                        .Include("Orders")
-                                                        .Where(c => customerIds.Contains(c.Id))
-                                                        .Select(c => new { CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id) })
-                                                        .ToDictionary(c => c.CustomerId);
-                        // apply the list of IDs to each OrderDto
-                        foreach (var order in list)
-                        {
-                            if (customersOrders.ContainsKey(order.Customer.Id))
-                                order.Customer.Orders = customersOrders[order.Customer.Id].OrderIds.ToArray();
-                        }
-
-                        return list.GetEnumerator();
+                        // modify one of the DTOs
+                        dto.FullName = "Intercepted: " + dto.FullName;
                     }
-                    return enumerator;
+
+                    // load additionl propeties from database
+                    var customerIds = enumerator.OfType<OrderDto>().Select(o => o.Customer.Id);
+                    // add IDs of orders
+                    var customersOrders = context.CustomerSet
+                                                    .Include("Orders")
+                                                    .Where(c => customerIds.Contains(c.Id))
+                                                    .Select(c => new { CustomerId = c.Id, OrderIds = c.Orders.Select(o => o.Id) })
+                                                    .ToDictionary(c => c.CustomerId);
+                    // apply the list of IDs to each OrderDto
+                    foreach (var order in enumerator.OfType<OrderDto>())
+                    {
+                        if (customersOrders.ContainsKey(order.Customer.Id))
+                            order.Customer.Orders = customersOrders[order.Customer.Id].OrderIds.ToArray();
+                    }
                 })
                 .OrderBy(o => o.Price);
         }
@@ -93,34 +77,5 @@ namespace AutoMapperSamples.OData
 
             base.Dispose(disposing);
         }
-    }
-
-    /// <summary>
-    /// EntityFramework does not support "LongCount" so we need to rewrite the expression to a call to the "Count" method
-    /// </summary>
-    public class EntityFrameworkCompatibilityVisitor : ExpressionVisitor
-    {
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            // replace call to "LongCount" with "Count"            
-            if (node.Method.IsGenericMethod && node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == "LongCount")
-            {
-                var method = node.Method.DeclaringType.GetMethods(BindingFlags.Public | BindingFlags.Static).First(m => m.Name == "Count");
-                method = method.MakeGenericMethod(node.Method.GetGenericArguments());
-                return Expression.Call(method, node.Arguments);
-            }
-
-            //// ignore all "Select" calls as we do not support them now
-            //// but made a mistake - this somehow does not work... :-/
-            //if (node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == "Select")
-            //{
-            //    return node.Arguments.First();
-            //}
-
-            // ignore all "Expand" calls as we do NOT want to support them - do we? :)
-
-            return base.VisitMethodCall(node);
-        }
-        
     }
 }

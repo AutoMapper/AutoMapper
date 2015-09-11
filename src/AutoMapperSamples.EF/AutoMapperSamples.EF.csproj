@@ -113,9 +113,6 @@
     <Compile Include="EffortQueryTests.cs" />
     <Compile Include="TestDbContext.cs" />
     <Compile Include="TestContextBase.cs" />
-    <Compile Include="Visitors\ExpressionVisitorBase.cs" />
-    <Compile Include="Visitors\ExpressionWriter.cs" />
-    <Compile Include="Visitors\TypeHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
