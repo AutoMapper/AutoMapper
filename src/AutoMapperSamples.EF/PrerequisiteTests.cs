@@ -120,6 +120,14 @@ namespace AutoMapperSamples.EF
             var detailDtoQuery = detailQuery.UseAsDataSource()
                 .OnError(ex => exceptions.Add(ex))
                 .For<DetailDto>()
+                .OnEnumerated((enumerable) =>
+                {
+                    // fixup navigationproperties
+                    foreach(var canFix in enumerable.OfType<ICanFixupRelationships>())
+                    {
+                        canFix.Fixup();
+                    }
+                })
                 .Where(d => d.Master.Name == "Harry Marry");
 
             // Assert
@@ -127,12 +135,47 @@ namespace AutoMapperSamples.EF
 
             AssertValidDtoGraph(dto.Single());
         }
-        
+
+
+
+        [Test]
+        public void CanMapCaclicExpressionGraph_Other()
+        {
+            // Arrange
+            master.Details.Add(new Detail
+            {
+                Id = Guid.NewGuid(),
+                Master = master,
+                Name = "The othe detail"
+            });
+            var detailQuery = new List<Detail> { detail }.AsQueryable();
+
+            // Act
+            var detailDtoQuery = detailQuery.UseAsDataSource()
+                .OnError(ex => exceptions.Add(ex))
+                .For<DetailDto>()
+                .OnEnumerated((enumerable) =>
+                {
+                    // fixup navigationproperties
+                    foreach (var canFix in enumerable.OfType<ICanFixupRelationships>())
+                    {
+                        canFix.Fixup();
+                    }
+                })
+                .Where(d => d.Master.Name == "Harry Marry" && d.Master.Name != "Lollypop");
+
+            // Assert
+            var dtos = detailDtoQuery.ToList();
+
+            Assert.AreEqual(1, dtos.Count);
+            Assert.AreEqual(2, dtos.Single().Master.Details.Count);
+        }
+
         [Test]
         public void CanMapCaclicExpressionGraph_WithoutResults_Single()
         {
             // Arrange
-            var detailQuery = new List<Detail> {  }.AsQueryable();
+            var detailQuery = new List<Detail>().AsQueryable();
 
             // Act
             var detailDtoQuery = detailQuery.UseAsDataSource()
@@ -189,7 +232,9 @@ namespace AutoMapperSamples.EF
             Assert.IsNotNull(detail.Master);
             Assert.IsNotEmpty(master.Details);
             Assert.AreEqual(detail.Master.Id, master.Id);
-            Assert.AreSame(dto.Master.Details.Single(), dto);
+
+            Assert.AreEqual(dto.Master.Details.Single().Id, dto.Id, "Dto was not added to inner collection");
+            Assert.AreNotEqual(dto.GetHashCode(), dto.Master.Details.Single().GetHashCode(), "Underlying provider always creates two distinct instances");
         }
 
         #region Entities
@@ -227,11 +272,28 @@ namespace AutoMapperSamples.EF
             public ICollection<DetailDto> Details { get; set; }
         }
 
-        private class DetailDto
+        private class DetailDto : ICanFixupRelationships
         {
+            public DetailDto()
+            {
+                
+            }
+
             public Guid Id { get; set; }
             public string Name { get; set; }
             public MasterDto Master { get; set; }
+
+            void ICanFixupRelationships.Fixup()
+            {
+                var other = Master.Details.FirstOrDefault(d => d.Id == this.Id);
+                if(other == null)
+                    Master.Details.Add(this);
+            }
+        }
+
+        public interface ICanFixupRelationships
+        {
+            void Fixup();
         }
 
         #endregion
