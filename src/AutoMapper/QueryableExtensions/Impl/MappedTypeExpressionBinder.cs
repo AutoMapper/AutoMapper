@@ -7,7 +7,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
-            return propertyTypeMap != null && propertyTypeMap.CustomProjection == null;
+            return propertyTypeMap != null; //&& propertyTypeMap.CustomProjection == null;
         }
 
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,

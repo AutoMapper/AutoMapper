@@ -27,10 +27,10 @@ namespace AutoMapper
         private static readonly IExpressionBinder[] Binders =
         {
             new NullableExpressionBinder(),
-            new AssignableExpressionBinder(),
             new EnumerableExpressionBinder(),
             new MappedTypeExpressionBinder(),
-            new StringExpressionBinder()
+            new AssignableExpressionBinder(),
+            new StringExpressionBinder(),
         };
 
 
@@ -286,6 +286,15 @@ namespace AutoMapper
                 throw new InvalidOperationException(message);
             }
 
+            if(typeMap.CustomProjection != null) 
+            {
+                var nodeReplacer = new ExpressionNodeReplacer(
+                                                    instanceParameter,
+                                                    n => n == typeMap.CustomProjection.Parameters.First());
+
+                return nodeReplacer.Visit(typeMap.CustomProjection.Body);
+            }
+
             var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
 
             var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
@@ -299,6 +308,25 @@ namespace AutoMapper
                 );
             return expression;
         }
+
+
+        private class ExpressionNodeReplacer : ExpressionVisitor
+        {
+            Expression _exNew;
+            Predicate<Expression> _fnTest;
+
+            public ExpressionNodeReplacer(Expression exNew, Predicate<Expression> fnTest) {
+                _exNew = exNew;
+                _fnTest = fnTest;
+            }
+
+            public override Expression Visit(Expression node) {
+                return _fnTest(node)
+                            ? _exNew
+                            : base.Visit(node);
+            }
+        }
+
 
         private class NewFinderVisitor : ExpressionVisitor
         {

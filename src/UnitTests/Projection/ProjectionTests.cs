@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Projection
 
             var target = new[] { new Source() { Greeting = _nastyGreeting, Number = _niceNumber } }
                             .AsQueryable()
-                            .Project().To<Target>()
+                            .ProjectTo<Target>()
                             .First();
 
             target.Greeting.ShouldEqual(_pleasantGreeting);
@@ -49,7 +49,7 @@ namespace AutoMapper.UnitTests.Projection
 
             var target = new[] { new Source() }
                             .AsQueryable()
-                            .Project().To<Target>()
+                            .ProjectTo<Target>()
                             .First();
 
             target.Greeting.ShouldEqual(_pleasantGreeting);
@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests.Projection
 
             var target = new[] { new Source() }
                             .AsQueryable()
-                            .Project().To<Target>()
+                            .ProjectTo<Target>()
                             .First();
 
             target.Child.Greeting.ShouldEqual(_pleasantGreeting);
