@@ -72,9 +72,7 @@ namespace AutoMapper.UnitTests.Projection
 
             target.Child.Greeting.ShouldEqual(_pleasantGreeting);
         }
-
-        
-
+                
 
         class Source
         {
