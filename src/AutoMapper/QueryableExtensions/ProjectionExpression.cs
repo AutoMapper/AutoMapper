@@ -81,13 +81,29 @@ namespace AutoMapper.QueryableExtensions
         {
             var mapExpr = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, members);
 
-            return _source.Provider.CreateQuery<TResult>(
+
+            var exQuery =
                 Expression.Call(
                     null,
                     QueryableSelectMethod.MakeGenericMethod(_source.ElementType, typeof(TResult)),
                     new[] { _source.Expression, Expression.Quote(mapExpr) }
-                    )
-                );
+                    );
+
+            var query = _source.Provider.CreateQuery<TResult>(exQuery);
+
+
+
+            //var query = _source.Provider.CreateQuery<TResult>(
+            //    Expression.Call(
+            //        null,
+            //        QueryableSelectMethod.MakeGenericMethod(_source.ElementType, typeof(TResult)),
+            //        new[] { _source.Expression, Expression.Quote(mapExpr) }
+            //        )
+            //    );
+
+            var items = query.ToArray();
+
+            return query;
         }
     }
 }

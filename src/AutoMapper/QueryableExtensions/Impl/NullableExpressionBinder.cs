@@ -3,7 +3,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq.Expressions;
     using Internal;
 
-    public class NullableExpressionBinder : IExpressionBinder
+    public class NullablePropertyProjector : IPropertyProjector
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
@@ -11,14 +11,14 @@ namespace AutoMapper.QueryableExtensions.Impl
                    && !result.Type.IsNullableType();
         }
 
-        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
+        public Expression Project(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
             ExpressionRequest request, ExpressionResolutionResult result,
             IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return BindNullableExpression(propertyMap, result);
+            return GetNullableExpression(propertyMap, result);
         }
 
-        private static MemberAssignment BindNullableExpression(PropertyMap propertyMap,
+        private static Expression GetNullableExpression(PropertyMap propertyMap,
             ExpressionResolutionResult result)
         {
             if (result.ResolutionExpression.NodeType == ExpressionType.MemberAccess)
@@ -41,12 +41,11 @@ namespace AutoMapper.QueryableExtensions.Impl
                             );
                     }
 
-                    return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, expressionToBind);
+                    return expressionToBind;
                 }
             }
 
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo,
-                Expression.Convert(result.ResolutionExpression, propertyMap.DestinationPropertyType));
+            return Expression.Convert(result.ResolutionExpression, propertyMap.DestinationPropertyType);
         }
     }
 }

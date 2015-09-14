@@ -3,23 +3,26 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq.Expressions;
     using Internal;
 
-    public class MappedTypeExpressionBinder : IExpressionBinder
+    public class MappedTypePropertyProjector : IPropertyProjector
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
-            return propertyTypeMap != null; //&& propertyTypeMap.CustomProjection == null;
+            return propertyTypeMap != null;
         }
 
-        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
+        public Expression Project(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
             ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return BindMappedTypeExpression(mappingEngine, propertyMap, request, result, typePairCount);
+            return BuildMappedTypeExpression(mappingEngine, propertyMap, request, result, typePairCount);
         }
 
-        private static MemberAssignment BindMappedTypeExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
+        private static Expression BuildMappedTypeExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
             ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             var transformedExpression = ((IMappingEngineRunner)mappingEngine).CreateMapExpression(request, result.ResolutionExpression, typePairCount);
+
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            //BELOW SHOULDN'T BE NEEDED WHEN NULL GUARDS ARE PUT IN BY MAPPINGENGINE...
 
             // Handles null source property so it will not create an object with possible non-nullable propeerties 
             // which would result in an exception.
@@ -31,7 +34,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         transformedExpression, expressionNull);
             }
 
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, transformedExpression);
+            return transformedExpression;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using Extensions = AutoMapper.QueryableExtensions.Extensions;
 #endif
 
-    public class EnumerableExpressionBinder : IExpressionBinder
+    public class EnumerablePropertyProjector : IPropertyProjector
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
@@ -17,16 +17,15 @@ namespace AutoMapper.QueryableExtensions.Impl
                    propertyMap.DestinationPropertyType != typeof (string);
         }
 
-        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
+        public Expression Project(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
             ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return BindEnumerableExpression(mappingEngine, propertyMap, request, result, typePairCount);
+            return BuildEnumerableExpression(mappingEngine, propertyMap, request, result, typePairCount);
         }
 
-        private static MemberAssignment BindEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
+        private static Expression BuildEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
             ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
-            MemberAssignment bindExpression;
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
 
             var sourceListType = result.Type.IsArray ? result.Type.GetElementType() : result.Type.GetGenericArguments().First();
@@ -53,7 +52,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 // Call .ToList() on IEnumerable
                 var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType, selectExpression);
 
-                bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, toListCallExpression);
+                return toListCallExpression;
             }
             else if (propertyMap.DestinationPropertyType.IsArray)
             {
@@ -63,14 +62,14 @@ namespace AutoMapper.QueryableExtensions.Impl
                     "ToArray",
                     new[] {destinationListType},
                     selectExpression);
-                bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, toArrayCallExpression);
+
+                return toArrayCallExpression;
             }
             else
             {
                 // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
-                bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, selectExpression);
+                return selectExpression;
             }
-            return bindExpression;
         }
 
         private static Type GetDestinationListTypeFor(PropertyMap propertyMap)
@@ -82,13 +81,13 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         private static MethodCallExpression GetToListCallExpression(PropertyMap propertyMap, Type destinationListType,
-            Expression selectExpression)
+            Expression sourceExpression)
         {
             return Expression.Call(
                 typeof (Enumerable),
                 propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList",
                 new[] {destinationListType},
-                selectExpression);
+                sourceExpression);
         }
     }
 }

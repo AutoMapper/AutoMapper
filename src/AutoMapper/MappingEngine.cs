@@ -24,13 +24,13 @@ namespace AutoMapper
             new NullSubstitutionExpressionResultConverter()
         };
 
-        private static readonly IExpressionBinder[] Binders =
+        private static readonly IPropertyProjector[] PropertyProjectors =
         {
-            new NullableExpressionBinder(),
-            new EnumerableExpressionBinder(),
-            new MappedTypeExpressionBinder(),
-            new AssignableExpressionBinder(),
-            new StringExpressionBinder(),
+            new NullablePropertyProjector(),
+            new EnumerablePropertyProjector(),
+            new MappedTypePropertyProjector(),
+            new AssignablePropertyProjector(),
+            new ToStringPropertyProjector(),
         };
 
 
@@ -362,20 +362,27 @@ namespace AutoMapper
                     propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.MembersToExpand);
 
-                var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
+                var propProjector = PropertyProjectors.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
-                if (binder == null)
+                if (propProjector == null)
                 {
                     var message =
                         $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
 
                     throw new AutoMapperMappingException(message);
                 }
+                
+                var propProjectExp = propProjector.Project(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
 
-                var bindExpression = binder.Build(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
+                //if nullable, should insert null guard here - i.e. if null, just project null
 
-                bindings.Add(bindExpression);
+
+                var propBinding = Expression.Bind(propertyMap.DestinationProperty.MemberInfo,
+                                                    propProjectExp);
+                
+                bindings.Add(propBinding);
             }
+
             return bindings;
         }
 
