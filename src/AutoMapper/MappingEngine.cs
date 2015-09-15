@@ -372,15 +372,23 @@ namespace AutoMapper
                     throw new AutoMapperMappingException(message);
                 }
                 
-                var propProjectExp = propProjector.Project(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
-
-                //if nullable, should insert null guard here - i.e. if null, just project null
-
-
-                var propBinding = Expression.Bind(propertyMap.DestinationProperty.MemberInfo,
-                                                    propProjectExp);
+                var projection = propProjector.Project(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 
-                bindings.Add(propBinding);
+                if(!result.Type.IsValueType 
+                    && ConfigurationProvider.MapNullSourceValuesAsNull) //But what about MapNullSourceCollectionsAsNull???
+                {
+                    projection = Expression.Condition(
+                                                Expression.Equal(
+                                                            Expression.TypeAs(result.ResolutionExpression, typeof(object)),
+                                                            Expression.Constant(null)),
+                                                Expression.Default(projection.Type),
+                                                projection);
+                }
+
+                var binding = Expression.Bind(propertyMap.DestinationProperty.MemberInfo,
+                                                    projection);
+                
+                bindings.Add(binding);
             }
 
             return bindings;

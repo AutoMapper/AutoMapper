@@ -80,30 +80,13 @@ namespace AutoMapper.QueryableExtensions
         private IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberInfo[] members)
         {
             var mapExpr = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, members);
+            
+            var queryExpr = Expression.Call(
+                                QueryableSelectMethod.MakeGenericMethod(_source.ElementType, typeof(TResult)),
+                                new[] { _source.Expression, Expression.Quote(mapExpr) }
+                            );
 
-
-            var exQuery =
-                Expression.Call(
-                    null,
-                    QueryableSelectMethod.MakeGenericMethod(_source.ElementType, typeof(TResult)),
-                    new[] { _source.Expression, Expression.Quote(mapExpr) }
-                    );
-
-            var query = _source.Provider.CreateQuery<TResult>(exQuery);
-
-
-
-            //var query = _source.Provider.CreateQuery<TResult>(
-            //    Expression.Call(
-            //        null,
-            //        QueryableSelectMethod.MakeGenericMethod(_source.ElementType, typeof(TResult)),
-            //        new[] { _source.Expression, Expression.Quote(mapExpr) }
-            //        )
-            //    );
-
-            var items = query.ToArray();
-
-            return query;
+            return _source.Provider.CreateQuery<TResult>(queryExpr);
         }
     }
 }
