@@ -19,7 +19,15 @@ namespace AutoMapper.Mappers
             var destination = mapper.CreateObject(context);
             foreach(var member in MembersToMap(source, destination))
             {
-                var sourceMemberValue = GetSourceMember(member, source);
+                object sourceMemberValue;
+                try
+                {
+                    sourceMemberValue = GetSourceMember(member, source);
+                }
+                catch(RuntimeBinderException)
+                {
+                    continue;
+                }
                 var destinationMemberValue = Map(member, sourceMemberValue);
                 SetDestinationMember(member, destination, destinationMemberValue);
             }
