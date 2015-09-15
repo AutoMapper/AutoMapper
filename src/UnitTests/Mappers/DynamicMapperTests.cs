@@ -52,17 +52,20 @@ namespace AutoMapper.UnitTests.Mappers
 
     public class When_mapping_from_dynamic_with_missing_property : NonValidatingSpecBase
     {
-        [Fact]
-        public void Should_throw()
+        Destination _destination;
+
+        protected override void Because_of()
         {
             dynamic source = new ExpandoObject();
             source.Foo = "Foo";
-            new Action(()=>Mapper.Map<Destination>(source)).ShouldThrow<AutoMapperMappingException>(ex =>
-            {
-                var innerException = ex.InnerException;
-                innerException.ShouldBeType<RuntimeBinderException>();
-                innerException.Message.EndsWith("'Bar'").ShouldBeTrue();
-            });
+            _destination = Mapper.Map<Destination>(source);
+        }
+
+        [Fact]
+        public void Should_map_existing_properties()
+        {
+            _destination.Foo.ShouldEqual("Foo");
+            _destination.Bar.ShouldBeNull();
         }
     }
 
