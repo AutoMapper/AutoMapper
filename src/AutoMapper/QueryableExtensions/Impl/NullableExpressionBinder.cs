@@ -15,12 +15,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             ExpressionRequest request, ExpressionResolutionResult result,
             IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return GetNullableExpression(propertyMap, result);
-        }
-
-        private static Expression GetNullableExpression(PropertyMap propertyMap,
-            ExpressionResolutionResult result)
-        {
             if (result.ResolutionExpression.NodeType == ExpressionType.MemberAccess)
             {
                 var memberExpr = (MemberExpression) result.ResolutionExpression;

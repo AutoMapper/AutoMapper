@@ -12,11 +12,6 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public Expression Project(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return BuildStringExpression(propertyMap, result);
-        }
-
-        private static Expression BuildStringExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
-        {
             return Expression.Call(result.ResolutionExpression, "ToString", null, null);
         }
     }

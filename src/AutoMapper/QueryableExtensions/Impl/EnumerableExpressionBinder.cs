@@ -20,12 +20,6 @@ namespace AutoMapper.QueryableExtensions.Impl
         public Expression Project(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
             ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return BuildEnumerableExpression(mappingEngine, propertyMap, request, result, typePairCount);
-        }
-
-        private static Expression BuildEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
-            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
-        {
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
 
             var sourceListType = result.Type.IsArray ? result.Type.GetElementType() : result.Type.GetGenericArguments().First();

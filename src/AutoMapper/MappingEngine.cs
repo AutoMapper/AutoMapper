@@ -10,6 +10,7 @@ namespace AutoMapper
     using Mappers;
     using QueryableExtensions;
     using QueryableExtensions.Impl;
+    using System.Collections;
 
     public class MappingEngine : IMappingEngine, IMappingEngineRunner
     {
@@ -374,9 +375,12 @@ namespace AutoMapper
                 
                 var projection = propProjector.Project(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
                 
-                if(!result.Type.IsValueType 
-                    && ConfigurationProvider.MapNullSourceValuesAsNull) //But what about MapNullSourceCollectionsAsNull???
-                {
+                bool addNullGuard = result.Type.IsReferenceType()
+                                    && (result.Type.IsEnumerableType()
+                                                        ? ConfigurationProvider.MapNullSourceCollectionsAsNull
+                                                        : ConfigurationProvider.MapNullSourceValuesAsNull);
+
+                if(addNullGuard) {
                     projection = Expression.Condition(
                                                 Expression.Equal(
                                                             Expression.TypeAs(result.ResolutionExpression, typeof(object)),

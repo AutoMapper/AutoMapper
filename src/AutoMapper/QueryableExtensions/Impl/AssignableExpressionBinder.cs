@@ -15,12 +15,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             ExpressionRequest request, ExpressionResolutionResult result,
             IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return BuildAssignableExpression(propertyMap, result);
-        }
-
-        private static Expression BuildAssignableExpression(PropertyMap propertyMap,
-            ExpressionResolutionResult result)
-        {
             return result.ResolutionExpression;
         }
     }
