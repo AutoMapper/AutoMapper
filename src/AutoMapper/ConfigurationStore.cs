@@ -48,6 +48,11 @@ namespace AutoMapper
             ForAllMaps(DefaultProfileName, configuration);
         }
 
+        public TypeInfo GetTypeInfo(Type type)
+        {
+            return _typeMapFactory.GetTypeInfo(type, GetProfile(DefaultProfileName));
+        }
+
         internal void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration)
         {
             foreach(var typeMap in _userDefinedTypeMaps.Values.Where(tm => tm.Profile == profileName))

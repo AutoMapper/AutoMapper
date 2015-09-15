@@ -73,7 +73,7 @@ namespace AutoMapper
             return true;
         }
 
-        private TypeInfo GetTypeInfo(Type type, IMappingOptions mappingOptions)
+        public TypeInfo GetTypeInfo(Type type, IMappingOptions mappingOptions)
         {
             return GetTypeInfo(type, mappingOptions.ShouldMapProperty, mappingOptions.ShouldMapField, mappingOptions.SourceExtensionMethods);
         }
