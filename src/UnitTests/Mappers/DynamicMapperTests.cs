@@ -65,4 +65,24 @@ namespace AutoMapper.UnitTests.Mappers
             });
         }
     }
+
+    public class When_mapping_dynamic_from_expando_to_expando: NonValidatingSpecBase
+    {
+        dynamic _destination;
+
+        protected override void Because_of()
+        {
+            dynamic source = new ExpandoObject();
+            source.Foo = "Foo";
+            source.Bar = "Bar";
+            _destination = Mapper.Map<ExpandoObject>(source);
+        }
+
+        [Fact]
+        public void Should_map_as_dictionary()
+        {
+            Assert.Equal("Foo", _destination.Foo);
+            Assert.Equal("Bar", _destination.Bar);
+        }
+    }
 }
