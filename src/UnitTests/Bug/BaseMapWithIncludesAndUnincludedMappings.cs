@@ -89,6 +89,20 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         [Fact]
+        public void TestInitialiserProxyOfSub1()
+        {
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<BaseA, SubB>();
+                cfg.CreateMap<BaseA, BaseB>();
+            });
+
+            var mapped = Mapper.Map<BaseA, SubB>(new ProxyOfSubA() { Name = "Martin", Description = "Hello" });
+            Assert.IsType<SubB>(mapped);
+
+        }
+
+        [Fact]
         public void TestInitialiserProxyOfSubInclude()
         {
             Mapper.Initialize(cfg =>

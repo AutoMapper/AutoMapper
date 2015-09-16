@@ -193,7 +193,7 @@ namespace AutoMapper
 
         public bool HasDerivedTypesToInclude()
         {
-            return _includedDerivedTypes.Any();
+            return _includedDerivedTypes.Any() || DestinationTypeOverride != null;
         }
 
         public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
