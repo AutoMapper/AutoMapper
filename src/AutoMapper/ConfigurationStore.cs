@@ -417,10 +417,15 @@ namespace AutoMapper
 
         private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root)
         {
-            return
+            var includeOverrideTypePairs =
+                GetAllTypeMaps()
+                    .Where(tm => tm.SourceType.IsAssignableFrom(root.SourceType) && (tm.DestinationTypeOverride ?? tm.DestinationType) != root.DestinationType && tm.DestinationType.IsAssignableFrom(root.DestinationType))
+                    .Select(tm => new TypePair(tm.SourceType,tm.DestinationTypeOverride ?? tm.GetDerivedTypeFor(root.SourceType))).ToList();
+            var subTypePairs =
                 from sourceType in GetAllTypes(root.SourceType)
                 from destinationType in GetAllTypes(root.DestinationType)
                 select new TypePair(sourceType, destinationType);
+            return includeOverrideTypePairs.Concat(subTypePairs);
         }
 
         private IEnumerable<Type> GetAllTypes(Type type)

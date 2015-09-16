@@ -183,7 +183,7 @@ namespace AutoMapper
             // This might need to be fixed for multiple derived source types to different dest types
             var match = _includedDerivedTypes.FirstOrDefault(tp => tp.SourceType == derivedSourceType);
 
-            return match == null ? DestinationType : match.DestinationType;
+            return DestinationTypeOverride ?? match?.DestinationType ?? DestinationType;
         }
 
         public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
