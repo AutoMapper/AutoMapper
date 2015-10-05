@@ -289,10 +289,14 @@ namespace AutoMapper
 
             var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
 
-            var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
+            Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
+            if(instanceParameter is ParameterExpression)
+            {
+                var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
+                constructorExpression = parameterReplacer.Visit(constructorExpression);
+            }
             var visitor = new NewFinderVisitor();
-            var constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
-            visitor.Visit(parameterReplacer.Visit(constructorExpression));
+            visitor.Visit(constructorExpression);
 
             var expression = Expression.MemberInit(
                 visitor.NewExpression,
