@@ -1,14 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Internal;
+using Microsoft.CSharp.RuntimeBinder;
+using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
 namespace AutoMapper.Mappers
 {
-    using System.Collections.Generic;
-    using Microsoft.CSharp.RuntimeBinder;
-
     public abstract class DynamicMapper : IObjectMapper
     {
         public abstract bool IsMatch(ResolutionContext context);
@@ -28,16 +28,10 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = Map(member, sourceMemberValue);
+                var destinationMemberValue = ReflectionHelper.Map(member, sourceMemberValue);
                 SetDestinationMember(member, destination, destinationMemberValue);
             }
             return destination;
-        }
-
-        private object Map(MemberInfo member, object value)
-        {
-            var memberType = member.GetMemberType();
-            return Mapper.Map(value, value?.GetType() ?? memberType, memberType);
         }
 
         protected abstract IEnumerable<MemberInfo> MembersToMap(object source, object destination);

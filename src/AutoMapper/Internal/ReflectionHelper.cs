@@ -9,6 +9,12 @@ namespace AutoMapper.Internal
 
     public static class ReflectionHelper
 	{
+        public static object Map(MemberInfo member, object value)
+        {
+            var memberType = member.GetMemberType();
+            return Mapper.Map(value, value?.GetType() ?? memberType, memberType);
+        }
+
         public static bool IsDynamic(this object obj)
         {
             return obj is IDynamicMetaObjectProvider;
