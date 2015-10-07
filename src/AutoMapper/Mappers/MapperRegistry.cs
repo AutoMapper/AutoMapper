@@ -40,6 +40,8 @@ namespace AutoMapper.Mappers
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
             new OpenGenericMapper(),
+            new FromStringDictionaryMapper(),
+            new ToStringDictionaryMapper(),
             new FromDynamicMapper(),
             new ToDynamicMapper()
         };
