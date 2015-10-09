@@ -35,7 +35,7 @@ task release {
 task compile -depends clean { 
     exec { dnu restore }
     exec { dnu build $source_dir\AutoMapper --configuration $config}
-    exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.sln }
+    exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
 }
 
