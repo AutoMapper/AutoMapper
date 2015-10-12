@@ -55,21 +55,7 @@ namespace AutoMapper.Mappers
                 object destKey = mapper.Map(keyContext);
                 object destValue = mapper.Map(valueContext);
 
-                var method = genericDestDictType.GetMethod("Add");
-
-                try
-                {
-                    method.Invoke(destDictionary, new[] { destKey, destValue });
-                }
-                catch (Exception ex)
-                {
-#if NETFX_CORE
-                    System.Diagnostics.Debug.WriteLine(genericDestDictType.FullName);
-                    throw new Exception(genericDestDictType.FullName, ex);
-#else
-                    throw;
-#endif
-                }
+                genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
 
                 count++;
             }
