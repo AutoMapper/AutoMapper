@@ -44,7 +44,7 @@ namespace AutoMapper
 
         public Type SourceType => _sourceType.Type;
 
-        public Type DestinationType => _destinationType.Type;
+        public Type DestinationType => DestinationTypeOverride ?? _destinationType.Type;
 
         public string Profile { get; set; }
         public Func<ResolutionContext, object> CustomMapper { get; private set; }

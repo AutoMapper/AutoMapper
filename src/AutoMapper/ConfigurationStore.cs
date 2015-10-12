@@ -177,15 +177,6 @@ namespace AutoMapper
 
                 var typePair = new TypePair(typeMap.SourceType, typeMap.DestinationType);
                 _typeMapPlanCache.AddOrUpdate(typePair, typeMap, (_, _2) => typeMap);
-                if (typeMap.DestinationTypeOverride != null)
-                {
-                    var includedDerivedType = new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride);
-                    var derivedMap = FindTypeMapFor(includedDerivedType);
-                    if (derivedMap != null)
-                    {
-                        _typeMapPlanCache.AddOrUpdate(typePair, derivedMap, (_, _2) => derivedMap);
-                    }
-                }
                 foreach (var derivedMap in GetDerivedTypeMaps(typeMap))
                 {
                     _typeMapPlanCache.AddOrUpdate(new TypePair(derivedMap.SourceType, typeMap.DestinationType),

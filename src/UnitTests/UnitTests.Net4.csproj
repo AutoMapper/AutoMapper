@@ -100,6 +100,7 @@
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\ForAllMaps.cs" />
     <Compile Include="Bug\NullableDateTime.cs" />
+    <Compile Include="Bug\MapToInterfaceWithAs.cs" />
     <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
     <Compile Include="Bug\JsonNet.cs" />
     <Compile Include="Bug\TargetISet.cs" />
