@@ -54,7 +54,7 @@ task test {
 
 task test-lite {
 	create_directory "$build_dir\results"
-    exec { & $build_dir\packages\Fixie.1.0.0.29\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.UnitTests.Net4.xml $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll }
+    exec { & $source_dir\packages\Fixie.1.0.0.29\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.UnitTests.Net4.xml $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll }
 }
 
 task dist {
