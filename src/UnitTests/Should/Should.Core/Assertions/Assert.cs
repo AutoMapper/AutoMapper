@@ -6,6 +6,8 @@ using Should.Core.Exceptions;
 
 namespace Should.Core.Assertions
 {
+    using AutoMapper.Internal;
+
     /// <summary>
     /// Contains various static methods that are used to verify that conditions are met during the
     /// process of running tests.

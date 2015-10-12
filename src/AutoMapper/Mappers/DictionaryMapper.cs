@@ -1,11 +1,11 @@
 namespace AutoMapper.Mappers
 {
+    using Internal;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Internal;
 
     // So IEnumerable<T> inherits IEnumerable
     // but IDictionary<TKey, TValue> DOES NOT inherit IDictionary
@@ -55,7 +55,21 @@ namespace AutoMapper.Mappers
                 object destKey = mapper.Map(keyContext);
                 object destValue = mapper.Map(valueContext);
 
-                genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
+                var method = genericDestDictType.GetMethod("Add");
+
+                try
+                {
+                    method.Invoke(destDictionary, new[] { destKey, destValue });
+                }
+                catch (Exception ex)
+                {
+#if NETFX_CORE
+                    System.Diagnostics.Debug.WriteLine(genericDestDictType.FullName);
+                    throw new Exception(genericDestDictType.FullName, ex);
+#else
+                    throw;
+#endif
+                }
 
                 count++;
             }

@@ -8,6 +8,8 @@ using Should;
 
 namespace AutoMapper.UnitTests
 {
+    using Internal;
+
     public delegate void ThrowingAction();
 
 	public static class AssertionExtensions
