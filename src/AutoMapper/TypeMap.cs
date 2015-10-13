@@ -56,7 +56,7 @@ namespace AutoMapper
 
         public bool ShouldCheck()
         {
-            return (CustomMapper == null && CustomProjection == null && _destinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(SourceType);
+            return CustomMapper == null && CustomProjection == null && _destinationTypeOverride == null && !FeatureDetector.IsIDataRecordType(SourceType);
         }
 
         public Func<ResolutionContext, object> CustomMapper { get; private set; }
