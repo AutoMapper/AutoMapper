@@ -41,5 +41,15 @@ namespace AutoMapper.Internal
 
             return value;
         }
+
+        public static void Register<TFactoryInterface, TFactoryClass>() where TFactoryClass : TFactoryInterface, new()
+        {
+            var factoryType = typeof(TFactoryInterface);
+            if(!_factories.ContainsKey(factoryType))
+            {
+                throw new ArgumentOutOfRangeException(nameof(TFactoryInterface), "Unknown factory type : " + factoryType);
+            }
+            _factories[factoryType] = () => new TFactoryClass();
+        }
     }
 }
