@@ -201,9 +201,10 @@ namespace AutoMapper
             return _includedDerivedTypes.Contains(new TypePair(derivedSourceType, derivedDestinationType));
         }
 
-        public bool HasDerivedTypesToInclude()
+        public bool IsRelatedTo(TypePair typePair)
         {
-            return _includedDerivedTypes.Any();
+            return _includedDerivedTypes.Any() && SourceType.IsAssignableFrom(typePair.SourceType) && 
+                        DestinationType != typePair.DestinationType && DestinationType.IsAssignableFrom(typePair.DestinationType);
         }
 
         public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
