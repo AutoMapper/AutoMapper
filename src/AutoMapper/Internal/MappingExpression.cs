@@ -46,11 +46,6 @@ namespace AutoMapper.Internal
             TypeMap.UseCustomMapper(converter.Convert);
         }
 
-        public void As(Type typeOverride)
-        {
-            TypeMap.DestinationTypeOverride = typeOverride;
-        }
-
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions)
         {
             return (IMappingExpression) base.ForMember(name, c => memberOptions((IMemberConfigurationExpression)c));
@@ -543,9 +538,14 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
             memberOptions(this);
         }
 
+        public void As(Type typeOverride)
+        {
+            TypeMap.As(typeOverride);
+        }
+
         public void As<T>()
         {
-            TypeMap.DestinationTypeOverride = typeof(T);
+            As(typeof(T));
         }
 
         public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)

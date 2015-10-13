@@ -51,8 +51,8 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var orderDto = Mapper.Map<Order, OrderDTO>(order);
 
             var customerDto = (CustomerDTO)orderDto.Customer;
-            "A".ShouldEqual(customerDto.Name);
-            1.ShouldEqual(customerDto.Id);
+            customerDto.Name.ShouldEqual("A");
+            customerDto.Id.ShouldEqual(1);
 
         }
 
