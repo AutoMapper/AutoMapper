@@ -376,8 +376,7 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(ResolutionResult resolutionResult, Type destinationType)
         {
-            return ResolveTypeMap(resolutionResult.Value, null, resolutionResult.Type, destinationType) ??
-                   ResolveTypeMap(resolutionResult.Value, null, resolutionResult.MemberType, destinationType);
+            return ResolveTypeMap(resolutionResult.Type, destinationType) ?? ResolveTypeMap(resolutionResult.MemberType, destinationType);
         }
 
         public TypeMap FindClosedGenericTypeMapFor(ResolutionContext context)
@@ -431,9 +430,6 @@ namespace AutoMapper
         private IEnumerable<Type> GetAllTypes(Type type)
         {
             yield return type;
-
-            if (type.IsValueType() && !type.IsNullableType())
-                yield return typeof (Nullable<>).MakeGenericType(type);
 
             Type baseType = type.BaseType();
             while (baseType != null)
