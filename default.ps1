@@ -62,7 +62,7 @@ task dist {
 	create_directory $dist_dir
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\net45" "$dist_dir\net45"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\net40" "$dist_dir\net40"
-	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10" "$dist_dir\Portable"
+	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\portable-net45+dnxcore50+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10" "$dist_dir\Portable"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\sl50" "$dist_dir\sl50"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\wp80" "$dist_dir\wp80"
 	copy_files "$source_dir\artifacts\bin\AutoMapper\$config\wpa81" "$dist_dir\wpa81"

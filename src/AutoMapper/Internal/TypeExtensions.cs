@@ -2,7 +2,7 @@
 using ms=System.Reflection.TypeExtensions;
 #endif
 
-namespace System.Reflection
+namespace AutoMapper.Internal
 {
     using System;
     using System.Collections.Generic;
@@ -298,7 +298,7 @@ namespace System.Reflection
 
         public static MethodInfo GetMethod(this Type type, string name)
         {
-            return type.GetRuntimeMethod(name, new Type[0]);
+            return type.GetRuntimeMethods().FirstOrDefault(mi => mi.Name == name);
         }
 
         public static MethodInfo GetMethod(this Type type, string name, Type[] parameterTypes)

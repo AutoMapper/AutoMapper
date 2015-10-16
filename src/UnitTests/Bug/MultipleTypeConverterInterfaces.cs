@@ -45,8 +45,12 @@ namespace AutoMapper.UnitTests.Bug
 
 			protected override void Establish_context()
 			{
-				Mapper.CreateMap(typeof(SourceFoo), typeof(DestinationFoo)).ConvertUsing(typeof(DualConverter));
-				Mapper.CreateMap(typeof(SourceBar), typeof(DestinationBar)).ConvertUsing(typeof(DualConverter));
+				Mapper.Initialize(cfg =>
+				{
+                    cfg.CreateMap(typeof(SourceFoo), typeof(DestinationFoo)).ConvertUsing(typeof(DualConverter));
+				    cfg.CreateMap(typeof (SourceBar), typeof (DestinationBar)).ConvertUsing(typeof (DualConverter));
+				});
+
 			}
 
 			protected override void Because_of()

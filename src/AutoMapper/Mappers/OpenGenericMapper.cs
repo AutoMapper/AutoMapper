@@ -1,6 +1,7 @@
 ﻿namespace AutoMapper.Mappers
 {
     using System.Reflection;
+    using Internal;
 
     public class OpenGenericMapper : IObjectMapper
     {
