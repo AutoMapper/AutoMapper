@@ -287,9 +287,14 @@ namespace AutoMapper
                 throw new InvalidOperationException(message);
             }
 
-            var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
-
             var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
+            var customProjection = typeMap.CustomProjection;
+            if(customProjection != null)
+            {
+                return parameterReplacer.Visit(customProjection.Body);
+            }
+
+            var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
             var visitor = new NewFinderVisitor();
             var constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
             visitor.Visit(parameterReplacer.Visit(constructorExpression));
