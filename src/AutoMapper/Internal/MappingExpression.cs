@@ -4,7 +4,6 @@ namespace AutoMapper.Internal
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using TypeInfo = AutoMapper.TypeInfo;
 
     public class MappingExpression : MappingExpression<object, object>, IMappingExpression, IMemberConfigurationExpression
     {
@@ -221,7 +220,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var typeInfo = new TypeInfo(TypeMap.DestinationType, _configurationContainer.ShouldMapProperty, _configurationContainer.ShouldMapField);
+            var typeInfo = new TypeDetails(TypeMap.DestinationType, _configurationContainer.ShouldMapProperty, _configurationContainer.ShouldMapField);
 
             typeInfo.PublicWriteAccessors.Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }

@@ -192,6 +192,8 @@
     <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
     <Compile Include="Mappers\CustomMapperTests.cs" />
+    <Compile Include="Mappers\StringDictionaryMapperTests.cs" />
+    <Compile Include="Mappers\DynamicMapperTests.cs" />
     <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
     <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
     <Compile Include="Mappers\TypeHelperTests.cs">

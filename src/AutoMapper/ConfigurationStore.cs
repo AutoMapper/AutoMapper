@@ -48,6 +48,11 @@ namespace AutoMapper
             ForAllMaps(DefaultProfileName, configuration);
         }
 
+        public TypeDetails GetTypeInfo(Type type)
+        {
+            return _typeMapFactory.GetTypeInfo(type, GetProfile(DefaultProfileName));
+        }
+
         internal void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration)
         {
             foreach(var typeMap in _userDefinedTypeMaps.Values.Where(tm => tm.Profile == profileName))
@@ -484,7 +489,7 @@ namespace AutoMapper
 
         private IMappingExpression<TSource, TDestination> Ignore<TSource, TDestination>(IMappingExpression<TSource, TDestination> mappingExp, Type destinationType)
         {
-            var destInfo = new TypeInfo(destinationType, ShouldMapProperty, ShouldMapField);
+            var destInfo = new TypeDetails(destinationType, ShouldMapProperty, ShouldMapField);
             foreach(var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);

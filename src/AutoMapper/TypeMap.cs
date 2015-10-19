@@ -17,7 +17,7 @@ namespace AutoMapper
     {
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
-        private readonly TypeInfo _destinationType;
+        private readonly TypeDetails _destinationType;
         private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
 
@@ -26,13 +26,13 @@ namespace AutoMapper
 
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
-        private readonly TypeInfo _sourceType;
+        private readonly TypeDetails _sourceType;
         private bool _sealed;
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
         private IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
-        public TypeMap(TypeInfo sourceType, TypeInfo destinationType, MemberList memberList)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;

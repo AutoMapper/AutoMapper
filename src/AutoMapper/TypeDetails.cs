@@ -12,15 +12,19 @@ namespace AutoMapper
     /// Contains cached reflection information for easy retrieval
     /// </summary>
     [DebuggerDisplay("{Type}")]
-    public class TypeInfo
+    public class TypeDetails
     {
 
-        public TypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField)
+        public TypeDetails(Type type)
+            : this(type, _ => true, _ => true, new MethodInfo[0])
+        {
+        }
+        public TypeDetails(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField)
             : this(type, shouldMapProperty, shouldMapField, new MethodInfo[0])
         {
         }
 
-        public TypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+        public TypeDetails(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
             Type = type;
             var membersToMap = MembersToMap(shouldMapProperty, shouldMapField);
