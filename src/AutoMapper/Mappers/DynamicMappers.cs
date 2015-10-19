@@ -69,7 +69,7 @@ namespace AutoMapper.Mappers
 
         protected override IEnumerable<MemberInfo> MembersToMap(object source, object destination)
         {
-            return destination.GetType().GetWritableAccesors();
+            return new TypeDetails(destination.GetType()).PublicWriteAccessors;
         }
 
         protected override object GetSourceMember(MemberInfo member, object target)
@@ -92,7 +92,7 @@ namespace AutoMapper.Mappers
 
         protected override IEnumerable<MemberInfo> MembersToMap(object source, object destination)
         {
-            return source.GetType().GetReadableAccesors();
+            return new TypeDetails(source.GetType()).PublicReadAccessors;
         }
 
         protected override object GetSourceMember(MemberInfo member, object target)

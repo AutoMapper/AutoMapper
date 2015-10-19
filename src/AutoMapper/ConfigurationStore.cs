@@ -48,7 +48,7 @@ namespace AutoMapper
             ForAllMaps(DefaultProfileName, configuration);
         }
 
-        public TypeInfo GetTypeInfo(Type type)
+        public TypeDetails GetTypeInfo(Type type)
         {
             return _typeMapFactory.GetTypeInfo(type, GetProfile(DefaultProfileName));
         }
@@ -489,7 +489,7 @@ namespace AutoMapper
 
         private IMappingExpression<TSource, TDestination> Ignore<TSource, TDestination>(IMappingExpression<TSource, TDestination> mappingExp, Type destinationType)
         {
-            var destInfo = new TypeInfo(destinationType, ShouldMapProperty, ShouldMapField);
+            var destInfo = new TypeDetails(destinationType, ShouldMapProperty, ShouldMapField);
             foreach(var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);

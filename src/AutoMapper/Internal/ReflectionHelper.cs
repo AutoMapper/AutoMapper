@@ -25,22 +25,6 @@ namespace AutoMapper.Internal
             return typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
         }
 
-        public static AutoMapper.TypeInfo GetTypeInfo(this Type type)
-        {
-            var store = (ConfigurationStore)Mapper.Configuration;
-            return store.GetTypeInfo(type);
-        }
-
-        public static IEnumerable<MemberInfo> GetWritableAccesors(this Type type)
-        {
-            return type.GetTypeInfo().PublicWriteAccessors;
-        }
-
-        public static IEnumerable<MemberInfo> GetReadableAccesors(this Type type)
-        {
-            return type.GetTypeInfo().PublicReadAccessors;
-        }
-
         public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
         {
             var property = propertyOrField as PropertyInfo;
