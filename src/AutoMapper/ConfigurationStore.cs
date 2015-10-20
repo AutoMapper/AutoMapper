@@ -177,15 +177,6 @@ namespace AutoMapper
 
                 var typePair = new TypePair(typeMap.SourceType, typeMap.DestinationType);
                 _typeMapPlanCache.AddOrUpdate(typePair, typeMap, (_, _2) => typeMap);
-                if (typeMap.DestinationTypeOverride != null)
-                {
-                    var includedDerivedType = new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride);
-                    var derivedMap = FindTypeMapFor(includedDerivedType);
-                    if (derivedMap != null)
-                    {
-                        _typeMapPlanCache.AddOrUpdate(typePair, derivedMap, (_, _2) => derivedMap);
-                    }
-                }
                 foreach (var derivedMap in GetDerivedTypeMaps(typeMap))
                 {
                     _typeMapPlanCache.AddOrUpdate(new TypePair(derivedMap.SourceType, typeMap.DestinationType),
@@ -422,9 +413,9 @@ namespace AutoMapper
         private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root)
         {
             var includeOverrideTypePairs = 
-                GetAllTypeMaps()
-                    .Where(tm => tm.HasDerivedTypesToInclude() && tm.SourceType.IsAssignableFrom(root.SourceType) && (tm.DestinationTypeOverride ?? tm.DestinationType) != root.DestinationType && tm.DestinationType.IsAssignableFrom(root.DestinationType))
-                    .Select(tm => new TypePair(tm.SourceType,tm.DestinationTypeOverride ?? tm.GetDerivedTypeFor(root.SourceType))).ToList();
+                from tm in _userDefinedTypeMaps.Values
+                where tm.IsRelatedTo(root)
+                select new TypePair(tm.SourceType, tm.GetDerivedTypeFor(root.SourceType));
             var subTypePairs =
                 from sourceType in GetAllTypes(root.SourceType)
                 from destinationType in GetAllTypes(root.DestinationType)
@@ -517,7 +508,7 @@ namespace AutoMapper
             var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
             var badTypeMaps =
                 (from typeMap in maps
-                    where ShouldCheckMap(typeMap)
+                    where typeMap.ShouldCheck()
                     let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
                     where unmappedPropertyNames.Length > 0
                     select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames)
@@ -553,12 +544,6 @@ namespace AutoMapper
             {
                 throw configExceptions[0];
             }
-        }
-
-        private static bool ShouldCheckMap(TypeMap typeMap)
-        {
-            return (typeMap.CustomMapper == null && typeMap.CustomProjection == null &&
-                    typeMap.DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(typeMap.SourceType);
         }
 
         private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)

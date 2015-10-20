@@ -31,6 +31,7 @@ namespace AutoMapper
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
         private IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private Type _destinationTypeOverride;
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList)
         {
@@ -44,9 +45,20 @@ namespace AutoMapper
 
         public Type SourceType => _sourceType.Type;
 
-        public Type DestinationType => _destinationType.Type;
+        public Type DestinationType => _destinationTypeOverride ?? _destinationType.Type;
 
         public string Profile { get; set; }
+
+        internal void As(Type typeOverride)
+        {
+            _destinationTypeOverride = typeOverride;
+        }
+
+        public bool ShouldCheck()
+        {
+            return CustomMapper == null && CustomProjection == null && _destinationTypeOverride == null && !FeatureDetector.IsIDataRecordType(SourceType);
+        }
+
         public Func<ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
@@ -77,8 +89,6 @@ namespace AutoMapper
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
         public List<string> IgnorePropertiesStartingWith { get; set; }
-
-        public Type DestinationTypeOverride { get; set; }
 
         public bool ConstructDestinationUsingServiceLocator { get; set; }
 
@@ -183,7 +193,7 @@ namespace AutoMapper
             // This might need to be fixed for multiple derived source types to different dest types
             var match = _includedDerivedTypes.FirstOrDefault(tp => tp.SourceType == derivedSourceType);
 
-            return DestinationTypeOverride ?? match?.DestinationType ?? DestinationType;
+            return match?.DestinationType ?? DestinationType;
         }
 
         public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
@@ -191,9 +201,10 @@ namespace AutoMapper
             return _includedDerivedTypes.Contains(new TypePair(derivedSourceType, derivedDestinationType));
         }
 
-        public bool HasDerivedTypesToInclude()
+        public bool IsRelatedTo(TypePair typePair)
         {
-            return _includedDerivedTypes.Any() || DestinationTypeOverride != null;
+            return _includedDerivedTypes.Any() && SourceType.IsAssignableFrom(typePair.SourceType) && 
+                        DestinationType != typePair.DestinationType && DestinationType.IsAssignableFrom(typePair.DestinationType);
         }
 
         public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
@@ -413,7 +424,7 @@ namespace AutoMapper
             }
             else
             {
-                newExpression = Expression.New(DestinationTypeOverride ?? DestinationType);
+                newExpression = Expression.New(DestinationType);
             }
             return Expression.Lambda(newExpression);
         }
