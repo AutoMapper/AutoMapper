@@ -190,6 +190,7 @@
     <Compile Include="Indexers.cs" />
     <Compile Include="InterfaceMapping.cs" />
     <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
+    <Compile Include="Internal\RegisterFactory.cs" />
     <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
     <Compile Include="Mappers\CustomMapperTests.cs" />
