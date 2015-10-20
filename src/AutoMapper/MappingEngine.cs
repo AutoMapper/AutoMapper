@@ -287,12 +287,18 @@ namespace AutoMapper
                 throw new InvalidOperationException(message);
             }
 
+            var parameterReplacer = instanceParameter is ParameterExpression ? new ParameterReplacementVisitor(instanceParameter) : null;
+            var customProjection = typeMap.CustomProjection;
+            if(customProjection != null)
+            {
+                return parameterReplacer == null ? customProjection.Body : parameterReplacer.Visit(customProjection.Body);
+            }
+
             var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
 
             Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
-            if(instanceParameter is ParameterExpression)
+            if(parameterReplacer != null)
             {
-                var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
                 constructorExpression = parameterReplacer.Visit(constructorExpression);
             }
             var visitor = new NewFinderVisitor();
