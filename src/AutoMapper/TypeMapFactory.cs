@@ -10,8 +10,8 @@ namespace AutoMapper
 
     public class TypeMapFactory : ITypeMapFactory
     {
-        private readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
-            = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeInfo>();
+        private readonly Internal.IDictionary<Type, TypeDetails> _typeInfos
+            = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeDetails>();
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options,
             MemberList memberList)
@@ -46,7 +46,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo,
+        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo,
             IMappingOptions options)
         {
             var parameters = new List<ConstructorParameterMap>();
@@ -73,17 +73,17 @@ namespace AutoMapper
             return true;
         }
 
-        private TypeInfo GetTypeInfo(Type type, IMappingOptions mappingOptions)
+        public TypeDetails GetTypeInfo(Type type, IMappingOptions mappingOptions)
         {
             return GetTypeInfo(type, mappingOptions.ShouldMapProperty, mappingOptions.ShouldMapField, mappingOptions.SourceExtensionMethods);
         }
 
-        private TypeInfo GetTypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> extensionMethodsToSearch)
+        private TypeDetails GetTypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> extensionMethodsToSearch)
         {
-            return _typeInfos.GetOrAdd(type, t => new TypeInfo(type, shouldMapProperty, shouldMapField, extensionMethodsToSearch));
+            return _typeInfos.GetOrAdd(type, t => new TypeDetails(type, shouldMapProperty, shouldMapField, extensionMethodsToSearch));
         }
 
-        private bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeInfo sourceType,
+        private bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeDetails sourceType,
             string nameToSearch, IMappingOptions mappingOptions)
         {
             if (string.IsNullOrEmpty(nameToSearch))

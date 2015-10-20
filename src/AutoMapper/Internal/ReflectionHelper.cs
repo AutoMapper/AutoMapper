@@ -1,12 +1,67 @@
 namespace AutoMapper.Internal
 {
     using System;
+    using System.Collections.Generic;
+    using System.Dynamic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
-	public static class ReflectionHelper
+    public static class ReflectionHelper
 	{
+        public static object Map(MemberInfo member, object value)
+        {
+            var memberType = member.GetMemberType();
+            return Mapper.Map(value, value?.GetType() ?? memberType, memberType);
+        }
+
+        public static bool IsDynamic(this object obj)
+        {
+            return obj is IDynamicMetaObjectProvider;
+        }
+
+        public static bool IsDynamic(this Type type)
+        {
+            return typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
+        }
+
+        public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
+        {
+            var property = propertyOrField as PropertyInfo;
+            if(property != null)
+            {
+                property.SetValue(target, value, null);
+                return;
+            }
+            var field = propertyOrField as FieldInfo;
+            if(field != null)
+            {
+                field.SetValue(target, value);
+                return;
+            }
+            throw Expected(propertyOrField);
+        }
+
+        private static ArgumentOutOfRangeException Expected(MemberInfo propertyOrField)
+        {
+            return new ArgumentOutOfRangeException("propertyOrField", "Expected a property or field, not " + propertyOrField);
+        }
+
+        public static object GetMemberValue(this MemberInfo propertyOrField, object target)
+        {
+            var property = propertyOrField as PropertyInfo;
+            if(property != null)
+            {
+                return property.GetValue(target, null);
+            }
+            var field = propertyOrField as FieldInfo;
+            if(field != null)
+            {
+                return field.GetValue(target);
+            }
+            throw Expected(propertyOrField);
+        }
+
         public static MemberInfo GetFieldOrProperty(Type type, string memberName)
         {
             return memberName.Split('.').Aggregate((MemberInfo) null, (property, member) => (property?.GetMemberType() ?? type).GetMember(member).Single());
