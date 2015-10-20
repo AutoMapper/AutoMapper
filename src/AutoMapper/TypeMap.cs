@@ -30,15 +30,19 @@ namespace AutoMapper
         private bool _sealed;
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
-        private IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private Type _destinationTypeOverride;
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
+            Types = new TypePair(sourceType.Type, destinationType.Type);
             Profile = ConfigurationStore.DefaultProfileName;
             ConfiguredMemberList = memberList;
         }
+
+        public TypePair Types { get; }
 
         public ConstructorMap ConstructorMap { get; private set; }
 
@@ -50,29 +54,17 @@ namespace AutoMapper
         public Func<ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
-        public Action<object, object> BeforeMap
-        {
-            get
-            {
-                return (src, dest) =>
+        public Action<object, object> BeforeMap => (src, dest) =>
                 {
                     foreach (var action in _beforeMapActions)
                         action(src, dest);
                 };
-            }
-        }
 
-        public Action<object, object> AfterMap
-        {
-            get
-            {
-                return (src, dest) =>
+        public Action<object, object> AfterMap => (src, dest) =>
                 {
                     foreach (var action in _afterMapActions)
                         action(src, dest);
                 };
-            }
-        }
 
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
