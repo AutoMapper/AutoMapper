@@ -3,7 +3,6 @@ using System.Collections.Generic;
 namespace AutoMapper
 {
     using System;
-    using Impl;
 
     public interface IConfigurationProvider : IConfiguration
     {

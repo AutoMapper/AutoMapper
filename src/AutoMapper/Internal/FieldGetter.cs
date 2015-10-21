@@ -3,7 +3,6 @@ namespace AutoMapper.Internal
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using Impl;
 
     public class FieldGetter : MemberGetter
     {

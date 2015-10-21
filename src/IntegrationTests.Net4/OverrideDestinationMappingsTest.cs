@@ -59,7 +59,8 @@ namespace AutoMapper.IntegrationTests.Net4
 
                 c.CreateMap<ChildEntity, ChildModelBase>()
                     .Include<ChildEntity, ChildModel>()
-                    .ForMember(x => x.SomeValue, x => x.Ignore());
+                    .ForMember(x => x.SomeValue, x => x.Ignore())
+                    .As<ChildModel>();
 
                 c.CreateMap<ChildEntity, ChildModel>();
             });

@@ -173,7 +173,7 @@ namespace AutoMapper
 
         public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
         {
-            Cache.GetOrAdd(typeInfo, ti => getTypeInfoMembers.GetMemberInfos(ti).ToDictionary(mi => mi, mi => mi.GetCustomAttributes(typeof(SourceToDestinationMapperAttribute)).OfType<SourceToDestinationMapperAttribute>()));
+            Cache.GetOrAdd(typeInfo, ti => getTypeInfoMembers.GetMemberInfos(ti).ToDictionary(mi => mi, mi => mi.GetCustomAttributes(typeof(SourceToDestinationMapperAttribute), true).OfType<SourceToDestinationMapperAttribute>()));
 
             return Cache[typeInfo].FirstOrDefault(kp => kp.Value.Any(_ => _.IsMatch(typeInfo, kp.Key, destType, nameToSearch))).Key;
         }

@@ -1,4 +1,4 @@
-namespace AutoMapper.Impl
+namespace AutoMapper
 {
     using System;
     using System.Diagnostics;
