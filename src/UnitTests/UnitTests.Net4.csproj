@@ -100,7 +100,6 @@
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\ForAllMaps.cs" />
     <Compile Include="Bug\NullableDateTime.cs" />
-    <Compile Include="Bug\MapToInterfaceWithAs.cs" />
     <Compile Include="Bug\ProjectUsingTheQueriedEntity.cs" />
     <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
     <Compile Include="Bug\JsonNet.cs" />
@@ -205,8 +204,10 @@
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludeBaseBug.cs" />
     <Compile Include="MappingInheritance\IncludedBaseMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
+    <Compile Include="MappingInheritance\InheritanceWithoutIncludeShouldWork.cs" />
     <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
     <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
     <Compile Include="MappingInheritance\OverrideIgnore.cs" />

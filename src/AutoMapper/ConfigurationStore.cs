@@ -5,7 +5,6 @@ namespace AutoMapper
     using System.Linq;
     using System.Reflection;
     using Configuration;
-    using Impl;
     using Internal;
     using Mappers;
 
@@ -55,7 +54,7 @@ namespace AutoMapper
 
         internal void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration)
         {
-            foreach(var typeMap in _userDefinedTypeMaps.Values.Where(tm => tm.Profile == profileName))
+            foreach (var typeMap in _userDefinedTypeMaps.Values.Where(tm => tm.Profile == profileName))
             {
                 configuration(typeMap, CreateMappingExpression(typeMap, typeMap.DestinationType));
             }
@@ -171,17 +170,30 @@ namespace AutoMapper
 
         public void Seal()
         {
+            var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
+            var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
             foreach (var typeMap in _userDefinedTypeMaps.Values)
             {
                 typeMap.Seal();
 
-                var typePair = new TypePair(typeMap.SourceType, typeMap.DestinationType);
-                _typeMapPlanCache.AddOrUpdate(typePair, typeMap, (_, _2) => typeMap);
-                foreach (var derivedMap in GetDerivedTypeMaps(typeMap))
+                _typeMapPlanCache.AddOrUpdate(typeMap.Types, typeMap, (_, _2) => typeMap);
+                if (typeMap.DestinationTypeOverride != null)
                 {
-                    _typeMapPlanCache.AddOrUpdate(new TypePair(derivedMap.SourceType, typeMap.DestinationType),
-                        derivedMap, (_, _2) => derivedMap);
+                    redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
                 }
+                derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
+            }
+            foreach (var redirectedType in redirectedTypes)
+            {
+                var derivedMap = FindTypeMapFor(redirectedType.Item2);
+                if (derivedMap != null)
+                {
+                    _typeMapPlanCache.AddOrUpdate(redirectedType.Item1, derivedMap, (_, _2) => derivedMap);
+                }
+            }
+            foreach (var derivedMap in derivedMaps)
+            {
+                _typeMapPlanCache.GetOrAdd(derivedMap.Item1, _ => derivedMap.Item2);
             }
         }
 
@@ -220,7 +232,7 @@ namespace AutoMapper
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName,
             MemberList memberList)
         {
-            TypeMap typeMap = CreateTypeMap(typeof (TSource), typeof (TDestination), profileName, memberList);
+            TypeMap typeMap = CreateTypeMap(typeof(TSource), typeof(TDestination), profileName, memberList);
 
             return CreateMappingExpression<TSource, TDestination>(typeMap);
         }
@@ -359,7 +371,7 @@ namespace AutoMapper
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair,
                 _ =>
                     GetRelatedTypePairs(_)
-                        .Select(tp => FindTypeMapFor(tp) ?? _typeMapPlanCache.GetOrDefault(tp))
+                        .Select(tp => _typeMapPlanCache.GetOrDefault(tp) ?? FindTypeMapFor(tp))
                         .FirstOrDefault(tm => tm != null));
 
             return typeMap;
@@ -412,15 +424,11 @@ namespace AutoMapper
 
         private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root)
         {
-            var includeOverrideTypePairs = 
-                from tm in _userDefinedTypeMaps.Values
-                where tm.IsRelatedTo(root)
-                select new TypePair(tm.SourceType, tm.GetDerivedTypeFor(root.SourceType));
             var subTypePairs =
                 from sourceType in GetAllTypes(root.SourceType)
                 from destinationType in GetAllTypes(root.DestinationType)
                 select new TypePair(sourceType, destinationType);
-            return includeOverrideTypePairs.Concat(subTypePairs);
+            return subTypePairs;
         }
 
         private IEnumerable<Type> GetAllTypes(Type type)
@@ -481,14 +489,14 @@ namespace AutoMapper
         private IMappingExpression<TSource, TDestination> Ignore<TSource, TDestination>(IMappingExpression<TSource, TDestination> mappingExp, Type destinationType)
         {
             var destInfo = new TypeDetails(destinationType, ShouldMapProperty, ShouldMapField);
-            foreach(var destProperty in destInfo.PublicWriteAccessors)
+            foreach (var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);
-                if(attrs.Any(x => x is IgnoreMapAttribute))
+                if (attrs.Any(x => x is IgnoreMapAttribute))
                 {
                     mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
                 }
-                if(_globalIgnore.Contains(destProperty.Name))
+                if (_globalIgnore.Contains(destProperty.Name))
                 {
                     mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
                 }
@@ -499,7 +507,7 @@ namespace AutoMapper
         private IMappingExpression CreateMappingExpression(TypeMap typeMap, Type destinationType)
         {
             var mappingExp = new MappingExpression(typeMap, _serviceCtor, this);
-            return (IMappingExpression) Ignore(mappingExp, destinationType);
+            return (IMappingExpression)Ignore(mappingExp, destinationType);
         }
 
         private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
@@ -508,10 +516,10 @@ namespace AutoMapper
             var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
             var badTypeMaps =
                 (from typeMap in maps
-                    where typeMap.ShouldCheck()
-                    let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
-                    where unmappedPropertyNames.Length > 0
-                    select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames)
+                 where typeMap.ShouldCheckForValid()
+                 let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
+                 where unmappedPropertyNames.Length > 0
+                 select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames)
                     ).ToArray();
 
             if (badTypeMaps.Any())
@@ -580,7 +588,7 @@ namespace AutoMapper
                         {
                             var sourceType = lastResolver.MemberType;
                             var destinationType = propertyMap.DestinationProperty.MemberType;
-                            var memberTypeMap = ((IConfigurationProvider) this).ResolveTypeMap(sourceType,
+                            var memberTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceType,
                                 destinationType);
 
                             if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
@@ -598,7 +606,7 @@ namespace AutoMapper
             {
                 Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
                 Type destElementType = TypeHelper.GetElementType(context.DestinationType);
-                TypeMap itemTypeMap = ((IConfigurationProvider) this).ResolveTypeMap(sourceElementType, destElementType);
+                TypeMap itemTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceElementType, destElementType);
 
                 if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
                     return;
