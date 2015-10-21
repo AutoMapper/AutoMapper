@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
+using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
@@ -9,14 +10,32 @@ namespace AutoMapper
 
     public class TypeMapFactory : ITypeMapFactory
     {
-        private readonly Internal.IDictionary<Type, TypeDetails> _typeInfos
+        private static readonly Internal.IDictionary<Type, TypeDetails> _typeInfos
             = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeDetails>();
 
-        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions options,
-            MemberList memberList)
+        public static TypeDetails GetTypeInfo(Type type, IProfileConfiguration profileConfiguration)
+        {
+            TypeDetails typeInfo = _typeInfos.GetOrAdd(type, t => new TypeDetails(type, profileConfiguration.ShouldMapProperty, profileConfiguration.ShouldMapField, profileConfiguration.SourceExtensionMethods));
+
+            return typeInfo;
+        }
+        //internal static ICollection<IChildMemberConfiguration> sourceToDestinationMemberMappers = new Collection<IChildMemberConfiguration>
+        //{
+        //    // Need to do it fixie way for prefix and postfix to work together + not specify match explicitly
+        //    // Have 3 properties for Members, Methods, And External Methods
+        //    // Parent goes to all
+        //    new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")).SetMemberInfo<AllMemberInfo>(),
+        //    //new CustomizedSourceToDestinationMemberMapper().MemberNameMatch().ExtensionNameMatch().ExtensionPrefix("Get").MethodPrefix("Get").MethodNameMatch(),
+        //};
+
+        
+
+        //internal static readonly ICollection<IChildMemberConfiguration> def = sourceToDestinationMemberMappers.ToList();
+
+        public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IProfileConfiguration options, MemberList memberList)
         {
             var sourceTypeInfo = GetTypeInfo(sourceType, options);
-            var destTypeInfo = GetTypeInfo(destinationType, options.ShouldMapProperty, options.ShouldMapField, new MethodInfo[0]);
+            var destTypeInfo = GetTypeInfo(destinationType, options);
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList);
 
@@ -24,7 +43,7 @@ namespace AutoMapper
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (MapDestinationPropertyToSource(members, sourceTypeInfo, destProperty.Name, options))
+                if (MapDestinationPropertyToSource(options, sourceTypeInfo, destProperty.GetType(), destProperty.Name, members))
                 {
                     var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
@@ -45,8 +64,12 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo,
-            IMappingOptions options)
+        private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
+        {
+            return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(options, sourceTypeInfo, destType, destMemberInfo, members));
+        }
+
+        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo, IProfileConfiguration options)
         {
             var parameters = new List<ConstructorParameterMap>();
             var ctorParameters = destCtor.GetParameters();
@@ -58,7 +81,7 @@ namespace AutoMapper
             {
                 var members = new LinkedList<MemberInfo>();
 
-                var canResolve = MapDestinationPropertyToSource(members, sourceTypeInfo, parameter.Name, options);
+                var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, parameter.GetType(), parameter.Name, members);
 
                 var resolvers = members.Select(mi => mi.ToMemberGetter());
 
@@ -80,60 +103,6 @@ namespace AutoMapper
         private TypeDetails GetTypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> extensionMethodsToSearch)
         {
             return _typeInfos.GetOrAdd(type, t => new TypeDetails(type, shouldMapProperty, shouldMapField, extensionMethodsToSearch));
-        }
-
-        private bool MapDestinationPropertyToSource(LinkedList<MemberInfo> resolvers, TypeDetails sourceType,
-            string nameToSearch, IMappingOptions mappingOptions)
-        {
-            if (string.IsNullOrEmpty(nameToSearch))
-                return true;
-
-            var sourceProperties = sourceType.PublicReadAccessors;
-            var sourceNoArgMethods = sourceType.PublicNoArgMethods;
-            var sourceNoArgExtensionMethods = sourceType.PublicNoArgExtensionMethods;
-
-            MemberInfo resolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods,
-                nameToSearch, mappingOptions);
-
-            bool foundMatch = resolver != null;
-
-            if (foundMatch)
-            {
-                resolvers.AddLast(resolver);
-            }
-            else
-            {
-                string[] matches = mappingOptions.DestinationMemberNamingConvention.SplittingExpression
-                    .Matches(nameToSearch)
-                    .Cast<Match>()
-                    .Select(m => m.Value)
-                    .ToArray();
-
-                for (int i = 1; (i <= matches.Length) && (!foundMatch); i++)
-                {
-                    NameSnippet snippet = CreateNameSnippet(matches, i, mappingOptions);
-
-                    var valueResolver = FindTypeMember(sourceProperties, sourceNoArgMethods, sourceNoArgExtensionMethods,
-                        snippet.First,
-                        mappingOptions);
-
-                    if (valueResolver != null)
-                    {
-                        resolvers.AddLast(valueResolver);
-
-                        foundMatch = MapDestinationPropertyToSource(resolvers,
-                            GetTypeInfo(valueResolver.GetMemberType(), mappingOptions),
-                            snippet.Second, mappingOptions);
-
-                        if (!foundMatch)
-                        {
-                            resolvers.RemoveLast();
-                        }
-                    }
-                }
-            }
-
-            return foundMatch;
         }
 
         private static MemberInfo FindTypeMember(IEnumerable<MemberInfo> modelProperties,
@@ -190,37 +159,6 @@ namespace AutoMapper
             {
                 yield return alias.Alias;
             }
-
-            if (memberNameReplacers.Any())
-            {
-                string aliasName = memberName;
-
-                foreach (var nameReplacer in memberNameReplacers)
-                {
-                    aliasName = aliasName.Replace(nameReplacer.OriginalValue, nameReplacer.NewValue);
-                }
-
-                yield return aliasName;
-            }
-
-            foreach (var prefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.Ordinal)))
-            {
-                var withoutPrefix = memberName.Substring(prefix.Length);
-
-                yield return withoutPrefix;
-
-                foreach (
-                    var postfix in postfixes.Where(postfix => withoutPrefix.EndsWith(postfix, StringComparison.Ordinal))
-                    )
-                {
-                    yield return withoutPrefix.Remove(withoutPrefix.Length - postfix.Length);
-                }
-            }
-
-            foreach (var postfix in postfixes.Where(postfix => memberName.EndsWith(postfix, StringComparison.Ordinal)))
-            {
-                yield return memberName.Remove(memberName.Length - postfix.Length);
-            }
         }
 
         private NameSnippet CreateNameSnippet(IEnumerable<string> matches, int i, IMappingOptions mappingOptions)
@@ -228,11 +166,9 @@ namespace AutoMapper
             return new NameSnippet
             {
                 First =
-                    String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter,
-                        matches.Take(i).ToArray()),
+                    String.Join("",matches.Take(i).ToArray()),
                 Second =
-                    String.Join(mappingOptions.SourceMemberNamingConvention.SeparatorCharacter,
-                        matches.Skip(i).ToArray())
+                    String.Join("",matches.Skip(i).ToArray())
             };
         }
 

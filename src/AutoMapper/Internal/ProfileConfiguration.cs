@@ -1,3 +1,5 @@
+using AutoMapper.Mappers;
+
 namespace AutoMapper.Internal
 {
     using System;
@@ -6,58 +8,48 @@ namespace AutoMapper.Internal
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    public class ProfileConfiguration : IProfileConfiguration, IMappingOptions
+    public class ProfileConfiguration : IProfileConfiguration
     {
-        private readonly ISet<string> _prefixes = new HashSet<string>();
-        private readonly ISet<string> _postfixes = new HashSet<string>();
-        private readonly ISet<string> _destinationPrefixes = new HashSet<string>();
-        private readonly ISet<string> _destinationPostfixes = new HashSet<string>();
-        private readonly ISet<AliasedMember> _aliases = new HashSet<AliasedMember>();
-        private readonly ISet<MemberNameReplacer> _memberNameReplacers = new HashSet<MemberNameReplacer>();
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
         public ProfileConfiguration()
         {
-            SourceMemberNamingConvention = new PascalCaseNamingConvention();
-            DestinationMemberNamingConvention = new PascalCaseNamingConvention();
-            RecognizePrefixes("Get");
-            AllowNullDestinationValues = true;
+            _memberConfigurations.Add(new MemberConfiguration());
             ConstructorMappingEnabled = true;
-            IncludeSourceExtensionMethods(typeof (Enumerable).Assembly());
+            IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
             ShouldMapProperty = p => p.IsPublic();
             ShouldMapField = f => f.IsPublic;
         }
 
-        public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+        private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
+        public IEnumerable<IMemberConfiguration> MemberConfigurations => _memberConfigurations;
 
-        public Func<FieldInfo, bool> ShouldMapField { get; set; }
+        private readonly IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+        public IEnumerable<IConditionalObjectMapper> TypeConfigurations => _typeConfigurations;
 
-        public bool AllowNullDestinationValues { get; set; }
-        public bool AllowNullCollections { get; set; }
-        public INamingConvention SourceMemberNamingConvention { get; set; }
-        public INamingConvention DestinationMemberNamingConvention { get; set; }
+        public IMemberConfiguration AddMemberConfiguration()
+        {
+            var condition = new MemberConfiguration();
+            _memberConfigurations.Add(condition);
+            return condition;
+        }
 
-        public IEnumerable<string> Prefixes => _prefixes;
-
-        public IEnumerable<string> Postfixes => _postfixes;
-
-        public IEnumerable<string> DestinationPrefixes => _destinationPrefixes;
-
-        public IEnumerable<string> DestinationPostfixes => _destinationPostfixes;
-
-        public IEnumerable<MemberNameReplacer> MemberNameReplacers => _memberNameReplacers;
-
-        public IEnumerable<AliasedMember> Aliases => _aliases;
+        public IConditionalObjectMapper AddConditionalObjectMapper()
+        {
+            var condition = new ConditionalObjectMapper(ConfigurationStore.DefaultProfileName);
+            _typeConfigurations.Add(condition);
+            return condition;
+        }
+        
 
         public bool ConstructorMappingEnabled { get; set; }
         public bool DataReaderMapperYieldReturnEnabled { get; set; }
-
+        public IMemberConfiguration DefaultMemberConfig { get; }
         public IEnumerable<MethodInfo> SourceExtensionMethods => _sourceExtensionMethods;
 
+        public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
 
-        public bool MapNullSourceValuesAsNull => AllowNullDestinationValues;
-
-        public bool MapNullSourceCollectionsAsNull => AllowNullCollections;
+        public Func<FieldInfo, bool> ShouldMapField { get; set; }
 
         public void IncludeSourceExtensionMethods(Assembly assembly)
         {
@@ -65,55 +57,8 @@ namespace AutoMapper.Internal
             _sourceExtensionMethods.AddRange(assembly.GetTypes()
                 .Where(type => type.IsSealed() && !type.IsGenericType() && !type.IsNested)
                 .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
-                .Where(method => method.IsDefined(typeof (ExtensionAttribute), false))
+                .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
                 .Where(method => method.GetParameters().Length == 1));
-        }
-
-        public void ClearPrefixes()
-        {
-            _prefixes.Clear();
-        }
-
-        public void RecognizePrefixes(params string[] prefixes)
-        {
-            foreach (var prefix in prefixes)
-            {
-                _prefixes.Add(prefix);
-            }
-        }
-
-        public void RecognizePostfixes(params string[] postfixes)
-        {
-            foreach (var postfix in postfixes)
-            {
-                _postfixes.Add(postfix);
-            }
-        }
-
-        public void RecognizeAlias(string original, string alias)
-        {
-            _aliases.Add(new AliasedMember(original, alias));
-        }
-
-        public void ReplaceMemberName(string original, string newValue)
-        {
-            _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
-        }
-
-        public void RecognizeDestinationPrefixes(params string[] prefixes)
-        {
-            foreach (var prefix in prefixes)
-            {
-                _destinationPrefixes.Add(prefix);
-            }
-        }
-
-        public void RecognizeDestinationPostfixes(params string[] postfixes)
-        {
-            foreach (var postfix in postfixes)
-            {
-                _destinationPostfixes.Add(postfix);
-            }
         }
     }
 }

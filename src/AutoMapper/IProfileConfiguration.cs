@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using AutoMapper.Mappers;
+
 namespace AutoMapper
 {
     /// <summary>
@@ -5,14 +10,29 @@ namespace AutoMapper
     /// </summary>
 	public interface IProfileConfiguration
 	{
+        IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
+        IMemberConfiguration AddMemberConfiguration();
+        IEnumerable<IConditionalObjectMapper> TypeConfigurations { get; }
+        IConditionalObjectMapper AddConditionalObjectMapper();
+        bool ConstructorMappingEnabled { get; set; }
+        bool DataReaderMapperYieldReturnEnabled { get; set; }
+        IMemberConfiguration DefaultMemberConfig { get; }
         /// <summary>
-        /// Indicates that null source values should be mapped as null
+        /// Source extension methods included for search
         /// </summary>
-		bool MapNullSourceValuesAsNull { get; }
+        IEnumerable<MethodInfo> SourceExtensionMethods { get; }
+
+        void IncludeSourceExtensionMethods(Assembly assembly);
+        /// <summary>
+        /// Specify which properties should be mapped.
+        /// By default only public properties are mapped.e
+        /// </summary>
+        Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
 
         /// <summary>
-        /// Indicates that null source collections should be mapped as null
+        /// Specify which fields should be mapped.
+        /// By default only public fields are mapped.
         /// </summary>
-		bool MapNullSourceCollectionsAsNull { get; }
-	}
+        Func<FieldInfo, bool> ShouldMapField { get; set; }
+    }
 }

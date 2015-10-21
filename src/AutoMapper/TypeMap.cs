@@ -116,10 +116,11 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
+            Func<PropertyMap, string> getFunc = pm => ConfiguredMemberList == MemberList.Destination ? pm.DestinationProperty.Name : pm.SourceMember.Name;
             var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
-                .Select(pm => pm.DestinationProperty.Name);
+                .Select(getFunc).ToList();
             var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
-                .Select(pm => pm.DestinationProperty.Name);
+                .Select(getFunc).ToList();
 
             IEnumerable<string> properties;
 
@@ -138,7 +139,7 @@ namespace AutoMapper
 
                 var ignoredSourceMembers = _sourceMemberConfigs
                     .Where(smc => smc.IsIgnored())
-                    .Select(pm => pm.SourceMember.Name);
+                    .Select(pm => pm.SourceMember.Name).ToList();
 
                 properties = _sourceType.PublicReadAccessors
                     .Select(p => p.Name)

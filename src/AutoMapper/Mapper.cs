@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace AutoMapper
 {
     using System;

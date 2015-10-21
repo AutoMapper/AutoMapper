@@ -10,6 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
     <AssemblyName>AutoMapper.UnitTests.Net4</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
@@ -167,6 +168,7 @@
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="Constructors.cs" />
     <Compile Include="ContextItems.cs" />
+    <Compile Include="ConvensionTest.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
     <Compile Include="EnumToNullableEnum.cs" />
@@ -216,6 +218,7 @@
     <Compile Include="MappingInheritance\ShouldInheritBeforeAndAfterMap.cs" />
     <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
     <Compile Include="MappingOrder.cs" />
+    <Compile Include="MapToAttributeTest.cs" />
     <Compile Include="MaxDepthTests.cs" />
     <Compile Include="MemberNameReplacers.cs" />
     <Compile Include="MemberResolution.cs" />

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,8 +14,21 @@ namespace AutoMapper.UnitTests.Tests
 
     public class StubNamingConvention : INamingConvention
     {
+        private readonly Func<Match, string> _replaceFunc;
+
+        public StubNamingConvention(Func<Match, string> replaceFunc)
+        {
+            _replaceFunc = replaceFunc;
+            SeparatorCharacter = "";
+        }
+
         public Regex SplittingExpression { get; set; }
         public string SeparatorCharacter { get; set; }
+
+        public string ReplaceValue(Match match)
+        {
+            return _replaceFunc(match);
+        }
     }
 
     public class StubMappingOptions : IMappingOptions
@@ -140,9 +154,9 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_map_properties_with_same_name()
         {
-            var mappingOptions = new StubMappingOptions();
-            mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
-            mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            var mappingOptions = new Profile("Test");
+            //mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
+            //mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 
             var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions, MemberList.Destination);
 
@@ -156,9 +170,8 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private StubMappingOptions _mappingOptions;
-
-
+        private IProfileConfiguration _mappingOptions;
+        
         private class Source
         {
             public SubSource some__source { get; set; }
@@ -176,12 +189,14 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention();
-            namingConvention.SeparatorCharacter = "__";
+            var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)")};
 
-            _mappingOptions = new StubMappingOptions();
-            _mappingOptions.SourceMemberNamingConvention = namingConvention;
-            _mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            _mappingOptions = new Profile("Test");
+            _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            {
+                _.SourceMemberNamingConvention = namingConvention;
+                _.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            });
 
             _factory = new TypeMapFactory();
 
@@ -203,7 +218,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private StubMappingOptions _mappingOptions;
+        private IProfileConfiguration _mappingOptions;
 
         private class Source
         {
@@ -222,13 +237,14 @@ namespace AutoMapper.UnitTests.Tests
 
         protected override void Establish_context()
         {
-            var namingConvention = new StubNamingConvention();
+            var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
 
-            namingConvention.SplittingExpression = new Regex(@"[\p{Ll}0-9]*(?=_?)");
-
-            _mappingOptions = new StubMappingOptions();
-            _mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
-            _mappingOptions.DestinationMemberNamingConvention = namingConvention;
+            _mappingOptions = new Profile("Test");
+            _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            {
+                _.SourceMemberNamingConvention = new PascalCaseNamingConvention();
+                _.DestinationMemberNamingConvention = namingConvention;
+            });
 
             _factory = new TypeMapFactory();
         }
@@ -271,16 +287,16 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_map_properties_with_different_names()
         {
-            var mappingOptions = new StubMappingOptions();
-            mappingOptions.ReplaceMemberName("Ä", "A");
-            mappingOptions.ReplaceMemberName("í", "i");
-            mappingOptions.ReplaceMemberName("Airlina", "Airline");
+            Mapper.Configuration.ReplaceMemberName("A", "Ä");
+            Mapper.Configuration.ReplaceMemberName("i", "í");
+            Mapper.Configuration.ReplaceMemberName("Airline", "Airlina");
             
-            var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions, MemberList.Destination);
+            Mapper.CreateMap<Source,Destination>();
 
-            var propertyMaps = typeMap.GetPropertyMaps();
-
-            propertyMaps.Count().ShouldEqual(3);
+            var dest = Mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
+            dest.Aviator.ShouldEqual(3);
+            dest.SubAirlineFlight.ShouldEqual(4);
+            dest.Value.ShouldEqual(5);
         }
     }
 }

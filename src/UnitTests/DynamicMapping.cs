@@ -161,7 +161,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_result = Mapper.DynamicMap<IDestination>(new {value = 5});
+				_result = Mapper.DynamicMap<IDestination>(new {Value = 5});
 			}
 
 			[Fact]

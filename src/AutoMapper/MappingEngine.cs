@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AutoMapper
 {
     using System;
@@ -35,8 +37,8 @@ namespace AutoMapper
 
 
         private bool _disposed;
-        private readonly IObjectMapper[] _mappers;
-        private readonly Internal.IDictionary<TypePair, IObjectMapper> _objectMapperCache;
+        private readonly IEnumerable<IObjectMapper> _mappers;
+        internal readonly Internal.IDictionary<TypePair, IObjectMapper> _objectMapperCache;
         private readonly Internal.IDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
 
         private readonly Func<Type, object> _serviceCtor;
@@ -408,7 +410,7 @@ namespace AutoMapper
                 var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
                 Func<TypePair, IObjectMapper> missFunc =
-                    tp => _mappers.FirstOrDefault(mapper => mapper.IsMatch(context));
+                    tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
 
                 IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
                 if (mapperToUse == null || (context.Options.CreateMissingTypeMaps && !mapperToUse.IsMatch(context)))
@@ -465,7 +467,7 @@ namespace AutoMapper
             if (destinationType.IsInterface())
                 destinationType = ProxyGeneratorFactory.Create().GetProxyType(destinationType);
 
-            return !ConfigurationProvider.MapNullSourceValuesAsNull
+            return !ConfigurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(destinationType)
                 : ObjectCreator.CreateObject(destinationType);
         }
@@ -477,18 +479,18 @@ namespace AutoMapper
 
             var typeMap = context.GetContextTypeMap();
             if (typeMap != null)
-                return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceValuesAsNull;
+				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).AllowNullDestinationValues;
 
-            return ConfigurationProvider.MapNullSourceValuesAsNull;
+			return ConfigurationProvider.AllowNullDestinationValues;
         }
 
         bool IMappingEngineRunner.ShouldMapSourceCollectionAsNull(ResolutionContext context)
         {
             var typeMap = context.GetContextTypeMap();
             if (typeMap != null)
-                return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).MapNullSourceCollectionsAsNull;
+				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).AllowNullCollections;
 
-            return ConfigurationProvider.MapNullSourceCollectionsAsNull;
+            return ConfigurationProvider.AllowNullCollections;
         }
 
         private void ClearTypeMap(object sender, TypeMapCreatedEventArgs e)

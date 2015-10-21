@@ -4,7 +4,6 @@ namespace AutoMapper
 
     public interface ITypeMapFactory
     {
-        TypeDetails GetTypeInfo(Type type, IMappingOptions mappingOptions);
-        TypeMap CreateTypeMap(Type sourceType, Type destinationType, IMappingOptions mappingOptions, MemberList memberList);
+        TypeMap CreateTypeMap(Type sourceType, Type destinationType, IProfileConfiguration mappingOptions, MemberList memberList);
     }
 }
