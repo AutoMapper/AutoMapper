@@ -1,7 +1,6 @@
 namespace AutoMapper
 {
     using System;
-    using Impl;
 
     public interface IConfigurationProvider : IProfileConfiguration
     {

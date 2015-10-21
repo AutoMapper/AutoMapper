@@ -6,7 +6,6 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Impl;
     using Internal;
 
     /// <summary>
@@ -361,6 +360,12 @@ namespace AutoMapper
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
 
+        public bool ShouldCheckForValid()
+        {
+            return (CustomMapper == null && CustomProjection == null &&
+                    DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(SourceType);
+        }
+
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {
             foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
@@ -409,5 +414,6 @@ namespace AutoMapper
             }
             return Expression.Lambda(newExpression);
         }
+
     }
 }

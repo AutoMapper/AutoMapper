@@ -5,7 +5,6 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Impl;
     using Internal;
     using Mappers;
     using QueryableExtensions;
