@@ -207,6 +207,7 @@
     <Compile Include="MappingInheritance\IncludeBaseBug.cs" />
     <Compile Include="MappingInheritance\IncludedBaseMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
+    <Compile Include="MappingInheritance\InheritanceWithoutIncludeShouldWork.cs" />
     <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
     <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
     <Compile Include="MappingInheritance\OverrideIgnore.cs" />
