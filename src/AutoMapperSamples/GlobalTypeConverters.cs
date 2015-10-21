@@ -46,7 +46,7 @@ namespace AutoMapperSamples
 			[Test]
 			public void Example()
 			{
-				Mapper.CreateMap<string, int>().ConvertUsing(Convert.ToInt32);
+				Mapper.CreateMap<string, int>().ConvertUsing((string s) => Convert.ToInt32(s));
 				Mapper.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
 				Mapper.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
 				Mapper.CreateMap<Source, Destination>();

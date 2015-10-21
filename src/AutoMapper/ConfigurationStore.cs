@@ -48,6 +48,11 @@ namespace AutoMapper
             ForAllMaps(DefaultProfileName, configuration);
         }
 
+        public TypeDetails GetTypeInfo(Type type)
+        {
+            return TypeMapFactory.GetTypeInfo(type, GetProfile(DefaultProfileName));
+        }
+
         internal void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration)
         {
             foreach(var typeMap in _userDefinedTypeMaps.Values.Where(tm => tm.Profile == profileName))
@@ -182,15 +187,6 @@ namespace AutoMapper
 
                 var typePair = new TypePair(typeMap.SourceType, typeMap.DestinationType);
                 _typeMapPlanCache.AddOrUpdate(typePair, typeMap, (_, _2) => typeMap);
-                if (typeMap.DestinationTypeOverride != null)
-                {
-                    var includedDerivedType = new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride);
-                    var derivedMap = FindTypeMapFor(includedDerivedType);
-                    if (derivedMap != null)
-                    {
-                        _typeMapPlanCache.AddOrUpdate(typePair, derivedMap, (_, _2) => derivedMap);
-                    }
-                }
                 foreach (var derivedMap in GetDerivedTypeMaps(typeMap))
                 {
                     _typeMapPlanCache.AddOrUpdate(new TypePair(derivedMap.SourceType, typeMap.DestinationType),
@@ -386,8 +382,7 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(ResolutionResult resolutionResult, Type destinationType)
         {
-            return ResolveTypeMap(resolutionResult.Value, null, resolutionResult.Type, destinationType) ??
-                   ResolveTypeMap(resolutionResult.Value, null, resolutionResult.MemberType, destinationType);
+            return ResolveTypeMap(resolutionResult.Type, destinationType) ?? ResolveTypeMap(resolutionResult.MemberType, destinationType);
         }
 
         public TypeMap FindClosedGenericTypeMapFor(ResolutionContext context)
@@ -427,18 +422,20 @@ namespace AutoMapper
 
         private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root)
         {
-            return
+            var includeOverrideTypePairs = 
+                from tm in _userDefinedTypeMaps.Values
+                where tm.IsRelatedTo(root)
+                select new TypePair(tm.SourceType, tm.GetDerivedTypeFor(root.SourceType));
+            var subTypePairs =
                 from sourceType in GetAllTypes(root.SourceType)
                 from destinationType in GetAllTypes(root.DestinationType)
                 select new TypePair(sourceType, destinationType);
+            return includeOverrideTypePairs.Concat(subTypePairs);
         }
 
         private IEnumerable<Type> GetAllTypes(Type type)
         {
             yield return type;
-
-            if (type.IsValueType() && !type.IsNullableType())
-                yield return typeof (Nullable<>).MakeGenericType(type);
 
             Type baseType = type.BaseType();
             while (baseType != null)
@@ -493,7 +490,7 @@ namespace AutoMapper
 
         private IMappingExpression<TSource, TDestination> Ignore<TSource, TDestination>(IMappingExpression<TSource, TDestination> mappingExp, Type destinationType)
         {
-            var destInfo = new TypeInfo(destinationType, ShouldMapProperty, ShouldMapField);
+            var destInfo = new TypeDetails(destinationType, ShouldMapProperty, ShouldMapField);
             foreach(var destProperty in destInfo.PublicWriteAccessors)
             {
                 var attrs = destProperty.GetCustomAttributes(true);
@@ -521,7 +518,7 @@ namespace AutoMapper
             var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
             var badTypeMaps =
                 (from typeMap in maps
-                    where ShouldCheckMap(typeMap)
+                    where typeMap.ShouldCheck()
                     let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
                     where unmappedPropertyNames.Length > 0
                     select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames)
@@ -557,12 +554,6 @@ namespace AutoMapper
             {
                 throw configExceptions[0];
             }
-        }
-
-        private static bool ShouldCheckMap(TypeMap typeMap)
-        {
-            return (typeMap.CustomMapper == null && typeMap.CustomProjection == null &&
-                    typeMap.DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(typeMap.SourceType);
         }
 
         private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)

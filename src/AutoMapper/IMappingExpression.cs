@@ -49,7 +49,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="ctor">Callback to create the destination type given the source object</param>
         /// <returns>Itself</returns>
-        IMappingExpression ConstructProjectionUsing(Expression<Func<object, object>> ctor);
+        IMappingExpression ConstructProjectionUsing(LambdaExpression ctor);
 
         /// <summary>
         /// Supply a custom instantiation function for the destination type, based on the entire resolution context
@@ -104,7 +104,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="typeConverterType">Type converter type</param>
         void ConvertUsing(Type typeConverterType);
-
+        
         /// <summary>
         /// Override the destination type mapping for looking up configuration and instantiation
         /// </summary>
@@ -271,6 +271,18 @@ namespace AutoMapper
         /// </summary>
         /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
         void ConvertUsing(Func<TSource, TDestination> mappingFunction);
+
+        /// <summary>
+        /// Skip member mapping and use a custom function to convert to the destination type
+        /// </summary>
+        /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
+        void ConvertUsing(Func<ResolutionContext, TDestination> mappingFunction);
+
+        /// <summary>
+        /// Skip member mapping and use a custom function to convert to the destination type
+        /// </summary>
+        /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
+        void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction);
 
         /// <summary>
         /// Skip member mapping and use a custom type converter instance to convert to the destination type

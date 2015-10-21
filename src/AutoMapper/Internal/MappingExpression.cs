@@ -4,7 +4,6 @@ namespace AutoMapper.Internal
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using TypeInfo = AutoMapper.TypeInfo;
 
     public class MappingExpression : MappingExpression<object, object>, IMappingExpression, IMemberConfigurationExpression
     {
@@ -45,11 +44,6 @@ namespace AutoMapper.Internal
             var converter = new DeferredInstantiatedConverter(convertMethodType, BuildCtor<object>(typeConverterType));
 
             TypeMap.UseCustomMapper(converter.Convert);
-        }
-
-        public void As(Type typeOverride)
-        {
-            TypeMap.DestinationTypeOverride = typeOverride;
         }
 
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions)
@@ -136,9 +130,11 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
             return (IMappingExpression)base.ConstructUsing(ctor);
         }
 
-        public new IMappingExpression ConstructProjectionUsing(Expression<Func<object, object>> ctor)
+        public IMappingExpression ConstructProjectionUsing(LambdaExpression ctor)
         {
-            return (IMappingExpression)base.ConstructProjectionUsing(ctor);
+            var func = ctor.Compile();
+            TypeMap.ConstructExpression = ctor;
+            return ConstructUsing(ctxt => func.DynamicInvoke(ctxt.SourceValue));
         }
 
         public new IMappingExpression MaxDepth(int depth)
@@ -219,7 +215,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var typeInfo = new TypeInfo(TypeMap.DestinationType, _configurationContainer.ShouldMapProperty, _configurationContainer.ShouldMapField);
+            var typeInfo = new TypeDetails(TypeMap.DestinationType, _configurationContainer.ShouldMapProperty, _configurationContainer.ShouldMapField);
 
             typeInfo.PublicWriteAccessors.Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }
@@ -324,6 +320,11 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         public void ResolveUsing(Func<ResolutionResult, object> resolver)
         {
             _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver));
+        }
+
+        public void ResolveUsing(Func<ResolutionResult, TSource, object> resolver)
+        {
+            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver(r, (TSource)r.Value)));
         }
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
@@ -537,9 +538,14 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
             memberOptions(this);
         }
 
+        public void As(Type typeOverride)
+        {
+            TypeMap.As(typeOverride);
+        }
+
         public void As<T>()
         {
-            TypeMap.DestinationTypeOverride = typeof(T);
+            As(typeof(T));
         }
 
         public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)

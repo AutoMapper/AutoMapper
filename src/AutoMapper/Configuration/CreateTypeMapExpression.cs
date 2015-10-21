@@ -140,7 +140,7 @@
             return this;
         }
 
-        public IMappingExpression ConstructProjectionUsing(Expression<Func<object, object>> ctor)
+        public IMappingExpression ConstructProjectionUsing(LambdaExpression ctor)
         {
             _actions.Add(me => me.ConstructProjectionUsing(ctor));
             return this;

@@ -11,12 +11,12 @@ using System.Collections.ObjectModel;
 
     public class TypeMapFactory : ITypeMapFactory
     {
-        private static readonly Internal.IDictionary<Type, TypeInfo> _typeInfos
-            = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeInfo>();
+        private static readonly Internal.IDictionary<Type, TypeDetails> _typeInfos
+            = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeDetails>();
 
-        internal static TypeInfo GetTypeInfo(Type type, IProfileConfiguration profileConfiguration)
+        public static TypeDetails GetTypeInfo(Type type, IProfileConfiguration profileConfiguration)
         {
-            TypeInfo typeInfo = _typeInfos.GetOrAdd(type, t => new TypeInfo(type, profileConfiguration.ShouldMapProperty, profileConfiguration.ShouldMapField, profileConfiguration.SourceExtensionMethods));
+            TypeDetails typeInfo = _typeInfos.GetOrAdd(type, t => new TypeDetails(type, profileConfiguration.ShouldMapProperty, profileConfiguration.ShouldMapField, profileConfiguration.SourceExtensionMethods));
 
             return typeInfo;
         }
@@ -65,12 +65,12 @@ using System.Collections.ObjectModel;
             return typeMap;
         }
 
-        private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeInfo sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
+        private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
         {
             return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(options, sourceTypeInfo, destType, destMemberInfo, members));
         }
 
-        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeInfo sourceTypeInfo, IProfileConfiguration options)
+        private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo, IProfileConfiguration options)
         {
             var parameters = new List<ConstructorParameterMap>();
             var ctorParameters = destCtor.GetParameters();
@@ -96,82 +96,70 @@ using System.Collections.ObjectModel;
             return true;
         }
 
+        public TypeDetails GetTypeInfo(Type type, IMappingOptions mappingOptions)
+        {
+            return GetTypeInfo(type, mappingOptions.ShouldMapProperty, mappingOptions.ShouldMapField, mappingOptions.SourceExtensionMethods);
         }
-    public class CustomizedSourceToDestinationMemberMapper
+
+        private TypeDetails GetTypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> extensionMethodsToSearch)
         {
-        private readonly ICollection<Func<TypeInfo, string, IMappingOptions, MemberInfo>> _convensions = new Collection<Func<TypeInfo, string, IMappingOptions, MemberInfo>>();
+            return _typeInfos.GetOrAdd(type, t => new TypeDetails(type, shouldMapProperty, shouldMapField, extensionMethodsToSearch));
+        }
 
-        public ICollection<Func<TypeInfo, string, IMappingOptions, MemberInfo>> Convensions {
-            get { return _convensions; }
-            }
-
-        public ICollection<MemberNameReplacer> MemberNameReplacers { get; private set; }
-
-        public CustomizedSourceToDestinationMemberMapper()
-                    {
-            MemberNameReplacers = new Collection<MemberNameReplacer>();
-                        }
-
-        public bool MapDestinationPropertyToSource(TypeInfo sourceType, string nameToSearch, LinkedList<MemberInfo> resolvers, IChildMemberConfiguration parent)
+        private static MemberInfo FindTypeMember(IEnumerable<MemberInfo> modelProperties,
+            IEnumerable<MethodInfo> getMethods,
+            IEnumerable<MethodInfo> getExtensionMethods,
+            string nameToSearch,
+            IMappingOptions mappingOptions)
         {
-            if (string.IsNullOrEmpty(nameToSearch))
-                return true;
-            return false;
-            //var matchingMemberInfo = MatchingMemberInfo(sourceType, nameToSearch);
+            MemberInfo pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch, mappingOptions));
+            if (pi != null)
+                return pi;
 
-            //if (matchingMemberInfo != null)
-            //{
-            //    resolvers.AddLast(matchingMemberInfo);
-            //    return true;
-            //}
+            MethodInfo mi = getMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
+            if (mi != null)
+                return mi;
 
-            //string[] matches = DestinationMemberNamingConvention.SplittingExpression
-            //        .Matches(nameToSearch)
-            //        .Cast<Match>()
-            //        .Select(m => m.Value)
-            //        .ToArray();
-            //for (int i = 1; (i <= matches.Length) && (matchingMemberInfo == null); i++)
-            //{
-            //    NameSnippet snippet = CreateNameSnippet(matches, i);
+            mi = getExtensionMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
+            if (mi != null)
+                return mi;
 
-            //    matchingMemberInfo = MatchingMemberInfo(sourceType, snippet.First);
+            return null;
+        }
 
-            //    if (matchingMemberInfo != null)
-            //    {
-            //        resolvers.AddLast(matchingMemberInfo);
+        private static bool NameMatches(string memberName, string nameToMatch, IMappingOptions mappingOptions)
+        {
+            var possibleSourceNames = PossibleNames(memberName, mappingOptions.Aliases,
+                mappingOptions.MemberNameReplacers,
+                mappingOptions.Prefixes, mappingOptions.Postfixes);
 
-            //        var foundMatch = MapDestinationPropertyToSource(resolvers, TypeMapFactory.GetTypeInfo(matchingMemberInfo.GetMemberType(), mappingOptions.SourceExtensionMethods), snippet.Second, mappingOptions);
+            var possibleDestNames = PossibleNames(nameToMatch, mappingOptions.Aliases,
+                mappingOptions.MemberNameReplacers,
+                mappingOptions.DestinationPrefixes, mappingOptions.DestinationPostfixes);
 
-            //        if (!foundMatch)
-            //        {
-            //            resolvers.RemoveLast();
-            //        }
-            //    }
-            //}
+            var all =
+                from sourceName in possibleSourceNames
+                from destName in possibleDestNames
+                select new {sourceName, destName};
 
-            //return matchingMemberInfo != null;
-            }
+            return
+                all.Any(pair => String.Compare(pair.sourceName, pair.destName, StringComparison.OrdinalIgnoreCase) == 0);
+        }
 
-        private MemberInfo MatchingMemberInfo(TypeInfo sourceType, string nameToSearch, IMappingOptions mappingOptions)
-                {
-            MemberInfo matchingMemberInfo = null;
-            var namesToSearch =
-                MemberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))
-                    .Concat(new[] {MemberNameReplacers.Aggregate(nameToSearch, (s, r) => s.Replace(r.OriginalValue, r.NewValue)), nameToSearch})
-                    .ToList();
+        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases,
+            IEnumerable<MemberNameReplacer> memberNameReplacers, IEnumerable<string> prefixes,
+            IEnumerable<string> postfixes)
+        {
+            if (string.IsNullOrEmpty(memberName))
+                yield break;
 
-            foreach (var name in namesToSearch)
+            yield return memberName;
+
+            foreach (
+                var alias in aliases.Where(alias => String.Equals(memberName, alias.Member, StringComparison.Ordinal)))
             {
-                foreach (var convension in _convensions)
-                {
-                    matchingMemberInfo = convension(sourceType, name, mappingOptions);
-                    if (matchingMemberInfo != null)
-                        break;
+                yield return alias.Alias;
             }
-                if (matchingMemberInfo != null)
-                    break;
-            }
-            return matchingMemberInfo;
         }
 
         private NameSnippet CreateNameSnippet(IEnumerable<string> matches, int i, IMappingOptions mappingOptions)

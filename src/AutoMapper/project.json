@@ -8,6 +8,7 @@
         ".NETPortable,Version=v4.5,Profile=Profile259": {
             "frameworkAssemblies": {
                 "System.Collections": "",
+                "System.Dynamic.Runtime": "",
                 "System.Runtime": "",
                 "System.Linq": "",
                 "System.Linq.Expressions": "",
@@ -18,7 +19,8 @@
                 "System.Diagnostics.Debug": "",
                 "System.ObjectModel": "",
                 "System.Runtime.Extensions": "",
-                "System.Threading": ""
+                "System.Threading": "",
+                "Microsoft.CSharp": ""
             },
             "compilationOptions": { "define": [ "PORTABLE" ] }
         },
@@ -35,21 +37,12 @@
                 "define": [ "NET40" ]
             }
         },
-        "sl5": {
-            "frameworkAssemblies": {
-                "System": "",
-                "System.Core": "",
-                "mscorlib": ""
-            },
-            "compilationOptions": {
-                "define": [ "SILVERLIGHT" ]
-            }
-        },
         "wp8": {
             "frameworkAssemblies": {
                 "mscorlib": "",
                 "System": "",
-                "System.Core": ""
+                "System.Core": "",
+                "Microsoft.CSharp": ""
             },
             "compilationOptions": {
                 "define": [ "SILVERLIGHT" ]
@@ -59,6 +52,7 @@
             "frameworkAssemblies": {
                 "System.Collections": "",
                 "System.Runtime": "",
+                "System.Dynamic.Runtime": "",
                 "System.Linq": "",
                 "System.Linq.Expressions": "",
                 "System.Linq.Queryable": "",
@@ -68,7 +62,8 @@
                 "System.Diagnostics.Debug": "",
                 "System.ObjectModel": "",
                 "System.Runtime.Extensions": "",
-                "System.Threading": ""
+                "System.Threading": "",
+                "Microsoft.CSharp": ""
             },
             "compilationOptions": {
                 "define": [ "WINDOWS_PHONE" ]
@@ -77,7 +72,9 @@
         "netcore45": {
             "frameworkAssemblies": {
                 "System.Collections": "",
+                "System.Core": "",
                 "System.Runtime": "",
+                "System.Dynamic.Runtime": "",
                 "System.Linq": "",
                 "System.Linq.Expressions": "",
                 "System.Linq.Queryable": "",
@@ -87,7 +84,8 @@
                 "System.Diagnostics.Debug": "",
                 "System.ObjectModel": "",
                 "System.Runtime.Extensions": "",
-                "System.Threading": ""
+                "System.Threading": "",
+                "Microsoft.CSharp": ""
             },
             "compilationOptions": {
                 "define": [ "NETCORE45" ]

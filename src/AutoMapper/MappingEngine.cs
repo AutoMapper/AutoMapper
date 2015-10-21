@@ -289,12 +289,22 @@ namespace AutoMapper
                 throw new InvalidOperationException(message);
             }
 
+            var parameterReplacer = instanceParameter is ParameterExpression ? new ParameterReplacementVisitor(instanceParameter) : null;
+            var customProjection = typeMap.CustomProjection;
+            if(customProjection != null)
+            {
+                return parameterReplacer == null ? customProjection.Body : parameterReplacer.Visit(customProjection.Body);
+            }
+
             var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
 
-            var parameterReplacer = new ParameterReplacementVisitor(instanceParameter);
+            Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
+            if(parameterReplacer != null)
+            {
+                constructorExpression = parameterReplacer.Visit(constructorExpression);
+            }
             var visitor = new NewFinderVisitor();
-            var constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
-            visitor.Visit(parameterReplacer.Visit(constructorExpression));
+            visitor.Visit(constructorExpression);
 
             var expression = Expression.MemberInit(
                 visitor.NewExpression,
