@@ -387,17 +387,26 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(Type sourceType, Type destinationType)
         {
+            return ResolveTypeMap(sourceType, destinationType, destinationObjectExists: false);
+        }
+
+        public TypeMap ResolveTypeMap(Type sourceType, Type destinationType, bool destinationObjectExists)
+        {
             var typePair = new TypePair(sourceType, destinationType);
 
-            return ResolveTypeMap(typePair);
+            return ResolveTypeMap(typePair, destinationObjectExists);
         }
 
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
+            return ResolveTypeMap(typePair, destinationObjectExists: false);
+        }
 
+        public TypeMap ResolveTypeMap(TypePair typePair, bool destinationObjectExists)
+        {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair,
                 _ =>
-                    GetRelatedTypePairs(_)
+                    GetRelatedTypePairs(_destinationObjectExists)
                         .Select(
                             tp =>
                                 _typeMapPlanCache.GetOrDefault(tp) ??
@@ -413,7 +422,7 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(object source, object destination, Type sourceType, Type destinationType)
         {
-            return ResolveTypeMap(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
+            return ResolveTypeMap(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType, destinationObjectExists: destination != null);
         }
 
         public TypeMap ResolveTypeMap(ResolutionResult resolutionResult, Type destinationType)
@@ -464,24 +473,27 @@ namespace AutoMapper
             return _typeMapExpressionCache.ContainsKey(genericTypePair);
         }
 
-        private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root)
+        private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root, bool includeDestinationBases)
         {
             var subTypePairs =
-                from destinationType in GetAllTypes(root.DestinationType)
-                from sourceType in GetAllTypes(root.SourceType)
+                from sourceType in GetAllTypes(root.SourceType, includeBases: true)
+                from destinationType in GetAllTypes(root.DestinationType, includeDestinationBases)
                 select new TypePair(sourceType, destinationType);
             return subTypePairs;
         }
 
-        private IEnumerable<Type> GetAllTypes(Type type)
+        private IEnumerable<Type> GetAllTypes(Type type, bool includeBases)
         {
             yield return type;
 
-            Type baseType = type.BaseType();
-            while (baseType != null)
+            if(includeBases)
             {
-                yield return baseType;
-                baseType = baseType.BaseType();
+                Type baseType = type.BaseType();
+                while(baseType != null)
+                {
+                    yield return baseType;
+                    baseType = baseType.BaseType();
+                }
             }
 
             foreach (var interfaceType in type.GetTypeInfo().ImplementedInterfaces)
