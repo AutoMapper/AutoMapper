@@ -33,6 +33,10 @@ namespace AutoMapper.UnitTests
                 public Regex SplittingExpression { get; } = new Regex(@"\p{Lu}[a-z0-9]*(?=_?)");
 
                 public string SeparatorCharacter => "_";
+                public string ReplaceValue(Match match)
+                {
+                    return match.Value;
+                }
             }
 
             protected override void Establish_context()

@@ -72,6 +72,8 @@
     <Compile Include="Internal\IDictionary.cs" />
     <Compile Include="Internal\AliasedMember.cs" />
     <Compile Include="Internal\IAdapterResolver.cs" />
+    <Compile Include="Internal\IMappingOptionsMemberMapper.cs" />
+    <Compile Include="Internal\ISourceToDestinationNameMapper.cs" />
     <Compile Include="Internal\ManualNullableConverterFactory.cs" />
     <Compile Include="Internal\MemberNameReplacer.cs" />
     <Compile Include="Internal\NoOpReaderWriterLockFactory.cs" />
@@ -88,6 +90,7 @@
     <Compile Include="Internal\TypeExtensions.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="Mappers\AssignableArrayMapper.cs" />
+    <Compile Include="Mappers\CreateMapBasedOnCriteriaMapper.cs" />
     <Compile Include="Mappers\ExplicitConversionOperatorMapper.cs" />
     <Compile Include="Mappers\ExpressionMapper.cs" />
     <Compile Include="Mappers\HashSetMapper.cs" />

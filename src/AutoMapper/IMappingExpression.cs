@@ -104,7 +104,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="typeConverterType">Type converter type</param>
         void ConvertUsing(Type typeConverterType);
-
+        
         /// <summary>
         /// Override the destination type mapping for looking up configuration and instantiation
         /// </summary>
@@ -406,9 +406,9 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions);
 
-    /// <summary>
+        /// <summary>
         /// The current TypeMap being configured
-    /// </summary>
+        /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         TypeMap TypeMap { get; }
     }
