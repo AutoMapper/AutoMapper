@@ -476,13 +476,13 @@ namespace AutoMapper
         private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root, bool includeDestinationBases)
         {
             var subTypePairs =
-                from destinationType in GetAllTypes(root.DestinationType, includeDestinationBases)
+                from destinationType in GetAllTypes(root.DestinationType)
                 from sourceType in GetAllTypes(root.SourceType)
                 select new TypePair(sourceType, destinationType);
             return subTypePairs;
         }
 
-        private IEnumerable<Type> GetAllTypes(Type type, bool includeBases = true)
+        private IEnumerable<Type> GetAllTypes(Type type)
         {
             yield return type;
 
