@@ -269,8 +269,21 @@ namespace AutoMapper
     }
     public class NameSplitMember : IChildMemberConfiguration
     {
+        INamingConvention _destinationMemberNamingConvention;
+
         public INamingConvention SourceMemberNamingConvention { get; set; }
-        public INamingConvention DestinationMemberNamingConvention { get; set; }
+
+        public INamingConvention DestinationMemberNamingConvention
+        {
+            get
+            {
+                return _destinationMemberNamingConvention ?? NoNamingConvention.Value;
+            }
+            set
+            {
+                _destinationMemberNamingConvention = value;
+            }
+        }
 
         public IEnumerable<MethodInfo> SourceExtensionMethods => (Mapper.Configuration as ConfigurationStore).SourceExtensionMethods;
 
