@@ -6,7 +6,6 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Impl;
     using Internal;
 
     /// <summary>
@@ -17,7 +16,7 @@ namespace AutoMapper
     {
         private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
         private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
-        private readonly TypeInfo _destinationType;
+        private readonly TypeDetails _destinationType;
         private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
 
@@ -26,19 +25,23 @@ namespace AutoMapper
 
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
-        private readonly TypeInfo _sourceType;
+        private readonly TypeDetails _sourceType;
         private bool _sealed;
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
-        private IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private Type _destinationTypeOverride;
 
-        public TypeMap(TypeInfo sourceType, TypeInfo destinationType, MemberList memberList)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
+            Types = new TypePair(sourceType.Type, destinationType.Type);
             Profile = ConfigurationStore.DefaultProfileName;
             ConfiguredMemberList = memberList;
         }
+
+        public TypePair Types { get; }
 
         public ConstructorMap ConstructorMap { get; private set; }
 
@@ -50,29 +53,17 @@ namespace AutoMapper
         public Func<ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
-        public Action<object, object> BeforeMap
-        {
-            get
-            {
-                return (src, dest) =>
+        public Action<object, object> BeforeMap => (src, dest) =>
                 {
                     foreach (var action in _beforeMapActions)
                         action(src, dest);
                 };
-            }
-        }
 
-        public Action<object, object> AfterMap
-        {
-            get
-            {
-                return (src, dest) =>
+        public Action<object, object> AfterMap => (src, dest) =>
                 {
                     foreach (var action in _afterMapActions)
                         action(src, dest);
                 };
-            }
-        }
 
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
@@ -125,37 +116,37 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
+            Func<PropertyMap, string> getFunc = pm => ConfiguredMemberList == MemberList.Destination ? pm.DestinationProperty.Name : pm.SourceMember.Name;
             var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
-                .Select(pm => pm.DestinationProperty.Name);
+                .Select(getFunc).ToList();
             var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
-                .Select(pm => pm.DestinationProperty.Name);
+                .Select(getFunc).ToList();
 
             IEnumerable<string> properties;
 
-            if (ConfiguredMemberList == MemberList.Destination)
+            if(ConfiguredMemberList == MemberList.Destination)
+            {
                 properties = _destinationType.PublicWriteAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties);
+            }
             else
             {
                 var redirectedSourceMembers = _propertyMaps
-                    .Where(pm => pm.IsMapped())
-                    .Where(pm => pm.CustomExpression != null)
-                    .Where(pm => pm.SourceMember != null)
+                    .Where(pm => pm.IsMapped() && pm.SourceMember != null && pm.SourceMember.Name != pm.DestinationProperty.Name)
                     .Select(pm => pm.SourceMember.Name);
 
                 var ignoredSourceMembers = _sourceMemberConfigs
                     .Where(smc => smc.IsIgnored())
-                    .Select(pm => pm.SourceMember.Name);
+                    .Select(pm => pm.SourceMember.Name).ToList();
 
                 properties = _sourceType.PublicReadAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties)
                     .Except(redirectedSourceMembers)
-                    .Except(ignoredSourceMembers)
-                    ;
+                    .Except(ignoredSourceMembers);
             }
 
             return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
@@ -184,7 +175,7 @@ namespace AutoMapper
             // This might need to be fixed for multiple derived source types to different dest types
             var match = _includedDerivedTypes.FirstOrDefault(tp => tp.SourceType == derivedSourceType);
 
-            return match == null ? DestinationType : match.DestinationType;
+            return DestinationTypeOverride ?? match?.DestinationType ?? DestinationType;
         }
 
         public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
@@ -194,7 +185,7 @@ namespace AutoMapper
 
         public bool HasDerivedTypesToInclude()
         {
-            return _includedDerivedTypes.Any();
+            return _includedDerivedTypes.Any() || DestinationTypeOverride != null;
         }
 
         public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
@@ -370,6 +361,12 @@ namespace AutoMapper
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
 
+        public bool ShouldCheckForValid()
+        {
+            return (CustomMapper == null && CustomProjection == null &&
+                    DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(SourceType);
+        }
+
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {
             foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
@@ -414,9 +411,10 @@ namespace AutoMapper
             }
             else
             {
-                newExpression = Expression.New(DestinationType);
+                newExpression = Expression.New(DestinationTypeOverride ?? DestinationType);
             }
             return Expression.Lambda(newExpression);
         }
+
     }
 }

@@ -6,7 +6,7 @@ namespace AutoMapper
     /// <summary>
     /// Configuration for profile-specific maps
     /// </summary>
-    public interface IProfileExpression
+    public interface IProfileExpression : IProfileConfiguration
     {
         /// <summary>
         /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
@@ -27,6 +27,17 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList);
 
         /// <summary>
+        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
+        /// Specify the member list to validate against during configuration validation.
+        /// </summary>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="profileName">Profile name</param>
+        /// <param name="memberList">Member list to validate</param>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList);
+
+        /// <summary>
         /// Create a mapping configuration from the source type to the destination type.
         /// Use this method when the source and destination type are known at runtime and not compile time.
         /// </summary>
@@ -44,6 +55,17 @@ namespace AutoMapper
         /// <param name="memberList">Member list to validate</param>
         /// <returns>Mapping expression for more configuration options</returns>
         IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList);
+
+        /// <summary>
+        /// Creates a mapping configuration from the source type to the destination type.
+        /// Specify the member list to validate against during configuration validation.
+        /// </summary>
+        /// <param name="sourceType">Source type</param>
+        /// <param name="destinationType">Destination type</param>
+        /// <param name="memberList">Member list to validate</param>
+        /// <param name="profileName">Profile name</param>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName);
 
         /// <summary>
         /// Clear the list of recognized prefixes.
@@ -132,5 +154,11 @@ namespace AutoMapper
         /// By default only public fields are mapped.
         /// </summary>
         Func<FieldInfo, bool> ShouldMapField { get; set; }
+
+        /// <summary>
+        /// Specify common configuration for all type maps.
+        /// </summary>
+        /// <param name="configuration">configuration callback</param>
+        void ForAllMaps(Action<TypeMap, IMappingExpression> configuration);
     }
 }

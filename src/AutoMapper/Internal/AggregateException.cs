@@ -23,7 +23,7 @@ namespace System
     /// exception object.
     /// </remarks>
     [DebuggerDisplay("Count = {InnerExceptionCount}")]
-    public class AggregateException : Exception
+    internal class AggregateException : Exception
     {
 
         private readonly ReadOnlyCollection<Exception> m_innerExceptions; // Complete set of exceptions.

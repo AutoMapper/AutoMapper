@@ -33,7 +33,7 @@
                     }
                 };
 
-                var projected = items.AsQueryable().Project().To<ParentDto>().ToList();
+                var projected = items.AsQueryable().ProjectTo<ParentDto>().ToList();
 
                 projected[0].TotalSum.ShouldEqual(9);
             }

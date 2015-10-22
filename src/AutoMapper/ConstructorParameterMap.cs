@@ -18,7 +18,7 @@ namespace AutoMapper
 
         public IMemberGetter[] SourceResolvers { get; private set; }
 
-        public bool CanResolve { get; private set; }
+        public bool CanResolve { get; set; }
 
         public Expression GetExpression(Expression instanceParameter)
         {

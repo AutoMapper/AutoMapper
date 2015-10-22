@@ -4,6 +4,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using Internal;
     using System.Reflection;
 #if MONODROID
     using Extensions = AutoMapper.QueryableExtensions.Extensions;
@@ -30,7 +31,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
 
             var sourceListType = result.Type.IsArray ? result.Type.GetElementType() : result.Type.GetGenericArguments().First();
-            var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.IncludedMembers);
+            var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand);
 
             var selectExpression = result.ResolutionExpression;
             if (sourceListType != destinationListType)

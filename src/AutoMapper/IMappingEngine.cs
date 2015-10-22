@@ -1,7 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+
 namespace AutoMapper
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
+    using ObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
 
     /// <summary>
     /// Performs mapping based on configuration
@@ -161,6 +168,7 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
 
-        Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params string[] membersToExpand);
+        Expression CreateMapExpression(Type sourceType, Type destinationType, ObjectDictionary parameters = null, params MemberInfo[] membersToExpand);
     }
+
 }

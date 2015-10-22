@@ -60,7 +60,7 @@
                 var belist = new List<BEntity>();
                 belist.Add(be);
                 IQueryable<BEntity> bei = belist.AsQueryable();
-                typeof(Exception).ShouldNotBeThrownBy(() => bei.Project().To<B>());
+                typeof(Exception).ShouldNotBeThrownBy(() => bei.ProjectTo<B>());
             }
         }
     }

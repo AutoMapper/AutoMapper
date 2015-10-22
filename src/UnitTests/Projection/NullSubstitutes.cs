@@ -29,7 +29,7 @@
         {
             var source = new[] {new Source()}.AsQueryable();
 
-            _dests = source.Project().To<Dest>().ToList();
+            _dests = source.ProjectTo<Dest>().ToList();
         }
 
         [Fact]
@@ -66,7 +66,7 @@
         {
             var source = new[] {new Source()}.AsQueryable();
 
-            _dests = source.Project().To<Dest>().ToList();
+            _dests = source.ProjectTo<Dest>().ToList();
         }
 
         [Fact]

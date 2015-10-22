@@ -1193,7 +1193,7 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.Initialize(cfg =>
-					{
+                    {
 						cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
 						cfg.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
 						cfg.CreateMap<Source, Destination>();
@@ -1233,11 +1233,11 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(cfg =>
-					{
-						cfg.RecognizePrefixes("Foo");
-						cfg.CreateMap<Source, Destination>();
-					});
+			    Mapper.Initialize(cfg =>
+			    {
+			        cfg.RecognizePrefixes("Foo");
+			        cfg.CreateMap<Source, Destination>();
+			    });
 			}
 
 			protected override void Because_of()
@@ -1388,7 +1388,7 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.Initialize(cfg =>
                 {
-                    cfg.RecognizeDestinationPrefixes("Foo","Bar");
+                    cfg.RecognizeDestinationPrefixes("Foo", "Bar");
                     cfg.CreateMap<Source, Destination>();
                 });
             }

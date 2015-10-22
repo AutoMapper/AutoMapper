@@ -52,6 +52,14 @@ namespace AutoMapper
         void ResolveUsing(Func<ResolutionResult, object> resolver);
 
         /// <summary>
+        /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
+        /// Access both the source object and current resolution context for additional mapping, context items and parent objects
+        /// This method cannot be used in conjunction with LINQ query projection
+        /// </summary>
+        /// <param name="resolver">Callback function to resolve against source type</param>
+        void ResolveUsing(Func<ResolutionResult, TSource, object> resolver);
+
+        /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
         /// This method can be used in mapping to LINQ query projections, while ResolveUsing cannot.
         /// Any null reference exceptions in this expression will be ignored (similar to flattening behavior)
@@ -136,43 +144,12 @@ namespace AutoMapper
     /// <summary>
     /// Configuration options for an individual member
     /// </summary>
-    public interface IMemberConfigurationExpression
+    public interface IMemberConfigurationExpression : IMemberConfigurationExpression<object>
     {
         /// <summary>
         /// Map from a specific source member
         /// </summary>
         /// <param name="sourceMember">Source member to map from</param>
         void MapFrom(string sourceMember);
-
-        /// <summary>
-        /// Resolve destination member using a custom value resolver instance
-        /// </summary>
-        /// <param name="valueResolver">Value resolver to use</param>
-        /// <returns>Value resolver configuration options</returns>
-        IResolutionExpression ResolveUsing(IValueResolver valueResolver);
-
-        /// <summary>
-        /// Resolve destination member using a custom value resolver
-        /// </summary>
-        /// <param name="valueResolverType">Value resolver of type <see cref="IValueResolver"/></param>
-        /// <returns>Value resolver configuration options</returns>
-        IResolverConfigurationExpression ResolveUsing(Type valueResolverType);
-
-        /// <summary>
-        /// Resolve destination member using a custom value resolver
-        /// </summary>
-        /// <typeparam name="TValueResolver">Value resolver of type <see cref="IValueResolver"/></typeparam>
-        /// <returns>Value resolver configuration options</returns>
-        IResolverConfigurationExpression ResolveUsing<TValueResolver>();
-
-        /// <summary>
-        /// Ignore this member for configuration validation and skip during mapping
-        /// </summary>
-        void Ignore();
-
-        /// <summary>
-        /// Use the destination value instead of mapping from the source value or creating a new instance
-        /// </summary>
-        void UseDestinationValue();
     }
 }

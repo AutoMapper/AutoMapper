@@ -18,10 +18,13 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                Mapper.CreateMap<ParentModel, ParentDto>()
-                    .BeforeMap((src, dest) => _beforeMapCount++)
-                    .AfterMap((src, dest) => _afterMapCount++);
-                Mapper.CreateMap<ChildModel, ChildDto>();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<ParentModel, ParentDto>()
+                        .BeforeMap((src, dest) => _beforeMapCount++)
+                        .AfterMap((src, dest) => _afterMapCount++);
+                    cfg.CreateMap<ChildModel, ChildDto>();
+                });
                 Mapper.AssertConfigurationIsValid();
             }
 
@@ -213,13 +216,15 @@ namespace AutoMapper.UnitTests
 
 				Dictionary<int, ParentModel> parents = childModels.ToDictionary(x => x.ID, x => x.Parent);
 
-				Mapper.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
-				Mapper.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
+                    cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
 
-				Mapper.CreateMap<ParentModel, ParentDto>()
-					.ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
-				Mapper.CreateMap<ChildModel, ChildDto>();
-
+                    cfg.CreateMap<ParentModel, ParentDto>()
+                        .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
+                    cfg.CreateMap<ChildModel, ChildDto>();
+                });
 				Mapper.AssertConfigurationIsValid();
 			}
 

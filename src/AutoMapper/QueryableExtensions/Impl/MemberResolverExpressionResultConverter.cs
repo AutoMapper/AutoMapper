@@ -3,6 +3,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System;
     using System.Linq;
     using System.Linq.Expressions;
+    using Internal;
     using System.Reflection;
 
     public class MemberResolverExpressionResultConverter : IExpressionResultConverter

@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             public string cmok { get; set; }
 
-            public string mojeIme { get; set; }
+            public string MojeIme { get; set; }
 
             public string MojePrezime { get; set; }
 
@@ -35,19 +35,20 @@ namespace AutoMapper.UnitTests.Bug
 
             protected override void Establish_context()
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateProfile("MyMapperProfile", prf =>
+                
+                    Mapper.Initialize(cfg =>
                     {
-                        prf.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
-                        prf.CreateMap<Neda, Dario>();
-                    });                   
-                    cfg.CreateProfile("MyMapperProfile2", prf =>
-                    {
-                        prf.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
-                        prf.CreateMap<Dario, Neda>();
+                        cfg.CreateProfile("MyMapperProfile", prf =>
+                        {
+                            prf.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
+                            prf.CreateMap<Neda, Dario>();
+                        });
+                        cfg.CreateProfile("MyMapperProfile2", prf =>
+                        {
+                            prf.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
+                            prf.CreateMap<Dario, Neda>();
+                        });
                     });
-                });
             }
 
             protected override void Because_of()

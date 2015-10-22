@@ -38,7 +38,7 @@
                 new Source()
             }.AsQueryable();
 
-            _dests = _sources.Project().To<Dest>(new { value = 10 }).ToArray();
+            _dests = _sources.ProjectTo<Dest>(new { value = 10 }).ToArray();
         }
 
         [Fact]
@@ -50,7 +50,7 @@
         [Fact]
         public void Should_not_cache_parameter_value()
         {
-            var newDests = _sources.Project().To<Dest>(new {value = 15}).ToArray();
+            var newDests = _sources.ProjectTo<Dest>(new {value = 15}).ToArray();
 
             newDests[0].Value.ShouldEqual(20);
         }
@@ -86,7 +86,7 @@
                 new Source()
             }.AsQueryable();
 
-            _dests = _sources.Project().To<Dest>(new Dictionary<string, object>{{"value", 10}}).ToArray();
+            _dests = _sources.ProjectTo<Dest>(new Dictionary<string, object>{{"value", 10}}).ToArray();
         }
 
         [Fact]
@@ -98,7 +98,7 @@
         [Fact]
         public void Should_not_cache_parameter_value()
         {
-            var newDests = _sources.Project().To<Dest>(new Dictionary<string, object> { { "value", 15 } }).ToArray();
+            var newDests = _sources.ProjectTo<Dest>(new Dictionary<string, object> { { "value", 15 } }).ToArray();
 
             newDests[0].Value.ShouldEqual(20);
         }
@@ -151,7 +151,7 @@
         {
             var db = new DB();
 
-            var user = db.Users.Project().To<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == 2);
+            var user = db.Users.ProjectTo<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == 2);
 
             user.position.ShouldEqual(1);
         }

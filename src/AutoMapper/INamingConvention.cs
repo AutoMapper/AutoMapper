@@ -12,9 +12,8 @@ namespace AutoMapper
         /// </summary>
 		Regex SplittingExpression { get; }
 
-        /// <summary>
-        /// Character to separate on
-        /// </summary>
-		string SeparatorCharacter { get; }
+        string SeparatorCharacter { get; }
+
+        string ReplaceValue(Match match);
 	}
 }
