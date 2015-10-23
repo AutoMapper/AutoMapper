@@ -5,6 +5,7 @@ using Xunit;
 using Should;
 using AutoMapper.UnitTests;
 using AutoMapper.QueryableExtensions;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
@@ -28,7 +29,6 @@ namespace AutoMapper.IntegrationTests.Net4
                 base.OnModelCreating(modelBuilder);
 
                 modelBuilder.Entity<Entity>().HasKey(x => x.Id);
-                modelBuilder.ComplexType<ComplexType>();
             }
         }
 
@@ -39,7 +39,8 @@ namespace AutoMapper.IntegrationTests.Net4
             public virtual ComplexType ComplexType { get; set; }
         }
 
-        class ComplexType : INotNull
+        [ComplexType]
+        class ComplexType
         {
             public virtual string Field { get; set; }
         }

@@ -11,6 +11,15 @@ namespace AutoMapper.Internal
 
     internal static class TypeExtensions
     {
+        public static bool CanBeNull(this Type type)
+        {
+#if NET40
+            return !type.IsDefined(typeof(System.ComponentModel.DataAnnotations.Schema.ComplexTypeAttribute));
+#else
+            return true;
+#endif
+        }
+
         public static Type[] GetGenericParameters(this Type type)
         {
 #if NETFX_CORE || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50

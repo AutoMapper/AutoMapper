@@ -90,11 +90,4 @@ namespace AutoMapper.QueryableExtensions
                 );
         }
     }
-
-    /// <summary>
-    /// Marker interface used to let AutoMapper know that some type cannot be null, for example complex types in Entity Framework.
-    /// </summary>
-    public interface INotNull
-    {
-    }
 }
