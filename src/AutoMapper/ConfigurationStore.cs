@@ -435,8 +435,8 @@ namespace AutoMapper
         private IEnumerable<TypePair> GetRelatedTypePairs(TypePair root)
         {
             var subTypePairs =
-                from sourceType in GetAllTypes(root.SourceType)
                 from destinationType in GetAllTypes(root.DestinationType)
+                from sourceType in GetAllTypes(root.SourceType)
                 select new TypePair(sourceType, destinationType);
             return subTypePairs;
         }

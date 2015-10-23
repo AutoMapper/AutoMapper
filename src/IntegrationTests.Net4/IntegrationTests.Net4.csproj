@@ -76,6 +76,7 @@
     <Compile Include="OverrideDestinationMappingsTest.cs" />
     <Compile Include="ProjectToAbstractType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProxyTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
