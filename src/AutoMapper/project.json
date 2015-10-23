@@ -1,5 +1,5 @@
 {
-    "version": "4.1.0-*",
+    "version": "4.1.1-*",
 
     "compilationOptions": { "keyFile": "..\\AutoMapper.snk" },
 
@@ -31,7 +31,7 @@
         },
         "net40": {
             "dependencies": {
-                "Microsoft.Bcl": "1.1.9"
+                "Microsoft.Bcl": "1.1.10"
             },
             "compilationOptions": {
                 "define": [ "NET40" ]
