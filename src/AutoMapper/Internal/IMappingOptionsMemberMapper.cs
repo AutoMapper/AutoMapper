@@ -61,7 +61,11 @@ namespace AutoMapper
     }
 
     // Source Destination Mapper
-    public class DefaultName : ISourceToDestinationNameMapper
+    public class DefaultName : CaseInsensitiveName
+    {
+    }
+
+    public class CaseSensitiveName : ISourceToDestinationNameMapper
     {
         public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
         {
@@ -72,6 +76,16 @@ namespace AutoMapper
                             typeof (ParameterInfo).IsAssignableFrom(destType) 
                                 ? string.Compare(mi.Name, nameToSearch, StringComparison.OrdinalIgnoreCase) == 0
                                 : string.CompareOrdinal(mi.Name, nameToSearch) == 0);
+        }
+    }
+
+    public class CaseInsensitiveName : ISourceToDestinationNameMapper
+    {
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
+        {
+            return
+                getTypeInfoMembers.GetMemberInfos(typeInfo)
+                    .FirstOrDefault(mi => string.Compare(mi.Name, nameToSearch, StringComparison.OrdinalIgnoreCase) == 0);
         }
     }
     public class PrePostfixName : ISourceToDestinationNameMapper

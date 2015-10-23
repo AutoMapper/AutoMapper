@@ -95,6 +95,7 @@
     <Compile Include="Bug\AssignableCollectionBug.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
+    <Compile Include="Bug\CaseSensitivityBug.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\ForAllMaps.cs" />
     <Compile Include="Bug\NullableDateTime.cs" />
