@@ -153,6 +153,10 @@ namespace AutoMapper.QueryableExtensions
             params Expression<Func<TDestination, object>>[] membersToExpand
             )
         {
+            if (parameters is IMappingEngine)
+                throw new ArgumentException(
+                    "Parameters is an IMappingEngine. Use the overload that explicitly takes IMappingEngine.",
+                    nameof(parameters));
             return source.ProjectTo(parameters, Mapper.Engine, membersToExpand);
         }
 
