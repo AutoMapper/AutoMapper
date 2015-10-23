@@ -482,7 +482,7 @@ namespace AutoMapper
             return subTypePairs;
         }
 
-        private IEnumerable<Type> GetAllTypes(Type type, bool includeBases)
+        private IEnumerable<Type> GetAllTypes(Type type, bool includeBases = true)
         {
             yield return type;
 
