@@ -155,7 +155,7 @@ namespace AutoMapper
         
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
-        public readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
+        private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
 
         public IMemberConfiguration DefaultMemberConfig
         {
@@ -181,7 +181,7 @@ namespace AutoMapper
             _memberConfigurations.Add(condition);
             return condition;
         }
-        public IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+        private IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
         public IEnumerable<IConditionalObjectMapper> TypeConfigurations => _typeConfigurations;
         public IConditionalObjectMapper AddConditionalObjectMapper()
         {

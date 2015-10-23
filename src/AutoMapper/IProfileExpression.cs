@@ -128,12 +128,6 @@ namespace AutoMapper
         bool AllowNullCollections { get; set; }
 
         /// <summary>
-        /// Include an assembly to search for extension methods to match
-        /// </summary>
-        /// <param name="assembly">Assembly containing extension methods</param>
-        void IncludeSourceExtensionMethods(Assembly assembly);
-
-        /// <summary>
         /// Naming convention for source members
         /// </summary>
         INamingConvention SourceMemberNamingConvention { get; set; }
@@ -142,18 +136,6 @@ namespace AutoMapper
         /// Naming convention for destination members
         /// </summary>
         INamingConvention DestinationMemberNamingConvention { get; set; }
-
-        /// <summary>
-        /// Specify which properties should be mapped.
-        /// By default only public properties are mapped.
-        /// </summary>
-        Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
-
-        /// <summary>
-        /// Specify which fields should be mapped.
-        /// By default only public fields are mapped.
-        /// </summary>
-        Func<FieldInfo, bool> ShouldMapField { get; set; }
 
         /// <summary>
         /// Specify common configuration for all type maps.

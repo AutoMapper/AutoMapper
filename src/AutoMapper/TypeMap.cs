@@ -30,7 +30,6 @@ namespace AutoMapper
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
-        private Type _destinationTypeOverride;
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList)
         {
