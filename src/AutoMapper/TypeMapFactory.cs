@@ -43,7 +43,7 @@ using System.Collections.ObjectModel;
             {
                 var members = new LinkedList<MemberInfo>();
 
-                if (MapDestinationPropertyToSource(options, sourceTypeInfo, destProperty.GetType(), destProperty.Name, members))
+                if (MapDestinationPropertyToSource(options, sourceTypeInfo, destProperty.GetMemberType(), destProperty.Name, members))
                 {
                     var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
