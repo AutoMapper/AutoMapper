@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.1.0' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.1.1' }
 	$assemblyVersion = $pkgVersion -replace "\-.*$", ".0"
 	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
@@ -36,7 +36,7 @@ task release {
 task compile -depends clean { 
     exec { dnu restore }
     exec { dnu build $source_dir\AutoMapper --configuration $config}
-    exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
+    exec { & $base_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
 }
 
@@ -157,65 +157,13 @@ function global:create-nuspec($version, $fileName)
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>A convention-based object-object mapper</summary>
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
-    <frameworkAssemblies>
-      <frameworkAssembly assemblyName=""System.Collections"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Runtime"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Linq"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Linq.Expressions"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Linq.Queryable"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Text.RegularExpressions"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Reflection"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Reflection.Extensions"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Diagnostics.Debug"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.ObjectModel"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Runtime.Extensions"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""System.Threading"" targetFramework="".NETPortable4.5-Profile259"" />
-      <frameworkAssembly assemblyName=""mscorlib"" targetFramework="".NETFramework4.5"" />
-      <frameworkAssembly assemblyName=""System"" targetFramework="".NETFramework4.5"" />
-      <frameworkAssembly assemblyName=""System.Core"" targetFramework="".NETFramework4.5"" />
-      <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework="".NETFramework4.5"" />
-      <frameworkAssembly assemblyName=""mscorlib"" targetFramework="".NETFramework4.0"" />
-      <frameworkAssembly assemblyName=""System"" targetFramework="".NETFramework4.0"" />
-      <frameworkAssembly assemblyName=""System.Core"" targetFramework="".NETFramework4.0"" />
-      <frameworkAssembly assemblyName=""Microsoft.CSharp"" targetFramework="".NETFramework4.0"" />
-      <frameworkAssembly assemblyName=""System"" targetFramework=""Silverlight5.0"" />
-      <frameworkAssembly assemblyName=""System.Core"" targetFramework=""Silverlight5.0"" />
-      <frameworkAssembly assemblyName=""mscorlib"" targetFramework=""Silverlight5.0"" />
-      <frameworkAssembly assemblyName=""mscorlib"" targetFramework=""WindowsPhone8.0"" />
-      <frameworkAssembly assemblyName=""System"" targetFramework=""WindowsPhone8.0"" />
-      <frameworkAssembly assemblyName=""System.Core"" targetFramework=""WindowsPhone8.0"" />
-      <frameworkAssembly assemblyName=""System.Collections"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Runtime"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Linq"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Linq.Expressions"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Linq.Queryable"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Text.RegularExpressions"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Reflection"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Reflection.Extensions"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Diagnostics.Debug"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.ObjectModel"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Runtime.Extensions"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Threading"" targetFramework=""WindowsPhoneApp8.1"" />
-      <frameworkAssembly assemblyName=""System.Collections"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Runtime"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Linq"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Linq.Expressions"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Linq.Queryable"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Text.RegularExpressions"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Reflection"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Reflection.Extensions"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Diagnostics.Debug"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.ObjectModel"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Runtime.Extensions"" targetFramework="".NETCore4.5"" />
-      <frameworkAssembly assemblyName=""System.Threading"" targetFramework="".NETCore4.5"" />
-    </frameworkAssemblies>
 	  <dependencies>
 		<group targetFramework=""portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10"">
 		</group>
 		<group targetFramework=""net45"">
 		</group>
 		<group targetFramework=""net40"">
-	      <dependency id=""Microsoft.Bcl"" version=""1.1.9"" />
+	      <dependency id=""Microsoft.Bcl"" version=""1.1.10"" />
 		</group>
 		<group targetFramework=""sl50"">
 		</group>
@@ -223,11 +171,11 @@ function global:create-nuspec($version, $fileName)
 		</group>
 		<group targetFramework=""wpa81"">
 		</group>
-		<group targetFramework=""win"">
+		<group targetFramework=""win80"">
 		</group>
-		<group targetFramework=""MonoAndroid"">
+		<group targetFramework=""MonoAndroid10"">
 		</group>
-		<group targetFramework=""MonoTouch"">
+		<group targetFramework=""MonoTouch10"">
 		</group>
 		<group targetFramework=""Xamarin.iOS10"">
 		</group>
