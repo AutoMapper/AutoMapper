@@ -20,4 +20,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademarkAttribute("AutoMapper")]
 [assembly: AssemblyCompanyAttribute("")]
 [assembly: AssemblyConfigurationAttribute("release")]
-[assembly: AssemblyInformationalVersionAttribute("9d7ca2d8eaceee90387769e5f49625596764ed50")]
+[assembly: AssemblyInformationalVersionAttribute("8d237356eab6e6da3382701d0b8cc72b8a53d8e4")]
