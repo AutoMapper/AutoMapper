@@ -102,6 +102,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="sourceType">Source type</param>
         /// <param name="destinationType">Destination type</param>
+        /// <param name="profileName">Profile name, defaults to the default profile</param>
         /// <returns>Type map configuration</returns>
         TypeMap CreateTypeMap(Type sourceType, Type destinationType, string profileName = ConfigurationStore.DefaultProfileName);
 

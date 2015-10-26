@@ -43,12 +43,12 @@ namespace AutoMapper.IntegrationTests.Net4
             public string Sub1 { get; set; }
         }
 
-        public class Context : DbContext
+        public class TestContext : DbContext
         {
-            public Context()
+            public TestContext()
                 : base()
             {
-                Database.SetInitializer<Context>(new DatabaseInitializer());
+                Database.SetInitializer<TestContext>(new DatabaseInitializer());
             }
 
             public DbSet<Base> Bases { get; set; }
@@ -56,31 +56,19 @@ namespace AutoMapper.IntegrationTests.Net4
 
         }
 
-        public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+        public class DatabaseInitializer : DropCreateDatabaseAlways<TestContext>
         {
-            protected override void Seed(Context context)
+            protected override void Seed(TestContext testContext)
             {
-                context.Bases.Add(new Base() { BaseID = 1, Base1 = "base1", Sub = new Sub() { BaseId = 1, Sub1 = "sub1" } });
+                testContext.Bases.Add(new Base() { BaseID = 1, Base1 = "base1", Sub = new Sub() { BaseId = 1, Sub1 = "sub1" } });
 
-                base.Seed(context);
+                base.Seed(testContext);
             }
         }
 
 
         public class UnitTest : AutoMapperSpecBase
         {
-            [Fact]
-            public void EFConfiguredCorrectly()
-            {
-                using (var context = new Context())
-                {
-                    var baseEntitiy = context.Bases.FirstOrDefault();
-                    baseEntitiy.ShouldNotBeNull();
-                    baseEntitiy.BaseID.ShouldEqual(1);
-                    baseEntitiy.Sub.Sub1.ShouldEqual("sub1");
-                }
-            }
-
             protected override void Establish_context()
             {
                 Mapper.Initialize(cfg =>
@@ -93,7 +81,15 @@ namespace AutoMapper.IntegrationTests.Net4
             [Fact]
             public void AutoMapperEFRelationsTest()
             {
-                using (var context = new Context())
+                using (var context = new TestContext())
+                {
+                    var baseEntitiy = context.Bases.FirstOrDefault();
+                    baseEntitiy.ShouldNotBeNull();
+                    baseEntitiy.BaseID.ShouldEqual(1);
+                    baseEntitiy.Sub.Sub1.ShouldEqual("sub1");
+                }
+
+                using (var context = new TestContext())
                 {
                     var baseDTO = context.Bases.Select(b => new BaseDTO
                     {

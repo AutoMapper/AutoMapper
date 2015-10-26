@@ -65,7 +65,7 @@ namespace AutoMapperSamples.Mappers
                     .AsQueryable()
                     .Where(s => s.SrcValue > 6)
                     .Map<Source, Destination>(_destinations.AsQueryable())
-                    .Project().To<Source>(); // projection added
+                    .ProjectTo<Source>(); // projection added
 
                 sourceResult.Count().ShouldEqual(1);
                 sourceResult.First().GetType().ShouldEqual(typeof(Source));
