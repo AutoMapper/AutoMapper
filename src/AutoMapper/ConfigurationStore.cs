@@ -200,7 +200,7 @@ namespace AutoMapper
                 {
                     _typeMapPlanCache.AddOrUpdate(redirectedType.Item1, derivedMap, (_, _2) => derivedMap);
                 }
-                }
+            }
             foreach (var derivedMap in derivedMaps)
             {
                 _typeMapPlanCache.GetOrAdd(derivedMap.Item1, _ => derivedMap.Item2);
@@ -342,11 +342,10 @@ namespace AutoMapper
 
         private void IncludeBaseMappings(Type source, Type destination, TypeMap typeMap)
         {
-            foreach (
-                var inheritedTypeMap in
-                    _userDefinedTypeMaps.Values.Where(t => t.TypeHasBeenIncluded(source, destination)))
+            foreach(var inheritedTypeMap in _userDefinedTypeMaps.Values.Where(t => t.TypeHasBeenIncluded(source, destination)))
             {
                 typeMap.ApplyInheritedMap(inheritedTypeMap);
+                IncludeBaseMappings(inheritedTypeMap.SourceType, inheritedTypeMap.DestinationType, typeMap);
             }
         }
 
