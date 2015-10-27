@@ -11,7 +11,7 @@
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
     <AssemblyName>AutoMapper.UnitTests.Net4</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
@@ -99,6 +99,7 @@
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
+    <Compile Include="Bug\IncludeBaseInheritance.cs" />
     <Compile Include="Bug\NullableDateTime.cs" />
     <Compile Include="Bug\ProjectUsingTheQueriedEntity.cs" />
     <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
