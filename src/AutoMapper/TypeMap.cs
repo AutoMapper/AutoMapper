@@ -172,7 +172,12 @@ namespace AutoMapper
 
         public void IncludeDerivedTypes(Type derivedSourceType, Type derivedDestinationType)
         {
-            _includedDerivedTypes.Add(new TypePair(derivedSourceType, derivedDestinationType));
+            var derivedTypes = new TypePair(derivedSourceType, derivedDestinationType);
+            if(derivedTypes.Equals(Types))
+            {
+                throw new InvalidOperationException("You cannot include a type map into itself.");
+            }
+            _includedDerivedTypes.Add(derivedTypes);
         }
 
         public Type GetDerivedTypeFor(Type derivedSourceType)
