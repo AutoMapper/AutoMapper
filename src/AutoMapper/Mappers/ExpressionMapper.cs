@@ -26,7 +26,7 @@
             if (sourceArgType.IsGenericType())
                 sourceArgType = sourceArgType.GetGenericArguments()[0];
 
-            var typeMap = Mapper.FindTypeMapFor(destArgType, sourceArgType);
+            var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(destArgType, sourceArgType);
 
             var parentMasterVisitor = new MappingVisitor(destDelegateType.GetGenericArguments());
             var typeMapVisitor = new MappingVisitor(typeMap, expression.Parameters[0], Expression.Parameter(destDelegateType.GetGenericArguments()[0], expression.Parameters[0].Name), parentMasterVisitor, destDelegateType.GetGenericArguments());
