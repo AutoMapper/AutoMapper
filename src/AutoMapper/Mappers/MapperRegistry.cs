@@ -39,7 +39,6 @@ namespace AutoMapper.Mappers
             //new NullableMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
-            new OpenGenericMapper(),
             new FromStringDictionaryMapper(),
             new ToStringDictionaryMapper(),
             new FromDynamicMapper(),
