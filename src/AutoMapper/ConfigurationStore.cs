@@ -9,6 +9,7 @@ namespace AutoMapper
     using Configuration;
     using Internal;
     using Mappers;
+    using QueryableExtensions.Impl;
 
     public class ConfigurationStore : IConfigurationProvider
     {
@@ -173,6 +174,7 @@ namespace AutoMapper
             GetProfile(DefaultProfileName).DisableConstructorMapping();
         }
 
+
         public void Seal()
         {
             var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
@@ -195,7 +197,7 @@ namespace AutoMapper
                 {
                     _typeMapPlanCache.AddOrUpdate(redirectedType.Item1, derivedMap, (_, _2) => derivedMap);
                 }
-                }
+            }
             foreach (var derivedMap in derivedMaps)
             {
                 _typeMapPlanCache.GetOrAdd(derivedMap.Item1, _ => derivedMap.Item2);
@@ -204,15 +206,14 @@ namespace AutoMapper
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
         {
-            if (typeMap == null)
-                yield break;
-
             foreach (var derivedMap in typeMap.IncludedDerivedTypes.Select(FindTypeMapFor))
             {
-                if (derivedMap != null)
-                    yield return derivedMap;
-
-                foreach (var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
+                if(derivedMap == null)
+                {
+                    throw QueryMapperHelper.MissingMapException(typeMap.SourceType, typeMap.DestinationType);
+                }
+                yield return derivedMap;
+                foreach(var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
                 {
                     yield return derivedTypeMap;
                 }
@@ -566,7 +567,6 @@ namespace AutoMapper
             {
                 typeMapsChecked.Add(typeMap);
             }
-            CheckIncludedMaps(typeMapsChecked, context);
             var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
             if (mapperToUse == null && context.SourceType.IsNullableType())
             {
@@ -585,24 +585,6 @@ namespace AutoMapper
             {
                 CheckElementMaps(typeMapsChecked, context);
             }
-        }
-
-        private void CheckIncludedMaps(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
-        {
-            var typeMap = context.TypeMap;
-            var destinationTypeOverride = typeMap.DestinationTypeOverride;
-            if(destinationTypeOverride != null)
-            {
-                CheckMapExists(context.SourceType, destinationTypeOverride, context);
-            }
-            foreach(var include in typeMap.IncludedDerivedTypes)
-            {
-                CheckMapExists(include.SourceType, include.DestinationType, context);
-            }
-        }
-
-        private void CheckMapExists(Type sourceType, Type destinationType, ResolutionContext context)
-        {
         }
 
         private void CheckElementMaps(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)

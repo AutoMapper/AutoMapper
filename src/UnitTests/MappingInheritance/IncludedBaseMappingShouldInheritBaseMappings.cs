@@ -182,6 +182,7 @@ namespace AutoMapper.UnitTests.Bug
                     .Include<ModelSubObject, DtoSubObject>();
 
                 cfg.CreateMap<ModelSubObject, OtherDto>();
+                cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
 
             var dto = Mapper.Map<OtherDto>(new ModelSubObject
@@ -203,6 +204,7 @@ namespace AutoMapper.UnitTests.Bug
                     .Include<ModelSubObject, DtoSubObject>();
 
                 cfg.CreateMap<ModelSubObject, OtherDto>();
+                cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
             var dto = Mapper.Map<ModelSubObject, OtherDto>(new ModelSubObject
             {
@@ -223,6 +225,7 @@ namespace AutoMapper.UnitTests.Bug
                     .Include<ModelSubObject, DtoSubObject>();
 
                 cfg.CreateMap<ModelSubObject, OtherDto>();
+                cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
             Mapper.AssertConfigurationIsValid();
         }
