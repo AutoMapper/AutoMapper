@@ -14,6 +14,7 @@ namespace AutoMapper.IntegrationTests.Net4
         {
             Mapper.Initialize(cfg => 
             {
+                //cfg.AllowNullDestinationValues = false;
                 cfg.CreateMap<TrainingCourse, TrainingCourseDto>().MaxDepth(1);
                 cfg.CreateMap<TrainingContent, TrainingContentDto>();
             });

@@ -295,8 +295,19 @@ namespace AutoMapper
                 return parameterReplacer == null ? customProjection.Body : parameterReplacer.Visit(customProjection.Body);
             }
 
-            var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
-
+            var bindings = new List<MemberBinding>();
+            var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
+            if(visitCount >= typeMap.MaxDepth)
+            {
+                if(ConfigurationProvider.AllowNullDestinationValues)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
+            }
             Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
             if(parameterReplacer != null)
             {
@@ -329,11 +340,6 @@ namespace AutoMapper
         {
             var bindings = new List<MemberBinding>();
 
-            var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
-
-            if (visitCount >= typeMap.MaxDepth)
-                return bindings;
-
             foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
             {
                 var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter);
@@ -358,7 +364,10 @@ namespace AutoMapper
 
                 var bindExpression = binder.Build(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
 
-                bindings.Add(bindExpression);
+                if(bindExpression != null)
+                {
+                    bindings.Add(bindExpression);
+                }
             }
             return bindings;
         }

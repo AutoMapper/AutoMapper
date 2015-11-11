@@ -20,7 +20,10 @@ namespace AutoMapper.QueryableExtensions.Impl
             ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
         {
             var transformedExpression = ((IMappingEngineRunner)mappingEngine).CreateMapExpression(request, result.ResolutionExpression, typePairCount);
-
+            if(transformedExpression == null)
+            {
+                return null;
+            }
             // Handles null source property so it will not create an object with possible non-nullable propeerties 
             // which would result in an exception.
             if (mappingEngine.ConfigurationProvider.AllowNullDestinationValues)
