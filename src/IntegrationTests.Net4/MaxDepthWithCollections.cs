@@ -5,11 +5,14 @@ using System.Linq;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.UnitTests;
 using Xunit;
+using Should;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
     public class MaxDepthWithCollections : AutoMapperSpecBase
     {
+        TrainingCourseDto _course;
+
         protected override void Establish_context()
         {
             Mapper.Initialize(cfg => 
@@ -20,13 +23,21 @@ namespace AutoMapper.IntegrationTests.Net4
             });
         }
 
-        [Fact]
-        public void Should_project_with_MaxDepth()
+        protected override void Because_of()
         {
             using(var context = new ClientContext())
             {
-                var course = context.TrainingCourses.ProjectTo<TrainingCourseDto>().FirstOrDefault(n => n.CourseName == "Course 1");
+                _course = context.TrainingCourses.ProjectTo<TrainingCourseDto>().FirstOrDefault(n => n.CourseName == "Course 1");
             }
+        }
+
+        [Fact]
+        public void Should_project_with_MaxDepth()
+        {
+            _course.CourseName.ShouldEqual("Course 1");
+            var content = _course.Content[0];
+            content.ContentName.ShouldEqual("Content 1");
+            content.Course.ShouldBeNull();
         }
 
         class Initializer : DropCreateDatabaseAlways<ClientContext>
@@ -58,7 +69,7 @@ namespace AutoMapper.IntegrationTests.Net4
 
             public string CourseName { get; set; }
 
-            public virtual ICollection<TrainingContent> Content { get; set; } = new List<TrainingContent>();
+            public virtual IList<TrainingContent> Content { get; set; } = new List<TrainingContent>();
         }
 
         public class TrainingContent
@@ -77,7 +88,7 @@ namespace AutoMapper.IntegrationTests.Net4
 
             public string CourseName { get; set; }
 
-            public virtual ICollection<TrainingContentDto> Content { get; set; }
+            public virtual IList<TrainingContentDto> Content { get; set; }
         }
 
         public class TrainingContentDto
