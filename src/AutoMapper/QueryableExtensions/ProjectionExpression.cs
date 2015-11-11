@@ -68,7 +68,12 @@ namespace AutoMapper.QueryableExtensions
 
         private MemberInfo[] GetMembers<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
         {
-            return membersToExpand.Select(ReflectionHelper.GetFieldOrProperty).ToArray();
+            return membersToExpand.Select(expr =>
+            {
+                var visitor = new MemberVisitor();
+                visitor.Visit(expr);
+                return visitor.Member;
+            }).ToArray();
         }
 
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params Expression<Func<TResult, object>>[] membersToExpand)
@@ -88,6 +93,23 @@ namespace AutoMapper.QueryableExtensions
                     new[] { _source.Expression, Expression.Quote(mapExpr) }
                     )
                 );
+        }
+
+        private class MemberVisitor : ExpressionVisitor
+        {
+            private MemberExpression _memberExpression;
+
+            protected override Expression VisitLambda<T>(Expression<T> node)
+            {
+                var memberExpression = node.Body as MemberExpression;
+                if(memberExpression != null)
+                {
+                    _memberExpression = memberExpression;
+                }
+                return base.VisitLambda<T>(node);
+            }
+
+            public MemberInfo Member => _memberExpression.Member;
         }
     }
 }
