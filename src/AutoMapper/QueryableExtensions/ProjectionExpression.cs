@@ -104,6 +104,10 @@ namespace AutoMapper.QueryableExtensions
                 var memberExpression = node.Body as MemberExpression;
                 if(memberExpression != null)
                 {
+                    if(_memberExpression != null)
+                    {
+                        throw new InvalidOperationException("There are more than one lambda member expressions.");
+                    }
                     _memberExpression = memberExpression;
                 }
                 return base.VisitLambda<T>(node);
