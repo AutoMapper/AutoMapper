@@ -8,9 +8,21 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
         {
+            return ExpressionResolutionResult(expressionResolutionResult, valueResolver);
+        }
+
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap, IValueResolver valueResolver)
+        {
+            return ExpressionResolutionResult(expressionResolutionResult, valueResolver);
+        }
+
+        private static ExpressionResolutionResult ExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
+        {
             Expression currentChild = expressionResolutionResult.ResolutionExpression;
             Type currentChildType;
-            var getter = (IMemberGetter)valueResolver;
+            var getter = (IMemberGetter) valueResolver;
             var memberInfo = getter.MemberInfo;
 
             var propertyInfo = memberInfo as PropertyInfo;

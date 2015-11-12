@@ -1,4 +1,7 @@
-﻿namespace AutoMapper
+﻿using AutoMapper.QueryableExtensions;
+using AutoMapper.QueryableExtensions.Impl;
+
+namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
@@ -22,10 +25,29 @@
             _runtimeCtor = LazyFactory.Create(() => DelegateFactory.CreateCtor(ctor, CtorParams));
         }
 
+        private static readonly IExpressionResultConverter[] ExpressionResultConverters =
+        {
+            new MemberGetterExpressionResultConverter(),
+            new MemberResolverExpressionResultConverter(),
+            new NullSubstitutionExpressionResultConverter()
+        };
+
         public Expression NewExpression(Expression instanceParameter)
         {
-            var parameters = CtorParams.Select(map => map.GetExpression(instanceParameter));
-            return Expression.New(Ctor, parameters);
+            var parameters = CtorParams.Select(map =>
+            {
+                var result = new ExpressionResolutionResult(instanceParameter, Ctor.ReflectedType);
+                foreach (var resolver in map.SourceResolvers)
+                {
+                    var matchingExpressionConverter =
+                        ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
+                    if (matchingExpressionConverter == null)
+                        throw new Exception("Can't resolve this to Queryable Expression");
+                    result = matchingExpressionConverter.GetExpressionResolutionResult(result, map, resolver);
+                }
+                return result;
+            });
+            return Expression.New(Ctor, parameters.Select(p => p.ResolutionExpression));
         }
 
         public object ResolveValue(ResolutionContext context, IMappingEngineRunner mappingEngine)

@@ -41,14 +41,13 @@ using System.Collections.ObjectModel;
 
             foreach (var destProperty in destTypeInfo.PublicWriteAccessors)
             {
-                var members = new LinkedList<MemberInfo>();
+                var resolvers = new LinkedList<IValueResolver>();
 
-                if (MapDestinationPropertyToSource(options, sourceTypeInfo, destProperty.GetType(), destProperty.Name, members))
+                if (MapDestinationPropertyToSource(options, sourceTypeInfo, destProperty.GetType(), destProperty.Name, resolvers))
                 {
-                    var resolvers = members.Select(mi => mi.ToMemberGetter());
                     var destPropertyAccessor = destProperty.ToMemberAccessor();
 
-                    typeMap.AddPropertyMap(destPropertyAccessor, resolvers.Cast<IValueResolver>());
+                    typeMap.AddPropertyMap(destPropertyAccessor, resolvers);
                 }
             }
             if (!destinationType.IsAbstract() && destinationType.IsClass())
@@ -64,7 +63,7 @@ using System.Collections.ObjectModel;
             return typeMap;
         }
 
-        private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<MemberInfo> members)
+        private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceTypeInfo, Type destType, string destMemberInfo, LinkedList<IValueResolver> members)
         {
             return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(options, sourceTypeInfo, destType, destMemberInfo, members));
         }
@@ -79,11 +78,9 @@ using System.Collections.ObjectModel;
 
             foreach (var parameter in ctorParameters)
             {
-                var members = new LinkedList<MemberInfo>();
+                var resolvers = new LinkedList<IValueResolver>();
 
-                var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, parameter.GetType(), parameter.Name, members);
-
-                var resolvers = members.Select(mi => mi.ToMemberGetter());
+                var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, parameter.GetType(), parameter.Name, resolvers);
 
                 var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), canResolve);
 

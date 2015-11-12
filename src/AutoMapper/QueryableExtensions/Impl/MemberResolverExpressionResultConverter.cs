@@ -11,14 +11,26 @@ namespace AutoMapper.QueryableExtensions.Impl
         public ExpressionResolutionResult GetExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
         {
-            var oldParameter = propertyMap.CustomExpression.Parameters.Single();
+            return ExpressionResolutionResult(expressionResolutionResult, propertyMap.CustomExpression);
+        }
+
+        private static ExpressionResolutionResult ExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, LambdaExpression lambdaExpression)
+        {
+            var oldParameter = lambdaExpression.Parameters.Single();
             var newParameter = expressionResolutionResult.ResolutionExpression;
             var converter = new ParameterConversionVisitor(newParameter, oldParameter);
 
-            Expression currentChild = converter.Visit(propertyMap.CustomExpression.Body);
+            Expression currentChild = converter.Visit(lambdaExpression.Body);
             Type currentChildType = currentChild.Type;
 
             return new ExpressionResolutionResult(currentChild, currentChildType);
+        }
+
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap, IValueResolver valueResolver)
+        {
+            return ExpressionResolutionResult(expressionResolutionResult, null);
         }
 
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
