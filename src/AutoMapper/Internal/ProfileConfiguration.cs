@@ -40,11 +40,16 @@ namespace AutoMapper.Internal
             _typeConfigurations.Add(condition);
             return condition;
         }
-        
 
-        public bool ConstructorMappingEnabled { get; set; }
-        public bool DataReaderMapperYieldReturnEnabled { get; set; }
+        public void DisableConstructorMapping()
+        {
+            ConstructorMappingEnabled = false;
+        }
+
+        public bool ConstructorMappingEnabled { get; private set; }
+
         public IMemberConfiguration DefaultMemberConfig { get; }
+
         public IEnumerable<MethodInfo> SourceExtensionMethods => _sourceExtensionMethods;
 
         public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
