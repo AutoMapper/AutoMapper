@@ -111,7 +111,6 @@ namespace AutoMapper
             set { GetProfile(DefaultProfileName).DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
-        public bool DataReaderMapperYieldReturnEnabled { get; set; }
         public IEnumerable<MethodInfo> SourceExtensionMethods => GetProfile(DefaultProfileName).SourceExtensionMethods;
 
         public IEnumerable<IMemberConfiguration> MemberConfigurations => GetProfile(DefaultProfileName).MemberConfigurations;
@@ -131,7 +130,7 @@ namespace AutoMapper
             return condition;
         }
 
-        public bool ConstructorMappingEnabled { get; set; }
+        public bool ConstructorMappingEnabled => GetProfile(DefaultProfileName).ConstructorMappingEnabled;
 
         public IProfileExpression CreateProfile(string profileName)
         {
@@ -170,12 +169,7 @@ namespace AutoMapper
 
         public void DisableConstructorMapping()
         {
-            GetProfile(DefaultProfileName).ConstructorMappingEnabled = false;
-        }
-
-        public void EnableYieldReturnForDataReaderMapper()
-        {
-            GetProfile(DefaultProfileName).DataReaderMapperYieldReturnEnabled = true;
+            GetProfile(DefaultProfileName).DisableConstructorMapping();
         }
 
         public void Seal()
