@@ -146,7 +146,17 @@ namespace AutoMapper.UnitTests
 			target.ShouldBeType<ValueSource>();
 		}
 
-		public object CreateValueSource()
+        [Fact]
+        public void Create_ctor_should_throw_when_default_constructor_is_missing()
+        {
+            var type = typeof(NoDefaultConstructor);
+            new Action(()=>DelegateFactory.CreateCtor(type)).ShouldThrow<ArgumentException>(ex=>
+            {
+                ex.Message.ShouldStartWith(type.FullName);
+            });
+        }
+
+        public object CreateValueSource()
 		{
 			return new ValueSource();
 		}
@@ -195,6 +205,14 @@ namespace AutoMapper.UnitTests
 				return default(T);
 			}
 		}
+
+        public class NoDefaultConstructor
+        {
+            public NoDefaultConstructor(int x)
+            {
+            }
+        }
+
 
 		public struct ValueSource
 		{
