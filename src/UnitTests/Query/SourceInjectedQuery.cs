@@ -33,10 +33,15 @@ namespace AutoMapper.UnitTests.Query
 
         protected override void Establish_context()
         {
-            Mapper.CreateMap<Destination, Source>()
-                       .ForMember(s => s.SrcValue, opt => opt.MapFrom(d => d.DestValue))
-                       .ReverseMap()
-                       .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue));
+            Mapper.Initialize(x => {
+                x.AllowNullDestinationValues = true;
+                x.AllowNullCollections = true;
+
+                x.CreateMap<Destination, Source>()
+                           .ForMember(s => s.SrcValue, opt => opt.MapFrom(d => d.DestValue))
+                           .ReverseMap()
+                           .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue));
+            });
         }
 
         [Fact]
@@ -176,46 +181,48 @@ namespace AutoMapper.UnitTests.Query
 
         private static void SetupAutoMapper()
         {
-            Mapper.CreateMap<User, UserModel>()
-            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
-            .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name))
-            .ForMember(d => d.LoggedOn, opt => opt.MapFrom(s => s.IsLoggedOn ? "Y" : "N"))
-            .ForMember(d => d.IsOverEighty, opt => opt.MapFrom(s => s.Age > 80))
-            .ForMember(d => d.AccountName, opt => opt.MapFrom(s => s.Account == null ? string.Empty : string.Concat(s.Account.FirstName, " ", s.Account.LastName)))
-            .ForMember(d => d.AgeInYears, opt => opt.MapFrom(s => s.Age))
-            .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.Active))
-            .ForMember(d => d.AccountModel, opt => opt.MapFrom(s => s.Account));
+            Mapper.Initialize(x => {
+                x.CreateMap<User, UserModel>()
+                    .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
+                    .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name))
+                    .ForMember(d => d.LoggedOn, opt => opt.MapFrom(s => s.IsLoggedOn ? "Y" : "N"))
+                    .ForMember(d => d.IsOverEighty, opt => opt.MapFrom(s => s.Age > 80))
+                    .ForMember(d => d.AccountName, opt => opt.MapFrom(s => s.Account == null ? string.Empty : string.Concat(s.Account.FirstName, " ", s.Account.LastName)))
+                    .ForMember(d => d.AgeInYears, opt => opt.MapFrom(s => s.Age))
+                    .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.Active))
+                    .ForMember(d => d.AccountModel, opt => opt.MapFrom(s => s.Account));
 
-            Mapper.CreateMap<UserModel, User>()
-                .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
-                .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName))
-                .ForMember(d => d.IsLoggedOn, opt => opt.MapFrom(s => s.LoggedOn.ToUpper() == "Y"))
-                .ForMember(d => d.Age, opt => opt.MapFrom(s => s.AgeInYears))
-                .ForMember(d => d.Active, opt => opt.MapFrom(s => s.IsActive))
-                .ForMember(d => d.Account, opt => opt.MapFrom(s => s.AccountModel));
+                x.CreateMap<UserModel, User>()
+                    .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
+                    .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName))
+                    .ForMember(d => d.IsLoggedOn, opt => opt.MapFrom(s => s.LoggedOn.ToUpper() == "Y"))
+                    .ForMember(d => d.Age, opt => opt.MapFrom(s => s.AgeInYears))
+                    .ForMember(d => d.Active, opt => opt.MapFrom(s => s.IsActive))
+                    .ForMember(d => d.Account, opt => opt.MapFrom(s => s.AccountModel));
 
-            Mapper.CreateMap<Account, AccountModel>()
-                .ForMember(d => d.Bal, opt => opt.MapFrom(s => s.Balance))
-                .ForMember(d => d.DateCreated, opt => opt.MapFrom(s => s.CreateDate))
-                .ForMember(d => d.ComboName, opt => opt.MapFrom(s => string.Concat(s.FirstName, " ", s.LastName)))
-                .ForMember(d => d.ThingModels, opt => opt.MapFrom(s => s.Things));
+                x.CreateMap<Account, AccountModel>()
+                    .ForMember(d => d.Bal, opt => opt.MapFrom(s => s.Balance))
+                    .ForMember(d => d.DateCreated, opt => opt.MapFrom(s => s.CreateDate))
+                    .ForMember(d => d.ComboName, opt => opt.MapFrom(s => string.Concat(s.FirstName, " ", s.LastName)))
+                    .ForMember(d => d.ThingModels, opt => opt.MapFrom(s => s.Things));
 
-            Mapper.CreateMap<AccountModel, Account>()
-                .ForMember(d => d.Balance, opt => opt.MapFrom(s => s.Bal))
-                .ForMember(d => d.Things, opt => opt.MapFrom(s => s.ThingModels));
+                x.CreateMap<AccountModel, Account>()
+                    .ForMember(d => d.Balance, opt => opt.MapFrom(s => s.Bal))
+                    .ForMember(d => d.Things, opt => opt.MapFrom(s => s.ThingModels));
 
-            Mapper.CreateMap<Thing, ThingModel>()
-                .ForMember(d => d.FooModel, opt => opt.MapFrom(s => s.Foo))
-                .ForMember(d => d.BarModel, opt => opt.MapFrom(s => s.Bar));
+                x.CreateMap<Thing, ThingModel>()
+                    .ForMember(d => d.FooModel, opt => opt.MapFrom(s => s.Foo))
+                    .ForMember(d => d.BarModel, opt => opt.MapFrom(s => s.Bar));
 
-            Mapper.CreateMap<ThingModel, Thing>()
-                .ForMember(d => d.Foo, opt => opt.MapFrom(s => s.FooModel))
-                .ForMember(d => d.Bar, opt => opt.MapFrom(s => s.BarModel));
+                x.CreateMap<ThingModel, Thing>()
+                    .ForMember(d => d.Foo, opt => opt.MapFrom(s => s.FooModel))
+                    .ForMember(d => d.Bar, opt => opt.MapFrom(s => s.BarModel));
 
-            //Mapper.CreateMap<IEnumerable<Thing>, IEnumerable<ThingModel>>();
-            //Mapper.CreateMap<IEnumerable<ThingModel>, IEnumerable<Thing>>();
-            //Mapper.CreateMap<IEnumerable<User>, IEnumerable<UserModel>>();
-            //Mapper.CreateMap<IEnumerable<UserModel>, IEnumerable<User>>();
+                //x.CreateMap<IEnumerable<Thing>, IEnumerable<ThingModel>>();
+                //x.CreateMap<IEnumerable<ThingModel>, IEnumerable<Thing>>();
+                //x.CreateMap<IEnumerable<User>, IEnumerable<UserModel>>();
+                //x.CreateMap<IEnumerable<UserModel>, IEnumerable<User>>();
+            });
         }
 
     }

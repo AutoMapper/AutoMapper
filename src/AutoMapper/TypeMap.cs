@@ -7,6 +7,7 @@ namespace AutoMapper
     using System.Linq.Expressions;
     using System.Reflection;
     using Internal;
+    using CoreCLR.Internal;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
@@ -402,23 +403,22 @@ namespace AutoMapper
                 AddAfterMapAction(inheritedTypeMap.AfterMap);
         }
 
-        internal LambdaExpression DestinationConstructorExpression(Expression instanceParameter)
+        internal NewExpression GetDestinationConstructorExpression(Expression instanceParameter)
         {
-            var ctorExpr = ConstructExpression;
-            if(ctorExpr != null)
+            if(ConstructExpression != null) 
             {
-                return ctorExpr;
-            }
-            Expression newExpression;
-            if(ConstructorMap != null && ConstructorMap.CtorParams.All(p => p.CanResolve))
+                return (NewExpression)ConstructExpression.Body.Replace(
+                                                                ConstructExpression.Parameters.Single(),
+                                                                instanceParameter);
+            }            
+            else if(ConstructorMap != null && ConstructorMap.CtorParams.All(p => p.CanResolve))
             {
-                newExpression = ConstructorMap.NewExpression(instanceParameter);
+                return (NewExpression)ConstructorMap.NewExpression(instanceParameter);
             }
             else
             {
-                newExpression = Expression.New(DestinationTypeOverride ?? DestinationType);
+                return Expression.New(DestinationTypeOverride ?? DestinationType);
             }
-            return Expression.Lambda(newExpression);
         }
 
     }

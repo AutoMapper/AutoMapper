@@ -15,6 +15,10 @@ namespace AutoMapper.Internal
             return value;
         }
 
+        public static bool IsReferenceType(this Type type) {
+            return !type.IsValueType;
+        }
+
         public static bool IsNullableType(this Type type)
 		{
             return type.IsGenericType() && (type.GetGenericTypeDefinition().Equals(typeof (Nullable<>)));

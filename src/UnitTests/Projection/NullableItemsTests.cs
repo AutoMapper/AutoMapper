@@ -14,8 +14,40 @@ namespace AutoMapper.UnitTests.Projection
         {
             public NullChildItemTest()
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>());
+                Mapper.Initialize(cfg => {
+                    cfg.AllowNullDestinationValues = true;
+                    cfg.AllowNullCollections = true;
+
+                    cfg.CreateMap<Parent, ParentDto>();
+                    cfg.CreateMap<SerialParent, SerialParentDto>();
+                    cfg.CreateMap<Child, ChildDto>();
+                });
             }
+
+            [Fact]
+            public void Should_project_null_collection() 
+            {
+                var items = new[] {
+                                new SerialParent()
+                            };
+
+                var projected = items.AsQueryable().ProjectTo<SerialParentDto>().ToList();
+
+                projected[0].Children.ShouldBeNull();
+            }
+
+            class SerialParent
+            {
+                public Child[] Children { get; set; }
+            }
+
+            class SerialParentDto
+            {
+                public ChildDto[] Children { get; set; }
+            }
+
+
+
 
             [Fact]
             public void Should_project_null_value()
@@ -55,6 +87,11 @@ namespace AutoMapper.UnitTests.Projection
             {
                 public int Value { get; set; }
                 public GrandChild GrandChild { get; set; }
+            }
+
+            public class ChildDto
+            {
+                public int Value { get; set; }
             }
 
             public class GrandChild
