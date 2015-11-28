@@ -9,7 +9,7 @@ properties {
 	$test_dir = "$build_dir\test"
 	$result_dir = "$build_dir\results"
 	$lib_dir = "$base_dir\lib"
-	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.1.1' }
+	$pkgVersion = if ($env:build_number -ne $NULL) { $env:build_number } else { '4.2.0' }
 	$assemblyVersion = $pkgVersion -replace "\-.*$", ".0"
 	$assemblyFileVersion = $pkgVersion -replace "-[^0-9]*", "."
 	$global:config = "debug"
@@ -47,10 +47,7 @@ task commonAssemblyInfo {
 
 task test {
 	create_directory "$build_dir\results"
-    exec { & $source_dir\packages\Fixie.1.0.0.29\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.UnitTests.Net4.xml $source_dir/UnitTests/bin/NET4/$config/AutoMapper.UnitTests.Net4.dll }
-    exec { & $tools_dir\statlight\statlight.exe -x $source_dir/UnitTests/bin/SL5/$config/AutoMapper.UnitTests.xap -d $source_dir/UnitTests/bin/SL5/$config/AutoMapper.UnitTests.SL5.dll --ReportOutputFile=$result_dir\AutoMapper.UnitTests.SL5.xml --ReportOutputFileType=NUnit }
-    exec { & $source_dir\packages\xunit.runners.2.0.0-beta5-build2785\tools\xunit.console.x86.exe $source_dir/UnitTests/bin/WinRT/$config/AutoMapper.UnitTests.WinRT.dll -xml $result_dir\AutoMapper.UnitTests.WinRT.xml -parallel none }
-    exec { & $source_dir\packages\xunit.runners.2.0.0-beta5-build2785\tools\xunit.console.x86.exe $source_dir/UnitTests/bin/WP8/$config/AutoMapper.UnitTests.WP8.dll -xml $result_dir\AutoMapper.UnitTests.WP8.xml -parallel none }
+    exec { & $source_dir\packages\Fixie.1.0.0.29\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.UnitTests.Net4.xml $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.Net4.dll }
     exec { & $source_dir\packages\Fixie.1.0.0.29\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.IntegrationTests.Net4.xml $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
 }
 
@@ -83,14 +80,6 @@ task dist {
 function Get-FrameworkDirectory()
 {
     $([System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory().Replace("v2.0.50727", "v4.0.30319"))
-}
-
-function global:zip_directory($directory, $file)
-{
-    delete_file $file
-    cd $directory
-    exec { & "$tools_dir\7-zip\7za.exe" a $file *.* }
-    cd $base_dir
 }
 
 function global:delete_directory($directory_name)

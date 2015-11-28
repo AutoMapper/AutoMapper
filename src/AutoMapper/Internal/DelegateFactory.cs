@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -9,10 +10,8 @@
 
     public class DelegateFactory
     {
-        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
-
-        private readonly IDictionary<Type, LateBoundCtor> _ctorCache =
-            DictionaryFactory.CreateDictionary<Type, LateBoundCtor>();
+        private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
+            new ConcurrentDictionary<Type, LateBoundCtor>();
 
         public LateBoundMethod CreateGet(MethodInfo method)
         {

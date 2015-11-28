@@ -1,5 +1,4 @@
-﻿#if !SILVERLIGHT && !NETFX_CORE
-using System ;
+﻿using System ;
 using System.Collections.Generic;
 using System.Diagnostics ;
 using System.Linq;
@@ -252,7 +251,6 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 }
-#endif
 
 // The three exceptions I saw while running the multithreading tests for DynamicMap (lbargaoanu)
 

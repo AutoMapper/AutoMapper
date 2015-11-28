@@ -1,106 +1,39 @@
 {
-    "version": "4.1.1-*",
+  "version": "4.2.0-*",
+  "authors": [ "Jimmy Bogard" ],
+  "owners": [ "Jimmy Bogard" ],
+  "licenseUrl": "https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt",
+  "projectUrl": "http://automapper.org",
+  "iconUrl": "https://s3.amazonaws.com/automapper/icon.png",
+  "requireLicenseAcceptance": false,
+  "summary": "A convention-based object-object mapper",
+  "description": "A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is designed for model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.",
 
-    "compilationOptions": { "keyFile": "..\\AutoMapper.snk" },
+  "compilationOptions": { "keyFile": "..\\AutoMapper.snk" },
 
-    "frameworks": {
-
-        ".NETPortable,Version=v4.5,Profile=Profile259": {
-            "frameworkAssemblies": {
-                "System.Collections": "",
-                "System.Dynamic.Runtime": "",
-                "System.Runtime": "",
-                "System.Linq": "",
-                "System.Linq.Expressions": "",
-                "System.Linq.Queryable": "",
-                "System.Text.RegularExpressions": "",
-                "System.Reflection": "",
-                "System.Reflection.Extensions": "",
-                "System.Diagnostics.Debug": "",
-                "System.ObjectModel": "",
-                "System.Runtime.Extensions": "",
-                "System.Threading": "",
-                "Microsoft.CSharp": ""
-            },
-            "compilationOptions": { "define": [ "PORTABLE" ] }
-        },
-        "net45": {
-            "compilationOptions": {
-                "define": [ "NET4" ]
-            },
-        },
-        "net40": {
-            "dependencies": {
-                "Microsoft.Bcl": "1.1.10"
-            },
-            "compilationOptions": {
-                "define": [ "NET40" ]
-            }
-        },
-        "wp8": {
-            "frameworkAssemblies": {
-                "mscorlib": "",
-                "System": "",
-                "System.Core": "",
-                "Microsoft.CSharp": ""
-            },
-            "compilationOptions": {
-                "define": [ "SILVERLIGHT" ]
-            }
-        },
-        "wpa81": {
-            "frameworkAssemblies": {
-                "System.Collections": "",
-                "System.Runtime": "",
-                "System.Dynamic.Runtime": "",
-                "System.Linq": "",
-                "System.Linq.Expressions": "",
-                "System.Linq.Queryable": "",
-                "System.Text.RegularExpressions": "",
-                "System.Reflection": "",
-                "System.Reflection.Extensions": "",
-                "System.Diagnostics.Debug": "",
-                "System.ObjectModel": "",
-                "System.Runtime.Extensions": "",
-                "System.Threading": "",
-                "Microsoft.CSharp": ""
-            },
-            "compilationOptions": {
-                "define": [ "WINDOWS_PHONE" ]
-            }
-        },
-        "netcore45": {
-            "frameworkAssemblies": {
-                "System.Collections": "",
-                "System.Core": "",
-                "System.Runtime": "",
-                "System.Dynamic.Runtime": "",
-                "System.Linq": "",
-                "System.Linq.Expressions": "",
-                "System.Linq.Queryable": "",
-                "System.Text.RegularExpressions": "",
-                "System.Reflection": "",
-                "System.Reflection.Extensions": "",
-                "System.Diagnostics.Debug": "",
-                "System.ObjectModel": "",
-                "System.Runtime.Extensions": "",
-                "System.Threading": "",
-                "Microsoft.CSharp": ""
-            },
-            "compilationOptions": {
-                "define": [ "NETCORE45" ]
-            }
-        },
-        "dotnet": {
-            "dependencies": {
-                "Microsoft.NETCore.Platforms": "1.0.0",
-                "Microsoft.NETCore": "5.0.0",
-                "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
-            },
-            "imports": "portable-net452+win81",
-            "compilationOptions": {
-                "define": [ "DNXCORE50" ]
-            }
-        }
+  "frameworks": {
+    "dotnet5.1": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.0",
+        "System.Runtime": "4.0.20",
+        "System.Text.RegularExpressions": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Reflection.Extensions": "4.0.0",
+        "System.Reflection.TypeExtensions": "4.0.0",
+        "System.Reflection.Emit": "4.0.0",
+        "System.Reflection.Emit.Lightweight": "4.0.0",
+        "System.Reflection.Emit.ILGeneration": "4.0.0",
+        "System.Linq": "4.0.0",
+        "System.Linq.Expressions": "4.0.10",
+        "System.Linq.Queryable": "4.0.0",
+        "System.Collections.Concurrent": "4.0.0",
+        "System.Collections.Specialized": "4.0.0",
+        "System.ComponentModel.TypeConverter": "4.0.0",
+        "System.Globalization": "4.0.0"
+      },
+      "compilationOptions": {
+        "define": [ "COREFX10" ]
+      }
     }
+  }
 }

@@ -1,7 +1,9 @@
+
 namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using System.Linq;
     using System.Reflection;
     using Configuration;
@@ -10,22 +12,21 @@ namespace AutoMapper
 
     public class ConfigurationStore : IConfigurationProvider
     {
-        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
-        internal readonly ITypeMapFactory _typeMapFactory;
+        private readonly ITypeMapFactory _typeMapFactory;
         private readonly IEnumerable<IObjectMapper> _mappers;
         internal const string DefaultProfileName = "";
 
-        private readonly Internal.IDictionary<TypePair, TypeMap> _userDefinedTypeMaps =
-            DictionaryFactory.CreateDictionary<TypePair, TypeMap>();
+        private readonly ConcurrentDictionary<TypePair, TypeMap> _userDefinedTypeMaps =
+            new ConcurrentDictionary<TypePair, TypeMap>();
 
-        private readonly Internal.IDictionary<TypePair, TypeMap> _typeMapPlanCache =
-            DictionaryFactory.CreateDictionary<TypePair, TypeMap>();
+        private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache =
+            new ConcurrentDictionary<TypePair, TypeMap>();
 
-        private readonly Internal.IDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache =
-            DictionaryFactory.CreateDictionary<TypePair, CreateTypeMapExpression>();
+        private readonly ConcurrentDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache =
+            new ConcurrentDictionary<TypePair, CreateTypeMapExpression>();
 
-        internal readonly Internal.IDictionary<string, IProfileExpression> _formatterProfiles =
-            DictionaryFactory.CreateDictionary<string, IProfileExpression>();
+        internal readonly ConcurrentDictionary<string, IProfileExpression> _formatterProfiles =
+            new ConcurrentDictionary<string, IProfileExpression>();
 
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 

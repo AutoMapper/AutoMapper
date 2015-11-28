@@ -10,7 +10,7 @@
     public class ConstructorMap
     {
         private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
-        private readonly ILazy<LateBoundParamsCtor> _runtimeCtor;
+        private readonly Lazy<LateBoundParamsCtor> _runtimeCtor;
         public ConstructorInfo Ctor { get; private set; }
         public IEnumerable<ConstructorParameterMap> CtorParams { get; }
 
@@ -19,7 +19,7 @@
             Ctor = ctor;
             CtorParams = ctorParams;
 
-            _runtimeCtor = LazyFactory.Create(() => DelegateFactory.CreateCtor(ctor, CtorParams));
+            _runtimeCtor = new Lazy<LateBoundParamsCtor>(() => DelegateFactory.CreateCtor(ctor, CtorParams));
         }
 
         public Expression NewExpression(Expression instanceParameter)

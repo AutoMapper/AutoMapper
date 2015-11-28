@@ -169,6 +169,7 @@ namespace AutoMapper
         void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
 
         Expression CreateMapExpression(Type sourceType, Type destinationType, ObjectDictionary parameters = null, params MemberInfo[] membersToExpand);
+        IObjectMapper GetOrAddMapper(TypePair typePair, Func<TypePair, IObjectMapper> factory);
     }
 
 }

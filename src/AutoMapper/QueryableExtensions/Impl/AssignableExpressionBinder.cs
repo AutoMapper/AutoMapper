@@ -1,6 +1,7 @@
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System.Linq.Expressions;
+    using System.Collections.Concurrent;
     using Internal;
     using System.Reflection;
 
@@ -13,7 +14,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
             ExpressionRequest request, ExpressionResolutionResult result,
-            IDictionary<ExpressionRequest, int> typePairCount)
+            ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindAssignableExpression(propertyMap, result);
         }

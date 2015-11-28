@@ -1,5 +1,4 @@
-﻿#if NET4 || MONODROID || MONOTOUCH || __IOS__
-namespace AutoMapper.Mappers
+﻿namespace AutoMapper.Mappers
 {
     using System.Collections.Specialized;
 
@@ -26,5 +25,3 @@ namespace AutoMapper.Mappers
         }
     }
 }
-
-#endif

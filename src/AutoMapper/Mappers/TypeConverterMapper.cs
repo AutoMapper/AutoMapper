@@ -1,5 +1,3 @@
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT
-
 namespace AutoMapper.Mappers
 {
     using System;
@@ -43,24 +41,7 @@ namespace AutoMapper.Mappers
 
         private static TypeConverter GetTypeConverter(Type type)
         {
-#if !SILVERLIGHT
             return TypeDescriptor.GetConverter(type);
-#else
-            var attributes = type.GetCustomAttributes(typeof (TypeConverterAttribute), false);
-
-            if (attributes.Length != 1)
-                return new TypeConverter();
-
-            var converterAttribute = (TypeConverterAttribute) attributes[0];
-            var converterType = Type.GetType(converterAttribute.ConverterTypeName);
-
-            if (converterType == null)
-                return new TypeConverter();
-
-            return Activator.CreateInstance(converterType) as TypeConverter;
-#endif
         }
     }
 }
-
-#endif

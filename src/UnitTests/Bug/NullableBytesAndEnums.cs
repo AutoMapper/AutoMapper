@@ -43,7 +43,6 @@ namespace AutoMapper.UnitTests.Bug
 		}
 	}
 
-#if NET40
     public class NullableLong : AutoMapperSpecBase
     {
         private Destination _destination;
@@ -77,5 +76,4 @@ namespace AutoMapper.UnitTests.Bug
             _destination.Value.ShouldEqual(2);
         }
     }
-#endif
 }
