@@ -1,3 +1,6 @@
 {
-	"sources": [ "src\\AutoMapper" ]
+    "projects": [ "src\\AutoMapper", "test" ],
+    "sdk": {
+      "version": "1.0.0-rc1-final"
+    }
 }
