@@ -21,10 +21,6 @@ task clean {
 task init {
 	$dnxVersion = Get-DnxVersion
 	
-	# Remove the installed DNVM from the path and force use of
-	# per-user DNVM (which we can upgrade as needed without admin permissions)
-	Remove-PathVariable "*Program Files\Microsoft DNX\DNVM*"
-
 	# Make sure per-user DNVM is installed
 	Install-Dnvm
 
@@ -76,15 +72,4 @@ function Get-DnxVersion
     $globalJson = Join-Path $PSScriptRoot "global.json"
     $jsonData = Get-Content -Path $globalJson -Raw | ConvertFrom-JSON
     return $jsonData.sdk.version
-}
-
-function Remove-PathVariable
-{
-    param([string] $VariableToRemove)
-    $path = [Environment]::GetEnvironmentVariable("PATH", "User")
-    $newItems = $path.Split(';') | Where-Object { $_.ToString() -inotlike $VariableToRemove }
-    [Environment]::SetEnvironmentVariable("PATH", [System.String]::Join(';', $newItems), "User")
-    $path = [Environment]::GetEnvironmentVariable("PATH", "Process")
-    $newItems = $path.Split(';') | Where-Object { $_.ToString() -inotlike $VariableToRemove }
-    [Environment]::SetEnvironmentVariable("PATH", [System.String]::Join(';', $newItems), "Process")
 }
