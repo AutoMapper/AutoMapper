@@ -6,12 +6,12 @@
   </PropertyGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>35888286-1428-4bf3-bb0c-d8bc092d0a5d</ProjectGuid>
-    <RootNamespace>AutoMapper.CoreCLR</RootNamespace>
+    <RootNamespace>AutoMapper</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\artifacts\bin\$(MSBuildProjectName)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AssemblyName>AutoMapper.CoreCLR</AssemblyName>
+    <AssemblyName>AutoMapper</AssemblyName>
   </PropertyGroup>
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
