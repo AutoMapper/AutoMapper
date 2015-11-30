@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace AutoMapper
 {
     using System;
@@ -10,8 +12,8 @@ using System.Collections.ObjectModel;
 
     public class TypeMapFactory : ITypeMapFactory
     {
-        private static readonly Internal.IDictionary<Type, TypeDetails> _typeInfos
-            = PlatformAdapter.Resolve<IDictionaryFactory>().CreateDictionary<Type, TypeDetails>();
+        private static readonly ConcurrentDictionary<Type, TypeDetails> _typeInfos
+            = new ConcurrentDictionary<Type, TypeDetails>();
 
         public static TypeDetails GetTypeInfo(Type type, IProfileConfiguration profileConfiguration)
         {

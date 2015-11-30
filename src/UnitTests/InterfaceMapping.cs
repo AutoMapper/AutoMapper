@@ -79,7 +79,6 @@ namespace AutoMapper.UnitTests
             }
         }
 
-#if !SILVERLIGHT && !NETFX_CORE
         public class When_mapping_a_concrete_type_to_an_interface_type : AutoMapperSpecBase
         {
             private IDestination _result;
@@ -191,7 +190,7 @@ namespace AutoMapper.UnitTests
                 _count++;
             }
         }
-#endif
+
         public class When_mapping_a_derived_interface_to_an_derived_concrete_type : AutoMapperSpecBase
         {
             private Destination _result = null;

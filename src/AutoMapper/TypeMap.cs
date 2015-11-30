@@ -369,7 +369,7 @@ namespace AutoMapper
         public bool ShouldCheckForValid()
         {
             return (CustomMapper == null && CustomProjection == null &&
-                    DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(SourceType);
+                    DestinationTypeOverride == null);
         }
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)

@@ -50,11 +50,7 @@ namespace AutoMapper.UnitTests.Bug
             {
                 Items = new List<ItemDto>();
             }
-#if SILVERLIGHT
-            public List<ItemDto> Items { get; set; }
-#else
             public List<ItemDto> Items { get; private set; }
-#endif
         }
 
         [Fact]

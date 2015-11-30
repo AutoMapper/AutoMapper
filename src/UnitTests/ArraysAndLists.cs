@@ -488,7 +488,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-#if !SILVERLIGHT && !NETFX_CORE
 		public class When_destination_collection_is_only_a_list_source_and_not_IList : SpecBase
 		{
 			private Destination _destination;
@@ -538,12 +537,11 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3 } });
 			}
 
-			[Fact]
-			public void Should_use_the_underlying_list_to_add_values()
+            [Fact(Skip = "No IListSource in .NET Standard")]
+            public void Should_use_the_underlying_list_to_add_values()
 			{
 				_destination.Values.Count().ShouldEqual(3);
 			}
 		}
-#endif
 	}
 }

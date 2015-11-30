@@ -27,7 +27,7 @@ namespace AutoMapper.Mappers
 
             context = context.CreateTypeContext(typeMap, context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
 
-            var map = (context.Engine as MappingEngine)._objectMapperCache.GetOrAdd(contextTypePair, missFunc);
+            var map = context.Engine.GetOrAddMapper(contextTypePair, missFunc);
             return map.Map(context, mapper);
         }
 
