@@ -13,27 +13,32 @@
   "compilationOptions": { "keyFile": "..\\AutoMapper.snk" },
 
   "frameworks": {
+    "net45": {},
     "dotnet5.1": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.0",
-        "System.Runtime": "4.0.20",
-        "System.Text.RegularExpressions": "4.0.10",
-        "System.Reflection": "4.0.10",
-        "System.Reflection.Extensions": "4.0.0",
-        "System.Reflection.TypeExtensions": "4.0.0",
-        "System.Reflection.Emit": "4.0.0",
-        "System.Reflection.Emit.Lightweight": "4.0.0",
-        "System.Reflection.Emit.ILGeneration": "4.0.0",
-        "System.Linq": "4.0.0",
-        "System.Linq.Expressions": "4.0.10",
-        "System.Linq.Queryable": "4.0.0",
+        "System.Collections": "4.0.10",
         "System.Collections.Concurrent": "4.0.0",
         "System.Collections.Specialized": "4.0.0",
         "System.ComponentModel.TypeConverter": "4.0.0",
-        "System.Globalization": "4.0.0"
-      },
-      "compilationOptions": {
-        "define": [ "COREFX10" ]
+        "System.Diagnostics.Debug": "4.0.10",
+        "System.Dynamic.Runtime": "4.0.10",
+        "System.Globalization": "4.0.0",
+        "System.Linq": "4.0.0",
+        "System.Linq.Expressions": "4.0.10",
+        "System.Linq.Queryable": "4.0.0",
+        "System.ObjectModel": "4.0.10",
+        "System.Reflection": "4.0.10",
+        "System.Reflection.Emit": "4.0.0",
+        "System.Reflection.Emit.ILGeneration": "4.0.0",
+        "System.Reflection.Extensions": "4.0.0",
+        "System.Reflection.Primitives": "4.0.0",
+        "System.Reflection.TypeExtensions": "4.0.0",
+        "System.Runtime": "4.0.20",
+        "System.Runtime.Extensions": "4.0.10",
+        "System.Text.RegularExpressions": "4.0.10",
+        "System.Threading": "4.0.10",
+        "System.Threading.Tasks": "4.0.10"
       }
     }
   }
