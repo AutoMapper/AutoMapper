@@ -115,7 +115,7 @@ namespace AutoMapper
                 select new { sourceName, destName };
             var match =
                 all.FirstOrDefault(
-                    pair => pair.destName.possibles.Any(p => string.CompareOrdinal(p, pair.sourceName) == 0));
+                    pair => pair.destName.possibles.Any(p => string.Compare(p, pair.sourceName, StringComparison.OrdinalIgnoreCase) == 0));
             return match?.destName.mi;
         }
 
@@ -168,7 +168,7 @@ namespace AutoMapper
                 select new { sourceName, destName };
             var match =
                 all.FirstOrDefault(
-                    pair => pair.destName.possibles.Any(p => string.CompareOrdinal(p, pair.sourceName) == 0));
+                    pair => pair.destName.possibles.Any(p => string.Compare(p, pair.sourceName, StringComparison.OrdinalIgnoreCase) == 0));
             if (match == null)
                 return null;
             return match.destName.mi;
@@ -210,7 +210,7 @@ namespace AutoMapper
 
         public override bool IsMatch(TypeDetails typeInfo, MemberInfo memberInfo, Type destType, string nameToSearch)
         {
-            return string.CompareOrdinal(MatchingName, nameToSearch) == 0;
+            return string.Compare(MatchingName, nameToSearch, StringComparison.OrdinalIgnoreCase) == 0;
         }
     }
 
