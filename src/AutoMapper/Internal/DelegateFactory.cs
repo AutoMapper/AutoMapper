@@ -130,8 +130,7 @@
                     //find a ctor with only optional args
                     var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
                     if (ctorWithOptionalArgs == null)
-                        throw new ArgumentException(
-                            "Type needs to have a constructor with 0 args or only optional args", "type");
+                        throw new ArgumentException(type+" needs to have a constructor with 0 args or only optional args", "type");
 
                     //get all optional default values
                     var args = ctorWithOptionalArgs
