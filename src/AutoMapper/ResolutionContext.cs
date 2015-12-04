@@ -109,7 +109,10 @@ namespace AutoMapper
             else
             {
                 SourceType = sourceType;
-                DestinationType = destinationType;
+                if(destinationType != null)
+                {
+                    DestinationType = destinationType;
+                }
             }
         }
 
