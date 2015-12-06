@@ -252,7 +252,7 @@ namespace AutoMapper
             parameters = parameters ?? new Dictionary<string, object>();
 
             var cachedExpression =
-                _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand),
+                _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null),
                     tp => CreateMapExpression(tp, DictionaryFactory.CreateDictionary<ExpressionRequest, int>()));
 
             if (!parameters.Any())
@@ -333,21 +333,26 @@ namespace AutoMapper
 
                 var propertyTypeMap = ConfigurationProvider.ResolveTypeMap(result.Type,
                     propertyMap.DestinationPropertyType);
-                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.MembersToExpand);
+                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType,
+                    request.MembersToExpand, request);
 
-                var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
-
-                if (binder == null)
+                // prevent stackoverflow by examining if an ExpressionRequest like this has already been processed
+                if (!propertyRequest.AlreadyExists)
                 {
-                    var message =
-                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
+                    var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
-                    throw new AutoMapperMappingException(message);
+                    if (binder == null)
+                    {
+                        var message = $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
+
+                        throw new AutoMapperMappingException(message);
+                    }
+
+                    var bindExpression = binder.Build(this, propertyMap, propertyTypeMap, propertyRequest, result,
+                        typePairCount);
+
+                    bindings.Add(bindExpression);
                 }
-
-                var bindExpression = binder.Build(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
-
-                bindings.Add(bindExpression);
             }
             return bindings;
         }
