@@ -149,7 +149,7 @@
             var newDests = _sources.ProjectTo<Dest>(Configuration, new Dictionary<string, object> { { "value", 15 } }).ToArray();
 
             newDests[0].Value.ShouldEqual(20);
-        }
+        }  
     }
 
     public class ParameterizedQueriesTests_with_filter : AutoMapperSpecBase
@@ -198,6 +198,17 @@
             var db = new DB();
 
             var user = db.Users.ProjectTo<UserViewModel>(Configuration, new { db }).FirstOrDefault(a => a.Id == 2);
+
+            user.position.ShouldEqual(1);
+        }
+
+
+        [Fact]
+        public void Should_only_replace_outer_parameters_when_using_as_datasource()
+        {
+            var db = new DB();
+
+            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == 2);
 
             user.position.ShouldEqual(1);
         }

@@ -322,6 +322,55 @@ namespace AutoMapper.UnitTests.Query
             dto.Master.Details.Single().Id.ShouldEqual(dto.Id, "Dto was not added to inner collection");
             dto.GetHashCode().ShouldNotEqual(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
         }
+        [Fact]
+        public void SupportsParmeterization()
+        {
+            // Arrange
+            int value = 0;
+
+            Expression<Func<SourceWithParams, int>> sourceMember = src => value + 5;
+            Mapper.CreateMap<SourceWithParams, DestWithParams>()
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
+
+            var source = new[]
+            {
+                new SourceWithParams()
+            }.AsQueryable();
+
+            // Act
+            var result = source.UseAsDataSource().For<DestWithParams>(new Dictionary<string, object> { { "value", 10 } }).ToArray();
+            
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldNotBeEmpty();
+            result.Single().Value.ShouldEqual(15);
+        }
+
+        [Fact]
+        public void SupportsParmeterization_DoesNotCacheParameter()
+        {
+            // Arrange
+            int value = 0;
+
+            Expression<Func<SourceWithParams, int>> sourceMember = src => value + 5;
+            Mapper.CreateMap<SourceWithParams, DestWithParams>()
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
+
+            var source = new[]
+            {
+                new SourceWithParams()
+            }.AsQueryable();
+
+            // Act
+            var result1 = source.UseAsDataSource().For<DestWithParams>(new Dictionary<string, object> { { "value", 10 } }).ToArray();
+            var result = source.UseAsDataSource().For<DestWithParams>(new Dictionary<string, object> { { "value", 15 } }).ToArray();
+
+            // Assert
+            result.ShouldNotBeNull();
+            result.ShouldNotBeEmpty();
+            result.Single().Value.ShouldEqual(20);
+        }
+
 
         private static void SetupAutoMapper()
         {
@@ -493,6 +542,15 @@ namespace AutoMapper.UnitTests.Query
         public Guid Id { get; set; }
         public string Name { get; set; }
         public MasterCyclicDto Master { get; set; }
+    }
+
+    public class SourceWithParams
+    {
+    }
+
+    public class DestWithParams
+    {
+        public int Value { get; set; }
     }
 }
 
