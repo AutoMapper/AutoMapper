@@ -180,6 +180,116 @@ namespace AutoMapper.UnitTests.Query
         }
 
         [Fact]
+        public void CanMapCyclicObjectGraph()
+        {
+            // Arrange
+            var master = new Master()
+            {
+                Name = "Harry Marry",
+                Id = Guid.NewGuid(),
+            };
+            var detail = new Detail()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Order",
+                Master = master,
+            };
+            master.Details.Add(detail);
+
+            // Act
+            var dto = Mapper.Map<DetailCyclicDto>(detail);
+
+            // Assert
+            AssertValidDtoGraph(detail, master, dto);
+        }
+
+        [Fact]
+        public void CanMapCaclicExpressionGraph()
+        {
+            // Arrange
+            var master = new Master()
+            {
+                Name = "Harry Marry",
+                Id = Guid.NewGuid(),
+            };
+            var detail = new Detail()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Order",
+                Master = master,
+            };
+            master.Details.Add(detail);
+            var detailQuery = new List<Detail> { detail }.AsQueryable();
+
+            // Act
+            var detailDtoQuery = detailQuery.UseAsDataSource()
+                .For<DetailCyclicDto>();
+
+            // Assert
+            var dto = detailDtoQuery.Single();
+
+            AssertValidDtoGraph(detail, master, dto);
+        }
+
+        [Fact]
+        public void CanMapCaclicExpressionGraph_WithPropertyFilter()
+        {
+            // Arrange
+            var master = new Master()
+            {
+                Name = "Harry Marry",
+                Id = Guid.NewGuid(),
+            };
+            var detail = new Detail()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Order",
+                Master = master,
+            };
+            master.Details.Add(detail);
+            var detailQuery = new List<Detail> { detail }.AsQueryable();
+
+            // Act
+            var detailDtoQuery = detailQuery.UseAsDataSource()
+                .For<DetailCyclicDto>()
+                .Where(d => d.Name.EndsWith("rder"));
+
+            // Assert
+            var dto = detailDtoQuery.Single();
+
+            AssertValidDtoGraph(detail, master, dto);
+        }
+
+        [Fact]
+        public void CanMapCaclicExpressionGraph_WithPropertyPathEqualityFilter_Single()
+        {
+            // Arrange
+            var master = new Master()
+            {
+                Name = "Harry Marry",
+                Id = Guid.NewGuid(),
+            };
+            var detail = new Detail()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Order",
+                Master = master,
+            };
+            master.Details.Add(detail);
+            var detailQuery = new List<Detail> { detail }.AsQueryable();
+
+            // Act
+            var detailDtoQuery = detailQuery.UseAsDataSource()
+                .For<DetailCyclicDto>()
+                .Where(d => d.Master.Name == "Harry Marry");
+
+            // Assert
+            var dto = detailDtoQuery.Single();
+
+            AssertValidDtoGraph(detail, master, dto);
+        }
+
+        [Fact]
         [Description("Fix for issue #882")]
         public void Should_support_propertypath_expressons_with_equally_named_properties()
         {
@@ -198,6 +308,19 @@ namespace AutoMapper.UnitTests.Query
 
             // Assert
             detailDtoQuery.ToList().Count().ShouldEqual(1);
+        }
+
+        private void AssertValidDtoGraph(Detail detail, Master master, DetailCyclicDto dto)
+        {
+            dto.ShouldNotBeNull();
+            detail.Id.ShouldEqual(dto.Id);
+
+            detail.Master.ShouldNotBeNull();
+            master.Details.ShouldNotBeEmpty();
+            detail.Master.Id.ShouldEqual(master.Id);
+            
+            dto.Master.Details.Single().Id.ShouldEqual(dto.Id, "Dto was not added to inner collection");
+            dto.GetHashCode().ShouldNotEqual(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
         }
 
         private static void SetupAutoMapper()
@@ -251,6 +374,12 @@ namespace AutoMapper.UnitTests.Query
 
             Mapper.CreateMap<Master, MasterDto>().ReverseMap();
             Mapper.CreateMap<Detail, DetailDto>().ReverseMap();
+
+            // dtos with cyclic references that would cause a stackoverflow exception upon projection mapping
+            Mapper.CreateMap<Master, MasterCyclicDto>();
+            Mapper.CreateMap<MasterCyclicDto, Master>();
+            Mapper.CreateMap<Detail, DetailCyclicDto>();
+            Mapper.CreateMap<DetailCyclicDto, Detail>();
         }
 
     }
@@ -336,13 +465,8 @@ namespace AutoMapper.UnitTests.Query
 
     public class MasterDto
     {
-        public MasterDto()
-        {
-            Details = new List<DetailDto>();
-        }
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public ICollection<DetailDto> Details { get; set; }
     }
 
     public class DetailDto
@@ -350,6 +474,25 @@ namespace AutoMapper.UnitTests.Query
         public Guid Id { get; set; }
         public string Name { get; set; }
         public MasterDto Master { get; set; }
+    }
+
+    
+    public class MasterCyclicDto
+    {
+        public MasterCyclicDto()
+        {
+            Details = new List<DetailCyclicDto>();
+        }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public ICollection<DetailCyclicDto> Details { get; set; }
+    }
+
+    public class DetailCyclicDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public MasterCyclicDto Master { get; set; }
     }
 }
 
