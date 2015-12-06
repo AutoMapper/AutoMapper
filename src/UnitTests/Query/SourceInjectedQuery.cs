@@ -180,6 +180,7 @@ namespace AutoMapper.UnitTests.Query
         public void CanMapCyclicObjectGraph()
         {
             // Arrange
+            SetupAutoMapper();
             var master = new Master()
             {
                 Name = "Harry Marry",
@@ -204,6 +205,7 @@ namespace AutoMapper.UnitTests.Query
         public void CanMapCaclicExpressionGraph()
         {
             // Arrange
+            SetupAutoMapper();
             var master = new Master()
             {
                 Name = "Harry Marry",
@@ -232,6 +234,7 @@ namespace AutoMapper.UnitTests.Query
         public void CanMapCaclicExpressionGraph_WithPropertyFilter()
         {
             // Arrange
+            SetupAutoMapper();
             var master = new Master()
             {
                 Name = "Harry Marry",
@@ -261,6 +264,7 @@ namespace AutoMapper.UnitTests.Query
         public void CanMapCaclicExpressionGraph_WithPropertyPathEqualityFilter_Single()
         {
             // Arrange
+            SetupAutoMapper();
             var master = new Master()
             {
                 Name = "Harry Marry",
@@ -292,9 +296,9 @@ namespace AutoMapper.UnitTests.Query
         {
             // Arrange
             SetupAutoMapper();
-            
-            var master = new Master {Id = Guid.NewGuid(), Name="Harry Marry"};
-            var detail = new Detail {Id = Guid.NewGuid(), Master = master, Name = "Some detail"};
+
+            var master = new Master { Id = Guid.NewGuid(), Name = "Harry Marry" };
+            var detail = new Detail { Id = Guid.NewGuid(), Master = master, Name = "Some detail" };
             master.Details.Add(detail);
             var source = new List<Detail> { detail };
 
@@ -317,7 +321,7 @@ namespace AutoMapper.UnitTests.Query
             detail.Master.Id.ShouldEqual(master.Id);
             
             dto.Master.Details.Single().Id.ShouldEqual(dto.Id, "Dto was not added to inner collection");
-            dto.GetHashCode().ShouldNotEqual(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
+            dto.GetHashCode().ShouldEqual(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
         }
 
         [Fact]
