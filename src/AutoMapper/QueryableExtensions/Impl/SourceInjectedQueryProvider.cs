@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Reflection;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -7,6 +7,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq.Expressions;
     using Internal;
     using Mappers;
+    using System.Collections.Generic;
 
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider
     {
@@ -15,22 +16,31 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly IQueryable<TDestination> _destQuery;
         private readonly IEnumerable<ExpressionVisitor> _beforeVisitors;
         private readonly IEnumerable<ExpressionVisitor> _afterVisitors;
+        private readonly System.Collections.Generic.IDictionary<string, object> _parameters;
+        private readonly string[] _membersToExpand;
+        private readonly Expression<Func<TDestination, object>>[] _membersExpressionsToExpand;
         private readonly Action<Exception> _exceptionHandler;
 
         public SourceInjectedQueryProvider(IMapper mapper,
             IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
                 IEnumerable<ExpressionVisitor> beforeVisitors,
                 IEnumerable<ExpressionVisitor> afterVisitors,
-                Action<Exception> exceptionHandler)
+                Action<Exception> exceptionHandler, 
+                System.Collections.Generic.IDictionary<string, object> parameters, 
+                string[] membersToExpand,
+                Expression<Func<TDestination, object>>[] membersExpressionsToExpand)
         {
             _mapper = mapper;
             _dataSource = dataSource;
             _destQuery = destQuery;
             _beforeVisitors = beforeVisitors;
             _afterVisitors = afterVisitors;
+            _parameters = parameters;
+            _membersToExpand = membersToExpand;
+            _membersExpressionsToExpand = membersExpressionsToExpand;
             _exceptionHandler = exceptionHandler ?? ((x) => { }); ;
         }
-
+        
         public SourceInjectedQueryInspector Inspector { get; set; }
         internal Action<IEnumerable<object>> EnumerationHandler { get; set; }
 
@@ -79,9 +89,21 @@ namespace AutoMapper.QueryableExtensions.Impl
 
                 Inspector.SourceResult(sourceExpression, sourceResult);
 
-                var destResult = IsProjection<TDestination>(resultType) 
+
+// TODO: Check out which is right.
+/*                var destResult = IsProjection<TDestination>(resultType) 
                     ? new ProjectionExpression(sourceResult as IQueryable<TSource>, _mapper.ConfigurationProvider.ExpressionBuilder).To<TDestination>() 
                     : _mapper.Map(sourceResult, sourceResultType, destResultType);
+*/
+                object destResult;
+                if (IsProjection<TDestination>(resultType))
+                {
+                    if(_membersToExpand != null) destResult = new ProjectionExpression(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>(_parameters, _membersToExpand);
+                    else destResult = new ProjectionExpression(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>(_parameters, _membersExpressionsToExpand);
+
+                }
+                else
+                    destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
                 Inspector.DestResult(sourceResult);
 
                 // implicitly convert types in case of valuetypes which cannot be casted explicitly

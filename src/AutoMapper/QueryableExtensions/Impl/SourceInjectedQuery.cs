@@ -1,30 +1,37 @@
 ﻿namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
+    using System.Reflection;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
 
     public class SourceSourceInjectedQuery<TSource, TDestination> : IOrderedQueryable<TDestination>, ISourceInjectedQueryable<TDestination>
     {
         private readonly Action<Exception> _exceptionHandler;
-
-        public SourceSourceInjectedQuery(IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
+        
+        public SourceSourceInjectedQuery(IQueryable<TSource> dataSource, 
+                IQueryable<TDestination> destQuery,
                 IMapper mapper, 
                 IEnumerable<ExpressionVisitor> beforeVisitors,
                 IEnumerable<ExpressionVisitor> afterVisitors,
                 Action<Exception> exceptionHandler,
-                SourceInjectedQueryInspector inspector = null)
+                IObjectDictionary parameters,
+                string[] membersToExpand,
+                Expression<Func<TDestination, object>>[] membersExpressionsToExpand,
+                SourceInjectedQueryInspector inspector)
         {
-            _exceptionHandler = exceptionHandler ?? ((x)=> {});
+            Parameters = parameters;
             EnumerationHandler = (x => {});
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
-            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mapper, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler)
+            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mapper, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler, parameters, membersToExpand, membersExpressionsToExpand)
             {
-                Inspector = inspector ?? new SourceInjectedQueryInspector()
+                Inspector = inspector ?? new SourceInjectedQueryInspector(),
             };
+            _exceptionHandler = exceptionHandler ?? ((x)=> {});
         }
 
         internal SourceSourceInjectedQuery(IQueryProvider provider, Expression expression, Action<IEnumerable<object>> enumerationHandler, Action<Exception> exceptionHandler)
@@ -44,6 +51,7 @@
         }
 
         internal Action<IEnumerable<object>> EnumerationHandler { get; set; }
+        internal IObjectDictionary Parameters { get; set; }
 
         public IEnumerator<TDestination> GetEnumerator()
         {
