@@ -87,6 +87,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public ISourceInjectedQueryable<TDestination> For<TDestination>(object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
         {
+            _parameters = GetParameters(parameters);
             return CreateQueryable<TDestination>(membersToExpand);
         }
         
