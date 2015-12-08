@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
@@ -114,7 +115,7 @@ namespace AutoMapper
                 select new { sourceName, destName };
             var match =
                 all.FirstOrDefault(
-                    pair => pair.destName.possibles.Any(p => string.CompareOrdinal(p, pair.sourceName) == 0));
+                    pair => pair.destName.possibles.Any(p => string.Compare(p, pair.sourceName, StringComparison.OrdinalIgnoreCase) == 0));
             return match?.destName.mi;
         }
 
@@ -167,7 +168,7 @@ namespace AutoMapper
                 select new { sourceName, destName };
             var match =
                 all.FirstOrDefault(
-                    pair => pair.destName.possibles.Any(p => string.CompareOrdinal(p, pair.sourceName) == 0));
+                    pair => pair.destName.possibles.Any(p => string.Compare(p, pair.sourceName, StringComparison.OrdinalIgnoreCase) == 0));
             if (match == null)
                 return null;
             return match.destName.mi;
@@ -183,7 +184,7 @@ namespace AutoMapper
     }
     public class SourceToDestinationNameMapperAttributesMember : ISourceToDestinationNameMapper
     {
-        private static readonly Internal.IDictionary<TypeDetails, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapperAttribute>>> Cache = new DictionaryFactory().CreateDictionary<TypeDetails, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapperAttribute>>>();
+        private static readonly ConcurrentDictionary<TypeDetails, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapperAttribute>>> Cache = new ConcurrentDictionary<TypeDetails, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapperAttribute>>>();
 
         public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
         {
@@ -209,7 +210,7 @@ namespace AutoMapper
 
         public override bool IsMatch(TypeDetails typeInfo, MemberInfo memberInfo, Type destType, string nameToSearch)
         {
-            return string.CompareOrdinal(MatchingName, nameToSearch) == 0;
+            return string.Compare(MatchingName, nameToSearch, StringComparison.OrdinalIgnoreCase) == 0;
         }
     }
 

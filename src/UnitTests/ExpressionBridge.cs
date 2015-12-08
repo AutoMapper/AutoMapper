@@ -216,7 +216,7 @@ namespace AutoMapper.UnitTests
                 complexProducts[0].ProductSubcategory.Name.ShouldEqual("Bar");
                 complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
             }
-#if !SILVERLIGHT
+
             [Fact(Skip = "Won't work for normal query providers")]
             public void List_of_abstract_should_be_mapped()
             {
@@ -232,10 +232,8 @@ namespace AutoMapper.UnitTests
                 abstractProducts[0].Types[1].GetType().ShouldEqual(typeof (ProdTypeB));
                 abstractProducts[0].Types[2].GetType().ShouldEqual(typeof (ProdTypeA));
             }
-#endif
         }
 
-#if !NETFX_CORE && !SILVERLIGHT
         namespace CircularReferences
         {
             public class A
@@ -305,6 +303,5 @@ namespace AutoMapper.UnitTests
                 }
             }
         }
-#endif
     }
 }

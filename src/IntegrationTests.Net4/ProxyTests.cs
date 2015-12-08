@@ -39,7 +39,7 @@
 
         class ClientContext : DbContext
         {
-            public ClientContext() : base(@"Server=(localdb)\v12.0;Integrated Security=true;Initial Catalog = ClientContext;")
+            public ClientContext()
             {
             }
 

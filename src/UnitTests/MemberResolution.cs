@@ -562,7 +562,7 @@ namespace AutoMapper.UnitTests
 			[Fact]
 			public void Should_not_report_it_as_unmapped()
 			{
-                _allTypeMaps.AsEnumerable().ForEach(t => t.GetUnmappedPropertyNames().ShouldBeOfLength(0));
+                Array.ForEach(_allTypeMaps, t => t.GetUnmappedPropertyNames().ShouldBeOfLength(0));
 			}
 
 			[Fact]
@@ -1408,7 +1408,6 @@ namespace AutoMapper.UnitTests
 
 	}
 
-#if !SILVERLIGHT
     public class When_destination_type_has_private_members : AutoMapperSpecBase
 	{
 		private IDestination _destination;
@@ -1453,8 +1452,6 @@ namespace AutoMapper.UnitTests
 			_destination.Value.ShouldEqual(5);
 		}
 	}
-#endif
-
 
     public static class MapFromExtensions
 	{

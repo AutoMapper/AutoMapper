@@ -9,6 +9,11 @@ namespace AutoMapper
     public interface IProfileExpression : IProfileConfiguration
     {
         /// <summary>
+        /// Disable constructor mapping. Use this if you don't intend to have AutoMapper try to map to constructors
+        /// </summary>
+        void DisableConstructorMapping();
+
+        /// <summary>
         /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
         /// </summary>
         /// <typeparam name="TSource">Source type</typeparam>

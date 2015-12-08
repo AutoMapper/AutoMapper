@@ -14,8 +14,8 @@ namespace AutoMapper
         IMemberConfiguration AddMemberConfiguration();
         IEnumerable<IConditionalObjectMapper> TypeConfigurations { get; }
         IConditionalObjectMapper AddConditionalObjectMapper();
-        bool ConstructorMappingEnabled { get; set; }
-        bool DataReaderMapperYieldReturnEnabled { get; set; }
+        bool ConstructorMappingEnabled { get; }
+
         IMemberConfiguration DefaultMemberConfig { get; }
         /// <summary>
         /// Source extension methods included for search

@@ -142,7 +142,6 @@ namespace AutoMapper.UnitTests
             public class SkipAttribute : System.Attribute { }
         }
 
-#if !SILVERLIGHT
         public class When_configuring_a_map_to_ignore_all_properties_with_an_inaccessible_setter : AutoMapperSpecBase
         {
             private Destination _destination;
@@ -308,6 +307,5 @@ namespace AutoMapper.UnitTests
                 _source.Respect.ShouldEqual("R-E-S-P-E-C-T"); // justification: if the mapping works one way, it should work in reverse
             }
         }
-#endif
     }
 }

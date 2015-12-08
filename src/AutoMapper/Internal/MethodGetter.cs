@@ -8,14 +8,14 @@ namespace AutoMapper.Internal
     {
         private readonly MethodInfo _methodInfo;
         private readonly Type _memberType;
-        private readonly ILazy<LateBoundMethod> _lateBoundMethod;
+        private readonly Lazy<LateBoundMethod> _lateBoundMethod;
 
         public MethodGetter(MethodInfo methodInfo)
         {
             _methodInfo = methodInfo;
             Name = _methodInfo.Name;
             _memberType = _methodInfo.ReturnType;
-            _lateBoundMethod = LazyFactory.Create(() => DelegateFactory.CreateGet(methodInfo));
+            _lateBoundMethod = new Lazy<LateBoundMethod>(() => DelegateFactory.CreateGet(methodInfo));
         }
 
         public override MemberInfo MemberInfo => _methodInfo;

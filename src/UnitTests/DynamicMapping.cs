@@ -149,7 +149,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-#if !SILVERLIGHT && !NETFX_CORE
 		public class When_mapping_from_an_anonymous_type_to_an_interface : SpecBase
 		{
 			private IDestination _result;
@@ -170,6 +169,5 @@ namespace AutoMapper.UnitTests
 				_result.Value.ShouldEqual(5);
 			}
 		}
-#endif
 	}
 }

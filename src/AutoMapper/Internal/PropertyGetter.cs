@@ -7,7 +7,7 @@ namespace AutoMapper.Internal
     public class PropertyGetter : MemberGetter
     {
         private readonly PropertyInfo _propertyInfo;
-        private readonly ILazy<LateBoundPropertyGet> _lateBoundPropertyGet;
+        private readonly Lazy<LateBoundPropertyGet> _lateBoundPropertyGet;
 
         public PropertyGetter(PropertyInfo propertyInfo)
         {
@@ -16,8 +16,8 @@ namespace AutoMapper.Internal
             MemberType = _propertyInfo.PropertyType;
             _lateBoundPropertyGet =
                 _propertyInfo.GetGetMethod(true) != null 
-                ? LazyFactory.Create(() => DelegateFactory.CreateGet(propertyInfo)) 
-                : LazyFactory.Create<LateBoundPropertyGet>(() => src => null);
+                ? new Lazy<LateBoundPropertyGet>(() => DelegateFactory.CreateGet(propertyInfo)) 
+                : new Lazy<LateBoundPropertyGet>(() => src => null);
         }
 
         public override MemberInfo MemberInfo => _propertyInfo;
