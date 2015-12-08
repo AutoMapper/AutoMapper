@@ -36,7 +36,7 @@ namespace AutoMapper
         {
             var parameters = CtorParams.Select(map =>
             {
-                var result = new ExpressionResolutionResult(instanceParameter, Ctor.ReflectedType);
+                var result = new ExpressionResolutionResult(instanceParameter, Ctor.DeclaringType);
                 foreach (var resolver in map.SourceResolvers)
                 {
                     var matchingExpressionConverter =
