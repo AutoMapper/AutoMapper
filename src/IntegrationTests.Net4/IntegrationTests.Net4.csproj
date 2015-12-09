@@ -70,6 +70,8 @@
     </Compile>
     <Compile Include="ChildClassTests.cs" />
     <Compile Include="CustomMapFromTest.cs" />
+    <Compile Include="ExpandCollectionsWithStrings.cs" />
+    <Compile Include="ExpandCollections.cs" />
     <Compile Include="NestedDtos.cs" />
     <Compile Include="NestedExplicitExpandWithFields.cs" />
     <Compile Include="NestedExplicitExpand.cs" />
