@@ -69,7 +69,7 @@ namespace AutoMapper.Internal
             foreach(var memberName in fullMemberName.Split('.'))
             {
                 var memberType = property?.GetMemberType() ?? type;
-                if(memberType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(memberType))
+                if(memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
                 {
                     memberType = memberType.GetGenericArguments()[0];
                 }
