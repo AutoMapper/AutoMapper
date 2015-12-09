@@ -63,19 +63,19 @@ namespace AutoMapper.Internal
             throw Expected(propertyOrField);
         }
 
-        public static MemberInfo GetFieldOrProperty(Type type, string memberName)
+        public static MemberInfo GetFieldOrProperty(Type type, string fullMemberName)
         {
-            return memberName.Split('.').Aggregate((MemberInfo)type, GetMember);
-        }
-
-        private static MemberInfo GetMember(MemberInfo property, string memberName)
-        {
-            var type = (property as Type) ?? property.GetMemberType();
-            if(type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type))
+            MemberInfo property = null;
+            foreach(var memberName in fullMemberName.Split('.'))
             {
-                type = type.GetGenericArguments()[0];
+                var memberType = property?.GetMemberType() ?? type;
+                if(memberType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(memberType))
+                {
+                    memberType = memberType.GetGenericArguments()[0];
+                }
+                property = memberType.GetMember(memberName).Single();
             }
-            return type.GetMember(memberName).Single();
+            return property;
         }
 
         public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)
