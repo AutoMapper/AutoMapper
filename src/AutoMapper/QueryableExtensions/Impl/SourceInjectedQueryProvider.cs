@@ -1,14 +1,13 @@
-
-
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using Internal;
     using Mappers;
-    using System.Collections.Generic;
 
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider
     {
@@ -90,16 +89,35 @@ namespace AutoMapper.QueryableExtensions.Impl
                     : _mapper.Map(sourceResult, sourceResultType, destResultType);
 */
                 object destResult;
+
+                // case #1: query is a projection from complex Source to complex Destination
+                // example: users.UseAsDataSource().For<UserDto>().Where(x => x.Age > 20).ToList()
                 if (IsProjection<TDestination>(resultType))
                 {
                     // in case of a projection, we need an IQueryable
                     var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
                     Inspector.SourceResult(sourceExpression, sourceResult);
 
-                    destResult =
-                        new ProjectionExpression((IQueryable<TSource>) sourceResult, _mappingEngine).To<TDestination>(
-                            _parameters, _membersToExpand);
+                    destResult = new ProjectionExpression((IQueryable<TSource>) sourceResult, _mappingEngine).To<TDestination>(_parameters, _membersToExpand);
                 }
+                // case #2: query is arbitrary ("manual") projection
+                // exaple: users.UseAsDataSource().For<UserDto>().Select(user => user.Age).ToList()
+                // in case an arbitrary select-statement is enumerated, we do not need to map the expression at all
+                // and cann safely return it
+                else if (IsProjection(resultType, sourceExpression))
+                {
+                    var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
+                    var enumerator = sourceResult.GetEnumerator();
+                    var elementType = TypeHelper.GetElementType(typeof (TResult));
+                    var listInstance = (IList)typeof(List<>).MakeGenericType(elementType).GetConstructor(Type.EmptyTypes).Invoke(null);
+                    while (enumerator.MoveNext())
+                    {
+                        listInstance.Add(enumerator.Current);
+                    }
+                    destResult = listInstance;
+                }
+                // case #2: projection to simple type
+                // example: users.UseAsDataSource().For<UserDto>().FirstOrDefault(user => user.Age > 20)
                 else
                 {
                     /* 
@@ -117,16 +135,23 @@ namespace AutoMapper.QueryableExtensions.Impl
                             this expression is not needed anymore as it has already been applied to the "Where" operation and can be safely omitted
                         * when we're done creating our new expression, we call the underlying provider to execute it
                     */
-
-                    var rmv = new RetainQueryableVisitor<TSource>();
+                    
+                    // as we need to replace the innermost element of the expression,
+                    // we need to traverse it first in order to find the node to replace or potential caveats
+                    // e.g. .UseAsDataSource().For<Dto>().Select(e => e.Name).First()
+                    //      in the above case we cannot map anymore as the "select" operator overrides our mapping.
+                    var searcher = new ReplaceableMethodNodeFinder<TSource>();
+                    searcher.Visit(sourceExpression);
+                    // provide the replacer with our found MethodNode or <null>
+                    var replacer = new MethodNodeReplacer<TSource>(searcher.MethodNode);
 
                     // default back to simple mapping of object instance for backwards compatibility (e.g. mapping non-nullable to nullable fields)
                     if (_parameters != null || _membersToExpand.Length != 0)
                     {
-                        sourceExpression = rmv.Visit(sourceExpression);
+                        sourceExpression = replacer.Visit(sourceExpression);
                     }
 
-                    if (rmv.FoundElementOperator)
+                    if (replacer.FoundElementOperator)
                     {
                         /*  in case of primitive element operators (e.g. Any(), Sum()...)
                             we need to map the originating types (e.g. Entity to Dto) in this query
@@ -157,16 +182,16 @@ namespace AutoMapper.QueryableExtensions.Impl
                             );
 
                         // in case an element operator without predicate expression was found (and thus not replaced)
-                        MethodInfo replacementMethod = rmv.ElementOperator;
+                        MethodInfo replacementMethod = replacer.ElementOperator;
                         // in case an element operator with predicate expression was replaced
-                        if (rmv.ReplacedMethod != null) { 
+                        if (replacer.ReplacedMethod != null) { 
                             // find replacement method that has no more predicates
                             replacementMethod = typeof (Queryable).GetMethods()
-                                .Single(m => m.Name == rmv.ReplacedMethod.Name
+                                .Single(m => m.Name == replacer.ReplacedMethod.Name
                                             &&
                                             m.GetParameters()
                                                 .All(p => typeof (Queryable).IsAssignableFrom(p.Member.ReflectedType))
-                                            && m.GetParameters().Length == rmv.ReplacedMethod.GetParameters().Length - 1);
+                                            && m.GetParameters().Length == replacer.ReplacedMethod.GetParameters().Length - 1);
                         }
 
                         // reintroduce element operator that was replaced with a "where" operator to make it queryable
@@ -210,7 +235,31 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private static bool IsProjection<T>(Type resultType)
         {
-            return resultType.IsEnumerableType() && !resultType.IsQueryableType() && resultType != typeof(string) && resultType.GetGenericElementType() == typeof(T);
+            return IsProjection(resultType) && resultType.GetGenericElementType() == typeof(T);
+        }
+
+        private static bool IsProjection(Type resultType, Expression sourceExpression)
+        {
+            if (!IsProjection(resultType))
+            {
+                return false;
+            }
+
+            // in cases, where the query selects an IEnumerable itself, the former "IsProjection" condition is not sufficient
+            // as it would detect that enuerable as projection
+            // e.g. Source and Destination class both have a property "string[] Items{get;set;}"
+            //      and the query was
+            //      var result = sources.UseAsDataSource().For<Destination>().Select(dest => dest.Items).First();
+            //      "result" would still be an IEnumerable and IsProjection would return "true"
+            //      therefore we need to search for the existence of an "linq element operator" (an operator that returns a single element from an enumerable)
+            var searcher = new ElementOperatorSearcher();
+            searcher.Visit(sourceExpression);
+            return !searcher.ContainsElementOperator;
+        }
+
+        private static bool IsProjection(Type resultType)
+        {
+            return resultType.IsEnumerableType() && !resultType.IsQueryableType() && resultType != typeof (string);
         }
 
         private static Type CreateSourceResultType(Type destResultType)
@@ -245,11 +294,51 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
     }
 
-    internal class RetainQueryableVisitor<TDestination> : ExpressionVisitor
+    internal class ReplaceableMethodNodeFinder<TDestination> : ExpressionVisitor
     {
-        private static readonly MethodInfo QueryableWhereMethod = FindQueryableWhereMethod();
-        private static readonly string[] IgnoredMethods = new[] {"Where", "Select", "OrderBy", "OrderByDescending"};
+        public MethodCallExpression MethodNode { get; private set; }
         private bool _ignoredMethodFound = false;
+        private static readonly string[] IgnoredMethods = new[] { "Select"};
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            if (_ignoredMethodFound)
+            {
+                return base.VisitMethodCall(node);
+            }
+
+            bool isReplacableMethod = node.Method.DeclaringType == typeof(System.Linq.Queryable)
+                                      && !IgnoredMethods.Contains(node.Method.Name)
+                                      && !typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType);
+
+            // invalid method found => skip all (e.g. Select(entity=> (object)entity.Child1)
+            if (isReplacableMethod &&
+                !node.Method.ReturnType.IsPrimitive && node.Method.ReturnType != typeof(TDestination))
+            {
+                return base.VisitMethodCall(node);
+            }
+
+
+            if (isReplacableMethod)
+            {
+                MethodNode = node;
+            }
+            // in case we find an incompatible method (Select), the already found MethodNode becomes invalid
+            else if (IgnoredMethods.Contains(node.Method.Name))
+            {
+                _ignoredMethodFound = true;
+                MethodNode = null;
+            }
+
+            return base.VisitMethodCall(node);
+        }
+    }
+
+    internal class MethodNodeReplacer<TDestination> : ExpressionVisitor
+    {
+        private readonly MethodCallExpression _foundExpression;
+        private static readonly MethodInfo QueryableWhereMethod = FindQueryableWhereMethod();
+
 
         private static MethodInfo FindQueryableWhereMethod()
         {
@@ -257,7 +346,12 @@ namespace AutoMapper.QueryableExtensions.Impl
             MethodInfo method = ((MethodCallExpression)select.Body).Method.GetGenericMethodDefinition();
             return method;
         }
-        
+
+        public MethodNodeReplacer(MethodCallExpression foundExpression)
+        {
+            _foundExpression = foundExpression;
+        }
+
         public MethodInfo ReplacedMethod { get; private set; }
 
         public MethodInfo ElementOperator { get; private set; }
@@ -267,15 +361,14 @@ namespace AutoMapper.QueryableExtensions.Impl
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             // only replace first occurrence
-            if (ReplacedMethod != null || _ignoredMethodFound)
+            if (ReplacedMethod != null || _foundExpression == null)
             {
                 return base.VisitMethodCall(node);
             }
-
-            if (node.Method.DeclaringType == typeof (System.Linq.Queryable)
-                && !IgnoredMethods.Contains(node.Method.Name)
-                && !typeof (IQueryable).IsAssignableFrom(node.Method.ReturnType))
+          
+            if (node == _foundExpression)
             {
+                // if method has invalid type
                 var parameters = node.Method.GetParameters();
 
                 if (parameters.Length > 1 &&
@@ -294,14 +387,26 @@ namespace AutoMapper.QueryableExtensions.Impl
                     return node.Arguments[0];
                 }
             }
-            else if(node.Method.DeclaringType == typeof(System.Linq.Queryable)
-                && typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType)
-                && IgnoredMethods.Contains(node.Method.Name))
+
+            return base.VisitMethodCall(node);
+        }
+    }
+
+    internal class ElementOperatorSearcher : ExpressionVisitor
+    {
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            bool isElementOperator = node.Method.DeclaringType == typeof(System.Linq.Queryable)
+                                      && !typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType);
+
+            if (!ContainsElementOperator)
             {
-                _ignoredMethodFound = true;
+                ContainsElementOperator = isElementOperator;
             }
 
             return base.VisitMethodCall(node);
         }
+
+        public bool ContainsElementOperator { get; private set; }
     }
 }

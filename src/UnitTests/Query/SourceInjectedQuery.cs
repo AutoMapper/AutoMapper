@@ -140,6 +140,28 @@ namespace AutoMapper.UnitTests.Query
             result.First().Count().ShouldEqual(0);
         }
 
+
+        [Fact]
+        public void Shoud_support_enumerable_return_type_with_result()
+        {
+            var source = new[]
+                    {
+                        new Source {SrcValue = 5, Strings = new [] {"lala5", "lili5"}},
+                        new Source {SrcValue = 4, Strings = new [] {"lala4", "lili4"}},
+                        new Source {SrcValue = 7, Strings = new [] {"lala7", "lili7"}}
+                    };
+
+            var result = source.AsQueryable()
+              .UseAsDataSource().For<Destination>()
+              .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
+              .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 5).Take(2)
+              .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
+
+            var item = result.First();
+            item.Length.ShouldEqual(2);
+            item.All(x => x.EndsWith("7")).ShouldEqual(true);
+        }
+
         [Fact]
         public void Shoud_support_any_stupid_thing_you_can_throw_at_it_with_annonumus_types()
         {
@@ -177,6 +199,125 @@ namespace AutoMapper.UnitTests.Query
               .UseAsDataSource(_mapper).For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
 
             (result.First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
+        }
+
+        [Fact]
+        public void Shoud_convert_source_item_to_destination_toList()
+        {
+            IQueryable<Destination> result = _source.AsQueryable()
+                .UseAsDataSource().For<Destination>();
+
+            var destItem = result.ToList().First(s => s.DestValue == 7);
+            var sourceItem = _source.First(s => s.SrcValue == 7);
+
+            destItem.DestValue.ShouldEqual(sourceItem.SrcValue);
+        }
+
+        [Fact]
+        public void Shoud_support_order_by_statement_result_toList()
+        {
+            IQueryable<Destination> result = _source.AsQueryable()
+              .UseAsDataSource().For<Destination>()
+              .OrderByDescending(s => s.DestValue);
+
+            result.ToList().First().DestValue.ShouldEqual(_source.Max(s => s.SrcValue));
+        }
+
+        [Fact]
+        public void Shoud_support_any_stupid_thing_you_can_throw_at_it_toList()
+        {
+            var result = _source.AsQueryable()
+              .UseAsDataSource().For<Destination>()
+              .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
+              .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
+              .OrderByDescending(s => s.DestValue).Select(s => s.DestValue);
+
+            var list = result.ToList();
+            list.First().ShouldEqual(_source.Max(s => s.SrcValue));
+        }
+
+        [Fact]
+        public void Shoud_support_string_return_type_toList()
+        {
+            var result = _source.AsQueryable()
+              .UseAsDataSource().For<Destination>()
+              .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
+              .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
+              .OrderByDescending(s => s.DestValue).Select(s => s.StringValue);
+
+            result.ToList().First().ShouldEqual(null);
+        }
+
+        [Fact]
+        public void Shoud_support_enumerable_return_type_toList()
+        {
+            var result = _source.AsQueryable()
+              .UseAsDataSource().For<Destination>()
+              .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
+              .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
+              .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
+
+            var list = result.ToList();
+            list.First().ShouldBeNull(); // must be null as source values are null as well and Destination does not create empty array in constructor
+        }
+
+        [Fact]
+        public void Shoud_support_enumerable_return_type_with_result_toList()
+        {
+            var source = new[]
+                    {
+                        new Source {SrcValue = 5, Strings = new [] {"lala5", "lili5"}},
+                        new Source {SrcValue = 4, Strings = new [] {"lala4", "lili4"}},
+                        new Source {SrcValue = 7, Strings = new [] {"lala7", "lili7"}}
+                    };
+
+            var result = source.AsQueryable()
+              .UseAsDataSource().For<Destination>()
+              .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
+              .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 5).Take(2)
+              .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
+
+            var list = result.ToList();
+            list.Count.ShouldEqual(2);
+            list[0].ShouldNotBeNull();
+            list[0].Length.ShouldEqual(2);
+            list[0].All(x => x.EndsWith("7")).ShouldEqual(true);
+
+            list[1].ShouldNotBeNull();
+            list[1].Length.ShouldEqual(2);
+            list[1].All(x => x.EndsWith("5")).ShouldEqual(true);
+        }
+
+        [Fact]
+        public void Shoud_support_any_stupid_thing_you_can_throw_at_it_with_annonumus_types_toList()
+        {
+            var result = _source.AsQueryable()
+              .UseAsDataSource().For<Destination>()
+              .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
+              .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
+              .OrderByDescending(s => s.DestValue).Select(s => new { A = s.DestValue });
+
+            result.ToList().First().A.ShouldEqual(_source.Max(s => s.SrcValue));
+        }
+
+        [Fact]
+        public void Map_select_method_toList()
+        {
+            SetupAutoMapper();
+            var result = _source2.AsQueryable()
+              .UseAsDataSource().For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
+
+            (result.ToList().First() as IEnumerable<string>).Last().ShouldEqual("Bar 4");
+        }
+
+        [Fact]
+        public void Map_orderBy_thenBy_expression_toList()
+        {
+            SetupAutoMapper();
+            var result = _source2.AsQueryable()
+              .UseAsDataSource().For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
+
+            (result.ToList().First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
         }
 
         [Fact]
