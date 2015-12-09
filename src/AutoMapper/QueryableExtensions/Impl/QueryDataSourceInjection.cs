@@ -70,7 +70,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private ExpressionVisitor _sourceExpressionTracer = null;
         private ExpressionVisitor _destinationExpressionTracer = null;
         private Action<Exception> _exceptionHandler = ((x) => { });
-        private string[] _membersToExpand = null;
+        private MemberInfo[] _membersToExpand = null;
         private IObjectDictionary _parameters = null;
         private SourceInjectedQueryInspector _inspector;
 
@@ -88,18 +88,20 @@ namespace AutoMapper.QueryableExtensions.Impl
         public ISourceInjectedQueryable<TDestination> For<TDestination>(object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
         {
             _parameters = GetParameters(parameters);
-            return CreateQueryable<TDestination>(membersToExpand);
+            _membersToExpand = GetMembers(membersToExpand);
+            return CreateQueryable<TDestination>();
         }
         
         public ISourceInjectedQueryable<TDestination> For<TDestination>(params Expression<Func<TDestination, object>>[] membersToExpand)
         {
-            return CreateQueryable<TDestination>(membersToExpand);
+            _membersToExpand = GetMembers(membersToExpand);
+            return CreateQueryable<TDestination>();
         }
 
         public ISourceInjectedQueryable<TDestination> For<TDestination>(IObjectDictionary parameters, params string[] membersToExpand)
         {
             _parameters = parameters;
-            _membersToExpand = membersToExpand;
+            _membersToExpand = GetMembers(typeof(TDestination), membersToExpand);
             return CreateQueryable<TDestination>();
         }
 
@@ -180,7 +182,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return this;
         }
         
-        private ISourceInjectedQueryable<TDestination> CreateQueryable<TDestination>(params Expression<Func<TDestination, object>>[] memberExpressionsToExpand)
+        private ISourceInjectedQueryable<TDestination> CreateQueryable<TDestination>()
         {
             return new SourceSourceInjectedQuery<TSource, TDestination>(_dataSource,
                 new TDestination[0].AsQueryable(),
@@ -190,7 +192,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                 _exceptionHandler,
                 _parameters,
                 _membersToExpand,
-                memberExpressionsToExpand,
                 _inspector);
         }
 
@@ -199,6 +200,17 @@ namespace AutoMapper.QueryableExtensions.Impl
             return (parameters ?? new object()).GetType()
                 .GetDeclaredProperties()
                 .ToDictionary(pi => pi.Name, pi => pi.GetValue(parameters, null));
+        }
+
+
+        private MemberInfo[] GetMembers(Type type, string[] membersToExpand)
+        {
+            return membersToExpand.Select(m => ReflectionHelper.GetFieldOrProperty(type, m)).ToArray();
+        }
+
+        private MemberInfo[] GetMembers<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
+        {
+            return membersToExpand.Select(ReflectionHelper.GetFieldOrProperty).ToArray();
         }
     }
 }

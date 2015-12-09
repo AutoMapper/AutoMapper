@@ -155,5 +155,46 @@
 
             user.position.ShouldEqual(1);
         }
+
+        [Fact]
+        public void Should_make_element_operators_queryable_First()
+        {
+            var db = new DB();
+
+            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).First(a => a.Id == 2);
+
+            user.position.ShouldEqual(1);
+        }
+
+        [Fact]
+        public void Should_make_element_operators_queryable_FirstOrDefault()
+        {
+            var db = new DB();
+
+            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == -1);
+
+            user.ShouldBeNull();
+        }
+
+
+        [Fact]
+        public void Should_make_element_operators_queryable_Single()
+        {
+            var db = new DB();
+
+            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).Single(a => a.Id == 2);
+
+            user.position.ShouldEqual(1);
+        }
+
+        [Fact]
+        public void Should_make_element_operators_queryable_SingleOrDefault()
+        {
+            var db = new DB();
+
+            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).SingleOrDefault(a => a.Id == -1);
+
+            user.ShouldBeNull();
+        }
     }
 }

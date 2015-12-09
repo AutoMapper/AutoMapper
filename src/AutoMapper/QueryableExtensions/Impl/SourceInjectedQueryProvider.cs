@@ -1,10 +1,11 @@
-using System.Reflection;
+
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Internal;
     using Mappers;
     using System.Collections.Generic;
@@ -17,8 +18,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly IEnumerable<ExpressionVisitor> _beforeVisitors;
         private readonly IEnumerable<ExpressionVisitor> _afterVisitors;
         private readonly System.Collections.Generic.IDictionary<string, object> _parameters;
-        private readonly string[] _membersToExpand;
-        private readonly Expression<Func<TDestination, object>>[] _membersExpressionsToExpand;
+        private readonly MemberInfo[] _membersToExpand;
         private readonly Action<Exception> _exceptionHandler;
 
         public SourceInjectedQueryProvider(IMapper mapper,
@@ -26,9 +26,8 @@ namespace AutoMapper.QueryableExtensions.Impl
                 IEnumerable<ExpressionVisitor> beforeVisitors,
                 IEnumerable<ExpressionVisitor> afterVisitors,
                 Action<Exception> exceptionHandler, 
-                System.Collections.Generic.IDictionary<string, object> parameters, 
-                string[] membersToExpand,
-                Expression<Func<TDestination, object>>[] membersExpressionsToExpand)
+                System.Collections.Generic.IDictionary<string, object> parameters,
+                MemberInfo[] membersToExpand)
         {
             _mapper = mapper;
             _dataSource = dataSource;
@@ -37,7 +36,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             _afterVisitors = afterVisitors;
             _parameters = parameters;
             _membersToExpand = membersToExpand;
-            _membersExpressionsToExpand = membersExpressionsToExpand;
             _exceptionHandler = exceptionHandler ?? ((x) => { }); ;
         }
         
@@ -85,10 +83,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                 var destResultType = typeof (TResult);
                 var sourceResultType = CreateSourceResultType(destResultType);
 
-                var sourceResult = InvokeSourceQuery(sourceResultType, sourceExpression);
-
-                Inspector.SourceResult(sourceExpression, sourceResult);
-
 
 // TODO: Check out which is right.
 /*                var destResult = IsProjection<TDestination>(resultType) 
@@ -98,13 +92,90 @@ namespace AutoMapper.QueryableExtensions.Impl
                 object destResult;
                 if (IsProjection<TDestination>(resultType))
                 {
-                    if(_membersToExpand != null) destResult = new ProjectionExpression(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>(_parameters, _membersToExpand);
-                    else destResult = new ProjectionExpression(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>(_parameters, _membersExpressionsToExpand);
+                    // in case of a projection, we need an IQueryable
+                    var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
+                    Inspector.SourceResult(sourceExpression, sourceResult);
 
+                    destResult =
+                        new ProjectionExpression((IQueryable<TSource>) sourceResult, _mappingEngine).To<TDestination>(
+                            _parameters, _membersToExpand);
                 }
                 else
-                    destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
-                Inspector.DestResult(sourceResult);
+                {
+                    /* 
+                        in case of an element result (so instead of IQueryable<TResult>, just TResult)
+                        we still want to support parameters.
+                        This is e.g. the case, when the developer writes "UseAsDataSource().For<TResult>().FirstOrDefault(x => ...)
+                        To still be able to support parameters, we need to create a query from it. 
+                        That said, we need to replace the "element" operator "FirstOrDefault" with a "Where" operator, then apply our "Select" 
+                        to map from TSource to TResult and finally re-apply the "element" operator ("FirstOrDefault" in our case) so only
+                        one element is returned by our "Execute<TResult>" method. Otherwise we'd get an InvalidCastException
+
+                        * So first we visit the sourceExpression and replace "element operators" with "where"
+                        * then we create our mapping expression from TSource to TDestination (select) and apply it
+                        * finally, we search for the element expression overload of our replaced "element operator" that has no expression as parameter
+                            this expression is not needed anymore as it has already been applied to the "Where" operation and can be safely omitted
+                        * when we're done creating our new expression, we call the underlying provider to execute it
+                    */
+
+                    var rmv = new RetainQueryableVisitor<TSource>();
+                    sourceExpression = rmv.Visit(sourceExpression);
+
+                    if (rmv.ReplacedMethod != null)
+                    {
+                        /*  in case of primitive element operators (e.g. Any(), Sum()...)
+                            we need to map the originating types (e.g. Entity to Dto) in this query
+                            as the final value will be projected automatically
+                            
+                            == example 1 ==
+                            UseAsDataSource().For<Dto>().Any(entity => entity.Name == "thename")
+                            ..in that case sourceResultType and destResultType would both be "Boolean" which is not mappable for AutoMapper
+
+                            == example 2 ==
+                            UseAsDataSource().For<Dto>().FirstOrDefault(entity => entity.Name == "thename")
+                            ..in this case the sourceResultType would be Entity and the destResultType Dto, so we can map the query directly
+                        */
+
+                        if (sourceResultType == destResultType && destResultType.IsPrimitive)
+                        {
+                            sourceResultType = typeof (TSource);
+                            destResultType = typeof (TDestination);
+                        }
+
+                        var mapExpr = _mappingEngine.CreateMapExpression(sourceResultType, destResultType,
+                            _parameters, _membersToExpand);
+                        // add projection via "select" operator
+                        var expr = Expression.Call(
+                            null,
+                            QueryableSelectMethod.MakeGenericMethod(sourceResultType, destResultType),
+                            new[] {sourceExpression, Expression.Quote(mapExpr)}
+                            );
+
+                        // find replacement method that has no more predicates
+                        var replacementMethods = typeof (Queryable).GetMethods()
+                            .Where(m => m.Name == rmv.ReplacedMethod.Name
+                                        &&
+                                        m.GetParameters()
+                                            .All(p => typeof (Queryable).IsAssignableFrom(p.Member.ReflectedType))
+                                        && m.GetParameters().Length == rmv.ReplacedMethod.GetParameters().Length - 1)
+                            .ToArray();
+
+                        // reintroduce element operator that was replaced with a "where" operator to make it queryable
+                        expr = Expression.Call(null,
+                            replacementMethods.First().MakeGenericMethod(destResultType), expr);
+
+                        destResult = _dataSource.Provider.Execute(expr);
+                    }
+                    // If there was no element operator that needed to be replaced by "where", just map the result
+                    else
+                    {
+                        var sourceResult = _dataSource.Provider.Execute(sourceExpression);
+                        Inspector.SourceResult(sourceExpression, sourceResult);
+                        destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
+                    }
+                }
+
+                Inspector.DestResult(destResult);
 
                 // implicitly convert types in case of valuetypes which cannot be casted explicitly
                 if (typeof (TResult).IsValueType && destResult.GetType() != typeof (TResult))
@@ -119,7 +190,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 throw;
             }
         }
-
+        
         private object InvokeSourceQuery(Type sourceResultType, Expression sourceExpression)
         {
             var result = IsProjection<TSource>(sourceResultType)
@@ -148,11 +219,60 @@ namespace AutoMapper.QueryableExtensions.Impl
             var visitor = new ExpressionMapper.MappingVisitor(typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] {typeof (TSource)});
             var sourceExpression = visitor.Visit(expression);
-
+            
             // call aftervisitors
             sourceExpression = _afterVisitors.Aggregate(sourceExpression, (current, after) => after.Visit(current));
 
             return sourceExpression;
+        }
+
+        private static readonly MethodInfo QueryableSelectMethod = FindQueryableSelectMethod();
+
+        private static MethodInfo FindQueryableSelectMethod()
+        {
+            Expression<Func<IQueryable<object>>> select = () => Queryable.Select(default(IQueryable<object>), default(Expression<Func<object, object>>));
+            MethodInfo method = ((MethodCallExpression)select.Body).Method.GetGenericMethodDefinition();
+            return method;
+        }
+    }
+
+    internal class RetainQueryableVisitor<TDestination> : ExpressionVisitor
+    {
+        private static readonly MethodInfo QueryableWhereMethod = FindQueryableWhereMethod();
+        private static readonly string[] IgnoredMethods = new[] {"Where", "Select", "OrderBy", "OrderByDescending"};
+
+        private static MethodInfo FindQueryableWhereMethod()
+        {
+            Expression<Func<IQueryable<object>>> select = () => Queryable.Where(default(IQueryable<object>), default(Expression<Func<object, bool>>));
+            MethodInfo method = ((MethodCallExpression)select.Body).Method.GetGenericMethodDefinition();
+            return method;
+        }
+        
+        public MethodInfo ReplacedMethod { get; set; }
+        
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            // only replace first occurrence
+            if (ReplacedMethod != null)
+            {
+                return base.VisitMethodCall(node);
+            }
+
+            if (node.Method.DeclaringType == typeof(System.Linq.Queryable) 
+                && !IgnoredMethods.Contains(node.Method.Name)
+                && !typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType))
+            {
+                var parameters = node.Method.GetParameters();
+
+                if (parameters.Length > 1 &&
+                    typeof(System.Linq.Expressions.Expression).IsAssignableFrom(parameters[1].ParameterType))
+                {
+                    ReplacedMethod = node.Method.GetGenericMethodDefinition();
+                    return Expression.Call(null, QueryableWhereMethod.MakeGenericMethod(typeof(TDestination)), node.Arguments);
+                }
+            }
+
+            return base.VisitMethodCall(node);
         }
     }
 }

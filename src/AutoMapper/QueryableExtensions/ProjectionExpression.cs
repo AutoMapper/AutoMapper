@@ -85,7 +85,7 @@ namespace AutoMapper.QueryableExtensions
             return To<TResult>(parameters, members);
         }
 
-        private IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberPaths memberPathsToExpand)
+        internal IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberPaths memberPathsToExpand)
         {
             var membersToExpand = memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
 

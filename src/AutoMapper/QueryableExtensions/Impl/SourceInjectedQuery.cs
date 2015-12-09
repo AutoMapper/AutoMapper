@@ -1,7 +1,8 @@
-﻿namespace AutoMapper.QueryableExtensions.Impl
+﻿using System.Reflection;
+
+namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
-    using System.Reflection;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
@@ -19,8 +20,7 @@
                 IEnumerable<ExpressionVisitor> afterVisitors,
                 Action<Exception> exceptionHandler,
                 IObjectDictionary parameters,
-                string[] membersToExpand,
-                Expression<Func<TDestination, object>>[] membersExpressionsToExpand,
+                MemberInfo[] membersToExpand,
                 SourceInjectedQueryInspector inspector)
         {
             Parameters = parameters;
