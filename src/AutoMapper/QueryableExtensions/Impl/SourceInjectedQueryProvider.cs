@@ -35,7 +35,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             _beforeVisitors = beforeVisitors;
             _afterVisitors = afterVisitors;
             _parameters = parameters;
-            _membersToExpand = membersToExpand;
+            _membersToExpand = membersToExpand ?? new MemberInfo[0];
             _exceptionHandler = exceptionHandler ?? ((x) => { }); ;
         }
         
@@ -119,9 +119,14 @@ namespace AutoMapper.QueryableExtensions.Impl
                     */
 
                     var rmv = new RetainQueryableVisitor<TSource>();
-                    sourceExpression = rmv.Visit(sourceExpression);
 
-                    if (rmv.ReplacedMethod != null)
+                    // default back to simple mapping of object instance for backwards compatibility (e.g. mapping non-nullable to nullable fields)
+                    if (_parameters != null || _membersToExpand.Length != 0)
+                    {
+                        sourceExpression = rmv.Visit(sourceExpression);
+                    }
+
+                    if (rmv.FoundElementOperator)
                     {
                         /*  in case of primitive element operators (e.g. Any(), Sum()...)
                             we need to map the originating types (e.g. Entity to Dto) in this query
@@ -136,7 +141,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                             ..in this case the sourceResultType would be Entity and the destResultType Dto, so we can map the query directly
                         */
 
-                        if (sourceResultType == destResultType && destResultType.IsPrimitive)
+                        if (sourceResultType == destResultType)// && destResultType.IsPrimitive)
                         {
                             sourceResultType = typeof (TSource);
                             destResultType = typeof (TDestination);
@@ -146,23 +151,27 @@ namespace AutoMapper.QueryableExtensions.Impl
                             _parameters, _membersToExpand);
                         // add projection via "select" operator
                         var expr = Expression.Call(
-                            null,
-                            QueryableSelectMethod.MakeGenericMethod(sourceResultType, destResultType),
-                            new[] {sourceExpression, Expression.Quote(mapExpr)}
+                                null,
+                                QueryableSelectMethod.MakeGenericMethod(sourceResultType, destResultType),
+                                new[] {sourceExpression, Expression.Quote(mapExpr)}
                             );
 
-                        // find replacement method that has no more predicates
-                        var replacementMethods = typeof (Queryable).GetMethods()
-                            .Where(m => m.Name == rmv.ReplacedMethod.Name
-                                        &&
-                                        m.GetParameters()
-                                            .All(p => typeof (Queryable).IsAssignableFrom(p.Member.ReflectedType))
-                                        && m.GetParameters().Length == rmv.ReplacedMethod.GetParameters().Length - 1)
-                            .ToArray();
+                        // in case an element operator without predicate expression was found (and thus not replaced)
+                        MethodInfo replacementMethod = rmv.ElementOperator;
+                        // in case an element operator with predicate expression was replaced
+                        if (rmv.ReplacedMethod != null) { 
+                            // find replacement method that has no more predicates
+                            replacementMethod = typeof (Queryable).GetMethods()
+                                .Single(m => m.Name == rmv.ReplacedMethod.Name
+                                            &&
+                                            m.GetParameters()
+                                                .All(p => typeof (Queryable).IsAssignableFrom(p.Member.ReflectedType))
+                                            && m.GetParameters().Length == rmv.ReplacedMethod.GetParameters().Length - 1);
+                        }
 
                         // reintroduce element operator that was replaced with a "where" operator to make it queryable
                         expr = Expression.Call(null,
-                            replacementMethods.First().MakeGenericMethod(destResultType), expr);
+                            replacementMethod.MakeGenericMethod(destResultType), expr);
 
                         destResult = _dataSource.Provider.Execute(expr);
                     }
@@ -240,6 +249,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         private static readonly MethodInfo QueryableWhereMethod = FindQueryableWhereMethod();
         private static readonly string[] IgnoredMethods = new[] {"Where", "Select", "OrderBy", "OrderByDescending"};
+        private bool _ignoredMethodFound = false;
 
         private static MethodInfo FindQueryableWhereMethod()
         {
@@ -248,28 +258,47 @@ namespace AutoMapper.QueryableExtensions.Impl
             return method;
         }
         
-        public MethodInfo ReplacedMethod { get; set; }
+        public MethodInfo ReplacedMethod { get; private set; }
+
+        public MethodInfo ElementOperator { get; private set; }
+
+        public bool FoundElementOperator { get; private set; }
         
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             // only replace first occurrence
-            if (ReplacedMethod != null)
+            if (ReplacedMethod != null || _ignoredMethodFound)
             {
                 return base.VisitMethodCall(node);
             }
 
-            if (node.Method.DeclaringType == typeof(System.Linq.Queryable) 
+            if (node.Method.DeclaringType == typeof (System.Linq.Queryable)
                 && !IgnoredMethods.Contains(node.Method.Name)
-                && !typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType))
+                && !typeof (IQueryable).IsAssignableFrom(node.Method.ReturnType))
             {
                 var parameters = node.Method.GetParameters();
 
                 if (parameters.Length > 1 &&
-                    typeof(System.Linq.Expressions.Expression).IsAssignableFrom(parameters[1].ParameterType))
+                    typeof (System.Linq.Expressions.Expression).IsAssignableFrom(parameters[1].ParameterType))
                 {
+                    FoundElementOperator = true;
                     ReplacedMethod = node.Method.GetGenericMethodDefinition();
-                    return Expression.Call(null, QueryableWhereMethod.MakeGenericMethod(typeof(TDestination)), node.Arguments);
+                    return Expression.Call(null, QueryableWhereMethod.MakeGenericMethod(typeof (TDestination)),
+                        node.Arguments);
                 }
+                // no predicate
+                else if (parameters.Length == 1)
+                {
+                    FoundElementOperator = true;
+                    ElementOperator = node.Method.GetGenericMethodDefinition();
+                    return node.Arguments[0];
+                }
+            }
+            else if(node.Method.DeclaringType == typeof(System.Linq.Queryable)
+                && typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType)
+                && IgnoredMethods.Contains(node.Method.Name))
+            {
+                _ignoredMethodFound = true;
             }
 
             return base.VisitMethodCall(node);

@@ -324,7 +324,7 @@ namespace AutoMapper.UnitTests.Query
             detail.Master.Id.ShouldEqual(master.Id);
             
             dto.Master.Details.Single().Id.ShouldEqual(dto.Id, "Dto was not added to inner collection");
-            dto.GetHashCode().ShouldEqual(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
+            //dto.GetHashCode().ShouldEqual(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
         }
         [Fact]
         public void SupportsParmeterization()
