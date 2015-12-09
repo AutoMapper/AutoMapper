@@ -1,7 +1,8 @@
-﻿namespace AutoMapper.QueryableExtensions.Impl
+﻿using System.Reflection;
+
+namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
-    using System.Reflection;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
@@ -19,15 +20,14 @@
                 IEnumerable<ExpressionVisitor> afterVisitors,
                 Action<Exception> exceptionHandler,
                 IObjectDictionary parameters,
-                string[] membersToExpand,
-                Expression<Func<TDestination, object>>[] membersExpressionsToExpand,
+                MemberInfo[] membersToExpand,
                 SourceInjectedQueryInspector inspector)
         {
             Parameters = parameters;
             EnumerationHandler = (x => {});
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
-            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mappingEngine, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler, parameters, membersToExpand, membersExpressionsToExpand)
+            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mappingEngine, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler, parameters, membersToExpand)
             {
                 Inspector = inspector ?? new SourceInjectedQueryInspector(),
             };

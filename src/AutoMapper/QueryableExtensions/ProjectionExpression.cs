@@ -77,7 +77,7 @@ namespace AutoMapper.QueryableExtensions
             return To<TResult>(parameters, members);
         }
 
-        private IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberInfo[] members)
+        internal IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberInfo[] members)
         {
             var mapExpr = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, members);
 
