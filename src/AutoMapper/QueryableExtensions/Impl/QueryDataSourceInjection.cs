@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
-using AutoMapper.QueryableExtensions.Visitors;
 using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
 
 namespace AutoMapper.QueryableExtensions.Impl
@@ -38,18 +37,6 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// <param name="visitors">The visitors.</param>
         /// <returns></returns>
         IQueryDataSourceInjection<TSource> AfterProjection(params ExpressionVisitor[] visitors);
-
-        /// <summary>
-        /// adds an ExpressionVisitor that will trace the source expression.
-        /// </summary>
-        /// <returns></returns>
-        IQueryDataSourceInjection<TSource> TraceSourceExpressionTo(TextWriter output = null);
-
-        /// <summary>
-        /// adds an ExpressionVisitor that will trace the destination expression.
-        /// </summary>
-        /// <returns></returns>
-        IQueryDataSourceInjection<TSource> TraceDestinationExpressionTo(TextWriter output = null);
 
         /// <summary>
         /// Allows specifying a handler that will be called when the underlying QueryProvider encounters an exception.
@@ -144,28 +131,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                 if (!_afterMappingVisitors.Contains(visitor))
                     _afterMappingVisitors.Add(visitor);
             }
-            return this;
-        }
-
-        /// <summary>
-        /// adds an ExpressionVisitor that will trace the source expression.
-        /// </summary>
-        /// <returns></returns>
-        public IQueryDataSourceInjection<TSource> TraceSourceExpressionTo(TextWriter output = null)
-        {
-            output = output ?? Console.Out;
-            _sourceExpressionTracer = new ExpressionWriter(output);
-            return this;
-        }
-
-        /// <summary>
-        /// adds an ExpressionVisitor that will trace the destination expression.
-        /// </summary>
-        /// <returns></returns>
-        public IQueryDataSourceInjection<TSource> TraceDestinationExpressionTo(TextWriter output = null)
-        {
-            output = output ?? Console.Out;
-            _destinationExpressionTracer = new ExpressionWriter(output);
             return this;
         }
 
