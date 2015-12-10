@@ -73,6 +73,7 @@
     <Compile Include="ExpandCollectionsWithStrings.cs" />
     <Compile Include="ExpandCollections.cs" />
     <Compile Include="NestedDtos.cs" />
+    <Compile Include="ExpandMembersPath.cs" />
     <Compile Include="NestedExplicitExpandWithFields.cs" />
     <Compile Include="NestedExplicitExpand.cs" />
     <Compile Include="OverrideDestinationMappingsTest.cs" />
