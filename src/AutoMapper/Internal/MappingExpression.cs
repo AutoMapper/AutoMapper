@@ -275,8 +275,8 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
                 TypeMap baseTypeMap = _configurationContainer.CreateMap(currentSourceBase, currentDestinationBase).TypeMap;
                 baseTypeMap.IncludeDerivedTypes(TypeMap.SourceType, TypeMap.DestinationType);
                 TypeMap.ApplyInheritedMap(baseTypeMap);
-                currentSourceBase = currentSourceBase.BaseType;
-                currentDestinationBase = currentDestinationBase.BaseType;
+                currentSourceBase = currentSourceBase.BaseType();
+                currentDestinationBase = currentDestinationBase.BaseType();
             }
             return this;
         }
