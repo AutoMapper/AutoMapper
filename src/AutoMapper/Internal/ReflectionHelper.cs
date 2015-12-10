@@ -63,19 +63,24 @@ namespace AutoMapper.Internal
             throw Expected(propertyOrField);
         }
 
-        public static MemberInfo GetFieldOrProperty(Type type, string fullMemberName)
+        public static IEnumerable<MemberInfo> GetMemberPath(Type type, string fullMemberName)
         {
             MemberInfo property = null;
             foreach(var memberName in fullMemberName.Split('.'))
             {
-                var memberType = property?.GetMemberType() ?? type;
-                if(memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
-                {
-                    memberType = memberType.GetGenericArguments()[0];
-                }
-                property = memberType.GetMember(memberName).Single();
+                var currentType = GetCurrentType(property, type);
+                yield return property = currentType.GetMember(memberName).Single();
             }
-            return property;
+        }
+
+        private static Type GetCurrentType(MemberInfo member, Type type)
+        {
+            var memberType = member?.GetMemberType() ?? type;
+            if(memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
+            {
+                memberType = memberType.GetGenericArguments()[0];
+            }
+            return memberType;
         }
 
         public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)
