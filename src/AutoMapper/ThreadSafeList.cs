@@ -1,3 +1,5 @@
+using System.Threading;
+
 namespace AutoMapper
 {
     using System;
@@ -9,10 +11,7 @@ namespace AutoMapper
     public class ThreadSafeList<T> : IEnumerable<T>, IDisposable
         where T : class
     {
-        private static readonly IReaderWriterLockSlimFactory ReaderWriterLockSlimFactory =
-            PlatformAdapter.Resolve<IReaderWriterLockSlimFactory>();
-
-        private IReaderWriterLockSlim _lock = ReaderWriterLockSlimFactory.Create();
+        private ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private readonly IList<T> _propertyMaps = new List<T>();
         private bool _disposed;
 

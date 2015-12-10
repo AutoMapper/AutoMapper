@@ -10,7 +10,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AutoMapper.UnitTests</RootNamespace>
     <AssemblyName>AutoMapper.UnitTests.Net4</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
@@ -43,7 +44,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\NET4\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NET4</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -53,7 +54,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\NET4\Release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;NET4</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -81,9 +82,6 @@
     <Compile Include="..\AutoMapper\Internal\TypeExtensions.cs">
       <Link>TypeExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\CommonAssemblyInfo.cs">
-      <Link>CommonAssemblyInfo.cs</Link>
-    </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="Bug\AfterMapNestedObjects.cs" />
@@ -97,8 +95,12 @@
     <Compile Include="Bug\AssignableCollectionBug.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
+    <Compile Include="Bug\CaseSensitivityBug.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\ForAllMaps.cs" />
+    <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
+    <Compile Include="Bug\NullableDateTime.cs" />
+    <Compile Include="Bug\ProjectUsingTheQueriedEntity.cs" />
     <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
     <Compile Include="Bug\JsonNet.cs" />
     <Compile Include="Bug\TargetISet.cs" />
@@ -165,6 +167,7 @@
     <Compile Include="ConditionalMapping.cs" />
     <Compile Include="Constructors.cs" />
     <Compile Include="ContextItems.cs" />
+    <Compile Include="ConvensionTest.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
     <Compile Include="EnumToNullableEnum.cs" />
@@ -174,6 +177,7 @@
     <Compile Include="IgnoreAllTests.cs" />
     <Compile Include="IMappingExpression\NonGenericAllMembersNullSubstitute.cs" />
     <Compile Include="IMappingExpression\ForCtorParam.cs" />
+    <Compile Include="IMappingExpression\NonGenericConstructorTests.cs" />
     <Compile Include="IMappingExpression\NonGenericReverseMapping.cs" />
     <Compile Include="IMappingExpression\NonGenericProjectEnumTest.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
@@ -190,6 +194,8 @@
     <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
     <Compile Include="Mappers\CustomMapperTests.cs" />
+    <Compile Include="Mappers\StringDictionaryMapperTests.cs" />
+    <Compile Include="Mappers\DynamicMapperTests.cs" />
     <Compile Include="Mappers\NameValueCollectionMapperTests.cs" />
     <Compile Include="Mappers\ReadOnlyCollectionMapperTests.cs" />
     <Compile Include="Mappers\TypeHelperTests.cs">
@@ -198,8 +204,10 @@
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludeBaseBug.cs" />
     <Compile Include="MappingInheritance\IncludedBaseMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
+    <Compile Include="MappingInheritance\InheritanceWithoutIncludeShouldWork.cs" />
     <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
     <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
     <Compile Include="MappingInheritance\OverrideIgnore.cs" />
@@ -208,6 +216,7 @@
     <Compile Include="MappingInheritance\ShouldInheritBeforeAndAfterMap.cs" />
     <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
     <Compile Include="MappingOrder.cs" />
+    <Compile Include="MapToAttributeTest.cs" />
     <Compile Include="MaxDepthTests.cs" />
     <Compile Include="MemberNameReplacers.cs" />
     <Compile Include="MemberResolution.cs" />
@@ -297,7 +306,6 @@
     <Compile Include="UsingEngineInsideMap.cs" />
     <Compile Include="ValueTypes.cs" />
     <Compile Include="Bug\MappingToAReadOnlyCollection.cs" />
-    <Compile Include="WinRTExtensions.cs" />
     <Compile Include="XUnitConventions.cs" />
   </ItemGroup>
   <ItemGroup>

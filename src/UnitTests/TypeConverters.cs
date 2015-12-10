@@ -1,4 +1,3 @@
-#if !NETFX_CORE
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -48,7 +47,7 @@ namespace AutoMapper.UnitTests
 			{
                 Mapper.Initialize(cfg =>
                 {
-                    cfg.CreateMap<string, int>().ConvertUsing(arg => Convert.ToInt32(arg));
+                    cfg.CreateMap<string, int>().ConvertUsing((string arg) => Convert.ToInt32(arg));
                     cfg.CreateMap<string, DateTime>().ConvertUsing(new DateTimeTypeConverter());
                     cfg.CreateMap<string, Type>().ConvertUsing<TypeTypeConverter>();
                     cfg.CreateMap<Source, Destination>();
@@ -287,4 +286,3 @@ namespace AutoMapper.UnitTests
 
 	}
 }
-#endif

@@ -1,5 +1,6 @@
 namespace AutoMapper.Mappers
 {
+    using Internal;
     using System.Reflection;
 
     public class AssignableArrayMapper : IObjectMapper
@@ -8,7 +9,7 @@ namespace AutoMapper.Mappers
         {
             if (context.SourceValue == null && !mapper.ShouldMapSourceCollectionAsNull(context))
             {
-                return mapper.CreateObject(context);
+                return ObjectCreator.CreateObject(context.DestinationType);
             }
 
             return context.SourceValue;

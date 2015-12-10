@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System.Linq.Expressions;
+    using System.Collections.Concurrent;
     using QueryableExtensions;
 
     /// <summary>
@@ -15,8 +16,8 @@ namespace AutoMapper
 	    bool ShouldMapSourceCollectionAsNull(ResolutionContext context);
 
         Expression CreateMapExpression(ExpressionRequest request,
-            Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount);
+            Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
 
-        LambdaExpression CreateMapExpression(ExpressionRequest request, Internal.IDictionary<ExpressionRequest, int> typePairCount);
+        LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
 	}
 }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -9,10 +10,8 @@
 
     public class DelegateFactory
     {
-        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
-
-        private readonly IDictionary<Type, LateBoundCtor> _ctorCache =
-            DictionaryFactory.CreateDictionary<Type, LateBoundCtor>();
+        private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
+            new ConcurrentDictionary<Type, LateBoundCtor>();
 
         public LateBoundMethod CreateGet(MethodInfo method)
         {
@@ -131,8 +130,7 @@
                     //find a ctor with only optional args
                     var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
                     if (ctorWithOptionalArgs == null)
-                        throw new ArgumentException(
-                            "Type needs to have a constructor with 0 args or only optional args", "type");
+                        throw new ArgumentException(type+" needs to have a constructor with 0 args or only optional args", "type");
 
                     //get all optional default values
                     var args = ctorWithOptionalArgs

@@ -75,11 +75,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             // It is needed when PropertyMap is changing type of property
             if (left.Type != right.Type && right.NodeType == ExpressionType.Constant)
             {
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT
-                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, Thread.CurrentThread.CurrentCulture);
-#else
-                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type);
-#endif
+                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, System.Globalization.CultureInfo.CurrentCulture);
+
                 right = Expression.Constant(value, left.Type);
             }
 

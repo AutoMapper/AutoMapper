@@ -3,19 +3,18 @@ namespace AutoMapper.Internal
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using Impl;
 
     public class FieldGetter : MemberGetter
     {
         private readonly FieldInfo _fieldInfo;
-        private readonly ILazy<LateBoundFieldGet> _lateBoundFieldGet;
+        private readonly Lazy<LateBoundFieldGet> _lateBoundFieldGet;
 
         public FieldGetter(FieldInfo fieldInfo)
         {
             _fieldInfo = fieldInfo;
             Name = fieldInfo.Name;
             MemberType = fieldInfo.FieldType;
-            _lateBoundFieldGet = LazyFactory.Create(() => DelegateFactory.CreateGet(fieldInfo));
+            _lateBoundFieldGet = new Lazy<LateBoundFieldGet>(() => DelegateFactory.CreateGet(fieldInfo));
         }
 
         public override MemberInfo MemberInfo => _fieldInfo;

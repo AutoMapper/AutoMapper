@@ -5,6 +5,8 @@ using System.Reflection;
 
 namespace Should.Core.Assertions
 {
+    using AutoMapper.Internal;
+
     internal class EnumerableEqualityComparer : IEqualityComparer<IEnumerable>
     {
         public int Position { get; set; }

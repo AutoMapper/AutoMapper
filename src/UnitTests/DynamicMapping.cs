@@ -149,7 +149,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-#if !SILVERLIGHT && !NETFX_CORE
 		public class When_mapping_from_an_anonymous_type_to_an_interface : SpecBase
 		{
 			private IDestination _result;
@@ -161,7 +160,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_result = Mapper.DynamicMap<IDestination>(new {value = 5});
+				_result = Mapper.DynamicMap<IDestination>(new {Value = 5});
 			}
 
 			[Fact]
@@ -170,6 +169,5 @@ namespace AutoMapper.UnitTests
 				_result.Value.ShouldEqual(5);
 			}
 		}
-#endif
 	}
 }

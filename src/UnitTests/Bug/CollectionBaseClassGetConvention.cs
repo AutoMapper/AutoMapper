@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Establish_context()
         {
-            Mapper.CreateMap<Source, Destination>();
+            Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
         }
 
         protected override void Because_of()

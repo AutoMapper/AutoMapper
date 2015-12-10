@@ -866,7 +866,6 @@ namespace AutoMapper.UnitTests
             }
         }
 
-#if !SILVERLIGHT
         public class When_destination_property_does_not_have_a_setter : AutoMapperSpecBase
         {
             private Source _source;
@@ -932,7 +931,6 @@ namespace AutoMapper.UnitTests
                 _dest.Foo.ShouldEqual("bar");
             }
         }
-#endif
 
         public class When_destination_property_does_not_have_a_getter : AutoMapperSpecBase
         {

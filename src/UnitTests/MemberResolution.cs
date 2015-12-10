@@ -562,7 +562,7 @@ namespace AutoMapper.UnitTests
 			[Fact]
 			public void Should_not_report_it_as_unmapped()
 			{
-                _allTypeMaps.AsEnumerable().ForEach(t => t.GetUnmappedPropertyNames().ShouldBeOfLength(0));
+                Array.ForEach(_allTypeMaps, t => t.GetUnmappedPropertyNames().ShouldBeOfLength(0));
 			}
 
 			[Fact]
@@ -1193,7 +1193,7 @@ namespace AutoMapper.UnitTests
 			protected override void Establish_context()
 			{
 				Mapper.Initialize(cfg =>
-					{
+                    {
 						cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
 						cfg.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
 						cfg.CreateMap<Source, Destination>();
@@ -1233,11 +1233,11 @@ namespace AutoMapper.UnitTests
 
 			protected override void Establish_context()
 			{
-				Mapper.Initialize(cfg =>
-					{
-						cfg.RecognizePrefixes("Foo");
-						cfg.CreateMap<Source, Destination>();
-					});
+			    Mapper.Initialize(cfg =>
+			    {
+			        cfg.RecognizePrefixes("Foo");
+			        cfg.CreateMap<Source, Destination>();
+			    });
 			}
 
 			protected override void Because_of()
@@ -1388,7 +1388,7 @@ namespace AutoMapper.UnitTests
             {
                 Mapper.Initialize(cfg =>
                 {
-                    cfg.RecognizeDestinationPrefixes("Foo","Bar");
+                    cfg.RecognizeDestinationPrefixes("Foo", "Bar");
                     cfg.CreateMap<Source, Destination>();
                 });
             }
@@ -1408,7 +1408,6 @@ namespace AutoMapper.UnitTests
 
 	}
 
-#if !SILVERLIGHT
     public class When_destination_type_has_private_members : AutoMapperSpecBase
 	{
 		private IDestination _destination;
@@ -1453,8 +1452,6 @@ namespace AutoMapper.UnitTests
 			_destination.Value.ShouldEqual(5);
 		}
 	}
-#endif
-
 
     public static class MapFromExtensions
 	{

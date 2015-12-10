@@ -70,11 +70,16 @@
     </Compile>
     <Compile Include="ChildClassTests.cs" />
     <Compile Include="CustomMapFromTest.cs" />
+    <Compile Include="ExpandCollectionsWithStrings.cs" />
+    <Compile Include="ExpandCollections.cs" />
+    <Compile Include="NestedDtos.cs" />
     <Compile Include="NestedExplicitExpandWithFields.cs" />
     <Compile Include="NestedExplicitExpand.cs" />
     <Compile Include="OverrideDestinationMappingsTest.cs" />
     <Compile Include="ProjectToAbstractType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MaxDepthWithCollections.cs" />
+    <Compile Include="ProxyTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

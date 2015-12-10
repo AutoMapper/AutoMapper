@@ -1,10 +1,12 @@
+using System;
+
 namespace AutoMapper.Internal
 {
     using System.Reflection;
 
     public class PropertyAccessor : PropertyGetter, IMemberAccessor
     {
-        private readonly ILazy<LateBoundPropertySet> _lateBoundPropertySet;
+        private readonly Lazy<LateBoundPropertySet> _lateBoundPropertySet;
 
         public PropertyAccessor(PropertyInfo propertyInfo)
             : base(propertyInfo)
@@ -12,7 +14,7 @@ namespace AutoMapper.Internal
             HasSetter = propertyInfo.GetSetMethod(true) != null;
             if (HasSetter)
             {
-                _lateBoundPropertySet = LazyFactory.Create(() => DelegateFactory.CreateSet(propertyInfo));
+                _lateBoundPropertySet = new Lazy<LateBoundPropertySet>(() => DelegateFactory.CreateSet(propertyInfo));
             }
         }
 

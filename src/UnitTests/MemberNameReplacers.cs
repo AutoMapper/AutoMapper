@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AutoMapper.Internal;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -41,6 +42,7 @@ namespace AutoMapper.UnitTests
                 SubAirlinaFlight = 4
             };
 
+            //Mapper.AddMemberConvention().AddName<ReplaceName>(_ => _.AddReplace("A", "Ä").AddReplace("i", "í").AddReplace("Airline", "Airlina")).SetMemberInfo<FieldPropertyMemberInfo>();
             Mapper.CreateMap<Source, Destination>();
             var destination = Mapper.Map<Source, Destination>(source);
 
