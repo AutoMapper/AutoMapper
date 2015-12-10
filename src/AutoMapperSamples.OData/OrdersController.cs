@@ -34,13 +34,9 @@ namespace AutoMapperSamples.OData
                 // otherwise it would get lost on the WebApi side and all we would get would be
                 // an unspecific "500 internal server error" response
                 .OnError(OnException)
-                // trace out original expression
-                .TraceSourceExpressionTo(Console.Out)
                 // add an additional visitor to convert "Queryable.LongCount" calls to "Queryable.Count" calls
                 // as EntityFramework does not support this method
                 .BeforeProjection(new EntityFrameworkCompatibilityVisitor())
-                // trace out mapped expression
-                .TraceDestinationExpressionTo(Console.Out)
                 .For<OrderDto>()
                 // modify the enumerated results before returning them to the client
                 .OnEnumerated((enumerator) =>

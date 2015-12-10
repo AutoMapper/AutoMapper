@@ -188,9 +188,9 @@ namespace AutoMapper.QueryableExtensions.Impl
                             // find replacement method that has no more predicates
                             replacementMethod = typeof (Queryable).GetMethods()
                                 .Single(m => m.Name == replacer.ReplacedMethod.Name
-                                            &&
-                                            m.GetParameters()
-                                                .All(p => typeof (Queryable).IsAssignableFrom(p.Member.ReflectedType))
+#if !NETCORE
+                                            && m.GetParameters().All(p => typeof (Queryable).IsAssignableFrom(p.Member.ReflectedType))
+#endif
                                             && m.GetParameters().Length == replacer.ReplacedMethod.GetParameters().Length - 1);
                         }
 
@@ -211,9 +211,15 @@ namespace AutoMapper.QueryableExtensions.Impl
 
                 Inspector.DestResult(destResult);
 
+#if !NETCORE
                 // implicitly convert types in case of valuetypes which cannot be casted explicitly
                 if (typeof (TResult).IsValueType && destResult.GetType() != typeof (TResult))
                     return (TResult) Convert.ChangeType(destResult, typeof (TResult));
+#else
+                // implicitly convert types in case of valuetypes which cannot be casted explicitly
+                if (typeof(TResult).IsValueType() && destResult.GetType() != typeof(TResult))
+                    return (TResult)Convert.ChangeType(destResult, typeof(TResult));
+#endif
 
                 // if it is not a valuetype, we can safely cast it
                 return (TResult) destResult;
@@ -311,12 +317,22 @@ namespace AutoMapper.QueryableExtensions.Impl
                                       && !IgnoredMethods.Contains(node.Method.Name)
                                       && !typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType);
 
+#if !NETCORE
             // invalid method found => skip all (e.g. Select(entity=> (object)entity.Child1)
             if (isReplacableMethod &&
                 !node.Method.ReturnType.IsPrimitive && node.Method.ReturnType != typeof(TDestination))
             {
                 return base.VisitMethodCall(node);
             }
+#else
+
+            // invalid method found => skip all (e.g. Select(entity=> (object)entity.Child1)
+            if (isReplacableMethod &&
+                !node.Method.ReturnType.IsPrimitive() && node.Method.ReturnType != typeof(TDestination))
+            {
+                return base.VisitMethodCall(node);
+            }
+#endif
 
 
             if (isReplacableMethod)
