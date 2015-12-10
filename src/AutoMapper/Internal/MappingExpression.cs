@@ -257,7 +257,6 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
         {
             TypeMap.IncludeDerivedTypes(otherSourceType, otherDestinationType);
-
             return this;
         }
 
@@ -268,9 +267,17 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TSource, TDestination> IncludeBase(Type sourceBase, Type destinationBase)
         {
-            TypeMap baseTypeMap = _configurationContainer.CreateMap(sourceBase, destinationBase).TypeMap;
-            baseTypeMap.IncludeDerivedTypes(typeof(TSource), typeof(TDestination));
-            TypeMap.ApplyInheritedMap(baseTypeMap);
+            var objectType = typeof(object);
+            var currentSourceBase = sourceBase;
+            var currentDestinationBase = destinationBase;
+            while(currentSourceBase != null && currentDestinationBase != null && currentSourceBase != objectType && currentDestinationBase != objectType)
+            {
+                TypeMap baseTypeMap = _configurationContainer.CreateMap(currentSourceBase, currentDestinationBase).TypeMap;
+                baseTypeMap.IncludeDerivedTypes(TypeMap.SourceType, TypeMap.DestinationType);
+                TypeMap.ApplyInheritedMap(baseTypeMap);
+                currentSourceBase = currentSourceBase.BaseType();
+                currentDestinationBase = currentDestinationBase.BaseType();
+            }
             return this;
         }
 

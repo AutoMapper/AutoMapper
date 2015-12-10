@@ -99,6 +99,8 @@
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
+    <Compile Include="Bug\IncludeBaseInheritance.cs" />
+    <Compile Include="Bug\IncludeInheritance.cs" />
     <Compile Include="Bug\NullableDateTime.cs" />
     <Compile Include="Bug\ProjectUsingTheQueriedEntity.cs" />
     <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
