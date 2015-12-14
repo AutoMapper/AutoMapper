@@ -2,12 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
 
     internal static class TypeExtensions
     {
+        public static bool CanBeNull(this Type type)
+        {
+            if(type.GetTypeInfo().IsDefined(typeof(ComplexTypeAttribute), inherit : false))
+            {
+                return false;
+            }
+            return true;
+        }
 
         public static Type[] GetGenericParameters(this Type type)
         {
