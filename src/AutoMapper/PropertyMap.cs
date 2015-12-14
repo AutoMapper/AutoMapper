@@ -66,6 +66,8 @@ namespace AutoMapper
 
         public bool UseDestinationValue { get; set; }
 
+        public bool AllowNull { get; set; }
+
         internal bool HasCustomValueResolver { get; private set; }
 
         public bool ExplicitExpansion { get; set; }
