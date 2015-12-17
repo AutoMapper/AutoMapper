@@ -35,7 +35,7 @@ task release {
 }
 
 task compile -depends clean {
-	$env:DNX_BUILD_VERSION=$env:build_number
+	$env:DNX_BUILD_VERSION=$env:APPVEYOR_BUILD_NUMBER
 
     exec { dnu restore }
     exec { dnu pack $source_dir\AutoMapper --configuration $config}
@@ -47,6 +47,11 @@ task test {
 	mkdir $result_dir
     exec { & $source_dir\packages\Fixie.1.0.0.33\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.UnitTests.Net4.xml $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.Net4.dll }
     exec { & $source_dir\packages\Fixie.1.0.0.33\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.IntegrationTests.Net4.xml $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
+	if($env:APPVEYOR -ne $NULL) {
+		$wc = New-Object 'System.Net.WebClient'
+		$wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $result_dir\AutoMapper.UnitTests.Net4.xml))
+		$wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $result_dir\AutoMapper.IntegrationTests.Net4.xml))
+	}
 }
 
 function Install-Dnvm
