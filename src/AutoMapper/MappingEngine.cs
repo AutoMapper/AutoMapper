@@ -395,7 +395,7 @@ namespace AutoMapper
             return result;
         }
 
-        private class ConstantExpressionReplacementVisitor : ExpressionVisitor
+        internal class ConstantExpressionReplacementVisitor : ExpressionVisitor
         {
             private readonly System.Collections.Generic.IDictionary<string, object> _paramValues;
 
