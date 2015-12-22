@@ -517,6 +517,76 @@ namespace AutoMapper.UnitTests.Query
         }
 
 
+        [Fact]
+        public void SupportsParameterizationInQuery()
+        {
+            // Arrange
+            var sources = new List<ResourceWithPermissions>()
+            {
+                new ResourceWithPermissions
+                {
+                    Title = "Resource 01",
+                    Permissions = new List<Permission>
+                    {
+                        new Permission {PermissionName = "Edit", UserId = 22},
+                        new Permission {PermissionName = "Read", UserId = 4}
+                    }
+                },
+                new ResourceWithPermissions
+                {
+                    Title = "Resource 02",
+                    Permissions = new List<Permission>
+                    {
+                        new Permission {PermissionName = "Edit", UserId = 4}
+                    }
+                },
+                new ResourceWithPermissions
+                {
+                    Title = "Resource 03",
+                    Permissions = new List<Permission>()
+                }
+            };
+
+            // note:
+            // we need to create the mapping and the query in two distinct scopes (therefore action and func)
+            // so that we can declare a parameter (userId) that is independent of mapping and query definition.
+            // that way, in the query, we have a parameter which needs to be replaced.
+            // (in SourceInjectedQueryProvider.ConvertDestinationExpressionToSourceExpression)
+            var createMappingAction = new Action(() =>
+            {
+                // parameter defined in mapping part
+                long userId = default(long);
+                Mapper.CreateMap<ResourceWithPermissions, ResourceDto>()
+                    .ForMember(t => t.HasEditPermission,
+                        o => o.MapFrom(s => s.Permissions.Any(p => p.PermissionName == "Edit" && p.UserId == userId)));
+                Mapper.CreateMap<ResourceDto, ResourceWithPermissions>()
+                    .ForMember(t => t.Permissions, o => o.Ignore());
+            });
+            createMappingAction();
+
+            var factoryFunc = new Func<IList<ResourceWithPermissions>, IQueryable<ResourceWithPermissions>>((list) =>
+            {
+                // same parameter defined in query part
+                long userId = default(long);
+                return list.AsQueryable().Where(r => r.Permissions.Any(p => p.UserId == userId));
+            });
+
+            var query = factoryFunc(sources)
+                .UseAsDataSource()
+                .For<ResourceDto>(new {userId = 4});
+                
+            // Act
+            var results = query.ToList();
+
+            // Assert
+            results.ShouldNotBeNull();
+            results.ShouldNotBeEmpty();
+
+            results.Count.ShouldEqual(2);
+            results[0].HasEditPermission.ShouldBeFalse();
+            results[1].HasEditPermission.ShouldBeTrue();
+        }
+
         private static void SetupAutoMapper()
         {
             var config = new MapperConfiguration(cfg =>
@@ -696,6 +766,34 @@ namespace AutoMapper.UnitTests.Query
     public class DestWithParams
     {
         public int Value { get; set; }
+    }
+
+    public class ResourceWithPermissions
+    {
+        public string Title { get; set; }
+        public ICollection<Permission> Permissions { get; set; }
+    }
+
+    public class Permission
+    {
+        public Permission()
+        {
+        }
+
+        public Permission(string permissionName, long userId)
+        {
+            PermissionName = permissionName;
+            UserId = userId;
+        }
+
+        public long UserId { get; set; }
+        public string PermissionName { get; set; }
+    }
+
+    public class ResourceDto
+    {
+        public string Title { get; set; }
+        public bool HasEditPermission { get; set; }
     }
 }
 

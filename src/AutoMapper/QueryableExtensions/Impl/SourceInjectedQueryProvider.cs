@@ -283,7 +283,15 @@ namespace AutoMapper.QueryableExtensions.Impl
             var visitor = new ExpressionMapper.MappingVisitor(typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] {typeof (TSource)});
             var sourceExpression = visitor.Visit(expression);
-            
+
+            // apply parameters
+            if (_parameters != null && _parameters.Any())
+            {
+                var constantVisitor = new MappingEngine.ConstantExpressionReplacementVisitor(_parameters);
+                sourceExpression = constantVisitor.Visit(sourceExpression);
+            }
+
+
             // call aftervisitors
             sourceExpression = _afterVisitors.Aggregate(sourceExpression, (current, after) => after.Visit(current));
 
