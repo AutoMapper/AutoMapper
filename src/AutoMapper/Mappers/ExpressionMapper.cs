@@ -177,8 +177,12 @@ namespace AutoMapper.Mappers
             private static void UpdateToNonNullableExpression(Expression right, out Expression newRight)
             {
                 if (right is ConstantExpression)
-                    newRight = Expression.Constant((right as ConstantExpression).Value,
-                        typeof(Nullable<>).MakeGenericType(right.Type));
+                {
+                    var t = right.Type.IsNullableType()
+                        ? right.Type.GetGenericArguments()[0]
+                        : right.Type;
+                    newRight = Expression.Constant(((ConstantExpression)right).Value, t);
+                }
                 else if (right is UnaryExpression)
                     newRight = (right as UnaryExpression).Operand;
                 else

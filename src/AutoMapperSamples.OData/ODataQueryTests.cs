@@ -318,6 +318,33 @@ namespace AutoMapperSamples.OData
         }
 
         [Test]
+        public void CanFilter_OrderDateGt()
+        {
+            // Arrange
+            HttpClient client = new HttpClient();
+
+            // Act
+            var response = client.GetAsync(_baseAddress + "api/Orders?$filter=OrderDate gt DateTime'2015-02-01T00:00:00'").Result;
+            
+            // Assert
+            Console.WriteLine(response);
+            Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+
+            if (_exceptions.Count != 0)
+                Assert.Fail(_exceptions.First().Message + "\n" + _exceptions.First().StackTrace);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+
+            var dtos = JsonConvert.DeserializeObject<OrderDto[]>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, dtos.Length, "should be filtered to two dtos");
+            foreach (var dto in dtos)
+            {
+                Assert.IsNotNull(dto.Customer);
+                Assert.IsNotEmpty(dto.Customer.Orders);
+            }
+        }
+
+        [Test]
         [Ignore("Not supported yet")]
         public void SupportsProjection()
         {
