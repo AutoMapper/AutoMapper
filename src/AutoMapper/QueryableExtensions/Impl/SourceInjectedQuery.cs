@@ -50,6 +50,11 @@ namespace AutoMapper.QueryableExtensions.Impl
             return this;
         }
 
+        public IQueryable<TDestination> AsQueryable()
+        {
+            return this;
+        }
+
         internal Action<IEnumerable<object>> EnumerationHandler { get; set; }
         internal IObjectDictionary Parameters { get; set; }
 
