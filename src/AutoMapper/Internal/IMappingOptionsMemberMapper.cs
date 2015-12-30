@@ -62,19 +62,21 @@ namespace AutoMapper
     }
 
     // Source Destination Mapper
-    public class DefaultName : CaseInsensitiveName
+    public class DefaultName : CaseSensitiveName
     {
     }
 
     public class CaseSensitiveName : ISourceToDestinationNameMapper
     {
+        public bool MethodCaseSensitive { get; set; }
+
         public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
         {
             return
                 getTypeInfoMembers.GetMemberInfos(typeInfo)
                     .FirstOrDefault(
                         mi =>
-                            typeof (ParameterInfo).IsAssignableFrom(destType) 
+                            typeof (ParameterInfo).IsAssignableFrom(destType) || !MethodCaseSensitive
                                 ? string.Compare(mi.Name, nameToSearch, StringComparison.OrdinalIgnoreCase) == 0
                                 : string.CompareOrdinal(mi.Name, nameToSearch) == 0);
         }
