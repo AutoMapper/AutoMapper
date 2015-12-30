@@ -72,6 +72,9 @@ function Install-Dnvm
     }
 }
 
+
+
+
 function Get-DnxVersion
 {
     $globalJson = Join-Path $PSScriptRoot "global.json"
