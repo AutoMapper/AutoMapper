@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
 
     /// <summary>
@@ -261,6 +262,23 @@ namespace AutoMapper
                 return result;
             }
         }
+
+        public ResolutionContext[] GetContexts()
+        {
+            return GetContextsCore().Reverse().Distinct().ToArray();
+        }
+
+        protected IEnumerable<ResolutionContext> GetContextsCore()
+        {
+            var context = this;
+            while(context.Parent != null)
+            {
+                yield return context;
+                context = context.Parent;
+            }
+            yield return context;
+        }
+
 
         public static ResolutionContext New<TSource>(TSource sourceValue)
         {
