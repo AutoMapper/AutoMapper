@@ -9,6 +9,7 @@ namespace AutoMapper
     using Configuration;
     using Internal;
     using Mappers;
+    using QueryableExtensions.Impl;
 
     public class ConfigurationStore : IConfigurationProvider
     {
@@ -173,6 +174,7 @@ namespace AutoMapper
             GetProfile(DefaultProfileName).DisableConstructorMapping();
         }
 
+
         public void Seal()
         {
             var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
@@ -204,15 +206,14 @@ namespace AutoMapper
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
         {
-            if (typeMap == null)
-                yield break;
-
             foreach (var derivedMap in typeMap.IncludedDerivedTypes.Select(FindTypeMapFor))
             {
-                if (derivedMap != null)
-                    yield return derivedMap;
-
-                foreach (var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
+                if(derivedMap == null)
+                {
+                    throw QueryMapperHelper.MissingMapException(typeMap.SourceType, typeMap.DestinationType);
+                }
+                yield return derivedMap;
+                foreach(var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
                 {
                     yield return derivedTypeMap;
                 }
@@ -560,65 +561,71 @@ namespace AutoMapper
 
         private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
         {
-            if (context.TypeMap != null)
+            var typeMap = context.TypeMap;
+            if (typeMap != null)
             {
-                typeMapsChecked.Add(context.TypeMap);
+                typeMapsChecked.Add(typeMap);
             }
-
             var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
-
             if (mapperToUse == null && context.SourceType.IsNullableType())
             {
                 var nullableContext = context.CreateValueContext(null, Nullable.GetUnderlyingType(context.SourceType));
-
                 mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(nullableContext));
             }
-
             if (mapperToUse == null)
             {
                 throw new AutoMapperConfigurationException(context);
             }
-
             if (mapperToUse is TypeMapMapper)
             {
-                foreach (var propertyMap in context.TypeMap.GetPropertyMaps())
-                {
-                    if (!propertyMap.IsIgnored())
-                    {
-                        var lastResolver =
-                            propertyMap.GetSourceValueResolvers().OfType<IMemberResolver>().LastOrDefault();
-
-                        if (lastResolver != null)
-                        {
-                            var sourceType = lastResolver.MemberType;
-                            var destinationType = propertyMap.DestinationProperty.MemberType;
-                            var memberTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceType,
-                                destinationType);
-
-                            if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
-                                continue;
-
-                            var memberContext = context.CreateMemberContext(memberTypeMap, null, null, sourceType,
-                                propertyMap);
-
-                            DryRunTypeMap(typeMapsChecked, memberContext);
-                        }
-                    }
-                }
+                CheckPropertyMaps(typeMapsChecked, context);
             }
             else if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
             {
-                Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
-                Type destElementType = TypeHelper.GetElementType(context.DestinationType);
-                TypeMap itemTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceElementType, destElementType);
+                CheckElementMaps(typeMapsChecked, context);
+            }
+        }
 
-                if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
-                    return;
+        private void CheckElementMaps(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
+        {
+            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
+            Type destElementType = TypeHelper.GetElementType(context.DestinationType);
+            TypeMap itemTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceElementType, destElementType);
 
-                var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType,
-                    0);
+            if(typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
+                return;
 
-                DryRunTypeMap(typeMapsChecked, memberContext);
+            var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType,
+                0);
+
+            DryRunTypeMap(typeMapsChecked, memberContext);
+        }
+
+        private void CheckPropertyMaps(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
+        {
+            foreach(var propertyMap in context.TypeMap.GetPropertyMaps())
+            {
+                if(!propertyMap.IsIgnored())
+                {
+                    var lastResolver =
+                        propertyMap.GetSourceValueResolvers().OfType<IMemberResolver>().LastOrDefault();
+
+                    if(lastResolver != null)
+                    {
+                        var sourceType = lastResolver.MemberType;
+                        var destinationType = propertyMap.DestinationProperty.MemberType;
+                        var memberTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceType,
+                            destinationType);
+
+                        if(typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
+                            continue;
+
+                        var memberContext = context.CreateMemberContext(memberTypeMap, null, null, sourceType,
+                            propertyMap);
+
+                        DryRunTypeMap(typeMapsChecked, memberContext);
+                    }
+                }
             }
         }
 

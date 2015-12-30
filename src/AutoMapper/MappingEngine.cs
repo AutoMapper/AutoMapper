@@ -283,11 +283,7 @@ namespace AutoMapper
 
             if (typeMap == null)
             {
-                const string MessageFormat = "Missing map from {0} to {1}. Create using Mapper.CreateMap<{0}, {1}>.";
-
-                var message = string.Format(MessageFormat, request.SourceType.Name, request.DestinationType.Name);
-
-                throw new InvalidOperationException(message);
+                throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             }
 
             var parameterReplacer = instanceParameter is ParameterExpression ? new ParameterReplacementVisitor(instanceParameter) : null;
