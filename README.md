@@ -1,11 +1,10 @@
 <img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper"> 
 ================================
 
-**AppVeyor:** [![Build status](https://ci.appveyor.com/api/projects/status/q261l3sbokafmx1o/branch/develop?svg=true)](https://ci.appveyor.com/project/jbogard/automapper/branch/develop)
-
-**NuGet:** [![NuGet Version](http://img.shields.io/nuget/v/AutoMapper.svg?style=flat)](https://www.nuget.org/packages/AutoMapper/)
-
-**MyGet:** [![MyGet CI Version](https://img.shields.io/myget/automapperdev/dt/AutoMapper.svg)](http://myget.org/gallery/automapperdev)
+[![Build status](https://ci.appveyor.com/api/projects/status/q261l3sbokafmx1o/branch/develop?svg=true)](https://ci.appveyor.com/project/jbogard/automapper/branch/develop)
+[![NuGet](https://img.shields.io/nuget/dt/AutoMapper.svg)](https://www.nuget.org/packages/AutoMapper/)
+[![NuGet](http://img.shields.io/nuget/v/AutoMapper.svg)](https://www.nuget.org/packages/AutoMapper/)
+[![MyGet CI](https://img.shields.io/myget/automapperdev/v/AutoMapper.svg)](http://myget.org/gallery/automapperdev)
 
 What is AutoMapper?
 --------------------------------
