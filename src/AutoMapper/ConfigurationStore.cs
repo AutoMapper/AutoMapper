@@ -46,8 +46,6 @@ namespace AutoMapper
         {
         }
 
-        public event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
-
         public Func<Type, object> ServiceCtor => _serviceCtor;
 
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
@@ -342,8 +340,6 @@ namespace AutoMapper
                 // keep the cache in sync
                 TypeMap _;
                 _typeMapPlanCache.TryRemove(tp, out _);
-
-                OnTypeMapCreated(tm);
 
                 return tm;
             });
@@ -675,20 +671,9 @@ namespace AutoMapper
             }
         }
 
-        protected void OnTypeMapCreated(TypeMap typeMap)
-        {
-            TypeMapCreated?.Invoke(this, new TypeMapCreatedEventArgs(typeMap));
-        }
-
         internal IProfileExpression GetProfile(string profileName)
         {
-            var brandNew = _formatterProfiles.Keys.Count == 0;
             var expr = _formatterProfiles.GetOrAdd(profileName, name => new Profile(profileName));
-            if (brandNew)
-        {
-                // TODO: what is this
-                var temp = expr.DefaultMemberConfig;
-            }
 
             return expr;
         }
