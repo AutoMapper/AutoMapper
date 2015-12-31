@@ -27,7 +27,6 @@ namespace AutoMapper.Mappers
             new NullableSourceMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
-            new OpenGenericMapper(),
             new FromStringDictionaryMapper(),
             new ToStringDictionaryMapper(),
             new FromDynamicMapper(),

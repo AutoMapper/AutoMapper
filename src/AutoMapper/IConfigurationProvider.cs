@@ -115,15 +115,5 @@ namespace AutoMapper
         /// Factory method to create formatters, resolvers and type converters
         /// </summary>
         Func<Type, object> ServiceCtor { get; }
-
-        /// <summary>
-        /// Find the closed generic type map for an item that maps to an open generic type map
-        /// </summary>
-        TypeMap FindClosedGenericTypeMapFor(ResolutionContext context);
-
-        /// <summary>
-        /// Determines if a context has an open generic type map defined
-        /// </summary>
-        bool HasOpenGenericTypeMapDefined(ResolutionContext context);
     }
 }

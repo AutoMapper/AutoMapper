@@ -364,6 +364,17 @@ namespace AutoMapper
             return typeMap;
         }
 
+        private bool CoveredByObjectMap(TypePair typePair)
+        {
+            return GetMappers().FirstOrDefault(m => m.IsMatch(new ResolutionContext(null, null, typePair.SourceType, typePair.DestinationType, new MappingOperationOptions(), new MappingEngine(this)))) != null;
+        }
+
+        private TypeMap FindConventionTypeMapFor(TypePair typePair)
+        {
+            var matchingTypeMapConfiguration = _formatterProfiles.Values.SelectMany(p => p.TypeConfigurations).FirstOrDefault(tc => tc.IsMatch(typePair));
+            return matchingTypeMapConfiguration != null ? CreateTypeMap(typePair.SourceType, typePair.DestinationType, matchingTypeMapConfiguration.ProfileName) : null;
+        }
+
         public TypeMap ResolveTypeMap(Type sourceType, Type destinationType)
         {
             var typePair = new TypePair(sourceType, destinationType);
@@ -373,10 +384,18 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
+
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair,
                 _ =>
                     GetRelatedTypePairs(_)
-                        .Select(tp => _typeMapPlanCache.GetOrDefault(tp) ?? FindTypeMapFor(tp))
+                        .Select(
+                            tp =>
+                                _typeMapPlanCache.GetOrDefault(tp) ??
+                                FindTypeMapFor(tp) ??
+                                (!CoveredByObjectMap(typePair)
+                                    ? FindConventionTypeMapFor(tp) ??
+                                      FindClosedGenericTypeMapFor(tp)
+                                    : null))
                         .FirstOrDefault(tm => tm != null));
 
             return typeMap;
@@ -392,18 +411,20 @@ namespace AutoMapper
             return ResolveTypeMap(resolutionResult.Type, destinationType) ?? ResolveTypeMap(resolutionResult.MemberType, destinationType);
         }
 
-        public TypeMap FindClosedGenericTypeMapFor(ResolutionContext context)
+        public TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
         {
-            var closedGenericTypePair = new TypePair(context.SourceType, context.DestinationType);
-            var sourceGenericDefinition = context.SourceType.GetGenericTypeDefinition();
-            var destGenericDefinition = context.DestinationType.GetGenericTypeDefinition();
+            if(!HasOpenGenericTypeMapDefined(typePair))
+                return null;
+            var closedGenericTypePair = new TypePair(typePair.SourceType, typePair.DestinationType);
+            var sourceGenericDefinition = typePair.SourceType.GetGenericTypeDefinition();
+            var destGenericDefinition = typePair.DestinationType.GetGenericTypeDefinition();
 
             var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
             CreateTypeMapExpression genericTypeMapExpression;
 
             if (!_typeMapExpressionCache.TryGetValue(genericTypePair, out genericTypeMapExpression))
             {
-                throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
+                throw new AutoMapperMappingException("Missing type map configuration or unsupported mapping.");
             }
 
             var typeMap = CreateTypeMap(closedGenericTypePair.SourceType, closedGenericTypePair.DestinationType,
@@ -417,10 +438,16 @@ namespace AutoMapper
             return typeMap;
         }
 
-        public bool HasOpenGenericTypeMapDefined(ResolutionContext context)
+        private bool HasOpenGenericTypeMapDefined(TypePair typePair)
         {
-            var sourceGenericDefinition = context.SourceType.GetGenericTypeDefinition();
-            var destGenericDefinition = context.DestinationType.GetGenericTypeDefinition();
+            var isGeneric = typePair.SourceType.IsGenericType()
+                            && typePair.DestinationType.IsGenericType()
+                            && (typePair.SourceType.GetGenericTypeDefinition() != null)
+                            && (typePair.DestinationType.GetGenericTypeDefinition() != null);
+            if (!isGeneric)
+                return false;
+            var sourceGenericDefinition = typePair.SourceType.GetGenericTypeDefinition();
+            var destGenericDefinition = typePair.DestinationType.GetGenericTypeDefinition();
 
             var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
 
@@ -481,7 +508,7 @@ namespace AutoMapper
 
 	    public IEnumerable<IObjectMapper> GetMappers()
         {
-	        return _mappers.Concat(_formatterProfiles.Values.SelectMany(p => p.TypeConfigurations));
+	        return _mappers;
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(TypeMap typeMap)
