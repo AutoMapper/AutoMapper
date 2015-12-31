@@ -15,7 +15,7 @@ namespace AutoMapper.Mappers
             Type enumSourceType = TypeHelper.GetEnumerationType(context.SourceType);
             Type enumDestinationType = TypeHelper.GetEnumerationType(context.DestinationType);
 
-            if (EnumToStringMapping(context, ref toEnum))
+            if (EnumToStringMapping(context.Types, ref toEnum))
             {
                 if (context.SourceValue == null)
                 {
@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers
                 }
                 return Enum.GetName(enumSourceType, context.SourceValue);
             }
-            if (EnumToEnumMapping(context))
+            if (EnumToEnumMapping(context.Types))
             {
                 if (context.SourceValue == null)
                 {
@@ -59,7 +59,7 @@ namespace AutoMapper.Mappers
 
                 return Enum.Parse(enumDestinationType, Enum.GetName(enumSourceType, context.SourceValue), true);
             }
-            if (EnumToUnderlyingTypeMapping(context, ref toEnum))
+            if (EnumToUnderlyingTypeMapping(context.Types, ref toEnum))
             {
                 if (toEnum && context.SourceValue != null)
                 {
@@ -76,14 +76,14 @@ namespace AutoMapper.Mappers
             return null;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             bool toEnum = false;
             return EnumToStringMapping(context, ref toEnum) || EnumToEnumMapping(context) ||
                    EnumToUnderlyingTypeMapping(context, ref toEnum);
         }
 
-        private static bool EnumToEnumMapping(ResolutionContext context)
+        private static bool EnumToEnumMapping(TypePair context)
         {
             // Enum to enum mapping
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
@@ -91,7 +91,7 @@ namespace AutoMapper.Mappers
             return sourceEnumType != null && destEnumType != null;
         }
 
-        private static bool EnumToUnderlyingTypeMapping(ResolutionContext context, ref bool toEnum)
+        private static bool EnumToUnderlyingTypeMapping(TypePair context, ref bool toEnum)
         {
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
             var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);
@@ -109,7 +109,7 @@ namespace AutoMapper.Mappers
             return false;
         }
 
-        private static bool EnumToStringMapping(ResolutionContext context, ref bool toEnum)
+        private static bool EnumToStringMapping(TypePair context, ref bool toEnum)
         {
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
             var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);

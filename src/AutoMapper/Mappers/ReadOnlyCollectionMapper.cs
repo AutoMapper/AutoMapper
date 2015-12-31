@@ -27,7 +27,7 @@ namespace AutoMapper.Mappers
             return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks, mapper);
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             if (!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType()))
                 return false;
@@ -43,7 +43,7 @@ namespace AutoMapper.Mappers
         {
             private readonly IList<TElement> inner = new List<TElement>();
 
-            public override bool IsMatch(ResolutionContext context)
+            public override bool IsMatch(TypePair context, IConfigurationProvider configuration)
             {
                 throw new NotImplementedException();
             }

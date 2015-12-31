@@ -35,12 +35,14 @@ namespace AutoMapper
         public AutoMapperMappingException(ResolutionContext context)
         {
             Context = context;
+            Types = context.Types;
         }
 
         public AutoMapperMappingException(ResolutionContext context, Exception inner)
             : base(null, inner)
         {
             Context = context;
+            Types = context.Types;
         }
 
         public AutoMapperMappingException(ResolutionContext context, string message)
@@ -49,7 +51,25 @@ namespace AutoMapper
             _message = message;
         }
 
+        public AutoMapperMappingException(TypePair types)
+        {
+            Types = types;
+        }
+
+        public AutoMapperMappingException(TypePair types, Exception inner)
+            : base(null, inner)
+        {
+            Types = types;
+        }
+
+        public AutoMapperMappingException(TypePair types, string message)
+            : this(types)
+        {
+            _message = message;
+        }
+
         public ResolutionContext Context { get; }
+        public TypePair Types { get; }
 
         public override string Message
         {
@@ -57,14 +77,16 @@ namespace AutoMapper
             {
                 string message = null;
                 var newLine = Environment.NewLine;
-                if (Context != null)
+                if (Types != null)
                 {
                     message = _message + newLine + newLine + "Mapping types:";
                     message += newLine +
-                               $"{Context.SourceType.Name} -> {Context.DestinationType.Name}";
+                               $"{Types.SourceType.Name} -> {Types.DestinationType.Name}";
                     message += newLine +
-                               $"{Context.SourceType.FullName} -> {Context.DestinationType.FullName}";
-
+                               $"{Types.SourceType.FullName} -> {Types.DestinationType.FullName}";
+                }
+                if (Context != null)
+                { 
                     var destPath = GetDestPath(Context);
                     message += newLine + newLine + "Destination path:" + newLine + destPath;
 

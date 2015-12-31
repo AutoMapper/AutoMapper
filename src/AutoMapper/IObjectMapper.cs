@@ -17,7 +17,8 @@ namespace AutoMapper
         /// When true, the mapping engine will use this mapper as the strategy
         /// </summary>
         /// <param name="context">Resolution context</param>
+        /// <param name="configuration"></param>
         /// <returns>Is match</returns>
-		bool IsMatch(ResolutionContext context);
+        bool IsMatch(TypePair context, IConfigurationProvider configuration);
 	}
 }

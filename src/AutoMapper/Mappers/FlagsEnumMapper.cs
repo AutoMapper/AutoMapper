@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
             return Enum.Parse(enumDestType, context.SourceValue.ToString(), true);
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
             var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);

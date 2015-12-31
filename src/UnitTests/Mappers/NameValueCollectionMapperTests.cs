@@ -13,10 +13,10 @@ namespace AutoMapper.UnitTests.Mappers
             [Fact]
             public void ReturnsTrueWhenBothSourceAndDestinationTypesAreNameValueCollection()
             {
-                var rc = new ResolutionContext(null, null, null, typeof(NameValueCollection), typeof(NameValueCollection), null, Mapper.Engine);
+                var tp = new TypePair(typeof(NameValueCollection), typeof(NameValueCollection));
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.IsMatch(rc);
+                var result = nvcm.IsMatch(tp, Mapper.Engine.ConfigurationProvider);
 
                 result.ShouldBeTrue();
             }
@@ -24,10 +24,10 @@ namespace AutoMapper.UnitTests.Mappers
             [Fact]
             public void ReturnsIsFalseWhenDestinationTypeIsNotNameValueCollection()
             {
-                var rc = new ResolutionContext(null, null, null, typeof(NameValueCollection), typeof(Object), null, Mapper.Engine);
+                var tp = new TypePair(typeof(NameValueCollection), typeof(Object));
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.IsMatch(rc);
+                var result = nvcm.IsMatch(tp, Mapper.Engine.ConfigurationProvider);
 
                 result.ShouldBeFalse();
             }            
@@ -35,10 +35,10 @@ namespace AutoMapper.UnitTests.Mappers
             [Fact]
             public void ReturnsIsFalseWhenSourceTypeIsNotNameValueCollection()
             {
-                var rc = new ResolutionContext(null, null, null, typeof(Object), typeof(NameValueCollection), null, Mapper.Engine);
+                var tp = new TypePair(typeof(Object), typeof(NameValueCollection));
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.IsMatch(rc);
+                var result = nvcm.IsMatch(tp, Mapper.Engine.ConfigurationProvider);
 
                 result.ShouldBeFalse();
             }            

@@ -8,19 +8,19 @@ namespace AutoMapper.Mappers
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
-            var implicitOperator = GetImplicitConversionOperator(context);
+            var implicitOperator = GetImplicitConversionOperator(context.Types);
 
             return implicitOperator.Invoke(null, new[] {context.SourceValue});
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             var methodInfo = GetImplicitConversionOperator(context);
 
             return methodInfo != null;
         }
 
-        private static MethodInfo GetImplicitConversionOperator(ResolutionContext context)
+        private static MethodInfo GetImplicitConversionOperator(TypePair context)
         {
             var destinationType = context.DestinationType;
             if(destinationType.IsNullableType())

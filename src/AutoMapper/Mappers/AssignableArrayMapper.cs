@@ -1,6 +1,5 @@
 namespace AutoMapper.Mappers
 {
-    using Internal;
     using System.Reflection;
 
     public class AssignableArrayMapper : IObjectMapper
@@ -15,19 +14,20 @@ namespace AutoMapper.Mappers
             return context.SourceValue;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             return context.DestinationType.IsAssignableFrom(context.SourceType)
                    && context.DestinationType.IsArray
                    && context.SourceType.IsArray
-                   && !ElementsExplicitlyMapped(context);
+                   && !ElementsExplicitlyMapped(context, configuration)
+                   ;
         }
 
-        private bool ElementsExplicitlyMapped(ResolutionContext context)
+        private bool ElementsExplicitlyMapped(TypePair context, IConfigurationProvider configuration)
         {
             var sourceElementType = context.SourceType.GetElementType();
             var destinationElementType = context.DestinationType.GetElementType();
-            return context.Engine.ConfigurationProvider.FindTypeMapFor(sourceElementType, destinationElementType) != null;
+            return configuration.FindTypeMapFor(sourceElementType, destinationElementType) != null;
         }
     }
 }

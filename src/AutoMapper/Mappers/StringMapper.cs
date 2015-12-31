@@ -7,7 +7,7 @@
             return context.SourceValue?.ToString();
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
         }

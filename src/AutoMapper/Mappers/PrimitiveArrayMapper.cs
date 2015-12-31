@@ -37,7 +37,7 @@
             return false;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             return IsPrimitiveArrayType(context.DestinationType) &&
                    IsPrimitiveArrayType(context.SourceType) &&

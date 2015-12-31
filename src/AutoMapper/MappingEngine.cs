@@ -417,10 +417,10 @@ namespace AutoMapper
                 var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
                 Func<TypePair, IObjectMapper> missFunc =
-                    tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
+                    tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(contextTypePair, ConfigurationProvider));
 
                 IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
-                if (mapperToUse == null || (context.Options.CreateMissingTypeMaps && !mapperToUse.IsMatch(context)))
+                if (mapperToUse == null || (context.Options.CreateMissingTypeMaps && !mapperToUse.IsMatch(contextTypePair, ConfigurationProvider)))
                 {
                     if (context.Options.CreateMissingTypeMaps)
                     {

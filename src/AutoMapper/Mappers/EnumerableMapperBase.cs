@@ -94,7 +94,7 @@ namespace AutoMapper.Mappers
             return CreateDestinationObjectBase(destinationElementType, count);
         }
 
-        public abstract bool IsMatch(ResolutionContext context);
+        public abstract bool IsMatch(TypePair context, IConfigurationProvider configuration);
 
 
         protected abstract void SetElementValue(TEnumerable destination, object mappedValue, int index);

@@ -34,9 +34,15 @@ namespace AutoMapper.Mappers
             return null;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
-            return GetConverter(context) != null;
+            var sourceTypeConverter = GetTypeConverter(context.SourceType);
+            var destTypeConverter = GetTypeConverter(context.DestinationType);
+
+            return sourceTypeConverter.CanConvertTo(context.DestinationType) ||
+                   (context.DestinationType.IsNullableType() &&
+                    sourceTypeConverter.CanConvertTo(Nullable.GetUnderlyingType(context.DestinationType)) ||
+                    destTypeConverter.CanConvertFrom(context.SourceType));
         }
 
         private static TypeConverter GetTypeConverter(Type type)

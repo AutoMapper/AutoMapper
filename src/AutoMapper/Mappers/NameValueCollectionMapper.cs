@@ -6,18 +6,18 @@
     {
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
-            if (!IsMatch(context) || context.SourceValue == null)
+            if (context.SourceValue == null)
                 return null;
 
             var nvc = new NameValueCollection();
-            var source = context.SourceValue as NameValueCollection;
+            var source = (NameValueCollection)context.SourceValue;
             foreach (var s in source.AllKeys)
                 nvc.Add(s, source[s]);
 
             return nvc;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             return
                 context.SourceType == typeof (NameValueCollection) &&

@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
                 return context.DestinationValue;
             }
 
-            public bool IsMatch(ResolutionContext context)
+            public bool IsMatch(TypePair context, IConfigurationProvider configuration)
             {
                 return context.SourceType == typeof(Base) && context.DestinationType == typeof(Base);
             }

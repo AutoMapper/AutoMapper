@@ -593,11 +593,11 @@ namespace AutoMapper
             {
                 typeMapsChecked.Add(typeMap);
             }
-            var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context));
+            var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context.Types, this));
             if (mapperToUse == null && context.SourceType.IsNullableType())
             {
-                var nullableContext = context.CreateValueContext(null, Nullable.GetUnderlyingType(context.SourceType));
-                mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(nullableContext));
+                var nullableTypes = new TypePair(Nullable.GetUnderlyingType(context.SourceType), context.DestinationType);
+                mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(nullableTypes, this));
             }
             if (mapperToUse == null)
             {

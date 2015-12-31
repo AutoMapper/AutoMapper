@@ -22,7 +22,7 @@
             return objectMapper.Map(context, mapper);
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             var isMatch = context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
@@ -48,7 +48,7 @@
         private class EnumerableMapper<TCollection, TElement> : EnumerableMapperBase<TCollection>
             where TCollection : ISet<TElement>
         {
-            public override bool IsMatch(ResolutionContext context)
+            public override bool IsMatch(TypePair context, IConfigurationProvider configuration)
             {
                 throw new NotImplementedException();
             }

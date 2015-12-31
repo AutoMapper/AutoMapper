@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
     {
         private static readonly Type KvpType = typeof (KeyValuePair<,>);
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
         {
             return (context.SourceType.IsDictionaryType() && context.DestinationType.IsDictionaryType());
         }

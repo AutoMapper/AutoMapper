@@ -24,9 +24,9 @@ namespace AutoMapper.Mappers
 	        return mappedObject;
 		}
 
-		public bool IsMatch(ResolutionContext context)
+		public bool IsMatch(TypePair context, IConfigurationProvider configuration)
 		{
-			return context.TypeMap != null;
+			return configuration.ResolveTypeMap(context) != null;
 		}
 	}
 }
