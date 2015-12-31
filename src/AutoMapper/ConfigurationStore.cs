@@ -440,9 +440,10 @@ namespace AutoMapper
 
         private bool HasOpenGenericTypeMapDefined(TypePair typePair)
         {
-            var isGeneric = typePair.SourceType.IsGenericType
-                            && typePair.DestinationType.IsGenericType
-                            && (typePair.SourceType.GetGenericTypeDefinition() != null) && (typePair.DestinationType.GetGenericTypeDefinition() != null);
+            var isGeneric = typePair.SourceType.IsGenericType()
+                            && typePair.DestinationType.IsGenericType()
+                            && (typePair.SourceType.GetGenericTypeDefinition() != null)
+                            && (typePair.DestinationType.GetGenericTypeDefinition() != null);
             if (!isGeneric)
                 return false;
             var sourceGenericDefinition = typePair.SourceType.GetGenericTypeDefinition();
