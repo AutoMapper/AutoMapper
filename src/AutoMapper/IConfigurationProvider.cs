@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
@@ -98,18 +99,10 @@ namespace AutoMapper
         IEnumerable<IObjectMapper> GetMappers();
 
         /// <summary>
-        /// Creates a <see cref="TypeMap"/> based on a source and destination type
+        /// Get all configured mappers
         /// </summary>
-        /// <param name="sourceType">Source type</param>
-        /// <param name="destinationType">Destination type</param>
-        /// <param name="profileName">Profile name, defaults to the default profile</param>
-        /// <returns>Type map configuration</returns>
-        TypeMap CreateTypeMap(Type sourceType, Type destinationType, string profileName = ConfigurationStore.DefaultProfileName);
-
-        /// <summary>
-        /// Fired each time a type map is created
-        /// </summary>
-        event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
+        /// <returns>List of mappers</returns>
+        IEnumerable<ITypeMapObjectMapper> GetTypeMapMappers();
 
         /// <summary>
         /// Factory method to create formatters, resolvers and type converters

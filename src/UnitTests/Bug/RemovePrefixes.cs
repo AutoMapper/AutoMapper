@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Establish_context()
         {
-            config = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
+            config = new ConfigurationStore();
             config.ClearPrefixes();
             config.CreateMap<Source, Destination>();
         }

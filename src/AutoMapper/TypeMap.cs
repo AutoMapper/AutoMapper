@@ -188,9 +188,9 @@ namespace AutoMapper
             return DestinationTypeOverride ?? match?.DestinationType ?? DestinationType;
         }
 
-        public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
+        public bool TypeHasBeenIncluded(TypePair derivedTypes)
         {
-            return _includedDerivedTypes.Contains(new TypePair(derivedSourceType, derivedDestinationType));
+            return _includedDerivedTypes.Contains(derivedTypes);
         }
 
         public bool HasDerivedTypesToInclude()

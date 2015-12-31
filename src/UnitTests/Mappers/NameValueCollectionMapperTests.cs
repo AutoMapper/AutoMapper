@@ -46,17 +46,6 @@ namespace AutoMapper.UnitTests.Mappers
         public class Map
         {
             [Fact]
-            public void ReturnsNullIfSourceTypeIsNotNameValueCollection()
-            {
-                var rc = new ResolutionContext(null, new Object(), new NameValueCollection(), typeof(Object), typeof(NameValueCollection), null, Mapper.Engine);
-                var nvcm = new NameValueCollectionMapper();
-
-                var result = nvcm.Map(rc, null);
-
-                result.ShouldBeNull();
-            }
-
-            [Fact]
             public void ReturnsNullIfSourceValueIsNull()
             {
                 var rc = new ResolutionContext(null, null, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, Mapper.Engine);

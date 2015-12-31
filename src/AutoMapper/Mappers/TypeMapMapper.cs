@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AutoMapper.Mappers
 {
-    public class TypeMapMapper : IObjectMapper
+    public class TypeMapMapper
 	{
         private readonly IEnumerable<ITypeMapObjectMapper> _mappers;
 

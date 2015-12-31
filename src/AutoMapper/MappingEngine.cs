@@ -33,7 +33,6 @@ namespace AutoMapper
         };
 
 
-        private bool _disposed;
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache;
         private readonly ConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
 
@@ -57,30 +56,9 @@ namespace AutoMapper
             _objectMapperCache = objectMapperCache;
             _expressionCache = expressionCache;
             _serviceCtor = serviceCtor;
-            ConfigurationProvider.TypeMapCreated += ClearTypeMap;
         }
 
         public IConfigurationProvider ConfigurationProvider { get; }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    if (ConfigurationProvider != null)
-                        ConfigurationProvider.TypeMapCreated -= ClearTypeMap;
-                }
-
-                _disposed = true;
-            }
-        }
 
         public TDestination Map<TDestination>(object source)
         {
@@ -212,26 +190,20 @@ namespace AutoMapper
 
         public object DynamicMap(object source, Type sourceType, Type destinationType)
         {
+            ConfigurationProvider.CreateMissingTypeMaps = true;
             var typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
 
-            var context = new ResolutionContext(typeMap, source, sourceType, destinationType,
-                new MappingOperationOptions
-                {
-                    CreateMissingTypeMaps = true
-                }, this);
+            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions(), this);
 
             return ((IMappingEngineRunner) this).Map(context);
         }
 
         public void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
         {
+            ConfigurationProvider.CreateMissingTypeMaps = true;
             var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
-            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType,
-                new MappingOperationOptions
-                {
-                    CreateMissingTypeMaps = true
-                }, this);
+            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions(), this);
 
             ((IMappingEngineRunner) this).Map(context);
         }
@@ -414,33 +386,32 @@ namespace AutoMapper
         {
             try
             {
+                if (context.TypeMap != null)
+                {
+                    context.TypeMap.Seal();
+
+                    var typeMapMapper = ConfigurationProvider.GetTypeMapMappers().First(objectMapper => objectMapper.IsMatch(context, this));
+
+                    // check whether the context passes conditions before attempting to map the value (depth check)
+                    object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : typeMapMapper.Map(context, this);
+
+                    return mappedObject;
+                }
+
                 var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
 
                 Func<TypePair, IObjectMapper> missFunc =
                     tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(contextTypePair, ConfigurationProvider));
 
                 IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
-                if (mapperToUse == null || (context.Options.CreateMissingTypeMaps && !mapperToUse.IsMatch(contextTypePair, ConfigurationProvider)))
+                if (mapperToUse == null)
                 {
-                    if (context.Options.CreateMissingTypeMaps)
+                    // TODO: do we need this check at all? Why does it fall through
+                    if(context.SourceValue != null)
                     {
-                        var typeMap = ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType);
-                        context = context.CreateTypeContext(typeMap, context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
-                        mapperToUse = missFunc(contextTypePair);
-                        if(mapperToUse == null)
-                        {
-                            throw new AutoMapperMappingException(context, "Unsupported mapping.");
-                        }
-                        _objectMapperCache.AddOrUpdate(contextTypePair, mapperToUse, (tp, mapper) => mapperToUse);
+                        throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
                     }
-                    else
-                    {
-                        if(context.SourceValue != null)
-                        {
-                            throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
-                        }
-                        return ObjectCreator.CreateDefaultValue(context.DestinationType);
-                    }
+                    return ObjectCreator.CreateDefaultValue(context.DestinationType);
                 }
 
                 return mapperToUse.Map(context, this);
@@ -498,13 +469,6 @@ namespace AutoMapper
 				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).AllowNullCollections;
 
             return ConfigurationProvider.AllowNullCollections;
-        }
-
-        private void ClearTypeMap(object sender, TypeMapCreatedEventArgs e)
-        {
-            IObjectMapper existing;
-
-            _objectMapperCache.TryRemove(new TypePair(e.TypeMap.SourceType, e.TypeMap.DestinationType), out existing);
         }
 
         private void DefaultMappingOptions(IMappingOperationOptions opts)
