@@ -1,4 +1,3 @@
-#if MONODROID || NET4
 namespace AutoMapper.Internal
 {
     using System;
@@ -18,18 +17,15 @@ namespace AutoMapper.Internal
 
         private static readonly byte[] privateKeyToken = StringToByteArray("be96cd2c38ef1005");
 
-        private static readonly MethodInfo delegate_Combine = typeof (Delegate).GetMethod("Combine",
-            BindingFlags.Public | BindingFlags.Static, null, new[] {typeof (Delegate), typeof (Delegate)}, null);
+        private static readonly MethodInfo delegate_Combine = typeof (Delegate).GetMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
 
-        private static readonly MethodInfo delegate_Remove = typeof (Delegate).GetMethod("Remove",
-            BindingFlags.Public | BindingFlags.Static, null, new[] {typeof (Delegate), typeof (Delegate)}, null);
+        private static readonly MethodInfo delegate_Remove = typeof (Delegate).GetMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
 
         private static readonly EventInfo iNotifyPropertyChanged_PropertyChanged =
             typeof (INotifyPropertyChanged).GetEvent("PropertyChanged", BindingFlags.Instance | BindingFlags.Public);
 
         private static readonly ConstructorInfo proxyBase_ctor =
-            typeof (ProxyBase).GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null,
-                Type.EmptyTypes, null);
+            typeof (ProxyBase).GetConstructor(Type.EmptyTypes);
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
@@ -40,14 +36,15 @@ namespace AutoMapper.Internal
             AssemblyName name = new AssemblyName("AutoMapper.Proxies");
             name.SetPublicKey(privateKey);
             name.SetPublicKeyToken(privateKeyToken);
-            //AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
-            AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+
+            AssemblyBuilder builder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+
             return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
         }
 
         private static Type CreateProxyType(Type interfaceType)
         {
-            if (!interfaceType.IsInterface)
+            if (!interfaceType.IsInterface())
             {
                 throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
             }
@@ -181,5 +178,3 @@ namespace AutoMapper.Internal
         }
     }
 }
-
-#endif

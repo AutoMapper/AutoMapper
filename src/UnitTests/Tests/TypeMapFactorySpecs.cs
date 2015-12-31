@@ -98,11 +98,6 @@ namespace AutoMapper.UnitTests.Tests
             get { return true; }
         }
 
-        public bool DataReaderMapperYieldReturnEnabled
-        {
-            get { return false; }
-        }
-
         public IEnumerable<MethodInfo> SourceExtensionMethods
         {
             get { return _sourceExtensionMethods; }

@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System.Linq.Expressions;
@@ -11,16 +13,19 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
-            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindMappedTypeExpression(mappingEngine, propertyMap, request, result, typePairCount);
         }
 
         private static MemberAssignment BindMappedTypeExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
-            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             var transformedExpression = ((IMappingEngineRunner)mappingEngine).CreateMapExpression(request, result.ResolutionExpression, typePairCount);
-
+            if(transformedExpression == null)
+            {
+                return null;
+            }
             // Handles null source property so it will not create an object with possible non-nullable propeerties 
             // which would result in an exception.
             if (mappingEngine.ConfigurationProvider.AllowNullDestinationValues)

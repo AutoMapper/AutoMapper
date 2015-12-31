@@ -115,7 +115,13 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
-            Func<PropertyMap, string> getFunc = pm => ConfiguredMemberList == MemberList.Destination ? pm.DestinationProperty.Name : pm.SourceMember.Name;
+            Func<PropertyMap, string> getFunc =
+                pm =>
+                    ConfiguredMemberList == MemberList.Destination
+                        ? pm.DestinationProperty.Name
+                        : pm.CustomExpression == null && pm.SourceMember != null
+                            ? pm.SourceMember.Name
+                            : pm.DestinationProperty.Name;
             var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
                 .Select(getFunc).ToList();
             var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
@@ -166,7 +172,12 @@ namespace AutoMapper
 
         public void IncludeDerivedTypes(Type derivedSourceType, Type derivedDestinationType)
         {
-            _includedDerivedTypes.Add(new TypePair(derivedSourceType, derivedDestinationType));
+            var derivedTypes = new TypePair(derivedSourceType, derivedDestinationType);
+            if(derivedTypes.Equals(Types))
+            {
+                throw new InvalidOperationException("You cannot include a type map into itself.");
+            }
+            _includedDerivedTypes.Add(derivedTypes);
         }
 
         public Type GetDerivedTypeFor(Type derivedSourceType)
@@ -363,7 +374,7 @@ namespace AutoMapper
         public bool ShouldCheckForValid()
         {
             return (CustomMapper == null && CustomProjection == null &&
-                    DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(SourceType);
+                    DestinationTypeOverride == null);
         }
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)

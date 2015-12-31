@@ -8,15 +8,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public static PropertyMap GetPropertyMap(this IMappingEngine mappingEngine, MemberInfo sourceMemberInfo, Type destinationMemberType)
         {
-            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(sourceMemberInfo.DeclaringType, destinationMemberType);
-
-            if (typeMap == null)
-            {
-                const string MessageFormat = "Missing map from {0} to {1}. " +
-                                             "Create using Mapper.CreateMap<{0}, {1}>.";
-                var message = string.Format(MessageFormat, sourceMemberInfo.DeclaringType.Name, destinationMemberType.Name);
-                throw new InvalidOperationException(message);
-            }
+            var typeMap = mappingEngine.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
 
             var propertyMap = typeMap.GetPropertyMaps()
                 .FirstOrDefault(pm => pm.CanResolveValue() &&
@@ -31,6 +23,23 @@ namespace AutoMapper.QueryableExtensions.Impl
                 throw new InvalidOperationException(message);
             }
             return propertyMap;
+        }
+
+        public static TypeMap CheckIfMapExists(this IMappingEngine mappingEngine, Type sourceType, Type destinationType)
+        {
+            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
+            if(typeMap == null)
+            {
+                throw MissingMapException(sourceType, destinationType);
+            }
+            return typeMap;
+        }
+
+        public static Exception MissingMapException(Type sourceType, Type destinationType)
+        {
+            var source = sourceType.Name;
+            var destination = destinationType.Name;
+            throw new InvalidOperationException($"Missing map from {source} to {destination}. Create using Mapper.CreateMap<{source}, {destination}>.");
         }
     }
 }

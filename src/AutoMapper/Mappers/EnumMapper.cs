@@ -1,17 +1,14 @@
+using System.ComponentModel;
+
 namespace AutoMapper.Mappers
 {
     using System;
     using Internal;
     using System.Reflection;
+    using System.Linq;
 
     public class EnumMapper : IObjectMapper
     {
-        private static readonly INullableConverterFactory NullableConverterFactory =
-            PlatformAdapter.Resolve<INullableConverterFactory>();
-
-        private static readonly IEnumNameValueMapperFactory EnumNameValueMapperFactory =
-            PlatformAdapter.Resolve<IEnumNameValueMapperFactory>();
-
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
             bool toEnum = false;
@@ -52,14 +49,12 @@ namespace AutoMapper.Mappers
                     return Enum.ToObject(enumDestinationType, context.SourceValue);
                 }
 
-                if (FeatureDetector.IsEnumGetNamesSupported)
+                if (!Enum.GetNames(enumDestinationType).Contains(context.SourceValue.ToString()))
                 {
-                    var enumValueMapper = EnumNameValueMapperFactory.Create();
+                    Type underlyingSourceType = Enum.GetUnderlyingType(enumSourceType);
+                    var underlyingSourceValue = Convert.ChangeType(context.SourceValue, underlyingSourceType);
 
-                    if (enumValueMapper.IsMatch(enumDestinationType, context.SourceValue.ToString()))
-                    {
-                        return enumValueMapper.Convert(enumSourceType, enumDestinationType, context);
-                    }
+                    return Enum.ToObject(context.DestinationType, underlyingSourceValue);
                 }
 
                 return Enum.Parse(enumDestinationType, Enum.GetName(enumSourceType, context.SourceValue), true);
@@ -145,7 +140,7 @@ namespace AutoMapper.Mappers
 
         private static object ConvertEnumToNullableType(ResolutionContext context)
         {
-            var nullableConverter = NullableConverterFactory.Create(context.DestinationType);
+            var nullableConverter = new NullableConverter(context.DestinationType);
 
             if (context.IsSourceValueNull)
             {

@@ -15,12 +15,12 @@ namespace AutoMapper
         private static readonly Func<ConfigurationStore> _configurationInit =
             () => new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
 
-        private static ILazy<ConfigurationStore> _configuration = LazyFactory.Create(_configurationInit);
+        private static Lazy<ConfigurationStore> _configuration = new Lazy<ConfigurationStore>(_configurationInit);
 
         private static readonly Func<IMappingEngine> _mappingEngineInit =
             () => new MappingEngine(_configuration.Value);
 
-        private static ILazy<IMappingEngine> _mappingEngine = LazyFactory.Create(_mappingEngineInit);
+        private static Lazy<IMappingEngine> _mappingEngine = new Lazy<IMappingEngine>(_mappingEngineInit);
 
         /// <summary>
         /// When set, destination can have null values. Defaults to true.
@@ -399,8 +399,8 @@ namespace AutoMapper
         public static void Reset()
         {
             MapperRegistry.Reset();
-            _configuration = LazyFactory.Create(_configurationInit);
-            _mappingEngine = LazyFactory.Create(_mappingEngineInit);
+            _configuration = new Lazy<ConfigurationStore>(_configurationInit);
+            _mappingEngine = new Lazy<IMappingEngine>(_mappingEngineInit);
         }
 
         /// <summary>

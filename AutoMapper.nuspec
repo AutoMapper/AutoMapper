@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>AutoMapper</id>
+    <version>4.1.1</version>
+    <authors>Jimmy Bogard</authors>
+    <owners>Jimmy Bogard</owners>
+    <licenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://automapper.org</projectUrl>
+    <iconUrl>https://s3.amazonaws.com/automapper/icon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>A convention-based object-object mapper</summary>
+    <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
+    <dependencies>
+      <group targetFramework="portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10"></group>
+      <group targetFramework="net45"></group>
+      <group targetFramework="net40">
+        <dependency id="Microsoft.Bcl" version="1.1.10" />
+      </group>
+      <group targetFramework="sl50"></group>
+      <group targetFramework="wp80"></group>
+      <group targetFramework="wpa81"></group>
+      <group targetFramework="win80"></group>
+      <group targetFramework="MonoAndroid10"></group>
+      <group targetFramework="MonoTouch10"></group>
+      <group targetFramework="Xamarin.iOS10"></group>
+      <group targetFramework="dotnet">
+        <dependency id="Microsoft.CSharp" version="4.0.0" />
+        <dependency id="System.Collections" version="4.0.10" />
+        <dependency id="System.Collections.Concurrent" version="4.0.10" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.10" />
+        <dependency id="System.Dynamic.Runtime" version="4.0.10" />
+        <dependency id="System.Linq" version="4.0.0" />
+        <dependency id="System.Linq.Expressions" version="4.0.10" />
+        <dependency id="System.Linq.Queryable" version="4.0.0" />
+        <dependency id="System.ObjectModel" version="4.0.10" />
+        <dependency id="System.Reflection" version="4.0.10" />
+        <dependency id="System.Reflection.Extensions" version="4.0.0" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.0.0" />
+        <dependency id="System.Runtime" version="4.0.20" />
+        <dependency id="System.Runtime.Extensions" version="4.0.10" />
+        <dependency id="System.Text.RegularExpressions" version="4.0.10" />
+        <dependency id="System.Threading" version="4.0.10" />
+        <dependency id="System.Threading.Tasks" version="4.0.10" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\dev\automapper\release\Portable\AutoMapper.dll" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10" />
+    <file src="C:\dev\automapper\release\Portable\AutoMapper.pdb" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10" />
+    <file src="C:\dev\automapper\release\Portable\AutoMapper.xml" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+Xamarin.iOS10+MonoTouch10" />
+    <file src="C:\dev\automapper\release\net45\AutoMapper.dll" target="lib\net45" />
+    <file src="C:\dev\automapper\release\net45\AutoMapper.pdb" target="lib\net45" />
+    <file src="C:\dev\automapper\release\net45\AutoMapper.xml" target="lib\net45" />
+    <file src="C:\dev\automapper\release\net40\AutoMapper.dll" target="lib\net40" />
+    <file src="C:\dev\automapper\release\net40\AutoMapper.pdb" target="lib\net40" />
+    <file src="C:\dev\automapper\release\net40\AutoMapper.xml" target="lib\net40" />
+    <file src="C:\dev\automapper\release\sl50\AutoMapper.dll" target="lib\sl50" />
+    <file src="C:\dev\automapper\release\sl50\AutoMapper.pdb" target="lib\sl50" />
+    <file src="C:\dev\automapper\release\sl50\AutoMapper.xml" target="lib\sl50" />
+    <file src="C:\dev\automapper\release\wp80\AutoMapper.dll" target="lib\wp80" />
+    <file src="C:\dev\automapper\release\wp80\AutoMapper.pdb" target="lib\wp80" />
+    <file src="C:\dev\automapper\release\wp80\AutoMapper.xml" target="lib\wp80" />
+    <file src="C:\dev\automapper\release\wpa81\AutoMapper.dll" target="lib\wpa81" />
+    <file src="C:\dev\automapper\release\wpa81\AutoMapper.pdb" target="lib\wpa81" />
+    <file src="C:\dev\automapper\release\wpa81\AutoMapper.xml" target="lib\wpa81" />
+    <file src="C:\dev\automapper\release\win\AutoMapper.dll" target="lib\win" />
+    <file src="C:\dev\automapper\release\win\AutoMapper.pdb" target="lib\win" />
+    <file src="C:\dev\automapper\release\win\AutoMapper.xml" target="lib\win" />
+    <file src="C:\dev\automapper\release\MonoAndroid\AutoMapper.dll" target="lib\MonoAndroid" />
+    <file src="C:\dev\automapper\release\MonoAndroid\AutoMapper.pdb" target="lib\MonoAndroid" />
+    <file src="C:\dev\automapper\release\MonoAndroid\AutoMapper.xml" target="lib\MonoAndroid" />
+    <file src="C:\dev\automapper\release\MonoTouch\AutoMapper.dll" target="lib\MonoTouch" />
+    <file src="C:\dev\automapper\release\MonoTouch\AutoMapper.pdb" target="lib\MonoTouch" />
+    <file src="C:\dev\automapper\release\MonoTouch\AutoMapper.xml" target="lib\MonoTouch" />
+    <file src="C:\dev\automapper\release\Xamarin.iOS10\AutoMapper.dll" target="lib\Xamarin.iOS10" />
+    <file src="C:\dev\automapper\release\Xamarin.iOS10\AutoMapper.pdb" target="lib\Xamarin.iOS10" />
+    <file src="C:\dev\automapper\release\Xamarin.iOS10\AutoMapper.xml" target="lib\Xamarin.iOS10" />
+    <file src="C:\dev\automapper\release\dotnet\AutoMapper.dll" target="lib\dotnet" />
+    <file src="C:\dev\automapper\release\dotnet\AutoMapper.pdb" target="lib\dotnet" />
+    <file src="C:\dev\automapper\release\dotnet\AutoMapper.xml" target="lib\dotnet" />
+    <file src="src\**\*.cs" target="src" />
+  </files>
+</package>

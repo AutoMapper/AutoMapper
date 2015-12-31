@@ -37,18 +37,8 @@ namespace AutoMapper
         void ConstructServicesUsing(Func<Type, object> constructor);
 
         /// <summary>
-        /// Disable constructor mapping. Use this if you don't intend to have AutoMapper try to map to constructors
-        /// </summary>
-        void DisableConstructorMapping();
-
-        /// <summary>
         /// Seal the configuration and optimize maps
         /// </summary>
         void Seal();
-
-        /// <summary>
-        /// Mapping via a data reader will yield return each item, keeping a data reader open instead of eagerly evaluating
-        /// </summary>
-        void EnableYieldReturnForDataReaderMapper();
     }
 }
