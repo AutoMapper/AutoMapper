@@ -20,11 +20,7 @@ namespace AutoMapper.UnitTests.Bug
             {
                 Items = new List<ItemBase>();
             }
-#if SILVERLIGHT
-            public List<ItemBase> Items { get; set; }
-#else
             public List<ItemBase> Items { get; private set; }
-#endif
         }
 
         public class ItemDto {}
@@ -37,11 +33,7 @@ namespace AutoMapper.UnitTests.Bug
             {
                 Items = new List<ItemDto>();
             }
-#if SILVERLIGHT
-            public List<ItemDto> Items { get; set; }
-#else
             public List<ItemDto> Items { get; private set; }
-#endif
         }
 
         // Getting an exception casting from SpecificItemDto to GeneralItemDto 

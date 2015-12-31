@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace AutoMapper
@@ -14,10 +15,6 @@ namespace AutoMapper
 
     public class MappingEngine : IMappingEngine, IMappingEngineRunner
     {
-        private static readonly IDictionaryFactory DictionaryFactory = PlatformAdapter.Resolve<IDictionaryFactory>();
-
-        private static readonly IProxyGeneratorFactory ProxyGeneratorFactory = PlatformAdapter.Resolve<IProxyGeneratorFactory>();
-
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
             new MemberGetterExpressionResultConverter(),
@@ -37,29 +34,29 @@ namespace AutoMapper
 
 
         private bool _disposed;
-        private readonly IEnumerable<IObjectMapper> _mappers;
-        internal readonly Internal.IDictionary<TypePair, IObjectMapper> _objectMapperCache;
-        private readonly Internal.IDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
+        private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache;
+        private readonly ConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
 
         private readonly Func<Type, object> _serviceCtor;
 
         public MappingEngine(IConfigurationProvider configurationProvider)
             : this(
                 configurationProvider,
-                DictionaryFactory.CreateDictionary<TypePair, IObjectMapper>(),
-                DictionaryFactory.CreateDictionary<ExpressionRequest, LambdaExpression>(),
+                new ConcurrentDictionary<TypePair, IObjectMapper>(),
+                new ConcurrentDictionary<ExpressionRequest, LambdaExpression>(),
                 configurationProvider.ServiceCtor)
         {
         }
 
-        public MappingEngine(IConfigurationProvider configurationProvider, Internal.IDictionary<TypePair, IObjectMapper> objectMapperCache, Internal.IDictionary<ExpressionRequest, LambdaExpression> expressionCache,
+        public MappingEngine(IConfigurationProvider configurationProvider,
+            ConcurrentDictionary<TypePair, IObjectMapper> objectMapperCache,
+            ConcurrentDictionary<ExpressionRequest, LambdaExpression> expressionCache,
             Func<Type, object> serviceCtor)
         {
             ConfigurationProvider = configurationProvider;
             _objectMapperCache = objectMapperCache;
             _expressionCache = expressionCache;
             _serviceCtor = serviceCtor;
-            _mappers = configurationProvider.GetMappers();
             ConfigurationProvider.TypeMapCreated += ClearTypeMap;
         }
 
@@ -254,7 +251,7 @@ namespace AutoMapper
 
             var cachedExpression =
                 _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand),
-                    tp => CreateMapExpression(tp, DictionaryFactory.CreateDictionary<ExpressionRequest, int>()));
+                    tp => CreateMapExpression(tp, new ConcurrentDictionary<ExpressionRequest, int>()));
 
             if (!parameters.Any())
                 return cachedExpression;
@@ -264,7 +261,12 @@ namespace AutoMapper
             return visitor.Visit(cachedExpression);
         }
 
-        public LambdaExpression CreateMapExpression(ExpressionRequest request, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+        public IObjectMapper GetOrAddMapper(TypePair typePair, Func<TypePair, IObjectMapper> factory)
+        {
+            return _objectMapperCache.GetOrAdd(typePair, factory);
+        }
+
+        public LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Expression.Parameter(request.SourceType, "dto");
@@ -274,18 +276,14 @@ namespace AutoMapper
         }
 
         public Expression CreateMapExpression(ExpressionRequest request,
-            Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             var typeMap = ConfigurationProvider.ResolveTypeMap(request.SourceType,
                 request.DestinationType);
 
             if (typeMap == null)
             {
-                const string MessageFormat = "Missing map from {0} to {1}. Create using Mapper.CreateMap<{0}, {1}>.";
-
-                var message = string.Format(MessageFormat, request.SourceType.Name, request.DestinationType.Name);
-
-                throw new InvalidOperationException(message);
+                throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             }
 
             var parameterReplacer = instanceParameter is ParameterExpression ? new ParameterReplacementVisitor(instanceParameter) : null;
@@ -295,8 +293,19 @@ namespace AutoMapper
                 return parameterReplacer == null ? customProjection.Body : parameterReplacer.Visit(customProjection.Body);
             }
 
-            var bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
-
+            var bindings = new List<MemberBinding>();
+            var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
+            if(visitCount >= typeMap.MaxDepth)
+            {
+                if(ConfigurationProvider.AllowNullDestinationValues)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
+            }
             Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
             if(parameterReplacer != null)
             {
@@ -325,14 +334,9 @@ namespace AutoMapper
 
         private List<MemberBinding> CreateMemberBindings(ExpressionRequest request,
             TypeMap typeMap,
-            Expression instanceParameter, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             var bindings = new List<MemberBinding>();
-
-            var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
-
-            if (visitCount >= typeMap.MaxDepth)
-                return bindings;
 
             foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
             {
@@ -358,7 +362,10 @@ namespace AutoMapper
 
                 var bindExpression = binder.Build(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
 
-                bindings.Add(bindExpression);
+                if(bindExpression != null)
+                {
+                    bindings.Add(bindExpression);
+                }
             }
             return bindings;
         }
@@ -465,7 +472,7 @@ namespace AutoMapper
                 return context.DestinationValue;
 
             if (destinationType.IsInterface())
-                destinationType = ProxyGeneratorFactory.Create().GetProxyType(destinationType);
+                destinationType = new ProxyGenerator().GetProxyType(destinationType);
 
             return !ConfigurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(destinationType)

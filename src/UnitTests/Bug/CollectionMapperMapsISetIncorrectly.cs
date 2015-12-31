@@ -1,5 +1,4 @@
-﻿#if !WINDOWS_PHONE
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Mappers;
 using Xunit;
@@ -45,4 +44,3 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 }
-#endif

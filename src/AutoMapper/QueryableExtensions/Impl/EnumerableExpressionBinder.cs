@@ -1,14 +1,12 @@
+using System.Collections.Concurrent;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Linq;
     using System.Linq.Expressions;
-    using Internal;
-    using System.Reflection;
-#if MONODROID
-    using Extensions = AutoMapper.QueryableExtensions.Extensions;
-#endif
 
     public class EnumerableExpressionBinder : IExpressionBinder
     {
@@ -19,13 +17,13 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
-            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindEnumerableExpression(mappingEngine, propertyMap, request, result, typePairCount);
         }
 
         private static MemberAssignment BindEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
-            ExpressionRequest request, ExpressionResolutionResult result, Internal.IDictionary<ExpressionRequest, int> typePairCount)
+            ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             MemberAssignment bindExpression;
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
@@ -37,6 +35,10 @@ namespace AutoMapper.QueryableExtensions.Impl
             if (sourceListType != destinationListType)
             {
                 var transformedExpression = ((IMappingEngineRunner)mappingEngine).CreateMapExpression(listTypePair, typePairCount);
+                if(transformedExpression == null)
+                {
+                    return null;
+                }
                 selectExpression = Expression.Call(
                     typeof (Enumerable),
                     "Select",

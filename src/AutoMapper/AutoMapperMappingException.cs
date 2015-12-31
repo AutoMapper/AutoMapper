@@ -5,9 +5,6 @@ namespace AutoMapper
     using System.Linq;
     using System.Text;
 
-#if NET45
-    [Serializable]
-#endif
     public class AutoMapperMappingException : Exception
     {
         private readonly string _message;
@@ -88,9 +85,9 @@ namespace AutoMapper
 
         private string GetDestPath(ResolutionContext context)
         {
-            var allContexts = GetContexts(context).Reverse();
+            var allContexts = context.GetContexts();
 
-            var builder = new StringBuilder(allContexts.First().DestinationType.Name);
+            var builder = new StringBuilder(allContexts[0].DestinationType.Name);
 
             foreach (var ctxt in allContexts)
             {
@@ -105,17 +102,6 @@ namespace AutoMapper
                 }
             }
             return builder.ToString();
-        }
-
-        private static IEnumerable<ResolutionContext> GetContexts(ResolutionContext context)
-        {
-            while (context.Parent != null)
-            {
-                yield return context;
-
-                context = context.Parent;
-            }
-            yield return context;
         }
 
 #if !DEBUG

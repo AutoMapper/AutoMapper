@@ -1,6 +1,7 @@
 namespace AutoMapper.Internal
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Linq;
@@ -62,9 +63,24 @@ namespace AutoMapper.Internal
             throw Expected(propertyOrField);
         }
 
-        public static MemberInfo GetFieldOrProperty(Type type, string memberName)
+        public static IEnumerable<MemberInfo> GetMemberPath(Type type, string fullMemberName)
         {
-            return memberName.Split('.').Aggregate((MemberInfo) null, (property, member) => (property?.GetMemberType() ?? type).GetMember(member).Single());
+            MemberInfo property = null;
+            foreach(var memberName in fullMemberName.Split('.'))
+            {
+                var currentType = GetCurrentType(property, type);
+                yield return property = currentType.GetMember(memberName).Single();
+            }
+        }
+
+        private static Type GetCurrentType(MemberInfo member, Type type)
+        {
+            var memberType = member?.GetMemberType() ?? type;
+            if(memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
+            {
+                memberType = memberType.GetGenericArguments()[0];
+            }
+            return memberType;
         }
 
         public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)

@@ -190,8 +190,8 @@ namespace AutoMapper
             return condition;
         }
 
-        public bool ConstructorMappingEnabled { get; set; }
-        public bool DataReaderMapperYieldReturnEnabled { get; set; }
+        public bool ConstructorMappingEnabled { get; private set; }
+
         public IEnumerable<MethodInfo> SourceExtensionMethods => _sourceExtensionMethods;
 
         public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }

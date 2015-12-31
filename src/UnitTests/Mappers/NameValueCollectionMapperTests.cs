@@ -1,5 +1,4 @@
-﻿#if NET4 || MONODROID || MONOTOUCH || __IOS__ || DNXCORE50
-using System;
+﻿using System;
 using System.Collections.Specialized;
 using AutoMapper.Mappers;
 using Should;
@@ -98,4 +97,3 @@ namespace AutoMapper.UnitTests.Mappers
         
     }
 }
-#endif
