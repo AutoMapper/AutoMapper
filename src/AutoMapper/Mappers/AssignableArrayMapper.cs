@@ -17,7 +17,7 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(ResolutionContext context)
         {
-            return context.DestinationType.IsAssignableFrom(context.SourceType)
+            return context.DestinationType.Equals(context.SourceType)
                    && context.DestinationType.IsArray
                    && context.SourceType.IsArray
                    && !ElementsExplicitlyMapped(context);
