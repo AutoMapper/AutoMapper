@@ -28,7 +28,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
             // Handles null source property so it will not create an object with possible non-nullable propeerties 
             // which would result in an exception.
-            if (mappingEngine.ConfigurationProvider.AllowNullDestinationValues)
+            if (mappingEngine.ConfigurationProvider.AllowNullDestinationValues && request.SourceType.CanBeNull())
             {
                 var expressionNull = Expression.Constant(null, propertyMap.DestinationPropertyType);
                 transformedExpression =
