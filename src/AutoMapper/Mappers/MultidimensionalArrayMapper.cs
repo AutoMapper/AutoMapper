@@ -28,8 +28,7 @@ namespace AutoMapper.Mappers
             throw new NotImplementedException();
         }
 
-        protected override object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper,
-            Type destElementType, int sourceLength)
+        protected override object GetOrCreateDestinationObject(ResolutionContext context, Type destElementType, int sourceLength)
         {
             var sourceArray = context.SourceValue as Array;
             if(sourceArray == null)

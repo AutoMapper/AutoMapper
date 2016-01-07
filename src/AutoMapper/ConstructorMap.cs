@@ -50,7 +50,7 @@ namespace AutoMapper
             return Expression.New(Ctor, parameters.Select(p => p.ResolutionExpression));
         }
 
-        public object ResolveValue(ResolutionContext context, IMappingEngineRunner mappingEngine)
+        public object ResolveValue(ResolutionContext context)
         {
             var ctorArgs = new List<object>();
 
@@ -61,7 +61,7 @@ namespace AutoMapper
                 var sourceType = result.Type;
                 var destinationType = map.Parameter.ParameterType;
 
-                var typeMap = mappingEngine.ConfigurationProvider.ResolveTypeMap(result, destinationType);
+                var typeMap = context.ConfigurationProvider.ResolveTypeMap(result, destinationType);
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 
@@ -75,7 +75,7 @@ namespace AutoMapper
                 }
                 else
                 {
-                    var value = mappingEngine.Map(newContext);
+                    var value = context.Engine.Map(newContext);
                     ctorArgs.Add(value);
                 }
             }

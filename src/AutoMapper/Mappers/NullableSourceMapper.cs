@@ -4,9 +4,9 @@ namespace AutoMapper.Mappers
 
     public class NullableSourceMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            return context.SourceValue ?? mapper.CreateObject(context);
+            return context.SourceValue ?? context.Engine.CreateObject(context);
         }
 
         public bool IsMatch(TypePair context)

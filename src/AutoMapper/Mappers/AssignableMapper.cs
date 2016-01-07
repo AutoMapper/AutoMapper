@@ -5,11 +5,11 @@ namespace AutoMapper.Mappers
 
     public class AssignableMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            if (context.SourceValue == null && !mapper.ShouldMapSourceValueAsNull(context))
+            if (context.SourceValue == null && !context.Engine.ShouldMapSourceValueAsNull(context))
             {
-                return mapper.CreateObject(context);
+                return context.Engine.CreateObject(context);
             }
 
             return context.SourceValue;

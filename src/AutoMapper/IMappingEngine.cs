@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AutoMapper.QueryableExtensions;
 
 namespace AutoMapper
 {
@@ -175,6 +177,14 @@ namespace AutoMapper
 
         Expression CreateMapExpression(Type sourceType, Type destinationType, ObjectDictionary parameters = null, params MemberInfo[] membersToExpand);
         IObjectMapper GetOrAddMapper(TypePair typePair, Func<TypePair, IObjectMapper> factory);
+        bool ShouldMapSourceValueAsNull(ResolutionContext context);
+        bool ShouldMapSourceCollectionAsNull(ResolutionContext context);
+        object CreateObject(ResolutionContext context);
+        object Map(ResolutionContext context);
+        LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
+
+        Expression CreateMapExpression(ExpressionRequest request,
+            Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
     }
 
 }

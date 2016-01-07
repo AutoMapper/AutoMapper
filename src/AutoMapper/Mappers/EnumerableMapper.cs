@@ -25,7 +25,7 @@ namespace AutoMapper.Mappers
             enumerable.Clear();
         }
 
-        protected override object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mappingEngineRunner, Type destElementType,
+        protected override object GetOrCreateDestinationObject(ResolutionContext context, Type destElementType,
             int sourceLength)
         {
             if (context.DestinationValue is IList && !(context.DestinationValue is Array))

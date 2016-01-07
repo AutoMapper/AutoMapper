@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 
     public class CollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             Type genericType = typeof (EnumerableMapper<,>);
 
@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
 
             var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
 
-            return objectMapper.Map(context, mapper);
+            return objectMapper.Map(context);
         }
 
         public bool IsMatch(TypePair context)

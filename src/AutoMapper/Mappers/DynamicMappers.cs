@@ -13,10 +13,10 @@ namespace AutoMapper.Mappers
     {
         public abstract bool IsMatch(TypePair context);
 
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             var source = context.SourceValue;
-            var destination = mapper.CreateObject(context);
+            var destination = context.Engine.CreateObject(context);
             foreach(var member in MembersToMap(source, destination))
             {
                 object sourceMemberValue;

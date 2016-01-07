@@ -4,7 +4,7 @@
 
     public class NameValueCollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             if (context.SourceValue == null)
                 return null;

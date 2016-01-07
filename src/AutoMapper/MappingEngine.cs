@@ -13,7 +13,7 @@ namespace AutoMapper
     using QueryableExtensions;
     using QueryableExtensions.Impl;
 
-    public class MappingEngine : IMappingEngine, IMappingEngineRunner
+    public class MappingEngine : IMappingEngine
     {
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
@@ -135,7 +135,7 @@ namespace AutoMapper
 
             var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, this);
 
-            return ((IMappingEngineRunner) this).Map(context);
+            return Map(context);
         }
 
         public object Map(object source, object destination, Type sourceType, Type destinationType)
@@ -160,7 +160,7 @@ namespace AutoMapper
 
             var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, this);
 
-            return ((IMappingEngineRunner) this).Map(context);
+            return Map(context);
         }
 
 
@@ -195,7 +195,7 @@ namespace AutoMapper
 
             var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions(), this);
 
-            return ((IMappingEngineRunner) this).Map(context);
+            return Map(context);
         }
 
         public void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
@@ -205,7 +205,7 @@ namespace AutoMapper
 
             var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions(), this);
 
-            ((IMappingEngineRunner) this).Map(context);
+            Map(context);
         }
 
         public TDestination Map<TSource, TDestination>(ResolutionContext parentContext, TSource source)
@@ -214,7 +214,7 @@ namespace AutoMapper
             Type sourceType = typeof (TSource);
             TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
             var context = parentContext.CreateTypeContext(typeMap, source, null, sourceType, destinationType);
-            return (TDestination) ((IMappingEngineRunner) this).Map(context);
+            return (TDestination) Map(context);
         }
 
         public Expression CreateMapExpression(Type sourceType, Type destinationType, System.Collections.Generic.IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
@@ -382,7 +382,7 @@ namespace AutoMapper
         }
 
 
-        object IMappingEngineRunner.Map(ResolutionContext context)
+        public object Map(ResolutionContext context)
         {
             try
             {
@@ -390,10 +390,10 @@ namespace AutoMapper
                 {
                     context.TypeMap.Seal();
 
-                    var typeMapMapper = ConfigurationProvider.GetTypeMapMappers().First(objectMapper => objectMapper.IsMatch(context, this));
+                    var typeMapMapper = ConfigurationProvider.GetTypeMapMappers().First(objectMapper => objectMapper.IsMatch(context));
 
                     // check whether the context passes conditions before attempting to map the value (depth check)
-                    object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : typeMapMapper.Map(context, this);
+                    object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : typeMapMapper.Map(context);
 
                     return mappedObject;
                 }
@@ -409,7 +409,7 @@ namespace AutoMapper
                     throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
                 }
 
-                return mapperToUse.Map(context, this);
+                return mapperToUse.Map(context);
             }
             catch (AutoMapperMappingException)
             {
@@ -421,7 +421,7 @@ namespace AutoMapper
             }
         }
 
-        object IMappingEngineRunner.CreateObject(ResolutionContext context)
+        public object CreateObject(ResolutionContext context)
         {
             var typeMap = context.TypeMap;
             var destinationType = context.DestinationType;
@@ -432,7 +432,7 @@ namespace AutoMapper
                 else if (typeMap.ConstructDestinationUsingServiceLocator)
                     return context.Options.ServiceCtor(destinationType);
                 else if (typeMap.ConstructorMap != null && typeMap.ConstructorMap.CtorParams.All(p => p.CanResolve))
-                    return typeMap.ConstructorMap.ResolveValue(context, this);
+                    return typeMap.ConstructorMap.ResolveValue(context);
 
             if (context.DestinationValue != null)
                 return context.DestinationValue;
@@ -445,7 +445,7 @@ namespace AutoMapper
                 : ObjectCreator.CreateObject(destinationType);
         }
 
-        bool IMappingEngineRunner.ShouldMapSourceValueAsNull(ResolutionContext context)
+        public bool ShouldMapSourceValueAsNull(ResolutionContext context)
         {
             if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
                 return false;
@@ -457,7 +457,7 @@ namespace AutoMapper
 			return ConfigurationProvider.AllowNullDestinationValues;
         }
 
-        bool IMappingEngineRunner.ShouldMapSourceCollectionAsNull(ResolutionContext context)
+        public bool ShouldMapSourceCollectionAsNull(ResolutionContext context)
         {
             var typeMap = context.GetContextTypeMap();
             if (typeMap != null)

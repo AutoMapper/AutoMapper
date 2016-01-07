@@ -6,11 +6,11 @@ namespace AutoMapper.Mappers
 
     public class TypeConverterMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             if (context.SourceValue == null)
             {
-                return mapper.CreateObject(context);
+                return context.Engine.CreateObject(context);
             }
             Func<object> converter = GetConverter(context);
             return converter?.Invoke();

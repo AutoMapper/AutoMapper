@@ -6,13 +6,13 @@ namespace AutoMapper.Mappers
 
     public class FlagsEnumMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             Type enumDestType = TypeHelper.GetEnumerationType(context.DestinationType);
 
             if (context.SourceValue == null)
             {
-                return mapper.CreateObject(context);
+                return context.Engine.CreateObject(context);
             }
 
             return Enum.Parse(enumDestType, context.SourceValue.ToString(), true);

@@ -34,7 +34,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             var selectExpression = result.ResolutionExpression;
             if (sourceListType != destinationListType)
             {
-                var transformedExpression = ((IMappingEngineRunner)mappingEngine).CreateMapExpression(listTypePair, typePairCount);
+                var transformedExpression = mappingEngine.CreateMapExpression(listTypePair, typePairCount);
                 if(transformedExpression == null)
                 {
                     return null;

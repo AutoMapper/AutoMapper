@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests.Mappers
                 var rc = new ResolutionContext(null, null, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, Mapper.Engine);
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.Map(rc, null);
+                var result = nvcm.Map(rc);
 
                 result.ShouldBeNull();
             }
@@ -63,7 +63,7 @@ namespace AutoMapper.UnitTests.Mappers
                 var rc = new ResolutionContext(null, sourceValue, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, Mapper.Engine);
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.Map(rc, null) as NameValueCollection;
+                var result = nvcm.Map(rc) as NameValueCollection;
 
                 result.ShouldBeEmpty(); 
             }
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests.Mappers
 
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.Map(rc, null) as NameValueCollection;
+                var result = nvcm.Map(rc) as NameValueCollection;
 
                 1.ShouldEqual(result.Count);
                 "foo".ShouldEqual(result.AllKeys[0]);

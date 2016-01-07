@@ -77,6 +77,11 @@ namespace AutoMapper
         public IMappingEngine Engine { get; }
 
         /// <summary>
+        /// Current configuration
+        /// </summary>
+        public IConfigurationProvider ConfigurationProvider => Engine.ConfigurationProvider;
+
+        /// <summary>
         /// Source and destination type pair
         /// </summary>
         public TypePair Types { get; }

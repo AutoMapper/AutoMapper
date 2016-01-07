@@ -31,8 +31,7 @@ namespace AutoMapper.Mappers
             return !context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType);
         }
 
-        protected override object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper,
-            Type destElementType, int sourceLength)
+        protected override object GetOrCreateDestinationObject(ResolutionContext context, Type destElementType, int sourceLength)
         {
             return ObjectCreator.CreateArray(destElementType, sourceLength);
         }

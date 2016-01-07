@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
 
     public class EnumMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             bool toEnum = false;
             Type enumSourceType = TypeHelper.GetEnumerationType(context.SourceType);
@@ -19,7 +19,7 @@ namespace AutoMapper.Mappers
             {
                 if (context.SourceValue == null)
                 {
-                    return mapper.CreateObject(context);
+                    return context.Engine.CreateObject(context);
                 }
 
                 if (toEnum)
@@ -27,7 +27,7 @@ namespace AutoMapper.Mappers
                     var stringValue = context.SourceValue.ToString();
                     if (string.IsNullOrEmpty(stringValue))
                     {
-                        return mapper.CreateObject(context);
+                        return context.Engine.CreateObject(context);
                     }
 
                     return Enum.Parse(enumDestinationType, stringValue, true);
@@ -38,10 +38,10 @@ namespace AutoMapper.Mappers
             {
                 if (context.SourceValue == null)
                 {
-                    if (mapper.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
+                    if (context.Engine.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
                         return null;
 
-                    return mapper.CreateObject(context);
+                    return context.Engine.CreateObject(context);
                 }
 
                 if (!Enum.IsDefined(enumSourceType, context.SourceValue))

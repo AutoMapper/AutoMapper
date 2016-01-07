@@ -4,7 +4,7 @@ namespace AutoMapper.Mappers
 
     public class NullableMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             return context.SourceValue;
         }

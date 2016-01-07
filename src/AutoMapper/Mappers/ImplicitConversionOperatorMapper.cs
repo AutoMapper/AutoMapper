@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
 
     public class ImplicitConversionOperatorMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             var implicitOperator = GetImplicitConversionOperator(context.Types);
 

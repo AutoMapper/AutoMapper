@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
                    && (!context.SourceType.IsDictionaryType());
         }
 
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             var sourceEnumerableValue = (IEnumerable)context.SourceValue ?? new object[0];
             IEnumerable<object> enumerableValue = sourceEnumerableValue.Cast<object>();
@@ -34,14 +34,14 @@ namespace AutoMapper.Mappers
 
             foreach (object item in enumerableValue)
             {
-                var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(item, null, sourceElementType, destKvpType);
+                var typeMap = context.ConfigurationProvider.ResolveTypeMap(item, null, sourceElementType, destKvpType);
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
                 Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destKvpType;
 
                 var newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, count);
 
-                object mappedValue = mapper.Map(newContext);
+                object mappedValue = context.Engine.Map(newContext);
                 var keyProperty = mappedValue.GetType().GetProperty("Key");
                 object destKey = keyProperty.GetValue(mappedValue, null);
 

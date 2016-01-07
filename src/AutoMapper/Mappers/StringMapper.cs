@@ -2,7 +2,7 @@
 {
     public class StringMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             return context.SourceValue?.ToString();
         }

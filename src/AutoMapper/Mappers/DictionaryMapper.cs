@@ -19,9 +19,9 @@ namespace AutoMapper.Mappers
             return (context.SourceType.IsDictionaryType() && context.DestinationType.IsDictionaryType());
         }
 
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            if(context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+            if(context.IsSourceValueNull && context.Engine.ShouldMapSourceCollectionAsNull(context))
             {
                 return null;
             }
@@ -42,9 +42,9 @@ namespace AutoMapper.Mappers
                 object sourceKey = sourceKvpType.GetProperty("Key").GetValue(keyValuePair, new object[0]);
                 object sourceValue = sourceKvpType.GetProperty("Value").GetValue(keyValuePair, new object[0]);
 
-                TypeMap keyTypeMap = mapper.ConfigurationProvider.ResolveTypeMap(sourceKey, null, sourceKeyType,
+                TypeMap keyTypeMap = context.ConfigurationProvider.ResolveTypeMap(sourceKey, null, sourceKeyType,
                     destKeyType);
-                TypeMap valueTypeMap = mapper.ConfigurationProvider.ResolveTypeMap(sourceValue, null, sourceValueType,
+                TypeMap valueTypeMap = context.ConfigurationProvider.ResolveTypeMap(sourceValue, null, sourceValueType,
                     destValueType);
 
                 ResolutionContext keyContext = context.CreateElementContext(keyTypeMap, sourceKey, sourceKeyType,
@@ -52,8 +52,8 @@ namespace AutoMapper.Mappers
                 ResolutionContext valueContext = context.CreateElementContext(valueTypeMap, sourceValue, sourceValueType,
                     destValueType, count);
 
-                object destKey = mapper.Map(keyContext);
-                object destValue = mapper.Map(valueContext);
+                object destKey = context.Engine.Map(keyContext);
+                object destValue = context.Engine.Map(valueContext);
 
                 genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
 

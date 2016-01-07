@@ -6,9 +6,9 @@
 
     public class PrimitiveArrayMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            if (context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+            if (context.IsSourceValueNull && context.Engine.ShouldMapSourceCollectionAsNull(context))
             {
                 return null;
             }
