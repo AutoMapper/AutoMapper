@@ -13,6 +13,11 @@
                 return null;
             }
 
+            if (!context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType))
+            {
+                return context.SourceValue;
+            }
+
             Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
             Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 

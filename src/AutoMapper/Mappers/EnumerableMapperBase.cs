@@ -24,6 +24,14 @@ namespace AutoMapper.Mappers
             Type sourceElementType = TypeHelper.GetElementType(context.SourceType, enumerableValue);
             Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
+            // If you can just assign the collection from one side to the other and the element types don't need to be mapped
+            if (ShouldAssignEnumerable(context))
+            {
+                var elementTypeMap = mapper.ConfigurationProvider.ResolveTypeMap(sourceElementType, destElementType);
+                if (elementTypeMap == null)
+                    return context.SourceValue;
+            }
+
             var sourceLength = enumerableValue.Count;
             var destination = GetOrCreateDestinationObject(context, mapper, destElementType, sourceLength);
             var enumerable = GetEnumerableFor(destination);
@@ -52,6 +60,11 @@ namespace AutoMapper.Mappers
 
             object valueToAssign = destination;
             return valueToAssign;
+        }
+
+        protected virtual bool ShouldAssignEnumerable(ResolutionContext context)
+        {
+            return false;
         }
 
         protected virtual object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper,

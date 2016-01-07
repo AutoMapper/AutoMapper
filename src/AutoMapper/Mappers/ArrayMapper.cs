@@ -1,6 +1,7 @@
 namespace AutoMapper.Mappers
 {
     using System;
+    using System.Reflection;
     using Internal;
 
     public class ArrayMapper : EnumerableMapperBase<Array>
@@ -23,6 +24,11 @@ namespace AutoMapper.Mappers
         protected override Array CreateDestinationObjectBase(Type destElementType, int sourceLength)
         {
             throw new NotImplementedException();
+        }
+
+        protected override bool ShouldAssignEnumerable(ResolutionContext context)
+        {
+            return !context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType);
         }
 
         protected override object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper,

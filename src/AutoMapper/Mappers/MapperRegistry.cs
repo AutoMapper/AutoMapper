@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
         private static readonly IObjectMapper[] _initialMappers =
         {
             new ExpressionMapper(), 
-            new AssignableArrayMapper(), 
+//            new AssignableArrayMapper(), 
             new FlagsEnumMapper(),
             new EnumMapper(),
             new MultidimensionalArrayMapper(),

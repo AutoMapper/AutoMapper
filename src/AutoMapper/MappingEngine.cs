@@ -406,13 +406,7 @@ namespace AutoMapper
                 IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
                 if (mapperToUse == null)
                 {
-                        throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
-                    // TODO: do we need this check at all? Why does it fall through
-                    if (context.SourceValue != null)
-                    {
-                        throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
-                    }
-                    return ObjectCreator.CreateDefaultValue(context.DestinationType);
+                    throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
                 }
 
                 return mapperToUse.Map(context, this);
