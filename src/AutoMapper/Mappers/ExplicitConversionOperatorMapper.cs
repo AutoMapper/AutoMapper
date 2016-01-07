@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
             return implicitOperator.Invoke(null, new[] {context.SourceValue});
         }
 
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             var methodInfo = GetExplicitConversionOperator(context);
 

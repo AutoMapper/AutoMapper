@@ -17,7 +17,7 @@
             return nvc;
         }
 
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             return
                 context.SourceType == typeof (NameValueCollection) &&

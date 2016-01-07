@@ -15,7 +15,7 @@ namespace AutoMapper.Mappers
             return context.SourceValue;
         }
 
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             return context.DestinationType.IsAssignableFrom(context.SourceType);
         }

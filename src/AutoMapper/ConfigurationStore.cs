@@ -377,7 +377,7 @@ namespace AutoMapper
 
         private bool CoveredByObjectMap(TypePair typePair)
         {
-            return GetMappers().FirstOrDefault(m => m.IsMatch(typePair, this)) != null;
+            return GetMappers().FirstOrDefault(m => m.IsMatch(typePair)) != null;
         }
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
@@ -610,12 +610,12 @@ namespace AutoMapper
             }
             else
             {
-                var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context.Types, this));
+                var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context.Types));
                 if (mapperToUse == null && context.SourceType.IsNullableType())
                 {
                     var nullableTypes = new TypePair(Nullable.GetUnderlyingType(context.SourceType),
                         context.DestinationType);
-                    mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(nullableTypes, this));
+                    mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(nullableTypes));
                 }
                 if (mapperToUse == null)
                 {

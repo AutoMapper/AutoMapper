@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     public class MultidimensionalArrayMapper : EnumerableMapperBase<Array>
     {
         MultidimensionalArrayFiller filler;
-        public override bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public override bool IsMatch(TypePair context)
         {
             return context.DestinationType.IsArray && context.DestinationType.GetArrayRank() > 1 && context.SourceType.IsEnumerableType();
         }

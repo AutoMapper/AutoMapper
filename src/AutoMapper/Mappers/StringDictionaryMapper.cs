@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
 
     public class ToStringDictionaryMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             return typeof(StringDictionary).IsAssignableFrom(context.DestinationType);
         }
@@ -27,7 +27,7 @@ namespace AutoMapper.Mappers
 
     public class FromStringDictionaryMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             return typeof(StringDictionary).IsAssignableFrom(context.SourceType);
         }

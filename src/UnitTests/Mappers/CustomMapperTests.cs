@@ -29,7 +29,7 @@
                     return new DestinationType();
                 }
 
-                public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+                public bool IsMatch(TypePair context)
                 {
                     return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
                 }

@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers
             return null;
         }
 
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             var sourceTypeConverter = GetTypeConverter(context.SourceType);
             var destTypeConverter = GetTypeConverter(context.DestinationType);

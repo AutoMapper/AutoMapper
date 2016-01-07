@@ -37,7 +37,7 @@
             return Expression.Lambda(body, parameters);
         }
 
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
                    && context.SourceType != typeof (LambdaExpression)

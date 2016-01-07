@@ -107,7 +107,7 @@ namespace AutoMapper.Mappers
             return CreateDestinationObjectBase(destinationElementType, count);
         }
 
-        public abstract bool IsMatch(TypePair context, IConfigurationProvider configuration);
+        public abstract bool IsMatch(TypePair context);
 
 
         protected abstract void SetElementValue(TEnumerable destination, object mappedValue, int index);

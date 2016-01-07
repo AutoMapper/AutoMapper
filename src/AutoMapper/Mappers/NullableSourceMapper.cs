@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
             return context.SourceValue ?? mapper.CreateObject(context);
         }
 
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             return context.SourceType.IsNullableType() && !context.DestinationType.IsNullableType();
         }

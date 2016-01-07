@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests.Mappers
                 var tp = new TypePair(typeof(NameValueCollection), typeof(NameValueCollection));
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.IsMatch(tp, Mapper.Engine.ConfigurationProvider);
+                var result = nvcm.IsMatch(tp);
 
                 result.ShouldBeTrue();
             }
@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.Mappers
                 var tp = new TypePair(typeof(NameValueCollection), typeof(Object));
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.IsMatch(tp, Mapper.Engine.ConfigurationProvider);
+                var result = nvcm.IsMatch(tp);
 
                 result.ShouldBeFalse();
             }            
@@ -38,7 +38,7 @@ namespace AutoMapper.UnitTests.Mappers
                 var tp = new TypePair(typeof(Object), typeof(NameValueCollection));
                 var nvcm = new NameValueCollectionMapper();
 
-                var result = nvcm.IsMatch(tp, Mapper.Engine.ConfigurationProvider);
+                var result = nvcm.IsMatch(tp);
 
                 result.ShouldBeFalse();
             }            

@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
 {
     public abstract class DynamicMapper : IObjectMapper
     {
-        public abstract bool IsMatch(TypePair context, IConfigurationProvider configuration);
+        public abstract bool IsMatch(TypePair context);
 
         public object Map(ResolutionContext context, IMappingEngineRunner mapper)
         {
@@ -62,7 +62,7 @@ namespace AutoMapper.Mappers
 
     public class FromDynamicMapper : DynamicMapper
     {
-        public override bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public override bool IsMatch(TypePair context)
         {
             return context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
         }
@@ -85,7 +85,7 @@ namespace AutoMapper.Mappers
 
     public class ToDynamicMapper : DynamicMapper
     {
-        public override bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public override bool IsMatch(TypePair context)
         {
             return context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
         }

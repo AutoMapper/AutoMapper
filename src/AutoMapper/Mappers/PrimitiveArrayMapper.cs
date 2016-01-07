@@ -42,7 +42,7 @@
             return false;
         }
 
-        public bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public bool IsMatch(TypePair context)
         {
             return IsPrimitiveArrayType(context.DestinationType) &&
                    IsPrimitiveArrayType(context.SourceType) &&

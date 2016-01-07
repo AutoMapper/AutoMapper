@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
 
     public class ArrayMapper : EnumerableMapperBase<Array>
     {
-        public override bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public override bool IsMatch(TypePair context)
         {
             return (context.DestinationType.IsArray) && (context.SourceType.IsEnumerableType());
         }

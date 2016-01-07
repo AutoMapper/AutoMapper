@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 
     public class EnumerableMapper : EnumerableMapperBase<IList>
     {
-        public override bool IsMatch(TypePair context, IConfigurationProvider configuration)
+        public override bool IsMatch(TypePair context)
         {
             // destination type must be IEnumerable interface or a class implementing at least IList 
             return ((context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType()) ||
