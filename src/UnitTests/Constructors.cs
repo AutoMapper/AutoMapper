@@ -7,6 +7,51 @@ namespace AutoMapper.UnitTests
 {
     namespace Constructors
     {
+        public class When_the_destination_has_a_matching_constructor_with_optional_extra_parameters : AutoMapperSpecBase
+        {
+            private Destination _destination;
+
+            public class Source
+            {
+                public int Foo { get; set; }
+            }
+
+            public class Destination
+            {
+                private readonly int _foo;
+
+                public int Foo
+                {
+                    get { return _foo; }
+                }
+
+                public string Bar { get;}
+
+                public Destination(int foo, string bar = "bar")
+                {
+                    _foo = foo;
+                    Bar = bar;
+                }
+            }
+
+            protected override void Establish_context()
+            {
+                Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
+            }
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Source, Destination>(new Source { Foo = 5 });
+            }
+
+            [Fact]
+            public void Should_map_the_constructor_argument()
+            {
+                _destination.Foo.ShouldEqual(5);
+                _destination.Bar.ShouldEqual("bar");
+            }
+        }
+
         public class When_mapping_to_an_object_with_a_constructor_with_a_matching_argument : AutoMapperSpecBase
         {
             private Dest _dest;
