@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 
     public class CollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             Type genericType = typeof (EnumerableMapper<,>);
 
@@ -18,10 +18,10 @@ namespace AutoMapper.Mappers
 
             var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
 
-            return objectMapper.Map(context, mapper);
+            return objectMapper.Map(context);
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             var isMatch = context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
 
@@ -33,7 +33,7 @@ namespace AutoMapper.Mappers
         private class EnumerableMapper<TCollection, TElement> : EnumerableMapperBase<TCollection>
             where TCollection : ICollection<TElement>
         {
-            public override bool IsMatch(ResolutionContext context)
+            public override bool IsMatch(TypePair context)
             {
                 throw new NotImplementedException();
             }

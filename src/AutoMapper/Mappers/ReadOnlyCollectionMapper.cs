@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
 
     public class ReadOnlyCollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             Type genericType = typeof (EnumerableMapper<>);
 
@@ -24,10 +24,10 @@ namespace AutoMapper.Mappers
                         context.PropertyMap)
                     : context;
 
-            return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks, mapper);
+            return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks);
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             if (!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType()))
                 return false;
@@ -43,7 +43,7 @@ namespace AutoMapper.Mappers
         {
             private readonly IList<TElement> inner = new List<TElement>();
 
-            public override bool IsMatch(ResolutionContext context)
+            public override bool IsMatch(TypePair context)
             {
                 throw new NotImplementedException();
             }
@@ -63,8 +63,7 @@ namespace AutoMapper.Mappers
                 throw new NotImplementedException();
             }
 
-            protected override object CreateDestinationObject(ResolutionContext context, Type destinationElementType,
-                int count, IMappingEngineRunner mapper)
+            protected override object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count)
             {
                 return new ReadOnlyCollection<TElement>(inner);
             }

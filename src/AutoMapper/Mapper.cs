@@ -13,7 +13,7 @@ namespace AutoMapper
     public static class Mapper
     {
         private static readonly Func<ConfigurationStore> _configurationInit =
-            () => new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
+            () => new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers);
 
         private static Lazy<ConfigurationStore> _configuration = new Lazy<ConfigurationStore>(_configurationInit);
 
@@ -171,6 +171,7 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
+        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static TDestination DynamicMap<TSource, TDestination>(TSource source)
         {
             return Engine.DynamicMap<TSource, TDestination>(source);
@@ -183,6 +184,7 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <param name="destination">Destination object to map into</param>
+        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
         {
             Engine.DynamicMap(source, destination);
@@ -195,6 +197,7 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
+        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static TDestination DynamicMap<TDestination>(object source)
         {
             return Engine.DynamicMap<TDestination>(source);
@@ -208,6 +211,7 @@ namespace AutoMapper
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to use</param>
         /// <returns>Mapped destination object</returns>
+        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static object DynamicMap(object source, Type sourceType, Type destinationType)
         {
             return Engine.DynamicMap(source, sourceType, destinationType);
@@ -221,6 +225,7 @@ namespace AutoMapper
         /// <param name="destination"></param>
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to use</param>
+        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
         {
             Engine.DynamicMap(source, destination, sourceType, destinationType);

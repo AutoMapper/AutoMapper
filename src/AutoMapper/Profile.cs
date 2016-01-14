@@ -65,6 +65,8 @@ namespace AutoMapper
             set { DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
+        public bool CreateMissingTypeMaps { get; set; }
+
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
         {
             _configurator.ForAllMaps(ProfileName, configuration);

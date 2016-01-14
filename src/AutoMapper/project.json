@@ -9,21 +9,19 @@
   "summary": "A convention-based object-object mapper",
   "copyright": "Copyright Jimmy Bogard 2008-2015",
   "description": "A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is designed for model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.",
-
   "compilationOptions": { "keyFile": "..\\AutoMapper.snk" },
-
   "frameworks": {
-    "net45": {},
+    "net45": { },
     "dotnet5.1": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.0",
         "System.Collections": "4.0.10",
-        "System.Collections.Concurrent": "4.0.0",
+        "System.Collections.Concurrent": "4.0.10",
         "System.Collections.Specialized": "4.0.0",
         "System.ComponentModel.TypeConverter": "4.0.0",
         "System.Diagnostics.Debug": "4.0.10",
         "System.Dynamic.Runtime": "4.0.10",
-        "System.Globalization": "4.0.0",
+        "System.Globalization": "4.0.10",
         "System.Linq": "4.0.0",
         "System.Linq.Expressions": "4.0.10",
         "System.Linq.Queryable": "4.0.0",

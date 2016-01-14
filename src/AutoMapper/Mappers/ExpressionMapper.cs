@@ -10,7 +10,7 @@
 
     public class ExpressionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             var sourceDelegateType = context.SourceType.GetGenericArguments()[0];
             var destDelegateType = context.DestinationType.GetGenericArguments()[0];
@@ -26,7 +26,7 @@
             if (sourceArgType.IsGenericType())
                 sourceArgType = sourceArgType.GetGenericArguments()[0];
 
-            var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(destArgType, sourceArgType);
+            var typeMap = context.ConfigurationProvider.ResolveTypeMap(destArgType, sourceArgType);
 
             var parentMasterVisitor = new MappingVisitor(destDelegateType.GetGenericArguments());
             var typeMapVisitor = new MappingVisitor(typeMap, expression.Parameters[0], Expression.Parameter(destDelegateType.GetGenericArguments()[0], expression.Parameters[0].Name), parentMasterVisitor, destDelegateType.GetGenericArguments());
@@ -37,7 +37,7 @@
             return Expression.Lambda(body, parameters);
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
                    && context.SourceType != typeof (LambdaExpression)

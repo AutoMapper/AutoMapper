@@ -9,17 +9,17 @@ namespace AutoMapper.Mappers
 
     public class EnumMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             bool toEnum = false;
             Type enumSourceType = TypeHelper.GetEnumerationType(context.SourceType);
             Type enumDestinationType = TypeHelper.GetEnumerationType(context.DestinationType);
 
-            if (EnumToStringMapping(context, ref toEnum))
+            if (EnumToStringMapping(context.Types, ref toEnum))
             {
                 if (context.SourceValue == null)
                 {
-                    return mapper.CreateObject(context);
+                    return context.Engine.CreateObject(context);
                 }
 
                 if (toEnum)
@@ -27,21 +27,21 @@ namespace AutoMapper.Mappers
                     var stringValue = context.SourceValue.ToString();
                     if (string.IsNullOrEmpty(stringValue))
                     {
-                        return mapper.CreateObject(context);
+                        return context.Engine.CreateObject(context);
                     }
 
                     return Enum.Parse(enumDestinationType, stringValue, true);
                 }
                 return Enum.GetName(enumSourceType, context.SourceValue);
             }
-            if (EnumToEnumMapping(context))
+            if (EnumToEnumMapping(context.Types))
             {
                 if (context.SourceValue == null)
                 {
-                    if (mapper.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
+                    if (context.Engine.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
                         return null;
 
-                    return mapper.CreateObject(context);
+                    return context.Engine.CreateObject(context);
                 }
 
                 if (!Enum.IsDefined(enumSourceType, context.SourceValue))
@@ -59,7 +59,7 @@ namespace AutoMapper.Mappers
 
                 return Enum.Parse(enumDestinationType, Enum.GetName(enumSourceType, context.SourceValue), true);
             }
-            if (EnumToUnderlyingTypeMapping(context, ref toEnum))
+            if (EnumToUnderlyingTypeMapping(context.Types, ref toEnum))
             {
                 if (toEnum && context.SourceValue != null)
                 {
@@ -76,14 +76,14 @@ namespace AutoMapper.Mappers
             return null;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             bool toEnum = false;
             return EnumToStringMapping(context, ref toEnum) || EnumToEnumMapping(context) ||
                    EnumToUnderlyingTypeMapping(context, ref toEnum);
         }
 
-        private static bool EnumToEnumMapping(ResolutionContext context)
+        private static bool EnumToEnumMapping(TypePair context)
         {
             // Enum to enum mapping
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
@@ -91,7 +91,7 @@ namespace AutoMapper.Mappers
             return sourceEnumType != null && destEnumType != null;
         }
 
-        private static bool EnumToUnderlyingTypeMapping(ResolutionContext context, ref bool toEnum)
+        private static bool EnumToUnderlyingTypeMapping(TypePair context, ref bool toEnum)
         {
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
             var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);
@@ -109,7 +109,7 @@ namespace AutoMapper.Mappers
             return false;
         }
 
-        private static bool EnumToStringMapping(ResolutionContext context, ref bool toEnum)
+        private static bool EnumToStringMapping(TypePair context, ref bool toEnum)
         {
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
             var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);

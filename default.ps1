@@ -44,14 +44,17 @@ task compile -depends clean {
 }
 
 task test {
-	mkdir $result_dir
-    exec { & $source_dir\packages\Fixie.1.0.0.33\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.UnitTests.Net4.xml $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.Net4.dll }
-    exec { & $source_dir\packages\Fixie.1.0.0.33\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.IntegrationTests.Net4.xml $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
-	if($env:APPVEYOR -ne $NULL) {
-		$wc = New-Object 'System.Net.WebClient'
-		$wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $result_dir\AutoMapper.UnitTests.Net4.xml))
-		$wc.UploadFile("https://ci.appveyor.com/api/testresults/xunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $result_dir\AutoMapper.IntegrationTests.Net4.xml))
-	}
+    $testRunners = @(gci $source_dir\packages -rec -filter Fixie.Console.exe)
+
+    if ($testRunners.Length -ne 1)
+    {
+        throw "Expected to find 1 Fixie.Console.exe, but found $($testRunners.Length)."
+    }
+
+    $testRunner = $testRunners[0].FullName
+
+    exec { & $testRunner $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.Net4.dll }
+    exec { & $testRunner $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
 }
 
 function Install-Dnvm

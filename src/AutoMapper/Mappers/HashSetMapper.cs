@@ -8,7 +8,7 @@
 
     public class HashSetMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             Type genericType = typeof (EnumerableMapper<,>);
 
@@ -19,10 +19,10 @@
 
             var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
 
-            return objectMapper.Map(context, mapper);
+            return objectMapper.Map(context);
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             var isMatch = context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
@@ -48,7 +48,7 @@
         private class EnumerableMapper<TCollection, TElement> : EnumerableMapperBase<TCollection>
             where TCollection : ISet<TElement>
         {
-            public override bool IsMatch(ResolutionContext context)
+            public override bool IsMatch(TypePair context)
             {
                 throw new NotImplementedException();
             }

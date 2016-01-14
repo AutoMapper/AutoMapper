@@ -21,18 +21,6 @@ using System.Collections.ObjectModel;
 
             return typeInfo;
         }
-        //internal static ICollection<IChildMemberConfiguration> sourceToDestinationMemberMappers = new Collection<IChildMemberConfiguration>
-        //{
-        //    // Need to do it fixie way for prefix and postfix to work together + not specify match explicitly
-        //    // Have 3 properties for Members, Methods, And External Methods
-        //    // Parent goes to all
-        //    new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")).SetMemberInfo<AllMemberInfo>(),
-        //    //new CustomizedSourceToDestinationMemberMapper().MemberNameMatch().ExtensionNameMatch().ExtensionPrefix("Get").MethodPrefix("Get").MethodNameMatch(),
-        //};
-
-        
-
-        //internal static readonly ICollection<IChildMemberConfiguration> def = sourceToDestinationMemberMappers.ToList();
 
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IProfileConfiguration options, MemberList memberList)
         {

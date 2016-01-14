@@ -24,12 +24,12 @@
 
             public class TestObjectMapper : IObjectMapper
             {
-                public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+                public object Map(ResolutionContext context)
                 {
                     return new DestinationType();
                 }
 
-                public bool IsMatch(ResolutionContext context)
+                public bool IsMatch(TypePair context)
                 {
                     return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
                 }
