@@ -80,7 +80,7 @@ namespace AutoMapper.Mappers
         {
             bool toEnum = false;
             return EnumToStringMapping(context, ref toEnum) || EnumToEnumMapping(context) ||
-                   EnumToUnderlyingTypeMapping(context, ref toEnum);
+                   EnumToUnderlyingTypeMapping(context, ref toEnum) || EnumToNullableTypeMapping(context);
         }
 
         private static bool EnumToEnumMapping(TypePair context)
@@ -140,6 +140,7 @@ namespace AutoMapper.Mappers
 
         private static object ConvertEnumToNullableType(ResolutionContext context)
         {
+#if !PORTABLE
             var nullableConverter = new NullableConverter(context.DestinationType);
 
             if (context.IsSourceValueNull)
@@ -149,6 +150,16 @@ namespace AutoMapper.Mappers
 
             var destType = nullableConverter.UnderlyingType;
             return Convert.ChangeType(context.SourceValue, destType, null);
+#else
+            if (context.IsSourceValueNull)
+            {
+                return null;
+            }
+
+            var destType = Nullable.GetUnderlyingType(context.DestinationType);
+
+            return Convert.ChangeType(context.SourceValue, destType, null);
+#endif
         }
     }
 }

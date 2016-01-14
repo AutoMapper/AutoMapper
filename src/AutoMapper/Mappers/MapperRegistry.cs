@@ -13,7 +13,9 @@ namespace AutoMapper.Mappers
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
+#if !PORTABLE
             new NameValueCollectionMapper(),
+#endif
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
             new HashSetMapper(),
@@ -21,7 +23,9 @@ namespace AutoMapper.Mappers
             new EnumerableMapper(),
             new StringMapper(),
             new AssignableMapper(),
+#if !PORTABLE
             new TypeConverterMapper(),
+#endif
             new NullableSourceMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),

@@ -71,7 +71,7 @@ namespace AutoMapper
                 .Where(method => method.GetParameters()[0].ParameterType == Type)
                 .ToList();
 
-            var genericInterfaces = Type.GetInterfaces().Where(t => t.IsGenericType()).ToList();
+            var genericInterfaces = Type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType()).ToList();
 
             if (Type.IsInterface() && Type.IsGenericType())
                 genericInterfaces.Add(Type);
@@ -80,10 +80,10 @@ namespace AutoMapper
                 from method in sourceExtensionMethodSearchArray.Where(method => method.IsGenericMethodDefinition)
                 let parameterType = method.GetParameters()[0].ParameterType
                 let interfaceMatch = genericInterfaces
-                    .Where(t => t.GetGenericParameters().Length == parameterType.GetGenericArguments().Length)
-                    .FirstOrDefault(t => method.MakeGenericMethod(t.GetGenericArguments()).GetParameters()[0].ParameterType.IsAssignableFrom(t))
+                    .Where(t => t.GetGenericParameters().Length == parameterType.GetTypeInfo().GenericTypeArguments.Length)
+                    .FirstOrDefault(t => method.MakeGenericMethod(t.GetTypeInfo().GenericTypeArguments).GetParameters()[0].ParameterType.GetTypeInfo().IsAssignableFrom(t.GetTypeInfo()))
                 where interfaceMatch != null
-                select method.MakeGenericMethod(interfaceMatch.GetGenericArguments()));
+                select method.MakeGenericMethod(interfaceMatch.GetTypeInfo().GenericTypeArguments));
 
             return explicitExtensionMethods;
         }
@@ -142,7 +142,7 @@ namespace AutoMapper
         private static bool PropertyWritable(PropertyInfo propertyInfo)
         {
             bool propertyIsEnumerable = (typeof (string) != propertyInfo.PropertyType)
-                                        && typeof (IEnumerable).IsAssignableFrom(propertyInfo.PropertyType);
+                                        && typeof (IEnumerable).GetTypeInfo().IsAssignableFrom(propertyInfo.PropertyType.GetTypeInfo());
 
             return propertyInfo.CanWrite || propertyIsEnumerable;
         }
@@ -162,7 +162,7 @@ namespace AutoMapper
                 typesToScan.Add(t);
 
             if (Type.IsInterface())
-                typesToScan.AddRange(Type.GetInterfaces());
+                typesToScan.AddRange(Type.GetTypeInfo().ImplementedInterfaces);
 
             // Scan all types for public properties and fields
             return typesToScan

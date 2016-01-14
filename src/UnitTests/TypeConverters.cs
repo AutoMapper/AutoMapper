@@ -126,7 +126,8 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_specifying_mapping_with_the_BCL_type_converter_class : AutoMapperSpecBase
+#if !PORTABLE
+        public class When_specifying_mapping_with_the_BCL_type_converter_class : AutoMapperSpecBase
 		{
 			[TypeConverter(typeof(CustomTypeConverter))]
 			public class Source
@@ -187,8 +188,9 @@ namespace AutoMapper.UnitTests
 				destination.Value.ShouldEqual(5);
 			}
 		}
+#endif
 
-		public class When_specifying_a_type_converter_for_a_non_generic_configuration : SpecBase
+        public class When_specifying_a_type_converter_for_a_non_generic_configuration : SpecBase
 		{
 			private Destination _result;
 

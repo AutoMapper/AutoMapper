@@ -78,7 +78,7 @@ namespace AutoMapper.Internal
             var memberType = member?.GetMemberType() ?? type;
             if(memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
             {
-                memberType = memberType.GetGenericArguments()[0];
+                memberType = memberType.GetTypeInfo().GenericTypeArguments[0];
             }
             return memberType;
         }
@@ -194,7 +194,7 @@ namespace AutoMapper.Internal
 
             if (targetType.IsGenericType())
             {
-                var genSubArgs = targetType.GetGenericArguments();
+                var genSubArgs = targetType.GetTypeInfo().GenericTypeArguments;
                 var newGenSubArgs = new Type[genSubArgs.Length];
                 for (int i = 0; i < genSubArgs.Length; i++)
                     newGenSubArgs[i] = ReplaceItemType(genSubArgs[i], oldType, newType);

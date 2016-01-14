@@ -486,7 +486,7 @@ namespace AutoMapper
                 baseType = baseType.BaseType();
             }
 
-            foreach (var interfaceType in type.GetInterfaces())
+            foreach (var interfaceType in type.GetTypeInfo().ImplementedInterfaces)
             {
                 yield return interfaceType;
             }

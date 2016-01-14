@@ -438,9 +438,13 @@ namespace AutoMapper
                 return context.DestinationValue;
 
             if (destinationType.IsInterface())
+#if PORTABLE
+                throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+#else
                 destinationType = new ProxyGenerator().GetProxyType(destinationType);
+#endif
 
-            return !ConfigurationProvider.AllowNullDestinationValues
+                return !ConfigurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(destinationType)
                 : ObjectCreator.CreateObject(destinationType);
         }

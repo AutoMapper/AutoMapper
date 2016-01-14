@@ -26,12 +26,12 @@ namespace AutoMapper.Mappers
                 return null;
             }
             Type genericSourceDictType = context.SourceType.GetDictionaryType();
-            Type sourceKeyType = genericSourceDictType.GetGenericArguments()[0];
-            Type sourceValueType = genericSourceDictType.GetGenericArguments()[1];
+            Type sourceKeyType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[0];
+            Type sourceValueType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[1];
             Type sourceKvpType = KvpType.MakeGenericType(sourceKeyType, sourceValueType);
             Type genericDestDictType = context.DestinationType.GetDictionaryType();
-            Type destKeyType = genericDestDictType.GetGenericArguments()[0];
-            Type destValueType = genericDestDictType.GetGenericArguments()[1];
+            Type destKeyType = genericDestDictType.GetTypeInfo().GenericTypeArguments[0];
+            Type destValueType = genericDestDictType.GetTypeInfo().GenericTypeArguments[1];
 
             var kvpEnumerator = GetKeyValuePairEnumerator(context, sourceKvpType);
             var destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);

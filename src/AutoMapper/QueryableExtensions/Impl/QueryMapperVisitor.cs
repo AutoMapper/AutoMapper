@@ -149,7 +149,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             if (lambdaType.IsGenericType())
             {
-                var genArgs = lambdaType.GetGenericArguments();
+                var genArgs = lambdaType.GetTypeInfo().GenericTypeArguments;
                 var newGenArgs = genArgs.Select(t => t.ReplaceItemType(_sourceType, _destinationType)).ToArray();
                 var genericTypeDef = lambdaType.GetGenericTypeDefinition();
                 if (genericTypeDef.FullName.StartsWith("System.Func"))

@@ -54,6 +54,7 @@ task test {
     $testRunner = $testRunners[0].FullName
 
     exec { & $testRunner $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.Net4.dll }
+    exec { & $testRunner $source_dir/UnitTests.Portable/bin/$config/AutoMapper.UnitTests.Portable.dll }
     exec { & $testRunner $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
 }
 
