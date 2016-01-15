@@ -66,7 +66,7 @@ namespace AutoMapper.Mappers
                     return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
                 }
 
-                if (EnumToNullableTypeMapping(context))
+                if (EnumToNullableTypeMapping(context.Types))
                 {
                     return ConvertEnumToNullableType(context);
                 }
@@ -80,7 +80,7 @@ namespace AutoMapper.Mappers
         {
             bool toEnum = false;
             return EnumToStringMapping(context, ref toEnum) || EnumToEnumMapping(context) ||
-                   EnumToUnderlyingTypeMapping(context, ref toEnum) || EnumToNullableTypeMapping(context);
+                   EnumToUnderlyingTypeMapping(context, ref toEnum);
         }
 
         private static bool EnumToEnumMapping(TypePair context)
@@ -127,7 +127,7 @@ namespace AutoMapper.Mappers
             return false;
         }
 
-        private static bool EnumToNullableTypeMapping(ResolutionContext context)
+        private static bool EnumToNullableTypeMapping(TypePair context)
         {
             if (!context.DestinationType.IsGenericType())
             {
@@ -135,7 +135,8 @@ namespace AutoMapper.Mappers
             }
 
             var genericType = context.DestinationType.GetGenericTypeDefinition();
-            return genericType.Equals(typeof (Nullable<>));
+
+            return genericType == typeof (Nullable<>);
         }
 
         private static object ConvertEnumToNullableType(ResolutionContext context)

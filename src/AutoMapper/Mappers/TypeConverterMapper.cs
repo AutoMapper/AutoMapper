@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-
 #if !PORTABLE
 namespace AutoMapper.Mappers
 {
@@ -47,41 +44,6 @@ namespace AutoMapper.Mappers
                    (context.DestinationType.IsNullableType() &&
                     sourceTypeConverter.CanConvertTo(Nullable.GetUnderlyingType(context.DestinationType)) ||
                     destTypeConverter.CanConvertFrom(context.SourceType));
-        }
-
-        private static TypeConverter GetTypeConverter(Type type)
-        {
-            return TypeDescriptor.GetConverter(type);
-        }
-    }
-}
-#else
-namespace AutoMapper.Mappers
-{
-    using System;
-    using System.ComponentModel;
-    using Internal;
-
-    public class TypeConverterMapper : IObjectMapper
-    {
-        private IReadOnlyDictionary<TypePair, Func<object, object>> _converters = new ReadOnlyDictionary<TypePair, Func<object, object>>(new Dictionary<TypePair, Func<object, object>>
-        {
-            { new TypePair(typeof(byte), typeof(bool)), foo => Convert.ToBoolean((byte)foo) },
-        });  
-
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
-        {
-            if (context.SourceValue == null)
-            {
-                return mapper.CreateObject(context);
-            }
-            Func<object> converter = GetConverter(context);
-            return converter?.Invoke();
-        }
-
-        public bool IsMatch(ResolutionContext context)
-        {
-            return _converters.ContainsKey(context)
         }
 
         private static TypeConverter GetTypeConverter(Type type)

@@ -34,9 +34,27 @@
         }
 
 #if PORTABLE
+        public static IEnumerable<MemberInfo> GetAllMembers(this Type type)
+        {
+            while (true)
+            {
+                foreach (var memberInfo in type.GetTypeInfo().DeclaredMembers)
+                {
+                    yield return memberInfo;
+                }
+
+                type = type.BaseType();
+
+                if (type == null)
+                {
+                    yield break;
+                }
+            }
+        }
+
         public static MemberInfo[] GetMember(this Type type, string name)
         {
-            return type.GetTypeInfo().DeclaredMembers.Where(mi => mi.Name == name).ToArray();
+            return type.GetAllMembers().Where(mi => mi.Name == name).ToArray();
         }
 #endif
 
@@ -48,12 +66,17 @@
 #if PORTABLE
         public static MethodInfo GetMethod(this Type type, string name)
         {
-            return type.GetTypeInfo().DeclaredMethods.FirstOrDefault(mi => mi.Name == name);
+            return type.GetAllMethods().FirstOrDefault(mi => mi.Name == name);
         }
 
         public static MethodInfo GetMethod(this Type type, string name, Type[] parameters)
         {
-            return type.GetTypeInfo().DeclaredMethods.FirstOrDefault(mi => mi.Name == name && mi.GetParameters().Select(pi => pi.ParameterType).ToArray() == parameters);
+            //a.Length == b.Length && a.Intersect(b).Count() == a.Length
+            return type.GetAllMethods()
+                .Where(mi => mi.Name == name)
+                .Where(mi => mi.GetParameters().Length == parameters.Length)
+                .Where(mi => mi.GetParameters().Select(pi => pi.ParameterType).Intersect(parameters).Count() == parameters.Length)
+                .FirstOrDefault();
         }
 #endif
 
