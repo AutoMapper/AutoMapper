@@ -95,7 +95,6 @@ namespace AutoMapper
         /// </summary>
         public bool CreateMissingTypeMaps
         {
-            get { return GetProfile(DefaultProfileName).CreateMissingTypeMaps; }
             set { GetProfile(DefaultProfileName).CreateMissingTypeMaps = value; }
         }
 
@@ -405,8 +404,7 @@ namespace AutoMapper
                                 FindTypeMapFor(tp) ??
                                 (!CoveredByObjectMap(typePair)
                                     ? FindConventionTypeMapFor(tp) ??
-                                      FindClosedGenericTypeMapFor(tp) ??
-                                      (CreateMissingTypeMaps ? CreateTypeMap(tp) : null)
+                                      FindClosedGenericTypeMapFor(tp)
                                     : null))
                         .FirstOrDefault(tm => tm != null));
 

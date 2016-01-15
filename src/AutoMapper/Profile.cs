@@ -15,6 +15,7 @@ namespace AutoMapper
     public class Profile : IProfileExpression
     {
         private ConfigurationStore _configurator;
+        private readonly IConditionalObjectMapper _mapMissingTypes;
 
         public Profile(string profileName)
             :this()
@@ -30,6 +31,7 @@ namespace AutoMapper
             IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
             ShouldMapProperty = p => p.IsPublic();
             ShouldMapField = f => f.IsPublic;
+            _mapMissingTypes = new ConditionalObjectMapper(ProfileName) {Conventions = {tp => true}};
         }
 
         public string ProfileName { get; }
@@ -65,7 +67,17 @@ namespace AutoMapper
             set { DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
-        public bool CreateMissingTypeMaps { get; set; }
+
+        public bool CreateMissingTypeMaps
+        {
+            set
+            {
+                if (value)
+                    _typeConfigurations.Add(_mapMissingTypes);
+                else
+                    _typeConfigurations.Remove(_mapMissingTypes);
+            }
+        }
 
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
         {
