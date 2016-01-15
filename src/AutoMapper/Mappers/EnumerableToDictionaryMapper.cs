@@ -25,8 +25,8 @@ namespace AutoMapper.Mappers
 
             Type sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceEnumerableValue);
             Type genericDestDictType = context.DestinationType.GetDictionaryType();
-            Type destKeyType = genericDestDictType.GetGenericArguments()[0];
-            Type destValueType = genericDestDictType.GetGenericArguments()[1];
+            Type destKeyType = genericDestDictType.GetTypeInfo().GenericTypeArguments[0];
+            Type destValueType = genericDestDictType.GetTypeInfo().GenericTypeArguments[1];
             Type destKvpType = KvpType.MakeGenericType(destKeyType, destValueType);
 
             object destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);

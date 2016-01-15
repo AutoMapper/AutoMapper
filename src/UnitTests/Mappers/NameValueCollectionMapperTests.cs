@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.Collections.Specialized;
 using AutoMapper.Mappers;
 using Should;
@@ -86,3 +87,4 @@ namespace AutoMapper.UnitTests.Mappers
         
     }
 }
+#endif

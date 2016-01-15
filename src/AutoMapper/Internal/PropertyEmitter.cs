@@ -1,3 +1,4 @@
+#if !PORTABLE
 namespace AutoMapper.Internal
 {
     using System;
@@ -68,3 +69,4 @@ namespace AutoMapper.Internal
         }
     }
 }
+#endif

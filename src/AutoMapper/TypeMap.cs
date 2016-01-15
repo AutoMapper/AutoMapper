@@ -279,12 +279,12 @@ namespace AutoMapper
             if (propertyInfo == null)
                 return propertyMap;
 
-            var baseAccessor = propertyInfo.GetAccessors()[0];
+            var baseAccessor = propertyInfo.GetMethod;
 
             if (baseAccessor.IsAbstract || baseAccessor.IsVirtual)
                 return propertyMap;
 
-            var accessor = ((PropertyInfo) destinationProperty.MemberInfo).GetAccessors()[0];
+            var accessor = ((PropertyInfo) destinationProperty.MemberInfo).GetMethod;
 
             if (baseAccessor.DeclaringType == accessor.DeclaringType)
                 return propertyMap;

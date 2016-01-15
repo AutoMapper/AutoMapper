@@ -66,7 +66,7 @@ namespace AutoMapper.Mappers
                     return Enum.Parse(enumDestinationType, context.SourceValue.ToString(), true);
                 }
 
-                if (EnumToNullableTypeMapping(context))
+                if (EnumToNullableTypeMapping(context.Types))
                 {
                     return ConvertEnumToNullableType(context);
                 }
@@ -127,7 +127,7 @@ namespace AutoMapper.Mappers
             return false;
         }
 
-        private static bool EnumToNullableTypeMapping(ResolutionContext context)
+        private static bool EnumToNullableTypeMapping(TypePair context)
         {
             if (!context.DestinationType.IsGenericType())
             {
@@ -135,11 +135,13 @@ namespace AutoMapper.Mappers
             }
 
             var genericType = context.DestinationType.GetGenericTypeDefinition();
-            return genericType.Equals(typeof (Nullable<>));
+
+            return genericType == typeof (Nullable<>);
         }
 
         private static object ConvertEnumToNullableType(ResolutionContext context)
         {
+#if !PORTABLE
             var nullableConverter = new NullableConverter(context.DestinationType);
 
             if (context.IsSourceValueNull)
@@ -149,6 +151,16 @@ namespace AutoMapper.Mappers
 
             var destType = nullableConverter.UnderlyingType;
             return Convert.ChangeType(context.SourceValue, destType, null);
+#else
+            if (context.IsSourceValueNull)
+            {
+                return null;
+            }
+
+            var destType = Nullable.GetUnderlyingType(context.DestinationType);
+
+            return Convert.ChangeType(context.SourceValue, destType, null);
+#endif
         }
     }
 }

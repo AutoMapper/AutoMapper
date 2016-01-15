@@ -12,7 +12,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
-            return propertyMap.DestinationPropertyType.GetInterfaces().Any(t => t.Name == "IEnumerable") &&
+            return propertyMap.DestinationPropertyType.GetTypeInfo().ImplementedInterfaces.Any(t => t.Name == "IEnumerable") &&
                    propertyMap.DestinationPropertyType != typeof (string);
         }
 
@@ -28,7 +28,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             MemberAssignment bindExpression;
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
 
-            var sourceListType = result.Type.IsArray ? result.Type.GetElementType() : result.Type.GetGenericArguments().First();
+            var sourceListType = result.Type.IsArray ? result.Type.GetElementType() : result.Type.GetTypeInfo().GenericTypeArguments.First();
             var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand);
 
             var selectExpression = result.ResolutionExpression;
@@ -48,10 +48,10 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
 
             if (typeof (IList<>).MakeGenericType(destinationListType)
-                .IsAssignableFrom(propertyMap.DestinationPropertyType)
+                .GetTypeInfo().IsAssignableFrom(propertyMap.DestinationPropertyType.GetTypeInfo())
                 ||
                 typeof (ICollection<>).MakeGenericType(destinationListType)
-                    .IsAssignableFrom(propertyMap.DestinationPropertyType))
+                    .GetTypeInfo().IsAssignableFrom(propertyMap.DestinationPropertyType.GetTypeInfo()))
             {
                 // Call .ToList() on IEnumerable
                 var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType, selectExpression);
@@ -80,7 +80,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             var destinationListType = propertyMap.DestinationPropertyType.IsArray 
                 ? propertyMap.DestinationPropertyType.GetElementType() 
-                : propertyMap.DestinationPropertyType.GetGenericArguments().First();
+                : propertyMap.DestinationPropertyType.GetTypeInfo().GenericTypeArguments.First();
             return destinationListType;
         }
 

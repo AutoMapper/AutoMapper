@@ -1,4 +1,5 @@
-﻿namespace AutoMapper.Mappers
+﻿#if !PORTABLE
+namespace AutoMapper.Mappers
 {
     using System.Collections.Specialized;
 
@@ -25,3 +26,4 @@
         }
     }
 }
+#endif

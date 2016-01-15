@@ -573,7 +573,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
             {
                 if(type.IsGenericTypeDefinition())
                 {
-                    type = type.MakeGenericType(context.SourceType.GetGenericArguments());
+                    type = type.MakeGenericType(context.SourceType.GetTypeInfo().GenericTypeArguments);
                 }
                 var obj = context.Options.ServiceCtor?.Invoke(type);
                 if(obj != null)
