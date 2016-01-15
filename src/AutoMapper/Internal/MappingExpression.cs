@@ -453,6 +453,11 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
             _propertyMap.Ignore();
         }
 
+        public void AllowNull()
+        {
+            _propertyMap.AllowNull = true;
+        }
+
         public void UseDestinationValue()
         {
             _propertyMap.UseDestinationValue = true;
