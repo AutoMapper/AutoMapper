@@ -60,7 +60,7 @@ namespace AutoMapper
 
         internal void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration)
         {
-            foreach (var typeMap in _userDefinedTypeMaps.Values.Where(tm => tm.Profile == profileName))
+            foreach (var typeMap in _userDefinedTypeMaps.Select(kv => kv.Value).Where(tm => tm.Profile == profileName))
             {
                 configuration(typeMap, CreateMappingExpression(typeMap, typeMap.DestinationType));
             }
@@ -193,7 +193,7 @@ namespace AutoMapper
         {
             var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
             var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
-            foreach (var typeMap in _userDefinedTypeMaps.Values)
+            foreach (var typeMap in _userDefinedTypeMaps.Select(kv => kv.Value))
             {
                 typeMap.Seal();
 
@@ -349,7 +349,7 @@ namespace AutoMapper
 
         private void IncludeBaseMappings(TypePair types, TypeMap typeMap)
         {
-            foreach(var inheritedTypeMap in _userDefinedTypeMaps.Values.Where(t => t.TypeHasBeenIncluded(types)))
+            foreach(var inheritedTypeMap in _userDefinedTypeMaps.Select(kv => kv.Value).Where(t => t.TypeHasBeenIncluded(types)))
             {
                 typeMap.ApplyInheritedMap(inheritedTypeMap);
                 IncludeBaseMappings(inheritedTypeMap.Types, typeMap);
@@ -358,7 +358,7 @@ namespace AutoMapper
 
         public TypeMap[] GetAllTypeMaps()
         {
-            return _userDefinedTypeMaps.Values.ToArray();
+            return _userDefinedTypeMaps.Select(kv => kv.Value).ToArray();
         }
 
         public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
@@ -382,7 +382,7 @@ namespace AutoMapper
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
-            var matchingTypeMapConfiguration = _formatterProfiles.Values.SelectMany(p => p.TypeConfigurations).FirstOrDefault(tc => tc.IsMatch(typePair));
+            var matchingTypeMapConfiguration = _formatterProfiles.Select(kv => kv.Value).SelectMany(p => p.TypeConfigurations).FirstOrDefault(tc => tc.IsMatch(typePair));
             return matchingTypeMapConfiguration != null ? CreateTypeMap(typePair, matchingTypeMapConfiguration.ProfileName) : null;
         }
 
@@ -504,7 +504,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid(string profileName)
         {
-            AssertConfigurationIsValid(_userDefinedTypeMaps.Values.Where(typeMap => typeMap.Profile == profileName));
+            AssertConfigurationIsValid(_userDefinedTypeMaps.Select(kv => kv.Value).Where(typeMap => typeMap.Profile == profileName));
         }
 
         public void AssertConfigurationIsValid<TProfile>()
@@ -515,7 +515,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid()
         {
-            AssertConfigurationIsValid(_userDefinedTypeMaps.Values);
+            AssertConfigurationIsValid(_userDefinedTypeMaps.Select(kv => kv.Value));
         }
 
 	    public IEnumerable<IObjectMapper> GetMappers()
