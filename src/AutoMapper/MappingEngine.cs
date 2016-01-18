@@ -190,7 +190,7 @@ namespace AutoMapper
 
         public object DynamicMap(object source, Type sourceType, Type destinationType)
         {
-            ConfigurationProvider.CreateMissingTypeMaps = true;
+            ((IConfiguration)ConfigurationProvider).CreateMissingTypeMaps = true;
             var typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions(), this);
@@ -200,7 +200,7 @@ namespace AutoMapper
 
         public void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
         {
-            ConfigurationProvider.CreateMissingTypeMaps = true;
+            ((IConfiguration)ConfigurationProvider).CreateMissingTypeMaps = true;
             var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions(), this);

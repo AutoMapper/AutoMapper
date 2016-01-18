@@ -11,7 +11,7 @@ namespace AutoMapper
     using Mappers;
     using QueryableExtensions.Impl;
 
-    public class ConfigurationStore : IConfigurationProvider
+    public class ConfigurationStore : IConfigurationProvider, IConfiguration
     {
         private readonly ITypeMapFactory _typeMapFactory;
         private readonly IEnumerable<IObjectMapper> _mappers;

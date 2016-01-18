@@ -5,7 +5,7 @@ namespace AutoMapper
 {
     using System;
 
-    public interface IConfigurationProvider : IConfiguration
+    public interface IConfigurationProvider
     {
         /// <summary>
         /// Get all configured type maps created
@@ -68,7 +68,6 @@ namespace AutoMapper
         /// <returns></returns>
         IProfileExpression GetProfileConfiguration(string profileName);
 
-
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
         /// </summary>
@@ -108,5 +107,15 @@ namespace AutoMapper
         /// Factory method to create formatters, resolvers and type converters
         /// </summary>
         Func<Type, object> ServiceCtor { get; }
+
+        /// <summary>
+        /// Allow null destination values. If false, destination objects will be created for deep object graphs.
+        /// </summary>
+        bool AllowNullDestinationValues { get; }
+
+        /// <summary>
+        /// Allow null destination collections. If true, null source collections result in null destination collections.
+        /// </summary>
+        bool AllowNullCollections { get; }
     }
 }
