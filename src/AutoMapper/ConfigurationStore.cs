@@ -1,4 +1,3 @@
-
 namespace AutoMapper
 {
     using System;
@@ -6,7 +5,6 @@ namespace AutoMapper
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reflection;
-    using Configuration;
     using Internal;
     using Mappers;
     using QueryableExtensions.Impl;
@@ -44,6 +42,11 @@ namespace AutoMapper
 
         public ConfigurationStore() : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
         {
+        }
+
+        public ConfigurationStore(Action<IConfiguration> configure) : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        {
+            configure(this);
         }
 
         public Func<Type, object> ServiceCtor => _serviceCtor;
@@ -215,6 +218,13 @@ namespace AutoMapper
             {
                 _typeMapPlanCache.GetOrAdd(derivedMap.Item1, _ => derivedMap.Item2);
             }
+        }
+
+        public IMappingEngine CreateMapper()
+        {
+            Seal();
+
+            return new MappingEngine(this);
         }
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)

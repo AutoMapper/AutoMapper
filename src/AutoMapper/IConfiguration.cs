@@ -40,5 +40,11 @@ namespace AutoMapper
         /// Seal the configuration and optimize maps
         /// </summary>
         void Seal();
+
+        /// <summary>
+        /// Create a mapper from current configuration
+        /// </summary>
+        /// <returns>Mapping engine</returns>
+        IMappingEngine CreateMapper();
     }
 }
