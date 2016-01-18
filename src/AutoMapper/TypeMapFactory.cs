@@ -71,6 +71,10 @@ using System.Collections.ObjectModel;
                 var resolvers = new LinkedList<IValueResolver>();
 
                 var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, parameter.GetType(), parameter.Name, resolvers);
+                if(!canResolve && parameter.HasDefaultValue)
+                {
+                    canResolve = true;
+                }
 
                 var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), canResolve);
 
