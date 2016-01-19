@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
                 .Include<Class, Dto>();
 
             configurationProvider.CreateMap<Class, Dto>();
-            var mappingEngine = new MappingEngine(configurationProvider);
+            var mappingEngine = configurationProvider.CreateMapper();
 
             // act
             var dest = mappingEngine.Map<Class, Dto>(source);
@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
                 .Include<Class, Dto>();
 
             configurationProvider.CreateMap<Class, Dto>();
-            var mappingEngine = new MappingEngine(configurationProvider);
+            var mappingEngine = configurationProvider.CreateMapper();
 
             // act
             var dest = mappingEngine.Map<Class, Dto>(source);

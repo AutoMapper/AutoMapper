@@ -28,7 +28,7 @@
             Mapper.Initialize(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(dest => dest.Child, opt => opt.ResolveUsing(result => result.Context.Engine.Map<Source, ChildDest>((Source) result.Value)));
+                    .ForMember(dest => dest.Child, opt => opt.ResolveUsing(result => result.Context.Engine.Map(result.Context.CreateTypeContext(result.Context.ConfigurationProvider.ResolveTypeMap(typeof(Source), typeof(ChildDest)), result.Value, result.Context.DestinationValue, typeof(Source), typeof(ChildDest)))));
                 cfg.CreateMap<Source, ChildDest>();
             });
         }

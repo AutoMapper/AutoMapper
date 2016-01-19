@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 
 namespace AutoMapper
@@ -10,19 +11,18 @@ namespace AutoMapper
     /// <summary>
     /// Main entry point for AutoMapper, for both creating maps and performing maps.
     /// </summary>
-    public class Mapper : IMapper
+    public class Mapper : IMapper, IDynamicMapper
     {
-
         #region Static API
         private static readonly Func<MapperConfiguration> _configurationInit =
             () => new MapperConfiguration(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers);
 
         private static Lazy<MapperConfiguration> _configuration = new Lazy<MapperConfiguration>(_configurationInit);
 
-        private static readonly Func<IMappingEngine> _mappingEngineInit =
-            () => new MappingEngine(_configuration.Value);
+        private static readonly Func<Mapper> _mappingEngineInit =
+            () => new Mapper(_configuration.Value);
 
-        private static Lazy<IMappingEngine> _mappingEngine = new Lazy<IMappingEngine>(_mappingEngineInit);
+        private static Lazy<Mapper> _mappingEngine = new Lazy<Mapper>(_mappingEngineInit);
 
         /// <summary>
         /// When set, destination can have null values. Defaults to true.
@@ -43,7 +43,7 @@ namespace AutoMapper
         /// <returns>Mapped destination object</returns>
         public static TDestination Map<TDestination>(object source)
         {
-            return Engine.Map<TDestination>(source);
+            return Instance.Map<TDestination>(source);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace AutoMapper
         /// <returns>Mapped destination object</returns>
         public static TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
-            return Engine.Map<TDestination>(source, opts);
+            return Instance.Map<TDestination>(source, opts);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace AutoMapper
         /// <returns>Mapped destination object</returns>
         public static TDestination Map<TSource, TDestination>(TSource source)
         {
-            return Engine.Map<TSource, TDestination>(source);
+            return Instance.Map<TSource, TDestination>(source);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace AutoMapper
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
         {
-            return Engine.Map(source, destination);
+            return Instance.Map(source, destination);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace AutoMapper
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            return Engine.Map(source, destination, opts);
+            return Instance.Map(source, destination, opts);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace AutoMapper
         public static TDestination Map<TSource, TDestination>(TSource source,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            return Engine.Map(source, opts);
+            return Instance.Map(source, opts);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace AutoMapper
         /// <returns>Mapped destination object</returns>
         public static object Map(object source, Type sourceType, Type destinationType)
         {
-            return Engine.Map(source, sourceType, destinationType);
+            return Instance.Map(source, sourceType, destinationType);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace AutoMapper
         public static object Map(object source, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
-            return Engine.Map(source, sourceType, destinationType, opts);
+            return Instance.Map(source, sourceType, destinationType, opts);
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace AutoMapper
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
         public static object Map(object source, object destination, Type sourceType, Type destinationType)
         {
-            return Engine.Map(source, destination, sourceType, destinationType);
+            return Instance.Map(source, destination, sourceType, destinationType);
         }
 
         /// <summary>
@@ -163,7 +163,7 @@ namespace AutoMapper
         public static object Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
-            return Engine.Map(source, destination, sourceType, destinationType, opts);
+            return Instance.Map(source, destination, sourceType, destinationType, opts);
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace AutoMapper
         [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static TDestination DynamicMap<TSource, TDestination>(TSource source)
         {
-            return Engine.DynamicMap<TSource, TDestination>(source);
+            return DynamicInstance.DynamicMap<TSource, TDestination>(source);
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace AutoMapper
         [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
         {
-            Engine.DynamicMap(source, destination);
+            DynamicInstance.DynamicMap(source, destination);
         }
 
         /// <summary>
@@ -202,7 +202,7 @@ namespace AutoMapper
         [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static TDestination DynamicMap<TDestination>(object source)
         {
-            return Engine.DynamicMap<TDestination>(source);
+            return DynamicInstance.DynamicMap<TDestination>(source);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace AutoMapper
         [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static object DynamicMap(object source, Type sourceType, Type destinationType)
         {
-            return Engine.DynamicMap(source, sourceType, destinationType);
+            return DynamicInstance.DynamicMap(source, sourceType, destinationType);
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace AutoMapper
         [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         public static void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
         {
-            Engine.DynamicMap(source, destination, sourceType, destinationType);
+            DynamicInstance.DynamicMap(source, destination, sourceType, destinationType);
         }
 
         /// <summary>
@@ -238,6 +238,7 @@ namespace AutoMapper
         /// This is the preferred means to configure AutoMapper.
         /// </summary>
         /// <param name="action">Initialization callback</param>
+        [Obsolete("Construct a MapperConfiguration instance and call CreateMapper instead. Store the instances statically as needed.")]
         public static void Initialize(Action<IConfiguration> action)
         {
             Reset();
@@ -407,13 +408,16 @@ namespace AutoMapper
         {
             MapperRegistry.Reset();
             _configuration = new Lazy<MapperConfiguration>(_configurationInit);
-            _mappingEngine = new Lazy<IMappingEngine>(_mappingEngineInit);
+            _mappingEngine = new Lazy<Mapper>(_mappingEngineInit);
         }
 
         /// <summary>
         /// Mapping engine used to perform mappings
         /// </summary>
-        public static IMappingEngine Engine => _mappingEngine.Value;
+        [Obsolete("Use a mapper instance instead")]
+        public static IMappingEngine Engine => _mappingEngine.Value._engine;
+        private static IMapper Instance => _mappingEngine.Value;
+        private static IDynamicMapper DynamicInstance => _mappingEngine.Value;
 
         /// <summary>
         /// Store for all configuration
@@ -435,6 +439,8 @@ namespace AutoMapper
         #region Instance API
 
         private readonly IMappingEngine _engine;
+        private readonly IConfigurationProvider _configurationProvider;
+        private readonly Func<Type, object> _serviceCtor;
 
         public Mapper(IConfigurationProvider configurationProvider)
         {
@@ -442,54 +448,162 @@ namespace AutoMapper
         }
         public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
-            _engine = new MappingEngine(configurationProvider, serviceCtor);
+            _configurationProvider = configurationProvider;
+            _serviceCtor = serviceCtor;
+            _engine = new MappingEngine(configurationProvider);
         }
 
-        TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts) => _engine.Map<TDestination>(source, opts);
+        TDestination IMapper.Map<TDestination>(object source)
+        {
+            return Map<TDestination>(source, DefaultMappingOptions);
+        }
 
-        TDestination IMapper.Map<TSource, TDestination>(TSource source) => _engine.Map<TSource, TDestination>(source);
+        TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
+        {
+            var mappedObject = default(TDestination);
+            if (source != null)
+            {
+                var sourceType = source.GetType();
+                var destinationType = typeof(TDestination);
 
-        TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
-            => _engine.Map(source, opts);
+                mappedObject = (TDestination)Map(source, sourceType, destinationType, opts);
+            }
+            return mappedObject;
+        }
+
+        TDestination IMapper.Map<TSource, TDestination>(TSource source)
+        {
+            Type modelType = typeof(TSource);
+            Type destinationType = typeof(TDestination);
+
+            return (TDestination)Map(source, modelType, destinationType, DefaultMappingOptions);
+        }
+
+        TDestination IMapper.Map<TSource, TDestination>(TSource source,
+            Action<IMappingOperationOptions<TSource, TDestination>> opts)
+        {
+            Type modelType = typeof(TSource);
+            Type destinationType = typeof(TDestination);
+
+            var options = new MappingOperationOptions<TSource, TDestination>();
+            opts(options);
+
+            return (TDestination)MapCore(source, modelType, destinationType, options);
+        }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
-            => _engine.Map(source, destination);
+        {
+            return Map(source, destination, DefaultMappingOptions);
+        }
 
-        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
-            => _engine.Map(source, destination, opts);
+        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
+            Action<IMappingOperationOptions<TSource, TDestination>> opts)
+        {
+            Type modelType = typeof(TSource);
+            Type destinationType = typeof(TDestination);
 
-        TDestination IMapper.Map<TDestination>(object source)
-            => _engine.Map<TDestination>(source);
+            var options = new MappingOperationOptions<TSource, TDestination>();
+            opts(options);
+
+            return (TDestination)MapCore(source, destination, modelType, destinationType, options);
+        }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType)
-            => _engine.Map(source, sourceType, destinationType);
+        {
+            return Map(source, sourceType, destinationType, DefaultMappingOptions);
+        }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
-            => _engine.Map(source, sourceType, destinationType, opts);
+        {
+            var options = new MappingOperationOptions();
+
+            opts(options);
+
+            return MapCore(source, sourceType, destinationType, options);
+        }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
-            => _engine.Map(source, destination, sourceType, destinationType);
+        {
+            return Map(source, destination, sourceType, destinationType, DefaultMappingOptions);
+        }
 
-        object IMapper.Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
-            => _engine.Map(source, destination, sourceType, destinationType);
+        object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
+            Action<IMappingOperationOptions> opts)
+        {
+            var options = new MappingOperationOptions();
 
-        TDestination IMapper.DynamicMap<TSource, TDestination>(TSource source)
-            => _engine.DynamicMap<TSource, TDestination>(source);
+            opts(options);
 
-        TDestination IMapper.DynamicMap<TDestination>(object source)
-            => _engine.DynamicMap<TDestination>(source);
+            return MapCore(source, destination, sourceType, destinationType, options);
+        }
 
-        object IMapper.DynamicMap(object source, Type sourceType, Type destinationType)
-            => _engine.DynamicMap(source, sourceType, destinationType);
-   
-        void IMapper.DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
-            => _engine.DynamicMap(source, destination);
+        TDestination IDynamicMapper.DynamicMap<TSource, TDestination>(TSource source)
+        {
+            Type modelType = typeof(TSource);
+            Type destinationType = typeof(TDestination);
 
-        void IMapper.DynamicMap(object source, object destination, Type sourceType, Type destinationType)
-            => _engine.DynamicMap(source, destination, sourceType, destinationType);
+            return (TDestination)DynamicMap(source, modelType, destinationType);
+        }
 
-        IConfigurationProvider IMapper.ConfigurationProvider => _engine.ConfigurationProvider;
+        void IDynamicMapper.DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
+        {
+            Type modelType = typeof(TSource);
+            Type destinationType = typeof(TDestination);
 
-#endregion
+            DynamicMap(source, destination, modelType, destinationType);
+        }
+
+        TDestination IDynamicMapper.DynamicMap<TDestination>(object source)
+        {
+            Type modelType = source?.GetType() ?? typeof(object);
+            Type destinationType = typeof(TDestination);
+
+            return (TDestination)DynamicMap(source, modelType, destinationType);
+        }
+
+        object IDynamicMapper.DynamicMap(object source, Type sourceType, Type destinationType)
+        {
+            ((IConfiguration)ConfigurationProvider).CreateMissingTypeMaps = true;
+            var typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+
+            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions(), _engine);
+
+            return _engine.Map(context);
+        }
+
+        void IDynamicMapper.DynamicMap(object source, object destination, Type sourceType, Type destinationType)
+        {
+            ((IConfiguration)ConfigurationProvider).CreateMissingTypeMaps = true;
+            var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+
+            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions(), _engine);
+
+            _engine.Map(context);
+        }
+
+        private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
+        {
+            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+
+            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, _engine);
+
+            return _engine.Map(context);
+        }
+
+        private object MapCore(object source, object destination, Type sourceType, Type destinationType,
+            MappingOperationOptions options)
+        {
+            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+
+            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, _engine);
+
+            return _engine.Map(context);
+        }
+
+        private void DefaultMappingOptions(IMappingOperationOptions opts) => opts.ConstructServicesUsing(_serviceCtor);
+
+        IConfigurationProvider IMapper.ConfigurationProvider => _configurationProvider;
+
+        #endregion
     }
 }

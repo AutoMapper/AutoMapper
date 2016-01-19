@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests.Bug
 
 			config.AssertConfigurationIsValid();
 
-			var engine = new MappingEngine(config);
+			var engine = config.CreateMapper();
 			var one = new One
 			{
 				Stuff = new List<string> { "hi", "", "mom" }

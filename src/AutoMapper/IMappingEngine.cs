@@ -12,6 +12,57 @@ namespace AutoMapper
     using System.Reflection;
     using ObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
 
+    [Obsolete("Use CreateMissingTypeMaps instead.")]
+    public interface IDynamicMapper
+    {
+        /// <summary>
+        /// Create a map between the <typeparamref name="TSource"/> and <typeparamref name="TDestination"/> types and execute the map
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use</typeparam>
+        /// <typeparam name="TDestination">Destination type to use</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <returns>Mapped destination object</returns>
+        TDestination DynamicMap<TSource, TDestination>(TSource source);
+
+        /// <summary>
+        /// Create a map between the <paramref name="source"/> object and <typeparamref name="TDestination"/> types and execute the map.
+        /// Source type is inferred from the source object .
+        /// </summary>
+        /// <typeparam name="TDestination">Destination type to use</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <returns>Mapped destination object</returns>
+        TDestination DynamicMap<TDestination>(object source);
+
+        /// <summary>
+        /// Create a map between the <paramref name="sourceType"/> and <paramref name="destinationType"/> types and execute the map.
+        /// Use this method when the source and destination types are not known until runtime.
+        /// </summary>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="sourceType">Source type to use</param>
+        /// <param name="destinationType">Destination type to use</param>
+        /// <returns>Mapped destination object</returns>
+        object DynamicMap(object source, Type sourceType, Type destinationType);
+
+        /// <summary>
+        /// Create a map between the <typeparamref name="TSource"/> and <typeparamref name="TDestination"/> types and execute the map to the existing destination object
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use</typeparam>
+        /// <typeparam name="TDestination">Destination type to use</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="destination">Destination object to map into</param>
+        void DynamicMap<TSource, TDestination>(TSource source, TDestination destination);
+
+        /// <summary>
+        /// Create a map between the <paramref name="sourceType"/> and <paramref name="destinationType"/> types and execute the map to the existing destination object.
+        /// Use this method when the source and destination types are not known until runtime.
+        /// </summary>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="destination"></param>
+        /// <param name="sourceType">Source type to use</param>
+        /// <param name="destinationType">Destination type to use</param>
+        void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
+
+    }
     public interface IMapper
     {
         /// <summary>
@@ -116,53 +167,6 @@ namespace AutoMapper
             Action<IMappingOperationOptions> opts);
 
         /// <summary>
-        /// Create a map between the <typeparamref name="TSource"/> and <typeparamref name="TDestination"/> types and execute the map
-        /// </summary>
-        /// <typeparam name="TSource">Source type to use</typeparam>
-        /// <typeparam name="TDestination">Destination type to use</typeparam>
-        /// <param name="source">Source object to map from</param>
-        /// <returns>Mapped destination object</returns>
-        TDestination DynamicMap<TSource, TDestination>(TSource source);
-
-        /// <summary>
-        /// Create a map between the <paramref name="source"/> object and <typeparamref name="TDestination"/> types and execute the map.
-        /// Source type is inferred from the source object .
-        /// </summary>
-        /// <typeparam name="TDestination">Destination type to use</typeparam>
-        /// <param name="source">Source object to map from</param>
-        /// <returns>Mapped destination object</returns>
-        TDestination DynamicMap<TDestination>(object source);
-
-        /// <summary>
-        /// Create a map between the <paramref name="sourceType"/> and <paramref name="destinationType"/> types and execute the map.
-        /// Use this method when the source and destination types are not known until runtime.
-        /// </summary>
-        /// <param name="source">Source object to map from</param>
-        /// <param name="sourceType">Source type to use</param>
-        /// <param name="destinationType">Destination type to use</param>
-        /// <returns>Mapped destination object</returns>
-        object DynamicMap(object source, Type sourceType, Type destinationType);
-
-        /// <summary>
-        /// Create a map between the <typeparamref name="TSource"/> and <typeparamref name="TDestination"/> types and execute the map to the existing destination object
-        /// </summary>
-        /// <typeparam name="TSource">Source type to use</typeparam>
-        /// <typeparam name="TDestination">Destination type to use</typeparam>
-        /// <param name="source">Source object to map from</param>
-        /// <param name="destination">Destination object to map into</param>
-        void DynamicMap<TSource, TDestination>(TSource source, TDestination destination);
-
-        /// <summary>
-        /// Create a map between the <paramref name="sourceType"/> and <paramref name="destinationType"/> types and execute the map to the existing destination object.
-        /// Use this method when the source and destination types are not known until runtime.
-        /// </summary>
-        /// <param name="source">Source object to map from</param>
-        /// <param name="destination"></param>
-        /// <param name="sourceType">Source type to use</param>
-        /// <param name="destinationType">Destination type to use</param>
-        void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
-
-        /// <summary>
         /// Configuration provider for performaing maps
         /// </summary>
         IConfigurationProvider ConfigurationProvider { get; }
@@ -171,7 +175,7 @@ namespace AutoMapper
     /// <summary>
     /// Performs mapping based on configuration
     /// </summary>
-    public interface IMappingEngine : IMapper
+    public interface IMappingEngine
     {
         Expression CreateMapExpression(Type sourceType, Type destinationType, ObjectDictionary parameters = null, params MemberInfo[] membersToExpand);
         bool ShouldMapSourceValueAsNull(ResolutionContext context);
@@ -182,6 +186,7 @@ namespace AutoMapper
 
         Expression CreateMapExpression(ExpressionRequest request,
             Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
+        IConfigurationProvider ConfigurationProvider { get; }
     }
 
 }

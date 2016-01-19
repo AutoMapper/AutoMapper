@@ -61,7 +61,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             if (IsProjection<TDestination>(resultType))
                 destResult = new ProjectionExpression(sourceResult as IQueryable<TSource>, _mappingEngine).To<TDestination>();
             else
-                destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
+                destResult = _mappingEngine.Map(new ResolutionContext(null, sourceResult, sourceResultType, destResultType, null, _mappingEngine));
             Inspector.DestResult(sourceResult);
 
             return (TResult)destResult;
