@@ -406,7 +406,7 @@ namespace AutoMapper
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair,
                 _ =>
-                    GetRelatedTypePairs(_destinationObjectExists)
+                    GetRelatedTypePairs(_, destinationObjectExists)
                         .Select(
                             tp =>
                                 _typeMapPlanCache.GetOrDefault(tp) ??
