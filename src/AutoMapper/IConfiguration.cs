@@ -44,7 +44,14 @@ namespace AutoMapper
         /// <summary>
         /// Create a mapper from current configuration
         /// </summary>
-        /// <returns>Mapping engine</returns>
-        IMappingEngine CreateMapper();
+        /// <returns>Mapper</returns>
+        IMapper CreateMapper();
+
+        /// <summary>
+        /// Create a mapper from current configuration with a supplied factory method
+        /// </summary>
+        /// <param name="serviceCtor">Factory method</param>
+        /// <returns>Mapper</returns>
+        IMapper CreateMapper(Func<Type, object> serviceCtor);
     }
 }

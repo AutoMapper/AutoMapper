@@ -7,7 +7,7 @@ namespace AutoMapper.UnitTests.Bug
 {
     public class ObjectEnumToObjectEnum : AutoMapperSpecBase
     {
-        MappingEngine _mapper;
+        IMapper _mapper;
         Target _target;
 
         public enum SourceEnumValue
@@ -34,10 +34,10 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Establish_context()
         {
-            var configuration = new ConfigurationStore();
-            _mapper = new MappingEngine(configuration);
+            var configuration = new MapperConfiguration();
             var parentMapping = configuration.CreateMap<Source, Target>();
             parentMapping.ForMember(dest => dest.Value, opt => opt.MapFrom(s => (TargetEnumValue)s.Value));
+            _mapper = configuration.CreateMapper();
         }
 
         protected override void Because_of()

@@ -33,28 +33,19 @@ namespace AutoMapper
         };
 
 
-        private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache;
-        private readonly ConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
+        private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
+        private readonly ConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache = new ConcurrentDictionary<ExpressionRequest, LambdaExpression>();
 
         private readonly Func<Type, object> _serviceCtor;
 
         public MappingEngine(IConfigurationProvider configurationProvider)
-            : this(
-                configurationProvider,
-                new ConcurrentDictionary<TypePair, IObjectMapper>(),
-                new ConcurrentDictionary<ExpressionRequest, LambdaExpression>(),
-                configurationProvider.ServiceCtor)
+            : this(configurationProvider, configurationProvider.ServiceCtor)
         {
         }
 
-        public MappingEngine(IConfigurationProvider configurationProvider,
-            ConcurrentDictionary<TypePair, IObjectMapper> objectMapperCache,
-            ConcurrentDictionary<ExpressionRequest, LambdaExpression> expressionCache,
-            Func<Type, object> serviceCtor)
+        public MappingEngine(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
             ConfigurationProvider = configurationProvider;
-            _objectMapperCache = objectMapperCache;
-            _expressionCache = expressionCache;
             _serviceCtor = serviceCtor;
         }
 

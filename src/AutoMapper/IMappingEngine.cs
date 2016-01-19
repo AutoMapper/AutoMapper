@@ -12,16 +12,8 @@ namespace AutoMapper
     using System.Reflection;
     using ObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
 
-    /// <summary>
-    /// Performs mapping based on configuration
-    /// </summary>
-    public interface IMappingEngine
+    public interface IMapper
     {
-        /// <summary>
-        /// Configuration provider for performaing maps
-        /// </summary>
-        IConfigurationProvider ConfigurationProvider { get; }
-
         /// <summary>
         /// Execute a mapping from the source object to a new destination object.
         /// The source type is inferred from the source object.
@@ -130,7 +122,6 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         TDestination DynamicMap<TSource, TDestination>(TSource source);
 
         /// <summary>
@@ -140,7 +131,6 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         TDestination DynamicMap<TDestination>(object source);
 
         /// <summary>
@@ -151,7 +141,6 @@ namespace AutoMapper
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to use</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         object DynamicMap(object source, Type sourceType, Type destinationType);
 
         /// <summary>
@@ -161,7 +150,6 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to use</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <param name="destination">Destination object to map into</param>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         void DynamicMap<TSource, TDestination>(TSource source, TDestination destination);
 
         /// <summary>
@@ -172,9 +160,19 @@ namespace AutoMapper
         /// <param name="destination"></param>
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to use</param>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
         void DynamicMap(object source, object destination, Type sourceType, Type destinationType);
 
+        /// <summary>
+        /// Configuration provider for performaing maps
+        /// </summary>
+        IConfigurationProvider ConfigurationProvider { get; }
+    }
+
+    /// <summary>
+    /// Performs mapping based on configuration
+    /// </summary>
+    public interface IMappingEngine : IMapper
+    {
         Expression CreateMapExpression(Type sourceType, Type destinationType, ObjectDictionary parameters = null, params MemberInfo[] membersToExpand);
         bool ShouldMapSourceValueAsNull(ResolutionContext context);
         bool ShouldMapSourceCollectionAsNull(ResolutionContext context);

@@ -36,7 +36,7 @@ namespace AutoMapper
             _sourceType = sourceType;
             _destinationType = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
-            Profile = ConfigurationStore.DefaultProfileName;
+            Profile = MapperConfiguration.DefaultProfileName;
             ConfiguredMemberList = memberList;
         }
 

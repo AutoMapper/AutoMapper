@@ -9,7 +9,13 @@ namespace AutoMapper
     using Mappers;
     using QueryableExtensions.Impl;
 
-    public class ConfigurationStore : IConfigurationProvider, IConfiguration
+    [Obsolete("ConfigurationStore is renamed to MapperConfiguration. Use MapperConfiguration instead.")]
+    public class ConfigurationStore : MapperConfiguration
+    {
+        
+    }
+
+    public class MapperConfiguration : IConfigurationProvider, IConfiguration
     {
         private readonly ITypeMapFactory _typeMapFactory;
         private readonly IEnumerable<IObjectMapper> _mappers;
@@ -32,7 +38,7 @@ namespace AutoMapper
 
         private readonly List<string> _globalIgnore;
 
-        public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
+        public MapperConfiguration(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
         {
             _typeMapFactory = typeMapFactory;
             _mappers = mappers;
@@ -40,11 +46,11 @@ namespace AutoMapper
             _globalIgnore = new List<string>();
         }
 
-        public ConfigurationStore() : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        public MapperConfiguration() : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
         {
         }
 
-        public ConfigurationStore(Action<IConfiguration> configure) : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        public MapperConfiguration(Action<IConfiguration> configure) : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
         {
             configure(this);
         }
@@ -220,11 +226,18 @@ namespace AutoMapper
             }
         }
 
-        public IMappingEngine CreateMapper()
+        public IMapper CreateMapper()
         {
             Seal();
 
-            return new MappingEngine(this);
+            return new Mapper(this);
+        }
+
+        public IMapper CreateMapper(Func<Type, object> serviceCtor)
+        {
+            Seal();
+
+            return new Mapper(this, serviceCtor);
         }
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)

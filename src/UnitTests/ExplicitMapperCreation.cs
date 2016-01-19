@@ -5,12 +5,12 @@ namespace AutoMapper.UnitTests
 {
     public class ExplicitMapperCreation : NonValidatingSpecBase
     {
-        private IMappingEngine _mapper;
-        private ConfigurationStore _config;
+        private IMapper _mapper;
+        private MapperConfiguration _config;
 
         protected override void Establish_context()
         {
-            _config = new ConfigurationStore(cfg => cfg.CreateMap<Source, Dest>());
+            _config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             _mapper = _config.CreateMapper();
         }

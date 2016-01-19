@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             // arrange
             var source = new Class{ Prop = "test" };
-            var configurationProvider = new ConfigurationStore();
+            var configurationProvider = new MapperConfiguration();
             configurationProvider
                 .CreateMap<BaseClass, BaseDto>()
                 .BeforeMap((s, d) => d.DifferentProp = s.Prop)
@@ -44,7 +44,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             // arrange
             var source = new Class { Prop = "test" };
-            var configurationProvider = new ConfigurationStore();
+            var configurationProvider = new MapperConfiguration();
             configurationProvider
                 .CreateMap<BaseClass, BaseDto>()
                 .AfterMap((s, d) => d.DifferentProp = s.Prop)
