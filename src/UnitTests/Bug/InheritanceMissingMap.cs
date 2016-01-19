@@ -4,10 +4,8 @@ using System;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class DynamicMapAndInheritance : AutoMapperSpecBase
+    public class InheritanceMissingMap : AutoMapperSpecBase
     {
-        Destination _destination;
-
         class SourceBase { }
         class DestinationBase { }
         class Source : SourceBase { }
@@ -21,15 +19,10 @@ namespace AutoMapper.UnitTests.Bug
             });
         }
 
-        protected override void Because_of()
-        {
-            _destination = Mapper.DynamicMap<Destination>(new Source());
-        }
-
         [Fact]
-        public void Should_choose_the_most_derived_map()
+        public void Should_report_missing_map()
         {
-            _destination.ShouldBeType<Destination>();
+            new Action(() => Mapper.Map<Destination>(new Source())).ShouldThrow<AutoMapperMappingException>();
         }
     }
 }
