@@ -233,11 +233,6 @@ namespace AutoMapper
             return visitor.Visit(cachedExpression);
         }
 
-        public IObjectMapper GetOrAddMapper(TypePair typePair, Func<TypePair, IObjectMapper> factory)
-        {
-            return _objectMapperCache.GetOrAdd(typePair, factory);
-        }
-
         public LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             // this is the input parameter of this expression with name <variableName>
