@@ -1,23 +1,24 @@
-﻿namespace AutoMapper.Mappers
+﻿#if !PORTABLE
+namespace AutoMapper.Mappers
 {
     using System.Collections.Specialized;
 
     public class NameValueCollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            if (!IsMatch(context) || context.SourceValue == null)
+            if (context.SourceValue == null)
                 return null;
 
             var nvc = new NameValueCollection();
-            var source = context.SourceValue as NameValueCollection;
+            var source = (NameValueCollection)context.SourceValue;
             foreach (var s in source.AllKeys)
                 nvc.Add(s, source[s]);
 
             return nvc;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             return
                 context.SourceType == typeof (NameValueCollection) &&
@@ -25,3 +26,4 @@
         }
     }
 }
+#endif

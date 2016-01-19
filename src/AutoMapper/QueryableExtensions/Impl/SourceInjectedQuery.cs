@@ -8,6 +8,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq;
     using System.Linq.Expressions;
     using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
+    using MemberPaths = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<MemberInfo>>;
 
     public class SourceSourceInjectedQuery<TSource, TDestination> : IOrderedQueryable<TDestination>, ISourceInjectedQueryable<TDestination>
     {
@@ -20,7 +21,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 IEnumerable<ExpressionVisitor> afterVisitors,
                 Action<Exception> exceptionHandler,
                 IObjectDictionary parameters,
-                MemberInfo[] membersToExpand,
+                MemberPaths membersToExpand,
                 SourceInjectedQueryInspector inspector)
         {
             Parameters = parameters;

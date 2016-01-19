@@ -1,3 +1,4 @@
+#if !PORTABLE
 namespace AutoMapper.Mappers
 {
     using System;
@@ -6,11 +7,11 @@ namespace AutoMapper.Mappers
 
     public class TypeConverterMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             if (context.SourceValue == null)
             {
-                return mapper.CreateObject(context);
+                return context.Engine.CreateObject(context);
             }
             Func<object> converter = GetConverter(context);
             return converter?.Invoke();
@@ -34,9 +35,15 @@ namespace AutoMapper.Mappers
             return null;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
-            return GetConverter(context) != null;
+            var sourceTypeConverter = GetTypeConverter(context.SourceType);
+            var destTypeConverter = GetTypeConverter(context.DestinationType);
+
+            return sourceTypeConverter.CanConvertTo(context.DestinationType) ||
+                   (context.DestinationType.IsNullableType() &&
+                    sourceTypeConverter.CanConvertTo(Nullable.GetUnderlyingType(context.DestinationType)) ||
+                    destTypeConverter.CanConvertFrom(context.SourceType));
         }
 
         private static TypeConverter GetTypeConverter(Type type)
@@ -45,3 +52,4 @@ namespace AutoMapper.Mappers
         }
     }
 }
+#endif

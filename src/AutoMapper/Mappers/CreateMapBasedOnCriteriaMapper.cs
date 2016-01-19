@@ -2,41 +2,32 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
-    public interface IConditionalObjectMapper : IObjectMapper
+    public interface IConditionalObjectMapper
     {
-        ICollection<Func<ResolutionContext, bool>> Conventions { get; }
+        string ProfileName { get; }
+        ICollection<Func<TypePair, bool>> Conventions { get; }
+		bool IsMatch(TypePair context);
     }
 
     public class ConditionalObjectMapper : IConditionalObjectMapper
     {
-        private readonly string _profileName;
+        public string ProfileName { get; }
 
         public ConditionalObjectMapper(string profileName)
         {
-            _profileName = profileName;
+            ProfileName = profileName;
         }
 
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public bool IsMatch(TypePair typePair)
         {
-            var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
-            Func<TypePair, IObjectMapper> missFunc = tp => context.Engine.ConfigurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(context));
-            var typeMap = mapper.ConfigurationProvider.CreateTypeMap(context.SourceType, context.DestinationType, _profileName);
-
-            context = context.CreateTypeContext(typeMap, context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
-
-            var map = context.Engine.GetOrAddMapper(contextTypePair, missFunc);
-            return map.Map(context, mapper);
+            return Conventions.All(c => c(typePair));
         }
 
-        public bool IsMatch(ResolutionContext context)
-        {
-            return Conventions.All(c => c(context));
-        }
-
-        public ICollection<Func<ResolutionContext, bool>> Conventions { get; } = new Collection<Func<ResolutionContext, bool>>();
+        public ICollection<Func<TypePair, bool>> Conventions { get; } = new Collection<Func<TypePair, bool>>();
     }
 
     public static class ConventionGeneratorExtensions

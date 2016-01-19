@@ -15,6 +15,7 @@ namespace AutoMapper
     public class Profile : IProfileExpression
     {
         private ConfigurationStore _configurator;
+        private readonly IConditionalObjectMapper _mapMissingTypes;
 
         public Profile(string profileName)
             :this()
@@ -30,6 +31,7 @@ namespace AutoMapper
             IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
             ShouldMapProperty = p => p.IsPublic();
             ShouldMapField = f => f.IsPublic;
+            _mapMissingTypes = new ConditionalObjectMapper(ProfileName) {Conventions = {tp => true}};
         }
 
         public string ProfileName { get; }
@@ -63,6 +65,18 @@ namespace AutoMapper
                 return convention;
         }
             set { DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
+        }
+
+
+        public bool CreateMissingTypeMaps
+        {
+            set
+            {
+                if (value)
+                    _typeConfigurations.Add(_mapMissingTypes);
+                else
+                    _typeConfigurations.Remove(_mapMissingTypes);
+            }
         }
 
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
@@ -201,7 +215,7 @@ namespace AutoMapper
         public void IncludeSourceExtensionMethods(Assembly assembly)
         {
             //http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
-            _sourceExtensionMethods.AddRange(assembly.GetTypes()
+            _sourceExtensionMethods.AddRange(assembly.ExportedTypes
                 .Where(type => type.IsSealed() && !type.IsGenericType() && !type.IsNested)
                 .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
                 .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))

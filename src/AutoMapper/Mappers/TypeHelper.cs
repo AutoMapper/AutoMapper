@@ -24,13 +24,13 @@ namespace AutoMapper.Mappers
             if (enumerableType.IsGenericType() &&
                 enumerableType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
             {
-                return enumerableType.GetGenericArguments()[0];
+                return enumerableType.GetTypeInfo().GenericTypeArguments[0];
             }
 
             Type ienumerableType = GetIEnumerableType(enumerableType);
             if (ienumerableType != null)
             {
-                return ienumerableType.GetGenericArguments()[0];
+                return ienumerableType.GetTypeInfo().GenericTypeArguments[0];
             }
 
             if (typeof (IEnumerable).IsAssignableFrom(enumerableType))
@@ -47,7 +47,7 @@ namespace AutoMapper.Mappers
         {
             if (enumType.IsNullableType())
             {
-                enumType = enumType.GetGenericArguments()[0];
+                enumType = enumType.GetTypeInfo().GenericTypeArguments[0];
             }
 
             if (!enumType.IsEnum())
@@ -60,7 +60,7 @@ namespace AutoMapper.Mappers
         {
             try
             {
-                return enumerableType.GetInterfaces().FirstOrDefault(t => t.Name == "IEnumerable`1");
+                return enumerableType.GetTypeInfo().ImplementedInterfaces.FirstOrDefault(t => t.Name == "IEnumerable`1");
             }
             catch (AmbiguousMatchException)
             {

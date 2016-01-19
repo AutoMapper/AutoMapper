@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Establish_context()
         {
-            var configuration = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
+            var configuration = new ConfigurationStore();
             _mapper = new MappingEngine(configuration);
             var parentMapping = configuration.CreateMap<Source, Target>();
             parentMapping.ForMember(dest => dest.Value, opt => opt.MapFrom(s => (TargetEnumValue)s.Value));

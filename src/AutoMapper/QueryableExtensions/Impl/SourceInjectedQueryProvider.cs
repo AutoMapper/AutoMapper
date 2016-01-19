@@ -1,3 +1,5 @@
+using MemberInfo = System.Reflection.MemberInfo;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
@@ -8,6 +10,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Reflection;
     using Internal;
     using Mappers;
+    using MemberPaths = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<MemberInfo>>;
 
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider
     {
@@ -17,7 +20,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly IEnumerable<ExpressionVisitor> _beforeVisitors;
         private readonly IEnumerable<ExpressionVisitor> _afterVisitors;
         private readonly System.Collections.Generic.IDictionary<string, object> _parameters;
-        private readonly MemberInfo[] _membersToExpand;
+        private readonly MemberPaths _membersToExpand;
         private readonly Action<Exception> _exceptionHandler;
 
         public SourceInjectedQueryProvider(IMappingEngine mappingEngine,
@@ -26,7 +29,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 IEnumerable<ExpressionVisitor> afterVisitors,
                 Action<Exception> exceptionHandler, 
                 System.Collections.Generic.IDictionary<string, object> parameters,
-                MemberInfo[] membersToExpand)
+                MemberPaths membersToExpand)
         {
             _mappingEngine = mappingEngine;
             _dataSource = dataSource;
@@ -34,7 +37,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             _beforeVisitors = beforeVisitors;
             _afterVisitors = afterVisitors;
             _parameters = parameters;
-            _membersToExpand = membersToExpand ?? new MemberInfo[0];
+            _membersToExpand = membersToExpand ?? Enumerable.Empty<System.Collections.Generic.IEnumerable<MemberInfo>>();
             _exceptionHandler = exceptionHandler ?? ((x) => { }); ;
         }
         
@@ -82,7 +85,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 var destResultType = typeof (TResult);
                 var sourceResultType = CreateSourceResultType(destResultType);
 
-                object destResult;
+                object destResult = null;
 
                 // case #1: query is a projection from complex Source to complex Destination
                 // example: users.UseAsDataSource().For<UserDto>().Where(x => x.Age > 20).ToList()
@@ -103,12 +106,21 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
                     var enumerator = sourceResult.GetEnumerator();
                     var elementType = TypeHelper.GetElementType(typeof (TResult));
-                    var listInstance = (IList)typeof(List<>).MakeGenericType(elementType).GetConstructor(Type.EmptyTypes).Invoke(null);
-                    while (enumerator.MoveNext())
+#if !PORTABLE
+                    var constructorInfo = typeof (List<>).MakeGenericType(elementType).GetConstructor(new Type[0]);
+                  
+#else
+                    var constructorInfo = typeof(List<>).MakeGenericType(elementType).GetConstructors().First(ci => ci.GetParameters().Length == 0);
+#endif
+                    if (constructorInfo != null)
                     {
-                        listInstance.Add(enumerator.Current);
+                        var listInstance = (IList)constructorInfo.Invoke(null);
+                        while (enumerator.MoveNext())
+                        {
+                            listInstance.Add(enumerator.Current);
+                        }
+                        destResult = listInstance;
                     }
-                    destResult = listInstance;
                 }
                 // case #2: projection to simple type
                 // example: users.UseAsDataSource().For<UserDto>().FirstOrDefault(user => user.Age > 20)
@@ -140,7 +152,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var replacer = new MethodNodeReplacer<TSource>(searcher.MethodNode);
 
                     // default back to simple mapping of object instance for backwards compatibility (e.g. mapping non-nullable to nullable fields)
-                    if (_parameters != null || _membersToExpand.Length != 0)
+                    if (_parameters != null || _membersToExpand.Any())
                     {
                         sourceExpression = replacer.Visit(sourceExpression);
                     }
@@ -166,8 +178,9 @@ namespace AutoMapper.QueryableExtensions.Impl
                             destResultType = typeof (TDestination);
                         }
 
+                        var membersToExpand = _membersToExpand.SelectMany(m => m).Distinct().ToArray();
                         var mapExpr = _mappingEngine.CreateMapExpression(sourceResultType, destResultType,
-                            _parameters, _membersToExpand);
+                            _parameters, membersToExpand);
                         // add projection via "select" operator
                         var expr = Expression.Call(
                                 null,
@@ -180,9 +193,9 @@ namespace AutoMapper.QueryableExtensions.Impl
                         // in case an element operator with predicate expression was replaced
                         if (replacer.ReplacedMethod != null) { 
                             // find replacement method that has no more predicates
-                            replacementMethod = typeof (Queryable).GetMethods()
+                            replacementMethod = typeof (Queryable).GetAllMethods()
                                 .Single(m => m.Name == replacer.ReplacedMethod.Name
-#if !NETCORE
+#if !NETCORE && !PORTABLE
                                             && m.GetParameters().All(p => typeof (Queryable).IsAssignableFrom(p.Member.ReflectedType))
 #endif
                                             && m.GetParameters().Length == replacer.ReplacedMethod.GetParameters().Length - 1);
@@ -205,7 +218,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
                 Inspector.DestResult(destResult);
 
-#if !NETCORE
+#if !NETCORE && !PORTABLE
                 // implicitly convert types in case of valuetypes which cannot be casted explicitly
                 if (typeof (TResult).IsValueType && destResult.GetType() != typeof (TResult))
                     return (TResult) Convert.ChangeType(destResult, typeof (TResult));
@@ -319,7 +332,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                                       && !IgnoredMethods.Contains(node.Method.Name)
                                       && !typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType);
 
-#if !NETCORE
+#if !NETCORE && !PORTABLE
             // invalid method found => skip all (e.g. Select(entity=> (object)entity.Child1)
             if (isReplacableMethod &&
                 !node.Method.ReturnType.IsPrimitive && node.Method.ReturnType != typeof(TDestination))

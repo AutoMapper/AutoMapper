@@ -7,15 +7,15 @@ namespace AutoMapper.Mappers
         private static readonly IObjectMapper[] _initialMappers =
         {
             new ExpressionMapper(), 
-            new TypeMapMapper(TypeMapObjectMapperRegistry.Mappers),
-            new AssignableArrayMapper(), 
             new FlagsEnumMapper(),
             new EnumMapper(),
             new MultidimensionalArrayMapper(),
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
+#if !PORTABLE
             new NameValueCollectionMapper(),
+#endif
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
             new HashSetMapper(),
@@ -23,11 +23,13 @@ namespace AutoMapper.Mappers
             new EnumerableMapper(),
             new StringMapper(),
             new AssignableMapper(),
+#if !PORTABLE
             new TypeConverterMapper(),
+#endif
             new NullableSourceMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
-            new OpenGenericMapper(),
+            new ConvertMapper(),
             new FromStringDictionaryMapper(),
             new ToStringDictionaryMapper(),
             new FromDynamicMapper(),

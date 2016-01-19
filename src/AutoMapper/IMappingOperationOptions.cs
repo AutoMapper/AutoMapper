@@ -15,11 +15,6 @@
         void ConstructServicesUsing(Func<Type, object> constructor);
 
         /// <summary>
-        /// Create any missing type maps, if found
-        /// </summary>
-        bool CreateMissingTypeMaps { get; set; }
-
-        /// <summary>
         /// Add context items to be accessed at map time inside an <see cref="IValueResolver"/> or <see cref="ITypeConverter{TSource, TDestination}"/>
         /// </summary>
         IDictionary<string, object> Items { get; }

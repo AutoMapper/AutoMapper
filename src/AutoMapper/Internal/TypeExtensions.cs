@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+#if !PORTABLE
     using System.Reflection.Emit;
+#endif
 
     internal static class TypeExtensions
     {
@@ -19,20 +21,64 @@
             return type.GetTypeInfo().DeclaredConstructors;
         }
 
+#if !PORTABLE
         public static Type CreateType(this TypeBuilder type)
         {
             return type.CreateTypeInfo().AsType();
         }
+#endif
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type)
         {
             return type.GetTypeInfo().DeclaredMembers;
         }
 
+#if PORTABLE
+        public static IEnumerable<MemberInfo> GetAllMembers(this Type type)
+        {
+            while (true)
+            {
+                foreach (var memberInfo in type.GetTypeInfo().DeclaredMembers)
+                {
+                    yield return memberInfo;
+                }
+
+                type = type.BaseType();
+
+                if (type == null)
+                {
+                    yield break;
+                }
+            }
+        }
+
+        public static MemberInfo[] GetMember(this Type type, string name)
+        {
+            return type.GetAllMembers().Where(mi => mi.Name == name).ToArray();
+        }
+#endif
+
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type)
         {
             return type.GetTypeInfo().DeclaredMethods;
         }
+
+#if PORTABLE
+        public static MethodInfo GetMethod(this Type type, string name)
+        {
+            return type.GetAllMethods().FirstOrDefault(mi => mi.Name == name);
+        }
+
+        public static MethodInfo GetMethod(this Type type, string name, Type[] parameters)
+        {
+            //a.Length == b.Length && a.Intersect(b).Count() == a.Length
+            return type.GetAllMethods()
+                .Where(mi => mi.Name == name)
+                .Where(mi => mi.GetParameters().Length == parameters.Length)
+                .Where(mi => mi.GetParameters().Select(pi => pi.ParameterType).Intersect(parameters).Count() == parameters.Length)
+                .FirstOrDefault();
+        }
+#endif
 
         public static IEnumerable<MethodInfo> GetAllMethods(this Type type)
         {
@@ -43,6 +89,13 @@
         {
             return type.GetTypeInfo().DeclaredProperties;
         }
+
+#if PORTABLE
+        public static PropertyInfo GetProperty(this Type type, string name)
+        {
+            return type.GetTypeInfo().DeclaredProperties.FirstOrDefault(mi => mi.Name == name);
+        }
+#endif
 
         public static object[] GetCustomAttributes(this Type type, Type attributeType, bool inherit)
         {
@@ -94,6 +147,13 @@
         {
             return type.GetTypeInfo().BaseType;
         }
+
+#if PORTABLE
+        public static bool IsAssignableFrom(this Type type, Type other)
+        {
+            return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
+        }
+#endif
 
         public static bool IsAbstract(this Type type)
         {

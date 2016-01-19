@@ -35,18 +35,27 @@ task release {
 }
 
 task compile -depends clean {
-	$env:DNX_BUILD_VERSION=$env:build_number
+	$env:DNX_BUILD_VERSION=$env:APPVEYOR_BUILD_NUMBER
 
     exec { dnu restore }
     exec { dnu pack $source_dir\AutoMapper --configuration $config}
-    exec { & $base_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
+    exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
 }
 
 task test {
-	mkdir $result_dir
-    exec { & $source_dir\packages\Fixie.1.0.0.33\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.UnitTests.Net4.xml $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.Net4.dll }
-    exec { & $source_dir\packages\Fixie.1.0.0.33\lib\Net45\Fixie.Console.exe --xUnitXml $result_dir\AutoMapper.IntegrationTests.Net4.xml $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
+    $testRunners = @(gci $source_dir\packages -rec -filter Fixie.Console.exe)
+
+    if ($testRunners.Length -ne 1)
+    {
+        throw "Expected to find 1 Fixie.Console.exe, but found $($testRunners.Length)."
+    }
+
+    $testRunner = $testRunners[0].FullName
+
+    exec { & $testRunner $source_dir/UnitTests/bin/$config/AutoMapper.UnitTests.Net4.dll }
+    exec { & $testRunner $source_dir/UnitTests.Portable/bin/$config/AutoMapper.UnitTests.Portable.dll }
+    exec { & $testRunner $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
 }
 
 function Install-Dnvm

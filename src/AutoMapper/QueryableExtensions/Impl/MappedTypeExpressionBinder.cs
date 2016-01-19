@@ -21,7 +21,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static MemberAssignment BindMappedTypeExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
             ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
-            var transformedExpression = ((IMappingEngineRunner)mappingEngine).CreateMapExpression(request, result.ResolutionExpression, typePairCount);
+            var transformedExpression = mappingEngine.CreateMapExpression(request, result.ResolutionExpression, typePairCount);
             if(transformedExpression == null)
             {
                 return null;

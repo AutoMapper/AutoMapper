@@ -5,10 +5,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Internal;
-using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    using MemberPaths = IEnumerable<IEnumerable<MemberInfo>>;
+    using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
+
     public interface IQueryDataSourceInjection<TSource>
     {
         /// <summary>
@@ -57,7 +59,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private ExpressionVisitor _sourceExpressionTracer = null;
         private ExpressionVisitor _destinationExpressionTracer = null;
         private Action<Exception> _exceptionHandler = ((x) => { });
-        private MemberInfo[] _membersToExpand = null;
+        private MemberPaths _membersToExpand = null;
         private IObjectDictionary _parameters = null;
         private SourceInjectedQueryInspector _inspector;
 
@@ -75,20 +77,20 @@ namespace AutoMapper.QueryableExtensions.Impl
         public ISourceInjectedQueryable<TDestination> For<TDestination>(object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
         {
             _parameters = GetParameters(parameters);
-            _membersToExpand = GetMembers(membersToExpand);
+            _membersToExpand = GetMemberPaths(membersToExpand);
             return CreateQueryable<TDestination>();
         }
         
         public ISourceInjectedQueryable<TDestination> For<TDestination>(params Expression<Func<TDestination, object>>[] membersToExpand)
         {
-            _membersToExpand = GetMembers(membersToExpand);
+            _membersToExpand = GetMemberPaths(membersToExpand);
             return CreateQueryable<TDestination>();
         }
 
         public ISourceInjectedQueryable<TDestination> For<TDestination>(IObjectDictionary parameters, params string[] membersToExpand)
         {
             _parameters = parameters;
-            _membersToExpand = GetMembers(typeof(TDestination), membersToExpand);
+            _membersToExpand = GetMemberPaths(typeof(TDestination), membersToExpand);
             return CreateQueryable<TDestination>();
         }
 
@@ -167,15 +169,18 @@ namespace AutoMapper.QueryableExtensions.Impl
                 .ToDictionary(pi => pi.Name, pi => pi.GetValue(parameters, null));
         }
 
-
-        private MemberInfo[] GetMembers(Type type, string[] membersToExpand)
+        private MemberPaths GetMemberPaths(Type type, string[] membersToExpand)
         {
-            return membersToExpand.Select(m => ReflectionHelper.GetFieldOrProperty(type, m)).ToArray();
+            return membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));
         }
-
-        private MemberInfo[] GetMembers<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
+        private MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
         {
-            return membersToExpand.Select(ReflectionHelper.GetFieldOrProperty).ToArray();
+            return membersToExpand.Select(expr =>
+            {
+                var visitor = new ProjectionExpression.MemberVisitor();
+                visitor.Visit(expr);
+                return visitor.MemberPath;
+            });
         }
     }
 }

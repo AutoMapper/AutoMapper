@@ -62,8 +62,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fixie, Version=1.0.0.33, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fixie.1.0.0.33\lib\net45\Fixie.dll</HintPath>
+    <Reference Include="Fixie, Version=1.0.0.41, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fixie.1.0.0.41\lib\net45\Fixie.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -97,8 +97,12 @@
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
     <Compile Include="Bug\CaseSensitivityBug.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
+    <Compile Include="Bug\ExceptionDestinationPath.cs" />
     <Compile Include="Bug\ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
+    <Compile Include="Bug\AssertConfigurationIsValidNullables.cs" />
+    <Compile Include="Bug\IncludeBaseInheritance.cs" />
+    <Compile Include="Bug\IncludeInheritance.cs" />
     <Compile Include="Bug\NullableDateTime.cs" />
     <Compile Include="Bug\ProjectUsingTheQueriedEntity.cs" />
     <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
@@ -244,6 +248,7 @@
     <Compile Include="Projection\ProjectEnumerableToArrayTest.cs" />
     <Compile Include="Projection\ProjectEnumTest.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
+    <Compile Include="Projection\GenericsTests.cs" />
     <Compile Include="Projection\ToStringTests.cs" />
     <Compile Include="Query\SourceInjectedQuery.cs" />
     <Compile Include="PropertyMapContexts.cs" />
@@ -297,7 +302,6 @@
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Bug\ProjectConstructorParameters.cs" />
-    <Compile Include="Tests\InitialTypes.cs" />
     <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\MapperTests.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />

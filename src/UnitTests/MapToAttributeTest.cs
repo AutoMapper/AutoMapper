@@ -38,7 +38,6 @@ namespace AutoMapper.UnitTests
                 Id = "3",
                 Key = "MyKey"
             };
-
             CategoryDto result = Mapper.Map<CategoryDto>(category);
             result.Id.ShouldEqual("3");
             result.MyValueProperty.ShouldEqual("MyKey");

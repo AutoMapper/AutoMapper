@@ -31,6 +31,7 @@ namespace AutoMapper.UnitTests
             protected override void Because_of()
             {
                 var source = new Foo { Value = "Hello" };
+                Mapper.Initialize(cfg => { });
 
                 _bar = Mapper.Map<Foo, Bar>(source);
             }
