@@ -4,11 +4,11 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq;
     using System.Reflection;
 
-    public static class QueryMapperHelper
+    internal static class QueryMapperHelper
     {
-        public static PropertyMap GetPropertyMap(this IMappingEngine mappingEngine, MemberInfo sourceMemberInfo, Type destinationMemberType)
+        public static PropertyMap GetPropertyMap(this IMapper mapper, MemberInfo sourceMemberInfo, Type destinationMemberType)
         {
-            var typeMap = mappingEngine.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
+            var typeMap = mapper.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
 
             var propertyMap = typeMap.GetPropertyMaps()
                 .FirstOrDefault(pm => pm.CanResolveValue() &&
@@ -16,18 +16,15 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             if (propertyMap == null)
             {
-                const string MessageFormat = "Missing property map from {0} to {1} for {2} property. " +
-                                             "Create using Mapper.CreateMap<{0}, {1}>.";
-                var message = string.Format(MessageFormat, sourceMemberInfo.DeclaringType.Name, destinationMemberType.Name,
-                    sourceMemberInfo.Name);
+                var message = $"Missing property map from {sourceMemberInfo.DeclaringType.Name} to {destinationMemberType.Name} for {sourceMemberInfo.Name} property. Create using Mapper.CreateMap<{sourceMemberInfo.DeclaringType.Name}, {destinationMemberType.Name}>.";
                 throw new InvalidOperationException(message);
             }
             return propertyMap;
         }
 
-        public static TypeMap CheckIfMapExists(this IMappingEngine mappingEngine, Type sourceType, Type destinationType)
+        public static TypeMap CheckIfMapExists(this IMapper mapper, Type sourceType, Type destinationType)
         {
-            var typeMap = mappingEngine.ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
+            var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
             if(typeMap == null)
             {
                 throw MissingMapException(sourceType, destinationType);

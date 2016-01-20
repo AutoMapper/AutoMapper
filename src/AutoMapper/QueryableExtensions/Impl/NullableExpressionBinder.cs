@@ -13,9 +13,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                    && !result.Type.IsNullableType();
         }
 
-        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
-            ExpressionRequest request, ExpressionResolutionResult result,
-            ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public MemberAssignment Build(ExpressionBuilder builder, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindNullableExpression(propertyMap, result);
         }

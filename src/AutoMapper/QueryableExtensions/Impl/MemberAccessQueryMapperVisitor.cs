@@ -5,12 +5,12 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class MemberAccessQueryMapperVisitor : ExpressionVisitor
     {
         private readonly ExpressionVisitor _rootVisitor;
-        private readonly IMappingEngine _mappingEngine;
+        private readonly IMapper _mapper;
 
-        public MemberAccessQueryMapperVisitor(ExpressionVisitor rootVisitor, IMappingEngine mappingEngine)
+        public MemberAccessQueryMapperVisitor(ExpressionVisitor rootVisitor, IMapper mapper)
         {
             _rootVisitor = rootVisitor;
-            _mappingEngine = mappingEngine;
+            _mapper = mapper;
         }
 
         protected override Expression VisitMember(MemberExpression node)
@@ -18,7 +18,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             Expression parentExpr = _rootVisitor.Visit(node.Expression);
             if (parentExpr != null)
             {
-                var propertyMap = _mappingEngine.GetPropertyMap(node.Member, parentExpr.Type);
+                var propertyMap = _mapper.GetPropertyMap(node.Member, parentExpr.Type);
 
                 var newMember = Expression.MakeMemberAccess(parentExpr, propertyMap.DestinationProperty.MemberInfo);
 

@@ -166,6 +166,8 @@ namespace AutoMapper
         object Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts);
 
+        Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
+
         /// <summary>
         /// Configuration provider for performaing maps
         /// </summary>
@@ -177,15 +179,10 @@ namespace AutoMapper
     /// </summary>
     public interface IMappingEngine
     {
-        Expression CreateMapExpression(Type sourceType, Type destinationType, ObjectDictionary parameters = null, params MemberInfo[] membersToExpand);
         bool ShouldMapSourceValueAsNull(ResolutionContext context);
         bool ShouldMapSourceCollectionAsNull(ResolutionContext context);
         object CreateObject(ResolutionContext context);
         object Map(ResolutionContext context);
-        LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
-
-        Expression CreateMapExpression(ExpressionRequest request,
-            Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
         IConfigurationProvider ConfigurationProvider { get; }
     }
 

@@ -12,9 +12,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return propertyMap.DestinationPropertyType.IsAssignableFrom(result.Type);
         }
 
-        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
-            ExpressionRequest request, ExpressionResolutionResult result,
-            ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public MemberAssignment Build(ExpressionBuilder builder, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindAssignableExpression(propertyMap, result);
         }

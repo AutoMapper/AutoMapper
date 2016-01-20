@@ -10,7 +10,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return propertyTypeMap?.CustomProjection != null;
         }
 
-        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public MemberAssignment Build(ExpressionBuilder builder, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindCustomProjectionExpression(propertyMap, propertyTypeMap, result);
         }

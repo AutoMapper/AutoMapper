@@ -49,10 +49,11 @@
             public void Example()
             {
 
-                Mapper.CreateMap<Entity, EntityViewModel>()
+                var config = new MapperConfiguration();
+                config.CreateMap<Entity, EntityViewModel>()
                     .ForMember(m => m.SubEntityNames, o => o.MapFrom(f => f.SubEntities.Select(e => e.Name)));
 
-                var expression = Mapper.Engine.CreateMapExpression<Entity, EntityViewModel>();
+                var expression = config.CreateMapper().CreateMapExpression<Entity, EntityViewModel>();
 
                 var entity = new Entity
                 {
@@ -78,13 +79,13 @@
             [Fact]
             public void SubMap()
             {
-
-                Mapper.CreateMap<SubEntity, SubEntityViewModel>()
+                var config = new MapperConfiguration();
+                config.CreateMap<SubEntity, SubEntityViewModel>()
                     .ForMember(m => m.Description, o => o.MapFrom(s => s.Description));
 
-                Mapper.CreateMap<Entity, EntityDetailledViewModel>();
+                config.CreateMap<Entity, EntityDetailledViewModel>();
 
-                var expression = Mapper.Engine.CreateMapExpression<Entity, EntityDetailledViewModel>();
+                var expression = config.CreateMapper().CreateMapExpression<Entity, EntityDetailledViewModel>();
 
                 var entity = new Entity
                 {

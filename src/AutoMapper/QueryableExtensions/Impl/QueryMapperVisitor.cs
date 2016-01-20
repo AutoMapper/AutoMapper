@@ -19,20 +19,18 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly MemberAccessQueryMapperVisitor _memberVisitor;
 
 
-        internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery,
-            IMappingEngine mappingEngine)
+        internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery, IMapper mapper)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             _destQuery = destQuery;
             _instanceParameter = Expression.Parameter(destinationType, "dto");
-            _memberVisitor = new MemberAccessQueryMapperVisitor(this, mappingEngine);
+            _memberVisitor = new MemberAccessQueryMapperVisitor(this, mapper);
         }
 
-        public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery,
-            IQueryable<TDestination> destQuery, IMappingEngine map)
+        public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery, IMapper mapper)
         {
-            var visitor = new QueryMapperVisitor(typeof(TSource), typeof(TDestination), destQuery, map);
+            var visitor = new QueryMapperVisitor(typeof(TSource), typeof(TDestination), destQuery, mapper);
             var expr = visitor.Visit(sourceQuery.Expression);
 
             var newDestQuery = destQuery.Provider.CreateQuery<TDestination>(expr);

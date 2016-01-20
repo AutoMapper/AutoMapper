@@ -13,10 +13,11 @@ namespace AutoMapper.UnitTests.Projection
             [Fact]
             public void Should_not_fail()
             {
-                Mapper.CreateMap<UserModel, UserDto>()
+                var config = new MapperConfiguration();
+                config.CreateMap<UserModel, UserDto>()
                                 .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => Mapper.Engine.CreateMapExpression<UserModel, UserDto>()); //null reference exception here
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.CreateMapper().CreateMapExpression<UserModel, UserDto>()); //null reference exception here
             }
 
             [Fact]

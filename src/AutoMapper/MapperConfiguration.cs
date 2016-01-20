@@ -38,19 +38,25 @@ namespace AutoMapper
 
         private readonly List<string> _globalIgnore;
 
-        public MapperConfiguration(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
+        public MapperConfiguration(IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
         {
-            _typeMapFactory = typeMapFactory;
+            _typeMapFactory = new TypeMapFactory();
             _mappers = mappers;
             _typeMapObjectMappers = typeMapObjectMappers;
             _globalIgnore = new List<string>();
         }
 
-        public MapperConfiguration() : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        public MapperConfiguration() : this(MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
         {
         }
 
-        public MapperConfiguration(Action<IConfiguration> configure) : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        public MapperConfiguration(Action<IConfiguration> configure) : this(MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        {
+            configure(this);
+        }
+
+        public MapperConfiguration(Action<IConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers) 
+            : this(mappers, typeMapObjectMappers)
         {
             configure(this);
         }

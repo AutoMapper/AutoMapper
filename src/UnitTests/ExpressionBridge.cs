@@ -106,7 +106,7 @@ namespace AutoMapper.UnitTests
 
             protected override void Establish_context()
             {
-                Mapper.Initialize(cfg =>
+                var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Product, SimpleProductDto>()
                         .ForMember(m => m.CategoryName, dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name));
@@ -122,10 +122,11 @@ namespace AutoMapper.UnitTests
                         //.ConvertUsing(x => ProductTypeDto.GetProdType(x));
                         .ConvertUsing<ProductTypeConverter>();
                 });
+                var mapper = config.CreateMapper();
 
-                _simpleProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, SimpleProductDto>();
-                _extendedProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, ExtendedProductDto>();
-                _abstractProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, AbstractProductDto>();
+                _simpleProductConversionLinq = mapper.CreateMapExpression<Product, SimpleProductDto>();
+                _extendedProductConversionLinq = mapper.CreateMapExpression<Product, ExtendedProductDto>();
+                _abstractProductConversionLinq = mapper.CreateMapExpression<Product, AbstractProductDto>();
 
                 _products = new List<Product>()
                 {

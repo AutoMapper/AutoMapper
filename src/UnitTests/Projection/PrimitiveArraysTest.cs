@@ -15,9 +15,10 @@ namespace AutoMapper.UnitTests.Projection
             [Fact]
             public void Should_not_fail()
             {
-                Mapper.CreateMap<Source, Destination>();
+                var config = new MapperConfiguration();
+                config.CreateMap<Source, Destination>();
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => Mapper.Engine.CreateMapExpression<Source, Destination>());
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.CreateMapper().CreateMapExpression<Source, Destination>());
             }
 
             [Fact]
