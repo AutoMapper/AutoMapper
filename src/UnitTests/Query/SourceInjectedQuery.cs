@@ -33,10 +33,10 @@ namespace AutoMapper.UnitTests.Query
 
         protected override void Establish_context()
         {
-            Mapper.CreateMap<Destination, Source>()
+            Mapper.Initialize(cfg => cfg.CreateMap<Destination, Source>()
                        .ForMember(s => s.SrcValue, opt => opt.MapFrom(d => d.DestValue))
                        .ReverseMap()
-                       .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue));
+                       .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue)));
         }
 
         [Fact]

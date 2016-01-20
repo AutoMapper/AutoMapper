@@ -596,6 +596,7 @@ namespace AutoMapper
 
             var typeMapsChecked = new List<TypeMap>();
             var configExceptions = new List<Exception>();
+            var engine = new MappingEngine(this);
 
             foreach (var typeMap in maps)
             {
@@ -603,7 +604,7 @@ namespace AutoMapper
                 {
                     DryRunTypeMap(typeMapsChecked,
                         new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType,
-                            new MappingOperationOptions(), Mapper.Engine));
+                            new MappingOperationOptions(), engine));
                 }
                 catch (Exception e)
                 {

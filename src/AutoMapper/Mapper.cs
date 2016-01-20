@@ -1,12 +1,7 @@
-using System.Diagnostics;
-using System.Linq;
-
 namespace AutoMapper
 {
     using System;
-    using Internal;
     using Mappers;
-    using QueryableExtensions;
 
     /// <summary>
     /// Main entry point for AutoMapper, for both creating maps and performing maps.
@@ -422,6 +417,7 @@ namespace AutoMapper
         /// <summary>
         /// Store for all configuration
         /// </summary>
+        [Obsolete("Use a mapper instance instead")]
         public static IConfiguration Configuration => (IConfiguration) ConfigurationProvider;
 
         private static IConfigurationProvider ConfigurationProvider => _configuration.Value;
@@ -443,8 +439,8 @@ namespace AutoMapper
         private readonly Func<Type, object> _serviceCtor;
 
         public Mapper(IConfigurationProvider configurationProvider)
+            : this(configurationProvider, configurationProvider.ServiceCtor)
         {
-            _engine = new MappingEngine(configurationProvider);
         }
         public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
@@ -455,7 +451,7 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TDestination>(object source)
         {
-            return Map<TDestination>(source, DefaultMappingOptions);
+            return ((IMapper)this).Map<TDestination>(source, DefaultMappingOptions);
         }
 
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
@@ -466,7 +462,7 @@ namespace AutoMapper
                 var sourceType = source.GetType();
                 var destinationType = typeof(TDestination);
 
-                mappedObject = (TDestination)Map(source, sourceType, destinationType, opts);
+                mappedObject = (TDestination)((IMapper)this).Map(source, sourceType, destinationType, opts);
             }
             return mappedObject;
         }
@@ -476,7 +472,7 @@ namespace AutoMapper
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            return (TDestination)Map(source, modelType, destinationType, DefaultMappingOptions);
+            return (TDestination)((IMapper)this).Map(source, modelType, destinationType, DefaultMappingOptions);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source,
@@ -493,7 +489,7 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
         {
-            return Map(source, destination, DefaultMappingOptions);
+            return ((IMapper)this).Map(source, destination, DefaultMappingOptions);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
@@ -510,7 +506,7 @@ namespace AutoMapper
 
         object IMapper.Map(object source, Type sourceType, Type destinationType)
         {
-            return Map(source, sourceType, destinationType, DefaultMappingOptions);
+            return ((IMapper)this).Map(source, sourceType, destinationType, DefaultMappingOptions);
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
@@ -524,7 +520,7 @@ namespace AutoMapper
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
         {
-            return Map(source, destination, sourceType, destinationType, DefaultMappingOptions);
+            return ((IMapper)this).Map(source, destination, sourceType, destinationType, DefaultMappingOptions);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
@@ -542,7 +538,7 @@ namespace AutoMapper
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            return (TDestination)DynamicMap(source, modelType, destinationType);
+            return (TDestination)((IDynamicMapper)this).DynamicMap(source, modelType, destinationType);
         }
 
         void IDynamicMapper.DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
@@ -550,7 +546,7 @@ namespace AutoMapper
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            DynamicMap(source, destination, modelType, destinationType);
+            ((IDynamicMapper)this).DynamicMap(source, destination, modelType, destinationType);
         }
 
         TDestination IDynamicMapper.DynamicMap<TDestination>(object source)
@@ -558,13 +554,13 @@ namespace AutoMapper
             Type modelType = source?.GetType() ?? typeof(object);
             Type destinationType = typeof(TDestination);
 
-            return (TDestination)DynamicMap(source, modelType, destinationType);
+            return (TDestination)((IDynamicMapper)this).DynamicMap(source, modelType, destinationType);
         }
 
         object IDynamicMapper.DynamicMap(object source, Type sourceType, Type destinationType)
         {
-            ((IConfiguration)ConfigurationProvider).CreateMissingTypeMaps = true;
-            var typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+            ((IConfiguration)_configurationProvider).CreateMissingTypeMaps = true;
+            var typeMap = _configurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions(), _engine);
 
@@ -573,8 +569,8 @@ namespace AutoMapper
 
         void IDynamicMapper.DynamicMap(object source, object destination, Type sourceType, Type destinationType)
         {
-            ((IConfiguration)ConfigurationProvider).CreateMissingTypeMaps = true;
-            var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+            ((IConfiguration)_configurationProvider).CreateMissingTypeMaps = true;
+            var typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions(), _engine);
 
@@ -583,7 +579,7 @@ namespace AutoMapper
 
         private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
         {
-            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, _engine);
 
@@ -593,7 +589,7 @@ namespace AutoMapper
         private object MapCore(object source, object destination, Type sourceType, Type destinationType,
             MappingOperationOptions options)
         {
-            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, _engine);
 

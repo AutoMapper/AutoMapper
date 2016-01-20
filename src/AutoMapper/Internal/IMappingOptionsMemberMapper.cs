@@ -289,8 +289,6 @@ namespace AutoMapper
         public INamingConvention SourceMemberNamingConvention { get; set; }
         public INamingConvention DestinationMemberNamingConvention { get; set; }
 
-        public IEnumerable<MethodInfo> SourceExtensionMethods => (Mapper.Configuration as MapperConfiguration).SourceExtensionMethods;
-
         public NameSplitMember()
         {
             SourceMemberNamingConvention = new PascalCaseNamingConvention();
