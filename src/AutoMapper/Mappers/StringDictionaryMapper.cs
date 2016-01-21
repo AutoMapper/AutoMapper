@@ -40,7 +40,7 @@ namespace AutoMapper.Mappers
             var members = from name in dictionary.Keys join member in destTypeDetails.PublicWriteAccessors on name equals member.Name select member;
             foreach(var member in members)
             {
-                object value = ReflectionHelper.Map(member, dictionary[member.Name]);
+                object value = ReflectionHelper.Map(context, member, dictionary[member.Name]);
                 member.SetMemberValue(destination, value);
             }
             return destination;

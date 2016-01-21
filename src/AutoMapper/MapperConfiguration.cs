@@ -630,7 +630,7 @@ namespace AutoMapper
 
             var typeMapsChecked = new List<TypeMap>();
             var configExceptions = new List<Exception>();
-            var engine = new MappingEngine(this);
+            var engine = new MappingEngine(this, CreateMapper());
 
             foreach (var typeMap in maps)
             {

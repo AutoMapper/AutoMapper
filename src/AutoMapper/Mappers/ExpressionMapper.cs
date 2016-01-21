@@ -28,8 +28,8 @@
 
             var typeMap = context.ConfigurationProvider.ResolveTypeMap(destArgType, sourceArgType);
 
-            var parentMasterVisitor = new MappingVisitor(destDelegateType.GetTypeInfo().GenericTypeArguments);
-            var typeMapVisitor = new MappingVisitor(typeMap, expression.Parameters[0], Expression.Parameter(destDelegateType.GetTypeInfo().GenericTypeArguments[0], expression.Parameters[0].Name), parentMasterVisitor, destDelegateType.GetTypeInfo().GenericTypeArguments);
+            var parentMasterVisitor = new MappingVisitor(context.ConfigurationProvider, destDelegateType.GetTypeInfo().GenericTypeArguments);
+            var typeMapVisitor = new MappingVisitor(context.ConfigurationProvider, typeMap, expression.Parameters[0], Expression.Parameter(destDelegateType.GetTypeInfo().GenericTypeArguments[0], expression.Parameters[0].Name), parentMasterVisitor, destDelegateType.GetTypeInfo().GenericTypeArguments);
             
             // Map expression body and variable seperately
             var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
@@ -49,18 +49,20 @@
         {
             private IList<Type> _destSubTypes = new Type[0];
 
+            private readonly IConfigurationProvider _configurationProvider;
             private readonly TypeMap _typeMap;
             private readonly Expression _oldParam;
             private readonly Expression _newParam;
             private readonly MappingVisitor _parentMappingVisitor;
 
-            public MappingVisitor(IList<Type> destSubTypes)
-                : this(null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)), null, destSubTypes)
+            public MappingVisitor(IConfigurationProvider configurationProvider, IList<Type> destSubTypes)
+                : this(configurationProvider, null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)), null, destSubTypes)
             {
             }
 
-            internal MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor = null, IList<Type> destSubTypes = null)
+            internal MappingVisitor(IConfigurationProvider configurationProvider, TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor = null, IList<Type> destSubTypes = null)
             {
+                _configurationProvider = configurationProvider;
                 _typeMap = typeMap;
                 _oldParam = oldParam;
                 _newParam = newParam;
@@ -208,14 +210,14 @@
                     foreach (var destParamType in _destSubTypes.Where(dt => dt != sourceParamType))
                     {
                         var a = destParamType.IsGenericType() ? destParamType.GetTypeInfo().GenericTypeArguments[0]: destParamType;
-                        var typeMap = Mapper.FindTypeMapFor(a, sourceParamType);
+                        var typeMap = _configurationProvider.FindTypeMapFor(a, sourceParamType);
 
                         if (typeMap == null)
                             continue;
 
                         var oldParam = expression.Parameters[i];
                         var newParam = Expression.Parameter(a, oldParam.Name);
-                        visitors.Add(new MappingVisitor(typeMap, oldParam, newParam, this));
+                        visitors.Add(new MappingVisitor(_configurationProvider, typeMap, oldParam, newParam, this));
                     }
                 }
                 return visitors.Aggregate(expression as Expression, (e, v) => v.Visit(e));
@@ -269,8 +271,8 @@
                 var destType = propertyMap.DestinationPropertyType;
                 if (sourceType == destType)
                     return Expression.MakeMemberAccess(baseExpression, node.Member);
-                var typeMap = Mapper.FindTypeMapFor(sourceType, destType);
-                var subVisitor = new MappingVisitor(typeMap, node.Expression, baseExpression, this);
+                var typeMap = _configurationProvider.FindTypeMapFor(sourceType, destType);
+                var subVisitor = new MappingVisitor(_configurationProvider, typeMap, node.Expression, baseExpression, this);
                 var newExpression = subVisitor.Visit(node);
                 _destSubTypes = _destSubTypes.Concat(subVisitor._destSubTypes).ToArray();
                 return newExpression;

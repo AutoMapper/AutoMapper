@@ -10,21 +10,14 @@ namespace AutoMapper
     {
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
 
-        public MappingEngine(IConfigurationProvider configurationProvider)
+        public MappingEngine(IConfigurationProvider configurationProvider, IMapper mapper)
         {
             ConfigurationProvider = configurationProvider;
+            Mapper = mapper;
         }
 
         public IConfigurationProvider ConfigurationProvider { get; }
-
-        public TDestination Map<TSource, TDestination>(ResolutionContext parentContext, TSource source)
-        {
-            Type destinationType = typeof (TDestination);
-            Type sourceType = typeof (TSource);
-            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
-            var context = parentContext.CreateTypeContext(typeMap, source, null, sourceType, destinationType);
-            return (TDestination) Map(context);
-        }
+        public IMapper Mapper { get; }
 
         public object Map(ResolutionContext context)
         {

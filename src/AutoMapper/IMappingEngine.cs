@@ -183,6 +183,7 @@ namespace AutoMapper
         object CreateObject(ResolutionContext context);
         object Map(ResolutionContext context);
         IConfigurationProvider ConfigurationProvider { get; }
+        IMapper Mapper { get; }
     }
 
 }
