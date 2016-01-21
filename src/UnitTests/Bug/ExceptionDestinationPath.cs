@@ -17,13 +17,10 @@ namespace AutoMapper.UnitTests.Bug
             public int Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(c =>
-            {
-                c.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.ResolveUsing((IValueResolver)null));
-            });
-        }
+            cfg.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.ResolveUsing((IValueResolver) null));
+        });
 
         [Fact]
         public void Should_report_destination_path()

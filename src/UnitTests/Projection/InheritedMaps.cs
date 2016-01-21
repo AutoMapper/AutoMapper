@@ -26,17 +26,14 @@
         {
             private Dest[] _dest;
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<SourceBase, Dest>()
-                        .Include<Source, Dest>()
-                        .ForMember(d => d.Value, opt => opt.MapFrom(src => src.OtherValue));
+                cfg.CreateMap<SourceBase, Dest>()
+                    .Include<Source, Dest>()
+                    .ForMember(d => d.Value, opt => opt.MapFrom(src => src.OtherValue));
 
-                    cfg.CreateMap<Source, Dest>();
-                });
-            }
+                cfg.CreateMap<Source, Dest>();
+            });
 
             protected override void Because_of()
             {
@@ -48,7 +45,7 @@
                     }
                 }.AsQueryable();
 
-                _dest = sources.ProjectTo<Dest>().ToArray();
+                _dest = sources.ProjectTo<Dest>(ExpressionBuilder).ToArray();
             }
 
             [Fact]

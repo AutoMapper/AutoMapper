@@ -53,7 +53,7 @@
                 config.CreateMap<Entity, EntityViewModel>()
                     .ForMember(m => m.SubEntityNames, o => o.MapFrom(f => f.SubEntities.Select(e => e.Name)));
 
-                var expression = config.CreateMapper().CreateMapExpression<Entity, EntityViewModel>();
+                var expression = config.CreateExpressionBuilder().CreateMapExpression<Entity, EntityViewModel>();
 
                 var entity = new Entity
                 {
@@ -85,7 +85,7 @@
 
                 config.CreateMap<Entity, EntityDetailledViewModel>();
 
-                var expression = config.CreateMapper().CreateMapExpression<Entity, EntityDetailledViewModel>();
+                var expression = config.CreateExpressionBuilder().CreateMapExpression<Entity, EntityDetailledViewModel>();
 
                 var entity = new Entity
                 {

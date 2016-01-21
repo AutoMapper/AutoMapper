@@ -82,12 +82,13 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-				Mapper.CreateMap<DateTime?, MyCustomDate>()
-					.ConvertUsing(src => src.HasValue ? new MyCustomDate(src.Value.Day, src.Value.Month, src.Value.Year) : null);
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		        cfg.CreateMap<DateTime?, MyCustomDate>()
+		            .ConvertUsing(
+		                src => src.HasValue ? new MyCustomDate(src.Value.Day, src.Value.Month, src.Value.Year) : null);
+		    });
 
 			protected override void Because_of()
 			{
@@ -108,7 +109,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_mappings_are_created_on_the_fly : NonValidatingSpecBase
+		public class When_mappings_are_created_on_the_fly : SpecBase
 		{
 			public class Order
 			{
@@ -152,10 +153,10 @@ namespace AutoMapper.UnitTests
 
 		public class TestEnumerable : AutoMapperSpecBase
 		{
-			protected override void Establish_context()
-			{
-                Mapper.Initialize(cfg=>cfg.CreateMap<Person, PersonModel>());
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Person, PersonModel>();
+		    });
 
 			[Fact]
 			public void MapsEnumerableTypes()

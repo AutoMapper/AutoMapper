@@ -9,7 +9,14 @@ using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.QueryableExtensions
 {
-    public class ExpressionBuilder
+    public interface IExpressionBuilder
+    {
+        IConfigurationProvider ConfigurationProvider { get; }
+        Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
+        Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
+    }
+
+    public class ExpressionBuilder : IExpressionBuilder
     {
 
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
@@ -53,6 +60,13 @@ namespace AutoMapper.QueryableExtensions
 
             return visitor.Visit(cachedExpression);
         }
+
+        public Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null,
+            params MemberInfo[] membersToExpand)
+        {
+            return (Expression<Func<TSource, TDestination>>) CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
+        }
+
 
         public LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {

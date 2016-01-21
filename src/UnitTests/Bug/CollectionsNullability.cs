@@ -19,11 +19,11 @@ namespace AutoMapper.UnitTests.Bug
             public Container[] Containers { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Holder, Holder>();
-            Mapper.CreateMap<Container, Container>();
-        }
+            cfg.CreateMap<Holder, Holder>();
+            cfg.CreateMap<Container, Container>();
+        });
 
         protected override void Because_of()
         {

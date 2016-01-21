@@ -21,10 +21,10 @@ namespace AutoMapper.UnitTests
 				public string this[string key] { get { return null; }}
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -43,7 +43,7 @@ namespace AutoMapper.UnitTests
 				Exception thrown = null;
 				try
 				{
-					Mapper.AssertConfigurationIsValid();
+					Configuration.AssertConfigurationIsValid();
 				}
 				catch (Exception ex)
 				{

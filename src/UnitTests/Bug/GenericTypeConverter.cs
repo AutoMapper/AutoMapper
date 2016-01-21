@@ -46,11 +46,11 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap(typeof(Source<>), typeof(Destination<>)).ConvertUsing(typeof(Converter<>));
-            Mapper.CreateMap(typeof(OtherSource<>), typeof(OtherDestination<>)).ConvertUsing(typeof(Converter<>));
-        }
+            cfg.CreateMap(typeof (Source<>), typeof (Destination<>)).ConvertUsing(typeof (Converter<>));
+            cfg.CreateMap(typeof (OtherSource<>), typeof (OtherDestination<>)).ConvertUsing(typeof (Converter<>));
+        });
 
         protected override void Because_of()
         {

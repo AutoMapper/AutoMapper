@@ -18,14 +18,11 @@ namespace AutoMapper.UnitTests.Bug
             public string[] ArrayOfItems { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.AllowNullCollections = false;
-                cfg.CreateMap<Source, Destination>();
-            });
-        }
+            cfg.AllowNullCollections = false;
+            cfg.CreateMap<Source, Destination>();
+        });
 
         protected override void Because_of()
         {

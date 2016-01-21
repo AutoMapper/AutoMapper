@@ -22,14 +22,18 @@ namespace AutoMapper.UnitTests
 				public string Value2;
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
 
-				_destination = Mapper.Map<Source, Destination>(new Source {Value1 = 4, Value2 = "hello"});
-			}
+		    });
 
-			[Fact]
+		    protected override void Because_of()
+		    {
+		        _destination = Mapper.Map<Source, Destination>(new Source {Value1 = 4, Value2 = "hello"});
+		    }
+
+		    [Fact]
 			public void Should_map_property_value()
 			{
 				_destination.Value1.ShouldEqual(4);
@@ -59,12 +63,12 @@ namespace AutoMapper.UnitTests
                 public int? Value2 { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<string, int>().ConvertUsing((string s) => Convert.ToInt32(s));
-                Mapper.CreateMap<string, int?>().ConvertUsing((string s) => (int?)Convert.ToInt32(s));
-                Mapper.CreateMap<Source, Destination>();
-            }
+                cfg.CreateMap<string, int>().ConvertUsing((string s) => Convert.ToInt32(s));
+                cfg.CreateMap<string, int?>().ConvertUsing((string s) => (int?) Convert.ToInt32(s));
+                cfg.CreateMap<Source, Destination>();
+            });
 
             protected override void Because_of()
             {

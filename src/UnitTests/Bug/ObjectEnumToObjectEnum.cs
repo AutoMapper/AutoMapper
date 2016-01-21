@@ -7,7 +7,6 @@ namespace AutoMapper.UnitTests.Bug
 {
     public class ObjectEnumToObjectEnum : AutoMapperSpecBase
     {
-        IMapper _mapper;
         Target _target;
 
         public enum SourceEnumValue
@@ -32,17 +31,15 @@ namespace AutoMapper.UnitTests.Bug
             public object Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            var configuration = new MapperConfiguration();
-            var parentMapping = configuration.CreateMap<Source, Target>();
-            parentMapping.ForMember(dest => dest.Value, opt => opt.MapFrom(s => (TargetEnumValue)s.Value));
-            _mapper = configuration.CreateMapper();
-        }
+            var parentMapping = cfg.CreateMap<Source, Target>();
+            parentMapping.ForMember(dest => dest.Value, opt => opt.MapFrom(s => (TargetEnumValue) s.Value));
+        });
 
         protected override void Because_of()
         {
-            _target = _mapper.Map<Target>(new Source { Value = SourceEnumValue.Mule });
+            _target = Mapper.Map<Target>(new Source { Value = SourceEnumValue.Mule });
         }
 
         [Fact]

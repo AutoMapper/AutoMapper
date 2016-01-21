@@ -35,15 +35,17 @@ namespace AutoMapperSamples.Mappers
             [Test]
             public void Select_source_items_from_destination()
             {
-                Mapper.Initialize(cfg =>
+                var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Destination, Source>()
                         .ForMember(d => d.SrcValue, opt => opt.MapFrom(s => s.DestValue))
                         .ReverseMap();
                 });
+                var builder = config.CreateExpressionBuilder();
+                var mapper = config.CreateMapper();
 
                 IQueryable<Destination> result = _source.AsQueryable()
-                    .UseAsDataSource().For<Destination>()
+                    .UseAsDataSource(builder, mapper).For<Destination>()
                     .Where(s => s.DestValue > 6);
 
                 result.Count().ShouldEqual(1);

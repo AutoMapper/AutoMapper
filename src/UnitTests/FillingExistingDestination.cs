@@ -24,20 +24,18 @@ namespace AutoMapper.UnitTests
 				public int Value { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				base.Establish_context();
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
 
-				Mapper.CreateMap<Source, Destination>();
-
-				_source = new Source
-				{
-					Value = 10,
-				};
-			}
+		    });
 
 			protected override void Because_of()
 			{
+		        _source = new Source
+		        {
+		            Value = 10,
+		        };
 				_originalDest = new Destination { Value = 1111 };
 				_dest = Mapper.Map<Source, Destination>(_source, _originalDest);
 			}
@@ -85,16 +83,14 @@ namespace AutoMapper.UnitTests
                 public string Name { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                base.Establish_context();
+                cfg.CreateMap<Source, Destination>(MemberList.Source);
+                cfg.CreateMap<ChildSource, ChildDestination>(MemberList.Source);
+            });
 
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Destination>(MemberList.Source);
-                    cfg.CreateMap<ChildSource, ChildDestination>(MemberList.Source);
-                });
-
+            protected override void Because_of()
+            {
                 _source = new Source
                 {
                     Value = 10,
@@ -103,10 +99,6 @@ namespace AutoMapper.UnitTests
                         Value = 20
                     }
                 };
-            }
-
-            protected override void Because_of()
-            {
                 _originalDest = new Destination
                 {
                     Value = 1111,
@@ -135,7 +127,7 @@ namespace AutoMapper.UnitTests
         }
 
 
-		public class When_the_destination_object_is_specified_and_you_are_converting_an_enum : AutoMapperSpecBase
+		public class When_the_destination_object_is_specified_and_you_are_converting_an_enum : SpecBase
 		{
 			private string _result;
 

@@ -19,10 +19,10 @@
             public string Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Dest>();
-        }
+            cfg.CreateMap<Source, Dest>();
+        });
 
         protected override void Because_of()
         {
@@ -34,7 +34,7 @@
                 }
             }.AsQueryable();
 
-            _dests = sources.ProjectTo<Dest>().ToArray();
+            _dests = sources.ProjectTo<Dest>(ExpressionBuilder).ToArray();
         }
 
         [Fact]

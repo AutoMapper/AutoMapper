@@ -23,10 +23,10 @@ namespace AutoMapper.UnitTests.Bug
                 public int? Dummy { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<DummySource, DummyDestination>();
-            }
+                cfg.CreateMap<DummySource, DummyDestination>();
+            });
 
             [Fact]
             public void Should_map_null_enum_to_nullable_base_type()

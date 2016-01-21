@@ -15,13 +15,10 @@ namespace AutoMapper.UnitTests.Bug
             public int Number { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Destination>().ConstructUsing((Source source)=>null);
-            });
-        }
+            cfg.CreateMap<Source, Destination>().ConstructUsing((Source source) => null);
+        });
 
         [Fact]
         public void Should_throw_when_construct_using_returns_null()

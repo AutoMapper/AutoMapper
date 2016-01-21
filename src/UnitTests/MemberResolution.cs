@@ -34,28 +34,26 @@ namespace AutoMapper.UnitTests
 				public string SubString { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Reset();
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
 
-				var model = new[]
-					{
-						new ModelObject {BaseString = "Base1"},
-						new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
-					};
+		        cfg.CreateMap<ModelObject, DtoObject>()
+		            .Include<ModelSubObject, DtoSubObject>();
 
-			    Mapper.Initialize(cfg =>
-			    {
-			        cfg.CreateMap<ModelObject, DtoObject>()
-			            .Include<ModelSubObject, DtoSubObject>();
+		        cfg.CreateMap<ModelSubObject, DtoSubObject>();
+		    });
 
-			        cfg.CreateMap<ModelSubObject, DtoSubObject>();
-			    });
+		    protected override void Because_of()
+		    {
+		        var model = new[]
+		        {
+		            new ModelObject {BaseString = "Base1"},
+		            new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
+		        };
+		        _result = (DtoObject[]) Mapper.Map(model, typeof (ModelObject[]), typeof (DtoObject[]));
+		    }
 
-				_result = (DtoObject[]) Mapper.Map(model, typeof (ModelObject[]), typeof (DtoObject[]));
-			}
-
-			[Fact]
+		    [Fact]
 			public void Should_map_both_the_base_and_sub_objects()
 			{
 				_result.Length.ShouldEqual(2);
@@ -95,16 +93,13 @@ namespace AutoMapper.UnitTests
 				public string SubString { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-			    Mapper.Initialize(cfg =>
-			    {
-			        cfg.CreateMap<ModelObject, DtoObject>()
-			            .Include<ModelSubObject, DtoSubObject>();
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<ModelObject, DtoObject>()
+		            .Include<ModelSubObject, DtoSubObject>();
 
-			        cfg.CreateMap<ModelSubObject, DtoSubObject>();
-			    });
-			}
+		        cfg.CreateMap<ModelSubObject, DtoSubObject>();
+		    });
 
             protected override void Because_of()
             {
@@ -145,27 +140,25 @@ namespace AutoMapper.UnitTests
 				public string SubString { get; set; }
 			}
 
-		    protected override void Establish_context()
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
 		    {
-		        Mapper.Reset();
+		        cfg.CreateMap<IModelObject, DtoObject>()
+		            .Include<ModelSubObject, DtoSubObject>();
 
+		        cfg.CreateMap<ModelSubObject, DtoSubObject>();
+		    });
+
+		    protected override void Because_of()
+		    {
 		        var model = new IModelObject[]
 		        {
 		            new ModelSubObject {BaseString = "Base2", SubString = "Sub2"}
 		        };
+		        _result = (DtoObject[]) Mapper.Map(model, typeof (IModelObject[]), typeof (DtoObject[]));
+		        base.Because_of();
+		    }
 
-		        Mapper.Initialize(cfg =>
-		        {
-                    cfg.CreateMap<IModelObject, DtoObject>()
-                        .Include<ModelSubObject, DtoSubObject>();
-
-                    cfg.CreateMap<ModelSubObject, DtoSubObject>();
-                });
-
-				_result = (DtoObject[]) Mapper.Map(model, typeof (IModelObject[]), typeof (DtoObject[]));
-			}
-
-			[Fact]
+		    [Fact]
 			public void Should_map_both_the_base_and_sub_objects()
 			{
 				_result.Length.ShouldEqual(1);
@@ -215,18 +208,15 @@ namespace AutoMapper.UnitTests
 				public string SubString { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Model, DtoModel>();
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Model, DtoModel>();
 
-                    cfg.CreateMap<IModelObject, DtoObject>()
-                        .Include<ModelSubObject, DtoSubObject>();
+		        cfg.CreateMap<IModelObject, DtoObject>()
+		            .Include<ModelSubObject, DtoSubObject>();
 
-                    cfg.CreateMap<ModelSubObject, DtoSubObject>();
-                });
-			}
+		        cfg.CreateMap<ModelSubObject, DtoSubObject>();
+		    });
 
 			[Fact]
 			public void Should_map_object_to_sub_object()
@@ -279,40 +269,42 @@ namespace AutoMapper.UnitTests
 				public string SubMissingSubSubIAmACoolProperty { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-                Mapper.Reset();
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
 
-				var model = new ModelObject
-					{
-						BaseDate = new DateTime(2007, 4, 5),
-						Sub = new ModelSubObject
-							{
-								ProperName = "Some name",
-								SubSub = new ModelSubSubObject
-									{
-										IAmACoolProperty = "Cool daddy-o"
-									}
-							},
-						Sub2 = new ModelSubObject
-							{
-								ProperName = "Sub 2 name"
-							},
-						SubWithExtraName = new ModelSubObject
-							{
-								ProperName = "Some other name"
-							},
-						SubMissing = new ModelSubObject
-							{
-								ProperName = "I have a missing sub sub object"
-							}
-					};
+		        cfg.CreateMap<ModelObject, ModelDto>();
+		    });
 
-				Mapper.CreateMap<ModelObject, ModelDto>();
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
+		    protected override void Because_of()
+		    {
+		        var model = new ModelObject
+		        {
+		            BaseDate = new DateTime(2007, 4, 5),
+		            Sub = new ModelSubObject
+		            {
+		                ProperName = "Some name",
+		                SubSub = new ModelSubSubObject
+		                {
+		                    IAmACoolProperty = "Cool daddy-o"
+		                }
+		            },
+		            Sub2 = new ModelSubObject
+		            {
+		                ProperName = "Sub 2 name"
+		            },
+		            SubWithExtraName = new ModelSubObject
+		            {
+		                ProperName = "Some other name"
+		            },
+		            SubMissing = new ModelSubObject
+		            {
+		                ProperName = "I have a missing sub sub object"
+		            }
+		        };
+		        _result = Mapper.Map<ModelObject, ModelDto>(model);
+		    }
 
-			[Fact]
+		    [Fact]
 			public void Should_map_item_in_first_level_of_hierarchy()
 			{
 				_result.BaseDate.ShouldEqual(new DateTime(2007, 4, 5));
@@ -377,10 +369,13 @@ namespace AutoMapper.UnitTests
                 public string SubMissingSubSubIAmACoolProperty;            
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Reset();
+                cfg.CreateMap<ModelObject, ModelDto>();
+            });
 
+            protected override void Because_of()
+            {
                 var model = new ModelObject
                 {
                     BaseDate = new DateTime(2007, 4, 5),
@@ -405,8 +400,6 @@ namespace AutoMapper.UnitTests
                         ProperName = "I have a missing sub sub object"
                     }
                 };
-
-                Mapper.CreateMap<ModelObject, ModelDto>();
                 _result = Mapper.Map<ModelObject, ModelDto>(model);
             }
 
@@ -475,10 +468,13 @@ namespace AutoMapper.UnitTests
                 public string SubMissingSubSubIAmACoolProperty { get; set;}
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Reset();
+                cfg.CreateMap<ModelObject, ModelDto>();
+            });
 
+            protected override void Because_of()
+            {
                 var model = new ModelObject
                 {
                     BaseDate = new DateTime(2007, 4, 5),
@@ -503,9 +499,8 @@ namespace AutoMapper.UnitTests
                         ProperName = "I have a missing sub sub object"
                     }
                 };
-
-                Mapper.CreateMap<ModelObject, ModelDto>();
                 _result = Mapper.Map<ModelObject, ModelDto>(model);
+                base.Because_of();
             }
 
             [Fact]
@@ -539,7 +534,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-		public class When_ignoring_a_dto_property_during_configuration : AutoMapperSpecBase
+		public class When_ignoring_a_dto_property_during_configuration : SpecBase
 		{
 			private TypeMap[] _allTypeMaps;
 			private Source _source;
@@ -616,19 +611,23 @@ namespace AutoMapper.UnitTests
 				public string SubSomeOtherCoolValue { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				var model = new ModelObject
-					{
-						Sub = new ModelSubObject()
-					};
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<ModelObject, ModelDto>();
+		    });
 
-				Mapper.CreateMap<ModelObject, ModelDto>();
+		    protected override void Because_of()
+		    {
+		        var model = new ModelObject
+		        {
+		            Sub = new ModelSubObject()
+		        };
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
 
-			[Fact]
+		        _result = Mapper.Map<ModelObject, ModelDto>(model);
+		    }
+
+		    [Fact]
 			public void Should_map_base_method_value()
 			{
 				_result.SomeCoolValue.ShouldEqual("Cool value");
@@ -669,19 +668,23 @@ namespace AutoMapper.UnitTests
 				public string SubSomeOtherCoolValue { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				var model = new ModelObject
-					{
-						Sub = new ModelSubObject()
-					};
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<ModelObject, ModelDto>();
+		    });
 
-				Mapper.CreateMap<ModelObject, ModelDto>();
+		    protected override void Because_of()
+		    {
+		        var model = new ModelObject
+		        {
+		            Sub = new ModelSubObject()
+		        };
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
 
-			[Fact]
+		        _result = Mapper.Map<ModelObject, ModelDto>(model);
+		    }
+
+		    [Fact]
 			public void Should_map_base_method_value()
 			{
 				_result.SomeCoolValue.ShouldEqual("Cool value");
@@ -718,23 +721,27 @@ namespace AutoMapper.UnitTests
 				public string SomeValue { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<ModelObject, ModelDto>();
-				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<ModelObject, ModelDto>();
+		        cfg.CreateMap<ModelSubObject, ModelSubDto>();
 
-				var model = new ModelObject
-					{
-						Sub = new ModelSubObject
-							{
-								SomeValue = "Some value"
-							}
-					};
+		    });
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
+		    protected override void Because_of()
+		    {
+		        var model = new ModelObject
+		        {
+		            Sub = new ModelSubObject
+		            {
+		                SomeValue = "Some value"
+		            }
+		        };
 
-			[Fact]
+		        _result = Mapper.Map<ModelObject, ModelDto>(model);
+		    }
+
+		    [Fact]
 			public void Should_map_the_model_sub_type_to_the_dto_sub_type()
 			{
 				_result.Sub.ShouldNotBeNull();
@@ -766,17 +773,21 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<ModelObject, ModelDto>();
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<ModelObject, ModelDto>();
 
-				var model = new ModelObject();
-				model.SomeValue = 46;
+		    });
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
+		    protected override void Because_of()
+		    {
+		        var model = new ModelObject();
+		        model.SomeValue = 46;
 
-			[Fact]
+		        _result = Mapper.Map<ModelObject, ModelDto>(model);
+		    }
+
+		    [Fact]
 			public void Should_map_the_get_method_to_the_dto()
 			{
 				_result.SomeValue.ShouldEqual(46);
@@ -841,38 +852,43 @@ namespace AutoMapper.UnitTests
 				public int MoreBlarg { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				var model = new ModelObject
-					{
-						Blarg = 10,
-						SomeValue = "Some value",
-						SomeWeirdSubObject = new ModelSubObject
-							{
-								Narf = 5,
-								SubSub = new ModelSubSubObject
-									{
-										Norf = 15
-									}
-							},
-						MoreBlarg = "adsfdsaf"
-					};
-				Mapper
-					.CreateMap<ModelObject, ModelDto>()
-					.ForMember(dto => dto.Splorg, opt => opt.MapFrom(m => m.Blarg))
-					.ForMember(dto => dto.SomeMethod, opt => opt.MapFrom(m => m.IAmSomeMethod()))
-					.ForMember(dto => dto.SubNarf, opt => opt.MapFrom(m => m.SomeWeirdSubObject.Narf))
-					.ForMember(dto => dto.SubValue, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SomeSubValue()))
-					.ForMember(dto => dto.GrandChildInt, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.Norf))
-					.ForMember(dto => dto.GrandChildString, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.SomeSubSubValue()))
-					.ForMember(dto => dto.MoreBlarg, opt => opt.MapFrom(m => m.SomeMethodToGetMoreBlarg()))
-					.ForMember(dto => dto.BlargPlus3, opt => opt.MapFrom(m => m.Blarg.Plus(3)))
-					.ForMember(dto => dto.BlargMinus2, opt => opt.MapFrom(m => m.Blarg - 2));
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg
+		            .CreateMap<ModelObject, ModelDto>()
+		            .ForMember(dto => dto.Splorg, opt => opt.MapFrom(m => m.Blarg))
+		            .ForMember(dto => dto.SomeMethod, opt => opt.MapFrom(m => m.IAmSomeMethod()))
+		            .ForMember(dto => dto.SubNarf, opt => opt.MapFrom(m => m.SomeWeirdSubObject.Narf))
+		            .ForMember(dto => dto.SubValue, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SomeSubValue()))
+		            .ForMember(dto => dto.GrandChildInt, opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.Norf))
+		            .ForMember(dto => dto.GrandChildString,
+		                opt => opt.MapFrom(m => m.SomeWeirdSubObject.SubSub.SomeSubSubValue()))
+		            .ForMember(dto => dto.MoreBlarg, opt => opt.MapFrom(m => m.SomeMethodToGetMoreBlarg()))
+		            .ForMember(dto => dto.BlargPlus3, opt => opt.MapFrom(m => m.Blarg.Plus(3)))
+		            .ForMember(dto => dto.BlargMinus2, opt => opt.MapFrom(m => m.Blarg - 2));
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
+		    });
 
-			[Fact]
+		    protected override void Because_of()
+		    {
+		        var model = new ModelObject
+		        {
+		            Blarg = 10,
+		            SomeValue = "Some value",
+		            SomeWeirdSubObject = new ModelSubObject
+		            {
+		                Narf = 5,
+		                SubSub = new ModelSubSubObject
+		                {
+		                    Norf = 15
+		                }
+		            },
+		            MoreBlarg = "adsfdsaf"
+		        };
+		        _result = Mapper.Map<ModelObject, ModelDto>(model);
+		    }
+
+		    [Fact]
 			public void Should_preserve_the_existing_mapping()
 			{
 				_result.SomeValue.ShouldEqual("Some value");
@@ -986,18 +1002,21 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap(typeof (Order), typeof (OrderDTO))
-                        .ForMember("CurrentState", map => map.MapFrom("Status"))
-                        .ForMember("Contact", map => map.ResolveUsing(new StringCAPS()).FromMember("Customer"))
-                        .ForMember("Tracking", map => map.ResolveUsing(typeof(StringLower)).FromMember("ShippingCode"))
-                        .ForMember("Postal", map => map.ResolveUsing<StringPadder>().ConstructedBy(() => new StringPadder(6)).FromMember("Zip"));
-                });
+                cfg.CreateMap(typeof (Order), typeof (OrderDTO))
+                    .ForMember("CurrentState", map => map.MapFrom("Status"))
+                    .ForMember("Contact", map => map.ResolveUsing(new StringCAPS()).FromMember("Customer"))
+                    .ForMember("Tracking", map => map.ResolveUsing(typeof (StringLower)).FromMember("ShippingCode"))
+                    .ForMember("Postal",
+                        map =>
+                            map.ResolveUsing<StringPadder>().ConstructedBy(() => new StringPadder(6)).FromMember("Zip"));
 
-                var order = new Order
+            });
+
+            protected override void Because_of()
+            {
+                 var order = new Order
                 {
                     Id = 7,
                     Status = "Pending",
@@ -1054,10 +1073,10 @@ namespace AutoMapper.UnitTests
 				public int someValueWithPascalName { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -1074,7 +1093,7 @@ namespace AutoMapper.UnitTests
 			[Fact]
 			public void Should_pass_configuration_check()
 			{
-				Mapper.AssertConfigurationIsValid();
+				Configuration.AssertConfigurationIsValid();
 			}
 		}
 
@@ -1094,10 +1113,10 @@ namespace AutoMapper.UnitTests
                 public CategoryDto[] Children { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<Category, CategoryDto>();
-            }
+                cfg.CreateMap<Category, CategoryDto>();
+            });
 
             protected override void Because_of()
             {
@@ -1127,7 +1146,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_pass_configuration_check()
             {
-                Mapper.AssertConfigurationIsValid();
+                Configuration.AssertConfigurationIsValid();
             }
 
             [Fact]
@@ -1154,10 +1173,10 @@ namespace AutoMapper.UnitTests
 				public int Value { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap(typeof (Source), typeof (Destination));
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap(typeof (Source), typeof (Destination));
+		    });
 
 			protected override void Because_of()
 			{
@@ -1190,15 +1209,12 @@ namespace AutoMapper.UnitTests
 				public int some_source_value { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(cfg =>
-                    {
-						cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
-						cfg.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
-						cfg.CreateMap<Source, Destination>();
-					});
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.SourceMemberNamingConvention = new LowerUnderscoreNamingConvention();
+		        cfg.DestinationMemberNamingConvention = new LowerUnderscoreNamingConvention();
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -1231,14 +1247,11 @@ namespace AutoMapper.UnitTests
 				public int OtherValue { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-			    Mapper.Initialize(cfg =>
-			    {
-			        cfg.RecognizePrefixes("Foo");
-			        cfg.CreateMap<Source, Destination>();
-			    });
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.RecognizePrefixes("Foo");
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -1278,15 +1291,12 @@ namespace AutoMapper.UnitTests
 				public int OtherValue { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(cfg =>
-				{
-					cfg.RecognizePrefixes("Foo");
-					cfg.RecognizePostfixes("Bar");
-					cfg.CreateMap<Source, Destination>();
-				});
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.RecognizePrefixes("Foo");
+		        cfg.RecognizePostfixes("Bar");
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -1320,13 +1330,17 @@ namespace AutoMapper.UnitTests
 				public int I_amaCraAZZEE____Name { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-				_destination = Mapper.Map<Source, Destination>(new Source {I_amaCraAZZEE____Name = 5});
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
-			[Fact]
+		    protected override void Because_of()
+		    {
+		        _destination = Mapper.Map<Source, Destination>(new Source {I_amaCraAZZEE____Name = 5});
+		    }
+
+		    [Fact]
 			public void Should_match_based_on_name()
 			{
 				_destination.I_amaCraAZZEE____Name.ShouldEqual(5);
@@ -1347,14 +1361,11 @@ namespace AutoMapper.UnitTests
 				public int Bar { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(cfg =>
-				{
-					cfg.RecognizeAlias("Foo", "Bar");
-					cfg.CreateMap<Source, Destination>();
-				});
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.RecognizeAlias("Foo", "Bar");
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -1384,14 +1395,11 @@ namespace AutoMapper.UnitTests
                 public int BarValue2 { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.RecognizeDestinationPrefixes("Foo", "Bar");
-                    cfg.CreateMap<Source, Destination>();
-                });
-            }
+                cfg.RecognizeDestinationPrefixes("Foo", "Bar");
+                cfg.CreateMap<Source, Destination>();
+            });
 
             protected override void Because_of()
             {
@@ -1436,10 +1444,10 @@ namespace AutoMapper.UnitTests
 			public int Value { get; private set; }
 		}
 
-		protected override void Establish_context()
-		{
-			Mapper.CreateMap<Source, Destination>();
-		}
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
 
 		protected override void Because_of()
 		{

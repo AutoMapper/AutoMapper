@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System;
+    using QueryableExtensions;
 
     public interface IConfiguration : IProfileExpression
     {
@@ -53,5 +54,7 @@ namespace AutoMapper
         /// <param name="serviceCtor">Factory method</param>
         /// <returns>Mapper</returns>
         IMapper CreateMapper(Func<Type, object> serviceCtor);
+
+        IExpressionBuilder CreateExpressionBuilder();
     }
 }

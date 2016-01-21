@@ -41,17 +41,17 @@ namespace AutoMapper.UnitTests.Bug
             public int Prop { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<FuEntity, Fu>().ForMember(dest => dest.Man, opt => opt.ExplicitExpansion());
-            Mapper.CreateMap<ManEntity, Man>().ForMember(dest => dest.Chu, opt => opt.ExplicitExpansion());
-            Mapper.CreateMap<ChuEntity, Chu>();
-        }
+            cfg.CreateMap<FuEntity, Fu>().ForMember(dest => dest.Man, opt => opt.ExplicitExpansion());
+            cfg.CreateMap<ManEntity, Man>().ForMember(dest => dest.Chu, opt => opt.ExplicitExpansion());
+            cfg.CreateMap<ChuEntity, Chu>();
+        });
 
         protected override void Because_of()
         {
             var fuEntity = new FuEntity { Man = new ManEntity { Chu = new ChuEntity { Prop = _propValue } } };
-            _destination = new[] { fuEntity }.AsQueryable().ProjectTo<Fu>(m=>m.Man, m=>m.Man.Chu).First();
+            _destination = new[] { fuEntity }.AsQueryable().ProjectTo<Fu>(ExpressionBuilder, m =>m.Man, m=>m.Man.Chu).First();
         }
 
         [Fact]

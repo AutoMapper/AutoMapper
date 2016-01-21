@@ -78,11 +78,12 @@ namespace AutoMapper.IntegrationTests.Net4
         
         public class AutoMapperQueryableExtensionsThrowsNullReferenceExceptionSpec : AutoMapperSpecBase
         {
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg=> cfg.CreateMap<Customer, CustomerViewModel>()
-                .ForMember(x => x.FullAddress, o => o.MapFrom(c => c.Address.Street + ", " + c.Address.City + " " + c.Address.State)));
-            }
+                cfg.CreateMap<Customer, CustomerViewModel>()
+                    .ForMember(x => x.FullAddress,
+                        o => o.MapFrom(c => c.Address.Street + ", " + c.Address.City + " " + c.Address.State));
+            });
 
             [Fact]
             public void can_map_with_projection()
@@ -102,7 +103,7 @@ namespace AutoMapper.IntegrationTests.Net4
                         x.FullAddress.ShouldNotBeEmpty();
                     });
 
-                    customerVms = context.Customers.ProjectTo<CustomerViewModel>().ToList();
+                    customerVms = context.Customers.ProjectTo<CustomerViewModel>(ExpressionBuilder).ToList();
                     customerVms.ForEach(x =>
                     {
                         x.FullAddress.ShouldNotBeNull();

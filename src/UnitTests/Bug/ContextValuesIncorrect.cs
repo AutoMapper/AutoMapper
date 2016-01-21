@@ -21,14 +21,12 @@ namespace AutoMapper.UnitTests.Bug
         {
             private FooDto _destination;
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Foo, FooDto>()
-                        .ForAllMembers(opt => opt.Condition(ctx => ctx.DestinationValue == null));
-                });
-            }
+                cfg.CreateMap<Foo, FooDto>()
+                    .ForAllMembers(opt => opt.Condition(ctx => ctx.DestinationValue == null));
+            });
+
             protected override void Because_of()
             {
                 var source = new Foo

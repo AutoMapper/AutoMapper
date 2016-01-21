@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    public class ConvensionTest : AutoMapperSpecBase
+    public class ConvensionTest
     {
         public class Client
         {

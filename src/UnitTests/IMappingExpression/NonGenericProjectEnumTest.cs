@@ -8,10 +8,14 @@
 
     public class NonGenericProjectEnumTest
     {
+        private IExpressionBuilder _builder;
+
         public NonGenericProjectEnumTest()
         {
-            Mapper.CreateMap(typeof(Customer), typeof(CustomerDto));
-            Mapper.CreateMap(typeof(CustomerType), typeof(string)).ProjectUsing(ct => ct.ToString().ToUpper());
+            var config = new MapperConfiguration();
+            config.CreateMap(typeof(Customer), typeof(CustomerDto));
+            config.CreateMap(typeof(CustomerType), typeof(string)).ProjectUsing(ct => ct.ToString().ToUpper());
+            _builder = config.CreateExpressionBuilder();
         }
 
         [Fact]
@@ -19,7 +23,7 @@
         {
             var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
 
-            var projected = customers.ProjectTo<CustomerDto>();
+            var projected = customers.ProjectTo<CustomerDto>(_builder);
             projected.ShouldNotBeNull();
             Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
         }
@@ -104,15 +108,15 @@
             public int Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap(typeof(Source), typeof(Dest)).ProjectUsing(src => new Dest {Value = 10});
-        }
+            cfg.CreateMap(typeof (Source), typeof (Dest)).ProjectUsing(src => new Dest {Value = 10});
+        });
 
         [Fact]
         public void Should_validate_because_of_overridden_projection()
         {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
         }
     }
 }

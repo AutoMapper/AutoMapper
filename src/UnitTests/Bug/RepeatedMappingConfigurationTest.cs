@@ -2,7 +2,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	public class When_mapping_for_derived_class_is_duplicated : AutoMapperSpecBase
+	public class When_mapping_for_derived_class_is_duplicated : SpecBase
 	{
 		public class ModelObject
 		{

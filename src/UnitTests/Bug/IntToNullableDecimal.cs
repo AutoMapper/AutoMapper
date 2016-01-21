@@ -17,13 +17,10 @@ namespace AutoMapper.UnitTests.Bug
             public decimal? Number { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Destination>();
-            });
-        }
+            cfg.CreateMap<Source, Destination>();
+        });
 
         protected override void Because_of()
         {

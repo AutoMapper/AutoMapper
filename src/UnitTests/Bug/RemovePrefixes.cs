@@ -5,7 +5,7 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class RemovePrefixes : AutoMapperSpecBase
+    public class RemovePrefixes : SpecBase
     {
         MapperConfiguration config;
 

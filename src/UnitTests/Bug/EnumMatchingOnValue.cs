@@ -28,13 +28,11 @@ namespace AutoMapper.UnitTests.Bug
             DifferentNamedEnum = 1,
             SecondNameEnum = 2
         }
-        protected override void Establish_context()
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<FirstClass, SecondClass>();
-            });
-        }
+            cfg.CreateMap<FirstClass, SecondClass>();
+        });
 
         protected override void Because_of()
         {

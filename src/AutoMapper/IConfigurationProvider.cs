@@ -29,6 +29,14 @@ namespace AutoMapper
         TypeMap FindTypeMapFor(TypePair typePair);
 
         /// <summary>
+        /// Find the <see cref="TypeMap"/> for the configured source and destination type
+        /// </summary>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <returns>Type map configuration</returns>
+        TypeMap FindTypeMapFor<TSource, TDestination>();
+
+        /// <summary>
         /// Find the <see cref="TypeMap"/> for the configured source and destination type, checking the source/destination object types too
         /// </summary>
         /// <param name="source">Source object</param>

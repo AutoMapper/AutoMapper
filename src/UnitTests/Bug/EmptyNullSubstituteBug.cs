@@ -3,7 +3,7 @@
     using Should;
     using Xunit;
 
-    public class EmptyNullSubstituteBug : NonValidatingSpecBase
+    public class EmptyNullSubstituteBug : SpecBase
     {
         private Entity _destination;
 

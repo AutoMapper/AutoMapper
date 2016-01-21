@@ -45,16 +45,13 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Destination>();
-                cfg.CreateMap<Source1, Destination1>();
-                cfg.CreateMap<Source2, Destination2>();
-                cfg.ForAllMaps((tm, map) => map.ForMember("Number", o => o.ResolveUsing<MinusOneResolver>()));
-            });
-        }
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<Source1, Destination1>();
+            cfg.CreateMap<Source2, Destination2>();
+            cfg.ForAllMaps((tm, map) => map.ForMember("Number", o => o.ResolveUsing<MinusOneResolver>()));
+        });
 
         protected override void Because_of()
         {

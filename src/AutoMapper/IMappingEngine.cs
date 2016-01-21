@@ -166,7 +166,6 @@ namespace AutoMapper
         object Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts);
 
-        Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
 
         /// <summary>
         /// Configuration provider for performaing maps

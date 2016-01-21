@@ -6,9 +6,9 @@ namespace AutoMapper.QueryableExtensions.Impl
 
     internal static class QueryMapperHelper
     {
-        public static PropertyMap GetPropertyMap(this IMapper mapper, MemberInfo sourceMemberInfo, Type destinationMemberType)
+        public static PropertyMap GetPropertyMap(this IConfigurationProvider config, MemberInfo sourceMemberInfo, Type destinationMemberType)
         {
-            var typeMap = mapper.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
+            var typeMap = config.CheckIfMapExists(sourceMemberInfo.DeclaringType, destinationMemberType);
 
             var propertyMap = typeMap.GetPropertyMaps()
                 .FirstOrDefault(pm => pm.CanResolveValue() &&
@@ -22,9 +22,9 @@ namespace AutoMapper.QueryableExtensions.Impl
             return propertyMap;
         }
 
-        public static TypeMap CheckIfMapExists(this IMapper mapper, Type sourceType, Type destinationType)
+        public static TypeMap CheckIfMapExists(this IConfigurationProvider config, Type sourceType, Type destinationType)
         {
-            var typeMap = mapper.ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
+            var typeMap = config.FindTypeMapFor(sourceType, destinationType);
             if(typeMap == null)
             {
                 throw MissingMapException(sourceType, destinationType);

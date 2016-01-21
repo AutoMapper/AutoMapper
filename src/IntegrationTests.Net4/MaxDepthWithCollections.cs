@@ -13,21 +13,18 @@ namespace AutoMapper.IntegrationTests.Net4
     {
         TrainingCourseDto _course;
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg => 
-            {
-                //cfg.AllowNullDestinationValues = false;
-                cfg.CreateMap<TrainingCourse, TrainingCourseDto>().MaxDepth(1);
-                cfg.CreateMap<TrainingContent, TrainingContentDto>();
-            });
-        }
+            //cfg.AllowNullDestinationValues = false;
+            cfg.CreateMap<TrainingCourse, TrainingCourseDto>().MaxDepth(1);
+            cfg.CreateMap<TrainingContent, TrainingContentDto>();
+        });
 
         protected override void Because_of()
         {
             using(var context = new ClientContext())
             {
-                _course = context.TrainingCourses.ProjectTo<TrainingCourseDto>().FirstOrDefault(n => n.CourseName == "Course 1");
+                _course = context.TrainingCourses.ProjectTo<TrainingCourseDto>(ExpressionBuilder).FirstOrDefault(n => n.CourseName == "Course 1");
             }
         }
 

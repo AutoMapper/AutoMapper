@@ -5,7 +5,7 @@ namespace AutoMapper.UnitTests.Bug
 {
     namespace DestinationCtorCalledTwice
     {
-        public class Bug : AutoMapperSpecBase
+        public class Bug
         {
             public class Source
             {

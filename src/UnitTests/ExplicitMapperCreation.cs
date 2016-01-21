@@ -3,7 +3,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    public class ExplicitMapperCreation : NonValidatingSpecBase
+    public class ExplicitMapperCreation : SpecBase
     {
         private IMapper _mapper;
         private MapperConfiguration _config;

@@ -1,11 +1,7 @@
 namespace AutoMapper
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using System.Reflection;
     using Mappers;
-    using QueryableExtensions;
 
     /// <summary>
     /// Main entry point for AutoMapper, for both creating maps and performing maps.
@@ -416,6 +412,7 @@ namespace AutoMapper
         [Obsolete("Use a mapper instance instead")]
         public static IMappingEngine Engine => _mappingEngine.Value._engine;
         private static IMapper Instance => _mappingEngine.Value;
+        private static IConfigurationProvider ConfigurationProvider => _configuration.Value;
         private static IDynamicMapper DynamicInstance => _mappingEngine.Value;
 
         /// <summary>
@@ -424,7 +421,6 @@ namespace AutoMapper
         [Obsolete("Use a mapper instance instead")]
         public static IConfiguration Configuration => (IConfiguration) ConfigurationProvider;
 
-        private static IConfigurationProvider ConfigurationProvider => _configuration.Value;
 
         /// <summary>
         /// Globally ignore all members starting with a prefix
@@ -440,7 +436,6 @@ namespace AutoMapper
 
         private readonly IMappingEngine _engine;
         private readonly IConfigurationProvider _configurationProvider;
-        private readonly ExpressionBuilder _expressionBuilder;
         private readonly Func<Type, object> _serviceCtor;
 
         internal Mapper(IConfigurationProvider configurationProvider)
@@ -453,7 +448,6 @@ namespace AutoMapper
             _configurationProvider = configurationProvider;
             _serviceCtor = serviceCtor;
             _engine = new MappingEngine(configurationProvider);
-            _expressionBuilder = new ExpressionBuilder(configurationProvider);
         }
 
         TDestination IMapper.Map<TDestination>(object source)
@@ -583,9 +577,6 @@ namespace AutoMapper
 
             _engine.Map(context);
         }
-
-        Expression IMapper.CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
-            => _expressionBuilder.CreateMapExpression(sourceType, destinationType, parameters, membersToExpand);
 
         private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
         {

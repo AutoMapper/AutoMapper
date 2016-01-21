@@ -46,21 +46,25 @@
             [Fact]
             public void Should_not_throw_exception()
             {
-                Mapper.CreateMap<BEntity, B>();
-                Mapper.CreateMap<AEntity, A>();
-                Mapper.AssertConfigurationIsValid();
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<BEntity, B>();
+                    cfg.CreateMap<AEntity, A>();
+                });
+                var builder = config.CreateExpressionBuilder();
+                config.AssertConfigurationIsValid();
 
                 var be = new BEntity();
                 be.BP1 = 3;
                 be.BP2.Add(new AEntity() { AP1 = 1, AP2 = "hello" });
                 be.BP2.Add(new AEntity() { AP1 = 2, AP2 = "two" });
 
-                var b = Mapper.Map<BEntity, B>(be);
+                var b = config.CreateMapper().Map<BEntity, B>(be);
 
                 var belist = new List<BEntity>();
                 belist.Add(be);
                 IQueryable<BEntity> bei = belist.AsQueryable();
-                typeof(Exception).ShouldNotBeThrownBy(() => bei.ProjectTo<B>());
+                typeof(Exception).ShouldNotBeThrownBy(() => bei.ProjectTo<B>(builder));
             }
         }
     }

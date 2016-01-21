@@ -1,5 +1,4 @@
-﻿using AutoMapper.Mappers;
-using Should;
+﻿using Should;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -28,11 +27,11 @@ namespace AutoMapper.UnitTests.Bug
             public InnerDTO Inner { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Inner, InnerDTO>();
-            Mapper.CreateMap<Outer, OuterDTO>();
-        }
+            cfg.CreateMap<Inner, InnerDTO>();
+            cfg.CreateMap<Outer, OuterDTO>();
+        });
 
         protected override void Because_of()
         {

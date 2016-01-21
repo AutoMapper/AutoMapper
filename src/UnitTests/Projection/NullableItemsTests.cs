@@ -12,9 +12,12 @@ namespace AutoMapper.UnitTests.Projection
 
         public class NullChildItemTest
         {
+            private IExpressionBuilder _builder;
+
             public NullChildItemTest()
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>());
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Parent, ParentDto>());
+                _builder = config.CreateExpressionBuilder();
             }
 
             [Fact]
@@ -28,7 +31,7 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var projected = items.AsQueryable().ProjectTo<ParentDto>().ToList();
+                var projected = items.AsQueryable().ProjectTo<ParentDto>(_builder).ToList();
 
                 projected[0].Value.ShouldEqual(5);
                 projected[0].ChildValue.ShouldBeNull();
@@ -65,6 +68,8 @@ namespace AutoMapper.UnitTests.Projection
 
         public class CustomMapFromTest
         {
+            private IExpressionBuilder _builder;
+
             public class Parent
             {
                 public int Value { get; set; }
@@ -78,8 +83,9 @@ namespace AutoMapper.UnitTests.Projection
             }
             public CustomMapFromTest()
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>()
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Parent, ParentDto>()
                     .ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.UtcNow)));
+                _builder = config.CreateExpressionBuilder();
             }
 
             [Fact]
@@ -93,9 +99,9 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var projected = items.AsQueryable().ProjectTo<ParentDto>().ToList();
+                var projected = items.AsQueryable().ProjectTo<ParentDto>(_builder).ToList();
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().ProjectTo<ParentDto>().ToList());
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().ProjectTo<ParentDto>(_builder).ToList());
                 Assert.NotNull(projected[0].Date);
             }
         }
