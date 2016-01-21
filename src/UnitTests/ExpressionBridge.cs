@@ -95,7 +95,7 @@ namespace AutoMapper.UnitTests
         {
             public int BillOfMaterialsID { set; get; }
         }
-        public class When_mapping_using_expressions : NonValidatingSpecBase
+        public class When_mapping_using_expressions : SpecBase
         {
             private List<Product> _products;
             private Expression<Func<Product, SimpleProductDto>> _simpleProductConversionLinq;
@@ -103,10 +103,11 @@ namespace AutoMapper.UnitTests
             private Expression<Func<Product, AbstractProductDto>> _abstractProductConversionLinq;
             private List<SimpleProductDto> _simpleProducts;
             private List<ExtendedProductDto> _extendedProducts;
+            private IExpressionBuilder _builder;
 
             protected override void Establish_context()
             {
-                Mapper.Initialize(cfg =>
+                var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Product, SimpleProductDto>()
                         .ForMember(m => m.CategoryName, dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name));
@@ -122,10 +123,11 @@ namespace AutoMapper.UnitTests
                         //.ConvertUsing(x => ProductTypeDto.GetProdType(x));
                         .ConvertUsing<ProductTypeConverter>();
                 });
+                _builder = config.CreateExpressionBuilder();
 
-                _simpleProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, SimpleProductDto>();
-                _extendedProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, ExtendedProductDto>();
-                _abstractProductConversionLinq = Mapper.Engine.CreateMapExpression<Product, AbstractProductDto>();
+                _simpleProductConversionLinq = _builder.CreateMapExpression<Product, SimpleProductDto>();
+                _extendedProductConversionLinq = _builder.CreateMapExpression<Product, ExtendedProductDto>();
+                _abstractProductConversionLinq = _builder.CreateMapExpression<Product, AbstractProductDto>();
 
                 _products = new List<Product>()
                 {
@@ -193,14 +195,14 @@ namespace AutoMapper.UnitTests
                 
                 var queryable = _products.AsQueryable();
 
-                var simpleProducts = queryable.ProjectTo<SimpleProductDto>().ToList();
+                var simpleProducts = queryable.ProjectTo<SimpleProductDto>(_builder).ToList();
 
                 simpleProducts.Count.ShouldEqual(1);
                 simpleProducts[0].Name.ShouldEqual("Foo");
                 simpleProducts[0].ProductSubcategoryName.ShouldEqual("Bar");
                 simpleProducts[0].CategoryName.ShouldEqual("Baz");
 
-                var extendedProducts = queryable.ProjectTo<ExtendedProductDto>().ToList();
+                var extendedProducts = queryable.ProjectTo<ExtendedProductDto>(_builder).ToList();
 
                 extendedProducts.Count.ShouldEqual(1);
                 extendedProducts[0].Name.ShouldEqual("Foo");
@@ -209,7 +211,7 @@ namespace AutoMapper.UnitTests
                 extendedProducts[0].BOM.Count.ShouldEqual(1);
                 extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldEqual(5);
 
-                var complexProducts = queryable.ProjectTo<ComplexProductDto>().ToList();
+                var complexProducts = queryable.ProjectTo<ComplexProductDto>(_builder).ToList();
 
                 complexProducts.Count.ShouldEqual(1);
                 complexProducts[0].Name.ShouldEqual("Foo");
@@ -225,7 +227,7 @@ namespace AutoMapper.UnitTests
 
                 var queryable = _products.AsQueryable();
 
-                var abstractProducts = queryable.ProjectTo<AbstractProductDto>().ToList();
+                var abstractProducts = queryable.ProjectTo<AbstractProductDto>(_builder).ToList();
 
                 abstractProducts[0].Types.Count.ShouldEqual(3);
                 abstractProducts[0].Types[0].GetType().ShouldEqual(typeof (ProdTypeA));
@@ -278,11 +280,11 @@ namespace AutoMapper.UnitTests
             {
                 private IQueryable<BEntity> _bei;
 
-                protected override void Establish_context()
+                protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
                 {
-                    Mapper.CreateMap<BEntity, B>().MaxDepth(3);
-                    Mapper.CreateMap<AEntity, A>().MaxDepth(3);
-                }
+                    cfg.CreateMap<BEntity, B>().MaxDepth(3);
+                    cfg.CreateMap<AEntity, A>().MaxDepth(3);
+                });
 
                 protected override void Because_of()
                 {
@@ -299,7 +301,7 @@ namespace AutoMapper.UnitTests
                 [Fact]
                 public void Should_not_throw_exception()
                 {
-                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>());
+                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>(ExpressionBuilder));
                 }
             }
         }

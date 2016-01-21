@@ -20,14 +20,12 @@ namespace AutoMapper.UnitTests.Bug
             public DateTime Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(c=>
-            {
-                c.CreateMap<Source, Destination>();
-                c.CreateMap<DateTime, DateTime?>().ConvertUsing(source => source == new DateTime(1900, 1, 1) ? (DateTime?)null : source);
-            });
-        }
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<DateTime, DateTime?>()
+                .ConvertUsing(source => source == new DateTime(1900, 1, 1) ? (DateTime?) null : source);
+        });
 
         protected override void Because_of()
         {

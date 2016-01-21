@@ -11,11 +11,14 @@
 
         public class NestedExpressionMapFromTests
         {
+            private IExpressionBuilder _builder;
+
             public NestedExpressionMapFromTests()
             {
-                Mapper.Initialize(cfg => 
+                var config = new MapperConfiguration(cfg => 
                     cfg.CreateMap<Parent, ParentDto>()
                     .ForMember(dest => dest.TotalSum, opt => opt.MapFrom(p => p.Children.Sum(child => child.Value))));
+                _builder = config.CreateExpressionBuilder();
             }
 
             [Fact]
@@ -33,7 +36,7 @@
                     }
                 };
 
-                var projected = items.AsQueryable().ProjectTo<ParentDto>().ToList();
+                var projected = items.AsQueryable().ProjectTo<ParentDto>(_builder).ToList();
 
                 projected[0].TotalSum.ShouldEqual(9);
             }

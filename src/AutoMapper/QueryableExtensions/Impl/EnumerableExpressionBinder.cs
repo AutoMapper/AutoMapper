@@ -16,14 +16,12 @@ namespace AutoMapper.QueryableExtensions.Impl
                    propertyMap.DestinationPropertyType != typeof (string);
         }
 
-        public MemberAssignment Build(IMappingEngine mappingEngine, PropertyMap propertyMap, TypeMap propertyTypeMap,
-            ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public MemberAssignment Build(ExpressionBuilder builder, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
-            return BindEnumerableExpression(mappingEngine, propertyMap, request, result, typePairCount);
+            return BindEnumerableExpression(builder, propertyMap, request, result, typePairCount);
         }
 
-        private static MemberAssignment BindEnumerableExpression(IMappingEngine mappingEngine, PropertyMap propertyMap,
-            ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        private static MemberAssignment BindEnumerableExpression(ExpressionBuilder builder, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
             MemberAssignment bindExpression;
             Type destinationListType = GetDestinationListTypeFor(propertyMap);
@@ -34,7 +32,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             var selectExpression = result.ResolutionExpression;
             if (sourceListType != destinationListType)
             {
-                var transformedExpression = mappingEngine.CreateMapExpression(listTypePair, typePairCount);
+                var transformedExpression = builder.CreateMapExpression(listTypePair, typePairCount);
                 if(transformedExpression == null)
                 {
                     return null;

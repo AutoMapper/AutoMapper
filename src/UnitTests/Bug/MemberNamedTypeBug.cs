@@ -5,7 +5,7 @@ namespace AutoMapper.UnitTests.Bug
     using System;
     using Should;
 
-    public class CorrectCtorIsPickedOnDestinationType : AutoMapperSpecBase
+    public class CorrectCtorIsPickedOnDestinationType : SpecBase
     {
         public class SourceClass { }
 
@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.Map<DestinationClass>(source);
         }
     }
-    public class MemberNamedTypeWrong : AutoMapperSpecBase
+    public class MemberNamedTypeWrong : SpecBase
     {
         public class SourceClass
         {

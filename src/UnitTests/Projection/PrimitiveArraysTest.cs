@@ -15,15 +15,19 @@ namespace AutoMapper.UnitTests.Projection
             [Fact]
             public void Should_not_fail()
             {
-                Mapper.CreateMap<Source, Destination>();
+                var config = new MapperConfiguration();
+                config.CreateMap<Source, Destination>();
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => Mapper.Engine.CreateMapExpression<Source, Destination>());
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.CreateExpressionBuilder().CreateMapExpression<Source, Destination>());
             }
 
             [Fact]
             public void Should_map_values()
             {
-                Mapper.CreateMap<Source, Destination>();
+                var config = new MapperConfiguration();
+                config.CreateMap<Source, Destination>();
+
+                var builder = config.CreateExpressionBuilder();
 
                 var sources = new List<Source>
                 {
@@ -34,7 +38,7 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var expr = sources.AsQueryable().ProjectTo<Destination>();
+                var expr = sources.AsQueryable().ProjectTo<Destination>(builder);
 
                 var result = expr.ToList();
 

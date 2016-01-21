@@ -36,7 +36,7 @@ namespace AutoMapper.Internal
 
         public IConditionalObjectMapper AddConditionalObjectMapper()
         {
-            var condition = new ConditionalObjectMapper(ConfigurationStore.DefaultProfileName);
+            var condition = new ConditionalObjectMapper(MapperConfiguration.DefaultProfileName);
             _typeConfigurations.Add(condition);
             return condition;
         }

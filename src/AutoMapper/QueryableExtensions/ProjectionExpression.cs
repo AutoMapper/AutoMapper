@@ -15,12 +15,12 @@ namespace AutoMapper.QueryableExtensions
         private static readonly MethodInfo QueryableSelectMethod = FindQueryableSelectMethod();
 
         private readonly IQueryable _source;
-        private readonly IMappingEngine _mappingEngine;
+        private readonly IExpressionBuilder _builder;
 
-        public ProjectionExpression(IQueryable source, IMappingEngine mappingEngine)
+        public ProjectionExpression(IQueryable source, IExpressionBuilder builder)
         {
             _source = source;
-            _mappingEngine = mappingEngine;
+            _builder = builder;
         }
 
         private static MethodInfo FindQueryableSelectMethod()
@@ -89,7 +89,7 @@ namespace AutoMapper.QueryableExtensions
         {
             var membersToExpand = memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
 
-            var mapExpression = _mappingEngine.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
+            var mapExpression = _builder.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
 
             return _source.Provider.CreateQuery<TResult>(
                 Expression.Call(

@@ -3,7 +3,7 @@
     using Should;
     using Xunit;
 
-    public class ProxyClassWithInheritance : AutoMapperSpecBase
+    public class ProxyClassWithInheritance : SpecBase
     {
         public class Duck : Animal { }
         public class DuckDto : AnimalDto { } 

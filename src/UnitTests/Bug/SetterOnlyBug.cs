@@ -7,12 +7,12 @@
 
         public class MappingTests : AutoMapperSpecBase
         {
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper
+                cfg
                     .CreateMap<Source, Desitination>()
                     .ForMember("Property", o => o.Ignore());
-            }
+            });
 
             [Fact]
             public void TestMapping()

@@ -6,20 +6,13 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
 {
     using Bug;
 
-    public class When_configuring_before_and_after_methods : AutoMapperSpecBase
+    public class When_configuring_before_and_after_methods
     {
-        private Source _src;
-
         public class Source
         {
         }
         public class Destination
         {
-        }
-
-        protected override void Establish_context()
-        {
-            _src = new Source();
         }
 
         [Fact]
@@ -32,7 +25,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
                 .BeforeMap((src, dest) => beforeMapCalled = true)
                 .AfterMap((src, dest) => afterMapCalled = true);
 
-            Mapper.Map<Source, Destination>(_src);
+            Mapper.Map<Source, Destination>(new Source());
 
             beforeMapCalled.ShouldBeTrue();
             afterMapCalled.ShouldBeTrue();
@@ -40,20 +33,13 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
 
     }
 
-    public class When_configuring_before_and_after_methods_multiple_times : AutoMapperSpecBase
+    public class When_configuring_before_and_after_methods_multiple_times
     {
-        private Source _src;
-
         public class Source
         {
         }
         public class Destination
         {
-        }
-
-        protected override void Establish_context()
-        {
-            _src = new Source();
         }
 
         [Fact]
@@ -68,7 +54,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
                 .AfterMap((src, dest) => afterMapCount++)
                 .AfterMap((src, dest) => afterMapCount++);
 
-            Mapper.Map<Source, Destination>(_src);
+            Mapper.Map<Source, Destination>(new Source());
 
             beforeMapCount.ShouldEqual(2);
             afterMapCount.ShouldEqual(2);
@@ -120,14 +106,14 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
 			}
 		}
 
-		protected override void Establish_context()
-		{
-			Mapper.Initialize(i => i.ConstructServicesUsing(t => Activator.CreateInstance(t, 2)));
+	    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	    {
+	        cfg.ConstructServicesUsing(t => Activator.CreateInstance(t, 2));
 
-			Mapper.CreateMap<Source, Destination>()
-				.BeforeMap<BeforeMapAction>()
-				.AfterMap<AfterMapAction>();
-		}
+	        cfg.CreateMap<Source, Destination>()
+	            .BeforeMap<BeforeMapAction>()
+	            .AfterMap<AfterMapAction>();
+	    });
 
 		protected override void Because_of()
 		{
@@ -156,11 +142,11 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
         }
 
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Dest>()
+            cfg.CreateMap<Source, Dest>()
                 .BeforeMap((src, dest) => src.Value += 10);
-        }
+        });
 
         protected override void Because_of()
         {
@@ -192,11 +178,11 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
         }
 
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Dest>()
+            cfg.CreateMap<Source, Dest>()
                 .AfterMap((src, dest) => dest.Value += 10);
-        }
+        });
 
         protected override void Because_of()
         {

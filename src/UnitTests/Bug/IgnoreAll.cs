@@ -53,13 +53,11 @@ namespace AutoMapper.UnitTests.Bug
             public string Unmapped { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-                cfg.CreateMap<Source, Dest>()
-                    .ForAllMembers(opt => opt.Condition(c => !c.IsSourceValueNull))
-            );
-        }
+            cfg.CreateMap<Source, Dest>()
+                .ForAllMembers(opt => opt.Condition(c => !c.IsSourceValueNull));
+        });
 
         protected override void Because_of()
         {

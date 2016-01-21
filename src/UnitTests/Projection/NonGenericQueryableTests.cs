@@ -8,10 +8,14 @@
 
     public class NonGenericQueryableTests
     {
+        private IExpressionBuilder _builder;
+
         public NonGenericQueryableTests()
         {
-            Mapper.CreateMap<Movie, MovieDto>();
-            Mapper.CreateMap<Actor, ActorDto>();
+            var config = new MapperConfiguration();
+            config.CreateMap<Movie, MovieDto>();
+            config.CreateMap<Actor, ActorDto>();
+            _builder = config.CreateExpressionBuilder();
         }
 
         [Fact]
@@ -23,7 +27,7 @@
                 new Movie() { Actors = new Actor[] { new Actor() { Name = "Actor 3" }, new Actor() { Name = "Actor 4" } } }
                 }.AsQueryable();
 
-            var mapped = movies.ProjectTo<MovieDto>();
+            var mapped = movies.ProjectTo<MovieDto>(_builder);
 
             mapped.ElementAt(0).Actors.Length.ShouldEqual(2);
             mapped.ElementAt(1).Actors[1].Name.ShouldEqual("Actor 4");

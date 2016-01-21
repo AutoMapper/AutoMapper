@@ -34,20 +34,17 @@
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.AddProfile<GoodProfile>();
-                cfg.AddProfile<BadProfile>();
-            });
-        }
+            cfg.AddProfile<GoodProfile>();
+            cfg.AddProfile<BadProfile>();
+        });
 
         [Fact]
         public void Should_pass_specific_profile_assertion()
         {
             typeof(AutoMapperConfigurationException)
-                .ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid<GoodProfile>);
+                .ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid<GoodProfile>);
         }
     }
 }

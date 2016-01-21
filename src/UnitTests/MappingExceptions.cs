@@ -18,10 +18,10 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<Source, Dest>();
-            }
+                cfg.CreateMap<Source, Dest>();
+            });
 
             [Fact]
             public void Should_provide_a_contextual_exception()

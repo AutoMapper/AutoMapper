@@ -31,19 +31,19 @@ namespace AutoMapper.UnitTests.Query
             public string[] Strings { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Destination, Source>()
-                       .ForMember(s => s.SrcValue, opt => opt.MapFrom(d => d.DestValue))
-                       .ReverseMap()
-                       .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue));
-        }
+            cfg.CreateMap<Destination, Source>()
+                .ForMember(s => s.SrcValue, opt => opt.MapFrom(d => d.DestValue))
+                .ReverseMap()
+                .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue));
+        });
 
         [Fact]
         public void Shoud_support_const_result()
         {
             IQueryable<Destination> result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>()
               .Where(s => s.DestValue > 6);
 
             result.Count().ShouldEqual(1);
@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_use_destination_elementType()
         {
             IQueryable<Destination> result = _source.AsQueryable()
-                .UseAsDataSource().For<Destination>();
+                .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>();
 
             result.ElementType.ShouldEqual(typeof(Destination));
 
@@ -66,7 +66,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_single_item_result()
         {
             IQueryable<Destination> result = _source.AsQueryable()
-                .UseAsDataSource().For<Destination>();
+                .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>();
 
             result.First(s => s.DestValue > 6).ShouldBeType<Destination>();
         }
@@ -75,7 +75,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_IEnumerable_result()
         {
             IQueryable<Destination> result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>()
               .Where(s => s.DestValue > 6);
 
             List<Destination> list = result.ToList();
@@ -85,7 +85,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_convert_source_item_to_destination()
         {
             IQueryable<Destination> result = _source.AsQueryable()
-                .UseAsDataSource().For<Destination>();
+                .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>();
 
             var destItem = result.First(s => s.DestValue == 7);
             var sourceItem = _source.First(s => s.SrcValue == 7);
@@ -97,7 +97,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_order_by_statement_result()
         {
             IQueryable<Destination> result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>()
               .OrderByDescending(s => s.DestValue);
 
             result.First().DestValue.ShouldEqual(_source.Max(s => s.SrcValue));
@@ -107,7 +107,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_any_stupid_thing_you_can_throw_at_it()
         {
             var result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.DestValue);
@@ -119,7 +119,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_string_return_type()
         {
             var result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.StringValue);
@@ -130,7 +130,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_enumerable_return_type()
         {
             var result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
@@ -142,7 +142,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_any_stupid_thing_you_can_throw_at_it_with_annonumus_types()
         {
             var result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(ExpressionBuilder, Mapper).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => new { A = s.DestValue });
@@ -154,12 +154,16 @@ namespace AutoMapper.UnitTests.Query
                         new User { UserId = 2, Account = new Account(){ Id = 4,Things = {new Thing(){Bar = "Bar"}, new Thing(){ Bar ="Bar 2"}}}},
                         new User { UserId = 1, Account = new Account(){ Id = 3,Things = {new Thing(){Bar = "Bar 3"}, new Thing(){ Bar ="Bar 4"}}}},
                     };
+
+        private static IMapper _mapper;
+        private static IExpressionBuilder _builder;
+
         [Fact]
         public void Map_select_method()
         {
             SetupAutoMapper();
             var result = _source2.AsQueryable()
-              .UseAsDataSource().For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
+              .UseAsDataSource(_builder, _mapper).For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
 
             (result.First() as IEnumerable<string>).Last().ShouldEqual("Bar 4");
         }
@@ -169,14 +173,16 @@ namespace AutoMapper.UnitTests.Query
         {
             SetupAutoMapper();
             var result = _source2.AsQueryable()
-              .UseAsDataSource().For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
+              .UseAsDataSource(_builder, _mapper).For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
 
             (result.First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
         }
 
         private static void SetupAutoMapper()
         {
-            Mapper.CreateMap<User, UserModel>()
+            var config = new MapperConfiguration();
+
+            config.CreateMap<User, UserModel>()
             .ForMember(d => d.Id, opt => opt.MapFrom(s => s.UserId))
             .ForMember(d => d.FullName, opt => opt.MapFrom(s => s.Name))
             .ForMember(d => d.LoggedOn, opt => opt.MapFrom(s => s.IsLoggedOn ? "Y" : "N"))
@@ -186,7 +192,7 @@ namespace AutoMapper.UnitTests.Query
             .ForMember(d => d.IsActive, opt => opt.MapFrom(s => s.Active))
             .ForMember(d => d.AccountModel, opt => opt.MapFrom(s => s.Account));
 
-            Mapper.CreateMap<UserModel, User>()
+            config.CreateMap<UserModel, User>()
                 .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
                 .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName))
                 .ForMember(d => d.IsLoggedOn, opt => opt.MapFrom(s => s.LoggedOn.ToUpper() == "Y"))
@@ -194,23 +200,26 @@ namespace AutoMapper.UnitTests.Query
                 .ForMember(d => d.Active, opt => opt.MapFrom(s => s.IsActive))
                 .ForMember(d => d.Account, opt => opt.MapFrom(s => s.AccountModel));
 
-            Mapper.CreateMap<Account, AccountModel>()
+            config.CreateMap<Account, AccountModel>()
                 .ForMember(d => d.Bal, opt => opt.MapFrom(s => s.Balance))
                 .ForMember(d => d.DateCreated, opt => opt.MapFrom(s => s.CreateDate))
                 .ForMember(d => d.ComboName, opt => opt.MapFrom(s => string.Concat(s.FirstName, " ", s.LastName)))
                 .ForMember(d => d.ThingModels, opt => opt.MapFrom(s => s.Things));
 
-            Mapper.CreateMap<AccountModel, Account>()
+            config.CreateMap<AccountModel, Account>()
                 .ForMember(d => d.Balance, opt => opt.MapFrom(s => s.Bal))
                 .ForMember(d => d.Things, opt => opt.MapFrom(s => s.ThingModels));
 
-            Mapper.CreateMap<Thing, ThingModel>()
+            config.CreateMap<Thing, ThingModel>()
                 .ForMember(d => d.FooModel, opt => opt.MapFrom(s => s.Foo))
                 .ForMember(d => d.BarModel, opt => opt.MapFrom(s => s.Bar));
 
-            Mapper.CreateMap<ThingModel, Thing>()
+            config.CreateMap<ThingModel, Thing>()
                 .ForMember(d => d.Foo, opt => opt.MapFrom(s => s.FooModel))
                 .ForMember(d => d.Bar, opt => opt.MapFrom(s => s.BarModel));
+
+            _mapper = config.CreateMapper();
+            _builder = config.CreateExpressionBuilder();
 
             //Mapper.CreateMap<IEnumerable<Thing>, IEnumerable<ThingModel>>();
             //Mapper.CreateMap<IEnumerable<ThingModel>, IEnumerable<Thing>>();

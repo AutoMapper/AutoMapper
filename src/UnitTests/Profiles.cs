@@ -27,17 +27,14 @@ namespace AutoMapper.UnitTests
 				public string Value { get; }
 			}
 
-			protected override void Establish_context()
-			{
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.DisableConstructorMapping();
+	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        {
+	            cfg.DisableConstructorMapping();
 
-                    cfg.CreateProfile("Custom");
+	            cfg.CreateProfile("Custom");
 
-                    cfg.CreateMap<Model, Dto>().WithProfile("Custom");
-                });
-			}
+	            cfg.CreateMap<Model, Dto>().WithProfile("Custom");
+	        });
 
 			protected override void Because_of()
 			{
@@ -90,12 +87,12 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			protected override void Establish_context()
-			{
-			    _customProfile = new CustomProfile1();
-			    Mapper.AddProfile(_customProfile);
-				Mapper.AddProfile<CustomProfile2>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        _customProfile = new CustomProfile1();
+		        cfg.AddProfile(_customProfile);
+		        cfg.AddProfile<CustomProfile2>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -149,10 +146,10 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.AddProfile<AProfile>();
-            }
+                cfg.AddProfile<AProfile>();
+            });
 
             protected override void Because_of()
             {

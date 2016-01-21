@@ -27,10 +27,10 @@ namespace AutoMapper.UnitTests
 				public IEnumerable Values2 { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -74,10 +74,10 @@ namespace AutoMapper.UnitTests
 				public IEnumerable<string> Values2 { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -121,10 +121,10 @@ namespace AutoMapper.UnitTests
 				public ICollection Values2 { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -166,10 +166,10 @@ namespace AutoMapper.UnitTests
 				public ICollection<string> Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -201,10 +201,10 @@ namespace AutoMapper.UnitTests
 				public IList Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -236,10 +236,10 @@ namespace AutoMapper.UnitTests
 				public IList<string> Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -276,10 +276,10 @@ namespace AutoMapper.UnitTests
 				public ValueCollection Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -384,12 +384,12 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
-				Mapper.CreateMap<SourceItem, DestItem>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>()
+		            .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
+		        cfg.CreateMap<SourceItem, DestItem>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -465,14 +465,14 @@ namespace AutoMapper.UnitTests
 			private IEnumerable<string> _strings;
 			private List<string> _mappedStrings;
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(x => x.AllowNullDestinationValues = true);
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.AllowNullDestinationValues = true;
 
-				_strings = new List<string> { FirstString };
+		        _strings = new List<string> {FirstString};
 
-				_mappedStrings = new List<string>();
-			}
+		        _mappedStrings = new List<string>();
+		    });
 
 			protected override void Because_of()
 			{

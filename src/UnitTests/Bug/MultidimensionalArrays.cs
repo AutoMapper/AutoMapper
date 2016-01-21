@@ -28,10 +28,10 @@ namespace AutoMapper.UnitTests.Bug
             public int Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Destination>();
-        }
+            cfg.CreateMap<Source, Destination>();
+        });
 
         protected override void Because_of()
         {
@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 
-    public class FillMultidimensionalArray : AutoMapperSpecBase
+    public class FillMultidimensionalArray : SpecBase
     {
         int[,] _source;
         MultidimensionalArrayFiller _filler;

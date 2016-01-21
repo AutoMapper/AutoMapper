@@ -20,16 +20,16 @@
             public int? Value { get; set; }            
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Dest>().ForMember(m => m.Value, opt => opt.NullSubstitute(5));
-        }
+            cfg.CreateMap<Source, Dest>().ForMember(m => m.Value, opt => opt.NullSubstitute(5));
+        });
 
         protected override void Because_of()
         {
             var source = new[] {new Source()}.AsQueryable();
 
-            _dests = source.ProjectTo<Dest>().ToList();
+            _dests = source.ProjectTo<Dest>(ExpressionBuilder).ToList();
         }
 
         [Fact]
@@ -53,20 +53,20 @@
             public int? ValuePropertyNotMatching { get; set; }            
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Dest>().ForMember(m => m.ValuePropertyNotMatching, opt =>
+            cfg.CreateMap<Source, Dest>().ForMember(m => m.ValuePropertyNotMatching, opt =>
             {
                 opt.MapFrom(src => src.Value);
                 opt.NullSubstitute(5);
             });
-        }
+        });
 
         protected override void Because_of()
         {
             var source = new[] {new Source()}.AsQueryable();
 
-            _dests = source.ProjectTo<Dest>().ToList();
+            _dests = source.ProjectTo<Dest>(ExpressionBuilder).ToList();
         }
 
         [Fact]

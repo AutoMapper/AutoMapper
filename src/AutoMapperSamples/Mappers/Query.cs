@@ -35,7 +35,7 @@ namespace AutoMapperSamples.Mappers
             [Test]
             public void Select_destinations_items_with_query_by_source_items()
             {
-                Mapper.Initialize(cfg =>
+                var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Source, Destination>()
                         .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue));
@@ -45,7 +45,7 @@ namespace AutoMapperSamples.Mappers
                 IQueryable<Destination> detsResult = new Source[0]
                     .AsQueryable()
                     .Where(s => s.SrcValue > 6)
-                    .Map<Source, Destination>(_destinations.AsQueryable());
+                    .Map(_destinations.AsQueryable(), config);
 
                 detsResult.Count().ShouldEqual(1);
                 detsResult.First().GetType().ShouldEqual(typeof(Destination));
@@ -54,7 +54,7 @@ namespace AutoMapperSamples.Mappers
             [Test]
             public void Select_source_items_from_destinations()
             {
-                Mapper.Initialize(cfg =>
+                var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Source, Destination>()
                         .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue))
@@ -64,8 +64,8 @@ namespace AutoMapperSamples.Mappers
                 IQueryable<Source> sourceResult = new Source[0]
                     .AsQueryable()
                     .Where(s => s.SrcValue > 6)
-                    .Map<Source, Destination>(_destinations.AsQueryable())
-                    .ProjectTo<Source>(); // projection added
+                    .Map<Source, Destination>(_destinations.AsQueryable(), config)
+                    .ProjectTo<Source>(config.CreateExpressionBuilder()); // projection added
 
                 sourceResult.Count().ShouldEqual(1);
                 sourceResult.First().GetType().ShouldEqual(typeof(Source));

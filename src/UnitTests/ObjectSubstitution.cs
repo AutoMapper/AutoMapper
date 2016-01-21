@@ -31,18 +31,15 @@
         {
             private AnimalDto _animalDto;
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Animal, AnimalDto>()
-                        .Substitute(CastToEntity)
-                        .Include<Cat, CatDto>()
-                        .Include<Dog, DogDto>();
-                    cfg.CreateMap<Cat, CatDto>();
-                    cfg.CreateMap<Dog, DogDto>();
-                });
-            }
+                cfg.CreateMap<Animal, AnimalDto>()
+                    .Substitute(CastToEntity)
+                    .Include<Cat, CatDto>()
+                    .Include<Dog, DogDto>();
+                cfg.CreateMap<Cat, CatDto>();
+                cfg.CreateMap<Dog, DogDto>();
+            });
 
             protected override void Because_of()
             {

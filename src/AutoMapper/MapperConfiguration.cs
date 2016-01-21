@@ -1,4 +1,3 @@
-
 namespace AutoMapper
 {
     using System;
@@ -6,16 +5,24 @@ namespace AutoMapper
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reflection;
-    using Configuration;
     using Internal;
     using Mappers;
+    using QueryableExtensions;
     using QueryableExtensions.Impl;
 
-    public class ConfigurationStore : IConfigurationProvider
+    [Obsolete("ConfigurationStore is renamed to MapperConfiguration. Use MapperConfiguration instead.")]
+    public class ConfigurationStore : MapperConfiguration
+    {
+        
+    }
+
+    public class MapperConfiguration : IConfigurationProvider, IConfiguration
     {
         private readonly ITypeMapFactory _typeMapFactory;
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly IEnumerable<ITypeMapObjectMapper> _typeMapObjectMappers;
+        private readonly object _padlock = new object();
+        private bool _sealed = false;
         internal const string DefaultProfileName = "";
 
         private readonly ConcurrentDictionary<TypePair, TypeMap> _userDefinedTypeMaps =
@@ -34,16 +41,27 @@ namespace AutoMapper
 
         private readonly List<string> _globalIgnore;
 
-        public ConfigurationStore(ITypeMapFactory typeMapFactory, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
+        public MapperConfiguration(IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
         {
-            _typeMapFactory = typeMapFactory;
+            _typeMapFactory = new TypeMapFactory();
             _mappers = mappers;
             _typeMapObjectMappers = typeMapObjectMappers;
             _globalIgnore = new List<string>();
         }
 
-        public ConfigurationStore() : this(new TypeMapFactory(), MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        public MapperConfiguration() : this(MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
         {
+        }
+
+        public MapperConfiguration(Action<IConfiguration> configure) : this(MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        {
+            configure(this);
+        }
+
+        public MapperConfiguration(Action<IConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers) 
+            : this(mappers, typeMapObjectMappers)
+        {
+            configure(this);
         }
 
         public Func<Type, object> ServiceCtor => _serviceCtor;
@@ -190,31 +208,63 @@ namespace AutoMapper
 
         public void Seal()
         {
-            var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
-            var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
-            foreach (var typeMap in _userDefinedTypeMaps.Select(kv => kv.Value))
+            if (!_sealed)
             {
-                typeMap.Seal();
+                lock (_padlock)
+                {
+                    if (!_sealed)
+                    {
+                        var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
+                        var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
+                        foreach (var typeMap in _userDefinedTypeMaps.Select(kv => kv.Value))
+                        {
+                            typeMap.Seal();
 
-                _typeMapPlanCache.AddOrUpdate(typeMap.Types, typeMap, (_, _2) => typeMap);
-                if (typeMap.DestinationTypeOverride != null)
-                {
-                    redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
+                            _typeMapPlanCache.AddOrUpdate(typeMap.Types, typeMap, (_, _2) => typeMap);
+                            if (typeMap.DestinationTypeOverride != null)
+                            {
+                                redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
+                            }
+                            derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
+                        }
+                        foreach (var redirectedType in redirectedTypes)
+                        {
+                            var derivedMap = FindTypeMapFor(redirectedType.Item2);
+                            if (derivedMap != null)
+                            {
+                                _typeMapPlanCache.AddOrUpdate(redirectedType.Item1, derivedMap, (_, _2) => derivedMap);
+                            }
+                        }
+                        foreach (var derivedMap in derivedMaps)
+                        {
+                            _typeMapPlanCache.GetOrAdd(derivedMap.Item1, _ => derivedMap.Item2);
+                        }
+                        _sealed = true;
+                    }
                 }
-                derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
+                
             }
-            foreach (var redirectedType in redirectedTypes)
-            {
-                var derivedMap = FindTypeMapFor(redirectedType.Item2);
-                if (derivedMap != null)
-                {
-                    _typeMapPlanCache.AddOrUpdate(redirectedType.Item1, derivedMap, (_, _2) => derivedMap);
-                }
-            }
-            foreach (var derivedMap in derivedMaps)
-            {
-                _typeMapPlanCache.GetOrAdd(derivedMap.Item1, _ => derivedMap.Item2);
-            }
+        }
+
+        public IMapper CreateMapper()
+        {
+            Seal();
+
+            return new Mapper(this);
+        }
+
+        public IMapper CreateMapper(Func<Type, object> serviceCtor)
+        {
+            Seal();
+
+            return new Mapper(this, serviceCtor);
+        }
+
+        public IExpressionBuilder CreateExpressionBuilder()
+        {
+            Seal();
+
+            return new ExpressionBuilder(this);
         }
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
@@ -363,6 +413,13 @@ namespace AutoMapper
         public TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
         {
             var typePair = new TypePair(sourceType, destinationType);
+
+            return FindTypeMapFor(typePair);
+        }
+
+        public TypeMap FindTypeMapFor<TSource, TDestination>()
+        {
+            var typePair = new TypePair(typeof(TSource), typeof(TDestination));
 
             return FindTypeMapFor(typePair);
         }
@@ -573,6 +630,7 @@ namespace AutoMapper
 
             var typeMapsChecked = new List<TypeMap>();
             var configExceptions = new List<Exception>();
+            var engine = new MappingEngine(this, CreateMapper());
 
             foreach (var typeMap in maps)
             {
@@ -580,7 +638,7 @@ namespace AutoMapper
                 {
                     DryRunTypeMap(typeMapsChecked,
                         new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType,
-                            new MappingOperationOptions(), Mapper.Engine));
+                            new MappingOperationOptions(), engine));
                 }
                 catch (Exception e)
                 {

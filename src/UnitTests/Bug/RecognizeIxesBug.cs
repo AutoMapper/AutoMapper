@@ -10,14 +10,11 @@ namespace AutoMapper.UnitTests.Bug
             private Stuff _source;
             private StuffView _dest;
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.RecognizeDestinationPostfixes("CodeKey", "Key");
-                    cfg.CreateMap<Stuff, StuffView>();
-                });
-            }
+                cfg.RecognizeDestinationPostfixes("CodeKey", "Key");
+                cfg.CreateMap<Stuff, StuffView>();
+            });
 
             protected override void Because_of()
             {

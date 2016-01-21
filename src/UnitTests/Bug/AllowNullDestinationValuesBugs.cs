@@ -24,16 +24,13 @@ namespace AutoMapper.UnitTests.Bug
                 public string Name { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(config =>
             {
-                Mapper.Initialize(config =>
-                {
-                    config.AllowNullDestinationValues = false;
-                    config.CreateMap<Inner, Inner>();
-                    config.CreateMap<Source, Destination>()
-                        .ForMember(dest => dest.SomeOtherProperty, opt => opt.MapFrom(src => src.Property));
-                });
-            }
+                config.AllowNullDestinationValues = false;
+                config.CreateMap<Inner, Inner>();
+                config.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.SomeOtherProperty, opt => opt.MapFrom(src => src.Property));
+            });
 
             protected override void Because_of()
             {

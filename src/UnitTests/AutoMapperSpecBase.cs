@@ -5,22 +5,29 @@ using Rhino.Mocks;
 
 namespace AutoMapper.UnitTests
 {
-    public class AutoMapperSpecBase : NonValidatingSpecBase
+    using QueryableExtensions;
+
+    public abstract class AutoMapperSpecBase : NonValidatingSpecBase
     {
         [Fact]
         public void Should_have_valid_configuration()
         {
-            Mapper.AssertConfigurationIsValid();
+            Configuration.AssertConfigurationIsValid();
         }
+
     }
 
-    public class NonValidatingSpecBase : SpecBase
+    public abstract class NonValidatingSpecBase : SpecBase
     {
+        protected abstract MapperConfiguration Configuration { get; }
+        protected IConfigurationProvider ConfigProvider => Configuration;
+        protected IMapper Mapper => Configuration.CreateMapper();
+        protected IExpressionBuilder ExpressionBuilder => Configuration.CreateExpressionBuilder();
+
         protected override void Cleanup()
         {
-            Mapper.Reset();
+            AutoMapper.Mapper.Reset();
         }
-
     }
 
     public abstract class SpecBaseBase
@@ -47,6 +54,7 @@ namespace AutoMapper.UnitTests
         protected virtual void Cleanup()
         {
         }
+
 
         protected TType CreateDependency<TType>()
             where TType : class

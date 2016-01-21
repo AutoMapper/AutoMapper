@@ -8,7 +8,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	public class NonGenericAllMembersNullSubstituteBug : AutoMapperSpecBase
+	public class NonGenericAllMembersNullSubstituteBug : SpecBase
 	{
         public class Source
         {

@@ -289,11 +289,9 @@ namespace AutoMapper
             yield return context;
         }
 
-
-        public static ResolutionContext New<TSource>(TSource sourceValue)
+        public static ResolutionContext New<TSource>(TSource sourceValue, IMappingEngine mappingEngine)
         {
-            return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions(),
-                Mapper.Engine);
+            return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions(), mappingEngine);
         }
 
         internal void BeforeMap(object destination)

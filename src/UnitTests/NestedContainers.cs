@@ -50,15 +50,12 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Dest>()
-                        .ForMember(x => x.Value, opt => opt.ResolveUsing<FooResolver>().FromMember(x => x.Value))
-                        .ForMember(x => x.Value2, opt => opt.ResolveUsing<BarResolver>().FromMember(x => x.Value2));
-                });
-            }
+                cfg.CreateMap<Source, Dest>()
+                    .ForMember(x => x.Value, opt => opt.ResolveUsing<FooResolver>().FromMember(x => x.Value))
+                    .ForMember(x => x.Value2, opt => opt.ResolveUsing<BarResolver>().FromMember(x => x.Value2));
+            });
 
             protected override void Because_of()
             {
@@ -119,14 +116,11 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Dest>()
-                        .ConvertUsing<FooTypeConverter>();
-                });
-            }
+                cfg.CreateMap<Source, Dest>()
+                    .ConvertUsing<FooTypeConverter>();
+            });
 
             protected override void Because_of()
             {

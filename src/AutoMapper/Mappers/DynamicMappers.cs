@@ -28,7 +28,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = ReflectionHelper.Map(member, sourceMemberValue);
+                var destinationMemberValue = ReflectionHelper.Map(context, member, sourceMemberValue);
                 SetDestinationMember(member, destination, destinationMemberValue);
             }
             return destination;

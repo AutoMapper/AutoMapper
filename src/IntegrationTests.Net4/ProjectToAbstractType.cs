@@ -52,21 +52,18 @@ namespace AutoMapper.IntegrationTests.Net4
             public DbSet<DbEntityA> EntityA { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(c =>
-            {
-                c.CreateMap<DbEntityA, ITypeA>().As<ConcreteTypeA>();
-                c.CreateMap<DbEntityA, ConcreteTypeA>();
-            });
-        }
+            cfg.CreateMap<DbEntityA, ITypeA>().As<ConcreteTypeA>();
+            cfg.CreateMap<DbEntityA, ConcreteTypeA>();
+        });
 
         [Fact]
         public void Should_project_to_abstract_type()
         {
             using(var context = new Context())
             {
-                _destinations = context.EntityA.ProjectTo<ITypeA>().ToArray();
+                _destinations = context.EntityA.ProjectTo<ITypeA>(ExpressionBuilder).ToArray();
             }
             _destinations.Length.ShouldEqual(3);
             _destinations[2].Name.ShouldEqual("Bill Gates");

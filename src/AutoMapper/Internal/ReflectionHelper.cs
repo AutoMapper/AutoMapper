@@ -8,12 +8,12 @@ namespace AutoMapper.Internal
     using System.Linq.Expressions;
     using System.Reflection;
 
-    public static class ReflectionHelper
+    internal static class ReflectionHelper
 	{
-        public static object Map(MemberInfo member, object value)
+        public static object Map(ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = member.GetMemberType();
-            return Mapper.Map(value, value?.GetType() ?? memberType, memberType);
+            return context.Engine.Mapper.Map(value, value?.GetType() ?? memberType, memberType);
         }
 
         public static bool IsDynamic(this object obj)

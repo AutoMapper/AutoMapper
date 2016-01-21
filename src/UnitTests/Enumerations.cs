@@ -405,10 +405,10 @@ namespace AutoMapper.Tests
 	}
     public class When_mapping_from_a_null_object_with_a_nullable_enum_as_string : AutoMapperSpecBase
     {
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<SourceClass, DestinationClass>();
-        }
+            cfg.CreateMap<SourceClass, DestinationClass>();
+        });
 
         public enum EnumValues
         {
@@ -458,8 +458,8 @@ namespace AutoMapper.Tests
     }
 
 
-	public class When_mapping_a_flags_enum : AutoMapperSpecBase
-	{
+	public class When_mapping_a_flags_enum : SpecBase
+    {
 		private DestinationFlags _result;
 
 		[Flags]

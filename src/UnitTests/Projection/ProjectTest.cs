@@ -12,10 +12,14 @@ namespace AutoMapper.UnitTests.Projection
 
     public class ProjectTest
 	{
+        private IExpressionBuilder _builder;
+
         public ProjectTest()
         {
-			Mapper.CreateMap<Address, AddressDto>();
-			Mapper.CreateMap<Customer, CustomerDto>();
+            var config = new MapperConfiguration();
+			config.CreateMap<Address, AddressDto>();
+			config.CreateMap<Customer, CustomerDto>();
+            _builder = config.CreateExpressionBuilder();
         }
 
 		[Fact(Skip = "EF doesn't support null values in expressions")]
@@ -23,7 +27,7 @@ namespace AutoMapper.UnitTests.Projection
 		{
 			var customers = new[] { new Customer { FirstName = "Bill", LastName = "White" } }.AsQueryable();
 
-			var projected = customers.ProjectTo<CustomerDto>().SingleOrDefault();
+			var projected = customers.ProjectTo<CustomerDto>(_builder).SingleOrDefault();
 			projected.ShouldNotBeNull();
 			projected.Address.ShouldBeNull();
 		}
@@ -37,7 +41,7 @@ namespace AutoMapper.UnitTests.Projection
 
 			IList<Unmapped> projected = null;
 
-            typeof(InvalidOperationException).ShouldBeThrownBy(() => projected = customers.ProjectTo<Unmapped>().ToList());
+            typeof(InvalidOperationException).ShouldBeThrownBy(() => projected = customers.ProjectTo<Unmapped>(_builder).ToList());
 
 			projected.ShouldBeNull();
 		}

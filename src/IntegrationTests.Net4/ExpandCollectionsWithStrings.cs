@@ -14,22 +14,19 @@ namespace AutoMapper.IntegrationTests.Net4
     {
         TrainingCourseDto _course;
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg => 
-            {
-                cfg.CreateMap<Category, CategoryDto>();
-                cfg.CreateMap<TrainingCourse, TrainingCourseDto>();
-                cfg.CreateMap<TrainingContent, TrainingContentDto>().ForMember(c=>c.Category, o=>o.ExplicitExpansion());
-            });
-        }
+            cfg.CreateMap<Category, CategoryDto>();
+            cfg.CreateMap<TrainingCourse, TrainingCourseDto>();
+            cfg.CreateMap<TrainingContent, TrainingContentDto>().ForMember(c => c.Category, o => o.ExplicitExpansion());
+        });
 
         protected override void Because_of()
         {
             using(var context = new ClientContext())
             {
                 context.Database.Log = s => Trace.WriteLine(s);
-                _course = context.TrainingCourses.ProjectTo<TrainingCourseDto>(null, "Content.Category").FirstOrDefault(n => n.CourseName == "Course 1");
+                _course = context.TrainingCourses.ProjectTo<TrainingCourseDto>(ExpressionBuilder, null, "Content.Category").FirstOrDefault(n => n.CourseName == "Course 1");
             }
         }
 

@@ -4,7 +4,7 @@ using System;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class ReportMissingInclude : NonValidatingSpecBase
+    public class ReportMissingInclude : SpecBase
     {
         protected override void Because_of()
         {

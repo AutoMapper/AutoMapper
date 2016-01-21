@@ -8,7 +8,7 @@ using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	public class SequenceContainsNoElementsTest : AutoMapperSpecBase
+	public class SequenceContainsNoElementsTest : SpecBase
 	{
         public SequenceContainsNoElementsTest()
         {

@@ -54,20 +54,17 @@ namespace AutoMapper.UnitTests
             }
 
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<ModelObject, ModelDto>();
-                    cfg.CreateMap<ModelObject2, ModelDto2>();
-                    cfg.CreateMap<ModelObject3, ModelDto3>(MemberList.Source);
-                });
-            }
+                cfg.CreateMap<ModelObject, ModelDto>();
+                cfg.CreateMap<ModelObject2, ModelDto2>();
+                cfg.CreateMap<ModelObject3, ModelDto3>(MemberList.Source);
+            });
 
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
         }
 
@@ -85,19 +82,16 @@ namespace AutoMapper.UnitTests
                 public string Bar { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<ModelObject, ModelDto>()
+                cfg.CreateMap<ModelObject, ModelDto>()
                     .ForMember(dto => dto.Bar, opt => opt.MapFrom(m => m.Barr));
-                });
-            }
+            });
 
             [Fact]
             public void Should_pass_an_inspection_of_missing_mappings()
             {
-                Mapper.AssertConfigurationIsValid();
+                Configuration.AssertConfigurationIsValid();
             }
         }
 
@@ -113,15 +107,15 @@ namespace AutoMapper.UnitTests
                 public Type Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<Source, Destination>();
-            }
+                cfg.CreateMap<Source, Destination>();
+            });
 
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
         }
 
@@ -151,17 +145,17 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<Source, Destination>();
-                Mapper.CreateMap<OtherSource, OtherDest>();
-            }
+                cfg.CreateMap<Source, Destination>();
+                cfg.CreateMap<OtherSource, OtherDest>();
+            });
 
             protected override void Because_of()
             {
                 try
                 {
-                    Mapper.AssertConfigurationIsValid();
+                    Configuration.AssertConfigurationIsValid();
                 }
                 catch (AutoMapperConfigurationException ex)
                 {
@@ -192,17 +186,17 @@ namespace AutoMapper.UnitTests
                 public int Bar { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<ModelObject, ModelDto>()
-                      .ForMember(dest => dest.Bar, opt => opt.Ignore());
-            }
+                cfg.CreateMap<ModelObject, ModelDto>()
+                    .ForMember(dest => dest.Bar, opt => opt.Ignore());
+            });
 
             protected override void Because_of()
             {
                 try
                 {
-                    Mapper.AssertConfigurationIsValid();
+                    Configuration.AssertConfigurationIsValid();
                 }
                 catch (AutoMapperConfigurationException ex)
                 {
@@ -239,15 +233,15 @@ namespace AutoMapper.UnitTests
 
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<Source, Destination>();
-            }
+                cfg.CreateMap<Source, Destination>();
+            });
 
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
         }
 
@@ -273,15 +267,15 @@ namespace AutoMapper.UnitTests
 
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<Source, Destination>();
-            }
+                cfg.CreateMap<Source, Destination>();
+            });
 
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
         }
 
@@ -299,10 +293,10 @@ namespace AutoMapper.UnitTests
                 public int ValuePlusTwo { get { return Value + 2; } }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<Source, Destination>();
-            }
+                cfg.CreateMap<Source, Destination>();
+            });
 
             protected override void Because_of()
             {
@@ -312,7 +306,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_be_valid()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
         }
 
@@ -333,25 +327,22 @@ namespace AutoMapper.UnitTests
                 public int Valufffff { get; set; }
             }
 
-            protected override void Because_of()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
+                cfg.CreateProfile("Good", profile =>
                 {
-                    cfg.CreateProfile("Good", profile =>
-                    {
-                        profile.CreateMap<GoodSource, GoodDest>();
-                    });
-                    cfg.CreateProfile("Bad", profile =>
-                    {
-                        profile.CreateMap<GoodSource, BadDest>();
-                    });
+                    profile.CreateMap<GoodSource, GoodDest>();
                 });
-            }
+                cfg.CreateProfile("Bad", profile =>
+                {
+                    profile.CreateMap<GoodSource, BadDest>();
+                });
+            });
 
             [Fact]
             public void Should_ignore_bad_dtos_in_other_profiles()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid("Good"));
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid("Good"));
             }
         }
 
@@ -373,16 +364,16 @@ namespace AutoMapper.UnitTests
                 public SubBar Bar { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.CreateMap<ModelObject, ModelDto>()
+                cfg.CreateMap<ModelObject, ModelDto>()
                     .ForMember(dest => dest.Bar, opt => opt.MapFrom(src => src.Barr));
-            }
+            });
 
             [Fact]
             public void Should_fail_a_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
         }
 
@@ -394,20 +385,17 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
                 object i = 7;
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Destination>()
-                        .ForMember(dest => dest.Value, opt => opt.UseValue(i));
-                });
-            }
+                cfg.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.Value, opt => opt.UseValue(i));
+            });
 
             [Fact]
             public void Should_validate_successfully()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
         }
 		
@@ -423,15 +411,15 @@ namespace AutoMapper.UnitTests
 				public string Value { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			[Fact]
 			public void Should_fail_a_configuration_check()
 			{
-				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Configuration.AssertConfigurationIsValid);
 			}
 		}
 
@@ -449,34 +437,31 @@ namespace AutoMapper.UnitTests
 				public string Method { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			[Fact]
 			public void Should_fail_a_configuration_check()
 			{
-				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Mapper.AssertConfigurationIsValid);
+				typeof(AutoMapperConfigurationException).ShouldBeThrownBy(Configuration.AssertConfigurationIsValid);
 			}
 		}
 
         public class When_redirecting_types : NonValidatingSpecBase
         {
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<ConcreteSource, ConcreteDest>()
-                        .ForMember(d => d.DifferentName, opt => opt.MapFrom(s => s.Name));
-                    cfg.CreateMap<ConcreteSource, IAbstractDest>().As<ConcreteDest>();
-                });
-            }
+                cfg.CreateMap<ConcreteSource, ConcreteDest>()
+                    .ForMember(d => d.DifferentName, opt => opt.MapFrom(s => s.Name));
+                cfg.CreateMap<ConcreteSource, IAbstractDest>().As<ConcreteDest>();
+            });
 
             [Fact]
             public void Should_pass_configuration_check()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
 
             class ConcreteSource
