@@ -31,12 +31,12 @@ namespace AutoMapper
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, string profileName)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
-            Profile = MapperConfiguration.DefaultProfileName;
+            Profile = profileName;
             ConfiguredMemberList = memberList;
         }
 

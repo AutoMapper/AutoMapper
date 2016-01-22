@@ -64,19 +64,19 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestMethod1()
         {
-            Mapper.Reset();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Order, OrderDto>()
+                    .Include<OnlineOrder, OnlineOrderDto>()
+                    .Include<MailOrder, MailOrderDto>();
+                cfg.CreateMap<OnlineOrder, OnlineOrderDto>();
+                cfg.CreateMap<MailOrder, MailOrderDto>();
+            });
 
-            Mapper.CreateMap<Order, OrderDto>()
-                .Include<OnlineOrder, OnlineOrderDto>()
-                .Include<MailOrder, MailOrderDto>();
-            Mapper.CreateMap<OnlineOrder, OnlineOrderDto>();
-            Mapper.CreateMap<MailOrder, MailOrderDto>();
-            Mapper.Configuration.Seal();
-
-            //Mapper.AssertConfigurationIsValid();
+            var mapper = config.CreateMapper();
 
             var mailOrder = new MailOrder() { NewId = 1 };
-            var mapped = Mapper.Map<OrderDto>(mailOrder);
+            var mapped = mapper.Map<OrderDto>(mailOrder);
 
             mapped.ShouldBeType<MailOrderDto>();
         }

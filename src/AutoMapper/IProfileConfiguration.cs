@@ -36,5 +36,7 @@ namespace AutoMapper
         /// By default only public fields are mapped.
         /// </summary>
         Func<FieldInfo, bool> ShouldMapField { get; }
-    }
+
+        string ProfileName { get; }
+	}
 }

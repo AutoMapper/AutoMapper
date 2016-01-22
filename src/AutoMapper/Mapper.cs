@@ -251,7 +251,7 @@ namespace AutoMapper
 
             action(Configuration);
 
-            Configuration.Seal();
+            ((MapperConfiguration)Configuration).Seal();
         }
 
         /// <summary>

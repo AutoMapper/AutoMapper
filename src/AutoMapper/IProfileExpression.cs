@@ -146,7 +146,7 @@ namespace AutoMapper
         /// <summary>
         /// Create missing type maps during mapping, if necessary
         /// </summary>
-        bool CreateMissingTypeMaps { set; }
+        bool CreateMissingTypeMaps { get; set; }
 
         /// <summary>
         /// Specify common configuration for all type maps.
@@ -156,6 +156,7 @@ namespace AutoMapper
 
         Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
         Func<FieldInfo, bool> ShouldMapField { get; set; }
+        string ProfileName { get; }
         IMemberConfiguration AddMemberConfiguration();
         IConditionalObjectMapper AddConditionalObjectMapper();
         void IncludeSourceExtensionMethods(Assembly assembly);

@@ -14,7 +14,7 @@ namespace AutoMapper
     /// </summary>
     public class Profile : IProfileExpression, IProfileConfiguration
     {
-        private MapperConfiguration _configurator;
+        private IConfiguration _configurator;
         private readonly IConditionalObjectMapper _mapMissingTypes;
 
         public Profile(string profileName)
@@ -165,7 +165,7 @@ namespace AutoMapper
             // override in a derived class for custom configuration behavior
         }
 
-        public void Initialize(MapperConfiguration configurator)
+        public void Initialize(IConfiguration configurator)
         {
             _configurator = configurator;
         }

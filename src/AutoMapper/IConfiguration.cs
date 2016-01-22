@@ -36,10 +36,7 @@ namespace AutoMapper
         /// <param name="constructor">Factory method</param>
         void ConstructServicesUsing(Func<Type, object> constructor);
 
-        /// <summary>
-        /// Seal the configuration and optimize maps
-        /// </summary>
-        [Obsolete("Use a MapperConfiguration instance and call CreateMapper directly.")]
-        void Seal();
+        void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration);
+        IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName);
     }
 }
