@@ -164,7 +164,16 @@ namespace AutoMapper
 
         IMappingExpression IConfiguration.CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
         {
-            var typeMap = CreateTypeMap(new TypePair(sourceType, destinationType), profileName, memberList);
+            var typePair = new TypePair(sourceType, destinationType);
+
+            if (sourceType.IsGenericTypeDefinition() && destinationType.IsGenericTypeDefinition())
+            {
+                var expression = _typeMapExpressionCache.GetOrAdd(typePair, tp => new CreateTypeMapExpression(tp, memberList, profileName));
+
+                return expression;
+            }
+
+            var typeMap = CreateTypeMap(typePair, profileName, memberList);
 
             return CreateMappingExpression(typeMap);
         }
