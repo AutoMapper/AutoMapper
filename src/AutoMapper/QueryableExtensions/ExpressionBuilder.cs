@@ -11,14 +11,14 @@ namespace AutoMapper.QueryableExtensions
 {
     public interface IExpressionBuilder
     {
-        IConfigurationProvider ConfigurationProvider { get; }
         Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
         Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
+        LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
+        Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
     }
 
     public class ExpressionBuilder : IExpressionBuilder
     {
-
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
             new MemberGetterExpressionResultConverter(),
@@ -37,13 +37,12 @@ namespace AutoMapper.QueryableExtensions
         };
 
         private readonly ConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache = new ConcurrentDictionary<ExpressionRequest, LambdaExpression>();
+        private readonly IConfigurationProvider _configurationProvider;
 
         public ExpressionBuilder(IConfigurationProvider configurationProvider)
         {
-            ConfigurationProvider = configurationProvider;
+            _configurationProvider = configurationProvider;
         }
-
-        public IConfigurationProvider ConfigurationProvider { get; }
 
         public Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
         {
@@ -79,7 +78,7 @@ namespace AutoMapper.QueryableExtensions
 
         public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
-            var typeMap = ConfigurationProvider.ResolveTypeMap(request.SourceType,
+            var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType,
                 request.DestinationType);
 
             if (typeMap == null)
@@ -98,7 +97,7 @@ namespace AutoMapper.QueryableExtensions
             var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
             if (visitCount >= typeMap.MaxDepth)
             {
-                if (ConfigurationProvider.AllowNullDestinationValues)
+                if (_configurationProvider.AllowNullDestinationValues)
                 {
                     return null;
                 }
@@ -147,7 +146,7 @@ namespace AutoMapper.QueryableExtensions
                     !request.MembersToExpand.Contains(propertyMap.DestinationProperty.MemberInfo))
                     continue;
 
-                var propertyTypeMap = ConfigurationProvider.ResolveTypeMap(result.Type,
+                var propertyTypeMap = _configurationProvider.ResolveTypeMap(result.Type,
                     propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.MembersToExpand);
 
@@ -161,7 +160,7 @@ namespace AutoMapper.QueryableExtensions
                     throw new AutoMapperMappingException(message);
                 }
 
-                var bindExpression = binder.Build(this, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
+                var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
 
                 if (bindExpression != null)
                 {

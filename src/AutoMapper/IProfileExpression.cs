@@ -2,11 +2,12 @@ namespace AutoMapper
 {
     using System;
     using System.Reflection;
+    using Mappers;
 
     /// <summary>
     /// Configuration for profile-specific maps
     /// </summary>
-    public interface IProfileExpression : IProfileConfiguration
+    public interface IProfileExpression
     {
         /// <summary>
         /// Disable constructor mapping. Use this if you don't intend to have AutoMapper try to map to constructors
@@ -152,5 +153,11 @@ namespace AutoMapper
         /// </summary>
         /// <param name="configuration">configuration callback</param>
         void ForAllMaps(Action<TypeMap, IMappingExpression> configuration);
+
+        Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+        Func<FieldInfo, bool> ShouldMapField { get; set; }
+        IMemberConfiguration AddMemberConfiguration();
+        IConditionalObjectMapper AddConditionalObjectMapper();
+        void IncludeSourceExtensionMethods(Assembly assembly);
     }
 }

@@ -11,26 +11,25 @@ namespace AutoMapper.UnitTests.Projection
 
     public class ProjectCollectionEnumerableTest
 	{
-        private IExpressionBuilder _builder;
+        private MapperConfiguration _config;
         private const string Street1 = "Street1";
 		private const string Street2 = "Street2";
 
         public ProjectCollectionEnumerableTest()
-		{
-            var config = new MapperConfiguration();
-			config.CreateMap<Address, AddressDto>();
-			config.CreateMap<Customer, CustomerDto>();
+        {
+            _config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Address, AddressDto>();
+                cfg.CreateMap<Customer, CustomerDto>();
+            });
+        }
 
-            _builder = config.CreateExpressionBuilder()
-                ;
-		}
-
-		[Fact(Skip = "EF doesn't support null assignments in expressions")]
+        [Fact(Skip = "EF doesn't support null assignments in expressions")]
 		public void ProjectWithNullCollectionSourceProperty()
 		{
 			var customers = new[] { new Customer() }.AsQueryable();
 
-			var mapped = customers.ProjectTo<CustomerDto>(_builder).SingleOrDefault();
+			var mapped = customers.ProjectTo<CustomerDto>(_config).SingleOrDefault();
 
             mapped.ShouldNotBeNull();
             mapped.Addresses.ShouldBeNull();
@@ -42,7 +41,7 @@ namespace AutoMapper.UnitTests.Projection
 			var customer = new Customer { Addresses = new List<Address> { new Address(Street1), new Address(Street2) } };
 			var customers = new[] { customer }.AsQueryable();
 
-			var mapped = customers.ProjectTo<CustomerDto>(_builder).SingleOrDefault();
+			var mapped = customers.ProjectTo<CustomerDto>(_config).SingleOrDefault();
 
 			mapped.ShouldNotBeNull();
 

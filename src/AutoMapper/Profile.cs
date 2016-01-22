@@ -12,7 +12,7 @@ namespace AutoMapper
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public class Profile : IProfileExpression
+    public class Profile : IProfileExpression, IProfileConfiguration
     {
         private MapperConfiguration _configurator;
         private readonly IConditionalObjectMapper _mapMissingTypes;
@@ -70,8 +70,13 @@ namespace AutoMapper
 
         public bool CreateMissingTypeMaps
         {
+            get
+            {
+                return _createMissingTypeMaps;
+            }
             set
             {
+                _createMissingTypeMaps = value;
                 if (value)
                     _typeConfigurations.Add(_mapMissingTypes);
                 else
@@ -163,7 +168,6 @@ namespace AutoMapper
         public void Initialize(MapperConfiguration configurator)
         {
             _configurator = configurator;
-            _configurator._formatterProfiles.AddOrUpdate(ProfileName, this, (s, configuration) => this);
         }
 
         
@@ -196,6 +200,7 @@ namespace AutoMapper
             return condition;
         }
         private IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+        private bool _createMissingTypeMaps;
         public IEnumerable<IConditionalObjectMapper> TypeConfigurations => _typeConfigurations;
         public IConditionalObjectMapper AddConditionalObjectMapper()
         {

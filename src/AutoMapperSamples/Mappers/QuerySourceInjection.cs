@@ -41,11 +41,10 @@ namespace AutoMapperSamples.Mappers
                         .ForMember(d => d.SrcValue, opt => opt.MapFrom(s => s.DestValue))
                         .ReverseMap();
                 });
-                var builder = config.CreateExpressionBuilder();
                 var mapper = config.CreateMapper();
 
                 IQueryable<Destination> result = _source.AsQueryable()
-                    .UseAsDataSource(builder, mapper).For<Destination>()
+                    .UseAsDataSource(mapper).For<Destination>()
                     .Where(s => s.DestValue > 6);
 
                 result.Count().ShouldEqual(1);

@@ -26,14 +26,16 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void multiple_inherited_base_mappings_of_same_type_fails()
         {
-            var config = new MapperConfiguration();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<MyClass, MyDto>()
+                    .ForMember(d => d.Information, m => m.MapFrom(s => s.CurrentInformation))
+                    .Include<MySpecificClass, MySpecificDto>();
+                cfg.CreateMap<MySpecificClass, MySpecificDto>();
 
-            config.CreateMap<MyClass, MyDto>()
-                .ForMember(d=> d.Information, m => m.MapFrom(s=>s.CurrentInformation))
-                .Include<MySpecificClass, MySpecificDto>();
-            config.CreateMap<MySpecificClass, MySpecificDto>();
+                cfg.CreateMap<InformationClass, InformationDto>();
+            });
 
-            config.CreateMap<InformationClass, InformationDto>();
 
             config.AssertConfigurationIsValid();
         }

@@ -165,7 +165,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IProfileConfiguration _mappingOptions;
+        private Profile _mappingOptions;
         
         private class Source
         {
@@ -213,7 +213,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IProfileConfiguration _mappingOptions;
+        private Profile _mappingOptions;
 
         private class Source
         {

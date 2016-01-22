@@ -10,7 +10,7 @@ namespace AutoMapper
     {
         #region Static API
         private static readonly Func<MapperConfiguration> _configurationInit =
-            () => new MapperConfiguration(MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers);
+            () => new MapperConfiguration(cfg => { }, MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers);
 
         private static Lazy<MapperConfiguration> _configuration = new Lazy<MapperConfiguration>(_configurationInit);
 

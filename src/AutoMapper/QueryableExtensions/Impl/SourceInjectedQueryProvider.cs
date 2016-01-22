@@ -8,14 +8,12 @@ namespace AutoMapper.QueryableExtensions.Impl
 
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider
     {
-        private readonly IExpressionBuilder _builder;
         private readonly IMapper _mapper;
         private readonly IQueryable<TSource> _dataSource;
         private readonly IQueryable<TDestination> _destQuery;
 
-        public SourceInjectedQueryProvider(IExpressionBuilder builder, IMapper mapper, IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery)
+        public SourceInjectedQueryProvider(IMapper mapper, IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery)
         {
-            _builder = builder;
             _mapper = mapper;
             _dataSource = dataSource;
             _destQuery = destQuery;
@@ -59,7 +57,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             Inspector.SourceResult(sourceExpression, sourceResult);
 
             var destResult = IsProjection<TDestination>(resultType) 
-                ? new ProjectionExpression(sourceResult as IQueryable<TSource>, _builder).To<TDestination>() 
+                ? new ProjectionExpression(sourceResult as IQueryable<TSource>, _mapper.ConfigurationProvider.ExpressionBuilder).To<TDestination>() 
                 : _mapper.Map(sourceResult, sourceResultType, destResultType);
 
             Inspector.DestResult(sourceResult);
@@ -88,8 +86,8 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private Expression ConvertDestinationExpressionToSourceExpression(Expression expression)
         {
-            var typeMap = _builder.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
-            var visitor = new ExpressionMapper.MappingVisitor(_builder.ConfigurationProvider, typeMap, _destQuery.Expression, _dataSource.Expression, null,
+            var typeMap = _mapper.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
+            var visitor = new ExpressionMapper.MappingVisitor(_mapper.ConfigurationProvider, typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] {typeof (TSource)});
             var sourceExpression = visitor.Visit(expression);
             return sourceExpression;

@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source { Inner = new Inner { Member = SomeValue } };
             //_dest = Mapper.Map<Source, SourceDto>(source);
-            _dest = new[] { source }.AsQueryable().ProjectTo<SourceDto>(ExpressionBuilder).First();
+            _dest = new[] { source }.AsQueryable().ProjectTo<SourceDto>(Configuration).First();
         }
 
         [Fact]

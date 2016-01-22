@@ -34,7 +34,7 @@
                 }
             }.AsQueryable();
 
-            _dests = sources.ProjectTo<Dest<string>>(ExpressionBuilder).ToArray();
+            _dests = sources.ProjectTo<Dest<string>>(Configuration).ToArray();
         }
 
         [Fact]

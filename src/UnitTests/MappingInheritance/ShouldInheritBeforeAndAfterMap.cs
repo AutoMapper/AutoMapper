@@ -23,13 +23,15 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             // arrange
             var source = new Class{ Prop = "test" };
-            var configurationProvider = new MapperConfiguration();
-            configurationProvider
-                .CreateMap<BaseClass, BaseDto>()
-                .BeforeMap((s, d) => d.DifferentProp = s.Prop)
-                .Include<Class, Dto>();
+            var configurationProvider = new MapperConfiguration(cfg =>
+            {
+                cfg
+                    .CreateMap<BaseClass, BaseDto>()
+                    .BeforeMap((s, d) => d.DifferentProp = s.Prop)
+                    .Include<Class, Dto>();
 
-            configurationProvider.CreateMap<Class, Dto>();
+                cfg.CreateMap<Class, Dto>();
+            });
             var mappingEngine = configurationProvider.CreateMapper();
 
             // act
@@ -44,13 +46,15 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             // arrange
             var source = new Class { Prop = "test" };
-            var configurationProvider = new MapperConfiguration();
-            configurationProvider
-                .CreateMap<BaseClass, BaseDto>()
-                .AfterMap((s, d) => d.DifferentProp = s.Prop)
-                .Include<Class, Dto>();
+            var configurationProvider = new MapperConfiguration(cfg =>
+            {
+                cfg
+                    .CreateMap<BaseClass, BaseDto>()
+                    .AfterMap((s, d) => d.DifferentProp = s.Prop)
+                    .Include<Class, Dto>();
 
-            configurationProvider.CreateMap<Class, Dto>();
+                cfg.CreateMap<Class, Dto>();
+            });
             var mappingEngine = configurationProvider.CreateMapper();
 
             // act

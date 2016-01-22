@@ -26,7 +26,7 @@ namespace AutoMapper.IntegrationTests.Net4
             using(var context = new ClientContext())
             {
                 context.Database.Log = s => Trace.WriteLine(s);
-                _course = context.TrainingCourses.ProjectTo<TrainingCourseDto>(ExpressionBuilder, c => c.Content.Select(co => co.Category)).FirstOrDefault(n => n.CourseName == "Course 1");
+                _course = context.TrainingCourses.ProjectTo<TrainingCourseDto>(Configuration, c => c.Content.Select(co => co.Category)).FirstOrDefault(n => n.CourseName == "Course 1");
             }
         }
 

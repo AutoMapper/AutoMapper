@@ -1,7 +1,6 @@
 namespace AutoMapper
 {
     using System;
-    using QueryableExtensions;
 
     public interface IConfiguration : IProfileExpression
     {
@@ -40,21 +39,7 @@ namespace AutoMapper
         /// <summary>
         /// Seal the configuration and optimize maps
         /// </summary>
+        [Obsolete("Use a MapperConfiguration instance and call CreateMapper directly.")]
         void Seal();
-
-        /// <summary>
-        /// Create a mapper from current configuration
-        /// </summary>
-        /// <returns>Mapper</returns>
-        IMapper CreateMapper();
-
-        /// <summary>
-        /// Create a mapper from current configuration with a supplied factory method
-        /// </summary>
-        /// <param name="serviceCtor">Factory method</param>
-        /// <returns>Mapper</returns>
-        IMapper CreateMapper(Func<Type, object> serviceCtor);
-
-        IExpressionBuilder CreateExpressionBuilder();
     }
 }
