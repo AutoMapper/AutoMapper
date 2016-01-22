@@ -10,7 +10,7 @@ namespace AutoMapper
     using QueryableExtensions;
     using QueryableExtensions.Impl;
 
-    public class MapperConfiguration : IConfigurationProvider, IConfiguration
+    public class MapperConfiguration : IConfigurationProvider, IMapperConfiguration
     {
         private readonly ITypeMapFactory _typeMapFactory;
         private readonly IEnumerable<IObjectMapper> _mappers;
@@ -31,19 +31,17 @@ namespace AutoMapper
 
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
-        private readonly List<string> _globalIgnore;
 
-        public MapperConfiguration(Action<IConfiguration> configure) : this(configure, MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
         {
         }
 
-        public MapperConfiguration(Action<IConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers) 
+        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers) 
         {
             _typeMapFactory = new TypeMapFactory();
             _mappers = mappers;
             _typeMapObjectMappers = typeMapObjectMappers;
-            _globalIgnore = new List<string>();
-            _defaultProfile = (Profile) ((IConfiguration)this).CreateProfile(ProfileName);
+            _defaultProfile = CreateProfile(ProfileName);
 
             configure(this);
 
@@ -60,7 +58,7 @@ namespace AutoMapper
         {
             foreach (var typeMap in _userDefinedTypeMaps.Select(kv => kv.Value).Where(tm => tm.Profile == profileName))
             {
-                configuration(typeMap, CreateMappingExpression(typeMap, typeMap.DestinationType));
+                configuration(typeMap, CreateMappingExpression(typeMap));
             }
         }
 
@@ -162,23 +160,13 @@ namespace AutoMapper
             => _defaultProfile.CreateMap(sourceType, destinationType, MemberList.Destination);
 
         IMappingExpression IProfileExpression.CreateMap(Type sourceType, Type destinationType, MemberList memberList)
-            => _defaultProfile.CreateMap(sourceType, destinationType, memberList, ProfileName);
+            => _defaultProfile.CreateMap(sourceType, destinationType, memberList);
 
-        IMappingExpression IProfileExpression.CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
+        IMappingExpression IConfiguration.CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
         {
-            var typePair = new TypePair(sourceType, destinationType);
+            var typeMap = CreateTypeMap(new TypePair(sourceType, destinationType), profileName, memberList);
 
-            if (sourceType.IsGenericTypeDefinition() && destinationType.IsGenericTypeDefinition())
-            {
-                var expression = _typeMapExpressionCache.GetOrAdd(typePair,
-                    tp => new CreateTypeMapExpression(tp, memberList, profileName));
-
-                return expression;
-            }
-
-            var typeMap = CreateTypeMap(typePair, profileName, memberList);
-
-            return CreateMappingExpression(typeMap, destinationType);
+            return CreateMappingExpression(typeMap);
         }
 
         void IProfileExpression.ClearPrefixes() => _defaultProfile.ClearPrefixes();
@@ -195,7 +183,7 @@ namespace AutoMapper
 
         void IProfileExpression.RecognizeDestinationPostfixes(params string[] postfixes) => _defaultProfile.RecognizeDestinationPostfixes(postfixes);
 
-        void IProfileExpression.AddGlobalIgnore(string startingwith) => _globalIgnore.Add(startingwith);
+        void IProfileExpression.AddGlobalIgnore(string startingwith) => _defaultProfile.AddGlobalIgnore(startingwith);
 
         #endregion
 
@@ -390,7 +378,7 @@ namespace AutoMapper
                 var tm = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, profileConfiguration, memberList);
 
                 tm.Profile = profileName;
-                tm.IgnorePropertiesStartingWith = _globalIgnore;
+                tm.IgnorePropertiesStartingWith = profileConfiguration.GlobalIgnores;
 
                 IncludeBaseMappings(types, tm);
 
@@ -445,7 +433,7 @@ namespace AutoMapper
                 genericTypeMapExpression.ProfileName,
                 genericTypeMapExpression.MemberList);
 
-            var mappingExpression = CreateMappingExpression(typeMap, closedGenericTypePair.DestinationType);
+            var mappingExpression = CreateMappingExpression(typeMap);
 
             genericTypeMapExpression.Accept(mappingExpression);
 
@@ -496,7 +484,8 @@ namespace AutoMapper
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(TypeMap typeMap)
         {
-            var mappingExp = new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, this);
+            var profileExpression = GetProfile(typeMap.Profile);
+            var mappingExp = new MappingExpression<TSource, TDestination>(typeMap, _serviceCtor, profileExpression);
             var type = (typeMap.ConfiguredMemberList == MemberList.Destination) ? typeof(TDestination) : typeof(TSource);
             return Ignore(mappingExp, type);
         }
@@ -511,7 +500,7 @@ namespace AutoMapper
                 {
                     mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
                 }
-                if (_globalIgnore.Contains(destProperty.Name))
+                if (_defaultProfile.GlobalIgnores.Contains(destProperty.Name))
                 {
                     mappingExp = mappingExp.ForMember(destProperty.Name, y => y.Ignore());
                 }
@@ -519,10 +508,11 @@ namespace AutoMapper
             return mappingExp;
         }
 
-        private IMappingExpression CreateMappingExpression(TypeMap typeMap, Type destinationType)
+        private IMappingExpression CreateMappingExpression(TypeMap typeMap)
         {
-            var mappingExp = new MappingExpression(typeMap, _serviceCtor, this);
-            return (IMappingExpression)Ignore(mappingExp, destinationType);
+            var profileExpression = GetProfile(typeMap.Profile);
+            var mappingExp = new MappingExpression(typeMap, _serviceCtor, profileExpression);
+            return (IMappingExpression)Ignore(mappingExp, typeMap.DestinationType);
         }
 
         private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)

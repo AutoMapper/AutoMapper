@@ -245,7 +245,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="action">Initialization callback</param>
         [Obsolete("Construct a MapperConfiguration instance and call CreateMapper instead. Store the instances statically as needed.")]
-        public static void Initialize(Action<IConfiguration> action)
+        public static void Initialize(Action<IMapperConfiguration> action)
         {
             Reset();
 
@@ -446,7 +446,7 @@ namespace AutoMapper
         /// Store for all configuration
         /// </summary>
         [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
-        public static IConfiguration Configuration => (IConfiguration) ConfigurationProvider;
+        public static IMapperConfiguration Configuration => _configuration.Value;
 
 
         /// <summary>
@@ -588,7 +588,7 @@ namespace AutoMapper
 
         object IDynamicMapper.DynamicMap(object source, Type sourceType, Type destinationType)
         {
-            ((IConfiguration)_configurationProvider).CreateMissingTypeMaps = true;
+            Configuration.CreateMissingTypeMaps = true;
             var typeMap = _configurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions(), _engine);
@@ -598,7 +598,7 @@ namespace AutoMapper
 
         void IDynamicMapper.DynamicMap(object source, object destination, Type sourceType, Type destinationType)
         {
-            ((IConfiguration)_configurationProvider).CreateMissingTypeMaps = true;
+            Configuration.CreateMissingTypeMaps = true;
             var typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions(), _engine);

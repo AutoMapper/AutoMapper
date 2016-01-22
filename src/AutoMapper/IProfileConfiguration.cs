@@ -38,5 +38,6 @@ namespace AutoMapper
         Func<FieldInfo, bool> ShouldMapField { get; }
 
         string ProfileName { get; }
+        IEnumerable<string> GlobalIgnores { get; }
 	}
 }

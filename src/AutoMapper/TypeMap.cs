@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -66,7 +67,7 @@ namespace AutoMapper
 
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
-        public List<string> IgnorePropertiesStartingWith { get; set; }
+        public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
 
