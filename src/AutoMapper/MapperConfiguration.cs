@@ -26,7 +26,7 @@ namespace AutoMapper
         private readonly ConcurrentDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache =
             new ConcurrentDictionary<TypePair, CreateTypeMapExpression>();
 
-        private readonly ConcurrentDictionary<string, Profile> _formatterProfiles =
+        private readonly ConcurrentDictionary<string, Profile> _profiles =
             new ConcurrentDictionary<string, Profile>();
 
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
@@ -64,31 +64,20 @@ namespace AutoMapper
             }
         }
 
-        IProfileExpression IConfiguration.CreateProfile(string profileName)
-        {
-            var profileExpression = new Profile(profileName);
-
-            profileExpression.Initialize(this);
-            _formatterProfiles.AddOrUpdate(profileExpression.ProfileName, profileExpression, (s, configuration) => profileExpression);
-
-            return profileExpression;
-        }
+        IProfileExpression IConfiguration.CreateProfile(string profileName) => CreateProfile(profileName);
 
         void IConfiguration.CreateProfile(string profileName, Action<IProfileExpression> profileConfiguration)
         {
-            var profileExpression = new Profile(profileName);
+            var profile = CreateProfile(profileName);
 
-            profileExpression.Initialize(this);
-            _formatterProfiles.AddOrUpdate(profileExpression.ProfileName, profileExpression, (s, configuration) => profileExpression);
-
-            profileConfiguration(profileExpression);
+            profileConfiguration(profile);
         }
 
         void IConfiguration.AddProfile(Profile profile)
         {
             profile.Initialize(this);
 
-            _formatterProfiles.AddOrUpdate(profile.ProfileName, profile, (s, configuration) => profile);
+            _profiles.AddOrUpdate(profile.ProfileName, profile, (s, configuration) => profile);
 
             profile.Configure();
         }
@@ -144,29 +133,24 @@ namespace AutoMapper
             set { AllowNullCollections = value; }
         }
 
-        void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => ((IConfiguration)this).ForAllMaps(ProfileName, configuration);
+        void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => _defaultProfile.ForAllMaps(configuration);
 
         IMemberConfiguration IProfileExpression.AddMemberConfiguration() => _defaultProfile.AddMemberConfiguration();
 
-        IConditionalObjectMapper IProfileExpression.AddConditionalObjectMapper()
-        {
-            var condition = new ConditionalObjectMapper(ProfileName);
-            ((List<IConditionalObjectMapper>)_defaultProfile.TypeConfigurations).Add(condition);
-            return condition;
-        }
+        IConditionalObjectMapper IProfileExpression.AddConditionalObjectMapper() => _defaultProfile.AddConditionalObjectMapper();
 
         void IProfileExpression.DisableConstructorMapping() => _defaultProfile.DisableConstructorMapping();
 
         IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>() 
-            => ((IConfiguration)this).CreateMap<TSource, TDestination>(ProfileName);
+            => _defaultProfile.CreateMap<TSource, TDestination>();
 
         IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>(MemberList memberList)
-            => ((IProfileExpression)this).CreateMap<TSource, TDestination>(ProfileName, memberList);
+            => _defaultProfile.CreateMap<TSource, TDestination>(memberList);
 
         IMappingExpression<TSource, TDestination> IConfiguration.CreateMap<TSource, TDestination>(string profileName)
-            => ((IProfileExpression)this).CreateMap<TSource, TDestination>(profileName, MemberList.Destination);
+            => ((IConfiguration)this).CreateMap<TSource, TDestination>(profileName, MemberList.Destination);
 
-        IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>(string profileName,
+        IMappingExpression<TSource, TDestination> IConfiguration.CreateMap<TSource, TDestination>(string profileName,
             MemberList memberList)
         {
             TypeMap typeMap = CreateTypeMap(new TypePair(typeof(TSource), typeof(TDestination)), profileName, memberList);
@@ -175,10 +159,10 @@ namespace AutoMapper
         }
 
         IMappingExpression IProfileExpression.CreateMap(Type sourceType, Type destinationType)
-            => ((IProfileExpression)this).CreateMap(sourceType, destinationType, MemberList.Destination);
+            => _defaultProfile.CreateMap(sourceType, destinationType, MemberList.Destination);
 
         IMappingExpression IProfileExpression.CreateMap(Type sourceType, Type destinationType, MemberList memberList)
-            => ((IProfileExpression)this).CreateMap(sourceType, destinationType, memberList, ProfileName);
+            => _defaultProfile.CreateMap(sourceType, destinationType, memberList, ProfileName);
 
         IMappingExpression IProfileExpression.CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
         {
@@ -197,45 +181,22 @@ namespace AutoMapper
             return CreateMappingExpression(typeMap, destinationType);
         }
 
-        void IProfileExpression.ClearPrefixes()
-        {
-            _defaultProfile.ClearPrefixes();
-        }
+        void IProfileExpression.ClearPrefixes() => _defaultProfile.ClearPrefixes();
 
-        void IProfileExpression.RecognizeAlias(string original, string alias)
-        {
-            _defaultProfile.RecognizeAlias(original, alias);
-        }
+        void IProfileExpression.RecognizeAlias(string original, string alias) => _defaultProfile.RecognizeAlias(original, alias);
 
-        void IProfileExpression.ReplaceMemberName(string original, string newValue)
-        {
-            _defaultProfile.ReplaceMemberName(original, newValue);
-        }
+        void IProfileExpression.ReplaceMemberName(string original, string newValue) => _defaultProfile.ReplaceMemberName(original, newValue);
 
-        void IProfileExpression.RecognizePrefixes(params string[] prefixes)
-        {
-            _defaultProfile.RecognizePrefixes(prefixes);
-        }
+        void IProfileExpression.RecognizePrefixes(params string[] prefixes) => _defaultProfile.RecognizePrefixes(prefixes);
 
-        void IProfileExpression.RecognizePostfixes(params string[] postfixes)
-        {
-            _defaultProfile.RecognizePostfixes(postfixes);
-        }
+        void IProfileExpression.RecognizePostfixes(params string[] postfixes) => _defaultProfile.RecognizePostfixes(postfixes);
 
-        void IProfileExpression.RecognizeDestinationPrefixes(params string[] prefixes)
-        {
-            _defaultProfile.RecognizeDestinationPrefixes(prefixes);
-        }
+        void IProfileExpression.RecognizeDestinationPrefixes(params string[] prefixes) => _defaultProfile.RecognizeDestinationPrefixes(prefixes);
 
-        void IProfileExpression.RecognizeDestinationPostfixes(params string[] postfixes)
-        {
-            _defaultProfile.RecognizeDestinationPostfixes(postfixes);
-        }
+        void IProfileExpression.RecognizeDestinationPostfixes(params string[] postfixes) => _defaultProfile.RecognizeDestinationPostfixes(postfixes);
 
-        void IProfileExpression.AddGlobalIgnore(string startingwith)
-        {
-            _globalIgnore.Add(startingwith);
-        }
+        void IProfileExpression.AddGlobalIgnore(string startingwith) => _globalIgnore.Add(startingwith);
+
         #endregion
 
         #region IConfigurationProvider members
@@ -403,6 +364,18 @@ namespace AutoMapper
             }
         }
 
+        private Profile CreateProfile(string profileName)
+        {
+            var profileExpression = new Profile(profileName);
+
+            profileExpression.Initialize(this);
+
+            _profiles.AddOrUpdate(profileExpression.ProfileName, profileExpression,
+                (s, configuration) => profileExpression);
+
+            return profileExpression;
+        }
+
         private TypeMap CreateTypeMap(TypePair types, string profileName)
         {
 		    return CreateTypeMap(types, profileName, MemberList.Destination);
@@ -448,7 +421,7 @@ namespace AutoMapper
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
-            var matchingTypeMapConfiguration = _formatterProfiles.Select(kv => kv.Value).SelectMany(p => p.TypeConfigurations).FirstOrDefault(tc => tc.IsMatch(typePair));
+            var matchingTypeMapConfiguration = _profiles.Select(kv => kv.Value).SelectMany(p => p.TypeConfigurations).FirstOrDefault(tc => tc.IsMatch(typePair));
             return matchingTypeMapConfiguration != null ? CreateTypeMap(typePair, matchingTypeMapConfiguration.ProfileName) : null;
         }
 
@@ -670,7 +643,7 @@ namespace AutoMapper
 
         private Profile GetProfile(string profileName)
         {
-            var expr = _formatterProfiles.GetOrAdd(profileName, name => new Profile(profileName));
+            var expr = _profiles.GetOrAdd(profileName, name => new Profile(profileName));
 
             return expr;
         }

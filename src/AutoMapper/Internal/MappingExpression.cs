@@ -402,7 +402,8 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            var mappingExpression = _configurationContainer.CreateMap<TDestination, TSource>(TypeMap.Profile, MemberList.Source);
+            var mappingExpression = _configurationContainer.CreateMap<TDestination, TSource>(MemberList.Source).WithProfile(TypeMap.Profile);
+
             return ConfigureReverseMap(mappingExpression);
         }
 

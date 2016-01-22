@@ -99,11 +99,6 @@ namespace AutoMapper
             return _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
         }
 
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList)
-        {
-            return _configurator.CreateMap<TSource, TDestination>(profileName, memberList);
-        }
-
         public IMappingExpression CreateMap(Type sourceType, Type destinationType)
         {
             return CreateMap(sourceType, destinationType, MemberList.Destination);
@@ -199,13 +194,18 @@ namespace AutoMapper
             _memberConfigurations.Add(condition);
             return condition;
         }
-        private IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+        private readonly IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+
         private bool _createMissingTypeMaps;
+
         public IEnumerable<IConditionalObjectMapper> TypeConfigurations => _typeConfigurations;
+
         public IConditionalObjectMapper AddConditionalObjectMapper()
         {
             var condition = new ConditionalObjectMapper(ProfileName);
+
             _typeConfigurations.Add(condition);
+
             return condition;
         }
 

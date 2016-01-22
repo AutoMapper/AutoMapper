@@ -36,6 +36,17 @@ namespace AutoMapper
         /// <param name="constructor">Factory method</param>
         void ConstructServicesUsing(Func<Type, object> constructor);
 
+        /// <summary>
+        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
+        /// Specify the member list to validate against during configuration validation.
+        /// </summary>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="profileName">Profile name</param>
+        /// <param name="memberList">Member list to validate</param>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList);
+
         void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration);
         IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName);
     }
