@@ -56,80 +56,12 @@ namespace AutoMapper
 
         #region IConfiguration Members
 
-        void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => ((IConfiguration)this).ForAllMaps(ProfileName, configuration);
-
         void IConfiguration.ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration)
         {
             foreach (var typeMap in _userDefinedTypeMaps.Select(kv => kv.Value).Where(tm => tm.Profile == profileName))
             {
                 configuration(typeMap, CreateMappingExpression(typeMap, typeMap.DestinationType));
             }
-        }
-
-        Func<PropertyInfo, bool> IProfileExpression.ShouldMapProperty
-        {
-            get { return _defaultProfile.ShouldMapProperty; }
-            set { _defaultProfile.ShouldMapProperty = value; }
-        }
-
-        Func<FieldInfo, bool> IProfileExpression.ShouldMapField
-        {
-            get { return _defaultProfile.ShouldMapField; }
-            set { _defaultProfile.ShouldMapField = value; }
-        }
-
-        bool IProfileExpression.CreateMissingTypeMaps
-        {
-            get { return _defaultProfile.CreateMissingTypeMaps; }
-            set { _defaultProfile.CreateMissingTypeMaps = value; }
-        }
-
-        void IProfileExpression.IncludeSourceExtensionMethods(Assembly assembly)
-        {
-            _defaultProfile.IncludeSourceExtensionMethods(assembly);
-        }
-
-        INamingConvention IProfileExpression.SourceMemberNamingConvention
-        {
-            get
-            {
-                INamingConvention convention = null;
-                _defaultProfile.DefaultMemberConfig.AddMember<NameSplitMember>(_ => convention = _.SourceMemberNamingConvention);
-                return convention;
-            }
-            set { _defaultProfile.DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = value); }
-        }
-
-        INamingConvention IProfileExpression.DestinationMemberNamingConvention
-        {
-            get
-            {
-                INamingConvention convention = null;
-                _defaultProfile.DefaultMemberConfig.AddMember<NameSplitMember>(_ => convention = _.DestinationMemberNamingConvention);
-                return convention;
-            }
-            set { _defaultProfile.DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
-        }
-
-        bool IProfileExpression.AllowNullDestinationValues
-        {
-            get { return AllowNullDestinationValues; }
-            set { AllowNullDestinationValues = value; }
-        }
-
-        bool IProfileExpression.AllowNullCollections
-        {
-            get { return AllowNullCollections; }
-            set { AllowNullCollections = value; }
-        }
-
-        IMemberConfiguration IProfileExpression.AddMemberConfiguration() => _defaultProfile.AddMemberConfiguration();
-
-        IConditionalObjectMapper IProfileExpression.AddConditionalObjectMapper()
-        {
-            var condition = new ConditionalObjectMapper(ProfileName);
-            ((List<IConditionalObjectMapper>)_defaultProfile.TypeConfigurations).Add(condition);
-            return condition;
         }
 
         IProfileExpression IConfiguration.CreateProfile(string profileName)
@@ -164,6 +96,64 @@ namespace AutoMapper
         void IConfiguration.AddProfile<TProfile>() => ((IConfiguration)this).AddProfile(new TProfile());
 
         void IConfiguration.ConstructServicesUsing(Func<Type, object> constructor) => _serviceCtor = constructor;
+
+        Func<PropertyInfo, bool> IProfileExpression.ShouldMapProperty
+        {
+            get { return _defaultProfile.ShouldMapProperty; }
+            set { _defaultProfile.ShouldMapProperty = value; }
+        }
+
+        Func<FieldInfo, bool> IProfileExpression.ShouldMapField
+        {
+            get { return _defaultProfile.ShouldMapField; }
+            set { _defaultProfile.ShouldMapField = value; }
+        }
+
+        bool IProfileExpression.CreateMissingTypeMaps
+        {
+            get { return _defaultProfile.CreateMissingTypeMaps; }
+            set { _defaultProfile.CreateMissingTypeMaps = value; }
+        }
+
+        void IProfileExpression.IncludeSourceExtensionMethods(Assembly assembly)
+        {
+            _defaultProfile.IncludeSourceExtensionMethods(assembly);
+        }
+
+        INamingConvention IProfileExpression.SourceMemberNamingConvention
+        {
+            get { return _defaultProfile.SourceMemberNamingConvention; }
+            set { _defaultProfile.SourceMemberNamingConvention = value; }
+        }
+
+        INamingConvention IProfileExpression.DestinationMemberNamingConvention
+        {
+            get { return _defaultProfile.DestinationMemberNamingConvention; }
+            set { _defaultProfile.DestinationMemberNamingConvention = value; }
+        }
+
+        bool IProfileExpression.AllowNullDestinationValues
+        {
+            get { return AllowNullDestinationValues; }
+            set { AllowNullDestinationValues = value; }
+        }
+
+        bool IProfileExpression.AllowNullCollections
+        {
+            get { return AllowNullCollections; }
+            set { AllowNullCollections = value; }
+        }
+
+        void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => ((IConfiguration)this).ForAllMaps(ProfileName, configuration);
+
+        IMemberConfiguration IProfileExpression.AddMemberConfiguration() => _defaultProfile.AddMemberConfiguration();
+
+        IConditionalObjectMapper IProfileExpression.AddConditionalObjectMapper()
+        {
+            var condition = new ConditionalObjectMapper(ProfileName);
+            ((List<IConditionalObjectMapper>)_defaultProfile.TypeConfigurations).Add(condition);
+            return condition;
+        }
 
         void IProfileExpression.DisableConstructorMapping() => _defaultProfile.DisableConstructorMapping();
 
@@ -209,37 +199,37 @@ namespace AutoMapper
 
         void IProfileExpression.ClearPrefixes()
         {
-            _defaultProfile.DefaultMemberConfig.AddName<PrePostfixName>(_ => _.Prefixes.Clear());
+            _defaultProfile.ClearPrefixes();
         }
 
         void IProfileExpression.RecognizeAlias(string original, string alias)
         {
-            _defaultProfile.DefaultMemberConfig.AddName<ReplaceName>(_ => _.AddReplace(original, alias));
+            _defaultProfile.RecognizeAlias(original, alias);
         }
 
         void IProfileExpression.ReplaceMemberName(string original, string newValue)
         {
-            _defaultProfile.DefaultMemberConfig.AddName<ReplaceName>(_ => _.AddReplace(original, newValue));
+            _defaultProfile.ReplaceMemberName(original, newValue);
         }
 
         void IProfileExpression.RecognizePrefixes(params string[] prefixes)
         {
-            _defaultProfile.DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, prefixes));
+            _defaultProfile.RecognizePrefixes(prefixes);
         }
 
         void IProfileExpression.RecognizePostfixes(params string[] postfixes)
         {
-            _defaultProfile.DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.Postfixes, postfixes));
+            _defaultProfile.RecognizePostfixes(postfixes);
         }
 
         void IProfileExpression.RecognizeDestinationPrefixes(params string[] prefixes)
         {
-            _defaultProfile.DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPrefixes, prefixes));
+            _defaultProfile.RecognizeDestinationPrefixes(prefixes);
         }
 
         void IProfileExpression.RecognizeDestinationPostfixes(params string[] postfixes)
         {
-            _defaultProfile.DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
+            _defaultProfile.RecognizeDestinationPostfixes(postfixes);
         }
 
         void IProfileExpression.AddGlobalIgnore(string startingwith)
