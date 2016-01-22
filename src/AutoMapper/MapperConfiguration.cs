@@ -52,10 +52,6 @@ namespace AutoMapper
             ExpressionBuilder = new ExpressionBuilder(this);
         }
 
-        public IExpressionBuilder ExpressionBuilder { get; }
-
-        public Func<Type, object> ServiceCtor => _serviceCtor;
-
         public string ProfileName => "";
 
         #region IConfiguration Members
@@ -175,7 +171,7 @@ namespace AutoMapper
             => ((IConfiguration)this).CreateMap<TSource, TDestination>(ProfileName);
 
         IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>(MemberList memberList)
-    => ((IProfileExpression)this).CreateMap<TSource, TDestination>(ProfileName, memberList);
+            => ((IProfileExpression)this).CreateMap<TSource, TDestination>(ProfileName, memberList);
 
         IMappingExpression<TSource, TDestination> IConfiguration.CreateMap<TSource, TDestination>(string profileName)
             => ((IProfileExpression)this).CreateMap<TSource, TDestination>(profileName, MemberList.Destination);
@@ -253,6 +249,10 @@ namespace AutoMapper
         #endregion
 
         #region IConfigurationProvider members
+
+        public IExpressionBuilder ExpressionBuilder { get; }
+
+        public Func<Type, object> ServiceCtor => _serviceCtor;
 
         public bool AllowNullDestinationValues
         {
@@ -413,12 +413,12 @@ namespace AutoMapper
             }
         }
 
-        public TypeMap CreateTypeMap(TypePair types, string profileName)
+        private TypeMap CreateTypeMap(TypePair types, string profileName)
         {
 		    return CreateTypeMap(types, profileName, MemberList.Destination);
         }
 
-        public TypeMap CreateTypeMap(TypePair types, string profileName, MemberList memberList)
+        private TypeMap CreateTypeMap(TypePair types, string profileName, MemberList memberList)
         {
             var typeMap = _userDefinedTypeMaps.GetOrAdd(types, tp =>
             {
@@ -462,7 +462,7 @@ namespace AutoMapper
             return matchingTypeMapConfiguration != null ? CreateTypeMap(typePair, matchingTypeMapConfiguration.ProfileName) : null;
         }
 
-        public TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
+        private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
         {
             if(!HasOpenGenericTypeMapDefined(typePair))
                 return null;
