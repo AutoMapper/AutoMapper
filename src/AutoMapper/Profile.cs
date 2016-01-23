@@ -12,13 +12,13 @@ namespace AutoMapper
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public class Profile : IProfileExpression, IProfileConfiguration
+    public abstract class Profile : IProfileExpression, IProfileConfiguration
     {
         private IConfiguration _configurator;
         private readonly IConditionalObjectMapper _mapMissingTypes;
         private readonly List<string> _globalIgnore;
 
-        public Profile(string profileName)
+        protected Profile(string profileName)
             :this()
         {
             ProfileName = profileName;
@@ -37,7 +37,7 @@ namespace AutoMapper
             _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
 
-        public string ProfileName { get; }
+        public virtual string ProfileName { get; }
 
         public void DisableConstructorMapping()
         {
@@ -160,14 +160,13 @@ namespace AutoMapper
         /// Override this method in a derived class and call the CreateMap method to associate that map with this profile.
         /// Avoid calling the <see cref="Mapper"/> class from this method.
         /// </summary>
-        protected internal virtual void Configure()
-        {
-            // override in a derived class for custom configuration behavior
-        }
+        protected abstract void Configure();
 
         public void Initialize(IConfiguration configurator)
         {
             _configurator = configurator;
+
+            Configure();
         }
 
         
