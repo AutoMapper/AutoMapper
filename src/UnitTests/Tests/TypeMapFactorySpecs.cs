@@ -146,10 +146,20 @@ namespace AutoMapper.UnitTests.Tests
             _factory = new TypeMapFactory();
         }
 
+        private class TestProfile : Profile
+        {
+            public override string ProfileName => "Test";
+
+            protected override void Configure()
+            {
+                
+            }
+        }
+
         [Fact]
         public void Should_map_properties_with_same_name()
         {
-            var mappingOptions = new Profile("Test");
+            var mappingOptions = new TestProfile();
             //mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
             //mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 
@@ -182,11 +192,20 @@ namespace AutoMapper.UnitTests.Tests
             public int SomeSourceValue { get; set; }
         }
 
+        private class TestProfile : Profile
+        {
+            public override string ProfileName => "Test";
+
+            protected override void Configure()
+            {
+
+            }
+        }
         protected override void Establish_context()
         {
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)")};
 
-            _mappingOptions = new Profile("Test");
+            _mappingOptions = new TestProfile();
             _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
             {
                 _.SourceMemberNamingConvention = namingConvention;
@@ -230,11 +249,21 @@ namespace AutoMapper.UnitTests.Tests
             public int some__source__value { get; set; }
         }
 
+        private class TestProfile : Profile
+        {
+            public override string ProfileName => "Test";
+
+            protected override void Configure()
+            {
+
+            }
+        }
+
         protected override void Establish_context()
         {
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
 
-            _mappingOptions = new Profile("Test");
+            _mappingOptions = new TestProfile();
             _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
             {
                 _.SourceMemberNamingConvention = new PascalCaseNamingConvention();

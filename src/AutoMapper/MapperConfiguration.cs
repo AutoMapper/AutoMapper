@@ -73,11 +73,9 @@ namespace AutoMapper
 
         void IConfiguration.AddProfile(Profile profile)
         {
-            profile.Initialize(this);
-
             _profiles.AddOrUpdate(profile.ProfileName, profile, (s, configuration) => profile);
 
-            profile.Configure();
+            profile.Initialize(this);
         }
 
         void IConfiguration.AddProfile<TProfile>() => ((IConfiguration)this).AddProfile(new TProfile());
@@ -363,7 +361,7 @@ namespace AutoMapper
 
         private Profile CreateProfile(string profileName)
         {
-            var profileExpression = new Profile(profileName);
+            var profileExpression = new NamedProfile(profileName);
 
             profileExpression.Initialize(this);
 
@@ -642,9 +640,21 @@ namespace AutoMapper
 
         private Profile GetProfile(string profileName)
         {
-            var expr = _profiles.GetOrAdd(profileName, name => new Profile(profileName));
+            var expr = _profiles.GetOrAdd(profileName, name => new NamedProfile(profileName));
 
             return expr;
+        }
+
+        private class NamedProfile : Profile
+        {
+            public NamedProfile(string profileName) : base(profileName)
+            {
+            }
+
+            protected override void Configure()
+            {
+                // no-op
+            }
         }
 
     }
