@@ -4,6 +4,7 @@ using AutoMapper.Mappers;
 namespace AutoMapper
 {
     using System;
+    using QueryableExtensions;
 
     public interface IConfigurationProvider
     {
@@ -74,7 +75,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="profileName">Profile name</param>
         /// <returns></returns>
-        IProfileExpression GetProfileConfiguration(string profileName);
+        IProfileConfiguration GetProfileConfiguration(string profileName);
 
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
@@ -125,5 +126,7 @@ namespace AutoMapper
         /// Allow null destination collections. If true, null source collections result in null destination collections.
         /// </summary>
         bool AllowNullCollections { get; }
+
+        IExpressionBuilder ExpressionBuilder { get; }
     }
 }

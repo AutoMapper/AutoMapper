@@ -20,9 +20,11 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Establish_context()
         {
-            config = new MapperConfiguration();
-            config.ClearPrefixes();
-            config.CreateMap<Source, Destination>();
+            config = new MapperConfiguration(cfg =>
+            {
+                cfg.ClearPrefixes();
+                cfg.CreateMap<Source, Destination>();
+            });
         }
 
         [Fact]

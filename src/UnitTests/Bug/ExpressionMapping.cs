@@ -115,7 +115,7 @@ namespace AutoMapper.UnitTests.Bug
             var expression = Mapper.Map<Expression<Func<Parent, bool>>>(_predicateExpression);
             var items = new[] {_valid}.AsQueryable();
             items.Where(expression).ShouldContain(_valid);
-            var items2 = items.UseAsDataSource(ExpressionBuilder, Mapper).For<ParentDTO>().Where(_predicateExpression);
+            var items2 = items.UseAsDataSource(Mapper).For<ParentDTO>().Where(_predicateExpression);
             //var a = items2.ToList();
             items2.Count().ShouldEqual(1);
         }
@@ -127,7 +127,7 @@ namespace AutoMapper.UnitTests.Bug
             var expression = Mapper.Map<Expression<Func<GrandParent, bool>>>(_predicateExpression);
             var items = new[] {new GrandParent(){Parent = new Parent(){Children = new[]{new Child(){ID2 = 3}}, Child = new Child(){ID2 = 3}}}}.AsQueryable();
             items.Where(expression).ShouldContain(items.First());
-            var items2 = items.UseAsDataSource(ExpressionBuilder, Mapper).For<GrandParentDTO>().Where(_predicateExpression);
+            var items2 = items.UseAsDataSource(Mapper).For<GrandParentDTO>().Where(_predicateExpression);
             items2.Count().ShouldEqual(1);
             When_Use_Outside_Class_Method_Call();
         }

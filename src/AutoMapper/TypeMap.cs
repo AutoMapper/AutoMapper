@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -31,12 +32,12 @@ namespace AutoMapper
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, string profileName)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
-            Profile = MapperConfiguration.DefaultProfileName;
+            Profile = profileName;
             ConfiguredMemberList = memberList;
         }
 
@@ -66,7 +67,7 @@ namespace AutoMapper
 
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
-        public List<string> IgnorePropertiesStartingWith { get; set; }
+        public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
 

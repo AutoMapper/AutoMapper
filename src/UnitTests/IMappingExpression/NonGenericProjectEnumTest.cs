@@ -8,14 +8,15 @@
 
     public class NonGenericProjectEnumTest
     {
-        private IExpressionBuilder _builder;
+        private MapperConfiguration _config;
 
         public NonGenericProjectEnumTest()
         {
-            var config = new MapperConfiguration();
-            config.CreateMap(typeof(Customer), typeof(CustomerDto));
-            config.CreateMap(typeof(CustomerType), typeof(string)).ProjectUsing(ct => ct.ToString().ToUpper());
-            _builder = config.CreateExpressionBuilder();
+            _config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap(typeof(Customer), typeof(CustomerDto));
+                cfg.CreateMap(typeof(CustomerType), typeof(string)).ProjectUsing(ct => ct.ToString().ToUpper());
+            });
         }
 
         [Fact]
@@ -23,7 +24,7 @@
         {
             var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
 
-            var projected = customers.ProjectTo<CustomerDto>(_builder);
+            var projected = customers.ProjectTo<CustomerDto>(_config);
             projected.ShouldNotBeNull();
             Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
         }

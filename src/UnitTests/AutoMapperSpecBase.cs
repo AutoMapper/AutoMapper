@@ -22,7 +22,6 @@ namespace AutoMapper.UnitTests
         protected abstract MapperConfiguration Configuration { get; }
         protected IConfigurationProvider ConfigProvider => Configuration;
         protected IMapper Mapper => Configuration.CreateMapper();
-        protected IExpressionBuilder ExpressionBuilder => Configuration.CreateExpressionBuilder();
 
         protected override void Cleanup()
         {

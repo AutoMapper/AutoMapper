@@ -11,15 +11,15 @@ namespace AutoMapper.UnitTests.Projection
 
     public class ProjectEnumerableToArrayTest
     {
-        private IExpressionBuilder _builder;
+        private MapperConfiguration _config;
 
         public ProjectEnumerableToArrayTest()
         {
-            var config = new MapperConfiguration();
-            config.CreateMap<Movie, MovieDto>();
-            config.CreateMap<Actor, ActorDto>();
-
-            _builder = config.CreateExpressionBuilder();
+            _config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Movie, MovieDto>();
+                cfg.CreateMap<Actor, ActorDto>();
+            });
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Projection
                 new Movie() { Actors = new Actor[] { new Actor() { Name = "Actor 3" }, new Actor() { Name = "Actor 4" } } }
                 }.AsQueryable();
 
-            var mapped = movies.ProjectTo<MovieDto>(_builder);
+            var mapped = movies.ProjectTo<MovieDto>(_config);
 
             mapped.ElementAt(0).Actors.Length.ShouldEqual(2);
             mapped.ElementAt(1).Actors[1].Name.ShouldEqual("Actor 4");

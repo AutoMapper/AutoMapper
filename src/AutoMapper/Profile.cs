@@ -12,10 +12,11 @@ namespace AutoMapper
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public class Profile : IProfileExpression
+    public class Profile : IProfileExpression, IProfileConfiguration
     {
-        private MapperConfiguration _configurator;
+        private IConfiguration _configurator;
         private readonly IConditionalObjectMapper _mapMissingTypes;
+        private readonly List<string> _globalIgnore;
 
         public Profile(string profileName)
             :this()
@@ -32,6 +33,8 @@ namespace AutoMapper
             ShouldMapProperty = p => p.IsPublic();
             ShouldMapField = f => f.IsPublic;
             _mapMissingTypes = new ConditionalObjectMapper(ProfileName) {Conventions = {tp => true}};
+            _globalIgnore = new List<string>();
+            _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
 
         public string ProfileName { get; }
@@ -44,6 +47,8 @@ namespace AutoMapper
         public bool AllowNullDestinationValues { get; set; }
 
         public bool AllowNullCollections { get; set; }
+
+        public IEnumerable<string> GlobalIgnores => _globalIgnore; 
 
         public INamingConvention SourceMemberNamingConvention
         {
@@ -70,8 +75,13 @@ namespace AutoMapper
 
         public bool CreateMissingTypeMaps
         {
+            get
+            {
+                return _createMissingTypeMaps;
+            }
             set
             {
+                _createMissingTypeMaps = value;
                 if (value)
                     _typeConfigurations.Add(_mapMissingTypes);
                 else
@@ -92,11 +102,6 @@ namespace AutoMapper
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
         {
             return _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
-        }
-
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList)
-        {
-            return _configurator.CreateMap<TSource, TDestination>(profileName, memberList);
         }
 
         public IMappingExpression CreateMap(Type sourceType, Type destinationType)
@@ -148,7 +153,7 @@ namespace AutoMapper
 
         public void AddGlobalIgnore(string propertyNameStartingWith)
         {
-            _configurator.AddGlobalIgnore(propertyNameStartingWith);
+            _globalIgnore.Add(propertyNameStartingWith);
         }
 
         /// <summary>
@@ -160,10 +165,9 @@ namespace AutoMapper
             // override in a derived class for custom configuration behavior
         }
 
-        public void Initialize(MapperConfiguration configurator)
+        public void Initialize(IConfiguration configurator)
         {
             _configurator = configurator;
-            _configurator._formatterProfiles.AddOrUpdate(ProfileName, this, (s, configuration) => this);
         }
 
         
@@ -171,36 +175,28 @@ namespace AutoMapper
 
         private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
 
-        public IMemberConfiguration DefaultMemberConfig
-        {
-            get
-            {
-                if(!_memberConfigurations.Any())
-                    _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
-                return _memberConfigurations.First();
-            }
-        }
+        public IMemberConfiguration DefaultMemberConfig => _memberConfigurations.First();
 
-        public IEnumerable<IMemberConfiguration> MemberConfigurations
-        {
-            get
-            {
-                var temp = DefaultMemberConfig;
-                return _memberConfigurations;
-            }
-        }
+        public IEnumerable<IMemberConfiguration> MemberConfigurations => _memberConfigurations;
+
         public IMemberConfiguration AddMemberConfiguration()
         {
             var condition = new MemberConfiguration();
             _memberConfigurations.Add(condition);
             return condition;
         }
-        private IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+        private readonly IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+
+        private bool _createMissingTypeMaps;
+
         public IEnumerable<IConditionalObjectMapper> TypeConfigurations => _typeConfigurations;
+
         public IConditionalObjectMapper AddConditionalObjectMapper()
         {
             var condition = new ConditionalObjectMapper(ProfileName);
+
             _typeConfigurations.Add(condition);
+
             return condition;
         }
 
@@ -220,11 +216,6 @@ namespace AutoMapper
                 .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
                 .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
                 .Where(method => method.GetParameters().Length == 1));
-        }
-
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
-        {
-            return _configurator.CreateMap(sourceType, destinationType, memberList, profileName);
         }
     }
 }

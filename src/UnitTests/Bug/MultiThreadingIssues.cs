@@ -196,17 +196,18 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_not_fail()
         {
-            Mapper.Reset();
+            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var mapper = config.CreateMapper();
 
             var tasks = Enumerable.Range(0, 5).Select(
           i =>
               Task.Factory.StartNew(
                   () =>
                   {
-                      Mapper.DynamicMap<SomeDtoA, SomeDtoB>(new SomeDtoA());
-                      Mapper.DynamicMap<SomeDtoB, SomeDtoA>(new SomeDtoB());
-                      Mapper.DynamicMap<SomeDtoC, SomeDtoD>(new SomeDtoC());
-                      Mapper.DynamicMap<SomeDtoD, SomeDtoC>(new SomeDtoD());
+                      mapper.Map<SomeDtoA, SomeDtoB>(new SomeDtoA());
+                      mapper.Map<SomeDtoB, SomeDtoA>(new SomeDtoB());
+                      mapper.Map<SomeDtoC, SomeDtoD>(new SomeDtoC());
+                      mapper.Map<SomeDtoD, SomeDtoC>(new SomeDtoD());
                   }))
           .ToArray();
             Exception exception = null;
@@ -221,7 +222,7 @@ namespace AutoMapper.UnitTests.Bug
             exception.ShouldBeNull();
             //typeof(Exception).ShouldNotBeThrownBy(() => Task.WaitAll(tasks));
         }
-        [Fact]
+        [Fact(Skip="Static API is going away")]
         public void Should_not_fail_with_create_map()
         {
             Mapper.Reset();

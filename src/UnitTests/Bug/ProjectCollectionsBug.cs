@@ -51,7 +51,6 @@
                     cfg.CreateMap<BEntity, B>();
                     cfg.CreateMap<AEntity, A>();
                 });
-                var builder = config.CreateExpressionBuilder();
                 config.AssertConfigurationIsValid();
 
                 var be = new BEntity();
@@ -64,7 +63,7 @@
                 var belist = new List<BEntity>();
                 belist.Add(be);
                 IQueryable<BEntity> bei = belist.AsQueryable();
-                typeof(Exception).ShouldNotBeThrownBy(() => bei.ProjectTo<B>(builder));
+                typeof(Exception).ShouldNotBeThrownBy(() => bei.ProjectTo<B>(config));
             }
         }
     }

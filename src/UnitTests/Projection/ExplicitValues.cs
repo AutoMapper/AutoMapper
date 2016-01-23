@@ -30,7 +30,7 @@
         {
             var source = new[] { new Source { Value = 10 } }.AsQueryable();
 
-            _dests = source.ProjectTo<Dest>(ExpressionBuilder).ToList();
+            _dests = source.ProjectTo<Dest>(Configuration).ToList();
         }
 
         [Fact]

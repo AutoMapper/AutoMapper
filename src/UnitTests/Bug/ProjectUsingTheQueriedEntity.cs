@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Because_of()
         {
-            _destination = new[] { new Source() }.AsQueryable().ProjectTo<Destination>(ExpressionBuilder).First();
+            _destination = new[] { new Source() }.AsQueryable().ProjectTo<Destination>(Configuration).First();
         }
 
         [Fact]

@@ -26,9 +26,9 @@ namespace AutoMapper.QueryableExtensions
             return QueryMapperVisitor.Map<TSource, TDestination>(sourceQuery, destQuery, config);
         }
 
-        public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource, IExpressionBuilder builder, IMapper mapper)
+        public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource, IMapper mapper)
         {
-            return new QueryDataSourceInjection<TSource>(dataSource, builder, mapper);
+            return new QueryDataSourceInjection<TSource>(dataSource, mapper);
         }
 
         /// <summary>
@@ -37,13 +37,13 @@ namespace AutoMapper.QueryableExtensions
         /// <remarks>Projections are only calculated once and cached</remarks>
         /// <typeparam name="TDestination">Destination type</typeparam>
         /// <param name="source">Queryable source</param>
-        /// <param name="builder">Expression builder</param>
+        /// <param name="configuration">Maper configuration</param>
         /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Expression to project into</returns>
-        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IExpressionBuilder builder, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
+        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IConfigurationProvider configuration, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
         {
-            return new ProjectionExpression(source, builder).To(parameters, membersToExpand);
+            return new ProjectionExpression(source, configuration.ExpressionBuilder).To(parameters, membersToExpand);
         }
 
         /// <summary>
@@ -52,15 +52,16 @@ namespace AutoMapper.QueryableExtensions
         /// <remarks>Projections are only calculated once and cached</remarks>
         /// <typeparam name="TDestination">Destination type</typeparam>
         /// <param name="source">Queryable source</param>
+        /// <param name="configuration">Mapper configuration</param>
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Expression to project into</returns>
         public static IQueryable<TDestination> ProjectTo<TDestination>(
             this IQueryable source,
-            IExpressionBuilder builder,
+            IConfigurationProvider configuration,
             params Expression<Func<TDestination, object>>[] membersToExpand
             )
         {
-            return source.ProjectTo(builder, null, membersToExpand);
+            return source.ProjectTo(configuration, null, membersToExpand);
         }
 
         /// <summary>
@@ -68,13 +69,13 @@ namespace AutoMapper.QueryableExtensions
         /// </summary>
         /// <typeparam name="TDestination">Destination type to map to</typeparam>
         /// <param name="source">Queryable source</param>
-        /// <param name="builder">Expression builder</param>
+        /// <param name="configuration">Mapper configuration</param>
         /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IExpressionBuilder builder, IDictionary<string, object> parameters, params string[] membersToExpand)
+        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IConfigurationProvider configuration, IDictionary<string, object> parameters, params string[] membersToExpand)
         {
-            return new ProjectionExpression(source, builder).To<TDestination>(parameters, membersToExpand);
+            return new ProjectionExpression(source, configuration.ExpressionBuilder).To<TDestination>(parameters, membersToExpand);
         }
     }
 }

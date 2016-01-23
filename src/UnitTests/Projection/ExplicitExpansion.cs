@@ -54,7 +54,7 @@
                 }
             };
 
-            _dests = sourceList.AsQueryable().ProjectTo<Dest>(ExpressionBuilder, d => d.Child2).ToArray();
+            _dests = sourceList.AsQueryable().ProjectTo<Dest>(Configuration, d => d.Child2).ToArray();
         }
 
         [Fact]

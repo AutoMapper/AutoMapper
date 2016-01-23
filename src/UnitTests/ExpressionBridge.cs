@@ -103,11 +103,11 @@ namespace AutoMapper.UnitTests
             private Expression<Func<Product, AbstractProductDto>> _abstractProductConversionLinq;
             private List<SimpleProductDto> _simpleProducts;
             private List<ExtendedProductDto> _extendedProducts;
-            private IExpressionBuilder _builder;
+            private MapperConfiguration _config;
 
             protected override void Establish_context()
             {
-                var config = new MapperConfiguration(cfg =>
+                _config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Product, SimpleProductDto>()
                         .ForMember(m => m.CategoryName, dst => dst.MapFrom(p => p.ProductSubcategory.ProductCategory.Name));
@@ -123,11 +123,9 @@ namespace AutoMapper.UnitTests
                         //.ConvertUsing(x => ProductTypeDto.GetProdType(x));
                         .ConvertUsing<ProductTypeConverter>();
                 });
-                _builder = config.CreateExpressionBuilder();
-
-                _simpleProductConversionLinq = _builder.CreateMapExpression<Product, SimpleProductDto>();
-                _extendedProductConversionLinq = _builder.CreateMapExpression<Product, ExtendedProductDto>();
-                _abstractProductConversionLinq = _builder.CreateMapExpression<Product, AbstractProductDto>();
+                _simpleProductConversionLinq = _config.ExpressionBuilder.CreateMapExpression<Product, SimpleProductDto>();
+                _extendedProductConversionLinq = _config.ExpressionBuilder.CreateMapExpression<Product, ExtendedProductDto>();
+                _abstractProductConversionLinq = _config.ExpressionBuilder.CreateMapExpression<Product, AbstractProductDto>();
 
                 _products = new List<Product>()
                 {
@@ -195,14 +193,14 @@ namespace AutoMapper.UnitTests
                 
                 var queryable = _products.AsQueryable();
 
-                var simpleProducts = queryable.ProjectTo<SimpleProductDto>(_builder).ToList();
+                var simpleProducts = queryable.ProjectTo<SimpleProductDto>(_config).ToList();
 
                 simpleProducts.Count.ShouldEqual(1);
                 simpleProducts[0].Name.ShouldEqual("Foo");
                 simpleProducts[0].ProductSubcategoryName.ShouldEqual("Bar");
                 simpleProducts[0].CategoryName.ShouldEqual("Baz");
 
-                var extendedProducts = queryable.ProjectTo<ExtendedProductDto>(_builder).ToList();
+                var extendedProducts = queryable.ProjectTo<ExtendedProductDto>(_config).ToList();
 
                 extendedProducts.Count.ShouldEqual(1);
                 extendedProducts[0].Name.ShouldEqual("Foo");
@@ -211,7 +209,7 @@ namespace AutoMapper.UnitTests
                 extendedProducts[0].BOM.Count.ShouldEqual(1);
                 extendedProducts[0].BOM[0].BillOfMaterialsID.ShouldEqual(5);
 
-                var complexProducts = queryable.ProjectTo<ComplexProductDto>(_builder).ToList();
+                var complexProducts = queryable.ProjectTo<ComplexProductDto>(_config).ToList();
 
                 complexProducts.Count.ShouldEqual(1);
                 complexProducts[0].Name.ShouldEqual("Foo");
@@ -227,7 +225,7 @@ namespace AutoMapper.UnitTests
 
                 var queryable = _products.AsQueryable();
 
-                var abstractProducts = queryable.ProjectTo<AbstractProductDto>(_builder).ToList();
+                var abstractProducts = queryable.ProjectTo<AbstractProductDto>(_config).ToList();
 
                 abstractProducts[0].Types.Count.ShouldEqual(3);
                 abstractProducts[0].Types[0].GetType().ShouldEqual(typeof (ProdTypeA));
@@ -301,7 +299,7 @@ namespace AutoMapper.UnitTests
                 [Fact]
                 public void Should_not_throw_exception()
                 {
-                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>(ExpressionBuilder));
+                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>(Configuration));
                 }
             }
         }
