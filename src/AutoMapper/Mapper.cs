@@ -439,7 +439,7 @@ namespace AutoMapper
         [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static IMappingEngine Engine => _mappingEngine.Value._engine;
         private static IMapper Instance => _mappingEngine.Value;
-        private static IConfigurationProvider ConfigurationProvider => _configuration.Value;
+        internal static IConfigurationProvider ConfigurationProvider => _configuration.Value;
         private static IDynamicMapper DynamicInstance => _mappingEngine.Value;
 
         /// <summary>
