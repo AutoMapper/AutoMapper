@@ -11,7 +11,38 @@ namespace AutoMapper.UnitTests
 {
 	namespace ArraysAndLists
 	{
-		public class When_mapping_to_a_concrete_non_generic_ienumerable : AutoMapperSpecBase
+        public class When_mapping_to_an_existing_array_typed_as_IEnumerable : AutoMapperSpecBase
+        {
+            private Destination _destination = new Destination();
+
+            public class Source
+            {
+                public int[] IntCollection { get; set; } = new int[0];
+            }
+
+            public class Destination
+            {
+                public IEnumerable<int> IntCollection { get; set; } = new[] { 1, 2, 3, 4, 5 };
+            }
+
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>();
+            });
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map(new Source(), _destination);
+            }
+
+            [Fact]
+            public void Should_create_destination_array_the_same_size_as_the_source()
+            {
+                _destination.IntCollection.Count().ShouldEqual(0);
+            }
+        }
+
+        public class When_mapping_to_a_concrete_non_generic_ienumerable : AutoMapperSpecBase
 		{
 			private Destination _destination;
 
