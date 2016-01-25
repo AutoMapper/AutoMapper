@@ -19,9 +19,22 @@ namespace AutoMapper.UnitTests
 
     public abstract class NonValidatingSpecBase : SpecBase
     {
+        private IMapper mapper;
+
         protected abstract MapperConfiguration Configuration { get; }
         protected IConfigurationProvider ConfigProvider => Configuration;
-        protected IMapper Mapper => Configuration.CreateMapper();
+
+        protected IMapper Mapper
+        {
+            get
+            {
+                if(mapper == null)
+                {
+                    mapper = Configuration.CreateMapper();
+                }
+                return mapper;
+            }
+        }
 
         protected override void Cleanup()
         {
