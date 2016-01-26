@@ -650,11 +650,6 @@ namespace AutoMapper
             public NamedProfile(string profileName) : base(profileName)
             {
             }
-
-            protected override void Configure()
-            {
-                // no-op
-            }
         }
 
     }
