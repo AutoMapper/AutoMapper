@@ -399,6 +399,21 @@ namespace AutoMapper
 
         private IEnumerable<Type> GetAllTypes(Type type)
         {
+            var typeInheritance = GetTypeInheritance(type);
+            foreach (var item in typeInheritance)
+                yield return item;
+
+            var interfaceComparer = new InterfaceComparer(type);
+            var allInterfaces = type.GetTypeInfo().ImplementedInterfaces.OrderByDescending(t => t, interfaceComparer);
+
+            foreach (var interfaceType in allInterfaces)
+            {
+                yield return interfaceType;
+            }
+        }
+
+        private static IEnumerable<Type> GetTypeInheritance(Type type)
+        {
             yield return type;
 
             Type baseType = type.BaseType();
@@ -406,13 +421,6 @@ namespace AutoMapper
             {
                 yield return baseType;
                 baseType = baseType.BaseType();
-            }
-
-            var allInterfaces = type.GetTypeInfo().ImplementedInterfaces.OrderByDescending(t => t, new InterfaceComparer());
-
-            foreach (var interfaceType in allInterfaces)
-            {
-                yield return interfaceType;
             }
         }
 
@@ -536,20 +544,72 @@ namespace AutoMapper
         }
         private class InterfaceComparer : IComparer<Type>
         {
+            private readonly List<TypeInfo> _typeInheritance;
+            private readonly TypeInfo _target;
+
+            public InterfaceComparer(Type target)
+            {
+                if (target != null)
+                {
+                    _typeInheritance = GetTypeInheritance(target).Select(type => type.GetTypeInfo()).Reverse().ToList();
+                    _target = _typeInheritance[_typeInheritance.Count - 1];
+                }
+            }
+
             public int Compare(Type x, Type y)
             {
-                var left = x.IsAssignableFrom(y);
-                var right = y.IsAssignableFrom(x);
-                if (left & !right)
+                var xLessOrEqualY = x.IsAssignableFrom(y);
+                var yLessOrEqualX = y.IsAssignableFrom(x);
+
+                if (xLessOrEqualY & !yLessOrEqualX)
                 {
                     return -1;
                 }
-                if (!left & right)
+                if (!xLessOrEqualY & yLessOrEqualX)
                 {
                     return 1;
                 }
+                if (xLessOrEqualY & yLessOrEqualX)
+                {
+                    return 0;
+                }
+
+                if (_target != null && !_target.IsInterface)
+                {
+                    var comparer = new InterfaceComparer(null);
+
+                    var xLastImplementedIn =
+                        _target.GetRuntimeInterfaceMap(x)
+                            .TargetMethods
+                            .OrderBy(method => method.DeclaringType, comparer)
+                            .Select(method => method.DeclaringType.GetTypeInfo())
+                            .LastOrDefault() ?? _target;
+
+                    var yLastImplementedIn =
+                        _target.GetRuntimeInterfaceMap(y)
+                            .TargetMethods
+                            .OrderBy(method => method.DeclaringType, comparer)
+                            .Select(method => method.DeclaringType.GetTypeInfo())
+                            .LastOrDefault() ?? _target;
+
+                    var xFirstIntroduceTypeIndex =
+                        _typeInheritance.IndexOf(xLastImplementedIn);
+                    var yFirstIntroduceTypeIndex =
+                        _typeInheritance.IndexOf(yLastImplementedIn);
+
+                    if (xFirstIntroduceTypeIndex < yFirstIntroduceTypeIndex)
+                    {
+                        return -1;
+                    }
+                    if (yFirstIntroduceTypeIndex > xFirstIntroduceTypeIndex)
+                    {
+                        return 1;
+                    }
+                }
+
                 return 0;
             }
         }
+
     }
 }
