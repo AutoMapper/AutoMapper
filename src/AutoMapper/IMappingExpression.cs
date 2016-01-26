@@ -78,6 +78,12 @@ namespace AutoMapper
         void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions);
 
         /// <summary>
+        /// Customize configuration for members not previously configured
+        /// </summary>
+        /// <param name="memberOptions">Callback for member options</param>
+        void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions);
+
+        /// <summary>
         /// Customize configuration for an individual source member
         /// </summary>
         /// <param name="sourceMemberName">Source member name</param>
@@ -178,6 +184,12 @@ namespace AutoMapper
     /// <typeparam name="TDestination">Destination type</typeparam>
     public interface IMappingExpression<TSource, TDestination>
     {
+        /// <summary>
+        /// Customize configuration for members not previously configured
+        /// </summary>
+        /// <param name="memberOptions">Callback for member options</param>
+        void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
+
         /// <summary>
         /// Customize configuration for individual member
         /// </summary>
