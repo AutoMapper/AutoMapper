@@ -408,7 +408,9 @@ namespace AutoMapper
                 baseType = baseType.BaseType();
             }
 
-            foreach (var interfaceType in type.GetTypeInfo().ImplementedInterfaces)
+            var allInterfaces = type.GetTypeInfo().ImplementedInterfaces.OrderByDescending(t => t, new InterfaceComparer());
+
+            foreach (var interfaceType in allInterfaces)
             {
                 yield return interfaceType;
             }
@@ -530,6 +532,23 @@ namespace AutoMapper
                         DryRunTypeMap(typeMapsChecked, memberContext);
                     }
                 }
+            }
+        }
+        private class InterfaceComparer : IComparer<Type>
+        {
+            public int Compare(Type x, Type y)
+            {
+                var left = x.IsAssignableFrom(y);
+                var right = y.IsAssignableFrom(x);
+                if (left & !right)
+                {
+                    return -1;
+                }
+                if (!left & right)
+                {
+                    return 1;
+                }
+                return 0;
             }
         }
     }
