@@ -477,15 +477,31 @@ namespace AutoMapper
         private IEnumerable<Type> GetAllTypes(Type type)
         {
             yield return type;
-
+            foreach(var interfaceType in GetInterfaces(type))
+            {
+                yield return interfaceType;
+            }
             Type baseType = type.BaseType();
             while (baseType != null)
             {
                 yield return baseType;
+                foreach(var interfaceType in GetInterfaces(baseType))
+                {
+                    yield return interfaceType;
+                }
                 baseType = baseType.BaseType();
             }
+        }
 
-            foreach (var interfaceType in type.GetTypeInfo().ImplementedInterfaces)
+        private static IEnumerable<Type> GetInterfaces(Type type)
+        {
+            var typeInfo = type.GetTypeInfo();
+            var interfaces = typeInfo.ImplementedInterfaces;
+            if(!typeInfo.IsArray && !typeInfo.IsInterface)
+            {
+                interfaces = interfaces.Where(i => typeInfo.GetRuntimeInterfaceMap(i).TargetMethods.Any(m => m.DeclaringType == type));
+            }
+            foreach(var interfaceType in interfaces)
             {
                 yield return interfaceType;
             }

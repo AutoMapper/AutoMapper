@@ -9,6 +9,69 @@ namespace AutoMapper.UnitTests
 {
     namespace InterfaceMapping
     {
+        public class When_mapping_to_existing_object_through_interfaces : AutoMapperSpecBase
+        {
+            private class2DTO _result;
+
+            public class class1 : iclass1
+            {
+                public string prop1 { get; set; }
+            }
+
+            public class class2 : class1, iclass2
+            {
+                public string prop2 { get; set; }
+            }
+
+            public class class1DTO : iclass1DTO
+            {
+                public string prop1 { get; set; }
+            }
+
+            public class class2DTO : class1DTO, iclass2DTO
+            {
+                public string prop2 { get; set; }
+            }
+
+            public interface iclass1
+            {
+                string prop1 { get; set; }
+            }
+
+            public interface iclass2
+            {
+                string prop2 { get; set; }
+            }
+
+            public interface iclass1DTO
+            {
+                string prop1 { get; set; }
+            }
+
+            public interface iclass2DTO
+            {
+                string prop2 { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<iclass1, iclass1DTO>();
+                cfg.CreateMap<iclass2, iclass2DTO>();
+            });
+
+            protected override void Because_of()
+            {
+                var bo = new class2 { prop1 = "PROP1", prop2 = "PROP2" };
+                _result = Mapper.Map(bo, new class2DTO());
+            }
+
+            [Fact]
+            public void Should_use_the_most_derived_interface()
+            {
+                _result.prop2.ShouldEqual("PROP2");
+            }
+        }
+
         public class When_mapping_an_interface_to_an_abstract_type : AutoMapperSpecBase
         {
             private DtoObject _result;
