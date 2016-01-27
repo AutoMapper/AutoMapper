@@ -27,19 +27,21 @@ namespace AutoMapperSamples
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var mapperConfig = new MapperConfiguration(cfg =>
 				{
 					cfg.CreateMap<OrderForm, ICreateOrderMessage>();
 				});
 
-				Mapper.AssertConfigurationIsValid();
+				mapperConfig.AssertConfigurationIsValid();
+
+			    var mapper = mapperConfig.CreateMapper();
 
 				var order = new OrderForm
 					{
 						Customer = new Customer {Name = "Bob Smith"}
 					};
 
-				var message = Mapper.Map<OrderForm, ICreateOrderMessage>(order);
+				var message = mapper.Map<OrderForm, ICreateOrderMessage>(order);
 
 				message.CustomerName.ShouldEqual("Bob Smith");
 			}
