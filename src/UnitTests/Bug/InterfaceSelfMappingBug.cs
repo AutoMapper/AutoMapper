@@ -39,7 +39,7 @@ namespace AutoMapper.UnitTests.Bug
                 Value = 10
             };
 
-            Mapper.Map(bar, baz);
+            config.CreateMapper().Map(bar, baz);
 
             baz.Value.ShouldEqual(5);
         }

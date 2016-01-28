@@ -8,7 +8,7 @@ namespace AutoMapper.UnitTests
 {
 	namespace General
 	{
-		public class When_mapping_dto_with_a_missing_match : AutoMapperSpecBase
+		public class When_mapping_dto_with_a_missing_match : NonValidatingSpecBase
 		{
 			public class ModelObject
 			{

@@ -216,22 +216,6 @@ namespace AutoMapper.UnitTests
                 complexProducts[0].ProductSubcategory.Name.ShouldEqual("Bar");
                 complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
             }
-
-            [Fact(Skip = "Won't work for normal query providers")]
-            public void List_of_abstract_should_be_mapped()
-            {
-                var mapped = Mapper.Map<AbstractProductDto>(_products[0]);
-                mapped.Types.Count.ShouldEqual(3);
-
-                var queryable = _products.AsQueryable();
-
-                var abstractProducts = queryable.ProjectTo<AbstractProductDto>(_config).ToList();
-
-                abstractProducts[0].Types.Count.ShouldEqual(3);
-                abstractProducts[0].Types[0].GetType().ShouldEqual(typeof (ProdTypeA));
-                abstractProducts[0].Types[1].GetType().ShouldEqual(typeof (ProdTypeB));
-                abstractProducts[0].Types[2].GetType().ShouldEqual(typeof (ProdTypeA));
-            }
         }
 
         namespace CircularReferences

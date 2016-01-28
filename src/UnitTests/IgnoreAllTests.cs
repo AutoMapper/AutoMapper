@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests
 					.ForMember(dest => dest.AnotherString_ShouldBeNullAfterwards, opt => opt.Ignore());
 			});
             
-            Mapper.Map<Source, Destination>(new Source{ShouldBeMapped = "true"});
+            config.CreateMapper().Map<Source, Destination>(new Source{ShouldBeMapped = "true"});
             config.AssertConfigurationIsValid();
         }
 
@@ -47,7 +47,7 @@ namespace AutoMapper.UnitTests
                 cfg.CreateMap<Source, DestinationWrongType>();
             });
 
-            Mapper.Map<Source, DestinationWrongType>(new Source { ShouldBeMapped = "true" });
+            config.CreateMapper().Map<Source, DestinationWrongType>(new Source { ShouldBeMapped = "true" });
             config.AssertConfigurationIsValid();
         }
 
@@ -61,7 +61,7 @@ namespace AutoMapper.UnitTests
 					.ForMember(dest => dest.AnotherString_ShouldBeNullAfterwards, opt => opt.Ignore());
 			});
 
-            Destination destination = Mapper.Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
+            Destination destination = config.CreateMapper().Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
             destination.StartingWith_ShouldBeNullAfterwards.ShouldEqual(null);
             destination.StartingWith_ShouldNotBeMapped.ShouldEqual(null);
         }
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests
 				cfg.CreateMap<Source, Destination>();
 			});
 
-            Destination destination = Mapper.Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
+            Destination destination = config.CreateMapper().Map<Source, Destination>(new Source { ShouldBeMapped = "true" });
             destination.AnotherString_ShouldBeNullAfterwards.ShouldEqual(null);
             destination.StartingWith_ShouldNotBeMapped.ShouldEqual(null);
         }
@@ -99,7 +99,7 @@ namespace AutoMapper.UnitTests
 		[Fact]
 		public void Ignore_On_Source_Field()
 		{
-			Mapper.CreateMap<Source, Destination>();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
 			config.AssertConfigurationIsValid();
 
 			Source source = new Source
@@ -108,7 +108,7 @@ namespace AutoMapper.UnitTests
 				ShouldNotBeMapped = "Value2"
 			};
 
-			Destination destination = Mapper.Map<Source, Destination>(source);
+			Destination destination = config.CreateMapper().Map<Source, Destination>(source);
             destination.ShouldNotBeMapped.ShouldEqual(null);
 		}
 	}
@@ -131,8 +131,8 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Ignore_On_Source_Field()
         {
-            Mapper.CreateMap<Source, Destination>()
-                .ReverseMap();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
+                .ReverseMap());
             config.AssertConfigurationIsValid();
 
             Destination source = new Destination
@@ -141,7 +141,7 @@ namespace AutoMapper.UnitTests
                 ShouldNotBeMapped = "Value2"
             };
 
-            Source destination = Mapper.Map<Destination, Source>(source);
+            Source destination = config.CreateMapper().Map<Destination, Source>(source);
             destination.ShouldNotBeMapped.ShouldEqual(null);
 
         }

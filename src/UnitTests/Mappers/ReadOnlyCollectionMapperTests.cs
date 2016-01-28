@@ -11,7 +11,9 @@ namespace AutoMapper.UnitTests.Mappers
 	public class ReadOnlyCollectionMapperTests
 	{
 		SourceAsEnumerable _sourceAsEnumerable;
-        public ReadOnlyCollectionMapperTests()
+	    private IMapper _mapper;
+
+	    public ReadOnlyCollectionMapperTests()
         {
             SetUp();
         }
@@ -24,15 +26,19 @@ namespace AutoMapper.UnitTests.Mappers
 				ValueIUser = new List<IUser>() { new UserSource("z", 21) },
 				ValueUser = new List<UserSource>() { new UserSource("y", 20), new UserSource("x", 19) },
 			};
-			Mapper.CreateMap<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>();
-			Mapper.CreateMap<SourceAsEnumerable, DestinationAsReadOnlyCollectionNotNull>();
-			Mapper.CreateMap<UserSource, UserDestination>();
+		    var config = new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>();
+		        cfg.CreateMap<SourceAsEnumerable, DestinationAsReadOnlyCollectionNotNull>();
+		        cfg.CreateMap<UserSource, UserDestination>();
+		    });
+		    _mapper = config.CreateMapper();
 		}
 
 		[Fact]
 		public void should_map_to_ReadOnlyCollection_when_destination_properties_are_null()
 		{
-			var destination = Mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
+			var destination = _mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
 			destination.ShouldNotBeNull();
 			_sourceAsEnumerable.ValueInt.Count().ShouldEqual(destination.ValueInt.Count());
@@ -65,7 +71,7 @@ namespace AutoMapper.UnitTests.Mappers
 		[Fact]
 		public void should_replace_ReadOnlyCollection_when_destination_properties_are_not_null()
 		{
-			var destination = Mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNotNull>(_sourceAsEnumerable);
+			var destination = _mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNotNull>(_sourceAsEnumerable);
 
 			destination.ShouldNotBeNull();
 			_sourceAsEnumerable.ValueInt.Count().ShouldEqual(destination.ValueInt.Count());
@@ -96,7 +102,7 @@ namespace AutoMapper.UnitTests.Mappers
 		[Fact]
 		public void should_set_ReadOnlyCollection_underlying_all_IReadOnlyList()
 		{
-			var destination = Mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
+			var destination = _mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
 			destination.ShouldNotBeNull();
 			destination.ValueIUser.ShouldBeType<ReadOnlyCollection<IUser>>();
@@ -105,7 +111,7 @@ namespace AutoMapper.UnitTests.Mappers
 		[Fact]
 		public void should_set_ReadOnlyCollection_underlying_all_IReadOnlyCollection()
 		{
-			var destination = Mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
+			var destination = _mapper.Map<SourceAsEnumerable, DestinationAsReadOnlyCollectionNull>(_sourceAsEnumerable);
 
 			destination.ShouldNotBeNull();
 			destination.ValueUser.ShouldBeType<ReadOnlyCollection<UserDestination>>();

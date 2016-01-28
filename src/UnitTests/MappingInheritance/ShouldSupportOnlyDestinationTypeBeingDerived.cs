@@ -48,7 +48,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
                 cfg.CreateMap<Customer, CustomerDTO>();
                 cfg.CreateMap<Customer, CustomerStubDTO>().As<CustomerDTO>();
             });
-            var orderDto = Mapper.Map<Order, OrderDTO>(order);
+            var orderDto = config.CreateMapper().Map<Order, OrderDTO>(order);
 
             var customerDto = (CustomerDTO)orderDto.Customer;
             "A".ShouldEqual(customerDto.Name);
@@ -96,7 +96,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
                 cfg.CreateMap(typeof(Customer), typeof(CustomerDTO));
                 cfg.CreateMap(typeof(Customer), typeof(CustomerStubDTO)).As(typeof(CustomerDTO));
             });
-            var orderDto = Mapper.Map<Order, OrderDTO>(order);
+            var orderDto = config.CreateMapper().Map<Order, OrderDTO>(order);
 
             var customerDto = (CustomerDTO)orderDto.Customer;
             "A".ShouldEqual(customerDto.Name);

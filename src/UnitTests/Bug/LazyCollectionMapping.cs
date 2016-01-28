@@ -66,10 +66,10 @@ namespace AutoMapper.UnitTests.Bug
 		[Fact]
 		public void Should_not_enumerate_twice()
 		{
-			Mapper.CreateMap<Source, Destination>();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
 
 			var source = new Source {Collection = Create(new[] {"one", "two", "three"})};
-			var enumerable = Mapper.Map(source, new Destination());
+			var enumerable = config.CreateMapper().Map(source, new Destination());
 
 			enumerable.Collection.Count().ShouldEqual(3);
 		}

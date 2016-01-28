@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests
 
             Expression<Func<Dest, bool>> expr = d => d.Value == 10;
 
-            var mapped = Mapper.Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
+            var mapped = config.CreateMapper().Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
 
             var items = new[]
             {
@@ -55,7 +55,7 @@ namespace AutoMapper.UnitTests
 
             Expression<Func<Dest, bool>> expr = d => d.ChildValue == 10;
 
-            var mapped = Mapper.Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
+            var mapped = config.CreateMapper().Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
 
             var items = new[]
             {
@@ -74,7 +74,7 @@ namespace AutoMapper.UnitTests
 
             Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
 
-            var mapped = Mapper.Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
+            var mapped = config.CreateMapper().Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
 
             var items = new[]
             {
@@ -93,7 +93,7 @@ namespace AutoMapper.UnitTests
 
             Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
 
-            Assert.Throws<AutoMapperMappingException>(() => Mapper.Map<Expression<Func<Dest, bool>>, Expression<Action<Source, bool>>>(expr));
+            Assert.Throws<AutoMapperMappingException>(() => config.CreateMapper().Map<Expression<Func<Dest, bool>>, Expression<Action<Source, bool>>>(expr));
         }
 
         [Fact]
@@ -103,7 +103,7 @@ namespace AutoMapper.UnitTests
 
             Expression<Func<Dest, Dest>> expr = d => d;
 
-            var mapped = Mapper.Map<Expression<Func<Dest, Dest>>, Expression<Func<Source, Source>>>(expr);
+            var mapped = config.CreateMapper().Map<Expression<Func<Dest, Dest>>, Expression<Func<Source, Source>>>(expr);
 
             var items = new[]
             {

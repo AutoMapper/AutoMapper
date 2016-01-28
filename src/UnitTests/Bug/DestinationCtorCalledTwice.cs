@@ -41,7 +41,7 @@ namespace AutoMapper.UnitTests.Bug
                 var dest = new Destination {Value = 7};
 
                 var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
-                Mapper.Map(source, dest);
+                config.CreateMapper().Map(source, dest);
 
                 Destination.CallCount.ShouldEqual(1);
             }

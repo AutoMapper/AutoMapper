@@ -401,21 +401,21 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_use_the_custom_translator()
             {
-                Mapper.CreateMap<Source, Destination>()
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
+                    .ConvertUsing(s => new Destination { Value = s.Value + 10 }));
 
-                _dest = Mapper.Map<Source, Destination>(_source);
+                _dest = config.CreateMapper().Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
             }
 
             [Fact]
             public void Should_ignore_other_mapping_rules()
             {
-                Mapper.CreateMap<Source, Destination>()
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                    .ConvertUsing(s => new Destination { Value = s.Value + 10 }));
 
-                _dest = Mapper.Map<Source, Destination>(_source);
+                _dest = config.CreateMapper().Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
             }
         }
@@ -448,21 +448,21 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_use_the_custom_translator()
             {
-                Mapper.CreateMap<Source, Destination>()
-                    .ProjectUsing(s => new Destination { Value = s.Value + 10 });
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
+                    .ProjectUsing(s => new Destination { Value = s.Value + 10 }));
 
-                _dest = Mapper.Map<Source, Destination>(_source);
+                _dest = config.CreateMapper().Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
             }
 
             [Fact]
             public void Should_ignore_other_mapping_rules()
             {
-                Mapper.CreateMap<Source, Destination>()
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-                    .ProjectUsing(s => new Destination { Value = s.Value + 10 });
+                    .ProjectUsing(s => new Destination { Value = s.Value + 10 }));
 
-                _dest = Mapper.Map<Source, Destination>(_source);
+                _dest = config.CreateMapper().Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
             }
         }
@@ -500,21 +500,21 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_to_the_destination_object_from_the_custom_translator()
             {
-                Mapper.CreateMap<Source, Destination>()
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
+                    .ConvertUsing(s => new Destination { Value = s.Value + 10 }));
 
-                _dest = Mapper.Map(_source, _dest);
+                _dest = config.CreateMapper().Map(_source, _dest);
                 _dest.Value.ShouldEqual(20);
             }
 
             [Fact]
             public void Should_ignore_other_mapping_rules()
             {
-                Mapper.CreateMap<Source, Destination>()
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                    .ConvertUsing(s => new Destination { Value = s.Value + 10 }));
 
-                _dest = Mapper.Map(_source, _dest);
+                _dest = config.CreateMapper().Map(_source, _dest);
                 _dest.Value.ShouldEqual(20);
             }
         }
@@ -555,21 +555,21 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_use_the_custom_translator()
             {
-                Mapper.CreateMap<Source, Destination>()
-                    .ConvertUsing<Converter>();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
+                    .ConvertUsing<Converter>());
 
-                _dest = Mapper.Map<Source, Destination>(_source);
+                _dest = config.CreateMapper().Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
             }
 
             [Fact]
             public void Should_ignore_other_mapping_rules()
             {
-                Mapper.CreateMap<Source, Destination>()
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.AnotherValue))
-                    .ConvertUsing(s => new Destination { Value = s.Value + 10 });
+                    .ConvertUsing(s => new Destination { Value = s.Value + 10 }));
 
-                _dest = Mapper.Map<Source, Destination>(_source);
+                _dest = config.CreateMapper().Map<Source, Destination>(_source);
                 _dest.Value.ShouldEqual(20);
             }
         }
@@ -826,8 +826,8 @@ namespace AutoMapper.UnitTests
             {
                 typeof(ArgumentException).ShouldBeThrownBy(() =>
                 {
-                    Mapper.CreateMap<Source, Destination>()
-                        .ForMember(dest => dest.Dest.Value, opt => opt.MapFrom(src => src.Value));
+                    var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
+                        .ForMember(dest => dest.Dest.Value, opt => opt.MapFrom(src => src.Value)));
                 });
             }
         }
@@ -1115,8 +1115,8 @@ namespace AutoMapper.UnitTests
             {
                 try
                 {
-                    Mapper.CreateMap<Source, Dest>()
-                        .ForMember(dest => dest, opt => opt.UseValue(5));
+                    var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>()
+                        .ForMember(dest => dest, opt => opt.UseValue(5)));
                 }
                 catch (Exception e)
                 {

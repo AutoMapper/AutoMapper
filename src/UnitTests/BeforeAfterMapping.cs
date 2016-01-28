@@ -59,7 +59,9 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
                     .AfterMap((src, dest) => afterMapCount++);
             });
 
-            Mapper.Map<Source, Destination>(new Source());
+            var mapper = config.CreateMapper();
+
+            mapper.Map<Source, Destination>(new Source());
 
             beforeMapCount.ShouldEqual(2);
             afterMapCount.ShouldEqual(2);

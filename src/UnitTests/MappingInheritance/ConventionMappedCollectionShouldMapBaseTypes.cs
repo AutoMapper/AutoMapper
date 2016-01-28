@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<SpecificItem, SpecificItemDto>();
             });
 
-            var dto = Mapper.Map<Container, ContainerDto>(new Container
+            var dto = config.CreateMapper().Map<Container, ContainerDto>(new Container
                                                     {
                                                         Items =
                                                             {
@@ -77,7 +77,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<SpecificItem, SpecificItemDto>();
             });
 
-            var dto = Mapper.Map<ContainerDto>(new Container
+            var dto = config.CreateMapper().Map<ContainerDto>(new Container
             {
                 Items =
                                                             {

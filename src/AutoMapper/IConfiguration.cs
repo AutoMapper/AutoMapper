@@ -36,6 +36,12 @@ namespace AutoMapper
         void AddProfile<TProfile>() where TProfile : Profile, new();
 
         /// <summary>
+        /// Add an existing profile type. Profile will be instantiated and added to the configuration.
+        /// </summary>
+        /// <param name="profileType">Profile type</param>
+        void AddProfile(Type profileType);
+
+        /// <summary>
         /// Supply a factory method callback for creating resolvers and type converters
         /// </summary>
         /// <param name="constructor">Factory method</param>

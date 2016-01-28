@@ -215,7 +215,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private Source _source;
+			private static Source _source;
 			private Destination _dest;
 
 			public class Source

@@ -5,7 +5,7 @@ namespace AutoMapper.UnitTests.Bug
     using System;
     using Should;
 
-    public class CorrectCtorIsPickedOnDestinationType : AutoMapperSpecBase
+    public class CorrectCtorIsPickedOnDestinationType : NonValidatingSpecBase
     {
         public class SourceClass { }
 

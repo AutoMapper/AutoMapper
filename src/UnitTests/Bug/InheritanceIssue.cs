@@ -164,21 +164,25 @@ namespace AutoMapper.UnitTests.Bug
                 };
                 entity.Components.Add("2", locationComponent);
 
-                Mapper.CreateMap<ComponentContainer, ComponentContainerDTO>()
-                    .Include<Entity, EntityDTO>();
+                var config = new MapperConfiguration(cfg =>
+                {
 
-                Mapper.CreateMap<Entity, EntityDTO>();
+                    cfg.CreateMap<ComponentContainer, ComponentContainerDTO>()
+                        .Include<Entity, EntityDTO>();
 
-                Mapper.CreateMap<Component, ComponentDTO>()
-                    .Include<Health, HealthDTO>()
-                    .Include<PhysicalLocation, PhysicalLocationDTO>();
+                    cfg.CreateMap<Entity, EntityDTO>();
 
-                Mapper.CreateMap<Health, HealthDTO>();
-                Mapper.CreateMap<PhysicalLocation, PhysicalLocationDTO>();
+                    cfg.CreateMap<Component, ComponentDTO>()
+                        .Include<Health, HealthDTO>()
+                        .Include<PhysicalLocation, PhysicalLocationDTO>();
+
+                    cfg.CreateMap<Health, HealthDTO>();
+                    cfg.CreateMap<PhysicalLocation, PhysicalLocationDTO>();
+                });
 
                 config.AssertConfigurationIsValid();
 
-                EntityDTO targetEntity = Mapper.Map<Entity, EntityDTO>(entity);
+                EntityDTO targetEntity = config.CreateMapper().Map<Entity, EntityDTO>(entity);
 
                 targetEntity.Components.Count.ShouldEqual(2);
 

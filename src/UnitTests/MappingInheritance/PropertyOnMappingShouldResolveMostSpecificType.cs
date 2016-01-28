@@ -79,7 +79,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<Container, ContainerDto>();
             });
 
-            var dto = Mapper.Map<Container, ContainerDto>(new Container
+            var dto = config.CreateMapper().Map<Container, ContainerDto>(new Container
                                                               {
                                                                   Items =
                                                                       {
@@ -119,7 +119,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<Container, ContainerDto>();
             });
 
-            var dto = Mapper.Map<ContainerDto>(new Container
+            var dto = config.CreateMapper().Map<ContainerDto>(new Container
             {
                 Items =
                                                                       {
@@ -159,7 +159,7 @@ namespace AutoMapper.UnitTests.Bug
 
             config.AssertConfigurationIsValid();
 
-            var dto = Mapper.Map<ItemBase, ItemDto>(new DifferentItem());
+            var dto = config.CreateMapper().Map<ItemBase, ItemDto>(new DifferentItem());
 
             dto.ShouldBeType<ItemDto>();
             dto.Description.ShouldBeType<DifferentDescriptionDto>();
@@ -191,7 +191,7 @@ namespace AutoMapper.UnitTests.Bug
 
             config.AssertConfigurationIsValid();
 
-            var dto = Mapper.Map<ItemDto>(new DifferentItem());
+            var dto = config.CreateMapper().Map<ItemDto>(new DifferentItem());
 
             dto.ShouldBeType<ItemDto>();
             dto.Description.ShouldBeType<DifferentDescriptionDto>();

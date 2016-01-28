@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests
 		public class When_configuring_a_profile_through_a_profile_subclass : AutoMapperSpecBase
 		{
 			private Dto _result;
-		    private CustomProfile1 _customProfile;
+		    private static CustomProfile1 _customProfile;
 
 		    public class Model
 			{

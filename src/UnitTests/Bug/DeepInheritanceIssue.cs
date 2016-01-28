@@ -28,8 +28,9 @@ namespace AutoMapper.UnitTests.Bug
             var expectedContCSrc = new ContainsASrc() {A = expectedCSrc};
             var expectedContBSrc = new ContainsASrc() {A = expectedBSrc};
 
-            var actualContCDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContCSrc);
-            var actualContBDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContBSrc); // THROWS
+            var mapper = config.CreateMapper();
+            var actualContCDest = mapper.Map<ContainsASrc, ContainsADest>(expectedContCSrc);
+            var actualContBDest = mapper.Map<ContainsASrc, ContainsADest>(expectedContBSrc); // THROWS
 
             config.AssertConfigurationIsValid();
             actualContBDest.ShouldNotBeNull();

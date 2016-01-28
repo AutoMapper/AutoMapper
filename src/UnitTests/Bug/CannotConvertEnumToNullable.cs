@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.Bug
             config.AssertConfigurationIsValid();
             DummySource src = new DummySource() { Dummy = DummyTypes.Bar };
 
-            var destination = Mapper.Map<DummySource, DummyDestination>(src);
+            var destination = config.CreateMapper().Map<DummySource, DummyDestination>(src);
 
             destination.Dummy.ShouldEqual((int)DummyTypes.Bar);
         }

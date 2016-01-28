@@ -3,7 +3,7 @@
     using Should;
     using Xunit;
 
-    public class EmptyNullSubstituteBug : AutoMapperSpecBase
+    public class EmptyNullSubstituteBug : NonValidatingSpecBase
     {
         private Entity _destination;
 

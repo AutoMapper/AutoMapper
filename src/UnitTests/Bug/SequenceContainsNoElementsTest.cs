@@ -12,7 +12,7 @@ namespace AutoMapper.UnitTests.Bug
 	{
 	    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	    {
-	        Mapper.CreateMap<Person, PersonModel>();
+	        cfg.CreateMap<Person, PersonModel>();
 	    });
 
 		[Fact]
@@ -33,13 +33,7 @@ namespace AutoMapper.UnitTests.Bug
 		{
 			this.people = people;
 		}
-		public IEnumerator GetEnumerator()
-		{
-			foreach (var person in people)
-			{
-				yield return person;
-			}
-		}
+		public IEnumerator GetEnumerator() => people.GetEnumerator();
 	}
 
 	public class Person

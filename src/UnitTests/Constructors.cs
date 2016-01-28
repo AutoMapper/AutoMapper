@@ -294,14 +294,17 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_constructor_arguments_using_mapping_engine()
             {
-                Mapper.CreateMap<SourceBar, DestinationBar>();
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<SourceBar, DestinationBar>();
 
-                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+                    cfg.CreateMap<SourceFoo, DestinationFoo>();
+                });
 
                 var sourceBar = new SourceBar("fooBar");
                 var sourceFoo = new SourceFoo(sourceBar);
 
-                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
                 destinationFoo.Bar.FooBar.ShouldEqual(sourceBar.FooBar);
             }
@@ -364,12 +367,12 @@ namespace AutoMapper.UnitTests
             public void Should_resolve_constructor_when_args_are_optional()
             {
 
-                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceFoo, DestinationFoo>());
 
                 var sourceBar = new SourceBar("fooBar");
                 var sourceFoo = new SourceFoo(sourceBar);
 
-                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
                 destinationFoo.Bar.ShouldBeNull();
                 destinationFoo.Str.ShouldEqual("hello");
@@ -440,12 +443,12 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_constructor_when_arg_is_optional()
             {
-                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceFoo, DestinationFoo>());
 
                 var sourceBar = new SourceBar("fooBar");
                 var sourceFoo = new SourceFoo(sourceBar);
 
-                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
                 destinationFoo.Bar.ShouldBeNull();
             }
@@ -507,12 +510,12 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_constructor_when_string_args_are_optional()
             {
-                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceFoo, DestinationFoo>());
 
                 var sourceBar = new SourceBar("fooBar");
                 var sourceFoo = new SourceFoo(sourceBar);
 
-                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
                 destinationFoo.A.ShouldEqual("a");
                 destinationFoo.B.ShouldEqual("b");

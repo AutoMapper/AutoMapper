@@ -77,9 +77,9 @@ namespace AutoMapper.UnitTests.Bug
 
     		Console.WriteLine( @"Mapping {0} on thread {1}", source.GetType( ), Thread.CurrentThread.ManagedThreadId ) ;
 
-    		Mapper.CreateMap( source.GetType( ), typeof( DestType ) ) ;
+    	    var config = new MapperConfiguration(cfg => cfg.CreateMap(source.GetType(), typeof (DestType)));
 
-    		DestType t2 = (DestType)Mapper.Map(source, source.GetType(  ), typeof( DestType ) )  ;
+    		DestType t2 = (DestType)config.CreateMapper().Map(source, source.GetType(  ), typeof( DestType ) )  ;
     	}
     	
 		static readonly Random _random = new Random();
@@ -208,34 +208,6 @@ namespace AutoMapper.UnitTests.Bug
                       mapper.Map<SomeDtoB, SomeDtoA>(new SomeDtoB());
                       mapper.Map<SomeDtoC, SomeDtoD>(new SomeDtoC());
                       mapper.Map<SomeDtoD, SomeDtoC>(new SomeDtoD());
-                  }))
-          .ToArray();
-            Exception exception = null;
-            try
-            {
-                Task.WaitAll(tasks);
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-            exception.ShouldBeNull();
-            //typeof(Exception).ShouldNotBeThrownBy(() => Task.WaitAll(tasks));
-        }
-        [Fact(Skip="Static API is going away")]
-        public void Should_not_fail_with_create_map()
-        {
-            
-
-            var tasks = Enumerable.Range(0, 5).Select(
-          i =>
-              Task.Factory.StartNew(
-                  () =>
-                  {
-                      Mapper.CreateMap<SomeDtoA, SomeDtoB>();
-                      Mapper.CreateMap<SomeDtoB, SomeDtoA>();
-                      Mapper.CreateMap<SomeDtoC, SomeDtoD>();
-                      Mapper.CreateMap<SomeDtoD, SomeDtoC>();
                   }))
           .ToArray();
             Exception exception = null;

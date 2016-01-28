@@ -30,8 +30,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_still_apply_configuration_to_missing_members()
         {
-            Mapper.CreateMap<ModelObjectNotMatching, ModelDto>()
-                .ForAllMembers(opt => opt.Ignore());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<ModelObjectNotMatching, ModelDto>()
+                .ForAllMembers(opt => opt.Ignore()));
             config.AssertConfigurationIsValid();
         }
     }

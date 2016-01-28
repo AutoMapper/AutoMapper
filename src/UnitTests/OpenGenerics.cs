@@ -27,7 +27,7 @@
                 Value = 5
             };
 
-            var dest = Mapper.Map<Source<int>, Dest<int>>(source);
+            var dest = config.CreateMapper().Map<Source<int>, Dest<int>>(source);
 
             dest.Value.ShouldEqual(5);
         }
@@ -42,7 +42,7 @@
                 A = 5
             };
 
-            var dest = Mapper.Map<Source<int>, Dest<int>>(source);
+            var dest = config.CreateMapper().Map<Source<int>, Dest<int>>(source);
 
             dest.A.ShouldEqual(5);
         }
@@ -60,7 +60,7 @@
                 }
             };
 
-            var dest = Mapper.Map<Source<Source<int>>, Dest<Dest<double>>>(source);
+            var dest = config.CreateMapper().Map<Source<Source<int>>, Dest<Dest<double>>>(source);
 
             dest.Value.Value.ShouldEqual(5);
         }
