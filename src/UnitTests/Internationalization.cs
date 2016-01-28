@@ -24,10 +24,10 @@ namespace AutoMapper.UnitTests
 				public string CustomerÆøå { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Order, OrderDto>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Order, OrderDto>();
+		    });
 
 			protected override void Because_of()
 			{

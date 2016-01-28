@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
     using System;
+    using QueryableExtensions;
 
-    public interface IConfigurationProvider : IConfiguration
+    public interface IConfigurationProvider
     {
         /// <summary>
         /// Get all configured type maps created
@@ -26,6 +28,14 @@ namespace AutoMapper
         /// <param name="typePair">Type pair</param>
         /// <returns>Type map configuration</returns>
         TypeMap FindTypeMapFor(TypePair typePair);
+
+        /// <summary>
+        /// Find the <see cref="TypeMap"/> for the configured source and destination type
+        /// </summary>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <returns>Type map configuration</returns>
+        TypeMap FindTypeMapFor<TSource, TDestination>();
 
         /// <summary>
         /// Find the <see cref="TypeMap"/> for the configured source and destination type, checking the source/destination object types too
@@ -65,8 +75,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="profileName">Profile name</param>
         /// <returns></returns>
-        IProfileExpression GetProfileConfiguration(string profileName);
-
+        IProfileConfiguration GetProfileConfiguration(string profileName);
 
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
@@ -98,18 +107,10 @@ namespace AutoMapper
         IEnumerable<IObjectMapper> GetMappers();
 
         /// <summary>
-        /// Creates a <see cref="TypeMap"/> based on a source and destination type
+        /// Get all configured mappers
         /// </summary>
-        /// <param name="sourceType">Source type</param>
-        /// <param name="destinationType">Destination type</param>
-        /// <param name="profileName">Profile name, defaults to the default profile</param>
-        /// <returns>Type map configuration</returns>
-        TypeMap CreateTypeMap(Type sourceType, Type destinationType, string profileName = ConfigurationStore.DefaultProfileName);
-
-        /// <summary>
-        /// Fired each time a type map is created
-        /// </summary>
-        event EventHandler<TypeMapCreatedEventArgs> TypeMapCreated;
+        /// <returns>List of mappers</returns>
+        IEnumerable<ITypeMapObjectMapper> GetTypeMapMappers();
 
         /// <summary>
         /// Factory method to create formatters, resolvers and type converters
@@ -117,13 +118,15 @@ namespace AutoMapper
         Func<Type, object> ServiceCtor { get; }
 
         /// <summary>
-        /// Find the closed generic type map for an item that maps to an open generic type map
+        /// Allow null destination values. If false, destination objects will be created for deep object graphs.
         /// </summary>
-        TypeMap FindClosedGenericTypeMapFor(ResolutionContext context);
+        bool AllowNullDestinationValues { get; }
 
         /// <summary>
-        /// Determines if a context has an open generic type map defined
+        /// Allow null destination collections. If true, null source collections result in null destination collections.
         /// </summary>
-        bool HasOpenGenericTypeMapDefined(ResolutionContext context);
+        bool AllowNullCollections { get; }
+
+        IExpressionBuilder ExpressionBuilder { get; }
     }
 }

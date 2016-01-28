@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
 
     /// <summary>
@@ -75,6 +76,17 @@ namespace AutoMapper
         /// </summary>
         public IMappingEngine Engine { get; }
 
+        /// <summary>
+        /// Current configuration
+        /// </summary>
+        public IConfigurationProvider ConfigurationProvider => Engine.ConfigurationProvider;
+
+        /// <summary>
+        /// Source and destination type pair
+        /// </summary>
+        public TypePair Types { get; }
+
+
         private ResolutionContext()
         {
         }
@@ -109,8 +121,12 @@ namespace AutoMapper
             else
             {
                 SourceType = sourceType;
-                DestinationType = destinationType;
+                if(destinationType != null)
+                {
+                    DestinationType = destinationType;
+                }
             }
+            Types = new TypePair(SourceType, DestinationType);
         }
 
         public ResolutionContext(TypeMap typeMap, object source, Type sourceType, Type destinationType,
@@ -149,11 +165,9 @@ namespace AutoMapper
         }
 
         private ResolutionContext(ResolutionContext context, object sourceValue, object destinationValue,
-            Type sourceType, PropertyMap propertyMap) : this(context, sourceValue, destinationValue, sourceType)
+            Type sourceType, PropertyMap propertyMap) : this(context, sourceValue, destinationValue, sourceType, propertyMap.DestinationProperty.MemberType == typeof(object) ? sourceType : propertyMap.DestinationProperty.MemberType)
         {
             PropertyMap = propertyMap;
-            var destinationMemberType = propertyMap.DestinationProperty.MemberType;
-            DestinationType = destinationMemberType == typeof(object) ? sourceType : destinationMemberType;
         }
 
         private ResolutionContext(ResolutionContext context, object sourceValue, TypeMap typeMap, Type sourceType,
@@ -259,10 +273,25 @@ namespace AutoMapper
             }
         }
 
-        public static ResolutionContext New<TSource>(TSource sourceValue)
+        public ResolutionContext[] GetContexts()
         {
-            return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions(),
-                Mapper.Engine);
+            return GetContextsCore().Reverse().Distinct().ToArray();
+        }
+
+        protected IEnumerable<ResolutionContext> GetContextsCore()
+        {
+            var context = this;
+            while(context.Parent != null)
+            {
+                yield return context;
+                context = context.Parent;
+            }
+            yield return context;
+        }
+
+        public static ResolutionContext New<TSource>(TSource sourceValue, IMappingEngine mappingEngine)
+        {
+            return new ResolutionContext(null, sourceValue, typeof (TSource), null, new MappingOperationOptions(), mappingEngine);
         }
 
         internal void BeforeMap(object destination)

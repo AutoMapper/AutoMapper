@@ -27,7 +27,6 @@ namespace AutoMapper
         }
 
         public Func<Type, object> ServiceCtor { get; private set; }
-        public bool CreateMissingTypeMaps { get; set; }
         public IDictionary<string, object> Items { get; }
         public bool DisableCache { get; set; }
         public Action<object, object> BeforeMapAction { get; protected set; }

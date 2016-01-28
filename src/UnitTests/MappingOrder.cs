@@ -37,12 +37,12 @@ namespace AutoMapper.UnitTests
 				public int Value2 { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(src => src.Value1, opt => opt.SetMappingOrder(2))
-					.ForMember(src => src.Value2, opt => opt.SetMappingOrder(1));
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>()
+		            .ForMember(src => src.Value1, opt => opt.SetMappingOrder(2))
+		            .ForMember(src => src.Value2, opt => opt.SetMappingOrder(1));
+		    });
 
 			protected override void Because_of()
 			{

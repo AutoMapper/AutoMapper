@@ -3,7 +3,7 @@ using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class ObjectTypeMapFailure : NonValidatingSpecBase
+    public class ObjectTypeMapFailure : SpecBase
     {
         [Fact]
         public void Should_map_the_object_type()

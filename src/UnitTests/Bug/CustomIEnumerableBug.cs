@@ -39,14 +39,16 @@ namespace AutoMapper.UnitTests.Bug
 		[Fact]
 		public void ShouldMapOneToTwo()
 		{
-            var config = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-			config.CreateMap<One, Two>();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<One, Two>();
 
-			config.CreateMap<IEnumerable<string>, IEnumerable<Item>>().ConvertUsing<StringToItemConverter>();
+                cfg.CreateMap<IEnumerable<string>, IEnumerable<Item>>().ConvertUsing<StringToItemConverter>();
+            });
 
 			config.AssertConfigurationIsValid();
 
-			var engine = new MappingEngine(config);
+			var engine = config.CreateMapper();
 			var one = new One
 			{
 				Stuff = new List<string> { "hi", "", "mom" }

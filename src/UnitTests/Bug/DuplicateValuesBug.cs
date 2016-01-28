@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
 				Children.Add(childObject);
 			}
 		}
-		public class DuplicateValuesIssue : AutoMapperSpecBase
+		public class DuplicateValuesIssue
 		{
 			[Fact]
 			public void Should_map_the_existing_array_elements_over()

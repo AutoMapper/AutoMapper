@@ -36,14 +36,11 @@ namespace AutoMapper.UnitTests.Bug
             public bool IsTrue { get; set; }
         }
 
-	    protected override void Establish_context()
+	    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
 	    {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<ItemToMap, ItemToMapDto>();
-                cfg.CreateMap<Tag, TagDto>();
-            });
-        }
+	        cfg.CreateMap<ItemToMap, ItemToMapDto>();
+	        cfg.CreateMap<Tag, TagDto>();
+	    });
 
         [Fact]
 		public void Should_map_all_null_values_to_its_substitute()

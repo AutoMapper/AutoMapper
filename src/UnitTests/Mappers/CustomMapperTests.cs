@@ -7,29 +7,32 @@
 
         public class When_adding_a_custom_mapper : NonValidatingSpecBase
         {
-            protected override void Establish_context()
+            public When_adding_a_custom_mapper()
             {
                 MapperRegistry.Mappers.Insert(0, new TestObjectMapper());
-
-                Mapper.CreateMap<ClassA, ClassB>()
-                    .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
             }
+
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ClassA, ClassB>()
+                    .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
+            });
 
             [Fact]
             public void Should_have_valid_configuration()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
 
 
             public class TestObjectMapper : IObjectMapper
             {
-                public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+                public object Map(ResolutionContext context)
                 {
                     return new DestinationType();
                 }
 
-                public bool IsMatch(ResolutionContext context)
+                public bool IsMatch(TypePair context)
                 {
                     return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
                 }

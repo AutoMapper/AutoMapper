@@ -6,21 +6,21 @@ namespace AutoMapper.Mappers
 
     public class ExplicitConversionOperatorMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            var implicitOperator = GetExplicitConversionOperator(context);
+            var implicitOperator = GetExplicitConversionOperator(context.Types);
 
             return implicitOperator.Invoke(null, new[] {context.SourceValue});
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             var methodInfo = GetExplicitConversionOperator(context);
 
             return methodInfo != null;
         }
 
-        private static MethodInfo GetExplicitConversionOperator(ResolutionContext context)
+        private static MethodInfo GetExplicitConversionOperator(TypePair context)
         {
             var sourceTypeMethod = context.SourceType
                 .GetDeclaredMethods()

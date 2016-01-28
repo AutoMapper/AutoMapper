@@ -18,11 +18,10 @@ namespace AutoMapper.UnitTests
             public SomeEnum? EnumValue { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Destination>();
-            Mapper.AssertConfigurationIsValid();
-        }
+            cfg.CreateMap<Source, Destination>();
+        });
 
         protected override void Because_of()
         {

@@ -10,10 +10,10 @@ namespace AutoMapper.UnitTests.Bug
 
         public enum EnumType { One, Two }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Src, Dst>();
-        }
+            cfg.CreateMap<Src, Dst>();
+        });
 
         [Fact]
         public void TestNullableEnum()

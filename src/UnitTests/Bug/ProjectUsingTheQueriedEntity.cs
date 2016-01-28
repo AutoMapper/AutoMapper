@@ -19,17 +19,14 @@ namespace AutoMapper.UnitTests.Bug
             public int Number { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Destination>().ProjectUsing(s=>new Destination { Number = 23 + s.Number });
-            });
-        }
+            cfg.CreateMap<Source, Destination>().ProjectUsing(s => new Destination {Number = 23 + s.Number});
+        });
 
         protected override void Because_of()
         {
-            _destination = new[] { new Source() }.AsQueryable().ProjectTo<Destination>().First();
+            _destination = new[] { new Source() }.AsQueryable().ProjectTo<Destination>(Configuration).First();
         }
 
         [Fact]

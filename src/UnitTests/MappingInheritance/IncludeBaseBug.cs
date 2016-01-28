@@ -27,21 +27,18 @@
         }
 
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<From, Concrete>()
-                    .ForMember(d => d.ConcreteValue, o => o.MapFrom(s => s == null ? default(int) : s.ChildValue))
-                    .Include<From, AbstractChild>();
-                cfg.CreateMap<From, AbstractChild>()
-                    .ForMember(d => d.AbstractValue, o => o.Ignore())
-                    .Include<From, Derivation>();
-                cfg.CreateMap<From, Derivation>()
-                    .ForMember(d => d.DerivedValue, o => o.Ignore());
-                cfg.AllowNullDestinationValues = false;
-            });
-        }
+            cfg.CreateMap<From, Concrete>()
+                .ForMember(d => d.ConcreteValue, o => o.MapFrom(s => s == null ? default(int) : s.ChildValue))
+                .Include<From, AbstractChild>();
+            cfg.CreateMap<From, AbstractChild>()
+                .ForMember(d => d.AbstractValue, o => o.Ignore())
+                .Include<From, Derivation>();
+            cfg.CreateMap<From, Derivation>()
+                .ForMember(d => d.DerivedValue, o => o.Ignore());
+            cfg.AllowNullDestinationValues = false;
+        });
 
         public void TestMethod1()
         {

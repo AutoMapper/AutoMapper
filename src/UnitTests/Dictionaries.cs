@@ -175,12 +175,12 @@ namespace AutoMapper.UnitTests
 				public System.Collections.Generic.IDictionary<string, FooDto> Bar { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.AllowNullDestinationValues = false;
-				Mapper.CreateMap<Foo, FooDto>();
-				Mapper.CreateMap<FooDto, Foo>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.AllowNullDestinationValues = false;
+		        cfg.CreateMap<Foo, FooDto>();
+		        cfg.CreateMap<FooDto, Foo>();
+		    });
 
 			protected override void Because_of()
 			{

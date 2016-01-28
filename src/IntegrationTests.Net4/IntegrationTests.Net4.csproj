@@ -42,8 +42,8 @@
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Fixie, Version=1.0.0.29, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fixie.1.0.0.29\lib\net45\Fixie.dll</HintPath>
+    <Reference Include="Fixie, Version=1.0.0.41, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fixie.1.0.0.41\lib\net45\Fixie.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Rhino.Mocks">
@@ -70,13 +70,18 @@
     </Compile>
     <Compile Include="ChildClassTests.cs" />
     <Compile Include="CustomMapFromTest.cs" />
+    <Compile Include="ExpandCollectionsWithStrings.cs" />
+    <Compile Include="ExpandCollections.cs" />
     <Compile Include="NestedDtos.cs" />
+    <Compile Include="ExpandMembersPath.cs" />
     <Compile Include="NestedExplicitExpandWithFields.cs" />
     <Compile Include="NestedExplicitExpand.cs" />
     <Compile Include="OverrideDestinationMappingsTest.cs" />
     <Compile Include="ProjectToAbstractType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MaxDepthWithCollections.cs" />
     <Compile Include="ProxyTests.cs" />
+    <Compile Include="TestDbConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

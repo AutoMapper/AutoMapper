@@ -5,9 +5,9 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class RemovePrefixes : AutoMapperSpecBase
+    public class RemovePrefixes : SpecBase
     {
-        ConfigurationStore config;
+        MapperConfiguration config;
 
         class Source
         {
@@ -20,9 +20,11 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override void Establish_context()
         {
-            config = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-            config.ClearPrefixes();
-            config.CreateMap<Source, Destination>();
+            config = new MapperConfiguration(cfg =>
+            {
+                cfg.ClearPrefixes();
+                cfg.CreateMap<Source, Destination>();
+            });
         }
 
         [Fact]

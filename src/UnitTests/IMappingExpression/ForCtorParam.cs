@@ -22,13 +22,11 @@ namespace AutoMapper.UnitTests
             public int Value1 { get; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap(typeof(Source), typeof(Dest)).ForCtorParam("thing", opt => opt.MapFrom(src => ((Source)src).Value));
-            });
-        }
+            cfg.CreateMap(typeof (Source), typeof (Dest))
+                .ForCtorParam("thing", opt => opt.MapFrom(src => ((Source) src).Value));
+        });
 
         [Fact]
         public void Should_redirect_value()

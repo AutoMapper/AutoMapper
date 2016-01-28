@@ -48,13 +48,11 @@ namespace AutoMapper.UnitTests.Bug
             public dynamic Json { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, Destination>().ForMember(d=>d.Json, o=>o.ResolveUsing(s=>new JObject(s.JsonString)));
-            });
-        }
+            cfg.CreateMap<Source, Destination>()
+                .ForMember(d => d.Json, o => o.ResolveUsing(s => new JObject(s.JsonString)));
+        });
 
         protected override void Because_of()
         {

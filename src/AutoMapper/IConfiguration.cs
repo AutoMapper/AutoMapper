@@ -2,7 +2,12 @@ namespace AutoMapper
 {
     using System;
 
-    public interface IConfiguration : IProfileExpression
+    public interface IMapperConfiguration : IProfileExpression, IConfiguration
+    {
+        
+    }
+
+    public interface IConfiguration
     {
         /// <summary>
         /// Create a named profile for grouped mapping configuration
@@ -31,24 +36,48 @@ namespace AutoMapper
         void AddProfile<TProfile>() where TProfile : Profile, new();
 
         /// <summary>
-        /// Supply a factory method callback for creating formatters, resolvers and type converters
+        /// Supply a factory method callback for creating resolvers and type converters
         /// </summary>
         /// <param name="constructor">Factory method</param>
         void ConstructServicesUsing(Func<Type, object> constructor);
 
         /// <summary>
-        /// Disable constructor mapping. Use this if you don't intend to have AutoMapper try to map to constructors
+        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
+        /// Specify the member list to validate against during configuration validation.
         /// </summary>
-        void DisableConstructorMapping();
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="profileName">Profile name</param>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName);
 
         /// <summary>
-        /// Seal the configuration and optimize maps
+        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
+        /// Specify the member list to validate against during configuration validation.
         /// </summary>
-        void Seal();
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="profileName">Profile name</param>
+        /// <param name="memberList">Member list to validate</param>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList);
 
         /// <summary>
-        /// Mapping via a data reader will yield return each item, keeping a data reader open instead of eagerly evaluating
+        /// Apply a mapping configuration for all maps in a profile
         /// </summary>
-        void EnableYieldReturnForDataReaderMapper();
+        /// <param name="profileName">Profile name</param>
+        /// <param name="configuration">Configuration to apply</param>
+        void ForAllMaps(string profileName, Action<TypeMap, IMappingExpression> configuration);
+
+        /// <summary>
+        /// Creates a mapping configuration from the source type to the destination type.
+        /// Specify the member list to validate against during configuration validation.
+        /// </summary>
+        /// <param name="sourceType">Source type</param>
+        /// <param name="destinationType">Destination type</param>
+        /// <param name="memberList">Member list to validate</param>
+        /// <param name="profileName">Profile name</param>
+        /// <returns>Mapping expression for more configuration options</returns>
+        IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName);
     }
 }

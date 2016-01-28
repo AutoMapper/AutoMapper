@@ -23,14 +23,16 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             // arrange
             var source = new Class{ Prop = "test" };
-            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-            configurationProvider
-                .CreateMap<BaseClass, BaseDto>()
-                .BeforeMap((s, d) => d.DifferentProp = s.Prop)
-                .Include<Class, Dto>();
+            var configurationProvider = new MapperConfiguration(cfg =>
+            {
+                cfg
+                    .CreateMap<BaseClass, BaseDto>()
+                    .BeforeMap((s, d) => d.DifferentProp = s.Prop)
+                    .Include<Class, Dto>();
 
-            configurationProvider.CreateMap<Class, Dto>();
-            var mappingEngine = new MappingEngine(configurationProvider);
+                cfg.CreateMap<Class, Dto>();
+            });
+            var mappingEngine = configurationProvider.CreateMapper();
 
             // act
             var dest = mappingEngine.Map<Class, Dto>(source);
@@ -44,14 +46,16 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             // arrange
             var source = new Class { Prop = "test" };
-            var configurationProvider = new ConfigurationStore(new TypeMapFactory(), MapperRegistry.Mappers);
-            configurationProvider
-                .CreateMap<BaseClass, BaseDto>()
-                .AfterMap((s, d) => d.DifferentProp = s.Prop)
-                .Include<Class, Dto>();
+            var configurationProvider = new MapperConfiguration(cfg =>
+            {
+                cfg
+                    .CreateMap<BaseClass, BaseDto>()
+                    .AfterMap((s, d) => d.DifferentProp = s.Prop)
+                    .Include<Class, Dto>();
 
-            configurationProvider.CreateMap<Class, Dto>();
-            var mappingEngine = new MappingEngine(configurationProvider);
+                cfg.CreateMap<Class, Dto>();
+            });
+            var mappingEngine = configurationProvider.CreateMapper();
 
             // act
             var dest = mappingEngine.Map<Class, Dto>(source);

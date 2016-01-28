@@ -10,9 +10,9 @@ namespace AutoMapper.Mappers
     public abstract class EnumerableMapperBase<TEnumerable> : IObjectMapper
         where TEnumerable : IEnumerable
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            if (context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+            if (context.IsSourceValueNull && context.Engine.ShouldMapSourceCollectionAsNull(context))
             {
                 return null;
             }
@@ -24,8 +24,16 @@ namespace AutoMapper.Mappers
             Type sourceElementType = TypeHelper.GetElementType(context.SourceType, enumerableValue);
             Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
+            // If you can just assign the collection from one side to the other and the element types don't need to be mapped
+            if (ShouldAssignEnumerable(context))
+            {
+                var elementTypeMap = context.ConfigurationProvider.ResolveTypeMap(sourceElementType, destElementType);
+                if (elementTypeMap == null)
+                    return context.SourceValue;
+            }
+
             var sourceLength = enumerableValue.Count;
-            var destination = GetOrCreateDestinationObject(context, mapper, destElementType, sourceLength);
+            var destination = GetOrCreateDestinationObject(context, destElementType, sourceLength);
             var enumerable = GetEnumerableFor(destination);
 
             ClearEnumerable(enumerable);
@@ -36,14 +44,14 @@ namespace AutoMapper.Mappers
                 var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, i);
                 var elementResolutionResult = new ResolutionResult(newContext);
 
-                var typeMap = mapper.ConfigurationProvider.ResolveTypeMap(elementResolutionResult, destElementType);
+                var typeMap = context.ConfigurationProvider.ResolveTypeMap(elementResolutionResult, destElementType);
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
                 Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;
 
                 newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, i);
 
-                object mappedValue = mapper.Map(newContext);
+                object mappedValue = context.Engine.Map(newContext);
 
                 SetElementValue(enumerable, mappedValue, i);
 
@@ -54,8 +62,12 @@ namespace AutoMapper.Mappers
             return valueToAssign;
         }
 
-        protected virtual object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper,
-            Type destElementType, int sourceLength)
+        protected virtual bool ShouldAssignEnumerable(ResolutionContext context)
+        {
+            return false;
+        }
+
+        protected virtual object GetOrCreateDestinationObject(ResolutionContext context, Type destElementType, int sourceLength)
         {
             if (context.DestinationValue != null)
             {
@@ -70,7 +82,7 @@ namespace AutoMapper.Mappers
                     return context.DestinationValue;
             }
 
-            return CreateDestinationObject(context, destElementType, sourceLength, mapper);
+            return CreateDestinationObject(context, destElementType, sourceLength);
         }
 
         protected virtual TEnumerable GetEnumerableFor(object destination)
@@ -82,19 +94,18 @@ namespace AutoMapper.Mappers
         {
         }
 
-        protected virtual object CreateDestinationObject(ResolutionContext context, Type destinationElementType,
-            int count, IMappingEngineRunner mapper)
+        protected virtual object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count)
         {
             var destinationType = context.DestinationType;
 
             if (!destinationType.IsInterface() && !destinationType.IsArray)
             {
-                return mapper.CreateObject(context);
+                return context.Engine.CreateObject(context);
             }
             return CreateDestinationObjectBase(destinationElementType, count);
         }
 
-        public abstract bool IsMatch(ResolutionContext context);
+        public abstract bool IsMatch(TypePair context);
 
 
         protected abstract void SetElementValue(TEnumerable destination, object mappedValue, int index);

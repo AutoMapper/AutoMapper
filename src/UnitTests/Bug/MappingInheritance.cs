@@ -9,17 +9,17 @@ namespace AutoMapper.UnitTests.Bug
 		private Entity testEntity;
 		private EditModel testModel;
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Entity, ViewModel>();
-            Mapper.CreateMap<Entity, BaseModel>()
-                    .ForMember(model => model.Value1, mce => mce.MapFrom(entity => entity.Value2))
-                    .ForMember(model => model.Value2, mce => mce.MapFrom(entity => entity.Value1))
-                    .Include<Entity, EditModel>()
-                    .Include<Entity, ViewModel>();
-            Mapper.CreateMap<Entity, EditModel>()
+            cfg.CreateMap<Entity, ViewModel>();
+            cfg.CreateMap<Entity, BaseModel>()
+                .ForMember(model => model.Value1, mce => mce.MapFrom(entity => entity.Value2))
+                .ForMember(model => model.Value2, mce => mce.MapFrom(entity => entity.Value1))
+                .Include<Entity, EditModel>()
+                .Include<Entity, ViewModel>();
+            cfg.CreateMap<Entity, EditModel>()
                 .ForMember(model => model.Value3, mce => mce.MapFrom(entity => entity.Value1 + entity.Value2));
-        }
+        });
 
         protected override void Because_of()
         {
@@ -64,19 +64,19 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestMethod1()
         {
-            Mapper.Reset();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Order, OrderDto>()
+                    .Include<OnlineOrder, OnlineOrderDto>()
+                    .Include<MailOrder, MailOrderDto>();
+                cfg.CreateMap<OnlineOrder, OnlineOrderDto>();
+                cfg.CreateMap<MailOrder, MailOrderDto>();
+            });
 
-            Mapper.CreateMap<Order, OrderDto>()
-                .Include<OnlineOrder, OnlineOrderDto>()
-                .Include<MailOrder, MailOrderDto>();
-            Mapper.CreateMap<OnlineOrder, OnlineOrderDto>();
-            Mapper.CreateMap<MailOrder, MailOrderDto>();
-            Mapper.Configuration.Seal();
-
-            //Mapper.AssertConfigurationIsValid();
+            var mapper = config.CreateMapper();
 
             var mailOrder = new MailOrder() { NewId = 1 };
-            var mapped = Mapper.Map<OrderDto>(mailOrder);
+            var mapped = mapper.Map<OrderDto>(mailOrder);
 
             mapped.ShouldBeType<MailOrderDto>();
         }

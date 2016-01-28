@@ -22,6 +22,12 @@ namespace AutoMapper.QueryableExtensions.Impl
             return new ExpressionResolutionResult(currentChild, currentChildType);
         }
 
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap, IValueResolver valueResolver)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
             IValueResolver valueResolver)
         {

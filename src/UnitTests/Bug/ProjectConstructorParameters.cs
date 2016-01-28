@@ -36,16 +36,16 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, SourceDto>();
-        }
+            cfg.CreateMap<Source, SourceDto>();
+        });
 
         protected override void Because_of()
         {
             var source = new Source { Inner = new Inner { Member = SomeValue } };
             //_dest = Mapper.Map<Source, SourceDto>(source);
-            _dest = new[] { source }.AsQueryable().ProjectTo<SourceDto>().First();
+            _dest = new[] { source }.AsQueryable().ProjectTo<SourceDto>(Configuration).First();
         }
 
         [Fact]

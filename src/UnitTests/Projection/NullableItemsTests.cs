@@ -12,9 +12,11 @@ namespace AutoMapper.UnitTests.Projection
 
         public class NullChildItemTest
         {
+            private MapperConfiguration _config;
+
             public NullChildItemTest()
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>());
+                _config = new MapperConfiguration(cfg => cfg.CreateMap<Parent, ParentDto>());
             }
 
             [Fact]
@@ -28,7 +30,7 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var projected = items.AsQueryable().ProjectTo<ParentDto>().ToList();
+                var projected = items.AsQueryable().ProjectTo<ParentDto>(_config).ToList();
 
                 projected[0].Value.ShouldEqual(5);
                 projected[0].ChildValue.ShouldBeNull();
@@ -65,6 +67,8 @@ namespace AutoMapper.UnitTests.Projection
 
         public class CustomMapFromTest
         {
+            private MapperConfiguration _config;
+
             public class Parent
             {
                 public int Value { get; set; }
@@ -78,7 +82,7 @@ namespace AutoMapper.UnitTests.Projection
             }
             public CustomMapFromTest()
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Parent, ParentDto>()
+                _config = new MapperConfiguration(cfg => cfg.CreateMap<Parent, ParentDto>()
                     .ForMember(dto => dto.Date, opt => opt.MapFrom(src => DateTime.UtcNow)));
             }
 
@@ -93,9 +97,9 @@ namespace AutoMapper.UnitTests.Projection
                     }
                 };
 
-                var projected = items.AsQueryable().ProjectTo<ParentDto>().ToList();
+                var projected = items.AsQueryable().ProjectTo<ParentDto>(_config).ToList();
 
-                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().ProjectTo<ParentDto>().ToList());
+                typeof(NullReferenceException).ShouldNotBeThrownBy(() => items.AsQueryable().ProjectTo<ParentDto>(_config).ToList());
                 Assert.NotNull(projected[0].Date);
             }
         }

@@ -11,12 +11,12 @@ namespace AutoMapper.Mappers
 {
     public abstract class DynamicMapper : IObjectMapper
     {
-        public abstract bool IsMatch(ResolutionContext context);
+        public abstract bool IsMatch(TypePair context);
 
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             var source = context.SourceValue;
-            var destination = mapper.CreateObject(context);
+            var destination = context.Engine.CreateObject(context);
             foreach(var member in MembersToMap(source, destination))
             {
                 object sourceMemberValue;
@@ -28,7 +28,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = ReflectionHelper.Map(member, sourceMemberValue);
+                var destinationMemberValue = ReflectionHelper.Map(context, member, sourceMemberValue);
                 SetDestinationMember(member, destination, destinationMemberValue);
             }
             return destination;
@@ -62,9 +62,9 @@ namespace AutoMapper.Mappers
 
     public class FromDynamicMapper : DynamicMapper
     {
-        public override bool IsMatch(ResolutionContext context)
+        public override bool IsMatch(TypePair context)
         {
-            return context.SourceValue.IsDynamic() && !context.DestinationType.IsDynamic();
+            return context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
         }
 
         protected override IEnumerable<MemberInfo> MembersToMap(object source, object destination)
@@ -85,9 +85,9 @@ namespace AutoMapper.Mappers
 
     public class ToDynamicMapper : DynamicMapper
     {
-        public override bool IsMatch(ResolutionContext context)
+        public override bool IsMatch(TypePair context)
         {
-            return context.DestinationType.IsDynamic() && !context.SourceValue.IsDynamic();
+            return context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
         }
 
         protected override IEnumerable<MemberInfo> MembersToMap(object source, object destination)

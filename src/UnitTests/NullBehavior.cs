@@ -39,19 +39,23 @@ namespace AutoMapper.UnitTests
 				public int Something { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				var model = new ModelObject();
-				model.Sub = null;
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.AllowNullDestinationValues = false;
+		        cfg.CreateMap<ModelObject, ModelDto>();
+		        cfg.CreateMap<ModelSubObject, ModelSubDto>();
 
-				Mapper.AllowNullDestinationValues = false;
-				Mapper.CreateMap<ModelObject, ModelDto>();
-				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
+		    });
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
+		    protected override void Because_of()
+		    {
+                var model = new ModelObject();
+                model.Sub = null;
 
-			[Fact]
+                _result = Mapper.Map<ModelObject, ModelDto>(model);
+            }
+
+            [Fact]
 			public void Should_populate_dto_items_with_a_value()
 			{
 				_result.Sub.ShouldNotBeNull();
@@ -108,20 +112,25 @@ namespace AutoMapper.UnitTests
 				public int Something { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				var model = new ModelObject();
-				model.Sub = null;
-				model.NullString = null;
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
 
-				Mapper.Initialize(c => c.AllowNullDestinationValues = true);
-				Mapper.CreateMap<ModelObject, ModelDto>();
-				Mapper.CreateMap<ModelSubObject, ModelSubDto>();
+		        cfg.AllowNullDestinationValues = true;
+		        cfg.CreateMap<ModelObject, ModelDto>();
+		        cfg.CreateMap<ModelSubObject, ModelSubDto>();
 
-				_result = Mapper.Map<ModelObject, ModelDto>(model);
-			}
+		    });
 
-			[Fact]
+		    protected override void Because_of()
+		    {
+                var model = new ModelObject();
+                model.Sub = null;
+                model.NullString = null;
+
+                _result = Mapper.Map<ModelObject, ModelDto>(model);
+            }
+
+            [Fact]
 			public void Should_map_first_level_items_as_null()
 			{
 				_result.NullString.ShouldBeNull();
@@ -165,15 +174,15 @@ namespace AutoMapper.UnitTests
 				public object Value { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateProfile("MapsNulls", p =>
-					{
-						p.AllowNullDestinationValues = false;
-						p.CreateMap<NullSource, NullDestination>();
-					});
-				Mapper.CreateMap<DefaultSource, DefaultDestination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateProfile("MapsNulls", p =>
+		        {
+		            p.AllowNullDestinationValues = false;
+		            p.CreateMap<NullSource, NullDestination>();
+		        });
+		        cfg.CreateMap<DefaultSource, DefaultDestination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -219,12 +228,12 @@ namespace AutoMapper.UnitTests
 				public string Name { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver>().FromMember(src => src.MyName));
-				_source = new Source();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>()
+		            .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver>().FromMember(src => src.MyName));
+		        _source = new Source();
+		    });
 
 			protected override void Because_of()
 			{
@@ -257,12 +266,12 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-            protected override void Establish_context()
-            {
-                Mapper.AllowNullDestinationValues = false;
-                Mapper.CreateMap<Source, Dest>()
-                    .ForMember(dest => dest.OtherValue, opt => opt.MapFrom(src => src.Sub.Value));
-            }
+	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        {
+	            cfg.AllowNullDestinationValues = false;
+	            cfg.CreateMap<Source, Dest>()
+	                .ForMember(dest => dest.OtherValue, opt => opt.MapFrom(src => src.Sub.Value));
+	        });
 
             protected override void Because_of()
             {
@@ -276,7 +285,7 @@ namespace AutoMapper.UnitTests
 	        }
 	    }
 
-	    public class When_specifying_a_resolver_for_a_nullable_type : SpecBase
+	    public class When_specifying_a_resolver_for_a_nullable_type : AutoMapperSpecBase
 	    {
 	        private FooViewModel _result;
 
@@ -306,14 +315,11 @@ namespace AutoMapper.UnitTests
                 public string IsFooBarred { get; set; }
             }
 
-            protected override void Establish_context()
-            {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<bool?, string>().ConvertUsing<NullableBoolToLabel>();
-                    cfg.CreateMap<Foo, FooViewModel>();
-                });
-            }
+	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        {
+	            cfg.CreateMap<bool?, string>().ConvertUsing<NullableBoolToLabel>();
+	            cfg.CreateMap<Foo, FooViewModel>();
+	        });
 
             protected override void Because_of()
             {
@@ -352,14 +358,11 @@ namespace AutoMapper.UnitTests
                 public Collection<int> Values6 { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Dest>();
-                    cfg.AllowNullCollections = true;
-                });
-            }
+                cfg.CreateMap<Source, Dest>();
+                cfg.AllowNullCollections = true;
+            });
 
             protected override void Because_of()
             {

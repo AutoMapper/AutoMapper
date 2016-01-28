@@ -20,14 +20,11 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Destination>()
-                        .ForMember(dest => dest.Value, opt => opt.Condition(src => src.Value > 0));
-                });
-            }
+                cfg.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.Value, opt => opt.Condition(src => src.Value > 0));
+            });
 
             [Fact]
             public void Should_skip_the_mapping_when_the_condition_is_true()
@@ -58,21 +55,18 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Destination>()
-                        .ForMember(dest => dest.Value, opt =>
+                cfg.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.Value, opt =>
+                    {
+                        opt.Condition(src => src.Value > 0);
+                        opt.ResolveUsing((Source src) =>
                         {
-                            opt.Condition(src => src.Value > 0);
-                            opt.ResolveUsing((Source src) =>
-                            {
-                                return 10;
-                            });
+                            return 10;
                         });
-                });
-            }
+                    });
+            });
 
             [Fact]
             public void Should_skip_the_mapping_when_the_condition_is_true()
@@ -108,14 +102,11 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Destination>()
-                        .ForAllMembers(opt => opt.Condition(CustomCondition));
-                });
-            }
+                cfg.CreateMap<Source, Destination>()
+                    .ForAllMembers(opt => opt.Condition(CustomCondition));
+            });
 
             private static bool CustomCondition(ResolutionContext context)
             {
@@ -142,7 +133,6 @@ namespace AutoMapper.UnitTests
             public class SkipAttribute : System.Attribute { }
         }
 
-#if !SILVERLIGHT
         public class When_configuring_a_map_to_ignore_all_properties_with_an_inaccessible_setter : AutoMapperSpecBase
         {
             private Destination _destination;
@@ -179,16 +169,13 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Destination>()
-                        .ForMember(dest => dest.ScreenName, opt => opt.MapFrom(src => src.ScreenName))
-                        .IgnoreAllPropertiesWithAnInaccessibleSetter()
-                        .ForMember(dest => dest.Nickname, opt => opt.MapFrom(src => src.Nickname));
-                });
-            }
+                cfg.CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.ScreenName, opt => opt.MapFrom(src => src.ScreenName))
+                    .IgnoreAllPropertiesWithAnInaccessibleSetter()
+                    .ForMember(dest => dest.Nickname, opt => opt.MapFrom(src => src.Nickname));
+            });
 
             protected override void Because_of()
             {
@@ -198,7 +185,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
 
             [Fact]
@@ -255,20 +242,17 @@ namespace AutoMapper.UnitTests
                 public int Baz { get; protected set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Source, Destination>()
-                        .IgnoreAllPropertiesWithAnInaccessibleSetter()
-                        .ForMember(dest => dest.IsVisible, opt => opt.Ignore())
-                        .ForMember(dest => dest.Force, opt => opt.MapFrom(src => src.Force))
-                        .ReverseMap()
-                        .IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
-                        .ForMember(dest => dest.ReverseForce, opt => opt.MapFrom(src => src.ReverseForce))
-                        .ForSourceMember(dest => dest.IsVisible, opt => opt.Ignore());
-                });
-            }
+                cfg.CreateMap<Source, Destination>()
+                    .IgnoreAllPropertiesWithAnInaccessibleSetter()
+                    .ForMember(dest => dest.IsVisible, opt => opt.Ignore())
+                    .ForMember(dest => dest.Force, opt => opt.MapFrom(src => src.Force))
+                    .ReverseMap()
+                    .IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
+                    .ForMember(dest => dest.ReverseForce, opt => opt.MapFrom(src => src.ReverseForce))
+                    .ForSourceMember(dest => dest.IsVisible, opt => opt.Ignore());
+            });
 
             protected override void Because_of()
             {
@@ -281,7 +265,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_consider_the_configuration_valid_even_if_some_properties_with_an_inaccessible_setter_are_unmapped()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
             }
 
             [Fact]
@@ -308,6 +292,5 @@ namespace AutoMapper.UnitTests
                 _source.Respect.ShouldEqual("R-E-S-P-E-C-T"); // justification: if the mapping works one way, it should work in reverse
             }
         }
-#endif
     }
 }

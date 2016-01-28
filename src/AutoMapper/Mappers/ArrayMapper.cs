@@ -1,11 +1,12 @@
 namespace AutoMapper.Mappers
 {
     using System;
+    using System.Reflection;
     using Internal;
 
     public class ArrayMapper : EnumerableMapperBase<Array>
     {
-        public override bool IsMatch(ResolutionContext context)
+        public override bool IsMatch(TypePair context)
         {
             return (context.DestinationType.IsArray) && (context.SourceType.IsEnumerableType());
         }
@@ -25,8 +26,12 @@ namespace AutoMapper.Mappers
             throw new NotImplementedException();
         }
 
-        protected override object GetOrCreateDestinationObject(ResolutionContext context, IMappingEngineRunner mapper,
-            Type destElementType, int sourceLength)
+        protected override bool ShouldAssignEnumerable(ResolutionContext context)
+        {
+            return !context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType);
+        }
+
+        protected override object GetOrCreateDestinationObject(ResolutionContext context, Type destElementType, int sourceLength)
         {
             return ObjectCreator.CreateArray(destElementType, sourceLength);
         }

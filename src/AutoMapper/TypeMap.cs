@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -31,12 +32,12 @@ namespace AutoMapper
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, string profileName)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
-            Profile = ConfigurationStore.DefaultProfileName;
+            Profile = profileName;
             ConfiguredMemberList = memberList;
         }
 
@@ -66,7 +67,7 @@ namespace AutoMapper
 
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
-        public List<string> IgnorePropertiesStartingWith { get; set; }
+        public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
 
@@ -172,7 +173,12 @@ namespace AutoMapper
 
         public void IncludeDerivedTypes(Type derivedSourceType, Type derivedDestinationType)
         {
-            _includedDerivedTypes.Add(new TypePair(derivedSourceType, derivedDestinationType));
+            var derivedTypes = new TypePair(derivedSourceType, derivedDestinationType);
+            if(derivedTypes.Equals(Types))
+            {
+                throw new InvalidOperationException("You cannot include a type map into itself.");
+            }
+            _includedDerivedTypes.Add(derivedTypes);
         }
 
         public Type GetDerivedTypeFor(Type derivedSourceType)
@@ -183,9 +189,9 @@ namespace AutoMapper
             return DestinationTypeOverride ?? match?.DestinationType ?? DestinationType;
         }
 
-        public bool TypeHasBeenIncluded(Type derivedSourceType, Type derivedDestinationType)
+        public bool TypeHasBeenIncluded(TypePair derivedTypes)
         {
-            return _includedDerivedTypes.Contains(new TypePair(derivedSourceType, derivedDestinationType));
+            return _includedDerivedTypes.Contains(derivedTypes);
         }
 
         public bool HasDerivedTypesToInclude()
@@ -274,12 +280,12 @@ namespace AutoMapper
             if (propertyInfo == null)
                 return propertyMap;
 
-            var baseAccessor = propertyInfo.GetAccessors()[0];
+            var baseAccessor = propertyInfo.GetMethod;
 
             if (baseAccessor.IsAbstract || baseAccessor.IsVirtual)
                 return propertyMap;
 
-            var accessor = ((PropertyInfo) destinationProperty.MemberInfo).GetAccessors()[0];
+            var accessor = ((PropertyInfo) destinationProperty.MemberInfo).GetMethod;
 
             if (baseAccessor.DeclaringType == accessor.DeclaringType)
                 return propertyMap;
@@ -369,7 +375,7 @@ namespace AutoMapper
         public bool ShouldCheckForValid()
         {
             return (CustomMapper == null && CustomProjection == null &&
-                    DestinationTypeOverride == null) && !FeatureDetector.IsIDataRecordType(SourceType);
+                    DestinationTypeOverride == null);
         }
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)

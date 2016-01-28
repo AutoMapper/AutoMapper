@@ -10,7 +10,7 @@ namespace AutoMapper.UnitTests.Mappers
         public string Bar { get; set; }
     }
 
-    public class When_mapping_to_StringDictionary : NonValidatingSpecBase
+    public class When_mapping_to_StringDictionary : SpecBase
     {
         StringDictionary _destination;
 
@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests.Mappers
         }
     }
 
-    public class When_mapping_from_StringDictionary : NonValidatingSpecBase
+    public class When_mapping_from_StringDictionary : SpecBase
     {
         Destination _destination;
 
@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests.Mappers
         }
     }
 
-    public class When_mapping_from_StringDictionary_with_missing_property : NonValidatingSpecBase
+    public class When_mapping_from_StringDictionary_with_missing_property : SpecBase
     {
         Destination _destination;
 
@@ -63,7 +63,7 @@ namespace AutoMapper.UnitTests.Mappers
         }
     }
 
-    public class When_mapping_from_StringDictionary_to_StringDictionary: NonValidatingSpecBase
+    public class When_mapping_from_StringDictionary_to_StringDictionary: SpecBase
     {
         StringDictionary _destination;
 

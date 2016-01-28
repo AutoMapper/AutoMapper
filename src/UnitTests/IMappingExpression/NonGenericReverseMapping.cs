@@ -22,13 +22,10 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap(typeof(Source), typeof(Destination)).ReverseMap();
-                });
-            }
+                cfg.CreateMap(typeof (Source), typeof (Destination)).ReverseMap();
+            });
 
             protected override void Because_of()
             {
@@ -59,24 +56,21 @@ namespace AutoMapper.UnitTests
                 public int Ignored { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap(typeof(Source), typeof(Dest))
-                        .ForMember("Ignored", opt => opt.Ignore())
-                        .ReverseMap();
-                });
-            }
+                cfg.CreateMap(typeof (Source), typeof (Dest))
+                    .ForMember("Ignored", opt => opt.Ignore())
+                    .ReverseMap();
+            });
 
             [Fact]
             public void Should_show_valid()
             {
-                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.AssertConfigurationIsValid());
+                typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid());
             }
         }
 
-        public class When_reverse_mapping_and_ignoring : AutoMapperSpecBase
+        public class When_reverse_mapping_and_ignoring : SpecBase
         {
             public class Foo
             {
@@ -94,8 +88,11 @@ namespace AutoMapper.UnitTests
             public void GetUnmappedPropertyNames_ShouldReturnBoo()
             {
                 //Arrange
-                Mapper.CreateMap(typeof(Foo), typeof(Foo2));
-                var typeMap = Mapper.GetAllTypeMaps()
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap(typeof(Foo), typeof(Foo2));
+                });
+                var typeMap = config.GetAllTypeMaps()
                           .First(x => x.SourceType == typeof(Foo) && x.DestinationType == typeof(Foo2));
                 //Act
                 var unmappedPropertyNames = typeMap.GetUnmappedPropertyNames();
@@ -107,8 +104,11 @@ namespace AutoMapper.UnitTests
             public void WhenSecondCallTo_GetUnmappedPropertyNames_ShouldReturnBoo()
             {
                 //Arrange
-                Mapper.CreateMap(typeof(Foo), typeof(Foo2)).ReverseMap();
-                var typeMap = Mapper.GetAllTypeMaps()
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap(typeof (Foo), typeof (Foo2)).ReverseMap();
+                });
+                var typeMap = config.GetAllTypeMaps()
                           .First(x => x.SourceType == typeof(Foo2) && x.DestinationType == typeof(Foo));
                 //Act
                 var unmappedPropertyNames = typeMap.GetUnmappedPropertyNames();
@@ -119,12 +119,15 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_not_throw_exception_for_unmapped_properties()
             {
-                Mapper.CreateMap(typeof(Foo), typeof(Foo2))
-                .IgnoreAllNonExisting()
-                .ReverseMap()
-                .IgnoreAllNonExistingSource();
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap(typeof (Foo), typeof (Foo2))
+                        .IgnoreAllNonExisting()
+                        .ReverseMap()
+                        .IgnoreAllNonExistingSource();
+                });
 
-                Mapper.AssertConfigurationIsValid();
+                config.AssertConfigurationIsValid();
             }
         }
 
@@ -133,10 +136,7 @@ namespace AutoMapper.UnitTests
             // from http://stackoverflow.com/questions/954480/automapper-ignore-the-rest/6474397#6474397
             public static IMappingExpression IgnoreAllNonExisting(this IMappingExpression expression)
             {
-                var sourceType = expression.TypeMap.SourceType;
-                var destinationType = expression.TypeMap.DestinationType;
-                var existingMaps = AutoMapper.Mapper.GetAllTypeMaps().First(x => x.SourceType.Equals(sourceType) && x.DestinationType.Equals(destinationType));
-                foreach(var property in existingMaps.GetUnmappedPropertyNames())
+                foreach(var property in expression.TypeMap.GetUnmappedPropertyNames())
                 {
                     expression.ForMember(property, opt => opt.Ignore());
                 }
@@ -145,10 +145,7 @@ namespace AutoMapper.UnitTests
 
             public static IMappingExpression IgnoreAllNonExistingSource(this IMappingExpression expression)
             {
-                var sourceType = expression.TypeMap.SourceType;
-                var destinationType = expression.TypeMap.DestinationType;
-                var existingMaps = AutoMapper.Mapper.GetAllTypeMaps().First(x => x.SourceType.Equals(sourceType) && x.DestinationType.Equals(destinationType));
-                foreach(var property in existingMaps.GetUnmappedPropertyNames())
+                foreach(var property in expression.TypeMap.GetUnmappedPropertyNames())
                 {
                     expression.ForSourceMember(property, opt => opt.Ignore());
                 }

@@ -8,12 +8,11 @@
 
     public class SourceInjectedQuery<TSource, TDestination> : IOrderedQueryable<TDestination>
     {
-        public SourceInjectedQuery(IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
-                IMappingEngine mappingEngine, SourceInjectedQueryInspector inspector = null)
+        public SourceInjectedQuery(IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery, IMapper mapper, SourceInjectedQueryInspector inspector = null)
         {
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
-            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mappingEngine, dataSource, destQuery)
+            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mapper, dataSource, destQuery)
             {
                 Inspector = inspector ?? new SourceInjectedQueryInspector()
             };

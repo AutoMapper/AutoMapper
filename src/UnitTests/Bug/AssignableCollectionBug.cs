@@ -102,10 +102,10 @@ namespace AutoMapper.UnitTests.Bug
                 public byte[] ImageData { get; set; }
             }
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg => cfg.CreateMap<Picture, PictureDto>());
-            }
+                cfg.CreateMap<Picture, PictureDto>();
+            });
 
             protected override void Because_of()
             {

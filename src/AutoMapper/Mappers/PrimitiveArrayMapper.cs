@@ -6,11 +6,16 @@
 
     public class PrimitiveArrayMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            if (context.IsSourceValueNull && mapper.ShouldMapSourceCollectionAsNull(context))
+            if (context.IsSourceValueNull && context.Engine.ShouldMapSourceCollectionAsNull(context))
             {
                 return null;
+            }
+
+            if (!context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType))
+            {
+                return context.SourceValue;
             }
 
             Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
@@ -37,7 +42,7 @@
             return false;
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             return IsPrimitiveArrayType(context.DestinationType) &&
                    IsPrimitiveArrayType(context.SourceType) &&

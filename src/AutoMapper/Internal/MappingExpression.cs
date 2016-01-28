@@ -13,7 +13,7 @@ namespace AutoMapper.Internal
 
         public new IMappingExpression ReverseMap()
         {
-            var mappingExpression = ConfigurationContainer.CreateMap(TypeMap.DestinationType, TypeMap.SourceType, MemberList.Source, TypeMap.Profile);
+            var mappingExpression = Profile.CreateMap(TypeMap.DestinationType, TypeMap.SourceType, MemberList.Source);
             return (IMappingExpression) ConfigureReverseMap((MappingExpression)mappingExpression);
         }
 
@@ -171,21 +171,19 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
     public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>
     {
         private readonly Func<Type, object> _serviceCtor;
-        private readonly IProfileExpression _configurationContainer;
-        private PropertyMap _propertyMap;
 
-        public MappingExpression(TypeMap typeMap, Func<Type, object> serviceCtor, IProfileExpression configurationContainer)
+        public MappingExpression(TypeMap typeMap, Func<Type, object> serviceCtor, IProfileExpression profile)
         {
             TypeMap = typeMap;
             _serviceCtor = serviceCtor;
-            _configurationContainer = configurationContainer;
+            Profile = profile;
         }
 
         public TypeMap TypeMap { get; }
 
-        public PropertyMap PropertyMap =>_propertyMap;
+        public PropertyMap PropertyMap { get; private set; }
 
-        public IProfileExpression ConfigurationContainer => _configurationContainer;
+        public IProfileExpression Profile { get; }
 
         public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
                                                                    Action<IMemberConfigurationExpression<TSource>> memberOptions)
@@ -220,7 +218,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var typeInfo = new TypeDetails(TypeMap.DestinationType, _configurationContainer.ShouldMapProperty, _configurationContainer.ShouldMapField);
+            var typeInfo = new TypeDetails(TypeMap.DestinationType, Profile.ShouldMapProperty, Profile.ShouldMapField);
 
             typeInfo.PublicWriteAccessors.Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
         }
@@ -257,7 +255,6 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
         {
             TypeMap.IncludeDerivedTypes(otherSourceType, otherDestinationType);
-
             return this;
         }
 
@@ -268,9 +265,17 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TSource, TDestination> IncludeBase(Type sourceBase, Type destinationBase)
         {
-            TypeMap baseTypeMap = _configurationContainer.CreateMap(sourceBase, destinationBase).TypeMap;
-            baseTypeMap.IncludeDerivedTypes(typeof(TSource), typeof(TDestination));
-            TypeMap.ApplyInheritedMap(baseTypeMap);
+            var objectType = typeof(object);
+            var currentSourceBase = sourceBase;
+            var currentDestinationBase = destinationBase;
+            while(currentSourceBase != null && currentDestinationBase != null && currentSourceBase != objectType && currentDestinationBase != objectType)
+            {
+                TypeMap baseTypeMap = Profile.CreateMap(currentSourceBase, currentDestinationBase).TypeMap;
+                baseTypeMap.IncludeDerivedTypes(TypeMap.SourceType, TypeMap.DestinationType);
+                TypeMap.ApplyInheritedMap(baseTypeMap);
+                currentSourceBase = currentSourceBase.BaseType();
+                currentDestinationBase = currentDestinationBase.BaseType();
+            }
             return this;
         }
 
@@ -289,7 +294,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void NullSubstitute(object nullSubstitute)
         {
-            _propertyMap.SetNullSubstitute(nullSubstitute);
+            PropertyMap.SetNullSubstitute(nullSubstitute);
         }
 
         public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
@@ -298,7 +303,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
             ResolveUsing(resolver);
 
-            return new ResolutionExpression<TSource, TValueResolver>(TypeMap.SourceType, _propertyMap);
+            return new ResolutionExpression<TSource, TValueResolver>(TypeMap.SourceType, PropertyMap);
         }
 
         public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
@@ -307,34 +312,34 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
             ResolveUsing(resolver);
 
-            return new ResolutionExpression<TSource>(TypeMap.SourceType, _propertyMap);
+            return new ResolutionExpression<TSource>(TypeMap.SourceType, PropertyMap);
         }
 
         public IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver)
         {
-            _propertyMap.AssignCustomValueResolver(valueResolver);
+            PropertyMap.AssignCustomValueResolver(valueResolver);
 
-            return new ResolutionExpression<TSource>(TypeMap.SourceType, _propertyMap);
+            return new ResolutionExpression<TSource>(TypeMap.SourceType, PropertyMap);
         }
 
         public void ResolveUsing(Func<TSource, object> resolver)
         {
-            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver((TSource)r.Value)));
+            PropertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver((TSource)r.Value)));
         }
 
         public void ResolveUsing(Func<ResolutionResult, object> resolver)
         {
-            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver));
+            PropertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver));
         }
 
         public void ResolveUsing(Func<ResolutionResult, TSource, object> resolver)
         {
-            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver(r, (TSource)r.Value)));
+            PropertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver(r, (TSource)r.Value)));
         }
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            _propertyMap.SetCustomValueResolverExpression(sourceMember);
+            PropertyMap.SetCustomValueResolverExpression(sourceMember);
         }
 
         public void MapFrom<TMember>(string property)
@@ -342,7 +347,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
             var par = Expression.Parameter(typeof (TSource));
             var prop = Expression.Property(par, property);
             var lambda = Expression.Lambda<Func<TSource, TMember>>(prop, par);
-            _propertyMap.SetCustomValueResolverExpression(lambda);
+            PropertyMap.SetCustomValueResolverExpression(lambda);
         }
 
         public void UseValue<TValue>(TValue value)
@@ -352,7 +357,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void UseValue(object value)
         {
-            _propertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(src => value));
+            PropertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(src => value));
         }
 
         public void Condition(Func<TSource, bool> condition)
@@ -362,7 +367,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void Condition(Func<ResolutionContext, bool> condition)
         {
-            _propertyMap.ApplyCondition(condition);
+            PropertyMap.ApplyCondition(condition);
         }
 
         public void PreCondition(Func<TSource, bool> condition)
@@ -372,12 +377,12 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void PreCondition(Func<ResolutionContext, bool> condition)
         {
-            _propertyMap.ApplyPreCondition(condition);
+            PropertyMap.ApplyPreCondition(condition);
         }
 
         public void ExplicitExpansion()
         {
-            _propertyMap.ExplicitExpansion = true;
+            PropertyMap.ExplicitExpansion = true;
         }
 
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
@@ -395,7 +400,8 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            var mappingExpression = _configurationContainer.CreateMap<TDestination, TSource>(TypeMap.Profile, MemberList.Source);
+            var mappingExpression = Profile.CreateMap<TDestination, TSource>(MemberList.Source);
+
             return ConfigureReverseMap(mappingExpression);
         }
 
@@ -443,22 +449,22 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void Ignore()
         {
-            _propertyMap.Ignore();
+            PropertyMap.Ignore();
         }
 
         public void UseDestinationValue()
         {
-            _propertyMap.UseDestinationValue = true;
+            PropertyMap.UseDestinationValue = true;
         }
 
         public void DoNotUseDestinationValue()
         {
-            _propertyMap.UseDestinationValue = false;
+            PropertyMap.UseDestinationValue = false;
         }
 
         public void SetMappingOrder(int mappingOrder)
         {
-            _propertyMap.SetMappingOrder(mappingOrder);
+            PropertyMap.SetMappingOrder(mappingOrder);
         }
 
         public void ConvertUsing(Func<TSource, TDestination> mappingFunction)
@@ -538,7 +544,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            _propertyMap = TypeMap.FindOrCreatePropertyMapFor(destinationProperty);
+            PropertyMap = TypeMap.FindOrCreatePropertyMapFor(destinationProperty);
 
             memberOptions(this);
         }
@@ -566,7 +572,7 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
             {
                 if(type.IsGenericTypeDefinition())
                 {
-                    type = type.MakeGenericType(context.SourceType.GetGenericArguments());
+                    type = type.MakeGenericType(context.SourceType.GetTypeInfo().GenericTypeArguments);
                 }
                 var obj = context.Options.ServiceCtor?.Invoke(type);
                 if(obj != null)

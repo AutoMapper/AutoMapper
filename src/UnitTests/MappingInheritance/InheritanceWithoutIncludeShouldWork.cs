@@ -9,14 +9,11 @@
         public class Foo : FooBase { }
         public class FooDto { public int Value { get; set; } }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<FooBase, FooDto>().ForMember(d => d.Value, opt => opt.UseValue(10));
-                cfg.CreateMap<Foo, FooDto>().ForMember(d => d.Value, opt => opt.UseValue(5));
-            });
-        }
+            cfg.CreateMap<FooBase, FooDto>().ForMember(d => d.Value, opt => opt.UseValue(10));
+            cfg.CreateMap<Foo, FooDto>().ForMember(d => d.Value, opt => opt.UseValue(5));
+        });
 
         [Fact]
         public void Should_map_derived()

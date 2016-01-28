@@ -1,4 +1,4 @@
-#if NET4 || MONODROID
+#if !PORTABLE
 namespace AutoMapper.Internal
 {
     using System;
@@ -10,8 +10,7 @@ namespace AutoMapper.Internal
     {
         private static readonly MethodInfo proxyBase_NotifyPropertyChanged =
             typeof (ProxyBase).GetMethod("NotifyPropertyChanged",
-                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public, null,
-                new[] {typeof (PropertyChangedEventHandler), typeof (string)}, null);
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 
         private readonly FieldBuilder fieldBuilder;
         private readonly MethodBuilder getterBuilder;
@@ -70,5 +69,4 @@ namespace AutoMapper.Internal
         }
     }
 }
-
 #endif

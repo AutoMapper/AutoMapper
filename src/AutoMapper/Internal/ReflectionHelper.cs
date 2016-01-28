@@ -1,18 +1,19 @@
 namespace AutoMapper.Internal
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Dynamic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
-    public static class ReflectionHelper
+    internal static class ReflectionHelper
 	{
-        public static object Map(MemberInfo member, object value)
+        public static object Map(ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = member.GetMemberType();
-            return Mapper.Map(value, value?.GetType() ?? memberType, memberType);
+            return context.Engine.Mapper.Map(value, value?.GetType() ?? memberType, memberType);
         }
 
         public static bool IsDynamic(this object obj)
@@ -62,9 +63,24 @@ namespace AutoMapper.Internal
             throw Expected(propertyOrField);
         }
 
-        public static MemberInfo GetFieldOrProperty(Type type, string memberName)
+        public static IEnumerable<MemberInfo> GetMemberPath(Type type, string fullMemberName)
         {
-            return memberName.Split('.').Aggregate((MemberInfo) null, (property, member) => (property?.GetMemberType() ?? type).GetMember(member).Single());
+            MemberInfo property = null;
+            foreach(var memberName in fullMemberName.Split('.'))
+            {
+                var currentType = GetCurrentType(property, type);
+                yield return property = currentType.GetMember(memberName).Single();
+            }
+        }
+
+        private static Type GetCurrentType(MemberInfo member, Type type)
+        {
+            var memberType = member?.GetMemberType() ?? type;
+            if(memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
+            {
+                memberType = memberType.GetTypeInfo().GenericTypeArguments[0];
+            }
+            return memberType;
         }
 
         public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)
@@ -178,7 +194,7 @@ namespace AutoMapper.Internal
 
             if (targetType.IsGenericType())
             {
-                var genSubArgs = targetType.GetGenericArguments();
+                var genSubArgs = targetType.GetTypeInfo().GenericTypeArguments;
                 var newGenSubArgs = new Type[genSubArgs.Length];
                 for (int i = 0; i < genSubArgs.Length; i++)
                     newGenSubArgs[i] = ReplaceItemType(genSubArgs[i], oldType, newType);

@@ -19,20 +19,18 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly MemberAccessQueryMapperVisitor _memberVisitor;
 
 
-        internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery,
-            IMappingEngine mappingEngine)
+        internal QueryMapperVisitor(Type sourceType, Type destinationType, IQueryable destQuery, IConfigurationProvider config)
         {
             _sourceType = sourceType;
             _destinationType = destinationType;
             _destQuery = destQuery;
             _instanceParameter = Expression.Parameter(destinationType, "dto");
-            _memberVisitor = new MemberAccessQueryMapperVisitor(this, mappingEngine);
+            _memberVisitor = new MemberAccessQueryMapperVisitor(this, config);
         }
 
-        public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery,
-            IQueryable<TDestination> destQuery, IMappingEngine map)
+        public static IQueryable<TDestination> Map<TSource, TDestination>(IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery, IConfigurationProvider config)
         {
-            var visitor = new QueryMapperVisitor(typeof(TSource), typeof(TDestination), destQuery, map);
+            var visitor = new QueryMapperVisitor(typeof(TSource), typeof(TDestination), destQuery, config);
             var expr = visitor.Visit(sourceQuery.Expression);
 
             var newDestQuery = destQuery.Provider.CreateQuery<TDestination>(expr);
@@ -75,11 +73,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             // It is needed when PropertyMap is changing type of property
             if (left.Type != right.Type && right.NodeType == ExpressionType.Constant)
             {
-#if NET4 || MONODROID || MONOTOUCH || __IOS__ || SILVERLIGHT
-                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, Thread.CurrentThread.CurrentCulture);
-#else
-                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type);
-#endif
+                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, System.Globalization.CultureInfo.CurrentCulture);
+
                 right = Expression.Constant(value, left.Type);
             }
 
@@ -152,7 +147,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             if (lambdaType.IsGenericType())
             {
-                var genArgs = lambdaType.GetGenericArguments();
+                var genArgs = lambdaType.GetTypeInfo().GenericTypeArguments;
                 var newGenArgs = genArgs.Select(t => t.ReplaceItemType(_sourceType, _destinationType)).ToArray();
                 var genericTypeDef = lambdaType.GetGenericTypeDefinition();
                 if (genericTypeDef.FullName.StartsWith("System.Func"))

@@ -1,5 +1,6 @@
 build/
 release/
+TestResults/
 *.suo
 *.user
 bin

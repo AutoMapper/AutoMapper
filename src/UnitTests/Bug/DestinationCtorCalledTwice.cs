@@ -5,7 +5,7 @@ namespace AutoMapper.UnitTests.Bug
 {
     namespace DestinationCtorCalledTwice
     {
-        public class Bug : AutoMapperSpecBase
+        public class Bug
         {
             public class Source
             {
@@ -40,7 +40,8 @@ namespace AutoMapper.UnitTests.Bug
                 var source = new Source {Value = 5};
                 var dest = new Destination {Value = 7};
 
-                Mapper.Map(source, dest, opt => opt.CreateMissingTypeMaps = true);
+                Mapper.Initialize(cfg => cfg.CreateMissingTypeMaps = true);
+                Mapper.Map(source, dest);
 
                 Destination.CallCount.ShouldEqual(1);
             }

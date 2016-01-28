@@ -16,17 +16,13 @@ namespace AutoMapper.UnitTests
             private int _beforeMapCount = 0;
             private int _afterMapCount = 0;
 
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<ParentModel, ParentDto>()
-                        .BeforeMap((src, dest) => _beforeMapCount++)
-                        .AfterMap((src, dest) => _afterMapCount++);
-                    cfg.CreateMap<ChildModel, ChildDto>();
-                });
-                Mapper.AssertConfigurationIsValid();
-            }
+                cfg.CreateMap<ParentModel, ParentDto>()
+                    .BeforeMap((src, dest) => _beforeMapCount++)
+                    .AfterMap((src, dest) => _afterMapCount++);
+                cfg.CreateMap<ChildModel, ChildDto>();
+            });
 
             protected override void Because_of()
             {
@@ -198,35 +194,31 @@ namespace AutoMapper.UnitTests
 			private ParentDto _dto;
 			private ParentModel _parent;
 
-			protected override void Establish_context()
-			{
-				_parent = new ParentModel
-					{
-						ID = 2
-					};
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        _parent = new ParentModel
+		        {
+		            ID = 2
+		        };
 
-				List<ChildModel> childModels = new List<ChildModel>
-					{
-						new ChildModel
-							{
-								ID = 1,
-								Parent = _parent
-							}
-					};
+		        List<ChildModel> childModels = new List<ChildModel>
+		        {
+		            new ChildModel
+		            {
+		                ID = 1,
+		                Parent = _parent
+		            }
+		        };
 
-				Dictionary<int, ParentModel> parents = childModels.ToDictionary(x => x.ID, x => x.Parent);
+		        Dictionary<int, ParentModel> parents = childModels.ToDictionary(x => x.ID, x => x.Parent);
 
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
-                    cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
+		        cfg.CreateMap<int, ParentDto>().ConvertUsing(new ChildIdToParentDtoConverter(parents));
+		        cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
 
-                    cfg.CreateMap<ParentModel, ParentDto>()
-                        .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
-                    cfg.CreateMap<ChildModel, ChildDto>();
-                });
-				Mapper.AssertConfigurationIsValid();
-			}
+		        cfg.CreateMap<ParentModel, ParentDto>()
+		            .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
+		        cfg.CreateMap<ChildModel, ChildDto>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -252,8 +244,10 @@ namespace AutoMapper.UnitTests
 				{
 					int childId = (int) resolutionContext.SourceValue;
 					ParentModel parentModel = _parentModels[childId];
-					MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
-					return mappingEngine.Map<ParentModel, ParentDto>(resolutionContext, parentModel);
+				    var context = resolutionContext.CreateTypeContext(
+				        resolutionContext.Engine.ConfigurationProvider.ResolveTypeMap(typeof (ParentModel), typeof (ParentDto)),
+				        parentModel, null, typeof (ParentModel), typeof (ParentDto));
+				    return (ParentDto) resolutionContext.Engine.Map(context);
 				}
 			}
 
@@ -270,8 +264,10 @@ namespace AutoMapper.UnitTests
 				{
 					int childId = (int)resolutionContext.SourceValue;
 					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == childId).ToList();
-					MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
-					return mappingEngine.Map<List<ChildModel>, List<ChildDto>>(resolutionContext, childModels);
+                    var context = resolutionContext.CreateTypeContext(
+                        null,
+                        childModels, null, typeof(List<ChildModel>), typeof(List<ChildDto>));
+                    return (List<ChildDto>) context.Engine.Map(context);
 				}
 			}
 
@@ -303,12 +299,11 @@ namespace AutoMapper.UnitTests
 		{
 			private FooDto _dto;
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Foo, FooDto>();
-				Mapper.CreateMap<Bar, BarDto>();
-				Mapper.AssertConfigurationIsValid();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Foo, FooDto>();
+		        cfg.CreateMap<Bar, BarDto>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -356,15 +351,14 @@ namespace AutoMapper.UnitTests
 		{
 			private FooContainerModel _dto;
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<FooModel, FooScreenModel>();
-				Mapper.CreateMap<FooModel, FooInputModel>();
-				Mapper.CreateMap<FooModel, FooContainerModel>()
-					.ForMember(dest => dest.Input, opt => opt.MapFrom(src => src))
-					.ForMember(dest => dest.Screen, opt => opt.MapFrom(src => src));
-				Mapper.AssertConfigurationIsValid();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<FooModel, FooScreenModel>();
+		        cfg.CreateMap<FooModel, FooInputModel>();
+		        cfg.CreateMap<FooModel, FooContainerModel>()
+		            .ForMember(dest => dest.Input, opt => opt.MapFrom(src => src))
+		            .ForMember(dest => dest.Screen, opt => opt.MapFrom(src => src));
+		    });
 
 			protected override void Because_of()
 			{
@@ -409,21 +403,25 @@ namespace AutoMapper.UnitTests
 	    {
 	        private ParentDto _dtoParent;
 
-	        protected override void Establish_context()
-            {
+	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        {
+	            cfg.CreateMap<Parent, ParentDto>();
+	            cfg.CreateMap<Child, ChildDto>();
+
+	        });
+
+	        protected override void Because_of()
+	        {
                 var parent1 = new Parent { Name = "Parent 1" };
                 var child1 = new Child { Name = "Child 1" };
 
                 parent1.Children.Add(child1);
                 child1.Parents.Add(parent1);
 
-                Mapper.CreateMap<Parent, ParentDto>();
-                Mapper.CreateMap<Child, ChildDto>();
-
-	            _dtoParent = Mapper.Map<Parent, ParentDto>(parent1);
+                _dtoParent = Mapper.Map<Parent, ParentDto>(parent1);
             }
 
-	        [Fact]
+            [Fact]
 	        public void Should_map_successfully()
 	        {
                 object.ReferenceEquals(_dtoParent.Children[0].Parents[0], _dtoParent).ShouldBeTrue();
@@ -528,7 +526,7 @@ namespace AutoMapper.UnitTests
             }
 	    }
 
-	    public class When_disabling_instance_cache_for_instances : AutoMapperSpecBase
+	    public class When_disabling_instance_cache_for_instances
 	    {
             public class Tag
             {

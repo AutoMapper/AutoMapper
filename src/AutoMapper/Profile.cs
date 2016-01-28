@@ -12,11 +12,13 @@ namespace AutoMapper
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public class Profile : IProfileExpression
+    public abstract class Profile : IProfileExpression, IProfileConfiguration
     {
-        private ConfigurationStore _configurator;
+        private IConfiguration _configurator;
+        private readonly IConditionalObjectMapper _mapMissingTypes;
+        private readonly List<string> _globalIgnore;
 
-        public Profile(string profileName)
+        protected Profile(string profileName)
             :this()
         {
             ProfileName = profileName;
@@ -30,9 +32,12 @@ namespace AutoMapper
             IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
             ShouldMapProperty = p => p.IsPublic();
             ShouldMapField = f => f.IsPublic;
+            _mapMissingTypes = new ConditionalObjectMapper(ProfileName) {Conventions = {tp => true}};
+            _globalIgnore = new List<string>();
+            _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
 
-        public string ProfileName { get; }
+        public virtual string ProfileName { get; }
 
         public void DisableConstructorMapping()
         {
@@ -42,6 +47,8 @@ namespace AutoMapper
         public bool AllowNullDestinationValues { get; set; }
 
         public bool AllowNullCollections { get; set; }
+
+        public IEnumerable<string> GlobalIgnores => _globalIgnore; 
 
         public INamingConvention SourceMemberNamingConvention
         {
@@ -65,6 +72,23 @@ namespace AutoMapper
             set { DefaultMemberConfig.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = value); }
         }
 
+
+        public bool CreateMissingTypeMaps
+        {
+            get
+            {
+                return _createMissingTypeMaps;
+            }
+            set
+            {
+                _createMissingTypeMaps = value;
+                if (value)
+                    _typeConfigurations.Add(_mapMissingTypes);
+                else
+                    _typeConfigurations.Remove(_mapMissingTypes);
+            }
+        }
+
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
         {
             _configurator.ForAllMaps(ProfileName, configuration);
@@ -78,11 +102,6 @@ namespace AutoMapper
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
         {
             return _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
-        }
-
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(string profileName, MemberList memberList)
-        {
-            return _configurator.CreateMap<TSource, TDestination>(profileName, memberList);
         }
 
         public IMappingExpression CreateMap(Type sourceType, Type destinationType)
@@ -134,22 +153,20 @@ namespace AutoMapper
 
         public void AddGlobalIgnore(string propertyNameStartingWith)
         {
-            _configurator.AddGlobalIgnore(propertyNameStartingWith);
+            _globalIgnore.Add(propertyNameStartingWith);
         }
 
         /// <summary>
         /// Override this method in a derived class and call the CreateMap method to associate that map with this profile.
         /// Avoid calling the <see cref="Mapper"/> class from this method.
         /// </summary>
-        protected internal virtual void Configure()
-        {
-            // override in a derived class for custom configuration behavior
-        }
+        protected abstract void Configure();
 
-        public void Initialize(ConfigurationStore configurator)
+        public void Initialize(IConfiguration configurator)
         {
             _configurator = configurator;
-            _configurator._formatterProfiles.AddOrUpdate(ProfileName, this, (s, configuration) => this);
+
+            Configure();
         }
 
         
@@ -157,41 +174,33 @@ namespace AutoMapper
 
         private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
 
-        public IMemberConfiguration DefaultMemberConfig
-        {
-            get
-            {
-                if(!_memberConfigurations.Any())
-                    _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
-                return _memberConfigurations.First();
-            }
-        }
+        public IMemberConfiguration DefaultMemberConfig => _memberConfigurations.First();
 
-        public IEnumerable<IMemberConfiguration> MemberConfigurations
-        {
-            get
-            {
-                var temp = DefaultMemberConfig;
-                return _memberConfigurations;
-            }
-        }
+        public IEnumerable<IMemberConfiguration> MemberConfigurations => _memberConfigurations;
+
         public IMemberConfiguration AddMemberConfiguration()
         {
             var condition = new MemberConfiguration();
             _memberConfigurations.Add(condition);
             return condition;
         }
-        private IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+        private readonly IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+
+        private bool _createMissingTypeMaps;
+
         public IEnumerable<IConditionalObjectMapper> TypeConfigurations => _typeConfigurations;
+
         public IConditionalObjectMapper AddConditionalObjectMapper()
         {
             var condition = new ConditionalObjectMapper(ProfileName);
+
             _typeConfigurations.Add(condition);
+
             return condition;
         }
 
-        public bool ConstructorMappingEnabled { get; set; }
-        public bool DataReaderMapperYieldReturnEnabled { get; set; }
+        public bool ConstructorMappingEnabled { get; private set; }
+
         public IEnumerable<MethodInfo> SourceExtensionMethods => _sourceExtensionMethods;
 
         public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
@@ -201,16 +210,11 @@ namespace AutoMapper
         public void IncludeSourceExtensionMethods(Assembly assembly)
         {
             //http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
-            _sourceExtensionMethods.AddRange(assembly.GetTypes()
+            _sourceExtensionMethods.AddRange(assembly.ExportedTypes
                 .Where(type => type.IsSealed() && !type.IsGenericType() && !type.IsNested)
                 .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
                 .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
                 .Where(method => method.GetParameters().Length == 1));
-        }
-
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList, string profileName)
-        {
-            return _configurator.CreateMap(sourceType, destinationType, memberList, profileName);
         }
     }
 }

@@ -1,3 +1,5 @@
+using System;
+
 namespace AutoMapper
 {
     using System.Collections.Generic;
@@ -7,7 +9,7 @@ namespace AutoMapper
 
     public class ConstructorParameterMap
     {
-        public ConstructorParameterMap(ParameterInfo parameter, IMemberGetter[] sourceResolvers, bool canResolve)
+        public ConstructorParameterMap(ParameterInfo parameter, IValueResolver[] sourceResolvers, bool canResolve)
         {
             Parameter = parameter;
             SourceResolvers = sourceResolvers;
@@ -16,14 +18,9 @@ namespace AutoMapper
 
         public ParameterInfo Parameter { get; private set; }
 
-        public IMemberGetter[] SourceResolvers { get; private set; }
+        public IValueResolver[] SourceResolvers { get; private set; }
 
         public bool CanResolve { get; set; }
-
-        public Expression GetExpression(Expression instanceParameter)
-        {
-            return SourceResolvers.Aggregate(instanceParameter, (parameter, getter) => Expression.MakeMemberAccess(parameter, getter.MemberInfo));
-        }
 
         public ResolutionResult ResolveValue(ResolutionContext context)
         {

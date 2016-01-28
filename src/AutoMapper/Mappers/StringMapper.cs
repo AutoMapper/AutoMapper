@@ -2,12 +2,12 @@
 {
     public class StringMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
             return context.SourceValue?.ToString();
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
         }

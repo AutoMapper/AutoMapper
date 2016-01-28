@@ -64,11 +64,6 @@ namespace AutoMapper
         bool ConstructorMappingEnabled { get; }
 
         /// <summary>
-        /// For mapping via data readers, enable lazy returning of values instead of immediate evalaution
-        /// </summary>
-        bool DataReaderMapperYieldReturnEnabled { get; }
-
-        /// <summary>
         /// Source extension methods included for search
         /// </summary>
         IEnumerable<MethodInfo> SourceExtensionMethods { get; }

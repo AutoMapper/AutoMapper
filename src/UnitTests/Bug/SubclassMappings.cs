@@ -19,10 +19,10 @@ namespace AutoMapper.UnitTests.Bug
             public string SubName { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            AutoMapper.Mapper.CreateMap<Source, Destination>();
-        }
+            cfg.CreateMap<Source, Destination>();
+        });
 
         [Fact]
         public void TestCase()
@@ -31,11 +31,11 @@ namespace AutoMapper.UnitTests.Bug
             var source = new Source() { Name = "Test" };
             var destination = new Destination();
 
-            AutoMapper.Mapper.Map<Source, Destination>(source, destination); // Works
+            Mapper.Map<Source, Destination>(source, destination); // Works
 
             var subDestination = new SubDestination();
 
-            AutoMapper.Mapper.Map<Source, Destination>(source, subDestination); // Fails
+            Mapper.Map<Source, Destination>(source, subDestination); // Fails
         }
     }
 }

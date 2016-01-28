@@ -3,7 +3,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class IncludedBaseMappingShouldInheritBaseMappings : NonValidatingSpecBase   
+    public class IncludedBaseMappingShouldInheritBaseMappings : SpecBase
     {
         public class ModelObject
         {

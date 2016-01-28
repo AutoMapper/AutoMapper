@@ -3,7 +3,6 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-#if !SILVERLIGHT
     public class EnumMatchingOnValue : AutoMapperSpecBase
     {
         private SecondClass _result;
@@ -29,13 +28,11 @@ namespace AutoMapper.UnitTests.Bug
             DifferentNamedEnum = 1,
             SecondNameEnum = 2
         }
-        protected override void Establish_context()
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<FirstClass, SecondClass>();
-            });
-        }
+            cfg.CreateMap<FirstClass, SecondClass>();
+        });
 
         protected override void Because_of()
         {
@@ -52,6 +49,5 @@ namespace AutoMapper.UnitTests.Bug
             _result.EnumValue.ShouldEqual(SecondEnum.DifferentNamedEnum);
         }
     }
-#endif
 
 }

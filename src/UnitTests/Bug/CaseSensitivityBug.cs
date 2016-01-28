@@ -4,15 +4,15 @@
 
     public class CaseSensitivityBug : NonValidatingSpecBase
     {
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Foo, Bar>());
-        }
+            cfg.CreateMap<Foo, Bar>();
+        });
 
         [Fact]
         public void TestMethod1()
         {
-            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Mapper.AssertConfigurationIsValid);
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(Configuration.AssertConfigurationIsValid);
         }
 
         public class Foo

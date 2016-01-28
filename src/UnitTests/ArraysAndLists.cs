@@ -11,7 +11,38 @@ namespace AutoMapper.UnitTests
 {
 	namespace ArraysAndLists
 	{
-		public class When_mapping_to_a_concrete_non_generic_ienumerable : AutoMapperSpecBase
+        public class When_mapping_to_an_existing_array_typed_as_IEnumerable : AutoMapperSpecBase
+        {
+            private Destination _destination = new Destination();
+
+            public class Source
+            {
+                public int[] IntCollection { get; set; } = new int[0];
+            }
+
+            public class Destination
+            {
+                public IEnumerable<int> IntCollection { get; set; } = new[] { 1, 2, 3, 4, 5 };
+            }
+
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>();
+            });
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map(new Source(), _destination);
+            }
+
+            [Fact]
+            public void Should_create_destination_array_the_same_size_as_the_source()
+            {
+                _destination.IntCollection.Count().ShouldEqual(0);
+            }
+        }
+
+        public class When_mapping_to_a_concrete_non_generic_ienumerable : AutoMapperSpecBase
 		{
 			private Destination _destination;
 
@@ -27,10 +58,10 @@ namespace AutoMapper.UnitTests
 				public IEnumerable Values2 { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -74,10 +105,10 @@ namespace AutoMapper.UnitTests
 				public IEnumerable<string> Values2 { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -121,10 +152,10 @@ namespace AutoMapper.UnitTests
 				public ICollection Values2 { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -166,10 +197,10 @@ namespace AutoMapper.UnitTests
 				public ICollection<string> Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -201,10 +232,10 @@ namespace AutoMapper.UnitTests
 				public IList Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -236,10 +267,10 @@ namespace AutoMapper.UnitTests
 				public IList<string> Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -276,10 +307,10 @@ namespace AutoMapper.UnitTests
 				public ValueCollection Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -384,12 +415,12 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
-				Mapper.CreateMap<SourceItem, DestItem>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>()
+		            .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
+		        cfg.CreateMap<SourceItem, DestItem>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -465,14 +496,14 @@ namespace AutoMapper.UnitTests
 			private IEnumerable<string> _strings;
 			private List<string> _mappedStrings;
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(x => x.AllowNullDestinationValues = true);
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.AllowNullDestinationValues = true;
 
-				_strings = new List<string> { FirstString };
+		        _strings = new List<string> {FirstString};
 
-				_mappedStrings = new List<string>();
-			}
+		        _mappedStrings = new List<string>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -488,7 +519,6 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-#if !SILVERLIGHT && !NETFX_CORE
 		public class When_destination_collection_is_only_a_list_source_and_not_IList : SpecBase
 		{
 			private Destination _destination;
@@ -538,12 +568,11 @@ namespace AutoMapper.UnitTests
 				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3 } });
 			}
 
-			[Fact]
-			public void Should_use_the_underlying_list_to_add_values()
+            [Fact(Skip = "No IListSource in .NET Standard")]
+            public void Should_use_the_underlying_list_to_add_values()
 			{
 				_destination.Values.Count().ShouldEqual(3);
 			}
 		}
-#endif
 	}
 }

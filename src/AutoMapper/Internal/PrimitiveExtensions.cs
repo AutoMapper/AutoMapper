@@ -22,7 +22,7 @@ namespace AutoMapper.Internal
 
         public static Type GetTypeOfNullable(this Type type)
         {
-            return type.GetGenericArguments()[0];
+            return type.GetTypeInfo().GenericTypeArguments[0];
         }
 
         public static bool IsCollectionType(this Type type)
@@ -32,7 +32,7 @@ namespace AutoMapper.Internal
                 return true;
             }
 
-            IEnumerable<Type> genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType());
+            IEnumerable<Type> genericInterfaces = type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType());
             IEnumerable<Type> baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
             
             var isCollectionType = baseDefinitions.Any(t => t == typeof (ICollection<>));
@@ -43,17 +43,17 @@ namespace AutoMapper.Internal
 
 		public static bool IsEnumerableType(this Type type)
 		{
-			return type.GetInterfaces().Contains(typeof (IEnumerable));
+			return type.GetTypeInfo().ImplementedInterfaces.Contains(typeof (IEnumerable));
 		}
 
         public static bool IsQueryableType(this Type type)
         {
-            return type.GetInterfaces().Contains(typeof(IQueryable));
+            return type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IQueryable));
         }
 
 		public static bool IsListType(this Type type)
 		{
-			return type.GetInterfaces().Contains(typeof (IList));
+			return type.GetTypeInfo().ImplementedInterfaces.Contains(typeof (IList));
 		}
 
 		public static bool IsListOrDictionaryType(this Type type)
@@ -67,7 +67,7 @@ namespace AutoMapper.Internal
                 type.GetGenericTypeDefinition() == typeof (System.Collections.Generic.IDictionary<,>))
 				return true;
 
-            var genericInterfaces = type.GetInterfaces().Where(t => t.IsGenericType());
+            var genericInterfaces = type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType());
 			var baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
             return baseDefinitions.Any(t => t == typeof (System.Collections.Generic.IDictionary<,>));
 		}
@@ -79,7 +79,7 @@ namespace AutoMapper.Internal
 				return type;
 
             var genericInterfaces =
-                type.GetInterfaces()
+                type.GetTypeInfo().ImplementedInterfaces
                     .Where(
                         t =>
                             t.IsGenericType() &&
@@ -91,7 +91,7 @@ namespace AutoMapper.Internal
         {
             if (type.HasElementType)
                 return type.GetElementType();
-            return type.GetGenericArguments()[0];
+            return type.GetTypeInfo().GenericTypeArguments[0];
         }
 	}
 }

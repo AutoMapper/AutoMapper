@@ -11,28 +11,33 @@ namespace AutoMapper
 	public interface IProfileConfiguration
 	{
         IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
-        IMemberConfiguration AddMemberConfiguration();
         IEnumerable<IConditionalObjectMapper> TypeConfigurations { get; }
-        IConditionalObjectMapper AddConditionalObjectMapper();
-        bool ConstructorMappingEnabled { get; set; }
-        bool DataReaderMapperYieldReturnEnabled { get; set; }
+        bool ConstructorMappingEnabled { get; }
+        bool AllowNullDestinationValues { get; }
+        bool AllowNullCollections { get; }
+        INamingConvention SourceMemberNamingConvention { get; }
+        INamingConvention DestinationMemberNamingConvention { get; }
+        bool CreateMissingTypeMaps { get; }
+
         IMemberConfiguration DefaultMemberConfig { get; }
         /// <summary>
         /// Source extension methods included for search
         /// </summary>
         IEnumerable<MethodInfo> SourceExtensionMethods { get; }
 
-        void IncludeSourceExtensionMethods(Assembly assembly);
         /// <summary>
         /// Specify which properties should be mapped.
         /// By default only public properties are mapped.e
         /// </summary>
-        Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+        Func<PropertyInfo, bool> ShouldMapProperty { get; }
 
         /// <summary>
         /// Specify which fields should be mapped.
         /// By default only public fields are mapped.
         /// </summary>
-        Func<FieldInfo, bool> ShouldMapField { get; set; }
-    }
+        Func<FieldInfo, bool> ShouldMapField { get; }
+
+        string ProfileName { get; }
+        IEnumerable<string> GlobalIgnores { get; }
+	}
 }

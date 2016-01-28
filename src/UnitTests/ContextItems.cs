@@ -5,7 +5,7 @@
         using Should;
         using Xunit;
 
-        public class When_mapping_with_contextual_values : AutoMapperSpecBase
+        public class When_mapping_with_contextual_values
         {
             public class Source
             {
@@ -40,7 +40,7 @@
             }
         }
 
-        public class When_mapping_with_contextual_values_in_resolve_func : AutoMapperSpecBase
+        public class When_mapping_with_contextual_values_in_resolve_func
         {
             public class Source
             {

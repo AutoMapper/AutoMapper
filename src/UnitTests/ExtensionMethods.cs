@@ -31,11 +31,11 @@ namespace AutoMapper.UnitTests
 				public string Value2 { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-                Mapper.Initialize(config => config.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly()));
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly());
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -83,11 +83,11 @@ namespace AutoMapper.UnitTests
 				public int Property { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(config => config.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly()));
-				Mapper.CreateMap<Source, Destination>();
-			}
+		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    {
+		        cfg.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly());
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -121,10 +121,10 @@ namespace AutoMapper.UnitTests
 	            public int ValuesCount { get; set; }
 	        }
 
-	        protected override void Establish_context()
+	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
 	        {
-	            Mapper.Initialize(cfg => cfg.CreateMap<Source, Destination>());
-	        }
+	            cfg.CreateMap<Source, Destination>();
+	        });
 
 	        protected override void Because_of()
 	        {

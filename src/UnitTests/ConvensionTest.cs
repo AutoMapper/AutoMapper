@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    public class ConvensionTest : AutoMapperSpecBase
+    public class ConvensionTest
     {
         public class Client
         {
@@ -121,6 +121,19 @@ namespace AutoMapper.UnitTests
             a.Transval.ShouldEqual("testTransfer");
 
             var clients = Mapper.Map<Client[]>(new[] { new ClientDto() });
+            Expression<Func<Client, bool>> expr = c => c.ID < 5;
+            var clientExp = Mapper.Map<Expression<Func<ClientDto, bool>>>(expr);
+        }
+
+        [Fact]
+        public void Should_Work_Without_Explicitly_Mapping_Before_Hand()
+        {
+            Mapper.Initialize(cfg =>
+            {
+                cfg.AddProfile<ToDTO>();
+                cfg.AddProfile<FromDTO>();
+            });
+
             Expression<Func<Client, bool>> expr = c => c.ID < 5;
             var clientExp = Mapper.Map<Expression<Func<ClientDto, bool>>>(expr);
         }

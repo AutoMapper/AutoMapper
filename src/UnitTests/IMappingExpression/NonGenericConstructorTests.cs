@@ -32,11 +32,11 @@
             public int Other { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             Expression<Func<Source, Dest>> constructor = src => new Dest(src.Value + 10);
-            Mapper.CreateMap(typeof(Source), typeof(Dest)).ConstructProjectionUsing(constructor);
-        }
+            cfg.CreateMap(typeof (Source), typeof (Dest)).ConstructProjectionUsing(constructor);
+        });
 
         protected override void Because_of()
         {
@@ -48,7 +48,7 @@
                 }
             }.AsQueryable();
 
-            _dest = values.ProjectTo<Dest>().ToArray();
+            _dest = values.ProjectTo<Dest>(Configuration).ToArray();
         }
 
         [Fact]

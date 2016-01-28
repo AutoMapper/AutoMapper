@@ -10,26 +10,26 @@
 
     public class ExpressionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context, IMappingEngineRunner mapper)
+        public object Map(ResolutionContext context)
         {
-            var sourceDelegateType = context.SourceType.GetGenericArguments()[0];
-            var destDelegateType = context.DestinationType.GetGenericArguments()[0];
+            var sourceDelegateType = context.SourceType.GetTypeInfo().GenericTypeArguments[0];
+            var destDelegateType = context.DestinationType.GetTypeInfo().GenericTypeArguments[0];
             var expression = (LambdaExpression) context.SourceValue;
 
             if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
                 throw new AutoMapperMappingException("Source and destination expressions must be of the same type.");
 
-            var destArgType = destDelegateType.GetGenericArguments()[0];
+            var destArgType = destDelegateType.GetTypeInfo().GenericTypeArguments[0];
             if (destArgType.IsGenericType())
-                destArgType = destArgType.GetGenericArguments()[0];
-            var sourceArgType = sourceDelegateType.GetGenericArguments()[0];
+                destArgType = destArgType.GetTypeInfo().GenericTypeArguments[0];
+            var sourceArgType = sourceDelegateType.GetTypeInfo().GenericTypeArguments[0];
             if (sourceArgType.IsGenericType())
-                sourceArgType = sourceArgType.GetGenericArguments()[0];
+                sourceArgType = sourceArgType.GetTypeInfo().GenericTypeArguments[0];
 
-            var typeMap = Mapper.FindTypeMapFor(destArgType, sourceArgType);
+            var typeMap = context.ConfigurationProvider.ResolveTypeMap(destArgType, sourceArgType);
 
-            var parentMasterVisitor = new MappingVisitor(destDelegateType.GetGenericArguments());
-            var typeMapVisitor = new MappingVisitor(typeMap, expression.Parameters[0], Expression.Parameter(destDelegateType.GetGenericArguments()[0], expression.Parameters[0].Name), parentMasterVisitor, destDelegateType.GetGenericArguments());
+            var parentMasterVisitor = new MappingVisitor(context.ConfigurationProvider, destDelegateType.GetTypeInfo().GenericTypeArguments);
+            var typeMapVisitor = new MappingVisitor(context.ConfigurationProvider, typeMap, expression.Parameters[0], Expression.Parameter(destDelegateType.GetTypeInfo().GenericTypeArguments[0], expression.Parameters[0].Name), parentMasterVisitor, destDelegateType.GetTypeInfo().GenericTypeArguments);
             
             // Map expression body and variable seperately
             var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
@@ -37,7 +37,7 @@
             return Expression.Lambda(body, parameters);
         }
 
-        public bool IsMatch(ResolutionContext context)
+        public bool IsMatch(TypePair context)
         {
             return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
                    && context.SourceType != typeof (LambdaExpression)
@@ -49,18 +49,20 @@
         {
             private IList<Type> _destSubTypes = new Type[0];
 
+            private readonly IConfigurationProvider _configurationProvider;
             private readonly TypeMap _typeMap;
             private readonly Expression _oldParam;
             private readonly Expression _newParam;
             private readonly MappingVisitor _parentMappingVisitor;
 
-            public MappingVisitor(IList<Type> destSubTypes)
-                : this(null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)), null, destSubTypes)
+            public MappingVisitor(IConfigurationProvider configurationProvider, IList<Type> destSubTypes)
+                : this(configurationProvider, null, Expression.Parameter(typeof(Nullable)), Expression.Parameter(typeof(Nullable)), null, destSubTypes)
             {
             }
 
-            internal MappingVisitor(TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor = null, IList<Type> destSubTypes = null)
+            internal MappingVisitor(IConfigurationProvider configurationProvider, TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor = null, IList<Type> destSubTypes = null)
             {
+                _configurationProvider = configurationProvider;
                 _typeMap = typeMap;
                 _oldParam = oldParam;
                 _newParam = newParam;
@@ -116,11 +118,11 @@
                     return arguments[index].Type;
                 }
 
-                var matchingEnumerableArgument = args.Where(a => a.Type.IsGenericType()).FirstOrDefault(a => a.Type.GetGenericArguments()[0] == t);
+                var matchingEnumerableArgument = args.Where(a => a.Type.IsGenericType()).FirstOrDefault(a => a.Type.GetTypeInfo().GenericTypeArguments[0] == t);
                 var index2 = args.IndexOf(matchingEnumerableArgument);
                 if (index2 < 0) 
                     return t;
-                return arguments[index2].Type.GetGenericArguments()[0];
+                return arguments[index2].Type.GetTypeInfo().GenericTypeArguments[0];
             }
 
             protected override Expression VisitBinary(BinaryExpression node)
@@ -207,15 +209,15 @@
                     var sourceParamType = expression.Parameters[i].Type;
                     foreach (var destParamType in _destSubTypes.Where(dt => dt != sourceParamType))
                     {
-                        var a = destParamType.IsGenericType() ? destParamType.GetGenericArguments()[0]: destParamType;
-                        var typeMap = Mapper.FindTypeMapFor(a, sourceParamType);
+                        var a = destParamType.IsGenericType() ? destParamType.GetTypeInfo().GenericTypeArguments[0]: destParamType;
+                        var typeMap = _configurationProvider.FindTypeMapFor(a, sourceParamType);
 
                         if (typeMap == null)
                             continue;
 
                         var oldParam = expression.Parameters[i];
                         var newParam = Expression.Parameter(a, oldParam.Name);
-                        visitors.Add(new MappingVisitor(typeMap, oldParam, newParam, this));
+                        visitors.Add(new MappingVisitor(_configurationProvider, typeMap, oldParam, newParam, this));
                     }
                 }
                 return visitors.Aggregate(expression as Expression, (e, v) => v.Visit(e));
@@ -269,8 +271,8 @@
                 var destType = propertyMap.DestinationPropertyType;
                 if (sourceType == destType)
                     return Expression.MakeMemberAccess(baseExpression, node.Member);
-                var typeMap = Mapper.FindTypeMapFor(sourceType, destType);
-                var subVisitor = new MappingVisitor(typeMap, node.Expression, baseExpression, this);
+                var typeMap = _configurationProvider.FindTypeMapFor(sourceType, destType);
+                var subVisitor = new MappingVisitor(_configurationProvider, typeMap, node.Expression, baseExpression, this);
                 var newExpression = subVisitor.Visit(node);
                 _destSubTypes = _destSubTypes.Concat(subVisitor._destSubTypes).ToArray();
                 return newExpression;
@@ -297,9 +299,9 @@
             private void SetSorceSubTypes(PropertyMap propertyMap)
             {
                 if (propertyMap.SourceMember is PropertyInfo)
-                    _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetGenericArguments().Concat(new []{ (propertyMap.SourceMember as PropertyInfo).PropertyType }).ToList();
+                    _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetTypeInfo().GenericTypeArguments.Concat(new []{ (propertyMap.SourceMember as PropertyInfo).PropertyType }).ToList();
                 else if (propertyMap.SourceMember is FieldInfo)
-                    _destSubTypes = (propertyMap.SourceMember as FieldInfo).FieldType.GetGenericArguments();
+                    _destSubTypes = (propertyMap.SourceMember as FieldInfo).FieldType.GetTypeInfo().GenericTypeArguments;
             }
 
             private Expression ConvertCustomExpression(Expression node, PropertyMap propertyMap)

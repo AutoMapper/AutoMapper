@@ -20,14 +20,11 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                // BUG. ArgumentException : Expression must be writeable
-                cfg.CreateMap<Source, Destination>();
-            });
-        }
+            // BUG. ArgumentException : Expression must be writeable
+            cfg.CreateMap<Source, Destination>();
+        });
 
         [Fact]
         public void Should_map_over_constructor()
