@@ -9,7 +9,7 @@
         public class Foo : FooBase { }
         public class FooDto { public int Value { get; set; } }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<FooBase, FooDto>().ForMember(d => d.Value, opt => opt.UseValue(10));
             cfg.CreateMap<Foo, FooDto>().ForMember(d => d.Value, opt => opt.UseValue(5));

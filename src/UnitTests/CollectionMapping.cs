@@ -15,7 +15,7 @@ namespace AutoMapper.UnitTests
         }
         public void SetUp()
         {
-            Mapper.Reset();
+            
         }
 
 

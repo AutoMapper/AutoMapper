@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_map_single_properties()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             Expression<Func<Dest, bool>> expr = d => d.Value == 10;
 
@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_map_flattened_properties()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             Expression<Func<Dest, bool>> expr = d => d.ChildValue == 10;
 
@@ -70,7 +70,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_map_custom_mapped_properties()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
 
             Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
 
@@ -89,7 +89,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Throw_AutoMapperMappingException_if_expression_types_dont_match()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
 
@@ -99,7 +99,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_map_with_different_destination_types()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
 
             Expression<Func<Dest, Dest>> expr = d => d;
 

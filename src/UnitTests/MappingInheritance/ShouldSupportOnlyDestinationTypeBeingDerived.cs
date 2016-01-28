@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         {
             var order = new Order() { Customer = new Customer() { Id = 1, Name = "A" } };
 
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Order, OrderDTO>();
                 cfg.CreateMap<Customer, CustomerDTO>();
@@ -90,7 +90,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
         public void Mapper_Should_Allow_Overriding_Of_Destination_Type()
         {
             var order = new Order() { Customer = new Customer() { Id = 1, Name = "A" } };
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap(typeof(Order), typeof(OrderDTO));
                 cfg.CreateMap(typeof(Customer), typeof(CustomerDTO));

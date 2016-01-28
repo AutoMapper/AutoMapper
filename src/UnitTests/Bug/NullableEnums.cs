@@ -10,7 +10,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public enum EnumType { One, Two }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Src, Dst>();
         });

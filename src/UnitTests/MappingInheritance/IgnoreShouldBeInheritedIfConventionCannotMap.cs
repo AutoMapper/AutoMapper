@@ -35,7 +35,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void inhertited_ignore_should_be_overridden_passes_validation()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<BaseDomain, Dto>()
                     .ForMember(d => d.SpecificProperty, m => m.Ignore())
@@ -50,7 +50,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<MoreSpecificDomain, Dto>();
             });
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
     }
 }

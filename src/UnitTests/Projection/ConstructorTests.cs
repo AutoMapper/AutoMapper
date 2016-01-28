@@ -30,7 +30,7 @@
             public int Other { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ConstructProjectionUsing(src => new Dest(src.Value + 10));

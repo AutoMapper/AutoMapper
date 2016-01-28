@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         public void SetUp(){
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, GrandGrandChild>();
                 cfg.CreateMap<Source, GrandChild>();
@@ -53,7 +53,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void HasValidConfiguration()
         {
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
 
         [Fact]

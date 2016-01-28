@@ -8,7 +8,7 @@
         private Source _source;
         private Destination _destination;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.AllowNullCollections = false;
             cfg.CreateMap<Source, Destination>();

@@ -8,7 +8,7 @@
     using Should;
     using Xunit;
 
-    public class ParameterizedQueriesTests_with_anonymous_object_and_factory : SpecBase
+    public class ParameterizedQueriesTests_with_anonymous_object_and_factory : AutoMapperSpecBase
     {
         private Dest[] _dests;
         private IQueryable<Source> _sources;
@@ -22,17 +22,14 @@
             public int Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                int value = 0;
+            int value = 0;
 
-                Expression<Func<Source, int>> sourceMember = src => value + 5;
-                cfg.CreateMap<Source, Dest>()
-                    .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
-            });
-        }
+            Expression<Func<Source, int>> sourceMember = src => value + 5;
+            cfg.CreateMap<Source, Dest>()
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
+        });
 
         protected override void Because_of()
         {
@@ -41,7 +38,7 @@
                 new Source()
             }.AsQueryable();
 
-            _dests = _sources.ProjectTo<Dest>(new { value = 10 }).ToArray();
+            _dests = _sources.ProjectTo<Dest>(Configuration, new { value = 10 }).ToArray();
         }
 
         [Fact]
@@ -53,7 +50,7 @@
         [Fact]
         public void Should_not_cache_parameter_value()
         {
-            var newDests = _sources.ProjectTo<Dest>(new { value = 15 }).ToArray();
+            var newDests = _sources.ProjectTo<Dest>(Configuration, new { value = 15 }).ToArray();
 
             newDests[0].Value.ShouldEqual(20);
         }
@@ -73,7 +70,7 @@
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             int value = 0;
 
@@ -121,7 +118,7 @@
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             int value = 0;
 
@@ -186,7 +183,7 @@
             public IQueryable<User> Users { get; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             DB db = null;
 

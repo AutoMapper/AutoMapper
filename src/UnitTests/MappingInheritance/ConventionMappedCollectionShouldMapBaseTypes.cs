@@ -41,7 +41,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void item_collection_should_map_by_base_type()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Container, ContainerDto>();
                 cfg.CreateMap<ItemBase, ItemDto>()
@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void item_collection_should_map_by_base_type_for_map_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Container, ContainerDto>();
                 cfg.CreateMap<ItemBase, ItemDto>()

@@ -27,15 +27,16 @@ namespace AutoMapper.UnitTests.Bug
 		[Fact]
 		public void Should_map_all_null_values_to_its_substitute()
 		{
-            Mapper.CreateMap(typeof(Source), typeof(Destination))
-                .ForAllMembers(opt => opt.NullSubstitute(string.Empty));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap(typeof(Source), typeof(Destination))
+                .ForAllMembers(opt => opt.NullSubstitute(string.Empty)));
 
 		    var src = new Source
 		    {
 		        Value1 = 5
 		    };
 
-		    var dest = Mapper.Map<Source, Destination>(src);
+		    var mapper = config.CreateMapper();
+		    var dest = mapper.Map<Source, Destination>(src);
 
 		    dest.Value1.ShouldEqual("5");
 		    dest.Value2.ShouldEqual(string.Empty);

@@ -8,7 +8,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Example()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ContainsASrc, ContainsADest>();
 
@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Bug
             var actualContCDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContCSrc);
             var actualContBDest = Mapper.Map<ContainsASrc, ContainsADest>(expectedContBSrc); // THROWS
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
             actualContBDest.ShouldNotBeNull();
             actualContCDest.ShouldNotBeNull();
         }

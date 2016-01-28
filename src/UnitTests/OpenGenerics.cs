@@ -20,7 +20,7 @@
         [Fact]
         public void Can_map_simple_generic_types()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
 
             var source = new Source<int>
             {
@@ -35,7 +35,7 @@
         [Fact]
         public void Can_map_non_generic_members()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
 
             var source = new Source<int>
             {
@@ -50,7 +50,7 @@
         [Fact]
         public void Can_map_recursive_generic_types()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap(typeof(Source<>), typeof(Dest<>)));
 
             var source = new Source<Source<int>>
             {

@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests.Bug
             private Dario _dario;
             private Neda _neda;
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateProfile("MyMapperProfile", prf =>
                 {

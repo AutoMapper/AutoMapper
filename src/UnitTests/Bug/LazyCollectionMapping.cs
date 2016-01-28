@@ -15,7 +15,7 @@ namespace AutoMapper.UnitTests.Bug
         }
 		public void SetUp()
 		{
-			Mapper.Reset();
+			
 		}
 
 		public class OneTimeEnumerator<T> : IEnumerable<T>

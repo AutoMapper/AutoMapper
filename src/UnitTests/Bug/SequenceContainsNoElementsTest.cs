@@ -8,17 +8,12 @@ using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	public class SequenceContainsNoElementsTest : SpecBase
+	public class SequenceContainsNoElementsTest : AutoMapperSpecBase
 	{
-        public SequenceContainsNoElementsTest()
-        {
-            SetUp();
-        }
-
-        public void SetUp()
-		{
-			Mapper.CreateMap<Person, PersonModel>();
-		}
+	    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+	    {
+	        Mapper.CreateMap<Person, PersonModel>();
+	    });
 
 		[Fact]
 		public void should_not_throw_InvalidOperationException()

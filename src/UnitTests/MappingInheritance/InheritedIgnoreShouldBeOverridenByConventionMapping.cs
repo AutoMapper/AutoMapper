@@ -29,7 +29,7 @@ namespace AutoMapper.UnitTests.Bug
 
             Mapper.CreateMap<SpecificDomain, Dto>();
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
 
         [Fact]

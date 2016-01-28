@@ -20,7 +20,7 @@
             public int? Value { get; set; }            
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>().ForMember(m => m.Value, opt => opt.NullSubstitute(5));
         });
@@ -53,7 +53,7 @@
             public int? ValuePropertyNotMatching { get; set; }            
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>().ForMember(m => m.ValuePropertyNotMatching, opt =>
             {

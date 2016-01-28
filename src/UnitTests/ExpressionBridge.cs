@@ -278,7 +278,7 @@ namespace AutoMapper.UnitTests
             {
                 private IQueryable<BEntity> _bei;
 
-                protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+                protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<BEntity, B>().MaxDepth(3);
                     cfg.CreateMap<AEntity, A>().MaxDepth(3);

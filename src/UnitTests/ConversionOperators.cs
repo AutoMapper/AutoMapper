@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests
             public void Should_use_the_implicit_conversion_operator()
             {
                 var source = new Foo { Value = "Hello" };
-                Mapper.Initialize(cfg => { });
+                var config = new MapperConfiguration(cfg => { });
 
                 _bar = Mapper.Map<Foo, Bar>(source);
 

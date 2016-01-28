@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests
 				public string Value { get; }
 			}
 
-	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
 	            cfg.DisableConstructorMapping();
 
@@ -87,7 +87,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        _customProfile = new CustomProfile1();
 		        cfg.AddProfile(_customProfile);
@@ -146,7 +146,7 @@ namespace AutoMapper.UnitTests
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<AProfile>();
             });

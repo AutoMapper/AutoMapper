@@ -6,7 +6,7 @@ namespace AutoMapper.UnitTests
 {
 	namespace DynamicMapping
 	{
-		public class When_mapping_two_non_configured_types
+		public class When_mapping_two_non_configured_types : NonValidatingSpecBase
 		{
 			private Destination _resultWithGenerics;
 			private Destination _resultWithoutGenerics;
@@ -21,17 +21,19 @@ namespace AutoMapper.UnitTests
 				public int Value { get; set; }
 			}
 
-			[Fact]
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+
+            [Fact]
 			public void Should_dynamically_map_the_two_types()
 			{
-				_resultWithGenerics = Mapper.DynamicMap<Source, Destination>(new Source {Value = 5});
-				_resultWithoutGenerics = (Destination) Mapper.DynamicMap(new Source {Value = 5}, typeof(Source), typeof(Destination));
+				_resultWithGenerics = Mapper.Map<Source, Destination>(new Source {Value = 5});
+				_resultWithoutGenerics = (Destination) Mapper.Map(new Source {Value = 5}, typeof(Source), typeof(Destination));
 				_resultWithGenerics.Value.ShouldEqual(5);
 				_resultWithoutGenerics.Value.ShouldEqual(5);
 			}
 		}
 
-        public class When_mapping_two_non_configured_types_with_nesting
+        public class When_mapping_two_non_configured_types_with_nesting : NonValidatingSpecBase
         {
             private Destination _resultWithGenerics;
 
@@ -57,6 +59,8 @@ namespace AutoMapper.UnitTests
                 public string Value2 { get; set; }
             }
 
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+
             public When_mapping_two_non_configured_types_with_nesting()
             {
                 var source = new Source
@@ -67,7 +71,7 @@ namespace AutoMapper.UnitTests
                         Value2 = "foo"
                     }
                 };
-                _resultWithGenerics = Mapper.DynamicMap<Source, Destination>(source);
+                _resultWithGenerics = Mapper.Map<Source, Destination>(source);
             }
 
             [Fact]
@@ -83,7 +87,7 @@ namespace AutoMapper.UnitTests
             }
         }
 
-		public class When_mapping_two_non_configured_types_that_do_not_match
+		public class When_mapping_two_non_configured_types_that_do_not_match : NonValidatingSpecBase
 		{
 			public class Source
 			{
@@ -95,10 +99,12 @@ namespace AutoMapper.UnitTests
 				public int Valuefff { get; set; }
 			}
 
-			[Fact]
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+
+            [Fact]
 			public void Should_ignore_any_members_that_do_not_match()
 			{
-				var destination = Mapper.DynamicMap<Source, Destination>(new Source {Value = 5});
+				var destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
 
 				destination.Valuefff.ShouldEqual(0);
 			}
@@ -106,11 +112,11 @@ namespace AutoMapper.UnitTests
 			[Fact]
 			public void Should_not_throw_any_configuration_errors()
 			{
-				typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.DynamicMap<Source, Destination>(new Source { Value = 5 }));
+				typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.Map<Source, Destination>(new Source { Value = 5 }));
 			}
 		}
 
-		public class When_mapping_to_an_existing_destination_object
+		public class When_mapping_to_an_existing_destination_object : NonValidatingSpecBase
 		{
 			private Destination _destination;
 
@@ -126,10 +132,12 @@ namespace AutoMapper.UnitTests
 				public int Value2 { get; set; }
 			}
 
-		    public When_mapping_to_an_existing_destination_object()
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+
+            public When_mapping_to_an_existing_destination_object()
 		    {
 				_destination = new Destination { Valuefff = 7};
-				Mapper.DynamicMap(new Source { Value = 5, Value2 = 3}, _destination);
+				Mapper.Map(new Source { Value = 5, Value2 = 3}, _destination);
 			}
 
 			[Fact]
@@ -146,7 +154,7 @@ namespace AutoMapper.UnitTests
 		}
 
 #if !PORTABLE
-        public class When_mapping_from_an_anonymous_type_to_an_interface : SpecBase
+        public class When_mapping_from_an_anonymous_type_to_an_interface : NonValidatingSpecBase
 		{
 			private IDestination _result;
 
@@ -157,7 +165,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_result = Mapper.DynamicMap<IDestination>(new {Value = 5});
+				_result = Mapper.Map<IDestination>(new {Value = 5});
 			}
 
 			[Fact]
@@ -165,6 +173,8 @@ namespace AutoMapper.UnitTests
 			{
 				_result.Value.ShouldEqual(5);
 			}
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 		}
 #endif
     }

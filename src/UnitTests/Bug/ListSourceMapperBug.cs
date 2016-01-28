@@ -34,7 +34,7 @@
         [Fact]
         public void CustomListSourceShouldNotBlowUp()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             var source = new CustomCollection<Source> {new Source()};
 

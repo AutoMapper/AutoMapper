@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap(typeof (Source), typeof (Destination)).ReverseMap();
             });
@@ -56,7 +56,7 @@ namespace AutoMapper.UnitTests
                 public int Ignored { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap(typeof (Source), typeof (Dest))
                     .ForMember("Ignored", opt => opt.Ignore())

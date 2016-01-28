@@ -27,7 +27,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void GlobalIgnore_ignores_all_properties_beginning_with_string()
         {
-			Mapper.Initialize(cfg =>
+			var config = new MapperConfiguration(cfg =>
 			{
 				cfg.AddGlobalIgnore("StartingWith");
 				cfg.CreateMap<Source, Destination>()
@@ -35,26 +35,26 @@ namespace AutoMapper.UnitTests
 			});
             
             Mapper.Map<Source, Destination>(new Source{ShouldBeMapped = "true"});
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
 
         [Fact]
         public void GlobalIgnore_ignores_properties_with_names_matching_but_different_types()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddGlobalIgnore("ShouldBeMapped");
                 cfg.CreateMap<Source, DestinationWrongType>();
             });
 
             Mapper.Map<Source, DestinationWrongType>(new Source { ShouldBeMapped = "true" });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
 
         [Fact]
         public void Ignored_properties_should_be_default_value()
         {
-			Mapper.Initialize(cfg =>
+			var config = new MapperConfiguration(cfg =>
 			{
 				cfg.AddGlobalIgnore("StartingWith");
 				cfg.CreateMap<Source, Destination>()
@@ -69,7 +69,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Ignore_supports_two_different_values()
         {
-			Mapper.Initialize(cfg =>
+			var config = new MapperConfiguration(cfg =>
 			{
 				cfg.AddGlobalIgnore("StartingWith");
 				cfg.AddGlobalIgnore("AnotherString");
@@ -100,7 +100,7 @@ namespace AutoMapper.UnitTests
 		public void Ignore_On_Source_Field()
 		{
 			Mapper.CreateMap<Source, Destination>();
-			Mapper.AssertConfigurationIsValid();
+			config.AssertConfigurationIsValid();
 
 			Source source = new Source
 			{
@@ -133,7 +133,7 @@ namespace AutoMapper.UnitTests
         {
             Mapper.CreateMap<Source, Destination>()
                 .ReverseMap();
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
 
             Destination source = new Destination
             {

@@ -39,7 +39,7 @@ namespace AutoMapper.UnitTests
 				public int Something { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.AllowNullDestinationValues = false;
 		        cfg.CreateMap<ModelObject, ModelDto>();
@@ -112,7 +112,7 @@ namespace AutoMapper.UnitTests
 				public int Something { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 
 		        cfg.AllowNullDestinationValues = true;
@@ -174,7 +174,7 @@ namespace AutoMapper.UnitTests
 				public object Value { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateProfile("MapsNulls", p =>
 		        {
@@ -228,7 +228,7 @@ namespace AutoMapper.UnitTests
 				public string Name { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>()
 		            .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver>().FromMember(src => src.MyName));
@@ -266,7 +266,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
 	            cfg.AllowNullDestinationValues = false;
 	            cfg.CreateMap<Source, Dest>()
@@ -315,7 +315,7 @@ namespace AutoMapper.UnitTests
                 public string IsFooBarred { get; set; }
             }
 
-	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
 	            cfg.CreateMap<bool?, string>().ConvertUsing<NullableBoolToLabel>();
 	            cfg.CreateMap<Foo, FooViewModel>();
@@ -358,7 +358,7 @@ namespace AutoMapper.UnitTests
                 public Collection<int> Values6 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
                 cfg.AllowNullCollections = true;

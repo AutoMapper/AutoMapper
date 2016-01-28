@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests
             private int _beforeMapCount = 0;
             private int _afterMapCount = 0;
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ParentModel, ParentDto>()
                     .BeforeMap((src, dest) => _beforeMapCount++)
@@ -117,7 +117,7 @@ namespace AutoMapper.UnitTests
         //            .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
         //        Mapper.CreateMap<ChildModel, ChildDto>();
 
-        //        Mapper.AssertConfigurationIsValid();
+        //        config.AssertConfigurationIsValid();
         //    }
 
         //    protected override void Because_of()
@@ -194,7 +194,7 @@ namespace AutoMapper.UnitTests
 			private ParentDto _dto;
 			private ParentModel _parent;
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        _parent = new ParentModel
 		        {
@@ -299,7 +299,7 @@ namespace AutoMapper.UnitTests
 		{
 			private FooDto _dto;
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Foo, FooDto>();
 		        cfg.CreateMap<Bar, BarDto>();
@@ -351,7 +351,7 @@ namespace AutoMapper.UnitTests
 		{
 			private FooContainerModel _dto;
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<FooModel, FooScreenModel>();
 		        cfg.CreateMap<FooModel, FooInputModel>();
@@ -403,7 +403,7 @@ namespace AutoMapper.UnitTests
 	    {
 	        private ParentDto _dtoParent;
 
-	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
 	            cfg.CreateMap<Parent, ParentDto>();
 	            cfg.CreateMap<Child, ChildDto>();

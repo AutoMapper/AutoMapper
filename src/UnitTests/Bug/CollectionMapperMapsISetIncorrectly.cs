@@ -25,7 +25,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void ShouldMapToNewISet()
         {
-            Mapper.Initialize(config =>
+            var config = new MapperConfiguration(config =>
                 config.CreateMap<SourceWithIEnumerable, TargetWithISet>()
                     .ForMember(dest => dest.Stuff, opt => opt.MapFrom(src => src.Stuff.Select(s => s.Value))));
 

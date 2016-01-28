@@ -27,7 +27,7 @@
         }
 
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<From, Concrete>()
                 .ForMember(d => d.ConcreteValue, o => o.MapFrom(s => s == null ? default(int) : s.ChildValue))

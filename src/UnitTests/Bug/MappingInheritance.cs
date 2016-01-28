@@ -9,7 +9,7 @@ namespace AutoMapper.UnitTests.Bug
 		private Entity testEntity;
 		private EditModel testModel;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Entity, ViewModel>();
             cfg.CreateMap<Entity, BaseModel>()

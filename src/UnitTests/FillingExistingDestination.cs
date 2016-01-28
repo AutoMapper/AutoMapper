@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests
 				public int Value { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 
@@ -83,7 +83,7 @@ namespace AutoMapper.UnitTests
                 public string Name { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>(MemberList.Source);
                 cfg.CreateMap<ChildSource, ChildDestination>(MemberList.Source);
@@ -127,7 +127,7 @@ namespace AutoMapper.UnitTests
         }
 
 
-		public class When_the_destination_object_is_specified_and_you_are_converting_an_enum : SpecBase
+		public class When_the_destination_object_is_specified_and_you_are_converting_an_enum : NonValidatingSpecBase
 		{
 			private string _result;
 
@@ -138,7 +138,10 @@ namespace AutoMapper.UnitTests
 				Three
 			}
 
-			protected override void Because_of()
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+
+
+            protected override void Because_of()
 			{
 				_result = Mapper.Map<SomeEnum, string>(SomeEnum.Two, "test");
 			}

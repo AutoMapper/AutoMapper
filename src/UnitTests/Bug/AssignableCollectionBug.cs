@@ -63,7 +63,7 @@ namespace AutoMapper.UnitTests.Bug
 				Mapper.CreateMap<PersonOne, PersonTwo>();
 				Mapper.CreateMap<AddressOne, AddressTwo>();
 				Mapper.CreateMap<AddressOne, IAddress>().ConvertUsing(Mapper.Map<AddressOne, AddressTwo>);
-				Mapper.AssertConfigurationIsValid();
+				config.AssertConfigurationIsValid();
 				var result = Mapper.Map<PersonOne, PersonTwo>(source);
 
 				// These are ok.
@@ -102,7 +102,7 @@ namespace AutoMapper.UnitTests.Bug
                 public byte[] ImageData { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Picture, PictureDto>();
             });
@@ -129,7 +129,7 @@ namespace AutoMapper.UnitTests.Bug
             public void ListShouldNotMapAsReference()
             {
                 // arrange
-                Mapper.Reset();
+                
                 Mapper.CreateMap<A, B>();
                 var source = new A { Images = new List<string>() };
 

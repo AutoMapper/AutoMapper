@@ -32,7 +32,7 @@
             public int Other { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             Expression<Func<Source, Dest>> constructor = src => new Dest(src.Value + 10);
             cfg.CreateMap(typeof (Source), typeof (Dest)).ConstructProjectionUsing(constructor);

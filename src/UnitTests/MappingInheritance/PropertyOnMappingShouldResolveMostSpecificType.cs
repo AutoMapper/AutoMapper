@@ -56,7 +56,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void container_class_is_caching_too_specific_mapper_for_collection()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ItemBase, ItemDto>()
                     .ForMember(d => d.Description, m => m.MapFrom(s => s))
@@ -96,7 +96,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void container_class_is_caching_too_specific_mapper_for_collection_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ItemBase, ItemDto>()
                     .ForMember(d => d.Description, m => m.MapFrom(s => s))
@@ -136,7 +136,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void property_on_dto_mapped_from_self_should_be_specific_match()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ItemBase, ItemDto>()
                     .ForMember(d => d.Description, m => m.MapFrom(s => s))
@@ -157,7 +157,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
             });
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
 
             var dto = Mapper.Map<ItemBase, ItemDto>(new DifferentItem());
 
@@ -168,7 +168,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void property_on_dto_mapped_from_self_should_be_specific_match_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ItemBase, ItemDto>()
                     .ForMember(d => d.Description, m => m.MapFrom(s => s))
@@ -189,7 +189,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<DifferentItem2, DifferentDescriptionDto2>();
             });
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
 
             var dto = Mapper.Map<ItemDto>(new DifferentItem());
 

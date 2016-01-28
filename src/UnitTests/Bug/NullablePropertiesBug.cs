@@ -11,7 +11,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Example()
         {
-            Mapper.Reset();
+            
             Mapper.CreateMap<Source, Target>();
 
             var d = Mapper.Map(new Source { A = null }, new Target { A = 10 });

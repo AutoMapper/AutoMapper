@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests.Bug
         }
         public void SetUp()
         {
-            Mapper.Reset();
+            
         }
 
         [Fact]
@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             Mapper.CreateMap<ModelObjectNotMatching, ModelDto>()
                 .ForAllMembers(opt => opt.Ignore());
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
     }
 
@@ -53,7 +53,7 @@ namespace AutoMapper.UnitTests.Bug
             public string Unmapped { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ForAllMembers(opt => opt.Condition(c => !c.IsSourceValueNull));

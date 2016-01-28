@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestInitialiserProxyOfSub()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<SubA, SubB>();
                 cfg.CreateMap<SubA, BaseB>().As<SubB>();
@@ -91,7 +91,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestInitialiserProxyOfSub1()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<BaseA, SubB>();
                 cfg.CreateMap<BaseA, BaseB>();
@@ -105,7 +105,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestInitialiserProxyOfSubInclude()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<BaseA, BaseB>().Include<SubA, SubB>();
                 cfg.CreateMap<SubA, SubB>();

@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             private FooDto _destination;
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Foo, FooDto>()
                     .ForAllMembers(opt => opt.Condition(ctx => ctx.DestinationValue == null));

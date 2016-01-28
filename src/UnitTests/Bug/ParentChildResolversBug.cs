@@ -79,7 +79,7 @@
         {
             private Dest _dest;
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, ParentDest>()
                     .ForMember(dest => dest.field, opt => opt.ResolveUsing<ParentResolver>())

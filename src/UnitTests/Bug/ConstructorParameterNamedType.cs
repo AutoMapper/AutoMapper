@@ -23,8 +23,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_handle_constructor_parameter_named_type()
         {
-            Mapper.Initialize(c => c.CreateMap<SourceClass, DestinationClass>());
-            new Action(Mapper.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>(ex=>ex.Errors[0].UnmappedPropertyNames[0].ShouldEqual("Type"));
+            var config = new MapperConfiguration(c => c.CreateMap<SourceClass, DestinationClass>());
+            new Action(config.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>(ex=>ex.Errors[0].UnmappedPropertyNames[0].ShouldEqual("Type"));
         }
     }
 }

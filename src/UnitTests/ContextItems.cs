@@ -28,7 +28,7 @@
             [Fact]
             public void Should_use_value_passed_in()
             {
-                Mapper.Initialize(cfg =>
+                var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Source, Dest>()
                         .ForMember(d => d.Value, opt => opt.ResolveUsing<ContextResolver>().FromMember(src => src.Value));
@@ -63,7 +63,7 @@
             [Fact]
             public void Should_use_value_passed_in()
             {
-                Mapper.Initialize(cfg =>
+                var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Source, Dest>()
                         .ForMember(d => d.Value1, opt => opt.ResolveUsing(result => (int)result.Context.Options.Items["Item"] + ((Source)result.Value).Value1));

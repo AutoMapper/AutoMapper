@@ -225,7 +225,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact(Skip="Static API is going away")]
         public void Should_not_fail_with_create_map()
         {
-            Mapper.Reset();
+            
 
             var tasks = Enumerable.Range(0, 5).Select(
           i =>

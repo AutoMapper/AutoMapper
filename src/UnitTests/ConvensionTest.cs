@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Fact()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 var profile = cfg.CreateProfile("New Profile");
                 profile.AddMemberConfiguration().AddName<PrePostfixName>(
@@ -85,7 +85,7 @@ namespace AutoMapper.UnitTests
         }
         public void Fact2()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<ConventionProfile>();
             });
@@ -106,7 +106,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Fact3()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<ToDTO>();
                 cfg.AddProfile<FromDTO>();
@@ -128,7 +128,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_Work_Without_Explicitly_Mapping_Before_Hand()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<ToDTO>();
                 cfg.AddProfile<FromDTO>();

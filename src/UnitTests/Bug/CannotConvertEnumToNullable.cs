@@ -24,8 +24,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_enum_to_nullable()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<DummySource, DummyDestination>());
-            Mapper.AssertConfigurationIsValid();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<DummySource, DummyDestination>());
+            config.AssertConfigurationIsValid();
             DummySource src = new DummySource() { Dummy = DummyTypes.Bar };
 
             var destination = Mapper.Map<DummySource, DummyDestination>(src);

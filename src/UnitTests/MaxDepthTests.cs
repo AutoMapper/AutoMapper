@@ -43,7 +43,7 @@ namespace AutoMapper.UnitTests
         }
         public void Initializer()
         {
-            Mapper.Reset();
+            
             var nest = new Source(1);
 
             nest.AddChild(new Source(2));
