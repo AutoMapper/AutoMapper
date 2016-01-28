@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests
             private static int _beforeMapCount = 0;
             private static int _afterMapCount = 0;
 
-            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ParentModel, ParentDto>()
                     .BeforeMap((src, dest) => _beforeMapCount++)
@@ -40,7 +40,11 @@ namespace AutoMapper.UnitTests
             {
                 _dto.Children[0].Parent.ShouldBeSameAs(_dto);
                 _dto.Children[1].Parent.ShouldBeSameAs(_dto);
-            
+            }
+
+            [Fact]
+            public void Before_and_After_for_the_parent_should_be_called_once()
+            {
                 _beforeMapCount.ShouldEqual(1);
                 _afterMapCount.ShouldEqual(1);
             }

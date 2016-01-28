@@ -2,9 +2,6 @@ namespace AutoMapper
 {
     using System;
 
-    /// <summary>
-    /// Main entry point for AutoMapper, for both creating maps and performing maps.
-    /// </summary>
     public class Mapper : IMapper
     {
         private readonly IMappingEngine _engine;
