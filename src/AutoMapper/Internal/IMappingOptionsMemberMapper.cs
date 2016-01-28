@@ -40,7 +40,7 @@ namespace AutoMapper
     {
         ICollection<ISourceToDestinationNameMapper> NamedMappers { get; }
         IGetTypeInfoMembers GetMembers { get; }
-        MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, string nameToSearch);
+        MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch);
     }
     public class ParentSourceToDestinationNameMapper : IParentSourceToDestinationNameMapper
     {
@@ -48,12 +48,12 @@ namespace AutoMapper
 
         public ICollection<ISourceToDestinationNameMapper> NamedMappers { get; } = new Collection<ISourceToDestinationNameMapper> {new DefaultName(), new SourceToDestinationNameMapperAttributesMember()};
 
-        public MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             MemberInfo memberInfo = null;
             foreach (var namedMapper in NamedMappers)
             {
-                memberInfo = namedMapper.GetMatchingMemberInfo(GetMembers, typeInfo, destType, nameToSearch);
+                memberInfo = namedMapper.GetMatchingMemberInfo(GetMembers, typeInfo, destType, destMemberType, nameToSearch);
                 if (memberInfo != null)
                     break;
             }
@@ -70,7 +70,7 @@ namespace AutoMapper
     {
         public bool MethodCaseSensitive { get; set; }
 
-        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             return
                 getTypeInfoMembers.GetMemberInfos(typeInfo)
@@ -84,7 +84,7 @@ namespace AutoMapper
 
     public class CaseInsensitiveName : ISourceToDestinationNameMapper
     {
-        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             return
                 getTypeInfoMembers.GetMemberInfos(typeInfo)
@@ -106,7 +106,7 @@ namespace AutoMapper
             return this;
         }
 
-        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch, DestinationPrefixes, DestinationPostfixes);
             var possibleDestNames = getTypeInfoMembers.GetMemberInfos(typeInfo).Select(mi => new { mi, possibles = PossibleNames(mi.Name, Prefixes, Postfixes) });
@@ -159,7 +159,7 @@ namespace AutoMapper
             MemberNameReplacers.Add(new MemberNameReplacer(original, newValue));
             return this;
         }
-        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch);
             var possibleDestNames = getTypeInfoMembers.GetMemberInfos(typeInfo).Select(mi => new { mi, possibles = PossibleNames(mi.Name) });
@@ -188,7 +188,7 @@ namespace AutoMapper
     {
         private static readonly ConcurrentDictionary<TypeDetails, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapperAttribute>>> Cache = new ConcurrentDictionary<TypeDetails, Dictionary<MemberInfo, IEnumerable<SourceToDestinationMapperAttribute>>>();
 
-        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             Cache.GetOrAdd(typeInfo, ti => getTypeInfoMembers.GetMemberInfos(ti).ToDictionary(mi => mi, mi => mi.GetCustomAttributes(typeof(SourceToDestinationMapperAttribute), true).OfType<SourceToDestinationMapperAttribute>()));
 
@@ -226,7 +226,7 @@ namespace AutoMapper
             where TNameMapper : ISourceToDestinationNameMapper, new();
 
         IParentSourceToDestinationNameMapper NameMapper { get; set; }
-        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, string nameToSearch, LinkedList<IValueResolver> resolvers);
+        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IValueResolver> resolvers);
     }
     public class MemberConfiguration : IMemberConfiguration
     {
@@ -267,12 +267,12 @@ namespace AutoMapper
             MemberMappers.Add(new DefaultMember { NameMapper = NameMapper });
         }
 
-        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, string nameToSearch, LinkedList<IValueResolver> resolvers)
+        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IValueResolver> resolvers)
         {
             var foundMap = false;
             foreach (var memberMapper in MemberMappers)
             {
-                foundMap = memberMapper.MapDestinationPropertyToSource(options, sourceType, destType, nameToSearch, resolvers, this);
+                foundMap = memberMapper.MapDestinationPropertyToSource(options, sourceType, destType, destMemberType, nameToSearch, resolvers, this);
                 if (foundMap)
                     break;
             }
@@ -282,7 +282,7 @@ namespace AutoMapper
 
     public interface IChildMemberConfiguration
     {
-        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, string nameToSearch, LinkedList<IValueResolver> resolvers, IMemberConfiguration parent);
+        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IValueResolver> resolvers, IMemberConfiguration parent);
     }
     public class NameSplitMember : IChildMemberConfiguration
     {
@@ -295,7 +295,7 @@ namespace AutoMapper
             DestinationMemberNamingConvention = new PascalCaseNamingConvention();
         }
 
-        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, string nameToSearch, LinkedList<IValueResolver> resolvers, IMemberConfiguration parent )
+        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IValueResolver> resolvers, IMemberConfiguration parent )
         {
             string[] matches = DestinationMemberNamingConvention.SplittingExpression
                        .Matches(nameToSearch)
@@ -307,13 +307,13 @@ namespace AutoMapper
             {
                 NameSnippet snippet = CreateNameSnippet(matches, i);
 
-                matchingMemberInfo = parent.NameMapper.GetMatchingMemberInfo(sourceType, destType, snippet.First);
+                matchingMemberInfo = parent.NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, snippet.First);
 
                 if (matchingMemberInfo != null)
                 {
                     resolvers.AddLast(matchingMemberInfo.ToMemberGetter());
 
-                    var foundMatch = parent.MapDestinationPropertyToSource(options, TypeMapFactory.GetTypeInfo(matchingMemberInfo.GetMemberType(), options), destType, snippet.Second, resolvers);
+                    var foundMatch = parent.MapDestinationPropertyToSource(options, TypeMapFactory.GetTypeInfo(matchingMemberInfo.GetMemberType(), options), destType, destMemberType, snippet.Second, resolvers);
 
                     if (!foundMatch)
                         resolvers.RemoveLast();
@@ -343,11 +343,11 @@ namespace AutoMapper
     {
         public IParentSourceToDestinationNameMapper NameMapper { get; set; }
 
-        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, string nameToSearch, LinkedList<IValueResolver> resolvers, IMemberConfiguration parent = null)
+        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IValueResolver> resolvers, IMemberConfiguration parent = null)
         {
             if (string.IsNullOrEmpty(nameToSearch))
                 return true;
-            var matchingMemberInfo = NameMapper.GetMatchingMemberInfo(sourceType, destType, nameToSearch);
+            var matchingMemberInfo = NameMapper.GetMatchingMemberInfo(sourceType, destType, destMemberType, nameToSearch);
 
             if (matchingMemberInfo != null)
                 resolvers.AddLast(matchingMemberInfo.ToMemberGetter());
