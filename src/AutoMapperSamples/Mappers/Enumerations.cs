@@ -25,17 +25,21 @@ namespace AutoMapperSamples.Mappers
 			[Test]
 			public void Example()
 			{
-				Mapper.Map<OrderStatus, OrderStatusDto>(OrderStatus.InProgress).ShouldEqual(OrderStatusDto.InProgress);
-				Mapper.Map<OrderStatus, short>(OrderStatus.Complete).ShouldEqual((short)1);
-				Mapper.Map<OrderStatus, string>(OrderStatus.Complete).ShouldEqual("Complete");
-				Mapper.Map<short, OrderStatus>(1).ShouldEqual(OrderStatus.Complete);
-				Mapper.Map<string, OrderStatus>("Complete").ShouldEqual(OrderStatus.Complete);
+			    var config = new MapperConfiguration(cfg => { });
+			    var mapper = config.CreateMapper();
+			    mapper.Map<OrderStatus, OrderStatusDto>(OrderStatus.InProgress).ShouldEqual(OrderStatusDto.InProgress);
+				mapper.Map<OrderStatus, short>(OrderStatus.Complete).ShouldEqual((short)1);
+				mapper.Map<OrderStatus, string>(OrderStatus.Complete).ShouldEqual("Complete");
+				mapper.Map<short, OrderStatus>(1).ShouldEqual(OrderStatus.Complete);
+				mapper.Map<string, OrderStatus>("Complete").ShouldEqual(OrderStatus.Complete);
 			}
 
 			[Test]
 			public void FlagsEnumerationExample()
 			{
-				var targets = Mapper.Map<AttributeTargets, AttributeTargets>(AttributeTargets.Class | AttributeTargets.Interface);
+			    var config = new MapperConfiguration(cfg => { });
+			    var mapper = config.CreateMapper();
+			    var targets = mapper.Map<AttributeTargets, AttributeTargets>(AttributeTargets.Class | AttributeTargets.Interface);
 
 				(targets & AttributeTargets.Class).ShouldEqual(AttributeTargets.Class);
 				(targets & AttributeTargets.Interface).ShouldEqual(AttributeTargets.Interface);

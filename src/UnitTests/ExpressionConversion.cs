@@ -32,11 +32,11 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_map_single_properties()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             Expression<Func<Dest, bool>> expr = d => d.Value == 10;
 
-            var mapped = Mapper.Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
+            var mapped = config.CreateMapper().Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
 
             var items = new[]
             {
@@ -51,11 +51,11 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_map_flattened_properties()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             Expression<Func<Dest, bool>> expr = d => d.ChildValue == 10;
 
-            var mapped = Mapper.Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
+            var mapped = config.CreateMapper().Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
 
             var items = new[]
             {
@@ -70,11 +70,11 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_map_custom_mapped_properties()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
 
             Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
 
-            var mapped = Mapper.Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
+            var mapped = config.CreateMapper().Map<Expression<Func<Dest, bool>>, Expression<Func<Source, bool>>>(expr);
 
             var items = new[]
             {
@@ -89,21 +89,21 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Throw_AutoMapperMappingException_if_expression_types_dont_match()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
 
             Expression<Func<Dest, bool>> expr = d => d.Bar == 10;
 
-            Assert.Throws<AutoMapperMappingException>(() => Mapper.Map<Expression<Func<Dest, bool>>, Expression<Action<Source, bool>>>(expr));
+            Assert.Throws<AutoMapperMappingException>(() => config.CreateMapper().Map<Expression<Func<Dest, bool>>, Expression<Action<Source, bool>>>(expr));
         }
 
         [Fact]
         public void Can_map_with_different_destination_types()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>().ForMember(d => d.Bar, opt => opt.MapFrom(src => src.Foo)));
 
             Expression<Func<Dest, Dest>> expr = d => d;
 
-            var mapped = Mapper.Map<Expression<Func<Dest, Dest>>, Expression<Func<Source, Source>>>(expr);
+            var mapped = config.CreateMapper().Map<Expression<Func<Dest, Dest>>, Expression<Func<Source, Source>>>(expr);
 
             var items = new[]
             {

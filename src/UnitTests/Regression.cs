@@ -24,18 +24,16 @@ namespace AutoMapper.UnitTests
 		{
 			public Guid Id { get; set; }
 		}
-		public class automapper_fails_to_map_custom_mappings_when_mapping_collections_for_an_interface
+		public class automapper_fails_to_map_custom_mappings_when_mapping_collections_for_an_interface : AutoMapperSpecBase
 		{
-            public automapper_fails_to_map_custom_mappings_when_mapping_collections_for_an_interface()
-            {
-                Setup();
-            }
-			public void Setup()
-			{
-				Mapper.Reset();
-			}
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+		    {
+				cfg.CreateMap<ITestDomainItem, TestDtoItem>()
+					.ForMember(d => d.Id, s => s.MapFrom(x => x.ItemId));
+		    });
 
-			[Fact]
+
+            [Fact]
 			public void should_map_the_id_property()
 			{
 				var domainItems = new List<ITestDomainItem>
@@ -43,10 +41,6 @@ namespace AutoMapper.UnitTests
                     new TestDomainItem {ItemId = Guid.NewGuid()},
                     new TestDomainItem {ItemId = Guid.NewGuid()}
                 };
-				Mapper.CreateMap<ITestDomainItem, TestDtoItem>()
-					.ForMember(d => d.Id, s => s.MapFrom(x => x.ItemId));
-
-				Mapper.AssertConfigurationIsValid();
 
 				var dtos = Mapper.Map<IEnumerable<ITestDomainItem>, TestDtoItem[]>(domainItems);
 
@@ -82,7 +76,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 		        cfg.CreateMap<DateTime?, MyCustomDate>()
@@ -109,51 +103,9 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_mappings_are_created_on_the_fly : SpecBase
-		{
-			public class Order
-			{
-				public string Name { get; set; }
-				public Product Product { get; set; }
-			}
-
-			public class Product
-			{
-				public string ProductName { get; set; }
-			}
-
-			[Fact(Skip = "I don't like this scenario, don't create mappings on the fly")]
-			public void Should_not_use_AssignableMapper_when_mappings_are_specified_on_the_fly()
-			{
-				Mapper.CreateMap<Order, Order>();
-
-				var sourceOrder = new Order()
-				{
-					Name = "order",
-					Product = new Product() { ProductName = "product" }
-				};
-				var destinationOrder = new Order();
-				destinationOrder = Mapper.Map(sourceOrder, destinationOrder);
-
-				// Defining this mapping on the fly, but since the previous call to Mapper.Map()
-				// had to deal with mapping Product to Product, it created an AssignableMapper
-				// which will get used in place of this one.  I would expect that if I call
-				// Mapper.CreateMap(), that should replace any cached value in
-				// MappingEngine._objectMapperCache.
-				Mapper.CreateMap<Product, Product>();
-
-				var sourceProduct = new Product() { ProductName = "name" };
-				var destinationProduct = new Product();
-				destinationProduct = Mapper.Map(sourceProduct, destinationProduct);
-
-				sourceProduct.ProductName.ShouldEqual(destinationProduct.ProductName);
-				sourceProduct.ShouldNotEqual(destinationProduct);
-			}
-		}
-
 		public class TestEnumerable : AutoMapperSpecBase
 		{
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Person, PersonModel>();
 		    });

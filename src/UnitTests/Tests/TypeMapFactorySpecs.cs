@@ -311,13 +311,16 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_map_properties_with_different_names()
         {
-            Mapper.Configuration.ReplaceMemberName("A", "Ä");
-            Mapper.Configuration.ReplaceMemberName("i", "í");
-            Mapper.Configuration.ReplaceMemberName("Airline", "Airlina");
-            
-            Mapper.CreateMap<Source,Destination>();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.ReplaceMemberName("A", "Ä");
+                cfg.ReplaceMemberName("i", "í");
+                cfg.ReplaceMemberName("Airline", "Airlina");
+                cfg.CreateMap<Source, Destination>();
+            });
 
-            var dest = Mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
+            var mapper = config.CreateMapper();
+            var dest = mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
             dest.Aviator.ShouldEqual(3);
             dest.SubAirlineFlight.ShouldEqual(4);
             dest.Value.ShouldEqual(5);

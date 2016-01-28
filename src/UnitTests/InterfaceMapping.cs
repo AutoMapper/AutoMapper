@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests
                 _result = Mapper.Map<ModelObject, DtoObject>(model);
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
 
                 cfg.CreateMap<ModelObject, DtoObject>();
@@ -90,7 +90,7 @@ namespace AutoMapper.UnitTests
                 int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, IDestination>();
             });
@@ -129,7 +129,7 @@ namespace AutoMapper.UnitTests
                 int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, IDestination>();
             });
@@ -219,7 +219,7 @@ namespace AutoMapper.UnitTests
                 public int SecondId { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ISource, Destination>();
             });
@@ -289,7 +289,7 @@ namespace AutoMapper.UnitTests
                 public int SecondId { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ISource, Destination>();
             });
@@ -338,7 +338,7 @@ namespace AutoMapper.UnitTests
                 int IOtherDestination.OtherValue { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>();
             });
@@ -373,7 +373,7 @@ namespace AutoMapper.UnitTests
             public class DerivedDto : BaseDto { }
 
             //and following mappings:
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Base, BaseDto>().Include<Derived, DerivedDto>();
                 cfg.CreateMap<Derived, DerivedDto>();
@@ -401,7 +401,7 @@ namespace AutoMapper.UnitTests
         //    [SetUp]
         //    public void SetUp()
         //    {
-        //        Mapper.Reset();
+        //        
         //    }
 
         //    public interface DomainInterface

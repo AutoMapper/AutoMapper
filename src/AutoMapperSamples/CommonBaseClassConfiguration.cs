@@ -38,22 +38,21 @@ namespace AutoMapperSamples
 				public string SomeOtherValue { get; set; }
 			}
 
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
-			}
-
 			[Test]
 			public void Example()
 			{
-				Mapper.CreateMap<Source1, SubDest1>().FixRootDest();
-				Mapper.CreateMap<Source2, SubDest2>().FixRootDest();
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<Source1, SubDest1>().FixRootDest();
+                    cfg.CreateMap<Source2, SubDest2>().FixRootDest();
+                });
 
-				Mapper.AssertConfigurationIsValid();
+				config.AssertConfigurationIsValid();
 
-				var subDest1 = Mapper.Map<Source1, SubDest1>(new Source1 {SomeValue = "Value1"});
-				var subDest2 = Mapper.Map<Source2, SubDest2>(new Source2 {SomeOtherValue = "Value2"});
+			    var mapper = config.CreateMapper();
+
+			    var subDest1 = mapper.Map<Source1, SubDest1>(new Source1 {SomeValue = "Value1"});
+				var subDest2 = mapper.Map<Source2, SubDest2>(new Source2 {SomeOtherValue = "Value2"});
 
 				subDest1.SomeValue.ShouldEqual("Value1");
 				subDest2.SomeOtherValue.ShouldEqual("Value2");

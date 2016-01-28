@@ -94,7 +94,7 @@ namespace AutoMapper.UnitTests.Bug
         private Expression<Func<ParentDTO, bool>> _predicateExpression;
         private Parent _valid;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<GrandParent, GrandParentDTO>().ReverseMap();
             cfg.CreateMap<Parent, ParentDTO>().ReverseMap();

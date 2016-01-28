@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>();
             });
@@ -79,7 +79,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
             });
@@ -130,7 +130,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
             });
@@ -178,7 +178,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.ConstructServicesUsing(t => new Dest(5));
                 cfg.CreateMap<Source, Dest>()
@@ -228,7 +228,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.ConstructServicesUsing(t => new Dest(5));
                 cfg.CreateMap<Source, Dest>()
@@ -271,7 +271,7 @@ namespace AutoMapper.UnitTests
                 public Dest() { }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.DisableConstructorMapping();
                 cfg.CreateMap<Source, Dest>();
@@ -294,14 +294,17 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_constructor_arguments_using_mapping_engine()
             {
-                Mapper.CreateMap<SourceBar, DestinationBar>();
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<SourceBar, DestinationBar>();
 
-                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+                    cfg.CreateMap<SourceFoo, DestinationFoo>();
+                });
 
                 var sourceBar = new SourceBar("fooBar");
                 var sourceFoo = new SourceFoo(sourceBar);
 
-                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
                 destinationFoo.Bar.FooBar.ShouldEqual(sourceBar.FooBar);
             }
@@ -364,12 +367,12 @@ namespace AutoMapper.UnitTests
             public void Should_resolve_constructor_when_args_are_optional()
             {
 
-                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceFoo, DestinationFoo>());
 
                 var sourceBar = new SourceBar("fooBar");
                 var sourceFoo = new SourceFoo(sourceBar);
 
-                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
                 destinationFoo.Bar.ShouldBeNull();
                 destinationFoo.Str.ShouldEqual("hello");
@@ -440,12 +443,12 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_constructor_when_arg_is_optional()
             {
-                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceFoo, DestinationFoo>());
 
                 var sourceBar = new SourceBar("fooBar");
                 var sourceFoo = new SourceFoo(sourceBar);
 
-                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
                 destinationFoo.Bar.ShouldBeNull();
             }
@@ -507,12 +510,12 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_constructor_when_string_args_are_optional()
             {
-                Mapper.CreateMap<SourceFoo, DestinationFoo>();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceFoo, DestinationFoo>());
 
                 var sourceBar = new SourceBar("fooBar");
                 var sourceFoo = new SourceFoo(sourceBar);
 
-                var destinationFoo = Mapper.Map<DestinationFoo>(sourceFoo);
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
                 destinationFoo.A.ShouldEqual("a");
                 destinationFoo.B.ShouldEqual("b");
@@ -601,7 +604,7 @@ namespace AutoMapper.UnitTests
                 public int Value1 { get; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.MapFrom(src => src.Value));
             });

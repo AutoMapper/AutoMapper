@@ -24,7 +24,7 @@ namespace AutoMapperSamples.Mappers
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var config = new MapperConfiguration(cfg =>
 				{
 					cfg.CreateMap<Source, Destination>();
 				});
@@ -36,10 +36,10 @@ namespace AutoMapperSamples.Mappers
 						new Source {Value = 7}
 					};
 
-				IEnumerable<Destination> ienumerableDest = Mapper.Map<Source[], IEnumerable<Destination>>(sources);
-				ICollection<Destination> icollectionDest = Mapper.Map<Source[], ICollection<Destination>>(sources);
-				IList<Destination> ilistDest = Mapper.Map<Source[], IList<Destination>>(sources);
-				List<Destination> listDest = Mapper.Map<Source[], List<Destination>>(sources);
+				IEnumerable<Destination> ienumerableDest = config.CreateMapper().Map<Source[], IEnumerable<Destination>>(sources);
+				ICollection<Destination> icollectionDest = config.CreateMapper().Map<Source[], ICollection<Destination>>(sources);
+				IList<Destination> ilistDest = config.CreateMapper().Map<Source[], IList<Destination>>(sources);
+				List<Destination> listDest = config.CreateMapper().Map<Source[], List<Destination>>(sources);
 
 				ienumerableDest.Count().ShouldEqual(3);
 				icollectionDest.Count().ShouldEqual(3);
@@ -74,7 +74,7 @@ namespace AutoMapperSamples.Mappers
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var config = new MapperConfiguration(cfg =>
 				{
 					cfg.CreateMap<ParentSource, ParentDestination>()
 						.Include<ChildSource, ChildDestination>();
@@ -88,7 +88,7 @@ namespace AutoMapperSamples.Mappers
 						new ParentSource()
 					};
 
-				var destinations = Mapper.Map<ParentSource[], ParentDestination[]>(sources);
+				var destinations = config.CreateMapper().Map<ParentSource[], ParentDestination[]>(sources);
 
 				destinations[0].ShouldBeType<ParentDestination>();
 				destinations[1].ShouldBeType<ChildDestination>();

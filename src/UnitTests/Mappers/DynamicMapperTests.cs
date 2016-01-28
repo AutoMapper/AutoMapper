@@ -35,7 +35,8 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         [Fact]
         public void Should_map_source_properties()
         {
-            _destination = Mapper.Map<DynamicDictionary>(new Destination {Foo = "Foo", Bar = "Bar"});
+            var config = new MapperConfiguration(cfg => { });
+            _destination = config.CreateMapper().Map<DynamicDictionary>(new Destination {Foo = "Foo", Bar = "Bar"});
             Assert.Equal("Foo", _destination.Foo);
             Assert.Equal("Bar", _destination.Bar);
         }
@@ -51,7 +52,8 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
             source.Bar = "Bar";
-            _destination = Mapper.Map<Destination>(source);
+            var config = new MapperConfiguration(cfg => { });
+            _destination = config.CreateMapper().Map<Destination>(source);
             _destination.Foo.ShouldEqual("Foo");
             _destination.Bar.ShouldEqual("Bar");
         }
@@ -66,7 +68,8 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         {
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
-            _destination = Mapper.Map<Destination>(source);
+            var config = new MapperConfiguration(cfg => { });
+            _destination = config.CreateMapper().Map<Destination>(source);
             _destination.Foo.ShouldEqual("Foo");
             _destination.Bar.ShouldBeNull();
         }
@@ -82,7 +85,8 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
             source.Bar = "Bar";
-            _destination = Mapper.Map<DynamicDictionary>(source);
+            var config = new MapperConfiguration(cfg => { });
+            _destination = config.CreateMapper().Map<DynamicDictionary>(source);
             Assert.Equal("Foo", _destination.Foo);
             Assert.Equal("Bar", _destination.Bar);
         }

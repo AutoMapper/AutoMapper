@@ -74,7 +74,6 @@
     <Compile Include="AdvancedMappers\MapToExistingObjects.cs" />
     <Compile Include="CommonBaseClassConfiguration.cs" />
     <Compile Include="ConfigurationValidation.cs" />
-    <Compile Include="AdvancedMappers\DynamicMapping.cs" />
     <Compile Include="Configuration\Initialization.cs" />
     <Compile Include="Configuration\Profiles.cs" />
     <Compile Include="GlobalTypeConverters.cs" />

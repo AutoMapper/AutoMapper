@@ -13,13 +13,14 @@ namespace AutoMapper.UnitTests.Bug
                 Radius = 300
             };
             object vm = new SomeViewModel();
-            Mapper.CreateMap<DisplayModel, SomeViewModel>();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<DisplayModel, SomeViewModel>());
 
-            Mapper.Map(displayModel, vm);
+            var mapper = config.CreateMapper();
+            mapper.Map(displayModel, vm);
             ((SomeViewModel)vm).Radius.ShouldEqual(300); // fails
 
             var vm2 = new SomeViewModel();
-            Mapper.Map(displayModel, vm2);
+            mapper.Map(displayModel, vm2);
             vm2.Radius.ShouldEqual(300); // succeeds
         }
 

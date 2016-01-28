@@ -80,6 +80,8 @@ namespace AutoMapper
 
         void IConfiguration.AddProfile<TProfile>() => ((IConfiguration)this).AddProfile(new TProfile());
 
+        void IConfiguration.AddProfile(Type profileType) => ((IConfiguration)this).AddProfile((Profile)Activator.CreateInstance(profileType));
+
         void IConfiguration.ConstructServicesUsing(Func<Type, object> constructor) => _serviceCtor = constructor;
 
         Func<PropertyInfo, bool> IProfileExpression.ShouldMapProperty

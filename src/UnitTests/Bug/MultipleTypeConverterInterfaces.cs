@@ -3,7 +3,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-		public class When_specifying_a_type_converter_implementing_multiple_type_converter_interfaces : SpecBase
+		public class When_specifying_a_type_converter_implementing_multiple_type_converter_interfaces : AutoMapperSpecBase
 		{
 			private DestinationFoo _resultFoo;
 			private DestinationBar _resultBar;
@@ -43,15 +43,11 @@ namespace AutoMapper.UnitTests.Bug
 				}
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.Initialize(cfg =>
-				{
-                    cfg.CreateMap(typeof(SourceFoo), typeof(DestinationFoo)).ConvertUsing(typeof(DualConverter));
-				    cfg.CreateMap(typeof (SourceBar), typeof (DestinationBar)).ConvertUsing(typeof (DualConverter));
-				});
-
-			}
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap(typeof (SourceFoo), typeof (DestinationFoo)).ConvertUsing(typeof (DualConverter));
+		        cfg.CreateMap(typeof (SourceBar), typeof (DestinationBar)).ConvertUsing(typeof (DualConverter));
+		    });
 
 			protected override void Because_of()
 			{
@@ -74,7 +70,7 @@ namespace AutoMapper.UnitTests.Bug
 			[Fact]
 			public void Should_pass_configuration_validation()
 			{
-				Mapper.AssertConfigurationIsValid();
+				Configuration.AssertConfigurationIsValid();
 			}
 		}
 }

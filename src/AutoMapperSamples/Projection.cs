@@ -24,12 +24,6 @@ namespace AutoMapperSamples
 		[TestFixture]
 		public class Projection
 		{
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
-			}
-
 			[Test]
 			public void Example()
 			{
@@ -40,14 +34,18 @@ namespace AutoMapperSamples
 						Title = "Company Holiday Party"
 					};
 
-				// Configure AutoMapper
-				Mapper.CreateMap<CalendarEvent, CalendarEventForm>()
-					.ForMember(dest => dest.EventDate, opt => opt.MapFrom(src => src.EventDate.Date))
-					.ForMember(dest => dest.EventHour, opt => opt.MapFrom(src => src.EventDate.Hour))
-					.ForMember(dest => dest.EventMinute, opt => opt.MapFrom(src => src.EventDate.Minute));
+			    var config = new MapperConfiguration(cfg =>
+			    {
+			        // Configure AutoMapper
+			        cfg.CreateMap<CalendarEvent, CalendarEventForm>()
+			            .ForMember(dest => dest.EventDate, opt => opt.MapFrom(src => src.EventDate.Date))
+			            .ForMember(dest => dest.EventHour, opt => opt.MapFrom(src => src.EventDate.Hour))
+			            .ForMember(dest => dest.EventMinute, opt => opt.MapFrom(src => src.EventDate.Minute));
+			    });
 
 				// Perform mapping
-				CalendarEventForm form = Mapper.Map<CalendarEvent, CalendarEventForm>(calendarEvent);
+			    var mapper = config.CreateMapper();
+			    CalendarEventForm form = mapper.Map<CalendarEvent, CalendarEventForm>(calendarEvent);
 
 				form.EventDate.ShouldEqual(new DateTime(2008, 12, 15));
 				form.EventHour.ShouldEqual(20);
