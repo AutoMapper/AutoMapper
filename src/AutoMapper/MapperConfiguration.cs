@@ -583,19 +583,22 @@ namespace AutoMapper
                             .TargetMethods
                             .OrderBy(method => method.DeclaringType, comparer)
                             .Select(method => method.DeclaringType.GetTypeInfo())
-                            .LastOrDefault() ?? _target;
+                            .LastOrDefault();
 
                     var yLastImplementedIn =
                         _target.GetRuntimeInterfaceMap(y)
                             .TargetMethods
                             .OrderBy(method => method.DeclaringType, comparer)
                             .Select(method => method.DeclaringType.GetTypeInfo())
-                            .LastOrDefault() ?? _target;
+                            .LastOrDefault();
 
-                    var xFirstIntroduceTypeIndex =
-                        _typeInheritance.IndexOf(xLastImplementedIn);
-                    var yFirstIntroduceTypeIndex =
-                        _typeInheritance.IndexOf(yLastImplementedIn);
+                    var xFirstIntroduceTypeIndex = xLastImplementedIn != null
+                        ? _typeInheritance.IndexOf(xLastImplementedIn)
+                        : _typeInheritance.FindIndex(type => type.ImplementedInterfaces.Contains(x));
+
+                    var yFirstIntroduceTypeIndex = yLastImplementedIn != null
+                        ? _typeInheritance.IndexOf(yLastImplementedIn)
+                        : _typeInheritance.FindIndex(type => type.ImplementedInterfaces.Contains(y));
 
                     if (xFirstIntroduceTypeIndex < yFirstIntroduceTypeIndex)
                     {
