@@ -86,7 +86,7 @@ namespace AutoMapper.Mappers
                 if (context.SourceValue != null && !context.Options.DisableCache)
                     context.InstanceCache[context] = mappedObject;
 
-                context.TypeMap.BeforeMap(context.SourceValue, mappedObject);
+                context.TypeMap.BeforeMap(context.SourceValue, mappedObject, context);
                 context.BeforeMap(mappedObject);
 
                 foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
@@ -96,7 +96,7 @@ namespace AutoMapper.Mappers
                 mappedObject = ReassignValue(context, mappedObject);
 
                 context.AfterMap(mappedObject);
-                context.TypeMap.AfterMap(context.SourceValue, mappedObject);
+                context.TypeMap.AfterMap(context.SourceValue, mappedObject, context);
 
                 return mappedObject;
             }

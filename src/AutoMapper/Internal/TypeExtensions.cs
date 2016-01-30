@@ -125,6 +125,12 @@
                 || (propertyInfo?.GetSetMethod(true)?.IsPublic ?? false);
         }
 
+        public static bool HasAnInaccessibleSetter(this PropertyInfo property)
+        {
+            var setMethod = property.GetSetMethod(true);
+            return setMethod == null || setMethod.IsPrivate || setMethod.IsFamily;
+        }
+
         public static bool IsPublic(this MemberInfo memberInfo)
         {
             return (memberInfo as FieldInfo)?.IsPublic ?? (memberInfo as PropertyInfo).IsPublic();

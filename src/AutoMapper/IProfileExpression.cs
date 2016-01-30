@@ -122,11 +122,6 @@ namespace AutoMapper
         INamingConvention DestinationMemberNamingConvention { get; set; }
 
         /// <summary>
-        /// Create missing type maps during mapping, if necessary
-        /// </summary>
-        bool CreateMissingTypeMaps { get; set; }
-
-        /// <summary>
         /// Specify common configuration for all type maps.
         /// </summary>
         /// <param name="configuration">configuration callback</param>

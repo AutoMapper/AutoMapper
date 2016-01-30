@@ -1,196 +1,639 @@
 namespace AutoMapper.Internal
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
-    public class MappingExpression : MappingExpression<object, object>, IMappingExpression, IMemberConfigurationExpression
+    public interface ITypeMapConfiguration
     {
-        public MappingExpression(TypeMap typeMap, Func<Type, object> typeConverterCtor, IProfileExpression configurationContainer) : base(typeMap, typeConverterCtor, configurationContainer)
+        void Configure(IProfileConfiguration profile, TypeMap typeMap);
+        MemberList MemberList { get; }
+        Type SourceType { get; }
+        Type DestinationType { get; }
+        TypePair Types { get; }
+        ITypeMapConfiguration ReverseTypeMap { get; }
+        IEnumerable<TypePair> IncludedDerivedTypes { get; } 
+        IEnumerable<TypePair> IncludedBaseTypes { get; } 
+    }
+
+    public class MappingExpression : IMappingExpression, ITypeMapConfiguration
+    {
+        private readonly MappingExpression<object, object> _innerExpression;
+        private readonly List<Action<TypeMap>> _typeMapActions = new List<Action<TypeMap>>();
+        private readonly List<MemberConfigurationExpression> _memberConfigurations = new List<MemberConfigurationExpression>();
+        private MappingExpression _reverseMap;
+        private Action<IMemberConfigurationExpression> _allMemberOptions;
+
+        public MappingExpression(TypePair types, MemberList memberList)
         {
+            MemberList = memberList;
+            Types = types;
+            _innerExpression = new MappingExpression<object, object>(memberList);
         }
 
-        public new IMappingExpression ReverseMap()
+        public MemberList MemberList { get; }
+        public TypePair Types { get; }
+        public Type SourceType => Types.SourceType;
+        public Type DestinationType => Types.DestinationType;
+        public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
+        public IEnumerable<TypePair> IncludedDerivedTypes => _innerExpression.IncludedDerivedTypes;
+        public IEnumerable<TypePair> IncludedBaseTypes => _innerExpression.IncludedBaseTypes;
+
+        private class MemberConfigurationExpression : IMemberConfigurationExpression
         {
-            var mappingExpression = Profile.CreateMap(TypeMap.DestinationType, TypeMap.SourceType, MemberList.Source);
-            return (IMappingExpression) ConfigureReverseMap((MappingExpression)mappingExpression);
+            private readonly Type _sourceType;
+            private readonly IMemberAccessor _destinationMember;
+            private readonly MappingExpression<object, object>.MemberConfigurationExpression _innerExpression;
+            private readonly List<Action<PropertyMap>> _propertyMapActions = new List<Action<PropertyMap>>();
+
+            public MemberConfigurationExpression(Type sourceType, IMemberAccessor destinationMember)
+            {
+                _sourceType = sourceType;
+                _destinationMember = destinationMember;
+                _innerExpression = new MappingExpression<object, object>.MemberConfigurationExpression(destinationMember);
+            }
+
+            public void MapFrom(string sourceMember)
+            {
+                var members = _sourceType.GetMember(sourceMember);
+                if (!members.Any())
+                    throw new AutoMapperConfigurationException(
+    $"Unable to find source member {sourceMember} on type {_sourceType.FullName}");
+                if (members.Skip(1).Any())
+                    throw new AutoMapperConfigurationException(
+    $"Source member {sourceMember} is ambiguous on type {_sourceType.FullName}");
+                var member = members.Single();
+
+                _propertyMapActions.Add(pm =>
+                {
+                    pm.SourceMember = member;
+                    pm.AssignCustomValueResolver(member.ToMemberGetter());
+                });
+            }
+
+            public void Configure(TypeMap typeMap)
+            {
+                var propertyMap = typeMap.FindOrCreatePropertyMapFor(_destinationMember);
+
+                foreach (var action in _propertyMapActions)
+                {
+                    action(propertyMap);
+                }
+
+                _innerExpression.Configure(typeMap);
+            }
+
+            public void NullSubstitute(object nullSubstitute)
+            {
+                _innerExpression.NullSubstitute(nullSubstitute);
+            }
+
+            public IResolverConfigurationExpression<object, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
+            {
+                return _innerExpression.ResolveUsing<TValueResolver>();
+            }
+
+            public IResolverConfigurationExpression<object> ResolveUsing(Type valueResolverType)
+            {
+                return _innerExpression.ResolveUsing(valueResolverType);
+            }
+
+            public IResolutionExpression<object> ResolveUsing(IValueResolver valueResolver)
+            {
+                return _innerExpression.ResolveUsing(valueResolver);
+            }
+
+            public void ResolveUsing(Func<object, object> resolver)
+            {
+                _innerExpression.ResolveUsing(resolver);
+            }
+
+            public void ResolveUsing(Func<ResolutionResult, object> resolver)
+            {
+                _innerExpression.ResolveUsing(resolver);
+            }
+
+            public void ResolveUsing(Func<ResolutionResult, object, object> resolver)
+            {
+                _innerExpression.ResolveUsing(resolver);
+            }
+
+            public void MapFrom<TMember>(Expression<Func<object, TMember>> sourceMember)
+            {
+                _innerExpression.MapFrom(sourceMember);
+            }
+
+            public void MapFrom<TMember>(string property)
+            {
+                _innerExpression.MapFrom<TMember>(property);
+            }
+
+            public void Ignore()
+            {
+                _innerExpression.Ignore();
+            }
+
+            public void SetMappingOrder(int mappingOrder)
+            {
+                _innerExpression.SetMappingOrder(mappingOrder);
+            }
+
+            public void UseDestinationValue()
+            {
+                _innerExpression.UseDestinationValue();
+            }
+
+            public void DoNotUseDestinationValue()
+            {
+                _innerExpression.DoNotUseDestinationValue();
+            }
+
+            public void UseValue<TValue>(TValue value)
+            {
+                _innerExpression.UseValue(value);
+            }
+
+            public void UseValue(object value)
+            {
+                _innerExpression.UseValue(value);
+            }
+
+            public void Condition(Func<object, bool> condition)
+            {
+                _innerExpression.Condition(condition);
+            }
+
+            public void Condition(Func<ResolutionContext, bool> condition)
+            {
+                _innerExpression.Condition(condition);
+            }
+
+            public void PreCondition(Func<object, bool> condition)
+            {
+                _innerExpression.PreCondition(condition);
+            }
+
+            public void PreCondition(Func<ResolutionContext, bool> condition)
+            {
+                _innerExpression.PreCondition(condition);
+            }
+
+            public void ExplicitExpansion()
+            {
+                _innerExpression.ExplicitExpansion();
+            }
         }
 
-        public new IMappingExpression Substitute(Func<object, object> substituteFunc)
+        public IMappingExpression ReverseMap()
         {
-            return (IMappingExpression)base.Substitute(substituteFunc);
+            _reverseMap = new MappingExpression(new TypePair(Types.DestinationType, Types.SourceType), MemberList.Source);
+
+            return _reverseMap;
         }
 
-        public new IMappingExpression ConstructUsingServiceLocator()
+        public IMappingExpression Substitute(Func<object, object> substituteFunc)
         {
-            return (IMappingExpression)base.ConstructUsingServiceLocator();
+            _innerExpression.Substitute(substituteFunc);
+
+            return this;
+        }
+
+        public IMappingExpression ConstructUsingServiceLocator()
+        {
+            _innerExpression.ConstructUsingServiceLocator();
+
+            return this;
         }
 
         public void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions)
         {
-            base.ForAllMembers(o => memberOptions((IMemberConfigurationExpression)o));
+            _allMemberOptions = memberOptions;
         }
 
-        void IMappingExpression.ConvertUsing<TTypeConverter>()
+        public void ConvertUsing<TTypeConverter>()
         {
             ConvertUsing(typeof(TTypeConverter));
         }
 
         public void ConvertUsing(Type typeConverterType)
         {
-            var interfaceType = typeof(ITypeConverter<,>).MakeGenericType(TypeMap.SourceType, TypeMap.DestinationType);
+            var interfaceType = typeof(ITypeConverter<,>).MakeGenericType(Types.SourceType, Types.DestinationType);
             var convertMethodType = interfaceType.IsAssignableFrom(typeConverterType) ? interfaceType : typeConverterType;
             var converter = new DeferredInstantiatedConverter(convertMethodType, BuildCtor<object>(typeConverterType));
 
-            TypeMap.UseCustomMapper(converter.Convert);
+            _innerExpression.ConvertUsing(converter);
         }
 
         public void As(Type typeOverride)
         {
-            TypeMap.DestinationTypeOverride = typeOverride;
+            _typeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
         }
 
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions)
         {
-            return (IMappingExpression) base.ForMember(name, c => memberOptions((IMemberConfigurationExpression)c));
+            IMemberAccessor destMember = null;
+            var propertyInfo = Types.DestinationType.GetProperty(name);
+            if (propertyInfo != null)
+            {
+                destMember = new PropertyAccessor(propertyInfo);
+            }
+            if (destMember == null)
+            {
+                var fieldInfo = Types.DestinationType.GetField(name);
+                if (fieldInfo == null)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
+                }
+                destMember = new FieldAccessor(fieldInfo);
+            }
+            ForDestinationMember(destMember, memberOptions);
+
+            return this;
         }
 
-        IMappingExpression IMappingExpression.WithProfile(string profileName)
+        public IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
         {
-            return (IMappingExpression) base.WithProfile(profileName);
+            _innerExpression.ForSourceMember(sourceMemberName, memberOptions);
+
+            return this;
         }
 
-        public new IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
+        public IMappingExpression Include(Type otherSourceType, Type otherDestinationType)
         {
-            return (IMappingExpression) base.ForSourceMember(sourceMemberName, memberOptions);
+            _innerExpression.Include(otherSourceType, otherDestinationType);
+
+            return this;
         }
 
-        public void MapFrom(string sourceMember)
+        public IMappingExpression IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
-            var members = TypeMap.SourceType.GetMember(sourceMember);
-            if(!members.Any())
-                throw new AutoMapperConfigurationException(
-$"Unable to find source member {sourceMember} on type {TypeMap.SourceType.FullName}");
-            if(members.Skip(1).Any())
-                throw new AutoMapperConfigurationException(
-$"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName}");
-            var member = members.Single();
-            PropertyMap.SourceMember = member;
-            PropertyMap.AssignCustomValueResolver(member.ToMemberGetter());
+            _innerExpression.IgnoreAllPropertiesWithAnInaccessibleSetter();
+
+            return this;
         }
 
-        public new IMappingExpression Include(Type otherSourceType, Type otherDestinationType)
+        public IMappingExpression IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
-            return (IMappingExpression) base.Include(otherSourceType, otherDestinationType);
+            _innerExpression.IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+
+            return this;
         }
 
-        public new IMappingExpression IgnoreAllPropertiesWithAnInaccessibleSetter()
+        public IMappingExpression IncludeBase(Type sourceBase, Type destinationBase)
         {
-            return (IMappingExpression)base.IgnoreAllPropertiesWithAnInaccessibleSetter();
+            _innerExpression.IncludeBase(sourceBase, destinationBase);
+
+            return this;
         }
 
-        public new IMappingExpression IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
+        public void ProjectUsing(Expression<Func<object, object>> projectionExpression)
         {
-            return (IMappingExpression)base.IgnoreAllSourcePropertiesWithAnInaccessibleSetter();
+            _innerExpression.ProjectUsing(projectionExpression);
         }
 
-        public new IMappingExpression IncludeBase(Type sourceBase, Type destinationBase)
+        public IMappingExpression BeforeMap(Action<object, object> beforeFunction)
         {
-            return (IMappingExpression)base.IncludeBase(sourceBase, destinationBase);
+            _innerExpression.BeforeMap(beforeFunction);
+
+            return this;
         }
 
-        public void ProjectUsing(LambdaExpression projectionExpression)
+        public IMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<object, object>
         {
-            TypeMap.UseCustomProjection(projectionExpression);
+            _innerExpression.BeforeMap<TMappingAction>();
+
+            return this;
         }
 
-        public new IMappingExpression BeforeMap(Action<object, object> beforeFunction)
+        public IMappingExpression AfterMap(Action<object, object> afterFunction)
         {
-            return (IMappingExpression)base.BeforeMap(beforeFunction);
+            _innerExpression.AfterMap(afterFunction);
+
+            return this;
         }
 
-        public new IMappingExpression BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<object, object>
+        public IMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<object, object>
         {
-            return (IMappingExpression)base.BeforeMap<TMappingAction>();
+            _innerExpression.AfterMap<TMappingAction>();
+
+            return this;
         }
 
-        public new IMappingExpression AfterMap(Action<object, object> afterFunction)
+        public IMappingExpression ConstructUsing(Func<object, object> ctor)
         {
-            return (IMappingExpression)base.AfterMap(afterFunction);
+            _innerExpression.ConstructUsing(ctor);
+
+            return this;
         }
 
-        public new IMappingExpression AfterMap<TMappingAction>() where TMappingAction : IMappingAction<object, object>
+        public IMappingExpression ConstructUsing(Func<ResolutionContext, object> ctor)
         {
-            return (IMappingExpression)base.AfterMap<TMappingAction>();
-        }
+            _innerExpression.ConstructUsing(ctor);
 
-        public new IMappingExpression ConstructUsing(Func<object, object> ctor)
-        {
-            return (IMappingExpression)base.ConstructUsing(ctor);
-        }
-
-        public new IMappingExpression ConstructUsing(Func<ResolutionContext, object> ctor)
-        {
-            return (IMappingExpression)base.ConstructUsing(ctor);
+            return this;
         }
 
         public IMappingExpression ConstructProjectionUsing(LambdaExpression ctor)
         {
             var func = ctor.Compile();
-            TypeMap.ConstructExpression = ctor;
+
+            _typeMapActions.Add(tm => tm.ConstructExpression = ctor);
+
             return ConstructUsing(ctxt => func.DynamicInvoke(ctxt.SourceValue));
         }
 
-        public new IMappingExpression MaxDepth(int depth)
+        public IMappingExpression MaxDepth(int depth)
         {
-            return (IMappingExpression)base.MaxDepth(depth);
+            _innerExpression.MaxDepth(depth);
+
+            return this;
         }
 
-        public new IMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<object>> paramOptions)
+        public IMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<object>> paramOptions)
         {
-            return (IMappingExpression)base.ForCtorParam(ctorParamName, paramOptions);
+            _innerExpression.ForCtorParam(ctorParamName, paramOptions);
+
+            return this;
         }
+
+        public void Configure(IProfileConfiguration profile, TypeMap typeMap)
+        {
+            foreach (var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
+            {
+                var attrs = destProperty.GetCustomAttributes(true);
+                if (attrs.Any(x => x is IgnoreMapAttribute))
+                {
+                    ForMember(destProperty.Name, y => y.Ignore());
+                }
+                if (profile.GlobalIgnores.Contains(destProperty.Name))
+                {
+                    ForMember(destProperty.Name, y => y.Ignore());
+                }
+            }
+
+            if (_allMemberOptions != null)
+            {
+                foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors)
+                {
+                    ForDestinationMember(accessor.ToMemberAccessor(), _allMemberOptions);
+                }
+            }
+
+            foreach (var action in _typeMapActions)
+            {
+                action(typeMap);
+            }
+            foreach (var memberConfig in _memberConfigurations)
+            {
+                memberConfig.Configure(typeMap);
+            }
+
+            _innerExpression.Configure(profile, typeMap);
+
+            if (_reverseMap != null)
+            {
+                foreach (var destProperty in typeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
+                {
+                    _reverseMap.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
+                }
+                foreach (var includedDerivedType in typeMap.IncludedDerivedTypes)
+                {
+                    _reverseMap.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
+                }
+            }
+        }
+
+        private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression> memberOptions)
+        {
+            var expression = new MemberConfigurationExpression(Types.SourceType, destinationProperty);
+
+            _memberConfigurations.Add(expression);
+
+            memberOptions(expression);
+        }
+
+        protected static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)
+        {
+            return context =>
+            {
+                if (type.IsGenericTypeDefinition())
+                {
+                    type = type.MakeGenericType(context.SourceType.GetTypeInfo().GenericTypeArguments);
+                }
+
+                var obj = context.Options.ServiceCtor.Invoke(type);
+
+                return (TServiceType)obj;
+            };
+        }
+
     }
 
-    class SourceMappingExpression : ISourceMemberConfigurationExpression
+    public class SourceMappingExpression : ISourceMemberConfigurationExpression
     {
-        private readonly SourceMemberConfig _sourcePropertyConfig;
+        private readonly MemberInfo _sourceMember;
+        private readonly List<Action<SourceMemberConfig>> _sourceMemberActions = new List<Action<SourceMemberConfig>>();
 
-        public SourceMappingExpression(TypeMap typeMap, MemberInfo sourceMember)
+        public SourceMappingExpression(MemberInfo sourceMember)
         {
-            _sourcePropertyConfig = typeMap.FindOrCreateSourceMemberConfigFor(sourceMember);
+            _sourceMember = sourceMember;
         }
 
         public void Ignore()
         {
-            _sourcePropertyConfig.Ignore();
+            _sourceMemberActions.Add(smc => smc.Ignore());
+        }
+
+        public void Configure(TypeMap typeMap)
+        {
+            var sourcePropertyConfig = typeMap.FindOrCreateSourceMemberConfigFor(_sourceMember);
+
+            foreach (var action in _sourceMemberActions)
+            {
+                action(sourcePropertyConfig);
+            }
         }
     }
 
-    public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, IMemberConfigurationExpression<TSource>
+    public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, ITypeMapConfiguration
     {
-        private readonly Func<Type, object> _serviceCtor;
+        private readonly List<Action<TypeMap>> _typeMapActions = new List<Action<TypeMap>>();
+        private readonly List<MemberConfigurationExpression> _memberConfigurations = new List<MemberConfigurationExpression>();
+        private readonly List<SourceMappingExpression> _sourceMemberConfigurations = new List<SourceMappingExpression>();
+        private readonly List<CtorParamConfigurationExpression<TSource>> _ctorParamConfigurations = new List<CtorParamConfigurationExpression<TSource>>();
+        private readonly List<TypePair> _includedDerivedTypes = new List<TypePair>();
+        private readonly List<TypePair> _includedBaseTypes = new List<TypePair>();
+        private MappingExpression<TDestination, TSource> _reverseMap;
+        private Action<IMemberConfigurationExpression<TSource>> _allMemberOptions;
 
-        public MappingExpression(TypeMap typeMap, Func<Type, object> serviceCtor, IProfileExpression profile)
+        public MappingExpression(MemberList memberList)
         {
-            TypeMap = typeMap;
-            _serviceCtor = serviceCtor;
-            Profile = profile;
+            MemberList = memberList;
+            Types = new TypePair(typeof(TSource), typeof(TDestination));
         }
 
-        public TypeMap TypeMap { get; }
+        public MemberList MemberList { get; }
+        public TypePair Types { get; }
+        public Type SourceType => typeof(TSource);
+        public Type DestinationType => typeof(TDestination);
+        public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
+        public IEnumerable<TypePair> IncludedDerivedTypes => _includedDerivedTypes;
+        public IEnumerable<TypePair> IncludedBaseTypes => _includedBaseTypes;
 
-        public PropertyMap PropertyMap { get; private set; }
+        public class MemberConfigurationExpression : IMemberConfigurationExpression<TSource>
+        {
+            private readonly IMemberAccessor _destinationMember;
+            private readonly List<Action<PropertyMap>> _propertyMapActions = new List<Action<PropertyMap>>();
 
-        public IProfileExpression Profile { get; }
+            public MemberConfigurationExpression(IMemberAccessor destinationMember)
+            {
+                _destinationMember = destinationMember;
+            }
+
+            public void NullSubstitute(object nullSubstitute)
+            {
+                _propertyMapActions.Add(pm => pm.SetNullSubstitute(nullSubstitute));
+            }
+
+            public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
+            {
+                var resolver = new DeferredInstantiatedResolver(BuildCtor<IValueResolver>(typeof(TValueResolver)));
+
+                ResolveUsing(resolver);
+
+                var resolutionExpression = new ResolutionExpression<TSource, TValueResolver>();
+
+                return resolutionExpression;
+            }
+
+            public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
+            {
+                var resolver = new DeferredInstantiatedResolver(BuildCtor<IValueResolver>(valueResolverType));
+
+                ResolveUsing(resolver);
+
+                var expression = new ResolutionExpression<TSource>();
+
+                _propertyMapActions.Add(pm => expression.Configure(pm));
+
+                return expression;
+            }
+
+            public IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver)
+            {
+                _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(valueResolver));
+
+                var expression = new ResolutionExpression<TSource>();
+
+                _propertyMapActions.Add(pm => expression.Configure(pm));
+
+                return expression;
+            }
+
+            public void ResolveUsing(Func<TSource, object> resolver)
+            {
+                _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver((TSource)r.Value))));
+            }
+
+            public void ResolveUsing(Func<ResolutionResult, object> resolver)
+            {
+                _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver)));
+            }
+
+            public void ResolveUsing(Func<ResolutionResult, TSource, object> resolver)
+            {
+                _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver(r, (TSource)r.Value))));
+            }
+
+            public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
+            {
+                _propertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(sourceMember));
+            }
+
+            public void MapFrom<TMember>(string property)
+            {
+                var par = Expression.Parameter(typeof(TSource));
+                var prop = Expression.Property(par, property);
+                var lambda = Expression.Lambda<Func<TSource, TMember>>(prop, par);
+                _propertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(lambda));
+            }
+
+            public void UseValue<TValue>(TValue value)
+            {
+                MapFrom(src => value);
+            }
+
+            public void UseValue(object value)
+            {
+                _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(src => value)));
+            }
+
+            public void Condition(Func<TSource, bool> condition)
+            {
+                Condition(context => condition((TSource)context.Parent.SourceValue));
+            }
+
+            public void Condition(Func<ResolutionContext, bool> condition)
+            {
+                _propertyMapActions.Add(pm => pm.ApplyCondition(condition));
+            }
+
+            public void PreCondition(Func<TSource, bool> condition)
+            {
+                PreCondition(context => condition((TSource)context.Parent.SourceValue));
+            }
+
+            public void PreCondition(Func<ResolutionContext, bool> condition)
+            {
+                _propertyMapActions.Add(pm => pm.ApplyPreCondition(condition));
+            }
+
+            public void ExplicitExpansion()
+            {
+                _propertyMapActions.Add(pm => pm.ExplicitExpansion = true);
+            }
+
+            public void Ignore()
+            {
+                _propertyMapActions.Add(pm => pm.Ignore());
+            }
+
+            public void UseDestinationValue()
+            {
+                _propertyMapActions.Add(pm => pm.UseDestinationValue = true);
+            }
+
+            public void DoNotUseDestinationValue()
+            {
+                _propertyMapActions.Add(pm => pm.UseDestinationValue = false);
+            }
+
+            public void SetMappingOrder(int mappingOrder)
+            {
+                _propertyMapActions.Add(pm => pm.SetMappingOrder(mappingOrder));
+            }
+
+            public void Configure(TypeMap typeMap)
+            {
+                var propertyMap = typeMap.FindOrCreatePropertyMapFor(_destinationMember);
+
+                foreach (var action in _propertyMapActions)
+                {
+                    action(propertyMap);
+                }
+            }
+        }
 
         public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
                                                                    Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
             var memberInfo = ReflectionHelper.FindProperty(destinationMember);
             IMemberAccessor destProperty = memberInfo.ToMemberAccessor();
+
             ForDestinationMember(destProperty, memberOptions);
+
             return this;
         }
 
@@ -198,17 +641,17 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
                                                                    Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
             IMemberAccessor destMember = null;
-            var propertyInfo = TypeMap.DestinationType.GetProperty(name);
+            var propertyInfo = typeof(TDestination).GetProperty(name);
             if (propertyInfo != null)
             {
                 destMember = new PropertyAccessor(propertyInfo);
             }
             if (destMember == null)
             {
-                var fieldInfo = TypeMap.DestinationType.GetField(name);
+                var fieldInfo = typeof(TDestination).GetField(name);
                 if(fieldInfo == null)
                 {
-                    throw new ArgumentOutOfRangeException("name", "Cannot find a field or property named " + name);
+                    throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
                 }
                 destMember = new FieldAccessor(fieldInfo);
             }
@@ -218,14 +661,12 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            var typeInfo = new TypeDetails(TypeMap.DestinationType, Profile.ShouldMapProperty, Profile.ShouldMapField);
-
-            typeInfo.PublicWriteAccessors.Each(acc => ForDestinationMember(acc.ToMemberAccessor(), memberOptions));
+            _allMemberOptions = memberOptions;
         }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
-            var properties = typeof(TDestination).GetDeclaredProperties().Where(HasAnInaccessibleSetter);
+            var properties = typeof(TDestination).GetDeclaredProperties().Where(pm => pm.HasAnInaccessibleSetter());
             foreach (var property in properties)
                 ForMember(property.Name, opt => opt.Ignore());
             return this;
@@ -233,16 +674,10 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
-            var properties = typeof(TSource).GetDeclaredProperties().Where(HasAnInaccessibleSetter);
+            var properties = typeof(TSource).GetDeclaredProperties().Where(pm => pm.HasAnInaccessibleSetter());
             foreach (var property in properties)
                 ForSourceMember(property.Name, opt => opt.Ignore());
             return this;
-        }
-
-        private bool HasAnInaccessibleSetter(PropertyInfo property)
-        {
-            var setMethod = property.GetSetMethod(true);
-            return setMethod == null || setMethod.IsPrivate || setMethod.IsFamily;
         }
 
         public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
@@ -254,7 +689,10 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
         {
-            TypeMap.IncludeDerivedTypes(otherSourceType, otherDestinationType);
+            _typeMapActions.Add(tm => tm.IncludeDerivedTypes(otherSourceType, otherDestinationType));
+
+            _includedDerivedTypes.Add(new TypePair(otherSourceType, otherDestinationType));
+
             return this;
         }
 
@@ -265,6 +703,9 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TSource, TDestination> IncludeBase(Type sourceBase, Type destinationBase)
         {
+            _includedBaseTypes.Add(new TypePair(sourceBase, destinationBase));
+
+            /*
             var objectType = typeof(object);
             var currentSourceBase = sourceBase;
             var currentDestinationBase = destinationBase;
@@ -276,145 +717,37 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
                 currentSourceBase = currentSourceBase.BaseType();
                 currentDestinationBase = currentDestinationBase.BaseType();
             }
-            return this;
-        }
-
-        public IMappingExpression<TSource, TDestination> WithProfile(string profileName)
-        {
-            TypeMap.Profile = profileName;
-
+            */
             return this;
         }
 
         public void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression)
         {
-            TypeMap.UseCustomProjection(projectionExpression);
+            _typeMapActions.Add(tm => tm.UseCustomProjection(projectionExpression));
+
             ConvertUsing(projectionExpression.Compile());
-        }
-
-        public void NullSubstitute(object nullSubstitute)
-        {
-            PropertyMap.SetNullSubstitute(nullSubstitute);
-        }
-
-        public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
-        {
-            var resolver = new DeferredInstantiatedResolver(BuildCtor<IValueResolver>(typeof(TValueResolver)));
-
-            ResolveUsing(resolver);
-
-            return new ResolutionExpression<TSource, TValueResolver>(TypeMap.SourceType, PropertyMap);
-        }
-
-        public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
-        {
-            var resolver = new DeferredInstantiatedResolver(BuildCtor<IValueResolver>(valueResolverType));
-
-            ResolveUsing(resolver);
-
-            return new ResolutionExpression<TSource>(TypeMap.SourceType, PropertyMap);
-        }
-
-        public IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver)
-        {
-            PropertyMap.AssignCustomValueResolver(valueResolver);
-
-            return new ResolutionExpression<TSource>(TypeMap.SourceType, PropertyMap);
-        }
-
-        public void ResolveUsing(Func<TSource, object> resolver)
-        {
-            PropertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver((TSource)r.Value)));
-        }
-
-        public void ResolveUsing(Func<ResolutionResult, object> resolver)
-        {
-            PropertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(resolver));
-        }
-
-        public void ResolveUsing(Func<ResolutionResult, TSource, object> resolver)
-        {
-            PropertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(r => resolver(r, (TSource)r.Value)));
-        }
-
-        public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
-        {
-            PropertyMap.SetCustomValueResolverExpression(sourceMember);
-        }
-
-        public void MapFrom<TMember>(string property)
-        {
-            var par = Expression.Parameter(typeof (TSource));
-            var prop = Expression.Property(par, property);
-            var lambda = Expression.Lambda<Func<TSource, TMember>>(prop, par);
-            PropertyMap.SetCustomValueResolverExpression(lambda);
-        }
-
-        public void UseValue<TValue>(TValue value)
-        {
-            MapFrom(src => value);
-        }
-
-        public void UseValue(object value)
-        {
-            PropertyMap.AssignCustomValueResolver(new DelegateBasedResolver<TSource>(src => value));
-        }
-
-        public void Condition(Func<TSource, bool> condition)
-        {
-            Condition(context => condition((TSource)context.Parent.SourceValue));
-        }
-
-        public void Condition(Func<ResolutionContext, bool> condition)
-        {
-            PropertyMap.ApplyCondition(condition);
-        }
-
-        public void PreCondition(Func<TSource, bool> condition)
-        {
-            PreCondition(context => condition((TSource)context.Parent.SourceValue));
-        }
-
-        public void PreCondition(Func<ResolutionContext, bool> condition)
-        {
-            PropertyMap.ApplyPreCondition(condition);
-        }
-
-        public void ExplicitExpansion()
-        {
-            PropertyMap.ExplicitExpansion = true;
         }
 
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
         {
-            TypeMap.MaxDepth = depth;
+            _typeMapActions.Add(tm => tm.MaxDepth = depth);
+
             return this;
         }
 
         public IMappingExpression<TSource, TDestination> ConstructUsingServiceLocator()
         {
-            TypeMap.ConstructDestinationUsingServiceLocator = true;
+            _typeMapActions.Add(tm => tm.ConstructDestinationUsingServiceLocator = true);
 
             return this;
         }
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            var mappingExpression = Profile.CreateMap<TDestination, TSource>(MemberList.Source);
+            var mappingExpression = new MappingExpression<TDestination, TSource>(MemberList.Source);
 
-            return ConfigureReverseMap(mappingExpression);
-        }
+            _reverseMap = mappingExpression;
 
-        protected IMappingExpression<TDestination, TSource> ConfigureReverseMap(IMappingExpression<TDestination, TSource> mappingExpression)
-        {
-            foreach(var destProperty in TypeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
-            {
-                mappingExpression.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
-            }
-            foreach(var includedDerivedType in TypeMap.IncludedDerivedTypes)
-            {
-                mappingExpression.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
-            }
             return mappingExpression;
         }
 
@@ -422,64 +755,48 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         {
             var memberInfo = ReflectionHelper.FindProperty(sourceMember);
 
-            var srcConfig = new SourceMappingExpression(TypeMap, memberInfo);
+            var srcConfig = new SourceMappingExpression(memberInfo);
 
             memberOptions(srcConfig);
+
+            _sourceMemberConfigurations.Add(srcConfig);
 
             return this;
         }
 
         public IMappingExpression<TSource, TDestination> ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions)
         {
-            var memberInfo = TypeMap.SourceType.GetMember(sourceMemberName).First();
+            var memberInfo = typeof(TSource).GetMember(sourceMemberName).First();
 
-            var srcConfig = new SourceMappingExpression(TypeMap, memberInfo);
+            var srcConfig = new SourceMappingExpression(memberInfo);
 
             memberOptions(srcConfig);
+
+            _sourceMemberConfigurations.Add(srcConfig);
 
             return this;
         }
 
         public IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc)
         {
-            TypeMap.Substitution = src => substituteFunc((TSource) src);
+            _typeMapActions.Add(tm => tm.Substitution = src => substituteFunc((TSource) src));
 
             return this;
         }
 
-        public void Ignore()
-        {
-            PropertyMap.Ignore();
-        }
-
-        public void UseDestinationValue()
-        {
-            PropertyMap.UseDestinationValue = true;
-        }
-
-        public void DoNotUseDestinationValue()
-        {
-            PropertyMap.UseDestinationValue = false;
-        }
-
-        public void SetMappingOrder(int mappingOrder)
-        {
-            PropertyMap.SetMappingOrder(mappingOrder);
-        }
-
         public void ConvertUsing(Func<TSource, TDestination> mappingFunction)
         {
-            TypeMap.UseCustomMapper(source => mappingFunction((TSource)source.SourceValue));
+            _typeMapActions.Add(tm => tm.UseCustomMapper(source => mappingFunction((TSource)source.SourceValue)));
         }
 
         public void ConvertUsing(Func<ResolutionContext, TDestination> mappingFunction)
         {
-            TypeMap.UseCustomMapper(context => mappingFunction(context));
+            _typeMapActions.Add(tm => tm.UseCustomMapper(context => mappingFunction(context)));
         }
 
         public void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction)
         {
-            TypeMap.UseCustomMapper(source => mappingFunction(source, (TSource)source.SourceValue));
+            _typeMapActions.Add(tm => tm.UseCustomMapper(source => mappingFunction(source, (TSource)source.SourceValue)));
         }
 
         public void ConvertUsing(ITypeConverter<TSource, TDestination> converter)
@@ -496,28 +813,44 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction)
         {
-            TypeMap.AddBeforeMapAction((src, dest) => beforeFunction((TSource)src, (TDestination)dest));
+            _typeMapActions.Add(tm => tm.AddBeforeMapAction((src, dest, ctxt) => beforeFunction((TSource)src, (TDestination)dest)));
+
+            return this;
+        }
+
+        public IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction)
+        {
+            _typeMapActions.Add(tm => tm.AddBeforeMapAction((src, dest, ctxt) => beforeFunction((TSource)src, (TDestination)dest, ctxt)));
 
             return this;
         }
 
         public IMappingExpression<TSource, TDestination> BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
         {
-            Action<TSource, TDestination> beforeFunction = (src, dest) => ((TMappingAction)_serviceCtor(typeof(TMappingAction))).Process(src, dest);
+            Action<TSource, TDestination, ResolutionContext> beforeFunction = (src, dest, ctxt) => 
+                ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
 
             return BeforeMap(beforeFunction);
         }
 
         public IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction)
         {
-            TypeMap.AddAfterMapAction((src, dest) => afterFunction((TSource)src, (TDestination)dest));
+            _typeMapActions.Add(tm => tm.AddAfterMapAction((src, dest, ctxt) => afterFunction((TSource)src, (TDestination)dest)));
+
+            return this;
+        }
+
+        public IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction)
+        {
+            _typeMapActions.Add(tm => tm.AddAfterMapAction((src, dest, ctxt) => afterFunction((TSource)src, (TDestination)dest, ctxt)));
 
             return this;
         }
 
         public IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
         {
-            Action<TSource, TDestination> afterFunction = (src, dest) => ((TMappingAction)_serviceCtor(typeof(TMappingAction))).Process(src, dest);
+            Action<TSource, TDestination, ResolutionContext> afterFunction = (src, dest, ctxt) 
+                => ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
 
             return AfterMap(afterFunction);
         }
@@ -529,7 +862,8 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<ResolutionContext, TDestination> ctor)
         {
-            TypeMap.DestinationCtor = ctxt => ctor(ctxt);
+            _typeMapActions.Add(tm => tm.DestinationCtor = ctxt => ctor(ctxt));
+
             return this;
         }
 
@@ -537,36 +871,90 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
         {
             var func = ctor.Compile();
 
-            TypeMap.ConstructExpression = ctor;
+            _typeMapActions.Add(tm => tm.ConstructExpression = ctor);
 
             return ConstructUsing(ctxt => func((TSource)ctxt.SourceValue));
         }
 
         private void ForDestinationMember(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
-            PropertyMap = TypeMap.FindOrCreatePropertyMapFor(destinationProperty);
+            var expression = new MemberConfigurationExpression(destinationProperty);
 
-            memberOptions(this);
+            _memberConfigurations.Add(expression);
+
+            memberOptions(expression);
         }
 
         public void As<T>()
         {
-            TypeMap.DestinationTypeOverride = typeof(T);
+            _typeMapActions.Add(tm => tm.DestinationTypeOverride = typeof(T));
         }
 
         public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {
-            var param = TypeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == ctorParamName);
-
-            var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(param);
-            param.CanResolve = true;
+            var ctorParamExpression = new CtorParamConfigurationExpression<TSource>(ctorParamName);
 
             paramOptions(ctorParamExpression);
+
+            _ctorParamConfigurations.Add(ctorParamExpression);
 
             return this;
         }
 
-        protected Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)
+        public void Configure(IProfileConfiguration profile, TypeMap typeMap)
+        {
+            foreach (var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
+            {
+                var attrs = destProperty.GetCustomAttributes(true);
+                if (attrs.Any(x => x is IgnoreMapAttribute))
+                {
+                    ForMember(destProperty.Name, y => y.Ignore());
+                }
+                if (profile.GlobalIgnores.Contains(destProperty.Name))
+                {
+                    ForMember(destProperty.Name, y => y.Ignore());
+                }
+            }
+
+            if (_allMemberOptions != null)
+            {
+                foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors)
+                {
+                    ForDestinationMember(accessor.ToMemberAccessor(), _allMemberOptions);
+                }
+            }
+
+            foreach (var action in _typeMapActions)
+            {
+                action(typeMap);
+            }
+            foreach (var memberConfig in _memberConfigurations)
+            {
+                memberConfig.Configure(typeMap);
+            }
+            foreach (var memberConfig in _sourceMemberConfigurations)
+            {
+                memberConfig.Configure(typeMap);
+            }
+            foreach (var paramConfig in _ctorParamConfigurations)
+            {
+                paramConfig.Configure(typeMap);
+            }
+
+            if (_reverseMap != null)
+            {
+                foreach (var destProperty in typeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
+                {
+                    _reverseMap.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
+                }
+                foreach (var includedDerivedType in typeMap.IncludedDerivedTypes)
+                {
+                    _reverseMap.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
+                }
+            }
+        }
+
+        private static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(Type type)
         {
             return context =>
             {
@@ -574,10 +962,10 @@ $"Source member {sourceMember} is ambiguous on type {TypeMap.SourceType.FullName
                 {
                     type = type.MakeGenericType(context.SourceType.GetTypeInfo().GenericTypeArguments);
                 }
-                var obj = context.Options.ServiceCtor?.Invoke(type);
-                if(obj != null)
-                    return (TServiceType)obj;
-                return (TServiceType)_serviceCtor(type);
+
+                var obj = context.Options.ServiceCtor.Invoke(type);
+
+                return (TServiceType)obj;
             };
         }
     }

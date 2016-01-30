@@ -12,19 +12,20 @@ namespace AutoMapper
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public abstract class Profile : IProfileExpression, IProfileConfiguration
+    public class Profile : IProfileExpression, IProfileConfiguration
     {
-        private IConfiguration _configurator;
         private readonly IConditionalObjectMapper _mapMissingTypes;
         private readonly List<string> _globalIgnore;
+        private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
+        private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
 
-        protected Profile(string profileName)
+        public Profile(string profileName)
             :this()
         {
             ProfileName = profileName;
         }
 
-        protected Profile()
+        public Profile()
         {
             ProfileName = GetType().FullName;
             AllowNullDestinationValues = true;
@@ -91,7 +92,7 @@ namespace AutoMapper
 
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
         {
-            _configurator.ForAllMaps(ProfileName, configuration);
+            _allTypeMapActions.Add(configuration);
         }
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
@@ -101,7 +102,7 @@ namespace AutoMapper
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
         {
-            return _configurator.CreateMap<TSource, TDestination>(ProfileName, memberList);
+            return CreateMappingExpression<TSource, TDestination>(memberList);
         }
 
         public IMappingExpression CreateMap(Type sourceType, Type destinationType)
@@ -111,9 +112,20 @@ namespace AutoMapper
 
         public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
         {
-            var map = _configurator.CreateMap(sourceType, destinationType, memberList, ProfileName);
+            var map = new MappingExpression(new TypePair(sourceType, destinationType), memberList);
+
+            _typeMapConfigs.Add(map);
 
             return map;
+        }
+
+        private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(MemberList memberList)
+        {
+            var mappingExp = new MappingExpression<TSource, TDestination>(memberList);
+
+            _typeMapConfigs.Add(mappingExp);
+
+            return mappingExp;
         }
 
         public void ClearPrefixes()
@@ -155,20 +167,6 @@ namespace AutoMapper
         {
             _globalIgnore.Add(propertyNameStartingWith);
         }
-
-        /// <summary>
-        /// Override this method in a derived class and call the CreateMap method to associate that map with this profile.
-        /// Avoid calling the <see cref="Mapper"/> class from this method.
-        /// </summary>
-        protected abstract void Configure();
-
-        public void Initialize(IConfiguration configurator)
-        {
-            _configurator = configurator;
-
-            Configure();
-        }
-
         
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
@@ -215,6 +213,34 @@ namespace AutoMapper
                 .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
                 .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
                 .Where(method => method.GetParameters().Length == 1));
+        }
+
+        void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry)
+        {
+            var factory = new TypeMapFactory();
+            foreach (var config in _typeMapConfigs)
+            {
+                BuildTypeMap(typeMapRegistry, factory, config);
+
+                if (config.ReverseTypeMap != null)
+                {
+                    BuildTypeMap(typeMapRegistry, factory, config.ReverseTypeMap);
+                }
+            }
+        }
+
+        private void BuildTypeMap(TypeMapRegistry typeMapRegistry, TypeMapFactory factory, ITypeMapConfiguration config)
+        {
+            var typeMap = factory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.MemberList);
+
+            typeMap.Profile = ProfileName;
+            typeMap.IgnorePropertiesStartingWith = GlobalIgnores;
+
+            config.Configure(this, typeMap);
+
+            typeMapRegistry.RegisterTypeMap(typeMap);
+
+            typeMap.Seal();
         }
     }
 }
