@@ -37,5 +37,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="constructor">Factory method</param>
         void ConstructServicesUsing(Func<Type, object> constructor);
+
+        void CreateProfile(string profileName, Action<Profile> config);
     }
 }

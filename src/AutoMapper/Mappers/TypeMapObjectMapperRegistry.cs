@@ -59,8 +59,7 @@ namespace AutoMapper.Mappers
 
             public bool IsMatch(ResolutionContext context)
             {
-                var profileConfiguration = context.ConfigurationProvider.GetProfileConfiguration(context.TypeMap.Profile);
-                return (context.SourceValue == null && profileConfiguration.AllowNullDestinationValues);
+                return context.SourceValue == null && context.TypeMap.Profile.AllowNullDestinationValues;
             }
         }
 

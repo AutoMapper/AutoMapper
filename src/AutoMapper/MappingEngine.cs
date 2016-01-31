@@ -92,19 +92,15 @@ namespace AutoMapper
                 return false;
 
             var typeMap = context.GetContextTypeMap();
-            if (typeMap != null)
-				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).AllowNullDestinationValues;
 
-			return ConfigurationProvider.AllowNullDestinationValues;
+            return typeMap?.Profile.AllowNullDestinationValues ?? ConfigurationProvider.AllowNullDestinationValues;
         }
 
         public bool ShouldMapSourceCollectionAsNull(ResolutionContext context)
         {
             var typeMap = context.GetContextTypeMap();
-            if (typeMap != null)
-				return ConfigurationProvider.GetProfileConfiguration(typeMap.Profile).AllowNullCollections;
 
-            return ConfigurationProvider.AllowNullCollections;
+            return typeMap?.Profile.AllowNullCollections ?? ConfigurationProvider.AllowNullCollections;
         }
 
     }

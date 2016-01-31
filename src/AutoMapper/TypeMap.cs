@@ -30,12 +30,12 @@ namespace AutoMapper
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, string profileName)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, IProfileConfiguration profile)
         {
             SourceTypeDetails = sourceType;
             DestinationTypeDetails = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
-            Profile = profileName;
+            Profile = profile;
             ConfiguredMemberList = memberList;
         }
 
@@ -46,10 +46,12 @@ namespace AutoMapper
         public TypeDetails SourceTypeDetails { get; }
         public TypeDetails DestinationTypeDetails { get; }
 
+
         public Type SourceType => SourceTypeDetails.Type;
         public Type DestinationType => DestinationTypeDetails.Type;
 
-        public string Profile { get; set; }
+        public IProfileConfiguration Profile { get; }
+
         public Func<ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
@@ -426,6 +428,5 @@ namespace AutoMapper
             }
             return Expression.Lambda(newExpression);
         }
-
     }
 }

@@ -12,31 +12,37 @@ namespace AutoMapper
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
-    public class Profile : IProfileExpression, IProfileConfiguration
+    public abstract class Profile : IProfileExpression, IProfileConfiguration
     {
         private readonly IConditionalObjectMapper _mapMissingTypes;
         private readonly List<string> _globalIgnore;
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
 
-        public Profile(string profileName)
+        protected Profile(string profileName)
             :this()
         {
             ProfileName = profileName;
         }
 
-        public Profile()
+        protected Profile()
         {
-            ProfileName = GetType().FullName;
+            var profileName = GetType().FullName;
+            ProfileName = profileName;
             AllowNullDestinationValues = true;
             ConstructorMappingEnabled = true;
             IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
             ShouldMapProperty = p => p.IsPublic();
             ShouldMapField = f => f.IsPublic;
-            _mapMissingTypes = new ConditionalObjectMapper(ProfileName) {Conventions = {tp => true}};
+            _mapMissingTypes = new ConditionalObjectMapper(profileName) {Conventions = {tp => true}};
             _globalIgnore = new List<string>();
             _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
+
+        [Obsolete("Use the construtor instead. Will be removed in 6.0")]
+        protected virtual void Configure() { }
+
+        internal void Initialize() => Configure();
 
         public virtual string ProfileName { get; }
 
@@ -232,9 +238,6 @@ namespace AutoMapper
         private void BuildTypeMap(TypeMapRegistry typeMapRegistry, TypeMapFactory factory, ITypeMapConfiguration config)
         {
             var typeMap = factory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.MemberList);
-
-            typeMap.Profile = ProfileName;
-            typeMap.IgnorePropertiesStartingWith = GlobalIgnores;
 
             config.Configure(this, typeMap);
 

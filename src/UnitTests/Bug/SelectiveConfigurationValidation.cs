@@ -20,7 +20,7 @@
         }
         public class GoodProfile : Profile
         {
-            protected override void Configure()
+            public GoodProfile()
             {
                 CreateMap<GoodSrc, GoodDest>();
             }
@@ -28,7 +28,7 @@
 
         public class BadProfile : Profile
         {
-            protected override void Configure()
+            public BadProfile()
             {
                 CreateMap<BadSrc, BadDest>();
             }

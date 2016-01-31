@@ -43,12 +43,6 @@ namespace AutoMapper.Internal
             _actions.Add((me => me.As(typeOverride)));
         }
 
-        public IMappingExpression WithProfile(string profileName)
-        {
-            _actions.Add(me => me.WithProfile(profileName));
-            return this;
-        }
-
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions)
         {
             _actions.Add(me => me.ForMember(name, memberOptions));

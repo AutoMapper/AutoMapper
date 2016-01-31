@@ -60,7 +60,7 @@ namespace AutoMapper
             _typeMapFactory = new TypeMapFactory();
             _mappers = mappers;
             _typeMapObjectMappers = typeMapObjectMappers;
-            var profileExpression = new Profile(ProfileName);
+            var profileExpression = new NamedProfile(ProfileName);
 
             _profiles.AddOrUpdate(profileExpression.ProfileName, profileExpression,
                 (s, configuration) => profileExpression);
@@ -78,7 +78,25 @@ namespace AutoMapper
 
         #region IConfiguration Members
 
-        void IConfiguration.AddProfile(Profile profile) => _profiles.AddOrUpdate(profile.ProfileName, profile, (s, configuration) => profile);
+        void IConfiguration.CreateProfile(string profileName, Action<Profile> config)
+        {
+            var profile = new NamedProfile(profileName);
+
+            config(profile);
+
+            ((IConfiguration) this).AddProfile(profile);
+        }
+
+        private class NamedProfile : Profile
+        {
+            public NamedProfile(string profileName) : base(profileName) { }
+        }
+
+        void IConfiguration.AddProfile(Profile profile)
+        {
+            profile.Initialize();
+            _profiles.AddOrUpdate(profile.ProfileName, profile, (s, configuration) => profile);
+        }
 
         void IConfiguration.AddProfile<TProfile>() => ((IConfiguration)this).AddProfile(new TProfile());
 
@@ -261,7 +279,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid(string profileName)
         {
-            AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(typeMap => typeMap.Profile == profileName));
+            AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(typeMap => typeMap.Profile.ProfileName == profileName));
         }
 
         public void AssertConfigurationIsValid<TProfile>()
@@ -592,7 +610,7 @@ namespace AutoMapper
 
         private Profile GetProfile(string profileName)
         {
-            var expr = _profiles.GetOrAdd(profileName, name => new Profile(profileName));
+            var expr = _profiles.GetOrAdd(profileName, name => new NamedProfile(profileName));
 
             return expr;
         }
