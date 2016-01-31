@@ -574,7 +574,7 @@ namespace AutoMapper
                     return 0;
                 }
 
-                if (_target != null && !_target.IsInterface)
+                if (_target != null && !_target.IsInterface && !_target.IsArray)
                 {
                     var comparer = new InterfaceComparer(null);
 
