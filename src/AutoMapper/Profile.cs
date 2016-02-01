@@ -14,8 +14,8 @@ namespace AutoMapper
     /// </summary>
     public abstract class Profile : IProfileExpression, IProfileConfiguration
     {
-        private readonly IConditionalObjectMapper _mapMissingTypes;
-        private readonly List<string> _globalIgnore;
+        private readonly IConditionalObjectMapper _mapMissingTypes = new ConditionalObjectMapper {Conventions = {tp => true}};
+        private readonly List<string> _globalIgnore = new List<string>();
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
 
@@ -27,15 +27,8 @@ namespace AutoMapper
 
         protected Profile()
         {
-            var profileName = GetType().FullName;
-            ProfileName = profileName;
-            AllowNullDestinationValues = true;
-            ConstructorMappingEnabled = true;
+            ProfileName = GetType().FullName;
             IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
-            ShouldMapProperty = p => p.IsPublic();
-            ShouldMapField = f => f.IsPublic;
-            _mapMissingTypes = new ConditionalObjectMapper(profileName) {Conventions = {tp => true}};
-            _globalIgnore = new List<string>();
             _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
 
@@ -51,7 +44,7 @@ namespace AutoMapper
             ConstructorMappingEnabled = false;
         }
 
-        public bool AllowNullDestinationValues { get; set; }
+        public bool AllowNullDestinationValues { get; set; } = true;
 
         public bool AllowNullCollections { get; set; }
 
@@ -196,20 +189,20 @@ namespace AutoMapper
 
         public IConditionalObjectMapper AddConditionalObjectMapper()
         {
-            var condition = new ConditionalObjectMapper(ProfileName);
+            var condition = new ConditionalObjectMapper();
 
             _typeConfigurations.Add(condition);
 
             return condition;
         }
 
-        public bool ConstructorMappingEnabled { get; private set; }
+        public bool ConstructorMappingEnabled { get; private set; } = true;
 
         public IEnumerable<MethodInfo> SourceExtensionMethods => _sourceExtensionMethods;
 
-        public Func<PropertyInfo, bool> ShouldMapProperty { get; set; }
+        public Func<PropertyInfo, bool> ShouldMapProperty { get; set; } = p => p.IsPublic();
 
-        public Func<FieldInfo, bool> ShouldMapField { get; set; }
+        public Func<FieldInfo, bool> ShouldMapField { get; set; } = f => f.IsPublic();
 
         public void IncludeSourceExtensionMethods(Assembly assembly)
         {
@@ -241,31 +234,38 @@ namespace AutoMapper
             {
                 var typeMap = typeMapRegistry.GetTypeMap(config.Types);
 
-                foreach (var action in _allTypeMapActions)
+                Configure(typeMapRegistry, config, typeMap);
+            }
+        }
+
+        void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config, TypeMap typeMap) => Configure(typeMapRegistry, config, typeMap);
+
+        private void Configure(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config, TypeMap typeMap)
+        {
+            foreach (var action in _allTypeMapActions)
+            {
+                var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
+
+                action(typeMap, expression);
+
+                expression.Configure(this, typeMap);
+            }
+
+            foreach (var baseMap in config.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
+            {
+                var currentMap = baseMap;
+                while (currentMap != null)
                 {
-                    var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
+                    currentMap.IncludeDerivedTypes(typeMap.SourceType, typeMap.DestinationType);
+                    typeMap.ApplyInheritedMap(currentMap);
 
-                    action(typeMap, expression);
-
-                    expression.Configure(this, typeMap);
+                    currentMap = typeMapRegistry.GetTypeMap(new TypePair(currentMap.SourceType.BaseType(), currentMap.DestinationType.BaseType()));
                 }
 
-                foreach (var baseMap in config.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
-                {
-                    var currentMap = baseMap;
-                    while (currentMap != null)
-                    {
-                        currentMap.IncludeDerivedTypes(typeMap.SourceType, typeMap.DestinationType);
-                        typeMap.ApplyInheritedMap(currentMap);
-
-                        currentMap = typeMapRegistry.GetTypeMap(new TypePair(currentMap.SourceType.BaseType(), currentMap.DestinationType.BaseType()));
-                    }
-
-                }
-                foreach (var inheritedTypeMap in config.IncludedDerivedTypes.Select(typeMapRegistry.GetTypeMap).Where(map => map != null))
-                {
-                    inheritedTypeMap.ApplyInheritedMap(typeMap);
-                }
+            }
+            foreach (var inheritedTypeMap in config.IncludedDerivedTypes.Select(typeMapRegistry.GetTypeMap).Where(map => map != null))
+            {
+                inheritedTypeMap.ApplyInheritedMap(typeMap);
             }
         }
 

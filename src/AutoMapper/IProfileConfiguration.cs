@@ -5,6 +5,8 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
+    using Internal;
+
     /// <summary>
     /// Contains profile-specific configuration
     /// </summary>
@@ -40,7 +42,8 @@ namespace AutoMapper
         string ProfileName { get; }
         IEnumerable<string> GlobalIgnores { get; }
 
-        void Register(TypeMapRegistry typeMapsRegistry);
-        void Configure(TypeMapRegistry typeMapsRegistry);
+        void Register(TypeMapRegistry typeMapRegistry);
+        void Configure(TypeMapRegistry typeMapRegistry);
+        void Configure(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config, TypeMap typeMap);
 	}
 }

@@ -46,8 +46,7 @@ namespace AutoMapper
         private readonly ConcurrentDictionary<TypePair, CreateTypeMapExpression> _typeMapExpressionCache =
             new ConcurrentDictionary<TypePair, CreateTypeMapExpression>();
 
-        private readonly ConcurrentDictionary<string, Profile> _profiles =
-            new ConcurrentDictionary<string, Profile>();
+        private readonly ConcurrentBag<Profile> _profiles = new ConcurrentBag<Profile>();
 
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
@@ -63,8 +62,7 @@ namespace AutoMapper
             _typeMapObjectMappers = typeMapObjectMappers;
             var profileExpression = new NamedProfile(ProfileName);
 
-            _profiles.AddOrUpdate(profileExpression.ProfileName, profileExpression,
-                (s, configuration) => profileExpression);
+            _profiles.Add(profileExpression);
 
             _defaultProfile = profileExpression;
 
@@ -96,7 +94,7 @@ namespace AutoMapper
         void IConfiguration.AddProfile(Profile profile)
         {
             profile.Initialize();
-            _profiles.AddOrUpdate(profile.ProfileName, profile, (s, configuration) => profile);
+            _profiles.Add(profile);
         }
 
         void IConfiguration.AddProfile<TProfile>() => ((IConfiguration)this).AddProfile(new TProfile());
@@ -305,7 +303,7 @@ namespace AutoMapper
             var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
             var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
 
-            foreach (var profile in _profiles.Values.Cast<IProfileConfiguration>())
+            foreach (var profile in _profiles.Cast<IProfileConfiguration>())
             {
                 profile.Register(_typeMapRegistry);
             }
@@ -322,7 +320,7 @@ namespace AutoMapper
                 }
             }
 
-            foreach (var profile in _profiles.Values.Cast<IProfileConfiguration>())
+            foreach (var profile in _profiles.Cast<IProfileConfiguration>())
             {
                 profile.Configure(_typeMapRegistry);
             }
@@ -377,33 +375,32 @@ namespace AutoMapper
             }
         }
 
-      //  private TypeMap CreateTypeMap(TypePair types, string profileName)
-      //  {
-		    //return CreateTypeMap(types, profileName, MemberList.Destination);
-      //  }
+        //  private TypeMap CreateTypeMap(TypePair types, string profileName)
+        //  {
+        //return CreateTypeMap(types, profileName, MemberList.Destination);
+        //  }
 
-        //private TypeMap CreateTypeMap(TypePair types, string profileName, MemberList memberList)
-        //{
-        //    var typeMap = _userDefinedTypeMaps.GetOrAdd(types, tp =>
-        //    {
-        //        var profileConfiguration = GetProfile(profileName);
+        private TypeMap CreateTypeMap(TypePair types, IProfileConfiguration profile, MemberList memberList)
+        {
+            var typeMap = _typeMapPlanCache.GetOrAdd(types, tp =>
+            {
+                var tm = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, profile, memberList);
 
-        //        var tm = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, profileConfiguration, memberList);
+                profile.Configure(_typeMapRegistry, new MappingExpression(types, memberList), tm);
 
-        //        tm.Profile = profileName;
-        //        tm.IgnorePropertiesStartingWith = profileConfiguration.GlobalIgnores;
+                //tm.IgnorePropertiesStartingWith = profileConfiguration.GlobalIgnores;
 
-        //        IncludeBaseMappings(types, tm);
+                //IncludeBaseMappings(types, tm);
 
-        //        // keep the cache in sync
-        //        TypeMap _;
-        //        _typeMapPlanCache.TryRemove(tp, out _);
+                // keep the cache in sync
+                TypeMap _;
+                _typeMapPlanCache.TryRemove(tp, out _);
 
-        //        return tm;
-        //    });
+                return tm;
+            });
 
-        //    return typeMap;
-        //}
+            return typeMap;
+        }
 
         private void IncludeBaseMappings(TypePair types, TypeMap typeMap)
         {
@@ -422,10 +419,8 @@ namespace AutoMapper
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
-            return null;
-            //TODO: Conventions
-            //var matchingTypeMapConfiguration = _profiles.Select(kv => kv.Value).SelectMany(p => p.TypeConfigurations).FirstOrDefault(tc => tc.IsMatch(typePair));
-            //return matchingTypeMapConfiguration != null ? CreateTypeMap(typePair, matchingTypeMapConfiguration.ProfileName) : null;
+            var matchingTypeMapConfiguration = _profiles.SelectMany(p => p.TypeConfigurations, (profile, condition) => new { profile, condition }).FirstOrDefault(tc => tc.condition.IsMatch(typePair));
+            return matchingTypeMapConfiguration != null ? CreateTypeMap(typePair, matchingTypeMapConfiguration.profile, MemberList.Destination) : null;
         }
 
         private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
@@ -615,13 +610,6 @@ namespace AutoMapper
                     }
                 }
             }
-        }
-
-        private Profile GetProfile(string profileName)
-        {
-            var expr = _profiles.GetOrAdd(profileName, name => new NamedProfile(profileName));
-
-            return expr;
         }
     }
 }

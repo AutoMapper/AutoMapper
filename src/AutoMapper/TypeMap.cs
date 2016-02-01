@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -18,10 +19,8 @@ namespace AutoMapper
         private readonly IList<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();
         private readonly IList<Action<object, object, ResolutionContext>> _beforeMapActions = new List<Action<object, object, ResolutionContext>>();
         private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
-        private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
-
-        private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs =
-            new ThreadSafeList<SourceMemberConfig>();
+        private ConcurrentBag<PropertyMap> _propertyMaps = new ConcurrentBag<PropertyMap>();
+        private readonly ConcurrentBag<SourceMemberConfig> _sourceMemberConfigs = new ConcurrentBag<SourceMemberConfig>();
 
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
@@ -37,6 +36,7 @@ namespace AutoMapper
             Types = new TypePair(sourceType.Type, destinationType.Type);
             Profile = profile;
             ConfiguredMemberList = memberList;
+            IgnorePropertiesStartingWith = profile.GlobalIgnores;
         }
 
         public TypePair Types { get; }
@@ -204,7 +204,7 @@ namespace AutoMapper
         public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
         {
             CustomMapper = customMapper;
-            _propertyMaps.Clear();
+            _propertyMaps = new ConcurrentBag<PropertyMap>();
         }
 
         public void AddBeforeMapAction(Action<object, object, ResolutionContext> beforeMap)
@@ -366,7 +366,7 @@ namespace AutoMapper
         public void UseCustomProjection(LambdaExpression projectionExpression)
         {
             CustomProjection = projectionExpression;
-            _propertyMaps.Clear();
+            _propertyMaps = new ConcurrentBag<PropertyMap>();
         }
 
         public void ApplyInheritedMap(TypeMap inheritedTypeMap)
