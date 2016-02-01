@@ -38,6 +38,7 @@ namespace AutoMapper
         private readonly ITypeMapFactory _typeMapFactory;
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly IEnumerable<ITypeMapObjectMapper> _typeMapObjectMappers;
+        private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
@@ -151,7 +152,7 @@ namespace AutoMapper
             set { AllowNullCollections = value; }
         }
 
-        void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => _defaultProfile.ForAllMaps(configuration);
+        void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => _allTypeMapActions.Add(configuration);
 
         IMemberConfiguration IProfileExpression.AddMemberConfiguration() => _defaultProfile.AddMemberConfiguration();
 
@@ -308,6 +309,19 @@ namespace AutoMapper
             {
                 profile.Register(_typeMapRegistry);
             }
+
+            foreach (var action in _allTypeMapActions)
+            {
+                foreach (var typeMap in _typeMapRegistry.TypeMaps)
+                {
+                    var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
+
+                    action(typeMap, expression);
+
+                    expression.Configure(typeMap.Profile, typeMap);
+                }
+            }
+
             foreach (var profile in _profiles.Values.Cast<IProfileConfiguration>())
             {
                 profile.Configure(_typeMapRegistry);

@@ -240,6 +240,16 @@ namespace AutoMapper
             foreach (var config in _typeMapConfigs)
             {
                 var typeMap = typeMapRegistry.GetTypeMap(config.Types);
+
+                foreach (var action in _allTypeMapActions)
+                {
+                    var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
+
+                    action(typeMap, expression);
+
+                    expression.Configure(this, typeMap);
+                }
+
                 foreach (var baseMap in config.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
                 {
                     baseMap.IncludeDerivedTypes(typeMap.SourceType, typeMap.DestinationType);
