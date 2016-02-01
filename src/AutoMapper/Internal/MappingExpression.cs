@@ -503,9 +503,11 @@ namespace AutoMapper.Internal
 
                 ResolveUsing(resolver);
 
-                var resolutionExpression = new ResolutionExpression<TSource, TValueResolver>();
+                var expression = new ResolutionExpression<TSource, TValueResolver>();
 
-                return resolutionExpression;
+                _propertyMapActions.Add(pm => expression.Configure(pm));
+
+                return expression;
             }
 
             public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
