@@ -306,16 +306,12 @@ namespace AutoMapper
 
             foreach (var profile in _profiles.Values.Cast<IProfileConfiguration>())
             {
+                profile.Register(_typeMapRegistry);
+            }
+            foreach (var profile in _profiles.Values.Cast<IProfileConfiguration>())
+            {
                 profile.Configure(_typeMapRegistry);
             }
-            foreach (var typeMap in _typeMapRegistry.TypeMaps)
-            {
-                foreach (var derivedMap in typeMap.IncludedDerivedTypes.Select(derivedType => _typeMapRegistry.GetTypeMap(derivedType)))
-                {
-                    derivedMap.ApplyInheritedMap(typeMap);
-                }
-            }
-
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
             {
@@ -326,12 +322,6 @@ namespace AutoMapper
                     redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
                 }
                 derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
-
-                foreach (var derivedMap in typeMap.IncludedDerivedTypes.Select(derivedType => _typeMapRegistry.GetTypeMap(derivedType)))
-                {
-                    derivedMap?.ApplyInheritedMap(typeMap);
-                }
-
             }
             foreach (var redirectedType in redirectedTypes)
             {
@@ -344,6 +334,11 @@ namespace AutoMapper
             foreach (var derivedMap in derivedMaps)
             {
                 _typeMapPlanCache.GetOrAdd(derivedMap.Item1, _ => derivedMap.Item2);
+            }
+
+            foreach (var typeMap in _typeMapRegistry.TypeMaps)
+            {
+                typeMap.Seal();
             }
         }
 

@@ -12,7 +12,7 @@ namespace AutoMapper
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
     /// </summary>
-    [DebuggerDisplay("{_sourceType.Type.Name} -> {_destinationType.Type.Name}")]
+    [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
     public class TypeMap
     {
         private readonly IList<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();

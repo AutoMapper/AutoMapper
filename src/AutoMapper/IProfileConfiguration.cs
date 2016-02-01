@@ -40,6 +40,7 @@ namespace AutoMapper
         string ProfileName { get; }
         IEnumerable<string> GlobalIgnores { get; }
 
+        void Register(TypeMapRegistry typeMapsRegistry);
         void Configure(TypeMapRegistry typeMapsRegistry);
 	}
 }

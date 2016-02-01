@@ -221,7 +221,7 @@ namespace AutoMapper
                 .Where(method => method.GetParameters().Length == 1));
         }
 
-        void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry)
+        void IProfileConfiguration.Register(TypeMapRegistry typeMapRegistry)
         {
             var factory = new TypeMapFactory();
             foreach (var config in _typeMapConfigs)
@@ -235,6 +235,24 @@ namespace AutoMapper
             }
         }
 
+        void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry)
+        {
+            foreach (var config in _typeMapConfigs)
+            {
+                var typeMap = typeMapRegistry.GetTypeMap(config.Types);
+                foreach (var baseMap in config.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
+                {
+                    baseMap.IncludeDerivedTypes(typeMap.SourceType, typeMap.DestinationType);
+                    typeMap.ApplyInheritedMap(baseMap);
+                }
+                foreach (var inheritedTypeMap in config.IncludedDerivedTypes.Select(typeMapRegistry.GetTypeMap).Where(map => map != null))
+                {
+                    inheritedTypeMap.ApplyInheritedMap(typeMap);
+                }
+            }
+        }
+
+
         private void BuildTypeMap(TypeMapRegistry typeMapRegistry, TypeMapFactory factory, ITypeMapConfiguration config)
         {
             var typeMap = factory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.MemberList);
@@ -242,8 +260,6 @@ namespace AutoMapper
             config.Configure(this, typeMap);
 
             typeMapRegistry.RegisterTypeMap(typeMap);
-
-            typeMap.Seal();
         }
     }
 }
