@@ -388,10 +388,6 @@ namespace AutoMapper
 
                 profile.Configure(_typeMapRegistry, new MappingExpression(types, memberList), tm);
 
-                //tm.IgnorePropertiesStartingWith = profileConfiguration.GlobalIgnores;
-
-                //IncludeBaseMappings(types, tm);
-
                 // keep the cache in sync
                 TypeMap _;
                 _typeMapPlanCache.TryRemove(tp, out _);
