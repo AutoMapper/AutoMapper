@@ -241,7 +241,7 @@ namespace AutoMapper
 
         TypeMap IProfileConfiguration.ConfigureConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair types)
         {
-            if (! TypeConfigurations.All(c => c.IsMatch(types)))
+            if (! TypeConfigurations.Any(c => c.IsMatch(types)))
                 return null;
 
             var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this, MemberList.Destination);
