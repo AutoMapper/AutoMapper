@@ -44,6 +44,7 @@ namespace AutoMapper
 
         void Register(TypeMapRegistry typeMapRegistry);
         void Configure(TypeMapRegistry typeMapRegistry);
-        void Configure(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config, TypeMap typeMap);
+        TypeMap ConfigureConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair conventionTypes);
+        TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair openTypes);
 	}
 }

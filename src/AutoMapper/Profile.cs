@@ -14,10 +14,11 @@ namespace AutoMapper
     /// </summary>
     public abstract class Profile : IProfileExpression, IProfileConfiguration
     {
-        private readonly IConditionalObjectMapper _mapMissingTypes = new ConditionalObjectMapper {Conventions = {tp => true}};
+        private readonly ConditionalObjectMapper _mapMissingTypes = new ConditionalObjectMapper {Conventions = {tp => true}};
         private readonly List<string> _globalIgnore = new List<string>();
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
+        private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
 
         protected Profile(string profileName)
             :this()
@@ -181,7 +182,7 @@ namespace AutoMapper
             _memberConfigurations.Add(condition);
             return condition;
         }
-        private readonly IList<IConditionalObjectMapper> _typeConfigurations = new List<IConditionalObjectMapper>();
+        private readonly IList<ConditionalObjectMapper> _typeConfigurations = new List<ConditionalObjectMapper>();
 
         private bool _createMissingTypeMaps;
 
@@ -219,11 +220,11 @@ namespace AutoMapper
             var factory = new TypeMapFactory();
             foreach (var config in _typeMapConfigs)
             {
-                BuildTypeMap(typeMapRegistry, factory, config);
+                BuildTypeMap(typeMapRegistry, config);
 
                 if (config.ReverseTypeMap != null)
                 {
-                    BuildTypeMap(typeMapRegistry, factory, config.ReverseTypeMap);
+                    BuildTypeMap(typeMapRegistry, config.ReverseTypeMap);
                 }
             }
         }
@@ -238,7 +239,31 @@ namespace AutoMapper
             }
         }
 
-        void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config, TypeMap typeMap) => Configure(typeMapRegistry, config, typeMap);
+        TypeMap IProfileConfiguration.ConfigureConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair types)
+        {
+            if (! TypeConfigurations.All(c => c.IsMatch(types)))
+                return null;
+
+            var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this, MemberList.Destination);
+
+            Configure(typeMapRegistry, new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList), typeMap);
+
+            return typeMap;
+        }
+
+        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair openTypes)
+        {
+            var openMapConfig = _typeMapConfigs.FirstOrDefault(tm => tm.Types == openTypes);
+
+            if (openMapConfig == null)
+                return null;
+
+            var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this, openMapConfig.MemberList);
+
+            Configure(typeMapRegistry, openMapConfig, closedMap);
+
+            return closedMap;
+        }
 
         private void Configure(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config, TypeMap typeMap)
         {
@@ -269,9 +294,9 @@ namespace AutoMapper
             }
         }
 
-        private void BuildTypeMap(TypeMapRegistry typeMapRegistry, TypeMapFactory factory, ITypeMapConfiguration config)
+        private void BuildTypeMap(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config)
         {
-            var typeMap = factory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.MemberList);
+            var typeMap = _typeMapFactory.CreateTypeMap(config.SourceType, config.DestinationType, this, config.MemberList);
 
             config.Configure(this, typeMap);
 

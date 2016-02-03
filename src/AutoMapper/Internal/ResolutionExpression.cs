@@ -8,7 +8,13 @@ namespace AutoMapper.Internal
     public class ResolutionExpression<TSource> : IResolverConfigurationExpression<TSource>,
         IResolverConfigurationExpression
     {
+        private readonly Type _sourceType;
         private readonly List<Action<PropertyMap>> _propertyMapActions = new List<Action<PropertyMap>>();
+
+        public ResolutionExpression(Type sourceType)
+        {
+            _sourceType = sourceType;
+        }
 
         public void FromMember(Expression<Func<TSource, object>> sourceMember)
         {
@@ -28,8 +34,8 @@ namespace AutoMapper.Internal
         {
             _propertyMapActions.Add(pm =>
             {
-                pm.SourceMember = typeof(TSource).GetMember(sourcePropertyName)[0];
-                pm.ChainTypeMemberForResolver(new PropertyNameResolver(typeof(TSource), sourcePropertyName));
+                pm.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
+                pm.ChainTypeMemberForResolver(new PropertyNameResolver(_sourceType, sourcePropertyName));
             });
         }
 
@@ -56,13 +62,22 @@ namespace AutoMapper.Internal
 
     public class ResolutionExpression : ResolutionExpression<object>
     {
+        public ResolutionExpression(Type sourceType) : base(sourceType)
+        {
+        }
     }
 
     public class ResolutionExpression<TSource, TValueResolver> :
         IResolverConfigurationExpression<TSource, TValueResolver>
         where TValueResolver : IValueResolver
     {
+        private readonly Type _sourceType;
         private readonly List<Action<PropertyMap>> _propertyMapActions = new List<Action<PropertyMap>>();
+
+        public ResolutionExpression(Type sourceType)
+        {
+            _sourceType = sourceType;
+        }
 
         public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(
             Expression<Func<TSource, object>> sourceMember)
@@ -85,8 +100,8 @@ namespace AutoMapper.Internal
         {
             _propertyMapActions.Add(pm =>
             {
-                pm.SourceMember = typeof(TSource).GetMember(sourcePropertyName)[0];
-                pm.ChainTypeMemberForResolver(new PropertyNameResolver(typeof(TSource), sourcePropertyName));
+                pm.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
+                pm.ChainTypeMemberForResolver(new PropertyNameResolver(_sourceType, sourcePropertyName));
             });
 
             return this;
