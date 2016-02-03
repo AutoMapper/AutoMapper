@@ -328,11 +328,12 @@ namespace AutoMapper
 
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
         {
-            foreach (var derivedMap in typeMap.IncludedDerivedTypes.Select(FindTypeMapFor))
+            foreach (var derivedTypes in typeMap.IncludedDerivedTypes)
             {
+                var derivedMap = FindTypeMapFor(derivedTypes);
                 if(derivedMap == null)
                 {
-                    throw QueryMapperHelper.MissingMapException(typeMap.SourceType, typeMap.DestinationType);
+                    throw QueryMapperHelper.MissingMapException(derivedTypes.SourceType, derivedTypes.DestinationType);
                 }
                 yield return derivedMap;
                 foreach(var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
