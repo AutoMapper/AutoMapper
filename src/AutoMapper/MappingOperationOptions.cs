@@ -49,7 +49,8 @@ namespace AutoMapper
 
         void IMappingOperationOptions.ConstructServicesUsing(Func<Type, object> constructor)
         {
-            ServiceCtor = constructor;
+            var ctor = ServiceCtor;
+            ServiceCtor = t => constructor(t) ?? ctor(t);
         }
     }
 }
