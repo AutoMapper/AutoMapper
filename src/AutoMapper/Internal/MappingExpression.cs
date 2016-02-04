@@ -99,6 +99,11 @@ namespace AutoMapper.Internal
         protected override MemberConfigurationExpression<object> CreateMemberConfigurationExpression(IMemberAccessor member, Type sourceType)
             => new MemberConfigurationExpression(member, sourceType);
 
+        protected override MappingExpression<object, object> CreateReverseMapExpression()
+        {
+            return new MappingExpression(new TypePair(DestinationType, SourceType), MemberList.Source);
+        }
+
         private class MemberConfigurationExpression : MemberConfigurationExpression<object>, IMemberConfigurationExpression
         {
             public MemberConfigurationExpression(IMemberAccessor destinationMember, Type sourceType) 
@@ -335,6 +340,11 @@ namespace AutoMapper.Internal
             return new MemberConfigurationExpression<TSource>(member, sourceType);
         }
 
+        protected virtual MappingExpression<TDestination, TSource> CreateReverseMapExpression()
+        {
+            return new MappingExpression<TDestination, TSource>(MemberList.Source, DestinationType, SourceType);
+        }
+
         public IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
                                                                    Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
@@ -440,7 +450,7 @@ namespace AutoMapper.Internal
 
         public IMappingExpression<TDestination, TSource> ReverseMap()
         {
-            var mappingExpression = new MappingExpression<TDestination, TSource>(MemberList.Source);
+            var mappingExpression = CreateReverseMapExpression();
 
             _reverseMap = mappingExpression;
 
