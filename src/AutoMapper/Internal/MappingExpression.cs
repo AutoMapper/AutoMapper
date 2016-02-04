@@ -14,8 +14,6 @@ namespace AutoMapper.Internal
         Type DestinationType { get; }
         TypePair Types { get; }
         ITypeMapConfiguration ReverseTypeMap { get; }
-        IEnumerable<TypePair> IncludedDerivedTypes { get; } 
-        IEnumerable<TypePair> IncludedBaseTypes { get; } 
     }
 
     public class MappingExpression : MappingExpression<object, object>, IMappingExpression
@@ -315,8 +313,6 @@ namespace AutoMapper.Internal
         private readonly List<MemberConfigurationExpression<TSource>> _memberConfigurations = new List<MemberConfigurationExpression<TSource>>();
         private readonly List<SourceMappingExpression> _sourceMemberConfigurations = new List<SourceMappingExpression>();
         private readonly List<CtorParamConfigurationExpression<TSource>> _ctorParamConfigurations = new List<CtorParamConfigurationExpression<TSource>>();
-        private readonly List<TypePair> _includedDerivedTypes = new List<TypePair>();
-        private readonly List<TypePair> _includedBaseTypes = new List<TypePair>();
         private MappingExpression<TDestination, TSource> _reverseMap;
         private Action<IMemberConfigurationExpression<TSource>> _allMemberOptions;
 
@@ -337,8 +333,6 @@ namespace AutoMapper.Internal
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;
         public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
-        public IEnumerable<TypePair> IncludedDerivedTypes => _includedDerivedTypes;
-        public IEnumerable<TypePair> IncludedBaseTypes => _includedBaseTypes;
         protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
 
         protected virtual MemberConfigurationExpression<TSource> CreateMemberConfigurationExpression(IMemberAccessor member, Type sourceType)
@@ -416,8 +410,6 @@ namespace AutoMapper.Internal
         {
             TypeMapActions.Add(tm => tm.IncludeDerivedTypes(otherSourceType, otherDestinationType));
 
-            _includedDerivedTypes.Add(new TypePair(otherSourceType, otherDestinationType));
-
             return this;
         }
 
@@ -428,7 +420,7 @@ namespace AutoMapper.Internal
 
         public IMappingExpression<TSource, TDestination> IncludeBase(Type sourceBase, Type destinationBase)
         {
-            _includedBaseTypes.Add(new TypePair(sourceBase, destinationBase));
+            TypeMapActions.Add(tm => tm.IncludeBaseTypes(sourceBase, destinationBase));
 
             return this;
         }

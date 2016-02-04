@@ -19,6 +19,7 @@ namespace AutoMapper
         private readonly IList<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();
         private readonly IList<Action<object, object, ResolutionContext>> _beforeMapActions = new List<Action<object, object, ResolutionContext>>();
         private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
+        private readonly ISet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
         private ConcurrentBag<PropertyMap> _propertyMaps = new ConcurrentBag<PropertyMap>();
         private readonly ConcurrentBag<SourceMemberConfig> _sourceMemberConfigs = new ConcurrentBag<SourceMemberConfig>();
 
@@ -78,6 +79,7 @@ namespace AutoMapper
         public MemberList ConfiguredMemberList { get; }
 
         public IEnumerable<TypePair> IncludedDerivedTypes => _includedDerivedTypes;
+        public IEnumerable<TypePair> IncludedBaseTypes => _includedBaseTypes;
 
         public int MaxDepth
         {
@@ -181,6 +183,16 @@ namespace AutoMapper
                 throw new InvalidOperationException("You cannot include a type map into itself.");
             }
             _includedDerivedTypes.Add(derivedTypes);
+        }
+
+        public void IncludeBaseTypes(Type baseSourceType, Type baseDestinationType)
+        {
+            var baseTypes = new TypePair(baseSourceType, baseDestinationType);
+            if(baseTypes.Equals(Types))
+            {
+                throw new InvalidOperationException("You cannot include a type map into itself.");
+            }
+            _includedBaseTypes.Add(baseTypes);
         }
 
         public Type GetDerivedTypeFor(Type derivedSourceType)

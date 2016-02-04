@@ -512,6 +512,10 @@ namespace AutoMapper
                     if(lastResolver != null)
                     {
                         var sourceType = lastResolver.MemberType;
+
+                        if (sourceType.IsGenericParameter)
+                            return;
+
                         var destinationType = propertyMap.DestinationProperty.MemberType;
                         var memberTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceType,
                             destinationType);
