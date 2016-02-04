@@ -46,7 +46,7 @@ namespace AutoMapper.Internal
             var convertMethodType = interfaceType.IsAssignableFrom(typeConverterType) ? interfaceType : typeConverterType;
             var converter = new DeferredInstantiatedConverter(convertMethodType, typeConverterType.BuildCtor<object>());
 
-            ConvertUsing(converter);
+            TypeMapActions.Add(tm => tm.UseCustomMapper(converter.Convert));
         }
 
         public void As(Type typeOverride) => TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);

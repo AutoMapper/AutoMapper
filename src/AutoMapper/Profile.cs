@@ -245,7 +245,11 @@ namespace AutoMapper
 
             var typeMap = _typeMapFactory.CreateTypeMap(types.SourceType, types.DestinationType, this, MemberList.Destination);
 
-            Configure(typeMapRegistry, new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList), typeMap);
+            var config = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
+
+            config.Configure(this, typeMap);
+
+            Configure(typeMapRegistry, config, typeMap);
 
             return typeMap;
         }
@@ -258,6 +262,8 @@ namespace AutoMapper
                 return null;
 
             var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this, openMapConfig.MemberList);
+
+            openMapConfig.Configure(this, closedMap);
 
             Configure(typeMapRegistry, openMapConfig, closedMap);
 
