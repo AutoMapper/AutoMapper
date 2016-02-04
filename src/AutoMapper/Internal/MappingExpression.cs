@@ -87,8 +87,14 @@ namespace AutoMapper.Internal
         public new IMappingExpression ConstructUsing(Func<ResolutionContext, object> ctor) 
             => (IMappingExpression)base.ConstructUsing(ctor);
 
-        public new IMappingExpression ConstructProjectionUsing(Expression<Func<object, object>> ctor)
-            => (IMappingExpression) base.ConstructProjectionUsing(ctor);
+        public IMappingExpression ConstructProjectionUsing(LambdaExpression ctor)
+        {
+            var func = ctor.Compile();
+
+            TypeMapActions.Add(tm => tm.ConstructExpression = ctor);
+
+            return ConstructUsing(ctxt => func.DynamicInvoke(ctxt.SourceValue));
+        }
 
         public new IMappingExpression MaxDepth(int depth) 
             => (IMappingExpression)base.MaxDepth(depth);
