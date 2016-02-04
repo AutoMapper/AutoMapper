@@ -439,7 +439,7 @@ namespace AutoMapper
                 {
                     DryRunTypeMap(typeMapsChecked,
                         new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType,
-                            new MappingOperationOptions(), engine));
+                            new MappingOperationOptions(_serviceCtor), engine));
                 }
                 catch (Exception e)
                 {

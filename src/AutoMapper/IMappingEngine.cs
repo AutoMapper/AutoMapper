@@ -110,6 +110,11 @@ namespace AutoMapper
         /// Configuration provider for performaing maps
         /// </summary>
         IConfigurationProvider ConfigurationProvider { get; }
+
+        /// <summary>
+        /// Factory method for creating runtime instances of converters, resolvers etc.
+        /// </summary>
+        Func<Type, object> ServiceCtor { get; }
     }
 
     /// <summary>

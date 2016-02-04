@@ -5,7 +5,6 @@ namespace AutoMapper
     public class Mapper : IMapper
     {
         private readonly IMappingEngine _engine;
-        private readonly Func<Type, object> _serviceCtor;
 
         internal Mapper(IConfigurationProvider configurationProvider)
             : this(configurationProvider, configurationProvider.ServiceCtor)
@@ -15,13 +14,14 @@ namespace AutoMapper
         internal Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
             ConfigurationProvider = configurationProvider;
-            _serviceCtor = serviceCtor;
+            ServiceCtor = serviceCtor;
             _engine = new MappingEngine(configurationProvider, this);
         }
 
+        public Func<Type, object> ServiceCtor { get; }
         public IConfigurationProvider ConfigurationProvider { get; }
 
-        public TDestination Map<TDestination>(object source) => Map<TDestination>(source, DefaultMappingOptions);
+        public TDestination Map<TDestination>(object source) => Map<TDestination>(source, _ => { });
 
         public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
@@ -41,7 +41,7 @@ namespace AutoMapper
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            return (TDestination)Map(source, modelType, destinationType, DefaultMappingOptions);
+            return (TDestination)Map(source, modelType, destinationType, _ => { });
         }
 
         public TDestination Map<TSource, TDestination>(TSource source,
@@ -50,7 +50,7 @@ namespace AutoMapper
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            var options = new MappingOperationOptions<TSource, TDestination>();
+            var options = new MappingOperationOptions<TSource, TDestination>(ServiceCtor);
             opts(options);
 
             return (TDestination)MapCore(source, modelType, destinationType, options);
@@ -58,7 +58,7 @@ namespace AutoMapper
 
         public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
         {
-            return Map(source, destination, DefaultMappingOptions);
+            return Map(source, destination, _ => { });
         }
 
         public TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
@@ -67,7 +67,7 @@ namespace AutoMapper
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            var options = new MappingOperationOptions<TSource, TDestination>();
+            var options = new MappingOperationOptions<TSource, TDestination>(ServiceCtor);
             opts(options);
 
             return (TDestination)MapCore(source, destination, modelType, destinationType, options);
@@ -75,12 +75,12 @@ namespace AutoMapper
 
         public object Map(object source, Type sourceType, Type destinationType)
         {
-            return Map(source, sourceType, destinationType, DefaultMappingOptions);
+            return Map(source, sourceType, destinationType, _ => { });
         }
 
         public object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
-            var options = new MappingOperationOptions();
+            var options = new MappingOperationOptions(ServiceCtor);
 
             opts(options);
 
@@ -89,13 +89,13 @@ namespace AutoMapper
 
         public object Map(object source, object destination, Type sourceType, Type destinationType)
         {
-            return Map(source, destination, sourceType, destinationType, DefaultMappingOptions);
+            return Map(source, destination, sourceType, destinationType, _ => { });
         }
 
         public object Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
-            var options = new MappingOperationOptions();
+            var options = new MappingOperationOptions(ServiceCtor);
 
             opts(options);
 
@@ -121,8 +121,5 @@ namespace AutoMapper
 
             return _engine.Map(context);
         }
-
-        private void DefaultMappingOptions(IMappingOperationOptions opts) => opts.ConstructServicesUsing(_serviceCtor);
-
     }
 }

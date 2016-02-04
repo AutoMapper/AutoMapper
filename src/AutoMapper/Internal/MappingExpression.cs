@@ -216,9 +216,13 @@ namespace AutoMapper.Internal
                 throw new AutoMapperConfigurationException($"Unable to find source member {sourceMember} on type {_sourceType.FullName}");
             if (members.Skip(1).Any())
                 throw new AutoMapperConfigurationException($"Source member {sourceMember} is ambiguous on type {_sourceType.FullName}");
+            var member = members.Single();
 
-            var par = Expression.Parameter(_sourceType);
-            var prop = Expression.Property(par, sourceMember);
+            var par = Expression.Parameter(typeof(TSource));
+            var prop = typeof(TSource) != _sourceType ? (Expression) Expression.Property(Expression.Convert(par, _sourceType), sourceMember) : Expression.Property(par, sourceMember);
+            if (typeof (TMember) != member.GetMemberType())
+                prop = Expression.Convert(prop, typeof(TMember));
+
             var lambda = Expression.Lambda<Func<TSource, TMember>>(prop, par);
 
             _propertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(lambda));
