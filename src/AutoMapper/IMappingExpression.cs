@@ -49,7 +49,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="ctor">Callback to create the destination type given the source object</param>
         /// <returns>Itself</returns>
-        IMappingExpression ConstructProjectionUsing(LambdaExpression ctor);
+        IMappingExpression ConstructProjectionUsing(Expression<Func<object, object>> ctor);
 
         /// <summary>
         /// Supply a custom instantiation function for the destination type, based on the entire resolution context

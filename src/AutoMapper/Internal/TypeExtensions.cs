@@ -10,6 +10,20 @@
 
     internal static class TypeExtensions
     {
+        internal static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type)
+        {
+            return context =>
+            {
+                if (type.IsGenericTypeDefinition())
+                {
+                    type = type.MakeGenericType(context.SourceType.GetTypeInfo().GenericTypeArguments);
+                }
+
+                var obj = context.Options.ServiceCtor.Invoke(type);
+
+                return (TServiceType)obj;
+            };
+        }
 
         public static Type[] GetGenericParameters(this Type type)
         {

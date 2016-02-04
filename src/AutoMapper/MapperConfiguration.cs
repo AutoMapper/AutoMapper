@@ -415,7 +415,6 @@ namespace AutoMapper
 
         private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
         {
-            Seal();
             var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
             var badTypeMaps =
                 (from typeMap in maps

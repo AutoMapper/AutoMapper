@@ -217,7 +217,6 @@ namespace AutoMapper
 
         void IProfileConfiguration.Register(TypeMapRegistry typeMapRegistry)
         {
-            var factory = new TypeMapFactory();
             foreach (var config in _typeMapConfigs)
             {
                 BuildTypeMap(typeMapRegistry, config);
