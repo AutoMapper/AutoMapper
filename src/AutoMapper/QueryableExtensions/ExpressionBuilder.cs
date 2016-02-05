@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.QueryableExtensions
 {
+    using Execution;
+
     public interface IExpressionBuilder
     {
         Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);

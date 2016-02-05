@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using AutoMapper.Internal;
 using Xunit;
 using Should;
 

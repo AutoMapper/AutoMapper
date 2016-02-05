@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace Should.Core.Assertions
-{ 
-    using AutoMapper.Internal;
-
+{
     internal class AssertEqualityComparer<T> : IEqualityComparer<T>
     {
         public bool Equals(T x, T y)

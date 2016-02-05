@@ -6,7 +6,6 @@ using AutoMapper.Mappers;
 namespace AutoMapper
 {
     using Configuration.Conventions;
-    using Internal;
 
     /// <summary>
     /// Contains profile-specific configuration

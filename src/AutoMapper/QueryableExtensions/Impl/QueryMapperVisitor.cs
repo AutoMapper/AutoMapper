@@ -6,7 +6,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
-    using Internal;
+    using Execution;
 
     public class QueryMapperVisitor : ExpressionVisitor
     {

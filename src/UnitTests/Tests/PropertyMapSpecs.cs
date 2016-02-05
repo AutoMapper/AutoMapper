@@ -6,8 +6,6 @@ using Should;
 
 namespace AutoMapper.UnitTests.Tests
 {
-    using Internal;
-
     public abstract class using_generic_configuration : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>

@@ -6,7 +6,7 @@ namespace AutoMapper
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    using Internal;
+    using Configuration;
 
     /// <summary>
     /// Contains cached reflection information for easy retrieval

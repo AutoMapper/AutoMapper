@@ -2,7 +2,7 @@ namespace AutoMapper.Configuration.Conventions
 {
     using System;
     using System.Collections.Generic;
-    using Internal;
+    using Execution;
 
     // Source Destination Mapper
 

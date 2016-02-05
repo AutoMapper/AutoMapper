@@ -5,7 +5,7 @@ namespace AutoMapper.Configuration.Conventions
     using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
-    using Internal;
+    using Execution;
 
     public class NameSplitMember : IChildMemberConfiguration
     {

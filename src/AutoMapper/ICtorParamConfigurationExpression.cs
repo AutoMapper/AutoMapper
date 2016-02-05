@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
-    using Internal;
     using System.Linq;
+    using Execution;
 
     public interface ICtorParamConfigurationExpression<TSource>
     {

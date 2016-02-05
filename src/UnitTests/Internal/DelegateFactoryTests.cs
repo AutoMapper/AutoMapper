@@ -7,9 +7,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    using Internal;
-
-	public class DelegateFactoryTests
+    public class DelegateFactoryTests
 	{
         protected DelegateFactory DelegateFactory => new DelegateFactory();
 
