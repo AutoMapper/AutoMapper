@@ -7,8 +7,8 @@ namespace AutoMapper
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using Configuration.Conventions;
     using Internal;
+    using Configuration.Conventions;
 
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.
@@ -231,11 +231,9 @@ namespace AutoMapper
 
         void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry)
         {
-            foreach (var config in _typeMapConfigs)
+            foreach (var typeMap in _typeMapConfigs.Select(config => typeMapRegistry.GetTypeMap(config.Types)))
             {
-                var typeMap = typeMapRegistry.GetTypeMap(config.Types);
-
-                Configure(typeMapRegistry, config, typeMap);
+                Configure(typeMapRegistry, typeMap);
             }
         }
 
@@ -250,7 +248,7 @@ namespace AutoMapper
 
             config.Configure(this, typeMap);
 
-            Configure(typeMapRegistry, config, typeMap);
+            Configure(typeMapRegistry, typeMap);
 
             return typeMap;
         }
@@ -266,12 +264,12 @@ namespace AutoMapper
 
             openMapConfig.Configure(this, closedMap);
 
-            Configure(typeMapRegistry, openMapConfig, closedMap);
+            Configure(typeMapRegistry, closedMap);
 
             return closedMap;
         }
 
-        private void Configure(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration config, TypeMap typeMap)
+        private void Configure(TypeMapRegistry typeMapRegistry, TypeMap typeMap)
         {
             foreach (var action in _allTypeMapActions)
             {
