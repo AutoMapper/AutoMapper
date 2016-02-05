@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Mappers;
+using AutoMapper.Configuration.Conventions;
 using Should;
 using Xunit;
 
@@ -28,13 +29,15 @@ namespace AutoMapper.UnitTests
         {
             var config = new MapperConfiguration(cfg =>
             {
-                var profile = cfg.CreateProfile("New Profile");
-                profile.AddMemberConfiguration().AddName<PrePostfixName>(
-                        _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
-                            .AddStrings(p => p.Postfixes, "Transfer")
-                            .AddStrings(p => p.DestinationPrefixes, "Trans")
-                            .AddStrings(p => p.Prefixes, "Trans"));
-                profile.AddConditionalObjectMapper().Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
+                cfg.CreateProfile("New Profile", profile =>
+                {
+                    profile.AddMemberConfiguration().AddName<PrePostfixName>(
+                            _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
+                                .AddStrings(p => p.Postfixes, "Transfer")
+                                .AddStrings(p => p.DestinationPrefixes, "Trans")
+                                .AddStrings(p => p.Prefixes, "Trans"));
+                    profile.AddConditionalObjectMapper().Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
+                });
             });
 
             var mapper = config.CreateMapper();

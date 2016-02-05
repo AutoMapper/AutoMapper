@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using AutoMapper.Internal;
 using Xunit;
 using Should;
+using AutoMapper.Configuration.Conventions;
 
 namespace AutoMapper.UnitTests.Tests
 {

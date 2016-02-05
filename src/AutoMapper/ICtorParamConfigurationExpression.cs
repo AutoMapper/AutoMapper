@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using Internal;
+    using System.Linq;
 
     public interface ICtorParamConfigurationExpression<TSource>
     {
@@ -17,11 +18,12 @@
 
     public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>
     {
-        private readonly ConstructorParameterMap _ctorParamMap;
+        private readonly string _ctorParamName;
+        private readonly List<Action<ConstructorParameterMap>> _ctorParamActions = new List<Action<ConstructorParameterMap>>();
 
-        public CtorParamConfigurationExpression(ConstructorParameterMap ctorParamMap)
+        public CtorParamConfigurationExpression(string ctorParamName)
         {
-            _ctorParamMap = ctorParamMap;
+            _ctorParamName = ctorParamName;
         }
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
@@ -30,7 +32,7 @@
 
             visitor.Visit(sourceMember);
 
-            _ctorParamMap.ResolveUsing(visitor.Members);
+            _ctorParamActions.Add(cpm => cpm.ResolveUsing(visitor.Members));
         }
 
         private class MemberInfoFinderVisitor : ExpressionVisitor
@@ -45,6 +47,18 @@
             }
 
             public IEnumerable<IMemberGetter> Members => _members;
+        }
+
+        public void Configure(TypeMap typeMap)
+        {
+            var param = typeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == _ctorParamName);
+
+            param.CanResolve = true;
+
+            foreach (var action in _ctorParamActions)
+            {
+                action(param);
+            }
         }
     }
 }

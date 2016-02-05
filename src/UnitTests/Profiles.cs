@@ -31,9 +31,7 @@ namespace AutoMapper.UnitTests
 	        {
 	            cfg.DisableConstructorMapping();
 
-	            cfg.CreateProfile("Custom");
-
-	            cfg.CreateMap<Model, Dto>().WithProfile("Custom");
+	            cfg.CreateProfile("Custom", p => p.CreateMap<Model, Dto>());
 	        });
 
 			protected override void Because_of()
@@ -41,7 +39,7 @@ namespace AutoMapper.UnitTests
 				_result = Mapper.Map<Model, Dto>(new Model {Value = 5});
 			}
 
-			[Fact(Skip = "Because the stupid config model isn't right")]
+			[Fact]
 			public void Should_not_include_default_profile_configuration_with_profiled_maps()
 			{
 				_result.Value.ShouldEqual("5");
@@ -70,7 +68,7 @@ namespace AutoMapper.UnitTests
 
 			public class CustomProfile1 : Profile
 			{
-				protected override void Configure()
+                public CustomProfile1()
 				{
                     RecognizeDestinationPrefixes("Foo");
 					CreateMap<Model, Dto>();
@@ -79,7 +77,7 @@ namespace AutoMapper.UnitTests
 
 			public class CustomProfile2 : Profile
 			{
-				protected override void Configure()
+				public CustomProfile2()
 				{
                     RecognizeDestinationPrefixes("Foo");
 
@@ -119,7 +117,7 @@ namespace AutoMapper.UnitTests
 
             public class AProfile : Profile
             {
-                protected override void Configure()
+                public AProfile()
                 {
                     DisableConstructorMapping();
                     CreateMap<A, B>();

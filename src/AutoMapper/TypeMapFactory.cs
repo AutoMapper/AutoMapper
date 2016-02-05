@@ -27,7 +27,7 @@ using System.Collections.ObjectModel;
             var sourceTypeInfo = GetTypeInfo(sourceType, options);
             var destTypeInfo = GetTypeInfo(destinationType, options);
 
-            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList, options.ProfileName);
+            var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList, options);
 
             foreach (var destProperty in destTypeInfo.PublicWriteAccessors)
             {

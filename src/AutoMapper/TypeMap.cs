@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -12,57 +13,59 @@ namespace AutoMapper
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
     /// </summary>
-    [DebuggerDisplay("{_sourceType.Type.Name} -> {_destinationType.Type.Name}")]
+    [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
     public class TypeMap
     {
-        private readonly IList<Action<object, object>> _afterMapActions = new List<Action<object, object>>();
-        private readonly IList<Action<object, object>> _beforeMapActions = new List<Action<object, object>>();
-        private readonly TypeDetails _destinationType;
+        private readonly IList<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();
+        private readonly IList<Action<object, object, ResolutionContext>> _beforeMapActions = new List<Action<object, object, ResolutionContext>>();
         private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
-        private readonly ThreadSafeList<PropertyMap> _propertyMaps = new ThreadSafeList<PropertyMap>();
-
-        private readonly ThreadSafeList<SourceMemberConfig> _sourceMemberConfigs =
-            new ThreadSafeList<SourceMemberConfig>();
+        private readonly ISet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
+        private ConcurrentBag<PropertyMap> _propertyMaps = new ConcurrentBag<PropertyMap>();
+        private readonly ConcurrentBag<SourceMemberConfig> _sourceMemberConfigs = new ConcurrentBag<SourceMemberConfig>();
 
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
-        private readonly TypeDetails _sourceType;
         private bool _sealed;
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, string profileName)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, IProfileConfiguration profile)
         {
-            _sourceType = sourceType;
-            _destinationType = destinationType;
+            SourceTypeDetails = sourceType;
+            DestinationTypeDetails = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
-            Profile = profileName;
+            Profile = profile;
             ConfiguredMemberList = memberList;
+            IgnorePropertiesStartingWith = profile.GlobalIgnores;
         }
 
         public TypePair Types { get; }
 
         public ConstructorMap ConstructorMap { get; private set; }
 
-        public Type SourceType => _sourceType.Type;
+        public TypeDetails SourceTypeDetails { get; }
+        public TypeDetails DestinationTypeDetails { get; }
 
-        public Type DestinationType => _destinationType.Type;
 
-        public string Profile { get; set; }
+        public Type SourceType => SourceTypeDetails.Type;
+        public Type DestinationType => DestinationTypeDetails.Type;
+
+        public IProfileConfiguration Profile { get; }
+
         public Func<ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
-        public Action<object, object> BeforeMap => (src, dest) =>
+        public Action<object, object, ResolutionContext> BeforeMap => (src, dest, context) =>
                 {
                     foreach (var action in _beforeMapActions)
-                        action(src, dest);
+                        action(src, dest, context);
                 };
 
-        public Action<object, object> AfterMap => (src, dest) =>
+        public Action<object, object, ResolutionContext> AfterMap => (src, dest, context) =>
                 {
                     foreach (var action in _afterMapActions)
-                        action(src, dest);
+                        action(src, dest, context);
                 };
 
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
@@ -76,6 +79,7 @@ namespace AutoMapper
         public MemberList ConfiguredMemberList { get; }
 
         public IEnumerable<TypePair> IncludedDerivedTypes => _includedDerivedTypes;
+        public IEnumerable<TypePair> IncludedBaseTypes => _includedBaseTypes;
 
         public int MaxDepth
         {
@@ -132,7 +136,7 @@ namespace AutoMapper
 
             if(ConfiguredMemberList == MemberList.Destination)
             {
-                properties = _destinationType.PublicWriteAccessors
+                properties = DestinationTypeDetails.PublicWriteAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties);
@@ -147,7 +151,7 @@ namespace AutoMapper
                     .Where(smc => smc.IsIgnored())
                     .Select(pm => pm.SourceMember.Name).ToList();
 
-                properties = _sourceType.PublicReadAccessors
+                properties = SourceTypeDetails.PublicReadAccessors
                     .Select(p => p.Name)
                     .Except(autoMappedProperties)
                     .Except(inheritedProperties)
@@ -181,6 +185,16 @@ namespace AutoMapper
             _includedDerivedTypes.Add(derivedTypes);
         }
 
+        public void IncludeBaseTypes(Type baseSourceType, Type baseDestinationType)
+        {
+            var baseTypes = new TypePair(baseSourceType, baseDestinationType);
+            if(baseTypes.Equals(Types))
+            {
+                throw new InvalidOperationException("You cannot include a type map into itself.");
+            }
+            _includedBaseTypes.Add(baseTypes);
+        }
+
         public Type GetDerivedTypeFor(Type derivedSourceType)
         {
             // This might need to be fixed for multiple derived source types to different dest types
@@ -202,15 +216,15 @@ namespace AutoMapper
         public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
         {
             CustomMapper = customMapper;
-            _propertyMaps.Clear();
+            _propertyMaps = new ConcurrentBag<PropertyMap>();
         }
 
-        public void AddBeforeMapAction(Action<object, object> beforeMap)
+        public void AddBeforeMapAction(Action<object, object, ResolutionContext> beforeMap)
         {
             _beforeMapActions.Add(beforeMap);
         }
 
-        public void AddAfterMapAction(Action<object, object> afterMap)
+        public void AddAfterMapAction(Action<object, object, ResolutionContext> afterMap)
         {
             _afterMapActions.Add(afterMap);
         }
@@ -242,7 +256,7 @@ namespace AutoMapper
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other._sourceType, _sourceType) && Equals(other._destinationType, _destinationType);
+            return Equals(other.SourceTypeDetails, SourceTypeDetails) && Equals(other.DestinationTypeDetails, DestinationTypeDetails);
         }
 
         public override bool Equals(object obj)
@@ -257,7 +271,7 @@ namespace AutoMapper
         {
             unchecked
             {
-                return (_sourceType.GetHashCode()*397) ^ _destinationType.GetHashCode();
+                return (SourceTypeDetails.GetHashCode()*397) ^ DestinationTypeDetails.GetHashCode();
             }
         }
 
@@ -364,7 +378,7 @@ namespace AutoMapper
         public void UseCustomProjection(LambdaExpression projectionExpression)
         {
             CustomProjection = projectionExpression;
-            _propertyMaps.Clear();
+            _propertyMaps = new ConcurrentBag<PropertyMap>();
         }
 
         public void ApplyInheritedMap(TypeMap inheritedTypeMap)
@@ -426,6 +440,5 @@ namespace AutoMapper
             }
             return Expression.Lambda(newExpression);
         }
-
     }
 }

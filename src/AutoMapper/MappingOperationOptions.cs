@@ -6,6 +6,10 @@ namespace AutoMapper
     public class MappingOperationOptions<TSource, TDestination> : MappingOperationOptions,
         IMappingOperationOptions<TSource, TDestination>
     {
+        public MappingOperationOptions(Func<Type, object> serviceCtor) : base(serviceCtor)
+        {
+        }
+
         public void BeforeMap(Action<TSource, TDestination> beforeFunction)
         {
             BeforeMapAction = (src, dest) => beforeFunction((TSource) src, (TDestination) dest);
@@ -19,11 +23,12 @@ namespace AutoMapper
 
     public class MappingOperationOptions : IMappingOperationOptions
     {
-        public MappingOperationOptions()
+        public MappingOperationOptions(Func<Type, object> serviceCtor)
         {
             Items = new Dictionary<string, object>();
             BeforeMapAction = (src, dest) => { };
             AfterMapAction = (src, dest) => { };
+            ServiceCtor = serviceCtor;
         }
 
         public Func<Type, object> ServiceCtor { get; private set; }
@@ -44,7 +49,8 @@ namespace AutoMapper
 
         void IMappingOperationOptions.ConstructServicesUsing(Func<Type, object> constructor)
         {
-            ServiceCtor = constructor;
+            var ctor = ServiceCtor;
+            ServiceCtor = t => constructor(t) ?? ctor(t);
         }
     }
 }

@@ -2,26 +2,17 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
     public interface IConditionalObjectMapper
     {
-        string ProfileName { get; }
         ICollection<Func<TypePair, bool>> Conventions { get; }
 		bool IsMatch(TypePair context);
     }
 
     public class ConditionalObjectMapper : IConditionalObjectMapper
     {
-        public string ProfileName { get; }
-
-        public ConditionalObjectMapper(string profileName)
-        {
-            ProfileName = profileName;
-        }
-
         public bool IsMatch(TypePair typePair)
         {
             return Conventions.All(c => c(typePair));

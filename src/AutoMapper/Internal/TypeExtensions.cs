@@ -10,6 +10,20 @@
 
     internal static class TypeExtensions
     {
+        internal static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type)
+        {
+            return context =>
+            {
+                if (type.IsGenericTypeDefinition())
+                {
+                    type = type.MakeGenericType(context.SourceType.GetTypeInfo().GenericTypeArguments);
+                }
+
+                var obj = context.Options.ServiceCtor.Invoke(type);
+
+                return (TServiceType)obj;
+            };
+        }
 
         public static Type[] GetGenericParameters(this Type type)
         {
@@ -123,6 +137,12 @@
         {
             return (propertyInfo?.GetGetMethod(true)?.IsPublic ?? false)
                 || (propertyInfo?.GetSetMethod(true)?.IsPublic ?? false);
+        }
+
+        public static bool HasAnInaccessibleSetter(this PropertyInfo property)
+        {
+            var setMethod = property.GetSetMethod(true);
+            return setMethod == null || setMethod.IsPrivate || setMethod.IsFamily;
         }
 
         public static bool IsPublic(this MemberInfo memberInfo)

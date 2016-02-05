@@ -71,13 +71,6 @@ namespace AutoMapper
         TypeMap ResolveTypeMap(ResolutionResult resolutionResult, Type destinationType);
 
         /// <summary>
-        /// Get named profile configuration
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <returns></returns>
-        IProfileConfiguration GetProfileConfiguration(string profileName);
-
-        /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
         /// </summary>
         void AssertConfigurationIsValid();

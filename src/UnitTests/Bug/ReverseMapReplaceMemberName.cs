@@ -66,7 +66,7 @@ namespace AutoMapper.UnitTests.Bug
 
         class MyProfile : Profile
         {
-            protected override void Configure()
+            public MyProfile()
             {
                 ReplaceMemberName("Account", "User");
                 ReplaceMemberName("User", "Account");
