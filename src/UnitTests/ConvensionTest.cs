@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Mappers;
+using AutoMapper.Configuration.Conventions;
 using Should;
 using Xunit;
 

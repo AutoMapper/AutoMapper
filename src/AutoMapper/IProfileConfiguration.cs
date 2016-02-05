@@ -5,6 +5,7 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
+    using Configuration.Conventions;
     using Internal;
 
     /// <summary>
@@ -17,8 +18,8 @@ namespace AutoMapper
         bool ConstructorMappingEnabled { get; }
         bool AllowNullDestinationValues { get; }
         bool AllowNullCollections { get; }
-        INamingConvention SourceMemberNamingConvention { get; }
-        INamingConvention DestinationMemberNamingConvention { get; }
+        //INamingConvention SourceMemberNamingConvention { get; }
+        //INamingConvention DestinationMemberNamingConvention { get; }
         bool CreateMissingTypeMaps { get; }
 
         IMemberConfiguration DefaultMemberConfig { get; }

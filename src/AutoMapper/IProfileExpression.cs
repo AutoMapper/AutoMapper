@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Reflection;
+    using Configuration.Conventions;
     using Mappers;
 
     /// <summary>

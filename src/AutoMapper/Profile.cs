@@ -7,6 +7,7 @@ namespace AutoMapper
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using Configuration.Conventions;
     using Internal;
 
     /// <summary>

@@ -38,6 +38,11 @@ namespace AutoMapper
         /// <param name="constructor">Factory method</param>
         void ConstructServicesUsing(Func<Type, object> constructor);
 
+        /// <summary>
+        /// Create a named profile with the supplied configuration
+        /// </summary>
+        /// <param name="profileName">Profile name, must be unique</param>
+        /// <param name="config">Profile configuration</param>
         void CreateProfile(string profileName, Action<Profile> config);
     }
 }

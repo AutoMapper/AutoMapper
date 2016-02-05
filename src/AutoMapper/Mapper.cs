@@ -6,12 +6,12 @@ namespace AutoMapper
     {
         private readonly IMappingEngine _engine;
 
-        internal Mapper(IConfigurationProvider configurationProvider)
+        public Mapper(IConfigurationProvider configurationProvider)
             : this(configurationProvider, configurationProvider.ServiceCtor)
         {
         }
 
-        internal Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
+        public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
             ConfigurationProvider = configurationProvider;
             ServiceCtor = serviceCtor;
