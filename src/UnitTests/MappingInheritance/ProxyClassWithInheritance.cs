@@ -14,7 +14,7 @@
         [Fact]
         public void Should_map_correctly()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Animal, AnimalDto>()
                     .Include<Duck, DuckDto>();
@@ -24,7 +24,8 @@
 
             var aDuck = new DuckProxyClassFoo();
 
-            var dto = Mapper.Map<Animal, AnimalDto>(aDuck);
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<Animal, AnimalDto>(aDuck);
 
             dto.ShouldBeType<DuckDto>();
         }

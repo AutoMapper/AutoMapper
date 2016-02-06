@@ -59,13 +59,13 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void CustomValueResolver_Should_Be_Supplied_With_Current_PropertyMap()
         {
-            Mapper.CreateMap<Source, DestinationDto>()
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, DestinationDto>()
               .ForMember(x => x.CodeValue1, o => o.ResolveUsing<CodeValueDtoResolver>().FromMember(y => y.CodeValue1))
-              .ForMember(x => x.CodeValue2, o => o.ResolveUsing<CodeValueDtoResolver>().FromMember(y => y.CodeValue2));
+              .ForMember(x => x.CodeValue2, o => o.ResolveUsing<CodeValueDtoResolver>().FromMember(y => y.CodeValue2)));
 
             var src = new Source { CodeValue1 = "Value1", CodeValue2 = "Value1" };
 
-            var dest = Mapper.Map<Source, DestinationDto>(src);
+            var dest = config.CreateMapper().Map<Source, DestinationDto>(src);
 
             dest.CodeValue1.Title.ShouldEqual("lookup value for Value1==1");
             dest.CodeValue2.Title.ShouldEqual("lookup value for Value2==1");

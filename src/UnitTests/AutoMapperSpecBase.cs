@@ -24,22 +24,7 @@ namespace AutoMapper.UnitTests
         protected abstract MapperConfiguration Configuration { get; }
         protected IConfigurationProvider ConfigProvider => Configuration;
 
-        protected IMapper Mapper
-        {
-            get
-            {
-                if(mapper == null)
-                {
-                    mapper = Configuration.CreateMapper();
-                }
-                return mapper;
-            }
-        }
-
-        protected override void Cleanup()
-        {
-            AutoMapper.Mapper.Reset();
-        }
+        protected IMapper Mapper => mapper ?? (mapper = Configuration.CreateMapper());
     }
 
     public abstract class SpecBaseBase

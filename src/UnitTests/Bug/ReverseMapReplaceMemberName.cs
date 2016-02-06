@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.Bug
             public string UserId { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.ReplaceMemberName("Account", "User");
             cfg.ReplaceMemberName("User", "Account");
@@ -66,7 +66,7 @@ namespace AutoMapper.UnitTests.Bug
 
         class MyProfile : Profile
         {
-            protected override void Configure()
+            public MyProfile()
             {
                 ReplaceMemberName("Account", "User");
                 ReplaceMemberName("User", "Account");
@@ -74,7 +74,7 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<MyProfile>();
         });

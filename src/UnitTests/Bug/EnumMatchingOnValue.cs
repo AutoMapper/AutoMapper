@@ -29,7 +29,7 @@ namespace AutoMapper.UnitTests.Bug
             SecondNameEnum = 2
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<FirstClass, SecondClass>();
         });

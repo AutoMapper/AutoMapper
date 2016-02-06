@@ -12,7 +12,7 @@
                 MapperRegistry.Mappers.Insert(0, new TestObjectMapper());
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ClassA, ClassB>()
                     .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));

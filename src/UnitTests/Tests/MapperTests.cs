@@ -18,9 +18,9 @@ namespace AutoMapper.UnitTests.Tests
 		[Fact]
 		public void Should_find_configured_type_map_when_two_types_are_configured()
 		{
-			Mapper.CreateMap<Source, Destination>();
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
 
-			Mapper.FindTypeMapFor<Source, Destination>().ShouldNotBeNull();
+			config.FindTypeMapFor<Source, Destination>().ShouldNotBeNull();
 		}
 	}
 }

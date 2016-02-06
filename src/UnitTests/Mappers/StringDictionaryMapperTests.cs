@@ -10,9 +10,11 @@ namespace AutoMapper.UnitTests.Mappers
         public string Bar { get; set; }
     }
 
-    public class When_mapping_to_StringDictionary : SpecBase
+    public class When_mapping_to_StringDictionary : NonValidatingSpecBase
     {
         StringDictionary _destination;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -27,9 +29,11 @@ namespace AutoMapper.UnitTests.Mappers
         }
     }
 
-    public class When_mapping_from_StringDictionary : SpecBase
+    public class When_mapping_from_StringDictionary : NonValidatingSpecBase
     {
         Destination _destination;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -45,9 +49,11 @@ namespace AutoMapper.UnitTests.Mappers
         }
     }
 
-    public class When_mapping_from_StringDictionary_with_missing_property : SpecBase
+    public class When_mapping_from_StringDictionary_with_missing_property : NonValidatingSpecBase
     {
         Destination _destination;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -63,9 +69,11 @@ namespace AutoMapper.UnitTests.Mappers
         }
     }
 
-    public class When_mapping_from_StringDictionary_to_StringDictionary: SpecBase
+    public class When_mapping_from_StringDictionary_to_StringDictionary: NonValidatingSpecBase
     {
         StringDictionary _destination;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {

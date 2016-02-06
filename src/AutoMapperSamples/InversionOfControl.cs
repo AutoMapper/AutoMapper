@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using AutoMapper;
-using AutoMapper.Mappers;
 using NUnit.Framework;
 using StructureMap;
 using StructureMap.Attributes;

@@ -5,6 +5,9 @@ using AutoMapper.Mappers;
 
 namespace AutoMapper
 {
+    using Configuration.Conventions;
+    using Internal;
+
     /// <summary>
     /// Contains profile-specific configuration
     /// </summary>
@@ -15,8 +18,8 @@ namespace AutoMapper
         bool ConstructorMappingEnabled { get; }
         bool AllowNullDestinationValues { get; }
         bool AllowNullCollections { get; }
-        INamingConvention SourceMemberNamingConvention { get; }
-        INamingConvention DestinationMemberNamingConvention { get; }
+        //INamingConvention SourceMemberNamingConvention { get; }
+        //INamingConvention DestinationMemberNamingConvention { get; }
         bool CreateMissingTypeMaps { get; }
 
         IMemberConfiguration DefaultMemberConfig { get; }
@@ -39,5 +42,10 @@ namespace AutoMapper
 
         string ProfileName { get; }
         IEnumerable<string> GlobalIgnores { get; }
+
+        void Register(TypeMapRegistry typeMapRegistry);
+        void Configure(TypeMapRegistry typeMapRegistry);
+        TypeMap ConfigureConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair conventionTypes);
+        TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair openTypes);
 	}
 }

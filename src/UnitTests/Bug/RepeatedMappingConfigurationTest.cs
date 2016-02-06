@@ -27,15 +27,18 @@ namespace AutoMapper.UnitTests.Bug
 		[Fact]
 		public void should_not_throw_duplicated_key_exception()
 		{
-			Mapper.CreateMap<ModelSubObject, DtoObject>()
-				.Include<ModelSubObject, DtoSubObject>();
+		    new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<ModelSubObject, DtoObject>()
+		            .Include<ModelSubObject, DtoSubObject>();
 
-			Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+		        cfg.CreateMap<ModelSubObject, DtoSubObject>();
 
-			Mapper.CreateMap<ModelSubObject, DtoObject>()
-				.Include<ModelSubObject, DtoSubObject>();
+		        cfg.CreateMap<ModelSubObject, DtoObject>()
+		            .Include<ModelSubObject, DtoSubObject>();
 
-			Mapper.CreateMap<ModelSubObject, DtoSubObject>();
+		        cfg.CreateMap<ModelSubObject, DtoSubObject>();
+		    });
 		}
 	}
 }

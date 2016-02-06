@@ -25,7 +25,7 @@ namespace AutoMapper.UnitTests
                 public IEnumerable<int> IntCollection { get; set; } = new[] { 1, 2, 3, 4, 5 };
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>();
             });
@@ -58,7 +58,7 @@ namespace AutoMapper.UnitTests
 				public IEnumerable Values2 { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 		    });
@@ -105,7 +105,7 @@ namespace AutoMapper.UnitTests
 				public IEnumerable<string> Values2 { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 		    });
@@ -152,7 +152,7 @@ namespace AutoMapper.UnitTests
 				public ICollection Values2 { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 		    });
@@ -197,7 +197,7 @@ namespace AutoMapper.UnitTests
 				public ICollection<string> Values { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 		    });
@@ -232,7 +232,7 @@ namespace AutoMapper.UnitTests
 				public IList Values { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 		    });
@@ -267,7 +267,7 @@ namespace AutoMapper.UnitTests
 				public IList<string> Values { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 		    });
@@ -307,7 +307,7 @@ namespace AutoMapper.UnitTests
 				public ValueCollection Values { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 		    });
@@ -325,7 +325,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_mapping_to_a_custom_collection_with_the_same_type_not_implementing_IList : SpecBase
+		public class When_mapping_to_a_custom_collection_with_the_same_type_not_implementing_IList : AutoMapperSpecBase
 		{
 			private Source _source;
 
@@ -361,13 +361,17 @@ namespace AutoMapper.UnitTests
 				public ValueCollection Values { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-				_source = new Source { Values = new ValueCollection(new[] { 1, 2, 3, 4 }) };
-			}
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		    });
 
-			protected override void Because_of()
+		    protected override void Establish_context()
+		    {
+                _source = new Source { Values = new ValueCollection(new[] { 1, 2, 3, 4 }) };
+            }
+
+            protected override void Because_of()
 			{
 				_destination = Mapper.Map<Source, Destination>(_source);
 			}
@@ -415,7 +419,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>()
 		            .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
@@ -437,7 +441,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_mapping_to_an_existing_list_with_existing_items : SpecBase
+		public class When_mapping_to_an_existing_list_with_existing_items : AutoMapperSpecBase
 		{
 			private Destination _destination;
 			private Source _source;
@@ -467,12 +471,12 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
-				Mapper.CreateMap<SourceItem, DestItem>();
-			}
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>()
+		            .ForMember(dest => dest.Values, opt => opt.UseDestinationValue());
+		        cfg.CreateMap<SourceItem, DestItem>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -493,16 +497,12 @@ namespace AutoMapper.UnitTests
 		{
 			const string FirstString = null;
 
-			private IEnumerable<string> _strings;
-			private List<string> _mappedStrings;
+			private IEnumerable<string> _strings = new List<string> { FirstString };
+			private List<string> _mappedStrings = new List<string>();
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.AllowNullDestinationValues = true;
-
-		        _strings = new List<string> {FirstString};
-
-		        _mappedStrings = new List<string>();
 		    });
 
 			protected override void Because_of()
@@ -516,62 +516,6 @@ namespace AutoMapper.UnitTests
 				_mappedStrings.ShouldNotBeNull();
 				_mappedStrings.Count.ShouldEqual(1);
 				_mappedStrings[0].ShouldBeNull();
-			}
-		}
-
-		public class When_destination_collection_is_only_a_list_source_and_not_IList : SpecBase
-		{
-			private Destination _destination;
-
-			public class CustomCollection : IListSource, IEnumerable<int>
-			{
-				private List<int> _customList = new List<int>();
-
-				public IList GetList()
-				{
-					return _customList;
-				}
-
-				public bool ContainsListCollection
-				{
-					get { return true; }
-				}
-
-				IEnumerator<int> IEnumerable<int>.GetEnumerator()
-				{
-					return _customList.GetEnumerator();
-				}
-
-				public IEnumerator GetEnumerator()
-				{
-					return _customList.GetEnumerator();
-				}
-			}
-
-			public class Source
-			{
-				public int[] Values { get; set; }
-			}
-
-			public class Destination
-			{
-				public CustomCollection Values { get; set; }
-			}
-
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-			}
-
-			protected override void Because_of()
-			{
-				_destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3 } });
-			}
-
-            [Fact(Skip = "No IListSource in .NET Standard")]
-            public void Should_use_the_underlying_list_to_add_values()
-			{
-				_destination.Values.Count().ShouldEqual(3);
 			}
 		}
 	}

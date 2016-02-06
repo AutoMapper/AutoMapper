@@ -13,14 +13,10 @@ namespace AutoMapper.UnitTests
         public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship : AutoMapperSpecBase
         {
             private ParentDto _dto;
-            private int _beforeMapCount = 0;
-            private int _afterMapCount = 0;
 
             protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<ParentModel, ParentDto>()
-                    .BeforeMap((src, dest) => _beforeMapCount++)
-                    .AfterMap((src, dest) => _afterMapCount++);
+                cfg.CreateMap<ParentModel, ParentDto>();
                 cfg.CreateMap<ChildModel, ChildDto>();
             });
 
@@ -40,13 +36,6 @@ namespace AutoMapper.UnitTests
             {
                 _dto.Children[0].Parent.ShouldBeSameAs(_dto);
                 _dto.Children[1].Parent.ShouldBeSameAs(_dto);
-            }
-
-            [Fact]
-            public void Before_and_After_for_the_parent_should_be_called_once()
-            {
-                _beforeMapCount.ShouldEqual(1);
-                _afterMapCount.ShouldEqual(1);
             }
 
             public class ParentModel
@@ -117,7 +106,7 @@ namespace AutoMapper.UnitTests
         //            .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
         //        Mapper.CreateMap<ChildModel, ChildDto>();
 
-        //        Mapper.AssertConfigurationIsValid();
+        //        config.AssertConfigurationIsValid();
         //    }
 
         //    protected override void Because_of()
@@ -192,9 +181,9 @@ namespace AutoMapper.UnitTests
 		public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_many_child_relationship_using_CustomMapper_with_context : AutoMapperSpecBase
 		{
 			private ParentDto _dto;
-			private ParentModel _parent;
+			private static ParentModel _parent;
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        _parent = new ParentModel
 		        {
@@ -299,7 +288,7 @@ namespace AutoMapper.UnitTests
 		{
 			private FooDto _dto;
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Foo, FooDto>();
 		        cfg.CreateMap<Bar, BarDto>();
@@ -351,7 +340,7 @@ namespace AutoMapper.UnitTests
 		{
 			private FooContainerModel _dto;
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<FooModel, FooScreenModel>();
 		        cfg.CreateMap<FooModel, FooInputModel>();
@@ -403,7 +392,7 @@ namespace AutoMapper.UnitTests
 	    {
 	        private ParentDto _dtoParent;
 
-	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
 	            cfg.CreateMap<Parent, ParentDto>();
 	            cfg.CreateMap<Child, ChildDto>();
@@ -588,8 +577,9 @@ namespace AutoMapper.UnitTests
                     }
                 };
 
-                Mapper.CreateMap<Tag, Tag>().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags));
-                var result = Mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DisableCache = true);
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Tag, Tag>().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags)));
+	            var mapper = config.CreateMapper();
+	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DisableCache = true);
 
                 result[1].ChildTags.Count().ShouldEqual(0);
                 result[2].ChildTags.Count().ShouldEqual(1);

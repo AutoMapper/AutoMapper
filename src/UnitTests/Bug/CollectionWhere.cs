@@ -25,7 +25,7 @@ namespace AutoMapper.UnitTests.Bug
             public IEnumerable<int> ListProperty { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
         });

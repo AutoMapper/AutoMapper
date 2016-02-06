@@ -10,7 +10,7 @@ namespace AutoMapper.UnitTests.Tests
 
     public abstract class using_generic_configuration : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>()
                 .ForMember(d => d.Ignored, o => o.Ignore())
@@ -266,7 +266,7 @@ namespace AutoMapper.UnitTests.Tests
 
     public abstract class using_nongeneric_configuration : AutoMapperSpecBase
     {
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap(typeof (Source), typeof (Destination))
                 .ForMember("RenamedProperty", o => o.MapFrom("NamedProperty"));

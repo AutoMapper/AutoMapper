@@ -25,13 +25,13 @@ namespace AutoMapper.UnitTests.Projection
             [Fact]
             public void Should_map_from_String()
             {
-                Mapper.CreateMap<UserModel, UserDto>()
-                                .ForMember(dto => dto.FullName, opt => opt.MapFrom<string>("FirstName"));
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<UserModel, UserDto>()
+                                .ForMember(dto => dto.FullName, opt => opt.MapFrom<string>("FirstName")));
 
                 var um = new UserModel();
                 um.FirstName = "Hallo";
                 var u = new UserDto();
-                Mapper.Map(um, u);
+                config.CreateMapper().Map(um, u);
 
                 u.FullName.ShouldEqual(um.FirstName);
             }

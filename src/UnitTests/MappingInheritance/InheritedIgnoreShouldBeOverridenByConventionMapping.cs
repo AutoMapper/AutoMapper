@@ -23,25 +23,31 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void inhertited_ignore_should_be_pass_validation()
         {
-            Mapper.CreateMap<BaseDomain, Dto>()
-                .ForMember(d => d.SpecificProperty, m => m.Ignore())
-                .Include<SpecificDomain, Dto>();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<BaseDomain, Dto>()
+                    .ForMember(d => d.SpecificProperty, m => m.Ignore())
+                    .Include<SpecificDomain, Dto>();
 
-            Mapper.CreateMap<SpecificDomain, Dto>();
+                cfg.CreateMap<SpecificDomain, Dto>();
+            });
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
 
         [Fact]
         public void inhertited_ignore_should_be_overridden_by_successful_convention_mapping()
         {
-            Mapper.CreateMap<BaseDomain, Dto>()
-                .ForMember(d=>d.SpecificProperty, m=>m.Ignore())
-                .Include<SpecificDomain, Dto>();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<BaseDomain, Dto>()
+                    .ForMember(d => d.SpecificProperty, m => m.Ignore())
+                    .Include<SpecificDomain, Dto>();
 
-            Mapper.CreateMap<SpecificDomain, Dto>();
+                cfg.CreateMap<SpecificDomain, Dto>();
+            });
 
-            var dto = Mapper.Map<BaseDomain, Dto>(new SpecificDomain {SpecificProperty = "Test"});
+            var dto = config.CreateMapper().Map<BaseDomain, Dto>(new SpecificDomain {SpecificProperty = "Test"});
 
             dto.SpecificProperty.ShouldEqual("Test");
         }
@@ -49,13 +55,16 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void inhertited_ignore_should_be_overridden_by_successful_convention_mapping_with_one_parameter()
         {
-            Mapper.CreateMap<BaseDomain, Dto>()
-                .ForMember(d => d.SpecificProperty, m => m.Ignore())
-                .Include<SpecificDomain, Dto>();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<BaseDomain, Dto>()
+                    .ForMember(d => d.SpecificProperty, m => m.Ignore())
+                    .Include<SpecificDomain, Dto>();
 
-            Mapper.CreateMap<SpecificDomain, Dto>();
+                cfg.CreateMap<SpecificDomain, Dto>();
+            });
 
-            var dto = Mapper.Map<Dto>(new SpecificDomain { SpecificProperty = "Test" });
+            var dto = config.CreateMapper().Map<Dto>(new SpecificDomain { SpecificProperty = "Test" });
 
             dto.SpecificProperty.ShouldEqual("Test");
         }

@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Reflection;
+    using Configuration.Conventions;
     using Mappers;
 
     /// <summary>
@@ -120,11 +121,6 @@ namespace AutoMapper
         /// Naming convention for destination members
         /// </summary>
         INamingConvention DestinationMemberNamingConvention { get; set; }
-
-        /// <summary>
-        /// Create missing type maps during mapping, if necessary
-        /// </summary>
-        bool CreateMissingTypeMaps { get; set; }
 
         /// <summary>
         /// Specify common configuration for all type maps.

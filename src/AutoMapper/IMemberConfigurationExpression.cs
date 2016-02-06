@@ -78,6 +78,12 @@ namespace AutoMapper
         void MapFrom<TMember>(string property);
 
         /// <summary>
+        /// Map from a specific source member
+        /// </summary>
+        /// <param name="sourceMember">Source member to map from</param>
+        void MapFrom(string sourceMember);
+
+        /// <summary>
         /// Ignore this member for configuration validation and skip during mapping
         /// </summary>
         void Ignore();
@@ -146,10 +152,5 @@ namespace AutoMapper
     /// </summary>
     public interface IMemberConfigurationExpression : IMemberConfigurationExpression<object>
     {
-        /// <summary>
-        /// Map from a specific source member
-        /// </summary>
-        /// <param name="sourceMember">Source member to map from</param>
-        void MapFrom(string sourceMember);
     }
 }

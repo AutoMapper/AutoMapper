@@ -28,7 +28,7 @@
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt =>
@@ -72,7 +72,7 @@
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(d => d.Value, opt =>
                     {
@@ -125,7 +125,7 @@
                 public int BasePrice { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(itemDTO => itemDTO.BasePrice,
                         config =>
@@ -172,7 +172,7 @@
 
         public class ConditionTests : AutoMapperSpecBase
         {
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.Value, opt => opt.Condition(rc => rc.DestinationValue == null));
@@ -222,7 +222,7 @@
 
         public class ConditionTests : NonValidatingSpecBase
         {
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.Value, opt => opt.PreCondition((ResolutionContext rc) => false));

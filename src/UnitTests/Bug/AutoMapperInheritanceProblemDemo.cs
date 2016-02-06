@@ -3,24 +3,17 @@ using Should;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class SettersInBaseClasses
+    public class SettersInBaseClasses : AutoMapperSpecBase
     {
-        public SettersInBaseClasses()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            SetUp();
-        }
-
-        public void SetUp(){
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Source, GrandGrandChild>();
-                cfg.CreateMap<Source, GrandChild>();
-                cfg.CreateMap<Source, Child>();
-                cfg.CreateMap<Source, GrandGrandChildPrivate>();
-                cfg.CreateMap<Source, GrandChildPrivate>();
-                cfg.CreateMap<Source, ChildPrivate>();
-            });
-        }
+            cfg.CreateMap<Source, GrandGrandChild>();
+            cfg.CreateMap<Source, GrandChild>();
+            cfg.CreateMap<Source, Child>();
+            cfg.CreateMap<Source, GrandGrandChildPrivate>();
+            cfg.CreateMap<Source, GrandChildPrivate>();
+            cfg.CreateMap<Source, ChildPrivate>();
+        });
 
         [Fact]
         public void PublicSetterInParentWorks()
@@ -48,12 +41,6 @@ namespace AutoMapper.UnitTests.Bug
             var target = Mapper.Map<Source, GrandGrandChild>(source);
             target.ParentProperty.ShouldEqual(source.ParentProperty);
             target.ChildProperty.ShouldEqual(source.ChildProperty);
-        }
-
-        [Fact]
-        public void HasValidConfiguration()
-        {
-            Mapper.AssertConfigurationIsValid();
         }
 
         [Fact]

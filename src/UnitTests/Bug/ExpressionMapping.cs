@@ -94,7 +94,7 @@ namespace AutoMapper.UnitTests.Bug
         private Expression<Func<ParentDTO, bool>> _predicateExpression;
         private Parent _valid;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<GrandParent, GrandParentDTO>().ReverseMap();
             cfg.CreateMap<Parent, ParentDTO>().ReverseMap();
@@ -260,14 +260,14 @@ namespace AutoMapper.UnitTests.Bug
             _valid = new Parent { DateTime = DateTime.Now };
         }
 
-        [Fact(Skip = "Failing test")]
+        [Fact]
         public void When_Using_Non_TypeMapped_Class_Property_Against_Constant()
         {
             _predicateExpression = p => p.DateTime.Year.ToString() == "2015";
             _valid = new Parent { DateTime = new DateTime(2015, 1, 1) };
         }
 
-        [Fact(Skip = "Failing test")]
+        [Fact]
         public void When_Using_Non_TypeMapped_Class_Method_Against_Constant()
         {
             _predicateExpression = p => p.DateTime.Year.ToString().Equals("2015");
