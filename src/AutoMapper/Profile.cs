@@ -160,14 +160,9 @@ namespace AutoMapper
         }
 
         public void RecognizeDestinationPostfixes(params string[] postfixes)
-        {
-            DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
-        }
+            => DefaultMemberConfig.AddName<PrePostfixName>(_ => _.AddStrings(p => p.DestinationPostfixes, postfixes));
 
-        public void AddGlobalIgnore(string propertyNameStartingWith)
-        {
-            _globalIgnore.Add(propertyNameStartingWith);
-        }
+        public void AddGlobalIgnore(string propertyNameStartingWith) => _globalIgnore.Add(propertyNameStartingWith);
         
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
