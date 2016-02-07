@@ -36,7 +36,8 @@ namespace AutoMapper.Configuration.Conventions
                 {
                     resolvers.AddLast(matchingMemberInfo.ToMemberGetter());
 
-                    var foundMatch = parent.MapDestinationPropertyToSource(options, TypeMapFactory.GetTypeInfo(matchingMemberInfo.GetMemberType(), options), destType, snippet.Second, resolvers);
+                    var details = new TypeDetails(matchingMemberInfo.GetMemberType(), options);
+                    var foundMatch = parent.MapDestinationPropertyToSource(options, details, destType, snippet.Second, resolvers);
 
                     if (!foundMatch)
                         resolvers.RemoveLast();

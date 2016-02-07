@@ -5,6 +5,8 @@ using System.Reflection;
 
 namespace Should.Core.Assertions
 {
+    using AutoMapper;
+
     internal class AssertEqualityComparer<T> : IEqualityComparer<T>
     {
         public bool Equals(T x, T y)

@@ -11,8 +11,8 @@ namespace AutoMapper
     {
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IProfileConfiguration options, MemberList memberList)
         {
-            var sourceTypeInfo = new TypeDetails(sourceType, options.ShouldMapProperty, options.ShouldMapField, options.SourceExtensionMethods);
-            var destTypeInfo = new TypeDetails(destinationType, options.ShouldMapProperty, options.ShouldMapField, options.SourceExtensionMethods);
+            var sourceTypeInfo = new TypeDetails(sourceType, options);
+            var destTypeInfo = new TypeDetails(destinationType, options);
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList, options);
 

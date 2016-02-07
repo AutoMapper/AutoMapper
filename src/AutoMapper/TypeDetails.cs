@@ -23,6 +23,10 @@ namespace AutoMapper
             : this(type, shouldMapProperty, shouldMapField, new MethodInfo[0])
         {
         }
+        public TypeDetails(Type type, IProfileConfiguration config)
+            : this(type, config.ShouldMapProperty, config.ShouldMapField, config.SourceExtensionMethods)
+        {
+        }
 
         public TypeDetails(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {

@@ -5,7 +5,9 @@ using Should;
 
 namespace AutoMapper.UnitTests
 {
-	public class PrimitiveExtensionsTester
+    using Configuration;
+
+    public class PrimitiveExtensionsTester
 	{
 		[Fact]
 		public void Should_not_flag_only_enumerable_type_as_writeable_collection()
