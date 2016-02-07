@@ -3,7 +3,8 @@ namespace AutoMapper
     using System;
     using System.Linq;
     using System.Collections.Concurrent;
-    using Internal;
+    using Configuration;
+    using Execution;
     using Mappers;
 
     public class MappingEngine : IMappingEngine

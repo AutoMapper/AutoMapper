@@ -6,7 +6,7 @@ namespace AutoMapper
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
-    using Internal;
+    using Configuration;
 
     /// <summary>
     /// Contains cached reflection information for easy retrieval
@@ -21,6 +21,10 @@ namespace AutoMapper
         }
         public TypeDetails(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField)
             : this(type, shouldMapProperty, shouldMapField, new MethodInfo[0])
+        {
+        }
+        public TypeDetails(Type type, IProfileConfiguration config)
+            : this(type, config.ShouldMapProperty, config.ShouldMapField, config.SourceExtensionMethods)
         {
         }
 

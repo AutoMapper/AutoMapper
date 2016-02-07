@@ -1,6 +1,6 @@
 namespace AutoMapper.Mappers
 {
-    using Internal;
+    using Configuration;
 
     public class NullableMapper : IObjectMapper
     {

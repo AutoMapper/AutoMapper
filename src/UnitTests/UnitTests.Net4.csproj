@@ -79,7 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\AutoMapper\Internal\TypeExtensions.cs">
+    <Compile Include="..\AutoMapper\TypeExtensions.cs">
       <Link>TypeExtensions.cs</Link>
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
@@ -209,6 +209,7 @@
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\GenericsAndInterfaces.cs" />
     <Compile Include="MappingInheritance\IncludeBaseBug.cs" />
     <Compile Include="MappingInheritance\IncludedBaseMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />

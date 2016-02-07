@@ -5,7 +5,7 @@ namespace AutoMapper.Configuration.Conventions
     using System.Linq;
     using System.Reflection;
     using System.Text.RegularExpressions;
-    using Internal;
+    using Execution;
 
     public class NameSplitMember : IChildMemberConfiguration
     {
@@ -36,7 +36,8 @@ namespace AutoMapper.Configuration.Conventions
                 {
                     resolvers.AddLast(matchingMemberInfo.ToMemberGetter());
 
-                    var foundMatch = parent.MapDestinationPropertyToSource(options, TypeMapFactory.GetTypeInfo(matchingMemberInfo.GetMemberType(), options), destType, destMemberType, snippet.Second, resolvers);
+                    var details = new TypeDetails(matchingMemberInfo.GetMemberType(), options);
+                    var foundMatch = parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, snippet.Second, resolvers);
 
                     if (!foundMatch)
                         resolvers.RemoveLast();

@@ -6,7 +6,8 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Internal;
+    using Configuration;
+    using Execution;
 
     public class ExpressionMapper : IObjectMapper
     {

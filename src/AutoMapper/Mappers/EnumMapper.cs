@@ -3,9 +3,9 @@ using System.ComponentModel;
 namespace AutoMapper.Mappers
 {
     using System;
-    using Internal;
     using System.Reflection;
     using System.Linq;
+    using Configuration;
 
     public class EnumMapper : IObjectMapper
     {
