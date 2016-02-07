@@ -1,31 +1,18 @@
-using System.Collections.Concurrent;
 
 namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
-using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
-    using System.Text.RegularExpressions;
-    using Internal;
+    using Execution;
 
-    public class TypeMapFactory : ITypeMapFactory
+    public class TypeMapFactory
     {
-        private static readonly ConcurrentDictionary<Type, TypeDetails> _typeInfos
-            = new ConcurrentDictionary<Type, TypeDetails>();
-
-        public static TypeDetails GetTypeInfo(Type type, IProfileConfiguration profileConfiguration)
-        {
-            TypeDetails typeInfo = _typeInfos.GetOrAdd(type, t => new TypeDetails(type, profileConfiguration.ShouldMapProperty, profileConfiguration.ShouldMapField, profileConfiguration.SourceExtensionMethods));
-
-            return typeInfo;
-        }
-
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IProfileConfiguration options, MemberList memberList)
         {
-            var sourceTypeInfo = GetTypeInfo(sourceType, options);
-            var destTypeInfo = GetTypeInfo(destinationType, options);
+            var sourceTypeInfo = new TypeDetails(sourceType, options);
+            var destTypeInfo = new TypeDetails(destinationType, options);
 
             var typeMap = new TypeMap(sourceTypeInfo, destTypeInfo, memberList, options);
 
@@ -84,89 +71,6 @@ using System.Collections.ObjectModel;
             typeMap.AddConstructorMap(destCtor, parameters);
 
             return true;
-        }
-
-        public TypeDetails GetTypeInfo(Type type, IMappingOptions mappingOptions)
-        {
-            return GetTypeInfo(type, mappingOptions.ShouldMapProperty, mappingOptions.ShouldMapField, mappingOptions.SourceExtensionMethods);
-        }
-
-        private TypeDetails GetTypeInfo(Type type, Func<PropertyInfo, bool> shouldMapProperty, Func<FieldInfo, bool> shouldMapField, IEnumerable<MethodInfo> extensionMethodsToSearch)
-        {
-            return _typeInfos.GetOrAdd(type, t => new TypeDetails(type, shouldMapProperty, shouldMapField, extensionMethodsToSearch));
-        }
-
-        private static MemberInfo FindTypeMember(IEnumerable<MemberInfo> modelProperties,
-            IEnumerable<MethodInfo> getMethods,
-            IEnumerable<MethodInfo> getExtensionMethods,
-            string nameToSearch,
-            IMappingOptions mappingOptions)
-        {
-            MemberInfo pi = modelProperties.FirstOrDefault(prop => NameMatches(prop.Name, nameToSearch, mappingOptions));
-            if (pi != null)
-                return pi;
-
-            MethodInfo mi = getMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
-            if (mi != null)
-                return mi;
-
-            mi = getExtensionMethods.FirstOrDefault(m => NameMatches(m.Name, nameToSearch, mappingOptions));
-            if (mi != null)
-                return mi;
-
-            return null;
-        }
-
-        private static bool NameMatches(string memberName, string nameToMatch, IMappingOptions mappingOptions)
-        {
-            var possibleSourceNames = PossibleNames(memberName, mappingOptions.Aliases,
-                mappingOptions.MemberNameReplacers,
-                mappingOptions.Prefixes, mappingOptions.Postfixes);
-
-            var possibleDestNames = PossibleNames(nameToMatch, mappingOptions.Aliases,
-                mappingOptions.MemberNameReplacers,
-                mappingOptions.DestinationPrefixes, mappingOptions.DestinationPostfixes);
-
-            var all =
-                from sourceName in possibleSourceNames
-                from destName in possibleDestNames
-                select new {sourceName, destName};
-
-            return
-                all.Any(pair => String.Compare(pair.sourceName, pair.destName, StringComparison.OrdinalIgnoreCase) == 0);
-        }
-
-        private static IEnumerable<string> PossibleNames(string memberName, IEnumerable<AliasedMember> aliases,
-            IEnumerable<MemberNameReplacer> memberNameReplacers, IEnumerable<string> prefixes,
-            IEnumerable<string> postfixes)
-        {
-            if (string.IsNullOrEmpty(memberName))
-                yield break;
-
-            yield return memberName;
-
-            foreach (
-                var alias in aliases.Where(alias => String.Equals(memberName, alias.Member, StringComparison.Ordinal)))
-            {
-                yield return alias.Alias;
-            }
-        }
-
-        private NameSnippet CreateNameSnippet(IEnumerable<string> matches, int i, IMappingOptions mappingOptions)
-        {
-            return new NameSnippet
-            {
-                First =
-                    String.Join("",matches.Take(i).ToArray()),
-                Second =
-                    String.Join("",matches.Skip(i).ToArray())
-            };
-        }
-
-        private class NameSnippet
-        {
-            public string First { get; set; }
-            public string Second { get; set; }
         }
     }
 }

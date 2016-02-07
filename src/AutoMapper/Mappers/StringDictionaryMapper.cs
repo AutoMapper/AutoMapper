@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Reflection;
-using AutoMapper.Internal;
 using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 
 namespace AutoMapper.Mappers
 {
     using System;
+    using Execution;
 
     public class ToStringDictionaryMapper : IObjectMapper
     {

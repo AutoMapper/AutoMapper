@@ -2,7 +2,6 @@
 {
     using System;
     using System.Reflection;
-    using Internal;
 
     public class PrimitiveArrayMapper : IObjectMapper
     {

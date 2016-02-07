@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using AutoMapper.Internal;
 using Microsoft.CSharp.RuntimeBinder;
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
 namespace AutoMapper.Mappers
 {
+    using Execution;
+
     public abstract class DynamicMapper : IObjectMapper
     {
         public abstract bool IsMatch(TypePair context);

@@ -2,7 +2,6 @@ namespace AutoMapper.Mappers
 {
     using System;
     using System.Linq;
-    using Internal;
 
     public class FlagsEnumMapper : IObjectMapper
     {

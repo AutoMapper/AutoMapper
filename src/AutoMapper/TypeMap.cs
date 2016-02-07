@@ -8,7 +8,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Internal;
+    using Configuration;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
@@ -113,7 +113,10 @@ namespace AutoMapper
         {
             var propertyMap = new PropertyMap(destProperty);
 
-            resolvers.Each(propertyMap.ChainResolver);
+            foreach (var resolver in resolvers)
+            {
+                propertyMap.ChainResolver(resolver);
+            }
 
             AddPropertyMap(propertyMap);
         }
@@ -245,7 +248,10 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.GetMappingOrder()).ToArray();
 
-            _orderedPropertyMaps.Each(pm => pm.Seal());
+            foreach (var pm in _orderedPropertyMaps)
+            {
+                pm.Seal();
+            }
             foreach (var inheritedMap in _inheritedMaps)
                 inheritedMap.Seal();
 

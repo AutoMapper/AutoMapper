@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Should.Core.Assertions
 {
-    using AutoMapper.Internal;
+    using AutoMapper;
 
     internal class AssertComparer<T> : IComparer<T>
     {

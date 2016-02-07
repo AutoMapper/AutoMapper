@@ -5,8 +5,8 @@ namespace AutoMapper
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reflection;
+    using Configuration;
     using Configuration.Conventions;
-    using Internal;
     using Mappers;
     using QueryableExtensions;
     using QueryableExtensions.Impl;

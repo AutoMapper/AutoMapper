@@ -3,7 +3,6 @@ namespace AutoMapper.Configuration.Conventions
     using System;
     using System.Linq;
     using System.Reflection;
-    using Internal;
 
     public class CaseSensitiveName : ISourceToDestinationNameMapper
     {
