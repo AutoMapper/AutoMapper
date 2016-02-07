@@ -8,6 +8,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Configuration;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type

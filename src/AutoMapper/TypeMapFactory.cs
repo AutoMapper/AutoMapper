@@ -7,7 +7,7 @@ namespace AutoMapper
     using System.Reflection;
     using Execution;
 
-    public class TypeMapFactory : ITypeMapFactory
+    public class TypeMapFactory
     {
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, IProfileConfiguration options, MemberList memberList)
         {

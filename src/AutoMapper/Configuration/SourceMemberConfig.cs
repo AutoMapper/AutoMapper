@@ -1,4 +1,4 @@
-﻿namespace AutoMapper
+namespace AutoMapper.Configuration
 {
     using System.Reflection;
 
@@ -16,14 +16,8 @@
 
         public MemberInfo SourceMember { get; private set; }
 
-        public void Ignore()
-        {
-            _ignored = true;
-        }
+        public void Ignore() => _ignored = true;
 
-        public bool IsIgnored()
-        {
-            return _ignored;
-        }
+        public bool IsIgnored() => _ignored;
     }
 }
