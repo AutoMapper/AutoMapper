@@ -1,8 +1,9 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance
 {
+    using System;
     using Should;
     using Xunit;
-    public class MapToBaseClass : SpecBase
+    public class MapToBaseClass : AutoMapperSpecBase
     {
         A _destination;
 
@@ -10,12 +11,11 @@
         public class A { }
         public class B : A { }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
         {
-            Mapper.CreateMap<Input, A>().Include<Input, B>();
-            Mapper.CreateMap<Input, B>();
-            Mapper.AssertConfigurationIsValid();
-        }
+            c.CreateMap<Input, A>().Include<Input, B>();
+            c.CreateMap<Input, B>();
+        });
 
         protected override void Because_of()
         {
