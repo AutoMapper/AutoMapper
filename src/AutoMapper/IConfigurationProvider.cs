@@ -121,5 +121,7 @@ namespace AutoMapper
         bool AllowNullCollections { get; }
 
         IExpressionBuilder ExpressionBuilder { get; }
+        IMapper CreateMapper();
+        IMapper CreateMapper(Func<Type, object> serviceCtor);
     }
 }

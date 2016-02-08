@@ -28,36 +28,21 @@
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            var visitor = new MemberInfoFinderVisitor();
-
-            visitor.Visit(sourceMember);
-
-            _ctorParamActions.Add(cpm => cpm.ResolveUsing(visitor.Members));
-        }
-
-        private class MemberInfoFinderVisitor : ExpressionVisitor
-        {
-            private readonly List<IMemberGetter> _members = new List<IMemberGetter>();
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                _members.Add(node.Member.ToMemberGetter());
-
-                return base.VisitMember(node);
-            }
-
-            public IEnumerable<IMemberGetter> Members => _members;
+            _ctorParamActions.Add(cpm => cpm.ResolveUsing(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())));
         }
 
         public void Configure(TypeMap typeMap)
         {
-            var param = typeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == _ctorParamName);
-
-            param.CanResolve = true;
+            var parameter = typeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == _ctorParamName);
+            if(parameter == null)
+            {
+                throw new ArgumentOutOfRangeException("ctorParamName", "There is no constructor parameter named " + _ctorParamName);
+            }
+            parameter.CanResolve = true;
 
             foreach (var action in _ctorParamActions)
             {
-                action(param);
+                action(parameter);
             }
         }
     }
