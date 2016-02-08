@@ -107,7 +107,7 @@ namespace AutoMapper
 
 
         /// <summary>
-        /// Configuration provider for performaing maps
+        /// Configuration provider for performing maps
         /// </summary>
         IConfigurationProvider ConfigurationProvider { get; }
 
