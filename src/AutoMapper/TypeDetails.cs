@@ -81,11 +81,12 @@ namespace AutoMapper
                 genericInterfaces.Add(Type);
 
             explicitExtensionMethods.AddRange(
-                from genericMethod in sourceExtensionMethodSearchArray.Where(method => method.IsGenericMethodDefinition)
+                from genericMethod in sourceExtensionMethodSearchArray
+                where genericMethod.IsGenericMethodDefinition
                 from genericInterface in genericInterfaces
-                    let genericInterfaceArguments = genericInterface.GetTypeInfo().GenericTypeArguments
+                let genericInterfaceArguments = genericInterface.GetTypeInfo().GenericTypeArguments
                 where genericMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
-                    let methodMatch = genericMethod.MakeGenericMethod(genericInterfaceArguments)
+                let methodMatch = genericMethod.MakeGenericMethod(genericInterfaceArguments)
                 where methodMatch.GetParameters()[0].ParameterType.GetTypeInfo().IsAssignableFrom(genericInterface.GetTypeInfo())
                 select methodMatch);
 
