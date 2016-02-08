@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
-        public void Should_map_enum_to_nullable_enum()
+        public void Should_map_not_ignored()
         {
             _destination.value.ShouldEqual(12);
         }

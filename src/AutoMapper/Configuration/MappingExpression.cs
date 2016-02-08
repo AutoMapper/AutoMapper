@@ -40,6 +40,11 @@ namespace AutoMapper.Configuration
 
         public void As(Type typeOverride) => TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
 
+        public void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions)
+        {
+            base.ForAllOtherMembers(o => memberOptions((IMemberConfigurationExpression)o));
+        }
+
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions) 
             => (IMappingExpression)base.ForMember(name, c => memberOptions((IMemberConfigurationExpression)c));
 
@@ -116,6 +121,7 @@ namespace AutoMapper.Configuration
         private readonly List<CtorParamConfigurationExpression<TSource>> _ctorParamConfigurations = new List<CtorParamConfigurationExpression<TSource>>();
         private MappingExpression<TDestination, TSource> _reverseMap;
         private Action<IMemberConfigurationExpression<TSource>> _allMemberOptions;
+        private Func<IMemberAccessor, bool> _memberFilter;
 
         public MappingExpression(MemberList memberList)
         {
@@ -179,9 +185,16 @@ namespace AutoMapper.Configuration
             return this;
         }
 
+        public void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
+        {
+            _allMemberOptions = memberOptions;
+            _memberFilter = m => _memberConfigurations.All(c=>c.DestinationMember.MemberInfo != m.MemberInfo);
+        }
+
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions)
         {
             _allMemberOptions = memberOptions;
+            _memberFilter = _ => true;
         }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
@@ -424,9 +437,9 @@ namespace AutoMapper.Configuration
 
             if (_allMemberOptions != null)
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors)
+                foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors.Select(m=>m.ToMemberAccessor()).Where(_memberFilter))
                 {
-                    ForDestinationMember(accessor.ToMemberAccessor(), _allMemberOptions);
+                    ForDestinationMember(accessor, _allMemberOptions);
                 }
             }
 
