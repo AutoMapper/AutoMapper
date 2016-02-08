@@ -20,7 +20,7 @@ namespace AutoMapper
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
         private readonly ConcurrentBag<Profile> _profiles = new ConcurrentBag<Profile>();
-
+        private readonly ConfigurationValidator _validator;
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
 
@@ -37,6 +37,8 @@ namespace AutoMapper
             _profiles.Add(profileExpression);
 
             _defaultProfile = profileExpression;
+
+            _validator = new ConfigurationValidator(this);
 
             configure(this);
 
@@ -224,12 +226,12 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid(TypeMap typeMap)
         {
-            AssertConfigurationIsValid(Enumerable.Repeat(typeMap, 1));
+            _validator.AssertConfigurationIsValid(Enumerable.Repeat(typeMap, 1));
         }
 
         public void AssertConfigurationIsValid(string profileName)
         {
-            AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(typeMap => typeMap.Profile.ProfileName == profileName));
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(typeMap => typeMap.Profile.ProfileName == profileName));
         }
 
         public void AssertConfigurationIsValid<TProfile>()
@@ -240,7 +242,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid()
         {
-            AssertConfigurationIsValid(_typeMapRegistry.TypeMaps);
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps);
         }
 
         public IMapper CreateMapper() => new Mapper(this);
@@ -398,123 +400,5 @@ namespace AutoMapper
             }
         }
 
-        private void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
-        {
-            var maps = typeMaps as TypeMap[] ?? typeMaps.ToArray();
-            var badTypeMaps =
-                (from typeMap in maps
-                 where typeMap.ShouldCheckForValid()
-                    let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
-                    where unmappedPropertyNames.Length > 0
-                    select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames)
-                    ).ToArray();
-
-            if (badTypeMaps.Any())
-            {
-                throw new AutoMapperConfigurationException(badTypeMaps);
-            }
-
-            var typeMapsChecked = new List<TypeMap>();
-            var configExceptions = new List<Exception>();
-            var engine = new MappingEngine(this, CreateMapper());
-
-            foreach (var typeMap in maps)
-            {
-                try
-                {
-                    DryRunTypeMap(typeMapsChecked,
-                        new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType,
-                            new MappingOperationOptions(_serviceCtor), engine));
-                }
-                catch (Exception e)
-                {
-                    configExceptions.Add(e);
-                }
-            }
-
-            if (configExceptions.Count > 1)
-            {
-                throw new AggregateException(configExceptions);
-            }
-            if (configExceptions.Count > 0)
-            {
-                throw configExceptions[0];
-            }
-        }
-
-        private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
-        {
-            var typeMap = context.TypeMap;
-            if (typeMap != null)
-            {
-                typeMapsChecked.Add(typeMap);
-                CheckPropertyMaps(typeMapsChecked, context);
-            }
-            else
-            {
-                var mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context.Types));
-                if (mapperToUse == null && context.SourceType.IsNullableType())
-                {
-                    var nullableTypes = new TypePair(Nullable.GetUnderlyingType(context.SourceType),
-                        context.DestinationType);
-                    mapperToUse = GetMappers().FirstOrDefault(mapper => mapper.IsMatch(nullableTypes));
-                }
-                if (mapperToUse == null)
-                {
-                    throw new AutoMapperConfigurationException(context);
-                }
-                if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
-                {
-                    CheckElementMaps(typeMapsChecked, context);
-                }
-            }
-        }
-
-        private void CheckElementMaps(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
-        {
-            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
-            Type destElementType = TypeHelper.GetElementType(context.DestinationType);
-            TypeMap itemTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceElementType, destElementType);
-
-            if(typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
-                return;
-
-            var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType,
-                0);
-
-            DryRunTypeMap(typeMapsChecked, memberContext);
-        }
-
-        private void CheckPropertyMaps(ICollection<TypeMap> typeMapsChecked, ResolutionContext context)
-        {
-            foreach(var propertyMap in context.TypeMap.GetPropertyMaps())
-            {
-                if(!propertyMap.IsIgnored())
-                {
-                    var lastResolver =
-                        propertyMap.GetSourceValueResolvers().OfType<IMemberResolver>().LastOrDefault();
-
-                    if(lastResolver != null)
-                    {
-                        var sourceType = lastResolver.MemberType;
-
-                        if (sourceType.IsGenericParameter)
-                            return;
-
-                        var destinationType = propertyMap.DestinationProperty.MemberType;
-                        var memberTypeMap = ((IConfigurationProvider)this).ResolveTypeMap(sourceType,
-                            destinationType);
-
-                        if(typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
-                            continue;
-
-                        var memberContext = context.CreateMemberContext(memberTypeMap, null, null, sourceType,
-                            propertyMap);
-
-                        DryRunTypeMap(typeMapsChecked, memberContext);
-                    }
-                }
-            }
-        }
     }
 }
