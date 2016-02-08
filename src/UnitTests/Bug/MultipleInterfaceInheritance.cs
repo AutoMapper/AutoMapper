@@ -19,6 +19,8 @@ namespace AutoMapper.UnitTests.Bug
 
         public class Item : IItem
         {
+            // must have something to map
+            public int Value { get; set; }
         }
 
         public class ItemDto
@@ -27,6 +29,8 @@ namespace AutoMapper.UnitTests.Bug
 
         public interface IItem : ISome     // everything works well if IItem doesn't inherit ISome.
         {
+            // must have something to map
+            int Value { get; set; }
         }
 
         public interface ISome
