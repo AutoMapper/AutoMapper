@@ -6,16 +6,43 @@ namespace AutoMapper
     {
         #region Static API
 
+        private static IConfigurationProvider _configuration;
+        private static IMapper _instance;
+
         /// <summary>
         /// Configuration provider for performing maps
         /// </summary>
-        public static IConfigurationProvider Configuration { get; private set; }
+        public static IConfigurationProvider Configuration
+        {
+            get
+            {
+                if (_configuration == null)
+                    throw new InvalidOperationException("Mapper not initialized. Call Initialize with appropriate configuration.");
+
+                return _configuration;
+            }
+            private set { _configuration = value; }
+        }
 
         /// <summary>
         /// Static mapper instance. You can also create a <see cref="Mapper"/> instance directly using the <see cref="Configuration"/> instance.
         /// </summary>
-        public static IMapper Instance { get; private set; }
+        public static IMapper Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    throw new InvalidOperationException("Mapper not initialized. Call Initialize with appropriate configuration.");
 
+                return _instance;
+            }
+            private set { _instance = value; }
+        }
+
+        /// <summary>
+        /// Initialize static configuration instance
+        /// </summary>
+        /// <param name="config">Configuration action</param>
         public static void Initialize(Action<IMapperConfiguration> config)
         {
             Configuration = new MapperConfiguration(config);
