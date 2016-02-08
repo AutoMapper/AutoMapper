@@ -4,7 +4,22 @@ namespace AutoMapper
 
     public class Mapper : IMapper
     {
+        #region Static API
+
+        //public static IConfigurationProvider Configuration { get; private set; }
+        //public static IMapper Instance { get; private set; }
+
+        //public static void Initialize(Action<IMapperConfiguration> config)
+        //{
+        //    Configuration = new MapperConfiguration(config);
+        //    Instance = new Mapper(Configuration);
+        //}
+
+        #endregion
+
         private readonly IMappingEngine _engine;
+        private readonly IConfigurationProvider _configurationProvider;
+        private readonly Func<Type, object> _serviceCtor;
 
         public Mapper(IConfigurationProvider configurationProvider)
             : this(configurationProvider, configurationProvider.ServiceCtor)
@@ -13,17 +28,18 @@ namespace AutoMapper
 
         public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
-            ConfigurationProvider = configurationProvider;
-            ServiceCtor = serviceCtor;
+            _configurationProvider = configurationProvider;
+            _serviceCtor = serviceCtor;
             _engine = new MappingEngine(configurationProvider, this);
         }
 
-        public Func<Type, object> ServiceCtor { get; }
-        public IConfigurationProvider ConfigurationProvider { get; }
+        Func<Type, object> IMapper.ServiceCtor => _serviceCtor;
 
-        public TDestination Map<TDestination>(object source) => Map<TDestination>(source, _ => { });
+        IConfigurationProvider IMapper.ConfigurationProvider => _configurationProvider;
 
-        public TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
+        TDestination IMapper.Map<TDestination>(object source) => ((IMapper)this).Map<TDestination>(source, _ => { });
+
+        TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
             var mappedObject = default(TDestination);
 
@@ -32,80 +48,73 @@ namespace AutoMapper
             var sourceType = source.GetType();
             var destinationType = typeof(TDestination);
 
-            mappedObject = (TDestination)Map(source, sourceType, destinationType, opts);
+            mappedObject = (TDestination)((IMapper)this).Map(source, sourceType, destinationType, opts);
             return mappedObject;
         }
 
-        public TDestination Map<TSource, TDestination>(TSource source)
+        TDestination IMapper.Map<TSource, TDestination>(TSource source)
         {
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            return (TDestination)Map(source, modelType, destinationType, _ => { });
+            return (TDestination)((IMapper)this).Map(source, modelType, destinationType, _ => { });
         }
 
-        public TDestination Map<TSource, TDestination>(TSource source,
+        TDestination IMapper.Map<TSource, TDestination>(TSource source,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            var options = new MappingOperationOptions<TSource, TDestination>(ServiceCtor);
+            var options = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
             opts(options);
 
             return (TDestination)MapCore(source, modelType, destinationType, options);
         }
 
-        public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
-        {
-            return Map(source, destination, _ => { });
-        }
+        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
+            => ((IMapper)this).Map(source, destination, _ => { });
 
-        public TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
+        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             Type modelType = typeof(TSource);
             Type destinationType = typeof(TDestination);
 
-            var options = new MappingOperationOptions<TSource, TDestination>(ServiceCtor);
+            var options = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
             opts(options);
 
             return (TDestination)MapCore(source, destination, modelType, destinationType, options);
         }
 
-        public object Map(object source, Type sourceType, Type destinationType)
-        {
-            return Map(source, sourceType, destinationType, _ => { });
-        }
+        object IMapper.Map(object source, Type sourceType, Type destinationType)
+            => ((IMapper)this).Map(source, sourceType, destinationType, _ => { });
 
-        public object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+        object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
-            var options = new MappingOperationOptions(ServiceCtor);
+            var options = new MappingOperationOptions(_serviceCtor);
 
             opts(options);
 
             return MapCore(source, sourceType, destinationType, options);
         }
 
-        public object Map(object source, object destination, Type sourceType, Type destinationType)
-        {
-            return Map(source, destination, sourceType, destinationType, _ => { });
-        }
+        object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
+            => ((IMapper)this).Map(source, destination, sourceType, destinationType, _ => { });
 
-        public object Map(object source, object destination, Type sourceType, Type destinationType,
+        object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
-            var options = new MappingOperationOptions(ServiceCtor);
+            var options = new MappingOperationOptions(_serviceCtor);
 
             opts(options);
 
             return MapCore(source, destination, sourceType, destinationType, options);
         }
 
-
         private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
         {
-            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, _engine);
 
@@ -115,7 +124,7 @@ namespace AutoMapper
         private object MapCore(object source, object destination, Type sourceType, Type destinationType,
             MappingOperationOptions options)
         {
-            TypeMap typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
             var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, _engine);
 
