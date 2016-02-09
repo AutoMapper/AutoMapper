@@ -235,7 +235,7 @@ namespace AutoMapper
             CustomExpression = sourceMember;
             AssignCustomValueResolver(
                 new NullReferenceExceptionSwallowingResolver(
-                    new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())
+                    new DelegateBasedResolver<TSource, TMember>(sourceMember)
                     )
                 );
         }

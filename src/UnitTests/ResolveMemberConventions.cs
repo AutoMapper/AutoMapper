@@ -64,8 +64,11 @@ namespace AutoMapper.UnitTests
                 cfg.AddMemberConfiguration().AddName<ReverseSourceToDestinationNameMapperAttributesMember>();
                 cfg.CreateMissingTypeMaps = true;
             }).CreateMapper();
+            var from = new From {Int = 5};
+            mapper.Map<To>(from).String.ShouldEqual("5");
 
-            mapper.Map<To>(new From {Int = 5}).String.ShouldEqual("5");
+            var query = new[] { from }.AsQueryable().ProjectTo<To>(mapper.ConfigurationProvider).First();
+            query.String.ShouldEqual("5");
         }
 
         public class CultureInfoLocilization : IChildMemberConfiguration
@@ -97,7 +100,7 @@ namespace AutoMapper.UnitTests
                 var delegateResolverType = typeof (DelegateBasedResolver<,>).MakeGenericType(sourceType.Type,
                     searchProperty.GetMemberType());
                 resolvers.AddLast(
-                    Activator.CreateInstance(delegateResolverType, lambdaExpression.Compile()) as IValueResolver);
+                    Activator.CreateInstance(delegateResolverType, lambdaExpression) as IValueResolver);
                 return true;
             }
 
@@ -139,6 +142,9 @@ namespace AutoMapper.UnitTests
                 Localizations = { new QuestionLocalization { CultureInfo = CultureInfo.CurrentCulture, Text = "Current" } }
             };
             mapper.Map<QuestionDTO>(question).Text.ShouldEqual("Current");
+
+            var query = new [] {question}.AsQueryable().ProjectTo<QuestionDTO>(mapper.ConfigurationProvider).First();
+            query.Text.ShouldEqual("Current");
         }
     }
 }
