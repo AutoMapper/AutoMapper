@@ -20,7 +20,7 @@ namespace AutoMapper.Configuration.Conventions
             MemberNameReplacers.Add(new MemberNameReplacer(original, newValue));
             return this;
         }
-        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             var possibleSourceNames = PossibleNames(nameToSearch);
             var possibleDestNames = getTypeInfoMembers.GetMemberInfos(typeInfo).Select(mi => new { mi, possibles = PossibleNames(mi.Name) });

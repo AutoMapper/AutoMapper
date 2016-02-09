@@ -28,7 +28,7 @@
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            _ctorParamActions.Add(cpm => cpm.ResolveUsing(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())));
+            _ctorParamActions.Add(cpm => cpm.ResolveUsing(new ExpressionBasedResolver<TSource, TMember>(sourceMember)));
         }
 
         public void Configure(TypeMap typeMap)
