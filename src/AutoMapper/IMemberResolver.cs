@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-
 namespace AutoMapper
 {
     using System;
@@ -7,10 +5,5 @@ namespace AutoMapper
     public interface IMemberResolver : IValueResolver
     {
         Type MemberType { get; }
-    }
-
-    public interface IDelegateResolver : IMemberResolver
-    {
-        LambdaExpression Expression { get; }
     }
 }

@@ -22,7 +22,6 @@ namespace Benchmark
 					new BenchEngine(mapper, pair.Key).Start();
 				}
 			}
-		    Console.ReadKey();
 		}
 	}
 }
