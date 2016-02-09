@@ -37,33 +37,33 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             return valueResolver is IMemberResolver;
         }
+    }
 
-        private class ParameterConversionVisitor : ExpressionVisitor
+    internal class ParameterConversionVisitor : ExpressionVisitor
+    {
+        private readonly Expression newParameter;
+        private readonly ParameterExpression oldParameter;
+
+        public ParameterConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
         {
-            private readonly Expression newParameter;
-            private readonly ParameterExpression oldParameter;
+            this.newParameter = newParameter;
+            this.oldParameter = oldParameter;
+        }
 
-            public ParameterConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
-            {
-                this.newParameter = newParameter;
-                this.oldParameter = oldParameter;
-            }
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            // replace all old param references with new ones
+            return node == oldParameter ? newParameter : node;
+        }
 
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                // replace all old param references with new ones
-                return node == oldParameter ? newParameter : node;
-            }
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            if (node.Expression != oldParameter) // if instance is not old parameter - do nothing
+                return base.VisitMember(node);
 
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node.Expression != oldParameter) // if instance is not old parameter - do nothing
-                    return base.VisitMember(node);
-
-                var newObj = Visit(node.Expression);
-                var newMember = newParameter.Type.GetMember(node.Member.Name).First();
-                return Expression.MakeMemberAccess(newObj, newMember);
-            }
+            var newObj = Visit(node.Expression);
+            var newMember = newParameter.Type.GetMember(node.Member.Name).First();
+            return Expression.MakeMemberAccess(newObj, newMember);
         }
     }
 }
