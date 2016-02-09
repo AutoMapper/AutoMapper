@@ -253,6 +253,7 @@
     <Compile Include="Query\SourceInjectedQuery.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
+    <Compile Include="ResolveMemberConventions.cs" />
     <Compile Include="ReverseMapping.cs" />
     <Compile Include="Should\Should.Core\Assertions\Assert.cs" />
     <Compile Include="Should\Should.Core\Assertions\AssertComparer.cs" />
