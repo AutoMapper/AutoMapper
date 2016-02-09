@@ -27,7 +27,7 @@ namespace AutoMapper.Configuration
                     pm.SourceMember = body.Member;
                 }
                 var func = sourceMember.Compile();
-                pm.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(r => func((TSource) r.Value)));
+                pm.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource, object>(func));
             });
         }
 
@@ -91,7 +91,7 @@ namespace AutoMapper.Configuration
                     pm.SourceMember = body.Member;
                 }
                 var func = sourceMember.Compile();
-                pm.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource>(r => func((TSource) r.Value)));
+                pm.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource, object>(func));
             });
 
             return this;
