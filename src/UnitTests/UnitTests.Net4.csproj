@@ -84,6 +84,7 @@
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
+    <Compile Include="Bug\InterfaceMultipleInheritance.cs" />
     <Compile Include="Bug\AfterMapNestedObjects.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
@@ -209,6 +210,7 @@
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\MapToBaseClass.cs" />
     <Compile Include="MappingInheritance\GenericsAndInterfaces.cs" />
     <Compile Include="MappingInheritance\IncludeBaseBug.cs" />
     <Compile Include="MappingInheritance\IncludedBaseMappingShouldInheritBaseMappings.cs" />
@@ -300,6 +302,7 @@
     <Compile Include="Should\should\DoubleAssertionExtensions.cs" />
     <Compile Include="Should\should\ObjectAssertExtensions.cs" />
     <Compile Include="Should\should\StringAssertionExtensions.cs" />
+    <Compile Include="StaticMapping.cs" />
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Bug\ProjectConstructorParameters.cs" />

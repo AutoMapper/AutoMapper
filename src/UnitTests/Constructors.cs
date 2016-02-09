@@ -7,6 +7,47 @@ namespace AutoMapper.UnitTests
 {
     namespace Constructors
     {
+        public class When_mapping_a_constructor_parameter_from_nested_members : AutoMapperSpecBase
+        {
+            private Destination _destination;
+
+            public class Source
+            {
+                public NestedSource Nested { get; set; }
+            }
+
+            public class NestedSource
+            {
+                public int Foo { get; set; }
+            }
+
+            public class Destination
+            {
+                public int Foo { get; }
+
+                public Destination(int foo)
+                {
+                    Foo = foo;
+                }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>().ForCtorParam("foo", opt => opt.MapFrom(s => s.Nested.Foo));
+            });
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Destination>(new Source { Nested = new NestedSource { Foo = 5 } });
+            }
+
+            [Fact]
+            public void Should_map_the_constructor_argument()
+            {
+                _destination.Foo.ShouldEqual(5);
+            }
+        }
+
         public class When_the_destination_has_a_matching_constructor_with_optional_extra_parameters : AutoMapperSpecBase
         {
             private Destination _destination;
