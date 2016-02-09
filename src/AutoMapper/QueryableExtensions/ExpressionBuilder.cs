@@ -23,7 +23,6 @@ namespace AutoMapper.QueryableExtensions
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
             new MemberGetterExpressionResultConverter(),
-            new DelegateBasedResolverResultConverter(),
             new MemberResolverExpressionResultConverter(),
             new NullSubstitutionExpressionResultConverter()
         };

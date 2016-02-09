@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-
 namespace AutoMapper.Execution
 {
     using System;
@@ -26,15 +24,13 @@ namespace AutoMapper.Execution
         }
     }
 
-    public class DelegateBasedResolver<TSource, TMember> : IDelegateResolver
+    public class DelegateBasedResolver<TSource, TMember> : IMemberResolver
     {
-        public LambdaExpression Expression { get; }
         private readonly Func<TSource, TMember> _method;
 
-        public DelegateBasedResolver(Expression<Func<TSource, TMember>> expression)
+        public DelegateBasedResolver(Func<TSource, TMember> method)
         {
-            Expression = expression;
-            _method = expression.Compile();
+            _method = method;
         }
 
         public ResolutionResult Resolve(ResolutionResult source)
