@@ -31,7 +31,7 @@ namespace AutoMapper
                     var typeMapMapper = ConfigurationProvider.GetTypeMapMappers().First(objectMapper => objectMapper.IsMatch(context));
 
                     // check whether the context passes conditions before attempting to map the value (depth check)
-                    object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : typeMapMapper.Map(context);
+                    object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : typeMapMapper.Map(context.SourceValue, context);
 
                     return mappedObject;
                 }

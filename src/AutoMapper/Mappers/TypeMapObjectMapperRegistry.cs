@@ -20,9 +20,9 @@ namespace AutoMapper.Mappers
 
         private class CustomMapperStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
-                return context.TypeMap.CustomMapper(context);
+                return context.TypeMap.CustomMapper(source, context);
             }
 
             public bool IsMatch(ResolutionContext context)
@@ -33,7 +33,7 @@ namespace AutoMapper.Mappers
 
         private class SubstutitionMapperStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
                 var newSource = context.TypeMap.Substitution(context.SourceValue);
                 var typeMap = context.ConfigurationProvider.ResolveTypeMap(newSource.GetType(), context.DestinationType);
@@ -52,7 +52,7 @@ namespace AutoMapper.Mappers
 
         private class NullMappingStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
                 return null;
             }
@@ -65,7 +65,7 @@ namespace AutoMapper.Mappers
 
         private class CacheMappingStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
                 return context.InstanceCache[context];
             }
@@ -79,7 +79,7 @@ namespace AutoMapper.Mappers
 
         private abstract class PropertyMapMappingStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
                 var mappedObject = GetMappedObject(context);
                 if (context.SourceValue != null && !context.Options.DisableCache)

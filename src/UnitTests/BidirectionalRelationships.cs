@@ -120,7 +120,7 @@ namespace AutoMapper.UnitTests
         //        _dto.Children[0].Parent.ID.ShouldEqual(_dto.ID);
         //    }
 
-        //    public class ChildIdToParentDtoConverter : TypeConverter<int, ParentDto>
+        //    public class ChildIdToParentDtoConverter : ITypeConverter<int, ParentDto>
         //    {
         //        private readonly Dictionary<int, ParentModel> _parentModels;
 
@@ -129,7 +129,7 @@ namespace AutoMapper.UnitTests
         //            _parentModels = parentModels;
         //        }
 
-        //        protected override ParentDto ConvertCore(int childId)
+        //        public ParentDto Convert(int childId)
         //        {
         //            ParentModel parentModel = _parentModels[childId];
         //            MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
@@ -137,7 +137,7 @@ namespace AutoMapper.UnitTests
         //        }
         //    }
 
-        //    public class ParentIdToChildDtoListConverter : TypeConverter<int, List<ChildDto>>
+        //    public class ParentIdToChildDtoListConverter : ITypeConverter<int, List<ChildDto>>
         //    {
         //        private readonly IList<ChildModel> _childModels;
 
@@ -229,10 +229,9 @@ namespace AutoMapper.UnitTests
 					_parentModels = parentModels;
 				}
 
-				public ParentDto Convert(ResolutionContext resolutionContext)
+				public ParentDto Convert(int source, ResolutionContext resolutionContext)
 				{
-					int childId = (int) resolutionContext.SourceValue;
-					ParentModel parentModel = _parentModels[childId];
+					ParentModel parentModel = _parentModels[source];
 				    var context = resolutionContext.CreateTypeContext(
 				        resolutionContext.Engine.ConfigurationProvider.ResolveTypeMap(typeof (ParentModel), typeof (ParentDto)),
 				        parentModel, null, typeof (ParentModel), typeof (ParentDto));
@@ -249,10 +248,9 @@ namespace AutoMapper.UnitTests
 					_childModels = childModels;
 				}
 
-				public List<ChildDto> Convert(ResolutionContext resolutionContext)
+				public List<ChildDto> Convert(int source, ResolutionContext resolutionContext)
 				{
-					int childId = (int)resolutionContext.SourceValue;
-					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == childId).ToList();
+					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == source).ToList();
                     var context = resolutionContext.CreateTypeContext(
                         null,
                         childModels, null, typeof(List<ChildModel>), typeof(List<ChildDto>));

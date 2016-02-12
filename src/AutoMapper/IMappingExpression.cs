@@ -256,13 +256,7 @@ namespace AutoMapper
         /// Skip member mapping and use a custom function to convert to the destination type
         /// </summary>
         /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
-        void ConvertUsing(Func<ResolutionContext, TDestination> mappingFunction);
-
-        /// <summary>
-        /// Skip member mapping and use a custom function to convert to the destination type
-        /// </summary>
-        /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
-        void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction);
+        void ConvertUsing(Func<TSource, ResolutionContext, TDestination> mappingFunction);
 
         /// <summary>
         /// Skip member mapping and use a custom type converter instance to convert to the destination type

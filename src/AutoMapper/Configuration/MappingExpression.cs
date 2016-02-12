@@ -291,17 +291,12 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing(Func<TSource, TDestination> mappingFunction)
         {
-            TypeMapActions.Add(tm => tm.UseCustomMapper(source => mappingFunction((TSource)source.SourceValue)));
+            TypeMapActions.Add(tm => tm.UseCustomMapper((source, ctxt) => mappingFunction((TSource) source)));
         }
 
-        public void ConvertUsing(Func<ResolutionContext, TDestination> mappingFunction)
+        public void ConvertUsing(Func<TSource, ResolutionContext, TDestination> mappingFunction)
         {
-            TypeMapActions.Add(tm => tm.UseCustomMapper(context => mappingFunction(context)));
-        }
-
-        public void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction)
-        {
-            TypeMapActions.Add(tm => tm.UseCustomMapper(source => mappingFunction(source, (TSource)source.SourceValue)));
+            TypeMapActions.Add(tm => tm.UseCustomMapper((source, ctxt) => mappingFunction((TSource) source, ctxt)));
         }
 
         public void ConvertUsing(ITypeConverter<TSource, TDestination> converter)

@@ -26,17 +26,17 @@ namespace AutoMapperSamples
 				public Type Value3 { get; set; }
 			}
 
-			public class DateTimeTypeConverter : TypeConverter<string, DateTime>
+			public class DateTimeTypeConverter : ITypeConverter<string, DateTime>
 			{
-				protected override DateTime ConvertCore(string source)
+				public DateTime Convert(string source, ResolutionContext context)
 				{
 					return System.Convert.ToDateTime(source);
 				}
 			}
 
-			public class TypeTypeConverter : TypeConverter<string, Type>
+			public class TypeTypeConverter : ITypeConverter<string, Type>
 			{
-				protected override Type ConvertCore(string source)
+				public Type Convert(string source, ResolutionContext context)
 				{
 					Type type = Assembly.GetExecutingAssembly().GetType(source);
 					return type;

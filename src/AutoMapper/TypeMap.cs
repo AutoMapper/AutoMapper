@@ -53,7 +53,7 @@ namespace AutoMapper
 
         public IProfileConfiguration Profile { get; }
 
-        public Func<ResolutionContext, object> CustomMapper { get; private set; }
+        public Func<object, ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
         public Action<object, object, ResolutionContext> BeforeMap => (src, dest, context) =>
@@ -220,7 +220,7 @@ namespace AutoMapper
             return _includedDerivedTypes.Any() || DestinationTypeOverride != null;
         }
 
-        public void UseCustomMapper(Func<ResolutionContext, object> customMapper)
+        public void UseCustomMapper(Func<object, ResolutionContext, object> customMapper)
         {
             CustomMapper = customMapper;
             _propertyMaps = new ConcurrentBag<PropertyMap>();

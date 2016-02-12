@@ -37,17 +37,17 @@ namespace AutoMapper.UnitTests.Bug
                 }
             }
 
-            public class IntToEntityConverter : TypeConverter<int, Entity>
+            public class IntToEntityConverter : ITypeConverter<int, Entity>
             {
-                protected override Entity ConvertCore(int source)
+                public Entity Convert(int source, ResolutionContext context)
                 {
                     return new Entity() { Id = source };
                 }
             }
 
-            public class NullableIntToEntityConverter : TypeConverter<int?, Entity>
+            public class NullableIntToEntityConverter : ITypeConverter<int?, Entity>
             {
-                protected override Entity ConvertCore(int? source)
+                public Entity Convert(int? source, ResolutionContext context)
                 {
                     if (source.HasValue)
                     {

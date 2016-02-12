@@ -544,9 +544,9 @@ namespace AutoMapper.UnitTests
                 };
             }
 
-            public class Converter : TypeConverter<Source, Destination>
+            public class Converter : ITypeConverter<Source, Destination>
             {
-                protected override Destination ConvertCore(Source source)
+                public Destination Convert(Source source, ResolutionContext context)
                 {
                     return new Destination { Value = source.Value + 10 };
                 }
@@ -588,7 +588,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            public class CustomConverter : TypeConverter<Source, Destination>
+            public class CustomConverter : ITypeConverter<Source, Destination>
             {
                 private readonly int _value;
 
@@ -602,7 +602,7 @@ namespace AutoMapper.UnitTests
                     _value = value;
                 }
 
-                protected override Destination ConvertCore(Source source)
+                public Destination Convert(Source source, ResolutionContext context)
                 {
                     return new Destination { Value = source.Value + _value };
                 }

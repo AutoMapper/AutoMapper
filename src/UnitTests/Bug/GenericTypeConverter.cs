@@ -35,12 +35,12 @@ namespace AutoMapper.UnitTests.Bug
             public static Destination<T> SomeDestination = new Destination<T>();
             public static OtherDestination<T> SomeOtherDestination = new OtherDestination<T>();
 
-            public Destination<T> Convert(ResolutionContext context)
+            public Destination<T> Convert(Source<T> source, ResolutionContext context)
             {
                 return SomeDestination;
             }
 
-            OtherDestination<T> ITypeConverter<OtherSource<T>, OtherDestination<T>>.Convert(ResolutionContext context)
+            OtherDestination<T> ITypeConverter<OtherSource<T>, OtherDestination<T>>.Convert(OtherSource<T> source, ResolutionContext context)
             {
                 return SomeOtherDestination;
             }
