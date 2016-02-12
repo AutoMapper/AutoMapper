@@ -15,11 +15,14 @@ namespace AutoMapper.UnitTests.Bug
                 [Fact]
                 public void Example()
                 {
-                    Mapper.CreateMap<int?, Entity>()
+                    var config = new MapperConfiguration(cfg =>
+                    {
+                        cfg.CreateMap<int?, Entity>()
                             .ConvertUsing<NullableIntToEntityConverter>();
 
-                    Mapper.CreateMap<int, Entity>()
+                        cfg.CreateMap<int, Entity>()
                             .ConvertUsing<IntToEntityConverter>();
+                    });
 
                     var guids = new List<int?>()
                     {
@@ -28,7 +31,7 @@ namespace AutoMapper.UnitTests.Bug
                         null
                     };
 
-                    var result = Mapper.Map<List<Entity>>(guids);
+                    var result = config.CreateMapper().Map<List<Entity>>(guids);
 
                     result[2].ShouldBeNull();
                 }

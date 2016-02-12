@@ -86,13 +86,6 @@ namespace AutoMapper
         IMappingExpression ForSourceMember(string sourceMemberName, Action<ISourceMemberConfigurationExpression> memberOptions);
         
         /// <summary>
-        /// Assign a profile to the current type map
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <returns>Itself</returns>
-        IMappingExpression WithProfile(string profileName);
-
-        /// <summary>
         /// Skip normal member mapping and convert using a <see cref="ITypeConverter{TSource,TDestination}"/> instantiated during mapping
         /// </summary>
         /// <typeparam name="TTypeConverter">Type converter type</typeparam>
@@ -176,12 +169,6 @@ namespace AutoMapper
         /// <returns>Itself</returns>
         IMappingExpression AfterMap<TMappingAction>()
             where TMappingAction : IMappingAction<object, object>;
-
-        /// <summary>
-        /// The current TypeMap being configured
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        TypeMap TypeMap { get; }
     }
 
     /// <summary>
@@ -254,13 +241,6 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> Include(Type derivedSourceType, Type derivedDestinationType);
 
         /// <summary>
-        /// Assign a profile to the current type map
-        /// </summary>
-        /// <param name="profileName">Name of the profile</param>
-        /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> WithProfile(string profileName);
-
-        /// <summary>
         /// Skip member mapping and use a custom expression during LINQ projection
         /// </summary>
         /// <param name="projectionExpression">Projection expression</param>
@@ -304,6 +284,13 @@ namespace AutoMapper
         IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction);
 
         /// <summary>
+        /// Execute a custom function to the source and/or destination types before member mapping
+        /// </summary>
+        /// <param name="beforeFunction">Callback for the source/destination types</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination, ResolutionContext> beforeFunction);
+
+        /// <summary>
         /// Execute a custom mapping action before member mapping
         /// </summary>
         /// <typeparam name="TMappingAction">Mapping action type instantiated during mapping</typeparam>
@@ -317,6 +304,13 @@ namespace AutoMapper
         /// <param name="afterFunction">Callback for the source/destination types</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction);
+
+        /// <summary>
+        /// Execute a custom function to the source and/or destination types after member mapping
+        /// </summary>
+        /// <param name="afterFunction">Callback for the source/destination types</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination, ResolutionContext> afterFunction);
 
         /// <summary>
         /// Execute a custom mapping action after member mapping
@@ -405,11 +399,5 @@ namespace AutoMapper
         /// <param name="paramOptions">Options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions);
-
-        /// <summary>
-        /// The current TypeMap being configured
-        /// </summary>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        TypeMap TypeMap { get; }
     }
 }

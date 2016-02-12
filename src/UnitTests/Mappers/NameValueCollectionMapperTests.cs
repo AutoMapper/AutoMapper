@@ -49,7 +49,7 @@ namespace AutoMapper.UnitTests.Mappers
             [Fact]
             public void ReturnsNullIfSourceValueIsNull()
             {
-                var rc = new ResolutionContext(null, null, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, Mapper.Engine);
+                var rc = new ResolutionContext(null, null, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, new MappingEngine(null, null));
                 var nvcm = new NameValueCollectionMapper();
 
                 var result = nvcm.Map(rc);
@@ -61,7 +61,7 @@ namespace AutoMapper.UnitTests.Mappers
             public void ReturnsEmptyCollectionWhenSourceCollectionIsEmpty()
             {
                 var sourceValue = new NameValueCollection();
-                var rc = new ResolutionContext(null, sourceValue, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, Mapper.Engine);
+                var rc = new ResolutionContext(null, sourceValue, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, new MappingEngine(null, null));
                 var nvcm = new NameValueCollectionMapper();
 
                 var result = nvcm.Map(rc) as NameValueCollection;
@@ -73,7 +73,7 @@ namespace AutoMapper.UnitTests.Mappers
             public void ReturnsMappedObjectWithExpectedValuesWhenSourceCollectionHasOneItem()
             {
                 var sourceValue = new NameValueCollection() { { "foo", "bar" } };
-                var rc = new ResolutionContext(null, sourceValue, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, Mapper.Engine);
+                var rc = new ResolutionContext(null, sourceValue, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, new MappingEngine(null, null));
 
                 var nvcm = new NameValueCollectionMapper();
 

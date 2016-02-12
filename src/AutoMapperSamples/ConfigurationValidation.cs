@@ -18,27 +18,22 @@ namespace AutoMapperSamples
 				public int SomeValuefff { get; set; }
 			}
 
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
-			}
-
 			[Test, ExpectedException(typeof(AutoMapperConfigurationException))]
 			public void Example()
 			{
-				Mapper.CreateMap<Source, Destination>();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
 
-				Mapper.AssertConfigurationIsValid(); // Throws an exception
+				config.AssertConfigurationIsValid(); // Throws an exception
 			}
 
 			[Test]
 			public void ExampleIgnoring()
 			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.SomeValuefff, opt => opt.Ignore());
+                var config = new MapperConfiguration(cfg => 
+                    cfg.CreateMap<Source, Destination>().ForMember(m => m.SomeValuefff, opt => opt.Ignore())
+                    );
 
-				Mapper.AssertConfigurationIsValid();
+				config.AssertConfigurationIsValid();
 			}
 		}
 	}

@@ -8,13 +8,14 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Internal;
+    using Configuration;
+    using Execution;
     using Mappers;
     using MemberPaths = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<MemberInfo>>;
 
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider
     {
-        private readonly IMappingEngine _mappingEngine;
+        private readonly IMapper _mapper;
         private readonly IQueryable<TSource> _dataSource;
         private readonly IQueryable<TDestination> _destQuery;
         private readonly IEnumerable<ExpressionVisitor> _beforeVisitors;
@@ -23,7 +24,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly MemberPaths _membersToExpand;
         private readonly Action<Exception> _exceptionHandler;
 
-        public SourceInjectedQueryProvider(IMappingEngine mappingEngine,
+        public SourceInjectedQueryProvider(IMapper mapper,
             IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
                 IEnumerable<ExpressionVisitor> beforeVisitors,
                 IEnumerable<ExpressionVisitor> afterVisitors,
@@ -31,7 +32,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 System.Collections.Generic.IDictionary<string, object> parameters,
                 MemberPaths membersToExpand)
         {
-            _mappingEngine = mappingEngine;
+            _mapper = mapper;
             _dataSource = dataSource;
             _destQuery = destQuery;
             _beforeVisitors = beforeVisitors;
@@ -95,7 +96,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
                     Inspector.SourceResult(sourceExpression, sourceResult);
 
-                    destResult = new ProjectionExpression((IQueryable<TSource>) sourceResult, _mappingEngine).To<TDestination>(_parameters, _membersToExpand);
+                    destResult = new ProjectionExpression((IQueryable<TSource>) sourceResult, _mapper.ConfigurationProvider.ExpressionBuilder).To<TDestination>(_parameters, _membersToExpand);
                 }
                 // case #2: query is arbitrary ("manual") projection
                 // exaple: users.UseAsDataSource().For<UserDto>().Select(user => user.Age).ToList()
@@ -179,7 +180,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         }
 
                         var membersToExpand = _membersToExpand.SelectMany(m => m).Distinct().ToArray();
-                        var mapExpr = _mappingEngine.CreateMapExpression(sourceResultType, destResultType,
+                        var mapExpr = _mapper.ConfigurationProvider.ExpressionBuilder.CreateMapExpression(sourceResultType, destResultType,
                             _parameters, membersToExpand);
                         // add projection via "select" operator
                         var expr = Expression.Call(
@@ -212,7 +213,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     {
                         var sourceResult = _dataSource.Provider.Execute(sourceExpression);
                         Inspector.SourceResult(sourceExpression, sourceResult);
-                        destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
+                        destResult = _mapper.Map(sourceResult, sourceResultType, destResultType);
                     }
                 }
 
@@ -286,15 +287,15 @@ namespace AutoMapper.QueryableExtensions.Impl
             // call beforevisitors
             expression = _beforeVisitors.Aggregate(expression, (current, before) => before.Visit(current));
 
-            var typeMap = _mappingEngine.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
-            var visitor = new ExpressionMapper.MappingVisitor(typeMap, _destQuery.Expression, _dataSource.Expression, null,
+            var typeMap = _mapper.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
+            var visitor = new ExpressionMapper.MappingVisitor(_mapper.ConfigurationProvider, typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] {typeof (TSource)});
             var sourceExpression = visitor.Visit(expression);
 
             // apply parameters
             if (_parameters != null && _parameters.Any())
             {
-                var constantVisitor = new MappingEngine.ConstantExpressionReplacementVisitor(_parameters);
+                var constantVisitor = new ExpressionBuilder.ConstantExpressionReplacementVisitor(_parameters);
                 sourceExpression = constantVisitor.Visit(sourceExpression);
             }
 

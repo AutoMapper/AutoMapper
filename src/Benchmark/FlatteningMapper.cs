@@ -7,21 +7,20 @@ namespace Benchmark.Flattening
     public class CtorMapper : IObjectToObjectMapper
     {
         private Model11 _model;
+        private IMapper _mapper;
 
-        public string Name
-        {
-            get { return "CtorMapper"; }
-        }
+        public string Name => "CtorMapper";
 
         public void Initialize()
         {
-            Mapper.Initialize(cfg => cfg.CreateMap<Model11, Dto11>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Model11, Dto11>());
+            _mapper = config.CreateMapper();
             _model = new Model11 { Value = 5 };
         }
 
         public void Map()
         {
-            Mapper.Map<Model11, Dto11>(_model);
+            _mapper.Map<Model11, Dto11>(_model);
         }
     }
 
@@ -29,10 +28,7 @@ namespace Benchmark.Flattening
     {
         private Model11 _model;
 
-        public string Name
-        {
-            get { return "ManualCtorMapper"; }
-        }
+        public string Name => "ManualCtorMapper";
 
         public void Initialize()
         {
@@ -48,15 +44,16 @@ namespace Benchmark.Flattening
     public class FlatteningMapper : IObjectToObjectMapper
 	{
 		private ModelObject _source;
+        private IMapper _mapper;
 
-		public string Name
+        public string Name
 		{
 			get { return "AutoMapper"; }
 		}
 
 		public void Initialize()
 		{
-			Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
 			{
 				cfg.CreateMap<Model1, Dto1>();
 				cfg.CreateMap<Model2, Dto2>();
@@ -70,7 +67,7 @@ namespace Benchmark.Flattening
 				cfg.CreateMap<Model10, Dto10>();
 				cfg.CreateMap<ModelObject, ModelDto>();
 			});
-			Mapper.AssertConfigurationIsValid();
+			config.AssertConfigurationIsValid();
 			_source = new ModelObject
 				{
 					BaseDate = new DateTime(2007, 4, 5),
@@ -91,11 +88,12 @@ namespace Benchmark.Flattening
 							ProperName = "Some other name"
 						},
 				};
+		    _mapper = config.CreateMapper();
 		}
 
 		public void Map()
 		{
-			Mapper.Map<ModelObject, ModelDto>(_source);
+			_mapper.Map<ModelObject, ModelDto>(_source);
 		}
 	}
 

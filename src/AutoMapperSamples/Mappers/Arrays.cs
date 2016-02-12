@@ -24,7 +24,7 @@ namespace AutoMapperSamples.Mappers
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var config = new MapperConfiguration(cfg =>
 				{
 					cfg.CreateMap<Source, Dest>();
 				});
@@ -36,7 +36,7 @@ namespace AutoMapperSamples.Mappers
 					new Source { Value = 15 }
 				};
 
-				var destArray = Mapper.Map<Source[], Dest[]>(sourceArray);
+				var destArray = config.CreateMapper().Map<Source[], Dest[]>(sourceArray);
 
 				destArray.Length.ShouldEqual(3);
 				destArray[0].Value.ShouldEqual(5);
@@ -78,7 +78,7 @@ namespace AutoMapperSamples.Mappers
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var config = new MapperConfiguration(cfg =>
 				{
 					cfg.CreateMap<Order, OrderDto>();
 					cfg.CreateMap<OrderLine, OrderLineDto>();
@@ -89,7 +89,7 @@ namespace AutoMapperSamples.Mappers
 				order.AddLineItem(new OrderLine { Quantity = 15 });
 				order.AddLineItem(new OrderLine { Quantity = 25 });
 
-				var orderDto = Mapper.Map<Order, OrderDto>(order);
+				var orderDto = config.CreateMapper().Map<Order, OrderDto>(order);
 
 				orderDto.LineItems.Length.ShouldEqual(3);
 				orderDto.LineItems[0].Quantity.ShouldEqual(5);

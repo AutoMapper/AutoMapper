@@ -1,11 +1,11 @@
 namespace AutoMapper.Mappers
 {
-    using Internal;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Configuration;
 
     // So IEnumerable<T> inherits IEnumerable
     // but IDictionary<TKey, TValue> DOES NOT inherit IDictionary

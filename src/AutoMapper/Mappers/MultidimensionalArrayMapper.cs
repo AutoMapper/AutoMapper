@@ -3,7 +3,7 @@ namespace AutoMapper.Mappers
     using System;
     using System.Collections;
     using System.Linq;
-    using Internal;
+    using Configuration;
 
     public class MultidimensionalArrayMapper : EnumerableMapperBase<Array>
     {

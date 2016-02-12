@@ -71,17 +71,17 @@ namespace AutoMapper.IntegrationTests.Net4
             }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Sem, SemDto>().MaxDepth(1).ConstructProjectionUsing(s => new SemDto());
-            Mapper.CreateMap<Art, ArtDto>().MaxDepth(1).ConstructProjectionUsing(s => new ArtDto());
-        }
+            cfg.CreateMap<Sem, SemDto>().MaxDepth(1).ConstructProjectionUsing(s => new SemDto());
+            cfg.CreateMap<Art, ArtDto>().MaxDepth(1).ConstructProjectionUsing(s => new ArtDto());
+        });
 
         protected override void Because_of()
         {
             using(var context = new TestContext())
             {
-                _destination = context.Arts.ProjectTo<ArtDto>().FirstOrDefault();
+                _destination = context.Arts.ProjectTo<ArtDto>(Configuration).FirstOrDefault();
             }
         }
 

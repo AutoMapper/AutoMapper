@@ -67,12 +67,6 @@ namespace AutoMapperSamples
 		[TestFixture]
 		public class Flattening
 		{
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
-			}
-
 			[Test]
 			public void Example()
 			{
@@ -92,11 +86,12 @@ namespace AutoMapperSamples
 					};
 				order.AddOrderLineItem(bosco, 15);
 
-				// Configure AutoMapper
-				Mapper.CreateMap<Order, OrderDto>();
+                // Configure AutoMapper
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Order, OrderDto>());
 
 				// Perform mapping
-				OrderDto dto = Mapper.Map<Order, OrderDto>(order);
+			    var mapper = config.CreateMapper();
+			    OrderDto dto = mapper.Map<Order, OrderDto>(order);
 
 				dto.CustomerName.ShouldEqual("George Costanza");
 				dto.Total.ShouldEqual(74.85m);

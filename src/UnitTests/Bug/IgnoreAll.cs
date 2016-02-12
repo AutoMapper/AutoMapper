@@ -24,15 +24,15 @@ namespace AutoMapper.UnitTests.Bug
         }
         public void SetUp()
         {
-            Mapper.Reset();
+            
         }
 
         [Fact]
         public void Should_still_apply_configuration_to_missing_members()
         {
-            Mapper.CreateMap<ModelObjectNotMatching, ModelDto>()
-                .ForAllMembers(opt => opt.Ignore());
-            Mapper.AssertConfigurationIsValid();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<ModelObjectNotMatching, ModelDto>()
+                .ForAllMembers(opt => opt.Ignore()));
+            config.AssertConfigurationIsValid();
         }
     }
 
@@ -53,13 +53,11 @@ namespace AutoMapper.UnitTests.Bug
             public string Unmapped { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-                cfg.CreateMap<Source, Dest>()
-                    .ForAllMembers(opt => opt.Condition(c => !c.IsSourceValueNull))
-            );
-        }
+            cfg.CreateMap<Source, Dest>()
+                .ForAllMembers(opt => opt.Condition(c => !c.IsSourceValueNull));
+        });
 
         protected override void Because_of()
         {

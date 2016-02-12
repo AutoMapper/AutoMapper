@@ -6,21 +6,19 @@ using Should;
 
 namespace AutoMapper.UnitTests.Tests
 {
-    using Internal;
-
     public abstract class using_generic_configuration : AutoMapperSpecBase
     {
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Destination>()
+            cfg.CreateMap<Source, Destination>()
                 .ForMember(d => d.Ignored, o => o.Ignore())
                 .ForMember(d => d.RenamedField, o => o.MapFrom(s => s.NamedProperty))
                 .ForMember(d => d.IntField, o => o.ResolveUsing<FakeResolver>().FromMember(s => s.StringField))
                 .ForMember("IntProperty", o => o.ResolveUsing<FakeResolver>().FromMember("AnotherStringField"))
                 .ForMember(d => d.IntProperty3,
-                           o => o.ResolveUsing(typeof (FakeResolver)).FromMember(s => s.StringField3))
+                    o => o.ResolveUsing(typeof (FakeResolver)).FromMember(s => s.StringField3))
                 .ForMember(d => d.IntField4, o => o.ResolveUsing(new FakeResolver()).FromMember("StringField4"));
-        }
+        });
 
         protected class Source
         {
@@ -67,7 +65,7 @@ namespace AutoMapper.UnitTests.Tests
         protected override void Because_of()
         {
             sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
+                ConfigProvider.FindTypeMapFor<Source, Destination>()
                     .GetPropertyMaps()
                     .Single(pm => pm.DestinationProperty.Name == memberName)
                     .SourceMember;
@@ -93,7 +91,7 @@ namespace AutoMapper.UnitTests.Tests
         protected override void Because_of()
         {
             sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
+                ConfigProvider.FindTypeMapFor<Source, Destination>()
                     .GetPropertyMaps()
                     .Single(pm => pm.DestinationProperty.Name == "NestedSourceSomeField")
                     .SourceMember;
@@ -120,7 +118,7 @@ namespace AutoMapper.UnitTests.Tests
             try
             {
                 sourceMember =
-                    Mapper.FindTypeMapFor<Source, Destination>()
+                    ConfigProvider.FindTypeMapFor<Source, Destination>()
                         .GetPropertyMaps()
                         .Single(pm => pm.DestinationProperty.Name == "Ignored")
                         .SourceMember;
@@ -151,7 +149,7 @@ namespace AutoMapper.UnitTests.Tests
         protected override void Because_of()
         {
             sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
+                ConfigProvider.FindTypeMapFor<Source, Destination>()
                     .GetPropertyMaps()
                     .Single(pm => pm.DestinationProperty.Name == "RenamedField")
                     .SourceMember;
@@ -175,7 +173,7 @@ namespace AutoMapper.UnitTests.Tests
         protected override void Because_of()
         {
             sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
+                ConfigProvider.FindTypeMapFor<Source, Destination>()
                     .GetPropertyMaps()
                     .Single(pm => pm.DestinationProperty.Name == "IntField")
                     .SourceMember;
@@ -199,7 +197,7 @@ namespace AutoMapper.UnitTests.Tests
         protected override void Because_of()
         {
             sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
+                ConfigProvider.FindTypeMapFor<Source, Destination>()
                     .GetPropertyMaps()
                     .Single(pm => pm.DestinationProperty.Name == "IntProperty")
                     .SourceMember;
@@ -223,7 +221,7 @@ namespace AutoMapper.UnitTests.Tests
         protected override void Because_of()
         {
             sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
+                ConfigProvider.FindTypeMapFor<Source, Destination>()
                     .GetPropertyMaps()
                     .Single(pm => pm.DestinationProperty.Name == "IntProperty3")
                     .SourceMember;
@@ -247,7 +245,7 @@ namespace AutoMapper.UnitTests.Tests
         protected override void Because_of()
         {
             sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
+                ConfigProvider.FindTypeMapFor<Source, Destination>()
                     .GetPropertyMaps()
                     .Single(pm => pm.DestinationProperty.Name == "IntField4")
                     .SourceMember;
@@ -266,11 +264,11 @@ namespace AutoMapper.UnitTests.Tests
 
     public abstract class using_nongeneric_configuration : AutoMapperSpecBase
     {
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap(typeof (Source), typeof (Destination))
+            cfg.CreateMap(typeof (Source), typeof (Destination))
                 .ForMember("RenamedProperty", o => o.MapFrom("NamedProperty"));
-        }
+        });
 
         protected class Source
         {
@@ -290,7 +288,7 @@ namespace AutoMapper.UnitTests.Tests
         protected override void Because_of()
         {
             sourceMember =
-                Mapper.FindTypeMapFor<Source, Destination>()
+                ConfigProvider.FindTypeMapFor<Source, Destination>()
                     .GetPropertyMaps()
                     .Single(pm => pm.DestinationProperty.Name == "RenamedProperty")
                     .SourceMember;

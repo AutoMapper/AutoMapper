@@ -16,7 +16,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         
         public SourceSourceInjectedQuery(IQueryable<TSource> dataSource, 
                 IQueryable<TDestination> destQuery,
-                IMappingEngine mappingEngine, 
+                IMapper mapper, 
                 IEnumerable<ExpressionVisitor> beforeVisitors,
                 IEnumerable<ExpressionVisitor> afterVisitors,
                 Action<Exception> exceptionHandler,
@@ -28,7 +28,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             EnumerationHandler = (x => {});
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
-            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mappingEngine, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler, parameters, membersToExpand)
+            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mapper, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler, parameters, membersToExpand)
             {
                 Inspector = inspector ?? new SourceInjectedQueryInspector(),
             };

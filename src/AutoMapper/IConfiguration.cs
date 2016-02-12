@@ -2,21 +2,17 @@ namespace AutoMapper
 {
     using System;
 
-    public interface IConfiguration : IProfileExpression
+    public interface IMapperConfiguration : IProfileExpression, IConfiguration
+    {
+        
+    }
+
+    public interface IConfiguration
     {
         /// <summary>
-        /// Create a named profile for grouped mapping configuration
+        /// Create missing type maps during mapping, if necessary
         /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <returns>Profile configuration options</returns>
-        IProfileExpression CreateProfile(string profileName);
-
-        /// <summary>
-        /// Create a named profile for grouped mapping configuration, and configure the profile
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <param name="profileConfiguration">Profile configuration callback</param>
-        void CreateProfile(string profileName, Action<IProfileExpression> profileConfiguration);
+        bool CreateMissingTypeMaps { get; set; }
 
         /// <summary>
         /// Add an existing profile
@@ -31,14 +27,22 @@ namespace AutoMapper
         void AddProfile<TProfile>() where TProfile : Profile, new();
 
         /// <summary>
-        /// Supply a factory method callback for creating formatters, resolvers and type converters
+        /// Add an existing profile type. Profile will be instantiated and added to the configuration.
+        /// </summary>
+        /// <param name="profileType">Profile type</param>
+        void AddProfile(Type profileType);
+
+        /// <summary>
+        /// Supply a factory method callback for creating resolvers and type converters
         /// </summary>
         /// <param name="constructor">Factory method</param>
         void ConstructServicesUsing(Func<Type, object> constructor);
 
         /// <summary>
-        /// Seal the configuration and optimize maps
+        /// Create a named profile with the supplied configuration
         /// </summary>
-        void Seal();
+        /// <param name="profileName">Profile name, must be unique</param>
+        /// <param name="config">Profile configuration</param>
+        void CreateProfile(string profileName, Action<Profile> config);
     }
 }

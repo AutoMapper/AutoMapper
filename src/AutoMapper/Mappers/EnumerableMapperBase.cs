@@ -5,7 +5,6 @@ namespace AutoMapper.Mappers
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Internal;
 
     public abstract class EnumerableMapperBase<TEnumerable> : IObjectMapper
         where TEnumerable : IEnumerable

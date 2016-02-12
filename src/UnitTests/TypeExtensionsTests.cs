@@ -1,6 +1,5 @@
 ﻿namespace AutoMapper.UnitTests
 {
-    using Internal;
     using Should;
     using Xunit;
 

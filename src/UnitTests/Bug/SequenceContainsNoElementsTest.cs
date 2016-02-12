@@ -10,15 +10,10 @@ namespace AutoMapper.UnitTests.Bug
 {
 	public class SequenceContainsNoElementsTest : AutoMapperSpecBase
 	{
-        public SequenceContainsNoElementsTest()
-        {
-            SetUp();
-        }
-
-        public void SetUp()
-		{
-			Mapper.CreateMap<Person, PersonModel>();
-		}
+	    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+	    {
+	        cfg.CreateMap<Person, PersonModel>();
+	    });
 
 		[Fact]
 		public void should_not_throw_InvalidOperationException()
@@ -38,13 +33,7 @@ namespace AutoMapper.UnitTests.Bug
 		{
 			this.people = people;
 		}
-		public IEnumerator GetEnumerator()
-		{
-			foreach (var person in people)
-			{
-				yield return person;
-			}
-		}
+		public IEnumerator GetEnumerator() => people.GetEnumerator();
 	}
 
 	public class Person

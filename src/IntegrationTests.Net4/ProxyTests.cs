@@ -13,16 +13,17 @@
         {
             Database.SetInitializer(new Initializer());
 
-            Mapper.Initialize(cfg => {
+            var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<TrainingCourse, TrainingCourseDto>().Include<TrainingCourse, ParentTrainingCourseDto>();
                 cfg.CreateMap<TrainingCourse, ParentTrainingCourseDto>();
                 cfg.CreateMap<TrainingContent, TrainingContentDto>();
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
 
             var context = new ClientContext();
             var course = context.TrainingCourses.FirstOrDefault(n => n.CourseName == "Course 1");
-            var dto = Mapper.Map<TrainingCourseDto>(course);
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<TrainingCourseDto>(course);
         }
 
         class Initializer : DropCreateDatabaseAlways<ClientContext>
@@ -54,9 +55,9 @@
                 Content = new List<TrainingContent>();
             }
 
-            public TrainingCourse(TrainingCourse entity)
+            public TrainingCourse(TrainingCourse entity, IMapper mapper)
             {
-                Mapper.Map(entity, this);
+                mapper.Map(entity, this);
             }
 
             [Key]
