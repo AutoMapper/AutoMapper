@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapper.Net4", "AutoMapper.Net4\AutoMapper.Net4.csproj", "{8C955148-FA96-4F0D-880D-ABB6770F54E9}"
 EndProject
@@ -10,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests.Net4", "IntegrationTests.Net4\IntegrationTests.Net4.csproj", "{906F2125-2AEC-44A3-A95F-CB79C0A745BB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapperSamples", "AutoMapperSamples\AutoMapperSamples.csproj", "{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapperSamples.EF", "AutoMapperSamples.EF\AutoMapperSamples.EF.csproj", "{D497FA09-E931-4B4E-870A-55EC8E3E35E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoMapperSamples.OData", "AutoMapperSamples.OData\AutoMapperSamples.OData.csproj", "{E87F3347-5604-42DD-915B-173BDE2AAAF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +91,38 @@ Global
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Release|x64.Build.0 = Release|Any CPU
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Release|x86.ActiveCfg = Release|Any CPU
 		{277C689D-B1C1-43EA-B20D-C1155C4B2EA7}.Release|x86.Build.0 = Release|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Debug|x64.Build.0 = Debug|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Debug|x86.Build.0 = Debug|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Release|ARM.Build.0 = Release|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Release|x64.ActiveCfg = Release|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Release|x64.Build.0 = Release|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{D497FA09-E931-4B4E-870A-55EC8E3E35E2}.Release|x86.Build.0 = Release|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Debug|ARM.Build.0 = Debug|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Debug|x64.Build.0 = Debug|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Debug|x86.Build.0 = Debug|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Release|ARM.ActiveCfg = Release|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Release|ARM.Build.0 = Release|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Release|x64.ActiveCfg = Release|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Release|x64.Build.0 = Release|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Release|x86.ActiveCfg = Release|Any CPU
+		{E87F3347-5604-42DD-915B-173BDE2AAAF3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
