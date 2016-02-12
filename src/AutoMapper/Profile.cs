@@ -30,7 +30,7 @@ namespace AutoMapper
         protected Profile()
         {
             ProfileName = GetType().FullName;
-            IncludeSourceExtensionMethods(typeof(Enumerable).Assembly());
+            IncludeSourceExtensionMethods(typeof(Enumerable));
             _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
 
@@ -206,14 +206,9 @@ namespace AutoMapper
 
         public Func<FieldInfo, bool> ShouldMapField { get; set; } = f => f.IsPublic();
 
-        public void IncludeSourceExtensionMethods(Assembly assembly)
+        public void IncludeSourceExtensionMethods(Type type)
         {
-            //http://stackoverflow.com/questions/299515/c-sharp-reflection-to-identify-extension-methods
-            _sourceExtensionMethods.AddRange(assembly.ExportedTypes
-                .Where(type => type.IsSealed() && !type.IsGenericType() && !type.IsNested)
-                .SelectMany(type => type.GetDeclaredMethods().Where(mi => mi.IsStatic))
-                .Where(method => method.IsDefined(typeof(ExtensionAttribute), false))
-                .Where(method => method.GetParameters().Length == 1));
+            _sourceExtensionMethods.AddRange(type.GetDeclaredMethods().Where(m => m.IsStatic && m.IsDefined(typeof(ExtensionAttribute), false) && m.GetParameters().Length == 1));
         }
 
         void IProfileConfiguration.Register(TypeMapRegistry typeMapRegistry)

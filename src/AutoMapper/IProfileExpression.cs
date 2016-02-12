@@ -133,6 +133,6 @@ namespace AutoMapper
         string ProfileName { get; }
         IMemberConfiguration AddMemberConfiguration();
         IConditionalObjectMapper AddConditionalObjectMapper();
-        void IncludeSourceExtensionMethods(Assembly assembly);
+        void IncludeSourceExtensionMethods(Type type);
     }
 }

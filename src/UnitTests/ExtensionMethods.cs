@@ -33,7 +33,7 @@ namespace AutoMapper.UnitTests
 
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
-		        cfg.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly());
+		        cfg.IncludeSourceExtensionMethods(typeof(When_extension_method_returns_value_type_SourceExtensions));
 		        cfg.CreateMap<Source, Destination>();
 		    });
 
@@ -85,7 +85,7 @@ namespace AutoMapper.UnitTests
 
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
-		        cfg.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly());
+		        cfg.IncludeSourceExtensionMethods(typeof(When_extension_method_returns_object_SourceExtensions));
 		        cfg.CreateMap<Source, Destination>();
 		    });
 

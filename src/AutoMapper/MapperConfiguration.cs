@@ -95,9 +95,9 @@ namespace AutoMapper
             set { _defaultProfile.CreateMissingTypeMaps = value; }
         }
 
-        void IProfileExpression.IncludeSourceExtensionMethods(Assembly assembly)
+        void IProfileExpression.IncludeSourceExtensionMethods(Type type)
         {
-            _defaultProfile.IncludeSourceExtensionMethods(assembly);
+            _defaultProfile.IncludeSourceExtensionMethods(type);
         }
 
         INamingConvention IProfileExpression.SourceMemberNamingConvention
