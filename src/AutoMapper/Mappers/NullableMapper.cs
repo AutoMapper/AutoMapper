@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair context)
         {
-            return context.DestinationType.IsNullableType();
+            return context.SourceType == typeof(object) && context.DestinationType.IsNullableType();
         }
     }
 }
