@@ -168,7 +168,7 @@ namespace AutoMapper
         {
             _globalIgnore.Add(propertyNameStartingWith);
         }
-        
+
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
         private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();

@@ -114,6 +114,7 @@ namespace AutoMapper
                     if (lastResolver != null)
                     {
                         var sourceType = lastResolver.MemberType;
+
                         // when we don't know what the source type is, bail
                         if (sourceType.IsGenericParameter || sourceType == typeof(object))
                             return;

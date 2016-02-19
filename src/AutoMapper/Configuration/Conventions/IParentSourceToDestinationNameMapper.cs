@@ -8,6 +8,6 @@ namespace AutoMapper.Configuration.Conventions
     {
         ICollection<ISourceToDestinationNameMapper> NamedMappers { get; }
         IGetTypeInfoMembers GetMembers { get; }
-        MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, string nameToSearch);
+        MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch);
     }
 }

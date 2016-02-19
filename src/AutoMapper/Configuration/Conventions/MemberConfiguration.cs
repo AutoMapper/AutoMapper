@@ -45,12 +45,12 @@ namespace AutoMapper.Configuration.Conventions
             MemberMappers.Add(new DefaultMember { NameMapper = NameMapper });
         }
 
-        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, string nameToSearch, LinkedList<IValueResolver> resolvers)
+        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IValueResolver> resolvers)
         {
             var foundMap = false;
             foreach (var memberMapper in MemberMappers)
             {
-                foundMap = memberMapper.MapDestinationPropertyToSource(options, sourceType, destType, nameToSearch, resolvers, this);
+                foundMap = memberMapper.MapDestinationPropertyToSource(options, sourceType, destType, destMemberType, nameToSearch, resolvers, this);
                 if (foundMap)
                     break;
             }
