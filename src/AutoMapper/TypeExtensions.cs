@@ -16,19 +16,82 @@ namespace AutoMapper
             return expression.Type == typeof (object) ? expression : Expression.Convert(expression, typeof (object));
         }
 
-        public static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type)
+        /// <param name="type">The type to construct.</param>
+        /// <param name="getClosedGenericInterfaceType">
+        /// For generic interfaces, the only way to reliably determine the implementing type's generic type arguments
+        /// is to know the closed type of the desired interface implementation since there may be multiple implementations
+        /// of the same generic interface on this type.
+        /// </param>
+        public static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type, Func<ResolutionContext, Type> getClosedGenericInterfaceType = null)
         {
-            return context =>
+			return context =>
             {
                 if (type.IsGenericTypeDefinition())
                 {
-                    type = type.MakeGenericType(context.SourceType.GetTypeInfo().GenericTypeArguments);
+                    if (getClosedGenericInterfaceType == null) throw new ArgumentNullException(nameof(getClosedGenericInterfaceType), "For generic interfaces, the desired closed interface type must be known.");
+                    var closedInterfaceType = getClosedGenericInterfaceType.Invoke(context);
+                    var implementationTypeArguments = type.GetImplementedInterface(closedInterfaceType.GetGenericTypeDefinition(), closedInterfaceType.GenericTypeArguments).GenericTypeArguments;
+
+                    var genericParameters = type.GetTypeInfo().GenericTypeParameters;
+                    var deducedTypeArguments = new Type[genericParameters.Length];
+                    DeduceGenericArguments(genericParameters, deducedTypeArguments, implementationTypeArguments[0], context.SourceType);
+                    DeduceGenericArguments(genericParameters, deducedTypeArguments, implementationTypeArguments[1], context.DestinationType);
+                    
+                    if (deducedTypeArguments.Any(_ => _ == null)) throw new InvalidOperationException($"One or more type arguments to {type.Name} cannot be determined.");
+                    type = type.MakeGenericType(deducedTypeArguments);
                 }
 
                 var obj = context.Options.ServiceCtor.Invoke(type);
 
                 return (TServiceType)obj;
             };
+        }
+
+        private static void DeduceGenericArguments(Type[] genericParameters, Type[] deducedGenericArguments, Type typeUsingParameters, Type typeUsingArguments)
+        {
+            if (typeUsingParameters.IsByRef)
+            {
+                DeduceGenericArguments(genericParameters, deducedGenericArguments, typeUsingParameters.GetElementType(), typeUsingArguments.GetElementType());
+                return;
+            }
+
+            var index = Array.IndexOf(genericParameters, typeUsingParameters);
+            if (index != -1)
+            {
+                if (deducedGenericArguments[index] == null)
+                    deducedGenericArguments[index] = typeUsingArguments;
+                else if (deducedGenericArguments[index] != typeUsingArguments)
+                    throw new NotImplementedException("Generic variance is not implemented.");
+            }
+            else if (typeUsingParameters.IsGenericType() && typeUsingArguments.IsGenericType())
+            {
+                var childArgumentsUsingParameters = typeUsingParameters.GenericTypeArguments;
+                var childArgumentsUsingArguments = typeUsingArguments.GenericTypeArguments;
+                for (var i = 0; i < childArgumentsUsingParameters.Length; i++)
+                    DeduceGenericArguments(genericParameters, deducedGenericArguments, childArgumentsUsingParameters[i], childArgumentsUsingArguments[i]);
+            }
+        }
+
+        private static Type GetImplementedInterface(this Type implementation, Type interfaceDefinition, params Type[] interfaceGenericArguments)
+        {
+            return implementation.GetTypeInfo().ImplementedInterfaces.Single(implementedInterface =>
+            {
+                if (implementedInterface.GetGenericTypeDefinition() != interfaceDefinition) return false;
+
+                var implementedInterfaceArguments = implementedInterface.GenericTypeArguments;
+                for (var i = 0; i < interfaceGenericArguments.Length; i++)
+                {
+                    // This assumes the interface type parameters are not covariant or contravariant
+                    if (implementedInterfaceArguments[i].GetGenericTypeDefinitionIfGeneric() != interfaceGenericArguments[i].GetGenericTypeDefinitionIfGeneric()) return false;
+                }
+
+                return true;
+            });
+        }
+
+        public static Type GetGenericTypeDefinitionIfGeneric(this Type type)
+        {
+            return type.IsGenericType() ? type.GetGenericTypeDefinition() : type;
         }
 
         public static Type[] GetGenericParameters(this Type type)
