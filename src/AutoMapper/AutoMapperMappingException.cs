@@ -118,10 +118,6 @@ namespace AutoMapper
                     builder.Append(".");
                     builder.Append(ctxt.MemberName);
                 }
-                if (ctxt.ArrayIndex != null)
-                {
-                    builder.AppendFormat("[{0}]", ctxt.ArrayIndex);
-                }
             }
             return builder.ToString();
         }

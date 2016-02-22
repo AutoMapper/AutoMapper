@@ -6,9 +6,9 @@ namespace AutoMapper.Mappers
     {
         public object Map(ResolutionContext context)
         {
-            if (context.SourceValue == null && !context.Engine.ShouldMapSourceValueAsNull(context))
+            if (context.SourceValue == null && !context.Mapper.ShouldMapSourceValueAsNull(context))
             {
-                return context.Engine.CreateObject(context);
+                return context.Mapper.CreateObject(context);
             }
 
             return context.SourceValue;

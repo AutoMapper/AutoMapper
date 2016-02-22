@@ -40,8 +40,8 @@ namespace AutoMapper
                 try
                 {
                     DryRunTypeMap(typeMapsChecked,
-                        new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType,
-                            new MappingOperationOptions(_config.ServiceCtor), engine));
+                        new ResolutionContext(null, null, typeMap.SourceType, typeMap.DestinationType, typeMap,
+                            new MappingOperationOptions(_config.ServiceCtor), new Mapper(_config)));
                 }
                 catch (Exception e)
                 {
@@ -96,8 +96,7 @@ namespace AutoMapper
             if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
                 return;
 
-            var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType,
-                0);
+            var memberContext = new ResolutionContext(null, null, sourceElementType, destElementType, itemTypeMap, context);
 
             DryRunTypeMap(typeMapsChecked, memberContext);
         }
@@ -126,8 +125,7 @@ namespace AutoMapper
                         if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
                             continue;
 
-                        var memberContext = context.CreateMemberContext(memberTypeMap, null, null, sourceType,
-                            propertyMap);
+                        var memberContext = new ResolutionContext(null, null, sourceType, destinationType, memberTypeMap, context, propertyMap);
 
                         DryRunTypeMap(typeMapsChecked, memberContext);
                     }

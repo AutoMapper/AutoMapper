@@ -36,12 +36,8 @@ namespace AutoMapper.Mappers
             public object Map(object source, ResolutionContext context)
             {
                 var newSource = context.TypeMap.Substitution(context.SourceValue);
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(newSource.GetType(), context.DestinationType);
 
-                var substitutionContext = context.CreateTypeContext(typeMap, newSource, context.DestinationValue,
-                    newSource.GetType(), context.DestinationType);
-
-                return context.Engine.Map(substitutionContext);
+                return context.Mapper.Map(newSource, context.DestinationValue, newSource.GetType(), context.DestinationType, context);
             }
 
             public bool IsMatch(ResolutionContext context)
@@ -90,7 +86,7 @@ namespace AutoMapper.Mappers
 
                 foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
                 {
-                    MapPropertyValue(context.CreatePropertyMapContext(propertyMap), mappedObject, propertyMap);
+                    MapPropertyValue(context, mappedObject, propertyMap);
                 }
                 mappedObject = ReassignValue(context, mappedObject);
 
@@ -137,13 +133,7 @@ namespace AutoMapper.Mappers
                 var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, declaredSourceType, destinationType);
-
-                var targetSourceType = typeMap?.SourceType ?? sourceType;
-
-                var newContext = context.CreateMemberContext(typeMap, result, destinationValue,
-                    targetSourceType,
-                    propertyMap);
+                var newContext = new ResolutionContext(result.Value, destinationValue, sourceType, destinationType, context.TypeMap, context, propertyMap);
 
                 if (!propertyMap.ShouldAssignValue(newContext))
                     return;
@@ -154,7 +144,7 @@ namespace AutoMapper.Mappers
 
                 try
                 {
-                    object propertyValueToAssign = context.Engine.Map(newContext);
+                    object propertyValueToAssign = context.Mapper.Map(result.Value, destinationValue, sourceType, destinationType, context);
 
                     AssignValue(propertyMap, mappedObject, propertyValueToAssign);
                 }
@@ -178,12 +168,12 @@ namespace AutoMapper.Mappers
             private ResolutionContext CreateErrorContext(ResolutionContext context, PropertyMap propertyMap,
                 object destinationValue)
             {
-                return context.CreateMemberContext(
-                    null,
+                return new ResolutionContext(
                     context.SourceValue,
                     destinationValue,
                     context.SourceValue?.GetType() ?? typeof (object),
-                    propertyMap);
+                    destinationValue?.GetType() ?? propertyMap.DestinationPropertyType,
+                    context.TypeMap, context, propertyMap);
             }
         }
 
@@ -196,7 +186,7 @@ namespace AutoMapper.Mappers
 
             protected override object GetMappedObject(ResolutionContext context)
             {
-                var result = context.Engine.CreateObject(context);
+                var result = context.Mapper.CreateObject(context);
                 if(result == null)
                 {
                     throw new InvalidOperationException("Cannot create destination object. " + context);

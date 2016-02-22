@@ -64,11 +64,6 @@ namespace AutoMapper
 
                 var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, context.SourceType, destinationType);
 
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
-
-                var newContext = context.CreateTypeContext(typeMap, result, null, targetSourceType,
-                    destinationType);
-
                 if (typeMap == null && map.Parameter.IsOptional)
                 {
                     object value = map.Parameter.DefaultValue;
@@ -76,7 +71,7 @@ namespace AutoMapper
                 }
                 else
                 {
-                    var value = context.Engine.Map(newContext);
+                    var value = context.Mapper.Map(result.Value, null, sourceType, destinationType, context);
                     ctorArgs.Add(value);
                 }
             }

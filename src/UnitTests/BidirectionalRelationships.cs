@@ -232,10 +232,7 @@ namespace AutoMapper.UnitTests
 				public ParentDto Convert(int source, ResolutionContext resolutionContext)
 				{
 					ParentModel parentModel = _parentModels[source];
-				    var context = resolutionContext.CreateTypeContext(
-				        resolutionContext.Engine.ConfigurationProvider.ResolveTypeMap(typeof (ParentModel), typeof (ParentDto)),
-				        parentModel, null, typeof (ParentModel), typeof (ParentDto));
-				    return (ParentDto) resolutionContext.Engine.Map(context);
+				    return (ParentDto) resolutionContext.Mapper.Map(parentModel, null, typeof(ParentModel), typeof(ParentDto), resolutionContext);
 				}
 			}
 
@@ -251,10 +248,7 @@ namespace AutoMapper.UnitTests
 				public List<ChildDto> Convert(int source, ResolutionContext resolutionContext)
 				{
 					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == source).ToList();
-                    var context = resolutionContext.CreateTypeContext(
-                        null,
-                        childModels, null, typeof(List<ChildModel>), typeof(List<ChildDto>));
-                    return (List<ChildDto>) context.Engine.Map(context);
+                    return (List<ChildDto>)resolutionContext.Mapper.Map(childModels, null, typeof(List<ChildModel>), typeof(List<ChildDto>), resolutionContext);
 				}
 			}
 
