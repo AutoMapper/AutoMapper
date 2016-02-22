@@ -70,6 +70,7 @@ namespace AutoMapper
 
         public ResolutionContext Context { get; }
         public TypePair Types { get; }
+        public PropertyMap PropertyMap { get; set; }
 
         public override string Message
         {
@@ -87,7 +88,7 @@ namespace AutoMapper
                 }
                 if (Context != null)
                 { 
-                    var destPath = GetDestPath(Context);
+                    var destPath = GetDestPath();
                     message += newLine + newLine + "Destination path:" + newLine + destPath;
 
                     message += newLine + newLine + "Source value:" + newLine + (Context.SourceValue ?? "(null)");
@@ -105,21 +106,31 @@ namespace AutoMapper
             }
         }
 
-        private string GetDestPath(ResolutionContext context)
+        private string GetDestPath()
         {
-            var allContexts = context.GetContexts();
+            var allContexts = GetExceptions().ToArray();
 
-            var builder = new StringBuilder(allContexts[0].DestinationType.Name);
+            var context = allContexts[0].Context?.Parent ?? allContexts[0].Context;
+            var builder = new StringBuilder(context?.DestinationType.Name);
 
-            foreach (var ctxt in allContexts)
+            foreach (var memberName in allContexts.Select(ctxt => ctxt?.PropertyMap?.DestinationProperty?.Name).Where(memberName => !string.IsNullOrEmpty(memberName)))
             {
-                if (!string.IsNullOrEmpty(ctxt.MemberName))
-                {
-                    builder.Append(".");
-                    builder.Append(ctxt.MemberName);
-                }
+                builder.Append(".");
+                builder.Append(memberName);
             }
             return builder.ToString();
+        }
+
+        private IEnumerable<AutoMapperMappingException> GetExceptions()
+        {
+            Exception exc = this;
+            while (exc != null)
+            {
+                var mappingEx = exc as AutoMapperMappingException;
+                if (mappingEx != null)
+                    yield return mappingEx;
+                exc = exc.InnerException;
+            }
         }
 
 #if !DEBUG

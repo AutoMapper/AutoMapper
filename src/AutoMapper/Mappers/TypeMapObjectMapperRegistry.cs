@@ -116,14 +116,15 @@ namespace AutoMapper.Mappers
                 {
                     result = propertyMap.ResolveValue(context);
                 }
-                catch (AutoMapperMappingException)
+                catch (AutoMapperMappingException ex)
                 {
+                    ex.PropertyMap = propertyMap;
+
                     throw;
                 }
                 catch (Exception ex)
                 {
-                    var errorContext = CreateErrorContext(context, propertyMap, null);
-                    resolvingExc = new AutoMapperMappingException(errorContext, ex);
+                    resolvingExc = new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
                     result = context.SourceValue;
                 }
 
@@ -133,7 +134,7 @@ namespace AutoMapper.Mappers
                 var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                var newContext = new ResolutionContext(result.Value, destinationValue, sourceType, destinationType, context.TypeMap, context, propertyMap);
+                var newContext = new ResolutionContext(result.Value, destinationValue, sourceType, destinationType, context.TypeMap, context);
 
                 if (!propertyMap.ShouldAssignValue(newContext))
                     return;
@@ -148,8 +149,10 @@ namespace AutoMapper.Mappers
 
                     AssignValue(propertyMap, mappedObject, propertyValueToAssign);
                 }
-                catch (AutoMapperMappingException)
+                catch (AutoMapperMappingException ex)
                 {
+                    ex.PropertyMap = propertyMap;
+
                     throw;
                 }
                 catch (Exception ex)
@@ -163,17 +166,6 @@ namespace AutoMapper.Mappers
             {
                 if (propertyMap.CanBeSet)
                     propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
-            }
-
-            private ResolutionContext CreateErrorContext(ResolutionContext context, PropertyMap propertyMap,
-                object destinationValue)
-            {
-                return new ResolutionContext(
-                    context.SourceValue,
-                    destinationValue,
-                    context.SourceValue?.GetType() ?? typeof (object),
-                    destinationValue?.GetType() ?? propertyMap.DestinationPropertyType,
-                    context.TypeMap, context, propertyMap);
             }
         }
 

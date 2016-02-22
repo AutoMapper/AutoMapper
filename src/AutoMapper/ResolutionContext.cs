@@ -20,11 +20,6 @@ namespace AutoMapper
         public TypeMap TypeMap { get; }
 
         /// <summary>
-        /// Current property map
-        /// </summary>
-        public PropertyMap PropertyMap { get; }
-
-        /// <summary>
         /// Current source type
         /// </summary>
         public Type SourceType { get; }
@@ -70,13 +65,6 @@ namespace AutoMapper
         public TypePair Types { get; }
 
         public bool IsSourceValueNull => Equals(null, SourceValue);
-
-        public ResolutionContext(object source, object destination, Type sourceType, Type destinationType,
-            TypeMap typeMap, ResolutionContext parent, PropertyMap propertyMap)
-            : this(source, destination, sourceType, destinationType, typeMap, parent)
-        {
-            PropertyMap = propertyMap;
-        }
 
         public ResolutionContext(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap, ResolutionContext parent)
             : this(source, destination, typeMap)
@@ -145,8 +133,6 @@ namespace AutoMapper
             }
         }
 
-        public string MemberName => PropertyMap?.DestinationProperty.Name;
-
         public TypeMap GetContextTypeMap()
         {
             TypeMap typeMap = TypeMap;
@@ -157,18 +143,6 @@ namespace AutoMapper
                 parent = parent.Parent;
             }
             return typeMap;
-        }
-
-        public PropertyMap GetContextPropertyMap()
-        {
-            PropertyMap propertyMap = PropertyMap;
-            ResolutionContext parent = Parent;
-            while ((propertyMap == null) && (parent != null))
-            {
-                propertyMap = parent.PropertyMap;
-                parent = parent.Parent;
-            }
-            return propertyMap;
         }
 
         public ResolutionContext[] GetContexts()

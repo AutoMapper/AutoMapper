@@ -214,7 +214,7 @@ namespace AutoMapper
             var options = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
             opts(options);
 
-            return (TDestination)MapCore(source, modelType, destinationType, options);
+            return (TDestination)MapCore(source, null, modelType, destinationType, options);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
@@ -241,7 +241,7 @@ namespace AutoMapper
 
             opts(options);
 
-            return MapCore(source, sourceType, destinationType, options);
+            return MapCore(source, null, sourceType, destinationType, options);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
@@ -305,15 +305,6 @@ namespace AutoMapper
             return typeMap?.Profile.AllowNullCollections ?? _configurationProvider.AllowNullCollections;
         }
 
-        private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
-        {
-            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
-
-            var context = new ResolutionContext(source, null, sourceType, destinationType, typeMap, options, this);
-
-            return _engine.Map(context);
-        }
-
         private object MapCore(object source, object destination, Type sourceType, Type destinationType,
             MappingOperationOptions options)
         {
@@ -324,8 +315,7 @@ namespace AutoMapper
             return _engine.Map(context);
         }
 
-        private object MapCore(object source, object destination, Type sourceType, Type destinationType,
-            ResolutionContext parent)
+        private object MapCore(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
         {
             TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 

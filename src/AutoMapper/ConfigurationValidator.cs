@@ -125,9 +125,17 @@ namespace AutoMapper
                         if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
                             continue;
 
-                        var memberContext = new ResolutionContext(null, null, sourceType, destinationType, memberTypeMap, context, propertyMap);
+                        var memberContext = new ResolutionContext(null, null, sourceType, destinationType, memberTypeMap, context);
 
-                        DryRunTypeMap(typeMapsChecked, memberContext);
+                        try
+                        {
+                            DryRunTypeMap(typeMapsChecked, memberContext);
+                        }
+                        catch (AutoMapperMappingException ex)
+                        {
+                            ex.PropertyMap = propertyMap;
+                            throw;
+                        }
                     }
                 }
             }
