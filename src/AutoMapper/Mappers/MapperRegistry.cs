@@ -22,6 +22,7 @@ namespace AutoMapper.Mappers
             new CollectionMapper(),
             new EnumerableMapper(),
             new StringMapper(),
+            new AssignableMapper(),
 #if !PORTABLE
             new TypeConverterMapper(),
 #endif
@@ -32,8 +33,7 @@ namespace AutoMapper.Mappers
             new FromStringDictionaryMapper(),
             new ToStringDictionaryMapper(),
             new FromDynamicMapper(),
-            new ToDynamicMapper(),
-            new AssignableMapper()
+            new ToDynamicMapper()
         };
 
         private static readonly List<IObjectMapper> _mappers = new List<IObjectMapper>(_initialMappers);
