@@ -75,8 +75,8 @@ namespace AutoMapper
 
             InstanceCache = parent.InstanceCache;
 
-            SourceType = source?.GetType() ?? sourceType ?? typeMap?.SourceType ?? parent.SourceType;
-            DestinationType = destination?.GetType() ?? destinationType ?? typeMap?.DestinationType ?? parent.DestinationType;
+            SourceType = sourceType ?? typeMap?.SourceType ?? parent.SourceType;
+            DestinationType = destinationType ?? typeMap?.DestinationType ?? parent.DestinationType;
 
             Types = new TypePair(SourceType, DestinationType);
         }

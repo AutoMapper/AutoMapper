@@ -215,7 +215,8 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(object source, object destination, Type sourceType, Type destinationType)
         {
-            return ResolveTypeMap(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
+            return ResolveTypeMap(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType)
+                ?? ResolveTypeMap(sourceType, destinationType);
         }
 
         public TypeMap ResolveTypeMap(Type sourceRuntimeType, Type sourceDeclaredType, Type destinationType)

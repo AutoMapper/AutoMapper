@@ -117,12 +117,12 @@ namespace AutoMapper.Mappers
             // Enum to string
             if (sourceEnumType != null)
             {
-                return context.DestinationType.IsAssignableFrom(typeof (string));
+                return context.DestinationType == typeof (string);
             }
             if (destEnumType != null)
             {
                 toEnum = true;
-                return context.SourceType.IsAssignableFrom(typeof (string));
+                return context.SourceType == typeof (string);
             }
             return false;
         }
