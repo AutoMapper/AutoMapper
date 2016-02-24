@@ -8,11 +8,15 @@ namespace Benchmark
 	{
 		public static void Main(string[] args)
 		{
-			var mappers = new Dictionary<string, IObjectToObjectMapper[]>
-				{
-					{ "Flattening", new IObjectToObjectMapper[] { new FlatteningMapper(), new ManualMapper() } },
-					{ "Ctors", new IObjectToObjectMapper[] { new CtorMapper(), new ManualCtorMapper(),  } }
-				};
+			//var mappers = new Dictionary<string, IObjectToObjectMapper[]>
+			//	{
+			//		{ "Flattening", new IObjectToObjectMapper[] { new FlatteningMapper(), new ManualMapper() } },
+			//		{ "Ctors", new IObjectToObjectMapper[] { new CtorMapper(), new ManualCtorMapper(),  } }
+			//	};
+		    var mappers = new Dictionary<string, IObjectToObjectMapper[]>
+		    {
+		        {"Flattening", new IObjectToObjectMapper[] {new FlatteningMapper(), new ManualMapper()}},
+		    };
 		
 
 			foreach (var pair in mappers)

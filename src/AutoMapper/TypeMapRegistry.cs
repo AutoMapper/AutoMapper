@@ -2,20 +2,16 @@ namespace AutoMapper
 {
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using Configuration;
 
     public class TypeMapRegistry
     {
-        private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMaps = new ConcurrentDictionary<TypePair, TypeMap>();
+        private readonly IDictionary<TypePair, TypeMap> _typeMaps = new Dictionary<TypePair, TypeMap>();
 
         public IEnumerable<TypeMap> TypeMaps => _typeMaps.Values;
 
-        public void RegisterTypeMap(TypeMap typeMap) => _typeMaps.AddOrUpdate(typeMap.Types, typeMap, (tp, tm) => tm);
+        public void RegisterTypeMap(TypeMap typeMap) => _typeMaps[typeMap.Types] = typeMap;
 
-        public TypeMap GetTypeMap(TypePair typePair)
-        {
-            TypeMap typeMap;
-
-            return _typeMaps.TryGetValue(typePair, out typeMap) ? typeMap : null;
-        }
+        public TypeMap GetTypeMap(TypePair typePair) => _typeMaps.GetOrDefault(typePair);
     }
 }
