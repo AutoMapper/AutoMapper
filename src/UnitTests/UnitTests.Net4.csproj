@@ -298,6 +298,7 @@
     <Compile Include="Should\should\DoubleAssertionExtensions.cs" />
     <Compile Include="Should\should\ObjectAssertExtensions.cs" />
     <Compile Include="Should\should\StringAssertionExtensions.cs" />
+    <Compile Include="StaticMapping.cs" />
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Bug\ProjectConstructorParameters.cs" />
