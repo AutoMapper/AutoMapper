@@ -351,7 +351,7 @@ namespace AutoMapper
 
             var typeMap = _profiles
                 .Cast<IProfileConfiguration>()
-                .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, openGenericTypes))
+                .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, openGenericTypes.Value))
                 .FirstOrDefault(t => t != null);
 
             return typeMap;
