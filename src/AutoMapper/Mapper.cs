@@ -423,12 +423,13 @@ namespace AutoMapper
         /// </summary>
         public static IMappingEngine Engine => _mappingEngine.Value._engine;
         public static IMapper Instance => _mappingEngine.Value;
-        public static IConfigurationProvider ConfigurationProvider => _configuration.Value;
+        internal static IConfigurationProvider ConfigurationProvider => _configuration.Value;
         private static IDynamicMapper DynamicInstance => _mappingEngine.Value;
 
         /// <summary>
         /// Store for all configuration
         /// </summary>
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static IMapperConfiguration Configuration => _configuration.Value;
 
 

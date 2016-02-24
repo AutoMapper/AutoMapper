@@ -12,8 +12,16 @@ namespace AutoMapper.QueryableExtensions
     /// </summary>
     public static class Extensions
     {
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, passing in to the overload that accepts an instance")]
-        public static Func<IConfigurationProvider> ConfigurationFactory = () => Mapper.ConfigurationProvider;
+        /// <summary>
+        /// Maps a queryable expression of a source type to a queryable expression of a destination type
+        /// </summary>
+        /// <typeparam name="TSource">Source type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="sourceQuery">Source queryable</param>
+        /// <param name="destQuery">Destination queryable</param>
+        /// <returns>Mapped destination queryable</returns>
+        public static IQueryable<TDestination> Map<TSource, TDestination>(this IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery)
+            => sourceQuery.Map(destQuery, Mapper.ConfigurationProvider);
 
         /// <summary>
         /// Maps a queryable expression of a source type to a queryable expression of a destination type
@@ -26,8 +34,11 @@ namespace AutoMapper.QueryableExtensions
         /// <returns>Mapped destination queryable</returns>
         public static IQueryable<TDestination> Map<TSource, TDestination>(this IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery, IConfigurationProvider config)
         {
-            return QueryMapperVisitor.Map<TSource, TDestination>(sourceQuery, destQuery, config);
+            return QueryMapperVisitor.Map(sourceQuery, destQuery, config);
         }
+
+        public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource)
+            => dataSource.UseAsDataSource(Mapper.Instance);
 
         public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource, IMapper mapper)
         {
@@ -40,19 +51,25 @@ namespace AutoMapper.QueryableExtensions
         /// <remarks>Projections are only calculated once and cached</remarks>
         /// <typeparam name="TDestination">Destination type</typeparam>
         /// <param name="source">Queryable source</param>
-        /// <param name="configuration">Maper configuration</param>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
+        /// <param name="membersToExpand">Explicit members to expand</param>
+        /// <returns>Expression to project into</returns>
+        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
+            => source.ProjectTo(Mapper.ConfigurationProvider, parameters, membersToExpand);
+
+        /// <summary>
+        /// Extension method to project from a queryable using the provided mapping engine
+        /// </summary>
+        /// <remarks>Projections are only calculated once and cached</remarks>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="source">Queryable source</param>
+        /// <param name="configuration">Mapper configuration</param>
         /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Expression to project into</returns>
         public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IConfigurationProvider configuration, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
         {
             return new ProjectionExpression(source, configuration.ExpressionBuilder).To(parameters, membersToExpand);
-        }
-
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, passing in to the overload that accepts an instance")]
-        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
-        {
-            return new ProjectionExpression(source, ConfigurationFactory().ExpressionBuilder).To(parameters, membersToExpand);
         }
 
         /// <summary>
@@ -69,18 +86,34 @@ namespace AutoMapper.QueryableExtensions
             IConfigurationProvider configuration,
             params Expression<Func<TDestination, object>>[] membersToExpand
             )
-        {
-            return source.ProjectTo(configuration, null, membersToExpand);
-        }
+            => source.ProjectTo(configuration, null, membersToExpand);
 
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, passing in to the overload that accepts an instance")]
+        /// <summary>
+        /// Extension method to project from a queryable using the provided mapping engine
+        /// </summary>
+        /// <remarks>Projections are only calculated once and cached</remarks>
+        /// <typeparam name="TDestination">Destination type</typeparam>
+        /// <param name="source">Queryable source</param>
+        /// <param name="membersToExpand">Explicit members to expand</param>
+        /// <returns>Expression to project into</returns>
         public static IQueryable<TDestination> ProjectTo<TDestination>(
             this IQueryable source,
             params Expression<Func<TDestination, object>>[] membersToExpand
             )
-        {
-            return source.ProjectTo(ConfigurationFactory(), null, membersToExpand);
-        }
+            => source.ProjectTo(Mapper.ConfigurationProvider, null, membersToExpand);
+
+        /// <summary>
+        /// Projects the source type to the destination type given the mapping configuration
+        /// </summary>
+        /// <typeparam name="TDestination">Destination type to map to</typeparam>
+        /// <param name="source">Queryable source</param>
+        /// <param name="configuration">Mapper configuration</param>
+        /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
+        /// <param name="membersToExpand">Explicit members to expand</param>
+        /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
+        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source,
+            IDictionary<string, object> parameters, params string[] membersToExpand)
+            => source.ProjectTo<TDestination>(Mapper.ConfigurationProvider, parameters, membersToExpand);
 
         /// <summary>
         /// Projects the source type to the destination type given the mapping configuration
@@ -94,12 +127,6 @@ namespace AutoMapper.QueryableExtensions
         public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IConfigurationProvider configuration, IDictionary<string, object> parameters, params string[] membersToExpand)
         {
             return new ProjectionExpression(source, configuration.ExpressionBuilder).To<TDestination>(parameters, membersToExpand);
-        }
-
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, passing in to the overload that accepts an instance")]
-        public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, IDictionary<string, object> parameters, params string[] membersToExpand)
-        {
-            return new ProjectionExpression(source, ConfigurationFactory().ExpressionBuilder).To<TDestination>(parameters, membersToExpand);
         }
     }
 }
