@@ -37,7 +37,6 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to create</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static TDestination Map<TDestination>(object source)
         {
             return Instance.Map<TDestination>(source);
@@ -50,7 +49,6 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
             return Instance.Map<TDestination>(source, opts);
@@ -63,7 +61,6 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to create</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static TDestination Map<TSource, TDestination>(TSource source)
         {
             return Instance.Map<TSource, TDestination>(source);
@@ -77,7 +74,6 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="destination">Destination object to map into</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
         {
             return Instance.Map(source, destination);
@@ -92,7 +88,6 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
@@ -107,7 +102,6 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static TDestination Map<TSource, TDestination>(TSource source,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
@@ -121,7 +115,6 @@ namespace AutoMapper
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to create</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static object Map(object source, Type sourceType, Type destinationType)
         {
             return Instance.Map(source, sourceType, destinationType);
@@ -135,7 +128,6 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to create</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static object Map(object source, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
@@ -150,7 +142,6 @@ namespace AutoMapper
         /// <param name="sourceType">Source type to use</param>
         /// <param name="destinationType">Destination type to use</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static object Map(object source, object destination, Type sourceType, Type destinationType)
         {
             return Instance.Map(source, destination, sourceType, destinationType);
@@ -165,7 +156,6 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static object Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
@@ -244,7 +234,6 @@ namespace AutoMapper
         /// This is the preferred means to configure AutoMapper.
         /// </summary>
         /// <param name="action">Initialization callback</param>
-        [Obsolete("Construct a MapperConfiguration instance and call CreateMapper instead. Store the instances statically as needed.")]
         public static void Initialize(Action<IMapperConfiguration> action)
         {
             Reset();
@@ -260,7 +249,7 @@ namespace AutoMapper
         /// <typeparam name="TSource">Source type</typeparam>
         /// <typeparam name="TDestination">Destination type</typeparam>
         /// <returns>Mapping expression for more configuration options</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
         {
             return Configuration.CreateMap<TSource, TDestination>();
@@ -274,7 +263,7 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type</typeparam>
         /// <param name="memberList">Member list to validate</param>
         /// <returns>Mapping expression for more configuration options</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
         {
             return Configuration.CreateMap<TSource, TDestination>(memberList);
@@ -287,7 +276,7 @@ namespace AutoMapper
         /// <param name="sourceType">Source type</param>
         /// <param name="destinationType">Destination type</param>
         /// <returns>Mapping expression for more configuration options</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static IMappingExpression CreateMap(Type sourceType, Type destinationType)
         {
             return Configuration.CreateMap(sourceType, destinationType);
@@ -301,7 +290,7 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type</param>
         /// <param name="memberList">Member list to validate</param>
         /// <returns>Mapping expression for more configuration options</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
         {
             return Configuration.CreateMap(sourceType, destinationType, memberList);
@@ -312,7 +301,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="profileName">Profile name</param>
         /// <returns>Profile configuration options</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static IProfileExpression CreateProfile(string profileName)
         {
             return Configuration.CreateProfile(profileName);
@@ -323,7 +312,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="profileName">Profile name</param>
         /// <param name="profileConfiguration">Profile configuration callback</param>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static void CreateProfile(string profileName, Action<IProfileExpression> profileConfiguration)
         {
             Configuration.CreateProfile(profileName, profileConfiguration);
@@ -333,7 +322,7 @@ namespace AutoMapper
         /// Add an existing profile
         /// </summary>
         /// <param name="profile">Profile to add</param>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static void AddProfile(Profile profile)
         {
             Configuration.AddProfile(profile);
@@ -343,7 +332,7 @@ namespace AutoMapper
         /// Add an existing profile type. Profile will be instantiated and added to the configuration.
         /// </summary>
         /// <typeparam name="TProfile">Profile type</typeparam>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static void AddProfile<TProfile>() where TProfile : Profile, new()
         {
             Configuration.AddProfile<TProfile>();
@@ -355,7 +344,7 @@ namespace AutoMapper
         /// <param name="sourceType">Configured source type</param>
         /// <param name="destinationType">Configured destination type</param>
         /// <returns>Type map configuration</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
         {
             return ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
@@ -367,7 +356,7 @@ namespace AutoMapper
         /// <typeparam name="TSource">Configured source type</typeparam>
         /// <typeparam name="TDestination">Configured destination type</typeparam>
         /// <returns>Type map configuration</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static TypeMap FindTypeMapFor<TSource, TDestination>()
         {
             return ConfigurationProvider.FindTypeMapFor(typeof (TSource), typeof (TDestination));
@@ -377,7 +366,7 @@ namespace AutoMapper
         /// Get all configured type maps created
         /// </summary>
         /// <returns>All configured type maps</returns>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static TypeMap[] GetAllTypeMaps()
         {
             return ConfigurationProvider.GetAllTypeMaps();
@@ -386,7 +375,6 @@ namespace AutoMapper
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
         /// </summary>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static void AssertConfigurationIsValid()
         {
             ConfigurationProvider.AssertConfigurationIsValid();
@@ -396,7 +384,6 @@ namespace AutoMapper
         /// Dry run single type map
         /// </summary>
         /// <param name="typeMap">Type map to check</param>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static void AssertConfigurationIsValid(TypeMap typeMap)
         {
             ConfigurationProvider.AssertConfigurationIsValid(typeMap);
@@ -406,7 +393,6 @@ namespace AutoMapper
         /// Dry run all type maps in given profile
         /// </summary>
         /// <param name="profileName">Profile name of type maps to test</param>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static void AssertConfigurationIsValid(string profileName)
         {
             ConfigurationProvider.AssertConfigurationIsValid(profileName);
@@ -416,7 +402,6 @@ namespace AutoMapper
         /// Dry run all type maps in given profile
         /// </summary>
         /// <typeparam name="TProfile">Profile type</typeparam>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new()
         {
             ConfigurationProvider.AssertConfigurationIsValid<TProfile>();
@@ -425,7 +410,7 @@ namespace AutoMapper
         /// <summary>
         /// Clear out all existing configuration
         /// </summary>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static void Reset()
         {
             MapperRegistry.Reset();
@@ -436,16 +421,14 @@ namespace AutoMapper
         /// <summary>
         /// Mapping engine used to perform mappings
         /// </summary>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static IMappingEngine Engine => _mappingEngine.Value._engine;
-        private static IMapper Instance => _mappingEngine.Value;
-        internal static IConfigurationProvider ConfigurationProvider => _configuration.Value;
+        public static IMapper Instance => _mappingEngine.Value;
+        public static IConfigurationProvider ConfigurationProvider => _configuration.Value;
         private static IDynamicMapper DynamicInstance => _mappingEngine.Value;
 
         /// <summary>
         /// Store for all configuration
         /// </summary>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
         public static IMapperConfiguration Configuration => _configuration.Value;
 
 
@@ -453,7 +436,7 @@ namespace AutoMapper
         /// Globally ignore all members starting with a prefix
         /// </summary>
         /// <param name="startingwith">Prefix of members to ignore. Call this before all other maps created.</param>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
+        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
         public static void AddGlobalIgnore(string startingwith)
         {
             Configuration.AddGlobalIgnore(startingwith);
