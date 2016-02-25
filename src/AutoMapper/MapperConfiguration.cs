@@ -18,7 +18,7 @@ namespace AutoMapper
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
-        private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
+        private readonly IDictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
         private readonly IList<Profile> _profiles = new List<Profile>();
         private readonly ConfigurationValidator _validator;
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
@@ -197,18 +197,23 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
+            TypeMap typeMap;
 
-            var typeMap = _typeMapPlanCache.GetOrAdd(typePair,
-                _ => _.GetRelatedTypePairs()
-                        .Select(
-                            tp =>
-                                _typeMapPlanCache.GetOrDefault(tp) ??
-                                FindTypeMapFor(tp) ??
-                                (!CoveredByObjectMap(typePair)
-                                    ? FindConventionTypeMapFor(tp) ??
-                                      FindClosedGenericTypeMapFor(tp)
-                                    : null))
-                        .FirstOrDefault(tm => tm != null));
+            if (!_typeMapPlanCache.TryGetValue(typePair, out typeMap))
+            {
+                typeMap = typePair.GetRelatedTypePairs()
+                    .Select(
+                        tp =>
+                            _typeMapPlanCache.GetOrDefault(tp) ??
+                            FindTypeMapFor(tp) ??
+                            (!CoveredByObjectMap(typePair)
+                                ? FindConventionTypeMapFor(tp) ??
+                                  FindClosedGenericTypeMapFor(tp)
+                                : null))
+                    .FirstOrDefault(tm => tm != null);
+
+                _typeMapPlanCache[typePair] = typeMap;
+            }
 
             return typeMap;
         }
@@ -285,7 +290,7 @@ namespace AutoMapper
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
             {
-                _typeMapPlanCache.AddOrUpdate(typeMap.Types, typeMap, (_, _2) => typeMap);
+                _typeMapPlanCache[typeMap.Types] = typeMap;
 
                 if (typeMap.DestinationTypeOverride != null)
                 {
@@ -298,12 +303,12 @@ namespace AutoMapper
                 var derivedMap = FindTypeMapFor(redirectedType.Item2);
                 if (derivedMap != null)
                 {
-                    _typeMapPlanCache.AddOrUpdate(redirectedType.Item1, derivedMap, (_, _2) => derivedMap);
+                    _typeMapPlanCache[redirectedType.Item1] = derivedMap;
                 }
             }
-            foreach (var derivedMap in derivedMaps)
+            foreach (var derivedMap in derivedMaps.Where(derivedMap => !_typeMapPlanCache.ContainsKey(derivedMap.Item1)))
             {
-                _typeMapPlanCache.GetOrAdd(derivedMap.Item1, _ => derivedMap.Item2);
+                _typeMapPlanCache[derivedMap.Item1] = derivedMap.Item2;
             }
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
