@@ -63,12 +63,13 @@ namespace AutoMapper
         TypeMap ResolveTypeMap(TypePair typePair);
 
         /// <summary>
-        /// Resolve the <see cref="TypeMap"/> for the resolution result and destination type, checking parent types
+        /// Resolve the <see cref="TypeMap"/> for the runtime and declared source types and destination type, checking parent types
         /// </summary>
-        /// <param name="resolutionResult">Resolution result from the source object</param>
+        /// <param name="sourceRuntimeType">The runtime type of the source</param>
+        /// <param name="sourceDeclaredType">The declared type of the source</param>
         /// <param name="destinationType">Configured destination type</param>
         /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(ResolutionResult resolutionResult, Type destinationType);
+        TypeMap ResolveTypeMap(Type sourceRuntimeType, Type sourceDeclaredType, Type destinationType);
 
         /// <summary>
         /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem

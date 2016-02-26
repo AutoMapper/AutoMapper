@@ -19,7 +19,7 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Destination>().ForMember(d=>d.OddNumber, o=>o.ResolveUsing((ResolutionResult r)=>((Source)r.Value).Number));
+            cfg.CreateMap<Source, Destination>().ForMember(d=>d.OddNumber, o=>o.ResolveUsing(s=>s.Number));
         });
 
         protected override void Because_of()

@@ -10,7 +10,8 @@ namespace AutoMapper
         /// Use the <see cref="ValueResolver{TSource, TDestination}"/> class for a type-safe version.
         /// </summary>
         /// <param name="source">Source resolution result</param>
+        /// <param name="context">The context of the mapping</param>
         /// <returns>Result, typically build from the source resolution result</returns>
-		ResolutionResult Resolve(ResolutionResult source);
+		object Resolve(object source, ResolutionContext context);
 	}
 }

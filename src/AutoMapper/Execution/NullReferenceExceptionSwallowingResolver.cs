@@ -11,15 +11,15 @@ namespace AutoMapper
             _inner = inner;
         }
 
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
             try
             {
-                return _inner.Resolve(source);
+                return _inner.Resolve(source, context);
             }
             catch (NullReferenceException)
             {
-                return source.New(null, MemberType);
+                return null;
             }
         }
 

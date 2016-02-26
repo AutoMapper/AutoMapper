@@ -15,18 +15,18 @@ namespace AutoMapper.Execution
         }
 
 
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
-            if (source.Value == null)
-                return source;
+            if (source == null)
+                return null;
 
-            var valueType = source.Value.GetType();
+            var valueType = source.GetType();
             if (!(_sourceType.IsAssignableFrom(valueType)))
                 throw new ArgumentException("Expected obj to be of type " + _sourceType + " but was " + valueType);
 
-            var result = _propertyInfo.GetValue(source.Value, null);
+            var result = _propertyInfo.GetValue(source, null);
 
-            return source.New(result);
+            return result;
         }
     }
 }

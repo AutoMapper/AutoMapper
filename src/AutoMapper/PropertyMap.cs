@@ -52,6 +52,21 @@ namespace AutoMapper
 
         public LambdaExpression CustomExpression { get; private set; }
 
+        public Type SourceType()
+        {
+            if(CustomExpression != null)
+            {
+                return CustomExpression.ReturnType;
+            }
+            var sourceMember = SourceMember;
+            if(sourceMember != null)
+            {
+                return sourceMember.GetMemberType();
+            }
+            return null;
+            //throw new Exception("Uknown type.");
+        }
+
         public MemberInfo SourceMember
         {
             get
@@ -94,13 +109,9 @@ namespace AutoMapper
             _sourceValueResolvers.RemoveLast();
         }
 
-        public ResolutionResult ResolveValue(ResolutionContext context)
+        public object ResolveValue(ResolutionContext context)
         {
-            Seal();
-
-            var result = new ResolutionResult(context);
-
-            return _cachedResolvers.Aggregate(result, (current, resolver) => resolver.Resolve(current));
+            return _cachedResolvers.Aggregate(context.SourceValue, (current, resolver) => resolver.Resolve(current, context));
         }
 
         internal void Seal()

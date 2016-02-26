@@ -41,9 +41,9 @@ namespace AutoMapper.Mappers
             foreach (object item in enumerableValue)
             {
                 var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, i);
-                var elementResolutionResult = new ResolutionResult(newContext);
+                var itemType = item?.GetType() ?? sourceElementType;
 
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(elementResolutionResult, destElementType);
+                var typeMap = context.ConfigurationProvider.ResolveTypeMap(itemType, sourceElementType, destElementType);
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
                 Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;

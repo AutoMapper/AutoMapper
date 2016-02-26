@@ -218,9 +218,14 @@ namespace AutoMapper
             return ResolveTypeMap(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
         }
 
-        public TypeMap ResolveTypeMap(ResolutionResult resolutionResult, Type destinationType)
+        public TypeMap ResolveTypeMap(Type sourceRuntimeType, Type sourceDeclaredType, Type destinationType)
         {
-            return ResolveTypeMap(resolutionResult.Type, destinationType) ?? ResolveTypeMap(resolutionResult.MemberType, destinationType);
+            var typeMap = ResolveTypeMap(sourceRuntimeType, destinationType);
+            if(typeMap == null && sourceDeclaredType != sourceRuntimeType)
+            {
+                return ResolveTypeMap(sourceDeclaredType, destinationType);
+            }
+            return typeMap;
         }
 
         public void AssertConfigurationIsValid(TypeMap typeMap)

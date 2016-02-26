@@ -59,14 +59,14 @@ namespace AutoMapper
             {
                 var result = map.ResolveValue(context);
 
-                var sourceType = result.Type;
+                var sourceType = result?.GetType() ?? context.SourceType;
                 var destinationType = map.Parameter.ParameterType;
 
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(result, destinationType);
+                var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, context.SourceType, destinationType);
 
                 Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
 
-                var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType,
+                var newContext = context.CreateTypeContext(typeMap, result, null, targetSourceType,
                     destinationType);
 
                 if (typeMap == null && map.Parameter.IsOptional)

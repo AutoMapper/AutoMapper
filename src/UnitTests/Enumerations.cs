@@ -298,17 +298,17 @@ namespace AutoMapper.Tests
 
 		public class DtoStatusValueResolver : IValueResolver
 		{
-			public ResolutionResult Resolve(ResolutionResult source)
+			public object Resolve(object source, ResolutionContext context)
 			{
-				return source.New(((Order)source.Value).Status);
+				return ((Order)source).Status;
 			}
 		}
 
 		public class EnumValueResolver<TInputEnum, TOutputEnum> : IValueResolver
 		{
-			public ResolutionResult Resolve(ResolutionResult source)
+			public object Resolve(object source, ResolutionContext context)
 			{
-				return source.New(((TOutputEnum)Enum.Parse(typeof(TOutputEnum), Enum.GetName(typeof(TInputEnum), source.Value), false)));
+				return ((TOutputEnum)Enum.Parse(typeof(TOutputEnum), Enum.GetName(typeof(TInputEnum), source), false));
 			}
 		}
 	}

@@ -22,11 +22,9 @@ namespace AutoMapper
 
         public bool CanResolve { get; set; }
 
-        public ResolutionResult ResolveValue(ResolutionContext context)
+        public object ResolveValue(ResolutionContext context)
         {
-            var result = new ResolutionResult(context);
-
-            return SourceResolvers.Aggregate(result, (current, resolver) => resolver.Resolve(current));
+            return SourceResolvers.Aggregate(context.SourceValue, (current, resolver) => resolver.Resolve(current, context));
         }
 
         public void ResolveUsing(params IValueResolver[] resolvers)

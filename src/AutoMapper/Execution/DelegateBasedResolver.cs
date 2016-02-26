@@ -6,23 +6,23 @@ namespace AutoMapper.Execution
 
     public class DelegateBasedResolver<TSource, TMember> : IValueResolver
     {
-        private readonly Func<ResolutionResult, TMember> _method;
+        private readonly Func<object, ResolutionContext, TMember> _method;
 
-        public DelegateBasedResolver(Func<ResolutionResult, TMember> method)
+        public DelegateBasedResolver(Func<object, ResolutionContext, TMember> method)
         {
             _method = method;
         }
 
         public Type MemberType => typeof(TMember);
 
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
-            if (source.Value != null && !(source.Value is TSource))
+            if (source != null && !(source is TSource))
             {
-                throw new ArgumentException($"Expected obj to be of type {typeof(TSource)} but was {source.Value.GetType()}");
+                throw new ArgumentException($"Expected obj to be of type {typeof(TSource)} but was {source.GetType()}");
             }
-            var result = _method(source);
-            return source.New(result, typeof(TMember));
+            var result = _method(source, context);
+            return result;
         }
     }
     public class ExpressionBasedResolver<TSource, TMember> : IExpressionResolver
@@ -38,14 +38,14 @@ namespace AutoMapper.Execution
 
         public Type MemberType => typeof(TMember);
 
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
-            if(source.Value != null && !(source.Value is TSource))
+            if(source != null && !(source is TSource))
             {
-                throw new ArgumentException($"Expected obj to be of type {typeof (TSource)} but was {source.Value.GetType()}");
+                throw new ArgumentException($"Expected obj to be of type {typeof (TSource)} but was {source.GetType()}");
             }
-            var result = _method((TSource)source.Value);
-            return source.New(result, typeof(TMember));
+            var result = _method((TSource)source);
+            return result;
         }
     }
 }

@@ -63,17 +63,12 @@ namespace AutoMapper.Configuration
 
         public void ResolveUsing<TMember>(Func<TSource, TMember> resolver)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(rr => resolver((TSource)rr.Value))));
+            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>((o, c) => resolver((TSource)o))));
         }
 
-        public void ResolveUsing<TMember>(Func<ResolutionResult, TMember> resolver)
+        public void ResolveUsing<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(resolver)));
-        }
-
-        public void ResolveUsing<TMember>(Func<ResolutionResult, TSource, TMember> resolver)
-        {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>(rr => resolver(rr, (TSource)rr.Value))));
+            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>((o, c) => resolver((TSource)o, c))));
         }
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
@@ -112,7 +107,7 @@ namespace AutoMapper.Configuration
 
         public void UseValue(object value)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, object>(rr => value)));
+            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, object>((o, c) => value)));
         }
 
         public void Condition(Func<TSource, bool> condition)

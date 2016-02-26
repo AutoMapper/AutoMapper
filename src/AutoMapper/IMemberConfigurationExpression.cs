@@ -49,15 +49,7 @@ namespace AutoMapper
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing<TMember>(Func<ResolutionResult, TMember> resolver);
-
-        /// <summary>
-        /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
-        /// Access both the source object and current resolution context for additional mapping, context items and parent objects
-        /// This method cannot be used in conjunction with LINQ query projection
-        /// </summary>
-        /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing<TMember>(Func<ResolutionResult, TSource, TMember> resolver);
+        void ResolveUsing<TMember>(Func<TSource, ResolutionContext, TMember> resolver);
 
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
