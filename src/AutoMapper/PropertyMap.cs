@@ -52,7 +52,7 @@ namespace AutoMapper
 
         public LambdaExpression CustomExpression { get; private set; }
 
-        public Type SourceType() => _cachedResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
+        public Type SourceType { get; private set; }
 
         public MemberInfo SourceMember
         {
@@ -109,6 +109,7 @@ namespace AutoMapper
             }
 
             _cachedResolvers = GetSourceValueResolvers().ToArray();
+            SourceType = _cachedResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
             _sealed = true;
         }
 

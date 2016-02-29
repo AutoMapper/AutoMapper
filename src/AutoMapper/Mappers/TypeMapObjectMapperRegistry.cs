@@ -133,7 +133,7 @@ namespace AutoMapper.Mappers
 
                 object destinationValue = propertyMap.GetDestinationValue(mappedObject);
 
-                var declaredSourceType = propertyMap.SourceType() ?? context.SourceType;
+                var declaredSourceType = propertyMap.SourceType ?? context.SourceType;
                 var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
