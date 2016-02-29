@@ -18,8 +18,7 @@ namespace AutoMapper
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
-        private readonly IDictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
-        private readonly object _typeMapPlanCacheLock = new object();
+        private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
         private readonly IList<Profile> _profiles = new List<Profile>();
         private readonly ConfigurationValidator _validator;
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
@@ -29,7 +28,7 @@ namespace AutoMapper
         {
         }
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers) 
+        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
         {
             _mappers = mappers;
             _typeMapObjectMappers = typeMapObjectMappers;
@@ -58,7 +57,7 @@ namespace AutoMapper
 
             config(profile);
 
-            ((IConfiguration) this).AddProfile(profile);
+            ((IConfiguration)this).AddProfile(profile);
         }
 
         private class NamedProfile : Profile
@@ -133,7 +132,7 @@ namespace AutoMapper
 
         void IProfileExpression.DisableConstructorMapping() => _defaultProfile.DisableConstructorMapping();
 
-        IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>() 
+        IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>()
             => _defaultProfile.CreateMap<TSource, TDestination>();
 
         IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>(MemberList memberList)
@@ -198,29 +197,16 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
-            TypeMap typeMap;
-
-            if (!_typeMapPlanCache.TryGetValue(typePair, out typeMap))
-            {
-                lock (_typeMapPlanCacheLock)
-                {
-                    if (!_typeMapPlanCache.TryGetValue(typePair, out typeMap))
-                    {
-                        typeMap = typePair.GetRelatedTypePairs()
-                            .Select(
-                                tp =>
-                                    _typeMapPlanCache.GetOrDefault(tp) ??
-                                    FindTypeMapFor(tp) ??
-                                    (!CoveredByObjectMap(typePair)
-                                        ? FindConventionTypeMapFor(tp) ??
-                                          FindClosedGenericTypeMapFor(tp)
-                                        : null))
-                            .FirstOrDefault(tm => tm != null);
-
-                        _typeMapPlanCache[typePair] = typeMap;
-                    }
-                }
-            }
+            var typeMap = _typeMapPlanCache.GetOrAdd(typePair, pair => pair.GetRelatedTypePairs()
+                .Select(
+                    tp =>
+                        _typeMapPlanCache.GetOrDefault(tp) ??
+                        FindTypeMapFor(tp) ??
+                        (!CoveredByObjectMap(pair)
+                            ? FindConventionTypeMapFor(tp) ??
+                              FindClosedGenericTypeMapFor(tp)
+                            : null))
+                .FirstOrDefault(tm => tm != null));
 
             return typeMap;
         }
@@ -335,12 +321,12 @@ namespace AutoMapper
             foreach (var derivedTypes in typeMap.IncludedDerivedTypes)
             {
                 var derivedMap = FindTypeMapFor(derivedTypes);
-                if(derivedMap == null)
+                if (derivedMap == null)
                 {
                     throw QueryMapperHelper.MissingMapException(derivedTypes.SourceType, derivedTypes.DestinationType);
                 }
                 yield return derivedMap;
-                foreach(var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
+                foreach (var derivedTypeMap in GetDerivedTypeMaps(derivedMap))
                 {
                     yield return derivedTypeMap;
                 }
