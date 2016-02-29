@@ -31,14 +31,14 @@ namespace AutoMapper.UnitTests
 
         public class CodeValueDtoResolver : IValueResolver
         {
-            public ResolutionResult Resolve(ResolutionResult source)
+            public object Resolve(object source, ResolutionContext context)
             {
-                var propertyMap = source.Context.PropertyMap;
+                var propertyMap = context.PropertyMap;
 
                 propertyMap.ShouldNotBeNull();
 
                 var codeValueTypeId = propertyMap.SourceMember.DeclaringType.Name + ":" + propertyMap.SourceMember.Name;
-                return source.New(LookupCodeValue(codeValueTypeId, "" + source.Value));
+                return LookupCodeValue(codeValueTypeId, "" + source);
             }
 
             private CodeValueDto LookupCodeValue(string codeValueTypeId, string code)

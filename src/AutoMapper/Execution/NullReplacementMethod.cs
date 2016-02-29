@@ -9,15 +9,13 @@ namespace AutoMapper.Execution
             _nullSubstitute = nullSubstitute;
         }
 
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
             if (_nullSubstitute == null)
             {
                 return source;
             }
-            return source.Value == null
-                ? source.New(_nullSubstitute)
-                : source;
+            return source ?? _nullSubstitute;
         }
     }
 }

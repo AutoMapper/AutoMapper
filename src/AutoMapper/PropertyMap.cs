@@ -52,6 +52,8 @@ namespace AutoMapper
 
         public LambdaExpression CustomExpression { get; private set; }
 
+        public Type SourceType { get; private set; }
+
         public MemberInfo SourceMember
         {
             get
@@ -94,13 +96,9 @@ namespace AutoMapper
             _sourceValueResolvers.RemoveLast();
         }
 
-        public ResolutionResult ResolveValue(ResolutionContext context)
+        public object ResolveValue(ResolutionContext context)
         {
-            Seal();
-
-            var result = new ResolutionResult(context);
-
-            return _cachedResolvers.Aggregate(result, (current, resolver) => resolver.Resolve(current));
+            return _cachedResolvers.Aggregate(context.SourceValue, (current, resolver) => resolver.Resolve(current, context));
         }
 
         internal void Seal()
@@ -111,6 +109,7 @@ namespace AutoMapper
             }
 
             _cachedResolvers = GetSourceValueResolvers().ToArray();
+            SourceType = _cachedResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
             _sealed = true;
         }
 

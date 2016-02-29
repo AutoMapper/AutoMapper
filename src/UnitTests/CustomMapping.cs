@@ -31,25 +31,25 @@ namespace AutoMapper.UnitTests
 
             public class CustomResolver : IValueResolver
             {
-                public ResolutionResult Resolve(ResolutionResult source)
+                public object Resolve(object source, ResolutionContext context)
                 {
-                    return source.New(((ModelObject)source.Value).Value + 1);
+                    return (((ModelObject)source).Value + 1);
                 }
             }
 
             public class CustomResolver2 : IValueResolver
             {
-                public ResolutionResult Resolve(ResolutionResult source)
+                public object Resolve(object source, ResolutionContext context)
                 {
-                    return source.New(((ModelObject)source.Value).Value2fff + 2);
+                    return (((ModelObject)source).Value2fff + 2);
                 }
             }
 
             public class CustomResolver3 : IValueResolver
             {
-                public ResolutionResult Resolve(ResolutionResult source)
+                public object Resolve(object source, ResolutionContext context)
                 {
-                    return source.New(((ModelObject)source.Value).Value4 + 4);
+                    return (((ModelObject)source).Value4 + 4);
                 }
 
                 public Type GetResolvedValueType()
@@ -126,9 +126,9 @@ namespace AutoMapper.UnitTests
 
             public class CustomResolver : IValueResolver
             {
-                public ResolutionResult Resolve(ResolutionResult source)
+                public object Resolve(object source, ResolutionContext context)
                 {
-                    return source.New(((ModelSubObject)source.Value).SomeValue + 1);
+                    return (((ModelSubObject)source).SomeValue + 1);
                 }
             }
 
@@ -171,9 +171,9 @@ namespace AutoMapper.UnitTests
 
             public class CustomResolver : IValueResolver
             {
-                public ResolutionResult Resolve(ResolutionResult source)
+                public object Resolve(object source, ResolutionContext context)
                 {
-                    return source.New(((int)source.Value) + 5);
+                    return (((int)source) + 5);
                 }
             }
 
@@ -219,9 +219,9 @@ namespace AutoMapper.UnitTests
 
             public class CustomResolver : IValueResolver
             {
-                public ResolutionResult Resolve(ResolutionResult source)
+                public object Resolve(object source, ResolutionContext context)
                 {
-                    return source.New(((int)source.Value) + 5);
+                    return (((int)source) + 5);
                 }
             }
 
@@ -732,9 +732,9 @@ namespace AutoMapper.UnitTests
 
             public class CustomValueResolver : IValueResolver
             {
-                public ResolutionResult Resolve(ResolutionResult source)
+                public object Resolve(object source, ResolutionContext context)
                 {
-                    return source.Ignore();
+                    return ((Destination)context.DestinationValue).Value;
                 }
             }
 
@@ -1140,7 +1140,7 @@ namespace AutoMapper.UnitTests
 
         public class Dest
         {
-            // AutoMapper tries to map Source.Value to this constructor's parameter,
+            // AutoMapper tries to map source to this constructor's parameter,
             // but does not take its member configuration into account
             public Dest(int value)
             {

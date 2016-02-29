@@ -2,9 +2,9 @@ namespace AutoMapper.Execution
 {
     public class DefaultResolver : IValueResolver
     {
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
-            return source.New(source.Value);
+            return source;
         }
     }
 }

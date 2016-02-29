@@ -13,11 +13,9 @@ namespace AutoMapper.Execution
         public abstract Type MemberType { get; }
         public abstract object GetValue(object source);
 
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
-            return source.Value == null
-                ? source.New(source.Value, MemberType)
-                : source.New(GetValue(source.Value), MemberType);
+            return source == null ? null : GetValue(source);
         }
 
         public abstract IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit);

@@ -114,8 +114,7 @@ namespace AutoMapper.Mappers
                 if (!propertyMap.CanResolveValue() || !propertyMap.ShouldAssignValuePreResolving(context))
                     return;
 
-                ResolutionResult result;
-
+                object result;
                 Exception resolvingExc = null;
                 try
                 {
@@ -129,23 +128,20 @@ namespace AutoMapper.Mappers
                 {
                     var errorContext = CreateErrorContext(context, propertyMap, null);
                     resolvingExc = new AutoMapperMappingException(errorContext, ex);
-
-                    result = new ResolutionResult(context);
+                    result = context.SourceValue;
                 }
-
-                if (result.ShouldIgnore)
-                    return;
 
                 object destinationValue = propertyMap.GetDestinationValue(mappedObject);
 
-                var sourceType = result.Type;
+                var declaredSourceType = propertyMap.SourceType ?? context.SourceType;
+                var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(result, destinationType);
+                var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, declaredSourceType, destinationType);
 
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
+                var targetSourceType = typeMap?.SourceType ?? sourceType;
 
-                var newContext = context.CreateMemberContext(typeMap, result.Value, destinationValue,
+                var newContext = context.CreateMemberContext(typeMap, result, destinationValue,
                     targetSourceType,
                     propertyMap);
 

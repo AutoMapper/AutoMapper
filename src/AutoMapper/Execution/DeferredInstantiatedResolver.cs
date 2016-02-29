@@ -11,11 +11,11 @@ namespace AutoMapper.Execution
             _constructor = constructor;
         }
 
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
-            var resolver = _constructor(source.Context);
+            var resolver = _constructor(context);
 
-            return resolver.Resolve(source);
+            return resolver.Resolve(source, context);
         }
     }
 }
