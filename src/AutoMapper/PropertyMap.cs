@@ -52,12 +52,7 @@ namespace AutoMapper
 
         public LambdaExpression CustomExpression { get; private set; }
 
-        public Type SourceType()
-        {
-            return CustomExpression?.ReturnType ?? 
-                      _sourceMember?.GetMemberType() ?? 
-                      _cachedResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
-        }
+        public Type SourceType() => _cachedResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
 
         public MemberInfo SourceMember
         {
