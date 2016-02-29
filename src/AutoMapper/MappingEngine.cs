@@ -3,9 +3,6 @@ namespace AutoMapper
     using System;
     using System.Linq;
     using System.Collections.Concurrent;
-    using Configuration;
-    using Execution;
-    using Mappers;
 
     public class MappingEngine : IMappingEngine
     {
@@ -26,12 +23,10 @@ namespace AutoMapper
             {
                 if (context.TypeMap != null)
                 {
-                    context.TypeMap.Seal();
-
                     var typeMapMapper = ConfigurationProvider.GetTypeMapMappers().First(objectMapper => objectMapper.IsMatch(context));
 
                     // check whether the context passes conditions before attempting to map the value (depth check)
-                    object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : typeMapMapper.Map(context);
+                    object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : typeMapMapper.Map(context.SourceValue, context);
 
                     return mappedObject;
                 }
@@ -58,51 +53,5 @@ namespace AutoMapper
                 throw new AutoMapperMappingException(context, ex);
             }
         }
-
-        public object CreateObject(ResolutionContext context)
-        {
-            var typeMap = context.TypeMap;
-            var destinationType = context.DestinationType;
-
-            if (typeMap != null)
-                if (typeMap.DestinationCtor != null)
-                    return typeMap.DestinationCtor(context);
-                else if (typeMap.ConstructDestinationUsingServiceLocator)
-                    return context.Options.ServiceCtor(destinationType);
-                else if (typeMap.ConstructorMap != null && typeMap.ConstructorMap.CtorParams.All(p => p.CanResolve))
-                    return typeMap.ConstructorMap.ResolveValue(context);
-
-            if (context.DestinationValue != null)
-                return context.DestinationValue;
-
-            if (destinationType.IsInterface())
-#if PORTABLE
-                throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
-#else
-                destinationType = new ProxyGenerator().GetProxyType(destinationType);
-#endif
-
-                return !ConfigurationProvider.AllowNullDestinationValues
-                ? ObjectCreator.CreateNonNullValue(destinationType)
-                : ObjectCreator.CreateObject(destinationType);
-        }
-
-        public bool ShouldMapSourceValueAsNull(ResolutionContext context)
-        {
-            if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
-                return false;
-
-            var typeMap = context.GetContextTypeMap();
-
-            return typeMap?.Profile.AllowNullDestinationValues ?? ConfigurationProvider.AllowNullDestinationValues;
-        }
-
-        public bool ShouldMapSourceCollectionAsNull(ResolutionContext context)
-        {
-            var typeMap = context.GetContextTypeMap();
-
-            return typeMap?.Profile.AllowNullCollections ?? ConfigurationProvider.AllowNullCollections;
-        }
-
     }
 }

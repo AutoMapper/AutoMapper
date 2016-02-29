@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
         {
             if (context.SourceValue == null)
             {
-                return context.Engine.CreateObject(context);
+                return context.Mapper.CreateObject(context);
             }
             Func<object> converter = GetConverter(context);
             return converter?.Invoke();

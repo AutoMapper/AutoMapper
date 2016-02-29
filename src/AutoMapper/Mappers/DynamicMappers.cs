@@ -17,7 +17,7 @@ namespace AutoMapper.Mappers
         public object Map(ResolutionContext context)
         {
             var source = context.SourceValue;
-            var destination = context.Engine.CreateObject(context);
+            var destination = context.Mapper.CreateObject(context);
             foreach(var member in MembersToMap(source, destination))
             {
                 object sourceMemberValue;

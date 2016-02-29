@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
     {
         public object Map(ResolutionContext context)
         {
-            if (context.IsSourceValueNull && context.Engine.ShouldMapSourceCollectionAsNull(context))
+            if (context.IsSourceValueNull && context.Mapper.ShouldMapSourceCollectionAsNull(context))
             {
                 return null;
             }
@@ -40,17 +40,7 @@ namespace AutoMapper.Mappers
             int i = 0;
             foreach (object item in enumerableValue)
             {
-                var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, i);
-                var itemType = item?.GetType() ?? sourceElementType;
-
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(itemType, sourceElementType, destElementType);
-
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
-                Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;
-
-                newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, i);
-
-                object mappedValue = context.Engine.Map(newContext);
+                object mappedValue = context.Mapper.Map(item, null, sourceElementType, destElementType, context);
 
                 SetElementValue(enumerable, mappedValue, i);
 
@@ -99,7 +89,7 @@ namespace AutoMapper.Mappers
 
             if (!destinationType.IsInterface() && !destinationType.IsArray)
             {
-                return context.Engine.CreateObject(context);
+                return context.Mapper.CreateObject(context);
             }
             return CreateDestinationObjectBase(destinationElementType, count);
         }

@@ -30,15 +30,13 @@ namespace AutoMapper.UnitTests.Bug
 			public class DualConverter : ITypeConverter<SourceFoo, DestinationFoo>,
 										 ITypeConverter<SourceBar, DestinationBar>
 			{
-				public DestinationFoo Convert(ResolutionContext context)
+				public DestinationFoo Convert(SourceFoo source, ResolutionContext context)
 				{
-					var source = context.SourceValue as SourceFoo;
 					return new DestinationFoo { DestinationFooValue = source.SourceFooValue + 100 };
 				}
 
-				DestinationBar ITypeConverter<SourceBar, DestinationBar>.Convert(ResolutionContext context)
+				DestinationBar ITypeConverter<SourceBar, DestinationBar>.Convert(SourceBar source, ResolutionContext context)
 				{
-					var source = context.SourceValue as SourceBar;
 					return new DestinationBar { DestinationBarValue = source.SourceBarValue + 1000 };
 				}
 			}

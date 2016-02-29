@@ -20,9 +20,9 @@ namespace AutoMapper.Mappers
 
         private class CustomMapperStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
-                return context.TypeMap.CustomMapper(context);
+                return context.TypeMap.CustomMapper(source, context);
             }
 
             public bool IsMatch(ResolutionContext context)
@@ -33,15 +33,11 @@ namespace AutoMapper.Mappers
 
         private class SubstutitionMapperStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
                 var newSource = context.TypeMap.Substitution(context.SourceValue);
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(newSource.GetType(), context.DestinationType);
 
-                var substitutionContext = context.CreateTypeContext(typeMap, newSource, context.DestinationValue,
-                    newSource.GetType(), context.DestinationType);
-
-                return context.Engine.Map(substitutionContext);
+                return context.Mapper.Map(newSource, context.DestinationValue, newSource.GetType(), context.DestinationType, context);
             }
 
             public bool IsMatch(ResolutionContext context)
@@ -52,7 +48,7 @@ namespace AutoMapper.Mappers
 
         private class NullMappingStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
                 return null;
             }
@@ -65,7 +61,7 @@ namespace AutoMapper.Mappers
 
         private class CacheMappingStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
                 return context.InstanceCache[context];
             }
@@ -79,7 +75,7 @@ namespace AutoMapper.Mappers
 
         private abstract class PropertyMapMappingStrategy : ITypeMapObjectMapper
         {
-            public object Map(ResolutionContext context)
+            public object Map(object source, ResolutionContext context)
             {
                 var mappedObject = GetMappedObject(context);
                 if (context.SourceValue != null && !context.Options.DisableCache)
@@ -90,7 +86,7 @@ namespace AutoMapper.Mappers
 
                 foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
                 {
-                    MapPropertyValue(context.CreatePropertyMapContext(propertyMap), mappedObject, propertyMap);
+                    MapPropertyValue(context, mappedObject, propertyMap);
                 }
                 mappedObject = ReassignValue(context, mappedObject);
 
@@ -120,14 +116,15 @@ namespace AutoMapper.Mappers
                 {
                     result = propertyMap.ResolveValue(context);
                 }
-                catch (AutoMapperMappingException)
+                catch (AutoMapperMappingException ex)
                 {
+                    ex.PropertyMap = propertyMap;
+
                     throw;
                 }
                 catch (Exception ex)
                 {
-                    var errorContext = CreateErrorContext(context, propertyMap, null);
-                    resolvingExc = new AutoMapperMappingException(errorContext, ex);
+                    resolvingExc = new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
                     result = context.SourceValue;
                 }
 
@@ -137,13 +134,7 @@ namespace AutoMapper.Mappers
                 var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, declaredSourceType, destinationType);
-
-                var targetSourceType = typeMap?.SourceType ?? sourceType;
-
-                var newContext = context.CreateMemberContext(typeMap, result, destinationValue,
-                    targetSourceType,
-                    propertyMap);
+                var newContext = new ResolutionContext(result, destinationValue, sourceType, destinationType, context.TypeMap, context);
 
                 if (!propertyMap.ShouldAssignValue(newContext))
                     return;
@@ -154,12 +145,14 @@ namespace AutoMapper.Mappers
 
                 try
                 {
-                    object propertyValueToAssign = context.Engine.Map(newContext);
+                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType, context);
 
                     AssignValue(propertyMap, mappedObject, propertyValueToAssign);
                 }
-                catch (AutoMapperMappingException)
+                catch (AutoMapperMappingException ex)
                 {
+                    ex.PropertyMap = propertyMap;
+
                     throw;
                 }
                 catch (Exception ex)
@@ -174,17 +167,6 @@ namespace AutoMapper.Mappers
                 if (propertyMap.CanBeSet)
                     propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
             }
-
-            private ResolutionContext CreateErrorContext(ResolutionContext context, PropertyMap propertyMap,
-                object destinationValue)
-            {
-                return context.CreateMemberContext(
-                    null,
-                    context.SourceValue,
-                    destinationValue,
-                    context.SourceValue?.GetType() ?? typeof (object),
-                    propertyMap);
-            }
         }
 
         private class NewObjectPropertyMapMappingStrategy : PropertyMapMappingStrategy
@@ -196,7 +178,7 @@ namespace AutoMapper.Mappers
 
             protected override object GetMappedObject(ResolutionContext context)
             {
-                var result = context.Engine.CreateObject(context);
+                var result = context.Mapper.CreateObject(context);
                 if(result == null)
                 {
                     throw new InvalidOperationException("Cannot create destination object. " + context);

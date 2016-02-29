@@ -3,7 +3,6 @@ namespace AutoMapper.Mappers
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Reflection;
     using Configuration;
 
     public class ReadOnlyCollectionMapper : IObjectMapper
@@ -19,10 +18,7 @@ namespace AutoMapper.Mappers
             var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
 
             var nullDestinationValueSoTheReadOnlyCollectionMapperWorks =
-                context.PropertyMap != null
-                    ? context.CreateMemberContext(context.TypeMap, context.SourceValue, null, context.SourceType,
-                        context.PropertyMap)
-                    : context;
+                    new ResolutionContext(context.SourceValue, null, context.SourceType, context.DestinationType, context.TypeMap, context);
 
             return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks);
         }

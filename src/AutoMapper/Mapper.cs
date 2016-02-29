@@ -1,8 +1,12 @@
 namespace AutoMapper
 {
     using System;
+    using System.Linq;
+    using Configuration;
+    using Execution;
+    using Mappers;
 
-    public class Mapper : IMapper
+    public class Mapper : IRuntimeMapper
     {
         #region Static API
 
@@ -210,7 +214,7 @@ namespace AutoMapper
             var options = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
             opts(options);
 
-            return (TDestination)MapCore(source, modelType, destinationType, options);
+            return (TDestination)MapCore(source, null, modelType, destinationType, options);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
@@ -237,7 +241,7 @@ namespace AutoMapper
 
             opts(options);
 
-            return MapCore(source, sourceType, destinationType, options);
+            return MapCore(source, null, sourceType, destinationType, options);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
@@ -253,13 +257,52 @@ namespace AutoMapper
             return MapCore(source, destination, sourceType, destinationType, options);
         }
 
-        private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
+        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
+            => MapCore(source, destination, sourceType, destinationType, parent);
+
+        object IRuntimeMapper.CreateObject(ResolutionContext context)
         {
-            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+            var typeMap = context.TypeMap;
+            var destinationType = typeMap?.DestinationType ?? context.DestinationType;
 
-            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, _engine);
+            if (typeMap != null)
+                if (typeMap.DestinationCtor != null)
+                    return typeMap.DestinationCtor(context);
+                else if (typeMap.ConstructDestinationUsingServiceLocator)
+                    return context.Options.ServiceCtor(destinationType);
+                else if (typeMap.ConstructorMap != null && typeMap.ConstructorMap.CtorParams.All(p => p.CanResolve))
+                    return typeMap.ConstructorMap.ResolveValue(context);
 
-            return _engine.Map(context);
+            if (context.DestinationValue != null)
+                return context.DestinationValue;
+
+            if (destinationType.IsInterface())
+#if PORTABLE
+                throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+#else
+                destinationType = new ProxyGenerator().GetProxyType(destinationType);
+#endif
+
+            return !_configurationProvider.AllowNullDestinationValues
+                ? ObjectCreator.CreateNonNullValue(destinationType)
+                : ObjectCreator.CreateObject(destinationType);
+        }
+
+        bool IRuntimeMapper.ShouldMapSourceValueAsNull(ResolutionContext context)
+        {
+            if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
+                return false;
+
+            var typeMap = context.GetContextTypeMap();
+
+            return typeMap?.Profile.AllowNullDestinationValues ?? _configurationProvider.AllowNullDestinationValues;
+        }
+
+        bool IRuntimeMapper.ShouldMapSourceCollectionAsNull(ResolutionContext context)
+        {
+            var typeMap = context.GetContextTypeMap();
+
+            return typeMap?.Profile.AllowNullCollections ?? _configurationProvider.AllowNullCollections;
         }
 
         private object MapCore(object source, object destination, Type sourceType, Type destinationType,
@@ -267,7 +310,16 @@ namespace AutoMapper
         {
             TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
 
-            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, _engine);
+            var context = new ResolutionContext(source, destination, sourceType, destinationType, typeMap, options, this);
+
+            return _engine.Map(context);
+        }
+
+        private object MapCore(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
+        {
+            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+
+            var context = new ResolutionContext(source, destination, sourceType, destinationType, typeMap, parent);
 
             return _engine.Map(context);
         }
