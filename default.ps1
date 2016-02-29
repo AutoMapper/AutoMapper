@@ -11,7 +11,7 @@ properties {
 
 task default -depends local
 task local -depends init, compile, test
-task ci -depends clean, release, local
+task ci -depends clean, release, local, benchmark
 
 task clean {
 	rd "$source_dir\artifacts" -recurse -force  -ErrorAction SilentlyContinue | out-null
@@ -41,6 +41,10 @@ task compile -depends clean {
     exec { dnu pack $source_dir\AutoMapper --configuration $config}
     exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
+}
+
+task benchmark {
+    exec { & $source_dir\Benchmark\bin\$config\Benchmark.exe }
 }
 
 task test {
