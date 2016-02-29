@@ -220,12 +220,8 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(Type sourceRuntimeType, Type sourceDeclaredType, Type destinationType)
         {
-            var typeMap = ResolveTypeMap(sourceRuntimeType, destinationType);
-            if(typeMap == null && sourceDeclaredType != sourceRuntimeType)
-            {
-                return ResolveTypeMap(sourceDeclaredType, destinationType);
-            }
-            return typeMap;
+            return ResolveTypeMap(sourceRuntimeType, destinationType) ??
+                      (sourceDeclaredType != sourceRuntimeType ? ResolveTypeMap(sourceDeclaredType, destinationType) : null);
         }
 
         public void AssertConfigurationIsValid(TypeMap typeMap)
