@@ -250,6 +250,7 @@
     <Compile Include="Projection\ProjectCollectionListTest.cs" />
     <Compile Include="Projection\ProjectEnumerableToArrayTest.cs" />
     <Compile Include="Projection\ProjectEnumTest.cs" />
+    <Compile Include="Projection\ProjectionTests.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="Projection\GenericsTests.cs" />
     <Compile Include="Projection\ToStringTests.cs" />

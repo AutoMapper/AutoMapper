@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.Query
         {
             public int SrcValue { get; set; }
             public string StringValue { get; set; }
-            public string[] Strings { get; set; }
+            public string[] Strings { get; set; } = new string[0];
         }
 
         public class Destination

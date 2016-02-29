@@ -23,13 +23,13 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private static MemberAssignment BindEnumerableExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
-            MemberAssignment bindExpression;
-            Type destinationListType = GetDestinationListTypeFor(propertyMap);
+            var destinationListType = GetDestinationListTypeFor(propertyMap);
 
             var sourceListType = result.Type.IsArray ? result.Type.GetElementType() : result.Type.GetTypeInfo().GenericTypeArguments.First();
             var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand);
 
-            var selectExpression = result.ResolutionExpression;
+            Expression exp = result.ResolutionExpression;
+
             if (sourceListType != destinationListType)
             {
                 var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount);
@@ -37,13 +37,14 @@ namespace AutoMapper.QueryableExtensions.Impl
                 {
                     return null;
                 }
-                selectExpression = Expression.Call(
-                    typeof (Enumerable),
-                    "Select",
-                    new[] {sourceListType, destinationListType},
-                    result.ResolutionExpression,
-                    transformedExpression);
+                exp = Expression.Call(
+                        typeof (Enumerable),
+                        "Select",
+                        new[] {sourceListType, destinationListType},
+                        result.ResolutionExpression,
+                        transformedExpression);
             }
+            
 
             if (typeof (IList<>).MakeGenericType(destinationListType)
                 .GetTypeInfo().IsAssignableFrom(propertyMap.DestinationPropertyType.GetTypeInfo())
@@ -52,26 +53,28 @@ namespace AutoMapper.QueryableExtensions.Impl
                     .GetTypeInfo().IsAssignableFrom(propertyMap.DestinationPropertyType.GetTypeInfo()))
             {
                 // Call .ToList() on IEnumerable
-                var toListCallExpression = GetToListCallExpression(propertyMap, destinationListType, selectExpression);
-
-                bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, toListCallExpression);
+                exp = GetToListCallExpression(propertyMap, destinationListType, exp);                
             }
             else if (propertyMap.DestinationPropertyType.IsArray)
             {
                 // Call .ToArray() on IEnumerable
-                MethodCallExpression toArrayCallExpression = Expression.Call(
-                    typeof (Enumerable),
-                    "ToArray",
-                    new[] {destinationListType},
-                    selectExpression);
-                bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, toArrayCallExpression);
+                exp = Expression.Call(
+                        typeof (Enumerable),
+                        "ToArray",
+                        new[] {destinationListType},
+                        exp);
             }
-            else
-            {
-                // destination type implements ienumerable, but is not an ilist. allow deferred enumeration
-                bindExpression = Expression.Bind(propertyMap.DestinationProperty.MemberInfo, selectExpression);
+            
+            if(configuration.AllowNullCollections) {
+                exp = Expression.Condition(
+                            Expression.NotEqual(
+                                Expression.TypeAs(result.ResolutionExpression, typeof(object)), 
+                                Expression.Constant(null)),
+                            exp,
+                            Expression.Constant(null, propertyMap.DestinationPropertyType));
             }
-            return bindExpression;
+
+            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, exp);
         }
 
         private static Type GetDestinationListTypeFor(PropertyMap propertyMap)
