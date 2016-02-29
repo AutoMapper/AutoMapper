@@ -4,7 +4,7 @@ namespace AutoMapper.Execution
 {
     using System;
 
-    public class DelegateBasedResolver<TSource, TMember> : IValueResolver
+    public class DelegateBasedResolver<TSource, TMember> : IMemberResolver
     {
         private readonly Func<object, ResolutionContext, TMember> _method;
 

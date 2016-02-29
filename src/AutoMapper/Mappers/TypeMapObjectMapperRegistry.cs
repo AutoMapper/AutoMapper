@@ -133,12 +133,13 @@ namespace AutoMapper.Mappers
 
                 object destinationValue = propertyMap.GetDestinationValue(mappedObject);
 
-                var sourceType = result?.GetType() ?? context.SourceType;
+                var declaredSourceType = propertyMap.SourceType() ?? context.SourceType;
+                var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, context.SourceType, destinationType);
+                var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, declaredSourceType, destinationType);
 
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
+                var targetSourceType = typeMap?.SourceType ?? sourceType;
 
                 var newContext = context.CreateMemberContext(typeMap, result, destinationValue,
                     targetSourceType,

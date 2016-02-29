@@ -54,7 +54,9 @@ namespace AutoMapper
 
         public Type SourceType()
         {
-            return CustomExpression?.ReturnType ?? SourceMember?.GetMemberType();
+            return CustomExpression?.ReturnType ?? 
+                      _sourceMember?.GetMemberType() ?? 
+                      _cachedResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
         }
 
         public MemberInfo SourceMember

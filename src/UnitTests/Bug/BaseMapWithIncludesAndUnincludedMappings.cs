@@ -30,7 +30,6 @@ namespace AutoMapper.UnitTests.Bug
             public int PropB { get; set; }
         }
 
-        [Fact(Skip = "Broken in 5.0")]
         public void base_has_include_of_source_but_mapping_with_both_sides_being_unmapped_types_from_the_base_fails()
         {
             var config = new MapperConfiguration(cfg =>
