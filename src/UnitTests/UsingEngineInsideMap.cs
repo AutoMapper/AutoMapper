@@ -33,7 +33,7 @@
                                 context.Engine.Map(
                                     context.CreateTypeContext(
                                         context.ConfigurationProvider.ResolveTypeMap(typeof (Source),typeof (ChildDest))
-                                        , context.SourceValue, context.DestinationValue, typeof (Source), typeof (ChildDest)))));
+                                        , source, context.DestinationValue, typeof (Source), typeof (ChildDest)))));
             cfg.CreateMap<Source, ChildDest>();
         });
 

@@ -54,17 +54,7 @@ namespace AutoMapper
 
         public Type SourceType()
         {
-            if(CustomExpression != null)
-            {
-                return CustomExpression.ReturnType;
-            }
-            var sourceMember = SourceMember;
-            if(sourceMember != null)
-            {
-                return sourceMember.GetMemberType();
-            }
-            return null;
-            //throw new Exception("Uknown type.");
+            return CustomExpression?.ReturnType ?? SourceMember?.GetMemberType();
         }
 
         public MemberInfo SourceMember
