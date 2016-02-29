@@ -198,7 +198,7 @@ namespace AutoMapper
 
         public ResolutionContext CreatePropertyMapContext(PropertyMap propertyMap)
         {
-            return new ResolutionContext(this, SourceValue, DestinationValue, propertyMap.SourceType() ?? SourceType, propertyMap);
+            return new ResolutionContext(this, SourceValue, DestinationValue, SourceType, propertyMap);
         }
 
         public ResolutionContext CreateMemberContext(TypeMap memberTypeMap, object memberValue, object destinationValue,
