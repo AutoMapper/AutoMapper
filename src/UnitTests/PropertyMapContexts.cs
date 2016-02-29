@@ -29,17 +29,17 @@
 //        }
 
 
-        public class CodeValueDtoResolver : IValueResolver
-        {
-            public object Resolve(object source, ResolutionContext context)
-            {
-                var propertyMap = context.PropertyMap;
+//        public class CodeValueDtoResolver : IValueResolver
+//        {
+//            public object Resolve(object source, ResolutionContext context)
+//            {
+//                var propertyMap = context.PropertyMap;
 
 //                propertyMap.ShouldNotBeNull();
 
-                var codeValueTypeId = propertyMap.SourceMember.DeclaringType.Name + ":" + propertyMap.SourceMember.Name;
-                return LookupCodeValue(codeValueTypeId, "" + source);
-            }
+//                var codeValueTypeId = propertyMap.SourceMember.DeclaringType.Name + ":" + propertyMap.SourceMember.Name;
+//                return LookupCodeValue(codeValueTypeId, "" + source);
+//            }
 
 //            private CodeValueDto LookupCodeValue(string codeValueTypeId, string code)
 //            {

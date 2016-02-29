@@ -296,6 +296,11 @@ namespace AutoMapper
                 {
                     redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
                 }
+                if (typeMap.SourceType.IsNullableType())
+                {
+                    var nonNullableTypes = new TypePair(Nullable.GetUnderlyingType(typeMap.SourceType), typeMap.DestinationType);
+                    redirectedTypes.Add(Tuple.Create(nonNullableTypes, typeMap.Types));
+                }
                 derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
             }
             foreach (var redirectedType in redirectedTypes)
@@ -347,6 +352,8 @@ namespace AutoMapper
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
 
+            typeMap?.Seal();
+
             return typeMap;
         }
 
@@ -360,6 +367,8 @@ namespace AutoMapper
                 .Cast<IProfileConfiguration>()
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, openGenericTypes.Value))
                 .FirstOrDefault(t => t != null);
+
+            typeMap?.Seal();
 
             return typeMap;
         }

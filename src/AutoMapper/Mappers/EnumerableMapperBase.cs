@@ -40,16 +40,6 @@ namespace AutoMapper.Mappers
             int i = 0;
             foreach (object item in enumerableValue)
             {
-                //var newContext = context.CreateElementContext(null, item, sourceElementType, destElementType, i);
-                //var elementResolutionResult = new ResolutionResult(newContext);
-
-                //var typeMap = context.ConfigurationProvider.ResolveTypeMap(elementResolutionResult, destElementType);
-
-                //Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
-                //Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destElementType;
-
-                //newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, i);
-
                 object mappedValue = context.Mapper.Map(item, null, sourceElementType, destElementType, context);
 
                 SetElementValue(enumerable, mappedValue, i);

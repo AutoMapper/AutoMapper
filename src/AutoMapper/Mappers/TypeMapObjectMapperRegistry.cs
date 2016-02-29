@@ -134,7 +134,7 @@ namespace AutoMapper.Mappers
                 var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                var newContext = new ResolutionContext(result.Value, destinationValue, sourceType, destinationType, context.TypeMap, context);
+                var newContext = new ResolutionContext(result, destinationValue, sourceType, destinationType, context.TypeMap, context);
 
                 if (!propertyMap.ShouldAssignValue(newContext))
                     return;
@@ -145,7 +145,7 @@ namespace AutoMapper.Mappers
 
                 try
                 {
-                    object propertyValueToAssign = context.Mapper.Map(result.Value, destinationValue, sourceType, destinationType, context);
+                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType, context);
 
                     AssignValue(propertyMap, mappedObject, propertyValueToAssign);
                 }

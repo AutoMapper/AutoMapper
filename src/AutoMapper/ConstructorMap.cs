@@ -71,7 +71,7 @@ namespace AutoMapper
                 }
                 else
                 {
-                    var value = context.Mapper.Map(result.Value, null, sourceType, destinationType, context);
+                    var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
                     ctorArgs.Add(value);
                 }
             }
