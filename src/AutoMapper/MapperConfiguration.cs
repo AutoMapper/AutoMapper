@@ -19,6 +19,7 @@ namespace AutoMapper
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly IDictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
+        private readonly object _typeMapPlanCacheLock = new object();
         private readonly IList<Profile> _profiles = new List<Profile>();
         private readonly ConfigurationValidator _validator;
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
@@ -201,18 +202,24 @@ namespace AutoMapper
 
             if (!_typeMapPlanCache.TryGetValue(typePair, out typeMap))
             {
-                typeMap = typePair.GetRelatedTypePairs()
-                    .Select(
-                        tp =>
-                            _typeMapPlanCache.GetOrDefault(tp) ??
-                            FindTypeMapFor(tp) ??
-                            (!CoveredByObjectMap(typePair)
-                                ? FindConventionTypeMapFor(tp) ??
-                                  FindClosedGenericTypeMapFor(tp)
-                                : null))
-                    .FirstOrDefault(tm => tm != null);
+                lock (_typeMapPlanCacheLock)
+                {
+                    if (!_typeMapPlanCache.TryGetValue(typePair, out typeMap))
+                    {
+                        typeMap = typePair.GetRelatedTypePairs()
+                            .Select(
+                                tp =>
+                                    _typeMapPlanCache.GetOrDefault(tp) ??
+                                    FindTypeMapFor(tp) ??
+                                    (!CoveredByObjectMap(typePair)
+                                        ? FindConventionTypeMapFor(tp) ??
+                                          FindClosedGenericTypeMapFor(tp)
+                                        : null))
+                            .FirstOrDefault(tm => tm != null);
 
-                _typeMapPlanCache[typePair] = typeMap;
+                        _typeMapPlanCache[typePair] = typeMap;
+                    }
+                }
             }
 
             return typeMap;
