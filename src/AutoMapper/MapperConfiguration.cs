@@ -186,7 +186,7 @@ namespace AutoMapper
 
         public TypeMap FindTypeMapFor<TSource, TDestination>() => FindTypeMapFor(new TypePair(typeof(TSource), typeof(TDestination)));
 
-        public TypeMap FindTypeMapFor(TypePair typePair) => _typeMapRegistry.GetTypeMap(typePair);
+        public TypeMap FindTypeMapFor(TypePair typePair) => _typeMapRegistry.GetTypeMap(typePair) ?? FindClosedGenericTypeMapFor(typePair);
 
         public TypeMap ResolveTypeMap(Type sourceType, Type destinationType)
         {
@@ -205,8 +205,7 @@ namespace AutoMapper
                                 _typeMapPlanCache.GetOrDefault(tp) ??
                                 FindTypeMapFor(tp) ??
                                 (!CoveredByObjectMap(typePair)
-                                    ? FindConventionTypeMapFor(tp) ??
-                                      FindClosedGenericTypeMapFor(tp)
+                                    ? FindConventionTypeMapFor(tp)
                                     : null))
                         .FirstOrDefault(tm => tm != null));
 

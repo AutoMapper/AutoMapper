@@ -7,6 +7,35 @@ using Should;
 
 namespace AutoMapper.UnitTests
 {
+    public class OverrideTheCollectionMapper : AutoMapperSpecBase
+    {
+        PaginatedList<int> _destinatinon;
+
+        public class PaginatedList<T> : List<T>
+        {
+            public int PageNumber { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(c => c.CreateMap(typeof(PaginatedList<>), typeof(PaginatedList<>)));
+            }
+        }
+
+        protected override void Because_of()
+        {
+            _destinatinon = Mapper.Map<PaginatedList<int>>(new PaginatedList<int> { PageNumber = 5 });
+        }
+
+        [Fact]
+        public void Should_use_the_custom_map()
+        {
+            _destinatinon.PageNumber.ShouldEqual(5);
+        }
+    }
+
     public class CollectionMapping
     {
         public CollectionMapping()
