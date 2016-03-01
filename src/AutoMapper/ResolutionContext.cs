@@ -17,27 +17,27 @@ namespace AutoMapper
         /// <summary>
         /// Current type map
         /// </summary>
-        public TypeMap TypeMap { get; }
+        public TypeMap TypeMap { get; private set; }
 
         /// <summary>
         /// Current source type
         /// </summary>
-        public Type SourceType { get; }
+        public Type SourceType { get; private set; }
 
         /// <summary>
         /// Current attempted destination type
         /// </summary>
-        public Type DestinationType { get; }
+        public Type DestinationType { get; private set; }
 
         /// <summary>
         /// Source value
         /// </summary>
-        public object SourceValue { get; }
+        public object SourceValue { get; private set; }
 
         /// <summary>
         /// Destination value
         /// </summary>
-        public object DestinationValue { get; }
+        public object DestinationValue { get; private set; }
 
         /// <summary>
         /// Parent resolution context
@@ -62,7 +62,7 @@ namespace AutoMapper
         /// <summary>
         /// Source and destination type pair
         /// </summary>
-        public TypePair Types { get; }
+        public TypePair Types { get; private set; }
 
         public bool IsSourceValueNull => Equals(null, SourceValue);
 
@@ -79,6 +79,24 @@ namespace AutoMapper
             DestinationType = destinationType ?? typeMap?.DestinationType ?? parent.DestinationType;
 
             Types = new TypePair(SourceType, DestinationType);
+        }
+
+        internal ResolutionContext(ResolutionContext parent)
+        {
+            Parent = parent;
+            Options = parent.Options;
+            Mapper = parent.Mapper;
+            InstanceCache = parent.InstanceCache;
+        }
+
+        internal void Fill(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap)
+        {
+           SourceType = sourceType ?? typeMap?.SourceType ?? Parent.SourceType;
+           DestinationType = destinationType ?? typeMap?.DestinationType ?? Parent.DestinationType;
+           Types = new TypePair(SourceType, DestinationType);
+           SourceValue = source;
+           DestinationValue = destination;
+           TypeMap = typeMap;
         }
 
         public ResolutionContext(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap, MappingOperationOptions options, IRuntimeMapper mapper)

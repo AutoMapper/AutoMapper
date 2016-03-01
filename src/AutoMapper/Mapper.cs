@@ -257,6 +257,8 @@ namespace AutoMapper
             return MapCore(source, destination, sourceType, destinationType, options);
         }
 
+        object IRuntimeMapper.Map(ResolutionContext context) => _engine.Map(context);
+
         object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
             => MapCore(source, destination, sourceType, destinationType, parent);
 
