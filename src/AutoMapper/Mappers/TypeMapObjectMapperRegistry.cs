@@ -84,10 +84,9 @@ namespace AutoMapper.Mappers
                 context.TypeMap.BeforeMap(context.SourceValue, mappedObject, context);
                 context.BeforeMap(mappedObject);
 
-                var propertyContext = new ResolutionContext(context);
                 foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
                 {
-                    MapPropertyValue(context, propertyContext, mappedObject, propertyMap);
+                    MapPropertyValue(context, mappedObject, propertyMap);
                 }
                 mappedObject = ReassignValue(context, mappedObject);
 
@@ -106,15 +105,15 @@ namespace AutoMapper.Mappers
 
             protected abstract object GetMappedObject(ResolutionContext context);
 
-            private void MapPropertyValue(ResolutionContext parentContext, ResolutionContext propertyContext, object mappedObject, PropertyMap propertyMap)
+            private void MapPropertyValue(ResolutionContext context, object mappedObject, PropertyMap propertyMap)
             {
-                if (!propertyMap.CanResolveValue() || !propertyMap.ShouldAssignValuePreResolving(parentContext))
+                if (!propertyMap.CanResolveValue() || !propertyMap.ShouldAssignValuePreResolving(context))
                     return;
 
                 object result;
                 try
                 {
-                    result = propertyMap.ResolveValue(parentContext);
+                    result = propertyMap.ResolveValue(context);
                 }
                 catch (AutoMapperMappingException ex)
                 {
@@ -129,7 +128,7 @@ namespace AutoMapper.Mappers
 
                 object destinationValue = propertyMap.GetDestinationValue(mappedObject);
 
-                var declaredSourceType = propertyMap.SourceType ?? parentContext.SourceType;
+                var declaredSourceType = propertyMap.SourceType ?? context.SourceType;
                 var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
@@ -138,7 +137,7 @@ namespace AutoMapper.Mappers
 
                 try
                 {
-                    object propertyValueToAssign = parentContext.Mapper.Map(propertyContext);
+                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType);
 
                     AssignValue(propertyMap, mappedObject, propertyValueToAssign);
                 }
