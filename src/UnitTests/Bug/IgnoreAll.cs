@@ -56,7 +56,7 @@ namespace AutoMapper.UnitTests.Bug
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
-                .ForAllMembers(opt => opt.Condition(c => !c.IsSourceValueNull));
+                .ForAllMembers(opt => opt.Condition((_, __, ___, c) => !c.IsSourceValueNull));
         });
 
         protected override void Because_of()

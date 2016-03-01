@@ -33,7 +33,7 @@
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt =>
                     {
-                        opt.Condition(src => src.Value.Count > 1);
+                        opt.PreCondition(src => src.Value.Count > 1);
                         opt.ResolveUsing(src => src.Value[1].SubValue);
                     });
             });
@@ -175,7 +175,7 @@
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(d => d.Value, opt => opt.Condition(rc => rc.DestinationValue == null));
+                    .ForMember(d => d.Value, opt => opt.Condition((_, __, dest, rc) => dest == null));
             });
 
             [Fact]

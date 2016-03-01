@@ -112,7 +112,6 @@ namespace AutoMapper.Mappers
                     return;
 
                 object result;
-                Exception resolvingExc = null;
                 try
                 {
                     result = propertyMap.ResolveValue(parentContext);
@@ -125,8 +124,7 @@ namespace AutoMapper.Mappers
                 }
                 catch (Exception ex)
                 {
-                    resolvingExc = new AutoMapperMappingException(parentContext, ex) { PropertyMap = propertyMap };
-                    result = parentContext.SourceValue;
+                    throw new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
                 }
 
                 object destinationValue = propertyMap.GetDestinationValue(mappedObject);
@@ -135,15 +133,8 @@ namespace AutoMapper.Mappers
                 var sourceType = result?.GetType() ?? declaredSourceType;
                 var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                var typeMap = parentContext.ConfigurationProvider.ResolveTypeMap(result, destinationValue, sourceType, destinationType);
-                propertyContext.Fill(result, destinationValue, sourceType, destinationType, typeMap);
-
-                if (!propertyMap.ShouldAssignValue(propertyContext))
+                if (!propertyMap.ShouldAssignValue(result, destinationValue, context))
                     return;
-
-                // If condition succeeded and resolving failed, throw
-                if (resolvingExc != null)
-                    throw resolvingExc;
 
                 try
                 {
@@ -159,7 +150,7 @@ namespace AutoMapper.Mappers
                 }
                 catch (Exception ex)
                 {
-                    throw new AutoMapperMappingException(propertyContext, ex);
+                    throw new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
                 }
             }
 

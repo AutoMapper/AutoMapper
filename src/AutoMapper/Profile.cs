@@ -9,6 +9,7 @@ namespace AutoMapper
     using System.Reflection;
     using Configuration;
     using Configuration.Conventions;
+    using IMemberConfiguration = Configuration.Conventions.IMemberConfiguration;
 
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.

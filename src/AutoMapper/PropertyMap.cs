@@ -17,9 +17,9 @@ namespace AutoMapper
         private IValueResolver _customResolver;
         private IValueResolver _customMemberResolver;
         private bool _sealed;
-        private IValueResolver[] _cachedResolvers;
-        private Func<ResolutionContext, bool> _condition;
-        private Func<ResolutionContext, bool> _preCondition;
+        private Func<object, object, ResolutionContext, bool> _condition = (_, __, ___) => true;
+        private Func<ResolutionContext, bool> _preCondition = _ => true;
+        private Func<ResolutionContext, object> _valueResolverFunc;
         private MemberInfo _sourceMember;
 
         public PropertyMap(IMemberAccessor destinationProperty)
@@ -98,7 +98,7 @@ namespace AutoMapper
 
         public object ResolveValue(ResolutionContext context)
         {
-            return _cachedResolvers.Aggregate(context.SourceValue, (current, resolver) => resolver.Resolve(current, context));
+            return _valueResolverFunc(context);
         }
 
         internal void Seal()
@@ -108,8 +108,13 @@ namespace AutoMapper
                 return;
             }
 
-            _cachedResolvers = GetSourceValueResolvers().ToArray();
-            SourceType = _cachedResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
+            var resolvers = GetSourceValueResolvers().ToArray();
+
+            _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
+                ctxt => ctxt.SourceValue, 
+                (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
+
+            SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
             _sealed = true;
         }
 
@@ -202,7 +207,7 @@ namespace AutoMapper
             return DestinationProperty.GetHashCode();
         }
 
-        public void ApplyCondition(Func<ResolutionContext, bool> condition)
+        public void ApplyCondition(Func<object, object, ResolutionContext, bool> condition)
         {
             _condition = condition;
         }
@@ -212,14 +217,14 @@ namespace AutoMapper
             _preCondition = condition;
         }
 
-        public bool ShouldAssignValue(ResolutionContext context)
+        public bool ShouldAssignValue(object resolvedValue, object destinationValue, ResolutionContext context)
         {
-            return _condition == null || _condition(context);
+            return _condition(resolvedValue, destinationValue, context);
         }
 
         public bool ShouldAssignValuePreResolving(ResolutionContext context)
         {
-            return _preCondition == null || _preCondition(context);
+            return _preCondition(context);
         }
 
         public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
