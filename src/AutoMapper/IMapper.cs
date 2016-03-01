@@ -32,6 +32,15 @@ namespace AutoMapper
         TDestination Map<TSource, TDestination>(TSource source);
 
         /// <summary>
+        /// Execute a merge mapping from the source object(s) to a new destination object.
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use, regardless of the runtime type</typeparam>
+        /// <typeparam name="TDestination">Destination type to create</typeparam>
+        /// <param name="sources">Source object(s) to map from</param>
+        /// <returns>Mapped destination object</returns>
+        TDestination Merge<TSource, TDestination>(params TSource[] sources);
+
+        /// <summary>
         /// Execute a mapping from the source object to a new destination object with supplied mapping options.
         /// </summary>
         /// <typeparam name="TSource">Source type to use</typeparam>
