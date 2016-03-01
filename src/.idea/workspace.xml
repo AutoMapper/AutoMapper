@@ -117,7 +117,12 @@
   <component name="PropertiesComponent">
     <property name="last_opened_file_path" value="$PROJECT_DIR$/AutoMapper.sln" />
   </component>
-  <component name="RunManager" selected=".DNX Project.Core\AutoMapper">
+  <component name="RunManager" selected=".Net Project.Tests\UnitTests.Net4">
+    <configuration default="false" name="Tests\UnitTests.Net4" type="RunProject" factoryName=".Net Project" temporary="true">
+      <option name="ARGUMENTS" value="" />
+      <option name="projectName" value="Tests\UnitTests.Net4" />
+      <method />
+    </configuration>
     <configuration default="true" type="RunDnxProject" factoryName=".DNX Project">
       <option name="dnxArguments" value="run" />
       <option name="workingDirectory" value="" />
@@ -138,10 +143,16 @@
       <option name="projectName" value="Tests\Benchmark" />
       <method />
     </configuration>
-    <list size="2">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue=".DNX Project.Core\AutoMapper" />
       <item index="1" class="java.lang.String" itemvalue=".Net Project.Tests\Benchmark" />
+      <item index="2" class="java.lang.String" itemvalue=".Net Project.Tests\UnitTests.Net4" />
     </list>
+    <recent_temporary>
+      <list size="1">
+        <item index="0" class="java.lang.String" itemvalue=".Net Project.Tests\UnitTests.Net4" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
