@@ -31,12 +31,10 @@ namespace AutoMapper
                     return mappedObject;
                 }
 
-                var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
-
                 Func<TypePair, IObjectMapper> missFunc =
-                    tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(contextTypePair));
+                    tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context.Types));
 
-                IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
+                IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(context.Types, missFunc);
                 if (mapperToUse == null)
                 {
                     throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
