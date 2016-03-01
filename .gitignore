@@ -21,3 +21,7 @@ packages
 .nuget
 project.lock.json
 .vs
+
+# JetBrains Rider
+.idea/
+*.sln.iml
