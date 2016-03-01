@@ -137,7 +137,7 @@ namespace AutoMapper.Mappers
 
                 try
                 {
-                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType);
+                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType, context);
 
                     AssignValue(propertyMap, mappedObject, propertyValueToAssign);
                 }
