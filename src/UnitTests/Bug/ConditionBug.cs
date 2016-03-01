@@ -76,7 +76,7 @@
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(d => d.Value, opt =>
                     {
-                        opt.Condition(src => src.Value.HasValue);
+                        opt.PreCondition(src => src.Value.HasValue);
                         opt.MapFrom(src => src.Value.Value + 10);
                     }));
 
@@ -130,7 +130,7 @@
                     .ForMember(itemDTO => itemDTO.BasePrice,
                         config =>
                         {
-                            config.Condition(item => item.HasBasePrice);
+                            config.PreCondition(item => item.HasBasePrice);
                             config.MapFrom(item => item.BasePrice);
                         }));
 
