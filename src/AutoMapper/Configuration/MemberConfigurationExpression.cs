@@ -7,7 +7,13 @@ namespace AutoMapper.Configuration
     using System.Reflection;
     using Execution;
 
-    public class MemberConfigurationExpression<TSource> : IMemberConfigurationExpression<TSource>
+    public interface IMemberConfiguration
+    {
+        void Configure(TypeMap typeMap);
+        IMemberAccessor DestinationMember { get; }
+    }
+
+    public class MemberConfigurationExpression<TSource, TMember> : IMemberConfigurationExpression<TSource, TMember>, IMemberConfiguration
     {
         private readonly IMemberAccessor _destinationMember;
         private readonly Type _sourceType;
@@ -63,22 +69,22 @@ namespace AutoMapper.Configuration
             return expression;
         }
 
-        public void ResolveUsing<TMember>(Func<TSource, TMember> resolver)
+        public void ResolveUsing<TSourceMember>(Func<TSource, TSourceMember> resolver)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>((o, c) => resolver((TSource)o))));
+            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TSourceMember>((o, c) => resolver((TSource)o))));
         }
 
-        public void ResolveUsing<TMember>(Func<TSource, ResolutionContext, TMember> resolver)
+        public void ResolveUsing<TSourceMember>(Func<TSource, ResolutionContext, TSourceMember> resolver)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TMember>((o, c) => resolver((TSource)o, c))));
+            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TSourceMember>((o, c) => resolver((TSource)o, c))));
         }
 
-        public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
+        public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
         {
             _propertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(sourceMember));
         }
 
-        public void MapFrom<TMember>(string sourceMember)
+        public void MapFrom<TSourceMember>(string sourceMember)
         {
             var members = _sourceType.GetMember(sourceMember);
             if (!members.Any())
@@ -89,10 +95,10 @@ namespace AutoMapper.Configuration
 
             var par = Expression.Parameter(typeof(TSource));
             var prop = typeof(TSource) != _sourceType ? (Expression) Expression.Property(Expression.Convert(par, _sourceType), sourceMember) : Expression.Property(par, sourceMember);
-            if (typeof (TMember) != member.GetMemberType())
-                prop = Expression.Convert(prop, typeof(TMember));
+            if (typeof (TSourceMember) != member.GetMemberType())
+                prop = Expression.Convert(prop, typeof(TSourceMember));
 
-            var lambda = Expression.Lambda<Func<TSource, TMember>>(prop, par);
+            var lambda = Expression.Lambda<Func<TSource, TSourceMember>>(prop, par);
 
             _propertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(lambda));
         }
@@ -112,19 +118,24 @@ namespace AutoMapper.Configuration
             _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, object>((o, c) => value)));
         }
 
-        public void Condition(Func<TSource, bool> condition)
+        public void Condition(Func<TSource, object, TMember, ResolutionContext, bool> condition)
         {
-            Condition(context => condition((TSource)context.Parent.SourceValue));
+            _propertyMapActions.Add(pm => pm.ApplyCondition((src, dest, ctxt) => condition((TSource)ctxt.SourceValue, src, (TMember)dest, ctxt)));
         }
 
-        public void Condition(Func<ResolutionContext, bool> condition)
+        public void Condition(Func<TSource, object, TMember, bool> condition)
         {
-            _propertyMapActions.Add(pm => pm.ApplyCondition(condition));
+            _propertyMapActions.Add(pm => pm.ApplyCondition((src, dest, ctxt) => condition((TSource)ctxt.SourceValue, src, (TMember)dest)));
+        }
+
+        public void Condition(Func<TSource, bool> condition)
+        {
+            _propertyMapActions.Add(pm => pm.ApplyCondition((src, dest, ctxt) => condition((TSource)ctxt.SourceValue)));
         }
 
         public void PreCondition(Func<TSource, bool> condition)
         {
-            PreCondition(context => condition((TSource)context.Parent.SourceValue));
+            PreCondition(context => condition((TSource)context.SourceValue));
         }
 
         public void PreCondition(Func<ResolutionContext, bool> condition)

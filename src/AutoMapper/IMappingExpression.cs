@@ -188,7 +188,7 @@ namespace AutoMapper
         /// Customize configuration for members not previously configured
         /// </summary>
         /// <param name="memberOptions">Callback for member options</param>
-        void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
+        void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
 
         /// <summary>
         /// Customize configuration for individual member
@@ -196,8 +196,8 @@ namespace AutoMapper
         /// <param name="destinationMember">Expression to the top-level destination member. This must be a member on the <typeparamref name="TDestination"/>TDestination</param> type
         /// <param name="memberOptions">Callback for member options</param>
         /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
-            Action<IMemberConfigurationExpression<TSource>> memberOptions);
+        IMappingExpression<TSource, TDestination> ForMember<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
+            Action<IMemberConfigurationExpression<TSource, TMember>> memberOptions);
 
         /// <summary>
         /// Customize configuration for individual member. Used when the name isn't known at compile-time
@@ -206,13 +206,13 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member options</param>
         /// <returns></returns>
         IMappingExpression<TSource, TDestination> ForMember(string name,
-            Action<IMemberConfigurationExpression<TSource>> memberOptions);
+            Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
 
         /// <summary>
         /// Customize configuration for all members
         /// </summary>
         /// <param name="memberOptions">Callback for member options</param>
-        void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
+        void ForAllMembers(Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
 
         /// <summary>
         /// Ignores all <typeparamref name="TDestination"/> properties that have either a private or protected setter, forcing the mapper to respect encapsulation (note: order matters, so place this before explicit configuration of any properties with an inaccessible setter)

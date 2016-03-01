@@ -10,6 +10,7 @@ namespace AutoMapper
     using Mappers;
     using QueryableExtensions;
     using QueryableExtensions.Impl;
+    using IMemberConfiguration = Configuration.Conventions.IMemberConfiguration;
 
     public class MapperConfiguration : IConfigurationProvider, IMapperConfiguration
     {

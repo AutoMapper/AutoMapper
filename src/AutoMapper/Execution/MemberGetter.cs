@@ -13,10 +13,7 @@ namespace AutoMapper.Execution
         public abstract Type MemberType { get; }
         public abstract object GetValue(object source);
 
-        public object Resolve(object source, ResolutionContext context)
-        {
-            return source == null ? null : GetValue(source);
-        }
+        public object Resolve(object source, ResolutionContext context) => source == null ? null : GetValue(source);
 
         public abstract IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit);
         public abstract IEnumerable<object> GetCustomAttributes(bool inherit);
