@@ -31,9 +31,10 @@ namespace AutoMapper.Mappers
 
             object destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
 
+            var itemContext = new ResolutionContext(context);
             foreach (object item in enumerableValue)
             {
-                object mappedValue = context.Mapper.Map(item, null, sourceElementType, destKvpType, context);
+                object mappedValue = itemContext.Map(item, null, sourceElementType, destKvpType);
                 var keyProperty = mappedValue.GetType().GetProperty("Key");
                 object destKey = keyProperty.GetValue(mappedValue, null);
 

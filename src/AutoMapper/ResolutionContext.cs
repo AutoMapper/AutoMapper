@@ -105,7 +105,14 @@ namespace AutoMapper
             _instanceCache = parent.InstanceCache;
         }
 
-        internal void Fill(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap)
+        internal object Map(object source, object destination, Type sourceType, Type destinationType)
+        {
+            var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+            Fill(source, destination, sourceType, destinationType, typeMap);
+            return Mapper.Map(this);
+        }
+
+        private void Fill(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap)
         {
            SourceType = sourceType ?? typeMap?.SourceType ?? Parent.SourceType;
            DestinationType = destinationType ?? typeMap?.DestinationType ?? Parent.DestinationType;

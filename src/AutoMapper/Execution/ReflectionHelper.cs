@@ -9,12 +9,13 @@ namespace AutoMapper.Execution
     using System.Reflection;
 
     public static class ReflectionHelper
-    {
-        public static object Map(ResolutionContext context, MemberInfo member, object value)
+	{
+        public static object Map(this ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = member.GetMemberType();
-            return context.Mapper.Map(value, null, value?.GetType() ?? memberType, memberType, context);
+            return context.Map(value, null, value?.GetType() ?? memberType, memberType);
         }
+
 
         public static bool IsDynamic(this object obj)
         {

@@ -35,14 +35,15 @@ namespace AutoMapper.Mappers
 
             var kvpEnumerator = GetKeyValuePairEnumerator(context, sourceKvpType);
             var destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
+            var itemContext = new ResolutionContext(context);
             while(kvpEnumerator.MoveNext())
             {
                 var keyValuePair = kvpEnumerator.Current;
                 object sourceKey = sourceKvpType.GetProperty("Key").GetValue(keyValuePair, new object[0]);
                 object sourceValue = sourceKvpType.GetProperty("Value").GetValue(keyValuePair, new object[0]);
 
-                object destKey = context.Mapper.Map(sourceKey, null, sourceKeyType, destKeyType, context);
-                object destValue = context.Mapper.Map(sourceValue, null, sourceValueType, destValueType, context);
+                object destKey = itemContext.Map(sourceKey, null, sourceKeyType, destKeyType);
+                object destValue = itemContext.Map(sourceValue, null, sourceValueType, destValueType);
 
                 genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
             }

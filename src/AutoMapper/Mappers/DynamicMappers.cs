@@ -18,6 +18,7 @@ namespace AutoMapper.Mappers
         {
             var source = context.SourceValue;
             var destination = context.Mapper.CreateObject(context);
+            var memberContext = new ResolutionContext(context);
             foreach(var member in MembersToMap(source, destination))
             {
                 object sourceMemberValue;
@@ -29,7 +30,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = ReflectionHelper.Map(context, member, sourceMemberValue);
+                var destinationMemberValue = memberContext.Map(member, sourceMemberValue);
                 SetDestinationMember(member, destination, destinationMemberValue);
             }
             return destination;
