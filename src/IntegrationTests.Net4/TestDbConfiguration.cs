@@ -16,7 +16,7 @@ namespace AutoMapper.IntegrationTests.Net4
             }
             else
             {
-                SetDefaultConnectionFactory(new LocalDbConnectionFactory("v12.0"));
+                SetDefaultConnectionFactory(new LocalDbConnectionFactory("mssqllocaldb"));
             }
         }
     }
