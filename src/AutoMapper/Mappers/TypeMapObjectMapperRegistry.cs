@@ -10,74 +10,43 @@ namespace AutoMapper.Mappers
         /// </summary>
         public static IList<ITypeMapObjectMapper> Mappers { get; } = new List<ITypeMapObjectMapper>
         {
-            new SubstutitionMapperStrategy(),
-            new CustomMapperStrategy(),
-            new NullMappingStrategy(),
-            new CacheMappingStrategy(),
-            new NewObjectPropertyMapMappingStrategy(),
-            new ExistingObjectMappingStrategy()
+            new PropertyMapMappingStrategy()
         };
 
-        private class CustomMapperStrategy : ITypeMapObjectMapper
+        private class PropertyMapMappingStrategy : ITypeMapObjectMapper
         {
             public object Map(object source, ResolutionContext context)
             {
-                return context.TypeMap.CustomMapper(source, context);
-            }
+                if (context.TypeMap.Substitution != null)
+                {
+                    var newSource = context.TypeMap.Substitution(context.SourceValue);
 
-            public bool IsMatch(ResolutionContext context)
-            {
-                return context.TypeMap.CustomMapper != null;
-            }
-        }
+                    return context.Mapper.Map(newSource, context.DestinationValue, newSource.GetType(), context.DestinationType, context);
+                }
 
-        private class SubstutitionMapperStrategy : ITypeMapObjectMapper
-        {
-            public object Map(object source, ResolutionContext context)
-            {
-                var newSource = context.TypeMap.Substitution(context.SourceValue);
+                if (context.TypeMap.CustomMapper != null)
+                {
+                    return context.TypeMap.CustomMapper(source, context);
+                }
 
-                return context.Mapper.Map(newSource, context.DestinationValue, newSource.GetType(), context.DestinationType, context);
-            }
+                if (context.SourceValue == null && context.TypeMap.Profile.AllowNullDestinationValues)
+                {
+                    return null;
+                }
 
-            public bool IsMatch(ResolutionContext context)
-            {
-                return context.TypeMap.Substitution != null;
-            }
-        }
+                if (!context.Options.DisableCache && context.DestinationValue == null &&
+                    context.InstanceCache.ContainsKey(context))
+                {
+                    return context.InstanceCache[context];
+                }
 
-        private class NullMappingStrategy : ITypeMapObjectMapper
-        {
-            public object Map(object source, ResolutionContext context)
-            {
-                return null;
-            }
+                var mappedObject = context.DestinationValue ?? context.Mapper.CreateObject(context);
 
-            public bool IsMatch(ResolutionContext context)
-            {
-                return context.SourceValue == null && context.TypeMap.Profile.AllowNullDestinationValues;
-            }
-        }
+                if (mappedObject == null)
+                {
+                    throw new InvalidOperationException("Cannot create destination object. " + context);
+                }
 
-        private class CacheMappingStrategy : ITypeMapObjectMapper
-        {
-            public object Map(object source, ResolutionContext context)
-            {
-                return context.InstanceCache[context];
-            }
-
-            public bool IsMatch(ResolutionContext context)
-            {
-                return !context.Options.DisableCache && context.DestinationValue == null &&
-                       context.InstanceCache.ContainsKey(context);
-            }
-        }
-
-        private abstract class PropertyMapMappingStrategy : ITypeMapObjectMapper
-        {
-            public object Map(object source, ResolutionContext context)
-            {
-                var mappedObject = GetMappedObject(context);
                 if (context.SourceValue != null && !context.Options.DisableCache)
                     context.InstanceCache[context] = mappedObject;
 
@@ -102,7 +71,6 @@ namespace AutoMapper.Mappers
                         throw new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
                     }
                 }
-                mappedObject = ReassignValue(context, mappedObject);
 
                 context.AfterMap(mappedObject);
                 context.TypeMap.AfterMap(context.SourceValue, mappedObject, context);
@@ -110,14 +78,10 @@ namespace AutoMapper.Mappers
                 return mappedObject;
             }
 
-            protected virtual object ReassignValue(ResolutionContext context, object o)
+            public bool IsMatch(ResolutionContext context)
             {
-                return o;
+                return true;
             }
-
-            public abstract bool IsMatch(ResolutionContext context);
-
-            protected abstract object GetMappedObject(ResolutionContext context);
 
             private void MapPropertyValue(ResolutionContext context, ResolutionContext propertyContext, object mappedObject, PropertyMap propertyMap)
             {
@@ -142,37 +106,6 @@ namespace AutoMapper.Mappers
 
                 if (propertyMap.CanBeSet)
                     propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
-            }
-        }
-
-        private class NewObjectPropertyMapMappingStrategy : PropertyMapMappingStrategy
-        {
-            public override bool IsMatch(ResolutionContext context)
-            {
-                return context.DestinationValue == null;
-            }
-
-            protected override object GetMappedObject(ResolutionContext context)
-            {
-                var result = context.Mapper.CreateObject(context);
-                if(result == null)
-                {
-                    throw new InvalidOperationException("Cannot create destination object. " + context);
-                }
-                return result;
-            }
-        }
-
-        private class ExistingObjectMappingStrategy : PropertyMapMappingStrategy
-        {
-            public override bool IsMatch(ResolutionContext context)
-            {
-                return true;
-            }
-
-            protected override object GetMappedObject(ResolutionContext context)
-            {
-                return context.DestinationValue;
             }
         }
     }
