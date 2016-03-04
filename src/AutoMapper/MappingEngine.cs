@@ -139,8 +139,7 @@ namespace AutoMapper
 
             object propertyValueToAssign = context.Mapper.Map(propertyContext);
 
-            if (propertyMap.CanBeSet)
-                propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+            propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
         }
     }
 }
