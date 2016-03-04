@@ -136,15 +136,9 @@ namespace AutoMapper
 
                 _mapperFunc = (mappedObject, context) =>
                 {
-                    if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
-                        return;
-
                     var result = ResolveValue(context);
 
-                    object destinationValue = GetDestinationValue(mappedObject);
                     
-                    if (!ShouldAssignValue(result, destinationValue, context))
-                        return;
                     
                     DestinationProperty.SetValue(mappedObject, result);
                 };
