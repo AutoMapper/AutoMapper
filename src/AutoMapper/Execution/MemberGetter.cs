@@ -4,7 +4,7 @@ namespace AutoMapper.Execution
     using System.Collections.Generic;
     using System.Reflection;
 
-    public abstract class MemberGetter : IMemberGetter
+    public abstract class MemberGetter<TSource, TValue> : IMemberGetter
     {
         protected static readonly DelegateFactory DelegateFactory = new DelegateFactory();
 

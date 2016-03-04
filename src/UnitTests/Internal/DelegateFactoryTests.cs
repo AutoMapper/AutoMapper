@@ -17,10 +17,10 @@ namespace AutoMapper.UnitTests
 		public void MethodTests()
 		{
 			MethodInfo method = typeof(String).GetMethod("StartsWith", new[] { typeof(string) });
-			LateBoundMethod callback = DelegateFactory.CreateGet(method);
+			LateBoundMethod<string, bool> callback = DelegateFactory.CreateGet<string, bool>(method).Compile();
 
 			string foo = "this is a test";
-			bool result = (bool)callback(foo, new[] { "this" });
+			bool result = callback(foo, new[] { "this" });
 
 			result.ShouldBeTrue();
 		}
@@ -29,10 +29,10 @@ namespace AutoMapper.UnitTests
 		public void PropertyTests()
 		{
 			PropertyInfo property = typeof(Source).GetProperty("Value", typeof(int));
-			LateBoundPropertyGet callback = DelegateFactory.CreateGet(property);
+			LateBoundPropertyGet<Source, int> callback = DelegateFactory.CreateGet<Source, int>(property).Compile();
 
 			var source = new Source {Value = 5};
-			int result = (int)callback(source);
+			int result = callback(source);
 
 			result.ShouldEqual(5);
 		}
@@ -41,10 +41,10 @@ namespace AutoMapper.UnitTests
 		public void FieldTests()
 		{
 			FieldInfo field = typeof(Source).GetField("Value2");
-			LateBoundFieldGet callback = DelegateFactory.CreateGet(field);
+			LateBoundFieldGet<Source, int> callback = DelegateFactory.CreateGet<Source, int>(field).Compile();
 
 			var source = new Source {Value2 = 15};
-			int result = (int)callback(source);
+			int result = callback(source);
 
 			result.ShouldEqual(15);
 		}
@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof (Source);
 			FieldInfo field = sourceType.GetField("Value2");
-			LateBoundFieldSet callback = DelegateFactory.CreateSet(field);
+			LateBoundFieldSet<Source, int> callback = DelegateFactory.CreateSet<Source, int>(field).Compile();
 
 			var source = new Source();
 			callback(source, 5);
@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof (Source);
 			FieldInfo field = sourceType.GetField("Value3");
-			LateBoundFieldSet callback = DelegateFactory.CreateSet(field);
+			LateBoundFieldSet<Source, string> callback = DelegateFactory.CreateSet<Source, string>(field).Compile();
 
 			var source = new Source();
 			callback(source, "hello");
@@ -80,7 +80,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof (Source);
 			PropertyInfo property = sourceType.GetProperty("Value");
-			LateBoundPropertySet callback = DelegateFactory.CreateSet(property);
+			LateBoundPropertySet<Source, int> callback = DelegateFactory.CreateSet<Source, int>(property).Compile();
 
 			var source = new Source();
 			callback(source, 5);
@@ -93,7 +93,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof (ISource);
 			PropertyInfo property = sourceType.GetProperty("Value");
-			LateBoundPropertySet callback = DelegateFactory.CreateSet(property);
+			LateBoundPropertySet<Source, int> callback = DelegateFactory.CreateSet<Source, int>(property).Compile();
 
 			var source = new Source();
 			callback(source, 5);
@@ -106,7 +106,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof(Source);
 			PropertyInfo property = sourceType.GetProperty("Value4");
-			LateBoundPropertySet callback = DelegateFactory.CreateSet(property);
+			LateBoundPropertySet<Source, string> callback = DelegateFactory.CreateSet<Source, string>(property).Compile();
 
 			var source = new Source();
 			callback(source, "hello");

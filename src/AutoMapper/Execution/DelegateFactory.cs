@@ -13,18 +13,16 @@ namespace AutoMapper.Execution
         private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
             new ConcurrentDictionary<Type, LateBoundCtor>();
 
-        public LateBoundMethod CreateGet(MethodInfo method)
+        public Expression<LateBoundMethod<TSource, TValue>> CreateGet<TSource, TValue>(MethodInfo method)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
+            ParameterExpression instanceParameter = Expression.Parameter(method.DeclaringType, "target");
             ParameterExpression argumentsParameter = Expression.Parameter(typeof (object[]), "arguments");
 
             MethodCallExpression call;
             if (!method.IsDefined(typeof (ExtensionAttribute), false))
             {
                 // instance member method
-                call = Expression.Call(
-                    Expression.Convert(instanceParameter, method.DeclaringType),
-                    method,
+                call = Expression.Call(instanceParameter, method,
                     CreateParameterExpressions(method, instanceParameter, argumentsParameter));
             }
             else
@@ -35,79 +33,69 @@ namespace AutoMapper.Execution
                     CreateParameterExpressions(method, instanceParameter, argumentsParameter));
             }
 
-            Expression<LateBoundMethod> lambda = Expression.Lambda<LateBoundMethod>(
-                Expression.Convert(call, typeof (object)),
+            Expression<LateBoundMethod<TSource, TValue>> lambda = Expression.Lambda<LateBoundMethod<TSource, TValue>>(
+                call,
                 instanceParameter,
                 argumentsParameter);
 
-            return lambda.Compile();
+            return lambda;
         }
 
-        public LateBoundPropertyGet CreateGet(PropertyInfo property)
+        public Expression<LateBoundPropertyGet<TSource, TValue>> CreateGet<TSource, TValue>(PropertyInfo property)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
+            ParameterExpression instanceParameter = Expression.Parameter(property.DeclaringType, "target");
 
-            MemberExpression member = Expression.Property(
-                Expression.Convert(instanceParameter, property.DeclaringType), property);
+            MemberExpression member = Expression.Property(instanceParameter, property);
 
-            Expression<LateBoundPropertyGet> lambda = Expression.Lambda<LateBoundPropertyGet>(
-                Expression.Convert(member, typeof (object)),
-                instanceParameter
-                );
+            Expression<LateBoundPropertyGet<TSource, TValue>> lambda = Expression.Lambda<LateBoundPropertyGet<TSource, TValue>>(member,instanceParameter);
 
-            return lambda.Compile();
+            return lambda;
         }
 
-        public LateBoundFieldGet CreateGet(FieldInfo field)
+        public Expression<LateBoundFieldGet<TSource, TValue>> CreateGet<TSource, TValue>(FieldInfo field)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
+            ParameterExpression instanceParameter = Expression.Parameter(typeof(TSource), "target");
 
-            MemberExpression member = Expression.Field(Expression.Convert(instanceParameter, field.DeclaringType), field);
+            MemberExpression member = Expression.Field(instanceParameter, field);
 
-            Expression<LateBoundFieldGet> lambda = Expression.Lambda<LateBoundFieldGet>(
-                Expression.Convert(member, typeof (object)),
-                instanceParameter
-                );
+            Expression<LateBoundFieldGet<TSource, TValue>> lambda = Expression.Lambda<LateBoundFieldGet<TSource, TValue>>(member, instanceParameter);
 
-            return lambda.Compile();
+            return lambda;
         }
 
-        public LateBoundFieldSet CreateSet(FieldInfo field)
+        public Expression<LateBoundFieldSet<TSource, TValue>> CreateSet<TSource, TValue>(FieldInfo field)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
-            ParameterExpression valueParameter = Expression.Parameter(typeof (object), "value");
+            ParameterExpression instanceParameter = Expression.Parameter(field.DeclaringType, "target");
+            ParameterExpression valueParameter = Expression.Parameter(field.FieldType, "value");
 
-            MemberExpression member = Expression.Field(Expression.Convert(instanceParameter, field.DeclaringType), field);
-            BinaryExpression assignExpression = Expression.Assign(member,
-                Expression.Convert(valueParameter, field.FieldType));
+            MemberExpression member = Expression.Field(instanceParameter, field);
+            BinaryExpression assignExpression = Expression.Assign(member, valueParameter);
 
-            Expression<LateBoundFieldSet> lambda = Expression.Lambda<LateBoundFieldSet>(
+            Expression<LateBoundFieldSet<TSource, TValue>> lambda = Expression.Lambda<LateBoundFieldSet<TSource, TValue>>(
                 assignExpression,
                 instanceParameter,
                 valueParameter
                 );
 
-            return lambda.Compile();
+            return lambda;
         }
 
-        public LateBoundPropertySet CreateSet(PropertyInfo property)
+        public Expression<LateBoundPropertySet<TSource, TValue>> CreateSet<TSource, TValue>(PropertyInfo property)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(typeof (object), "target");
-            ParameterExpression valueParameter = Expression.Parameter(typeof (object), "value");
+            ParameterExpression instanceParameter = Expression.Parameter(property.DeclaringType, "target");
+            ParameterExpression valueParameter = Expression.Parameter(property.PropertyType, "value");
 
-            MemberExpression member = Expression.Property(
-                Expression.Convert(instanceParameter, property.DeclaringType), property);
-            BinaryExpression assignExpression = Expression.Assign(member,
-                Expression.Convert(valueParameter, property.PropertyType));
+            MemberExpression member = Expression.Property(instanceParameter, property);
+            BinaryExpression assignExpression = Expression.Assign(member, valueParameter);
 
-            Expression<LateBoundPropertySet> lambda = Expression.Lambda<LateBoundPropertySet>(
+            Expression<LateBoundPropertySet<TSource, TValue>> lambda = Expression.Lambda<LateBoundPropertySet<TSource, TValue>>(
                 assignExpression,
                 instanceParameter,
                 valueParameter
                 );
 
 
-            return lambda.Compile();
+            return lambda;
         }
 
         public LateBoundCtor CreateCtor(Type type)

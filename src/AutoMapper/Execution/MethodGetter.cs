@@ -1,21 +1,25 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Execution
 {
     using System;
     using System.Collections.Generic;
     using System.Reflection;
 
-    public class MethodGetter : MemberGetter
+    public class MethodGetter<TSource, TValue> : MemberGetter<TSource, TValue>
     {
         private readonly MethodInfo _methodInfo;
         private readonly Type _memberType;
-        private readonly Lazy<LateBoundMethod> _lateBoundMethod;
+        private readonly Lazy<Expression<LateBoundMethod<TSource, TValue>>> _lateBoundMethodExpression;
+        private readonly Lazy<LateBoundMethod<TSource, TValue>> _lateBoundMethod;
 
         public MethodGetter(MethodInfo methodInfo)
         {
             _methodInfo = methodInfo;
             Name = _methodInfo.Name;
             _memberType = _methodInfo.ReturnType;
-            _lateBoundMethod = new Lazy<LateBoundMethod>(() => DelegateFactory.CreateGet(methodInfo));
+            _lateBoundMethodExpression = new Lazy<Expression<LateBoundMethod<TSource, TValue>>>(() => DelegateFactory.CreateGet<TSource, TValue>(methodInfo));
+            _lateBoundMethod = new Lazy<LateBoundMethod<TSource, TValue>>(() => _lateBoundMethodExpression.Value.Compile());
         }
 
         public override MemberInfo MemberInfo => _methodInfo;
@@ -27,8 +31,8 @@ namespace AutoMapper.Execution
         public override object GetValue(object source)
         {
             return _memberType == null
-                ? null
-                : _lateBoundMethod.Value(source, new object[0]);
+                ? default(TValue)
+                : _lateBoundMethod.Value((TSource)source, new object[0]);
         }
 
         public override IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit)
@@ -46,7 +50,7 @@ namespace AutoMapper.Execution
             return _methodInfo.IsDefined(attributeType, inherit);
         }
 
-        public bool Equals(MethodGetter other)
+        public bool Equals(MethodGetter<TSource, TValue> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -57,8 +61,8 @@ namespace AutoMapper.Execution
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (MethodGetter)) return false;
-            return Equals((MethodGetter) obj);
+            if (obj.GetType() != typeof (MethodGetter<TSource, TValue>)) return false;
+            return Equals((MethodGetter<TSource, TValue>) obj);
         }
 
         public override int GetHashCode()

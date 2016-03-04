@@ -1,14 +1,14 @@
 namespace AutoMapper.Execution
 {
-    public delegate object LateBoundMethod(object target, object[] arguments);
+    public delegate TValue LateBoundMethod<TSource, TValue>(TSource target, object[] arguments);
 
-    public delegate object LateBoundPropertyGet(object target);
+    public delegate TValue LateBoundPropertyGet<TSource, TValue>(TSource target);
 
-    public delegate object LateBoundFieldGet(object target);
+    public delegate TValue LateBoundFieldGet<TSource, TValue>(TSource target);
 
-    public delegate void LateBoundFieldSet(object target, object value);
+    public delegate void LateBoundFieldSet<TSource, TValue>(TSource target, TValue value);
 
-    public delegate void LateBoundPropertySet(object target, object value);
+    public delegate void LateBoundPropertySet<TSource,TValue>(TSource target, TValue value);
 
     public delegate void LateBoundValueTypeFieldSet(ref object target, object value);
 

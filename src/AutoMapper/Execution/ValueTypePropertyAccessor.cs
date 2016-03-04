@@ -2,9 +2,10 @@ namespace AutoMapper.Execution
 {
     using System.Reflection;
 
-    public class ValueTypePropertyAccessor : PropertyGetter, IMemberAccessor
+    public class ValueTypePropertyAccessor<TSource, TValue> : PropertyGetter<TSource, TValue>, IMemberAccessor
     {
-        private readonly MethodInfo _lateBoundPropertySet;
+        private readonly LateBoundPropertySet<TSource, TValue> _lateBoundPropertySetExpression;
+        private readonly LateBoundPropertySet<TSource, TValue> _lateBoundPropertySet;
 
         public ValueTypePropertyAccessor(PropertyInfo propertyInfo)
             : base(propertyInfo)
@@ -13,8 +14,9 @@ namespace AutoMapper.Execution
             HasSetter = method != null;
             if (HasSetter)
             {
-                _lateBoundPropertySet = method;
+                _lateBoundPropertySetExpression = ;
             }
+            _lateBoundPropertySet = (_, __) => { };
         }
 
         public bool HasSetter { get; }
