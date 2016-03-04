@@ -6,6 +6,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Configuration;
     using Execution;
 
     [DebuggerDisplay("{DestinationProperty.Name}")]
@@ -116,37 +117,45 @@ namespace AutoMapper
 
             SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
 
-            if (resolvers.All(r => r is IMemberResolver)
+            if (resolvers.All(r => r is IMemberGetter)
                 && CanResolveValue()
                 && !_hasPreCondition
                 && !_hasCondition
                 && SourceType != null
+                && !SourceType.IsEnumerableType()
                 && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
                 && DestinationPropertyType.IsAssignableFrom(SourceType))
             {
                 // Build assignable expression here
+
+                // But for now
+                _mapperFunc =
+                    (mappedObject, context) => DestinationProperty.SetValue(mappedObject, ResolveValue(context));
             }
-
-            _mapperFunc = (mappedObject, context) =>
+            else
             {
-                if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
-                    return;
+                _mapperFunc = (mappedObject, context) =>
+                {
+                    if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
+                        return;
 
-                var result = ResolveValue(context);
+                    var result = ResolveValue(context);
 
-                object destinationValue = GetDestinationValue(mappedObject);
+                    object destinationValue = GetDestinationValue(mappedObject);
 
-                var declaredSourceType = SourceType ?? context.SourceType;
-                var sourceType = result?.GetType() ?? declaredSourceType;
-                var destinationType = DestinationProperty.MemberType;
+                    var declaredSourceType = SourceType ?? context.SourceType;
+                    var sourceType = result?.GetType() ?? declaredSourceType;
+                    var destinationType = DestinationProperty.MemberType;
 
-                if (!ShouldAssignValue(result, destinationValue, context))
-                    return;
+                    if (!ShouldAssignValue(result, destinationValue, context))
+                        return;
 
-                object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType, context);
+                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType,
+                        destinationType, context);
 
-                DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
-            };
+                    DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+                };
+            }
 
             _sealed = true;
         }
