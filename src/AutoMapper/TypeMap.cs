@@ -236,14 +236,14 @@ namespace AutoMapper
             _afterMapActions.Add(afterMap);
         }
 
-        public void Seal()
+        public void Seal(TypeMapRegistry typeMapRegistry)
         {
             if (_sealed)
                 return;
 
             foreach (var inheritedTypeMap in _inheritedTypeMaps)
             {
-                inheritedTypeMap.Seal();
+                inheritedTypeMap.Seal(typeMapRegistry);
                 ApplyInheritedTypeMap(inheritedTypeMap);
             }
 
@@ -254,10 +254,10 @@ namespace AutoMapper
 
             foreach (var pm in _orderedPropertyMaps)
             {
-                pm.Seal();
+                pm.Seal(typeMapRegistry);
             }
             foreach (var inheritedMap in _inheritedMaps)
-                inheritedMap.Seal();
+                inheritedMap.Seal(typeMapRegistry);
 
             _sealed = true;
         }

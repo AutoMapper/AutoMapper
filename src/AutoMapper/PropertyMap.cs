@@ -18,8 +18,11 @@ namespace AutoMapper
         private IValueResolver _customMemberResolver;
         private bool _sealed;
         private Func<object, object, ResolutionContext, bool> _condition = (_, __, ___) => true;
+        private bool _hasCondition;
         private Func<ResolutionContext, bool> _preCondition = _ => true;
+        private bool _hasPreCondition;
         private Func<ResolutionContext, object> _valueResolverFunc;
+        private Action<object, ResolutionContext> _mapperFunc;
         private MemberInfo _sourceMember;
 
         public PropertyMap(IMemberAccessor destinationProperty)
@@ -98,7 +101,7 @@ namespace AutoMapper
             return _valueResolverFunc(context);
         }
 
-        internal void Seal()
+        internal void Seal(TypeMapRegistry typeMapRegistry)
         {
             if (_sealed)
             {
@@ -112,6 +115,39 @@ namespace AutoMapper
                 (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
 
             SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
+
+            if (resolvers.All(r => r is IMemberResolver)
+                && CanResolveValue()
+                && !_hasPreCondition
+                && !_hasCondition
+                && SourceType != null
+                && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
+                && DestinationPropertyType.IsAssignableFrom(SourceType))
+            {
+                // Build assignable expression here
+            }
+
+            _mapperFunc = (mappedObject, context) =>
+            {
+                if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
+                    return;
+
+                var result = ResolveValue(context);
+
+                object destinationValue = GetDestinationValue(mappedObject);
+
+                var declaredSourceType = SourceType ?? context.SourceType;
+                var sourceType = result?.GetType() ?? declaredSourceType;
+                var destinationType = DestinationProperty.MemberType;
+
+                if (!ShouldAssignValue(result, destinationValue, context))
+                    return;
+
+                object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType, context);
+
+                DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+            };
+
             _sealed = true;
         }
 
@@ -207,11 +243,13 @@ namespace AutoMapper
         public void ApplyCondition(Func<object, object, ResolutionContext, bool> condition)
         {
             _condition = condition;
+            _hasCondition = true;
         }
 
         public void ApplyPreCondition(Func<ResolutionContext, bool> condition)
         {
             _preCondition = condition;
+            _hasPreCondition = true;
         }
 
         public bool ShouldAssignValue(object resolvedValue, object destinationValue, ResolutionContext context)
@@ -262,23 +300,7 @@ namespace AutoMapper
 
         public void MapValue(object mappedObject, ResolutionContext context)
         {
-            if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
-                return;
-
-            var result = ResolveValue(context);
-
-            object destinationValue = GetDestinationValue(mappedObject);
-
-            var declaredSourceType = SourceType ?? context.SourceType;
-            var sourceType = result?.GetType() ?? declaredSourceType;
-            var destinationType = DestinationProperty.MemberType;
-
-            if (!ShouldAssignValue(result, destinationValue, context))
-                return;
-
-            object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType, context);
-
-            DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+            _mapperFunc(mappedObject, context);
         }
     }
 }
