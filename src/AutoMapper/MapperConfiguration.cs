@@ -15,7 +15,6 @@ namespace AutoMapper
     public class MapperConfiguration : IConfigurationProvider, IMapperConfiguration
     {
         private readonly IEnumerable<IObjectMapper> _mappers;
-        private readonly IEnumerable<ITypeMapObjectMapper> _typeMapObjectMappers;
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
@@ -25,14 +24,13 @@ namespace AutoMapper
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
 
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers)
         {
         }
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
+        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
-            _typeMapObjectMappers = typeMapObjectMappers;
             var profileExpression = new NamedProfile(ProfileName);
 
             _profiles.Add(profileExpression);
@@ -250,8 +248,6 @@ namespace AutoMapper
         public IMapper CreateMapper(Func<Type, object> serviceCtor) => new Mapper(this, serviceCtor);
 
         public IEnumerable<IObjectMapper> GetMappers() => _mappers;
-
-        public IEnumerable<ITypeMapObjectMapper> GetTypeMapMappers() => _typeMapObjectMappers;
 
         #endregion
 
