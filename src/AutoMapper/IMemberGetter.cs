@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 
 namespace AutoMapper
 {
@@ -18,6 +19,7 @@ namespace AutoMapper
             return source;
         }
 
+        public LambdaExpression GetExpression { get; }
         public Type MemberType { get; } = typeof (object);
         public MemberInfo MemberInfo { get; }
         public string Name { get; }

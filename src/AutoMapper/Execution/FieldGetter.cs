@@ -24,6 +24,7 @@ namespace AutoMapper.Execution
         public override MemberInfo MemberInfo => _fieldInfo;
 
         public override string Name { get; }
+        public override LambdaExpression GetExpression => _lateBoundFieldGetExpression.Value;
 
         public override Type MemberType { get; }
 

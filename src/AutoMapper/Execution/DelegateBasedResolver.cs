@@ -8,11 +8,13 @@ namespace AutoMapper.Execution
     {
         private readonly Func<object, ResolutionContext, TMember> _method;
 
-        public DelegateBasedResolver(Func<object, ResolutionContext, TMember> method)
+        public DelegateBasedResolver(Expression<Func<object, ResolutionContext, TMember>> method)
         {
-            _method = method;
+            GetExpression = method;
+            _method = method.Compile();
         }
 
+        public LambdaExpression GetExpression { get; }
         public Type MemberType => typeof(TMember);
 
         public object Resolve(object source, ResolutionContext context)
@@ -28,6 +30,7 @@ namespace AutoMapper.Execution
     public class ExpressionBasedResolver<TSource, TMember> : IExpressionResolver
     {
         public LambdaExpression Expression { get; }
+        public LambdaExpression GetExpression => Expression;
         private readonly Func<TSource, TMember> _method;
 
         public ExpressionBasedResolver(Expression<Func<TSource, TMember>> expression)

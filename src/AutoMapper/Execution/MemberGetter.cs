@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Execution
 {
     using System;
@@ -10,6 +12,7 @@ namespace AutoMapper.Execution
 
         public abstract MemberInfo MemberInfo { get; }
         public abstract string Name { get; }
+        public abstract LambdaExpression GetExpression { get; }
         public abstract Type MemberType { get; }
         public abstract object GetValue(object source);
 

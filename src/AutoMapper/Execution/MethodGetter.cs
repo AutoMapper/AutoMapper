@@ -25,6 +25,7 @@ namespace AutoMapper.Execution
         public override MemberInfo MemberInfo => _methodInfo;
 
         public override string Name { get; }
+        public override LambdaExpression GetExpression => _lateBoundMethodExpression.Value;
 
         public override Type MemberType => _memberType;
 

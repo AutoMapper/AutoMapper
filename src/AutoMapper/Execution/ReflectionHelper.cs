@@ -173,7 +173,7 @@ namespace AutoMapper.Execution
             }
             catch (Exception)
             {
-                return null;
+                return new MemberGetter();
             }
         }
 
@@ -200,7 +200,7 @@ namespace AutoMapper.Execution
             }
             catch (Exception)
             {
-                return null;
+                return new MemberAccessor();
             }
         }
 

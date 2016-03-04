@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper
 {
     using System;
@@ -23,6 +25,7 @@ namespace AutoMapper
             }
         }
 
+        public LambdaExpression GetExpression => _inner.GetExpression;
         public Type MemberType => _inner.MemberType;
     }
 }
