@@ -183,18 +183,23 @@ namespace AutoMapper.Execution
             {
                 var fieldInfo = accessorCandidate as FieldInfo;
                 if (fieldInfo != null)
-                    return Activator.CreateInstance(
+                    return accessorCandidate.DeclaringType.IsValueType()
+                        ? Activator.CreateInstance(
+                            typeof(ValueTypeFieldAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor
+                        : Activator.CreateInstance(
                             typeof (FieldAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
                                 accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor;
 
                 var propertyInfo = accessorCandidate as PropertyInfo;
                 if (propertyInfo != null)
-                {
-                    
-                    return Activator.CreateInstance(
+                    return accessorCandidate.DeclaringType.IsValueType()
+                        ? Activator.CreateInstance(
+                            typeof (ValueTypePropertyAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor
+                        : Activator.CreateInstance(
                             typeof (PropertyAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
                                 accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor;
-                }
 
                 return null;
             }

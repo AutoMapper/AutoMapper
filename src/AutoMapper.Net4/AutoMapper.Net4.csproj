@@ -205,6 +205,12 @@
     <Compile Include="..\AutoMapper\Execution\ReflectionHelper.cs">
       <Link>Execution\ReflectionHelper.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\Execution\ValueTypeFieldAccessor.cs">
+      <Link>Execution\ValueTypeFieldAccessor.cs</Link>
+    </Compile>
+    <Compile Include="..\AutoMapper\Execution\ValueTypePropertyAccessor.cs">
+      <Link>Execution\ValueTypePropertyAccessor.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\IConfiguration.cs">
       <Link>IConfiguration.cs</Link>
     </Compile>
