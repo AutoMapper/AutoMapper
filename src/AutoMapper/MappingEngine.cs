@@ -93,12 +93,11 @@ namespace AutoMapper
             context.TypeMap.BeforeMap(context.SourceValue, mappedObject, context);
             context.BeforeMap(mappedObject);
 
-            ResolutionContext propertyContext = new ResolutionContext(context);
             foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
             {
                 try
                 {
-                    MapPropertyValue(context, propertyContext, mappedObject, propertyMap);
+                    propertyMap.MapValue(mappedObject, context);
                 }
                 catch (AutoMapperMappingException ex)
                 {
@@ -116,30 +115,6 @@ namespace AutoMapper
             context.TypeMap.AfterMap(context.SourceValue, mappedObject, context);
 
             return mappedObject;
-        }
-
-        private void MapPropertyValue(ResolutionContext context, ResolutionContext propertyContext, object mappedObject, PropertyMap propertyMap)
-        {
-            if (!propertyMap.CanResolveValue() || !propertyMap.ShouldAssignValuePreResolving(context))
-                return;
-
-            var result = propertyMap.ResolveValue(context);
-
-            object destinationValue = propertyMap.GetDestinationValue(mappedObject);
-
-            var declaredSourceType = propertyMap.SourceType ?? context.SourceType;
-            var sourceType = result?.GetType() ?? declaredSourceType;
-            var destinationType = propertyMap.DestinationProperty.MemberType;
-
-            if (!propertyMap.ShouldAssignValue(result, destinationValue, context))
-                return;
-
-            var typeMap = context.ConfigurationProvider.ResolveTypeMap(result, destinationValue, sourceType, destinationType);
-            propertyContext.Fill(result, destinationValue, sourceType, destinationType, typeMap);
-
-            object propertyValueToAssign = context.Mapper.Map(propertyContext);
-
-            propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
         }
     }
 }

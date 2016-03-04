@@ -259,5 +259,26 @@ namespace AutoMapper
                 return base.VisitMember(node);
             }
         }
+
+        public void MapValue(object mappedObject, ResolutionContext context)
+        {
+            if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
+                return;
+
+            var result = ResolveValue(context);
+
+            object destinationValue = GetDestinationValue(mappedObject);
+
+            var declaredSourceType = SourceType ?? context.SourceType;
+            var sourceType = result?.GetType() ?? declaredSourceType;
+            var destinationType = DestinationProperty.MemberType;
+
+            if (!ShouldAssignValue(result, destinationValue, context))
+                return;
+
+            object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType, context);
+
+            DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+        }
     }
 }
