@@ -19,7 +19,7 @@ namespace AutoMapper.Execution
 
         public void SetValue(object destination, object value)
         {
-            _lateBoundFieldSet.Value((TSource)destination, (TValue)value);
+            _lateBoundFieldSet.Value((TSource)destination, value != null ? (TValue)value : default(TValue));
         }
     }
 }

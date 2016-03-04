@@ -22,7 +22,7 @@ namespace AutoMapper.Execution
 
         public virtual void SetValue(object destination, object value)
         {
-            _lateBoundPropertySet.Value((TSource)destination, (TValue)value);
+            _lateBoundPropertySet.Value((TSource)destination, value != null ? (TValue)value : default(TValue));
         }
     }
 }

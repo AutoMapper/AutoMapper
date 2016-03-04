@@ -1,3 +1,5 @@
+using AutoMapper.Configuration;
+
 namespace AutoMapper
 {
     using System;
@@ -113,31 +115,41 @@ namespace AutoMapper
 
             SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
 
+            _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
+                    ctxt => ctxt.SourceValue,
+                    (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
+
             if (resolvers.All(r => r is IMemberResolver)
                 && CanResolveValue()
                 && !_hasPreCondition
                 && !_hasCondition
                 && SourceType != null
                 && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
-                && DestinationPropertyType.IsAssignableFrom(SourceType))
+                && DestinationPropertyType.IsAssignableFrom(SourceType)
+                && !DestinationPropertyType.IsEnumerableType()
+                && !SourceType.IsEnumerableType())
             {
-                // Build assignable expression here
                 //var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
                 //    (ctxt => ctxt.SourceValue),
                 //    (expression, resolver) => new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression) as LambdaExpression);
                 //_valueResolverFunc = (Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters) as Expression<Func<ResolutionContext, object>>).Compile();
 
-                //_mapperFunc = (mappedObject, context) =>
-                //{
-                //    var result = ResolveValue(context);
-                //    DestinationProperty.SetValue(mappedObject, result);
-                //};
-                //return;
+                _mapperFunc = (mappedObject, context) =>
+                {
+                    if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
+                        return;
+
+                    var result = ResolveValue(context);
+
+                    object destinationValue = GetDestinationValue(mappedObject);
+                    
+                    if (!ShouldAssignValue(result, destinationValue, context))
+                        return;
+                    
+                    DestinationProperty.SetValue(mappedObject, result);
+                };
+                return;
             }
-            //else
-            _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
-                    ctxt => ctxt.SourceValue,
-                    (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
 
             _mapperFunc = (mappedObject, context) =>
             {
@@ -332,11 +344,23 @@ namespace AutoMapper
                     if (node.Type == typeof(object))
                         expression = Expression.Convert(node, _overrideExpression.Parameters[0].Type);
                     var body = _overrideExpression.Body as MemberExpression;
-                    if(body != null)
+                    if (body != null)
+                    {
+                        if (body.Expression is ConstantExpression)
+                            expression = body;
+                        else
                         expression = Expression.PropertyOrField(expression, body.Member.Name);
+                    }
                     var body2 = _overrideExpression.Body as MethodCallExpression;
                     if (body2 != null)
+                    {
+                        if (body2.Method.IsGenericMethod)
+                            return node;
+                        //var convertedArguments = Visit(body2.Arguments);
+                        //var convertedMethodArgumentTypes = body2.Method.GetGenericArguments().Select(t => GetConvertingTypeIfExists(node.Arguments, t, convertedArguments)).ToArray();
+                        //var convertedMethodCall = body2.Method.GetGenericMethodDefinition().MakeGenericMethod(convertedMethodArgumentTypes);
                         expression = Expression.Call(expression, body2.Method);
+                    }
 
                     return expression;
                 }
