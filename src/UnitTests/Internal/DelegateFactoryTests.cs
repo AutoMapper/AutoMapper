@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests
 		public void MethodTests()
 		{
 			MethodInfo method = typeof(String).GetMethod("StartsWith", new[] { typeof(string) });
-			LateBoundMethod<string, bool> callback = DelegateFactory.CreateGet<string, bool>(method).Compile();
+			LateBoundMethod<object, bool> callback = DelegateFactory.CreateGet<bool>(method).Compile();
 
 			string foo = "this is a test";
 			bool result = callback(foo, new[] { "this" });

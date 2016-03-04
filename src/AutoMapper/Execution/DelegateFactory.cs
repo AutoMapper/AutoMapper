@@ -13,16 +13,16 @@ namespace AutoMapper.Execution
         private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
             new ConcurrentDictionary<Type, LateBoundCtor>();
 
-        public Expression<LateBoundMethod<TSource, TValue>> CreateGet<TSource, TValue>(MethodInfo method)
+        public Expression<LateBoundMethod<object, TValue>> CreateGet<TValue>(MethodInfo method)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(method.DeclaringType, "target");
+            ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
             ParameterExpression argumentsParameter = Expression.Parameter(typeof (object[]), "arguments");
 
             MethodCallExpression call;
             if (!method.IsDefined(typeof (ExtensionAttribute), false))
             {
                 // instance member method
-                call = Expression.Call(instanceParameter, method,
+                call = Expression.Call(Expression.Convert(instanceParameter, method.DeclaringType), method,
                     CreateParameterExpressions(method, instanceParameter, argumentsParameter));
             }
             else
@@ -33,7 +33,7 @@ namespace AutoMapper.Execution
                     CreateParameterExpressions(method, instanceParameter, argumentsParameter));
             }
 
-            Expression<LateBoundMethod<TSource, TValue>> lambda = Expression.Lambda<LateBoundMethod<TSource, TValue>>(
+            Expression<LateBoundMethod<object, TValue>> lambda = Expression.Lambda<LateBoundMethod<object, TValue>>(
                 call,
                 instanceParameter,
                 argumentsParameter);

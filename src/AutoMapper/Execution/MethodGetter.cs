@@ -10,16 +10,16 @@ namespace AutoMapper.Execution
     {
         private readonly MethodInfo _methodInfo;
         private readonly Type _memberType;
-        private readonly Lazy<Expression<LateBoundMethod<TSource, TValue>>> _lateBoundMethodExpression;
-        private readonly Lazy<LateBoundMethod<TSource, TValue>> _lateBoundMethod;
+        private readonly Lazy<Expression<LateBoundMethod<object, TValue>>> _lateBoundMethodExpression;
+        private readonly Lazy<LateBoundMethod<object, TValue>> _lateBoundMethod;
 
         public MethodGetter(MethodInfo methodInfo)
         {
             _methodInfo = methodInfo;
             Name = _methodInfo.Name;
             _memberType = _methodInfo.ReturnType;
-            _lateBoundMethodExpression = new Lazy<Expression<LateBoundMethod<TSource, TValue>>>(() => DelegateFactory.CreateGet<TSource, TValue>(methodInfo));
-            _lateBoundMethod = new Lazy<LateBoundMethod<TSource, TValue>>(() => _lateBoundMethodExpression.Value.Compile());
+            _lateBoundMethodExpression = new Lazy<Expression<LateBoundMethod<object, TValue>>>(() => DelegateFactory.CreateGet<TValue>(methodInfo));
+            _lateBoundMethod = new Lazy<LateBoundMethod<object, TValue>>(() => _lateBoundMethodExpression.Value.Compile());
         }
 
         public override MemberInfo MemberInfo => _methodInfo;
@@ -33,7 +33,7 @@ namespace AutoMapper.Execution
         {
             return _memberType == null
                 ? default(TValue)
-                : _lateBoundMethod.Value((TSource)source, new object[0]);
+                : _lateBoundMethod.Value(source, new object[0]);
         }
 
         public override IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit)

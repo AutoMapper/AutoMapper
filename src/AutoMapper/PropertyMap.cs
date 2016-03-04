@@ -122,18 +122,19 @@ namespace AutoMapper
                 && DestinationPropertyType.IsAssignableFrom(SourceType))
             {
                 // Build assignable expression here
-                var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
-                    (ctxt => ctxt.SourceValue),
-                    (expression, resolver) => new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression) as LambdaExpression);
-                _valueResolverFunc = (Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters) as Expression<Func<ResolutionContext, object>>).Compile();
+                //var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
+                //    (ctxt => ctxt.SourceValue),
+                //    (expression, resolver) => new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression) as LambdaExpression);
+                //_valueResolverFunc = (Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters) as Expression<Func<ResolutionContext, object>>).Compile();
 
-                _mapperFunc = (mappedObject, context) =>
-                {
-                    var result = ResolveValue(context);
-                    DestinationProperty.SetValue(mappedObject, result);
-                };
-                return;
+                //_mapperFunc = (mappedObject, context) =>
+                //{
+                //    var result = ResolveValue(context);
+                //    DestinationProperty.SetValue(mappedObject, result);
+                //};
+                //return;
             }
+            //else
             _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
                     ctxt => ctxt.SourceValue,
                     (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
@@ -331,7 +332,11 @@ namespace AutoMapper
                     if (node.Type == typeof(object))
                         expression = Expression.Convert(node, _overrideExpression.Parameters[0].Type);
                     var body = _overrideExpression.Body as MemberExpression;
-                    expression = Expression.PropertyOrField(expression, body.Member.Name);
+                    if(body != null)
+                        expression = Expression.PropertyOrField(expression, body.Member.Name);
+                    var body2 = _overrideExpression.Body as MethodCallExpression;
+                    if (body2 != null)
+                        expression = Expression.Call(expression, body2.Method);
 
                     return expression;
                 }
