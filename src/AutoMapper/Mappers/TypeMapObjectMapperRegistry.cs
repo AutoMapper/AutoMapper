@@ -115,35 +115,22 @@ namespace AutoMapper.Mappers
                 try
                 {
                     result = propertyMap.ResolveValue(context);
-                }
-                catch (AutoMapperMappingException ex)
-                {
-                    ex.PropertyMap = propertyMap;
 
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    throw new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
-                }
+                    object destinationValue = propertyMap.GetDestinationValue(mappedObject);
 
-                object destinationValue = propertyMap.GetDestinationValue(mappedObject);
+                    var declaredSourceType = propertyMap.SourceType ?? context.SourceType;
+                    var sourceType = result?.GetType() ?? declaredSourceType;
+                    var destinationType = propertyMap.DestinationProperty.MemberType;
 
-                var declaredSourceType = propertyMap.SourceType ?? context.SourceType;
-                var sourceType = result?.GetType() ?? declaredSourceType;
-                var destinationType = propertyMap.DestinationProperty.MemberType;
+                    if (!propertyMap.ShouldAssignValue(result, destinationValue, context))
+                        return;
 
-                if (!propertyMap.ShouldAssignValue(result, destinationValue, context))
-                    return;
-
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(result, destinationValue, sourceType, destinationType);
-                propertyContext.Fill(result, destinationValue, sourceType, destinationType, typeMap);
-
-                try
-                {
+                    var typeMap = context.ConfigurationProvider.ResolveTypeMap(result, destinationValue, sourceType, destinationType);
+                    propertyContext.Fill(result, destinationValue, sourceType, destinationType, typeMap);
+                    
                     object propertyValueToAssign = context.Mapper.Map(propertyContext);
-
-                    AssignValue(propertyMap, mappedObject, propertyValueToAssign);
+                    
+                    propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
                 }
                 catch (AutoMapperMappingException ex)
                 {
@@ -155,13 +142,6 @@ namespace AutoMapper.Mappers
                 {
                     throw new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
                 }
-            }
-
-            protected virtual void AssignValue(PropertyMap propertyMap, object mappedObject,
-                object propertyValueToAssign)
-            {
-                if (propertyMap.CanBeSet)
-                    propertyMap.DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
             }
         }
 

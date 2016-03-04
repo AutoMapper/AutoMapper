@@ -10,14 +10,11 @@ namespace AutoMapper.Execution
         public PropertyAccessor(PropertyInfo propertyInfo)
             : base(propertyInfo)
         {
-            HasSetter = propertyInfo.GetSetMethod(true) != null;
-            if (HasSetter)
-            {
-                _lateBoundPropertySet = new Lazy<LateBoundPropertySet>(() => DelegateFactory.CreateSet(propertyInfo));
-            }
+            var HasSetter = propertyInfo.GetSetMethod(true) != null;
+            _lateBoundPropertySet = HasSetter
+                ? new Lazy<LateBoundPropertySet>(() => DelegateFactory.CreateSet(propertyInfo))
+                : new Lazy<LateBoundPropertySet>(() => (_, __) => { });
         }
-
-        public bool HasSetter { get; }
 
         public virtual void SetValue(object destination, object value)
         {

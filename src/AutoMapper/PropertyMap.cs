@@ -63,9 +63,6 @@ namespace AutoMapper
             internal set { _sourceMember = value; }
         }
 
-        public bool CanBeSet => !(DestinationProperty is PropertyAccessor) ||
-                                ((PropertyAccessor) DestinationProperty).HasSetter;
-
         public bool UseDestinationValue { get; set; }
 
         internal bool HasCustomValueResolver { get; private set; }
