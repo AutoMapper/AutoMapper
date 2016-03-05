@@ -196,7 +196,7 @@ namespace AutoMapper.UnitTests
 				_defaultResult.Value.ShouldBeNull();
 			}
             
-            [Fact(Skip = "Please fix Jimmy")]
+            [Fact]
             public void Should_use_overridden_null_behavior_in_profile()
 			{
 				_nullResult.Value.ShouldNotBeNull();

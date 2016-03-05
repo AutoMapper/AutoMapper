@@ -1,4 +1,5 @@
 using AutoMapper.Configuration;
+using AutoMapper.Mappers;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
@@ -114,15 +115,12 @@ namespace AutoMapper
 
             var resolvers = GetSourceValueResolvers().ToArray();
 
-
             SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
 
             _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
                 ctxt => ctxt.SourceValue, 
                 (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
-
-            SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
-
+            
             if (resolvers.All(r => r is IMemberGetter)
                 && CanResolveValue()
                 && !_hasPreCondition
@@ -130,6 +128,7 @@ namespace AutoMapper
                 && SourceType != null
                 && !SourceType.IsEnumerableType()
                 && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
+                && ((EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) && !EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) || !EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
                 && DestinationPropertyType.IsAssignableFrom(SourceType))
             {
                 var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
@@ -138,8 +137,15 @@ namespace AutoMapper
                 var exp = Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters) as Expression<Func<ResolutionContext, object>>;
                 _valueResolverFunc = exp.Compile();
 
-                _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, ResolveValue(context));
-                }
+                _mapperFunc = (mappedObject, context) =>
+                {
+                    var value = !context.Mapper.ShouldMapSourceValueAsNull(context) && DestinationProperty.GetValue(mappedObject) == null
+                        ? context.Mapper.CreateObject(context)
+                        : ResolveValue(context);
+
+                        DestinationProperty.SetValue(mappedObject, value);
+                };
+            }
             else
             {
             _mapperFunc = (mappedObject, context) =>
