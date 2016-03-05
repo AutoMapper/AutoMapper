@@ -66,7 +66,7 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<string, int>().ConvertUsing((string s) => Convert.ToInt32(s));
-                cfg.CreateMap<string, int?>().ConvertUsing((string s) => (int?)Convert.ToInt32(s));
+                cfg.CreateMap<string, int?>().ConvertUsing((string s) => (int?) Convert.ToInt32(s));
                 cfg.CreateMap<Source, Destination>();
             });
 

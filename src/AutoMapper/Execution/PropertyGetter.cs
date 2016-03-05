@@ -1,40 +1,34 @@
-using System.Linq.Expressions;
-
 namespace AutoMapper.Execution
 {
     using System;
     using System.Collections.Generic;
     using System.Reflection;
 
-    public class PropertyGetter<TSource, TValue> : MemberGetter<TSource, TValue>
+    public class PropertyGetter : MemberGetter
     {
         private readonly PropertyInfo _propertyInfo;
-        private readonly Lazy<Expression<LateBoundPropertyGet<TSource, TValue>>> _lateBoundPropertyGetExpression;
-        private readonly Lazy<LateBoundPropertyGet<TSource, TValue>> _lateBoundPropertyGet;
+        private readonly Lazy<LateBoundPropertyGet> _lateBoundPropertyGet;
 
         public PropertyGetter(PropertyInfo propertyInfo)
         {
             _propertyInfo = propertyInfo;
             Name = _propertyInfo.Name;
             MemberType = _propertyInfo.PropertyType;
-            _lateBoundPropertyGetExpression =
-                _propertyInfo.GetGetMethod(true) != null 
-                ? new Lazy<Expression<LateBoundPropertyGet<TSource, TValue>>>(() => DelegateFactory.CreateGet<TSource, TValue>(propertyInfo)) 
-                : new Lazy<Expression<LateBoundPropertyGet<TSource, TValue>>>(() => src => default(TValue));
             _lateBoundPropertyGet =
-                new Lazy<LateBoundPropertyGet<TSource, TValue>>(() => _lateBoundPropertyGetExpression.Value.Compile());
+                _propertyInfo.GetGetMethod(true) != null 
+                ? new Lazy<LateBoundPropertyGet>(() => DelegateFactory.CreateGet(propertyInfo)) 
+                : new Lazy<LateBoundPropertyGet>(() => src => null);
         }
 
         public override MemberInfo MemberInfo => _propertyInfo;
 
         public override string Name { get; }
-        public override LambdaExpression GetExpression => _lateBoundPropertyGetExpression.Value;
 
         public override Type MemberType { get; }
 
         public override object GetValue(object source)
         {
-            return _lateBoundPropertyGet.Value((TSource)source);
+            return _lateBoundPropertyGet.Value(source);
         }
 
         public override IEnumerable<object> GetCustomAttributes(Type attributeType, bool inherit)
@@ -52,7 +46,7 @@ namespace AutoMapper.Execution
             return _propertyInfo.IsDefined(attributeType, inherit);
         }
 
-        public bool Equals(PropertyGetter<TSource, TValue> other)
+        public bool Equals(PropertyGetter other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -63,8 +57,8 @@ namespace AutoMapper.Execution
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (PropertyGetter<TSource, TValue>)) return false;
-            return Equals((PropertyGetter<TSource, TValue>) obj);
+            if (obj.GetType() != typeof (PropertyGetter)) return false;
+            return Equals((PropertyGetter) obj);
         }
 
         public override int GetHashCode()

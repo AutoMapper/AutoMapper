@@ -2,7 +2,7 @@ namespace AutoMapper.Execution
 {
     using System.Reflection;
 
-    public class ValueTypeFieldAccessor<TSource, TValue> : FieldGetter<TSource, TValue>, IMemberAccessor
+    public class ValueTypeFieldAccessor : FieldGetter, IMemberAccessor
     {
         private readonly FieldInfo _lateBoundFieldSet;
 
