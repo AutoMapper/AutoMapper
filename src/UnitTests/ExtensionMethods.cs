@@ -74,8 +74,14 @@ namespace AutoMapper.UnitTests
 
 			public struct Destination
 			{
-				public int Value1 { get; set; }
-				public int InsideThingProperty { get; set; }
+			    private int _insideThingProperty;
+			    public int Value1 { get; set; }
+
+			    public int InsideThingProperty
+			    {
+			        get { return _insideThingProperty; }
+			        set { _insideThingProperty = value; }
+			    }
 			}
 
 			public class Nested
