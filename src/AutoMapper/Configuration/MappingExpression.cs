@@ -173,7 +173,7 @@ namespace AutoMapper.Configuration
             var propertyInfo = DestinationType.GetProperty(name);
             if (propertyInfo != null)
             {
-                destMember = new PropertyAccessor(propertyInfo);
+                destMember = propertyInfo.ToMemberAccessor();
             }
             if (destMember == null)
             {
@@ -182,7 +182,7 @@ namespace AutoMapper.Configuration
                 {
                     throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
                 }
-                destMember = new FieldAccessor(fieldInfo);
+                destMember = fieldInfo.ToMemberAccessor();
             }
             ForDestinationMember(destMember, memberOptions);
             return this;
