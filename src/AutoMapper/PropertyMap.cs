@@ -9,6 +9,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Configuration;
     using Execution;
 
     [DebuggerDisplay("{DestinationProperty.Name}")]
@@ -117,18 +118,19 @@ namespace AutoMapper
             SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
 
             _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
-                    ctxt => ctxt.SourceValue,
-                    (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
+                ctxt => ctxt.SourceValue, 
+                (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
 
-            if (resolvers.All(r => r is IMemberResolver)
+            SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
+
+            if (resolvers.All(r => r is IMemberGetter)
                 && CanResolveValue()
                 && !_hasPreCondition
                 && !_hasCondition
                 && SourceType != null
+                && !SourceType.IsEnumerableType()
                 && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
-                && DestinationPropertyType.IsAssignableFrom(SourceType)
-                && !DestinationPropertyType.IsEnumerableType()
-                && !SourceType.IsEnumerableType())
+                && DestinationPropertyType.IsAssignableFrom(SourceType))
             {
                 var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
                     (ctxt => ctxt.SourceValue),
@@ -137,9 +139,9 @@ namespace AutoMapper
                 _valueResolverFunc = exp.Compile();
 
                 _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, ResolveValue(context));
-                return;
-            }
-
+                }
+            else
+            {
             _mapperFunc = (mappedObject, context) =>
             {
                 if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
@@ -156,10 +158,12 @@ namespace AutoMapper
                 if (!ShouldAssignValue(result, destinationValue, context))
                     return;
 
-                object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, destinationType, context);
+                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType,
+                        destinationType, context);
 
                 DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
             };
+            }
 
             _sealed = true;
         }
