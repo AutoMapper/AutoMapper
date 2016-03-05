@@ -328,9 +328,7 @@ namespace AutoMapper
             {
                 _overrideExpression = overrideExpression;
             }
-
-
-
+            
             public override Expression Visit(Expression node)
             {
                 if (_overrideExpression == null)
@@ -345,32 +343,6 @@ namespace AutoMapper
                     var a = new ReplaceExpressionVisitor(_overrideExpression.Parameters[0], expression);
                     var b = a.Visit(_overrideExpression.Body);
                     return b;
-
-                    var body = _overrideExpression.Body as MemberExpression;
-                    if (body != null)
-                    {
-                        if (body.Expression is ConstantExpression)
-                            expression = body;
-                        else
-                        expression = Expression.PropertyOrField(expression, body.Member.Name);
-                    }
-                    var body2 = _overrideExpression.Body as MethodCallExpression;
-                    if (body2 != null)
-                    {
-                        if (body2.Method.IsGenericMethod)
-                            return node;
-                        //var convertedArguments = Visit(body2.Arguments);
-                        //var convertedMethodArgumentTypes = body2.Method.GetGenericArguments().Select(t => GetConvertingTypeIfExists(node.Arguments, t, convertedArguments)).ToArray();
-                        //var convertedMethodCall = body2.Method.GetGenericMethodDefinition().MakeGenericMethod(convertedMethodArgumentTypes);
-                        expression = Expression.Call(expression, body2.Method);
-                    }
-                    var body3 = _overrideExpression.Body as InvocationExpression;
-                    if (body3 != null)
-                    {
-                        expression = Expression.Invoke(body3.Expression, expression);
-                    }
-
-                        return expression;
                 }
                 return base.Visit(node);
             }
