@@ -65,7 +65,7 @@ namespace AutoMapper.Execution
 
         public static Expression IfNotNullExpression(MemberExpression member)
         {
-            if (member.Expression != null && !member.Expression.Type.IsValueType)
+            if (member.Expression != null && !member.Expression.Type.IsValueType())
                 return Expression.Condition(Expression.Equal(member.Expression, Expression.Default(member.Expression.Type)),
                 Expression.Default(member.Type), member);
             return member;

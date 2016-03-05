@@ -22,4 +22,26 @@ namespace AutoMapper.Execution
         public abstract IEnumerable<object> GetCustomAttributes(bool inherit);
         public abstract bool IsDefined(Type attributeType, bool inherit);
     }
+
+    public class MemberGetter : IMemberGetter
+    {
+        public MemberInfo MemberInfo { get; }
+        public string Name { get; }
+        public LambdaExpression GetExpression { get; }
+        public Type MemberType { get; }
+        public object GetValue(object source) => source;
+
+        public object Resolve(object source, ResolutionContext context) => source == null ? null : GetValue(source);
+    }
+    public class MemberAccessor : MemberGetter, IMemberAccessor
+    {
+        public MemberInfo MemberInfo { get; }
+        public string Name { get; }
+        public LambdaExpression GetExpression { get; }
+        public Type MemberType { get; }
+        public object GetValue(object source) => source;
+        public void SetValue(object destination, object value) { }
+
+        public object Resolve(object source, ResolutionContext context) => source == null ? null : GetValue(source);
+    }
 }
