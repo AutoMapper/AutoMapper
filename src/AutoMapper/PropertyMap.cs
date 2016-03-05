@@ -1,4 +1,5 @@
 using AutoMapper.Configuration;
+using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
@@ -129,19 +130,13 @@ namespace AutoMapper
                 && !DestinationPropertyType.IsEnumerableType()
                 && !SourceType.IsEnumerableType())
             {
-                //var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
-                //    (ctxt => ctxt.SourceValue),
-                //    (expression, resolver) => new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression) as LambdaExpression);
-                //_valueResolverFunc = (Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters) as Expression<Func<ResolutionContext, object>>).Compile();
+                var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
+                    (ctxt => ctxt.SourceValue),
+                    (expression, resolver) => new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression) as LambdaExpression);
+                var exp = Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters) as Expression<Func<ResolutionContext, object>>;
+                _valueResolverFunc = exp.Compile();
 
-                _mapperFunc = (mappedObject, context) =>
-                {
-                    var result = ResolveValue(context);
-
-                    
-                    
-                    DestinationProperty.SetValue(mappedObject, result);
-                };
+                _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, ResolveValue(context));
                 return;
             }
 
@@ -330,13 +325,23 @@ namespace AutoMapper
                 _overrideExpression = overrideExpression;
             }
 
+
+
             public override Expression Visit(Expression node)
             {
+                if (_overrideExpression == null)
+                    return node;
                 if (node.NodeType != ExpressionType.Lambda && node.NodeType != ExpressionType.Parameter)
                 {
                     var expression = node;
                     if (node.Type == typeof(object))
                         expression = Expression.Convert(node, _overrideExpression.Parameters[0].Type);
+
+
+                    var a = new ReplaceExpressionVisitor(_overrideExpression.Parameters[0], expression);
+                    var b = a.Visit(_overrideExpression.Body);
+                    return b;
+
                     var body = _overrideExpression.Body as MemberExpression;
                     if (body != null)
                     {
@@ -355,8 +360,13 @@ namespace AutoMapper
                         //var convertedMethodCall = body2.Method.GetGenericMethodDefinition().MakeGenericMethod(convertedMethodArgumentTypes);
                         expression = Expression.Call(expression, body2.Method);
                     }
+                    var body3 = _overrideExpression.Body as InvocationExpression;
+                    if (body3 != null)
+                    {
+                        expression = Expression.Invoke(body3.Expression, expression);
+                    }
 
-                    return expression;
+                        return expression;
                 }
                 return base.Visit(node);
             }
@@ -364,6 +374,23 @@ namespace AutoMapper
             protected override Expression VisitLambda<T>(Expression<T> node)
             {
                 return Expression.Lambda(Visit(node.Body), node.Parameters);
+            }
+        }
+
+        private class ReplaceExpressionVisitor : ExpressionVisitor
+        {
+            private readonly Expression _oldExpression;
+            private readonly Expression _newExpression;
+
+            public ReplaceExpressionVisitor(Expression oldExpression, Expression newExpression)
+            {
+                _oldExpression = oldExpression;
+                _newExpression = newExpression;
+            }
+
+            public override Expression Visit(Expression node)
+            {
+                return _oldExpression == node ? _newExpression : base.Visit(node);
             }
         }
     }

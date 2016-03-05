@@ -43,9 +43,9 @@ namespace AutoMapper.Execution
 
         public Expression<LateBoundPropertyGet<TSource, TValue>> CreateGet<TSource, TValue>(PropertyInfo property)
         {
-            ParameterExpression instanceParameter = Expression.Parameter(property.DeclaringType, "target");
+            ParameterExpression instanceParameter = Expression.Parameter(typeof(TSource), "target");
 
-            MemberExpression member = Expression.Property(instanceParameter, property);
+            Expression member = IfNotNullExpression(Expression.Property(instanceParameter, property));
 
             Expression<LateBoundPropertyGet<TSource, TValue>> lambda = Expression.Lambda<LateBoundPropertyGet<TSource, TValue>>(member,instanceParameter);
 
@@ -56,11 +56,19 @@ namespace AutoMapper.Execution
         {
             ParameterExpression instanceParameter = Expression.Parameter(typeof(TSource), "target");
 
-            MemberExpression member = Expression.Field(instanceParameter, field);
+            Expression member = IfNotNullExpression(Expression.Field(instanceParameter, field));
 
             Expression<LateBoundFieldGet<TSource, TValue>> lambda = Expression.Lambda<LateBoundFieldGet<TSource, TValue>>(member, instanceParameter);
 
             return lambda;
+        }
+
+        public static Expression IfNotNullExpression(MemberExpression member)
+        {
+            if (member.Expression != null && !member.Expression.Type.IsValueType)
+                return Expression.Condition(Expression.Equal(member.Expression, Expression.Default(member.Expression.Type)),
+                Expression.Default(member.Type), member);
+            return member;
         }
 
         public Expression<LateBoundFieldSet<TSource, TValue>> CreateSet<TSource, TValue>(FieldInfo field)

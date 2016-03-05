@@ -4,26 +4,22 @@ namespace AutoMapper.Execution
 {
     using System;
 
-    public class DelegateBasedResolver<TSource, TMember> : IMemberResolver
+    public class DelegateBasedResolver<TSource, TMember> : IValueResolver
     {
-        private readonly Func<object, ResolutionContext, TMember> _method;
+        private readonly Func<TSource, ResolutionContext, TMember> _method;
 
-        public DelegateBasedResolver(Expression<Func<object, ResolutionContext, TMember>> method)
+        public DelegateBasedResolver(Expression<Func<TSource, ResolutionContext, TMember>> method)
         {
-            GetExpression = method;
             _method = method.Compile();
         }
-
-        public LambdaExpression GetExpression { get; }
-        public Type MemberType => typeof(TMember);
-
+        
         public object Resolve(object source, ResolutionContext context)
         {
             if (source != null && !(source is TSource))
             {
                 throw new ArgumentException($"Expected obj to be of type {typeof(TSource)} but was {source.GetType()}");
             }
-            var result = _method(source, context);
+            var result = _method((TSource)source, context);
             return result;
         }
     }
