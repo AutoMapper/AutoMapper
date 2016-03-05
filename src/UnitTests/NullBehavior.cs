@@ -195,9 +195,9 @@ namespace AutoMapper.UnitTests
 			{
 				_defaultResult.Value.ShouldBeNull();
 			}
-            
-            [Fact]
-            public void Should_use_overridden_null_behavior_in_profile()
+
+			[Fact]
+			public void Should_use_overridden_null_behavior_in_profile()
 			{
 				_nullResult.Value.ShouldNotBeNull();
 			}
