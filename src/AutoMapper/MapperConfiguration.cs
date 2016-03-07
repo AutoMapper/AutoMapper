@@ -23,6 +23,7 @@ namespace AutoMapper
         private readonly IList<Profile> _profiles = new List<Profile>();
         private readonly ConfigurationValidator _validator;
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
+        private Func<TypePair, TypeMap> _getTypeMap;
 
 
         public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
@@ -46,6 +47,7 @@ namespace AutoMapper
             Seal();
 
             ExpressionBuilder = new ExpressionBuilder(this);
+            _getTypeMap = GetTypeMap;
         }
 
         public string ProfileName => "";
@@ -198,18 +200,27 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
-            var typeMap = _typeMapPlanCache.GetOrAdd(typePair, pair => pair.GetRelatedTypePairs()
-                .Select(
-                    tp =>
-                        _typeMapPlanCache.GetOrDefault(tp) ??
-                        FindTypeMapFor(tp) ??
-                        (!CoveredByObjectMap(pair)
-                            ? FindConventionTypeMapFor(tp) ??
-                              FindClosedGenericTypeMapFor(tp)
-                            : null))
-                .FirstOrDefault(tm => tm != null));
-
+            var typeMap = _typeMapPlanCache.GetOrAdd(typePair, _getTypeMap);
             return typeMap;
+        }
+
+        private TypeMap GetTypeMap(TypePair pair)
+        {
+            foreach(var tp in pair.GetRelatedTypePairs())
+            {
+                var typeMap =
+                          _typeMapPlanCache.GetOrDefault(tp) ??
+                          FindTypeMapFor(tp) ??
+                          (!CoveredByObjectMap(pair)
+                              ? FindConventionTypeMapFor(tp) ??
+                                FindClosedGenericTypeMapFor(tp)
+                              : null);
+                if(typeMap != null)
+                {
+                    return typeMap;
+                }
+            }
+            return null;
         }
 
         public TypeMap ResolveTypeMap(object source, object destination, Type sourceType, Type destinationType)
