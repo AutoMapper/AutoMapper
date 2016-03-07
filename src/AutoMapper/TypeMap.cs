@@ -16,10 +16,10 @@ namespace AutoMapper
     [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
     public class TypeMap
     {
-        private readonly IList<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();
-        private readonly IList<Action<object, object, ResolutionContext>> _beforeMapActions = new List<Action<object, object, ResolutionContext>>();
-        private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
-        private readonly ISet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
+        private readonly List<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();
+        private readonly List<Action<object, object, ResolutionContext>> _beforeMapActions = new List<Action<object, object, ResolutionContext>>();
+        private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
+        private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
         private ConcurrentBag<PropertyMap> _propertyMaps = new ConcurrentBag<PropertyMap>();
         private readonly ConcurrentBag<SourceMemberConfig> _sourceMemberConfigs = new ConcurrentBag<SourceMemberConfig>();
 
@@ -341,7 +341,7 @@ namespace AutoMapper
             return _condition == null || _condition(resolutionContext);
         }
 
-        public void AddConstructorMap(ConstructorInfo constructorInfo, IEnumerable<ConstructorParameterMap> parameters)
+        public void AddConstructorMap(ConstructorInfo constructorInfo, ConstructorParameterMap[] parameters)
         {
             var ctorMap = new ConstructorMap(constructorInfo, parameters);
             ConstructorMap = ctorMap;

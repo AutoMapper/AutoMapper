@@ -7,15 +7,20 @@ namespace AutoMapper
     public class MappingEngine : IMappingEngine
     {
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
+        private readonly Func<TypePair, IObjectMapper> _getObjectMapper;
 
         public MappingEngine(IConfigurationProvider configurationProvider, IMapper mapper)
         {
             ConfigurationProvider = configurationProvider;
             Mapper = mapper;
+            _getObjectMapper = GetObjectMapper;
         }
 
         public IConfigurationProvider ConfigurationProvider { get; }
         public IMapper Mapper { get; }
+
+
+        private IObjectMapper GetObjectMapper(TypePair types) => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(types));
 
         public object Map(ResolutionContext context)
         {
@@ -31,10 +36,7 @@ namespace AutoMapper
                     return mappedObject;
                 }
 
-                Func<TypePair, IObjectMapper> missFunc =
-                    tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(context.Types));
-
-                IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(context.Types, missFunc);
+                IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(context.Types, _getObjectMapper);
                 if (mapperToUse == null)
                 {
                     throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
