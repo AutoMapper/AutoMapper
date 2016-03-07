@@ -38,6 +38,16 @@ namespace AutoMapper
             Profile = profile;
             ConfiguredMemberList = memberList;
             IgnorePropertiesStartingWith = profile.GlobalIgnores;
+            BeforeMap = (src, dest, context) =>
+            {
+                foreach(var action in _beforeMapActions)
+                    action(src, dest, context);
+            };
+            AfterMap = (src, dest, context) =>
+            {
+                foreach(var action in _afterMapActions)
+                    action(src, dest, context);
+            };
         }
 
         public TypePair Types { get; }
@@ -56,17 +66,9 @@ namespace AutoMapper
         public Func<object, ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
-        public Action<object, object, ResolutionContext> BeforeMap => (src, dest, context) =>
-                {
-                    foreach (var action in _beforeMapActions)
-                        action(src, dest, context);
-                };
+        public Action<object, object, ResolutionContext> BeforeMap { get; }
 
-        public Action<object, object, ResolutionContext> AfterMap => (src, dest, context) =>
-                {
-                    foreach (var action in _afterMapActions)
-                        action(src, dest, context);
-                };
+        public Action<object, object, ResolutionContext> AfterMap { get; }
 
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
