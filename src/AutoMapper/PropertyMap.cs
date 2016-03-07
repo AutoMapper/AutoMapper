@@ -16,6 +16,7 @@ namespace AutoMapper
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
+        private readonly TypeMap _typeMap;
         private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
         private bool _ignored;
         private int _mappingOrder;
@@ -30,14 +31,15 @@ namespace AutoMapper
         private Action<object, ResolutionContext> _mapperFunc;
         private MemberInfo _sourceMember;
 
-        public PropertyMap(IMemberAccessor destinationProperty)
+        public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
+            _typeMap = typeMap;
             UseDestinationValue = true;
             DestinationProperty = destinationProperty;
         }
 
-        public PropertyMap(PropertyMap inheritedMappedProperty)
-            : this(inheritedMappedProperty.DestinationProperty)
+        public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
+            : this(inheritedMappedProperty.DestinationProperty, typeMap)
         {
             if (inheritedMappedProperty.IsIgnored())
                 Ignore();

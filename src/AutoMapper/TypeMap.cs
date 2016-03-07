@@ -111,7 +111,7 @@ namespace AutoMapper
 
         public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IValueResolver> resolvers)
         {
-            var propertyMap = new PropertyMap(destProperty);
+            var propertyMap = new PropertyMap(destProperty, this);
 
             foreach (var resolver in resolvers)
             {
@@ -171,7 +171,7 @@ namespace AutoMapper
 
             if (propertyMap != null) return propertyMap;
 
-            propertyMap = new PropertyMap(destinationProperty);
+            propertyMap = new PropertyMap(destinationProperty, this);
 
             AddPropertyMap(propertyMap);
 
@@ -418,7 +418,7 @@ namespace AutoMapper
                 }
                 else if (conventionPropertyMap == null)
                 {
-                    var propertyMap = new PropertyMap(inheritedMappedProperty);
+                    var propertyMap = new PropertyMap(inheritedMappedProperty, this);
 
                     AddInheritedPropertyMap(propertyMap);
                 }
