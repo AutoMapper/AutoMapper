@@ -83,7 +83,7 @@ namespace AutoMapper.Mappers
                    EnumToUnderlyingTypeMapping(context, ref toEnum);
         }
 
-        private static bool EnumToEnumMapping(TypePair context)
+        internal static bool EnumToEnumMapping(TypePair context)
         {
             // Enum to enum mapping
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
@@ -127,7 +127,7 @@ namespace AutoMapper.Mappers
             return false;
         }
 
-        private static bool EnumToNullableTypeMapping(TypePair context)
+        internal static bool EnumToNullableTypeMapping(TypePair context)
         {
             if (!context.DestinationType.IsGenericType())
             {

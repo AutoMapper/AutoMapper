@@ -240,7 +240,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid()
         {
-            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps);
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(tm => !tm.SourceType.IsGenericTypeDefinition() && !tm.DestinationType.IsGenericTypeDefinition()));
         }
 
         public IMapper CreateMapper() => new Mapper(this);

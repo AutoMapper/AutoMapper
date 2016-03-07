@@ -2,7 +2,7 @@ namespace AutoMapper.Execution
 {
     using System.Reflection;
 
-    public class ValueTypePropertyAccessor : PropertyGetter, IMemberAccessor
+    public class ValueTypePropertyAccessor<TSource, TValue> : PropertyGetter<TSource, TValue>, IMemberAccessor
     {
         private readonly MethodInfo _lateBoundPropertySet;
 

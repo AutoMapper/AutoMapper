@@ -71,7 +71,7 @@ namespace AutoMapper.Configuration
 
         public void ResolveUsing<TSourceMember>(Func<TSource, TSourceMember> resolver)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TSourceMember>((o, c) => resolver((TSource)o))));
+            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new ExpressionBasedResolver<TSource, TSourceMember>(s => resolver(s))));
         }
 
         public void ResolveUsing<TSourceMember>(Func<TSource, ResolutionContext, TSourceMember> resolver)
