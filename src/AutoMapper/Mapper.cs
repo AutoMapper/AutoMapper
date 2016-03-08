@@ -209,27 +209,27 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
-            => (TDestination) MapCore(source, null, typeof(TSource), typeof(TDestination), opts);
+            => (TDestination) MapWithOptions(source, null, typeof(TSource), typeof(TDestination), opts);
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
             => ((IMapper)this).Map(source, destination, null);
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
-            => (TDestination)MapCore(source, destination, typeof(TSource), typeof(TDestination), opts);
+            => (TDestination)MapWithOptions(source, destination, typeof(TSource), typeof(TDestination), opts);
 
         object IMapper.Map(object source, Type sourceType, Type destinationType)
             => ((IMapper)this).Map(source, sourceType, destinationType, null);
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
-            => MapCore(source, null, sourceType, destinationType, opts);
+            => MapWithOptions(source, null, sourceType, destinationType, opts);
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
             => ((IMapper)this).Map(source, destination, sourceType, destinationType, null);
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
-            => MapCore(source, destination, sourceType, destinationType, opts);
+            => MapWithOptions(source, destination, sourceType, destinationType, opts);
 
         object IRuntimeMapper.Map(ResolutionContext context) => _engine.Map(context);
 
@@ -281,7 +281,7 @@ namespace AutoMapper
             return typeMap?.Profile.AllowNullCollections ?? _configurationProvider.AllowNullCollections;
         }
 
-        private object MapCore<TSource, TDestination>(object source, object destination, Type sourceType, Type destinationType, 
+        private object MapWithOptions<TSource, TDestination>(object source, object destination, Type sourceType, Type destinationType, 
                                                                                   Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
             MappingOperationOptions options;
@@ -299,7 +299,7 @@ namespace AutoMapper
         }
 
 
-        private object MapCore(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+        private object MapWithOptions(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
             MappingOperationOptions options;
             if(opts != null)
