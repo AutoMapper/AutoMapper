@@ -36,7 +36,7 @@ namespace AutoMapper
 
         public Func<Type, object> ServiceCtor { get; private set; }
         public IDictionary<string, object> Items => _items ?? (_items = new StringDictionary());
-        public bool DisableCache { get; set; }
+        public bool PreserveReferences { get; set; }
         public Action<object, object> BeforeMapAction { get; protected set; }
         public Action<object, object> AfterMapAction { get; protected set; }
 

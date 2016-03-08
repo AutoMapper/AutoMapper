@@ -60,7 +60,7 @@ namespace AutoMapper.UnitTests.Bug
 				source1.AddChild(source2); // This causes the problem
 
 				DestObject dest1 = new DestObject();
-				config.CreateMapper().Map(sourceList, destList);
+				config.CreateMapper().Map(sourceList, destList, o=> o.PreserveReferences = true);
 
 				destList.Count.ShouldEqual(2);
 				destList[0].Children.Count.ShouldEqual(1);

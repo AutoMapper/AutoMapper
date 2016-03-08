@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests
 
                 parent.AddChild(new ChildModel { ID = "CHILD_TWO" });
 
-                _dto = Mapper.Map<ParentModel, ParentDto>(parent);
+                _dto = Mapper.Map<ParentModel, ParentDto>(parent, o=>o.PreserveReferences=true);
             }
 
             [Fact]
@@ -211,7 +211,7 @@ namespace AutoMapper.UnitTests
 
 			protected override void Because_of()
 			{
-				_dto = Mapper.Map<ParentModel, ParentDto>(_parent);
+				_dto = Mapper.Map<ParentModel, ParentDto>(_parent, o => o.PreserveReferences = true);
 			}
 
 			[Fact]
@@ -296,7 +296,7 @@ namespace AutoMapper.UnitTests
 							}
 					};
 				foo.Bar.Foo = foo;
-				_dto = Mapper.Map<Foo, FooDto>(foo);
+				_dto = Mapper.Map<Foo, FooDto>(foo, o => o.PreserveReferences = true);
 			}
 
 			[Fact]
@@ -344,7 +344,7 @@ namespace AutoMapper.UnitTests
 			protected override void Because_of()
 			{
                 var model = new FooModel { Id = 3 };
-				_dto = Mapper.Map<FooModel, FooContainerModel>(model);
+				_dto = Mapper.Map<FooModel, FooContainerModel>(model, o => o.PreserveReferences = true);
 			}
 
 			[Fact]
@@ -399,7 +399,7 @@ namespace AutoMapper.UnitTests
                 parent1.Children.Add(child1);
                 child1.Parents.Add(parent1);
 
-                _dtoParent = Mapper.Map<Parent, ParentDto>(parent1);
+                _dtoParent = Mapper.Map<Parent, ParentDto>(parent1, o => o.PreserveReferences = true);
             }
 
             [Fact]
@@ -571,7 +571,7 @@ namespace AutoMapper.UnitTests
 
                 var config = new MapperConfiguration(cfg => cfg.CreateMap<Tag, Tag>().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags)));
 	            var mapper = config.CreateMapper();
-	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DisableCache = true);
+	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.PreserveReferences = false);
 
                 result[1].ChildTags.Count().ShouldEqual(0);
                 result[2].ChildTags.Count().ShouldEqual(1);

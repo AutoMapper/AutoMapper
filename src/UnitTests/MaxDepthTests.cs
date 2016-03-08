@@ -66,7 +66,7 @@ namespace AutoMapper.UnitTests
         public void Second_level_children_are_null_with_max_depth_1()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().MaxDepth(1));
-            var destination = config.CreateMapper().Map<Source, Destination>(_source);
+            var destination = config.CreateMapper().Map<Source, Destination>(_source, o => o.PreserveReferences = true);
             foreach (var child in destination.Children)
             {
                 child.ShouldBeNull();
@@ -77,7 +77,7 @@ namespace AutoMapper.UnitTests
         public void Second_level_children_are_not_null_with_max_depth_2()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().MaxDepth(2));
-            var destination = config.CreateMapper().Map<Source, Destination>(_source);
+            var destination = config.CreateMapper().Map<Source, Destination>(_source, o=>o.PreserveReferences = true);
             foreach (var child in destination.Children)
             {
                 2.ShouldEqual(child.Level);
@@ -90,7 +90,7 @@ namespace AutoMapper.UnitTests
         public void Third_level_children_are_null_with_max_depth_2()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().MaxDepth(2));
-            var destination = config.CreateMapper().Map<Source, Destination>(_source);
+            var destination = config.CreateMapper().Map<Source, Destination>(_source, o => o.PreserveReferences = true);
             foreach (var child in destination.Children)
             {
                 child.Children.ShouldNotBeNull();
@@ -105,7 +105,7 @@ namespace AutoMapper.UnitTests
         public void Third_level_children_are_not_null_max_depth_3()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>().MaxDepth(3));
-            var destination = config.CreateMapper().Map<Source, Destination>(_source);
+            var destination = config.CreateMapper().Map<Source, Destination>(_source, o=>o.PreserveReferences = true);
             foreach (var child in destination.Children)
             {
                 child.Children.ShouldNotBeNull();
