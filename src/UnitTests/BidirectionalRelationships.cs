@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<ParentModel, ParentDto>();
+                cfg.CreateMap<ParentModel, ParentDto>().PreserveReferences();
                 cfg.CreateMap<ChildModel, ChildDto>();
             });
 
@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests
 
                 parent.AddChild(new ChildModel { ID = "CHILD_TWO" });
 
-                _dto = Mapper.Map<ParentModel, ParentDto>(parent, o=>o.PreserveReferences=true);
+                _dto = Mapper.Map<ParentModel, ParentDto>(parent);
             }
 
             [Fact]
@@ -205,13 +205,14 @@ namespace AutoMapper.UnitTests
 		        cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
 
 		        cfg.CreateMap<ParentModel, ParentDto>()
+                    .PreserveReferences()
 		            .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
 		        cfg.CreateMap<ChildModel, ChildDto>();
 		    });
 
 			protected override void Because_of()
 			{
-				_dto = Mapper.Map<ParentModel, ParentDto>(_parent, o => o.PreserveReferences = true);
+				_dto = Mapper.Map<ParentModel, ParentDto>(_parent);
 			}
 
 			[Fact]
@@ -282,7 +283,7 @@ namespace AutoMapper.UnitTests
 
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
-		        cfg.CreateMap<Foo, FooDto>();
+		        cfg.CreateMap<Foo, FooDto>().PreserveReferences();
 		        cfg.CreateMap<Bar, BarDto>();
 		    });
 
@@ -296,7 +297,7 @@ namespace AutoMapper.UnitTests
 							}
 					};
 				foo.Bar.Foo = foo;
-				_dto = Mapper.Map<Foo, FooDto>(foo, o => o.PreserveReferences = true);
+				_dto = Mapper.Map<Foo, FooDto>(foo);
 			}
 
 			[Fact]
@@ -337,6 +338,7 @@ namespace AutoMapper.UnitTests
 		        cfg.CreateMap<FooModel, FooScreenModel>();
 		        cfg.CreateMap<FooModel, FooInputModel>();
 		        cfg.CreateMap<FooModel, FooContainerModel>()
+                    .PreserveReferences()
 		            .ForMember(dest => dest.Input, opt => opt.MapFrom(src => src))
 		            .ForMember(dest => dest.Screen, opt => opt.MapFrom(src => src));
 		    });
@@ -344,7 +346,7 @@ namespace AutoMapper.UnitTests
 			protected override void Because_of()
 			{
                 var model = new FooModel { Id = 3 };
-				_dto = Mapper.Map<FooModel, FooContainerModel>(model, o => o.PreserveReferences = true);
+				_dto = Mapper.Map<FooModel, FooContainerModel>(model);
 			}
 
 			[Fact]
@@ -386,7 +388,7 @@ namespace AutoMapper.UnitTests
 
 	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
-	            cfg.CreateMap<Parent, ParentDto>();
+	            cfg.CreateMap<Parent, ParentDto>().PreserveReferences();
 	            cfg.CreateMap<Child, ChildDto>();
 
 	        });
@@ -399,7 +401,7 @@ namespace AutoMapper.UnitTests
                 parent1.Children.Add(child1);
                 child1.Parents.Add(parent1);
 
-                _dtoParent = Mapper.Map<Parent, ParentDto>(parent1, o => o.PreserveReferences = true);
+                _dtoParent = Mapper.Map<Parent, ParentDto>(parent1);
             }
 
             [Fact]
@@ -569,9 +571,9 @@ namespace AutoMapper.UnitTests
                     }
                 };
 
-                var config = new MapperConfiguration(cfg => cfg.CreateMap<Tag, Tag>().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags)));
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Tag, Tag>().PreserveReferences().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags)));
 	            var mapper = config.CreateMapper();
-	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.PreserveReferences = false);
+	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DontPreserveReferences());
 
                 result[1].ChildTags.Count().ShouldEqual(0);
                 result[2].ChildTags.Count().ShouldEqual(1);
