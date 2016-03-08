@@ -15,9 +15,9 @@ namespace AutoMapper
         private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
         private readonly Lazy<LateBoundParamsCtor> _runtimeCtor;
         public ConstructorInfo Ctor { get; private set; }
-        public IEnumerable<ConstructorParameterMap> CtorParams { get; }
+        internal ConstructorParameterMap[] CtorParams { get; }
 
-        public ConstructorMap(ConstructorInfo ctor, IEnumerable<ConstructorParameterMap> ctorParams)
+        public ConstructorMap(ConstructorInfo ctor, ConstructorParameterMap[] ctorParams)
         {
             Ctor = ctor;
             CtorParams = ctorParams;

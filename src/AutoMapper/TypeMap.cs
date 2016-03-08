@@ -16,10 +16,10 @@ namespace AutoMapper
     [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
     public class TypeMap
     {
-        private readonly IList<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();
-        private readonly IList<Action<object, object, ResolutionContext>> _beforeMapActions = new List<Action<object, object, ResolutionContext>>();
-        private readonly ISet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
-        private readonly ISet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
+        private readonly List<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();
+        private readonly List<Action<object, object, ResolutionContext>> _beforeMapActions = new List<Action<object, object, ResolutionContext>>();
+        private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
+        private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
         private ConcurrentBag<PropertyMap> _propertyMaps = new ConcurrentBag<PropertyMap>();
         private readonly ConcurrentBag<SourceMemberConfig> _sourceMemberConfigs = new ConcurrentBag<SourceMemberConfig>();
 
@@ -38,6 +38,16 @@ namespace AutoMapper
             Profile = profile;
             ConfiguredMemberList = memberList;
             IgnorePropertiesStartingWith = profile.GlobalIgnores;
+            BeforeMap = (src, dest, context) =>
+            {
+                foreach(var action in _beforeMapActions)
+                    action(src, dest, context);
+            };
+            AfterMap = (src, dest, context) =>
+            {
+                foreach(var action in _afterMapActions)
+                    action(src, dest, context);
+            };
         }
 
         public TypePair Types { get; }
@@ -56,17 +66,9 @@ namespace AutoMapper
         public Func<object, ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
-        public Action<object, object, ResolutionContext> BeforeMap => (src, dest, context) =>
-                {
-                    foreach (var action in _beforeMapActions)
-                        action(src, dest, context);
-                };
+        public Action<object, object, ResolutionContext> BeforeMap { get; }
 
-        public Action<object, object, ResolutionContext> AfterMap => (src, dest, context) =>
-                {
-                    foreach (var action in _afterMapActions)
-                        action(src, dest, context);
-                };
+        public Action<object, object, ResolutionContext> AfterMap { get; }
 
         public Func<ResolutionContext, object> DestinationCtor { get; set; }
 
@@ -341,7 +343,7 @@ namespace AutoMapper
             return _condition == null || _condition(resolutionContext);
         }
 
-        public void AddConstructorMap(ConstructorInfo constructorInfo, IEnumerable<ConstructorParameterMap> parameters)
+        public void AddConstructorMap(ConstructorInfo constructorInfo, ConstructorParameterMap[] parameters)
         {
             var ctorMap = new ConstructorMap(constructorInfo, parameters);
             ConstructorMap = ctorMap;

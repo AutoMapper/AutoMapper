@@ -68,7 +68,7 @@ namespace AutoMapper
                 parameters.Add(param);
             }
 
-            typeMap.AddConstructorMap(destCtor, parameters);
+            typeMap.AddConstructorMap(destCtor, parameters.ToArray());
 
             return true;
         }
