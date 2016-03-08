@@ -119,12 +119,14 @@ namespace AutoMapper
 
             SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
 
-            _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
-                ctxt => ctxt.SourceValue, 
-                (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
+            if (!CanResolveValue())
+            {
+                _mapperFunc = (_, __) => { };
+                return;
+            }
+
             
             if (resolvers.All(r => r is IMemberGetter)
-                && CanResolveValue()
                 && !_hasPreCondition
                 && !_hasCondition
                 && SourceType != null
@@ -133,11 +135,11 @@ namespace AutoMapper
                 && ((EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) && !EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) || !EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
                 && DestinationPropertyType.IsAssignableFrom(SourceType))
             {
-                var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
+                var innerResolver = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
                     (ctxt => ctxt.SourceValue),
                     (expression, resolver) => (LambdaExpression) new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression));
-                var exp = (Expression<Func<ResolutionContext, object>>) Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters);
-                _valueResolverFunc = exp.Compile();
+                var outerResolver = (Expression<Func<ResolutionContext, object>>) Expression.Lambda(Expression.Convert(innerResolver.Body, typeof(object)), innerResolver.Parameters);
+                _valueResolverFunc = outerResolver.Compile();
 
                 _mapperFunc = (mappedObject, context) =>
                 {
@@ -150,27 +152,31 @@ namespace AutoMapper
             }
             else
             {
-            _mapperFunc = (mappedObject, context) =>
-            {
-                if (!CanResolveValue() || !ShouldAssignValuePreResolving(context))
-                    return;
+                _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
+                    ctxt => ctxt.SourceValue,
+                    (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
 
-                var result = ResolveValue(context);
+                _mapperFunc = (mappedObject, context) =>
+                {
+                    if (!ShouldAssignValuePreResolving(context))
+                        return;
 
-                object destinationValue = GetDestinationValue(mappedObject);
+                    var result = ResolveValue(context);
 
-                var declaredSourceType = SourceType ?? context.SourceType;
-                var sourceType = result?.GetType() ?? declaredSourceType;
-                var destinationType = DestinationProperty.MemberType;
+                    object destinationValue = GetDestinationValue(mappedObject);
 
-                if (!ShouldAssignValue(result, destinationValue, context))
-                    return;
+                    var declaredSourceType = SourceType ?? context.SourceType;
+                    var sourceType = result?.GetType() ?? declaredSourceType;
+                    var destinationType = DestinationProperty.MemberType;
+
+                    if (!ShouldAssignValue(result, destinationValue, context))
+                        return;
 
                     object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType,
                         destinationType, context);
 
-                DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
-            };
+                    DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+                };
             }
 
             _sealed = true;
