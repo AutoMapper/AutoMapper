@@ -96,6 +96,9 @@ namespace AutoMapper.Configuration
         public new IMappingExpression ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<object>> paramOptions) 
             => (IMappingExpression)base.ForCtorParam(ctorParamName, paramOptions);
 
+        public new IMappingExpression PreserveReferences() => (IMappingExpression)base.PreserveReferences();
+
+
         protected override IMemberConfiguration CreateMemberConfigurationExpression<TMember>(IMemberAccessor member,
             Type sourceType)
         {
@@ -144,6 +147,12 @@ namespace AutoMapper.Configuration
         public Type DestinationType => Types.DestinationType;
         public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
         protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
+
+        public IMappingExpression<TSource, TDestination> PreserveReferences()
+        {
+            TypeMapActions.Add(tm => tm.EnablePreserveReferences());
+            return this;
+        }
 
         protected virtual IMemberConfiguration CreateMemberConfigurationExpression<TMember>(IMemberAccessor member, Type sourceType)
         {

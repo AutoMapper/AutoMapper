@@ -105,7 +105,10 @@ namespace AutoMapper
             Options = options;
             Mapper = mapper;
 
-            InstanceCache = new Dictionary<ResolutionContext, object>();
+            if(options.PreserveReferences)
+            {
+                InstanceCache = new Dictionary<ResolutionContext, object>();
+            }
 
             SourceType = source?.GetType() ?? sourceType ?? typeMap?.SourceType;
             DestinationType = destination?.GetType() ?? destinationType ?? typeMap?.DestinationType;

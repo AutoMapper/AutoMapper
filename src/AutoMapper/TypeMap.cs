@@ -83,6 +83,8 @@ namespace AutoMapper
         public IEnumerable<TypePair> IncludedDerivedTypes => _includedDerivedTypes;
         public IEnumerable<TypePair> IncludedBaseTypes => _includedBaseTypes;
 
+        public bool PreserveReferences { get; private set; }
+
         public int MaxDepth
         {
             get { return _maxDepth; }
@@ -385,6 +387,11 @@ namespace AutoMapper
                 contextCopy = contextCopy.Parent;
             }
             return currentDepth <= maxDepth;
+        }
+
+        public void EnablePreserveReferences()
+        {
+            PreserveReferences = true;
         }
 
         public void UseCustomProjection(LambdaExpression projectionExpression)
