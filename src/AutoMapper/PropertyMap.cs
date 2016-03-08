@@ -135,8 +135,8 @@ namespace AutoMapper
             {
                 var expression2 = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
                     (ctxt => ctxt.SourceValue),
-                    (expression, resolver) => new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression) as LambdaExpression);
-                var exp = Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters) as Expression<Func<ResolutionContext, object>>;
+                    (expression, resolver) => (LambdaExpression) new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression));
+                var exp = (Expression<Func<ResolutionContext, object>>) Expression.Lambda(Expression.Convert(expression2.Body, typeof(object)), expression2.Parameters);
                 _valueResolverFunc = exp.Compile();
 
                 _mapperFunc = (mappedObject, context) =>
