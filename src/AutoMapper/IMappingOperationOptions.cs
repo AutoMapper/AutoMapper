@@ -22,7 +22,7 @@
         /// <summary>
         /// Disable the cache used to re-use destination instances based on equality
         /// </summary>
-        bool DisableCache { get; set; }
+        void DontPreserveReferences();
 
         /// <summary>
         /// Execute a custom function to the source and/or destination types before member mapping

@@ -76,10 +76,11 @@ namespace AutoMapper
                 return null;
             }
 
-            if (!context.Options.DisableCache && context.DestinationValue == null &&
-                context.InstanceCache.ContainsKey(context))
+            object cachedDestination;
+            if(context.DestinationValue == null && context.PreserveReferences &&
+                context.InstanceCache.TryGetValue(context, out cachedDestination))
             {
-                return context.InstanceCache[context];
+                return cachedDestination;
             }
 
             var mappedObject = context.DestinationValue ?? context.Mapper.CreateObject(context);
@@ -89,7 +90,7 @@ namespace AutoMapper
                 throw new InvalidOperationException("Cannot create destination object. " + context);
             }
 
-            if (context.SourceValue != null && !context.Options.DisableCache)
+            if (context.SourceValue != null && context.PreserveReferences)
                 context.InstanceCache[context] = mappedObject;
 
             context.TypeMap.BeforeMap(context.SourceValue, mappedObject, context);

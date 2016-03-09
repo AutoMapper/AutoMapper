@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<ParentModel, ParentDto>();
+                cfg.CreateMap<ParentModel, ParentDto>().PreserveReferences();
                 cfg.CreateMap<ChildModel, ChildDto>();
             });
 
@@ -205,6 +205,7 @@ namespace AutoMapper.UnitTests
 		        cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
 
 		        cfg.CreateMap<ParentModel, ParentDto>()
+                    .PreserveReferences()
 		            .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
 		        cfg.CreateMap<ChildModel, ChildDto>();
 		    });
@@ -282,7 +283,7 @@ namespace AutoMapper.UnitTests
 
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
-		        cfg.CreateMap<Foo, FooDto>();
+		        cfg.CreateMap<Foo, FooDto>().PreserveReferences();
 		        cfg.CreateMap<Bar, BarDto>();
 		    });
 
@@ -337,6 +338,7 @@ namespace AutoMapper.UnitTests
 		        cfg.CreateMap<FooModel, FooScreenModel>();
 		        cfg.CreateMap<FooModel, FooInputModel>();
 		        cfg.CreateMap<FooModel, FooContainerModel>()
+                    .PreserveReferences()
 		            .ForMember(dest => dest.Input, opt => opt.MapFrom(src => src))
 		            .ForMember(dest => dest.Screen, opt => opt.MapFrom(src => src));
 		    });
@@ -386,7 +388,7 @@ namespace AutoMapper.UnitTests
 
 	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
-	            cfg.CreateMap<Parent, ParentDto>();
+	            cfg.CreateMap<Parent, ParentDto>().PreserveReferences();
 	            cfg.CreateMap<Child, ChildDto>();
 
 	        });
@@ -569,9 +571,9 @@ namespace AutoMapper.UnitTests
                     }
                 };
 
-                var config = new MapperConfiguration(cfg => cfg.CreateMap<Tag, Tag>().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags)));
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Tag, Tag>().PreserveReferences().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags)));
 	            var mapper = config.CreateMapper();
-	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DisableCache = true);
+	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DontPreserveReferences());
 
                 result[1].ChildTags.Count().ShouldEqual(0);
                 result[2].ChildTags.Count().ShouldEqual(1);
