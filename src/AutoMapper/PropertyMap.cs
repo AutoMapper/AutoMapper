@@ -103,11 +103,6 @@ namespace AutoMapper
             _sourceValueResolvers.RemoveLast();
         }
 
-        public object ResolveValue(ResolutionContext context)
-        {
-            return _valueResolverFunc(context);
-        }
-
         internal void Seal(TypeMapRegistry typeMapRegistry)
         {
             if (_sealed)
@@ -125,57 +120,76 @@ namespace AutoMapper
                 return;
             }
 
-            
+            Func<ResolutionContext, object> valueResolverFunc;
+
             if (resolvers.All(r => r is IMemberGetter)
-                && !_hasPreCondition
-                && !_hasCondition
+                && SourceType != null
+                && (!SourceType.IsEnumerableType() || SourceType == typeof(string))
+                && ((EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) && !EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) || !EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
+                )
+            {
+                var innerResolver = resolvers.Cast<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
+                    (ctxt => ctxt.SourceValue),
+                    (expression, resolver) => (LambdaExpression)new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression));
+                var outerResolver = (Expression<Func<ResolutionContext, object>>)Expression.Lambda(Expression.Convert(innerResolver.Body, typeof(object)), innerResolver.Parameters);
+
+                valueResolverFunc = outerResolver.Compile();
+
+                if ((!DestinationPropertyType.IsValueType() || DestinationPropertyType.IsNullableType()) &&
+                    !_typeMap.Profile.AllowNullDestinationValues)
+                {
+                    var inner = valueResolverFunc;
+
+                    valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(SourceType);
+                }
+            }
+            else
+            {
+                valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
+                    ctxt => ctxt.SourceValue,
+                    (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
+            }
+
+            if (!_hasCondition
                 && SourceType != null
                 && (!SourceType.IsEnumerableType() || SourceType == typeof(string))
                 && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
                 && ((EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) && !EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) || !EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
                 && DestinationPropertyType.IsAssignableFrom(SourceType))
             {
-                var innerResolver = resolvers.OfType<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
-                    (ctxt => ctxt.SourceValue),
-                    (expression, resolver) => (LambdaExpression) new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression));
-                var outerResolver = (Expression<Func<ResolutionContext, object>>) Expression.Lambda(Expression.Convert(innerResolver.Body, typeof(object)), innerResolver.Parameters);
-                _valueResolverFunc = outerResolver.Compile();
-
-                _mapperFunc = (mappedObject, context) =>
-                {
-                    var value = ResolveValue(context);
-                    if (value == null && !context.Mapper.ShouldMapSourceValueAsNull(context))
-                        value = ObjectCreator.CreateNonNullValue(SourceType);
-
-                    DestinationProperty.SetValue(mappedObject, value);
-                };
+                _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(context));
             }
             else
             {
-                _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
-                    ctxt => ctxt.SourceValue,
-                    (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
-
                 _mapperFunc = (mappedObject, context) =>
                 {
-                    if (!ShouldAssignValuePreResolving(context))
-                        return;
-
-                    var result = ResolveValue(context);
+                    var result = valueResolverFunc(context);
 
                     object destinationValue = GetDestinationValue(mappedObject);
 
-                    var declaredSourceType = SourceType ?? context.SourceType;
-                    var sourceType = result?.GetType() ?? declaredSourceType;
-                    var destinationType = DestinationProperty.MemberType;
-
                     if (!ShouldAssignValue(result, destinationValue, context))
                         return;
+
+                    var declaredSourceType = SourceType ?? context.SourceType;
+                    var sourceType = result?.GetType() ?? declaredSourceType;
+                    var destinationType = DestinationPropertyType;
 
                     object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType,
                         destinationType, context);
 
                     DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+                };
+            }
+
+            if (_hasPreCondition)
+            {
+                var inner = _mapperFunc;
+                _mapperFunc = (mappedObject, context) =>
+                {
+                    if (!ShouldAssignValuePreResolving(context))
+                        return;
+
+                    inner(mappedObject, context);
                 };
             }
 
