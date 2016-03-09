@@ -57,15 +57,13 @@ namespace AutoMapper
                 {
                     return _instanceCache;
                 }
-                if(PreserveReferences)
+                if(TypeMap?.PreserveReferences ?? false)
                 {
                     _instanceCache = new Dictionary<ResolutionContext, object>();
                 }
                 return _instanceCache;
             }
         }
-
-        internal bool PreserveReferences => Options.PreserveReferences && TypeMap?.PreserveReferences == true;
 
         /// <summary>
         /// Current mapper
