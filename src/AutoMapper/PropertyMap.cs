@@ -135,8 +135,7 @@ namespace AutoMapper
 
                 valueResolverFunc = outerResolver.Compile();
 
-                if ((!DestinationPropertyType.IsValueType() || DestinationPropertyType.IsNullableType()) &&
-                    !_typeMap.Profile.AllowNullDestinationValues)
+                if (!_typeMap.Profile.AllowNullDestinationValues)
                 {
                     var inner = valueResolverFunc;
 
@@ -170,12 +169,9 @@ namespace AutoMapper
                     if (!ShouldAssignValue(result, destinationValue, context))
                         return;
 
-                    var declaredSourceType = SourceType ?? context.SourceType;
-                    var sourceType = result?.GetType() ?? declaredSourceType;
-                    var destinationType = DestinationPropertyType;
+                    var sourceType = result?.GetType() ?? SourceType ?? context.SourceType;
 
-                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType,
-                        destinationType, context);
+                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, DestinationPropertyType, context);
 
                     DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
                 };
