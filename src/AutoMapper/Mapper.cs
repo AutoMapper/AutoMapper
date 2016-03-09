@@ -246,7 +246,7 @@ namespace AutoMapper
                     return typeMap.DestinationCtor(context);
                 else if (typeMap.ConstructDestinationUsingServiceLocator)
                     return context.Options.ServiceCtor(destinationType);
-                else if (typeMap.ConstructorMap != null && typeMap.ConstructorMap.CtorParams.All(p => p.CanResolve))
+                else if (typeMap.ConstructorMap?.CanResolve == true)
                     return typeMap.ConstructorMap.ResolveValue(context);
 
             if (context.DestinationValue != null)
