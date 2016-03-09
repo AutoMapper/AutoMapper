@@ -459,5 +459,74 @@ namespace AutoMapper
             }
             return Expression.Lambda(newExpression);
         }
+
+        public object Map(object source, ResolutionContext context)
+        {
+            if (!ShouldAssignValue(context))
+            {
+                return null;
+            }
+
+            if (Substitution != null)
+            {
+                var newSource = Substitution(context.SourceValue);
+
+                return context.Mapper.Map(newSource, context.DestinationValue, newSource.GetType(), context.DestinationType, context);
+            }
+
+            if (CustomMapper != null)
+            {
+                return CustomMapper(source, context);
+            }
+
+            if (context.SourceValue == null && Profile.AllowNullDestinationValues)
+            {
+                return null;
+            }
+
+            object cachedDestination;
+            if (context.DestinationValue == null && context.PreserveReferences &&
+                context.InstanceCache.TryGetValue(context, out cachedDestination))
+            {
+                return cachedDestination;
+            }
+
+            var mappedObject = context.DestinationValue ?? context.Mapper.CreateObject(context);
+
+            if (mappedObject == null)
+            {
+                throw new InvalidOperationException("Cannot create destination object. " + context);
+            }
+
+            if (context.SourceValue != null && context.PreserveReferences)
+                context.InstanceCache[context] = mappedObject;
+
+            BeforeMap(context.SourceValue, mappedObject, context);
+            context.BeforeMap(mappedObject);
+
+            foreach (PropertyMap propertyMap in GetPropertyMaps())
+            {
+                try
+                {
+                    propertyMap.MapValue(mappedObject, context);
+                }
+                catch (AutoMapperMappingException ex)
+                {
+                    ex.PropertyMap = propertyMap;
+
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    throw new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
+                }
+            }
+
+            context.AfterMap(mappedObject);
+            AfterMap(context.SourceValue, mappedObject, context);
+
+            return mappedObject;
+
+        }
     }
 }

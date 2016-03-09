@@ -573,7 +573,7 @@ namespace AutoMapper.UnitTests
 
                 var config = new MapperConfiguration(cfg => cfg.CreateMap<Tag, Tag>().PreserveReferences().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags)));
 	            var mapper = config.CreateMapper();
-	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DontPreserveReferences());
+	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DoNotPreserveReferences());
 
                 result[1].ChildTags.Count().ShouldEqual(0);
                 result[2].ChildTags.Count().ShouldEqual(1);

@@ -41,7 +41,7 @@ namespace AutoMapper
         public Action<object, object> BeforeMapAction { get; protected set; }
         public Action<object, object> AfterMapAction { get; protected set; }
 
-        public void DontPreserveReferences()
+        public void DoNotPreserveReferences()
         {
             PreserveReferences = false;
         }
