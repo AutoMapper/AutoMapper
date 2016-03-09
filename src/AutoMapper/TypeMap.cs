@@ -98,9 +98,9 @@ namespace AutoMapper
         public Func<object, object> Substitution { get; set; }
         public LambdaExpression ConstructExpression { get; set; }
 
-        public IEnumerable<PropertyMap> GetPropertyMaps()
+        public PropertyMap[] GetPropertyMaps()
         {
-            return _sealed ? _orderedPropertyMaps : _propertyMaps.Concat(_inheritedMaps);
+            return _sealed ? _orderedPropertyMaps : _propertyMaps.Concat(_inheritedMaps).ToArray();
         }
 
         public void AddPropertyMap(PropertyMap propertyMap)
@@ -449,7 +449,7 @@ namespace AutoMapper
                 return ctorExpr;
             }
             Expression newExpression;
-            if(ConstructorMap != null && ConstructorMap.CtorParams.All(p => p.CanResolve))
+            if(ConstructorMap?.CanResolve == true)
             {
                 newExpression = ConstructorMap.NewExpression(instanceParameter);
             }

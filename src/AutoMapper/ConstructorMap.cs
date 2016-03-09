@@ -33,6 +33,21 @@ namespace AutoMapper
             new NullSubstitutionExpressionResultConverter()
         };
 
+        public bool CanResolve
+        {
+            get
+            {
+                foreach(var param in CtorParams)
+                {
+                    if(!param.CanResolve)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
         public Expression NewExpression(Expression instanceParameter)
         {
             var parameters = CtorParams.Select(map =>

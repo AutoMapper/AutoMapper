@@ -24,7 +24,12 @@ namespace AutoMapper
 
         public object ResolveValue(ResolutionContext context)
         {
-            return SourceResolvers.Aggregate(context.SourceValue, (current, resolver) => resolver.Resolve(current, context));
+            object source = context.SourceValue;
+            foreach(var resolver in SourceResolvers)
+            {
+                source = resolver.Resolve(source, context);
+            }
+            return source;
         }
 
         public void ResolveUsing(params IValueResolver[] resolvers)
