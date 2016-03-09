@@ -20,11 +20,6 @@
         IDictionary<string, object> Items { get; }
 
         /// <summary>
-        /// Disable the cache used to re-use destination instances based on equality
-        /// </summary>
-        void DontPreserveReferences();
-
-        /// <summary>
         /// Execute a custom function to the source and/or destination types before member mapping
         /// </summary>
         /// <param name="beforeFunction">Callback for the source/destination types</param>

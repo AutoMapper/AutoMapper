@@ -28,10 +28,7 @@ namespace AutoMapper
             {
                 if (context.TypeMap != null)
                 {
-                    // check whether the context passes conditions before attempting to map the value (depth check)
-                    object mappedObject = Map(context.SourceValue, context);
-
-                    return mappedObject;
+                    return context.TypeMap.Map(context.SourceValue, context);
                 }
 
                 IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(context.Types, _getObjectMapper);
@@ -50,74 +47,6 @@ namespace AutoMapper
             {
                 throw new AutoMapperMappingException(context, ex);
             }
-        }
-
-        private object Map(object source, ResolutionContext context)
-        {
-            if (!context.TypeMap.ShouldAssignValue(context))
-            {
-                return null;
-            }
-
-            if (context.TypeMap.Substitution != null)
-            {
-                var newSource = context.TypeMap.Substitution(context.SourceValue);
-
-                return context.Mapper.Map(newSource, context.DestinationValue, newSource.GetType(), context.DestinationType, context);
-            }
-
-            if (context.TypeMap.CustomMapper != null)
-            {
-                return context.TypeMap.CustomMapper(source, context);
-            }
-
-            if (context.SourceValue == null && context.TypeMap.Profile.AllowNullDestinationValues)
-            {
-                return null;
-            }
-
-            object cachedDestination;
-            if(context.DestinationValue == null && context.PreserveReferences &&
-                context.InstanceCache.TryGetValue(context, out cachedDestination))
-            {
-                return cachedDestination;
-            }
-
-            var mappedObject = context.DestinationValue ?? context.Mapper.CreateObject(context);
-
-            if (mappedObject == null)
-            {
-                throw new InvalidOperationException("Cannot create destination object. " + context);
-            }
-
-            if (context.SourceValue != null && context.PreserveReferences)
-                context.InstanceCache[context] = mappedObject;
-
-            context.TypeMap.BeforeMap(context.SourceValue, mappedObject, context);
-            context.BeforeMap(mappedObject);
-
-            foreach (PropertyMap propertyMap in context.TypeMap.GetPropertyMaps())
-            {
-                try
-                {
-                    propertyMap.MapValue(mappedObject, context);
-                }
-                catch (AutoMapperMappingException ex)
-                {
-                    ex.PropertyMap = propertyMap;
-
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    throw new AutoMapperMappingException(context, ex) { PropertyMap = propertyMap };
-                }
-            }
-
-            context.AfterMap(mappedObject);
-            context.TypeMap.AfterMap(context.SourceValue, mappedObject, context);
-
-            return mappedObject;
         }
     }
 }

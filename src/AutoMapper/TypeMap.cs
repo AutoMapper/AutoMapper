@@ -29,6 +29,7 @@ namespace AutoMapper
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
+        private Func<object, ResolutionContext, object> _mapperFunc;
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, IProfileConfiguration profile)
         {
@@ -263,6 +264,8 @@ namespace AutoMapper
             foreach (var inheritedMap in _inheritedMaps)
                 inheritedMap.Seal(typeMapRegistry);
 
+            _mapperFunc = BuildMapperFunc();
+
             _sealed = true;
         }
 
@@ -338,11 +341,6 @@ namespace AutoMapper
         public void SetCondition(Func<ResolutionContext, bool> condition)
         {
             _condition = condition;
-        }
-
-        public bool ShouldAssignValue(ResolutionContext resolutionContext)
-        {
-            return _condition == null || _condition(resolutionContext);
         }
 
         public void AddConstructorMap(ConstructorInfo constructorInfo, ConstructorParameterMap[] parameters)
@@ -458,6 +456,164 @@ namespace AutoMapper
                 newExpression = Expression.New(DestinationTypeOverride ?? DestinationType);
             }
             return Expression.Lambda(newExpression);
+        }
+
+        public object Map(object source, ResolutionContext context)
+        {
+            return _mapperFunc(source, context);
+        }
+
+        private Func<object, ResolutionContext, object> BuildMapperFunc()
+        {
+            if (Substitution != null)
+            {
+                return (source, context) =>
+                {
+                    var newSource = Substitution(context.SourceValue);
+
+                    return context.Mapper.Map(newSource, context.DestinationValue, newSource.GetType(),
+                        context.DestinationType, context);
+                };
+            }
+
+            if (CustomMapper != null)
+            {
+                return CustomMapper;
+            }
+
+            var destinationFunc = CreateDestinationFunc();
+
+            var assignmentFunc = CreateAssignmentFunc();
+
+            var mapperFunc = CreateMapperFunc(assignmentFunc);
+
+            return (source, context) => mapperFunc(source, context, destinationFunc);
+        }
+
+        private Func<object, ResolutionContext, Func<ResolutionContext, object>, object> CreateMapperFunc(Func<object, ResolutionContext, object, object> assignmentFunc)
+        {
+            Func<object, ResolutionContext, Func<ResolutionContext, object>, object> mapperFunc =
+                (source, context, destFunc) => assignmentFunc(source, context, destFunc(context));
+
+            if (_condition != null)
+            {
+                var inner = mapperFunc;
+
+                mapperFunc = (source, context, destFunc) => _condition(context) ? inner(source, context, destFunc) : null;
+            }
+
+            if (Profile.AllowNullDestinationValues)
+            {
+                var inner = mapperFunc;
+
+                mapperFunc = (source, context, destFunc) => source == null ? null : inner(source, context, destFunc);
+            }
+
+            if (PreserveReferences)
+            {
+                var inner = mapperFunc;
+
+                mapperFunc = (source, context, destFunc) =>
+                {
+                    object cachedDestination;
+                    if (context.DestinationValue == null &&
+                        context.InstanceCache.TryGetValue(context, out cachedDestination))
+                    {
+                        return cachedDestination;
+                    }
+
+                    return inner(source, context, destFunc);
+                };
+            }
+            return mapperFunc;
+        }
+
+        private Func<object, ResolutionContext, object, object> CreateAssignmentFunc()
+        {
+            Func<object, ResolutionContext, object, object> assignmentFunc = (source, context, mappedObject) =>
+            {
+                context.BeforeMap(mappedObject);
+
+                foreach (PropertyMap propertyMap in GetPropertyMaps())
+                {
+                    try
+                    {
+                        propertyMap.MapValue(mappedObject, context);
+                    }
+                    catch (AutoMapperMappingException ex)
+                    {
+                        ex.PropertyMap = propertyMap;
+
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new AutoMapperMappingException(context, ex) {PropertyMap = propertyMap};
+                    }
+                }
+
+                context.AfterMap(mappedObject);
+
+                return mappedObject;
+            };
+
+            if (_beforeMapActions.Any())
+            {
+                var inner = assignmentFunc;
+
+                assignmentFunc = (source, context, mappedObject) =>
+                {
+                    BeforeMap(source, mappedObject, context);
+
+                    return inner(source, context, mappedObject);
+                };
+            }
+
+            if (_afterMapActions.Any())
+            {
+                var inner = assignmentFunc;
+
+                assignmentFunc = (source, context, mappedObject) =>
+                {
+                    inner(source, context, mappedObject);
+
+                    AfterMap(source, mappedObject, context);
+
+                    return mappedObject;
+                };
+            }
+            return assignmentFunc;
+        }
+
+        private Func<ResolutionContext, object> CreateDestinationFunc()
+        {
+            Func<ResolutionContext, object> destinationFunc = context =>
+            {
+                var destination = context.DestinationValue ?? context.Mapper.CreateObject(context);
+
+                if (destination == null)
+                {
+                    throw new InvalidOperationException("Cannot create destination object. " + context);
+                }
+
+                return destination;
+            };
+
+            if (PreserveReferences)
+            {
+                var inner = destinationFunc;
+
+                destinationFunc = context =>
+                {
+                    var dest = inner(context);
+
+                    if (context.SourceValue != null && PreserveReferences)
+                        context.InstanceCache[context] = dest;
+
+                    return dest;
+                };
+            }
+            return destinationFunc;
         }
     }
 }
