@@ -101,12 +101,6 @@ namespace AutoMapper
         IEnumerable<IObjectMapper> GetMappers();
 
         /// <summary>
-        /// Get all configured mappers
-        /// </summary>
-        /// <returns>List of mappers</returns>
-        IEnumerable<ITypeMapObjectMapper> GetTypeMapMappers();
-
-        /// <summary>
         /// Factory method to create formatters, resolvers and type converters
         /// </summary>
         Func<Type, object> ServiceCtor { get; }

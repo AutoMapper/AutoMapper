@@ -15,7 +15,6 @@ namespace AutoMapper
     public class MapperConfiguration : IConfigurationProvider, IMapperConfiguration
     {
         private readonly IEnumerable<IObjectMapper> _mappers;
-        private readonly IEnumerable<ITypeMapObjectMapper> _typeMapObjectMappers;
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
@@ -26,14 +25,13 @@ namespace AutoMapper
         private Func<TypePair, TypeMap> _getTypeMap;
 
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers)
+        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers)
         {
         }
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<ITypeMapObjectMapper> typeMapObjectMappers)
+        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
-            _typeMapObjectMappers = typeMapObjectMappers;
             var profileExpression = new NamedProfile(ProfileName);
 
             _profiles.Add(profileExpression);
@@ -253,7 +251,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid()
         {
-            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps);
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(tm => !tm.SourceType.IsGenericTypeDefinition() && !tm.DestinationType.IsGenericTypeDefinition()));
         }
 
         public IMapper CreateMapper() => new Mapper(this);
@@ -261,8 +259,6 @@ namespace AutoMapper
         public IMapper CreateMapper(Func<Type, object> serviceCtor) => new Mapper(this, serviceCtor);
 
         public IEnumerable<IObjectMapper> GetMappers() => _mappers;
-
-        public IEnumerable<ITypeMapObjectMapper> GetTypeMapMappers() => _typeMapObjectMappers;
 
         #endregion
 
@@ -323,7 +319,7 @@ namespace AutoMapper
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
             {
-                typeMap.Seal();
+                typeMap.Seal(_typeMapRegistry);
             }
         }
 
@@ -357,7 +353,7 @@ namespace AutoMapper
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
 
-            typeMap?.Seal();
+            typeMap?.Seal(_typeMapRegistry);
 
             return typeMap;
         }
@@ -373,7 +369,7 @@ namespace AutoMapper
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, openGenericTypes.Value))
                 .FirstOrDefault(t => t != null);
 
-            typeMap?.Seal();
+            typeMap?.Seal(_typeMapRegistry);
 
             return typeMap;
         }

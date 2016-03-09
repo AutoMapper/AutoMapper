@@ -1,3 +1,7 @@
+using AutoMapper.Configuration;
+using AutoMapper.Mappers;
+using AutoMapper.QueryableExtensions.Impl;
+
 namespace AutoMapper
 {
     using System;
@@ -6,11 +10,13 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Configuration;
     using Execution;
 
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
+        private readonly TypeMap _typeMap;
         private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
         private bool _ignored;
         private int _mappingOrder;
@@ -18,18 +24,22 @@ namespace AutoMapper
         private IValueResolver _customMemberResolver;
         private bool _sealed;
         private Func<object, object, ResolutionContext, bool> _condition = (_, __, ___) => true;
+        private bool _hasCondition;
         private Func<ResolutionContext, bool> _preCondition = _ => true;
+        private bool _hasPreCondition;
         private Func<ResolutionContext, object> _valueResolverFunc;
+        private Action<object, ResolutionContext> _mapperFunc;
         private MemberInfo _sourceMember;
 
-        public PropertyMap(IMemberAccessor destinationProperty)
+        public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
+            _typeMap = typeMap;
             UseDestinationValue = true;
             DestinationProperty = destinationProperty;
         }
 
-        public PropertyMap(PropertyMap inheritedMappedProperty)
-            : this(inheritedMappedProperty.DestinationProperty)
+        public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
+            : this(inheritedMappedProperty.DestinationProperty, typeMap)
         {
             if (inheritedMappedProperty.IsIgnored())
                 Ignore();
@@ -93,12 +103,7 @@ namespace AutoMapper
             _sourceValueResolvers.RemoveLast();
         }
 
-        public object ResolveValue(ResolutionContext context)
-        {
-            return _valueResolverFunc(context);
-        }
-
-        internal void Seal()
+        internal void Seal(TypeMapRegistry typeMapRegistry)
         {
             if (_sealed)
             {
@@ -107,11 +112,116 @@ namespace AutoMapper
 
             var resolvers = GetSourceValueResolvers().ToArray();
 
-            _valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
-                ctxt => ctxt.SourceValue, 
-                (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
-
             SourceType = resolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
+
+            if (!CanResolveValue())
+            {
+                _mapperFunc = (_, __) => { };
+                return;
+            }
+
+            Func<ResolutionContext, object> valueResolverFunc;
+
+            if (resolvers.All(r => r is IMemberGetter)
+                && SourceType != null
+                && (!SourceType.IsEnumerableType() || SourceType == typeof(string))
+                && ((EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) && !EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) || !EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
+                )
+            {
+                var innerResolver = resolvers.Cast<IMemberResolver>().Aggregate<IMemberResolver, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
+                    (ctxt => ctxt.SourceValue),
+                    (expression, resolver) => (LambdaExpression)new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression));
+                var outerResolver = (Expression<Func<ResolutionContext, object>>)Expression.Lambda(Expression.Convert(innerResolver.Body, typeof(object)), innerResolver.Parameters);
+
+                valueResolverFunc = outerResolver.Compile();
+
+                if (!_typeMap.Profile.AllowNullDestinationValues)
+                {
+                    var inner = valueResolverFunc;
+
+                    valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(SourceType);
+                }
+            }
+            else
+            {
+                valueResolverFunc = resolvers.Aggregate<IValueResolver, Func<ResolutionContext, object>>(
+                    ctxt => ctxt.SourceValue,
+                    (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
+            }
+
+            if (SourceType != null
+                && (!SourceType.IsEnumerableType() || SourceType == typeof(string))
+                && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
+                && ((EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) && !EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) || !EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
+                && DestinationPropertyType.IsAssignableFrom(SourceType))
+            {
+                if (_hasCondition)
+                {
+                    _mapperFunc = (mappedObject, context) =>
+                    {
+                        var result = valueResolverFunc(context);
+
+                        object destinationValue = GetDestinationValue(mappedObject);
+
+                        if (!ShouldAssignValue(result, destinationValue, context))
+                            result = destinationValue;
+
+                        DestinationProperty.SetValue(mappedObject, result);
+                    };
+                }
+                else
+                {
+                    _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(context));
+                }
+            }
+            else
+            {
+                if (_hasCondition)
+                {
+                    _mapperFunc = (mappedObject, context) =>
+                    {
+                        var result = valueResolverFunc(context);
+
+                        object destinationValue = GetDestinationValue(mappedObject);
+
+                        if (!ShouldAssignValue(result, destinationValue, context))
+                            return;
+
+                        var sourceType = result?.GetType() ?? SourceType ?? context.SourceType;
+
+                        object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, DestinationPropertyType, context);
+
+                        DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+                    };
+
+                }
+                else
+                {
+                    _mapperFunc = (mappedObject, context) =>
+                    {
+                        var result = valueResolverFunc(context);
+
+                        var sourceType = result?.GetType() ?? SourceType ?? context.SourceType;
+
+                        object propertyValueToAssign = context.Mapper.Map(result, GetDestinationValue(mappedObject), sourceType, DestinationPropertyType, context);
+
+                        DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+                    };
+                }
+            }
+
+            if (_hasPreCondition)
+            {
+                var inner = _mapperFunc;
+                _mapperFunc = (mappedObject, context) =>
+                {
+                    if (!ShouldAssignValuePreResolving(context))
+                        return;
+
+                    inner(mappedObject, context);
+                };
+            }
+
             _sealed = true;
         }
 
@@ -207,11 +317,13 @@ namespace AutoMapper
         public void ApplyCondition(Func<object, object, ResolutionContext, bool> condition)
         {
             _condition = condition;
+            _hasCondition = true;
         }
 
         public void ApplyPreCondition(Func<ResolutionContext, bool> condition)
         {
             _preCondition = condition;
+            _hasPreCondition = true;
         }
 
         public bool ShouldAssignValue(object resolvedValue, object destinationValue, ResolutionContext context)
@@ -257,6 +369,61 @@ namespace AutoMapper
                 Member = node;
 
                 return base.VisitMember(node);
+            }
+        }
+
+        public void MapValue(object mappedObject, ResolutionContext context)
+        {
+            _mapperFunc(mappedObject, context);
+        }
+
+        private class ExpressionConcatVisitor : ExpressionVisitor
+        {
+            private readonly LambdaExpression _overrideExpression;
+
+            public ExpressionConcatVisitor(LambdaExpression overrideExpression)
+            {
+                _overrideExpression = overrideExpression;
+            }
+            
+            public override Expression Visit(Expression node)
+            {
+                if (_overrideExpression == null)
+                    return node;
+                if (node.NodeType != ExpressionType.Lambda && node.NodeType != ExpressionType.Parameter)
+                {
+                    var expression = node;
+                    if (node.Type == typeof(object))
+                        expression = Expression.Convert(node, _overrideExpression.Parameters[0].Type);
+
+
+                    var a = new ReplaceExpressionVisitor(_overrideExpression.Parameters[0], expression);
+                    var b = a.Visit(_overrideExpression.Body);
+                    return b;
+                }
+                return base.Visit(node);
+            }
+
+            protected override Expression VisitLambda<T>(Expression<T> node)
+            {
+                return Expression.Lambda(Visit(node.Body), node.Parameters);
+            }
+        }
+
+        private class ReplaceExpressionVisitor : ExpressionVisitor
+        {
+            private readonly Expression _oldExpression;
+            private readonly Expression _newExpression;
+
+            public ReplaceExpressionVisitor(Expression oldExpression, Expression newExpression)
+            {
+                _oldExpression = oldExpression;
+                _newExpression = newExpression;
+            }
+
+            public override Expression Visit(Expression node)
+            {
+                return _oldExpression == node ? _newExpression : base.Visit(node);
             }
         }
     }

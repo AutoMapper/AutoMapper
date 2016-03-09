@@ -113,7 +113,7 @@ namespace AutoMapper
 
         public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IValueResolver> resolvers)
         {
-            var propertyMap = new PropertyMap(destProperty);
+            var propertyMap = new PropertyMap(destProperty, this);
 
             foreach (var resolver in resolvers)
             {
@@ -173,7 +173,7 @@ namespace AutoMapper
 
             if (propertyMap != null) return propertyMap;
 
-            propertyMap = new PropertyMap(destinationProperty);
+            propertyMap = new PropertyMap(destinationProperty, this);
 
             AddPropertyMap(propertyMap);
 
@@ -238,14 +238,14 @@ namespace AutoMapper
             _afterMapActions.Add(afterMap);
         }
 
-        public void Seal()
+        public void Seal(TypeMapRegistry typeMapRegistry)
         {
             if (_sealed)
                 return;
 
             foreach (var inheritedTypeMap in _inheritedTypeMaps)
             {
-                inheritedTypeMap.Seal();
+                inheritedTypeMap.Seal(typeMapRegistry);
                 ApplyInheritedTypeMap(inheritedTypeMap);
             }
 
@@ -256,10 +256,10 @@ namespace AutoMapper
 
             foreach (var pm in _orderedPropertyMaps)
             {
-                pm.Seal();
+                pm.Seal(typeMapRegistry);
             }
             foreach (var inheritedMap in _inheritedMaps)
-                inheritedMap.Seal();
+                inheritedMap.Seal(typeMapRegistry);
 
             _sealed = true;
         }
@@ -420,7 +420,7 @@ namespace AutoMapper
                 }
                 else if (conventionPropertyMap == null)
                 {
-                    var propertyMap = new PropertyMap(inheritedMappedProperty);
+                    var propertyMap = new PropertyMap(inheritedMappedProperty, this);
 
                     AddInheritedPropertyMap(propertyMap);
                 }

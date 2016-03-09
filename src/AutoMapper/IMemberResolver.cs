@@ -6,6 +6,7 @@ namespace AutoMapper
 
     public interface IMemberResolver : IValueResolver
     {
+        LambdaExpression GetExpression { get; }
         Type MemberType { get; }
     }
 
