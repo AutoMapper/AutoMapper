@@ -149,32 +149,65 @@ namespace AutoMapper
                     (inner, res) => ctxt => res.Resolve(inner(ctxt), ctxt));
             }
 
-            if (!_hasCondition
-                && SourceType != null
+            if (SourceType != null
                 && (!SourceType.IsEnumerableType() || SourceType == typeof(string))
                 && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
                 && ((EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) && !EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) || !EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
                 && DestinationPropertyType.IsAssignableFrom(SourceType))
             {
-                _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(context));
+                if (_hasCondition)
+                {
+                    _mapperFunc = (mappedObject, context) =>
+                    {
+                        var result = valueResolverFunc(context);
+
+                        object destinationValue = GetDestinationValue(mappedObject);
+
+                        if (!ShouldAssignValue(result, destinationValue, context))
+                            result = destinationValue;
+
+                        DestinationProperty.SetValue(mappedObject, result);
+                    };
+                }
+                else
+                {
+                    _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(context));
+                }
             }
             else
             {
-                _mapperFunc = (mappedObject, context) =>
+                if (_hasCondition)
                 {
-                    var result = valueResolverFunc(context);
+                    _mapperFunc = (mappedObject, context) =>
+                    {
+                        var result = valueResolverFunc(context);
 
-                    object destinationValue = GetDestinationValue(mappedObject);
+                        object destinationValue = GetDestinationValue(mappedObject);
 
-                    if (!ShouldAssignValue(result, destinationValue, context))
-                        return;
+                        if (!ShouldAssignValue(result, destinationValue, context))
+                            return;
 
-                    var sourceType = result?.GetType() ?? SourceType ?? context.SourceType;
+                        var sourceType = result?.GetType() ?? SourceType ?? context.SourceType;
 
-                    object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, DestinationPropertyType, context);
+                        object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, DestinationPropertyType, context);
 
-                    DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
-                };
+                        DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+                    };
+
+                }
+                else
+                {
+                    _mapperFunc = (mappedObject, context) =>
+                    {
+                        var result = valueResolverFunc(context);
+
+                        var sourceType = result?.GetType() ?? SourceType ?? context.SourceType;
+
+                        object propertyValueToAssign = context.Mapper.Map(result, GetDestinationValue(mappedObject), sourceType, DestinationPropertyType, context);
+
+                        DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
+                    };
+                }
             }
 
             if (_hasPreCondition)
