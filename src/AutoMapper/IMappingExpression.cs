@@ -44,7 +44,8 @@ namespace AutoMapper
         IMappingExpression ConstructUsingServiceLocator();
 
         /// <summary>
-        /// For self-referential types, limit recurse depth
+        /// For self-referential types, limit recurse depth.
+        /// Enables PreserveReferences.
         /// </summary>
         /// <param name="depth">Number of levels to limit to</param>
         /// <returns>Itself</returns>
@@ -366,7 +367,8 @@ namespace AutoMapper
         void As<T>();
 
         /// <summary>
-        /// For self-referential types, limit recurse depth
+        /// For self-referential types, limit recurse depth.
+        /// Enables PreserveReferences.
         /// </summary>
         /// <param name="depth">Number of levels to limit to</param>
         /// <returns>Itself</returns>

@@ -9,6 +9,8 @@ namespace AutoMapper
     /// </summary>
     public class ResolutionContext : IEquatable<ResolutionContext>
     {
+        private Dictionary<ResolutionContext, object> _instanceCache;
+
         /// <summary>
         /// Mapping operation options
         /// </summary>
@@ -47,7 +49,23 @@ namespace AutoMapper
         /// <summary>
         /// Instance cache for resolving circular references
         /// </summary>
-        public Dictionary<ResolutionContext, object> InstanceCache { get; }
+        public Dictionary<ResolutionContext, object> InstanceCache
+        {
+            get
+            {
+                if(_instanceCache != null)
+                {
+                    return _instanceCache;
+                }
+                if(PreserveReferences)
+                {
+                    _instanceCache = new Dictionary<ResolutionContext, object>();
+                }
+                return _instanceCache;
+            }
+        }
+
+        internal bool PreserveReferences => Options.PreserveReferences && TypeMap?.PreserveReferences == true;
 
         /// <summary>
         /// Current mapper
@@ -73,7 +91,7 @@ namespace AutoMapper
             Options = parent.Options;
             Mapper = parent.Mapper;
 
-            InstanceCache = parent.InstanceCache;
+            _instanceCache = parent.InstanceCache;
 
             SourceType = sourceType ?? typeMap?.SourceType ?? parent.SourceType;
             DestinationType = destinationType ?? typeMap?.DestinationType ?? parent.DestinationType;
@@ -86,7 +104,7 @@ namespace AutoMapper
             Parent = parent;
             Options = parent.Options;
             Mapper = parent.Mapper;
-            InstanceCache = parent.InstanceCache;
+            _instanceCache = parent.InstanceCache;
         }
 
         internal void Fill(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap)
@@ -104,12 +122,6 @@ namespace AutoMapper
         {
             Options = options;
             Mapper = mapper;
-
-            if(options.PreserveReferences)
-            {
-                InstanceCache = new Dictionary<ResolutionContext, object>();
-            }
-
             SourceType = source?.GetType() ?? sourceType ?? typeMap?.SourceType;
             DestinationType = destination?.GetType() ?? destinationType ?? typeMap?.DestinationType;
 
