@@ -13,6 +13,13 @@ namespace AutoMapper.Execution
         private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
             new ConcurrentDictionary<Type, LateBoundCtor>();
 
+        private readonly Func<Type, LateBoundCtor> _generateConstructor;
+
+        public DelegateFactory()
+        {
+            _generateConstructor = GenerateConstructor;
+        }
+
         public Expression<LateBoundMethod<object, TValue>> CreateGet<TValue>(MethodInfo method)
         {
             ParameterExpression instanceParameter = Expression.Parameter(typeof(object), "target");
@@ -108,40 +115,41 @@ namespace AutoMapper.Execution
 
         public LateBoundCtor CreateCtor(Type type)
         {
-            LateBoundCtor ctor = _ctorCache.GetOrAdd(type, t =>
-            {
-                //handle valuetypes
-                if (!type.IsClass())
-                {
-                    var ctorExpression =
-                        Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof (object)));
-                    return ctorExpression.Compile();
-                }
-                else
-                {
-                    var constructors = type
-                        .GetDeclaredConstructors()
-                        .Where(ci => !ci.IsStatic);
-
-                    //find a ctor with only optional args
-                    var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
-                    if (ctorWithOptionalArgs == null)
-                        throw new ArgumentException(type+" needs to have a constructor with 0 args or only optional args", "type");
-
-                    //get all optional default values
-                    var args = ctorWithOptionalArgs
-                        .GetParameters()
-                        .Select(p => Expression.Constant(p.DefaultValue, p.ParameterType)).ToArray();
-
-                    //create the ctor expression
-                    var ctorExpression =
-                        Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(ctorWithOptionalArgs, args),
-                            typeof (object)));
-                    return ctorExpression.Compile();
-                }
-            });
-
+            var ctor = _ctorCache.GetOrAdd(type, _generateConstructor);
             return ctor;
+        }
+
+        private static LateBoundCtor GenerateConstructor(Type type)
+        {
+            //handle valuetypes
+            if(!type.IsClass())
+            {
+                var ctorExpression =
+                    Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
+                return ctorExpression.Compile();
+            }
+            else
+            {
+                var constructors = type
+                    .GetDeclaredConstructors()
+                    .Where(ci => !ci.IsStatic);
+
+                //find a ctor with only optional args
+                var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
+                if(ctorWithOptionalArgs == null)
+                    throw new ArgumentException(type + " needs to have a constructor with 0 args or only optional args", "type");
+
+                //get all optional default values
+                var args = ctorWithOptionalArgs
+                    .GetParameters()
+                    .Select(p => Expression.Constant(p.DefaultValue, p.ParameterType)).ToArray();
+
+                //create the ctor expression
+                var ctorExpression =
+                    Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(ctorWithOptionalArgs, args),
+                        typeof(object)));
+                return ctorExpression.Compile();
+            }
         }
 
         private static Expression[] CreateParameterExpressions(MethodInfo method, Expression instanceParameter,
