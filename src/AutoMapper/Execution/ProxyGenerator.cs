@@ -2,6 +2,7 @@
 namespace AutoMapper.Execution
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
@@ -30,7 +31,7 @@ namespace AutoMapper.Execution
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
-        private static readonly Dictionary<Type, Type> proxyTypes = new Dictionary<Type, Type>();
+        private static readonly ConcurrentDictionary<Type, Type> proxyTypes = new ConcurrentDictionary<Type, Type>();
 
         private static ModuleBuilder CreateProxyModule()
         {
@@ -158,15 +159,8 @@ namespace AutoMapper.Execution
             {
                 throw new ArgumentNullException(nameof(interfaceType));
             }
-            lock (proxyTypes)
-            {
-                Type proxyType;
-                if (!proxyTypes.TryGetValue(interfaceType, out proxyType))
-                {
-                    proxyTypes.Add(interfaceType, proxyType = CreateProxyType(interfaceType));
-                }
-                return proxyType;
-            }
+
+            return proxyTypes.GetOrAdd(interfaceType, CreateProxyType);
         }
 
         private static byte[] StringToByteArray(string hex)

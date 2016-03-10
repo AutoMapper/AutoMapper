@@ -631,35 +631,30 @@ namespace AutoMapper
             if (ConstructorMap?.CanResolve == true)
                 return ConstructorMap.ResolveValue;
 
-
-            return context =>
+            if (DestinationType.IsInterface())
             {
                 var destinationType = DestinationType;
-
-                if (destinationType.IsInterface())
+                return context =>
+                {
 #if PORTABLE
-                throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+                    throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
 #else
                     destinationType = new ProxyGenerator().GetProxyType(destinationType);
+
+                    return ObjectCreator.DelegateFactory.CreateCtor(destinationType)();
 #endif
+                };
+            }
 
-                return !Profile.AllowNullDestinationValues
-                    ? ObjectCreator.CreateNonNullValue(destinationType)
-                    : ObjectCreator.CreateObject(destinationType);
-            };
-            //            if (DestinationType.IsInterface())
-            //            {
-            //#if PORTABLE
-            //                throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
-            //#else
-            //                var destinationType = new ProxyGenerator().GetProxyType(DestinationType);
-            //#endif
-            //                var ctor = ObjectCreator.DelegateFactory.CreateCtor(destinationType);
+            if (DestinationType.IsAbstract())
+                return _ => null;
 
-            //                return _ => ctor();
-            //            }
+            if (DestinationType.IsGenericTypeDefinition())
+                return _ => null;
 
-            //            return context => ObjectCreator.DelegateFactory.CreateCtor(context.DestinationType)();
+            var ctor = ObjectCreator.DelegateFactory.CreateCtor(DestinationType);
+
+            return context => ctor();
         }
     }
 }
