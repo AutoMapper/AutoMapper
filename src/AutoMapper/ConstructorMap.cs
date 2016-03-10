@@ -68,30 +68,33 @@ namespace AutoMapper
 
         public object ResolveValue(ResolutionContext context)
         {
-            var ctorArgs = new List<object>();
-
-            foreach (var map in CtorParams)
+            var ctorArgs = new object[CtorParams.Length];
+            for(int index = 0; index < CtorParams.Length; index++)
             {
-                var result = map.ResolveValue(context);
-
-                var sourceType = result?.GetType() ?? context.SourceType;
-                var destinationType = map.Parameter.ParameterType;
-
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, context.SourceType, destinationType);
-
-                if (typeMap == null && map.Parameter.IsOptional)
-                {
-                    object value = map.Parameter.DefaultValue;
-                    ctorArgs.Add(value);
-                }
-                else
-                {
-                    var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
-                    ctorArgs.Add(value);
-                }
+                ctorArgs[index] = Resolve(context, CtorParams[index]);
             }
+            return _runtimeCtor.Value(ctorArgs);
+        }
 
-            return _runtimeCtor.Value(ctorArgs.ToArray());
+        private object Resolve(ResolutionContext context, ConstructorParameterMap map)
+        {
+            var result = map.ResolveValue(context);
+
+            var sourceType = result?.GetType() ?? context.SourceType;
+            var destinationType = map.Parameter.ParameterType;
+
+            var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, context.SourceType, destinationType);
+
+            if(typeMap == null && map.Parameter.IsOptional)
+            {
+                object value = map.Parameter.DefaultValue;
+                return value;
+            }
+            else
+            {
+                var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
+                return value;
+            }
         }
     }
 }
