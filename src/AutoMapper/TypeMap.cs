@@ -9,6 +9,8 @@ namespace AutoMapper
     using System.Linq.Expressions;
     using System.Reflection;
     using Configuration;
+    using Execution;
+    using Mappers;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
@@ -587,9 +589,11 @@ namespace AutoMapper
 
         private Func<ResolutionContext, object> CreateDestinationFunc()
         {
+            Func<ResolutionContext, object> newDestFunc = CreateNewDestinationFunc();
+
             Func<ResolutionContext, object> destinationFunc = context =>
             {
-                var destination = context.DestinationValue ?? context.Mapper.CreateObject(context);
+                var destination = context.DestinationValue ?? newDestFunc(context);
 
                 if (destination == null)
                 {
@@ -614,6 +618,48 @@ namespace AutoMapper
                 };
             }
             return destinationFunc;
+        }
+
+        private Func<ResolutionContext, object> CreateNewDestinationFunc()
+        {
+            if (DestinationCtor != null)
+                return DestinationCtor;
+
+            if (ConstructDestinationUsingServiceLocator)
+                return context => context.Options.ServiceCtor(DestinationType);
+
+            if (ConstructorMap?.CanResolve == true)
+                return ConstructorMap.ResolveValue;
+
+
+            return context =>
+            {
+                var destinationType = DestinationType;
+
+                if (destinationType.IsInterface())
+#if PORTABLE
+                throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+#else
+                    destinationType = new ProxyGenerator().GetProxyType(destinationType);
+#endif
+
+                return !Profile.AllowNullDestinationValues
+                    ? ObjectCreator.CreateNonNullValue(destinationType)
+                    : ObjectCreator.CreateObject(destinationType);
+            };
+            //            if (DestinationType.IsInterface())
+            //            {
+            //#if PORTABLE
+            //                throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+            //#else
+            //                var destinationType = new ProxyGenerator().GetProxyType(DestinationType);
+            //#endif
+            //                var ctor = ObjectCreator.DelegateFactory.CreateCtor(destinationType);
+
+            //                return _ => ctor();
+            //            }
+
+            //            return context => ObjectCreator.DelegateFactory.CreateCtor(context.DestinationType)();
         }
     }
 }

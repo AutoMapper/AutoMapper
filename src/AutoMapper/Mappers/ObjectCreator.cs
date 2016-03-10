@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
     /// </summary>
     public static class ObjectCreator
     {
-        private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
+        public static readonly DelegateFactory DelegateFactory = new DelegateFactory();
 
         public static Array CreateArray(Type elementType, int length)
         {
