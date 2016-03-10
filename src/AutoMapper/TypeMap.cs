@@ -9,6 +9,8 @@ namespace AutoMapper
     using System.Linq.Expressions;
     using System.Reflection;
     using Configuration;
+    using Execution;
+    using Mappers;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
@@ -587,9 +589,11 @@ namespace AutoMapper
 
         private Func<ResolutionContext, object> CreateDestinationFunc()
         {
+            Func<ResolutionContext, object> newDestFunc = CreateNewDestinationFunc();
+
             Func<ResolutionContext, object> destinationFunc = context =>
             {
-                var destination = context.DestinationValue ?? context.Mapper.CreateObject(context);
+                var destination = context.DestinationValue ?? newDestFunc(context);
 
                 if (destination == null)
                 {
@@ -614,6 +618,43 @@ namespace AutoMapper
                 };
             }
             return destinationFunc;
+        }
+
+        private Func<ResolutionContext, object> CreateNewDestinationFunc()
+        {
+            if (DestinationCtor != null)
+                return DestinationCtor;
+
+            if (ConstructDestinationUsingServiceLocator)
+                return context => context.Options.ServiceCtor(DestinationType);
+
+            if (ConstructorMap?.CanResolve == true)
+                return ConstructorMap.ResolveValue;
+
+            if (DestinationType.IsInterface())
+            {
+                var destinationType = DestinationType;
+                return context =>
+                {
+#if PORTABLE
+                    throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+#else
+                    destinationType = new ProxyGenerator().GetProxyType(destinationType);
+
+                    return ObjectCreator.DelegateFactory.CreateCtor(destinationType)();
+#endif
+                };
+            }
+
+            if (DestinationType.IsAbstract())
+                return _ => null;
+
+            if (DestinationType.IsGenericTypeDefinition())
+                return _ => null;
+
+            var ctor = ObjectCreator.DelegateFactory.CreateCtor(DestinationType);
+
+            return context => ctor();
         }
     }
 }
