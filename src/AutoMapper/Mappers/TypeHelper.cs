@@ -8,8 +8,15 @@ namespace AutoMapper.Mappers
 {
     public static class TypeHelper
     {
+        private static ConcurrentDictionary<Type, IObjectMapper> _enumerableMappers = new ConcurrentDictionary<Type, IObjectMapper>();
         private static ConcurrentDictionary<Type, Type> _elementTypes = new ConcurrentDictionary<Type, Type>();
-        private static Func<Type, Type> _findElementType = FindElementType;
+        private static readonly Func<Type, Type> _findElementType = FindElementType;
+        private static readonly Func<Type, IObjectMapper> _createMapper = CreateMapper;
+
+        public static IObjectMapper GetEnumerableMapper(Type enumerableType)
+        {
+            return _enumerableMappers.GetOrAdd(enumerableType, _createMapper);
+        }
 
         public static Type GetElementType(Type enumerableType)
         {
@@ -18,6 +25,13 @@ namespace AutoMapper.Mappers
                 return enumerableType.GetElementType();
             }
             return _elementTypes.GetOrAdd(enumerableType, _findElementType);
+        }
+
+        private static IObjectMapper CreateMapper(Type enumerableType)
+        {
+            var elementType = GetElementType(enumerableType);
+            var enumerableMapperType = typeof(EnumerableMapper<,>).MakeGenericType(enumerableType, elementType);
+            return (IObjectMapper)Activator.CreateInstance(enumerableMapperType);
         }
 
         private static Type FindElementType(Type enumerableType)
