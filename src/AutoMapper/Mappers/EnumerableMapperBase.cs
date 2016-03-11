@@ -16,10 +16,6 @@ namespace AutoMapper.Mappers
                 return null;
             }
 
-            ICollection enumerableValue = (context.SourceValue as ICollection) ??
-                                                          ((IEnumerable)context.SourceValue)?.Cast<object>().ToArray() ??
-                                                          new object[0];
-
             Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
             Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
@@ -30,7 +26,9 @@ namespace AutoMapper.Mappers
                 if (elementTypeMap == null)
                     return context.SourceValue;
             }
-
+            ICollection enumerableValue = (context.SourceValue as ICollection) ??
+                                                          ((IEnumerable)context.SourceValue)?.Cast<object>().ToArray() ??
+                                                          new object[0];
             var sourceLength = enumerableValue.Count;
             var destination = GetOrCreateDestinationObject(context, destElementType, sourceLength);
             var enumerable = GetEnumerableFor(destination);
