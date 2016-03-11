@@ -23,7 +23,7 @@ namespace AutoMapper.Mappers
             var sourceEnumerableValue = (IEnumerable)context.SourceValue ?? new object[0];
             IEnumerable<object> enumerableValue = sourceEnumerableValue.Cast<object>();
 
-            Type sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceEnumerableValue);
+            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
             Type genericDestDictType = context.DestinationType.GetDictionaryType();
             Type destKeyType = genericDestDictType.GetTypeInfo().GenericTypeArguments[0];
             Type destValueType = genericDestDictType.GetTypeInfo().GenericTypeArguments[1];

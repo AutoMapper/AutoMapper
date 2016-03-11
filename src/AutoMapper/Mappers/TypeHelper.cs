@@ -1,74 +1,45 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper.Mappers
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Configuration;
-
     public static class TypeHelper
     {
+        private static ConcurrentDictionary<Type, Type> _elementTypes = new ConcurrentDictionary<Type, Type>();
+        private static Func<Type, Type> _findElementType = FindElementType;
+
         public static Type GetElementType(Type enumerableType)
         {
-            return GetElementType(enumerableType, null);
-        }
-
-        public static Type GetElementType(Type enumerableType, IEnumerable enumerable)
-        {
-            if (enumerableType.HasElementType)
+            if(enumerableType.HasElementType)
             {
                 return enumerableType.GetElementType();
             }
+            return _elementTypes.GetOrAdd(enumerableType, _findElementType);
+        }
 
-            if (enumerableType.IsGenericType() &&
-                enumerableType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
-            {
-                return enumerableType.GetTypeInfo().GenericTypeArguments[0];
-            }
+        private static Type FindElementType(Type enumerableType)
+        {
+            return GetIEnumerableType(enumerableType)?.GenericTypeArguments[0] ?? typeof(object);
+        }
 
-            Type ienumerableType = GetIEnumerableType(enumerableType);
-            if (ienumerableType != null)
-            {
-                return ienumerableType.GetTypeInfo().GenericTypeArguments[0];
-            }
-
-            if (typeof (IEnumerable).IsAssignableFrom(enumerableType))
-            {
-                var first = enumerable?.Cast<object>().FirstOrDefault();
-
-                return first?.GetType() ?? typeof (object);
-            }
-
-            throw new ArgumentException($"Unable to find the element type for type '{enumerableType}'.", nameof(enumerableType));
+        public static bool IsGenericIEnumerable(this Type type)
+        {
+            return type.IsGenericType() && type.GetGenericTypeDefinition() == typeof(IEnumerable<>);
         }
 
         public static Type GetEnumerationType(Type enumType)
         {
-            if (enumType.IsNullableType())
-            {
-                enumType = enumType.GetTypeInfo().GenericTypeArguments[0];
-            }
-
-            if (!enumType.IsEnum())
-                return null;
-
-            return enumType;
+            enumType = Nullable.GetUnderlyingType(enumType) ?? enumType;
+            return enumType.IsEnum() ? enumType : null;
         }
 
         private static Type GetIEnumerableType(Type enumerableType)
         {
-            try
-            {
-                return enumerableType.GetTypeInfo().ImplementedInterfaces.FirstOrDefault(t => t.Name == "IEnumerable`1");
-            }
-            catch (AmbiguousMatchException)
-            {
-                if (enumerableType.BaseType() != typeof (object))
-                    return GetIEnumerableType(enumerableType.BaseType());
-
-                return null;
-            }
+            return new[] { enumerableType }.Concat(enumerableType.GetTypeInfo().ImplementedInterfaces)
+                    .FirstOrDefault(IsGenericIEnumerable);
         }
     }
 }
