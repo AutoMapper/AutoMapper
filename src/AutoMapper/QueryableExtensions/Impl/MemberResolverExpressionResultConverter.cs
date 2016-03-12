@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
@@ -62,7 +64,36 @@ namespace AutoMapper.QueryableExtensions.Impl
                 return base.VisitMember(node);
 
             var newObj = Visit(node.Expression);
-            var newMember = newParameter.Type.GetMember(node.Member.Name).First();
+            MemberInfo newMember = null;
+            if (newParameter.Type.GetTypeInfo().IsInterface)
+            {
+                // Type.GetMember() does not return inherited members when the type is an interface,
+                // regardless of the binding flags used.  See http://stackoverflow.com/q/2132791/239394.
+                var typesQueried = new HashSet<Type>();
+                var interfaceQueue = new Queue<Type>();
+                interfaceQueue.Enqueue(newParameter.Type);
+
+                while (newMember == null && interfaceQueue.Count > 0)
+                {
+                    var @interface = interfaceQueue.Dequeue();
+                    if (typesQueried.Add(@interface))
+                    {
+                        newMember = @interface.GetMember(node.Member.Name).FirstOrDefault();
+                        foreach (var inherited in @interface.GetTypeInfo().ImplementedInterfaces)
+                        {
+                            interfaceQueue.Enqueue(inherited);
+                        }
+                    }
+                }
+                if (newMember == null)
+                {
+                    throw new InvalidOperationException($"No member named {node.Member.Name} was found in the interface {newParameter.Type} or its inherited interfaces");
+                }
+            }
+            else
+            {
+                newMember = newParameter.Type.GetMember(node.Member.Name).First();
+            }
             return Expression.MakeMemberAccess(newObj, newMember);
         }
     }
