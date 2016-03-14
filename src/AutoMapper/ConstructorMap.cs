@@ -69,14 +69,15 @@ namespace AutoMapper
         public object ResolveValue(ResolutionContext context)
         {
             var ctorArgs = new object[CtorParams.Length];
+            var parameterContext = new ResolutionContext(context);
             for(int index = 0; index < CtorParams.Length; index++)
             {
-                ctorArgs[index] = Resolve(context, CtorParams[index]);
+                ctorArgs[index] = Resolve(context, parameterContext, CtorParams[index]);
             }
             return _runtimeCtor.Value(ctorArgs);
         }
 
-        private object Resolve(ResolutionContext context, ConstructorParameterMap map)
+        private object Resolve(ResolutionContext context, ResolutionContext parameterContext, ConstructorParameterMap map)
         {
             var result = map.ResolveValue(context);
 
@@ -92,7 +93,7 @@ namespace AutoMapper
             }
             else
             {
-                var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
+                var value = parameterContext.Map(result, null, sourceType, destinationType);
                 return value;
             }
         }
