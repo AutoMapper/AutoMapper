@@ -8,13 +8,13 @@ namespace AutoMapper
     /// </summary>
     /// <typeparam name="TSource">Source type for this member</typeparam>
     /// <typeparam name="TMember">Type for this member</typeparam>
-    public interface IMemberConfigurationExpression<TSource, out TMember>
+    public interface IMemberConfigurationExpression<TSource, TMember>
     {
         /// <summary>
         /// Substitute a custom value when the source member resolves as null
         /// </summary>
         /// <param name="nullSubstitute">Value to use</param>
-        void NullSubstitute(object nullSubstitute);
+        void NullSubstitute(TMember nullSubstitute);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver

@@ -104,6 +104,7 @@
     <Compile Include="Bug\AssertConfigurationIsValidNullables.cs" />
     <Compile Include="Bug\IncludeBaseInheritance.cs" />
     <Compile Include="Bug\IncludeInheritance.cs" />
+    <Compile Include="Bug\NullSubstituteType.cs" />
     <Compile Include="Bug\NullableResolveUsing.cs" />
     <Compile Include="Bug\NullableDateTime.cs" />
     <Compile Include="Bug\ProjectUsingTheQueriedEntity.cs" />
