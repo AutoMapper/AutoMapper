@@ -9,6 +9,30 @@ namespace AutoMapper.UnitTests
 {
     namespace InterfaceMapping
     {
+        public class When_mapping_base_interface_members
+        {
+            public interface ISource
+            {
+                int Id { get; set; }
+            }
+
+            public interface ITarget : ITargetBase
+            {
+                int Id { get; set; }
+            }
+
+            public interface ITargetBase
+            {
+                int BaseId { get; set; }
+            }
+
+            [Fact]
+            public void Should_find_inherited_members_by_name()
+            {
+                new MapperConfiguration(c=>c.CreateMap<ISource, ITarget>().ForMember("BaseId", opt => opt.Ignore()));
+            }
+        }
+
         public class When_mapping_to_existing_object_through_interfaces : AutoMapperSpecBase
         {
             private class2DTO _result;
