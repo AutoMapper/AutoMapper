@@ -178,22 +178,16 @@ namespace AutoMapper.Configuration
         public IMappingExpression<TSource, TDestination> ForMember(string name,
                                                                    Action<IMemberConfigurationExpression<TSource, object>> memberOptions)
         {
-            IMemberAccessor destMember = null;
-            var propertyInfo = DestinationType.GetProperty(name);
-            if (propertyInfo != null)
+            var memberInfo = new[] { DestinationType }
+                .RecursiveSelect(i => i.GetTypeInfo().ImplementedInterfaces)
+                .Distinct()
+                .Select(i => i.GetMember(name).FirstOrDefault())
+                .FirstOrDefault(m => m != null);
+            if(memberInfo == null)
             {
-                destMember = propertyInfo.ToMemberAccessor();
+                throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
             }
-            if (destMember == null)
-            {
-                var fieldInfo = DestinationType.GetField(name);
-                if(fieldInfo == null)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
-                }
-                destMember = fieldInfo.ToMemberAccessor();
-            }
-            ForDestinationMember(destMember, memberOptions);
+            ForDestinationMember(memberInfo.ToMemberAccessor(), memberOptions);
             return this;
         }
 
