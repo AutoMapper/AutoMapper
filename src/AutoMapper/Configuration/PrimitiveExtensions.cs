@@ -15,6 +15,20 @@ namespace AutoMapper.Configuration
             return value;
         }
 
+        public static MemberInfo GetFieldOrProperty(this Type type, string name)
+        {
+            var memberInfo = new[] { type }
+                .RecursiveSelect(i => i.GetTypeInfo().ImplementedInterfaces)
+                .Distinct()
+                .Select(i => i.GetMember(name).FirstOrDefault())
+                .FirstOrDefault(m => m != null);
+            if(memberInfo == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
+            }
+            return memberInfo;
+        }
+
         public static bool IsNullableType(this Type type)
         {
             return type.IsGenericType() && (type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)));
