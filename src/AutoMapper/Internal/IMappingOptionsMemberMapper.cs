@@ -180,7 +180,7 @@ namespace AutoMapper
         {
             return 
                 MemberNameReplacers.Select(r => nameToSearch.Replace(r.OriginalValue, r.NewValue))
-                    .Concat(new[] { MemberNameReplacers.Aggregate(nameToSearch, (s, r) => s.Replace(r.OriginalValue, r.NewValue)), nameToSearch })
+                    .Union(new[] { MemberNameReplacers.Aggregate(nameToSearch, (s, r) => s.Replace(r.OriginalValue, r.NewValue)), nameToSearch })
                     .ToList();
         }
     }
