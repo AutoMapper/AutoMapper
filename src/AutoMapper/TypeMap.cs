@@ -448,15 +448,10 @@ namespace AutoMapper
             {
                 return ctorExpr;
             }
-            Expression newExpression;
-            if(ConstructorMap?.CanResolve == true)
-            {
-                newExpression = ConstructorMap.NewExpression(instanceParameter);
-            }
-            else
-            {
-                newExpression = Expression.New(DestinationTypeOverride ?? DestinationType);
-            }
+            var newExpression = ConstructorMap?.CanResolve == true 
+                ? ConstructorMap.NewExpression(instanceParameter) 
+                : Expression.New(DestinationTypeOverride ?? DestinationType);
+
             return Expression.Lambda(newExpression);
         }
 
