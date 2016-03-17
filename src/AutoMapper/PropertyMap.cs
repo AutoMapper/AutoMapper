@@ -130,15 +130,16 @@ namespace AutoMapper
             {
                 if (_hasCondition)
                 {
-                    _mapperFunc = (mappedObject, context) => 
-                        DestinationProperty.SetValue(mappedObject, ShouldAssignValue(valueResolverFunc(mappedObject, context), GetDestinationValue(mappedObject), context) 
-                        ? valueResolverFunc(mappedObject, context) 
-                        : GetDestinationValue(mappedObject));
+                    var inner = valueResolverFunc;
+
+                    valueResolverFunc =
+                        (mappedObject, context) => 
+                        ShouldAssignValue(inner(mappedObject, context), GetDestinationValue(mappedObject), context) 
+                        ? inner(mappedObject, context) 
+                        : GetDestinationValue(mappedObject);
                 }
-                else
-                {
-                    _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(mappedObject, context));
-                }
+
+                _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(mappedObject, context));
             }
             else
             {
