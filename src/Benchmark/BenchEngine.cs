@@ -4,33 +4,32 @@ namespace Benchmark
 {
 	public class BenchEngine
 	{
-		private readonly IObjectToObjectMapper _mapper;
+		private readonly IBenchmarker _benchmarker;
 		private readonly string _mode;
 
-		public BenchEngine(IObjectToObjectMapper mapper, string mode)
+		public BenchEngine(IBenchmarker benchmarker, string mode)
 		{
-			_mapper = mapper;
+			_benchmarker = benchmarker;
 			_mode = mode;
 		}
-
 
 		public void Start()
 		{
 			var timer = new HiPerfTimer();
 
-			_mapper.Initialize();
-			_mapper.Map();
+			_benchmarker.Initialize();
+			_benchmarker.Execute();
 
 			timer.Start();
 
-			for (int i = 0; i < 1000000; i++)
+			for (int i = 0; i < _benchmarker.Iterations; i++)
 			{
-				_mapper.Map();
+				_benchmarker.Execute();
 			}
 
 			timer.Stop();
 
-			Console.WriteLine("{0}: - {1} - Mapping time: \t{2}s", _mapper.Name, _mode, timer.Duration);
+			Console.WriteLine("{0}: - {1} - Execution time: \t{2}s", _benchmarker.Name, _mode, timer.Duration);
 		}
 	}
 }

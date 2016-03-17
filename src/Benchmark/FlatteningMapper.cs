@@ -4,57 +4,57 @@ using AutoMapper;
 namespace Benchmark.Flattening
 {
 
-    public class CtorMapper : IObjectToObjectMapper
+    public class CtorMapper : ObjectMapperBase
     {
         private Model11 _model;
 
-        public string Name
+        public override string Name
         {
             get { return "CtorMapper"; }
         }
 
-        public void Initialize()
+        public override void Initialize()
         {
             Mapper.Initialize(cfg => cfg.CreateMap<Model11, Dto11>());
             _model = new Model11 { Value = 5 };
         }
 
-        public void Map()
+        public override void Map()
         {
             Mapper.Map<Model11, Dto11>(_model);
         }
     }
 
-    public class ManualCtorMapper : IObjectToObjectMapper
+    public class ManualCtorMapper : ObjectMapperBase
     {
         private Model11 _model;
 
-        public string Name
+        public override string Name
         {
             get { return "ManualCtorMapper"; }
         }
 
-        public void Initialize()
+        public override void Initialize()
         {
             _model = new Model11 {Value = 5};
         }
 
-        public void Map()
+        public override void Map()
         {
             Dto11 dto = new Dto11(_model.Value);
         }
     }
 
-    public class FlatteningMapper : IObjectToObjectMapper
+    public class FlatteningMapper : ObjectMapperBase
 	{
 		private ModelObject _source;
 
-		public string Name
+		public override string Name
 		{
 			get { return "AutoMapper"; }
 		}
 
-		public void Initialize()
+		public override void Initialize()
 		{
 			Mapper.Initialize(cfg =>
 			{
@@ -93,22 +93,22 @@ namespace Benchmark.Flattening
 				};
 		}
 
-		public void Map()
+		public override void Map()
 		{
 			Mapper.Map<ModelObject, ModelDto>(_source);
 		}
 	}
 
-	public class ManualMapper : IObjectToObjectMapper
+	public class ManualMapper : ObjectMapperBase
 	{
 		private ModelObject _source;
 
-		public string Name
+		public override string Name
 		{
 			get { return "Manual"; }
 		}
 
-		public void Initialize()
+		public override void Initialize()
 		{
 			_source = new ModelObject
 			{
@@ -132,7 +132,7 @@ namespace Benchmark.Flattening
 			};
 		}
 
-		public void Map()
+		public override void Map()
 		{
 			var destination = new ModelDto
 				{

@@ -71,10 +71,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateMap.cs" />
     <Compile Include="BenchEngine.cs" />
     <Compile Include="FlatteningMapper.cs" />
     <Compile Include="HiPerfTimer.cs" />
-    <Compile Include="IObjectToObjectMapper.cs" />
+    <Compile Include="IBenchmarker.cs" />
+    <Compile Include="ObjectMapperBase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
