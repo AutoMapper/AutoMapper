@@ -164,16 +164,7 @@ namespace AutoMapper
                 }
                 else
                 {
-                    _mapperFunc = (mappedObject, context) =>
-                    {
-                        var result = valueResolverFunc(mappedObject, context);
-
-                        var sourceType = result?.GetType() ?? SourceType ?? context.SourceType;
-
-                        object propertyValueToAssign = context.Mapper.Map(result, GetDestinationValue(mappedObject), sourceType, DestinationPropertyType, context);
-
-                        DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
-                    };
+                    _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, context.Mapper.Map(valueResolverFunc(mappedObject, context), GetDestinationValue(mappedObject), valueResolverFunc(mappedObject, context)?.GetType() ?? SourceType ?? context.SourceType, DestinationPropertyType, context));
                 }
             }
 
