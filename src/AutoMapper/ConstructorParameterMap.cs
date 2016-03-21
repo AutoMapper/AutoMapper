@@ -9,7 +9,7 @@ namespace AutoMapper
 
     public class ConstructorParameterMap
     {
-        public ConstructorParameterMap(ParameterInfo parameter, IValueResolver[] sourceResolvers, bool canResolve)
+        public ConstructorParameterMap(ParameterInfo parameter, IMemberResolver[] sourceResolvers, bool canResolve)
         {
             Parameter = parameter;
             SourceResolvers = sourceResolvers;
@@ -18,7 +18,7 @@ namespace AutoMapper
 
         public ParameterInfo Parameter { get; private set; }
 
-        public IValueResolver[] SourceResolvers { get; private set; }
+        public IMemberResolver[] SourceResolvers { get; private set; }
 
         public bool CanResolve { get; set; }
 
@@ -32,7 +32,7 @@ namespace AutoMapper
             return source;
         }
 
-        public void ResolveUsing(params IValueResolver[] resolvers)
+        public void ResolveUsing(params IMemberResolver[] resolvers)
         {
             SourceResolvers = resolvers;
         }

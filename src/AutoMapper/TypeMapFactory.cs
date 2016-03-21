@@ -18,7 +18,7 @@ namespace AutoMapper
 
             foreach (var destProperty in destTypeInfo.PublicWriteAccessors)
             {
-                var resolvers = new LinkedList<IValueResolver>();
+                var resolvers = new LinkedList<IMemberGetter>();
 
                 if (MapDestinationPropertyToSource(options, sourceTypeInfo, destProperty.DeclaringType, destProperty.GetMemberType(), destProperty.Name, resolvers))
                 {
@@ -40,7 +40,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<IValueResolver> members)
+        private bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceTypeInfo, Type destType, Type destMemberType, string destMemberInfo, LinkedList<IMemberGetter> members)
         {
             return options.MemberConfigurations.Any(_ => _.MapDestinationPropertyToSource(options, sourceTypeInfo, destType, destMemberType, destMemberInfo, members));
         }
@@ -55,7 +55,7 @@ namespace AutoMapper
 
             foreach (var parameter in ctorParameters)
             {
-                var resolvers = new LinkedList<IValueResolver>();
+                var resolvers = new LinkedList<IMemberGetter>();
 
                 var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
                 if(!canResolve && parameter.HasDefaultValue)
@@ -63,7 +63,7 @@ namespace AutoMapper
                     canResolve = true;
                 }
 
-                var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), canResolve);
+                var param = new ConstructorParameterMap(parameter, resolvers.Cast<IMemberResolver>().ToArray(), canResolve);
 
                 parameters.Add(param);
             }

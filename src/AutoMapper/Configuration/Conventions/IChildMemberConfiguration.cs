@@ -5,6 +5,6 @@ namespace AutoMapper.Configuration.Conventions
 
     public interface IChildMemberConfiguration
     {
-        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IValueResolver> resolvers, IMemberConfiguration parent);
+        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IMemberGetter> resolvers, IMemberConfiguration parent);
     }
 }

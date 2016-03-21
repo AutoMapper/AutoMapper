@@ -10,7 +10,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public ExpressionResolutionResult GetExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
         {
-            return ExpressionResolutionResult(expressionResolutionResult, (valueResolver as IExpressionResolver).Expression);
+            return ExpressionResolutionResult(expressionResolutionResult, ((IMemberResolver) valueResolver).GetExpression);
         }
 
         private static ExpressionResolutionResult ExpressionResolutionResult(
@@ -35,7 +35,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
             IValueResolver valueResolver)
         {
-            return valueResolver is IExpressionResolver;
+            return valueResolver is IMemberResolver;
         }
     }
 }

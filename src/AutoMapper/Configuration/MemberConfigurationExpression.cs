@@ -35,10 +35,11 @@ namespace AutoMapper.Configuration
         public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
         {
             var resolver = new DeferredInstantiatedResolver(typeof(TValueResolver).BuildCtor<IValueResolver>());
+            var config = new ValueResolverConfiguration(typeof(TValueResolver));
 
             ResolveUsing(resolver);
 
-            var expression = new ResolutionExpression<TSource, TValueResolver>(_sourceType);
+            var expression = new ResolutionExpression<TSource, TValueResolver>(_sourceType, config);
 
             _propertyMapActions.Add(pm => expression.Configure(pm));
 
@@ -48,10 +49,11 @@ namespace AutoMapper.Configuration
         public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
         {
             var resolver = new DeferredInstantiatedResolver(valueResolverType.BuildCtor<IValueResolver>());
+            var config = new ValueResolverConfiguration(valueResolverType);
 
             ResolveUsing(resolver);
 
-            var expression = new ResolutionExpression<TSource>(_sourceType);
+            var expression = new ResolutionExpression<TSource>(_sourceType, config);
 
             _propertyMapActions.Add(pm => expression.Configure(pm));
 
@@ -61,8 +63,9 @@ namespace AutoMapper.Configuration
         public IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver)
         {
             _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(valueResolver));
+            var config = new ValueResolverConfiguration(valueResolver);
 
-            var expression = new ResolutionExpression<TSource>(_sourceType);
+            var expression = new ResolutionExpression<TSource>(_sourceType, config);
 
             _propertyMapActions.Add(pm => expression.Configure(pm));
 
@@ -71,12 +74,24 @@ namespace AutoMapper.Configuration
 
         public void ResolveUsing<TSourceMember>(Func<TSource, TSourceMember> resolver)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new ExpressionBasedResolver<TSource, TSourceMember>(s => resolver(s))));
+            _propertyMapActions.Add(pm =>
+            {
+                var expressionResolver = new ExpressionBasedResolver<TSource, TSourceMember>(s => resolver(s));
+
+                Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (s, c) => resolver(s);
+                pm.AssignCustomExpression(expr);
+                pm.AssignCustomValueResolver(expressionResolver);
+            });
         }
 
         public void ResolveUsing<TSourceMember>(Func<TSource, ResolutionContext, TSourceMember> resolver)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TSourceMember>((o, c) => resolver((TSource)o, c))));
+            _propertyMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (o, c) => resolver(o, c);
+                pm.AssignCustomExpression(expr);
+                pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TSourceMember>((o, c) => resolver((TSource) o, c)));
+            });
         }
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
@@ -115,12 +130,20 @@ namespace AutoMapper.Configuration
 
         public void UseValue(object value)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, object>((o, c) => value)));
+            _propertyMapActions.Add(pm =>
+            {
+                pm.AssignCustomValue(value);
+                pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, object>((o, c) => value));
+            });
         }
 
         public void Condition(Func<TSource, object, TMember, ResolutionContext, bool> condition)
         {
-            _propertyMapActions.Add(pm => pm.ApplyCondition((src, dest, ctxt) => condition((TSource)ctxt.SourceValue, src, (TMember)dest, ctxt)));
+            _propertyMapActions.Add(pm =>
+            {
+                //Func<TSource, object, TMember, ResolutionContext, bool> (src)
+                pm.ApplyCondition((src, dest, ctxt) => condition((TSource) ctxt.SourceValue, src, (TMember) dest, ctxt));
+            });
         }
 
         public void Condition(Func<TSource, object, TMember, bool> condition)

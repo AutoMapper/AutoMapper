@@ -13,6 +13,25 @@ namespace AutoMapper
     using Configuration;
     using Execution;
 
+    public class ValueResolverConfiguration
+    {
+        public IValueResolver Instance { get; private set; }
+        public Type Type { get; private set; }
+        public LambdaExpression SourceMember { get; set; }
+        public string SourceMemberName { get; set; }
+        public Func<IValueResolver> Constructor { get; set; }
+
+        public ValueResolverConfiguration(Type type)
+        {
+            Type = type;
+        }
+
+        public ValueResolverConfiguration(IValueResolver instance)
+        {
+            Instance = instance;
+        }
+    }
+
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
@@ -27,9 +46,9 @@ namespace AutoMapper
         private bool _hasCondition;
         private Func<ResolutionContext, bool> _preCondition = _ => true;
         private bool _hasPreCondition;
-        private Func<ResolutionContext, object> _valueResolverFunc;
         private Action<object, ResolutionContext> _mapperFunc;
         private MemberInfo _sourceMember;
+        private bool _hasCustomValue;
 
         public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
@@ -79,7 +98,9 @@ namespace AutoMapper
 
         public bool ExplicitExpansion { get; set; }
 
+        public object CustomValue { get; private set; }
         public object NullSubstitute { get; private set; }
+        public ValueResolverConfiguration ValueResolverConfig { get; set; }
 
         public IEnumerable<IValueResolver> GetSourceValueResolvers()
         {
@@ -122,51 +143,34 @@ namespace AutoMapper
 
             Func<object, ResolutionContext, object> valueResolverFunc = BuildValueResolverFunc(resolvers);
 
-            if (SourceType != null
-                && (!SourceType.IsEnumerableType() || SourceType == typeof(string))
-                && typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) == null
-                && ((EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) && !EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) || !EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
-                && DestinationPropertyType.IsAssignableFrom(SourceType))
-            {
-                if (_hasCondition)
-                {
-                    var inner = valueResolverFunc;
+            var original = valueResolverFunc;
 
-                    valueResolverFunc =
-                        (mappedObject, context) => 
-                        ShouldAssignValue(inner(mappedObject, context), GetDestinationValue(mappedObject), context) 
-                        ? inner(mappedObject, context) 
+            if (SourceType == null 
+                || (SourceType.IsEnumerableType() && SourceType != typeof (string)) 
+                || typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) != null 
+                || ((!EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) ||
+                  EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) &&
+                 EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
+                || !DestinationPropertyType.IsAssignableFrom(SourceType))
+            {
+                valueResolverFunc =
+                    (mappedObject, context) =>
+                        context.Mapper.Map(original(mappedObject, context), GetDestinationValue(mappedObject),
+                            original(mappedObject, context)?.GetType() ?? SourceType ?? context.SourceType,
+                            DestinationPropertyType, context);
+            }
+
+            if (_hasCondition)
+            {
+                var inner = valueResolverFunc;
+
+                valueResolverFunc = (mappedObject, context) =>
+                    ShouldAssignValue(original(mappedObject, context), GetDestinationValue(mappedObject), context)
+                        ? inner(mappedObject, context)
                         : GetDestinationValue(mappedObject);
-                }
-
-                _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(mappedObject, context));
             }
-            else
-            {
-                if (_hasCondition)
-                {
-                    _mapperFunc = (mappedObject, context) =>
-                    {
-                        var result = valueResolverFunc(mappedObject, context);
 
-                        object destinationValue = GetDestinationValue(mappedObject);
-
-                        if (!ShouldAssignValue(result, destinationValue, context))
-                            return;
-
-                        var sourceType = result?.GetType() ?? SourceType ?? context.SourceType;
-
-                        object propertyValueToAssign = context.Mapper.Map(result, destinationValue, sourceType, DestinationPropertyType, context);
-
-                        DestinationProperty.SetValue(mappedObject, propertyValueToAssign);
-                    };
-
-                }
-                else
-                {
-                    _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, context.Mapper.Map(valueResolverFunc(mappedObject, context), GetDestinationValue(mappedObject), valueResolverFunc(mappedObject, context)?.GetType() ?? SourceType ?? context.SourceType, DestinationPropertyType, context));
-                }
-            }
+            _mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(mappedObject, context));
 
             if (_hasPreCondition)
             {
@@ -285,6 +289,12 @@ namespace AutoMapper
         public void SetNullSubstitute(object nullSubstitute)
         {
             NullSubstitute = nullSubstitute;
+        }
+
+        public void AssignCustomValue(object value)
+        {
+            CustomValue = value;
+            _hasCustomValue = true;
         }
 
         private void ResetSourceMemberChain()
@@ -424,5 +434,6 @@ namespace AutoMapper
                 return _oldExpression == node ? _newExpression : base.Visit(node);
             }
         }
+
     }
 }

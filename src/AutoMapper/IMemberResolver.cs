@@ -9,9 +9,4 @@ namespace AutoMapper
         LambdaExpression GetExpression { get; }
         Type MemberType { get; }
     }
-
-    public interface IExpressionResolver : IMemberResolver
-    {
-        LambdaExpression Expression { get; }
-    }
 }

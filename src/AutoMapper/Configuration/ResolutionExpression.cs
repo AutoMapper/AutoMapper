@@ -10,15 +10,21 @@ namespace AutoMapper.Configuration
         IResolverConfigurationExpression
     {
         private readonly Type _sourceType;
+        private readonly ValueResolverConfiguration _config;
         private readonly List<Action<PropertyMap>> _propertyMapActions = new List<Action<PropertyMap>>();
 
-        public ResolutionExpression(Type sourceType)
+        public ResolutionExpression(Type sourceType, ValueResolverConfiguration config)
         {
             _sourceType = sourceType;
+            _config = config;
+
+            _propertyMapActions.Add(pm => pm.ValueResolverConfig = _config);
         }
 
         public void FromMember(Expression<Func<TSource, object>> sourceMember)
         {
+            _config.SourceMember = sourceMember;
+
             _propertyMapActions.Add(pm =>
             {
                 var body = sourceMember.Body as MemberExpression;
@@ -33,6 +39,8 @@ namespace AutoMapper.Configuration
 
         public void FromMember(string sourcePropertyName)
         {
+            _config.SourceMemberName = sourcePropertyName;
+
             _propertyMapActions.Add(pm =>
             {
                 pm.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
@@ -42,11 +50,15 @@ namespace AutoMapper.Configuration
 
         IResolutionExpression IResolverConfigurationExpression.ConstructedBy(Func<IValueResolver> constructor)
         {
+            _config.Constructor = constructor;
+
             return ConstructedBy(constructor);
         }
 
         public IResolutionExpression<TSource> ConstructedBy(Func<IValueResolver> constructor)
         {
+            _config.Constructor = constructor;
+
             _propertyMapActions.Add(pm => pm.ChainConstructorForResolver(new DeferredInstantiatedResolver(ctxt => constructor())));
 
             return this;
@@ -63,7 +75,7 @@ namespace AutoMapper.Configuration
 
     public class ResolutionExpression : ResolutionExpression<object>
     {
-        public ResolutionExpression(Type sourceType) : base(sourceType)
+        public ResolutionExpression(Type sourceType, ValueResolverConfiguration config) : base(sourceType, config)
         {
         }
     }
@@ -73,16 +85,21 @@ namespace AutoMapper.Configuration
         where TValueResolver : IValueResolver
     {
         private readonly Type _sourceType;
+        private readonly ValueResolverConfiguration _config;
         private readonly List<Action<PropertyMap>> _propertyMapActions = new List<Action<PropertyMap>>();
 
-        public ResolutionExpression(Type sourceType)
+        public ResolutionExpression(Type sourceType, ValueResolverConfiguration config)
         {
             _sourceType = sourceType;
+            _config = config;
+            _propertyMapActions.Add(pm => pm.ValueResolverConfig = _config);
         }
 
         public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(
             Expression<Func<TSource, object>> sourceMember)
         {
+            _config.SourceMember = sourceMember;
+
             _propertyMapActions.Add(pm =>
             {
                 var body = sourceMember.Body as MemberExpression;
@@ -99,6 +116,8 @@ namespace AutoMapper.Configuration
 
         public IResolverConfigurationExpression<TSource, TValueResolver> FromMember(string sourcePropertyName)
         {
+            _config.SourceMemberName = sourcePropertyName;
+
             _propertyMapActions.Add(pm =>
             {
                 pm.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
@@ -110,6 +129,8 @@ namespace AutoMapper.Configuration
 
         public IResolverConfigurationExpression<TSource, TValueResolver> ConstructedBy(Func<TValueResolver> constructor)
         {
+            _config.Constructor = () => constructor();
+
             _propertyMapActions.Add(pm => pm.ChainConstructorForResolver(new DeferredInstantiatedResolver(ctxt => constructor())));
 
             return this;

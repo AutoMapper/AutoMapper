@@ -23,15 +23,14 @@ namespace AutoMapper.Execution
             return result;
         }
     }
-    public class ExpressionBasedResolver<TSource, TMember> : IExpressionResolver
+    public class ExpressionBasedResolver<TSource, TMember> : IMemberResolver
     {
-        public LambdaExpression Expression { get; }
-        public LambdaExpression GetExpression => Expression;
+        public LambdaExpression GetExpression { get; }
         private readonly Func<TSource, TMember> _method;
 
         public ExpressionBasedResolver(Expression<Func<TSource, TMember>> expression)
         {
-            Expression = expression;
+            GetExpression = expression;
             _method = expression.Compile();
         }
 
