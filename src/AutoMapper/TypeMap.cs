@@ -116,9 +116,11 @@ namespace AutoMapper
             _inheritedMaps.Add(propertyMap);
         }
 
-        public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IValueResolver> resolvers)
+        public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IMemberGetter> resolvers)
         {
             var propertyMap = new PropertyMap(destProperty, this);
+
+            propertyMap.ChainMembers(resolvers);
 
             foreach (var resolver in resolvers)
             {

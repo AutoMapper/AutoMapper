@@ -37,6 +37,7 @@ namespace AutoMapper
     {
         private readonly TypeMap _typeMap;
         private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
+        private readonly List<IMemberGetter> _memberChain = new List<IMemberGetter>();
         private bool _ignored;
         private int _mappingOrder;
         private IValueResolver _customResolver;
@@ -68,6 +69,7 @@ namespace AutoMapper
                 {
                     ChainResolver(sourceValueResolver);
                 }
+                _memberChain.AddRange(inheritedMappedProperty._memberChain);
             }
             ApplyCondition(inheritedMappedProperty._condition);
             SetNullSubstitute(inheritedMappedProperty.NullSubstitute);
@@ -79,6 +81,8 @@ namespace AutoMapper
 
         public Type DestinationPropertyType => DestinationProperty.MemberType;
 
+        public IEnumerable<IMemberGetter> SourceMembers => _memberChain;
+
         public LambdaExpression CustomExpression { get; private set; }
 
         public Type SourceType { get; private set; }
@@ -87,7 +91,7 @@ namespace AutoMapper
         {
             get
             {
-                return _sourceMember ?? GetSourceValueResolvers().OfType<IMemberGetter>().LastOrDefault()?.MemberInfo;
+                return _sourceMember ?? _memberChain.LastOrDefault()?.MemberInfo;
             }
             internal set { _sourceMember = value; }
         }
@@ -101,6 +105,11 @@ namespace AutoMapper
         public object CustomValue { get; private set; }
         public object NullSubstitute { get; private set; }
         public ValueResolverConfiguration ValueResolverConfig { get; set; }
+
+        public void ChainMembers(IEnumerable<IMemberGetter> members)
+        {
+            _memberChain.AddRange(members);
+        }
 
         public IEnumerable<IValueResolver> GetSourceValueResolvers()
         {
