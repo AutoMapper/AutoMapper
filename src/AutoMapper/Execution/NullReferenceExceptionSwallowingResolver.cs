@@ -9,19 +9,19 @@ namespace AutoMapper
 
     public class NullReferenceExceptionSwallowingResolver : IMemberResolver
     {
-        private readonly IMemberResolver _inner;
+
         private static readonly ExpressionVisitor Visitor = new IfNotNullVisitor();
 
         public NullReferenceExceptionSwallowingResolver(IMemberResolver inner)
         {
-            _inner = inner;
+            Inner = inner;
         }
 
         public object Resolve(object source, ResolutionContext context)
         {
             try
             {
-                return _inner.Resolve(source, context);
+                return Inner.Resolve(source, context);
             }
             catch (NullReferenceException)
             {
@@ -29,8 +29,9 @@ namespace AutoMapper
             }
         }
 
-        public LambdaExpression GetExpression => Visitor.Visit(_inner.GetExpression) as LambdaExpression;
-        public Type MemberType => _inner.MemberType;
+        public IMemberResolver Inner { get; }
+        public LambdaExpression GetExpression => Visitor.Visit(Inner.GetExpression) as LambdaExpression;
+        public Type MemberType => Inner.MemberType;
 
         private class IfNotNullVisitor : ExpressionVisitor
         {

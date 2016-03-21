@@ -57,6 +57,15 @@ namespace AutoMapper.QueryableExtensions.Impl
                 }
                 return node;
             }
+
+            protected override Expression VisitConditional(ConditionalExpression node)
+            {
+                var equalsNull = Expression.Property(node.IfFalse, "HasValue");
+                var nullConst = Expression.Condition(equalsNull, Expression.Property(node.IfFalse, "Value"),
+                    Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+
+                return Expression.Condition(node.Test, Expression.Constant(_nullSubstitute), nullConst);
+            }
         }
     }
 }

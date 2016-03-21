@@ -176,7 +176,7 @@ namespace AutoMapper.QueryableExtensions
             Expression instanceParameter)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
-            foreach (var resolver in propertyMap.GetSourceValueResolvers())
+            foreach (var resolver in propertyMap.GetSourceValueResolvers().Select(r => r is NullReferenceExceptionSwallowingResolver ? ((NullReferenceExceptionSwallowingResolver)r).Inner : r))
             {
                 var matchingExpressionConverter =
                     ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
