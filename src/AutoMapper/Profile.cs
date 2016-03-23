@@ -267,7 +267,7 @@ namespace AutoMapper
 
         private void Configure(TypeMapRegistry typeMapRegistry, TypeMap typeMap)
         {
-            foreach (var action in _allTypeMapActions)
+            foreach(var action in _allTypeMapActions)
             {
                 var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
 
@@ -276,27 +276,26 @@ namespace AutoMapper
                 expression.Configure(this, typeMap);
             }
 
-            foreach (var baseMap in typeMap.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
-            {
-                var currentMap = baseMap;
-                while (currentMap != null)
-                {
-                    currentMap.IncludeDerivedTypes(typeMap.SourceType, typeMap.DestinationType);
-                    typeMap.ApplyInheritedMap(currentMap);
-
-                    currentMap = typeMapRegistry.GetTypeMap(new TypePair(currentMap.SourceType.BaseType(), currentMap.DestinationType.BaseType()));
-                }
-
-            }
-            ApplyInheritedMaps(typeMapRegistry, typeMap, typeMap);
+            ApplyBaseMaps(typeMapRegistry, typeMap, typeMap);
+            ApplyDerivedMaps(typeMapRegistry, typeMap, typeMap);
         }
 
-        private void ApplyInheritedMaps(TypeMapRegistry typeMapRegistry, TypeMap baseMap, TypeMap typeMap)
+        private static void ApplyBaseMaps(TypeMapRegistry typeMapRegistry, TypeMap derivedMap, TypeMap currentMap)
+        {
+            foreach(var baseMap in currentMap.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
+            {
+                baseMap.IncludeDerivedTypes(currentMap.SourceType, currentMap.DestinationType);
+                derivedMap.ApplyInheritedMap(baseMap);
+                ApplyBaseMaps(typeMapRegistry, derivedMap, baseMap);
+            }
+        }
+
+        private void ApplyDerivedMaps(TypeMapRegistry typeMapRegistry, TypeMap baseMap, TypeMap typeMap)
         {
             foreach (var inheritedTypeMap in typeMap.IncludedDerivedTypes.Select(typeMapRegistry.GetTypeMap).Where(map => map != null))
             {
                 inheritedTypeMap.ApplyInheritedMap(baseMap);
-                ApplyInheritedMaps(typeMapRegistry, baseMap, inheritedTypeMap);
+                ApplyDerivedMaps(typeMapRegistry, baseMap, inheritedTypeMap);
             }
         }
 

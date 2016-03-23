@@ -211,8 +211,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MappingExceptions.cs" />
+    <Compile Include="MappingInheritance\ApplyIncludeBaseRecursively.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludeBaseShouldNotCreateMaps.cs" />
     <Compile Include="MappingInheritance\MapToBaseClass.cs" />
     <Compile Include="MappingInheritance\GenericsAndInterfaces.cs" />
     <Compile Include="MappingInheritance\IncludeBaseBug.cs" />
