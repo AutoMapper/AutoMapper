@@ -641,7 +641,7 @@ namespace AutoMapper
 #else
                     destinationType = new ProxyGenerator().GetProxyType(destinationType);
 
-                    return ObjectCreator.DelegateFactory.CreateCtor(destinationType)();
+                    return Expression.Lambda<Func<ResolutionContext, object>>(ObjectCreator.DelegateFactory.CreateCtor(destinationType), Expression.Parameter(typeof(ResolutionContext))).Compile();
 #endif
                 };
             }
@@ -652,9 +652,7 @@ namespace AutoMapper
             if (DestinationType.IsGenericTypeDefinition())
                 return _ => null;
 
-            var ctor = ObjectCreator.DelegateFactory.CreateCtor(DestinationType);
-
-            return context => ctor();
+            return Expression.Lambda<Func<ResolutionContext, object>>(ObjectCreator.DelegateFactory.CreateCtor(DestinationType), Expression.Parameter(typeof(ResolutionContext))).Compile();
         }
     }
 }
