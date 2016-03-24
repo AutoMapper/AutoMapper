@@ -123,30 +123,6 @@ namespace AutoMapper.UnitTests
 		}
 
         [Fact]
-		public void Test_with_create_ctor()
-		{
-			var sourceType = typeof(Source);
-
-			LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
-
-			var target = ctor();
-
-			target.ShouldBeType<Source>();
-		}
-
-		[Fact]
-		public void Test_with_value_object_create_ctor()
-		{
-			var sourceType = typeof(ValueSource);
-
-			LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
-
-			var target = ctor();
-
-			target.ShouldBeType<ValueSource>();
-		}
-
-        [Fact]
         public void Create_ctor_should_throw_when_default_constructor_is_missing()
         {
             var type = typeof(NoDefaultConstructor);
