@@ -634,8 +634,10 @@ namespace AutoMapper
             if (DestinationType.IsInterface())
             {
 #if PORTABLE
-                
-                return context => throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+                return context =>
+                {
+                    throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+                };
 #else
                 var destinationType = new ProxyGenerator().GetProxyType(DestinationType);
                 return Expression.Lambda<Func<ResolutionContext, object>>(ObjectCreator.DelegateFactory.CreateCtor(destinationType), Expression.Parameter(typeof(ResolutionContext))).Compile();
