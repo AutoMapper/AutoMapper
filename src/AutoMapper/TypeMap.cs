@@ -639,8 +639,11 @@ namespace AutoMapper
                     throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
                 };
 #else
-                var destinationType = new ProxyGenerator().GetProxyType(DestinationType);
-                return Expression.Lambda<Func<ResolutionContext, object>>(ObjectCreator.DelegateFactory.CreateCtor(destinationType), Expression.Parameter(typeof(ResolutionContext))).Compile();
+                return context =>
+                {
+                    var destinationType = new ProxyGenerator().GetProxyType(DestinationType);
+                    return Expression.Lambda<Func<object>>(ObjectCreator.DelegateFactory.CreateCtor(destinationType)).Compile()();
+                };
 #endif
             }
 
