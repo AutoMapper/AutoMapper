@@ -633,17 +633,13 @@ namespace AutoMapper
 
             if (DestinationType.IsInterface())
             {
-                var destinationType = DestinationType;
-                return context =>
-                {
 #if PORTABLE
-                    throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
+                
+                return context => throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
 #else
-                    destinationType = new ProxyGenerator().GetProxyType(destinationType);
-
-                    return Expression.Lambda<Func<ResolutionContext, object>>(ObjectCreator.DelegateFactory.CreateCtor(destinationType), Expression.Parameter(typeof(ResolutionContext))).Compile();
+                var destinationType = new ProxyGenerator().GetProxyType(DestinationType);
+                return Expression.Lambda<Func<ResolutionContext, object>>(ObjectCreator.DelegateFactory.CreateCtor(destinationType), Expression.Parameter(typeof(ResolutionContext))).Compile();
 #endif
-                };
             }
 
             if (DestinationType.IsAbstract())
