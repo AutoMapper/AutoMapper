@@ -78,8 +78,7 @@ namespace AutoMapper.Configuration
             {
                 var expressionResolver = new ExpressionBasedResolver<TSource, TSourceMember>(s => resolver(s));
 
-                Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (s, c) => resolver(s);
-                pm.AssignCustomExpression(expr);
+                pm.AssignCustomExpression<TSource, TSourceMember>((s, c) => resolver(s));
                 pm.AssignCustomValueResolver(expressionResolver);
             });
         }
@@ -88,8 +87,7 @@ namespace AutoMapper.Configuration
         {
             _propertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (o, c) => resolver(o, c);
-                pm.AssignCustomExpression(expr);
+                pm.AssignCustomExpression(resolver);
                 pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TSourceMember>((o, c) => resolver((TSource) o, c)));
             });
         }
@@ -115,7 +113,11 @@ namespace AutoMapper.Configuration
 
             var lambda = Expression.Lambda<Func<TSource, TSourceMember>>(prop, par);
 
-            _propertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(lambda));
+            _propertyMapActions.Add(pm =>
+            {
+                pm.SourceMemberName = sourceMember;
+                pm.SetCustomValueResolverExpression(lambda);
+            });
         }
 
         public void MapFrom(string sourceMember)
