@@ -194,9 +194,13 @@ namespace AutoMapper
             {
                 valueResolverFunc =
                     (mappedObject, context) =>
-                        context.Mapper.Map(original(mappedObject, context), GetDestinationValue(mappedObject),
-                            original(mappedObject, context)?.GetType() ?? SourceType ?? context.SourceType,
+                    {
+                        var source = original(mappedObject, context);
+
+                        return context.Mapper.Map(source, GetDestinationValue(mappedObject),
+                            source?.GetType() ?? SourceType ?? context.SourceType,
                             DestinationPropertyType, context);
+                    };
             }
 
             if (_hasCondition)
@@ -347,7 +351,7 @@ namespace AutoMapper
             else if (!_typeMap.Profile.AllowNullDestinationValues)
             {
                 var inner = valueResolverFunc;
-                valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(DestinationPropertyType);
+                valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(SourceType ?? DestinationPropertyType);
             }
 
             return (src, ctxt) => valueResolverFunc(ctxt);
