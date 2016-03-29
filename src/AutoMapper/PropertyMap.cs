@@ -51,6 +51,7 @@ namespace AutoMapper
         private Action<object, ResolutionContext> _mapperFunc;
         private MemberInfo _sourceMember;
         private bool _hasCustomValue;
+        private LambdaExpression _customExpression;
 
         public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
@@ -71,7 +72,15 @@ namespace AutoMapper
 
         public IEnumerable<IMemberGetter> SourceMembers => _memberChain;
 
-        public LambdaExpression CustomExpression { get; private set; }
+        public LambdaExpression CustomExpression
+        {
+            get { return _customExpression; }
+            private set
+            {
+                _customExpression = value;
+                SourceType = value?.ReturnType;
+            }
+        }
 
         public Type SourceType { get; private set; }
 
@@ -81,7 +90,11 @@ namespace AutoMapper
             {
                 return _sourceMember ?? _memberChain.LastOrDefault()?.MemberInfo;
             }
-            internal set { _sourceMember = value; }
+            internal set
+            {
+                _sourceMember = value;
+                SourceType = value?.GetMemberType();
+            }
         }
 
         public bool UseDestinationValue { get; set; }
@@ -97,7 +110,9 @@ namespace AutoMapper
 
         public void ChainMembers(IEnumerable<IMemberGetter> members)
         {
-            _memberChain.AddRange(members);
+            var getters = members as IList<IMemberGetter> ?? members.ToList();
+            _memberChain.AddRange(getters);
+            SourceType = getters.LastOrDefault()?.MemberType;
         }
 
         public IEnumerable<IValueResolver> GetSourceValueResolvers()
@@ -115,11 +130,6 @@ namespace AutoMapper
 
             if (NullSubstitute != null)
                 yield return new NullReplacementMethod(NullSubstitute);
-        }
-
-        public void RemoveLastResolver()
-        {
-            _sourceValueResolvers.RemoveLast();
         }
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
@@ -152,6 +162,7 @@ namespace AutoMapper
             {
                 SetMappingOrder(inheritedMappedProperty._mappingOrder);
             }
+            SourceType = SourceType ?? inheritedMappedProperty.SourceType;
         }
 
         internal void Seal(TypeMapRegistry typeMapRegistry)
@@ -160,10 +171,6 @@ namespace AutoMapper
             {
                 return;
             }
-
-            SourceType = _memberChain.LastOrDefault()?.MemberType 
-                ?? _sourceValueResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType
-                ?? CustomExpression?.ReturnType;
 
             if (!CanResolveValue())
             {
@@ -353,6 +360,7 @@ namespace AutoMapper
         {
             //Expression<Func<TSource, ResolutionContext, TMember>> expr = (s, c) => resolverFunc(s, c);
             _customResolverFunc = (s, c) => resolverFunc((TSource) s, c);
+            SourceType = typeof (TMember);
             //AssignCustomExpression(expr);
         }
 
