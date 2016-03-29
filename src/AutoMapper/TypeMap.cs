@@ -252,7 +252,7 @@ namespace AutoMapper
 
             foreach (var inheritedTypeMap in _inheritedTypeMaps)
             {
-                inheritedTypeMap.Seal(typeMapRegistry);
+                //inheritedTypeMap.Seal(typeMapRegistry);
                 ApplyInheritedTypeMap(inheritedTypeMap);
             }
 
@@ -265,8 +265,8 @@ namespace AutoMapper
             {
                 pm.Seal(typeMapRegistry);
             }
-            foreach (var inheritedMap in _inheritedMaps)
-                inheritedMap.Seal(typeMapRegistry);
+            //foreach (var inheritedMap in _inheritedMaps)
+            //    inheritedMap.Seal(typeMapRegistry);
 
             _mapperFunc = BuildMapperFunc();
 
@@ -421,13 +421,11 @@ namespace AutoMapper
                     .SingleOrDefault(m =>
                         m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
 
-                if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver && !conventionPropertyMap.HasCustomValueResolver)
+                if (conventionPropertyMap != null)
                 {
-                    conventionPropertyMap.AssignCustomValueResolver(
-                        inheritedMappedProperty.GetSourceValueResolvers().First());
-                    conventionPropertyMap.AssignCustomExpression(inheritedMappedProperty.CustomExpression);
+                    conventionPropertyMap.ApplyInheritedPropertyMap(inheritedMappedProperty);
                 }
-                else if (conventionPropertyMap == null)
+                else
                 {
                     var propertyMap = new PropertyMap(inheritedMappedProperty, this);
 

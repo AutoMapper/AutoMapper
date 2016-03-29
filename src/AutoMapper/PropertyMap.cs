@@ -62,21 +62,7 @@ namespace AutoMapper
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
             : this(inheritedMappedProperty.DestinationProperty, typeMap)
         {
-            if (inheritedMappedProperty.IsIgnored())
-                Ignore();
-            else
-            {
-                foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
-                {
-                    ChainResolver(sourceValueResolver);
-                }
-                _memberChain.AddRange(inheritedMappedProperty._memberChain);
-            }
-            ApplyCondition(inheritedMappedProperty._condition);
-            SetNullSubstitute(inheritedMappedProperty.NullSubstitute);
-            SetMappingOrder(inheritedMappedProperty._mappingOrder);
-            CustomExpression = inheritedMappedProperty.CustomExpression;
-            _customResolverFunc = inheritedMappedProperty._customResolverFunc;
+            ApplyInheritedPropertyMap(inheritedMappedProperty);
         }
 
         public IMemberAccessor DestinationProperty { get; }
@@ -134,6 +120,38 @@ namespace AutoMapper
         public void RemoveLastResolver()
         {
             _sourceValueResolvers.RemoveLast();
+        }
+
+        public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
+        {
+            if (!CanResolveValue() && inheritedMappedProperty.IsIgnored())
+                Ignore();
+            else
+            {
+                foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
+                {
+                    ChainResolver(sourceValueResolver);
+                }
+                //if (inheritedMappedProperty._memberChain.Any())
+                //{
+                //    _memberChain.Clear();
+                //    _memberChain.AddRange(inheritedMappedProperty._memberChain);
+                //}
+            }
+            CustomExpression = CustomExpression ?? inheritedMappedProperty.CustomExpression;
+            _customResolverFunc = _customResolverFunc ?? inheritedMappedProperty._customResolverFunc;
+            if (!_hasCondition)
+            {
+                ApplyCondition(inheritedMappedProperty._condition);
+            }
+            if (NullSubstitute == null)
+            {
+                SetNullSubstitute(inheritedMappedProperty.NullSubstitute);
+            }
+            if (_mappingOrder == 0)
+            {
+                SetMappingOrder(inheritedMappedProperty._mappingOrder);
+            }
         }
 
         internal void Seal(TypeMapRegistry typeMapRegistry)
@@ -265,6 +283,7 @@ namespace AutoMapper
             {
                 var newParam = Expression.Parameter(typeof (object), "m");
                 var expr = new ConvertingVisitor(CustomExpression.Parameters[0], newParam).Visit(CustomExpression.Body);
+                expr = new IfNotNullVisitor().Visit(expr);
                 var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(expr, typeof (object)), newParam);
                 Func<object, object> mapFunc = lambda.Compile();
 
@@ -457,6 +476,8 @@ namespace AutoMapper
                     new ExpressionBasedResolver<TSource, TMember>(sourceMember)
                     )
                 );
+
+            _ignored = false;
         }
 
         public object GetDestinationValue(object mappedObject)
@@ -469,6 +490,19 @@ namespace AutoMapper
         public void MapValue(object mappedObject, ResolutionContext context)
         {
             _mapperFunc(mappedObject, context);
+        }
+
+        private class IfNotNullVisitor : ExpressionVisitor
+        {
+            private readonly IList<MemberExpression> AllreadyUpdated = new List<MemberExpression>();
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (AllreadyUpdated.Contains(node))
+                    return base.VisitMember(node);
+                AllreadyUpdated.Add(node);
+                var a = DelegateFactory.IfNotNullExpression(node);
+                return Visit(a);
+            }
         }
 
         private class ConvertingVisitor : ExpressionVisitor
