@@ -535,20 +535,21 @@ namespace AutoMapper
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                if (node.Expression == _oldParam)
-                {
-                    return Expression.MakeMemberAccess(Expression.Convert(_newParam, _oldParam.Type), node.Member);
-                }
-                return base.VisitMember(node);
+                return node.Expression == _oldParam 
+                    ? Expression.MakeMemberAccess(Expression.Convert(_newParam, _oldParam.Type), node.Member) 
+                    : base.VisitMember(node);
+            }
+
+            protected override Expression VisitParameter(ParameterExpression node)
+            {
+                return node == _oldParam ? _newParam : base.VisitParameter(node);
             }
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                if (node.Object == _oldParam)
-                {
-                    return Expression.Call(Expression.Convert(_newParam, _oldParam.Type), node.Method);
-                }
-                return base.VisitMethodCall(node);
+                return node.Object == _oldParam 
+                    ? Expression.Call(Expression.Convert(_newParam, _oldParam.Type), node.Method) 
+                    : base.VisitMethodCall(node);
             }
         }
 
