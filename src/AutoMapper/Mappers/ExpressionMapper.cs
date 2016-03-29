@@ -247,18 +247,7 @@
 
                 Func<Expression,IMemberGetter,Expression> getExpression = (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo);
 
-                //if (propertyMap.SourceMember.ToMemberGetter().MemberType.IsNullableType())
-                //{
-                //    var expression = getExpression;
-                //    getExpression = (current, memberGetter) => Expression.Call(expression.Invoke(current,memberGetter), "GetValueOrDefault", new Type[0], new Expression[0]);
-                //}
-                //else if (propertyMap.DestinationPropertyType.IsNullableType())
-                //{
-
-                //}
-
-                return propertyMap.GetSourceValueResolvers()
-                    .OfType<IMemberGetter>()
+                return propertyMap.SourceMembers
                     .Aggregate(replacedExpression, getExpression);
             }
 

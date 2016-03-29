@@ -1,28 +1,35 @@
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
+    using System.Reflection;    
 
     public class MemberGetterExpressionResultConverter : IExpressionResultConverter
     {
-        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap)
         {
-            return ExpressionResolutionResult(expressionResolutionResult, valueResolver);
+            return ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceMembers);
         }
 
         public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            ConstructorParameterMap propertyMap, IValueResolver valueResolver)
+            ConstructorParameterMap propertyMap)
         {
-            return ExpressionResolutionResult(expressionResolutionResult, valueResolver);
+            return ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceResolvers.Cast<IMemberGetter>());
         }
 
         private static ExpressionResolutionResult ExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
+            ExpressionResolutionResult expressionResolutionResult, IEnumerable<IMemberGetter> sourceMembers)
+        {
+            return sourceMembers.Aggregate(expressionResolutionResult, ExpressionResolutionResult);
+        }
+
+        private static ExpressionResolutionResult ExpressionResolutionResult(
+            ExpressionResolutionResult expressionResolutionResult, IMemberGetter getter)
         {
             Expression currentChild = expressionResolutionResult.ResolutionExpression;
             Type currentChildType;
-            var getter = (IMemberGetter) valueResolver;
             var memberInfo = getter.MemberInfo;
 
             var propertyInfo = memberInfo as PropertyInfo;
@@ -37,9 +44,14 @@ namespace AutoMapper.QueryableExtensions.Impl
             return new ExpressionResolutionResult(currentChild, currentChildType);
         }
 
-        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, IValueResolver valueResolver)
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap)
         {
-            return valueResolver is IMemberGetter;
+            return propertyMap.SourceMembers.Any();
+        }
+
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
+        {
+            return propertyMap.SourceResolvers.All(m => m is IMemberGetter);
         }
     }
 }

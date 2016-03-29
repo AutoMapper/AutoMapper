@@ -122,11 +122,6 @@ namespace AutoMapper
 
             propertyMap.ChainMembers(resolvers);
 
-            foreach (var resolver in resolvers)
-            {
-                propertyMap.ChainResolver(resolver);
-            }
-
             AddPropertyMap(propertyMap);
         }
 

@@ -4,7 +4,6 @@ using AutoMapper.QueryableExtensions.Impl;
 namespace AutoMapper
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -14,7 +13,7 @@ namespace AutoMapper
     {
         private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
         private readonly Lazy<LateBoundParamsCtor> _runtimeCtor;
-        public ConstructorInfo Ctor { get; private set; }
+        public ConstructorInfo Ctor { get; }
         internal ConstructorParameterMap[] CtorParams { get; }
 
         public ConstructorMap(ConstructorInfo ctor, ConstructorParameterMap[] ctorParams)
@@ -28,39 +27,25 @@ namespace AutoMapper
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
             new MemberGetterExpressionResultConverter(),
-            new ExpressionBasedResolverResultConverter(),
             new MemberResolverExpressionResultConverter(),
-            new NullSubstitutionExpressionResultConverter()
         };
 
-        public bool CanResolve
-        {
-            get
-            {
-                foreach(var param in CtorParams)
-                {
-                    if(!param.CanResolve)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
+        public bool CanResolve => CtorParams.All(param => param.CanResolve);
 
         public Expression NewExpression(Expression instanceParameter)
         {
             var parameters = CtorParams.Select(map =>
             {
                 var result = new ExpressionResolutionResult(instanceParameter, Ctor.DeclaringType);
-                foreach (var resolver in map.SourceResolvers)
-                {
-                    var matchingExpressionConverter =
-                        ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
-                    if (matchingExpressionConverter == null)
-                        throw new Exception("Can't resolve this to Queryable Expression");
-                    result = matchingExpressionConverter.GetExpressionResolutionResult(result, map, resolver);
-                }
+
+                var matchingExpressionConverter =
+                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, map));
+
+                if (matchingExpressionConverter == null)
+                    throw new Exception("Can't resolve this to Queryable Expression");
+
+                result = matchingExpressionConverter.GetExpressionResolutionResult(result, map);
+
                 return result;
             });
             return Expression.New(Ctor, parameters.Select(p => p.ResolutionExpression));

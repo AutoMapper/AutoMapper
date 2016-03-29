@@ -62,7 +62,6 @@ namespace AutoMapper.Configuration
 
         public IResolutionExpression<TSource> ResolveUsing(IValueResolver valueResolver)
         {
-            _propertyMapActions.Add(pm => pm.AssignCustomValueResolver(valueResolver));
             var config = new ValueResolverConfiguration(valueResolver);
 
             var expression = new ResolutionExpression<TSource>(_sourceType, config);
@@ -76,10 +75,7 @@ namespace AutoMapper.Configuration
         {
             _propertyMapActions.Add(pm =>
             {
-                var expressionResolver = new ExpressionBasedResolver<TSource, TSourceMember>(s => resolver(s));
-
                 pm.AssignCustomExpression<TSource, TSourceMember>((s, c) => resolver(s));
-                pm.AssignCustomValueResolver(expressionResolver);
             });
         }
 
@@ -88,7 +84,6 @@ namespace AutoMapper.Configuration
             _propertyMapActions.Add(pm =>
             {
                 pm.AssignCustomExpression(resolver);
-                pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, TSourceMember>((o, c) => resolver((TSource) o, c)));
             });
         }
 
@@ -127,23 +122,18 @@ namespace AutoMapper.Configuration
 
         public void UseValue<TValue>(TValue value)
         {
-            MapFrom(src => value);
+            _propertyMapActions.Add(pm => pm.AssignCustomValue(value));
         }
 
         public void UseValue(object value)
         {
-            _propertyMapActions.Add(pm =>
-            {
-                pm.AssignCustomValue(value);
-                pm.AssignCustomValueResolver(new DelegateBasedResolver<TSource, object>((o, c) => value));
-            });
+            _propertyMapActions.Add(pm => pm.AssignCustomValue(value));
         }
 
         public void Condition(Func<TSource, object, TMember, ResolutionContext, bool> condition)
         {
             _propertyMapActions.Add(pm =>
             {
-                //Func<TSource, object, TMember, ResolutionContext, bool> (src)
                 pm.ApplyCondition((src, dest, ctxt) => condition((TSource) ctxt.SourceValue, src, (TMember) dest, ctxt));
             });
         }

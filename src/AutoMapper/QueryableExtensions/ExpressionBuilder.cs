@@ -8,6 +8,7 @@ using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.QueryableExtensions
 {
+    using Configuration;
     using Execution;
 
     public interface IExpressionBuilder
@@ -22,10 +23,9 @@ namespace AutoMapper.QueryableExtensions
     {
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
+            new ExplicitValueExpressionResultConverter(), 
             new MemberGetterExpressionResultConverter(),
-            new ExpressionBasedResolverResultConverter(),
             new MemberResolverExpressionResultConverter(),
-            new NullSubstitutionExpressionResultConverter()
         };
 
         private static readonly IExpressionBinder[] Binders =
@@ -176,15 +176,62 @@ namespace AutoMapper.QueryableExtensions
             Expression instanceParameter)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
-            foreach (var resolver in propertyMap.GetSourceValueResolvers().Select(r => r is NullReferenceExceptionSwallowingResolver ? ((NullReferenceExceptionSwallowingResolver)r).Inner : r))
+
+            var matchingExpressionConverter =
+                ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
+            if (matchingExpressionConverter == null)
+                throw new Exception("Can't resolve this to Queryable Expression");
+            result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap);
+
+            if (propertyMap.NullSubstitute != null && result.Type.IsNullableType())
             {
-                var matchingExpressionConverter =
-                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
-                if (matchingExpressionConverter == null)
-                    throw new Exception("Can't resolve this to Queryable Expression");
-                result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, resolver);
+                Expression currentChild = result.ResolutionExpression;
+                Type currentChildType = result.Type;
+                var nullSubstitute = propertyMap.NullSubstitute;
+
+                var newParameter = result.ResolutionExpression;
+                var converter = new NullSubstitutionConversionVisitor(newParameter, nullSubstitute);
+
+                currentChild = converter.Visit(currentChild);
+                currentChildType = currentChildType.GetTypeOfNullable();
+
+                return new ExpressionResolutionResult(currentChild, currentChildType);
             }
+
             return result;
+        }
+
+        private class NullSubstitutionConversionVisitor : ExpressionVisitor
+        {
+            private readonly Expression newParameter;
+            private readonly object _nullSubstitute;
+
+            public NullSubstitutionConversionVisitor(Expression newParameter, object nullSubstitute)
+            {
+                this.newParameter = newParameter;
+                _nullSubstitute = nullSubstitute;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node == newParameter)
+                {
+                    var equalsNull = Expression.Property(newParameter, "HasValue");
+                    var nullConst = Expression.Condition(equalsNull, Expression.Property(newParameter, "Value"),
+                        Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+                    return nullConst;
+                }
+                return node;
+            }
+
+            protected override Expression VisitConditional(ConditionalExpression node)
+            {
+                var equalsNull = Expression.Property(node.IfFalse, "HasValue");
+                var nullConst = Expression.Condition(equalsNull, Expression.Property(node.IfFalse, "Value"),
+                    Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+
+                return Expression.Condition(node.Test, Expression.Constant(_nullSubstitute), nullConst);
+            }
         }
 
         private class ConstantExpressionReplacementVisitor : ExpressionVisitor

@@ -25,27 +25,14 @@ namespace AutoMapper.Configuration
         {
             _config.SourceMember = sourceMember;
 
-            _propertyMapActions.Add(pm =>
-            {
-                var body = sourceMember.Body as MemberExpression;
-                if (body != null)
-                {
-                    pm.SourceMember = body.Member;
-                }
-                var func = sourceMember.Compile();
-                pm.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource, object>((o, c) => func((TSource)o)));
-            });
+            //_propertyMapActions.Add(pm => pm.SourceMember = ((MemberExpression)sourceMember.Body).Member);
         }
 
         public void FromMember(string sourcePropertyName)
         {
             _config.SourceMemberName = sourcePropertyName;
 
-            _propertyMapActions.Add(pm =>
-            {
-                pm.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
-                pm.ChainTypeMemberForResolver(new PropertyNameResolver(_sourceType, sourcePropertyName));
-            });
+            //_propertyMapActions.Add(pm => pm.SourceMember = _sourceType.GetMember(sourcePropertyName)[0]);
         }
 
         IResolutionExpression IResolverConfigurationExpression.ConstructedBy(Func<IValueResolver> constructor)
@@ -59,7 +46,7 @@ namespace AutoMapper.Configuration
         {
             _config.Constructor = constructor;
 
-            _propertyMapActions.Add(pm => pm.ChainConstructorForResolver(new DeferredInstantiatedResolver(ctxt => constructor())));
+            //_propertyMapActions.Add(pm => pm.ChainConstructorForResolver(new DeferredInstantiatedResolver(ctxt => constructor())));
 
             return this;
         }
@@ -100,16 +87,16 @@ namespace AutoMapper.Configuration
         {
             _config.SourceMember = sourceMember;
 
-            _propertyMapActions.Add(pm =>
-            {
-                var body = sourceMember.Body as MemberExpression;
-                if (body != null)
-                {
-                    pm.SourceMember = body.Member;
-                }
-                var func = sourceMember.Compile();
-                pm.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource, object>((o, c) => func((TSource)o)));
-            });
+            //_propertyMapActions.Add(pm =>
+            //{
+            //    var body = sourceMember.Body as MemberExpression;
+            //    if (body != null)
+            //    {
+            //        pm.SourceMember = body.Member;
+            //    }
+            //    var func = sourceMember.Compile();
+            //    pm.ChainTypeMemberForResolver(new DelegateBasedResolver<TSource, object>((o, c) => func((TSource)o)));
+            //});
 
             return this;
         }
@@ -118,11 +105,11 @@ namespace AutoMapper.Configuration
         {
             _config.SourceMemberName = sourcePropertyName;
 
-            _propertyMapActions.Add(pm =>
-            {
-                pm.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
-                pm.ChainTypeMemberForResolver(new PropertyNameResolver(_sourceType, sourcePropertyName));
-            });
+            //_propertyMapActions.Add(pm =>
+            //{
+            //    pm.SourceMember = _sourceType.GetMember(sourcePropertyName)[0];
+            //    pm.ChainTypeMemberForResolver(new PropertyNameResolver(_sourceType, sourcePropertyName));
+            //});
 
             return this;
         }
@@ -131,7 +118,7 @@ namespace AutoMapper.Configuration
         {
             _config.Constructor = () => constructor();
 
-            _propertyMapActions.Add(pm => pm.ChainConstructorForResolver(new DeferredInstantiatedResolver(ctxt => constructor())));
+            //_propertyMapActions.Add(pm => pm.ChainConstructorForResolver(new DeferredInstantiatedResolver(ctxt => constructor())));
 
             return this;
         }

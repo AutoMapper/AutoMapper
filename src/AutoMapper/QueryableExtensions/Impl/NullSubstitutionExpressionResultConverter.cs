@@ -5,67 +5,29 @@ namespace AutoMapper.QueryableExtensions.Impl
     using Configuration;
     using Execution;
 
-    public class NullSubstitutionExpressionResultConverter : IExpressionResultConverter
+    public class ExplicitValueExpressionResultConverter : IExpressionResultConverter
     {
-        public ExpressionResolutionResult GetExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            PropertyMap propertyMap)
         {
-            Expression currentChild = expressionResolutionResult.ResolutionExpression;
-            Type currentChildType = expressionResolutionResult.Type;
-            var nullSubstitute = propertyMap.NullSubstitute;
-
-            var newParameter = expressionResolutionResult.ResolutionExpression;
-            var converter = new NullSubstitutionConversionVisitor(newParameter, nullSubstitute);
-
-            currentChild = converter.Visit(currentChild);
-            currentChildType = currentChildType.GetTypeOfNullable();
-
-            return new ExpressionResolutionResult(currentChild, currentChildType);
+            return new ExpressionResolutionResult(Expression.Constant(propertyMap.CustomValue), propertyMap.CustomValue.GetType());
         }
 
         public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            ConstructorParameterMap propertyMap, IValueResolver valueResolver)
+            ConstructorParameterMap propertyMap)
         {
             throw new NotImplementedException();
         }
 
-        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            IValueResolver valueResolver)
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap)
         {
-            return valueResolver is NullReplacementMethod && expressionResolutionResult.Type.IsNullableType();
+            return propertyMap.CustomValue != null;
         }
 
-        private class NullSubstitutionConversionVisitor : ExpressionVisitor
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap)
         {
-            private readonly Expression newParameter;
-            private readonly object _nullSubstitute;
-
-            public NullSubstitutionConversionVisitor(Expression newParameter, object nullSubstitute)
-            {
-                this.newParameter = newParameter;
-                _nullSubstitute = nullSubstitute;
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node == newParameter)
-                {
-                    var equalsNull = Expression.Property(newParameter, "HasValue");
-                    var nullConst = Expression.Condition(equalsNull, Expression.Property(newParameter, "Value"),
-                        Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
-                    return nullConst;
-                }
-                return node;
-            }
-
-            protected override Expression VisitConditional(ConditionalExpression node)
-            {
-                var equalsNull = Expression.Property(node.IfFalse, "HasValue");
-                var nullConst = Expression.Condition(equalsNull, Expression.Property(node.IfFalse, "Value"),
-                    Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
-
-                return Expression.Condition(node.Test, Expression.Constant(_nullSubstitute), nullConst);
-            }
+            return false;
         }
     }
 }
