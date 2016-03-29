@@ -78,7 +78,8 @@ namespace AutoMapper
             private set
             {
                 _customExpression = value;
-                SourceType = value?.ReturnType;
+                if (value != null)
+                    SourceType = value.ReturnType;
             }
         }
 
@@ -93,7 +94,8 @@ namespace AutoMapper
             internal set
             {
                 _sourceMember = value;
-                SourceType = value?.GetMemberType();
+                if (value != null)
+                    SourceType = value.GetMemberType();
             }
         }
 
@@ -150,7 +152,7 @@ namespace AutoMapper
             }
             CustomExpression = CustomExpression ?? inheritedMappedProperty.CustomExpression;
             _customResolverFunc = _customResolverFunc ?? inheritedMappedProperty._customResolverFunc;
-            if (!_hasCondition)
+            if (!_hasCondition && inheritedMappedProperty._hasCondition)
             {
                 ApplyCondition(inheritedMappedProperty._condition);
             }
