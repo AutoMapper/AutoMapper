@@ -343,37 +343,6 @@ namespace AutoMapper.Tests
 			dest.Values.ShouldEqual(default(EnumValues));
 		}
 	}
-	public class When_mapping_from_a_null_object_with_an_enum_on_a_nullable_enum : AutoMapperSpecBase
-	{
-	    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-	    {
-	        cfg.AllowNullDestinationValues = false;
-	        cfg.CreateMap<SourceClass, DestinationClass>();
-	    });
-
-		public enum EnumValues
-		{
-			One, Two, Three
-		}
-
-		public class DestinationClass
-		{
-			public EnumValues? Values { get; set; }
-		}
-
-		public class SourceClass
-		{
-			public EnumValues Values { get; set; }
-		}
-
-		[Fact]
-		public void Should_set_the_target_enum_to_null()
-		{
-			SourceClass sourceClass = null;
-			var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
-			dest.Values.ShouldEqual(null);
-		}
-	}
 	public class When_mapping_from_a_null_object_with_a_nullable_enum : AutoMapperSpecBase
 	{
 	    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>

@@ -161,7 +161,9 @@ namespace AutoMapper
                 return;
             }
 
-            SourceType = _memberChain.LastOrDefault()?.MemberType ?? _sourceValueResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType;
+            SourceType = _memberChain.LastOrDefault()?.MemberType 
+                ?? _sourceValueResolvers.OfType<IMemberResolver>().LastOrDefault()?.MemberType
+                ?? CustomExpression?.ReturnType;
 
             if (!CanResolveValue())
             {
@@ -309,13 +311,13 @@ namespace AutoMapper
                         Expression.Lambda(Expression.Convert(innerResolver.Body, typeof(object)), innerResolver.Parameters);
 
                 valueResolverFunc = outerResolver.Compile();
-
+                /*
                 if (!_typeMap.Profile.AllowNullDestinationValues)
                 {
                     var inner = valueResolverFunc;
 
                     valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(SourceType);
-                }
+                }*/
             }
             else
             {
@@ -332,6 +334,11 @@ namespace AutoMapper
             {
                 var inner = valueResolverFunc;
                 valueResolverFunc = ctxt => inner(ctxt) ?? NullSubstitute;
+            }
+            else if (!_typeMap.Profile.AllowNullDestinationValues)
+            {
+                var inner = valueResolverFunc;
+                valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(DestinationPropertyType);
             }
 
             return (src, ctxt) => valueResolverFunc(ctxt);
