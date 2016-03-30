@@ -433,49 +433,8 @@ namespace AutoMapper
             _mapperFunc(mappedObject, context);
         }
 
-        private class IfNotNullVisitor : ExpressionVisitor
-        {
-            private readonly IList<MemberExpression> AllreadyUpdated = new List<MemberExpression>();
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (AllreadyUpdated.Contains(node))
-                    return base.VisitMember(node);
-                AllreadyUpdated.Add(node);
-                var a = DelegateFactory.IfNotNullExpression(node);
-                return Visit(a);
-            }
-        }
 
-        private class ConvertingVisitor : ExpressionVisitor
-        {
-            private readonly ParameterExpression _newParam;
-            private readonly ParameterExpression _oldParam;
 
-            public ConvertingVisitor(ParameterExpression oldParam, ParameterExpression newParam)
-            {
-                _newParam = newParam;
-                _oldParam = oldParam;
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                return node.Expression == _oldParam 
-                    ? Expression.MakeMemberAccess(Expression.Convert(_newParam, _oldParam.Type), node.Member) 
-                    : base.VisitMember(node);
-            }
-
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                return node == _oldParam ? _newParam : base.VisitParameter(node);
-            }
-
-            protected override Expression VisitMethodCall(MethodCallExpression node)
-            {
-                return node.Object == _oldParam 
-                    ? Expression.Call(Expression.Convert(_newParam, _oldParam.Type), node.Method) 
-                    : base.VisitMethodCall(node);
-            }
-        }
 
         private class MemberFinderVisitor : ExpressionVisitor
         {
@@ -488,56 +447,98 @@ namespace AutoMapper
                 return base.VisitMember(node);
             }
         }
+    }
 
-        private class ExpressionConcatVisitor : ExpressionVisitor
+    internal class ConvertingVisitor : ExpressionVisitor
+    {
+        private readonly ParameterExpression _newParam;
+        private readonly ParameterExpression _oldParam;
+
+        public ConvertingVisitor(ParameterExpression oldParam, ParameterExpression newParam)
         {
-            private readonly LambdaExpression _overrideExpression;
-
-            public ExpressionConcatVisitor(LambdaExpression overrideExpression)
-            {
-                _overrideExpression = overrideExpression;
-            }
-            
-            public override Expression Visit(Expression node)
-            {
-                if (_overrideExpression == null)
-                    return node;
-                if (node.NodeType != ExpressionType.Lambda && node.NodeType != ExpressionType.Parameter)
-                {
-                    var expression = node;
-                    if (node.Type == typeof(object))
-                        expression = Expression.Convert(node, _overrideExpression.Parameters[0].Type);
-
-
-                    var a = new ReplaceExpressionVisitor(_overrideExpression.Parameters[0], expression);
-                    var b = a.Visit(_overrideExpression.Body);
-                    return b;
-                }
-                return base.Visit(node);
-            }
-
-            protected override Expression VisitLambda<T>(Expression<T> node)
-            {
-                return Expression.Lambda(Visit(node.Body), node.Parameters);
-            }
+            _newParam = newParam;
+            _oldParam = oldParam;
         }
 
-        private class ReplaceExpressionVisitor : ExpressionVisitor
+        protected override Expression VisitMember(MemberExpression node)
         {
-            private readonly Expression _oldExpression;
-            private readonly Expression _newExpression;
-
-            public ReplaceExpressionVisitor(Expression oldExpression, Expression newExpression)
-            {
-                _oldExpression = oldExpression;
-                _newExpression = newExpression;
-            }
-
-            public override Expression Visit(Expression node)
-            {
-                return _oldExpression == node ? _newExpression : base.Visit(node);
-            }
+            return node.Expression == _oldParam
+                ? Expression.MakeMemberAccess(Expression.Convert(_newParam, _oldParam.Type), node.Member)
+                : base.VisitMember(node);
         }
 
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            return node == _oldParam ? _newParam : base.VisitParameter(node);
+        }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            return node.Object == _oldParam
+                ? Expression.Call(Expression.Convert(_newParam, _oldParam.Type), node.Method)
+                : base.VisitMethodCall(node);
+        }
+    }
+
+    internal class IfNotNullVisitor : ExpressionVisitor
+    {
+        private readonly IList<MemberExpression> AllreadyUpdated = new List<MemberExpression>();
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            if (AllreadyUpdated.Contains(node))
+                return base.VisitMember(node);
+            AllreadyUpdated.Add(node);
+            var a = DelegateFactory.IfNotNullExpression(node);
+            return Visit(a);
+        }
+    }
+    internal class ReplaceExpressionVisitor : ExpressionVisitor
+    {
+        private readonly Expression _oldExpression;
+        private readonly Expression _newExpression;
+
+        public ReplaceExpressionVisitor(Expression oldExpression, Expression newExpression)
+        {
+            _oldExpression = oldExpression;
+            _newExpression = newExpression;
+        }
+
+        public override Expression Visit(Expression node)
+        {
+            return _oldExpression == node ? _newExpression : base.Visit(node);
+        }
+    }
+
+    internal class ExpressionConcatVisitor : ExpressionVisitor
+    {
+        private readonly LambdaExpression _overrideExpression;
+
+        public ExpressionConcatVisitor(LambdaExpression overrideExpression)
+        {
+            _overrideExpression = overrideExpression;
+        }
+
+        public override Expression Visit(Expression node)
+        {
+            if (_overrideExpression == null)
+                return node;
+            if (node.NodeType != ExpressionType.Lambda && node.NodeType != ExpressionType.Parameter)
+            {
+                var expression = node;
+                if (node.Type == typeof(object))
+                    expression = Expression.Convert(node, _overrideExpression.Parameters[0].Type);
+
+
+                var a = new ReplaceExpressionVisitor(_overrideExpression.Parameters[0], expression);
+                var b = a.Visit(_overrideExpression.Body);
+                return b;
+            }
+            return base.Visit(node);
+        }
+
+        protected override Expression VisitLambda<T>(Expression<T> node)
+        {
+            return Expression.Lambda(Visit(node.Body), node.Parameters);
+        }
     }
 }

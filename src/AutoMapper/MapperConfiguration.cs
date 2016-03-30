@@ -6,7 +6,6 @@ namespace AutoMapper
     using System.Linq;
     using System.Reflection;
     using Configuration;
-    using Configuration.Conventions;
     using Mappers;
     using QueryableExtensions;
     using QueryableExtensions.Impl;
@@ -22,7 +21,7 @@ namespace AutoMapper
         private readonly IList<Profile> _profiles = new List<Profile>();
         private readonly ConfigurationValidator _validator;
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
-        private Func<TypePair, TypeMap> _getTypeMap;
+        private readonly Func<TypePair, TypeMap> _getTypeMap;
 
 
         public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers)

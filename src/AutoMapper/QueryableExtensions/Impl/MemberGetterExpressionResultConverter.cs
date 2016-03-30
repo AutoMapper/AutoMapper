@@ -16,7 +16,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
             ConstructorParameterMap propertyMap)
         {
-            return ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceResolvers.Cast<IMemberGetter>());
+            return ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceMembers);
         }
 
         private static ExpressionResolutionResult ExpressionResolutionResult(
@@ -51,7 +51,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
         {
-            return propertyMap.SourceResolvers.All(m => m is IMemberGetter);
+            return propertyMap.SourceMembers.Any() && propertyMap.CustomExpression == null;
         }
     }
 }

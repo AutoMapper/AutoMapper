@@ -247,7 +247,6 @@ namespace AutoMapper
 
             foreach (var inheritedTypeMap in _inheritedTypeMaps)
             {
-                //inheritedTypeMap.Seal(typeMapRegistry);
                 ApplyInheritedTypeMap(inheritedTypeMap);
             }
 
@@ -260,8 +259,7 @@ namespace AutoMapper
             {
                 pm.Seal(typeMapRegistry);
             }
-            //foreach (var inheritedMap in _inheritedMaps)
-            //    inheritedMap.Seal(typeMapRegistry);
+            ConstructorMap?.Seal();
 
             _mapperFunc = BuildMapperFunc();
 

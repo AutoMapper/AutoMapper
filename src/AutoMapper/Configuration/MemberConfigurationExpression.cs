@@ -34,10 +34,7 @@ namespace AutoMapper.Configuration
 
         public IResolverConfigurationExpression<TSource, TValueResolver> ResolveUsing<TValueResolver>() where TValueResolver : IValueResolver
         {
-            var resolver = new DeferredInstantiatedResolver(typeof(TValueResolver).BuildCtor<IValueResolver>());
             var config = new ValueResolverConfiguration(typeof(TValueResolver));
-
-            ResolveUsing(resolver);
 
             var expression = new ResolutionExpression<TSource, TValueResolver>(_sourceType, config);
 
@@ -48,10 +45,7 @@ namespace AutoMapper.Configuration
 
         public IResolverConfigurationExpression<TSource> ResolveUsing(Type valueResolverType)
         {
-            var resolver = new DeferredInstantiatedResolver(valueResolverType.BuildCtor<IValueResolver>());
             var config = new ValueResolverConfiguration(valueResolverType);
-
-            ResolveUsing(resolver);
 
             var expression = new ResolutionExpression<TSource>(_sourceType, config);
 
@@ -73,18 +67,12 @@ namespace AutoMapper.Configuration
 
         public void ResolveUsing<TSourceMember>(Func<TSource, TSourceMember> resolver)
         {
-            _propertyMapActions.Add(pm =>
-            {
-                pm.AssignCustomExpression<TSource, TSourceMember>((s, c) => resolver(s));
-            });
+            _propertyMapActions.Add(pm => pm.AssignCustomExpression<TSource, TSourceMember>((s, c) => resolver(s)));
         }
 
         public void ResolveUsing<TSourceMember>(Func<TSource, ResolutionContext, TSourceMember> resolver)
         {
-            _propertyMapActions.Add(pm =>
-            {
-                pm.AssignCustomExpression(resolver);
-            });
+            _propertyMapActions.Add(pm => pm.AssignCustomExpression(resolver));
         }
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
@@ -94,25 +82,7 @@ namespace AutoMapper.Configuration
 
         public void MapFrom<TSourceMember>(string sourceMember)
         {
-            var members = _sourceType.GetMember(sourceMember);
-            if (!members.Any())
-                throw new AutoMapperConfigurationException($"Unable to find source member {sourceMember} on type {_sourceType.FullName}");
-            if (members.Skip(1).Any())
-                throw new AutoMapperConfigurationException($"Source member {sourceMember} is ambiguous on type {_sourceType.FullName}");
-            var member = members.Single();
-
-            var par = Expression.Parameter(typeof(TSource));
-            var prop = typeof(TSource) != _sourceType ? (Expression) Expression.Property(Expression.Convert(par, _sourceType), sourceMember) : Expression.Property(par, sourceMember);
-            if (typeof (TSourceMember) != member.GetMemberType())
-                prop = Expression.Convert(prop, typeof(TSourceMember));
-
-            var lambda = Expression.Lambda<Func<TSource, TSourceMember>>(prop, par);
-
-            _propertyMapActions.Add(pm =>
-            {
-                pm.SourceMemberName = sourceMember;
-                pm.SetCustomValueResolverExpression(lambda);
-            });
+            _propertyMapActions.Add(pm => pm.SourceMemberName = sourceMember);
         }
 
         public void MapFrom(string sourceMember)

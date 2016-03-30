@@ -34,7 +34,7 @@
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            _ctorParamActions.Add(cpm => cpm.ResolveUsing(new ExpressionBasedResolver<TSource, TMember>(sourceMember)));
+            _ctorParamActions.Add(cpm => cpm.CustomExpression = sourceMember);
         }
 
         public void ResolveUsing(Func<TSource, object> resolver)
@@ -47,7 +47,7 @@
             var parameter = typeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == _ctorParamName);
             if(parameter == null)
             {
-                throw new ArgumentOutOfRangeException("ctorParamName", "There is no constructor parameter named " + _ctorParamName);
+                throw new ArgumentOutOfRangeException(nameof(typeMap), $"There is no constructor parameter named {_ctorParamName}");
             }
             parameter.CanResolve = true;
 

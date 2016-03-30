@@ -63,7 +63,7 @@ namespace AutoMapper
                     canResolve = true;
                 }
 
-                var param = new ConstructorParameterMap(parameter, resolvers.Cast<IMemberResolver>().ToArray(), canResolve);
+                var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), canResolve);
 
                 parameters.Add(param);
             }

@@ -4,13 +4,17 @@ using AutoMapper.QueryableExtensions.Impl;
 namespace AutoMapper
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Configuration;
     using Execution;
+    using Mappers;
 
     public class ConstructorMap
     {
+        private bool _sealed;
         private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
         private readonly Lazy<LateBoundParamsCtor> _runtimeCtor;
         public ConstructorInfo Ctor { get; }
@@ -49,6 +53,19 @@ namespace AutoMapper
                 return result;
             });
             return Expression.New(Ctor, parameters.Select(p => p.ResolutionExpression));
+        }
+
+        internal void Seal()
+        {
+            if (_sealed)
+                return;
+
+            foreach (var ctorParam in CtorParams)
+            {
+                ctorParam.Seal();
+            }
+
+            _sealed = true;
         }
 
         public object ResolveValue(ResolutionContext context)
