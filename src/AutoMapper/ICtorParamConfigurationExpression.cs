@@ -14,6 +14,12 @@
         /// <typeparam name="TMember">Member type</typeparam>
         /// <param name="sourceMember">Member expression</param>
         void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
+
+        /// <summary>
+        /// Map constructor parameter from custom func
+        /// </summary>
+        /// <param name="resolver">Custom func</param>
+        void ResolveUsing(Func<TSource, object> resolver);
     }
 
     public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>
@@ -29,6 +35,11 @@
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
             _ctorParamActions.Add(cpm => cpm.ResolveUsing(new ExpressionBasedResolver<TSource, TMember>(sourceMember)));
+        }
+
+        public void ResolveUsing(Func<TSource, object> resolver)
+        {
+            _ctorParamActions.Add(cpm => cpm.ResolveUsing(new DelegateBasedResolver<TSource, object>((s, c) => resolver(s))));
         }
 
         public void Configure(TypeMap typeMap)
