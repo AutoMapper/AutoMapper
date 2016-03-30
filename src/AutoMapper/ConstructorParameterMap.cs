@@ -36,5 +36,10 @@ namespace AutoMapper
         {
             SourceResolvers = resolvers;
         }
+
+        public void ResolveUsing(IValueResolver resolver)
+        {
+            SourceResolvers = new[] { resolver };
+        }
     }
 }
