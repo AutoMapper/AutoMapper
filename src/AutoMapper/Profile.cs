@@ -249,7 +249,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair openTypes)
+        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes)
         {
             var openMapConfig = _typeMapConfigs
                 .Where(tm =>
