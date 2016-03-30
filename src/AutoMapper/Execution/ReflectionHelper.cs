@@ -146,67 +146,56 @@ namespace AutoMapper.Execution
 
         public static IMemberGetter ToMemberGetter(this MemberInfo accessorCandidate)
         {
-            try
-            {
-                if (accessorCandidate == null)
-                    return null;
+            if (accessorCandidate?.DeclaringType.GetTypeInfo().ContainsGenericParameters ?? false)
+                return new NulloMemberGetter();
 
-                if (accessorCandidate is PropertyInfo)
-                    return
-                        Activator.CreateInstance(
-                            typeof (PropertyAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
-                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberGetter;
+            if (accessorCandidate is PropertyInfo)
+                return
+                    Activator.CreateInstance(
+                        typeof (PropertyAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                            accessorCandidate.GetMemberType()), accessorCandidate) as IMemberGetter;
 
-                if (accessorCandidate is FieldInfo)
-                    return
-                        Activator.CreateInstance(
-                            typeof (FieldGetter<,>).MakeGenericType(accessorCandidate.DeclaringType,
-                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberGetter;
+            if (accessorCandidate is FieldInfo)
+                return
+                    Activator.CreateInstance(
+                        typeof (FieldGetter<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                            accessorCandidate.GetMemberType()), accessorCandidate) as IMemberGetter;
 
-                if (accessorCandidate is MethodInfo)
-                    return
-                        Activator.CreateInstance(
-                            typeof (MethodGetter<,>).MakeGenericType(accessorCandidate.DeclaringType,
-                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberGetter;
+            if (accessorCandidate is MethodInfo)
+                return
+                    Activator.CreateInstance(
+                        typeof (MethodGetter<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                            accessorCandidate.GetMemberType()), accessorCandidate) as IMemberGetter;
 
-                return null;
-            }
-            catch (Exception)
-            {
-                return new MemberGetter();
-            }
+            return null;
         }
 
         public static IMemberAccessor ToMemberAccessor(this MemberInfo accessorCandidate)
         {
-            try
-            {
-                var fieldInfo = accessorCandidate as FieldInfo;
-                if (fieldInfo != null)
-                    return accessorCandidate.DeclaringType.IsValueType()
-                        ? Activator.CreateInstance(
-                            typeof(ValueTypeFieldAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
-                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor
-                        : Activator.CreateInstance(
-                            typeof (FieldAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
-                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor;
+            if (accessorCandidate.DeclaringType.GetTypeInfo().ContainsGenericParameters)
+                return new NulloMemberAccessor();
 
-                var propertyInfo = accessorCandidate as PropertyInfo;
-                if (propertyInfo != null)
-                    return accessorCandidate.DeclaringType.IsValueType()
-                        ? Activator.CreateInstance(
-                            typeof (ValueTypePropertyAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
-                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor
-                        : Activator.CreateInstance(
-                            typeof (PropertyAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
-                                accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor;
+            var fieldInfo = accessorCandidate as FieldInfo;
+            if (fieldInfo != null)
+                return accessorCandidate.DeclaringType.IsValueType()
+                    ? Activator.CreateInstance(
+                        typeof(ValueTypeFieldAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                            accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor
+                    : Activator.CreateInstance(
+                        typeof (FieldAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                            accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor;
 
-                return null;
-            }
-            catch (Exception)
-            {
-                return new MemberAccessor();
-            }
+            var propertyInfo = accessorCandidate as PropertyInfo;
+            if (propertyInfo != null)
+                return accessorCandidate.DeclaringType.IsValueType()
+                    ? Activator.CreateInstance(
+                        typeof (ValueTypePropertyAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                            accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor
+                    : Activator.CreateInstance(
+                        typeof (PropertyAccessor<,>).MakeGenericType(accessorCandidate.DeclaringType,
+                            accessorCandidate.GetMemberType()), accessorCandidate) as IMemberAccessor;
+
+            return null;
         }
 
         /// <summary>
