@@ -6,11 +6,50 @@ using System.ComponentModel;
 using Xunit;
 using Should;
 using System.Linq;
+using System.Dynamic;
 
 namespace AutoMapper.UnitTests
 {
 	namespace ArraysAndLists
 	{
+        public class When_mapping_collections : AutoMapperSpecBase
+        {
+            Author mappedAuthor;
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(delegate{});
+
+            protected override void Because_of()
+            {
+                dynamic authorDynamic = new ExpandoObject();
+                authorDynamic.Name = "Charles Dickens";
+                dynamic book1 = new ExpandoObject();
+                book1.Name = "Great Expectations";
+                dynamic book2 = new ExpandoObject();
+                book2.Name = "Oliver Twist";
+                authorDynamic.Books = new List<object> { book1, book2 };
+                mappedAuthor = Mapper.Map<Author>(authorDynamic);
+            }
+
+            [Fact]
+            public void Should_map_by_item_type()
+            {
+                mappedAuthor.Name.ShouldEqual("Charles Dickens");
+                mappedAuthor.Books[0].Name.ShouldEqual("Great Expectations");
+                mappedAuthor.Books[1].Name.ShouldEqual("Oliver Twist");
+            }
+
+            public class Author
+            {
+                public string Name { get; set; }
+                public Book[] Books { get; set; }
+            }
+
+            public class Book
+            {
+                public string Name { get; set; }
+            }
+        }
+
         public class When_mapping_to_an_existing_array_typed_as_IEnumerable : AutoMapperSpecBase
         {
             private Destination _destination = new Destination();
