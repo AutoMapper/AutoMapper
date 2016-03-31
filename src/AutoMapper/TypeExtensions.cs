@@ -130,7 +130,10 @@ namespace AutoMapper
 
         public static bool IsStatic(this MemberInfo memberInfo)
         {
-            return (memberInfo as FieldInfo).IsStatic() || (memberInfo as PropertyInfo).IsStatic();
+            return (memberInfo as FieldInfo).IsStatic() 
+                || (memberInfo as PropertyInfo).IsStatic()
+                || ((memberInfo as MethodInfo)?.IsStatic
+                ?? false);
         }
 
         public static bool IsPublic(this PropertyInfo propertyInfo)

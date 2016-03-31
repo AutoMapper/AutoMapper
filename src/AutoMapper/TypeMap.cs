@@ -255,14 +255,16 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.GetMappingOrder()).ToArray();
 
-            foreach (var pm in _orderedPropertyMaps)
+            if (!SourceType.GetTypeInfo().ContainsGenericParameters && !DestinationType.GetTypeInfo().ContainsGenericParameters)
             {
-                pm.Seal(typeMapRegistry);
+                foreach (var pm in _orderedPropertyMaps)
+                {
+                    pm.Seal(typeMapRegistry);
+                }
+                ConstructorMap?.Seal();
+
+                _mapperFunc = BuildMapperFunc();
             }
-            ConstructorMap?.Seal();
-
-            _mapperFunc = BuildMapperFunc();
-
             _sealed = true;
         }
 

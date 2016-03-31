@@ -145,7 +145,11 @@ namespace AutoMapper
                 return;
             }
 
-            Func<object, ResolutionContext, object> valueResolverFunc = BuildValueResolverFunc();
+            var valueResolverExpr = BuildValueResolverFunc(typeMapRegistry);
+
+            var valueResolvedFunc = valueResolverExpr.Compile();
+
+            Func<object, ResolutionContext, object> valueResolverFunc = (mappedObject, context) => valueResolvedFunc(context.SourceValue, context);
 
             var original = valueResolverFunc;
 
@@ -195,117 +199,137 @@ namespace AutoMapper
             _sealed = true;
         }
 
-        private Func<object, ResolutionContext, object> BuildValueResolverFunc()
+        private Expression<Func<object, ResolutionContext, object>> BuildValueResolverFunc(TypeMapRegistry typeMapRegistry)
         {
-            Func<ResolutionContext, object> valueResolverFunc;
-            
+            Expression valueResolverFunc;
+
+            var srcParam = Expression.Parameter(typeof(object), "src");
+            var ctxtParam = Expression.Parameter(typeof(ResolutionContext), "ctxt");
+
             if (ValueResolverConfig != null)
             {
-
-                Func<ResolutionContext, IValueResolver> ctor;
+                Expression ctor;
                 if (ValueResolverConfig.Instance != null)
                 {
-                    ctor = ctxt => ValueResolverConfig.Instance;
+                    //ctor = ctxt => ValueResolverConfig.Instance;
+                    ctor = Expression.Constant(ValueResolverConfig.Instance);
                 }
                 else if (ValueResolverConfig.Constructor != null)
                 {
-                    ctor = ctxt => ValueResolverConfig.Constructor();
+                    //ctor = ctxt => ValueResolverConfig.Constructor();
+                    ctor = Expression.Invoke(Expression.Constant(ValueResolverConfig.Constructor));
                 }
                 else
                 {
-                    ctor = ctxt => (IValueResolver) ctxt.Options.ServiceCtor(ValueResolverConfig.Type);
+                    //ctor = ctxt => (IValueResolver) ctxt.Options.ServiceCtor(ValueResolverConfig.Type);
+                    ctor = Expression.Convert(
+                        Expression.Invoke(
+                            Expression.MakeMemberAccess(
+                                Expression.MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
+                                typeof (MappingOperationOptions).GetProperty("ServiceCtor"))
+                            , Expression.Constant(ValueResolverConfig.Type)),
+                        typeof (IValueResolver)
+                        );
                 }
 
-                Func<ResolutionContext, object> sourceFunc;
+                Expression sourceFunc;
                 if (ValueResolverConfig.SourceMember != null)
                 {
-                    var newParam = Expression.Parameter(typeof (object), "m");
-                    var expr = new ConvertingVisitor(ValueResolverConfig.SourceMember.Parameters[0], newParam).Visit(ValueResolverConfig.SourceMember.Body);
-                    var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(expr, typeof (object)), newParam);
-                    Func<object, object> mapFunc = lambda.Compile();
-
-                    sourceFunc = ctxt => mapFunc(ctxt.SourceValue);
+                    sourceFunc = new ConvertingVisitor(ValueResolverConfig.SourceMember.Parameters[0], srcParam).Visit(ValueResolverConfig.SourceMember.Body);
                 }
                 else if (ValueResolverConfig.SourceMemberName != null)
                 {
-                    var newParam = Expression.Parameter(typeof(object), "m");
-                    var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(
-                        Expression.MakeMemberAccess(Expression.Convert(newParam, _typeMap.SourceType), _typeMap.SourceType.GetFieldOrProperty(ValueResolverConfig.SourceMemberName))
-                        , typeof(object)), newParam);
-
-                    Func<object, object> mapFunc = lambda.Compile();
-
-                    sourceFunc = ctxt => mapFunc(ctxt.SourceValue);
+                    sourceFunc = Expression.Convert(
+                        Expression.MakeMemberAccess(
+                        Expression.Convert(srcParam, _typeMap.SourceType),
+                        _typeMap.SourceType.GetFieldOrProperty(ValueResolverConfig.SourceMemberName)),
+                        typeof(object));
                 }
                 else
                 {
-                    sourceFunc = ctxt => ctxt.SourceValue;
+                    sourceFunc = srcParam;
                 }
 
-                valueResolverFunc = ctxt => ctor(ctxt).Resolve(sourceFunc(ctxt), ctxt);
+                //valueResolverFunc = ctxt => ctor(ctxt).Resolve(sourceFunc(ctxt), ctxt);
+                valueResolverFunc = Expression.Call(ctor, typeof (IValueResolver).GetMethod("Resolve"), sourceFunc, ctxtParam);
             }
             else if (CustomValue != null)
             {
-                valueResolverFunc = ctxt => CustomValue;
+                //valueResolverFunc = ctxt => CustomValue;
+                valueResolverFunc = Expression.Constant(CustomValue);
             }
             else if (_customResolverFunc != null)
             {
-                valueResolverFunc = ctxt => _customResolverFunc(ctxt.SourceValue, ctxt);
+                //valueResolverFunc = ctxt => _customResolverFunc(ctxt.SourceValue, ctxt);
+                valueResolverFunc = Expression.Invoke(Expression.Constant(_customResolverFunc), srcParam, ctxtParam);
             }
             else if (SourceMemberName != null)
             {
-                var newParam = Expression.Parameter(typeof(object), "m");
-                var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(
-                    Expression.MakeMemberAccess(Expression.Convert(newParam, _typeMap.SourceType), _typeMap.SourceType.GetFieldOrProperty(SourceMemberName))
-                    , typeof(object)), newParam);
-
-                Func<object, object> mapFunc = lambda.Compile();
-
-                valueResolverFunc = ctxt => mapFunc(ctxt.SourceValue);
+                valueResolverFunc = Expression.MakeMemberAccess(
+                        Expression.Convert(srcParam, _typeMap.SourceType),
+                        _typeMap.SourceType.GetFieldOrProperty(SourceMemberName));
             }
             else if (CustomExpression != null)
             {
-                var newParam = Expression.Parameter(typeof (object), "m");
-                var expr = new ConvertingVisitor(CustomExpression.Parameters[0], newParam).Visit(CustomExpression.Body);
-                expr = new IfNotNullVisitor().Visit(expr);
-                var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(expr, typeof (object)), newParam);
-                Func<object, object> mapFunc = lambda.Compile();
-
-                valueResolverFunc = ctxt => mapFunc(ctxt.SourceValue);
+                var expr = new ConvertingVisitor(CustomExpression.Parameters[0], srcParam).Visit(CustomExpression.Body);
+                valueResolverFunc = new IfNotNullVisitor().Visit(expr);
             }
             else if (_memberChain.Any()
                 && SourceType != null
                 )
             {
-                var innerResolver =
-                    _memberChain
-                        .Aggregate<IMemberGetter, LambdaExpression>((Expression<Func<ResolutionContext, object>>)
-                            (ctxt => ctxt.SourceValue),
-                            (expression, resolver) =>
-                                (LambdaExpression)new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression));
-                var outerResolver =
-                    (Expression<Func<ResolutionContext, object>>)
-                        Expression.Lambda(Expression.Convert(innerResolver.Body, typeof(object)), innerResolver.Parameters);
-
-                valueResolverFunc = outerResolver.Compile();
+                valueResolverFunc = _memberChain.Aggregate(
+                    (Expression) Expression.Convert(srcParam, _typeMap.SourceType),
+                    (inner, getter) => getter.MemberInfo is MethodInfo 
+                        ? getter.MemberInfo.IsStatic()
+                            ? Expression.Call(null, (MethodInfo)getter.MemberInfo, inner)
+                            : (Expression) Expression.Call(inner, (MethodInfo)getter.MemberInfo)
+                        : Expression.MakeMemberAccess(getter.MemberInfo.IsStatic() ? null : inner, getter.MemberInfo)
+                    );
+                valueResolverFunc = new IfNotNullVisitor().Visit(valueResolverFunc);
             }
             else
             {
-                valueResolverFunc = ctxt => { throw new Exception("I done blowed up"); };
+                //valueResolverFunc = ctxt => { throw new Exception("I done blowed up"); };
+                valueResolverFunc = Expression.Throw(Expression.Constant(new Exception("I done blowed up")));
+            }
+
+            if (DestinationPropertyType == typeof (string) && valueResolverFunc.Type != typeof (string)
+                && typeMapRegistry.GetTypeMap(new TypePair(valueResolverFunc.Type, DestinationPropertyType)) == null)
+            {
+                valueResolverFunc = Expression.Call(valueResolverFunc, valueResolverFunc.Type.GetMethod("ToString", new Type[0]));
             }
 
             if (NullSubstitute != null)
             {
-                var inner = valueResolverFunc;
-                valueResolverFunc = ctxt => inner(ctxt) ?? NullSubstitute;
+                //var inner = valueResolverFunc;
+                //valueResolverFunc = ctxt => inner(ctxt) ?? NullSubstitute;
+                valueResolverFunc = Expression.MakeBinary(ExpressionType.Coalesce,
+                    valueResolverFunc,
+                    Expression.Constant(NullSubstitute));
             }
             else if (!_typeMap.Profile.AllowNullDestinationValues)
             {
-                var inner = valueResolverFunc;
-                valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(SourceType ?? DestinationPropertyType);
+                //var inner = valueResolverFunc;
+                //valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(SourceType ?? DestinationPropertyType);
+                var toCreate = SourceType ?? DestinationPropertyType;
+                if (!toCreate.GetTypeInfo().IsValueType)
+                {
+                    valueResolverFunc = Expression.MakeBinary(ExpressionType.Coalesce,
+                        valueResolverFunc,
+                        Expression.Call(
+                            typeof (ObjectCreator).GetMethod("CreateNonNullValue"),
+                            Expression.Constant(toCreate)
+                            ));
+                }
             }
 
-            return (src, ctxt) => valueResolverFunc(ctxt);
+            //return (src, ctxt) => valueResolverFunc(ctxt);
+            return Expression.Lambda<Func<object, ResolutionContext, object>>(
+                Expression.Convert(valueResolverFunc, typeof(object)),
+                srcParam,
+                ctxtParam
+                );
         }
 
         public void AssignCustomExpression<TSource, TMember>(Func<TSource, ResolutionContext, TMember> resolverFunc)
