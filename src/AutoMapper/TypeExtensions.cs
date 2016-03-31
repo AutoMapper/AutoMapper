@@ -3,6 +3,7 @@ namespace AutoMapper
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
 #if !PORTABLE
     using System.Reflection.Emit;
@@ -10,6 +11,11 @@ namespace AutoMapper
 
     internal static class TypeExtensions
     {
+        public static Expression ToObject(this Expression expression)
+        {
+            return expression.Type == typeof (object) ? expression : Expression.Convert(expression, typeof (object));
+        }
+
         public static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type)
         {
             return context =>

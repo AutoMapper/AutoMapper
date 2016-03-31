@@ -80,14 +80,13 @@ namespace AutoMapper.Configuration
             _propertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(sourceMember));
         }
 
-        public void MapFrom<TSourceMember>(string sourceMember)
-        {
-            _propertyMapActions.Add(pm => pm.SourceMemberName = sourceMember);
-        }
-
         public void MapFrom(string sourceMember)
         {
-            MapFrom<object>(sourceMember);
+            var memberInfo = _sourceType.GetMember(sourceMember).FirstOrDefault();
+            if (memberInfo == null)
+                throw new AutoMapperConfigurationException($"Cannot find member {sourceMember} of type {_sourceType}");
+
+            _propertyMapActions.Add(pm => pm.SourceMember = memberInfo);
         }
 
         public void UseValue<TValue>(TValue value)

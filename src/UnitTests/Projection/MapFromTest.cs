@@ -26,7 +26,7 @@ namespace AutoMapper.UnitTests.Projection
             public void Should_map_from_String()
             {
                 var config = new MapperConfiguration(cfg => cfg.CreateMap<UserModel, UserDto>()
-                                .ForMember(dto => dto.FullName, opt => opt.MapFrom<string>("FirstName")));
+                                .ForMember(dto => dto.FullName, opt => opt.MapFrom("FirstName")));
 
                 var um = new UserModel();
                 um.FirstName = "Hallo";
