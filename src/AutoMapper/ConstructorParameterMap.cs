@@ -24,6 +24,7 @@ namespace AutoMapper
 
         public bool CanResolve { get; set; }
         public LambdaExpression CustomExpression { get; set; }
+        public Func<object, ResolutionContext, object> CustomValueResolver { get; set; }
 
         public Type SourceType => CustomExpression?.ReturnType ?? SourceMembers.LastOrDefault()?.MemberType;
         public Type DestinationType => Parameter.ParameterType;
@@ -45,9 +46,12 @@ namespace AutoMapper
 
                 valueResolverFunc = ctxt => mapFunc(ctxt.SourceValue);
             }
+            else if (CustomValueResolver != null)
+            {
+                valueResolverFunc = ctxt => CustomValueResolver(ctxt.SourceValue, ctxt);
+            }
             else
             {
-
                 var innerResolver =
                     SourceMembers.Aggregate<IMemberGetter, LambdaExpression>(
                         (Expression<Func<ResolutionContext, object>>)
@@ -70,11 +74,6 @@ namespace AutoMapper
         public object ResolveValue(ResolutionContext context)
         {
             return _resolverFunc(context);
-        }
-
-        public void ResolveUsing(IValueResolver resolver)
-        {
-            SourceResolvers = new[] { resolver };
         }
     }
 }

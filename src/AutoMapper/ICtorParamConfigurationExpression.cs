@@ -39,7 +39,7 @@
 
         public void ResolveUsing(Func<TSource, object> resolver)
         {
-            _ctorParamActions.Add(cpm => cpm.ResolveUsing(new DelegateBasedResolver<TSource, object>((s, c) => resolver(s))));
+            _ctorParamActions.Add(cpm => cpm.CustomValueResolver = (src, ctxt) => resolver((TSource)src));
         }
 
         public void Configure(TypeMap typeMap)
