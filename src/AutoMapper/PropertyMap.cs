@@ -219,7 +219,24 @@ namespace AutoMapper
             }
 
             //_mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(mappedObject, context));
-            Expression mapperExpr = Expression.Assign(destMember, Expression.Convert(valueResolverExpr, DestinationPropertyType));
+            Expression mapperExpr;
+            if (DestinationProperty.MemberInfo is FieldInfo)
+            {
+                mapperExpr = Expression.Assign(destMember, Expression.Convert(valueResolverExpr, DestinationPropertyType));
+            }
+            else
+            {
+                var prop = (PropertyInfo) DestinationProperty.MemberInfo;
+                var setter = prop.GetSetMethod(true);
+                if (setter == null)
+                {
+                    mapperExpr = Expression.Convert(valueResolverExpr, DestinationPropertyType);
+                }
+                else
+                {
+                    mapperExpr = Expression.Assign(destMember, Expression.Convert(valueResolverExpr, DestinationPropertyType));
+                }
+            }
 
             if (_preCondition != null)
             {
@@ -243,7 +260,7 @@ namespace AutoMapper
 
             var mapperFunc = _finalMapperExpr.Compile();
 #else
-            var mapperFunc = finalMapperExpr.Compile();
+            var mapperFunc = _finalMapperExpr.Compile();
 #endif
             _mapperFunc = (dest, ctxt) => GetValue(mapperFunc, ctxt, dest);
 
@@ -322,9 +339,9 @@ namespace AutoMapper
                 var expr = new ConvertingVisitor(CustomExpression.Parameters[0], srcParam).Visit(CustomExpression.Body);
                 valueResolverFunc = new IfNotNullVisitor().Visit(expr);
             }
-            else if (SourceMember != null)
+            else if (_sourceMember != null)
             {
-                valueResolverFunc = Expression.MakeMemberAccess(Expression.Convert(srcParam, _typeMap.SourceType), SourceMember);
+                valueResolverFunc = Expression.MakeMemberAccess(Expression.Convert(srcParam, _typeMap.SourceType), _sourceMember);
             }
             else if (_memberChain.Any()
                 && SourceType != null
