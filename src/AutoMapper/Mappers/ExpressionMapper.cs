@@ -296,7 +296,7 @@
 
             private Expression ConvertCustomExpression(Expression node, PropertyMap propertyMap)
             {
-                var replaced = new ParameterReplacementVisitor(node);
+                var replaced = new ParameterConversionVisitor(node, propertyMap.CustomExpression.Parameters.FirstOrDefault());
                 var newBody = replaced.Visit(propertyMap.CustomExpression.Body);
                 return newBody;
             }

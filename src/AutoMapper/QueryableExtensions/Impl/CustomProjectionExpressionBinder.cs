@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System.Collections.Concurrent;
@@ -17,7 +19,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private static MemberAssignment BindCustomProjectionExpression(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
-            var visitor = new ParameterReplacementVisitor(result.ResolutionExpression);
+            var visitor = new ParameterConversionVisitor(result.ResolutionExpression, propertyTypeMap.CustomProjection.Parameters.FirstOrDefault());
 
             var replaced = visitor.Visit(propertyTypeMap.CustomProjection.Body);
 
