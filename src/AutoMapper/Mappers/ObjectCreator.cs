@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
     using System;
@@ -59,7 +61,8 @@ namespace AutoMapper.Mappers
                 ? CreateArray(type.GetElementType(), 0)
                 : type == typeof (string)
                     ? null
-                    : DelegateFactory.CreateCtor(type)();
+                    : Expression.Lambda<Func<object>>(DelegateFactory.CreateCtor(type)).Compile()();
+
         }
     }
 

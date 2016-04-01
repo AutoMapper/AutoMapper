@@ -10,10 +10,10 @@ namespace AutoMapper.Execution
 
     public class DelegateFactory
     {
-        private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
-            new ConcurrentDictionary<Type, LateBoundCtor>();
+        private readonly ConcurrentDictionary<Type, Expression> _ctorCache =
+            new ConcurrentDictionary<Type, Expression>();
 
-        private readonly Func<Type, LateBoundCtor> _generateConstructor;
+        private readonly Func<Type, Expression> _generateConstructor;
 
         public DelegateFactory()
         {
@@ -112,21 +112,20 @@ namespace AutoMapper.Execution
 
             return lambda;
         }
-
-        public LateBoundCtor CreateCtor(Type type)
+        
+        public Expression CreateCtor(Type type)
         {
             var ctor = _ctorCache.GetOrAdd(type, _generateConstructor);
             return ctor;
         }
 
-        private static LateBoundCtor GenerateConstructor(Type type)
+        private static Expression GenerateConstructor(Type type)
         {
             //handle valuetypes
             if(!type.IsClass())
             {
-                var ctorExpression =
-                    Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(type), typeof(object)));
-                return ctorExpression.Compile();
+                var ctorExpression = Expression.Convert(Expression.New(type), typeof(object));
+                return ctorExpression;
             }
             else
             {
@@ -145,10 +144,8 @@ namespace AutoMapper.Execution
                     .Select(p => Expression.Constant(p.DefaultValue, p.ParameterType)).ToArray();
 
                 //create the ctor expression
-                var ctorExpression =
-                    Expression.Lambda<LateBoundCtor>(Expression.Convert(Expression.New(ctorWithOptionalArgs, args),
-                        typeof(object)));
-                return ctorExpression.Compile();
+                var ctorExpression = Expression.Convert(Expression.New(ctorWithOptionalArgs, args), typeof(object));
+                return ctorExpression;
             }
         }
 

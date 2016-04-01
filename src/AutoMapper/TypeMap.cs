@@ -633,17 +633,18 @@ namespace AutoMapper
 
             if (DestinationType.IsInterface())
             {
-                var destinationType = DestinationType;
+#if PORTABLE
                 return context =>
                 {
-#if PORTABLE
                     throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
-#else
-                    destinationType = new ProxyGenerator().GetProxyType(destinationType);
-
-                    return ObjectCreator.DelegateFactory.CreateCtor(destinationType)();
-#endif
                 };
+#else
+                return context =>
+                {
+                    var destinationType = new ProxyGenerator().GetProxyType(DestinationType);
+                    return Expression.Lambda<Func<object>>(ObjectCreator.DelegateFactory.CreateCtor(destinationType)).Compile()();
+                };
+#endif
             }
 
             if (DestinationType.IsAbstract())
@@ -652,9 +653,7 @@ namespace AutoMapper
             if (DestinationType.IsGenericTypeDefinition())
                 return _ => null;
 
-            var ctor = ObjectCreator.DelegateFactory.CreateCtor(DestinationType);
-
-            return context => ctor();
+            return Expression.Lambda<Func<ResolutionContext, object>>(ObjectCreator.DelegateFactory.CreateCtor(DestinationType), Expression.Parameter(typeof(ResolutionContext))).Compile();
         }
     }
 }
