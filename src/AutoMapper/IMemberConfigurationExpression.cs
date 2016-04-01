@@ -66,15 +66,8 @@ namespace AutoMapper
         /// This method can be used in mapping to LINQ query projections, while ResolveUsing cannot.
         /// Any null reference exceptions in this expression will be ignored (similar to flattening behavior)
         /// </summary>
-        /// <typeparam name="TSourceMember">Member type of the source member to use</typeparam>
         /// <param name="property">Propertyname referencing the source member to map against</param>
-        void MapFrom<TSourceMember>(string property);
-
-        /// <summary>
-        /// Map from a specific source member
-        /// </summary>
-        /// <param name="sourceMember">Source member to map from</param>
-        void MapFrom(string sourceMember);
+        void MapFrom(string property);
 
         /// <summary>
         /// Ignore this member for configuration validation and skip during mapping

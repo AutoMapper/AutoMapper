@@ -116,14 +116,11 @@ namespace AutoMapper
             _inheritedMaps.Add(propertyMap);
         }
 
-        public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IValueResolver> resolvers)
+        public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IMemberGetter> resolvers)
         {
             var propertyMap = new PropertyMap(destProperty, this);
 
-            foreach (var resolver in resolvers)
-            {
-                propertyMap.ChainResolver(resolver);
-            }
+            propertyMap.ChainMembers(resolvers);
 
             AddPropertyMap(propertyMap);
         }
@@ -250,7 +247,6 @@ namespace AutoMapper
 
             foreach (var inheritedTypeMap in _inheritedTypeMaps)
             {
-                inheritedTypeMap.Seal(typeMapRegistry);
                 ApplyInheritedTypeMap(inheritedTypeMap);
             }
 
@@ -259,15 +255,16 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.GetMappingOrder()).ToArray();
 
-            foreach (var pm in _orderedPropertyMaps)
+            if (!SourceType.GetTypeInfo().ContainsGenericParameters && !DestinationType.GetTypeInfo().ContainsGenericParameters)
             {
-                pm.Seal(typeMapRegistry);
+                foreach (var pm in _orderedPropertyMaps)
+                {
+                    pm.Seal(typeMapRegistry);
+                }
+                ConstructorMap?.Seal();
+
+                _mapperFunc = BuildMapperFunc();
             }
-            foreach (var inheritedMap in _inheritedMaps)
-                inheritedMap.Seal(typeMapRegistry);
-
-            _mapperFunc = BuildMapperFunc();
-
             _sealed = true;
         }
 
@@ -419,13 +416,11 @@ namespace AutoMapper
                     .SingleOrDefault(m =>
                         m.DestinationProperty.Name == inheritedMappedProperty.DestinationProperty.Name);
 
-                if (conventionPropertyMap != null && inheritedMappedProperty.HasCustomValueResolver && !conventionPropertyMap.HasCustomValueResolver)
+                if (conventionPropertyMap != null)
                 {
-                    conventionPropertyMap.AssignCustomValueResolver(
-                        inheritedMappedProperty.GetSourceValueResolvers().First());
-                    conventionPropertyMap.AssignCustomExpression(inheritedMappedProperty.CustomExpression);
+                    conventionPropertyMap.ApplyInheritedPropertyMap(inheritedMappedProperty);
                 }
-                else if (conventionPropertyMap == null)
+                else
                 {
                     var propertyMap = new PropertyMap(inheritedMappedProperty, this);
 
@@ -448,15 +443,10 @@ namespace AutoMapper
             {
                 return ctorExpr;
             }
-            Expression newExpression;
-            if(ConstructorMap?.CanResolve == true)
-            {
-                newExpression = ConstructorMap.NewExpression(instanceParameter);
-            }
-            else
-            {
-                newExpression = Expression.New(DestinationTypeOverride ?? DestinationType);
-            }
+            var newExpression = ConstructorMap?.CanResolve == true 
+                ? ConstructorMap.NewExpression(instanceParameter) 
+                : Expression.New(DestinationTypeOverride ?? DestinationType);
+
             return Expression.Lambda(newExpression);
         }
 

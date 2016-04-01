@@ -8,7 +8,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class MemberResolverExpressionResultConverter : IExpressionResultConverter
     {
         public ExpressionResolutionResult GetExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap)
         {
             return ExpressionResolutionResult(expressionResolutionResult, propertyMap.CustomExpression);
         }
@@ -27,15 +27,21 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            ConstructorParameterMap propertyMap, IValueResolver valueResolver)
+            ConstructorParameterMap propertyMap)
         {
             return ExpressionResolutionResult(expressionResolutionResult, null);
         }
 
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            IValueResolver valueResolver)
+            PropertyMap propertyMap)
         {
-            return valueResolver is IMemberResolver;
+            return propertyMap.CustomExpression != null;
+        }
+
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap)
+        {
+            return false;
         }
     }
 

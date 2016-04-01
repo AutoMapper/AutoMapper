@@ -4,14 +4,9 @@ namespace AutoMapper
 {
     using System;
 
-    public interface IMemberResolver : IValueResolver
+    public interface IMemberResolver
     {
         LambdaExpression GetExpression { get; }
         Type MemberType { get; }
-    }
-
-    public interface IExpressionResolver : IMemberResolver
-    {
-        LambdaExpression Expression { get; }
     }
 }

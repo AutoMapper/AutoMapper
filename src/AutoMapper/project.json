@@ -34,7 +34,9 @@
       },
       "compilationOptions": { "define": [ "PORTABLE" ] }
     },
-    "net45": { },
+    "net45": {
+      "compilationOptions": { "define": [ "NET45" ] }
+    },
     "dotnet5.1": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.0",

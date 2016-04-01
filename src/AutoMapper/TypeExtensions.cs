@@ -3,6 +3,7 @@ namespace AutoMapper
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
 #if !PORTABLE
     using System.Reflection.Emit;
@@ -10,6 +11,11 @@ namespace AutoMapper
 
     internal static class TypeExtensions
     {
+        public static Expression ToObject(this Expression expression)
+        {
+            return expression.Type == typeof (object) ? expression : Expression.Convert(expression, typeof (object));
+        }
+
         public static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type)
         {
             return context =>
@@ -85,12 +91,11 @@ namespace AutoMapper
 
         public static MethodInfo GetMethod(this Type type, string name, Type[] parameters)
         {
-            //a.Length == b.Length && a.Intersect(b).Count() == a.Length
-            return type.GetAllMethods()
+            return type
+                .GetAllMethods()
                 .Where(mi => mi.Name == name)
                 .Where(mi => mi.GetParameters().Length == parameters.Length)
-                .Where(mi => mi.GetParameters().Select(pi => pi.ParameterType).Intersect(parameters).Count() == parameters.Length)
-                .FirstOrDefault();
+                .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
         }
 #endif
 
@@ -130,7 +135,10 @@ namespace AutoMapper
 
         public static bool IsStatic(this MemberInfo memberInfo)
         {
-            return (memberInfo as FieldInfo).IsStatic() || (memberInfo as PropertyInfo).IsStatic();
+            return (memberInfo as FieldInfo).IsStatic() 
+                || (memberInfo as PropertyInfo).IsStatic()
+                || ((memberInfo as MethodInfo)?.IsStatic
+                ?? false);
         }
 
         public static bool IsPublic(this PropertyInfo propertyInfo)

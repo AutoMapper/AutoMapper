@@ -105,38 +105,34 @@ namespace AutoMapper
         {
             foreach (var propertyMap in context.TypeMap.GetPropertyMaps())
             {
-                if (!propertyMap.IsIgnored())
+                if (propertyMap.IsIgnored()) continue;
+
+                var sourceType = propertyMap.SourceType;
+
+                if (sourceType == null) continue;
+
+                // when we don't know what the source type is, bail
+                if (sourceType.IsGenericParameter || sourceType == typeof (object))
+                    return;
+
+                var destinationType = propertyMap.DestinationProperty.MemberType;
+                var memberTypeMap = _config.ResolveTypeMap(sourceType,
+                    destinationType);
+
+                if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
+                    continue;
+
+                var memberContext = new ResolutionContext(null, null, sourceType, destinationType, memberTypeMap,
+                    context);
+
+                try
                 {
-                    var lastResolver =
-                        propertyMap.GetSourceValueResolvers().OfType<IMemberResolver>().LastOrDefault();
-
-                    if (lastResolver != null)
-                    {
-                        var sourceType = lastResolver.MemberType;
-
-                        // when we don't know what the source type is, bail
-                        if (sourceType.IsGenericParameter || sourceType == typeof(object))
-                            return;
-
-                        var destinationType = propertyMap.DestinationProperty.MemberType;
-                        var memberTypeMap = _config.ResolveTypeMap(sourceType,
-                            destinationType);
-
-                        if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
-                            continue;
-
-                        var memberContext = new ResolutionContext(null, null, sourceType, destinationType, memberTypeMap, context);
-
-                        try
-                        {
-                            DryRunTypeMap(typeMapsChecked, memberContext);
-                        }
-                        catch (AutoMapperMappingException ex)
-                        {
-                            ex.PropertyMap = propertyMap;
-                            throw;
-                        }
-                    }
+                    DryRunTypeMap(typeMapsChecked, memberContext);
+                }
+                catch (AutoMapperMappingException ex)
+                {
+                    ex.PropertyMap = propertyMap;
+                    throw;
                 }
             }
         }

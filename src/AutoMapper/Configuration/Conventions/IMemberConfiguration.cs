@@ -13,6 +13,6 @@ namespace AutoMapper.Configuration.Conventions
             where TNameMapper : ISourceToDestinationNameMapper, new();
 
         IParentSourceToDestinationNameMapper NameMapper { get; set; }
-        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IValueResolver> resolvers);
+        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IMemberGetter> resolvers);
     }
 }
