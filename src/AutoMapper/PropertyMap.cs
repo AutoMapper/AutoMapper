@@ -152,12 +152,24 @@ namespace AutoMapper
 
             var valueResolverExpr = BuildValueResolverFunc(typeMapRegistry, srcParam, ctxtParam);
             var innerResolverExpr = valueResolverExpr;
-            var destMember = (Expression) Expression.MakeMemberAccess(
-                Expression.Convert(destParam, _typeMap.DestinationType), 
+            var destMember = Expression.MakeMemberAccess(
+                Expression.Convert(destParam, _typeMap.DestinationType),
                 DestinationProperty.MemberInfo);
 
+            Expression getter;
+
+            if (DestinationProperty.MemberInfo is PropertyInfo &&
+                ((PropertyInfo) DestinationProperty.MemberInfo).GetGetMethod(true) == null)
+            {
+                getter = Expression.Default(_typeMap.DestinationType);
+            }
+            else
+            {
+                getter = destMember;
+            }
+
             var destValueExpr = UseDestinationValue
-                ? destMember
+                ? getter
                 : Expression.Constant(null, DestinationPropertyType);
 
             if (SourceType == null 
@@ -222,15 +234,18 @@ namespace AutoMapper
             Expression mapperExpr;
             if (DestinationProperty.MemberInfo is FieldInfo)
             {
-                mapperExpr = Expression.Assign(destMember, Expression.Convert(valueResolverExpr, DestinationPropertyType));
+                mapperExpr = Expression.Assign(getter, Expression.Convert(valueResolverExpr, DestinationPropertyType));
             }
             else
             {
-                var prop = (PropertyInfo) DestinationProperty.MemberInfo;
-                var setter = prop.GetSetMethod(true);
+                var setter = ((PropertyInfo) DestinationProperty.MemberInfo).GetSetMethod(true);
                 if (setter == null)
                 {
                     mapperExpr = Expression.Convert(valueResolverExpr, DestinationPropertyType);
+                }
+                else if (DestinationProperty.MemberInfo.DeclaringType.IsValueType())
+                {
+                    mapperExpr = Expression.Call(Expression.Convert(destParam, _typeMap.DestinationType), setter, Expression.Convert(valueResolverExpr, DestinationPropertyType));
                 }
                 else
                 {
@@ -347,15 +362,23 @@ namespace AutoMapper
                 && SourceType != null
                 )
             {
-                valueResolverFunc = _memberChain.Aggregate(
-                    (Expression) Expression.Convert(srcParam, _typeMap.SourceType),
-                    (inner, getter) => getter.MemberInfo is MethodInfo 
-                        ? getter.MemberInfo.IsStatic()
-                            ? Expression.Call(null, (MethodInfo)getter.MemberInfo, inner)
-                            : (Expression) Expression.Call(inner, (MethodInfo)getter.MemberInfo)
-                        : Expression.MakeMemberAccess(getter.MemberInfo.IsStatic() ? null : inner, getter.MemberInfo)
-                    );
-                valueResolverFunc = new IfNotNullVisitor().Visit(valueResolverFunc);
+                var last = _memberChain.Last();
+                if (last.MemberInfo is PropertyInfo && ((PropertyInfo) last.MemberInfo).GetGetMethod(true) == null)
+                {
+                    valueResolverFunc = Expression.Default(last.MemberType);
+                }
+                else
+                {
+                    valueResolverFunc = _memberChain.Aggregate(
+                        (Expression) Expression.Convert(srcParam, _typeMap.SourceType),
+                        (inner, getter) => getter.MemberInfo is MethodInfo
+                            ? getter.MemberInfo.IsStatic()
+                                ? Expression.Call(null, (MethodInfo) getter.MemberInfo, inner)
+                                : (Expression) Expression.Call(inner, (MethodInfo) getter.MemberInfo)
+                            : Expression.MakeMemberAccess(getter.MemberInfo.IsStatic() ? null : inner, getter.MemberInfo)
+                        );
+                    valueResolverFunc = new IfNotNullVisitor().Visit(valueResolverFunc);
+                }
             }
             else
             {
