@@ -322,7 +322,7 @@ namespace AutoMapper
                 }
 
                 //valueResolverFunc = ctxt => ctor(ctxt).Resolve(sourceFunc(ctxt), ctxt);
-                valueResolverFunc = Expression.Call(ctor, typeof (IValueResolver).GetMethod("Resolve"), sourceFunc, ctxtParam);
+                valueResolverFunc = Expression.Call(ctor, typeof (IValueResolver).GetMethod("Resolve"), sourceFunc.ToObject(), ctxtParam);
             }
             else if (CustomValue != null)
             {
