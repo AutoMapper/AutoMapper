@@ -91,12 +91,11 @@ namespace AutoMapper
 
         public static MethodInfo GetMethod(this Type type, string name, Type[] parameters)
         {
-            //a.Length == b.Length && a.Intersect(b).Count() == a.Length
-            return type.GetAllMethods()
+            return type
+                .GetAllMethods()
                 .Where(mi => mi.Name == name)
                 .Where(mi => mi.GetParameters().Length == parameters.Length)
-                .Where(mi => mi.GetParameters().Select(pi => pi.ParameterType).Intersect(parameters).Count() == parameters.Length)
-                .FirstOrDefault();
+                .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
         }
 #endif
 

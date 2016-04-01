@@ -197,9 +197,11 @@ namespace AutoMapper
                     : Expression.MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("SourceType"));
                 var ifFalse = Expression.Call(sourceExpr, typeof(object).GetMethod("GetType"));
 
+                var mapperProp = Expression.MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Mapper"));
+                var mapMethod = typeof (IRuntimeMapper).GetMethod("Map", new[] {typeof (object), typeof (object), typeof (Type), typeof (Type), typeof (ResolutionContext)});
                 var second = Expression.Call(
-                    Expression.MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Mapper")),
-                    typeof (IRuntimeMapper).GetMethod("Map", new[] {typeof (object), typeof (object), typeof (Type), typeof (Type), typeof (ResolutionContext)}),
+                    mapperProp,
+                    mapMethod,
                     sourceExpr,
                     destValueExpr.ToObject(),
                     Expression.Condition(Expression.Equal(sourceExpr, Expression.Constant(null)), 
@@ -234,7 +236,21 @@ namespace AutoMapper
             Expression mapperExpr;
             if (DestinationProperty.MemberInfo is FieldInfo)
             {
-                mapperExpr = Expression.Assign(getter, Expression.Convert(valueResolverExpr, DestinationPropertyType));
+                if (DestinationProperty.MemberInfo.DeclaringType.IsValueType())
+                {
+                    //field.SetValue(destination, value);
+                    var field = (FieldInfo) DestinationProperty.MemberInfo;
+                    mapperExpr = Expression.Call(
+                        Expression.Constant(field),
+                        typeof (FieldInfo).GetMethod("SetValue", new[] {typeof (object), typeof (object)}),
+                        destParam,
+                        valueResolverExpr.ToObject());
+                }
+                else
+                {
+                    mapperExpr = Expression.Assign(getter,
+                        Expression.Convert(valueResolverExpr, DestinationPropertyType));
+                }
             }
             else
             {
@@ -245,7 +261,12 @@ namespace AutoMapper
                 }
                 else if (DestinationProperty.MemberInfo.DeclaringType.IsValueType())
                 {
-                    mapperExpr = Expression.Call(Expression.Convert(destParam, _typeMap.DestinationType), setter, Expression.Convert(valueResolverExpr, DestinationPropertyType));
+                    // setter.Invoke(destination, new [] { value })
+                    mapperExpr = Expression.Call(
+                        Expression.Constant(setter),
+                        typeof(MethodInfo).GetMethod("Invoke", new[] { typeof(object), typeof(object[]) }),
+                        destParam,
+                        Expression.NewArrayInit(typeof(object), valueResolverExpr.ToObject()));
                 }
                 else
                 {
