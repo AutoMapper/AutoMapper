@@ -291,13 +291,9 @@ namespace AutoMapper
             }
 
             _finalMapperExpr = Expression.Lambda<Action<object, object, ResolutionContext>>(mapperExpr, srcParam, destParam, ctxtParam);
-#if NET45
-            var gen = DebugInfoGenerator.CreatePdbGenerator();
 
             var mapperFunc = _finalMapperExpr.Compile();
-#else
-            var mapperFunc = _finalMapperExpr.Compile();
-#endif
+
             _mapperFunc = (dest, ctxt) => GetValue(mapperFunc, ctxt, dest);
 
             _sealed = true;
