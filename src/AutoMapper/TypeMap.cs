@@ -43,16 +43,6 @@ namespace AutoMapper
             Profile = profile;
             ConfiguredMemberList = memberList;
             IgnorePropertiesStartingWith = profile.GlobalIgnores;
-            BeforeMap = (src, dest, context) =>
-            {
-                foreach(var action in _beforeMapActions)
-                    action(src, dest, context);
-            };
-            AfterMap = (src, dest, context) =>
-            {
-                foreach(var action in _afterMapActions)
-                    action(src, dest, context);
-            };
         }
 
         public TypePair Types { get; }
@@ -71,9 +61,17 @@ namespace AutoMapper
         public Func<object, ResolutionContext, object> CustomMapper { get; private set; }
         public LambdaExpression CustomProjection { get; private set; }
 
-        public Action<object, object, ResolutionContext> BeforeMap { get; }
+        public void BeforeMap(object src, object dest , ResolutionContext context)
+        {
+                foreach(var action in _beforeMapActions)
+                    action(src, dest, context);
+        }
 
-        public Action<object, object, ResolutionContext> AfterMap { get; }
+        public void AfterMap(object src, object dest, ResolutionContext context)
+        {
+            foreach (var action in _afterMapActions)
+                action(src, dest, context);
+        }
 
         public Expression<Func<ResolutionContext, object>> DestinationCtor { get; set; }
 
@@ -430,10 +428,10 @@ namespace AutoMapper
             }
 
             //Include BeforeMap
-            if (inheritedTypeMap.BeforeMap != null)
+            if (inheritedTypeMap._beforeMapActions.Any())
                 AddBeforeMapAction(inheritedTypeMap.BeforeMap);
             //Include AfterMap
-            if (inheritedTypeMap.AfterMap != null)
+            if (inheritedTypeMap._afterMapActions.Any())
                 AddAfterMapAction(inheritedTypeMap.AfterMap);
         }
 
@@ -542,9 +540,9 @@ namespace AutoMapper
             actions.Add(afterMap);
 
             if(_beforeMapActions.Any())
-                actions.Insert(0, Call(Constant(this), typeof(TypeMap).GetMethod("BeforeMap"), srcParam, ctxtParam, mapObj));
+                actions.Insert(0, Call(Constant(this), typeof(TypeMap).GetMethod("BeforeMap"), srcParam, mapObj, ctxtParam));
             if (_afterMapActions.Any())
-                actions.Add(Call(Constant(this), typeof(TypeMap).GetMethod("AfterMap"), srcParam, ctxtParam, mapObj));
+                actions.Add(Call(Constant(this), typeof(TypeMap).GetMethod("AfterMap"), srcParam, mapObj, ctxtParam));
             
             actions.Add(Convert(mapObj, typeof(object)));
 
