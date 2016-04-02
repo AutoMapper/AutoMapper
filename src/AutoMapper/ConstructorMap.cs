@@ -8,24 +8,21 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Configuration;
-    using Execution;
-    using Mappers;
 
     public class ConstructorMap
     {
         private bool _sealed;
-        private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
-        private readonly Lazy<LateBoundParamsCtor> _runtimeCtor;
-        public ConstructorInfo Ctor { get; }
-        internal ConstructorParameterMap[] CtorParams { get; }
+        private readonly IList<ConstructorParameterMap> _ctorParams = new List<ConstructorParameterMap>();
+        private Func<ResolutionContext, object> _ctorFunc;
 
-        public ConstructorMap(ConstructorInfo ctor, ConstructorParameterMap[] ctorParams)
+        public ConstructorInfo Ctor { get; }
+        public TypeMap TypeMap { get; private set; }
+        internal IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
+
+        public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
         {
             Ctor = ctor;
-            CtorParams = ctorParams;
-
-            _runtimeCtor = new Lazy<LateBoundParamsCtor>(() => DelegateFactory.CreateCtor(ctor, CtorParams));
+            TypeMap = typeMap;
         }
 
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
@@ -33,6 +30,8 @@ namespace AutoMapper
             new MemberGetterExpressionResultConverter(),
             new MemberResolverExpressionResultConverter(),
         };
+
+        private Expression<Func<object, ResolutionContext, object>> _ctorExpr;
 
         public bool CanResolve => CtorParams.All(param => param.CanResolve);
 
@@ -55,48 +54,69 @@ namespace AutoMapper
             return Expression.New(Ctor, parameters.Select(p => p.ResolutionExpression));
         }
 
-        internal void Seal()
+        internal void Seal(TypeMapRegistry typeMapRegistry)
         {
             if (_sealed)
                 return;
 
-            foreach (var ctorParam in CtorParams)
-            {
-                ctorParam.Seal();
-            }
+            if (!CanResolve)
+                return;
+
+            var srcParam = Expression.Parameter(typeof(object), "src");
+            var ctxtParam = Expression.Parameter(typeof(ResolutionContext), "ctxt");
+
+            var ctorArgs = CtorParams.Select(p => p.BuildExpression(srcParam, ctxtParam, typeMapRegistry));
+
+            ctorArgs =
+                ctorArgs.Zip(Ctor.GetParameters(),
+                    (exp, pi) => exp.Type == pi.ParameterType ? exp : Expression.Convert(exp, pi.ParameterType))
+                    .ToArray();
+
+            var newExpr = Expression.New(Ctor, ctorArgs);
+
+            _ctorExpr = Expression.Lambda<Func<object, ResolutionContext, object>>(newExpr, srcParam, ctxtParam);
+
+            var ctorFunc = _ctorExpr.Compile();
+
+            _ctorFunc = ctxt => BuildDest(ctorFunc, ctxt);
 
             _sealed = true;
         }
 
         public object ResolveValue(ResolutionContext context)
         {
-            var ctorArgs = new object[CtorParams.Length];
-            for(int index = 0; index < CtorParams.Length; index++)
-            {
-                ctorArgs[index] = Resolve(context, CtorParams[index]);
-            }
-            return _runtimeCtor.Value(ctorArgs);
+            return _ctorFunc(context);
         }
 
-        private object Resolve(ResolutionContext context, ConstructorParameterMap map)
+        private object BuildDest(Func<object, ResolutionContext, object> ctorFunc, ResolutionContext ctxt)
         {
-            var result = map.ResolveValue(context);
+            return ctorFunc(ctxt.SourceValue, ctxt);
+        }
 
-            var sourceType = result?.GetType() ?? context.SourceType;
-            var destinationType = map.Parameter.ParameterType;
+        //private object Resolve(ResolutionContext context, ConstructorParameterMap map)
+        //{
 
-            var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, context.SourceType, destinationType);
+        //    var result = map.ResolveValue(context);
 
-            if(typeMap == null && map.Parameter.IsOptional)
-            {
-                object value = map.Parameter.DefaultValue;
-                return value;
-            }
-            else
-            {
-                var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
-                return value;
-            }
+        //    var sourceType = result?.GetType() ?? context.SourceType;
+        //    var destinationType = map.Parameter.ParameterType;
+
+        //    var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, context.SourceType, destinationType);
+
+        //    if(typeMap == null && map.Parameter.IsOptional)
+        //    {
+        //        object value = map.Parameter.DefaultValue;
+        //        return value;
+        //    }
+        //    else
+        //    {
+        //        var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
+        //        return value;
+        //    }
+        //}
+        public void AddParameter(ParameterInfo parameter, IMemberGetter[] resolvers, bool canResolve)
+        {
+            _ctorParams.Add(new ConstructorParameterMap(this, parameter, resolvers, canResolve));
         }
     }
 }

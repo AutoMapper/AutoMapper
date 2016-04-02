@@ -261,7 +261,7 @@ namespace AutoMapper
                 {
                     pm.Seal(typeMapRegistry);
                 }
-                ConstructorMap?.Seal();
+                ConstructorMap?.Seal(typeMapRegistry);
 
                 _mapperFunc = BuildMapperFunc();
             }
@@ -342,9 +342,8 @@ namespace AutoMapper
             _condition = condition;
         }
 
-        public void AddConstructorMap(ConstructorInfo constructorInfo, ConstructorParameterMap[] parameters)
+        public void AddConstructorMap(ConstructorMap ctorMap)
         {
-            var ctorMap = new ConstructorMap(constructorInfo, parameters);
             ConstructorMap = ctorMap;
         }
 
