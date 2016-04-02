@@ -39,8 +39,7 @@ namespace AutoMapper
             if (CustomExpression != null)
             {
                 var newParam = Expression.Parameter(typeof(object), "m");
-                var expr = new ConvertingVisitor(CustomExpression.Parameters[0], newParam).Visit(CustomExpression.Body);
-                expr = new IfNotNullVisitor().Visit(expr);
+                var expr = new ConvertingVisitor(CustomExpression.Parameters[0], newParam).Visit(CustomExpression.Body).IfNotNull();
                 var lambda = Expression.Lambda<Func<object, object>>(Expression.Convert(expr, typeof(object)), newParam);
                 Func<object, object> mapFunc = lambda.Compile();
 
@@ -56,8 +55,7 @@ namespace AutoMapper
                     SourceMembers.Aggregate<IMemberGetter, LambdaExpression>(
                         (Expression<Func<ResolutionContext, object>>)
                             (ctxt => ctxt.SourceValue),
-                        (expression, resolver) =>
-                            (LambdaExpression)new ExpressionConcatVisitor(resolver.GetExpression).Visit(expression));
+                        (expression, resolver) => resolver.GetExpression.Concat(expression));
 
                 var outerResolver =
                     (Expression<Func<ResolutionContext, object>>)

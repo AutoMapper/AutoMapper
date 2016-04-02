@@ -243,7 +243,7 @@
                     replacedExpression = _parentMappingVisitor.Visit(node.Expression);
 
                 if (propertyMap.CustomExpression != null)
-                    return ConvertCustomExpression(replacedExpression, propertyMap);
+                    return propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
 
                 Func<Expression,IMemberGetter,Expression> getExpression = (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo);
 
@@ -292,13 +292,6 @@
                     _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetTypeInfo().GenericTypeArguments.Concat(new []{ (propertyMap.SourceMember as PropertyInfo).PropertyType }).ToList();
                 else if (propertyMap.SourceMember is FieldInfo)
                     _destSubTypes = (propertyMap.SourceMember as FieldInfo).FieldType.GetTypeInfo().GenericTypeArguments;
-            }
-
-            private Expression ConvertCustomExpression(Expression node, PropertyMap propertyMap)
-            {
-                var replaced = new ParameterConversionVisitor(node, propertyMap.CustomExpression.Parameters.FirstOrDefault());
-                var newBody = replaced.Visit(propertyMap.CustomExpression.Body);
-                return newBody;
             }
         }
     }
