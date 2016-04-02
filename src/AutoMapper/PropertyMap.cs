@@ -49,6 +49,7 @@ namespace AutoMapper
         internal MemberInfo _sourceMember;
         internal LambdaExpression _customExpression;
         internal Expression<Action<object, object, ResolutionContext>> _finalMapperExpr;
+        internal LambdaExpression _mapperExpr;
 
         public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
@@ -152,10 +153,10 @@ namespace AutoMapper
             var destParam = Parameter(typeof(object), "dest");
             var destination = Convert(destParam, _typeMap.DestinationType);
 
-            var lambda = this.CreateExpression(typeMapRegistry);
-            var exp = lambda.ReplaceParameters(source, destination);
+            _mapperExpr = this.CreateExpression(typeMapRegistry);
+            var exp = _mapperExpr.ReplaceParameters(source, destination);
 
-            _finalMapperExpr = Lambda<Action<object, object, ResolutionContext>>(exp, srcParam, destParam, lambda.Parameters[2]);
+            _finalMapperExpr = Lambda<Action<object, object, ResolutionContext>>(exp, srcParam, destParam, _mapperExpr.Parameters[2]);
 
             var mapperFunc = _finalMapperExpr.Compile();
 
@@ -425,6 +426,13 @@ namespace AutoMapper
         public static LambdaExpression Concat(this LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
         public static Expression IfNotNull(this Expression expression) => IfNullVisitor.Visit(expression);
+
+        public static Expression IfNullElse(this Expression expression, params Expression[] ifElse)
+        {
+            return ifElse.Any()
+                ? IfThenElse(NotEqual(expression, Constant(null)), expression, ifElse.First().IfNullElse(ifElse.Skip(1).ToArray()))
+                : expression;
+        }
 
         public static LambdaExpression CreateExpression(this PropertyMap propertyMap, TypeMapRegistry typeMapRegistry)
         {

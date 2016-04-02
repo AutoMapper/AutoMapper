@@ -192,7 +192,7 @@ namespace AutoMapper
             yield return context;
         }
 
-        internal void BeforeMap(object destination)
+        public void BeforeMap(object destination)
         {
             if(Parent == null)
             {
@@ -200,7 +200,7 @@ namespace AutoMapper
             }
         }
 
-        internal void AfterMap(object destination)
+        public void AfterMap(object destination)
         {
             if(Parent == null)
             {
