@@ -37,18 +37,18 @@ namespace AutoMapper
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
-        private readonly TypeMap _typeMap;
-        private readonly List<IMemberGetter> _memberChain = new List<IMemberGetter>();
-        private bool _ignored;
-        private int _mappingOrder;
-        private Func<object, ResolutionContext, object> _customResolverFunc;
-        private bool _sealed;
-        private Func<object, object, ResolutionContext, bool> _condition;
-        private Func<ResolutionContext, bool> _preCondition;
-        private Action<object, ResolutionContext> _mapperFunc;
-        private MemberInfo _sourceMember;
-        private LambdaExpression _customExpression;
-        private Expression<Action<object, object, ResolutionContext>> _finalMapperExpr;
+        internal readonly TypeMap _typeMap;
+        internal readonly List<IMemberGetter> _memberChain = new List<IMemberGetter>();
+        internal bool _ignored;
+        internal int _mappingOrder;
+        internal Func<object, ResolutionContext, object> _customResolverFunc;
+        internal bool _sealed;
+        internal Func<object, object, ResolutionContext, bool> _condition;
+        internal Func<ResolutionContext, bool> _preCondition;
+        internal Action<object, ResolutionContext> _mapperFunc;
+        internal MemberInfo _sourceMember;
+        internal LambdaExpression _customExpression;
+        internal Expression<Action<object, object, ResolutionContext>> _finalMapperExpr;
 
         public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
@@ -146,152 +146,8 @@ namespace AutoMapper
                 _mapperFunc = (_, __) => { };
                 return;
             }
-
-            var srcParam = Parameter(typeof(object), "src");
-            var destParam = Parameter(typeof(object), "dest");
-            var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
-
-            var valueResolverExpr = BuildValueResolverFunc(typeMapRegistry, srcParam, ctxtParam);
-            var innerResolverExpr = valueResolverExpr;
-            var destMember = MakeMemberAccess(
-                Convert(destParam, _typeMap.DestinationType),
-                DestinationProperty.MemberInfo);
-
-            Expression getter;
-
-            if (DestinationProperty.MemberInfo is PropertyInfo &&
-                ((PropertyInfo) DestinationProperty.MemberInfo).GetGetMethod(true) == null)
-            {
-                getter = Default(_typeMap.DestinationType);
-            }
-            else
-            {
-                getter = destMember;
-            }
-
-            var destValueExpr = UseDestinationValue
-                ? getter
-                : Constant(null, DestinationPropertyType);
-
-            if (SourceType == null 
-                || (SourceType.IsEnumerableType() && SourceType != typeof (string)) 
-                || typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationPropertyType)) != null 
-                || ((!EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)) ||
-                  EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationPropertyType))) &&
-                 EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationPropertyType)))
-                || !DestinationPropertyType.IsAssignableFrom(SourceType))
-            {
-                //valueResolverExpr = 
-                //    (mappedObject, context) =>
-                //    {
-                //        var source = original(mappedObject, context);
-
-                //        return context.Mapper.Map(source, GetDestinationValue(mappedObject),
-                //            source?.GetType() ?? SourceType ?? context.SourceType,
-                //            DestinationPropertyType, context);
-                //    };
-                var sourceExpr = Parameter(typeof (object), "source");
-
-                var first = Assign(sourceExpr, valueResolverExpr.ToObject());
-                var ifTrue = SourceType != null 
-                    ? (Expression) Constant(SourceType, typeof(Type)) 
-                    : MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("SourceType"));
-                var ifFalse = Call(sourceExpr, typeof(object).GetMethod("GetType"));
-
-                var mapperProp = MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Mapper"));
-                var mapMethod = typeof (IRuntimeMapper).GetMethod("Map", new[] {typeof (object), typeof (object), typeof (Type), typeof (Type), typeof (ResolutionContext)});
-                var second = Call(
-                    mapperProp,
-                    mapMethod,
-                    sourceExpr,
-                    destValueExpr.ToObject(),
-                    Condition(Equal(sourceExpr, Constant(null)), 
-                        ifTrue,
-                        ifFalse),
-                    Constant(DestinationPropertyType),
-                    ctxtParam
-                    );
-                valueResolverExpr = Block(typeof(object), new[] {sourceExpr}, first, second);
-            }
-
-            if (_condition != null)
-            {
-                //valueResolverFunc = (mappedObject, context) =>
-                //    ShouldAssignValue(original(mappedObject, context), GetDestinationValue(mappedObject), context)
-                //        ? inner(mappedObject, context)
-                //        : GetDestinationValue(mappedObject);
-                valueResolverExpr =
-                    Condition(
-                        Invoke(
-                            Constant(_condition),
-                            innerResolverExpr.ToObject(),
-                            destValueExpr.ToObject(), 
-                            ctxtParam
-                            ),
-                        valueResolverExpr.ToObject(),
-                        destValueExpr.ToObject()
-                        );
-            }
-
-            //_mapperFunc = (mappedObject, context) => DestinationProperty.SetValue(mappedObject, valueResolverFunc(mappedObject, context));
-            Expression mapperExpr;
-            if (DestinationProperty.MemberInfo is FieldInfo)
-            {
-                if (DestinationProperty.MemberInfo.DeclaringType.IsValueType())
-                {
-                    //field.SetValue(destination, value);
-                    var field = (FieldInfo) DestinationProperty.MemberInfo;
-                    mapperExpr = Call(
-                        Constant(field),
-                        typeof (FieldInfo).GetMethod("SetValue", new[] {typeof (object), typeof (object)}),
-                        destParam,
-                        valueResolverExpr.ToObject());
-                }
-                else
-                {
-                    mapperExpr = Assign(getter,
-                        Convert(valueResolverExpr, DestinationPropertyType));
-                }
-            }
-            else
-            {
-                var setter = ((PropertyInfo) DestinationProperty.MemberInfo).GetSetMethod(true);
-                if (setter == null)
-                {
-                    mapperExpr = Convert(valueResolverExpr, DestinationPropertyType);
-                }
-                else if (DestinationProperty.MemberInfo.DeclaringType.IsValueType())
-                {
-                    // setter.Invoke(destination, new [] { value })
-                    mapperExpr = Call(
-                        Constant(setter),
-                        typeof(MethodInfo).GetMethod("Invoke", new[] { typeof(object), typeof(object[]) }),
-                        destParam,
-                        NewArrayInit(typeof(object), valueResolverExpr.ToObject()));
-                }
-                else
-                {
-                    mapperExpr = Assign(destMember, Convert(valueResolverExpr, DestinationPropertyType));
-                }
-            }
-
-            if (_preCondition != null)
-            {
-                //var inner = _mapperFunc;
-                //_mapperFunc = (mappedObject, context) =>
-                //{
-                //    if (!ShouldAssignValuePreResolving(context))
-                //        return;
-
-                //    inner(mappedObject, context);
-                //};
-                mapperExpr = IfThen(
-                    Invoke(Constant(_preCondition), ctxtParam),
-                    mapperExpr
-                    );
-            }
-
-            _finalMapperExpr = Lambda<Action<object, object, ResolutionContext>>(mapperExpr, srcParam, destParam, ctxtParam);
+            
+            _finalMapperExpr = (Expression<Action<object, object, ResolutionContext>>)this.CreateExpression(typeMapRegistry);
 #if NET45
             var gen = DebugInfoGenerator.CreatePdbGenerator();
 
@@ -308,139 +164,7 @@ namespace AutoMapper
         {
             mapperFunc(ctxt.SourceValue, dest, ctxt);
         }
-
-        private Expression BuildValueResolverFunc(TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam,
-            ParameterExpression ctxtParam
-            )
-        {
-            Expression valueResolverFunc;
-
-            if (ValueResolverConfig != null)
-            {
-                Expression ctor;
-                if (ValueResolverConfig.Instance != null)
-                {
-                    //ctor = ctxt => ValueResolverConfig.Instance;
-                    ctor = Constant(ValueResolverConfig.Instance);
-                }
-                else if (ValueResolverConfig.Constructor != null)
-                {
-                    //ctor = ctxt => ValueResolverConfig.Constructor();
-                    ctor = Invoke(Constant(ValueResolverConfig.Constructor));
-                }
-                else
-                {
-                    //ctor = ctxt => (IValueResolver) ctxt.Options.ServiceCtor(ValueResolverConfig.Type);
-                    ctor = Convert(
-                        Invoke(
-                            MakeMemberAccess(
-                                MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
-                                typeof (MappingOperationOptions).GetProperty("ServiceCtor"))
-                            , Constant(ValueResolverConfig.Type)),
-                        typeof (IValueResolver)
-                        );
-                }
-
-                Expression sourceFunc;
-                if (ValueResolverConfig.SourceMember != null)
-                {
-                    sourceFunc = ValueResolverConfig.SourceMember.ConvertReplaceParameters(srcParam);
-                }
-                else if (ValueResolverConfig.SourceMemberName != null)
-                {
-                    sourceFunc = MakeMemberAccess(
-                        Convert(srcParam, _typeMap.SourceType),
-                        _typeMap.SourceType.GetFieldOrProperty(ValueResolverConfig.SourceMemberName));
-                }
-                else
-                {
-                    sourceFunc = srcParam;
-                }
-
-                //valueResolverFunc = ctxt => ctor(ctxt).Resolve(sourceFunc(ctxt), ctxt);
-                valueResolverFunc = Call(ctor, typeof (IValueResolver).GetMethod("Resolve"), sourceFunc.ToObject(), ctxtParam);
-            }
-            else if (CustomValue != null)
-            {
-                //valueResolverFunc = ctxt => CustomValue;
-                valueResolverFunc = Constant(CustomValue);
-            }
-            else if (_customResolverFunc != null)
-            {
-                //valueResolverFunc = ctxt => _customResolverFunc(ctxt.SourceValue, ctxt);
-                valueResolverFunc = Invoke(Constant(_customResolverFunc), srcParam, ctxtParam);
-            }
-            else if (CustomExpression != null)
-            {
-                valueResolverFunc = CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull();
-            }
-            else if (_sourceMember != null)
-            {
-                valueResolverFunc = MakeMemberAccess(Convert(srcParam, _typeMap.SourceType), _sourceMember);
-            }
-            else if (_memberChain.Any()
-                && SourceType != null
-                )
-            {
-                var last = _memberChain.Last();
-                if (last.MemberInfo is PropertyInfo && ((PropertyInfo) last.MemberInfo).GetGetMethod(true) == null)
-                {
-                    valueResolverFunc = Default(last.MemberType);
-                }
-                else
-                {
-                    valueResolverFunc = _memberChain.Aggregate(
-                        (Expression) Convert(srcParam, _typeMap.SourceType),
-                        (inner, getter) => getter.MemberInfo is MethodInfo
-                            ? getter.MemberInfo.IsStatic()
-                                ? Call(null, (MethodInfo) getter.MemberInfo, inner)
-                                : (Expression) Call(inner, (MethodInfo) getter.MemberInfo)
-                            : MakeMemberAccess(getter.MemberInfo.IsStatic() ? null : inner, getter.MemberInfo)
-                        );
-                    valueResolverFunc = valueResolverFunc.IfNotNull();
-                }
-            }
-            else
-            {
-                //valueResolverFunc = ctxt => { throw new Exception("I done blowed up"); };
-                valueResolverFunc = Throw(Constant(new Exception("I done blowed up")));
-            }
-
-            if (DestinationPropertyType == typeof (string) && valueResolverFunc.Type != typeof (string)
-                && typeMapRegistry.GetTypeMap(new TypePair(valueResolverFunc.Type, DestinationPropertyType)) == null)
-            {
-                valueResolverFunc = Call(valueResolverFunc, valueResolverFunc.Type.GetMethod("ToString", new Type[0]));
-            }
-
-            if (NullSubstitute != null)
-            {
-                //var inner = valueResolverFunc;
-                //valueResolverFunc = ctxt => inner(ctxt) ?? NullSubstitute;
-                valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
-                    valueResolverFunc,
-                    Constant(NullSubstitute));
-            }
-            else if (!_typeMap.Profile.AllowNullDestinationValues)
-            {
-                //var inner = valueResolverFunc;
-                //valueResolverFunc = ctxt => inner(ctxt) ?? ObjectCreator.CreateNonNullValue(SourceType ?? DestinationPropertyType);
-                var toCreate = SourceType ?? DestinationPropertyType;
-                if (!toCreate.GetTypeInfo().IsValueType)
-                {
-                    valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
-                        valueResolverFunc,
-                        Call(
-                            typeof (ObjectCreator).GetMethod("CreateNonNullValue"),
-                            Constant(toCreate)
-                            ));
-                }
-            }
-
-            //return (src, ctxt) => valueResolverFunc(ctxt);
-            return valueResolverFunc;
-        }
-
+        
         public void AssignCustomExpression<TSource, TMember>(Func<TSource, ResolutionContext, TMember> resolverFunc)
         {
             //Expression<Func<TSource, ResolutionContext, TMember>> expr = (s, c) => resolverFunc(s, c);
@@ -697,5 +421,252 @@ namespace AutoMapper
         public static LambdaExpression Concat(this LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
         public static Expression IfNotNull(this Expression expression) => IfNullVisitor.Visit(expression);
+
+        public static LambdaExpression CreateExpression(this PropertyMap propertyMap, TypeMapRegistry typeMapRegistry)
+        {
+
+            var srcParam = Parameter(typeof(object), "src");
+            var destParam = Parameter(typeof(object), "dest");
+            var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
+            
+            var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, ctxtParam);
+            var innerResolverExpr = valueResolverExpr;
+            var destMember = MakeMemberAccess(
+                Convert(destParam, propertyMap._typeMap.DestinationType),
+                propertyMap.DestinationProperty.MemberInfo);
+
+            Expression getter;
+
+            if (propertyMap.DestinationProperty.MemberInfo is PropertyInfo &&
+                ((PropertyInfo)propertyMap.DestinationProperty.MemberInfo).GetGetMethod(true) == null)
+            {
+                getter = Default(propertyMap._typeMap.DestinationType);
+            }
+            else
+            {
+                getter = destMember;
+            }
+
+            var destValueExpr = propertyMap.UseDestinationValue
+                ? getter
+                : Constant(null, propertyMap.DestinationPropertyType);
+
+            if (propertyMap.SourceType == null
+                || (propertyMap.SourceType.IsEnumerableType() && propertyMap.SourceType != typeof(string))
+                || typeMapRegistry.GetTypeMap(new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType)) != null
+                || ((!EnumMapper.EnumToEnumMapping(new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType)) ||
+                  EnumMapper.EnumToNullableTypeMapping(new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType))) &&
+                 EnumMapper.EnumToEnumMapping(new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType)))
+                || !propertyMap.DestinationPropertyType.IsAssignableFrom(propertyMap.SourceType))
+            {
+                var sourceExpr = Parameter(typeof(object), "source");
+
+                var first = Assign(sourceExpr, valueResolverExpr.ToObject());
+                var ifTrue = propertyMap.SourceType != null
+                    ? (Expression)Constant(propertyMap.SourceType, typeof(Type))
+                    : MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("SourceType"));
+                var ifFalse = Call(sourceExpr, typeof(object).GetMethod("GetType"));
+
+                var mapperProp = MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Mapper"));
+                var mapMethod = typeof(IRuntimeMapper).GetMethod("Map", new[] { typeof(object), typeof(object), typeof(Type), typeof(Type), typeof(ResolutionContext) });
+                var second = Call(
+                    mapperProp,
+                    mapMethod,
+                    sourceExpr,
+                    destValueExpr.ToObject(),
+                    Condition(Equal(sourceExpr, Constant(null)),
+                        ifTrue,
+                        ifFalse),
+                    Constant(propertyMap.DestinationPropertyType),
+                    ctxtParam
+                    );
+                valueResolverExpr = Block(typeof(object), new[] { sourceExpr }, first, second);
+            }
+
+            if (propertyMap._condition != null)
+            {
+                valueResolverExpr =
+                    Condition(
+                        Invoke(
+                            Constant(propertyMap._condition),
+                            innerResolverExpr.ToObject(),
+                            destValueExpr.ToObject(),
+                            ctxtParam
+                            ),
+                        valueResolverExpr.ToObject(),
+                        destValueExpr.ToObject()
+                        );
+            }
+            
+            Expression mapperExpr;
+            if (propertyMap.DestinationProperty.MemberInfo is FieldInfo)
+            {
+                if (propertyMap.DestinationProperty.MemberInfo.DeclaringType.IsValueType())
+                {
+                    var field = (FieldInfo)propertyMap.DestinationProperty.MemberInfo;
+                    mapperExpr = Call(
+                        Constant(field),
+                        typeof(FieldInfo).GetMethod("SetValue", new[] { typeof(object), typeof(object) }),
+                        destParam,
+                        valueResolverExpr.ToObject());
+                }
+                else
+                {
+                    mapperExpr = Assign(getter,
+                        Convert(valueResolverExpr, propertyMap.DestinationPropertyType));
+                }
+            }
+            else
+            {
+                var setter = ((PropertyInfo)propertyMap.DestinationProperty.MemberInfo).GetSetMethod(true);
+                if (setter == null)
+                {
+                    mapperExpr = Convert(valueResolverExpr, propertyMap.DestinationPropertyType);
+                }
+                else if (propertyMap.DestinationProperty.MemberInfo.DeclaringType.IsValueType())
+                {
+                    mapperExpr = Call(
+                        Constant(setter),
+                        typeof(MethodInfo).GetMethod("Invoke", new[] { typeof(object), typeof(object[]) }),
+                        destParam,
+                        NewArrayInit(typeof(object), valueResolverExpr.ToObject()));
+                }
+                else
+                {
+                    mapperExpr = Assign(destMember, Convert(valueResolverExpr, propertyMap.DestinationPropertyType));
+                }
+            }
+
+            if (propertyMap._preCondition != null)
+            {
+                mapperExpr = IfThen(
+                    Invoke(Constant(propertyMap._preCondition), ctxtParam),
+                    mapperExpr
+                    );
+            }
+
+            return Lambda<Action<object, object, ResolutionContext>>(mapperExpr, srcParam, destParam, ctxtParam);
+        }
+
+        private static Expression BuildValueResolverFunc(PropertyMap propertyMap, TypeMapRegistry typeMapRegistry,
+            ParameterExpression srcParam,
+            ParameterExpression ctxtParam)
+        {
+            Expression valueResolverFunc;
+            var valueResolverConfig = propertyMap.ValueResolverConfig;
+            var typeMap = propertyMap._typeMap;
+
+            if (valueResolverConfig != null)
+            {
+                Expression ctor;
+                if (valueResolverConfig.Instance != null)
+                {
+                    ctor = Constant(valueResolverConfig.Instance);
+                }
+                else if (valueResolverConfig.Constructor != null)
+                {
+                    ctor = Invoke(Constant(valueResolverConfig.Constructor));
+                }
+                else
+                {
+                    ctor = Convert(
+                        Invoke(
+                            MakeMemberAccess(
+                                MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Options")),
+                                typeof(MappingOperationOptions).GetProperty("ServiceCtor"))
+                            , Constant(valueResolverConfig.Type)),
+                        typeof(IValueResolver)
+                        );
+                }
+
+                Expression sourceFunc;
+                if (valueResolverConfig.SourceMember != null)
+                {
+                    sourceFunc = valueResolverConfig.SourceMember.ConvertReplaceParameters(srcParam);
+                }
+                else if (valueResolverConfig.SourceMemberName != null)
+                {
+                    sourceFunc = MakeMemberAccess(
+                        Convert(srcParam, typeMap.SourceType),
+                        typeMap.SourceType.GetFieldOrProperty(valueResolverConfig.SourceMemberName));
+                }
+                else
+                {
+                    sourceFunc = srcParam;
+                }
+                
+                valueResolverFunc = Call(ctor, typeof(IValueResolver).GetMethod("Resolve"), sourceFunc.ToObject(), ctxtParam);
+            }
+            else if (propertyMap.CustomValue != null)
+            {
+                valueResolverFunc = Constant(propertyMap.CustomValue);
+            }
+            else if (propertyMap._customResolverFunc != null)
+            {
+                valueResolverFunc = Invoke(Constant(propertyMap._customResolverFunc), srcParam, ctxtParam);
+            }
+            else if (propertyMap.CustomExpression != null)
+            {
+                valueResolverFunc = propertyMap.CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull();
+            }
+            else if (propertyMap._sourceMember != null)
+            {
+                valueResolverFunc = MakeMemberAccess(Convert(srcParam, typeMap.SourceType), propertyMap._sourceMember);
+            }
+            else if (propertyMap._memberChain.Any()
+                && propertyMap.SourceType != null
+                )
+            {
+                var last = propertyMap._memberChain.Last();
+                if (last.MemberInfo is PropertyInfo && ((PropertyInfo)last.MemberInfo).GetGetMethod(true) == null)
+                {
+                    valueResolverFunc = Default(last.MemberType);
+                }
+                else
+                {
+                    valueResolverFunc = propertyMap._memberChain.Aggregate(
+                        (Expression)Convert(srcParam, typeMap.SourceType),
+                        (inner, getter) => getter.MemberInfo is MethodInfo
+                            ? getter.MemberInfo.IsStatic()
+                                ? Call(null, (MethodInfo)getter.MemberInfo, inner)
+                                : (Expression)Call(inner, (MethodInfo)getter.MemberInfo)
+                            : MakeMemberAccess(getter.MemberInfo.IsStatic() ? null : inner, getter.MemberInfo)
+                        );
+                    valueResolverFunc = valueResolverFunc.IfNotNull();
+                }
+            }
+            else
+            {
+                valueResolverFunc = Throw(Constant(new Exception("I done blowed up")));
+            }
+
+            if (propertyMap.DestinationPropertyType == typeof(string) && valueResolverFunc.Type != typeof(string)
+                && typeMapRegistry.GetTypeMap(new TypePair(valueResolverFunc.Type, propertyMap.DestinationPropertyType)) == null)
+            {
+                valueResolverFunc = Call(valueResolverFunc, valueResolverFunc.Type.GetMethod("ToString", new Type[0]));
+            }
+
+            if (propertyMap.NullSubstitute != null)
+            {
+                valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
+                    valueResolverFunc,
+                    Constant(propertyMap.NullSubstitute));
+            }
+            else if (!typeMap.Profile.AllowNullDestinationValues)
+            {
+                var toCreate = propertyMap.SourceType ?? propertyMap.DestinationPropertyType;
+                if (!toCreate.GetTypeInfo().IsValueType)
+                {
+                    valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
+                        valueResolverFunc,
+                        Call(
+                            typeof(ObjectCreator).GetMethod("CreateNonNullValue"),
+                            Constant(toCreate)
+                            ));
+                }
+            }
+            
+            return valueResolverFunc;
+        }
     }
 }
