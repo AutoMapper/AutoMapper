@@ -47,11 +47,12 @@ namespace AutoMapper
 
         private bool MapDestinationCtorToSource(TypeMap typeMap, ConstructorInfo destCtor, TypeDetails sourceTypeInfo, IProfileConfiguration options)
         {
-            var parameters = new List<ConstructorParameterMap>();
             var ctorParameters = destCtor.GetParameters();
 
             if (ctorParameters.Length == 0 || !options.ConstructorMappingEnabled)
                 return false;
+
+            var ctorMap = new ConstructorMap(destCtor, typeMap);
 
             foreach (var parameter in ctorParameters)
             {
@@ -63,12 +64,10 @@ namespace AutoMapper
                     canResolve = true;
                 }
 
-                var param = new ConstructorParameterMap(parameter, resolvers.ToArray(), canResolve);
-
-                parameters.Add(param);
+                ctorMap.AddParameter(parameter, resolvers.ToArray(), canResolve);
             }
 
-            typeMap.AddConstructorMap(destCtor, parameters.ToArray());
+            typeMap.AddConstructorMap(ctorMap);
 
             return true;
         }

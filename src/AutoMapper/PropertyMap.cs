@@ -156,13 +156,9 @@ namespace AutoMapper
             var exp = lambda.ReplaceParameters(source, destination);
 
             _finalMapperExpr = Lambda<Action<object, object, ResolutionContext>>(exp, srcParam, destParam, lambda.Parameters[2]);
-#if NET45
-            var gen = DebugInfoGenerator.CreatePdbGenerator();
 
             var mapperFunc = _finalMapperExpr.Compile();
-#else
-            var mapperFunc = _finalMapperExpr.Compile();
-#endif
+
             _mapperFunc = (dest, ctxt) => GetValue(mapperFunc, ctxt, dest);
 
             _sealed = true;
@@ -172,7 +168,7 @@ namespace AutoMapper
         {
             mapperFunc(ctxt.SourceValue, dest, ctxt);
         }
-        
+
         public void AssignCustomExpression<TSource, TMember>(Func<TSource, ResolutionContext, TMember> resolverFunc)
         {
             //Expression<Func<TSource, ResolutionContext, TMember>> expr = (s, c) => resolverFunc(s, c);
