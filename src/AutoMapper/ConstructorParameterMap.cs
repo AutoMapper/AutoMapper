@@ -34,12 +34,7 @@ namespace AutoMapper
         public Expression BuildExpression(ParameterExpression srcParam, ParameterExpression ctxtParam, TypeMapRegistry typeMapRegistry)
         {
             if (CustomExpression != null)
-            {
-                var expr = new ConvertingVisitor(CustomExpression.Parameters[0], srcParam).Visit(CustomExpression.Body);
-                expr = new IfNotNullVisitor().Visit(expr);
-
-                return expr;
-            }
+                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull();
 
             if (CustomValueResolver != null)
             {
@@ -65,7 +60,7 @@ namespace AutoMapper
                         : (Expression)Expression.Call(inner, (MethodInfo)getter.MemberInfo)
                     : Expression.MakeMemberAccess(getter.MemberInfo.IsStatic() ? null : inner, getter.MemberInfo)
                 );
-            valueResolverExpr = new IfNotNullVisitor().Visit(valueResolverExpr);
+            valueResolverExpr = valueResolverExpr.IfNotNull();
 
             if ((SourceType.IsEnumerableType() && SourceType != typeof (string))
                 || typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) != null
