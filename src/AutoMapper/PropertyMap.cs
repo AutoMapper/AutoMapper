@@ -510,16 +510,6 @@ namespace AutoMapper
             Expression mapperExpr;
             if (propertyMap.DestinationProperty.MemberInfo is FieldInfo)
             {
-                //if (propertyMap.DestinationProperty.MemberInfo.DeclaringType.IsValueType())
-                //{
-                //    var field = (FieldInfo)propertyMap.DestinationProperty.MemberInfo;
-                //    mapperExpr = Call(
-                //        Constant(field),
-                //        typeof(FieldInfo).GetMethod("SetValue", new[] { typeof(object), typeof(object) }),
-                //        destParam.ToObject(),
-                //        valueResolverExpr.ToObject());
-                //}
-                //else
                 {
                     if (propertyMap.SourceType != propertyMap.DestinationPropertyType)
                         mapperExpr = Assign(destMember, Convert(valueResolverExpr, propertyMap.DestinationPropertyType));
@@ -534,14 +524,6 @@ namespace AutoMapper
                 {
                     mapperExpr = valueResolverExpr;
                 }
-                //else if (propertyMap.DestinationProperty.MemberInfo.DeclaringType.IsValueType())
-                //{
-                //    mapperExpr = Call(
-                //        Constant(setter),
-                //        typeof(MethodInfo).GetMethod("Invoke", new[] { typeof(object), typeof(object[]) }),
-                //        destParam.ToObject(),
-                //        NewArrayInit(typeof(object), valueResolverExpr.ToObject()));
-                //}
                 else
                 {
                     if (propertyMap.SourceType != propertyMap.DestinationPropertyType)

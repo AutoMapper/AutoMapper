@@ -533,13 +533,14 @@ namespace AutoMapper
             var afterMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("AfterMap"), Convert(mapObj, typeof(object)));
 
             var actions = typeMaps;
+
+            if (_beforeMapActions.Any())
+                actions.Insert(0, Call(Constant(this), typeof(TypeMap).GetMethod("BeforeMap"), srcParam, mapObj, ctxtParam));
             actions.Insert(0, beforeMap);
             actions.Insert(0, setMapObj);
             actions.Insert(0, setMapFrom);
             actions.Add(afterMap);
 
-            if(_beforeMapActions.Any())
-                actions.Insert(0, Call(Constant(this), typeof(TypeMap).GetMethod("BeforeMap"), srcParam, mapObj, ctxtParam));
             if (_afterMapActions.Any())
                 actions.Add(Call(Constant(this), typeof(TypeMap).GetMethod("AfterMap"), srcParam, mapObj, ctxtParam));
             
@@ -552,19 +553,11 @@ namespace AutoMapper
         {
             var newDestFunc = CreateNewDestinationFunc(ctxtParam);
 
-            Expression destinationFunc = Property(ctxtParam, "DestinationValue").IfNullElse(newDestFunc.Body);//, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
+            var destVar = Variable(typeof(object), "destination");
+            Expression getDest = Property(ctxtParam, "DestinationValue").IfNullElse(newDestFunc.Body);//, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
 
-            //   Func <ResolutionContext, object> destinationFunc = context =>
-            //{
-            //    var destination = context.DestinationValue ?? newDestFunc.Compile()(context);
-
-            //    if (destination == null)
-            //    {
-            //        throw new InvalidOperationException("Cannot create destination object. " + context);
-            //    }
-
-            //    return destination;
-            //};
+            var destinationFunc = Block(new[] {destVar}, Assign(destVar, getDest), IfThen(Equal(destVar, Constant(null)), Throw(Constant(new InvalidOperationException("Cannot create destination object. ")))), destVar);
+            
 
             if (PreserveReferences)
             {
