@@ -598,7 +598,7 @@ namespace AutoMapper
             }
             else if (propertyMap._customResolverFunc != null)
             {
-                valueResolverFunc = Convert(Invoke(Constant(propertyMap._customResolverFunc), srcParam, ctxtParam), propertyMap.DestinationPropertyType);
+                valueResolverFunc = TryCatch(Convert(Invoke(Constant(propertyMap._customResolverFunc), srcParam, ctxtParam), propertyMap.DestinationPropertyType), Catch(typeof(Exception), Default(propertyMap.DestinationPropertyType)));
             }
             else if (propertyMap.CustomExpression != null)
             {
