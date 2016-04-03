@@ -506,19 +506,15 @@ namespace AutoMapper
 
             if (PreserveReferences)
             {
-                var inner = mapperFunc;
 
-                //mapperFunc = (source, context, destFunc) =>
-                //{
-                //    object cachedDestination;
-                //    if (context.DestinationValue == null &&
-                //        context.InstanceCache.TryGetValue(context, out cachedDestination))
-                //    {
-                //        return cachedDestination;
-                //    }
+                var cache = Variable(typeof(object), "cachedDestination");
+                
+                var condition = Condition(And(
+                    Equal(Property(ctxtParam, "DestinationValue"), Constant(null)),
+                    Call(Property(ctxtParam, "InstanceCache"), typeof (Dictionary<ResolutionContext, object>).GetMethod("TryGetValue"), ctxtParam, cache)
+                    ), cache, mapperFunc);
 
-                //    return inner(source, context, destFunc);
-                //};
+                mapperFunc = Block(new[] { cache }, condition);
             }
             return mapperFunc;
         }
@@ -526,17 +522,20 @@ namespace AutoMapper
         private Expression CreateAssignmentFunc(ParameterExpression srcParam, ParameterExpression ctxtParam, Expression<Func<ResolutionContext, object>> destinationFunc)
         {
             var mapObj = Variable(DestinationType, "mapObj");
+            var mapFrom = Variable(SourceType, "mapFrom");
             var setMapObj = Assign(mapObj, Convert(destinationFunc.Body, DestinationType));
+            var setMapFrom = Assign(mapFrom, Convert(srcParam, SourceType));
             var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), mapObj);
 
             var typeMaps =
-                GetPropertyMaps().Select(pm => pm._mapperExpr.ReplaceParameters(Convert(srcParam, SourceType), mapObj, ctxtParam)).ToList();
+                GetPropertyMaps().Where(pm => pm.CanResolveValue()).Select(pm => pm._mapperExpr.ReplaceParameters(mapFrom, mapObj, ctxtParam)).ToList();
 
             var afterMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("AfterMap"), mapObj);
 
             var actions = typeMaps;
             actions.Insert(0, beforeMap);
             actions.Insert(0, setMapObj);
+            actions.Insert(0, setMapFrom);
             actions.Add(afterMap);
 
             if(_beforeMapActions.Any())
@@ -546,68 +545,15 @@ namespace AutoMapper
             
             actions.Add(Convert(mapObj, typeof(object)));
 
-            return Block( new [] { mapObj }, actions);
-            //Func<object, ResolutionContext, object, object> assignmentFunc = (source, context, mappedObject) =>
-            //{
-            //    context.BeforeMap(mappedObject);
-
-            //    foreach (PropertyMap propertyMap in GetPropertyMaps())
-            //    {
-            //        try
-            //        {
-            //            propertyMap.MapValue(mappedObject, context);
-            //        }
-            //        catch (AutoMapperMappingException ex)
-            //        {
-            //            ex.PropertyMap = propertyMap;
-
-            //            throw;
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            throw new AutoMapperMappingException(context, ex) {PropertyMap = propertyMap};
-            //        }
-            //    }
-
-            //    context.AfterMap(mappedObject);
-
-            //    return mappedObject;
-            //};
-
-            //if (_beforeMapActions.Any())
-            //{
-            //    var inner = assignmentFunc;
-
-            //    assignmentFunc = (source, context, mappedObject) =>
-            //    {
-            //        BeforeMap(source, mappedObject, context);
-
-            //        return inner(source, context, mappedObject);
-            //    };
-            //}
-
-            //if (_afterMapActions.Any())
-            //{
-            //    var inner = assignmentFunc;
-
-            //    assignmentFunc = (source, context, mappedObject) =>
-            //    {
-            //        inner(source, context, mappedObject);
-
-            //        AfterMap(source, mappedObject, context);
-
-            //        return mappedObject;
-            //    };
-            //}
-            //return assignmentFunc;
+            return Block( new [] { mapObj, mapFrom }, actions);
         }
 
         private Expression<Func<ResolutionContext, object>> CreateDestinationFunc(ParameterExpression ctxtParam)
         {
             var newDestFunc = CreateNewDestinationFunc(ctxtParam);
 
-            var destinationFunc = Property(ctxtParam, "DestinationValue").IfNullElse(newDestFunc.Body, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
-            destinationFunc = newDestFunc.Body;
+            Expression destinationFunc = Property(ctxtParam, "DestinationValue").IfNullElse(newDestFunc.Body);//, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
+
             //   Func <ResolutionContext, object> destinationFunc = context =>
             //{
             //    var destination = context.DestinationValue ?? newDestFunc.Compile()(context);
@@ -622,24 +568,14 @@ namespace AutoMapper
 
             if (PreserveReferences)
             {
-                var inner = destinationFunc;
+                var dest = Variable(typeof(object), "dest");
 
-                Expression instanceCache = null;// context.InstanceCache[context]
+                Expression valueBag = Property(ctxtParam, "InstanceCache");
+                var set = Assign(Property(valueBag, "Item", ctxtParam), dest);
                 var setCache =
-                    IfThen(NotEqual(Property(ctxtParam, "SourceValue"),Constant(null)),
-                        Assign(instanceCache, destinationFunc));
+                    IfThen(NotEqual(Property(ctxtParam, "SourceValue"),Constant(null)), set);
 
-                var block = Block();
-
-                //destinationFunc = context =>
-                //{
-                //    var dest = inner(context);
-
-                //    if (context.SourceValue != null && PreserveReferences)
-                //        context.InstanceCache[context] = dest;
-
-                //    return dest;
-                //};
+                destinationFunc = Block(new [] {dest}, Assign(dest, destinationFunc), setCache, dest);
             }
             return Lambda<Func<ResolutionContext, object>>(destinationFunc, ctxtParam);
         }

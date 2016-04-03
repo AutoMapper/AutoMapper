@@ -430,7 +430,7 @@ namespace AutoMapper
         public static Expression IfNullElse(this Expression expression, params Expression[] ifElse)
         {
             return ifElse.Any()
-                ? IfThenElse(NotEqual(expression, Constant(null)), expression, ifElse.First().IfNullElse(ifElse.Skip(1).ToArray()))
+                ? Condition(NotEqual(expression, Constant(null)), expression, ifElse.First().IfNullElse(ifElse.Skip(1).ToArray()))
                 : expression;
         }
 
