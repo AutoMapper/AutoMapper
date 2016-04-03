@@ -528,7 +528,7 @@ namespace AutoMapper
             var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), Convert(mapObj, typeof(object)));
 
             var typeMaps =
-                GetPropertyMaps().Where(pm => pm.CanResolveValue()).Select(pm => pm._mapperExpr.ReplaceParameters(mapFrom, mapObj, ctxtParam)).ToList();
+                GetPropertyMaps().Where(pm => pm.CanResolveValue()).Select(pm => TryPropertyMap(pm, mapFrom, mapObj, ctxtParam)).ToList();
 
             var afterMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("AfterMap"), Convert(mapObj, typeof(object)));
 
@@ -547,6 +547,18 @@ namespace AutoMapper
             actions.Add(Convert(mapObj, typeof(object)));
 
             return Block( new [] { mapObj, mapFrom }, actions);
+        }
+
+        private Expression TryPropertyMap(PropertyMap pm, params Expression[] replaceExpressions)
+        {
+            var autoMapException = Parameter(typeof (AutoMapperMappingException), "ex");
+            var exception = Parameter(typeof(Exception), "ex");
+
+            var mappingExceptionCtor = typeof(AutoMapperMappingException).GetConstructor(new [] { typeof(ResolutionContext), typeof(Exception), typeof(PropertyMap)});
+
+            return TryCatch(Block(typeof(void), pm._mapperExpr.ReplaceParameters(replaceExpressions)),
+                MakeCatchBlock(typeof (AutoMapperMappingException), autoMapException, Block(Assign(Property(autoMapException, "PropertyMap"), Constant(pm)),Rethrow()), null),
+                MakeCatchBlock(typeof(Exception), exception, Throw(New(mappingExceptionCtor, replaceExpressions[2], exception, Constant(pm))), null));
         }
 
         private Expression<Func<ResolutionContext, object>> CreateDestinationFunc(ParameterExpression ctxtParam)
