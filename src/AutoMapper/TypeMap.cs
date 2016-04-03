@@ -589,7 +589,7 @@ namespace AutoMapper
                 return Lambda<Func<ResolutionContext, object>>(Invoke(Property(Property(ctxtParam, "Options"), "ServiceCtor"), Constant(DestinationType)), ctxtParam);
 
             if (ConstructorMap?.CanResolve == true)
-                return Lambda<Func<ResolutionContext, object>>(Invoke(Call(Constant(ConstructorMap), typeof(ConstructorMap).GetMethod("ResolveValue"), ctxtParam)), ctxtParam);
+                return Lambda<Func<ResolutionContext, object>>(Call(Constant(ConstructorMap), typeof(ConstructorMap).GetMethod("ResolveValue"), ctxtParam), ctxtParam);
 
             if (DestinationType.IsInterface())
             {
