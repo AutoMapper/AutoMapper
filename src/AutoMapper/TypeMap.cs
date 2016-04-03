@@ -525,12 +525,12 @@ namespace AutoMapper
             var mapFrom = Variable(SourceType, "mapFrom");
             var setMapObj = Assign(mapObj, Convert(destinationFunc.Body, DestinationType));
             var setMapFrom = Assign(mapFrom, Convert(srcParam, SourceType));
-            var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), mapObj);
+            var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), Convert(mapObj, typeof(object)));
 
             var typeMaps =
                 GetPropertyMaps().Where(pm => pm.CanResolveValue()).Select(pm => pm._mapperExpr.ReplaceParameters(mapFrom, mapObj, ctxtParam)).ToList();
 
-            var afterMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("AfterMap"), mapObj);
+            var afterMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("AfterMap"), Convert(mapObj, typeof(object)));
 
             var actions = typeMaps;
             actions.Insert(0, beforeMap);
@@ -583,33 +583,32 @@ namespace AutoMapper
         private Expression<Func<ResolutionContext, object>> CreateNewDestinationFunc(ParameterExpression ctxtParam)
         {
             if (DestinationCtor != null)
-                return DestinationCtor;
-
+                return Lambda<Func<ResolutionContext, object>>(DestinationCtor.ReplaceParameters(ctxtParam), ctxtParam);
+            
             if (ConstructDestinationUsingServiceLocator)
-                return context => context.Options.ServiceCtor(DestinationType);
+                return Lambda<Func<ResolutionContext, object>>(Invoke(Property(Property(ctxtParam, "Options"), "ServiceCtor"), Constant(DestinationType)), ctxtParam);
 
             if (ConstructorMap?.CanResolve == true)
-                return Lambda<Func<ResolutionContext, object>>(Call(Constant(ConstructorMap), typeof(ConstructorMap).GetMethod("ResolveValue"), ctxtParam), ctxtParam);
+                return Lambda<Func<ResolutionContext, object>>(Invoke(Call(Constant(ConstructorMap), typeof(ConstructorMap).GetMethod("ResolveValue"), ctxtParam)), ctxtParam);
 
             if (DestinationType.IsInterface())
             {
-                var destinationType = DestinationType;
 #if PORTABLE
                 Expression.Lambda<Func<ResolutionContext, object>>(Expression.Throw(Expression.Constant(new PlatformNotSupportedException("Mapping to interfaces through proxies not supported."))), ctxtParam);
 #else
-                destinationType = new ProxyGenerator().GetProxyType(destinationType);
-                return Lambda<Func<ResolutionContext, object>>(Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor"), Constant(destinationType)), ctxtParam);
+                var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(DestinationType)));
+                return Lambda<Func<ResolutionContext, object>>(Invoke(ctor), ctxtParam);
 #endif
             }
 
             if (DestinationType.IsAbstract())
-                return _ => null;
+                return Lambda<Func<ResolutionContext, object>>(Constant(null), ctxtParam);
 
             if (DestinationType.IsGenericTypeDefinition())
-                return _ => null;
-            
-            var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Constant(DestinationType));
-            return Lambda<Func<ResolutionContext, object>>(Invoke(ctor), ctxtParam);
+                return Lambda<Func<ResolutionContext, object>>(Constant(null), ctxtParam);
+
+            var ctor2 = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Constant(DestinationType));
+            return Lambda<Func<ResolutionContext, object>>(Invoke(ctor2), ctxtParam);
         }
     }
 }
