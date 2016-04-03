@@ -554,7 +554,7 @@ namespace AutoMapper
             var autoMapException = Parameter(typeof (AutoMapperMappingException), "ex");
             var exception = Parameter(typeof(Exception), "ex");
 
-            var mappingExceptionCtor = typeof(AutoMapperMappingException).GetConstructor(new [] { typeof(ResolutionContext), typeof(Exception), typeof(PropertyMap)});
+            var mappingExceptionCtor = typeof(AutoMapperMappingException).GetTypeInfo().DeclaredConstructors.First(ci => ci.GetParameters().Count() == 3);
 
             return TryCatch(Block(typeof(void), pm._mapperExpr.ReplaceParameters(replaceExpressions)),
                 MakeCatchBlock(typeof (AutoMapperMappingException), autoMapException, Block(Assign(Property(autoMapException, "PropertyMap"), Constant(pm)),Rethrow()), null),
@@ -599,7 +599,7 @@ namespace AutoMapper
             if (DestinationType.IsInterface())
             {
 #if PORTABLE
-                Expression.Lambda<Func<ResolutionContext, object>>(Expression.Throw(Expression.Constant(new PlatformNotSupportedException("Mapping to interfaces through proxies not supported."))), ctxtParam);
+                Lambda<Func<ResolutionContext, object>>(Block(typeof(object), Throw(Constant(new PlatformNotSupportedException("Mapping to interfaces through proxies not supported."))), Constant(null)), ctxtParam);
 #else
                 var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(DestinationType)));
                 return Lambda<Func<ResolutionContext, object>>(Invoke(ctor), ctxtParam);
