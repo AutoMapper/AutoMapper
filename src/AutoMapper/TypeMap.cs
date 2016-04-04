@@ -582,7 +582,7 @@ namespace AutoMapper
                         .IfNullElse(newDestFunc.ToType(DestinationTypeToUse));
             //, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
 
-            var destinationFunc = Block(new[] {destVar}, Assign(destVar, getDest), IfThen(Equal(destVar, Constant(null)), Throw(Constant(new InvalidOperationException("Cannot create destination object. ")))), destVar);
+            var destinationFunc = Block(new[] {destVar}, Assign(destVar, getDest));
 
             if (PreserveReferences)
             {

@@ -369,7 +369,15 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)
         {
-            return ConstructUsing(ctxt => ctor((TSource)ctxt.SourceValue));
+            return ConstructUsing(ctxt =>
+            {
+                var destination = ctor((TSource) ctxt.SourceValue);
+
+                if (destination == null)
+                    throw new InvalidOperationException($"Cannot create destination object of type {typeof(TDestination)}");
+
+                return destination;
+            });
         }
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<ResolutionContext, TDestination> ctor)
