@@ -243,7 +243,7 @@ namespace AutoMapper
 
             if (typeMap != null)
                 if (typeMap.DestinationCtor != null)
-                    return typeMap.DestinationCtor(context);
+                    return typeMap.DestinationCtor.Compile()(context);
                 else if (typeMap.ConstructDestinationUsingServiceLocator)
                     return context.Options.ServiceCtor(destinationType);
                 else if (typeMap.ConstructorMap?.CanResolve == true)

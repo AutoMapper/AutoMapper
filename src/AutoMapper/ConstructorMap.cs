@@ -16,7 +16,7 @@ namespace AutoMapper
         private Func<ResolutionContext, object> _ctorFunc;
 
         public ConstructorInfo Ctor { get; }
-        public TypeMap TypeMap { get; private set; }
+        public TypeMap TypeMap { get; }
         internal IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
 
         public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
@@ -63,9 +63,10 @@ namespace AutoMapper
                 return;
 
             var srcParam = Expression.Parameter(typeof(object), "src");
+            var source = Expression.Convert(srcParam, TypeMap.SourceType);
             var ctxtParam = Expression.Parameter(typeof(ResolutionContext), "ctxt");
 
-            var ctorArgs = CtorParams.Select(p => p.BuildExpression(srcParam, ctxtParam, typeMapRegistry));
+            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry).ReplaceParameters(source, ctxtParam));
 
             ctorArgs =
                 ctorArgs.Zip(Ctor.GetParameters(),

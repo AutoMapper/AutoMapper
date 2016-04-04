@@ -45,6 +45,14 @@ namespace AutoMapper
             Types = context.Types;
         }
 
+        public AutoMapperMappingException(ResolutionContext context, Exception inner, PropertyMap propertyMap)
+            : base(null, inner)
+        {
+            Context = context;
+            Types = context.Types;
+            PropertyMap = propertyMap;
+        }
+
         public AutoMapperMappingException(ResolutionContext context, string message)
             : this(context)
         {

@@ -16,11 +16,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static ExpressionResolutionResult ExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, LambdaExpression lambdaExpression)
         {
-            var oldParameter = lambdaExpression.Parameters.Single();
-            var newParameter = expressionResolutionResult.ResolutionExpression;
-            var converter = new ParameterConversionVisitor(newParameter, oldParameter);
-
-            Expression currentChild = converter.Visit(lambdaExpression.Body);
+            Expression currentChild = lambdaExpression.ReplaceParameters(expressionResolutionResult.ResolutionExpression);
             Type currentChildType = currentChild.Type;
 
             return new ExpressionResolutionResult(currentChild, currentChildType);

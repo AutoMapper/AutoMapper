@@ -87,12 +87,10 @@ namespace AutoMapper.QueryableExtensions
             {
                 throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             }
-
-            var customProjection = typeMap.CustomProjection;
-            if (customProjection != null)
+            
+            if (typeMap.CustomProjection != null)
             {
-                var parameterReplacer = instanceParameter is ParameterExpression ? new ParameterConversionVisitor(instanceParameter, customProjection.Parameters.FirstOrDefault()) : null;
-                return parameterReplacer == null ? customProjection.Body : parameterReplacer.Visit(customProjection.Body);
+                return typeMap.CustomProjection.ReplaceParameters(instanceParameter);
             }
 
             var bindings = new List<MemberBinding>();
@@ -109,11 +107,8 @@ namespace AutoMapper.QueryableExtensions
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
             }
             Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
-            var ctorParamReplacer = instanceParameter is ParameterExpression ? new ParameterConversionVisitor(instanceParameter, ((LambdaExpression)constructorExpression).Parameters.FirstOrDefault()) : null;
-            if (ctorParamReplacer != null)
-            {
-                constructorExpression = ctorParamReplacer.Visit(constructorExpression);
-            }
+            if (instanceParameter is ParameterExpression)
+                constructorExpression = ((LambdaExpression) constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
             visitor.Visit(constructorExpression);
 
