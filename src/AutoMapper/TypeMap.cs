@@ -47,7 +47,7 @@ namespace AutoMapper
 
         public TypePair Types { get; }
 
-        public ConstructorMap ConstructorMap { get; private set; }
+        public ConstructorMap  ConstructorMap { get; private set; }
 
         public TypeDetails SourceTypeDetails { get; }
         public TypeDetails DestinationTypeDetails { get; }
@@ -78,6 +78,8 @@ namespace AutoMapper
         public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
+        public Type DestinationTypeToUse => DestinationTypeOverride ?? DestinationType;
+
 
         public bool ConstructDestinationUsingServiceLocator { get; set; }
 
@@ -261,9 +263,8 @@ namespace AutoMapper
                 {
                     pm.Seal(typeMapRegistry);
                 }
-                ConstructorMap?.Seal(typeMapRegistry);
 
-                _mapperFunc = BuildMapperFunc();
+                _mapperFunc = BuildMapperFunc(typeMapRegistry);
             }
             _sealed = true;
         }
@@ -454,7 +455,7 @@ namespace AutoMapper
             return _mapperFunc(source, context);
         }
 
-        private Func<object, ResolutionContext, object> BuildMapperFunc()
+        private Func<object, ResolutionContext, object> BuildMapperFunc(TypeMapRegistry typeMapRegistry)
         {
             if (Substitution != null)
             {
@@ -474,14 +475,17 @@ namespace AutoMapper
 
             var srcParam = Parameter(typeof(object), "src");
             var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
+            var mapFrom = Variable(SourceType, "mapFrom");
 
-            var destinationFunc = CreateDestinationFunc(ctxtParam);
+            var destinationFunc = CreateDestinationFunc(typeMapRegistry, mapFrom, ctxtParam);
 
-            var assignmentFunc = CreateAssignmentFunc(srcParam, ctxtParam, destinationFunc);
+            var assignmentFunc = CreateAssignmentFunc(srcParam, mapFrom, ctxtParam, destinationFunc);
 
             var mapperFunc = CreateMapperFunc(srcParam, ctxtParam, assignmentFunc);
 
-            return Lambda<Func<object, ResolutionContext, object>>(mapperFunc, srcParam, ctxtParam).Compile();
+            var lambdaExpr = Lambda<Func<object, ResolutionContext, object>>(mapperFunc, srcParam, ctxtParam);
+
+            return lambdaExpr.Compile();
         }
 
         private Expression CreateMapperFunc( ParameterExpression srcParam, ParameterExpression ctxtParam, Expression assignmentFunc)
@@ -519,10 +523,13 @@ namespace AutoMapper
             return mapperFunc;
         }
 
-        private Expression CreateAssignmentFunc(ParameterExpression srcParam, ParameterExpression ctxtParam, Expression<Func<ResolutionContext, object>> destinationFunc)
+        private Expression CreateAssignmentFunc(
+            ParameterExpression srcParam, 
+            ParameterExpression mapFrom, 
+            ParameterExpression ctxtParam, 
+            Expression<Func<ResolutionContext, object>> destinationFunc)
         {
             var mapObj = Variable(DestinationType, "mapObj");
-            var mapFrom = Variable(SourceType, "mapFrom");
             var setMapObj = Assign(mapObj, Convert(destinationFunc.Body, DestinationType));
             var setMapFrom = Assign(mapFrom, Convert(srcParam, SourceType));
             var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), Convert(mapObj, typeof(object)));
@@ -561,15 +568,21 @@ namespace AutoMapper
                 MakeCatchBlock(typeof(Exception), exception, Throw(New(mappingExceptionCtor, replaceExpressions[2], exception, Constant(pm))), null));
         }
 
-        private Expression<Func<ResolutionContext, object>> CreateDestinationFunc(ParameterExpression ctxtParam)
+        private Expression<Func<ResolutionContext, object>> CreateDestinationFunc(TypeMapRegistry typeMapRegistry, ParameterExpression mapFrom, ParameterExpression ctxtParam)
         {
-            var newDestFunc = CreateNewDestinationFunc(ctxtParam);
+            var newDestFunc = CreateNewDestinationFunc(typeMapRegistry, mapFrom, ctxtParam);
 
             var destVar = Variable(typeof(object), "destination");
-            Expression getDest = Property(ctxtParam, "DestinationValue").IfNullElse(newDestFunc.Body);//, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
+            Expression getDest;
+            if (DestinationTypeToUse.GetTypeInfo().IsValueType)
+                getDest = newDestFunc;
+            else
+                getDest =
+                    Convert(Property(ctxtParam, "DestinationValue"), DestinationTypeToUse)
+                        .IfNullElse(newDestFunc.ToType(DestinationTypeToUse));
+            //, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
 
             var destinationFunc = Block(new[] {destVar}, Assign(destVar, getDest), IfThen(Equal(destVar, Constant(null)), Throw(Constant(new InvalidOperationException("Cannot create destination object. ")))), destVar);
-            
 
             if (PreserveReferences)
             {
@@ -585,35 +598,34 @@ namespace AutoMapper
             return Lambda<Func<ResolutionContext, object>>(destinationFunc, ctxtParam);
         }
 
-        private Expression<Func<ResolutionContext, object>> CreateNewDestinationFunc(ParameterExpression ctxtParam)
+        private Expression CreateNewDestinationFunc(TypeMapRegistry typeMapRegistry, ParameterExpression mapFrom, ParameterExpression ctxtParam)
         {
             if (DestinationCtor != null)
-                return Lambda<Func<ResolutionContext, object>>(DestinationCtor.ReplaceParameters(ctxtParam), ctxtParam);
+                return DestinationCtor.ReplaceParameters(ctxtParam);
             
             if (ConstructDestinationUsingServiceLocator)
-                return Lambda<Func<ResolutionContext, object>>(Invoke(Property(Property(ctxtParam, "Options"), "ServiceCtor"), Constant(DestinationType)), ctxtParam);
+                return Invoke(Property(Property(ctxtParam, "Options"), "ServiceCtor"), Constant(DestinationType));
 
             if (ConstructorMap?.CanResolve == true)
-                return Lambda<Func<ResolutionContext, object>>(Call(Constant(ConstructorMap), typeof(ConstructorMap).GetMethod("ResolveValue"), ctxtParam), ctxtParam);
+                return ConstructorMap.BuildExpression(typeMapRegistry, mapFrom, ctxtParam);
 
             if (DestinationType.IsInterface())
             {
 #if PORTABLE
-                Lambda<Func<ResolutionContext, object>>(Block(typeof(object), Throw(Constant(new PlatformNotSupportedException("Mapping to interfaces through proxies not supported."))), Constant(null)), ctxtParam);
+                Block(typeof(object), Throw(Constant(new PlatformNotSupportedException("Mapping to interfaces through proxies not supported."))), Constant(null));
 #else
                 var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(DestinationType)));
-                return Lambda<Func<ResolutionContext, object>>(Invoke(ctor), ctxtParam);
+                return Invoke(ctor);
 #endif
             }
 
             if (DestinationType.IsAbstract())
-                return Lambda<Func<ResolutionContext, object>>(Constant(null), ctxtParam);
+                return Constant(null);
 
             if (DestinationType.IsGenericTypeDefinition())
-                return Lambda<Func<ResolutionContext, object>>(Constant(null), ctxtParam);
+                return Constant(null);
 
-            var ctor2 = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Constant(DestinationType));
-            return Lambda<Func<ResolutionContext, object>>(Invoke(ctor2), ctxtParam);
+            return DelegateFactory.GenerateConstructorExpression(DestinationType);
         }
     }
 }

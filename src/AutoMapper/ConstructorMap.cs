@@ -11,9 +11,7 @@ namespace AutoMapper
 
     public class ConstructorMap
     {
-        private bool _sealed;
         private readonly IList<ConstructorParameterMap> _ctorParams = new List<ConstructorParameterMap>();
-        private Func<ResolutionContext, object> _ctorFunc;
 
         public ConstructorInfo Ctor { get; }
         public TypeMap TypeMap { get; }
@@ -30,8 +28,6 @@ namespace AutoMapper
             new MemberGetterExpressionResultConverter(),
             new MemberResolverExpressionResultConverter(),
         };
-
-        private Expression<Func<object, ResolutionContext, object>> _ctorExpr;
 
         public bool CanResolve => CtorParams.All(param => param.CanResolve);
 
@@ -54,19 +50,15 @@ namespace AutoMapper
             return Expression.New(Ctor, parameters.Select(p => p.ResolutionExpression));
         }
 
-        internal void Seal(TypeMapRegistry typeMapRegistry)
+        public Expression BuildExpression(
+            TypeMapRegistry typeMapRegistry,
+            ParameterExpression srcParam, 
+            ParameterExpression ctxtParam)
         {
-            if (_sealed)
-                return;
-
             if (!CanResolve)
-                return;
+                return null;
 
-            var srcParam = Expression.Parameter(typeof(object), "src");
-            var source = Expression.Convert(srcParam, TypeMap.SourceType);
-            var ctxtParam = Expression.Parameter(typeof(ResolutionContext), "ctxt");
-
-            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry).ReplaceParameters(source, ctxtParam));
+            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry, srcParam, ctxtParam));
 
             ctorArgs =
                 ctorArgs.Zip(Ctor.GetParameters(),
@@ -75,46 +67,9 @@ namespace AutoMapper
 
             var newExpr = Expression.New(Ctor, ctorArgs);
 
-            _ctorExpr = Expression.Lambda<Func<object, ResolutionContext, object>>(newExpr, srcParam, ctxtParam);
-
-            var ctorFunc = _ctorExpr.Compile();
-
-            _ctorFunc = ctxt => BuildDest(ctorFunc, ctxt);
-
-            _sealed = true;
+            return newExpr;
         }
 
-        public object ResolveValue(ResolutionContext context)
-        {
-            return _ctorFunc(context);
-        }
-
-        private object BuildDest(Func<object, ResolutionContext, object> ctorFunc, ResolutionContext ctxt)
-        {
-            return ctorFunc(ctxt.SourceValue, ctxt);
-        }
-
-        //private object Resolve(ResolutionContext context, ConstructorParameterMap map)
-        //{
-
-        //    var result = map.ResolveValue(context);
-
-        //    var sourceType = result?.GetType() ?? context.SourceType;
-        //    var destinationType = map.Parameter.ParameterType;
-
-        //    var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceType, context.SourceType, destinationType);
-
-        //    if(typeMap == null && map.Parameter.IsOptional)
-        //    {
-        //        object value = map.Parameter.DefaultValue;
-        //        return value;
-        //    }
-        //    else
-        //    {
-        //        var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
-        //        return value;
-        //    }
-        //}
         public void AddParameter(ParameterInfo parameter, IMemberGetter[] resolvers, bool canResolve)
         {
             _ctorParams.Add(new ConstructorParameterMap(this, parameter, resolvers, canResolve));

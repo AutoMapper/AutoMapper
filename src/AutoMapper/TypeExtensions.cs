@@ -16,6 +16,11 @@ namespace AutoMapper
             return expression.Type == typeof (object) ? expression : Expression.Convert(expression, typeof (object));
         }
 
+        public static Expression ToType(this Expression expression, Type type)
+        {
+            return expression.Type == type ? expression : Expression.Convert(expression, type);
+        }
+
         /// <param name="type">The type to construct.</param>
         /// <param name="getClosedGenericInterfaceType">
         /// For generic interfaces, the only way to reliably determine the implementing type's generic type arguments
