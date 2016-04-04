@@ -359,13 +359,12 @@ namespace AutoMapper
 
         private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
         {
-            var openGenericTypes = typePair.GetOpenGenericTypePair();
-            if (openGenericTypes == null)
+            if (typePair.GetOpenGenericTypePair() == null)
                 return null;
 
             var typeMap = _profiles
                 .Cast<IProfileConfiguration>()
-                .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, openGenericTypes.Value))
+                .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
 
             typeMap?.Seal(_typeMapRegistry);

@@ -35,7 +35,7 @@ namespace AutoMapper
             _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
 
-        [Obsolete("Use the construtor instead. Will be removed in 6.0")]
+        [Obsolete("Use the constructor instead. Will be removed in 6.0")]
         protected virtual void Configure() { }
 
         internal void Initialize() => Configure();
@@ -249,9 +249,15 @@ namespace AutoMapper
             return typeMap;
         }
 
-        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair openTypes)
+        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes)
         {
-            var openMapConfig = _typeMapConfigs.FirstOrDefault(tm => tm.Types == openTypes);
+            var openMapConfig = _typeMapConfigs
+                .Where(tm =>
+                    tm.Types.SourceType.GetGenericTypeDefinitionIfGeneric() == closedTypes.SourceType.GetGenericTypeDefinitionIfGeneric() &&
+                    tm.Types.DestinationType.GetGenericTypeDefinitionIfGeneric() == closedTypes.DestinationType.GetGenericTypeDefinitionIfGeneric())
+                .OrderByDescending(tm => tm.DestinationType == closedTypes.DestinationType) // Favor more specific destination matches,
+                .ThenByDescending(tm => tm.SourceType == closedTypes.SourceType) // then more specific source matches
+                .FirstOrDefault();
 
             if (openMapConfig == null)
                 return null;

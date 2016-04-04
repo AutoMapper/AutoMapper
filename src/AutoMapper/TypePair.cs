@@ -35,15 +35,12 @@ namespace AutoMapper
 
         public TypePair? GetOpenGenericTypePair()
         {
-            var isGeneric = SourceType.IsGenericType()
-                            && DestinationType.IsGenericType()
-                            && (SourceType.GetGenericTypeDefinition() != null)
-                            && (DestinationType.GetGenericTypeDefinition() != null);
+            var isGeneric = SourceType.IsGenericType() || DestinationType.IsGenericType();
             if (!isGeneric)
                 return null;
 
-            var sourceGenericDefinition = SourceType.GetGenericTypeDefinition();
-            var destGenericDefinition = DestinationType.GetGenericTypeDefinition();
+            var sourceGenericDefinition = SourceType.IsGenericType() ? SourceType.GetGenericTypeDefinition() : SourceType;
+            var destGenericDefinition = DestinationType.IsGenericType() ? DestinationType.GetGenericTypeDefinition() : DestinationType;
 
             var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
 

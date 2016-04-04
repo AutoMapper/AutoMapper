@@ -33,7 +33,8 @@ namespace AutoMapper.Configuration
         {
             var interfaceType = typeof(ITypeConverter<,>).MakeGenericType(Types.SourceType, Types.DestinationType);
             var convertMethodType = interfaceType.IsAssignableFrom(typeConverterType) ? interfaceType : typeConverterType;
-            var converter = new DeferredInstantiatedConverter(convertMethodType, typeConverterType.BuildCtor<object>());
+            var converter = new DeferredInstantiatedConverter(convertMethodType, typeConverterType.BuildCtor<object>(
+                context => typeof(ITypeConverter<,>).MakeGenericType(context.SourceType, context.DestinationType)));
 
             TypeMapActions.Add(tm => tm.UseCustomMapper(converter.Convert));
         }
@@ -316,7 +317,8 @@ namespace AutoMapper.Configuration
 
         public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
         {
-            var converter = new DeferredInstantiatedConverter<TSource, TDestination>(typeof(TTypeConverter).BuildCtor<ITypeConverter<TSource, TDestination>>());
+            var converter = new DeferredInstantiatedConverter<TSource, TDestination>(typeof(TTypeConverter).BuildCtor<ITypeConverter<TSource, TDestination>>(
+                context => typeof(ITypeConverter<,>).MakeGenericType(context.SourceType, context.DestinationType)));
 
             ConvertUsing(converter.Convert);
         }
