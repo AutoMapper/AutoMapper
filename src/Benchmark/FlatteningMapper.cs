@@ -141,9 +141,67 @@ namespace Benchmark.Flattening
 					SubWithExtraNameProperName = _source.SubWithExtraName.ProperName
 				};
 		}
-	}
+    }
 
-	public class Model1
+    public class CastingManualMapper : IObjectToObjectMapper
+    {
+        private ModelObject _source;
+
+        public string Name
+        {
+            get { return "Manual Casting"; }
+        }
+
+        public void Initialize()
+        {
+            _source = new ModelObject
+            {
+                BaseDate = new DateTime(2007, 4, 5),
+                Sub = new ModelSubObject
+                {
+                    ProperName = "Some name",
+                    SubSub = new ModelSubSubObject
+                    {
+                        IAmACoolProperty = "Cool daddy-o"
+                    }
+                },
+                Sub2 = new ModelSubObject
+                {
+                    ProperName = "Sub 2 name"
+                },
+                SubWithExtraName = new ModelSubObject
+                {
+                    ProperName = "Some other name"
+                },
+            };
+        }
+
+        public void Map()
+        {
+            object source = _source;
+            object baseDate = ((ModelObject)source).BaseDate;
+            object sub2 = ((ModelObject)source).Sub2;
+            object sub2PropertyName = ((ModelSubObject)sub2).ProperName;
+            object sub = ((ModelObject)source).Sub;
+            object subPropertyName = ((ModelSubObject)sub).ProperName;
+            object subA = ((ModelObject)source).Sub;
+            object subSubSub = ((ModelSubObject)subA).SubSub;
+            object subSubSubIAmACoolProperty = ((ModelSubSubObject)subSubSub).IAmACoolProperty;
+            object subWithExtraName = ((ModelObject)source).SubWithExtraName;
+            object subWithExtraNamePropertyName = ((ModelSubObject)subWithExtraName).ProperName;
+
+            var destination = new ModelDto
+            {
+                BaseDate = (DateTime)baseDate,
+                Sub2ProperName = (string)sub2PropertyName,
+                SubProperName = (string)subPropertyName,
+                SubSubSubIAmACoolProperty = (string)subSubSubIAmACoolProperty,
+                SubWithExtraNameProperName = (string)subWithExtraNamePropertyName
+            };
+        }
+    }
+
+    public class Model1
 	{
 		public int Value { get; set; }
 	}
