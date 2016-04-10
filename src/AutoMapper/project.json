@@ -1,5 +1,5 @@
 {
-  "version": "4.2.0-ci-*",
+  "version": "5.0.0-ci-*",
   "authors": [ "Jimmy Bogard" ],
   "owners": [ "Jimmy Bogard" ],
   "licenseUrl": "https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt",

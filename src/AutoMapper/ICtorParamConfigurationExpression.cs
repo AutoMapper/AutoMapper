@@ -3,7 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
-    using Internal;
+    using System.Linq;
+    using Execution;
 
     public interface ICtorParamConfigurationExpression<TSource>
     {
@@ -17,34 +18,32 @@
 
     public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>
     {
-        private readonly ConstructorParameterMap _ctorParamMap;
+        private readonly string _ctorParamName;
+        private readonly List<Action<ConstructorParameterMap>> _ctorParamActions = new List<Action<ConstructorParameterMap>>();
 
-        public CtorParamConfigurationExpression(ConstructorParameterMap ctorParamMap)
+        public CtorParamConfigurationExpression(string ctorParamName)
         {
-            _ctorParamMap = ctorParamMap;
+            _ctorParamName = ctorParamName;
         }
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            var visitor = new MemberInfoFinderVisitor();
-
-            visitor.Visit(sourceMember);
-
-            _ctorParamMap.ResolveUsing(visitor.Members);
+            _ctorParamActions.Add(cpm => cpm.ResolveUsing(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())));
         }
 
-        private class MemberInfoFinderVisitor : ExpressionVisitor
+        public void Configure(TypeMap typeMap)
         {
-            private readonly List<IMemberGetter> _members = new List<IMemberGetter>();
-
-            protected override Expression VisitMember(MemberExpression node)
+            var parameter = typeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == _ctorParamName);
+            if(parameter == null)
             {
-                _members.Add(node.Member.ToMemberGetter());
-
-                return base.VisitMember(node);
+                throw new ArgumentOutOfRangeException("ctorParamName", "There is no constructor parameter named " + _ctorParamName);
             }
+            parameter.CanResolve = true;
 
-            public IEnumerable<IMemberGetter> Members => _members;
+            foreach (var action in _ctorParamActions)
+            {
+                action(parameter);
+            }
         }
     }
 }

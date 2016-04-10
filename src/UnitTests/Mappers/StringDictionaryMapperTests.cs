@@ -14,6 +14,8 @@ namespace AutoMapper.UnitTests.Mappers
     {
         StringDictionary _destination;
 
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+
         protected override void Because_of()
         {
             _destination = Mapper.Map<StringDictionary>(new Destination { Foo = "Foo", Bar = "Bar" });
@@ -30,6 +32,8 @@ namespace AutoMapper.UnitTests.Mappers
     public class When_mapping_from_StringDictionary : NonValidatingSpecBase
     {
         Destination _destination;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {
@@ -49,6 +53,8 @@ namespace AutoMapper.UnitTests.Mappers
     {
         Destination _destination;
 
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+
         protected override void Because_of()
         {
             var source = new StringDictionary() { { "Foo", "Foo" } };
@@ -66,6 +72,8 @@ namespace AutoMapper.UnitTests.Mappers
     public class When_mapping_from_StringDictionary_to_StringDictionary: NonValidatingSpecBase
     {
         StringDictionary _destination;
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
         protected override void Because_of()
         {

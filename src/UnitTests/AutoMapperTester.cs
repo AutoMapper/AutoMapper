@@ -9,10 +9,11 @@ namespace AutoMapper.UnitTests
 		[Fact]
 		public void Should_be_able_to_handle_derived_proxy_types()
 		{
-            Mapper.CreateMap<ModelType, DtoType>();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<ModelType, DtoType>());
 			var source = new[] { new DerivedModelType { TheProperty = "Foo" }, new DerivedModelType { TheProperty = "Bar" } };
 
-			var destination = (DtoType[])Mapper.Map(source, typeof(ModelType[]), typeof(DtoType[]));
+		    var mapper = config.CreateMapper();
+		    var destination = (DtoType[])mapper.Map(source, typeof(ModelType[]), typeof(DtoType[]));
 
 			destination[0].TheProperty.ShouldEqual("Foo");
 			destination[1].TheProperty.ShouldEqual("Bar");
@@ -20,7 +21,7 @@ namespace AutoMapper.UnitTests
 
 		public void Dispose()
 		{
-			Mapper.Reset();
+			
 		}
 
 		public class ModelType

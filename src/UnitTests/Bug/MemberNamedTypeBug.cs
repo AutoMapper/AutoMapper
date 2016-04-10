@@ -5,7 +5,7 @@ namespace AutoMapper.UnitTests.Bug
     using System;
     using Should;
 
-    public class CorrectCtorIsPickedOnDestinationType : AutoMapperSpecBase
+    public class CorrectCtorIsPickedOnDestinationType : NonValidatingSpecBase
     {
         public class SourceClass { }
 
@@ -22,12 +22,13 @@ namespace AutoMapper.UnitTests.Bug
 
             public Int32 Type { get; private set; }
         }
-        
+
+        protected override MapperConfiguration Configuration { get; } 
+            = new MapperConfiguration(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
+
         [Fact]
         public void Should_pick_a_ctor_which_best_matches()
         {
-            Mapper.CreateMap<SourceClass, DestinationClass>();
-
             var source = new SourceClass();
 
             Mapper.Map<DestinationClass>(source);
@@ -48,8 +49,6 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_correctly()
         {
-            Mapper.CreateMap<SourceClass, DestinationClass>();
-
             var source = new SourceClass
             {
                 Type = "Hello"
@@ -58,5 +57,7 @@ namespace AutoMapper.UnitTests.Bug
             var result = Mapper.Map<DestinationClass>(source);
             result.Type.ShouldEqual(source.Type);
         }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<SourceClass, DestinationClass>());
     }
 }

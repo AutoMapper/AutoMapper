@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Internal;
+using AutoMapper.Execution;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -53,7 +53,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class QueryDataSourceInjection<TSource> : IQueryDataSourceInjection<TSource>
     {
         private readonly IQueryable<TSource> _dataSource;
-        private readonly IMappingEngine _mappingEngine;
+        private readonly IMapper _mapper;
         private readonly List<ExpressionVisitor> _beforeMappingVisitors = new List<ExpressionVisitor>();
         private readonly List<ExpressionVisitor> _afterMappingVisitors = new List<ExpressionVisitor>();
         private ExpressionVisitor _sourceExpressionTracer = null;
@@ -63,10 +63,10 @@ namespace AutoMapper.QueryableExtensions.Impl
         private IObjectDictionary _parameters = null;
         private SourceInjectedQueryInspector _inspector;
 
-        public QueryDataSourceInjection(IQueryable<TSource> dataSource, IMappingEngine mappingEngine)
+        public QueryDataSourceInjection(IQueryable<TSource> dataSource, IMapper mapper)
         {
             _dataSource = dataSource;
-            _mappingEngine = mappingEngine;
+            _mapper = mapper;
         }
 
         public ISourceInjectedQueryable<TDestination> For<TDestination>()
@@ -153,7 +153,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             return new SourceSourceInjectedQuery<TSource, TDestination>(_dataSource,
                 new TDestination[0].AsQueryable(),
-                _mappingEngine,
+                _mapper,
                 _beforeMappingVisitors,
                 _afterMappingVisitors,
                 _exceptionHandler,

@@ -28,7 +28,7 @@ namespace AutoMapperSamples.OData
         [EnableQuery]
         public IQueryable<OrderDto> Get()
         {
-            return context.OrderSet.Include("Customer").UseAsDataSource(Mapper.Engine)
+            return context.OrderSet.Include("Customer").UseAsDataSource(Mapper.Instance)
                 // add an optional exceptionhandler that will be invoked
                 // in case an exception is raised upon query execution.
                 // otherwise it would get lost on the WebApi side and all we would get would be

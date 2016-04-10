@@ -34,9 +34,12 @@ namespace AutoMapperSamples
 			[Test]
 			public void Example()
 			{
-				Mapper.CreateMap<OuterSource, OuterDest>();
-				Mapper.CreateMap<InnerSource, InnerDest>();
-				Mapper.AssertConfigurationIsValid();
+			    var config = new MapperConfiguration(cfg =>
+			    {
+			        cfg.CreateMap<OuterSource, OuterDest>();
+			        cfg.CreateMap<InnerSource, InnerDest>();
+			    });
+				config.AssertConfigurationIsValid();
 
 				var source = new OuterSource
 					{
@@ -44,17 +47,11 @@ namespace AutoMapperSamples
 						Inner = new InnerSource {OtherValue = 15}
 					};
 
-				var dest = Mapper.Map<OuterSource, OuterDest>(source);
+				var dest = config.CreateMapper().Map<OuterSource, OuterDest>(source);
 
 				dest.Value.ShouldEqual(5);
 				dest.Inner.ShouldNotBeNull();
 				dest.Inner.OtherValue.ShouldEqual(15);
-			}
-
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
 			}
 		}
 	}

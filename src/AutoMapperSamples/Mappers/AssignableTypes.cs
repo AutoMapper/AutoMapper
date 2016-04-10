@@ -23,8 +23,10 @@ namespace AutoMapperSamples.Mappers
             public void SimpleTypeExample()
             {
                 // No configuration needed
-                Mapper.Map<int, int>(5).ShouldEqual(5);
-                Mapper.Map<string, string>("foo").ShouldEqual("foo");
+                var config = new MapperConfiguration(cfg => { });
+                var mapper = config.CreateMapper();
+                mapper.Map<int, int>(5).ShouldEqual(5);
+                mapper.Map<string, string>("foo").ShouldEqual("foo");
             }
 
             [Test]
@@ -32,7 +34,9 @@ namespace AutoMapperSamples.Mappers
             {
                 var source = new Bar { Value = 5 };
 
-                var dest = Mapper.Map<Bar, Foo>(source);
+                var config = new MapperConfiguration(cfg => { });
+                var mapper = config.CreateMapper();
+                var dest = mapper.Map<Bar, Foo>(source);
 
                 dest.Value.ShouldEqual(5);
             }

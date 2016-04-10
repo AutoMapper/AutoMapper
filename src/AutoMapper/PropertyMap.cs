@@ -6,7 +6,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Internal;
+    using Execution;
 
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
@@ -225,10 +225,12 @@ namespace AutoMapper
 
         public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            var body = sourceMember.Body as MemberExpression;
-            if (body != null)
+            var finder = new MemberFinderVisitor();
+            finder.Visit(sourceMember);
+
+            if (finder.Member != null)
             {
-                SourceMember = body.Member;
+                SourceMember = finder.Member.Member;
             }
             CustomExpression = sourceMember;
             AssignCustomValueResolver(
@@ -243,6 +245,18 @@ namespace AutoMapper
             return UseDestinationValue
                 ? DestinationProperty.GetValue(mappedObject)
                 : null;
+        }
+
+        private class MemberFinderVisitor : ExpressionVisitor
+        {
+            public MemberExpression Member { get; private set; }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                Member = node;
+
+                return base.VisitMember(node);
+            }
         }
     }
 }

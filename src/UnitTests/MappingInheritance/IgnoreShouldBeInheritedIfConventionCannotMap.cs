@@ -35,19 +35,22 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void inhertited_ignore_should_be_overridden_passes_validation()
         {
-            Mapper.CreateMap<BaseDomain, Dto>()
-                .ForMember(d => d.SpecificProperty, m => m.Ignore())
-                .Include<StandardDomain, Dto>();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<BaseDomain, Dto>()
+                    .ForMember(d => d.SpecificProperty, m => m.Ignore())
+                    .Include<StandardDomain, Dto>();
 
-            Mapper.CreateMap<StandardDomain, Dto>()
-                .Include<SpecificDomain, Dto>();
+                cfg.CreateMap<StandardDomain, Dto>()
+                    .Include<SpecificDomain, Dto>();
 
-            Mapper.CreateMap<SpecificDomain, Dto>()
-                .Include<MoreSpecificDomain, Dto>();
+                cfg.CreateMap<SpecificDomain, Dto>()
+                    .Include<MoreSpecificDomain, Dto>();
 
-            Mapper.CreateMap<MoreSpecificDomain, Dto>();
+                cfg.CreateMap<MoreSpecificDomain, Dto>();
+            });
 
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
     }
 }

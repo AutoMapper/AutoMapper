@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using AutoMapper.Internal;
 using Xunit;
 using Should;
+using AutoMapper.Configuration.Conventions;
 
 namespace AutoMapper.UnitTests.Tests
 {
@@ -31,100 +31,6 @@ namespace AutoMapper.UnitTests.Tests
         }
     }
 
-    public class StubMappingOptions : IMappingOptions
-    {
-        private INamingConvention _sourceMemberNamingConvention;
-
-        private INamingConvention _destinationMemberNamingConvention;
-
-        private IEnumerable<string> _prefixes = new List<string>();
-
-        private IEnumerable<string> _postfixes = new List<string>();
-
-        private IEnumerable<string> _destinationPrefixes = new List<string>();
-
-        private IEnumerable<string> _destinationPostfixes = new List<string>();
-
-        private IEnumerable<AliasedMember> _aliases = new List<AliasedMember>();
-
-        private HashSet<MemberNameReplacer> _memberNameReplacers = new HashSet<MemberNameReplacer>();
-
-        private IEnumerable<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
-
-        public INamingConvention SourceMemberNamingConvention
-        {
-            get { return _sourceMemberNamingConvention; }
-            set { _sourceMemberNamingConvention = value; }
-        }
-
-        public INamingConvention DestinationMemberNamingConvention
-        {
-            get { return _destinationMemberNamingConvention; }
-            set { _destinationMemberNamingConvention = value; }
-        }
-
-        public IEnumerable<string> Prefixes
-        {
-            get { return _prefixes; }
-        }
-
-        public IEnumerable<string> Postfixes
-        {
-            get { return _postfixes; }
-        }
-
-        public IEnumerable<string> DestinationPrefixes
-        {
-            get { return _destinationPrefixes; }
-        }
-
-        public IEnumerable<string> DestinationPostfixes
-        {
-            get { return _destinationPostfixes; }
-        }
-
-        public IEnumerable<MemberNameReplacer> MemberNameReplacers
-        {
-            get { return _memberNameReplacers; }
-        }
-
-        public IEnumerable<AliasedMember> Aliases
-        {
-            get { return _aliases; }
-        }
-
-        public bool ConstructorMappingEnabled
-        {
-            get { return true; }
-        }
-
-        public IEnumerable<MethodInfo> SourceExtensionMethods
-        {
-            get { return _sourceExtensionMethods; }
-        }
-
-        public Func<PropertyInfo, bool> ShouldMapProperty
-        {
-            get
-            {
-                return p => true;
-            }
-        }
-
-        public Func<FieldInfo, bool> ShouldMapField
-        {
-            get
-            {
-                return p => p.IsPublic;
-            }
-        }
-
-        public void ReplaceMemberName(string original, string newValue)
-        {
-            _memberNameReplacers.Add(new MemberNameReplacer(original, newValue));
-        }
-    }
-
     public class When_constructing_type_maps_with_matching_property_names : SpecBase
     {
         private TypeMapFactory _factory;
@@ -146,10 +52,20 @@ namespace AutoMapper.UnitTests.Tests
             _factory = new TypeMapFactory();
         }
 
+        private class TestProfile : Profile
+        {
+            public override string ProfileName => "Test";
+
+            protected override void Configure()
+            {
+                
+            }
+        }
+
         [Fact]
         public void Should_map_properties_with_same_name()
         {
-            var mappingOptions = new Profile("Test");
+            var mappingOptions = new TestProfile();
             //mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
             //mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
 
@@ -165,7 +81,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IProfileConfiguration _mappingOptions;
+        private Profile _mappingOptions;
         
         private class Source
         {
@@ -182,11 +98,20 @@ namespace AutoMapper.UnitTests.Tests
             public int SomeSourceValue { get; set; }
         }
 
+        private class TestProfile : Profile
+        {
+            public override string ProfileName => "Test";
+
+            protected override void Configure()
+            {
+
+            }
+        }
         protected override void Establish_context()
         {
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)")};
 
-            _mappingOptions = new Profile("Test");
+            _mappingOptions = new TestProfile();
             _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
             {
                 _.SourceMemberNamingConvention = namingConvention;
@@ -213,7 +138,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private IProfileConfiguration _mappingOptions;
+        private Profile _mappingOptions;
 
         private class Source
         {
@@ -230,11 +155,21 @@ namespace AutoMapper.UnitTests.Tests
             public int some__source__value { get; set; }
         }
 
+        private class TestProfile : Profile
+        {
+            public override string ProfileName => "Test";
+
+            protected override void Configure()
+            {
+
+            }
+        }
+
         protected override void Establish_context()
         {
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
 
-            _mappingOptions = new Profile("Test");
+            _mappingOptions = new TestProfile();
             _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
             {
                 _.SourceMemberNamingConvention = new PascalCaseNamingConvention();
@@ -282,13 +217,16 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_map_properties_with_different_names()
         {
-            Mapper.Configuration.ReplaceMemberName("A", "Ä");
-            Mapper.Configuration.ReplaceMemberName("i", "í");
-            Mapper.Configuration.ReplaceMemberName("Airline", "Airlina");
-            
-            Mapper.CreateMap<Source,Destination>();
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.ReplaceMemberName("A", "Ä");
+                cfg.ReplaceMemberName("i", "í");
+                cfg.ReplaceMemberName("Airline", "Airlina");
+                cfg.CreateMap<Source, Destination>();
+            });
 
-            var dest = Mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
+            var mapper = config.CreateMapper();
+            var dest = mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
             dest.Aviator.ShouldEqual(3);
             dest.SubAirlineFlight.ShouldEqual(4);
             dest.Value.ShouldEqual(5);

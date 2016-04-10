@@ -3,7 +3,7 @@ namespace AutoMapper.Mappers
 {
     using System;
     using System.ComponentModel;
-    using Internal;
+    using Configuration;
 
     public class TypeConverterMapper : IObjectMapper
     {

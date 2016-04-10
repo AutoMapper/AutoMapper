@@ -5,7 +5,7 @@ namespace AutoMapper.Mappers
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Internal;
+    using Execution;
 
     /// <summary>
     /// Instantiates objects

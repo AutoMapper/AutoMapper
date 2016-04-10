@@ -12,43 +12,37 @@ namespace AutoMapper.IntegrationTests.Net4
 {
     public class ExpandMembersPath : AutoMapperSpecBase
     {
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
+            var mappingClass1 = cfg.CreateMap<Class1, Class1DTO>();
+            mappingClass1.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
+            mappingClass1.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
+            mappingClass1.ForMember(dest => dest.Class2DTO, opt =>
             {
-                var mappingClass1 = cfg.CreateMap<Class1, Class1DTO>();
-                mappingClass1.ForAllMembers(r => r.Ignore());
-                mappingClass1.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
-                mappingClass1.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
-                mappingClass1.ForMember(dest => dest.Class2DTO, opt =>
-                {
-                    opt.MapFrom(src => src.Class2);
-                    opt.ExplicitExpansion();
-                });
-
-                var mappingClass2 = cfg.CreateMap<Class2, Class2DTO>();
-                mappingClass2.ForAllMembers(r => r.Ignore());
-                mappingClass2.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
-                mappingClass2.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
-                mappingClass2.ForMember(dest => dest.Class3DTO, opt =>
-                {
-                    opt.MapFrom(src => src.Class3);
-                    opt.ExplicitExpansion();
-                });
-
-                var mappingClass3 = cfg.CreateMap<Class3, Class3DTO>();
-                mappingClass3.ForAllMembers(r => r.Ignore());
-                mappingClass3.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
-                mappingClass3.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
-
-                //This is the trouble mapping
-                mappingClass3.ForMember(dest => dest.Class2DTO, opt =>
-                {
-                    opt.MapFrom(src => src.Class2);
-                    opt.ExplicitExpansion();
-                });
+                opt.MapFrom(src => src.Class2);
+                opt.ExplicitExpansion();
             });
-        }
+
+            var mappingClass2 = cfg.CreateMap<Class2, Class2DTO>();
+            mappingClass2.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
+            mappingClass2.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
+            mappingClass2.ForMember(dest => dest.Class3DTO, opt =>
+            {
+                opt.MapFrom(src => src.Class3);
+                opt.ExplicitExpansion();
+            });
+
+            var mappingClass3 = cfg.CreateMap<Class3, Class3DTO>();
+            mappingClass3.ForMember(dest => dest.IdDTO, opt => opt.MapFrom(src => src.Id));
+            mappingClass3.ForMember(dest => dest.NameDTO, opt => opt.MapFrom(src => src.Name));
+
+            //This is the trouble mapping
+            mappingClass3.ForMember(dest => dest.Class2DTO, opt =>
+            {
+                opt.MapFrom(src => src.Class2);
+                opt.ExplicitExpansion();
+            });
+        });
 
         [Fact]
         public void Should_expand_all_members_in_path()
@@ -57,7 +51,7 @@ namespace AutoMapper.IntegrationTests.Net4
             using(TestContext context = new TestContext())
             {
                 context.Database.Log = s => Debug.WriteLine(s);
-                dtos = context.Class1Set.ProjectTo<Class1DTO>(r => r.Class2DTO.Class3DTO).ToArray();                
+                dtos = context.Class1Set.ProjectTo<Class1DTO>(Configuration, r => r.Class2DTO.Class3DTO).ToArray();                
             }
             Check(dtos);
         }
@@ -69,7 +63,7 @@ namespace AutoMapper.IntegrationTests.Net4
             using(TestContext context = new TestContext())
             {
                 context.Database.Log = s => Debug.WriteLine(s);
-                dtos = context.Class1Set.ProjectTo<Class1DTO>(null, "Class2DTO.Class3DTO").ToArray();
+                dtos = context.Class1Set.ProjectTo<Class1DTO>(Configuration, null, "Class2DTO.Class3DTO").ToArray();
             }
             Check(dtos);
         }
@@ -77,10 +71,10 @@ namespace AutoMapper.IntegrationTests.Net4
         public void Check(Class1DTO[] dtos)
         {
             dtos.Length.ShouldEqual(3);
-            dtos.Select(d => d.IdDTO).ShouldEqual(new[] { 1, 2, 3 });
-            dtos.Select(d => d.Class2DTO.IdDTO).ShouldEqual(new[] { 1, 2, 3 });
-            dtos.Select(d => d.Class2DTO.Class3DTO.IdDTO).ShouldEqual(new[] { 1, 2, 3 });
-            dtos.Select(d => d.Class2DTO.Class3DTO.Class2DTO).ShouldEqual(new Class2DTO[] { null, null, null });
+            dtos.Select(d => d.IdDTO).ToArray().ShouldEqual(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.IdDTO).ToArray().ShouldEqual(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.Class3DTO.IdDTO).ToArray().ShouldEqual(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.Class3DTO.Class2DTO).ToArray().ShouldEqual(new Class2DTO[] { null, null, null });
         }
 
         public class TestContext : System.Data.Entity.DbContext

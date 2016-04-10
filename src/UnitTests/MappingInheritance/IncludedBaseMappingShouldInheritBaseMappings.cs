@@ -5,7 +5,7 @@ namespace AutoMapper.UnitTests.Bug
 {
     using CustomMapping;
 
-    public class IncludedMappingShouldInheritBaseMappings : NonValidatingSpecBase
+    public class IncludedMappingShouldInheritBaseMappings : SpecBase
     {
 
         public class ModelObject
@@ -36,33 +36,33 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void included_mapping_should_inherit_base_mappings_should_not_throw()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
                     .Include<ModelSubObject, DtoSubObject>();
                 cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
 
         [Fact]
         public void included_mapping_should_inherit_base_ignore_mappings_should_not_throw()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.Ignore())
                     .Include<ModelSubObject, DtoSubObject>();
                 cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
 
         [Fact]
         public void more_specific_map_should_override_base_ignore_passes_validation()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.Ignore())
@@ -70,13 +70,13 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<ModelSubObject, DtoSubObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString));
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
 
         [Fact]
         public void more_specific_map_should_override_base_ignore_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.Ignore())
@@ -85,7 +85,9 @@ namespace AutoMapper.UnitTests.Bug
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString));
             });
 
-            var dto = Mapper.Map<DtoSubObject>(new ModelSubObject
+            var mapper = config.CreateMapper();
+
+            var dto = mapper.Map<DtoSubObject>(new ModelSubObject
             {
                 DifferentBaseString = "123",
                 SubString = "456"
@@ -98,7 +100,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void more_specific_map_should_override_base_ignore()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.Ignore())
@@ -106,7 +108,8 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<ModelSubObject, DtoSubObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString));
             });
-            var dto = Mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject
             {
                 DifferentBaseString = "123",
                 SubString = "456"
@@ -119,7 +122,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void more_specific_map_should_override_base_mapping_passes_validation()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
@@ -127,12 +130,12 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<ModelSubObject, DtoSubObject>()
                     .ForMember(d => d.BaseString, m => m.UseValue("789"));
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
         [Fact]
         public void more_specific_map_should_override_base_mapping_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
@@ -141,7 +144,8 @@ namespace AutoMapper.UnitTests.Bug
                     .ForMember(d => d.BaseString, m => m.UseValue("789"));
             });
 
-            var dto = Mapper.Map<DtoSubObject>(new ModelSubObject
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<DtoSubObject>(new ModelSubObject
                                                                    {
                                                                        DifferentBaseString = "123",
                                                                        SubString = "456"
@@ -154,7 +158,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void more_specific_map_should_override_base_mapping()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
@@ -162,7 +166,8 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<ModelSubObject, DtoSubObject>()
                     .ForMember(d => d.BaseString, m => m.UseValue("789"));
             });
-            var dto = Mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject
                                                                    {
                                                                        DifferentBaseString = "123",
                                                                        SubString = "456"
@@ -175,7 +180,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void included_mapping_should_not_inherit_base_mappings_for_other_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
@@ -185,7 +190,8 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
 
-            var dto = Mapper.Map<OtherDto>(new ModelSubObject
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<OtherDto>(new ModelSubObject
             {
                 DifferentBaseString = "123",
                 SubString = "456"
@@ -197,7 +203,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void included_mapping_should_not_inherit_base_mappings_for_other()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
@@ -206,7 +212,8 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<ModelSubObject, OtherDto>();
                 cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
-            var dto = Mapper.Map<ModelSubObject, OtherDto>(new ModelSubObject
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<ModelSubObject, OtherDto>(new ModelSubObject
             {
                 DifferentBaseString = "123",
                 SubString = "456"
@@ -218,7 +225,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void included_mapping_should_not_inherit_base_mappings_for_other_should_not_throw()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
@@ -227,12 +234,12 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<ModelSubObject, OtherDto>();
                 cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
-            Mapper.AssertConfigurationIsValid();
+            config.AssertConfigurationIsValid();
         }
         [Fact]
         public void include_should_allow_automapper_to_select_more_specific_included_type_with_one_parameter()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
@@ -240,7 +247,8 @@ namespace AutoMapper.UnitTests.Bug
 
                 cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
-            var dto = Mapper.Map<ModelObject, DtoObject>(new ModelSubObject
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<ModelObject, DtoObject>(new ModelSubObject
             {
                 DifferentBaseString = "123",
                 SubString = "456"
@@ -252,7 +260,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void include_should_allow_automapper_to_select_more_specific_included_type()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m => m.MapFrom(s => s.DifferentBaseString))
@@ -260,7 +268,8 @@ namespace AutoMapper.UnitTests.Bug
 
                 cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
-            var dto = Mapper.Map<ModelObject, DtoObject>(new ModelSubObject
+            var mapper = config.CreateMapper();
+            var dto = mapper.Map<ModelObject, DtoObject>(new ModelSubObject
             {
                 DifferentBaseString = "123",
                 SubString = "456"
@@ -272,7 +281,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void include_should_apply_condition()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m =>
@@ -288,7 +297,8 @@ namespace AutoMapper.UnitTests.Bug
             {
                 BaseString = "12345"
             };
-            Mapper.Map(new ModelSubObject
+            var mapper = config.CreateMapper();
+            mapper.Map(new ModelSubObject
             {
                 DifferentBaseString = "",
             }, dest);
@@ -299,7 +309,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void include_should_apply_null_substitute()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, DtoObject>()
                     .ForMember(d => d.BaseString, m =>
@@ -311,7 +321,8 @@ namespace AutoMapper.UnitTests.Bug
 
                 cfg.CreateMap<ModelSubObject, DtoSubObject>();
             });
-            var dest = Mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject());
+            var mapper = config.CreateMapper();
+            var dest = mapper.Map<ModelSubObject, DtoSubObject>(new ModelSubObject());
 
             dest.BaseString.ShouldEqual("12345");
         }

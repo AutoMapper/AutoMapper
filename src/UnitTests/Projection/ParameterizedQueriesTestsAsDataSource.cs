@@ -22,14 +22,14 @@
             public int Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             int value = 0;
 
             Expression<Func<Source, int>> sourceMember = src => value + 5;
-            Mapper.CreateMap<Source, Dest>()
+            cfg.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
-        }
+        });
 
         protected override void Because_of()
         {
@@ -70,14 +70,14 @@
             public int Value { get; set; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             int value = 0;
 
             Expression<Func<Source, int>> sourceMember = src => value + 5;
-            Mapper.CreateMap<Source, Dest>()
+            cfg.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
-        }
+        });
 
         protected override void Because_of()
         {
@@ -135,16 +135,14 @@
             public IQueryable<User> Users { get; }
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.Initialize(cfg =>
-            {
-                DB db = null;
+            DB db = null;
 
-                cfg.CreateMap<User, UserViewModel>()
-                    .ForMember(a => a.position, opt => opt.MapFrom(src => db.Users.Count(u => u.DateActivated < src.DateActivated)));
-            });
-        }
+            cfg.CreateMap<User, UserViewModel>()
+                .ForMember(a => a.position,
+                    opt => opt.MapFrom(src => db.Users.Count(u => u.DateActivated < src.DateActivated)));
+        });
 
         [Fact]
         public void Should_only_replace_outer_parameters()

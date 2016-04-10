@@ -2,7 +2,6 @@ namespace AutoMapper.Mappers
 {
     using System.Linq;
     using System.Reflection;
-    using Internal;
 
     public class ExplicitConversionOperatorMapper : IObjectMapper
     {

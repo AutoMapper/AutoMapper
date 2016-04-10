@@ -23,7 +23,7 @@ namespace AutoMapperSamples.Mappers
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var config = new MapperConfiguration(cfg =>
 				{
 					cfg.CreateMap<SourceValue, DestValue>();
 				});
@@ -35,7 +35,7 @@ namespace AutoMapperSamples.Mappers
 					{"Third", new SourceValue {Value = 15}}
 				};
 
-				var destDict = Mapper.Map<Dictionary<string, SourceValue>, IDictionary<string, DestValue>>(sourceDict);
+				var destDict = config.CreateMapper().Map<Dictionary<string, SourceValue>, IDictionary<string, DestValue>>(sourceDict);
 
 				destDict.Count.ShouldEqual(3);
 				destDict["First"].Value.ShouldEqual(5);

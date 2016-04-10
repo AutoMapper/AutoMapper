@@ -27,7 +27,7 @@ namespace AutoMapperSamples.Configuration
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var config = new MapperConfiguration(cfg =>
 				{
 					cfg.ConstructServicesUsing(ObjectFactory.GetInstance);
 				});

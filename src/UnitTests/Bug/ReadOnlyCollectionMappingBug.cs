@@ -15,10 +15,10 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Example()
         {
-            Mapper.CreateMap<Source, Target>();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Target>());
 
             var source = new List<Source> { new Source { X = 42 } };
-            var target = Mapper.Map<ReadOnlyCollection<Target>>(source);
+            var target = config.CreateMapper().Map<ReadOnlyCollection<Target>>(source);
 
             target.Count.ShouldEqual(source.Count);
             target[0].X.ShouldEqual(source[0].X);

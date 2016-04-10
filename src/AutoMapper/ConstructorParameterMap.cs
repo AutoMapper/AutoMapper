@@ -29,9 +29,9 @@ namespace AutoMapper
             return SourceResolvers.Aggregate(result, (current, resolver) => resolver.Resolve(current));
         }
 
-        public void ResolveUsing(IEnumerable<IMemberGetter> members)
+        public void ResolveUsing(params IValueResolver[] resolvers)
         {
-            SourceResolvers = members.ToArray();
+            SourceResolvers = resolvers;
         }
     }
 }

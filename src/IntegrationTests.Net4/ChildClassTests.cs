@@ -69,14 +69,11 @@ namespace AutoMapper.IntegrationTests.Net4
 
         public class UnitTest : AutoMapperSpecBase
         {
-            protected override void Establish_context()
+            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                Mapper.Initialize(cfg =>
-                {
-                    cfg.CreateMap<Base, BaseDTO>();
-                    cfg.CreateMap<Sub, SubDTO>();
-                });
-            }
+                cfg.CreateMap<Base, BaseDTO>();
+                cfg.CreateMap<Sub, SubDTO>();
+            });
 
             [Fact]
             public void AutoMapperEFRelationsTest()
@@ -105,7 +102,7 @@ namespace AutoMapper.IntegrationTests.Net4
                     baseDTO.Sub.Sub1.ShouldEqual("sub1");
 
 
-                    baseDTO = context.Bases.ProjectTo<BaseDTO>().FirstOrDefault();
+                    baseDTO = context.Bases.ProjectTo<BaseDTO>(Configuration).FirstOrDefault();
                     baseDTO.ShouldNotBeNull();
                     baseDTO.BaseID.ShouldEqual(1);
                     baseDTO.Sub.Sub1.ShouldEqual("sub1");

@@ -41,7 +41,7 @@ namespace AutoMapper
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing(Func<TSource, object> resolver);
+        void ResolveUsing<TMember>(Func<TSource, TMember> resolver);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
@@ -49,7 +49,7 @@ namespace AutoMapper
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing(Func<ResolutionResult, object> resolver);
+        void ResolveUsing<TMember>(Func<ResolutionResult, TMember> resolver);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
@@ -57,7 +57,7 @@ namespace AutoMapper
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing(Func<ResolutionResult, TSource, object> resolver);
+        void ResolveUsing<TMember>(Func<ResolutionResult, TSource, TMember> resolver);
 
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
@@ -76,6 +76,12 @@ namespace AutoMapper
         /// <typeparam name="TMember">Member type of the source member to use</typeparam>
         /// <param name="property">Propertyname referencing the source member to map against</param>
         void MapFrom<TMember>(string property);
+
+        /// <summary>
+        /// Map from a specific source member
+        /// </summary>
+        /// <param name="sourceMember">Source member to map from</param>
+        void MapFrom(string sourceMember);
 
         /// <summary>
         /// Ignore this member for configuration validation and skip during mapping
@@ -146,10 +152,5 @@ namespace AutoMapper
     /// </summary>
     public interface IMemberConfigurationExpression : IMemberConfigurationExpression<object>
     {
-        /// <summary>
-        /// Map from a specific source member
-        /// </summary>
-        /// <param name="sourceMember">Source member to map from</param>
-        void MapFrom(string sourceMember);
     }
 }
