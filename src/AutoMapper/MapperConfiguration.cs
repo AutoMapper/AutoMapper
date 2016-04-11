@@ -124,6 +124,13 @@ namespace AutoMapper
             set { AllowNullCollections = value; }
         }
 
+
+        bool IProfileExpression.EnableNullPropagationForQueryMapping
+        {
+            get { return EnableNullPropagationForQueryMapping; }
+            set { EnableNullPropagationForQueryMapping = value; }
+        }
+
         void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => _allTypeMapActions.Add(configuration);
 
         IMemberConfiguration IProfileExpression.AddMemberConfiguration() => _defaultProfile.AddMemberConfiguration();
@@ -178,6 +185,12 @@ namespace AutoMapper
         {
             get { return _defaultProfile.AllowNullCollections; }
             private set { _defaultProfile.AllowNullCollections = value; }
+        }
+        
+        public bool EnableNullPropagationForQueryMapping
+        {
+            get { return _defaultProfile.EnableNullPropagationForQueryMapping; }
+            private set { _defaultProfile.EnableNullPropagationForQueryMapping = value; }
         }
 
         public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();

@@ -51,6 +51,8 @@ namespace AutoMapper
 
         public bool AllowNullCollections { get; set; }
 
+        public bool EnableNullPropagationForQueryMapping { get; set; }
+
         public IEnumerable<string> GlobalIgnores => _globalIgnore; 
 
         public INamingConvention SourceMemberNamingConvention

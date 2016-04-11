@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests.Bug
             public ChildDTO GrandChild { get; set; }
             public int ID_ { get; set; }
             public int? IDs { get; set; }
-            public int ID2 { get; set; }
+            public int? ID2 { get; set; }
         }
 
         public class GrandParent
@@ -102,6 +102,7 @@ namespace AutoMapper.UnitTests.Bug
                 .ForMember(d => d.ID_, opt => opt.MapFrom(s => s.ID))
                 .ReverseMap()
                 .ForMember(d => d.ID, opt => opt.MapFrom(s => s.ID_));
+            cfg.EnableNullPropagationForQueryMapping = true;
         });
 
         public override void MainTeardown()

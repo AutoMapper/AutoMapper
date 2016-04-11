@@ -90,9 +90,9 @@ namespace AutoMapper
                 {
                     message = _message + newLine + newLine + "Mapping types:";
                     message += newLine +
-                               $"{Types.SourceType.Name} -> {Types.DestinationType.Name}";
+                               $"{Types.SourceType?.Name} -> {Types.DestinationType?.Name}";
                     message += newLine +
-                               $"{Types.SourceType.FullName} -> {Types.DestinationType.FullName}";
+                               $"{Types.SourceType?.FullName} -> {Types.DestinationType?.FullName}";
                 }
                 if (Context != null)
                 { 
