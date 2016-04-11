@@ -249,6 +249,11 @@ namespace AutoMapper.UnitTests.Query
         [Fact]
         public void Shoud_support_enumerable_return_type_toList()
         {
+            foreach (var src in _source)
+            {
+                src.Strings = null;
+            }
+
             var result = _source.AsQueryable()
               .UseAsDataSource(Configuration).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
@@ -632,10 +637,10 @@ namespace AutoMapper.UnitTests.Query
                 cfg.CreateMap<Detail, DetailDto>().ReverseMap();
 
                 // dtos with cyclic references that would cause a stackoverflow exception upon projection mapping
-                cfg.CreateMap<Master, MasterCyclicDto>();
-                cfg.CreateMap<MasterCyclicDto, Master>();
-                cfg.CreateMap<Detail, DetailCyclicDto>();
-                cfg.CreateMap<DetailCyclicDto, Detail>();
+                cfg.CreateMap<Master, MasterCyclicDto>().PreserveReferences();
+                cfg.CreateMap<MasterCyclicDto, Master>().PreserveReferences();
+                cfg.CreateMap<Detail, DetailCyclicDto>().PreserveReferences();
+                cfg.CreateMap<DetailCyclicDto, Detail>().PreserveReferences();
             });
 
 
