@@ -291,7 +291,12 @@ namespace AutoMapper.QueryableExtensions.Impl
                 sourceExpression = constantVisitor.Visit(sourceExpression);
             }
 
-
+            // apply null guards in case the feature is enabled
+            if (_mapper.ConfigurationProvider.EnableNullPropagationForQueryMapping)
+            { 
+                var nullGuardVisitor = new ExpressionBuilder.NullsafeQueryRewriter();
+                sourceExpression = nullGuardVisitor.Visit(sourceExpression);
+            }
             // call aftervisitors
             sourceExpression = _afterVisitors.Aggregate(sourceExpression, (current, after) => after.Visit(current));
 

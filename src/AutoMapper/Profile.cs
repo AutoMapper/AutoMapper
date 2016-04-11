@@ -61,6 +61,8 @@ namespace AutoMapper
 
         public IEnumerable<string> GlobalIgnores => _globalIgnore;
 
+        public bool EnableNullPropagationForQueryMapping { get; set; }
+
         public IEnumerable<string> Prefixes { get; private set; } = new string[0];
 
         public IEnumerable<string> Postfixes { get; private set; } = new string[0];

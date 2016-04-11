@@ -54,12 +54,20 @@ namespace AutoMapper.QueryableExtensions
                 _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand),
                     tp => CreateMapExpression(tp, new ConcurrentDictionary<ExpressionRequest, int>()));
 
-            if (!parameters.Any())
-                return cachedExpression;
+            Expression x = cachedExpression;
+            if (parameters.Any())
+            {
+                var visitor = new ConstantExpressionReplacementVisitor(parameters);
+                x = visitor.Visit(cachedExpression);
+            }
 
-            var visitor = new ConstantExpressionReplacementVisitor(parameters);
-
-            return visitor.Visit(cachedExpression);
+            // perform null-propagation if this feature is enabled.
+            if (_configurationProvider.EnableNullPropagationForQueryMapping)
+            {
+                var nullVisitor = new NullsafeQueryRewriter();
+                return nullVisitor.Visit(x);
+            }
+            return x;
         }
 
         public Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null,
@@ -270,6 +278,86 @@ namespace AutoMapper.QueryableExtensions
                 return Expression.Convert(
                     Expression.Constant(_paramValues[node.Member.Name]),
                     node.Member.GetMemberType());
+            }
+        }
+
+        /// <summary>
+        /// Expression visitor for making member access null-safe.
+        /// </summary>
+        /// <remarks>
+        /// Use <see cref="NullsafeQueryBuilder" /> to make a query null-safe.
+        /// copied from NeinLinq (MIT License): https://github.com/axelheer/nein-linq/blob/master/src/NeinLinq/NullsafeQueryRewriter.cs
+        /// </remarks>
+        internal class NullsafeQueryRewriter : ExpressionVisitor
+        {
+            static readonly ConcurrentDictionary<Type, Expression> Cache =
+                new ConcurrentDictionary<Type, Expression>();
+
+            /// <inheritdoc />
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node?.Expression != null)
+                {
+                    return MakeNullsafe(node, node.Expression);
+                }
+
+                return base.VisitMember(node);
+            }
+
+            /// <inheritdoc />
+            protected override Expression VisitMethodCall(MethodCallExpression node)
+            {
+                if (node?.Object != null)
+                {
+                    return MakeNullsafe(node, node.Object);
+                }
+
+                return base.VisitMethodCall(node);
+            }
+
+            Expression MakeNullsafe(Expression node, Expression value)
+            {
+                // cache "fallback expression" for performance reasons
+                var fallback = Cache.GetOrAdd(node.Type, NodeFallback);
+
+                // check value and insert additional coalesce, if fallback is not default
+                return Expression.Condition(
+                    Expression.NotEqual(Visit(value), Expression.Default(value.Type)),
+                    fallback.NodeType != ExpressionType.Default ? Expression.Coalesce(node, fallback) : node,
+                    fallback);
+            }
+
+            static Expression NodeFallback(Type type)
+            {
+                // default values for generic collections
+                if (type.IsConstructedGenericType && type.GenericTypeArguments.Length == 1)
+                {
+                    return GenericCollectionFallback(typeof(List<>), type)
+                        ?? GenericCollectionFallback(typeof(HashSet<>), type)
+                        ?? Expression.Default(type);
+                }
+
+                // default value for arrays
+                if (type.IsArray)
+                {
+                    return Expression.NewArrayInit(type.GetElementType());
+                }
+
+                // default value
+                return Expression.Default(type);
+            }
+
+            static Expression GenericCollectionFallback(Type collectionDefinition, Type type)
+            {
+                var collectionType = collectionDefinition.MakeGenericType(type.GenericTypeArguments);
+
+                // try if an instance of this collection would suffice
+                if (type.GetTypeInfo().IsAssignableFrom(collectionType.GetTypeInfo()))
+                {
+                    return Expression.Convert(Expression.New(collectionType), type);
+                }
+
+                return null;
             }
         }
     }
