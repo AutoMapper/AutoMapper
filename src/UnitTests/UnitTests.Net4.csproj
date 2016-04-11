@@ -84,6 +84,7 @@
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
+    <Compile Include="BasicFlattening.cs" />
     <Compile Include="Bug\InterfaceMultipleInheritance.cs" />
     <Compile Include="Bug\AfterMapNestedObjects.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />

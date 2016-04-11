@@ -6,6 +6,6 @@ namespace Benchmark
 	{
 		string Name { get; }
 		void Initialize();
-		void Map();
+		object Map();
 	}
 }

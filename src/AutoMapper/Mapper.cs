@@ -238,6 +238,7 @@ namespace AutoMapper
 
         object IRuntimeMapper.CreateObject(ResolutionContext context)
         {
+            /*
             var typeMap = context.TypeMap;
             var destinationType = typeMap?.DestinationType ?? context.DestinationType;
 
@@ -258,10 +259,10 @@ namespace AutoMapper
 #else
                 destinationType = new ProxyGenerator().GetProxyType(destinationType);
 #endif
-
+*/
             return !_configurationProvider.AllowNullDestinationValues
-                ? ObjectCreator.CreateNonNullValue(destinationType)
-                : ObjectCreator.CreateObject(destinationType);
+                ? ObjectCreator.CreateNonNullValue(context.DestinationType)
+                : ObjectCreator.CreateObject(context.DestinationType);
         }
 
         bool IRuntimeMapper.ShouldMapSourceValueAsNull(ResolutionContext context)
