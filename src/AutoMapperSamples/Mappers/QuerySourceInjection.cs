@@ -64,7 +64,7 @@ namespace AutoMapperSamples.Mappers
                 });
 
                 IQueryable<Destination> result = _source.AsQueryable()
-                    .UseAsDataSource().For<Destination>()
+                    .UseAsDataSource(Mapper.Configuration).For<Destination>()
                     .Where(s => s.DestValue > 6);
 
                 result.Count().ShouldEqual(1);

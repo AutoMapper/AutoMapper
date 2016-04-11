@@ -74,7 +74,7 @@
                 }
             };
 
-            _dests = sourceList.AsQueryable().UseAsDataSource().For<Dest>(d => d.Child2, d => d.Child4, d => d.Child4.GrandChild).ToArray();
+            _dests = sourceList.AsQueryable().UseAsDataSource(Configuration).For<Dest>(d => d.Child2, d => d.Child4, d => d.Child4.GrandChild).ToArray();
         }
 
         [Fact]
@@ -173,7 +173,7 @@
                 }
             };
 
-            _dest = sourceList.AsQueryable().UseAsDataSource().For<Dest>(d => d.Child2, d => d.Child4, d => d.Child4.GrandChild).FirstOrDefault();
+            _dest = sourceList.AsQueryable().UseAsDataSource(Configuration).For<Dest>(d => d.Child2, d => d.Child4, d => d.Child4.GrandChild).FirstOrDefault();
         }
 
         [Fact]

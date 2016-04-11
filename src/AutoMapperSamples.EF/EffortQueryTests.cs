@@ -83,7 +83,7 @@ namespace AutoMapperSamples.EF
                 }
                 
                 // Using "AsDataSource"
-                IQueryable<OrderDto> sourceResult4 = context.OrderSet.UseAsDataSource().For<OrderDto>();
+                IQueryable<OrderDto> sourceResult4 = context.OrderSet.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
                 var dtos4 = sourceResult4.Where(d => d.FullName.EndsWith("Bestellung")).ToList();
 
                 Assert.AreEqual(2, dtos4.Count);
@@ -97,7 +97,7 @@ namespace AutoMapperSamples.EF
             {
                 var orders = context.OrderSet.Where(o => o.Price > 85D).OrderBy(o => o.Price);
 
-                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource().For<OrderDto>();
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .Where(d => d.FullName.EndsWith("Bestellung")).ToList();
 
@@ -112,7 +112,7 @@ namespace AutoMapperSamples.EF
             {
                 var orders = context.OrderSet;
 
-                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource().For<OrderDto>();
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .OrderBy(dto => dto.FullName).Skip(2).ToList();
 
@@ -128,7 +128,7 @@ namespace AutoMapperSamples.EF
             {
                 var orders = context.OrderSet;
 
-                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource().For<OrderDto>();
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .OrderBy(dto => dto.Price).Skip(2).ToList();
 
@@ -144,7 +144,7 @@ namespace AutoMapperSamples.EF
             {
                 var orders = context.OrderSet.OrderBy(o => o.Name);
 
-                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource().For<OrderDto>();
+                IQueryable<OrderDto> lazilyMappedQuery = orders.UseAsDataSource(Mapper.Configuration).For<OrderDto>();
                 var dtos3 = lazilyMappedQuery
                     .Skip(1).Take(1).ToList();
 
