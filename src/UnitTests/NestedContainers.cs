@@ -80,7 +80,7 @@ namespace AutoMapper.UnitTests
         {
             private Dest _dest;
 
-            public class FooTypeConverter : TypeConverter<Source, Dest>
+            public class FooTypeConverter : ITypeConverter<Source, Dest>
             {
                 private readonly int _value;
 
@@ -94,7 +94,7 @@ namespace AutoMapper.UnitTests
                     _value = value;
                 }
 
-                protected override Dest ConvertCore(Source source)
+                public Dest Convert(Source source, ResolutionContext context)
                 {
                     return new Dest
                     {

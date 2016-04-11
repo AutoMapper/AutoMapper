@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
     {
         public object Map(ResolutionContext context)
         {
-            return context.SourceValue ?? context.Engine.CreateObject(context);
+            return context.SourceValue ?? context.Mapper.CreateObject(context);
         }
 
         public bool IsMatch(TypePair context)

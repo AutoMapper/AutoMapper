@@ -8,6 +8,7 @@ using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.QueryableExtensions
 {
+    using Configuration;
     using Execution;
 
     public interface IExpressionBuilder
@@ -22,18 +23,18 @@ namespace AutoMapper.QueryableExtensions
     {
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
+            new ExplicitValueExpressionResultConverter(), 
             new MemberGetterExpressionResultConverter(),
             new MemberResolverExpressionResultConverter(),
-            new NullSubstitutionExpressionResultConverter()
         };
 
         private static readonly IExpressionBinder[] Binders =
         {
             new NullableExpressionBinder(),
-            new AssignableExpressionBinder(),
             new EnumerableExpressionBinder(),
             new MappedTypeExpressionBinder(),
             new CustomProjectionExpressionBinder(),
+            new AssignableExpressionBinder(),
             new StringExpressionBinder()
         };
 
@@ -87,11 +88,9 @@ namespace AutoMapper.QueryableExtensions
                 throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             }
 
-            var parameterReplacer = instanceParameter is ParameterExpression ? new ParameterReplacementVisitor(instanceParameter) : null;
-            var customProjection = typeMap.CustomProjection;
-            if (customProjection != null)
+            if (typeMap.CustomProjection != null)
             {
-                return parameterReplacer == null ? customProjection.Body : parameterReplacer.Visit(customProjection.Body);
+                return typeMap.CustomProjection.ReplaceParameters(instanceParameter);
             }
 
             var bindings = new List<MemberBinding>();
@@ -108,10 +107,8 @@ namespace AutoMapper.QueryableExtensions
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
             }
             Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
-            if (parameterReplacer != null)
-            {
-                constructorExpression = parameterReplacer.Visit(constructorExpression);
-            }
+            if (instanceParameter is ParameterExpression)
+                constructorExpression = ((LambdaExpression) constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
             visitor.Visit(constructorExpression);
 
@@ -151,21 +148,24 @@ namespace AutoMapper.QueryableExtensions
                     propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.MembersToExpand, request);
 
-                var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
-
-                if (binder == null)
+                if (!propertyRequest.AlreadyExists)
                 {
-                    var message =
-                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
+                    var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
-                    throw new AutoMapperMappingException(message);
-                }
+                    if (binder == null)
+                    {
+                        var message =
+                            $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
 
-                var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
+                        throw new AutoMapperMappingException(message);
+                    }
 
-                if (bindExpression != null)
-                {
-                    bindings.Add(bindExpression);
+                    var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
+
+                    if (bindExpression != null)
+                    {
+                        bindings.Add(bindExpression);
+                    }
                 }
             }
             return bindings;
@@ -175,15 +175,62 @@ namespace AutoMapper.QueryableExtensions
             Expression instanceParameter)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
-            foreach (var resolver in propertyMap.GetSourceValueResolvers())
-            {
+
                 var matchingExpressionConverter =
-                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
+                ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
                 if (matchingExpressionConverter == null)
                     throw new Exception("Can't resolve this to Queryable Expression");
-                result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, resolver);
+            result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap);
+
+            if (propertyMap.NullSubstitute != null && result.Type.IsNullableType())
+            {
+                Expression currentChild = result.ResolutionExpression;
+                Type currentChildType = result.Type;
+                var nullSubstitute = propertyMap.NullSubstitute;
+
+                var newParameter = result.ResolutionExpression;
+                var converter = new NullSubstitutionConversionVisitor(newParameter, nullSubstitute);
+
+                currentChild = converter.Visit(currentChild);
+                currentChildType = currentChildType.GetTypeOfNullable();
+
+                return new ExpressionResolutionResult(currentChild, currentChildType);
             }
+
             return result;
+        }
+
+        private class NullSubstitutionConversionVisitor : ExpressionVisitor
+        {
+            private readonly Expression newParameter;
+            private readonly object _nullSubstitute;
+
+            public NullSubstitutionConversionVisitor(Expression newParameter, object nullSubstitute)
+            {
+                this.newParameter = newParameter;
+                _nullSubstitute = nullSubstitute;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node == newParameter)
+                {
+                    var equalsNull = Expression.Property(newParameter, "HasValue");
+                    var nullConst = Expression.Condition(equalsNull, Expression.Property(newParameter, "Value"),
+                        Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+                    return nullConst;
+                }
+                return node;
+            }
+
+            protected override Expression VisitConditional(ConditionalExpression node)
+            {
+                var equalsNull = Expression.Property(node.IfFalse, "HasValue");
+                var nullConst = Expression.Condition(equalsNull, Expression.Property(node.IfFalse, "Value"),
+                    Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+
+                return Expression.Condition(node.Test, Expression.Constant(_nullSubstitute), nullConst);
+            }
         }
 
         internal class ConstantExpressionReplacementVisitor : ExpressionVisitor

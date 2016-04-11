@@ -289,9 +289,9 @@ namespace AutoMapper.UnitTests
 	    {
 	        private FooViewModel _result;
 
-	        public class NullableBoolToLabel : TypeConverter<bool?, string>
+	        public class NullableBoolToLabel : ITypeConverter<bool?, string>
             {
-                protected override string ConvertCore(bool? source)
+                public string Convert(bool? source, ResolutionContext context)
                 {
                     if (source.HasValue)
                     {

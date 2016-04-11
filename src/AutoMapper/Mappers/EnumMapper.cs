@@ -19,7 +19,7 @@ namespace AutoMapper.Mappers
             {
                 if (context.SourceValue == null)
                 {
-                    return context.Engine.CreateObject(context);
+                    return context.Mapper.CreateObject(context);
                 }
 
                 if (toEnum)
@@ -27,7 +27,7 @@ namespace AutoMapper.Mappers
                     var stringValue = context.SourceValue.ToString();
                     if (string.IsNullOrEmpty(stringValue))
                     {
-                        return context.Engine.CreateObject(context);
+                        return context.Mapper.CreateObject(context);
                     }
 
                     return Enum.Parse(enumDestinationType, stringValue, true);
@@ -38,10 +38,10 @@ namespace AutoMapper.Mappers
             {
                 if (context.SourceValue == null)
                 {
-                    if (context.Engine.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
+                    if (context.Mapper.ShouldMapSourceValueAsNull(context) && context.DestinationType.IsNullableType())
                         return null;
 
-                    return context.Engine.CreateObject(context);
+                    return context.Mapper.CreateObject(context);
                 }
 
                 if (!Enum.IsDefined(enumSourceType, context.SourceValue))
@@ -83,7 +83,7 @@ namespace AutoMapper.Mappers
                    EnumToUnderlyingTypeMapping(context, ref toEnum);
         }
 
-        private static bool EnumToEnumMapping(TypePair context)
+        internal static bool EnumToEnumMapping(TypePair context)
         {
             // Enum to enum mapping
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
@@ -117,17 +117,17 @@ namespace AutoMapper.Mappers
             // Enum to string
             if (sourceEnumType != null)
             {
-                return context.DestinationType.IsAssignableFrom(typeof (string));
+                return context.DestinationType == typeof (string);
             }
             if (destEnumType != null)
             {
                 toEnum = true;
-                return context.SourceType.IsAssignableFrom(typeof (string));
+                return context.SourceType == typeof (string);
             }
             return false;
         }
 
-        private static bool EnumToNullableTypeMapping(TypePair context)
+        internal static bool EnumToNullableTypeMapping(TypePair context)
         {
             if (!context.DestinationType.IsGenericType())
             {

@@ -8,6 +8,7 @@ namespace AutoMapper
     {
         public TypeMapConfigErrors[] Errors { get; }
         public ResolutionContext Context { get; }
+        public PropertyMap PropertyMap { get; set; }
 
         public class TypeMapConfigErrors
         {
@@ -47,24 +48,28 @@ namespace AutoMapper
             {
                 if (Context != null)
                 {
-                    var contextToUse = Context;
                     var message =
                         string.Format(
                             "The following property on {0} cannot be mapped: \n\t{2}\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
-                            contextToUse.DestinationType.FullName, contextToUse.DestinationType.FullName,
-                            contextToUse.GetContextPropertyMap().DestinationProperty.Name);
+                            Context.DestinationType.FullName, Context.DestinationType.FullName,
+                            PropertyMap.DestinationProperty.Name);
 
                     message += "\nContext:";
 
-                    while (contextToUse != null)
+                    Exception exToUse = this;
+                    while (exToUse != null)
                     {
-                        message += contextToUse.GetContextPropertyMap() == null
-                            ? string.Format("\n\tMapping from type {1} to {0}", contextToUse.DestinationType.FullName,
-                                contextToUse.SourceType.FullName)
+                        var configExc = exToUse as AutoMapperConfigurationException;
+                        if (configExc != null)
+                        { message += configExc.PropertyMap == null
+                            ? string.Format("\n\tMapping from type {1} to {0}", configExc.Context.DestinationType.FullName,
+                                configExc.Context.SourceType.FullName)
                             : string.Format("\n\tMapping to property {0} from {2} to {1}",
-                                contextToUse.GetContextPropertyMap().DestinationProperty.Name,
-                                contextToUse.DestinationType.FullName, contextToUse.SourceType.FullName);
-                        contextToUse = contextToUse.Parent;
+                                configExc.PropertyMap.DestinationProperty.Name,
+                                configExc.Context.DestinationType.FullName, configExc.Context.SourceType.FullName);
+                        }
+
+                        exToUse = exToUse.InnerException;
                     }
 
                     return message + "\n" + base.Message;

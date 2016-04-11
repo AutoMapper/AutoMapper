@@ -7,7 +7,7 @@ namespace AutoMapper
     using System.Reflection;
 
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
-    public class TypePair : IEquatable<TypePair>
+    public struct TypePair : IEquatable<TypePair>
     {
         public static bool operator ==(TypePair left, TypePair right) => Equals(left, right);
 
@@ -26,26 +26,21 @@ namespace AutoMapper
 
         public Type DestinationType { get; }
 
-        public bool Equals(TypePair other) => !ReferenceEquals(null, other) && (ReferenceEquals(this, other) ||
-                                                                                SourceType == other.SourceType &&
-                                                                                DestinationType == other.DestinationType);
+        public bool Equals(TypePair other) => SourceType == other.SourceType && DestinationType == other.DestinationType;
 
         public override bool Equals(object obj) => !ReferenceEquals(null, obj) &&
                                                    (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((TypePair) obj));
 
         public override int GetHashCode() => _hashcode;
 
-        public TypePair GetOpenGenericTypePair()
+        public TypePair? GetOpenGenericTypePair()
         {
-            var isGeneric = SourceType.IsGenericType()
-                            && DestinationType.IsGenericType()
-                            && (SourceType.GetGenericTypeDefinition() != null)
-                            && (DestinationType.GetGenericTypeDefinition() != null);
+            var isGeneric = SourceType.IsGenericType() || DestinationType.IsGenericType();
             if (!isGeneric)
                 return null;
 
-            var sourceGenericDefinition = SourceType.GetGenericTypeDefinition();
-            var destGenericDefinition = DestinationType.GetGenericTypeDefinition();
+            var sourceGenericDefinition = SourceType.IsGenericType() ? SourceType.GetGenericTypeDefinition() : SourceType;
+            var destGenericDefinition = DestinationType.IsGenericType() ? DestinationType.GetGenericTypeDefinition() : DestinationType;
 
             var genericTypePair = new TypePair(sourceGenericDefinition, destGenericDefinition);
 
@@ -54,9 +49,10 @@ namespace AutoMapper
 
         public IEnumerable<TypePair> GetRelatedTypePairs()
         {
+            var @this = this;
             var subTypePairs =
                 from destinationType in GetAllTypes(DestinationType)
-                from sourceType in GetAllTypes(SourceType)
+                from sourceType in @this.GetAllTypes(@this.SourceType)
                 select new TypePair(sourceType, destinationType);
             return subTypePairs;
         }

@@ -30,18 +30,10 @@ namespace AutoMapper.Mappers
             Type destKvpType = KvpType.MakeGenericType(destKeyType, destValueType);
 
             object destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
-            int count = 0;
 
             foreach (object item in enumerableValue)
             {
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(item, null, sourceElementType, destKvpType);
-
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
-                Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destKvpType;
-
-                var newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, count);
-
-                object mappedValue = context.Engine.Map(newContext);
+                object mappedValue = context.Mapper.Map(item, null, sourceElementType, destKvpType, context);
                 var keyProperty = mappedValue.GetType().GetProperty("Key");
                 object destKey = keyProperty.GetValue(mappedValue, null);
 
@@ -49,8 +41,6 @@ namespace AutoMapper.Mappers
                 object destValue = valueProperty.GetValue(mappedValue, null);
 
                 genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
-
-                count++;
             }
 
             return destDictionary;

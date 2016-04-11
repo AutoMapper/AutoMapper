@@ -49,9 +49,9 @@ namespace AutoMapper.UnitTests
         public class ProdTypeA : ProductTypeDto {}
         public class ProdTypeB : ProductTypeDto {}
 
-        public class ProductTypeConverter : TypeConverter<ProductType, ProductTypeDto>
+        public class ProductTypeConverter : ITypeConverter<ProductType, ProductTypeDto>
         {
-            protected override ProductTypeDto ConvertCore(ProductType source)
+            public ProductTypeDto Convert(ProductType source, ResolutionContext context)
             {
                 if (source.Name == "A")
                     return new ProdTypeA();

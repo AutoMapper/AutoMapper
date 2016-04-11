@@ -9,6 +9,7 @@ namespace AutoMapper
     using System.Reflection;
     using Configuration;
     using Configuration.Conventions;
+    using IMemberConfiguration = Configuration.Conventions.IMemberConfiguration;
 
     /// <summary>
     /// Provides a named configuration for maps. Naming conventions become scoped per profile.
@@ -34,7 +35,7 @@ namespace AutoMapper
             _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
 
-        [Obsolete("Use the construtor instead. Will be removed in 6.0")]
+        [Obsolete("Use the constructor instead. Will be removed in 6.0")]
         protected virtual void Configure() { }
 
         internal void Initialize() => Configure();
@@ -168,7 +169,7 @@ namespace AutoMapper
         {
             _globalIgnore.Add(propertyNameStartingWith);
         }
-        
+
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
 
         private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
@@ -248,9 +249,15 @@ namespace AutoMapper
             return typeMap;
         }
 
-        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair openTypes)
+        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes)
         {
-            var openMapConfig = _typeMapConfigs.FirstOrDefault(tm => tm.Types == openTypes);
+            var openMapConfig = _typeMapConfigs
+                .Where(tm =>
+                    tm.Types.SourceType.GetGenericTypeDefinitionIfGeneric() == closedTypes.SourceType.GetGenericTypeDefinitionIfGeneric() &&
+                    tm.Types.DestinationType.GetGenericTypeDefinitionIfGeneric() == closedTypes.DestinationType.GetGenericTypeDefinitionIfGeneric())
+                .OrderByDescending(tm => tm.DestinationType == closedTypes.DestinationType) // Favor more specific destination matches,
+                .ThenByDescending(tm => tm.SourceType == closedTypes.SourceType) // then more specific source matches
+                .FirstOrDefault();
 
             if (openMapConfig == null)
                 return null;
@@ -266,7 +273,7 @@ namespace AutoMapper
 
         private void Configure(TypeMapRegistry typeMapRegistry, TypeMap typeMap)
         {
-            foreach (var action in _allTypeMapActions)
+            foreach(var action in _allTypeMapActions)
             {
                 var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
 
@@ -275,27 +282,26 @@ namespace AutoMapper
                 expression.Configure(this, typeMap);
             }
 
-            foreach (var baseMap in typeMap.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
-            {
-                var currentMap = baseMap;
-                while (currentMap != null)
-                {
-                    currentMap.IncludeDerivedTypes(typeMap.SourceType, typeMap.DestinationType);
-                    typeMap.ApplyInheritedMap(currentMap);
-
-                    currentMap = typeMapRegistry.GetTypeMap(new TypePair(currentMap.SourceType.BaseType(), currentMap.DestinationType.BaseType()));
-                }
-
-            }
-            ApplyInheritedMaps(typeMapRegistry, typeMap, typeMap);
+            ApplyBaseMaps(typeMapRegistry, typeMap, typeMap);
+            ApplyDerivedMaps(typeMapRegistry, typeMap, typeMap);
         }
 
-        private void ApplyInheritedMaps(TypeMapRegistry typeMapRegistry, TypeMap baseMap, TypeMap typeMap)
+        private static void ApplyBaseMaps(TypeMapRegistry typeMapRegistry, TypeMap derivedMap, TypeMap currentMap)
+        {
+            foreach(var baseMap in currentMap.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
+            {
+                baseMap.IncludeDerivedTypes(currentMap.SourceType, currentMap.DestinationType);
+                derivedMap.ApplyInheritedMap(baseMap);
+                ApplyBaseMaps(typeMapRegistry, derivedMap, baseMap);
+            }
+        }
+
+        private void ApplyDerivedMaps(TypeMapRegistry typeMapRegistry, TypeMap baseMap, TypeMap typeMap)
         {
             foreach (var inheritedTypeMap in typeMap.IncludedDerivedTypes.Select(typeMapRegistry.GetTypeMap).Where(map => map != null))
             {
                 inheritedTypeMap.ApplyInheritedMap(baseMap);
-                ApplyInheritedMaps(typeMapRegistry, baseMap, inheritedTypeMap);
+                ApplyDerivedMaps(typeMapRegistry, baseMap, inheritedTypeMap);
             }
         }
 

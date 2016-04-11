@@ -15,27 +15,12 @@ namespace AutoMapper.UnitTests.Bug
 
         class JObject : Dictionary<string, string>, IEnumerable, IEnumerable<KeyValuePair<string, string>>
         {
-            List<StringKeyValuePair> _pairs;
-
-            public JObject()
+            public JObject(string json) : base(
+                (from pair in json.Split('&')
+                let items = pair.Split(',')
+                select new StringKeyValuePair(items[0], items[1]))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value))
             {
-            }
-
-            public JObject(string json)
-            {
-                _pairs = (from pair in json.Split('&')
-                             let items = pair.Split(',')
-                             select new StringKeyValuePair(items[0], items[1])).ToList();
-            }
-
-            public new IEnumerator<StringKeyValuePair> GetEnumerator()
-            {
-                return (IEnumerator<StringKeyValuePair>)_pairs.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return new[] { new object() }.GetEnumerator();
             }
         }
 

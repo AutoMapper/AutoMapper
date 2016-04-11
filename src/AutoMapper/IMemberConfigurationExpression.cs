@@ -7,13 +7,14 @@ namespace AutoMapper
     /// Member configuration options
     /// </summary>
     /// <typeparam name="TSource">Source type for this member</typeparam>
-    public interface IMemberConfigurationExpression<TSource>
+    /// <typeparam name="TMember">Type for this member</typeparam>
+    public interface IMemberConfigurationExpression<TSource, TMember>
     {
         /// <summary>
         /// Substitute a custom value when the source member resolves as null
         /// </summary>
         /// <param name="nullSubstitute">Value to use</param>
-        void NullSubstitute(object nullSubstitute);
+        void NullSubstitute(TMember nullSubstitute);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver
@@ -41,7 +42,7 @@ namespace AutoMapper
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing<TMember>(Func<TSource, TMember> resolver);
+        void ResolveUsing<TSourceMember>(Func<TSource, TSourceMember> resolver);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
@@ -49,39 +50,24 @@ namespace AutoMapper
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing<TMember>(Func<ResolutionResult, TMember> resolver);
-
-        /// <summary>
-        /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
-        /// Access both the source object and current resolution context for additional mapping, context items and parent objects
-        /// This method cannot be used in conjunction with LINQ query projection
-        /// </summary>
-        /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing<TMember>(Func<ResolutionResult, TSource, TMember> resolver);
+        void ResolveUsing<TSourceMember>(Func<TSource, ResolutionContext, TSourceMember> resolver);
 
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
         /// This method can be used in mapping to LINQ query projections, while ResolveUsing cannot.
         /// Any null reference exceptions in this expression will be ignored (similar to flattening behavior)
         /// </summary>
-        /// <typeparam name="TMember">Member type of the source member to use</typeparam>
+        /// <typeparam name="TSourceMember">Member type of the source member to use</typeparam>
         /// <param name="sourceMember">Expression referencing the source member to map against</param>
-        void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
+        void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember);
 
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
         /// This method can be used in mapping to LINQ query projections, while ResolveUsing cannot.
         /// Any null reference exceptions in this expression will be ignored (similar to flattening behavior)
         /// </summary>
-        /// <typeparam name="TMember">Member type of the source member to use</typeparam>
         /// <param name="property">Propertyname referencing the source member to map against</param>
-        void MapFrom<TMember>(string property);
-
-        /// <summary>
-        /// Map from a specific source member
-        /// </summary>
-        /// <param name="sourceMember">Source member to map from</param>
-        void MapFrom(string sourceMember);
+        void MapFrom(string property);
 
         /// <summary>
         /// Ignore this member for configuration validation and skip during mapping
@@ -121,13 +107,19 @@ namespace AutoMapper
         /// Conditionally map this member
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, bool> condition);
+        void Condition(Func<TSource, object, TMember, ResolutionContext, bool> condition);
 
         /// <summary>
         /// Conditionally map this member
         /// </summary>
-        /// <param name="condition">Condition to evaluate using the current resolution context</param>
-        void Condition(Func<ResolutionContext, bool> condition);
+        /// <param name="condition">Condition to evaluate using the source object</param>
+        void Condition(Func<TSource, object, TMember, bool> condition);
+       
+        /// <summary>
+        /// Conditionally map this member
+        /// </summary>
+        /// <param name="condition">Condition to evaluate using the source object</param>
+        void Condition(Func<TSource, bool> condition);
        
         /// <summary>
         /// Conditionally map this member, evaluated before accessing the source value
@@ -150,7 +142,7 @@ namespace AutoMapper
     /// <summary>
     /// Configuration options for an individual member
     /// </summary>
-    public interface IMemberConfigurationExpression : IMemberConfigurationExpression<object>
+    public interface IMemberConfigurationExpression : IMemberConfigurationExpression<object, object>
     {
     }
 }

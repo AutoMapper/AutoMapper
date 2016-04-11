@@ -247,22 +247,11 @@
                     replacedExpression = _parentMappingVisitor.Visit(node.Expression);
 
                 if (propertyMap.CustomExpression != null)
-                    return ConvertCustomExpression(replacedExpression, propertyMap);
+                    return propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
 
                 Func<Expression,IMemberGetter,Expression> getExpression = (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo);
 
-                //if (propertyMap.SourceMember.ToMemberGetter().MemberType.IsNullableType())
-                //{
-                //    var expression = getExpression;
-                //    getExpression = (current, memberGetter) => Expression.Call(expression.Invoke(current,memberGetter), "GetValueOrDefault", new Type[0], new Expression[0]);
-                //}
-                //else if (propertyMap.DestinationPropertyType.IsNullableType())
-                //{
-
-                //}
-
-                return propertyMap.GetSourceValueResolvers()
-                    .OfType<IMemberGetter>()
+                return propertyMap.SourceMembers
                     .Aggregate(replacedExpression, getExpression);
             }
 
@@ -312,13 +301,6 @@
                     _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetTypeInfo().GenericTypeArguments.Concat(new []{ (propertyMap.SourceMember as PropertyInfo).PropertyType }).ToList();
                 else if (propertyMap.SourceMember is FieldInfo)
                     _destSubTypes = (propertyMap.SourceMember as FieldInfo).FieldType.GetTypeInfo().GenericTypeArguments;
-            }
-
-            private Expression ConvertCustomExpression(Expression node, PropertyMap propertyMap)
-            {
-                var replaced = new ParameterReplacementVisitor(node);
-                var newBody = replaced.Visit(propertyMap.CustomExpression.Body);
-                return newBody;
             }
         }
     }

@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests.Bug
 				var sourceList = new List<SourceObject>();
 				var destList = new List<DestObject>();
 
-				var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceObject, DestObject>());
+				var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceObject, DestObject>().PreserveReferences());
 				config.AssertConfigurationIsValid();
 
 				var source1 = new SourceObject

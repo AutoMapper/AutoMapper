@@ -7,12 +7,12 @@ namespace AutoMapper
     /// <typeparam name="TDestination">Destination type</typeparam>
 	public interface ITypeConverter<in TSource, out TDestination>
 	{
-
         /// <summary>
         /// Performs conversion from source to destination type
         /// </summary>
+        /// <param name="source">Source object</param>
         /// <param name="context">Resolution context</param>
         /// <returns>Destination object</returns>
-		TDestination Convert(ResolutionContext context);
+        TDestination Convert(TSource source, ResolutionContext context);
 	}
 }

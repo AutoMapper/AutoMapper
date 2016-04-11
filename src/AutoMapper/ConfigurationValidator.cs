@@ -40,8 +40,8 @@ namespace AutoMapper
                 try
                 {
                     DryRunTypeMap(typeMapsChecked,
-                        new ResolutionContext(typeMap, null, typeMap.SourceType, typeMap.DestinationType,
-                            new MappingOperationOptions(_config.ServiceCtor), engine));
+                        new ResolutionContext(null, null, typeMap.SourceType, typeMap.DestinationType, typeMap,
+                            new MappingOperationOptions(_config.ServiceCtor), new Mapper(_config)));
                 }
                 catch (Exception e)
                 {
@@ -96,8 +96,7 @@ namespace AutoMapper
             if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
                 return;
 
-            var memberContext = context.CreateElementContext(itemTypeMap, null, sourceElementType, destElementType,
-                0);
+            var memberContext = new ResolutionContext(null, null, sourceElementType, destElementType, itemTypeMap, context);
 
             DryRunTypeMap(typeMapsChecked, memberContext);
         }
@@ -106,30 +105,34 @@ namespace AutoMapper
         {
             foreach (var propertyMap in context.TypeMap.GetPropertyMaps())
             {
-                if (!propertyMap.IsIgnored())
+                if (propertyMap.IsIgnored()) continue;
+
+                var sourceType = propertyMap.SourceType;
+
+                if (sourceType == null) continue;
+
+                // when we don't know what the source type is, bail
+                if (sourceType.IsGenericParameter || sourceType == typeof (object))
+                    return;
+
+                var destinationType = propertyMap.DestinationProperty.MemberType;
+                var memberTypeMap = _config.ResolveTypeMap(sourceType,
+                    destinationType);
+
+                if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
+                    continue;
+
+                var memberContext = new ResolutionContext(null, null, sourceType, destinationType, memberTypeMap,
+                    context);
+
+                try
                 {
-                    var lastResolver =
-                        propertyMap.GetSourceValueResolvers().OfType<IMemberResolver>().LastOrDefault();
-
-                    if (lastResolver != null)
-                    {
-                        var sourceType = lastResolver.MemberType;
-                        // when we don't know what the source type is, bail
-                        if (sourceType.IsGenericParameter || sourceType == typeof(object))
-                            return;
-
-                        var destinationType = propertyMap.DestinationProperty.MemberType;
-                        var memberTypeMap = _config.ResolveTypeMap(sourceType,
-                            destinationType);
-
-                        if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
-                            continue;
-
-                        var memberContext = context.CreateMemberContext(memberTypeMap, null, null, sourceType,
-                            propertyMap);
-
-                        DryRunTypeMap(typeMapsChecked, memberContext);
-                    }
+                    DryRunTypeMap(typeMapsChecked, memberContext);
+                }
+                catch (AutoMapperMappingException ex)
+                {
+                    ex.PropertyMap = propertyMap;
+                    throw;
                 }
             }
         }

@@ -16,7 +16,7 @@ namespace AutoMapper.UnitTests
 
             protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<ParentModel, ParentDto>();
+                cfg.CreateMap<ParentModel, ParentDto>().PreserveReferences();
                 cfg.CreateMap<ChildModel, ChildDto>();
             });
 
@@ -120,7 +120,7 @@ namespace AutoMapper.UnitTests
         //        _dto.Children[0].Parent.ID.ShouldEqual(_dto.ID);
         //    }
 
-        //    public class ChildIdToParentDtoConverter : TypeConverter<int, ParentDto>
+        //    public class ChildIdToParentDtoConverter : ITypeConverter<int, ParentDto>
         //    {
         //        private readonly Dictionary<int, ParentModel> _parentModels;
 
@@ -129,7 +129,7 @@ namespace AutoMapper.UnitTests
         //            _parentModels = parentModels;
         //        }
 
-        //        protected override ParentDto ConvertCore(int childId)
+        //        public ParentDto Convert(int childId)
         //        {
         //            ParentModel parentModel = _parentModels[childId];
         //            MappingEngine mappingEngine = (MappingEngine)Mapper.Engine;
@@ -137,7 +137,7 @@ namespace AutoMapper.UnitTests
         //        }
         //    }
 
-        //    public class ParentIdToChildDtoListConverter : TypeConverter<int, List<ChildDto>>
+        //    public class ParentIdToChildDtoListConverter : ITypeConverter<int, List<ChildDto>>
         //    {
         //        private readonly IList<ChildModel> _childModels;
 
@@ -205,6 +205,7 @@ namespace AutoMapper.UnitTests
 		        cfg.CreateMap<int, List<ChildDto>>().ConvertUsing(new ParentIdToChildDtoListConverter(childModels));
 
 		        cfg.CreateMap<ParentModel, ParentDto>()
+                    .PreserveReferences()
 		            .ForMember(dest => dest.Children, opt => opt.MapFrom(src => src.ID));
 		        cfg.CreateMap<ChildModel, ChildDto>();
 		    });
@@ -229,14 +230,10 @@ namespace AutoMapper.UnitTests
 					_parentModels = parentModels;
 				}
 
-				public ParentDto Convert(ResolutionContext resolutionContext)
+				public ParentDto Convert(int source, ResolutionContext resolutionContext)
 				{
-					int childId = (int) resolutionContext.SourceValue;
-					ParentModel parentModel = _parentModels[childId];
-				    var context = resolutionContext.CreateTypeContext(
-				        resolutionContext.Engine.ConfigurationProvider.ResolveTypeMap(typeof (ParentModel), typeof (ParentDto)),
-				        parentModel, null, typeof (ParentModel), typeof (ParentDto));
-				    return (ParentDto) resolutionContext.Engine.Map(context);
+					ParentModel parentModel = _parentModels[source];
+				    return (ParentDto) resolutionContext.Mapper.Map(parentModel, null, typeof(ParentModel), typeof(ParentDto), resolutionContext);
 				}
 			}
 
@@ -249,14 +246,10 @@ namespace AutoMapper.UnitTests
 					_childModels = childModels;
 				}
 
-				public List<ChildDto> Convert(ResolutionContext resolutionContext)
+				public List<ChildDto> Convert(int source, ResolutionContext resolutionContext)
 				{
-					int childId = (int)resolutionContext.SourceValue;
-					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == childId).ToList();
-                    var context = resolutionContext.CreateTypeContext(
-                        null,
-                        childModels, null, typeof(List<ChildModel>), typeof(List<ChildDto>));
-                    return (List<ChildDto>) context.Engine.Map(context);
+					List<ChildModel> childModels = _childModels.Where(x => x.Parent.ID == source).ToList();
+                    return (List<ChildDto>)resolutionContext.Mapper.Map(childModels, null, typeof(List<ChildModel>), typeof(List<ChildDto>), resolutionContext);
 				}
 			}
 
@@ -290,7 +283,7 @@ namespace AutoMapper.UnitTests
 
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
-		        cfg.CreateMap<Foo, FooDto>();
+		        cfg.CreateMap<Foo, FooDto>().PreserveReferences();
 		        cfg.CreateMap<Bar, BarDto>();
 		    });
 
@@ -345,6 +338,7 @@ namespace AutoMapper.UnitTests
 		        cfg.CreateMap<FooModel, FooScreenModel>();
 		        cfg.CreateMap<FooModel, FooInputModel>();
 		        cfg.CreateMap<FooModel, FooContainerModel>()
+                    .PreserveReferences()
 		            .ForMember(dest => dest.Input, opt => opt.MapFrom(src => src))
 		            .ForMember(dest => dest.Screen, opt => opt.MapFrom(src => src));
 		    });
@@ -394,7 +388,7 @@ namespace AutoMapper.UnitTests
 
 	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
-	            cfg.CreateMap<Parent, ParentDto>();
+	            cfg.CreateMap<Parent, ParentDto>().PreserveReferences();
 	            cfg.CreateMap<Child, ChildDto>();
 
 	        });
@@ -512,78 +506,6 @@ namespace AutoMapper.UnitTests
                 {
                     Parents = new List<ParentDto>();
                 }
-            }
-	    }
-
-	    public class When_disabling_instance_cache_for_instances
-	    {
-            public class Tag
-            {
-                public int Id { get; set; }
-                public string Name { get; set; }
-                public IEnumerable<Tag> ChildTags { get; set; }
-
-                protected bool Equals(Tag other)
-                {
-                    return Id == other.Id;
-                }
-
-                public override bool Equals(object obj)
-                {
-                    if (ReferenceEquals(null, obj)) return false;
-                    if (ReferenceEquals(this, obj)) return true;
-                    if (obj.GetType() != this.GetType()) return false;
-                    return Equals((Tag) obj);
-                }
-
-                public override int GetHashCode()
-                {
-                    return Id;
-                }
-            }
-
-	        [Fact]
-            public void Test()
-            {
-                var tags = new List<Tag>
-                {
-                    new Tag
-                    {
-                        Id = 1,
-                        Name = "Tag 1",
-                        ChildTags = new List<Tag>
-                        {
-                            new Tag
-                            {
-                                Id = 2,
-                                Name = "Tag 2",
-                                ChildTags = new List<Tag>
-                                {
-                                    new Tag {Id = 3, Name = "Tag 3"},
-                                    new Tag {Id = 4, Name = "Tag 4"}
-                                }
-                            }
-                        }
-                    },
-                    new Tag {Id = 1, Name = "Tag 1"},
-                    new Tag
-                    {
-                        Id = 3,
-                        Name = "Tag 3",
-                        ChildTags = new List<Tag>
-                        {
-                            new Tag {Id = 4, Name = "Tag 4"}
-                        }
-                    }
-                };
-
-                var config = new MapperConfiguration(cfg => cfg.CreateMap<Tag, Tag>().ForMember(dest => dest.ChildTags, opt => opt.MapFrom(src => src.ChildTags)));
-	            var mapper = config.CreateMapper();
-	            var result = mapper.Map<IList<Tag>, IList<Tag>>(tags, opt => opt.DisableCache = true);
-
-                result[1].ChildTags.Count().ShouldEqual(0);
-                result[2].ChildTags.Count().ShouldEqual(1);
-                result[2].ChildTags.First().Id.ShouldEqual(4);
             }
 	    }
     }

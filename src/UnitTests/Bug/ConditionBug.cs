@@ -33,7 +33,7 @@
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt =>
                     {
-                        opt.Condition(src => src.Value.Count > 1);
+                        opt.PreCondition(src => src.Value.Count > 1);
                         opt.ResolveUsing(src => src.Value[1].SubValue);
                     });
             });
@@ -76,7 +76,7 @@
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(d => d.Value, opt =>
                     {
-                        opt.Condition(src => src.Value.HasValue);
+                        opt.PreCondition(src => src.Value.HasValue);
                         opt.MapFrom(src => src.Value.Value + 10);
                     }));
 
@@ -130,7 +130,7 @@
                     .ForMember(itemDTO => itemDTO.BasePrice,
                         config =>
                         {
-                            config.Condition(item => item.HasBasePrice);
+                            config.PreCondition(item => item.HasBasePrice);
                             config.MapFrom(item => item.BasePrice);
                         }));
 
@@ -175,7 +175,7 @@
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(d => d.Value, opt => opt.Condition(rc => rc.DestinationValue == null));
+                    .ForMember(d => d.Value, opt => opt.Condition((_, __, dest, rc) => dest == null));
             });
 
             [Fact]

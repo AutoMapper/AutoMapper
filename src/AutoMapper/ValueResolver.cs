@@ -7,15 +7,15 @@ namespace AutoMapper
     /// <typeparam name="TDestination">Destination type</typeparam>
     public abstract class ValueResolver<TSource, TDestination> : IValueResolver
     {
-        public ResolutionResult Resolve(ResolutionResult source)
+        public object Resolve(object source, ResolutionContext context)
         {
-            if (source.Value != null && !(source.Value is TSource))
+            if (source != null && !(source is TSource))
             {
                 throw new AutoMapperMappingException(
-                    $"Value supplied is of type {source.Value.GetType()} but expected {typeof (TSource)}.\nChange the value resolver source type, or redirect the source value supplied to the value resolver using FromMember.");
+                    $"Value supplied is of type {source.GetType()} but expected {typeof (TSource)}.\nChange the value resolver source type, or redirect the source value supplied to the value resolver using FromMember.");
             }
 
-            return source.New(ResolveCore((TSource) source.Value), typeof (TDestination));
+            return ResolveCore((TSource) source);
         }
 
         /// <summary>

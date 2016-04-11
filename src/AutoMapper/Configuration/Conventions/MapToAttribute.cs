@@ -13,7 +13,7 @@ namespace AutoMapper.Configuration.Conventions
             MatchingName = matchingName;
         }
 
-        public override bool IsMatch(TypeDetails typeInfo, MemberInfo memberInfo, Type destType, string nameToSearch)
+        public override bool IsMatch(TypeDetails typeInfo, MemberInfo memberInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             return string.Compare(MatchingName, nameToSearch, StringComparison.OrdinalIgnoreCase) == 0;
         }

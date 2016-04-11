@@ -5,6 +5,6 @@ namespace AutoMapper.Configuration.Conventions
 
     public abstract class SourceToDestinationMapperAttribute : Attribute
     {
-        public abstract bool IsMatch(TypeDetails typeInfo, MemberInfo memberInfo, Type destType, string nameToSearch);
+        public abstract bool IsMatch(TypeDetails typeInfo, MemberInfo memberInfo, Type destType, Type destMemberType, string nameToSearch);
     }
 }

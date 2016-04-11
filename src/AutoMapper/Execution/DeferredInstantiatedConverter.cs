@@ -14,11 +14,11 @@ namespace AutoMapper.Execution
             _converterMethod = typeConverterType.GetMethod("Convert");
         }
 
-        public object Convert(ResolutionContext context)
+        public object Convert(object source, ResolutionContext context)
         {
             var converter = _instantiator(context);
             var method = _converterMethod.ContainsGenericParameters ? GetClosedConvertMethod(context) : _converterMethod;
-            return method.Invoke(converter, new[] { context });
+            return method.Invoke(converter, new[] { source, context });
         }
 
         private MethodInfo GetClosedConvertMethod(ResolutionContext context)
@@ -37,11 +37,11 @@ namespace AutoMapper.Execution
             _instantiator = instantiator;
         }
 
-        public TDestination Convert(ResolutionContext context)
+        public TDestination Convert(TSource source, ResolutionContext context)
         {
             var typeConverter = _instantiator(context);
 
-            return typeConverter.Convert(context);
+            return typeConverter.Convert(source, context);
         }
     }
 }

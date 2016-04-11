@@ -10,6 +10,12 @@ namespace AutoMapper
     public interface IMappingExpression
     {
         /// <summary>
+        /// Preserve object identity. Useful for circular references.
+        /// </summary>
+        /// <returns></returns>
+        IMappingExpression PreserveReferences();
+
+        /// <summary>
         /// Customize configuration for individual constructor parameter
         /// </summary>
         /// <param name="ctorParamName">Constructor parameter name</param>
@@ -38,7 +44,8 @@ namespace AutoMapper
         IMappingExpression ConstructUsingServiceLocator();
 
         /// <summary>
-        /// For self-referential types, limit recurse depth
+        /// For self-referential types, limit recurse depth.
+        /// Enables PreserveReferences.
         /// </summary>
         /// <param name="depth">Number of levels to limit to</param>
         /// <returns>Itself</returns>
@@ -76,6 +83,12 @@ namespace AutoMapper
         /// </summary>
         /// <param name="memberOptions">Callback for member options</param>
         void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions);
+
+        /// <summary>
+        /// Customize configuration for members not previously configured
+        /// </summary>
+        /// <param name="memberOptions">Callback for member options</param>
+        void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions);
 
         /// <summary>
         /// Customize configuration for an individual source member
@@ -179,13 +192,25 @@ namespace AutoMapper
     public interface IMappingExpression<TSource, TDestination>
     {
         /// <summary>
+        /// Preserve object identity. Useful for circular references.
+        /// </summary>
+        /// <returns></returns>
+        IMappingExpression<TSource, TDestination> PreserveReferences();
+
+        /// <summary>
+        /// Customize configuration for members not previously configured
+        /// </summary>
+        /// <param name="memberOptions">Callback for member options</param>
+        void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
+
+        /// <summary>
         /// Customize configuration for individual member
         /// </summary>
         /// <param name="destinationMember">Expression to the top-level destination member. This must be a member on the <typeparamref name="TDestination"/>TDestination</param> type
         /// <param name="memberOptions">Callback for member options</param>
         /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> ForMember(Expression<Func<TDestination, object>> destinationMember,
-            Action<IMemberConfigurationExpression<TSource>> memberOptions);
+        IMappingExpression<TSource, TDestination> ForMember<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
+            Action<IMemberConfigurationExpression<TSource, TMember>> memberOptions);
 
         /// <summary>
         /// Customize configuration for individual member. Used when the name isn't known at compile-time
@@ -194,13 +219,13 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member options</param>
         /// <returns></returns>
         IMappingExpression<TSource, TDestination> ForMember(string name,
-            Action<IMemberConfigurationExpression<TSource>> memberOptions);
+            Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
 
         /// <summary>
         /// Customize configuration for all members
         /// </summary>
         /// <param name="memberOptions">Callback for member options</param>
-        void ForAllMembers(Action<IMemberConfigurationExpression<TSource>> memberOptions);
+        void ForAllMembers(Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
 
         /// <summary>
         /// Ignores all <typeparamref name="TDestination"/> properties that have either a private or protected setter, forcing the mapper to respect encapsulation (note: order matters, so place this before explicit configuration of any properties with an inaccessible setter)
@@ -256,13 +281,7 @@ namespace AutoMapper
         /// Skip member mapping and use a custom function to convert to the destination type
         /// </summary>
         /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
-        void ConvertUsing(Func<ResolutionContext, TDestination> mappingFunction);
-
-        /// <summary>
-        /// Skip member mapping and use a custom function to convert to the destination type
-        /// </summary>
-        /// <param name="mappingFunction">Callback to convert from source type to destination type</param>
-        void ConvertUsing(Func<ResolutionContext, TSource, TDestination> mappingFunction);
+        void ConvertUsing(Func<TSource, ResolutionContext, TDestination> mappingFunction);
 
         /// <summary>
         /// Skip member mapping and use a custom type converter instance to convert to the destination type
@@ -348,7 +367,8 @@ namespace AutoMapper
         void As<T>();
 
         /// <summary>
-        /// For self-referential types, limit recurse depth
+        /// For self-referential types, limit recurse depth.
+        /// Enables PreserveReferences.
         /// </summary>
         /// <param name="depth">Number of levels to limit to</param>
         /// <returns>Itself</returns>

@@ -153,10 +153,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var replacer = new MethodNodeReplacer<TSource>(searcher.MethodNode);
 
                     // default back to simple mapping of object instance for backwards compatibility (e.g. mapping non-nullable to nullable fields)
-                    if (_parameters != null || _membersToExpand.Any())
-                    {
-                        sourceExpression = replacer.Visit(sourceExpression);
-                    }
+                    sourceExpression = replacer.Visit(sourceExpression);
 
                     if (replacer.FoundElementOperator)
                     {

@@ -14,6 +14,12 @@
         /// <typeparam name="TMember">Member type</typeparam>
         /// <param name="sourceMember">Member expression</param>
         void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember);
+
+        /// <summary>
+        /// Map constructor parameter from custom func
+        /// </summary>
+        /// <param name="resolver">Custom func</param>
+        void ResolveUsing(Func<TSource, object> resolver);
     }
 
     public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>
@@ -28,7 +34,12 @@
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            _ctorParamActions.Add(cpm => cpm.ResolveUsing(new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())));
+            _ctorParamActions.Add(cpm => cpm.CustomExpression = sourceMember);
+        }
+
+        public void ResolveUsing(Func<TSource, object> resolver)
+        {
+            _ctorParamActions.Add(cpm => cpm.CustomValueResolver = (src, ctxt) => resolver((TSource)src));
         }
 
         public void Configure(TypeMap typeMap)
@@ -36,7 +47,7 @@
             var parameter = typeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == _ctorParamName);
             if(parameter == null)
             {
-                throw new ArgumentOutOfRangeException("ctorParamName", "There is no constructor parameter named " + _ctorParamName);
+                throw new ArgumentOutOfRangeException(nameof(typeMap), $"There is no constructor parameter named {_ctorParamName}");
             }
             parameter.CanResolve = true;
 

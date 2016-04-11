@@ -11,12 +11,12 @@ namespace AutoMapper.Configuration.Conventions
 
         public ICollection<ISourceToDestinationNameMapper> NamedMappers { get; } = new Collection<ISourceToDestinationNameMapper> {new DefaultName(), new SourceToDestinationNameMapperAttributesMember()};
 
-        public MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             MemberInfo memberInfo = null;
             foreach (var namedMapper in NamedMappers)
             {
-                memberInfo = namedMapper.GetMatchingMemberInfo(GetMembers, typeInfo, destType, nameToSearch);
+                memberInfo = namedMapper.GetMatchingMemberInfo(GetMembers, typeInfo, destType, destMemberType, nameToSearch);
                 if (memberInfo != null)
                     break;
             }

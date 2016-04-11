@@ -8,7 +8,7 @@ namespace AutoMapper.Configuration.Conventions
     {
         public bool MethodCaseSensitive { get; set; }
 
-        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, string nameToSearch)
+        public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
             return
                 getTypeInfoMembers.GetMemberInfos(typeInfo)

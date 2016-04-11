@@ -8,7 +8,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     public class MemberResolverExpressionResultConverter : IExpressionResultConverter
     {
         public ExpressionResolutionResult GetExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, IValueResolver valueResolver)
+            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap)
         {
             return ExpressionResolutionResult(expressionResolutionResult, propertyMap.CustomExpression);
         }
@@ -16,54 +16,56 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static ExpressionResolutionResult ExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, LambdaExpression lambdaExpression)
         {
-            var oldParameter = lambdaExpression.Parameters.Single();
-            var newParameter = expressionResolutionResult.ResolutionExpression;
-            var converter = new ParameterConversionVisitor(newParameter, oldParameter);
-
-            Expression currentChild = converter.Visit(lambdaExpression.Body);
+            Expression currentChild = lambdaExpression.ReplaceParameters(expressionResolutionResult.ResolutionExpression);
             Type currentChildType = currentChild.Type;
 
             return new ExpressionResolutionResult(currentChild, currentChildType);
         }
 
         public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            ConstructorParameterMap propertyMap, IValueResolver valueResolver)
+            ConstructorParameterMap propertyMap)
         {
             return ExpressionResolutionResult(expressionResolutionResult, null);
         }
 
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
-            IValueResolver valueResolver)
+            PropertyMap propertyMap)
         {
-            return valueResolver is IMemberResolver;
+            return propertyMap.CustomExpression != null;
         }
 
-        private class ParameterConversionVisitor : ExpressionVisitor
+        public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,
+            ConstructorParameterMap propertyMap)
         {
-            private readonly Expression newParameter;
-            private readonly ParameterExpression oldParameter;
+            return false;
+        }
+    }
 
-            public ParameterConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
-            {
-                this.newParameter = newParameter;
-                this.oldParameter = oldParameter;
-            }
+    internal class ParameterConversionVisitor : ExpressionVisitor
+    {
+        private readonly Expression newParameter;
+        private readonly ParameterExpression oldParameter;
 
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                // replace all old param references with new ones
-                return node == oldParameter ? newParameter : node;
-            }
+        public ParameterConversionVisitor(Expression newParameter, ParameterExpression oldParameter)
+        {
+            this.newParameter = newParameter;
+            this.oldParameter = oldParameter;
+        }
 
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node.Expression != oldParameter) // if instance is not old parameter - do nothing
-                    return base.VisitMember(node);
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            // replace all old param references with new ones
+            return node == oldParameter ? newParameter : node;
+        }
 
-                var newObj = Visit(node.Expression);
-                var newMember = newParameter.Type.GetMember(node.Member.Name).First();
-                return Expression.MakeMemberAccess(newObj, newMember);
-            }
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            if (node.Expression != oldParameter) // if instance is not old parameter - do nothing
+                return base.VisitMember(node);
+
+            var newObj = Visit(node.Expression);
+            var newMember = newParameter.Type.GetMember(node.Member.Name).First();
+            return Expression.MakeMemberAccess(newObj, newMember);
         }
     }
 }

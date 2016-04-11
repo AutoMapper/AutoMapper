@@ -476,7 +476,7 @@
 
         public object Map(ResolutionContext context) =>
             context.SourceValue == null
-            ? context.Engine.CreateObject(context)
+            ? context.Mapper.CreateObject(context)
             : _converters[context.Types](context.SourceValue);
 
         public bool IsMatch(TypePair types) => _converters.ContainsKey(types);

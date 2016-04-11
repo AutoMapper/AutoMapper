@@ -7,7 +7,7 @@
     {
         public object Map(ResolutionContext context)
         {
-            if (context.IsSourceValueNull && context.Engine.ShouldMapSourceCollectionAsNull(context))
+            if (context.IsSourceValueNull && context.Mapper.ShouldMapSourceCollectionAsNull(context))
             {
                 return null;
             }

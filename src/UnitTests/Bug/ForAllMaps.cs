@@ -39,9 +39,9 @@ namespace AutoMapper.UnitTests.Bug
 
         public class MinusOneResolver : IValueResolver
         {
-            public ResolutionResult Resolve(ResolutionResult source)
+            public object Resolve(object source, ResolutionContext context)
             {
-                return source.New(-1);
+                return -1;
             }
         }
 

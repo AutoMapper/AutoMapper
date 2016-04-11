@@ -3,22 +3,24 @@ namespace AutoMapper
     using System;
     using System.Linq;
     using System.Collections.Concurrent;
-    using Configuration;
-    using Execution;
-    using Mappers;
 
     public class MappingEngine : IMappingEngine
     {
         private readonly ConcurrentDictionary<TypePair, IObjectMapper> _objectMapperCache = new ConcurrentDictionary<TypePair, IObjectMapper>();
+        private readonly Func<TypePair, IObjectMapper> _getObjectMapper;
 
         public MappingEngine(IConfigurationProvider configurationProvider, IMapper mapper)
         {
             ConfigurationProvider = configurationProvider;
             Mapper = mapper;
+            _getObjectMapper = GetObjectMapper;
         }
 
         public IConfigurationProvider ConfigurationProvider { get; }
         public IMapper Mapper { get; }
+
+
+        private IObjectMapper GetObjectMapper(TypePair types) => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(types));
 
         public object Map(ResolutionContext context)
         {
@@ -26,22 +28,10 @@ namespace AutoMapper
             {
                 if (context.TypeMap != null)
                 {
-                    context.TypeMap.Seal();
-
-                    var typeMapMapper = ConfigurationProvider.GetTypeMapMappers().First(objectMapper => objectMapper.IsMatch(context));
-
-                    // check whether the context passes conditions before attempting to map the value (depth check)
-                    object mappedObject = !context.TypeMap.ShouldAssignValue(context) ? null : typeMapMapper.Map(context);
-
-                    return mappedObject;
+                    return context.TypeMap.Map(context.SourceValue, context);
                 }
 
-                var contextTypePair = new TypePair(context.SourceType, context.DestinationType);
-
-                Func<TypePair, IObjectMapper> missFunc =
-                    tp => ConfigurationProvider.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(contextTypePair));
-
-                IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(contextTypePair, missFunc);
+                IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(context.Types, _getObjectMapper);
                 if (mapperToUse == null)
                 {
                     throw new AutoMapperMappingException(context, "Missing type map configuration or unsupported mapping.");
@@ -58,51 +48,5 @@ namespace AutoMapper
                 throw new AutoMapperMappingException(context, ex);
             }
         }
-
-        public object CreateObject(ResolutionContext context)
-        {
-            var typeMap = context.TypeMap;
-            var destinationType = context.DestinationType;
-
-            if (typeMap != null)
-                if (typeMap.DestinationCtor != null)
-                    return typeMap.DestinationCtor(context);
-                else if (typeMap.ConstructDestinationUsingServiceLocator)
-                    return context.Options.ServiceCtor(destinationType);
-                else if (typeMap.ConstructorMap != null && typeMap.ConstructorMap.CtorParams.All(p => p.CanResolve))
-                    return typeMap.ConstructorMap.ResolveValue(context);
-
-            if (context.DestinationValue != null)
-                return context.DestinationValue;
-
-            if (destinationType.IsInterface())
-#if PORTABLE
-                throw new PlatformNotSupportedException("Mapping to interfaces through proxies not supported.");
-#else
-                destinationType = new ProxyGenerator().GetProxyType(destinationType);
-#endif
-
-                return !ConfigurationProvider.AllowNullDestinationValues
-                ? ObjectCreator.CreateNonNullValue(destinationType)
-                : ObjectCreator.CreateObject(destinationType);
-        }
-
-        public bool ShouldMapSourceValueAsNull(ResolutionContext context)
-        {
-            if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
-                return false;
-
-            var typeMap = context.GetContextTypeMap();
-
-            return typeMap?.Profile.AllowNullDestinationValues ?? ConfigurationProvider.AllowNullDestinationValues;
-        }
-
-        public bool ShouldMapSourceCollectionAsNull(ResolutionContext context)
-        {
-            var typeMap = context.GetContextTypeMap();
-
-            return typeMap?.Profile.AllowNullCollections ?? ConfigurationProvider.AllowNullCollections;
-        }
-
     }
 }
