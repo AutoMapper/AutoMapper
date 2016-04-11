@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.Query
         {
             public int SrcValue { get; set; }
             public string StringValue { get; set; }
-            public string[] Strings { get; set; } = new string[0];
+            public string[] Strings { get; set; }
         }
 
         public class Destination
@@ -152,7 +152,7 @@ namespace AutoMapper.UnitTests.Query
                     };
 
             var result = source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(Configuration).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 5).Take(2)
               .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
@@ -178,15 +178,13 @@ namespace AutoMapper.UnitTests.Query
                         new User { UserId = 2, Account = new Account(){ Id = 4,Things = {new Thing(){Bar = "Bar"}, new Thing(){ Bar ="Bar 2"}}}},
                         new User { UserId = 1, Account = new Account(){ Id = 3,Things = {new Thing(){Bar = "Bar 3"}, new Thing(){ Bar ="Bar 4"}}}},
                     };
-
-        private static IMapper _mapper;
-
+        
         [Fact]
         public void Map_select_method()
         {
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
             var result = _source2.AsQueryable()
-              .UseAsDataSource(_mapper).For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
+              .UseAsDataSource(mapper).For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
 
             (result.First() as IEnumerable<string>).Last().ShouldEqual("Bar 4");
         }
@@ -194,9 +192,9 @@ namespace AutoMapper.UnitTests.Query
         [Fact]
         public void Map_orderBy_thenBy_expression()
         {
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
             var result = _source2.AsQueryable()
-              .UseAsDataSource(_mapper).For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
+              .UseAsDataSource(mapper).For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
 
             (result.First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
         }
@@ -205,7 +203,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_convert_source_item_to_destination_toList()
         {
             IQueryable<Destination> result = _source.AsQueryable()
-                .UseAsDataSource().For<Destination>();
+                .UseAsDataSource(Configuration).For<Destination>();
 
             var destItem = result.ToList().First(s => s.DestValue == 7);
             var sourceItem = _source.First(s => s.SrcValue == 7);
@@ -217,7 +215,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_order_by_statement_result_toList()
         {
             IQueryable<Destination> result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(Configuration).For<Destination>()
               .OrderByDescending(s => s.DestValue);
 
             result.ToList().First().DestValue.ShouldEqual(_source.Max(s => s.SrcValue));
@@ -227,7 +225,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_any_stupid_thing_you_can_throw_at_it_toList()
         {
             var result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(Configuration).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.DestValue);
@@ -240,7 +238,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_string_return_type_toList()
         {
             var result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(Configuration).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.StringValue);
@@ -252,7 +250,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_enumerable_return_type_toList()
         {
             var result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(Configuration).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
@@ -272,7 +270,7 @@ namespace AutoMapper.UnitTests.Query
                     };
 
             var result = source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(Configuration).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 5).Take(2)
               .OrderByDescending(s => s.DestValue).Select(s => s.Strings);
@@ -292,7 +290,7 @@ namespace AutoMapper.UnitTests.Query
         public void Shoud_support_any_stupid_thing_you_can_throw_at_it_with_annonumus_types_toList()
         {
             var result = _source.AsQueryable()
-              .UseAsDataSource().For<Destination>()
+              .UseAsDataSource(Configuration).For<Destination>()
               .Where(s => true && 5.ToString() == "5" && s.DestValue.ToString() != "0")
               .OrderBy(s => s.DestValue).SkipWhile(d => d.DestValue < 7).Take(1)
               .OrderByDescending(s => s.DestValue).Select(s => new { A = s.DestValue });
@@ -303,9 +301,9 @@ namespace AutoMapper.UnitTests.Query
         [Fact]
         public void Map_select_method_toList()
         {
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
             var result = _source2.AsQueryable()
-              .UseAsDataSource().For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
+              .UseAsDataSource(mapper).For<UserModel>().OrderBy(s => s.Id).ThenBy(s => s.FullName).Select(s => (object)s.AccountModel.ThingModels.Select(b => b.BarModel));
 
             (result.ToList().First() as IEnumerable<string>).Last().ShouldEqual("Bar 4");
         }
@@ -313,9 +311,9 @@ namespace AutoMapper.UnitTests.Query
         [Fact]
         public void Map_orderBy_thenBy_expression_toList()
         {
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
             var result = _source2.AsQueryable()
-              .UseAsDataSource().For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
+              .UseAsDataSource(mapper).For<UserModel>().Select(s => (object)s.AccountModel.ThingModels);
 
             (result.ToList().First() as IEnumerable<Thing>).Last().Bar.ShouldEqual("Bar 2");
         }
@@ -324,7 +322,7 @@ namespace AutoMapper.UnitTests.Query
         public void CanMapCyclicObjectGraph()
         {
             // Arrange
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
             var master = new Master()
             {
                 Name = "Harry Marry",
@@ -339,7 +337,7 @@ namespace AutoMapper.UnitTests.Query
             master.Details.Add(detail);
 
             // Act
-            var dto = Mapper.Map<DetailCyclicDto>(detail);
+            var dto = mapper.Map<DetailCyclicDto>(detail);
 
             // Assert
             AssertValidDtoGraph(detail, master, dto);
@@ -349,7 +347,7 @@ namespace AutoMapper.UnitTests.Query
         public void CanMapCaclicExpressionGraph()
         {
             // Arrange
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
             var master = new Master()
             {
                 Name = "Harry Marry",
@@ -365,7 +363,7 @@ namespace AutoMapper.UnitTests.Query
             var detailQuery = new List<Detail> { detail }.AsQueryable();
 
             // Act
-            var detailDtoQuery = detailQuery.UseAsDataSource()
+            var detailDtoQuery = detailQuery.UseAsDataSource(mapper)
                 .For<DetailCyclicDto>();
 
             // Assert
@@ -378,7 +376,7 @@ namespace AutoMapper.UnitTests.Query
         public void CanMapCaclicExpressionGraph_WithPropertyFilter()
         {
             // Arrange
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
             var master = new Master()
             {
                 Name = "Harry Marry",
@@ -394,7 +392,7 @@ namespace AutoMapper.UnitTests.Query
             var detailQuery = new List<Detail> { detail }.AsQueryable();
 
             // Act
-            var detailDtoQuery = detailQuery.UseAsDataSource()
+            var detailDtoQuery = detailQuery.UseAsDataSource(mapper)
                 .For<DetailCyclicDto>()
                 .Where(d => d.Name.EndsWith("rder"));
 
@@ -408,7 +406,7 @@ namespace AutoMapper.UnitTests.Query
         public void CanMapCaclicExpressionGraph_WithPropertyPathEqualityFilter_Single()
         {
             // Arrange
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
             var master = new Master()
             {
                 Name = "Harry Marry",
@@ -424,7 +422,7 @@ namespace AutoMapper.UnitTests.Query
             var detailQuery = new List<Detail> { detail }.AsQueryable();
 
             // Act
-            var detailDtoQuery = detailQuery.UseAsDataSource()
+            var detailDtoQuery = detailQuery.UseAsDataSource(mapper)
                 .For<DetailCyclicDto>()
                 .Where(d => d.Master.Name == "Harry Marry");
 
@@ -439,7 +437,7 @@ namespace AutoMapper.UnitTests.Query
         public void Should_support_propertypath_expressons_with_equally_named_properties()
         {
             // Arrange
-            SetupAutoMapper();
+            var mapper = SetupAutoMapper();
 
             var master = new Master { Id = Guid.NewGuid(), Name = "Harry Marry" };
             var detail = new Detail { Id = Guid.NewGuid(), Master = master, Name = "Some detail" };
@@ -447,7 +445,7 @@ namespace AutoMapper.UnitTests.Query
             var source = new List<Detail> { detail };
 
             // Act
-            var detailDtoQuery = source.AsQueryable().UseAsDataSource()
+            var detailDtoQuery = source.AsQueryable().UseAsDataSource(mapper)
                 .For<DetailDto>()
                 .Where(d => d.Master.Name == "Harry Marry");
 
@@ -467,6 +465,7 @@ namespace AutoMapper.UnitTests.Query
             dto.Master.Details.Single().Id.ShouldEqual(dto.Id, "Dto was not added to inner collection");
             //dto.GetHashCode().ShouldEqual(dto.Master.Details.Single().GetHashCode()); // "Underlying provider always creates two distinct instances"
         }
+
         [Fact]
         public void SupportsParmeterization()
         {
@@ -474,8 +473,9 @@ namespace AutoMapper.UnitTests.Query
             int value = 0;
 
             Expression<Func<SourceWithParams, int>> sourceMember = src => value + 5;
-            Mapper.CreateMap<SourceWithParams, DestWithParams>()
-                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceWithParams, DestWithParams>()
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember)));
+            var mapper = new Mapper(config);
 
             var source = new[]
             {
@@ -483,7 +483,7 @@ namespace AutoMapper.UnitTests.Query
             }.AsQueryable();
 
             // Act
-            var result = source.UseAsDataSource().For<DestWithParams>(new Dictionary<string, object> { { "value", 10 } }).ToArray();
+            var result = source.UseAsDataSource(mapper).For<DestWithParams>(new Dictionary<string, object> { { "value", 10 } }).ToArray();
             
             // Assert
             result.ShouldNotBeNull();
@@ -498,8 +498,9 @@ namespace AutoMapper.UnitTests.Query
             int value = 0;
 
             Expression<Func<SourceWithParams, int>> sourceMember = src => value + 5;
-            Mapper.CreateMap<SourceWithParams, DestWithParams>()
-                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceWithParams, DestWithParams>()
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(sourceMember)));
+            var mapper = new Mapper(config);
 
             var source = new[]
             {
@@ -507,8 +508,8 @@ namespace AutoMapper.UnitTests.Query
             }.AsQueryable();
 
             // Act
-            var result1 = source.UseAsDataSource().For<DestWithParams>(new Dictionary<string, object> { { "value", 10 } }).ToArray();
-            var result = source.UseAsDataSource().For<DestWithParams>(new Dictionary<string, object> { { "value", 15 } }).ToArray();
+            var result1 = source.UseAsDataSource(mapper).For<DestWithParams>(new Dictionary<string, object> { { "value", 10 } }).ToArray();
+            var result = source.UseAsDataSource(mapper).For<DestWithParams>(new Dictionary<string, object> { { "value", 15 } }).ToArray();
 
             // Assert
             result.ShouldNotBeNull();
@@ -552,17 +553,17 @@ namespace AutoMapper.UnitTests.Query
             // so that we can declare a parameter (userId) that is independent of mapping and query definition.
             // that way, in the query, we have a parameter which needs to be replaced.
             // (in SourceInjectedQueryProvider.ConvertDestinationExpressionToSourceExpression)
-            var createMappingAction = new Action(() =>
+            var config = new MapperConfiguration(cfg =>
             {
                 // parameter defined in mapping part
                 long userId = default(long);
-                Mapper.CreateMap<ResourceWithPermissions, ResourceDto>()
+                cfg.CreateMap<ResourceWithPermissions, ResourceDto>()
                     .ForMember(t => t.HasEditPermission,
                         o => o.MapFrom(s => s.Permissions.Any(p => p.PermissionName == "Edit" && p.UserId == userId)));
-                Mapper.CreateMap<ResourceDto, ResourceWithPermissions>()
+                cfg.CreateMap<ResourceDto, ResourceWithPermissions>()
                     .ForMember(t => t.Permissions, o => o.Ignore());
             });
-            createMappingAction();
+            var mapper = new Mapper(config);
 
             var factoryFunc = new Func<IList<ResourceWithPermissions>, IQueryable<ResourceWithPermissions>>((list) =>
             {
@@ -572,7 +573,7 @@ namespace AutoMapper.UnitTests.Query
             });
 
             var query = factoryFunc(sources)
-                .UseAsDataSource()
+                .UseAsDataSource(mapper)
                 .For<ResourceDto>(new {userId = 4});
                 
             // Act
@@ -587,7 +588,7 @@ namespace AutoMapper.UnitTests.Query
             results[1].HasEditPermission.ShouldBeTrue();
         }
 
-        private static void SetupAutoMapper()
+        private static IMapper SetupAutoMapper()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -626,24 +627,19 @@ namespace AutoMapper.UnitTests.Query
                 cfg.CreateMap<ThingModel, Thing>()
                     .ForMember(d => d.Foo, opt => opt.MapFrom(s => s.FooModel))
                     .ForMember(d => d.Bar, opt => opt.MapFrom(s => s.BarModel));
+
+                cfg.CreateMap<Master, MasterDto>().ReverseMap();
+                cfg.CreateMap<Detail, DetailDto>().ReverseMap();
+
+                // dtos with cyclic references that would cause a stackoverflow exception upon projection mapping
+                cfg.CreateMap<Master, MasterCyclicDto>();
+                cfg.CreateMap<MasterCyclicDto, Master>();
+                cfg.CreateMap<Detail, DetailCyclicDto>();
+                cfg.CreateMap<DetailCyclicDto, Detail>();
             });
 
 
-            _mapper = config.CreateMapper();
-
-            //Mapper.CreateMap<IEnumerable<Thing>, IEnumerable<ThingModel>>();
-            //Mapper.CreateMap<IEnumerable<ThingModel>, IEnumerable<Thing>>();
-            //Mapper.CreateMap<IEnumerable<User>, IEnumerable<UserModel>>();
-            //Mapper.CreateMap<IEnumerable<UserModel>, IEnumerable<User>>();
-
-            Mapper.CreateMap<Master, MasterDto>().ReverseMap();
-            Mapper.CreateMap<Detail, DetailDto>().ReverseMap();
-
-            // dtos with cyclic references that would cause a stackoverflow exception upon projection mapping
-            Mapper.CreateMap<Master, MasterCyclicDto>();
-            Mapper.CreateMap<MasterCyclicDto, Master>();
-            Mapper.CreateMap<Detail, DetailCyclicDto>();
-            Mapper.CreateMap<DetailCyclicDto, Detail>();
+           return config.CreateMapper();
         }
 
     }

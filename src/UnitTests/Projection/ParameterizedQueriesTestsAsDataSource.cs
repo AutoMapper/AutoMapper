@@ -38,7 +38,7 @@
                 new Source()
             }.AsQueryable();
 
-            _dests = _sources.UseAsDataSource().For<Dest>(new { value = 10 }).ToArray();
+            _dests = _sources.UseAsDataSource(Configuration).For<Dest>(new { value = 10 }).ToArray();
         }
 
         [Fact]
@@ -50,7 +50,7 @@
         [Fact]
         public void Should_not_cache_parameter_value()
         {
-            var newDests = _sources.UseAsDataSource().For<Dest>(new { value = 15 }).ToArray();
+            var newDests = _sources.UseAsDataSource(Configuration).For<Dest>(new { value = 15 }).ToArray();
 
             newDests[0].Value.ShouldEqual(20);
         }
@@ -86,7 +86,7 @@
                 new Source()
             }.AsQueryable();
 
-            _dests = _sources.UseAsDataSource().For<Dest>(new Dictionary<string, object> { { "value", 10 } }).ToArray();
+            _dests = _sources.UseAsDataSource(Configuration).For<Dest>(new Dictionary<string, object> { { "value", 10 } }).ToArray();
         }
 
         [Fact]
@@ -98,7 +98,7 @@
         [Fact]
         public void Should_not_cache_parameter_value()
         {
-            var newDests = _sources.UseAsDataSource().For<Dest>(new Dictionary<string, object> { { "value", 15 } }).ToArray();
+            var newDests = _sources.UseAsDataSource(Configuration).For<Dest>(new Dictionary<string, object> { { "value", 15 } }).ToArray();
 
             newDests[0].Value.ShouldEqual(20);
         }
@@ -151,7 +151,7 @@
         {
             var db = new DB();
 
-            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == 2);
+            var user = db.Users.UseAsDataSource(Configuration).For<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == 2);
 
             user.position.ShouldEqual(1);
         }
@@ -161,7 +161,7 @@
         {
             var db = new DB();
 
-            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).First(a => a.Id == 2);
+            var user = db.Users.UseAsDataSource(Configuration).For<UserViewModel>(new { db }).First(a => a.Id == 2);
 
             user.position.ShouldEqual(1);
         }
@@ -171,7 +171,7 @@
         {
             var db = new DB();
 
-            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == -1);
+            var user = db.Users.UseAsDataSource(Configuration).For<UserViewModel>(new { db }).FirstOrDefault(a => a.Id == -1);
 
             user.ShouldBeNull();
         }
@@ -182,7 +182,7 @@
         {
             var db = new DB();
 
-            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).Single(a => a.Id == 2);
+            var user = db.Users.UseAsDataSource(Configuration).For<UserViewModel>(new { db }).Single(a => a.Id == 2);
 
             user.position.ShouldEqual(1);
         }
@@ -192,7 +192,7 @@
         {
             var db = new DB();
 
-            var user = db.Users.UseAsDataSource().For<UserViewModel>(new { db }).SingleOrDefault(a => a.Id == -1);
+            var user = db.Users.UseAsDataSource(Configuration).For<UserViewModel>(new { db }).SingleOrDefault(a => a.Id == -1);
 
             user.ShouldBeNull();
         }
