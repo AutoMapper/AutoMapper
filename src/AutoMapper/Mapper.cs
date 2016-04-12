@@ -201,10 +201,19 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source)
         {
-            Type modelType = typeof(TSource);
-            Type destinationType = typeof(TDestination);
+            var types = new TypePair(source?.GetType() ?? typeof (TSource), typeof (TDestination));
 
-            return (TDestination)((IMapper)this).Map(source, modelType, destinationType, null);
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var destination = default(TDestination);
+
+            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
+
+            return func(source, destination, context);
+            //Type modelType = typeof(TSource);
+            //Type destinationType = typeof(TDestination);
+
+            //return (TDestination)((IMapper)this).Map(source, modelType, destinationType, null);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source,

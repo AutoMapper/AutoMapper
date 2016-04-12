@@ -57,10 +57,10 @@ namespace AutoMapper
                 {
                     return _instanceCache;
                 }
-                if(TypeMap?.PreserveReferences ?? false)
-                {
+                //if(TypeMap?.PreserveReferences ?? false)
+                //{
                     _instanceCache = new Dictionary<ResolutionContext, object>();
-                }
+                //}
                 return _instanceCache;
             }
         }
@@ -140,8 +140,9 @@ namespace AutoMapper
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other.TypeMap, TypeMap) && Equals(other.SourceType, SourceType) &&
-                   Equals(other.DestinationType, DestinationType) && Equals(other.SourceValue, SourceValue);
+            return Equals(other.SourceType, SourceType) &&
+                   Equals(other.DestinationType, DestinationType) && 
+                   Equals(other.SourceValue, SourceValue);
         }
 
         public override bool Equals(object obj)
@@ -156,8 +157,7 @@ namespace AutoMapper
         {
             unchecked
             {
-                int result = TypeMap?.GetHashCode() ?? 0;
-                result = (result*397) ^ (SourceType?.GetHashCode() ?? 0);
+                int result = SourceType?.GetHashCode() ?? 0;
                 result = (result*397) ^ (DestinationType?.GetHashCode() ?? 0);
                 result = (result*397) ^ (SourceValue?.GetHashCode() ?? 0);
                 return result;

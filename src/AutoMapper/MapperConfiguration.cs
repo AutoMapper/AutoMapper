@@ -18,6 +18,7 @@ namespace AutoMapper
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
+        private readonly ConcurrentDictionary<TypePair, Delegate> _mapPlanCache = new ConcurrentDictionary<TypePair, Delegate>();
         private readonly IList<Profile> _profiles = new List<Profile>();
         private readonly ConfigurationValidator _validator;
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
@@ -178,6 +179,57 @@ namespace AutoMapper
         {
             get { return _defaultProfile.AllowNullCollections; }
             private set { _defaultProfile.AllowNullCollections = value; }
+        }
+
+        public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(
+            TypePair types)
+        {
+            return (Func<TSource, TDestination, ResolutionContext, TDestination>) _mapPlanCache.GetOrAdd(types, tp =>
+            {
+                var typeMap = ResolveTypeMap(tp);
+
+                if (typeMap != null)
+                {
+                    return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
+                    {
+                        try
+                        {
+                            return (TDestination) typeMap.Map(src, context);
+                        }
+                        catch (AutoMapperMappingException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new AutoMapperMappingException(context, ex);
+                        }
+                    });
+                }
+
+                IObjectMapper mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(tp));
+
+                return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
+                {
+                    if (mapperToUse == null)
+                    {
+                        throw new AutoMapperMappingException(context,
+                            "Missing type map configuration or unsupported mapping.");
+                    }
+                    try
+                    {
+                        return (TDestination) mapperToUse.Map(context);
+                    }
+                    catch (AutoMapperMappingException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new AutoMapperMappingException(context, ex);
+                    }
+                });
+            });
         }
 
         public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();
