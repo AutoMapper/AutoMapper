@@ -210,22 +210,51 @@ namespace AutoMapper
             var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
 
             return func(source, destination, context);
-            //Type modelType = typeof(TSource);
-            //Type destinationType = typeof(TDestination);
-
-            //return (TDestination)((IMapper)this).Map(source, modelType, destinationType, null);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source,
             Action<IMappingOperationOptions<TSource, TDestination>> opts)
-            => (TDestination) MapWithOptions(source, null, typeof(TSource), typeof(TDestination), opts);
+        {
+            var types = new TypePair(source?.GetType() ?? typeof(TSource), typeof(TDestination));
+
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var destination = default(TDestination);
+
+            var typedOptions = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
+
+            opts(typedOptions);
+
+            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
+
+            return func(source, destination, context);
+        }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
-            => ((IMapper)this).Map(source, destination, null);
+        {
+            var types = new TypePair(source?.GetType() ?? typeof(TSource), destination?.GetType() ?? typeof(TDestination));
 
-        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
-            Action<IMappingOperationOptions<TSource, TDestination>> opts)
-            => (TDestination)MapWithOptions(source, destination, typeof(TSource), typeof(TDestination), opts);
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
+
+            return func(source, destination, context);
+        }
+
+        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
+        {
+            var types = new TypePair(source?.GetType() ?? typeof(TSource), destination?.GetType() ?? typeof(TDestination));
+
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var typedOptions = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
+
+            opts(typedOptions);
+
+            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
+
+            return func(source, destination, context);
+        }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType)
             => ((IMapper)this).Map(source, sourceType, destinationType, null);
