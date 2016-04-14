@@ -119,5 +119,6 @@ namespace AutoMapper
         IMapper CreateMapper();
         IMapper CreateMapper(Func<Type, object> serviceCtor);
         Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types);
+        Delegate GetMapperFunc(TypePair types);
     }
 }

@@ -38,14 +38,9 @@ namespace AutoMapper.Mappers
             ClearEnumerable(enumerable);
 
             int i = 0;
-            var itemContext = new ResolutionContext(context);
             foreach (object item in enumerableValue)
             {
-                var sourceItemType = item?.GetType() ?? sourceElementType;
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(sourceItemType, destElementType);
-
-                itemContext.Fill(item, null, sourceItemType, destElementType, typeMap);
-                var mappedValue = context.Mapper.Map(itemContext);
+                var mappedValue = context.Mapper.Map(item, null, sourceElementType, destElementType, context);
 
                 SetElementValue(enumerable, mappedValue, i);
 

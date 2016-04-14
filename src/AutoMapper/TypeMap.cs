@@ -519,14 +519,18 @@ namespace AutoMapper
 
             var actions = typeMaps;
 
-            if (_beforeMapActions.Any())
-                actions.Insert(0, Call(Constant(this), typeof(TypeMap).GetMethod("BeforeMap"), srcParam, destParam, ctxtParam));
+            foreach (var beforeMapAction in _beforeMapActions)
+            {
+                actions.Insert(0, beforeMapAction.ReplaceParameters(srcParam, destParam, ctxtParam));
+            }
             actions.Insert(0, beforeMap);
             actions.Insert(0, destinationFunc);
             actions.Add(afterMap);
 
-            if (_afterMapActions.Any())
-                actions.Add(Call(Constant(this), typeof(TypeMap).GetMethod("AfterMap"), srcParam, destParam, ctxtParam));
+            foreach (var afterMapAction in _afterMapActions)
+            {
+                actions.Add(afterMapAction.ReplaceParameters(srcParam, destParam, ctxtParam));
+            }
 
             actions.Add(destParam);
 

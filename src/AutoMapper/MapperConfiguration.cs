@@ -233,6 +233,57 @@ namespace AutoMapper
             });
         }
 
+        public Delegate GetMapperFunc(TypePair types)
+        {
+            return _mapPlanCache.GetOrAdd(types, tp =>
+            {
+                var typeMap = ResolveTypeMap(tp);
+
+                if (typeMap != null)
+                {
+                    return typeMap.MapExpression.Compile();
+                    //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
+                    //{
+                    //    try
+                    //    {
+                    //        return (TDestination) typeMap.Map(src, context);
+                    //    }
+                    //    catch (AutoMapperMappingException)
+                    //    {
+                    //        throw;
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        throw new AutoMapperMappingException(context, ex);
+                    //    }
+                    //});
+                }
+
+                IObjectMapper mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(tp));
+
+                return new Func<object, object, ResolutionContext, object>((src, dest, context) =>
+                {
+                    if (mapperToUse == null)
+                    {
+                        throw new AutoMapperMappingException(context,
+                            "Missing type map configuration or unsupported mapping.");
+                    }
+                    try
+                    {
+                        return mapperToUse.Map(context);
+                    }
+                    catch (AutoMapperMappingException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new AutoMapperMappingException(context, ex);
+                    }
+                });
+            });
+        }
+
         public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();
 
         public TypeMap FindTypeMapFor(Type sourceType, Type destinationType) => FindTypeMapFor(new TypePair(sourceType, destinationType));
