@@ -511,7 +511,7 @@ namespace AutoMapper
                     sourceFunc = srcParam;
                 }
                 
-                valueResolverFunc = Convert(Call(ctor, resolverType.GetMethod("Resolve"), ToObject(sourceFunc), ctxtParam), propertyMap.DestinationPropertyType);
+                valueResolverFunc = Convert(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"), sourceFunc, ctxtParam), propertyMap.DestinationPropertyType);
             }
             else if (propertyMap.CustomValue != null)
             {
