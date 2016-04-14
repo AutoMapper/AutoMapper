@@ -190,21 +190,22 @@ namespace AutoMapper
 
                 if (typeMap != null)
                 {
-                    return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
-                    {
-                        try
-                        {
-                            return (TDestination) typeMap.Map(src, context);
-                        }
-                        catch (AutoMapperMappingException)
-                        {
-                            throw;
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new AutoMapperMappingException(context, ex);
-                        }
-                    });
+                    return (Func<TSource, TDestination, ResolutionContext, TDestination>) typeMap.MapExpression.Compile();
+                    //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
+                    //{
+                    //    try
+                    //    {
+                    //        return (TDestination) typeMap.Map(src, context);
+                    //    }
+                    //    catch (AutoMapperMappingException)
+                    //    {
+                    //        throw;
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        throw new AutoMapperMappingException(context, ex);
+                    //    }
+                    //});
                 }
 
                 IObjectMapper mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(tp));

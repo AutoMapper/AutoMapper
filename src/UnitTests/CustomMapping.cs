@@ -29,32 +29,19 @@ namespace AutoMapper.UnitTests
                 public int Value5 { get; set; }
             }
 
-            public class CustomResolver : IValueResolver
+            public class CustomResolver : IValueResolver<ModelObject, int>
             {
-                public object Resolve(object source, ResolutionContext context)
+                public int Resolve(ModelObject source, ResolutionContext context)
                 {
-                    return (((ModelObject)source).Value + 1);
+                    return source.Value + 1;
                 }
             }
 
-            public class CustomResolver2 : IValueResolver
+            public class CustomResolver2 : IValueResolver<ModelObject, int>
             {
-                public object Resolve(object source, ResolutionContext context)
+                public int Resolve(ModelObject source, ResolutionContext context)
                 {
-                    return (((ModelObject)source).Value2fff + 2);
-                }
-            }
-
-            public class CustomResolver3 : IValueResolver
-            {
-                public object Resolve(object source, ResolutionContext context)
-                {
-                    return (((ModelObject)source).Value4 + 4);
-                }
-
-                public Type GetResolvedValueType()
-                {
-                    return typeof(int);
+                    return source.Value2fff + 2;
                 }
             }
 
@@ -63,7 +50,6 @@ namespace AutoMapper.UnitTests
                 cfg.CreateMap<ModelObject, ModelDto>()
                     .ForMember(dto => dto.Value, opt => opt.ResolveUsing<CustomResolver>())
                     .ForMember(dto => dto.Value2, opt => opt.ResolveUsing(new CustomResolver2()))
-                    .ForMember(dto => dto.Value4, opt => opt.ResolveUsing(typeof (CustomResolver3)))
                     .ForMember(dto => dto.Value5, opt => opt.ResolveUsing(src => src.Value5 + 5));
 
             });
@@ -93,12 +79,6 @@ namespace AutoMapper.UnitTests
             }
 
             [Fact]
-            public void Should_use_the_type_object_based_mapping_for_custom_dto_members()
-            {
-                _result.Value4.ShouldEqual(46);
-            }
-
-            [Fact]
             public void Should_use_the_func_based_mapping_for_custom_dto_members()
             {
                 _result.Value5.ShouldEqual(47);
@@ -124,18 +104,18 @@ namespace AutoMapper.UnitTests
                 public int SomeValue { get; set; }
             }
 
-            public class CustomResolver : IValueResolver
+            public class CustomResolver : IValueResolver<ModelSubObject, int>
             {
-                public object Resolve(object source, ResolutionContext context)
+                public int Resolve(ModelSubObject source, ResolutionContext context)
                 {
-                    return (((ModelSubObject)source).SomeValue + 1);
+                    return source.SomeValue + 1;
                 }
             }
 
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ModelObject, ModelDto>()
-                    .ForMember(dto => dto.SomeValue, opt => opt.ResolveUsing<CustomResolver>().FromMember(m => m.Sub));
+                    .ForMember(dto => dto.SomeValue, opt => opt.ResolveUsing<CustomResolver, ModelSubObject>(m => m.Sub));
             });
 
             [Fact]
@@ -169,11 +149,11 @@ namespace AutoMapper.UnitTests
                 public int SomeValue { get; set; }
             }
 
-            public class CustomResolver : IValueResolver
+            public class CustomResolver : IValueResolver<int, int>
             {
-                public object Resolve(object source, ResolutionContext context)
+                public int Resolve(int source, ResolutionContext context)
                 {
-                    return (((int)source) + 5);
+                    return source + 5;
                 }
             }
 
@@ -181,7 +161,7 @@ namespace AutoMapper.UnitTests
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(dto => dto.SomeValue,
-                        opt => opt.ResolveUsing<CustomResolver>().FromMember(m => m.SomeOtherValue));
+                        opt => opt.ResolveUsing<CustomResolver, int>(m => m.SomeOtherValue));
 
             });
 
@@ -217,11 +197,11 @@ namespace AutoMapper.UnitTests
                 public int Type { get; set; }
             }
 
-            public class CustomResolver : IValueResolver
+            public class CustomResolver : IValueResolver<int, int>
             {
-                public object Resolve(object source, ResolutionContext context)
+                public int Resolve(int source, ResolutionContext context)
                 {
-                    return (((int)source) + 5);
+                    return source + 5;
                 }
             }
 
@@ -264,7 +244,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            public class CustomResolver : ValueResolver<int, int>
+            public class CustomResolver : IValueResolver<int, int>
             {
                 private readonly int _toAdd;
 
@@ -278,7 +258,7 @@ namespace AutoMapper.UnitTests
                     _toAdd = 10;
                 }
 
-                protected override int ResolveCore(int source)
+                public int Resolve(int source, ResolutionContext context)
                 {
                     return source + _toAdd;
                 }
@@ -288,9 +268,7 @@ namespace AutoMapper.UnitTests
             {
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(s => s.Value,
-                        opt => opt.ResolveUsing<CustomResolver>()
-                            .FromMember(s => s.Value)
-                            .ConstructedBy(() => new CustomResolver(15)));
+                        opt => opt.ResolveUsing(new CustomResolver(15), src => src.Value));
 
             });
 
@@ -326,7 +304,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            public class CustomResolver : ValueResolver<int, int>
+            public class CustomResolver : IValueResolver<int, int>
             {
                 private readonly int _toAdd;
 
@@ -340,7 +318,7 @@ namespace AutoMapper.UnitTests
                     _toAdd = 10;
                 }
 
-                protected override int ResolveCore(int source)
+                public int Resolve(int source, ResolutionContext context)
                 {
                     return source + _toAdd;
                 }
@@ -350,9 +328,7 @@ namespace AutoMapper.UnitTests
             {
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(s => s.Value,
-                        opt => opt.ResolveUsing<CustomResolver>()
-                            .ConstructedBy(() => new CustomResolver(15))
-                            .FromMember(s => s.Value)
+                        opt => opt.ResolveUsing(new CustomResolver(15), s => s.Value)
                     );
 
             });
@@ -679,7 +655,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            public class CustomValueResolver : ValueResolver<int, int>
+            public class CustomValueResolver : IValueResolver<int, int>
             {
                 private readonly int _toAdd;
                 public CustomValueResolver() { _toAdd = 11; }
@@ -689,7 +665,7 @@ namespace AutoMapper.UnitTests
                     _toAdd = toAdd;
                 }
 
-                protected override int ResolveCore(int source)
+                public int Resolve(int source, ResolutionContext context)
                 {
                     return source + _toAdd;
                 }
@@ -700,7 +676,7 @@ namespace AutoMapper.UnitTests
                 cfg.ConstructServicesUsing(type => new CustomValueResolver(5));
 
                 cfg.CreateMap<Source, Destination>()
-                    .ForMember(d => d.Value, opt => opt.ResolveUsing<CustomValueResolver>().FromMember(src => src.Value));
+                    .ForMember(d => d.Value, opt => opt.ResolveUsing<CustomValueResolver, int>(src => src.Value));
             });
 
             protected override void Because_of()
@@ -730,9 +706,9 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            public class CustomValueResolver : IValueResolver
+            public class CustomValueResolver : IValueResolver<int, int>
             {
-                public object Resolve(object source, ResolutionContext context)
+                public int Resolve(int source, ResolutionContext context)
                 {
                     return ((Destination)context.DestinationValue).Value;
                 }
@@ -741,7 +717,7 @@ namespace AutoMapper.UnitTests
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>()
-                    .ForMember(d => d.Value, opt => opt.ResolveUsing<CustomValueResolver>().FromMember(src => src.Value));
+                    .ForMember(d => d.Value, opt => opt.ResolveUsing<CustomValueResolver, int>(src => src.Value));
             });
 
             protected override void Because_of()
@@ -771,13 +747,13 @@ namespace AutoMapper.UnitTests
                 public int DestinationValue { get; set; }
             }
 
-            public class CustomValueResolver : ValueResolver<int, int>
+            public class CustomValueResolver : IValueResolver<int, object>
             {
                 public CustomValueResolver()
                 {
                 }
 
-                protected override int ResolveCore(int source)
+                public object Resolve(int source, ResolutionContext context)
                 {
                     return source + 5;
                 }
@@ -789,7 +765,7 @@ namespace AutoMapper.UnitTests
 
                 cfg.CreateMap<Source, Destination>()
                     .ForMember("DestinationValue",
-                        opt => opt.ResolveUsing<CustomValueResolver>().FromMember("SourceValue"));
+                        opt => opt.ResolveUsing<CustomValueResolver, int>("SourceValue"));
             });
 
             protected override void Because_of()

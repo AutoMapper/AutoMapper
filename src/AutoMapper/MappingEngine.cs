@@ -28,7 +28,8 @@ namespace AutoMapper
             {
                 if (context.TypeMap != null)
                 {
-                    return context.TypeMap.Map(context.SourceValue, context);
+                    return null;
+                    //return context.TypeMap.Map(context.SourceValue, context);
                 }
 
                 IObjectMapper mapperToUse = _objectMapperCache.GetOrAdd(context.Types, _getObjectMapper);

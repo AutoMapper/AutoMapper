@@ -201,7 +201,7 @@ namespace AutoMapper
         /// Customize configuration for members not previously configured
         /// </summary>
         /// <param name="memberOptions">Callback for member options</param>
-        void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
+        void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions);
 
         /// <summary>
         /// Customize configuration for individual member
@@ -210,7 +210,7 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForMember<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
-            Action<IMemberConfigurationExpression<TSource, TMember>> memberOptions);
+            Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions);
 
         /// <summary>
         /// Customize configuration for individual member. Used when the name isn't known at compile-time
@@ -219,13 +219,13 @@ namespace AutoMapper
         /// <param name="memberOptions">Callback for member options</param>
         /// <returns></returns>
         IMappingExpression<TSource, TDestination> ForMember(string name,
-            Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
+            Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions);
 
         /// <summary>
         /// Customize configuration for all members
         /// </summary>
         /// <param name="memberOptions">Callback for member options</param>
-        void ForAllMembers(Action<IMemberConfigurationExpression<TSource, object>> memberOptions);
+        void ForAllMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions);
 
         /// <summary>
         /// Ignores all <typeparamref name="TDestination"/> properties that have either a private or protected setter, forcing the mapper to respect encapsulation (note: order matters, so place this before explicit configuration of any properties with an inaccessible setter)
@@ -410,7 +410,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="substituteFunc">Substitution function</param>
         /// <returns>New source object to map.</returns>
-        IMappingExpression<TSource, TDestination> Substitute(Func<TSource, object> substituteFunc);
+        IMappingExpression<TSource, TDestination> Substitute<TSubstitute>(Func<TSource, TSubstitute> substituteFunc);
 
         /// <summary>
         /// Customize configuration for individual constructor parameter

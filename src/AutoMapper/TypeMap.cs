@@ -1,9 +1,7 @@
-using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper
 {
     using System;
-    using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -13,6 +11,8 @@ namespace AutoMapper
     using Configuration;
     using Execution;
     using Mappers;
+    using static System.Linq.Expressions.Expression;
+    using static ExpressionExtensions;
 
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
@@ -20,11 +20,11 @@ namespace AutoMapper
     [DebuggerDisplay("{SourceType.Name} -> {DestinationType.Name}")]
     public class TypeMap
     {
-        private readonly List<Action<object, object, ResolutionContext>> _afterMapActions = new List<Action<object, object, ResolutionContext>>();
-        private readonly List<Action<object, object, ResolutionContext>> _beforeMapActions = new List<Action<object, object, ResolutionContext>>();
+        private readonly List<LambdaExpression> _afterMapActions = new List<LambdaExpression>();
+        private readonly List<LambdaExpression> _beforeMapActions = new List<LambdaExpression>();
         private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
-        private ConcurrentBag<PropertyMap> _propertyMaps = new ConcurrentBag<PropertyMap>();
+        private readonly ConcurrentBag<PropertyMap> _propertyMaps = new ConcurrentBag<PropertyMap>();
         private readonly ConcurrentBag<SourceMemberConfig> _sourceMemberConfigs = new ConcurrentBag<SourceMemberConfig>();
 
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
@@ -33,7 +33,7 @@ namespace AutoMapper
         private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
-        private Func<object, ResolutionContext, object> _mapperFunc;
+        internal LambdaExpression MapExpression { get; private set; }
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, IProfileConfiguration profile)
         {
@@ -58,20 +58,8 @@ namespace AutoMapper
 
         public IProfileConfiguration Profile { get; }
 
-        public Func<object, ResolutionContext, object> CustomMapper { get; private set; }
+        public LambdaExpression CustomMapper { get; set; }
         public LambdaExpression CustomProjection { get; private set; }
-
-        public void BeforeMap(object src, object dest, ResolutionContext context)
-        {
-            foreach (var action in _beforeMapActions)
-                action(src, dest, context);
-        }
-
-        public void AfterMap(object src, object dest, ResolutionContext context)
-        {
-            foreach (var action in _afterMapActions)
-                action(src, dest, context);
-        }
 
         public Expression<Func<ResolutionContext, object>> DestinationCtor { get; set; }
 
@@ -100,7 +88,7 @@ namespace AutoMapper
             }
         }
 
-        public Func<object, object> Substitution { get; set; }
+        public LambdaExpression Substitution { get; set; }
         public LambdaExpression ConstructExpression { get; set; }
 
         public PropertyMap[] GetPropertyMaps()
@@ -226,18 +214,12 @@ namespace AutoMapper
             return _includedDerivedTypes.Any() || DestinationTypeOverride != null;
         }
 
-        public void UseCustomMapper(Func<object, ResolutionContext, object> customMapper)
-        {
-            CustomMapper = customMapper;
-            _propertyMaps = new ConcurrentBag<PropertyMap>();
-        }
-
-        public void AddBeforeMapAction(Action<object, object, ResolutionContext> beforeMap)
+        public void AddBeforeMapAction(LambdaExpression beforeMap)
         {
             _beforeMapActions.Add(beforeMap);
         }
 
-        public void AddAfterMapAction(Action<object, object, ResolutionContext> afterMap)
+        public void AddAfterMapAction(LambdaExpression afterMap)
         {
             _afterMapActions.Add(afterMap);
         }
@@ -255,7 +237,7 @@ namespace AutoMapper
             _orderedPropertyMaps =
                 _propertyMaps
                     .Union(_inheritedMaps)
-                    .OrderBy(map => map.GetMappingOrder()).ToArray();
+                    .OrderBy(map => map.MappingOrder).ToArray();
 
             if (!SourceType.GetTypeInfo().ContainsGenericParameters && !DestinationType.GetTypeInfo().ContainsGenericParameters)
             {
@@ -263,9 +245,10 @@ namespace AutoMapper
                 {
                     pm.Seal(typeMapRegistry);
                 }
-
-                _mapperFunc = BuildMapperFunc(typeMapRegistry);
             }
+
+            MapExpression = BuildMapperFunc(typeMapRegistry);
+
             _sealed = true;
         }
 
@@ -394,7 +377,8 @@ namespace AutoMapper
         public void UseCustomProjection(LambdaExpression projectionExpression)
         {
             CustomProjection = projectionExpression;
-            _propertyMaps = new ConcurrentBag<PropertyMap>();
+            ConstructExpression = projectionExpression;
+            //_propertyMaps = new ConcurrentBag<PropertyMap>();
         }
 
         public void ApplyInheritedMap(TypeMap inheritedTypeMap)
@@ -429,11 +413,15 @@ namespace AutoMapper
             }
 
             //Include BeforeMap
-            if (inheritedTypeMap._beforeMapActions.Any())
-                AddBeforeMapAction(inheritedTypeMap.BeforeMap);
+            foreach (var beforeMapAction in inheritedTypeMap._beforeMapActions)
+            {
+                AddBeforeMapAction(beforeMapAction);
+            }
             //Include AfterMap
-            if (inheritedTypeMap._afterMapActions.Any())
-                AddAfterMapAction(inheritedTypeMap.AfterMap);
+            foreach (var afterMapAction in inheritedTypeMap._afterMapActions)
+            {
+                AddAfterMapAction(afterMapAction);
+            }
         }
 
         internal LambdaExpression DestinationConstructorExpression(Expression instanceParameter)
@@ -450,45 +438,38 @@ namespace AutoMapper
             return Lambda(newExpression);
         }
 
-        public object Map(object source, ResolutionContext context)
+        private LambdaExpression BuildMapperFunc(TypeMapRegistry typeMapRegistry)
         {
-            return _mapperFunc(source, context);
-        }
+            var srcParam = Parameter(SourceType, "src");
+            var destParam = Parameter(DestinationType, "dest");
+            var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
 
-        private Func<object, ResolutionContext, object> BuildMapperFunc(TypeMapRegistry typeMapRegistry)
-        {
             if (Substitution != null)
             {
-                return (source, context) =>
-                {
-                    var newSource = Substitution(context.SourceValue);
-
-                    return context.Mapper.Map(newSource, context.DestinationValue, newSource.GetType(),
-                        context.DestinationType, context);
-                };
+                return (LambdaExpression) Substitution.ReplaceParameters(srcParam, destParam, ctxtParam);
             }
 
             if (CustomMapper != null)
             {
-                return CustomMapper;
+                return (LambdaExpression) CustomMapper.ReplaceParameters(srcParam, destParam, ctxtParam);
             }
 
-            var srcParam = Parameter(typeof(object), "src");
-            var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
-            var mapFrom = Variable(SourceType, "mapFrom");
+            var destinationFunc = CreateDestinationFunc(typeMapRegistry, srcParam, destParam, ctxtParam);
 
-            var destinationFunc = CreateDestinationFunc(typeMapRegistry, mapFrom, ctxtParam);
+            var assignmentFunc = CreateAssignmentFunc(srcParam, destParam, ctxtParam, destinationFunc);
 
-            var assignmentFunc = CreateAssignmentFunc(srcParam, mapFrom, ctxtParam, destinationFunc);
+            var mapperFunc = CreateMapperFunc(srcParam, destParam, ctxtParam, assignmentFunc);
 
-            var mapperFunc = CreateMapperFunc(srcParam, ctxtParam, assignmentFunc);
+            var lambdaExpr = Lambda(mapperFunc, srcParam, destParam, ctxtParam);
 
-            var lambdaExpr = Lambda<Func<object, ResolutionContext, object>>(mapperFunc, srcParam, ctxtParam);
-
-            return lambdaExpr.Compile();
+            return lambdaExpr;
         }
 
-        private Expression CreateMapperFunc(ParameterExpression srcParam, ParameterExpression ctxtParam, Expression assignmentFunc)
+        private Expression CreateMapperFunc(
+            ParameterExpression srcParam, 
+            ParameterExpression destParam,
+            ParameterExpression ctxtParam,
+            Expression assignmentFunc)
         {
             var mapperFunc = assignmentFunc;
 
@@ -504,7 +485,7 @@ namespace AutoMapper
             {
                 mapperFunc =
                     Condition(Equal(srcParam, Constant(null)),
-                        Constant(null), mapperFunc);
+                        Constant(null, DestinationType), mapperFunc);
                 //mapperFunc = (source, context, destFunc) => source == null ? null : inner(source, context, destFunc);
             }
 
@@ -525,64 +506,63 @@ namespace AutoMapper
 
         private Expression CreateAssignmentFunc(
             ParameterExpression srcParam,
-            ParameterExpression mapFrom,
+            ParameterExpression destParam,
             ParameterExpression ctxtParam,
-            Expression<Func<ResolutionContext, object>> destinationFunc)
+            Expression destinationFunc)
         {
-            var mapObj = Variable(DestinationType, "mapObj");
-            var setMapObj = Assign(mapObj, Convert(destinationFunc.Body, DestinationType));
-            var setMapFrom = Assign(mapFrom, Convert(srcParam, SourceType));
-            var beforeMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("BeforeMap"), Convert(mapObj, typeof(object)));
+            var beforeMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("BeforeMap"), ToObject(destParam));
 
             var typeMaps =
-                GetPropertyMaps().Where(pm => pm.CanResolveValue()).Select(pm => TryPropertyMap(pm, mapFrom, mapObj, ctxtParam)).ToList();
+                GetPropertyMaps().Where(pm => pm.CanResolveValue()).Select(pm => TryPropertyMap(pm, srcParam, destParam, ctxtParam)).ToList();
 
-            var afterMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("AfterMap"), Convert(mapObj, typeof(object)));
+            var afterMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("AfterMap"), ToObject(destParam));
 
             var actions = typeMaps;
 
             if (_beforeMapActions.Any())
-                actions.Insert(0, Call(Constant(this), typeof(TypeMap).GetMethod("BeforeMap"), srcParam, mapObj, ctxtParam));
+                actions.Insert(0, Call(Constant(this), typeof(TypeMap).GetMethod("BeforeMap"), srcParam, destParam, ctxtParam));
             actions.Insert(0, beforeMap);
-            actions.Insert(0, setMapObj);
-            actions.Insert(0, setMapFrom);
+            actions.Insert(0, destinationFunc);
             actions.Add(afterMap);
 
             if (_afterMapActions.Any())
-                actions.Add(Call(Constant(this), typeof(TypeMap).GetMethod("AfterMap"), srcParam, mapObj, ctxtParam));
+                actions.Add(Call(Constant(this), typeof(TypeMap).GetMethod("AfterMap"), srcParam, destParam, ctxtParam));
 
-            actions.Add(Convert(mapObj, typeof(object)));
+            actions.Add(destParam);
 
-            return Block(new[] { mapObj, mapFrom }, actions);
+            return Block(actions);
         }
 
         private Expression TryPropertyMap(PropertyMap pm, params Expression[] replaceExpressions)
         {
+            if (pm.MapExpression == null)
+                return null;
+
             var autoMapException = Parameter(typeof(AutoMapperMappingException), "ex");
             var exception = Parameter(typeof(Exception), "ex");
 
             var mappingExceptionCtor = typeof(AutoMapperMappingException).GetTypeInfo().DeclaredConstructors.First(ci => ci.GetParameters().Count() == 3);
 
-            return TryCatch(Block(typeof(void), pm._mapperExpr.ReplaceParameters(replaceExpressions)),
+            return TryCatch(Block(typeof(void), pm.MapExpression.ReplaceParameters(replaceExpressions)),
                 MakeCatchBlock(typeof(AutoMapperMappingException), autoMapException, Block(Assign(Property(autoMapException, "PropertyMap"), Constant(pm)), Rethrow()), null),
                 MakeCatchBlock(typeof(Exception), exception, Throw(New(mappingExceptionCtor, replaceExpressions[2], exception, Constant(pm))), null));
         }
 
-        private Expression<Func<ResolutionContext, object>> CreateDestinationFunc(TypeMapRegistry typeMapRegistry, ParameterExpression mapFrom, ParameterExpression ctxtParam)
+        private Expression CreateDestinationFunc(TypeMapRegistry typeMapRegistry,
+            ParameterExpression srcParam, 
+            ParameterExpression destParam, 
+            ParameterExpression ctxtParam)
         {
-            var newDestFunc = CreateNewDestinationFunc(typeMapRegistry, mapFrom, ctxtParam);
+            var newDestFunc = CreateNewDestinationFunc(typeMapRegistry, srcParam, ctxtParam);
 
-            var destVar = Variable(typeof(object), "destination");
-            Expression getDest;
-            if (DestinationTypeToUse.GetTypeInfo().IsValueType)
-                getDest = newDestFunc;
-            else
-                getDest =
-                    Convert(Property(ctxtParam, "DestinationValue"), DestinationTypeToUse)
-                        .IfNullElse(newDestFunc.ToType(DestinationTypeToUse));
+            var getDest = DestinationTypeToUse.GetTypeInfo().IsValueType 
+                ? newDestFunc 
+                : Coalesce(destParam, newDestFunc);
+                    //destParam.ToType(DestinationTypeToUse)
+                    //    .IfNullElse(newDestFunc.ToType(DestinationTypeToUse));
             //, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
 
-            var destinationFunc = Block(new[] { destVar }, Assign(destVar, getDest));
+            Expression destinationFunc = Assign(destParam, getDest);
 
             if (PreserveReferences)
             {
@@ -595,7 +575,7 @@ namespace AutoMapper
 
                 destinationFunc = Block(new[] { dest }, Assign(dest, destinationFunc), setCache, dest);
             }
-            return Lambda<Func<ResolutionContext, object>>(destinationFunc, ctxtParam);
+            return destinationFunc;
         }
 
         private Expression CreateNewDestinationFunc(TypeMapRegistry typeMapRegistry, ParameterExpression mapFrom, ParameterExpression ctxtParam)

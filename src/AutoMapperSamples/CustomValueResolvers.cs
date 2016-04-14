@@ -20,9 +20,9 @@ namespace AutoMapperSamples
 				public int Total { get; set; }
 			}
 
-			public class CustomResolver : ValueResolver<Source, int>
+			public class CustomResolver : IValueResolver<Source, int>
 			{
-				protected override int ResolveCore(Source source)
+			    public int Resolve(Source source, ResolutionContext context)
 				{
 					return source.Value1 + source.Value2;
 				}
@@ -50,8 +50,7 @@ namespace AutoMapperSamples
 			public void ConstructedExample()
 			{
                 var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Total,
-					           opt => opt.ResolveUsing<CustomResolver>().ConstructedBy(() => new CustomResolver())
+					.ForMember(dest => dest.Total, opt => opt.ResolveUsing(new CustomResolver())
 					));
 				config.AssertConfigurationIsValid();
 
