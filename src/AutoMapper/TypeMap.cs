@@ -492,10 +492,10 @@ namespace AutoMapper
             if (PreserveReferences)
             {
 
-                var cache = Variable(typeof(object), "cachedDestination");
+                var cache = Variable(DestinationType, "cachedDestination");
 
                 var condition = Condition(And(
-                    Equal(Property(ctxtParam, "DestinationValue"), Constant(null)),
+                    Equal(destParam, Constant(null)),
                     Call(Property(ctxtParam, "InstanceCache"), typeof(Dictionary<ResolutionContext, object>).GetMethod("TryGetValue"), ctxtParam, cache)
                     ), cache, mapperFunc);
 
