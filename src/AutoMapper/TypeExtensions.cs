@@ -29,8 +29,12 @@ namespace AutoMapper
         /// </param>
         public static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type, Func<ResolutionContext, Type> getClosedGenericInterfaceType = null)
         {
-			return context =>
+            return context =>
             {
+                // Warning: do not mutate the parameter @type. It's in a shared closure and will be remembered in subsequent calls to this function.
+                // Otherwise all ctors for the same generic type definition will return whatever closed type then first one calculates.
+                var concreteType = type;
+
                 if (type.IsGenericTypeDefinition())
                 {
                     if (getClosedGenericInterfaceType == null) throw new ArgumentNullException(nameof(getClosedGenericInterfaceType), "For generic interfaces, the desired closed interface type must be known.");
@@ -43,10 +47,10 @@ namespace AutoMapper
                     DeduceGenericArguments(genericParameters, deducedTypeArguments, implementationTypeArguments[1], context.DestinationType);
                     
                     if (deducedTypeArguments.Any(_ => _ == null)) throw new InvalidOperationException($"One or more type arguments to {type.Name} cannot be determined.");
-                    type = type.MakeGenericType(deducedTypeArguments);
+                    concreteType = type.MakeGenericType(deducedTypeArguments);
                 }
 
-                var obj = context.Options.ServiceCtor.Invoke(type);
+                var obj = context.Options.ServiceCtor.Invoke(concreteType);
 
                 return (TServiceType)obj;
             };

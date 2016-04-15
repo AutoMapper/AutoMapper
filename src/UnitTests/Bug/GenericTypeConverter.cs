@@ -128,5 +128,12 @@ namespace AutoMapper.UnitTests.Bug
         {
             Mapper.Map<IReadOnlyDictionary<int, int>>(new Hashtable()).ShouldBeSameAs(Converter<int, int>.ReadOnlyDictionaryDestination);
         }
+
+        [Fact]
+        public void Should_use_generic_converter_with_correct_closed_type()
+        {
+            Mapper.Map<Destination<int>>(new Source<int>()).ShouldBeSameAs(Converter<int>.SomeDestination);
+            Mapper.Map<Destination<long>>(new Source<long>()).ShouldBeSameAs(Converter<long>.SomeDestination);
+        }
     }
 }
