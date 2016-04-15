@@ -1,7 +1,7 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Should;
 using Xunit;
-using AutoMapper;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -79,6 +79,17 @@ namespace AutoMapper.UnitTests.Bug
             }
         }
 
+        public class Converter<T1, T2> : ITypeConverter<Hashtable, IReadOnlyDictionary<T1, T2>>
+
+        {
+            public static IReadOnlyDictionary<T1, T2> ReadOnlyDictionaryDestination = new Dictionary<T1, T2>();
+
+            public IReadOnlyDictionary<T1, T2> Convert(Hashtable source, ResolutionContext context)
+            {
+                return ReadOnlyDictionaryDestination;
+            }
+        }
+
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap(typeof (Source<>), typeof (Destination<>)).ConvertUsing(typeof (Converter<>));
@@ -87,6 +98,8 @@ namespace AutoMapper.UnitTests.Bug
             cfg.CreateMap(typeof (int), typeof (Destination<>)).ConvertUsing(typeof (Converter<>));
             cfg.CreateMap(typeof (OtherSource<>), typeof (Destination<object>)).ConvertUsing(typeof (Converter<>));
             cfg.CreateMap(typeof (Source<int>), typeof (OtherDestination<>)).ConvertUsing(typeof (Converter<>));
+
+            cfg.CreateMap(typeof (Hashtable), typeof (IReadOnlyDictionary<,>)).ConvertUsing(typeof (Converter<,>));
         });
 
         protected override void Because_of()
@@ -100,7 +113,7 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         [Fact]
-        public void Should_use_generic_type_converter()
+        public void Should_use_generic_converter_with_correct_interface()
         {
             _destination.ShouldBeSameAs(Converter<int>.SomeDestination);
             _otherDestination.ShouldBeSameAs(Converter<int>.SomeOtherDestination);
@@ -108,6 +121,12 @@ namespace AutoMapper.UnitTests.Bug
             _nonGenericToOpenGenericDestination.ShouldBeSameAs(Converter<int>.SomeDestination);
             _openGenericToClosedGenericDestination.ShouldEqual(Converter<int>.ClosedDestinationViaOpenSource);
             _closedGenericToOpenGenericDestination.ShouldEqual(Converter<int>.OpenDestinationViaClosedSource);
+        }
+
+        [Fact]
+        public void Should_use_generic_converter_when_covered_by_object_map()
+        {
+            Mapper.Map<IReadOnlyDictionary<int, int>>(new Hashtable()).ShouldBeSameAs(Converter<int, int>.ReadOnlyDictionaryDestination);
         }
     }
 }
