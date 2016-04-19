@@ -601,9 +601,6 @@ namespace AutoMapper
             var getDest = DestinationTypeToUse.GetTypeInfo().IsValueType 
                 ? newDestFunc 
                 : Coalesce(destParam, newDestFunc);
-                    //destParam.ToType(DestinationTypeToUse)
-                    //    .IfNullElse(newDestFunc.ToType(DestinationTypeToUse));
-            //, Throw(Constant(new InvalidOperationException("Cannot create destination object. "))));
 
             Expression destinationFunc = Assign(destParam, getDest);
 

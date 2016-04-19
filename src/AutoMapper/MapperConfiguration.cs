@@ -4,12 +4,14 @@ namespace AutoMapper
     using System.Collections.Generic;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using Configuration;
     using Mappers;
     using QueryableExtensions;
     using QueryableExtensions.Impl;
-    using IMemberConfiguration = Configuration.Conventions.IMemberConfiguration;
+    using static System.Linq.Expressions.Expression;
+    using static ExpressionExtensions;
 
     public class MapperConfiguration : IConfigurationProvider, IMapperConfiguration
     {
@@ -127,7 +129,7 @@ namespace AutoMapper
 
         void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration) => _allTypeMapActions.Add(configuration);
 
-        IMemberConfiguration IProfileExpression.AddMemberConfiguration() => _defaultProfile.AddMemberConfiguration();
+        Configuration.Conventions.IMemberConfiguration IProfileExpression.AddMemberConfiguration() => _defaultProfile.AddMemberConfiguration();
 
         IConditionalObjectMapper IProfileExpression.AddConditionalObjectMapper() => _defaultProfile.AddConditionalObjectMapper();
 
@@ -190,7 +192,24 @@ namespace AutoMapper
 
                 if (typeMap != null)
                 {
-                    return (Func<TSource, TDestination, ResolutionContext, TDestination>) typeMap.MapExpression.Compile();
+                    var mapExpression = typeMap.MapExpression;
+
+                    if (mapExpression.Parameters[0].Type != typeof (TSource)
+                        || mapExpression.Parameters[1].Type != typeof (TDestination))
+                    {
+                        var srcParam = Parameter(typeof (TSource), "src");
+                        var destParam = Parameter(typeof (TDestination), "dest");
+                        var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
+
+                        mapExpression = Lambda(Invoke(typeMap.MapExpression,
+                            ToType(srcParam, typeMap.MapExpression.Parameters[0].Type),
+                            ToType(destParam, typeMap.MapExpression.Parameters[1].Type),
+                            ctxtParam
+                            ),
+                            srcParam, destParam, ctxtParam);
+                    }
+
+                    return (Func<TSource, TDestination, ResolutionContext, TDestination>) mapExpression.Compile();
                     //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
                     //{
                     //    try
@@ -241,7 +260,24 @@ namespace AutoMapper
 
                 if (typeMap != null)
                 {
-                    return typeMap.MapExpression.Compile();
+                    var mapExpression = typeMap.MapExpression;
+
+                    if (mapExpression.Parameters[0].Type != tp.SourceType
+                        || mapExpression.Parameters[1].Type != tp.DestinationType)
+                    {
+                        var srcParam = Parameter(tp.SourceType, "src");
+                        var destParam = Parameter(tp.DestinationType, "dest");
+                        var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
+
+                        mapExpression = Lambda(Invoke(typeMap.MapExpression,
+                            ToType(srcParam, typeMap.MapExpression.Parameters[0].Type),
+                            ToType(destParam, typeMap.MapExpression.Parameters[1].Type),
+                            ctxtParam
+                            ),
+                            srcParam, destParam, ctxtParam);
+                    }
+
+                    return mapExpression.Compile();
                     //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
                     //{
                     //    try
