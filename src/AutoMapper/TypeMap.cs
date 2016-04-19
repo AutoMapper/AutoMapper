@@ -30,7 +30,6 @@ namespace AutoMapper
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
-        private Func<ResolutionContext, bool> _condition;
         private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
         internal LambdaExpression MapExpression { get; private set; }
@@ -77,6 +76,7 @@ namespace AutoMapper
         public IEnumerable<TypePair> IncludedBaseTypes => _includedBaseTypes;
 
         public bool PreserveReferences { get; private set; }
+        public LambdaExpression Condition { get; set; }
 
         public int MaxDepth
         {
@@ -84,7 +84,10 @@ namespace AutoMapper
             set
             {
                 _maxDepth = value;
-                SetCondition(o => PassesDepthCheck(o, value));
+
+                Expression<Func<ResolutionContext, bool>> expr = ctxt => PassesDepthCheck(ctxt, value);
+
+                Condition = expr;
             }
         }
 
@@ -321,11 +324,6 @@ namespace AutoMapper
             }
         }
 
-        public void SetCondition(Func<ResolutionContext, bool> condition)
-        {
-            _condition = condition;
-        }
-
         public void AddConstructorMap(ConstructorMap ctorMap)
         {
             ConstructorMap = ctorMap;
@@ -358,8 +356,8 @@ namespace AutoMapper
             // walk parents to determine current depth
             while (contextCopy.Parent != null)
             {
-                if (contextCopy.SourceType == context.TypeMap.SourceType &&
-                    contextCopy.DestinationType == context.TypeMap.DestinationType)
+                if (contextCopy.SourceType == context.SourceType &&
+                    contextCopy.DestinationType == context.DestinationType)
                 {
                     // same source and destination types appear higher up in the hierarchy
                     currentDepth++;
@@ -476,20 +474,20 @@ namespace AutoMapper
         {
             var mapperFunc = assignmentFunc;
 
-            if (_condition != null)
+            if (Condition != null)
             {
                 mapperFunc =
-                    Condition(Invoke(Constant(_condition), ctxtParam),
-                        mapperFunc, Constant(null));
-                //mapperFunc = (source, context, destFunc) => _condition(context) ? inner(source, context, destFunc) : null;
+                    Condition(Invoke(Condition, ctxtParam),
+                        mapperFunc, Default(DestinationType));
+                //mapperFunc = (source, context, destFunc) => _condition(context) ? inner(source, context, destFunc) : default(TDestination);
             }
 
             if (Profile.AllowNullDestinationValues)
             {
                 mapperFunc =
-                    Condition(Equal(srcParam, Constant(null)),
-                        Constant(null, DestinationType), mapperFunc);
-                //mapperFunc = (source, context, destFunc) => source == null ? null : inner(source, context, destFunc);
+                    Condition(Equal(srcParam, Default(SourceType)),
+                        Default(DestinationType), mapperFunc);
+                //mapperFunc = (source, context, destFunc) => source == default(TSource) ? default(TDestination) : inner(source, context, destFunc);
             }
 
             if (PreserveReferences)
