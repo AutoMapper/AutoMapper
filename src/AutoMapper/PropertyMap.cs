@@ -366,7 +366,6 @@ namespace AutoMapper
             var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
             
             var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, ctxtParam);
-            var innerResolverExpr = valueResolverExpr;
             var destMember = MakeMemberAccess(destParam,propertyMap.DestinationProperty.MemberInfo);
 
             Expression getter;
@@ -393,25 +392,16 @@ namespace AutoMapper
                  EnumMapper.EnumToEnumMapping(new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType)))
                 || !propertyMap.DestinationPropertyType.IsAssignableFrom(propertyMap.SourceType))
             {
-                
-                var ifTrue = propertyMap.SourceType != null
-                    ? (Expression)Constant(propertyMap.SourceType, typeof(Type))
-                    : MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("SourceType"));
-                var ifFalse = Call(valueResolverExpr, typeof(object).GetMethod("GetType"));
-
-                var a = Condition(Equal(ToObject(valueResolverExpr), Constant(null)),
-                    ifTrue,
-                    ifFalse);
-
                 var mapperProp = MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Mapper"));
-                var mapMethod = typeof(IRuntimeMapper).GetMethod("Map", new[] { typeof(object), typeof(object), typeof(Type), typeof(Type), typeof(ResolutionContext) });
+                var mapMethod = typeof(IRuntimeMapper)
+                    .GetMethods()
+                    .Single(m => m.Name == "Map" && m.IsGenericMethodDefinition)
+                    .MakeGenericMethod(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
                 var second = Call(
                     mapperProp,
                     mapMethod,
-                    ToObject(valueResolverExpr),
-                    ToObject(destValueExpr),
-                    a,
-                    Constant(propertyMap.DestinationPropertyType),
+                    valueResolverExpr,
+                    destValueExpr,
                     ctxtParam
                     );
                 valueResolverExpr = Convert(second, propertyMap.DestinationPropertyType);

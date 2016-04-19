@@ -344,6 +344,20 @@ namespace AutoMapper
             return func.DynamicInvoke(source, destination, context);
         }
 
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext parent)
+        {
+            var sourceType = source?.GetType() ?? typeof(TSource);
+            var destinationType = destination?.GetType() ?? typeof(TDestination);
+
+            var types = new TypePair(sourceType, destinationType);
+
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var context = new ResolutionContext(source, destination, sourceType, destinationType, null, parent);
+
+            return func(source, destination, context);
+        }
+
         object IRuntimeMapper.CreateObject(ResolutionContext context)
         {
             return !_configurationProvider.AllowNullDestinationValues
