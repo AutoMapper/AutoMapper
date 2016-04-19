@@ -93,6 +93,7 @@ namespace AutoMapper
 
         public LambdaExpression Substitution { get; set; }
         public LambdaExpression ConstructExpression { get; set; }
+        public Type TypeConverterType { get; set; }
 
         public PropertyMap[] GetPropertyMaps()
         {
@@ -386,8 +387,10 @@ namespace AutoMapper
 
         public bool ShouldCheckForValid()
         {
-            return (CustomMapper == null && CustomProjection == null &&
-                    DestinationTypeOverride == null);
+            return CustomMapper == null
+                && CustomProjection == null
+                && TypeConverterType == null 
+                && DestinationTypeOverride == null;
         }
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
@@ -448,6 +451,26 @@ namespace AutoMapper
             if (Substitution != null)
             {
                 return Lambda(Substitution.ReplaceParameters(srcParam, destParam, ctxtParam), srcParam, destParam, ctxtParam);
+            }
+
+            if (TypeConverterType != null)
+            {
+                // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).Convert(src, ctxt);
+                Type converterInterfaceType = typeof (ITypeConverter<,>).MakeGenericType(SourceType, DestinationType);
+                return Lambda(
+                    Call(
+                        Convert(
+                            Call(
+                                MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
+                                typeof (MappingOperationOptions).GetMethod("CreateInstance")
+                                    .MakeGenericMethod(TypeConverterType)
+                                ),
+                            converterInterfaceType),
+                        converterInterfaceType.GetMethod("Convert"),
+                        srcParam, ctxtParam
+                        ),
+                    srcParam, destParam, ctxtParam);
+
             }
 
             if (CustomMapper != null)

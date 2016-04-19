@@ -186,11 +186,11 @@ namespace AutoMapper
         {
             var types = new TypePair(source.GetType(), typeof(TDestination));
 
-            dynamic func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(types);
 
             var context = new ResolutionContext(source, null, source.GetType(), typeof(TDestination), null, _defaultMappingOptions, this);
 
-            return func((dynamic)source, null, context);
+            return (TDestination) func.DynamicInvoke(source, null, context);
         }
 
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
@@ -266,36 +266,36 @@ namespace AutoMapper
         {
             var types = new TypePair(source?.GetType() ?? sourceType, destinationType);
 
-            dynamic func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(types);
 
             var context = new ResolutionContext(source, null, sourceType, destinationType, null, _defaultMappingOptions, this);
 
-            return func((dynamic) source, null, context);
+            return func.DynamicInvoke(source, null, context);
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
             var types = new TypePair(source?.GetType() ?? sourceType, destinationType);
 
-            dynamic func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(types);
 
             var options = new MappingOperationOptions(_serviceCtor);
             opts(options);
 
             var context = new ResolutionContext(source, null, sourceType, destinationType, null, options, this);
 
-            return func((dynamic)source, null, context);
+            return func.DynamicInvoke(source, null, context);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
         {
             var types = new TypePair(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
 
-            dynamic func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(types);
 
             var context = new ResolutionContext(source, destination, sourceType, destinationType, null, _defaultMappingOptions, this);
 
-            return func((dynamic)source, (dynamic)destination, context);
+            return func.DynamicInvoke(source, destination, context);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
@@ -303,25 +303,25 @@ namespace AutoMapper
         {
             var types = new TypePair(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
 
-            dynamic func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(types);
 
             var options = new MappingOperationOptions(_serviceCtor);
             opts(options);
 
             var context = new ResolutionContext(source, destination, sourceType, destinationType, null, options, this);
 
-            return func((dynamic)source, (dynamic)destination, context);
+            return func.DynamicInvoke(source, destination, context);
         }
 
         object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
         {
             var types = new TypePair(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
 
-            dynamic func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(types);
 
             var context = new ResolutionContext(source, destination, sourceType, destinationType, null, parent);
 
-            return func((dynamic)source, (dynamic)destination, context);
+            return func.DynamicInvoke(source, destination, context);
         }
 
         object IRuntimeMapper.CreateObject(ResolutionContext context)

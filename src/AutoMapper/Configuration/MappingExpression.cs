@@ -24,33 +24,17 @@ namespace AutoMapper.Configuration
         public void ForAllMembers(Action<IMemberConfigurationExpression> memberOptions) 
             => base.ForAllMembers(opts => memberOptions((IMemberConfigurationExpression)opts));
 
-        void IMappingExpression.ConvertUsing<TTypeConverter>()
-        {
-            ConvertUsing(typeof(TTypeConverter));
-        }
+        void IMappingExpression.ConvertUsing<TTypeConverter>() 
+            => ConvertUsing(typeof(TTypeConverter));
 
-        public void ConvertUsing(Type typeConverterType)
-        {
-            var interfaceType = typeof(ITypeConverter<,>).MakeGenericType(Types.SourceType, Types.DestinationType);
-            var convertMethodType = interfaceType.IsAssignableFrom(typeConverterType) ? interfaceType : typeConverterType;
-            var converter = new DeferredInstantiatedConverter(convertMethodType, typeConverterType.BuildCtor<object>(
-                context => typeof(ITypeConverter<,>).MakeGenericType(context.SourceType, context.DestinationType)));
+        public void ConvertUsing(Type typeConverterType) 
+            => TypeMapActions.Add(tm => tm.TypeConverterType = typeConverterType);
 
-            TypeMapActions.Add(tm =>
-            {
-                Expression<Func<object, ResolutionContext, object>> expr =
-                    (src, ctxt) => converter.Convert(src, ctxt);
+        public void As(Type typeOverride) 
+            => TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
 
-                tm.CustomMapper = expr;
-            });
-        }
-
-        public void As(Type typeOverride) => TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
-
-        public void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions)
-        {
-            base.ForAllOtherMembers(o => memberOptions((IMemberConfigurationExpression)o));
-        }
+        public void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions) 
+            => base.ForAllOtherMembers(o => memberOptions((IMemberConfigurationExpression)o));
 
         public IMappingExpression ForMember(string name, Action<IMemberConfigurationExpression> memberOptions) 
             => (IMappingExpression)base.ForMember(name, c => memberOptions((IMemberConfigurationExpression)c));
@@ -103,17 +87,11 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression PreserveReferences() => (IMappingExpression)base.PreserveReferences();
 
+        protected override IMemberConfiguration CreateMemberConfigurationExpression<TMember>(IMemberAccessor member, Type sourceType)
+            => new MemberConfigurationExpression(member, sourceType);
 
-        protected override IMemberConfiguration CreateMemberConfigurationExpression<TMember>(IMemberAccessor member,
-            Type sourceType)
-        {
-            return new MemberConfigurationExpression(member, sourceType);
-        }
-
-        protected override MappingExpression<object, object> CreateReverseMapExpression()
-        {
-            return new MappingExpression(new TypePair(DestinationType, SourceType), MemberList.Source);
-        }
+        protected override MappingExpression<object, object> CreateReverseMapExpression() 
+            => new MappingExpression(new TypePair(DestinationType, SourceType), MemberList.Source);
 
         private class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
         {
@@ -363,13 +341,9 @@ namespace AutoMapper.Configuration
             ConvertUsing(converter.Convert);
         }
 
-        // TODO: Convert to expression
         public void ConvertUsing<TTypeConverter>() where TTypeConverter : ITypeConverter<TSource, TDestination>
         {
-            var converter = new DeferredInstantiatedConverter<TSource, TDestination>(typeof(TTypeConverter).BuildCtor<ITypeConverter<TSource, TDestination>>(
-                context => typeof(ITypeConverter<,>).MakeGenericType(context.SourceType, context.DestinationType)));
-
-            ConvertUsing((src, ctxt) => converter.Convert(src, ctxt));
+            TypeMapActions.Add(tm => tm.TypeConverterType = typeof (TTypeConverter));
         }
 
         public IMappingExpression<TSource, TDestination> BeforeMap(Action<TSource, TDestination> beforeFunction)
