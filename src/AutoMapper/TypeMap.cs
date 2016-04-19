@@ -455,6 +455,16 @@ namespace AutoMapper
 
             if (TypeConverterType != null)
             {
+                Type type;
+                if (TypeConverterType.IsGenericTypeDefinition())
+                {
+                    var genericTypeParam = SourceType.IsGenericType()
+                        ? SourceType.GetTypeInfo().GenericTypeArguments[0]
+                        : DestinationType.GetTypeInfo().GenericTypeArguments[0];
+                    type = TypeConverterType.MakeGenericType(genericTypeParam);
+                }
+                else type = TypeConverterType;
+
                 // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).Convert(src, ctxt);
                 Type converterInterfaceType = typeof (ITypeConverter<,>).MakeGenericType(SourceType, DestinationType);
                 return Lambda(
@@ -463,7 +473,7 @@ namespace AutoMapper
                             Call(
                                 MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
                                 typeof (MappingOperationOptions).GetMethod("CreateInstance")
-                                    .MakeGenericMethod(TypeConverterType)
+                                    .MakeGenericMethod(type)
                                 ),
                             converterInterfaceType),
                         converterInterfaceType.GetMethod("Convert"),

@@ -268,6 +268,15 @@ namespace AutoMapper
 
             Configure(typeMapRegistry, closedMap);
 
+            if (closedMap.TypeConverterType != null)
+            {
+                var typeParam = openMapConfig.SourceType.IsGenericTypeDefinition()
+                    ? closedTypes.SourceType.GetTypeInfo().GenericTypeArguments[0]
+                    : closedTypes.DestinationType.GetTypeInfo().GenericTypeArguments[0];
+
+                closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParam);
+            }
+
             return closedMap;
         }
 

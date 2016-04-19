@@ -394,7 +394,7 @@ namespace AutoMapper
             {
                 var mapperProp = MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Mapper"));
                 var mapMethod = typeof(IRuntimeMapper)
-                    .GetMethods()
+                    .GetAllMethods()
                     .Single(m => m.Name == "Map" && m.IsGenericMethodDefinition)
                     .MakeGenericMethod(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
                 var second = Call(
@@ -514,10 +514,6 @@ namespace AutoMapper
             {
                 valueResolverFunc = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull();
             }
-            //else if (propertyMap.SourceMember != null)
-            //{
-            //    valueResolverFunc = MakeMemberAccess(srcParam, propertyMap.SourceMember);
-            //}
             else if (propertyMap.SourceMembers.Any()
                 && propertyMap.SourceType != null
                 )
@@ -539,6 +535,10 @@ namespace AutoMapper
                         );
                     valueResolverFunc = valueResolverFunc.IfNotNull();
                 }
+            }
+            else if (propertyMap.SourceMember != null)
+            {
+                valueResolverFunc = MakeMemberAccess(srcParam, propertyMap.SourceMember);
             }
             else
             {

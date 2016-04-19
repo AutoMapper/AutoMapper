@@ -181,6 +181,6 @@ namespace AutoMapper
         /// <param name="valueResolver">Value resolver instance to use</param>
         /// <param name="memberName">Source member to supply to value resolver</param>
         /// <returns>Resolution expression</returns>
-        void ResolveUsing<TSourceMember, TMember>(IValueResolver<TSourceMember, TMember> valueResolver, string memberName);
+        void ResolveUsing<TSource, TSourceMember>(IValueResolver<TSource, TSourceMember> valueResolver, string memberName);
     }
 }
