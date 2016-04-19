@@ -422,9 +422,10 @@ namespace AutoMapper
                 valueResolverExpr =
                     Condition(
                         Invoke(
-                            Constant(propertyMap.Condition),
-                            ToObject(innerResolverExpr),
-                            ToObject(destValueExpr),
+                            propertyMap.Condition,
+                            srcParam,
+                            destParam,
+                            ToType(destValueExpr, propertyMap.Condition.Parameters[2].Type),
                             ctxtParam
                             ),
                         Convert(valueResolverExpr, propertyMap.DestinationPropertyType),
