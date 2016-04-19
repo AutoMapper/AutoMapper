@@ -208,20 +208,22 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source)
         {
-            var types = new TypePair(source?.GetType() ?? typeof (TSource), typeof (TDestination));
+            var sourceType = source?.GetType() ?? typeof (TSource);
+            var types = new TypePair(sourceType, typeof (TDestination));
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
             var destination = default(TDestination);
 
-            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
+            var context = new ResolutionContext(source, destination, sourceType, typeof(TDestination), null, _defaultMappingOptions, this);
 
             return func(source, destination, context);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            var types = new TypePair(source?.GetType() ?? typeof(TSource), typeof(TDestination));
+            var sourceType = source?.GetType() ?? typeof(TSource);
+            var types = new TypePair(sourceType, typeof(TDestination));
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
@@ -231,25 +233,30 @@ namespace AutoMapper
 
             opts(typedOptions);
 
-            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, typedOptions, this);
+            var context = new ResolutionContext(source, destination, sourceType, typeof(TDestination), null, typedOptions, this);
 
             return func(source, destination, context);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
         {
-            var types = new TypePair(source?.GetType() ?? typeof(TSource), destination?.GetType() ?? typeof(TDestination));
+            var sourceType = source?.GetType() ?? typeof(TSource);
+            var destinationType = destination?.GetType() ?? typeof(TDestination);
+            var types = new TypePair(sourceType, destinationType);
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
-            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
+            var context = new ResolutionContext(source, destination, sourceType, destinationType, null, _defaultMappingOptions, this);
 
             return func(source, destination, context);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            var types = new TypePair(source?.GetType() ?? typeof(TSource), destination?.GetType() ?? typeof(TDestination));
+            var sourceType = source?.GetType() ?? typeof(TSource);
+            var destinationType = destination?.GetType() ?? typeof (TDestination);
+
+            var types = new TypePair(sourceType, destinationType);
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
@@ -257,14 +264,16 @@ namespace AutoMapper
 
             opts(typedOptions);
 
-            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, typedOptions, this);
+            var context = new ResolutionContext(source, destination, sourceType, destinationType, null, typedOptions, this);
 
             return func(source, destination, context);
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType)
         {
-            var types = new TypePair(source?.GetType() ?? sourceType, destinationType);
+            sourceType = source?.GetType() ?? sourceType;
+
+            var types = new TypePair(sourceType, destinationType);
 
             var func = _configurationProvider.GetMapperFunc(types);
 
@@ -275,7 +284,9 @@ namespace AutoMapper
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
-            var types = new TypePair(source?.GetType() ?? sourceType, destinationType);
+            sourceType = source?.GetType() ?? sourceType;
+
+            var types = new TypePair(sourceType, destinationType);
 
             var func = _configurationProvider.GetMapperFunc(types);
 
@@ -289,7 +300,10 @@ namespace AutoMapper
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
         {
-            var types = new TypePair(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
+            sourceType = source?.GetType() ?? sourceType;
+            destinationType = destination?.GetType() ?? destinationType;
+
+            var types = new TypePair(sourceType, destinationType);
 
             var func = _configurationProvider.GetMapperFunc(types);
 
@@ -301,7 +315,10 @@ namespace AutoMapper
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
-            var types = new TypePair(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
+            sourceType = source?.GetType() ?? sourceType;
+            destinationType = destination?.GetType() ?? destinationType;
+
+            var types = new TypePair(sourceType, destinationType);
 
             var func = _configurationProvider.GetMapperFunc(types);
 
@@ -315,7 +332,10 @@ namespace AutoMapper
 
         object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
         {
-            var types = new TypePair(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType);
+            sourceType = source?.GetType() ?? sourceType;
+            destinationType = destination?.GetType() ?? destinationType;
+
+            var types = new TypePair(sourceType, destinationType);
 
             var func = _configurationProvider.GetMapperFunc(types);
 

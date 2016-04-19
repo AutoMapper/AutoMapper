@@ -376,7 +376,7 @@ namespace AutoMapper
         public void UseCustomProjection(LambdaExpression projectionExpression)
         {
             CustomProjection = projectionExpression;
-            ConstructExpression = projectionExpression;
+            //ConstructExpression = projectionExpression;
             //_propertyMaps = new ConcurrentBag<PropertyMap>();
         }
 
@@ -476,6 +476,11 @@ namespace AutoMapper
             if (CustomMapper != null)
             {
                 return Lambda(CustomMapper.ReplaceParameters(srcParam, destParam, ctxtParam), srcParam, destParam, ctxtParam);
+            }
+
+            if (CustomProjection != null)
+            {
+                return Lambda(CustomProjection.ReplaceParameters(srcParam), srcParam, destParam, ctxtParam);
             }
 
             var destinationFunc = CreateDestinationFunc(typeMapRegistry, srcParam, destParam, ctxtParam);

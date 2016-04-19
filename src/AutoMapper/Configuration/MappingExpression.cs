@@ -251,7 +251,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(tm => tm.UseCustomProjection(projectionExpression));
 
-            ConvertUsing(projectionExpression.Compile());
+            //ConvertUsing(projectionExpression.Compile());
         }
 
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
