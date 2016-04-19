@@ -86,7 +86,7 @@ namespace AutoMapper
             {
                 string message = null;
                 var newLine = Environment.NewLine;
-                if (Types != null)
+                if (Types.SourceType != null && Types.DestinationType != null)
                 {
                     message = _message + newLine + newLine + "Mapping types:";
                     message += newLine +
