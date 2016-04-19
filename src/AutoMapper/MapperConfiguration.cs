@@ -186,9 +186,10 @@ namespace AutoMapper
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(
             TypePair types)
         {
-            return (Func<TSource, TDestination, ResolutionContext, TDestination>) _mapPlanCache.GetOrAdd(types, tp =>
+            var key = new TypePair(typeof (TSource), typeof (TDestination));
+            return (Func<TSource, TDestination, ResolutionContext, TDestination>) _mapPlanCache.GetOrAdd(key, tp =>
             {
-                var typeMap = ResolveTypeMap(tp);
+                var typeMap = ResolveTypeMap(types);
 
                 if (typeMap != null)
                 {
@@ -201,11 +202,11 @@ namespace AutoMapper
                         var destParam = Parameter(typeof (TDestination), "dest");
                         var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
 
-                        mapExpression = Lambda(Invoke(typeMap.MapExpression,
+                        mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
                             ToType(srcParam, typeMap.MapExpression.Parameters[0].Type),
                             ToType(destParam, typeMap.MapExpression.Parameters[1].Type),
                             ctxtParam
-                            ),
+                            ), typeof(TDestination)),
                             srcParam, destParam, ctxtParam);
                     }
 
@@ -269,11 +270,11 @@ namespace AutoMapper
                         var destParam = Parameter(tp.DestinationType, "dest");
                         var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
 
-                        mapExpression = Lambda(Invoke(typeMap.MapExpression,
+                        mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
                             ToType(srcParam, typeMap.MapExpression.Parameters[0].Type),
                             ToType(destParam, typeMap.MapExpression.Parameters[1].Type),
                             ctxtParam
-                            ),
+                            ), tp.DestinationType),
                             srcParam, destParam, ctxtParam);
                     }
 
