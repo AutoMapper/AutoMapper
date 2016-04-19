@@ -49,6 +49,8 @@ namespace AutoMapper
             AfterMapAction = afterFunction;
         }
 
+        public T CreateInstance<T>() => (T) ServiceCtor(typeof (T));
+
         void IMappingOperationOptions.ConstructServicesUsing(Func<Type, object> constructor)
         {
             var ctor = ServiceCtor;

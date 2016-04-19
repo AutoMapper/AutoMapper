@@ -231,7 +231,7 @@ namespace AutoMapper
 
             opts(typedOptions);
 
-            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
+            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, typedOptions, this);
 
             return func(source, destination, context);
         }
@@ -257,7 +257,7 @@ namespace AutoMapper
 
             opts(typedOptions);
 
-            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, _defaultMappingOptions, this);
+            var context = new ResolutionContext(source, destination, typeof(TSource), typeof(TDestination), null, typedOptions, this);
 
             return func(source, destination, context);
         }

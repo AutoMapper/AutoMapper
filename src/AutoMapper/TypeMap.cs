@@ -440,18 +440,21 @@ namespace AutoMapper
 
         private LambdaExpression BuildMapperFunc(TypeMapRegistry typeMapRegistry)
         {
+            if (SourceType.IsGenericTypeDefinition() || DestinationType.IsGenericTypeDefinition())
+                return null;
+
             var srcParam = Parameter(SourceType, "src");
             var destParam = Parameter(DestinationType, "dest");
             var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
 
             if (Substitution != null)
             {
-                return (LambdaExpression) Substitution.ReplaceParameters(srcParam, destParam, ctxtParam);
+                return Lambda(Substitution.ReplaceParameters(srcParam, destParam, ctxtParam), srcParam, destParam, ctxtParam);
             }
 
             if (CustomMapper != null)
             {
-                return (LambdaExpression) CustomMapper.ReplaceParameters(srcParam, destParam, ctxtParam);
+                return Lambda(CustomMapper.ReplaceParameters(srcParam, destParam, ctxtParam), srcParam, destParam, ctxtParam);
             }
 
             var destinationFunc = CreateDestinationFunc(typeMapRegistry, srcParam, destParam, ctxtParam);
@@ -557,7 +560,7 @@ namespace AutoMapper
             ParameterExpression destParam, 
             ParameterExpression ctxtParam)
         {
-            var newDestFunc = CreateNewDestinationFunc(typeMapRegistry, srcParam, ctxtParam);
+            var newDestFunc = ToType(CreateNewDestinationFunc(typeMapRegistry, srcParam, ctxtParam), DestinationType);
 
             var getDest = DestinationTypeToUse.GetTypeInfo().IsValueType 
                 ? newDestFunc 
@@ -588,7 +591,9 @@ namespace AutoMapper
                 return DestinationCtor.ReplaceParameters(ctxtParam);
 
             if (ConstructDestinationUsingServiceLocator)
-                return Invoke(Property(Property(ctxtParam, "Options"), "ServiceCtor"), Constant(DestinationType));
+                return Call(MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Options")),
+                                typeof(MappingOperationOptions).GetMethod("CreateInstance").MakeGenericMethod(DestinationType)
+                                );
 
             if (ConstructorMap?.CanResolve == true)
                 return ConstructorMap.BuildExpression(typeMapRegistry, mapFrom, ctxtParam);

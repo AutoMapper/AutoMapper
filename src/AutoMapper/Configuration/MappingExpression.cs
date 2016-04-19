@@ -328,7 +328,7 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(tm =>
             {
-                Expression<Func<TSource, TSubstitute>> expr = src => substituteFunc(src);
+                Expression<Func<TSource, TDestination, ResolutionContext, TSubstitute>> expr = (src, dest, ctxt) => substituteFunc(src);
 
                 tm.Substitution = expr;
             });
@@ -340,8 +340,8 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(tm =>
             {
-                Expression<Func<TSource, TDestination>> expr =
-                    src => mappingFunction(src);
+                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
+                    (src, dest, ctxt) => mappingFunction(src);
 
                 tm.CustomMapper = expr;
             });
@@ -351,8 +351,8 @@ namespace AutoMapper.Configuration
         {
             TypeMapActions.Add(tm =>
             {
-                Expression<Func<TSource, ResolutionContext, TDestination>> expr =
-                    (src, ctxt) => mappingFunction(src, ctxt);
+                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
+                    (src, dest, ctxt) => mappingFunction(src, ctxt);
 
                 tm.CustomMapper = expr;
             });

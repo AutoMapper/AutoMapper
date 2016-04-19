@@ -488,11 +488,9 @@ namespace AutoMapper
                 }
                 else
                 {
-                    ctor = Invoke(
-                            MakeMemberAccess(
-                                MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Options")),
-                                typeof(MappingOperationOptions).GetProperty("ServiceCtor"))
-                            , Constant(valueResolverConfig.Type));
+                    ctor = Call(MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Options")), 
+                                typeof(MappingOperationOptions).GetMethod("CreateInstance").MakeGenericMethod(valueResolverConfig.Type)
+                                );
                     resolverType = valueResolverConfig.Type;
                 }
 
