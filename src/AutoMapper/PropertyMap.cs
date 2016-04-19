@@ -462,7 +462,7 @@ namespace AutoMapper
             if (propertyMap.PreCondition != null)
             {
                 mapperExpr = IfThen(
-                    Invoke(Constant(propertyMap.PreCondition), ctxtParam),
+                    Invoke(propertyMap.PreCondition, srcParam, ctxtParam),
                     mapperExpr
                     );
             }
