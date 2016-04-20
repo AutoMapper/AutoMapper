@@ -176,7 +176,7 @@ namespace Benchmark.Flattening
                     ProperName = "Some other name"
                 },
             };
-            _context = new ResolutionContext(_source, null, typeof(ModelObject), typeof(ModelDto), null, null, new Mapper(new MapperConfiguration(_ => { })));
+            _context = new ResolutionContext(_source, null, new TypePair(typeof(ModelObject), typeof(ModelDto)), null, new Mapper(new MapperConfiguration(_ => { })));
         }
 
         public object Map()

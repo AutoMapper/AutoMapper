@@ -33,15 +33,13 @@ namespace AutoMapper
 
             var typeMapsChecked = new List<TypeMap>();
             var configExceptions = new List<Exception>();
-            var engine = new MappingEngine(_config, _config.CreateMapper());
 
             foreach (var typeMap in maps)
             {
                 try
                 {
                     DryRunTypeMap(typeMapsChecked,
-                        new ResolutionContext(null, null, typeMap.SourceType, typeMap.DestinationType, typeMap,
-                            new MappingOperationOptions(_config.ServiceCtor), new Mapper(_config)));
+                        new ResolutionContext(null, null, typeMap.Types, new MappingOperationOptions(_config.ServiceCtor), new Mapper(_config)) {TypeMap = typeMap});
                 }
                 catch (Exception e)
                 {
@@ -96,7 +94,7 @@ namespace AutoMapper
             if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
                 return;
 
-            var memberContext = new ResolutionContext(null, null, sourceElementType, destElementType, itemTypeMap, context);
+            var memberContext = new ResolutionContext(null, null, new TypePair(sourceElementType, destElementType), context) {TypeMap = itemTypeMap};
 
             DryRunTypeMap(typeMapsChecked, memberContext);
         }
@@ -122,8 +120,10 @@ namespace AutoMapper
                 if (typeMapsChecked.Any(typeMap => Equals(typeMap, memberTypeMap)))
                     continue;
 
-                var memberContext = new ResolutionContext(null, null, sourceType, destinationType, memberTypeMap,
-                    context);
+                var memberContext = new ResolutionContext(null, null, new TypePair(sourceType, destinationType), context)
+                {
+                    TypeMap = memberTypeMap
+                };
 
                 try
                 {

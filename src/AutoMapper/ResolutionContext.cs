@@ -3,6 +3,7 @@ namespace AutoMapper
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using Configuration;
 
     /// <summary>
     /// Context information regarding resolution of a destination value
@@ -17,19 +18,14 @@ namespace AutoMapper
         public MappingOperationOptions Options { get; }
 
         /// <summary>
-        /// Current type map
-        /// </summary>
-        public TypeMap TypeMap { get; private set; }
-
-        /// <summary>
         /// Current source type
         /// </summary>
-        public Type SourceType { get; private set; }
+        public Type SourceType => Types.SourceType;
 
         /// <summary>
         /// Current attempted destination type
         /// </summary>
-        public Type DestinationType { get; private set; }
+        public Type DestinationType => Types.DestinationType;
 
         /// <summary>
         /// Source value
@@ -76,14 +72,19 @@ namespace AutoMapper
         public IConfigurationProvider ConfigurationProvider => Mapper.ConfigurationProvider;
 
         /// <summary>
+        /// Current type map
+        /// </summary>
+        public TypeMap TypeMap { get; set; }
+
+        /// <summary>
         /// Source and destination type pair
         /// </summary>
         public TypePair Types { get; private set; }
 
         public bool IsSourceValueNull => Equals(null, SourceValue);
 
-        public ResolutionContext(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap, ResolutionContext parent)
-            : this(source, destination, typeMap)
+        public ResolutionContext(object source, object destination, TypePair types, ResolutionContext parent)
+            : this(source, destination)
         {
             Parent = parent;
             Options = parent.Options;
@@ -91,10 +92,7 @@ namespace AutoMapper
 
             _instanceCache = parent.InstanceCache;
 
-            SourceType = sourceType ?? typeMap?.SourceType ?? parent.SourceType;
-            DestinationType = destinationType ?? typeMap?.DestinationType ?? parent.DestinationType;
-
-            Types = new TypePair(SourceType, DestinationType);
+            Types = types;
         }
 
         internal ResolutionContext(ResolutionContext parent)
@@ -105,33 +103,25 @@ namespace AutoMapper
             _instanceCache = parent.InstanceCache;
         }
 
-        internal void Fill(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap)
+        internal void Fill(object source, object destination, TypePair types, TypeMap typeMap)
         {
-           SourceType = sourceType ?? typeMap?.SourceType ?? Parent.SourceType;
-           DestinationType = destinationType ?? typeMap?.DestinationType ?? Parent.DestinationType;
-           Types = new TypePair(SourceType, DestinationType);
+           Types = types;
            SourceValue = source;
            DestinationValue = destination;
-           TypeMap = typeMap;
         }
 
-        public ResolutionContext(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap, MappingOperationOptions options, IRuntimeMapper mapper)
-            : this(source, destination, typeMap)
+        public ResolutionContext(object source, object destination, TypePair types, MappingOperationOptions options, IRuntimeMapper mapper)
+            : this(source, destination)
         {
             Options = options;
             Mapper = mapper;
-            SourceType = source?.GetType() ?? sourceType ?? typeMap?.SourceType;
-            DestinationType = destination?.GetType() ?? destinationType ?? typeMap?.DestinationType;
-
-            Types = new TypePair(SourceType, DestinationType);
+            Types = types;
         }
 
-        private ResolutionContext(object source, object destination, TypeMap typeMap)
+        private ResolutionContext(object source, object destination)
         {
             SourceValue = source;
             DestinationValue = destination;
-
-            TypeMap = typeMap;
         }
 
         public override string ToString() => $"Trying to map {SourceType.Name} to {DestinationType.Name}.";
@@ -140,8 +130,7 @@ namespace AutoMapper
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other.SourceType, SourceType) &&
-                   Equals(other.DestinationType, DestinationType) && 
+            return Equals(other.Types, Types) &&
                    Equals(other.SourceValue, SourceValue);
         }
 
@@ -157,8 +146,7 @@ namespace AutoMapper
         {
             unchecked
             {
-                int result = SourceType?.GetHashCode() ?? 0;
-                result = (result*397) ^ (DestinationType?.GetHashCode() ?? 0);
+                int result = Types.GetHashCode();
                 result = (result*397) ^ (SourceValue?.GetHashCode() ?? 0);
                 return result;
             }

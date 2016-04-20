@@ -5,6 +5,7 @@ namespace AutoMapper
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
+    using Configuration;
 
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public struct TypePair : IEquatable<TypePair>
@@ -17,7 +18,21 @@ namespace AutoMapper
         {
             SourceType = sourceType;
             DestinationType = destinationType;
-            _hashcode = unchecked (SourceType.GetHashCode() * 397) ^ DestinationType.GetHashCode();
+            _hashcode = unchecked(SourceType.GetHashCode() * 397) ^ DestinationType.GetHashCode();
+        }
+
+        public static TypePair Create(object source, object destination, Type sourceType, Type destinationType)
+        {
+            if (source != null && !sourceType.IsNullableType())
+            {
+                sourceType = source.GetType();
+            }
+            if (destination != null && !destinationType.IsNullableType())
+            {
+                destinationType = destination.GetType();
+            }
+
+            return new TypePair(sourceType, destinationType);
         }
 
         private readonly int _hashcode;
@@ -29,7 +44,7 @@ namespace AutoMapper
         public bool Equals(TypePair other) => SourceType == other.SourceType && DestinationType == other.DestinationType;
 
         public override bool Equals(object obj) => !ReferenceEquals(null, obj) &&
-                                                   (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((TypePair) obj));
+                                                   (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((TypePair)obj));
 
         public override int GetHashCode() => _hashcode;
 

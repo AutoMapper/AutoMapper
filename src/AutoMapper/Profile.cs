@@ -249,7 +249,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes)
+        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
         {
             var openMapConfig = _typeMapConfigs
                 .Where(tm =>
@@ -262,7 +262,7 @@ namespace AutoMapper
             if (openMapConfig == null)
                 return null;
 
-            var closedMap = _typeMapFactory.CreateTypeMap(closedTypes.SourceType, closedTypes.DestinationType, this, openMapConfig.MemberList);
+            var closedMap = _typeMapFactory.CreateTypeMap(requestedTypes.SourceType, requestedTypes.DestinationType, this, openMapConfig.MemberList);
 
             openMapConfig.Configure(this, closedMap);
 

@@ -549,6 +549,8 @@ namespace AutoMapper
             ParameterExpression ctxtParam,
             Expression destinationFunc)
         {
+            var assignTypeMap = Assign(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("TypeMap")), Constant(this));
+
             var beforeMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("BeforeMap"), ToObject(destParam));
 
             var typeMaps =
@@ -564,6 +566,8 @@ namespace AutoMapper
             }
             actions.Insert(0, beforeMap);
             actions.Insert(0, destinationFunc);
+            actions.Insert(0, assignTypeMap);
+
             actions.Add(afterMap);
 
             foreach (var afterMapAction in _afterMapActions)

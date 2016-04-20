@@ -351,7 +351,7 @@ namespace AutoMapper
                           FindTypeMapFor(tp) ??
                           (!CoveredByObjectMap(pair)
                               ? FindConventionTypeMapFor(tp) ??
-                                FindClosedGenericTypeMapFor(tp)
+                                FindClosedGenericTypeMapFor(tp, pair)
                               : null);
                 if(typeMap != null)
                 {
@@ -498,14 +498,14 @@ namespace AutoMapper
             return typeMap;
         }
 
-        private TypeMap FindClosedGenericTypeMapFor(TypePair typePair)
+        private TypeMap FindClosedGenericTypeMapFor(TypePair typePair, TypePair requestedTypes)
         {
             if (typePair.GetOpenGenericTypePair() == null)
                 return null;
 
             var typeMap = _profiles
                 .Cast<IProfileConfiguration>()
-                .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair))
+                .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                 .FirstOrDefault(t => t != null);
 
             typeMap?.Seal(_typeMapRegistry);

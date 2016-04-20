@@ -66,6 +66,6 @@ namespace AutoMapper
         /// <param name="typeMapRegistry">Type map registry</param>
         /// <param name="closedTypes">Closed types to create</param>
         /// <returns>Configured type map, or null if not a match</returns>
-        TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes);
+        TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes);
 	}
 }

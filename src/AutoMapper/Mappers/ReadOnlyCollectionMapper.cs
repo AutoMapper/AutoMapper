@@ -18,7 +18,7 @@ namespace AutoMapper.Mappers
             var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
 
             var nullDestinationValueSoTheReadOnlyCollectionMapperWorks =
-                    new ResolutionContext(context.SourceValue, null, context.SourceType, context.DestinationType, context.TypeMap, context);
+                    new ResolutionContext(context.SourceValue, null, context.Types, context);
 
             return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks);
         }
