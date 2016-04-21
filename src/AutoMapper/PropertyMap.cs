@@ -373,7 +373,7 @@ namespace AutoMapper
             if (propertyMap.DestinationProperty.MemberInfo is PropertyInfo &&
                 ((PropertyInfo)propertyMap.DestinationProperty.MemberInfo).GetGetMethod(true) == null)
             {
-                getter = Default(propertyMap.TypeMap.DestinationType);
+                getter = Default(propertyMap.DestinationPropertyType);
             }
             else
             {
@@ -382,7 +382,7 @@ namespace AutoMapper
 
             var destValueExpr = propertyMap.UseDestinationValue
                 ? getter
-                : Constant(null, propertyMap.DestinationPropertyType);
+                : Default(propertyMap.DestinationPropertyType);
 
             if (propertyMap.SourceType == null
                 || (propertyMap.SourceType.IsEnumerableType() && propertyMap.SourceType != typeof(string))
