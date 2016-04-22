@@ -186,7 +186,7 @@ namespace AutoMapper
         {
             var types = new TypePair(source.GetType(), typeof(TDestination));
 
-            var func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(types, types));
 
             var context = new ResolutionContext(source, null, types, _defaultMappingOptions, this);
 
@@ -266,7 +266,7 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, null, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var context = new ResolutionContext(source, null, types, _defaultMappingOptions, this);
 
@@ -277,7 +277,7 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, null, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var options = new MappingOperationOptions(_serviceCtor);
             opts(options);
@@ -291,7 +291,7 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var context = new ResolutionContext(source, destination, types, _defaultMappingOptions, this);
 
@@ -303,7 +303,7 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var options = new MappingOperationOptions(_serviceCtor);
             opts(options);
@@ -317,7 +317,7 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(types);
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var context = new ResolutionContext(source, destination, types, parent);
 

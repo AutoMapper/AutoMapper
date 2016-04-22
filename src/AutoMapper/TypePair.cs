@@ -7,6 +7,44 @@ namespace AutoMapper
     using System.Reflection;
     using Configuration;
 
+    [DebuggerDisplay("{RequestedTypes.SourceType.Name}, {RequestedTypes.DestinationType.Name} : {RuntimeTypes.SourceType.Name}, {RuntimeTypes.DestinationType.Name}")]
+    public struct MapRequest : IEquatable<MapRequest>
+    {
+        private readonly int _hashcode;
+        public TypePair RequestedTypes { get; }
+        public TypePair RuntimeTypes { get; }
+
+        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes)
+        {
+            RequestedTypes = requestedTypes;
+            RuntimeTypes = runtimeTypes;
+            _hashcode = unchecked(RequestedTypes.GetHashCode() * 397) ^ RuntimeTypes.GetHashCode();
+        }
+
+        public bool Equals(MapRequest other)
+        {
+            return RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is MapRequest && Equals((MapRequest) obj);
+        }
+
+        public override int GetHashCode() => _hashcode;
+
+        public static bool operator ==(MapRequest left, MapRequest right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(MapRequest left, MapRequest right)
+        {
+            return !left.Equals(right);
+        }
+    }
+
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public struct TypePair : IEquatable<TypePair>
     {

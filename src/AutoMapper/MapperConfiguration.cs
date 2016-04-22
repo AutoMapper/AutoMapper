@@ -20,7 +20,7 @@ namespace AutoMapper
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
-        private readonly ConcurrentDictionary<TypePair, Delegate> _mapPlanCache = new ConcurrentDictionary<TypePair, Delegate>();
+        private readonly ConcurrentDictionary<MapRequest, Delegate> _mapPlanCache = new ConcurrentDictionary<MapRequest, Delegate>();
         private readonly IList<Profile> _profiles = new List<Profile>();
         private readonly ConfigurationValidator _validator;
         private Func<Type, object> _serviceCtor = ObjectCreator.CreateObject;
@@ -187,7 +187,8 @@ namespace AutoMapper
             TypePair types)
         {
             var key = new TypePair(typeof (TSource), typeof (TDestination));
-            return (Func<TSource, TDestination, ResolutionContext, TDestination>) _mapPlanCache.GetOrAdd(key, tp =>
+            var mapRequest = new MapRequest(key, types);
+            return (Func<TSource, TDestination, ResolutionContext, TDestination>) _mapPlanCache.GetOrAdd(mapRequest, mapReq =>
             {
                 var typeMap = ResolveTypeMap(types);
 
@@ -228,7 +229,7 @@ namespace AutoMapper
                     //});
                 }
 
-                IObjectMapper mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(tp));
+                IObjectMapper mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapReq.RuntimeTypes));
 
                 return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
                 {
@@ -253,10 +254,11 @@ namespace AutoMapper
             });
         }
 
-        public Delegate GetMapperFunc(TypePair types)
+        public Delegate GetMapperFunc(MapRequest mapRequest)
         {
-            return _mapPlanCache.GetOrAdd(types, tp =>
+            return _mapPlanCache.GetOrAdd(mapRequest, mapReq =>
             {
+                var tp = mapReq.RuntimeTypes;
                 var typeMap = ResolveTypeMap(tp);
 
                 if (typeMap != null)
