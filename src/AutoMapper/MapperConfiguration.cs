@@ -229,7 +229,7 @@ namespace AutoMapper
                     //});
                 }
 
-                IObjectMapper mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapReq.RuntimeTypes));
+                IObjectMapper mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapReq.RequestedTypes));
 
                 return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
                 {
