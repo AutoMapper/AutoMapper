@@ -10,7 +10,7 @@ namespace AutoMapper
     /// </summary>
     public class ResolutionContext : IEquatable<ResolutionContext>
     {
-        private Dictionary<ResolutionContext, object> _instanceCache;
+        private Dictionary<object, object> _instanceCache;
 
         /// <summary>
         /// Mapping operation options
@@ -45,7 +45,7 @@ namespace AutoMapper
         /// <summary>
         /// Instance cache for resolving circular references
         /// </summary>
-        public Dictionary<ResolutionContext, object> InstanceCache
+        public Dictionary<object, object> InstanceCache
         {
             get
             {
@@ -55,7 +55,7 @@ namespace AutoMapper
                 }
                 //if(TypeMap?.PreserveReferences ?? false)
                 //{
-                    _instanceCache = new Dictionary<ResolutionContext, object>();
+                    _instanceCache = new Dictionary<object, object>();
                 //}
                 return _instanceCache;
             }

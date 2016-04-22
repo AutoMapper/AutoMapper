@@ -389,7 +389,7 @@ namespace AutoMapper
         {
             return CustomMapper == null
                 && CustomProjection == null
-                && TypeConverterType == null 
+                && TypeConverterType == null
                 && DestinationTypeOverride == null;
         }
 
@@ -466,13 +466,13 @@ namespace AutoMapper
                 else type = TypeConverterType;
 
                 // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).Convert(src, ctxt);
-                Type converterInterfaceType = typeof (ITypeConverter<,>).MakeGenericType(SourceType, DestinationType);
+                Type converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(SourceType, DestinationType);
                 return Lambda(
                     Call(
                         Convert(
                             Call(
-                                MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
-                                typeof (MappingOperationOptions).GetMethod("CreateInstance")
+                                MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Options")),
+                                typeof(MappingOperationOptions).GetMethod("CreateInstance")
                                     .MakeGenericMethod(type)
                                 ),
                             converterInterfaceType),
@@ -505,7 +505,7 @@ namespace AutoMapper
         }
 
         private Expression CreateMapperFunc(
-            ParameterExpression srcParam, 
+            ParameterExpression srcParam,
             ParameterExpression destParam,
             ParameterExpression ctxtParam,
             Expression assignmentFunc)
@@ -530,15 +530,18 @@ namespace AutoMapper
 
             if (PreserveReferences)
             {
-
                 var cache = Variable(DestinationType, "cachedDestination");
 
-                var condition = Condition(And(
-                    Equal(destParam, Constant(null)),
-                    Call(Property(ctxtParam, "InstanceCache"), typeof(Dictionary<ResolutionContext, object>).GetMethod("TryGetValue"), ctxtParam, cache)
-                    ), cache, mapperFunc);
+                var condition = Condition(
+                    AndAlso(
+                        Equal(destParam, Constant(null)),
+                        Call(Property(ctxtParam, "InstanceCache"), typeof(Dictionary<object, object>).GetMethod("ContainsKey"), srcParam)
+                    ),
+                    Assign(cache, ToType(Property(Property(ctxtParam, "InstanceCache"), "Item", srcParam), DestinationType)),
+                    Assign(cache, mapperFunc)
+                );
 
-                mapperFunc = Block(new[] { cache }, condition);
+                mapperFunc = Block(new[] { cache }, condition, cache);
             }
             return mapperFunc;
         }
@@ -549,7 +552,7 @@ namespace AutoMapper
             ParameterExpression ctxtParam,
             Expression destinationFunc)
         {
-            var assignTypeMap = Assign(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("TypeMap")), Constant(this));
+            var assignTypeMap = Assign(MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("TypeMap")), Constant(this));
 
             var beforeMap = Call(ctxtParam, typeof(ResolutionContext).GetMethod("BeforeMap"), ToObject(destParam));
 
@@ -596,14 +599,14 @@ namespace AutoMapper
         }
 
         private Expression CreateDestinationFunc(TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam, 
-            ParameterExpression destParam, 
+            ParameterExpression srcParam,
+            ParameterExpression destParam,
             ParameterExpression ctxtParam)
         {
             var newDestFunc = ToType(CreateNewDestinationFunc(typeMapRegistry, srcParam, ctxtParam), DestinationType);
 
-            var getDest = DestinationTypeToUse.GetTypeInfo().IsValueType 
-                ? newDestFunc 
+            var getDest = DestinationTypeToUse.GetTypeInfo().IsValueType
+                ? newDestFunc
                 : Coalesce(destParam, newDestFunc);
 
             Expression destinationFunc = Assign(destParam, getDest);
@@ -613,9 +616,9 @@ namespace AutoMapper
                 var dest = Variable(typeof(object), "dest");
 
                 Expression valueBag = Property(ctxtParam, "InstanceCache");
-                var set = Assign(Property(valueBag, "Item", ctxtParam), dest);
+                var set = Assign(Property(valueBag, "Item", srcParam), dest);
                 var setCache =
-                    IfThen(NotEqual(Property(ctxtParam, "SourceValue"), Constant(null)), set);
+                    IfThen(NotEqual(srcParam, Constant(null)), set);
 
                 destinationFunc = Block(new[] { dest }, Assign(dest, destinationFunc), setCache, dest);
             }
