@@ -534,9 +534,11 @@ namespace AutoMapper
 
                 var condition = Condition(
                     AndAlso(
+                        NotEqual(srcParam, Constant(null)),
+                        AndAlso(
                         Equal(destParam, Constant(null)),
                         Call(Property(ctxtParam, "InstanceCache"), typeof(Dictionary<object, object>).GetMethod("ContainsKey"), srcParam)
-                    ),
+                    )),
                     Assign(cache, ToType(Property(Property(ctxtParam, "InstanceCache"), "Item", srcParam), DestinationType)),
                     Assign(cache, mapperFunc)
                 );
