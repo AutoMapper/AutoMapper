@@ -107,12 +107,23 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.CustomValue = value);
         }
 
-        public void Condition(Func<TSource, TDestination, TMember, ResolutionContext, bool> condition)
+        public void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, member, ctxt) => condition(src, dest, member, ctxt);
+                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
+                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember, destMember, ctxt);
+
+                pm.Condition = expr;
+            });
+        }
+
+        public void Condition(Func<TSource, TDestination, TMember, TMember, bool> condition)
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
+                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember, destMember);
 
                 pm.Condition = expr;
             });
@@ -122,8 +133,19 @@ namespace AutoMapper.Configuration
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, member, ctxt) => condition(src, dest, member);
+                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
+                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest, srcMember);
+
+                pm.Condition = expr;
+            });
+        }
+
+        public void Condition(Func<TSource, TDestination, bool> condition)
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
+                    (src, dest, srcMember, destMember, ctxt) => condition(src, dest);
 
                 pm.Condition = expr;
             });
@@ -133,8 +155,8 @@ namespace AutoMapper.Configuration
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, TMember, ResolutionContext, bool>> expr =
-                    (src, dest, member, ctxt) => condition(src);
+                Expression<Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool>> expr =
+                    (src, dest, srcMember, destMember, ctxt) => condition(src);
 
                 pm.Condition = expr;
             });

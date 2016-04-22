@@ -175,7 +175,7 @@
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(d => d.Value, opt => opt.Condition((_, __, dest, rc) => dest == null));
+                    .ForMember(d => d.Value, opt => opt.Condition((src, dest, srcVal, destVal) => destVal == null));
             });
 
             [Fact]

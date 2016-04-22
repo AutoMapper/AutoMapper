@@ -415,6 +415,7 @@ namespace AutoMapper
                             propertyMap.Condition,
                             srcParam,
                             destParam,
+                            ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
                             ToType(destValueExpr, propertyMap.Condition.Parameters[2].Type),
                             ctxtParam
                             ),

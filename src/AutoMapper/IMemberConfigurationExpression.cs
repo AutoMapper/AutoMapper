@@ -120,16 +120,28 @@ namespace AutoMapper
         void UseValue<TValue>(TValue value);
 
         /// <summary>
+        /// Conditionally map this member against the source, destination, source and destination members
+        /// </summary>
+        /// <param name="condition">Condition to evaluate using the source object</param>
+        void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition);
+
+        /// <summary>
         /// Conditionally map this member
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
-        void Condition(Func<TSource, TDestination, TMember, ResolutionContext, bool> condition);
+        void Condition(Func<TSource, TDestination, TMember, TMember, bool> condition);
 
         /// <summary>
         /// Conditionally map this member
         /// </summary>
         /// <param name="condition">Condition to evaluate using the source object</param>
         void Condition(Func<TSource, TDestination, TMember, bool> condition);
+       
+        /// <summary>
+        /// Conditionally map this member
+        /// </summary>
+        /// <param name="condition">Condition to evaluate using the source object</param>
+        void Condition(Func<TSource, TDestination, bool> condition);
        
         /// <summary>
         /// Conditionally map this member
