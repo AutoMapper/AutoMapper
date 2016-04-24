@@ -211,6 +211,23 @@ namespace AutoMapper
                             srcParam, destParam, ctxtParam);
                     }
 
+                    var autoMapException = Parameter(typeof(AutoMapperMappingException), "ex");
+                    var exception = Parameter(typeof(Exception), "ex");
+
+                    var mappingExceptionCtor = typeof(AutoMapperMappingException).GetTypeInfo().DeclaredConstructors
+                        .Where(ci => ci.GetParameters().Count() == 2)
+                        .First(ci => ci.GetParameters()[0].ParameterType == typeof(ResolutionContext) && ci.GetParameters()[1].ParameterType == typeof(Exception));
+
+                    mapExpression = Lambda(TryCatch(mapExpression.Body,
+                        MakeCatchBlock(typeof(AutoMapperMappingException), autoMapException,
+                            Block(Assign(Property(autoMapException, "Context"), mapExpression.Parameters[2]),
+                            Rethrow(),
+                            Default(typeof(TDestination))), null),
+                        MakeCatchBlock(typeof(Exception), exception, Block(
+                            Throw(New(mappingExceptionCtor, mapExpression.Parameters[2], exception)),
+                            Default(typeof(TDestination))), null)),
+                        mapExpression.Parameters);
+
                     return (Func<TSource, TDestination, ResolutionContext, TDestination>) mapExpression.Compile();
                     //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
                     //{
