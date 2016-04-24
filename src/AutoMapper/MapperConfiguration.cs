@@ -368,10 +368,8 @@ namespace AutoMapper
                 var typeMap =
                           _typeMapPlanCache.GetOrDefault(tp) ??
                           FindTypeMapFor(tp) ??
-                          (!CoveredByObjectMap(pair)
-                              ? FindConventionTypeMapFor(tp) ??
-                                FindClosedGenericTypeMapFor(tp, pair)
-                              : null);
+                          (!CoveredByObjectMap(pair) ? FindConventionTypeMapFor(tp) : null) ??
+                          FindClosedGenericTypeMapFor(tp, pair);
                 if(typeMap != null)
                 {
                     return typeMap;

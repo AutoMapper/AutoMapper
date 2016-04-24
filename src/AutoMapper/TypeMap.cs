@@ -97,7 +97,7 @@ namespace AutoMapper
 
         public PropertyMap[] GetPropertyMaps()
         {
-            return _sealed ? _orderedPropertyMaps : _propertyMaps.Concat(_inheritedMaps).ToArray();
+            return _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
         }
 
         public void AddPropertyMap(PropertyMap propertyMap)

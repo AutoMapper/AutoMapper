@@ -382,7 +382,7 @@ namespace AutoMapper
 
             var destValueExpr = propertyMap.UseDestinationValue
                 ? getter
-                : Default(propertyMap.DestinationPropertyType);
+                : Default(propertyMap.TypeMap.DestinationType);
 
             if (propertyMap.SourceType == null
                 || (propertyMap.SourceType.IsEnumerableType() && propertyMap.SourceType != typeof(string))
