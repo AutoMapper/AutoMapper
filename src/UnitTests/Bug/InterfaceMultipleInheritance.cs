@@ -83,7 +83,7 @@ namespace AutoMapper.UnitTests.Bug
                 .Include<IMapFromElementDerived1, IMapToElementWritableDerived>();
 
                 cfg.CreateMap<IMapFromElementDerived1, IMapToElementWritableDerived>()
-                    .ConstructUsing((ResolutionContext item) => new MapToElementDerived());
+                    .ConstructUsing(src => new MapToElementDerived());
             });
 
             protected override void Because_of()
@@ -197,7 +197,7 @@ namespace AutoMapper.UnitTests.Bug
                 cfg.CreateMap<iclass2, iclass2DTO>();
                 cfg.CreateMap<iclass3, iclass3DTO>();
                 cfg.CreateMap<iclass4, iclass4DTO>()
-                    .ConstructUsing((ResolutionContext rc) => new class4DTO());
+                    .ConstructUsing(src => new class4DTO());
             });
 
             protected override void Because_of()
