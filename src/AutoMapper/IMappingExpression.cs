@@ -61,9 +61,9 @@ namespace AutoMapper
         /// <summary>
         /// Supply a custom instantiation function for the destination type, based on the entire resolution context
         /// </summary>
-        /// <param name="ctor">Callback to create the destination type given the current resolution context</param>
+        /// <param name="ctor">Callback to create the destination type given the source object and current resolution context</param>
         /// <returns>Itself</returns>
-        IMappingExpression ConstructUsing(Func<ResolutionContext, object> ctor);
+        IMappingExpression ConstructUsing(Func<object, ResolutionContext, object> ctor);
 
         /// <summary>
         /// Supply a custom instantiation function for the destination type
@@ -358,7 +358,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="ctor">Callback to create the destination type given the current resolution context</param>
         /// <returns>Itself</returns>
-        IMappingExpression<TSource, TDestination> ConstructUsing(Func<ResolutionContext, TDestination> ctor);
+        IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, ResolutionContext, TDestination> ctor);
 
         /// <summary>
         /// Override the destination type mapping for looking up configuration and instantiation

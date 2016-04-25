@@ -60,7 +60,7 @@ namespace AutoMapper
         public LambdaExpression CustomMapper { get; set; }
         public LambdaExpression CustomProjection { get; private set; }
 
-        public Expression<Func<ResolutionContext, object>> DestinationCtor { get; set; }
+        public LambdaExpression DestinationCtor { get; set; }
 
         public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }
 
@@ -627,10 +627,10 @@ namespace AutoMapper
             return destinationFunc;
         }
 
-        private Expression CreateNewDestinationFunc(TypeMapRegistry typeMapRegistry, ParameterExpression mapFrom, ParameterExpression ctxtParam)
+        private Expression CreateNewDestinationFunc(TypeMapRegistry typeMapRegistry, ParameterExpression srcParam, ParameterExpression ctxtParam)
         {
             if (DestinationCtor != null)
-                return DestinationCtor.ReplaceParameters(ctxtParam);
+                return DestinationCtor.ReplaceParameters(srcParam, ctxtParam);
 
             if (ConstructDestinationUsingServiceLocator)
                 return Call(MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("Options")),
@@ -638,7 +638,7 @@ namespace AutoMapper
                                 );
 
             if (ConstructorMap?.CanResolve == true)
-                return ConstructorMap.BuildExpression(typeMapRegistry, mapFrom, ctxtParam);
+                return ConstructorMap.BuildExpression(typeMapRegistry, srcParam, ctxtParam);
 
             if (DestinationType.IsInterface())
             {
