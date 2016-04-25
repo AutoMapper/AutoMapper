@@ -25,8 +25,8 @@ namespace AutoMapper
 
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
-            new MemberGetterExpressionResultConverter(),
             new MemberResolverExpressionResultConverter(),
+            new MemberGetterExpressionResultConverter(),
         };
 
         public bool CanResolve => CtorParams.All(param => param.CanResolve);

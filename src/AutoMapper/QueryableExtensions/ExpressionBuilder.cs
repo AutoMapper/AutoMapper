@@ -23,9 +23,9 @@ namespace AutoMapper.QueryableExtensions
     {
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
-            new ExplicitValueExpressionResultConverter(), 
-            new MemberGetterExpressionResultConverter(),
+            new ExplicitValueExpressionResultConverter(),
             new MemberResolverExpressionResultConverter(),
+            new MemberGetterExpressionResultConverter(),
         };
 
         private static readonly IExpressionBinder[] Binders =

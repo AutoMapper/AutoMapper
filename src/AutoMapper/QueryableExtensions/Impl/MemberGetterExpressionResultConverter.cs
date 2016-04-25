@@ -51,7 +51,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, ConstructorParameterMap propertyMap)
         {
-            return propertyMap.SourceMembers.Any() && propertyMap.CustomExpression == null;
+            return propertyMap.SourceMembers.Any();
         }
     }
 }
