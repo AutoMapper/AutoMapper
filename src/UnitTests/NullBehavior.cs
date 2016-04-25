@@ -205,9 +205,9 @@ namespace AutoMapper.UnitTests
 
 		public class When_using_a_custom_resolver_and_the_source_value_is_null : NonValidatingSpecBase
 		{
-			public class NullResolver : ValueResolver<Source, string>
+			public class NullResolver : IValueResolver<string, string>
 			{
-				protected override string ResolveCore(Source source)
+				public string Resolve(string source, ResolutionContext context)
 				{
 					if (source == null)
 						return "jon";
@@ -231,7 +231,7 @@ namespace AutoMapper.UnitTests
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>()
-		            .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver>().FromMember(src => src.MyName));
+		            .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver, string>(src => src.MyName));
 		        _source = new Source();
 		    });
 

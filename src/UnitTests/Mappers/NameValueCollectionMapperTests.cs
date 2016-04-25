@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests.Mappers
             {
                 var config = new MapperConfiguration(_ => { });
                 var mapper = new Mapper(config);
-                var rc = new ResolutionContext(null, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, new MappingOperationOptions(config.ServiceCtor), mapper);
+                var rc = new ResolutionContext(null, new NameValueCollection(), new TypePair(typeof(NameValueCollection), typeof(NameValueCollection)), new MappingOperationOptions(config.ServiceCtor), mapper);
                 var nvcm = new NameValueCollectionMapper();
 
                 var result = nvcm.Map(rc);
@@ -65,7 +65,7 @@ namespace AutoMapper.UnitTests.Mappers
                 var config = new MapperConfiguration(_ => { });
                 var mapper = new Mapper(config);
                 var sourceValue = new NameValueCollection();
-                var rc = new ResolutionContext(sourceValue, null, typeof(NameValueCollection), typeof(NameValueCollection), null, new MappingOperationOptions(config.ServiceCtor), mapper);
+                var rc = new ResolutionContext(sourceValue, null, new TypePair(typeof(NameValueCollection), typeof(NameValueCollection)), new MappingOperationOptions(config.ServiceCtor), mapper);
                 var nvcm = new NameValueCollectionMapper();
 
                 var result = nvcm.Map(rc) as NameValueCollection;
@@ -79,7 +79,7 @@ namespace AutoMapper.UnitTests.Mappers
                 var config = new MapperConfiguration(_ => { });
                 var mapper = new Mapper(config);
                 var sourceValue = new NameValueCollection() { { "foo", "bar" } };
-                var rc = new ResolutionContext(sourceValue, new NameValueCollection(), typeof(NameValueCollection), typeof(NameValueCollection), null, new MappingOperationOptions(config.ServiceCtor), mapper);
+                var rc = new ResolutionContext(sourceValue, new NameValueCollection(), new TypePair(typeof(NameValueCollection), typeof(NameValueCollection)), new MappingOperationOptions(config.ServiceCtor), mapper);
 
                 var nvcm = new NameValueCollectionMapper();
 

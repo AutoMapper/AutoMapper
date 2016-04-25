@@ -5,6 +5,45 @@ namespace AutoMapper
     using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
+    using Configuration;
+
+    [DebuggerDisplay("{RequestedTypes.SourceType.Name}, {RequestedTypes.DestinationType.Name} : {RuntimeTypes.SourceType.Name}, {RuntimeTypes.DestinationType.Name}")]
+    public struct MapRequest : IEquatable<MapRequest>
+    {
+        private readonly int _hashcode;
+        public TypePair RequestedTypes { get; }
+        public TypePair RuntimeTypes { get; }
+
+        public MapRequest(TypePair requestedTypes, TypePair runtimeTypes)
+        {
+            RequestedTypes = requestedTypes;
+            RuntimeTypes = runtimeTypes;
+            _hashcode = unchecked(RequestedTypes.GetHashCode() * 397) ^ RuntimeTypes.GetHashCode();
+        }
+
+        public bool Equals(MapRequest other)
+        {
+            return RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is MapRequest && Equals((MapRequest) obj);
+        }
+
+        public override int GetHashCode() => _hashcode;
+
+        public static bool operator ==(MapRequest left, MapRequest right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(MapRequest left, MapRequest right)
+        {
+            return !left.Equals(right);
+        }
+    }
 
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public struct TypePair : IEquatable<TypePair>
@@ -17,7 +56,21 @@ namespace AutoMapper
         {
             SourceType = sourceType;
             DestinationType = destinationType;
-            _hashcode = unchecked (SourceType.GetHashCode() * 397) ^ DestinationType.GetHashCode();
+            _hashcode = unchecked(SourceType.GetHashCode() * 397) ^ DestinationType.GetHashCode();
+        }
+
+        public static TypePair Create(object source, object destination, Type sourceType, Type destinationType)
+        {
+            if (source != null && !sourceType.IsNullableType())
+            {
+                sourceType = source.GetType();
+            }
+            if (destination != null && !destinationType.IsNullableType())
+            {
+                destinationType = destination.GetType();
+            }
+
+            return new TypePair(sourceType, destinationType);
         }
 
         private readonly int _hashcode;
@@ -29,7 +82,7 @@ namespace AutoMapper
         public bool Equals(TypePair other) => SourceType == other.SourceType && DestinationType == other.DestinationType;
 
         public override bool Equals(object obj) => !ReferenceEquals(null, obj) &&
-                                                   (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((TypePair) obj));
+                                                   (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((TypePair)obj));
 
         public override int GetHashCode() => _hashcode;
 

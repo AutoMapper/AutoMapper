@@ -72,7 +72,7 @@ namespace AutoMapper
 
         public void AddParameter(ParameterInfo parameter, IMemberGetter[] resolvers, bool canResolve)
         {
-            _ctorParams.Add(new ConstructorParameterMap(this, parameter, resolvers, canResolve));
+            _ctorParams.Add(new ConstructorParameterMap(parameter, resolvers, canResolve));
         }
     }
 }

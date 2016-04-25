@@ -26,12 +26,6 @@ namespace AutoMapper
             _message = message;
         }
 
-        public AutoMapperMappingException(string message, Exception inner)
-            : base(null, inner)
-        {
-            _message = message;
-        }
-
         public AutoMapperMappingException(ResolutionContext context)
         {
             Context = context;
@@ -59,25 +53,8 @@ namespace AutoMapper
             _message = message;
         }
 
-        public AutoMapperMappingException(TypePair types)
-        {
-            Types = types;
-        }
-
-        public AutoMapperMappingException(TypePair types, Exception inner)
-            : base(null, inner)
-        {
-            Types = types;
-        }
-
-        public AutoMapperMappingException(TypePair types, string message)
-            : this(types)
-        {
-            _message = message;
-        }
-
-        public ResolutionContext Context { get; }
-        public TypePair Types { get; }
+        public ResolutionContext Context { get; set; }
+        public TypePair Types { get; set; }
         public PropertyMap PropertyMap { get; set; }
 
         public override string Message

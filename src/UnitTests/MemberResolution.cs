@@ -970,23 +970,23 @@ namespace AutoMapper.UnitTests
                 public string Postal { get; set; }
             }
 
-            public class StringCAPS : ValueResolver<string, string>
+            public class StringCAPS : IValueResolver<string, string>
             {
-                protected override string ResolveCore(string source)
+                public string Resolve(string source, ResolutionContext context)
                 {
                     return source.ToUpper();
                 }
             }
 
-            public class StringLower : ValueResolver<string, string>
+            public class StringLower : IValueResolver<string, string>
             {
-                protected override string ResolveCore(string source)
+                public string Resolve(string source, ResolutionContext context)
                 {
                     return source.ToLower();
                 }
             }
 
-            public class StringPadder : ValueResolver<string, string>
+            public class StringPadder : IValueResolver<string, string>
             {
                 private readonly int _desiredLength;
 
@@ -995,7 +995,7 @@ namespace AutoMapper.UnitTests
                     _desiredLength = desiredLength;
                 }
 
-                protected override string ResolveCore(string source)
+                public string Resolve(string source, ResolutionContext context)
                 {
                     return source.PadLeft(_desiredLength);
                 }
@@ -1005,11 +1005,9 @@ namespace AutoMapper.UnitTests
             {
                 cfg.CreateMap(typeof (Order), typeof (OrderDTO))
                     .ForMember("CurrentState", map => map.MapFrom("Status"))
-                    .ForMember("Contact", map => map.ResolveUsing(new StringCAPS()).FromMember("Customer"))
-                    .ForMember("Tracking", map => map.ResolveUsing(typeof (StringLower)).FromMember("ShippingCode"))
-                    .ForMember("Postal",
-                        map =>
-                            map.ResolveUsing<StringPadder>().ConstructedBy(() => new StringPadder(6)).FromMember("Zip"));
+                    .ForMember("Contact", map => map.ResolveUsing(new StringCAPS(), "Customer"))
+                    .ForMember("Tracking", map => map.ResolveUsing(typeof (StringLower), "ShippingCode"))
+                    .ForMember("Postal", map => map.ResolveUsing(new StringPadder(6), "Zip"));
 
             });
 

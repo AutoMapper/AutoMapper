@@ -12,7 +12,8 @@
         {
             Type genericType = typeof (EnumerableMapper<,>);
 
-            var collectionType = context.DestinationType;
+            var destType = context.DestinationValue?.GetType() ?? context.DestinationType;
+            var collectionType = destType;
             var elementType = TypeHelper.GetElementType(context.DestinationType);
 
             var enumerableMapper = genericType.MakeGenericType(collectionType, elementType);

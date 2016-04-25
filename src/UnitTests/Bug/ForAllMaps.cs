@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests.Bug
             public int Number { get; set; }
         }
 
-        public class MinusOneResolver : IValueResolver
+        public class MinusOneResolver : IValueResolver<object, object>
         {
             public object Resolve(object source, ResolutionContext context)
             {

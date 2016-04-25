@@ -119,8 +119,8 @@ namespace AutoMapper
 
     public interface IRuntimeMapper : IMapper
     {
-        object Map(ResolutionContext context);
         object Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent);
+        TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext parent);
         bool ShouldMapSourceValueAsNull(ResolutionContext context);
         bool ShouldMapSourceCollectionAsNull(ResolutionContext context);
         object CreateObject(ResolutionContext context);

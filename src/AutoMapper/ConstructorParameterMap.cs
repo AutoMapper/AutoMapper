@@ -5,17 +5,15 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using static System.Linq.Expressions.Expression;
+    using static ExpressionExtensions;
     using System.Reflection;
     using Configuration;
     using Mappers;
 
     public class ConstructorParameterMap
     {
-        internal readonly ConstructorMap _ctorMap;
-
-        public ConstructorParameterMap(ConstructorMap ctorMap, ParameterInfo parameter, IMemberGetter[] sourceMembers, bool canResolve)
+        public ConstructorParameterMap(ParameterInfo parameter, IMemberGetter[] sourceMembers, bool canResolve)
         {
-            _ctorMap = ctorMap;
             Parameter = parameter;
             SourceMembers = sourceMembers;
             CanResolve = canResolve;
@@ -82,7 +80,7 @@ namespace AutoMapper
                 valueResolverExpr = Call(
                     mapperProp,
                     mapMethod,
-                    valueResolverExpr.ToObject(),
+                    ToObject(valueResolverExpr),
                     Constant(null),
                     Constant(SourceType),
                     Constant(DestinationType),

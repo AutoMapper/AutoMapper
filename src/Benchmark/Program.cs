@@ -13,13 +13,13 @@ namespace Benchmark
                     { "Flattening", new IObjectToObjectMapper[] { new FlatteningMapper(), new ManualMapper(), new EquilvalentManualMapper(),  } },
                     { "Ctors", new IObjectToObjectMapper[] { new CtorMapper(), new ManualCtorMapper(),  } }
                 };
-      //      var mappers = new Dictionary<string, IObjectToObjectMapper[]>
-		    //{
-		    //    {"Flattening", new IObjectToObjectMapper[] {new FlatteningMapper(), new ManualMapper()}},
-		    //};
-		
+            //var mappers = new Dictionary<string, IObjectToObjectMapper[]>
+            //{
+            //    {"Flattening", new IObjectToObjectMapper[] {new FlatteningMapper()}},
+            //};
 
-			foreach (var pair in mappers)
+
+            foreach (var pair in mappers)
 			{
 				foreach (var mapper in pair.Value)
 				{
