@@ -1,10 +1,40 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Should;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
+    public class GenericTypeConverterWithTwoArguments : AutoMapperSpecBase
+    {
+        List<object> _destination;
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap(typeof(List<>), typeof(List<>)).ConvertUsing(typeof(Converter<,>)));
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<List<int>, List<object>>(Enumerable.Range(1, 10).ToList());
+        }
+
+        [Fact]
+        public void Should_work()
+        {
+            _destination.ShouldEqual(Converter<int, object>.Result);
+        }
+
+        public class Converter<TSource, TDestination> : ITypeConverter<List<TSource>, List<TDestination>>
+        {
+            public static readonly List<TDestination> Result = new List<TDestination>();
+
+            public List<TDestination> Convert(List<TSource> source, ResolutionContext context)
+            {
+                return Result;
+            }
+        }
+    }
+
     public class GenericTypeConverter : AutoMapperSpecBase
     {
         Destination<int> _destination;

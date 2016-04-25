@@ -93,6 +93,11 @@ namespace AutoMapper
             return type.IsGenericType() ? type.GetGenericTypeDefinition() : type;
         }
 
+        public static Type[] GetGenericArguments(this Type type)
+        {
+            return type.GetTypeInfo().GenericTypeArguments;
+        }
+
         public static Type[] GetGenericParameters(this Type type)
         {
             return type.GetGenericTypeDefinition().GetTypeInfo().GenericTypeParameters;

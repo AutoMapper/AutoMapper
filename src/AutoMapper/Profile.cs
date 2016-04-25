@@ -270,11 +270,14 @@ namespace AutoMapper
 
             if (closedMap.TypeConverterType != null)
             {
-                var typeParams = openMapConfig.SourceType.IsGenericTypeDefinition()
-                    ? closedTypes.SourceType.GetTypeInfo().GenericTypeArguments
-                    : closedTypes.DestinationType.GetTypeInfo().GenericTypeArguments;
+                var typeParams = 
+                    (openMapConfig.SourceType.IsGenericTypeDefinition() ? closedTypes.SourceType.GetGenericArguments() : new Type[0])
+                        .Concat
+                    (openMapConfig.DestinationType.IsGenericTypeDefinition() ? closedTypes.DestinationType.GetGenericArguments() : new Type[0]);
 
-                closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParams);
+                var neededParameters = closedMap.TypeConverterType.GetGenericParameters().Length;
+                closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
+
             }
 
             return closedMap;
