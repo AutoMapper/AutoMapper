@@ -392,7 +392,7 @@
             }
             else if (propertyMap.CustomResolver != null)
             {
-                valueResolverFunc = TryCatch(Convert(Invoke(Constant(propertyMap.CustomResolver), srcParam, ctxtParam), propertyMap.DestinationPropertyType), Catch(typeof(Exception), Default(propertyMap.DestinationPropertyType)));
+                valueResolverFunc = TryCatch(Convert(propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam), propertyMap.DestinationPropertyType), Catch(typeof(Exception), Default(propertyMap.DestinationPropertyType)));
             }
             else if (propertyMap.CustomExpression != null)
             {

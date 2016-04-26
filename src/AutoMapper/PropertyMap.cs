@@ -39,7 +39,7 @@ namespace AutoMapper
         private readonly List<IMemberGetter> _memberChain = new List<IMemberGetter>();
         public bool Ignored { get; set; }
         public int? MappingOrder { get; set; }
-        public Func<object, ResolutionContext, object> CustomResolver { get; private set; }
+        public LambdaExpression CustomResolver { get; private set; }
         public LambdaExpression Condition { get; set; }
         public LambdaExpression PreCondition { get; set; }
         private MemberInfo _sourceMember;
@@ -122,13 +122,10 @@ namespace AutoMapper
             CustomValue = CustomValue ?? inheritedMappedProperty.CustomValue;
         }
 
-        // TODO: make this expression based
-        public void AssignCustomExpression<TSource, TMember>(Func<TSource, ResolutionContext, TMember> resolverFunc)
+        public void AssignCustomExpression(LambdaExpression resolverExpression)
         {
-            //Expression<Func<TSource, ResolutionContext, TMember>> expr = (s, c) => resolverFunc(s, c);
-            CustomResolver = (s, c) => resolverFunc((TSource) s, c);
-            SourceType = typeof (TMember);
-            //AssignCustomExpression(expr);
+            CustomResolver = resolverExpression;
+            SourceType = resolverExpression.ReturnType;
         }
 
         public bool IsMapped()
