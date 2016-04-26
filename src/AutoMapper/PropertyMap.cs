@@ -14,13 +14,7 @@ namespace AutoMapper
     public class PropertyMap
     {
         private readonly List<IMemberGetter> _memberChain = new List<IMemberGetter>();
-        public bool Ignored { get; set; }
-        public int? MappingOrder { get; set; }
-        public LambdaExpression CustomResolver { get; private set; }
-        public LambdaExpression Condition { get; set; }
-        public LambdaExpression PreCondition { get; set; }
         private MemberInfo _sourceMember;
-        private LambdaExpression _customExpression;
 
         public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
@@ -42,45 +36,57 @@ namespace AutoMapper
 
         public IEnumerable<IMemberGetter> SourceMembers => _memberChain;
 
-        public LambdaExpression CustomExpression
-        {
-            get { return _customExpression; }
-            private set
-            {
-                _customExpression = value;
-                if (value != null)
-                    SourceType = value.ReturnType;
-            }
-        }
-
-        public Type SourceType { get; private set; }
-
-        public MemberInfo SourceMember
-        {
-            get
-            {
-                return _sourceMember ?? _memberChain.LastOrDefault()?.MemberInfo;
-            }
-            internal set
-            {
-                _sourceMember = value;
-                if (value != null)
-                    SourceType = value.GetMemberType();
-            }
-        }
-
+        public bool Ignored { get; set; }
+        public int? MappingOrder { get; set; }
+        public LambdaExpression CustomResolver { get; set; }
+        public LambdaExpression Condition { get; set; }
+        public LambdaExpression PreCondition { get; set; }
+        public LambdaExpression CustomExpression { get; private set; }
+        public MemberInfo CustomSourceMember { get; set; }
         public bool UseDestinationValue { get; set; }
-
         public bool ExplicitExpansion { get; set; }
         public object CustomValue { get; set; }
         public object NullSubstitute { get; set; }
         public ValueResolverConfiguration ValueResolverConfig { get; set; }
 
+        public MemberInfo SourceMember
+        {
+            get
+            {
+                if (CustomSourceMember != null)
+                    return CustomSourceMember;
+
+                if (CustomExpression != null)
+                {
+                    var finder = new MemberFinderVisitor();
+                    finder.Visit(CustomExpression);
+
+                    if (finder.Member != null)
+                    {
+                        return finder.Member.Member;
+                    }
+                }
+
+                return _memberChain.LastOrDefault()?.MemberInfo;
+            }
+        }
+
+        public Type SourceType
+        {
+            get
+            {
+                if (CustomExpression != null)
+                    return CustomExpression.ReturnType;
+                if (CustomResolver != null)
+                    return CustomResolver.ReturnType;
+                return SourceMember?.GetMemberType();
+            }
+        }
+
         public void ChainMembers(IEnumerable<IMemberGetter> members)
         {
             var getters = members as IList<IMemberGetter> ?? members.ToList();
             _memberChain.AddRange(getters);
-            SourceType = getters.LastOrDefault()?.MemberType;
         }
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
@@ -95,14 +101,8 @@ namespace AutoMapper
             PreCondition = PreCondition ?? inheritedMappedProperty.PreCondition;
             NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
-            SourceType = SourceType ?? inheritedMappedProperty.SourceType;
             CustomValue = CustomValue ?? inheritedMappedProperty.CustomValue;
-        }
-
-        public void AssignCustomExpression(LambdaExpression resolverExpression)
-        {
-            CustomResolver = resolverExpression;
-            SourceType = resolverExpression.ReturnType;
+            CustomSourceMember = CustomSourceMember ?? inheritedMappedProperty.CustomSourceMember;
         }
 
         public bool IsMapped()
@@ -148,23 +148,9 @@ namespace AutoMapper
 
         public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            var finder = new MemberFinderVisitor();
-            finder.Visit(sourceMember);
-
-            if (finder.Member != null)
-            {
-                SourceMember = finder.Member.Member;
-            }
             CustomExpression = sourceMember;
 
             Ignored = false;
-        }
-
-        public object GetDestinationValue(object mappedObject)
-        {
-            return UseDestinationValue
-                ? DestinationProperty.GetValue(mappedObject)
-                : null;
         }
 
         private class MemberFinderVisitor : ExpressionVisitor

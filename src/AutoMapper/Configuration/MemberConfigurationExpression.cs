@@ -84,7 +84,7 @@ namespace AutoMapper.Configuration
             {
                 Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (src, ctxt) => resolver(src);
 
-                pm.AssignCustomExpression(expr);
+                pm.CustomResolver = expr;
             });
         }
 
@@ -94,7 +94,7 @@ namespace AutoMapper.Configuration
             {
                 Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (src, ctxt) => resolver(src, ctxt);
 
-                pm.AssignCustomExpression(expr);
+                pm.CustomResolver = expr;
             });
         }
 
@@ -109,7 +109,7 @@ namespace AutoMapper.Configuration
             if (memberInfo == null)
                 throw new AutoMapperConfigurationException($"Cannot find member {sourceMember} of type {_sourceType}");
 
-            PropertyMapActions.Add(pm => pm.SourceMember = memberInfo);
+            PropertyMapActions.Add(pm => pm.CustomSourceMember = memberInfo);
         }
 
         public void UseValue<TValue>(TValue value)
