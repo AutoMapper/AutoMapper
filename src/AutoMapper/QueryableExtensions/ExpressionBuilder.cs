@@ -96,7 +96,7 @@ namespace AutoMapper.QueryableExtensions
 
             var bindings = new List<MemberBinding>();
             var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
-            if (visitCount >= typeMap.MaxDepth)
+            if (typeMap.MaxDepth > 0 && visitCount >= typeMap.MaxDepth)
             {
                 if (_configurationProvider.AllowNullDestinationValues)
                 {

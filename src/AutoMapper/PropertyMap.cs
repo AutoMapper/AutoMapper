@@ -1,8 +1,4 @@
-using AutoMapper.Configuration;
-using AutoMapper.Mappers;
-using AutoMapper.QueryableExtensions.Impl;
 using static System.Linq.Expressions.Expression;
-using static AutoMapper.ExpressionExtensions;
 
 namespace AutoMapper
 {
@@ -12,26 +8,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Configuration;
     using Execution;
-
-    public class ValueResolverConfiguration
-    {
-        public object Instance { get; }
-        public Type Type { get; }
-        public LambdaExpression SourceMember { get; set; }
-        public string SourceMemberName { get; set; }
-
-        public ValueResolverConfiguration(Type type)
-        {
-            Type = type;
-        }
-
-        public ValueResolverConfiguration(object instance)
-        {
-            Instance = instance;
-        }
-    }
 
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap

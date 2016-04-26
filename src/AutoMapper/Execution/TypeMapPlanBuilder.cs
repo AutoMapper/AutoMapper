@@ -94,6 +94,14 @@
                 //mapperFunc = (source, context, destFunc) => _condition(context) ? inner(source, context, destFunc) : default(TDestination);
             }
 
+            if (typeMap.MaxDepth > 0)
+            {
+                mapperFunc = Condition(Invoke(_passesDepthCheckExpression, ctxtParam, Constant(typeMap.MaxDepth)), 
+                    mapperFunc, 
+                    Default(typeMap.DestinationType));
+                //mapperFunc = (source, context, destFunc) => PassesDepthCheck(context, typeMap.MaxDepth) ? inner(source, context, destFunc) : default(TDestination);
+            }
+
             if (typeMap.Profile.AllowNullDestinationValues)
             {
                 mapperFunc =
@@ -458,6 +466,35 @@
             }
 
             return valueResolverFunc;
+        }
+
+        private static readonly Expression<Func<ResolutionContext, int, bool>> _passesDepthCheckExpression =
+            (ctxt, maxDepth) => PassesDepthCheck(ctxt, maxDepth);
+
+        private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
+        {
+            if (context.InstanceCache.ContainsKey(context))
+            {
+                // return true if we already mapped this value and it's in the cache
+                return true;
+            }
+
+            ResolutionContext contextCopy = context;
+
+            int currentDepth = 1;
+
+            // walk parents to determine current depth
+            while (contextCopy.Parent != null)
+            {
+                if (contextCopy.SourceType == context.SourceType &&
+                    contextCopy.DestinationType == context.DestinationType)
+                {
+                    // same source and destination types appear higher up in the hierarchy
+                    currentDepth++;
+                }
+                contextCopy = contextCopy.Parent;
+            }
+            return currentDepth <= maxDepth;
         }
 
     }

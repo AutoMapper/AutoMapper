@@ -28,9 +28,7 @@ namespace AutoMapper
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
-        private int _maxDepth = Int32.MaxValue;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
-        internal LambdaExpression MapExpression { get; private set; }
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, IProfileConfiguration profile)
         {
@@ -41,6 +39,8 @@ namespace AutoMapper
             ConfiguredMemberList = memberList;
             IgnorePropertiesStartingWith = profile.GlobalIgnores;
         }
+
+        public LambdaExpression MapExpression { get; private set; }
 
         public TypePair Types { get; }
 
@@ -76,18 +76,7 @@ namespace AutoMapper
         public bool PreserveReferences { get; set; }
         public LambdaExpression Condition { get; set; }
 
-        public int MaxDepth
-        {
-            get { return _maxDepth; }
-            set
-            {
-                _maxDepth = value;
-
-                Expression<Func<ResolutionContext, bool>> expr = ctxt => PassesDepthCheck(ctxt, value);
-
-                Condition = expr;
-            }
-        }
+        public int MaxDepth { get; set; }
 
         public LambdaExpression Substitution { get; set; }
         public LambdaExpression ConstructExpression { get; set; }
@@ -310,32 +299,6 @@ namespace AutoMapper
             _sourceMemberConfigs.Add(config);
 
             return config;
-        }
-
-        private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
-        {
-            if (context.InstanceCache.ContainsKey(context))
-            {
-                // return true if we already mapped this value and it's in the cache
-                return true;
-            }
-
-            ResolutionContext contextCopy = context;
-
-            int currentDepth = 1;
-
-            // walk parents to determine current depth
-            while (contextCopy.Parent != null)
-            {
-                if (contextCopy.SourceType == context.SourceType &&
-                    contextCopy.DestinationType == context.DestinationType)
-                {
-                    // same source and destination types appear higher up in the hierarchy
-                    currentDepth++;
-                }
-                contextCopy = contextCopy.Parent;
-            }
-            return currentDepth <= maxDepth;
         }
 
         public void ApplyInheritedMap(TypeMap inheritedTypeMap)
