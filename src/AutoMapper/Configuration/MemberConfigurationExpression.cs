@@ -191,7 +191,7 @@ namespace AutoMapper.Configuration
 
         public void Ignore()
         {
-            PropertyMapActions.Add(pm => pm.Ignore());
+            PropertyMapActions.Add(pm => pm.Ignored = true);
         }
 
         public void UseDestinationValue()

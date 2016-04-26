@@ -37,7 +37,7 @@ namespace AutoMapper
     public class PropertyMap
     {
         private readonly List<IMemberGetter> _memberChain = new List<IMemberGetter>();
-        private bool _ignored;
+        public bool Ignored { get; set; }
         public int? MappingOrder { get; set; }
         public Func<object, ResolutionContext, object> CustomResolver { get; private set; }
         public LambdaExpression Condition { get; set; }
@@ -108,9 +108,9 @@ namespace AutoMapper
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
-            if (!CanResolveValue() && inheritedMappedProperty.IsIgnored())
+            if (!CanResolveValue() && inheritedMappedProperty.Ignored)
             {
-                Ignore();
+                Ignored = true;
             }
             CustomExpression = CustomExpression ?? inheritedMappedProperty.CustomExpression;
             CustomResolver = CustomResolver ?? inheritedMappedProperty.CustomResolver;
@@ -131,16 +131,6 @@ namespace AutoMapper
             //AssignCustomExpression(expr);
         }
 
-        public void Ignore()
-        {
-            _ignored = true;
-        }
-
-        public bool IsIgnored()
-        {
-            return _ignored;
-        }
-
         public bool IsMapped()
         {
             return _memberChain.Count > 0 
@@ -149,7 +139,7 @@ namespace AutoMapper
                 || SourceMember != null
                 || CustomValue != null
                 || CustomExpression != null
-                || _ignored;
+                || Ignored;
         }
 
         public bool CanResolveValue()
@@ -159,7 +149,7 @@ namespace AutoMapper
                 || CustomResolver != null
                 || SourceMember != null
                 || CustomValue != null
-                || CustomExpression != null) && !_ignored;
+                || CustomExpression != null) && !Ignored;
         }
 
         public bool Equals(PropertyMap other)
@@ -193,7 +183,7 @@ namespace AutoMapper
             }
             CustomExpression = sourceMember;
 
-            _ignored = false;
+            Ignored = false;
         }
 
         public object GetDestinationValue(object mappedObject)

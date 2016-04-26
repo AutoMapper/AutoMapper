@@ -44,11 +44,10 @@ namespace AutoMapper
 
         public TypePair Types { get; }
 
-        public ConstructorMap ConstructorMap { get; private set; }
+        public ConstructorMap ConstructorMap { get; set; }
 
         public TypeDetails SourceTypeDetails { get; }
         public TypeDetails DestinationTypeDetails { get; }
-
 
         public Type SourceType => SourceTypeDetails.Type;
         public Type DestinationType => DestinationTypeDetails.Type;
@@ -56,15 +55,13 @@ namespace AutoMapper
         public IProfileConfiguration Profile { get; }
 
         public LambdaExpression CustomMapper { get; set; }
-        public LambdaExpression CustomProjection { get; private set; }
-
+        public LambdaExpression CustomProjection { get; set; }
         public LambdaExpression DestinationCtor { get; set; }
 
         public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
         public Type DestinationTypeToUse => DestinationTypeOverride ?? DestinationType;
-
 
         public bool ConstructDestinationUsingServiceLocator { get; set; }
 
@@ -76,7 +73,7 @@ namespace AutoMapper
         public IEnumerable<LambdaExpression> BeforeMapActions => _beforeMapActions;
         public IEnumerable<LambdaExpression> AfterMapActions => _afterMapActions; 
 
-        public bool PreserveReferences { get; private set; }
+        public bool PreserveReferences { get; set; }
         public LambdaExpression Condition { get; set; }
 
         public int MaxDepth
@@ -101,23 +98,13 @@ namespace AutoMapper
             return _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
         }
 
-        public void AddPropertyMap(PropertyMap propertyMap)
-        {
-            _propertyMaps.Add(propertyMap);
-        }
-
-        protected void AddInheritedMap(PropertyMap propertyMap)
-        {
-            _inheritedMaps.Add(propertyMap);
-        }
-
         public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IMemberGetter> resolvers)
         {
             var propertyMap = new PropertyMap(destProperty, this);
 
             propertyMap.ChainMembers(resolvers);
 
-            AddPropertyMap(propertyMap);
+            _propertyMaps.Add(propertyMap);
         }
 
         public string[] GetUnmappedPropertyNames()
@@ -172,7 +159,7 @@ namespace AutoMapper
 
             propertyMap = new PropertyMap(destinationProperty, this);
 
-            AddPropertyMap(propertyMap);
+            _propertyMaps.Add(propertyMap);
 
             return propertyMap;
         }
@@ -304,11 +291,6 @@ namespace AutoMapper
             return null;
         }
 
-        public void AddInheritedPropertyMap(PropertyMap mappedProperty)
-        {
-            _inheritedMaps.Add(mappedProperty);
-        }
-
         public void InheritTypes(TypeMap inheritedTypeMap)
         {
             foreach (var includedDerivedType in inheritedTypeMap._includedDerivedTypes
@@ -316,11 +298,6 @@ namespace AutoMapper
             {
                 _includedDerivedTypes.Add(includedDerivedType);
             }
-        }
-
-        public void AddConstructorMap(ConstructorMap ctorMap)
-        {
-            ConstructorMap = ctorMap;
         }
 
         public SourceMemberConfig FindOrCreateSourceMemberConfigFor(MemberInfo sourceMember)
@@ -361,16 +338,6 @@ namespace AutoMapper
             return currentDepth <= maxDepth;
         }
 
-        public void EnablePreserveReferences()
-        {
-            PreserveReferences = true;
-        }
-
-        public void UseCustomProjection(LambdaExpression projectionExpression)
-        {
-            CustomProjection = projectionExpression;
-        }
-
         public void ApplyInheritedMap(TypeMap inheritedTypeMap)
         {
             _inheritedTypeMaps.Add(inheritedTypeMap);
@@ -400,7 +367,7 @@ namespace AutoMapper
                 {
                     var propertyMap = new PropertyMap(inheritedMappedProperty, this);
 
-                    AddInheritedPropertyMap(propertyMap);
+                    _inheritedMaps.Add(propertyMap);
                 }
             }
 
@@ -414,20 +381,6 @@ namespace AutoMapper
             {
                 AddAfterMapAction(afterMapAction);
             }
-        }
-
-        internal LambdaExpression DestinationConstructorExpression(Expression instanceParameter)
-        {
-            var ctorExpr = ConstructExpression;
-            if (ctorExpr != null)
-            {
-                return ctorExpr;
-            }
-            var newExpression = ConstructorMap?.CanResolve == true
-                ? ConstructorMap.NewExpression(instanceParameter)
-                : New(DestinationTypeOverride ?? DestinationType);
-
-            return Lambda(newExpression);
         }
     }
 }

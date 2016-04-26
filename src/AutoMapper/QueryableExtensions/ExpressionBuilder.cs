@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.QueryableExtensions.Impl;
+using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.QueryableExtensions
 {
@@ -106,7 +107,7 @@ namespace AutoMapper.QueryableExtensions
             {
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
             }
-            Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
+            Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter);
             if (instanceParameter is ParameterExpression)
                 constructorExpression = ((LambdaExpression) constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
@@ -118,6 +119,21 @@ namespace AutoMapper.QueryableExtensions
                 );
             return expression;
         }
+
+        private LambdaExpression DestinationConstructorExpression(TypeMap typeMap, Expression instanceParameter)
+        {
+            var ctorExpr = typeMap.ConstructExpression;
+            if (ctorExpr != null)
+            {
+                return ctorExpr;
+            }
+            var newExpression = typeMap.ConstructorMap?.CanResolve == true
+                ? typeMap.ConstructorMap.NewExpression(instanceParameter)
+                : New(typeMap.DestinationTypeOverride ?? typeMap.DestinationType);
+
+            return Lambda(newExpression);
+        }
+
 
         private class NewFinderVisitor : ExpressionVisitor
         {

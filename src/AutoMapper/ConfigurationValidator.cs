@@ -103,7 +103,7 @@ namespace AutoMapper
         {
             foreach (var propertyMap in context.TypeMap.GetPropertyMaps())
             {
-                if (propertyMap.IsIgnored()) continue;
+                if (propertyMap.Ignored) continue;
 
                 var sourceType = propertyMap.SourceType;
 

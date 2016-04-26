@@ -67,7 +67,7 @@ namespace AutoMapper
                 ctorMap.AddParameter(parameter, resolvers.ToArray(), canResolve);
             }
 
-            typeMap.AddConstructorMap(ctorMap);
+            typeMap.ConstructorMap = ctorMap;
 
             return true;
         }

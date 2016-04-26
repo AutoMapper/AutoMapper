@@ -162,7 +162,8 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> PreserveReferences()
         {
-            TypeMapActions.Add(tm => tm.EnablePreserveReferences());
+            TypeMapActions.Add(tm => tm.PreserveReferences = true);
+
             return this;
         }
 
@@ -251,14 +252,13 @@ namespace AutoMapper.Configuration
 
         public void ProjectUsing(Expression<Func<TSource, TDestination>> projectionExpression)
         {
-            TypeMapActions.Add(tm => tm.UseCustomProjection(projectionExpression));
-
-            //ConvertUsing(projectionExpression.Compile());
+            TypeMapActions.Add(tm => tm.CustomProjection = projectionExpression);
         }
 
         public IMappingExpression<TSource, TDestination> MaxDepth(int depth)
         {
-            TypeMapActions.Add(tm => tm.MaxDepth = depth);            
+            TypeMapActions.Add(tm => tm.MaxDepth = depth);
+
             return PreserveReferences();
         }
 
@@ -525,7 +525,7 @@ namespace AutoMapper.Configuration
 
             if (_reverseMap != null)
             {
-                foreach (var destProperty in typeMap.GetPropertyMaps().Where(pm => pm.IsIgnored()))
+                foreach (var destProperty in typeMap.GetPropertyMaps().Where(pm => pm.Ignored))
                 {
                     _reverseMap.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
                 }
