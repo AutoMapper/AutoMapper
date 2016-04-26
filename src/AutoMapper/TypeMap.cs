@@ -224,29 +224,6 @@ namespace AutoMapper
             _sealed = true;
         }
 
-        public bool Equals(TypeMap other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(other.SourceTypeDetails, SourceTypeDetails) && Equals(other.DestinationTypeDetails, DestinationTypeDetails);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(TypeMap)) return false;
-            return Equals((TypeMap)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (SourceTypeDetails.GetHashCode() * 397) ^ DestinationTypeDetails.GetHashCode();
-            }
-        }
-
         public PropertyMap GetExistingPropertyMapFor(IMemberAccessor destinationProperty)
         {
             var propertyMap =
