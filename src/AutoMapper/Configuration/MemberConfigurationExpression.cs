@@ -80,12 +80,22 @@ namespace AutoMapper.Configuration
 
         public void ResolveUsing<TSourceMember>(Func<TSource, TSourceMember> resolver)
         {
-            PropertyMapActions.Add(pm => pm.AssignCustomExpression<TSource, TSourceMember>((s, c) => resolver(s)));
+            PropertyMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (src, ctxt) => resolver(src);
+
+                pm.CustomResolver = expr;
+            });
         }
 
         public void ResolveUsing<TSourceMember>(Func<TSource, ResolutionContext, TSourceMember> resolver)
         {
-            PropertyMapActions.Add(pm => pm.AssignCustomExpression(resolver));
+            PropertyMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (src, ctxt) => resolver(src, ctxt);
+
+                pm.CustomResolver = expr;
+            });
         }
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
@@ -99,7 +109,7 @@ namespace AutoMapper.Configuration
             if (memberInfo == null)
                 throw new AutoMapperConfigurationException($"Cannot find member {sourceMember} of type {_sourceType}");
 
-            PropertyMapActions.Add(pm => pm.SourceMember = memberInfo);
+            PropertyMapActions.Add(pm => pm.CustomSourceMember = memberInfo);
         }
 
         public void UseValue<TValue>(TValue value)
@@ -191,7 +201,7 @@ namespace AutoMapper.Configuration
 
         public void Ignore()
         {
-            PropertyMapActions.Add(pm => pm.Ignore());
+            PropertyMapActions.Add(pm => pm.Ignored = true);
         }
 
         public void UseDestinationValue()

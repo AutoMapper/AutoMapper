@@ -34,11 +34,9 @@ namespace AutoMapper
         public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
-            var profileExpression = new NamedProfile(ProfileName);
+            _defaultProfile = new NamedProfile(ProfileName);
 
-            _profiles.Add(profileExpression);
-
-            _defaultProfile = profileExpression;
+            _profiles.Add(_defaultProfile);
 
             _validator = new ConfigurationValidator(this);
 
