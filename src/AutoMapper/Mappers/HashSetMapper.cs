@@ -1,84 +1,27 @@
 ﻿namespace AutoMapper.Mappers
 {
-    using System;
-    using System.Reflection;
     using System.Collections.Generic;
     using System.Linq;
-    using Configuration;
 
-    public class HashSetMapper : IObjectMapper
+    public class HashSetMapper<TSource, TDestination> : IObjectMapper<IEnumerable<TSource>, ISet<TDestination>>
     {
-        public object Map(ResolutionContext context)
+        public ISet<TDestination> Map(IEnumerable<TSource> source, ISet<TDestination> destination, ResolutionContext context)
         {
-            Type genericType = typeof (EnumerableMapper<,>);
-
-            var destType = context.DestinationValue?.GetType() ?? context.DestinationType;
-            var collectionType = destType;
-            var elementType = TypeHelper.GetElementType(context.DestinationType);
-
-            var enumerableMapper = genericType.MakeGenericType(collectionType, elementType);
-
-            var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
-
-            return objectMapper.Map(context);
-        }
-
-        public bool IsMatch(TypePair context)
-        {
-            var isMatch = context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
-
-            return isMatch;
-        }
-
-        private static bool IsSetType(Type type)
-        {
-            if (type.IsGenericType() && type.GetGenericTypeDefinition() == typeof (ISet<>))
+            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
             {
-                return true;
+                return null;
             }
 
-            IEnumerable<Type> genericInterfaces = type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType());
-            IEnumerable<Type> baseDefinitions = genericInterfaces.Select(t => t.GetGenericTypeDefinition());
+            destination = destination ?? new HashSet<TDestination>();
 
-            var isCollectionType = baseDefinitions.Any(t => t == typeof (ISet<>));
+            destination.Clear();
 
-            return isCollectionType;
-        }
-
-
-        private class EnumerableMapper<TCollection, TElement> : EnumerableMapperBase<TCollection>
-            where TCollection : ISet<TElement>
-        {
-            public override bool IsMatch(TypePair context)
+            foreach (var item in source ?? Enumerable.Empty<TSource>())
             {
-                throw new NotImplementedException();
+                destination.Add(context.Mapper.Map(item, default(TDestination), context));
             }
 
-            protected override void SetElementValue(TCollection destination, object mappedValue, int index)
-            {
-                destination.Add((TElement) mappedValue);
-            }
-
-            protected override void ClearEnumerable(TCollection enumerable)
-            {
-                enumerable.Clear();
-            }
-
-            protected override TCollection CreateDestinationObjectBase(Type destElementType, int sourceLength)
-            {
-                Object collection;
-
-                if (typeof (TCollection).IsInterface())
-                {
-                    collection = new HashSet<TElement>();
-                }
-                else
-                {
-                    collection = ObjectCreator.CreateDefaultValue(typeof (TCollection));
-                }
-
-                return (TCollection) collection;
-            }
+            return destination;
         }
     }
 }

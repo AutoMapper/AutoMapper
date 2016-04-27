@@ -18,7 +18,6 @@ namespace AutoMapper.Mappers
 #endif
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
-            new HashSetMapper(),
             new CollectionMapper(),
             new EnumerableMapper(),
             new StringMapper(),
