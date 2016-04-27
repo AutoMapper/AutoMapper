@@ -20,7 +20,7 @@ namespace AutoMapper.Mappers
             new ReadOnlyCollectionMapper(),
             new CollectionMapper(),
             new EnumerableMapper(),
-            new StringMapper(),
+            //new StringMapper(),
             new AssignableMapper(),
 #if !PORTABLE
             new TypeConverterMapper(),

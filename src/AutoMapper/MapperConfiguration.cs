@@ -29,7 +29,7 @@ namespace AutoMapper
         private readonly Func<MapRequest, Delegate> _createMapperFunc;
 
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers, new[] {typeof(HashSetMapper<,>)})
+        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers, new[] {typeof(HashSetMapper<,>), typeof(StringMapper<>)})
         {
         }
 
