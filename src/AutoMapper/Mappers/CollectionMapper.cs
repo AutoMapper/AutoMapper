@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace AutoMapper.Mappers
 {
@@ -8,7 +9,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using Configuration;
 
-    public class CollectionMapper : IObjectMapper
+    public class CollectionMapper : IObjectMapper, IObjectMapExpression
     {
         public static ICollection<TDestinationItem> Map<TSource, TSourceItem, TDestination, TDestinationItem>(TSource source, TDestination destination, ResolutionContext context)
             where TSource : IEnumerable
@@ -30,7 +31,7 @@ namespace AutoMapper.Mappers
             return list;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(CollectionMapper).GetMethod("Map", BindingFlags.Static | BindingFlags.Public);
+        private static readonly MethodInfo MapMethodInfo = typeof(CollectionMapper).GetMethod("Map");
 
         public object Map(ResolutionContext context)
         {
@@ -44,6 +45,13 @@ namespace AutoMapper.Mappers
             var isMatch = context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
 
             return isMatch;
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            return Expression.Call(Expression.Constant(null), 
+                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), destExpression.Type, TypeHelper.GetElementType(destExpression.Type)),
+                    sourceExpression, destExpression, contextExpression);
         }
     }
 }

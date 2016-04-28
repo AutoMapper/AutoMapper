@@ -1,6 +1,9 @@
-﻿namespace AutoMapper.Mappers
+﻿using System.Linq.Expressions;
+using System.Reflection;
+
+namespace AutoMapper.Mappers
 {
-    public class StringMapper : IObjectMapper
+    public class StringMapper : IObjectMapper, IObjectMapExpression
     {
         public object Map(ResolutionContext context)
         {
@@ -10,6 +13,11 @@
         public bool IsMatch(TypePair context)
         {
             return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            return Expression.Call(sourceExpression, typeof(object).GetMethod("ToString")).IfNullElse(Expression.Constant(null));
         }
     }
 }

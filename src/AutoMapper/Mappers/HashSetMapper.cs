@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.Mappers
+﻿using System.Linq.Expressions;
+
+namespace AutoMapper.Mappers
 {
     using System;
     using System.Reflection;
@@ -6,7 +8,7 @@
     using System.Linq;
     using Configuration;
 
-    public class HashSetMapper : IObjectMapper
+    public class HashSetMapper : IObjectMapper, IObjectMapExpression
     {
         public static ISet<TDestination> Map<TSource, TDestination>(IEnumerable<TSource> source, ISet<TDestination> destination, ResolutionContext context)
         {
@@ -27,7 +29,7 @@
             return destination;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(HashSetMapper).GetMethod("Map", BindingFlags.Static | BindingFlags.Public);
+        private static readonly MethodInfo MapMethodInfo = typeof(HashSetMapper).GetMethod("Map");
 
         public object Map(ResolutionContext context)
         {
@@ -42,6 +44,14 @@
             var isMatch = context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
             return isMatch;
+        }
+
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            return Expression.Call(Expression.Constant(null),
+                MapMethodInfo.MakeGenericMethod(TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)),
+                    sourceExpression, destExpression, contextExpression);
         }
 
         private static bool IsSetType(Type type)

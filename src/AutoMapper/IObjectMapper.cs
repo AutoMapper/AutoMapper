@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper
 {
     /// <summary>
@@ -19,4 +21,9 @@ namespace AutoMapper
         /// <returns>Is match</returns>
         bool IsMatch(TypePair context);
 	}
+
+    public interface IObjectMapExpression
+    {
+        Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression);
+    }
 }

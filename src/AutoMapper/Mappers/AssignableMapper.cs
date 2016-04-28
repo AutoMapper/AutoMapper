@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
     using System.Reflection;
 
-    public class AssignableMapper : IObjectMapper
+    public class AssignableMapper : IObjectMapper, IObjectMapExpression
     {
         public object Map(ResolutionContext context)
         {
@@ -17,6 +19,11 @@ namespace AutoMapper.Mappers
         public bool IsMatch(TypePair context)
         {
             return context.DestinationType.IsAssignableFrom(context.SourceType);
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            return sourceExpression;
         }
     }
 }
