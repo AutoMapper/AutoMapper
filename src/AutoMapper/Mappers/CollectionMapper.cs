@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -11,17 +12,19 @@ namespace AutoMapper.Mappers
 
     public class CollectionMapper : IObjectMapper, IObjectMapExpression
     {
-        public static ICollection<TDestinationItem> Map<TSource, TSourceItem, TDestination, TDestinationItem>(TSource source, TDestination destination, ResolutionContext context)
+        public static TDestination Map<TSource, TSourceItem, TDestination, TDestinationItem>(TSource source, TDestination destination, ResolutionContext context)
             where TSource : IEnumerable
             where TDestination : class, ICollection<TDestinationItem>
         {
             if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
                 return null;
 
-            ICollection<TDestinationItem> list = destination ?? (
+            TDestination list = destination ?? (
                 typeof (TDestination).IsInterface()
-                    ? new List<TDestinationItem>()
-                    : (ICollection<TDestinationItem>) context.Mapper.CreateObject(context));
+                    ? new List<TDestinationItem>() as TDestination
+                    : (TDestination) (context.ConfigurationProvider.AllowNullDestinationValues
+                ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
+                : ObjectCreator.CreateObject(typeof(TDestination))));
 
             list.Clear();
 
@@ -49,7 +52,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(Expression.Constant(null), 
+            return Expression.Call(null, 
                 MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), destExpression.Type, TypeHelper.GetElementType(destExpression.Type)),
                     sourceExpression, destExpression, contextExpression);
         }

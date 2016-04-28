@@ -17,7 +17,9 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(sourceExpression, typeof(object).GetMethod("ToString")).IfNullElse(Expression.Constant(null));
+            return Expression.Condition(Expression.Equal(sourceExpression, Expression.Constant(null)),
+                Expression.Constant(null, typeof (string)),
+                Expression.Call(sourceExpression, typeof (object).GetMethod("ToString")));
         }
     }
 }

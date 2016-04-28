@@ -49,7 +49,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(Expression.Constant(null),
+            return Expression.Call(null,
                 MapMethodInfo.MakeGenericMethod(TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)),
                     sourceExpression, destExpression, contextExpression);
         }
