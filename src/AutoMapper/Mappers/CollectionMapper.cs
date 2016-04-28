@@ -31,7 +31,7 @@ namespace AutoMapper.Mappers
             return list;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(CollectionMapper).GetMethod("Map");
+        private static readonly MethodInfo MapMethodInfo = typeof(CollectionMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public object Map(ResolutionContext context)
         {

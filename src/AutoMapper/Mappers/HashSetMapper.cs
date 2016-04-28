@@ -29,7 +29,7 @@ namespace AutoMapper.Mappers
             return destination;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(HashSetMapper).GetMethod("Map");
+        private static readonly MethodInfo MapMethodInfo = typeof(HashSetMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public object Map(ResolutionContext context)
         {
