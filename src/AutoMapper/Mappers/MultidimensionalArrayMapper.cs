@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper.Mappers
 {
     using System;
@@ -5,39 +9,67 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using Configuration;
 
-    public class MultidimensionalArrayMapper : EnumerableMapperBase<Array>
+    public class MultidimensionalArrayMapper : IObjectMapper, IObjectMapExpression
     {
-        MultidimensionalArrayFiller filler;
-        public override bool IsMatch(TypePair context)
+        static MultidimensionalArrayFiller filler;
+
+        public static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context)
+            where TSource : IEnumerable
+        {
+            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
+                return null;
+
+            var destElementType = TypeHelper.GetElementType(typeof(TDestination));
+
+            if (!context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType))
+            {
+                var elementTypeMap = context.ConfigurationProvider.ResolveTypeMap(typeof(TSourceElement), destElementType);
+                if (elementTypeMap == null)
+                    return source as Array;
+            }
+
+            IEnumerable sourceList = source;
+            if (sourceList == null)
+                sourceList = typeof(TSource).IsInterface ?
+                new List<TSourceElement>() :
+                (IEnumerable<TSourceElement>)(context.ConfigurationProvider.AllowNullDestinationValues
+                ? ObjectCreator.CreateNonNullValue(typeof(TSource))
+                : ObjectCreator.CreateObject(typeof(TSource)));
+
+            var sourceLength = sourceList.OfType<object>().Count();
+            var sourceArray = context.SourceValue as Array;
+            Array destinationArray;
+            if (sourceArray == null)
+            {
+                destinationArray = ObjectCreator.CreateArray(destElementType, sourceLength);
+            }
+            else
+            {
+                destinationArray = ObjectCreator.CreateArray(destElementType, sourceArray);
+                filler = new MultidimensionalArrayFiller(destinationArray);
+            }
+            int count = 0;
+            foreach (var item in sourceList)
+                filler.NewValue(context.Mapper.Map(item, null, typeof(TSourceElement), destElementType, context));
+
+            return destinationArray;
+        }
+
+        private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetAllMethods().First(_ => _.IsStatic);
+
+        public object Map(ResolutionContext context)
+        {
+            return MapMethodInfo.MakeGenericMethod(context.DestinationType, context.SourceType, TypeHelper.GetElementType(context.SourceType, (IEnumerable)context.SourceValue)).Invoke(null, new[] { context.SourceValue, context });
+        }
+
+        public bool IsMatch(TypePair context)
         {
             return context.DestinationType.IsArray && context.DestinationType.GetArrayRank() > 1 && context.SourceType.IsEnumerableType();
         }
 
-        protected override void ClearEnumerable(Array enumerable)
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            // no op
-        }
-
-        protected override void SetElementValue(Array destination, object mappedValue, int index)
-        {
-            filler.NewValue(mappedValue);
-        }
-
-        protected override Array CreateDestinationObjectBase(Type destElementType, int sourceLength)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override object GetOrCreateDestinationObject(ResolutionContext context, Type destElementType, int sourceLength)
-        {
-            var sourceArray = context.SourceValue as Array;
-            if(sourceArray == null)
-            {
-                return ObjectCreator.CreateArray(destElementType, sourceLength);
-            }
-            var destinationArray = ObjectCreator.CreateArray(destElementType, sourceArray);
-            filler = new MultidimensionalArrayFiller(destinationArray);
-            return destinationArray;
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type)), sourceExpression, contextExpression);
         }
     }
 
