@@ -310,7 +310,7 @@
             {
                 var typePair = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
                 var typeMap = typeMapRegistry.GetTypeMap(typePair);
-                if (typeMap != null && typeMap.TypeConverterType != null)
+                if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
                 {
                     if(!typeMap.Sealed)
                         typeMap.Seal(typeMapRegistry, configurationProvider);
