@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
     using System;
@@ -10,19 +12,21 @@ namespace AutoMapper.Mappers
     // So IEnumerable<T> inherits IEnumerable
     // but IDictionary<TKey, TValue> DOES NOT inherit IDictionary
     // Fiddlesticks.
-    public class DictionaryMapper : IObjectMapper
+    public class DictionaryMapper : IObjectMapper, IObjectMapExpression
     {
-        public static IDictionary<TDestinationKey, TDestinationValue> Map<TSource, TSourceKey, TSourceValue, TDestination, TDestinationKey, TDestinationValue>(TSource source, TDestination destination, ResolutionContext context)
+        public static TDestination Map<TSource, TSourceKey, TSourceValue, TDestination, TDestinationKey, TDestinationValue>(TSource source, TDestination destination, ResolutionContext context)
             where TSource : IDictionary<TSourceKey, TSourceValue>
             where TDestination : class, IDictionary<TDestinationKey, TDestinationValue>
         {
             if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
                 return null;
 
-            IDictionary<TDestinationKey, TDestinationValue> list = destination ?? (
-                typeof(TDestination).IsInterface()
-                    ? new Dictionary<TDestinationKey, TDestinationValue>()
-                    : (IDictionary<TDestinationKey, TDestinationValue>)context.Mapper.CreateObject(context));
+            TDestination list = destination ?? (
+                typeof (TDestination).IsInterface()
+                    ? new Dictionary<TDestinationKey, TDestinationValue>() as TDestination
+                    : (TDestination) (context.ConfigurationProvider.AllowNullDestinationValues
+                        ? ObjectCreator.CreateNonNullValue(typeof (TDestination))
+                        : ObjectCreator.CreateObject(typeof (TDestination))));
 
             list.Clear();
 
@@ -42,7 +46,6 @@ namespace AutoMapper.Mappers
 
         public object Map(ResolutionContext context)
         {
-
             Type genericSourceDictType = context.SourceType.GetDictionaryType();
             Type sourceKeyType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[0];
             Type sourceValueType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[1];
@@ -53,6 +56,20 @@ namespace AutoMapper.Mappers
             return
                 MapMethodInfo.MakeGenericMethod(context.SourceType, sourceKeyType, sourceValueType, context.DestinationType, destKeyType, destValueType)
                     .Invoke(null, new[] { context.SourceValue, context.DestinationValue, context });
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            Type genericSourceDictType = sourceExpression.Type.GetDictionaryType();
+            Type sourceKeyType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[0];
+            Type sourceValueType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[1];
+            Type genericDestDictType = destExpression.Type.GetDictionaryType();
+            Type destKeyType = genericDestDictType.GetTypeInfo().GenericTypeArguments[0];
+            Type destValueType = genericDestDictType.GetTypeInfo().GenericTypeArguments[1];
+
+            return Expression.Call(null,
+                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, sourceKeyType, sourceValueType, destExpression.Type, destKeyType, destValueType),
+                    sourceExpression, destExpression, contextExpression);
         }
     }
 }

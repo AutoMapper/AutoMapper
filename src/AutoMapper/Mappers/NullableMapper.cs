@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
     using Configuration;
 
-    public class NullableMapper : IObjectMapper
+    public class NullableMapper : IObjectMapper, IObjectMapExpression
     {
         public object Map(ResolutionContext context)
         {
@@ -12,6 +14,11 @@ namespace AutoMapper.Mappers
         public bool IsMatch(TypePair context)
         {
             return context.DestinationType.IsNullableType();
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            return sourceExpression;
         }
     }
 }
