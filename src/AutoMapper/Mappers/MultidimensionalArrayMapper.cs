@@ -30,7 +30,7 @@ namespace AutoMapper.Mappers
 
             IEnumerable sourceList = source;
             if (sourceList == null)
-                sourceList = typeof(TSource).IsInterface ?
+                sourceList = typeof(TSource).GetTypeInfo().IsInterface ?
                 new List<TSourceElement>() :
                 (IEnumerable<TSourceElement>)(context.ConfigurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(typeof(TSource))
