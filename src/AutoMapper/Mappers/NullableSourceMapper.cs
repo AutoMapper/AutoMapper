@@ -6,14 +6,13 @@ namespace AutoMapper.Mappers
 {
     using Configuration;
 
-    public class NullableSourceMapper : IObjectMapper, IObjectMapExpression
+    public class NullableSourceMapper : IObjectMapper
     {
         public static TDestination Map<TDestination>(object source, ResolutionContext context)
-            where TDestination : class
         {
-            return (TDestination) source ?? (TDestination) (context.ConfigurationProvider.AllowNullDestinationValues
+            return (TDestination) (source ?? (context.ConfigurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(typeof (TDestination))
-                : ObjectCreator.CreateObject(typeof (TDestination)));
+                : ObjectCreator.CreateObject(typeof (TDestination))));
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(NullableSourceMapper).GetAllMethods().First(_ => _.IsStatic);
