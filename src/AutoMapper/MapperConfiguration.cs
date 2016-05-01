@@ -29,7 +29,16 @@ namespace AutoMapper
         private readonly Func<MapRequest, Delegate> _createMapperFunc;
 
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers, new[] {typeof(HashSetMapper<,>), typeof(StringMapper<>)})
+        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(
+            configure, 
+            MapperRegistry.Mappers, 
+            new[]
+            {
+                typeof(HashSetMapper<,>),
+                typeof(StringMapper<>),
+                //typeof(DictionaryNonGenericMapper<,>),
+                typeof(DictionaryGenericMapper<,,,>)
+            })
         {
         }
 
@@ -521,34 +530,34 @@ namespace AutoMapper
             if (typePair.GetOpenGenericTypePair() == null)
                 return null;
 
-            foreach (var pair in typePair.GetRelatedTypePairs())
+            foreach (var tm in _genericMappers)
             {
-                var openMapConfig = _genericMappers
-                    .Where(tm =>
-                        tm.Key.SourceType.GetGenericTypeDefinitionIfGeneric() ==
-                        pair.SourceType.GetGenericTypeDefinitionIfGeneric() &&
-                        tm.Key.DestinationType.GetGenericTypeDefinitionIfGeneric() ==
-                        pair.DestinationType.GetGenericTypeDefinitionIfGeneric())
-                    .OrderByDescending(tm => tm.Key.DestinationType == pair.DestinationType)
-                    // Favor more specific destination matches,
-                    .ThenByDescending(tm => tm.Key.SourceType == pair.SourceType) // then more specific source matches
-                    .FirstOrDefault();
+                foreach (var pair in typePair.GetRelatedTypePairs())
+                {
+                    var openMapConfig = 
+                            tm.Key.SourceType.GetGenericTypeDefinitionIfGeneric() ==
+                            pair.SourceType.GetGenericTypeDefinitionIfGeneric() &&
+                            tm.Key.DestinationType.GetGenericTypeDefinitionIfGeneric() ==
+                            pair.DestinationType.GetGenericTypeDefinitionIfGeneric()
+                            ? tm
+                            : default(KeyValuePair<TypePair, Type>);
 
-                if (openMapConfig.Equals(default(KeyValuePair<TypePair, Type>)))
-                    continue;
+                    if (openMapConfig.Equals(default(KeyValuePair<TypePair, Type>)))
+                        continue;
 
-                var neededParameters = openMapConfig.Value.GetGenericParameters().Length;
+                    var neededParameters = openMapConfig.Value.GetGenericParameters().Length;
 
-                var typeParams =
-                    (openMapConfig.Value.IsGenericTypeDefinition() ? pair.SourceType.GetGenericArguments() : new Type[0])
-                        .Concat
-                        (openMapConfig.Value.IsGenericTypeDefinition()
-                            ? pair.DestinationType.GetGenericArguments()
-                            : new Type[0])
-                        .Take(neededParameters)
-                        .ToArray();
+                    var typeParams =
+                        (openMapConfig.Value.IsGenericTypeDefinition() ? pair.SourceType.GetGenericArguments() : new Type[0])
+                            .Concat
+                            (openMapConfig.Value.IsGenericTypeDefinition()
+                                ? pair.DestinationType.GetGenericArguments()
+                                : new Type[0])
+                            .Take(neededParameters)
+                            .ToArray();
 
-                return openMapConfig.Value.MakeGenericType(typeParams);
+                    return openMapConfig.Value.MakeGenericType(typeParams);
+                }
             }
 
             return null;

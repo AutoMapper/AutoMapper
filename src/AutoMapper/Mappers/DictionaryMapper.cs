@@ -7,6 +7,65 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using Configuration;
 
+    public class DictionaryGenericMapper<TSourceKey, TSourceValue, TDestKey, TDestValue>
+        : IObjectMapper<IDictionary<TSourceKey, TSourceValue>, IDictionary<TDestKey, TDestValue>>
+    {
+        public IDictionary<TDestKey, TDestValue> Map(
+            IDictionary<TSourceKey, TSourceValue> source,
+            IDictionary<TDestKey, TDestValue> destination, 
+            ResolutionContext context)
+        {
+            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
+            {
+                return null;
+            }
+
+            destination = new Dictionary<TDestKey, TDestValue>();
+
+            var sourceEnumerable = (IEnumerable<KeyValuePair<TSourceKey, TSourceValue>>) source;
+            var dictionaryEntries = sourceEnumerable.OfType<DictionaryEntry>();
+            if (dictionaryEntries.Any())
+                sourceEnumerable = dictionaryEntries.Select(e => new KeyValuePair<TSourceKey, TSourceValue>((TSourceKey) e.Key, (TSourceValue) e.Value));
+
+
+            foreach (var value in sourceEnumerable ?? new Dictionary<TSourceKey, TSourceValue>())
+            {
+                destination.Add(context.Mapper.Map(value.Key, default(TDestKey), context),
+                    context.Mapper.Map(value.Value, default(TDestValue), context));
+            }
+
+            return destination;
+        }
+    }
+
+    public class DictionaryNonGenericMapper<TDestKey, TDestValue>
+        : IObjectMapper<IDictionary, IDictionary<TDestKey, TDestValue>>
+    {
+        public IDictionary<TDestKey, TDestValue> Map(
+            IDictionary source,
+            IDictionary<TDestKey, TDestValue> destination, 
+            ResolutionContext context)
+        {
+            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
+            {
+                return null;
+            }
+
+            destination = new Dictionary<TDestKey, TDestValue>();
+
+            if (source == null)
+                return destination;
+
+            foreach (var value in source.Cast<DictionaryEntry>())
+            {
+                destination.Add(context.Mapper.Map(value.Key, default(TDestKey), context),
+                    context.Mapper.Map(value.Value, default(TDestValue), context));
+            }
+
+            return destination;
+        }
+    }
+
     // So IEnumerable<T> inherits IEnumerable
     // but IDictionary<TKey, TValue> DOES NOT inherit IDictionary
     // Fiddlesticks.

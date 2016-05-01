@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
 #if !PORTABLE
             new NameValueCollectionMapper(),
 #endif
-            new DictionaryMapper(),
+            //new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
             new CollectionMapper(),
             new EnumerableMapper(),
