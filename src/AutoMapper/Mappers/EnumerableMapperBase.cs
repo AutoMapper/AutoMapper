@@ -16,11 +16,7 @@ namespace AutoMapper.Mappers
                 return null;
             }
 
-            ICollection<object> enumerableValue = ((IEnumerable) context.SourceValue ?? new object[0])
-                .Cast<object>()
-                .ToList();
-
-            Type sourceElementType = TypeHelper.GetElementType(context.SourceType, enumerableValue);
+            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
             Type destElementType = TypeHelper.GetElementType(context.DestinationType);
 
             // If you can just assign the collection from one side to the other and the element types don't need to be mapped
@@ -30,7 +26,9 @@ namespace AutoMapper.Mappers
                 if (elementTypeMap == null)
                     return context.SourceValue;
             }
-
+            ICollection enumerableValue = (context.SourceValue as ICollection) ??
+                                                          ((IEnumerable)context.SourceValue)?.Cast<object>().ToArray() ??
+                                                          new object[0];
             var sourceLength = enumerableValue.Count;
             var destination = GetOrCreateDestinationObject(context, destElementType, sourceLength);
             var enumerable = GetEnumerableFor(destination);
