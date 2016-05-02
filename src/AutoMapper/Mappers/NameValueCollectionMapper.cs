@@ -3,26 +3,18 @@ namespace AutoMapper.Mappers
 {
     using System.Collections.Specialized;
 
-    public class NameValueCollectionMapper : IObjectMapper
+    public class NameValueCollectionMapper : IObjectMapper<NameValueCollection, NameValueCollection>
     {
-        public object Map(ResolutionContext context)
+        public NameValueCollection Map(NameValueCollection source, NameValueCollection destination, ResolutionContext context)
         {
             if (context.SourceValue == null)
                 return null;
 
             var nvc = new NameValueCollection();
-            var source = (NameValueCollection)context.SourceValue;
             foreach (var s in source.AllKeys)
                 nvc.Add(s, source[s]);
 
             return nvc;
-        }
-
-        public bool IsMatch(TypePair context)
-        {
-            return
-                context.SourceType == typeof (NameValueCollection) &&
-                context.DestinationType == typeof (NameValueCollection);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
 #if !PORTABLE
-            new NameValueCollectionMapper(),
+            //new NameValueCollectionMapper(),
 #endif
             //new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),

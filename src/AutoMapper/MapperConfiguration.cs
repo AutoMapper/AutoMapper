@@ -36,6 +36,9 @@ namespace AutoMapper
             {
                 typeof(HashSetMapper<,>),
                 typeof(StringMapper<>),
+#if !PORTABLE
+                typeof(NameValueCollectionMapper),
+#endif
                 //typeof(DictionaryNonGenericMapper<,>),
                 typeof(DictionaryGenericMapper<,,,>)
             })
