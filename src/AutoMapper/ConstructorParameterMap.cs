@@ -2,6 +2,7 @@ using System;
 
 namespace AutoMapper
 {
+    using AutoMapper.Execution;
     using System.Linq;
     using System.Linq.Expressions;
     using static System.Linq.Expressions.Expression;
@@ -44,13 +45,13 @@ namespace AutoMapper
 
             if (!SourceMembers.Any() && Parameter.IsOptional)
             {
-                return Constant(Parameter.DefaultValue);
+                return Constant(Parameter.GetDefaultValue());
             }
 
             if (typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) == null
                 && Parameter.IsOptional)
             {
-                return Constant(Parameter.DefaultValue);
+                return Constant(Parameter.GetDefaultValue());
             }
 
             var valueResolverExpr = SourceMembers.Aggregate(
