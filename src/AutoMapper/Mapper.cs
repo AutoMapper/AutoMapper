@@ -337,6 +337,10 @@ namespace AutoMapper
 
         object IRuntimeMapper.CreateObject(ResolutionContext context)
         {
+            if(context.DestinationValue != null)
+            {
+                return context.DestinationValue;
+            }
             return !_configurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(context.DestinationType)
                 : ObjectCreator.CreateObject(context.DestinationType);
