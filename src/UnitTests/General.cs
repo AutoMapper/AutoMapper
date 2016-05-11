@@ -267,7 +267,7 @@ namespace AutoMapper.UnitTests
 		    protected override void Because_of()
 		    {
 		        _model = new List<ModelObject> {new ModelObject {SomeValue = "First"}, new ModelObject {SomeValue = "Second"}};
-		        _dto = (ModelDto[]) Mapper.Map(_model, typeof (ModelObject[]), typeof (ModelDto[]));
+		        _dto = (ModelDto[]) Mapper.Map(_model, typeof (List<ModelObject>), typeof (ModelDto[]));
 		    }
 
 		    [Fact]
