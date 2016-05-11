@@ -40,7 +40,8 @@ namespace AutoMapper.Mappers
             int i = 0;
             foreach (object item in enumerableValue)
             {
-                var mappedValue = context.Mapper.Map(item, null, sourceElementType, destElementType, context);
+                var sourceItemType = item?.GetType() ?? sourceElementType;
+                var mappedValue = context.Mapper.Map(item, null, sourceItemType, destElementType, context);
 
                 SetElementValue(enumerable, mappedValue, i);
 
