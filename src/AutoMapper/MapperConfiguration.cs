@@ -239,7 +239,7 @@ namespace AutoMapper
                 //    }
                 //});
             }
-            var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RequestedTypes));
+            var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
             return GenerateObjectMapperExpression(mapRequest, mapperToUse);
             //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
             //{
