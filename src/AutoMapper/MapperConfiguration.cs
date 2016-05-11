@@ -217,13 +217,12 @@ namespace AutoMapper
             return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFunc);
         }
 
-        private Delegate CreateMapperFunc(MapRequest mapReq)
+        private Delegate CreateMapperFunc(MapRequest mapRequest)
         {
-            var tp = mapReq.RuntimeTypes;
-            var typeMap = ResolveTypeMap(tp);
+            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
             if(typeMap != null)
             {
-                return GenerateTypeMapExpression(mapReq, tp, typeMap);
+                return GenerateTypeMapExpression(mapRequest, typeMap);
                 //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
                 //{
                 //    try
@@ -240,8 +239,8 @@ namespace AutoMapper
                 //    }
                 //});
             }
-            var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapReq.RequestedTypes));
-            return GenerateObjectMapperExpression(mapReq, mapperToUse);
+            var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RequestedTypes));
+            return GenerateObjectMapperExpression(mapRequest, mapperToUse);
             //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
             //{
             //    if(mapperToUse == null)
@@ -264,25 +263,26 @@ namespace AutoMapper
             //});
         }
 
-        private static Delegate GenerateTypeMapExpression(MapRequest mapRequest, TypePair tp, TypeMap typeMap)
+        private static Delegate GenerateTypeMapExpression(MapRequest mapRequest, TypeMap typeMap)
         {
             var mapExpression = typeMap.MapExpression;
+            var typeMapSourceParameter = mapExpression.Parameters[0];
+            var typeMapDestinationParameter = mapExpression.Parameters[1];
             var requestedSourceType = mapRequest.RequestedTypes.SourceType;
             var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
 
-            if(mapExpression.Parameters[0].Type != requestedSourceType
-                || mapExpression.Parameters[1].Type != requestedDestinationType)
+            if(typeMapSourceParameter.Type != requestedSourceType || typeMapDestinationParameter.Type != requestedDestinationType)
             {
-                var srcParam = Parameter(requestedSourceType, "src");
-                var destParam = Parameter(requestedDestinationType, "dest");
-                var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
+                var requestedSourceParameter = Parameter(requestedSourceType, "src");
+                var requestedDestinationParameter = Parameter(requestedDestinationType, "dest");
+                var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
 
                 mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
-                    ToType(srcParam, typeMap.MapExpression.Parameters[0].Type),
-                    ToType(destParam, typeMap.MapExpression.Parameters[1].Type),
-                    ctxtParam
-                    ), tp.DestinationType),
-                    srcParam, destParam, ctxtParam);
+                    ToType(requestedSourceParameter, typeMapSourceParameter.Type),
+                    ToType(requestedDestinationParameter, typeMapDestinationParameter.Type),
+                    contextParameter
+                    ), mapRequest.RuntimeTypes.DestinationType),
+                    requestedSourceParameter, requestedDestinationParameter, contextParameter);
             }
 
             return mapExpression.Compile();
