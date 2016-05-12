@@ -34,7 +34,7 @@ namespace AutoMapper
             MapperRegistry.Mappers, 
             new[]
             {
-                typeof(ExpressionMapper),
+                typeof(ExpressionMapper<,>),
                 typeof(HashSetMapper<,>),
                 typeof(StringMapper<>),
 #if !PORTABLE
@@ -246,44 +246,34 @@ namespace AutoMapper
             if(typeMap != null)
             {
                 return GenerateTypeMapExpression(mapRequest, typeMap);
-                //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
-                //{
-                //    try
-                //    {
-                //        return (TDestination) typeMap.Map(src, context);
-                //    }
-                //    catch (AutoMapperMappingException)
-                //    {
-                //        throw;
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        throw new AutoMapperMappingException(context, ex);
-                //    }
-                //});
             }
+
+            var genericMapperType = FindClosedGenericObjectMapperFor(mapRequest.RuntimeTypes);
+
+            if (genericMapperType != null)
+            {
+                return GenerateGenericObjectMapperExpression(mapRequest, genericMapperType);
+            }
+
             var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
             return GenerateObjectMapperExpression(mapRequest, mapperToUse);
-            //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
-            //{
-            //    if(mapperToUse == null)
-            //    {
-            //        throw new AutoMapperMappingException(context,
-            //        "Missing type map configuration or unsupported mapping.");
-            //    }
-            //    try
-            //    {
-            //        return mapperToUse.Map(context);
-            //    }
-            //    catch(AutoMapperMappingException)
-            //    {
-            //        throw;
-            //    }
-            //    catch(Exception ex)
-            //    {
-            //        throw new AutoMapperMappingException(context, ex);
-            //    }
-            //});
+        }
+
+        private static Delegate GenerateGenericObjectMapperExpression(MapRequest mapRequest, Type genericMapperType)
+        {
+            var srcParam = Parameter(mapRequest.RequestedTypes.SourceType, "src");
+            var destParam = Parameter(mapRequest.RequestedTypes.DestinationType, "dest");
+            var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
+
+            var mapExpression = Lambda(
+                ToType(Call(
+                    New(genericMapperType),
+                    genericMapperType.GetMethod("Map"),
+                    ToType(srcParam, mapRequest.RuntimeTypes.SourceType),
+                    ToType(destParam, mapRequest.RuntimeTypes.DestinationType),
+                    ctxtParam), mapRequest.RuntimeTypes.DestinationType), srcParam, destParam, ctxtParam);
+
+            return mapExpression.Compile();
         }
 
         private static Delegate GenerateTypeMapExpression(MapRequest mapRequest, TypeMap typeMap)
@@ -548,6 +538,9 @@ namespace AutoMapper
 
                     if (openMapConfig.Equals(default(KeyValuePair<TypePair, Type>)))
                         continue;
+
+                    if (!openMapConfig.Value.IsGenericTypeDefinition())
+                        return openMapConfig.Value;
 
                     var neededParameters = openMapConfig.Value.GetGenericParameters().Length;
 
