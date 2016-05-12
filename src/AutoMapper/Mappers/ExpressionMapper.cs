@@ -9,13 +9,13 @@
     using Configuration;
     using Execution;
 
-    public class ExpressionMapper : IObjectMapper
+    public class ExpressionMapper<TSource, TDestination> : IObjectMapper<Expression<TSource>, Expression<TDestination>>
     {
-        public object Map(ResolutionContext context)
+        public Expression<TDestination> Map(Expression<TSource> source, Expression<TDestination> destination, ResolutionContext context)
         {
-            var sourceDelegateType = context.SourceType.GetTypeInfo().GenericTypeArguments[0];
-            var destDelegateType = context.DestinationType.GetTypeInfo().GenericTypeArguments[0];
-            var expression = (LambdaExpression) context.SourceValue;
+            var sourceDelegateType = typeof(TSource);
+            var destDelegateType = typeof(TDestination);
+            var expression = source;
 
             if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
                 throw new AutoMapperMappingException("Source and destination expressions must be of the same type.");
@@ -35,15 +35,7 @@
             // Map expression body and variable seperately
             var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
             var body = typeMapVisitor.Visit(expression.Body);
-            return Expression.Lambda(body, parameters);
-        }
-
-        public bool IsMatch(TypePair context)
-        {
-            return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
-                   && context.SourceType != typeof (LambdaExpression)
-                   && typeof (LambdaExpression).IsAssignableFrom(context.DestinationType)
-                   && context.DestinationType != typeof (LambdaExpression);
+            return Expression.Lambda<TDestination>(body, parameters);
         }
 
         internal class MappingVisitor : ExpressionVisitor

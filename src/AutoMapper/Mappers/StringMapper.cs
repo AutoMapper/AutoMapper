@@ -1,15 +1,7 @@
 ﻿namespace AutoMapper.Mappers
 {
-    public class StringMapper : IObjectMapper
+    public class StringMapper<T> : IObjectMapper<T, string>
     {
-        public object Map(ResolutionContext context)
-        {
-            return context.SourceValue?.ToString();
-        }
-
-        public bool IsMatch(TypePair context)
-        {
-            return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
-        }
+        public string Map(T source, string destination, ResolutionContext context) => source?.ToString();
     }
 }

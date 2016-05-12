@@ -88,7 +88,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         private Expression ConvertDestinationExpressionToSourceExpression(Expression expression)
         {
             var typeMap = _mapper.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
-            var visitor = new ExpressionMapper.MappingVisitor(_mapper.ConfigurationProvider, typeMap, _destQuery.Expression, _dataSource.Expression, null,
+            var visitor = new ExpressionMapper<TDestination, TSource>.MappingVisitor(_mapper.ConfigurationProvider, typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] {typeof (TSource)});
             var sourceExpression = visitor.Visit(expression);
             return sourceExpression;

@@ -16,6 +16,7 @@ namespace AutoMapper
     public class MapperConfiguration : IConfigurationProvider, IMapperConfiguration
     {
         private readonly IEnumerable<IObjectMapper> _mappers;
+        private readonly IDictionary<TypePair, Type> _genericMappers;
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly Profile _defaultProfile;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
@@ -28,13 +29,35 @@ namespace AutoMapper
         private readonly Func<MapRequest, Delegate> _createMapperFunc;
 
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers)
+        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(
+            configure, 
+            MapperRegistry.Mappers, 
+            new[]
+            {
+                typeof(ExpressionMapper<,>),
+                typeof(HashSetMapper<,>),
+                typeof(StringMapper<>),
+#if !PORTABLE
+                typeof(NameValueCollectionMapper),
+#endif
+                //typeof(DictionaryNonGenericMapper<,>),
+                typeof(DictionaryGenericMapper<,,,>)
+            })
         {
         }
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers)
+        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers, IEnumerable<Type> genericMappers)
         {
             _mappers = mappers;
+            _genericMappers = genericMappers
+                .ToDictionary(t =>
+                {
+                    var objectMapperType = t.GetTypeInfo()
+                        .ImplementedInterfaces.First(
+                            i => i.GetGenericTypeDefinitionIfGeneric() == typeof (IObjectMapper<,>));
+
+                    return new TypePair(objectMapperType.GenericTypeArguments[0], objectMapperType.GetGenericArguments()[1]);
+                });
             _defaultProfile = new NamedProfile(ProfileName);
 
             _profiles.Add(_defaultProfile);
@@ -223,44 +246,34 @@ namespace AutoMapper
             if(typeMap != null)
             {
                 return GenerateTypeMapExpression(mapRequest, typeMap);
-                //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
-                //{
-                //    try
-                //    {
-                //        return (TDestination) typeMap.Map(src, context);
-                //    }
-                //    catch (AutoMapperMappingException)
-                //    {
-                //        throw;
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        throw new AutoMapperMappingException(context, ex);
-                //    }
-                //});
             }
+
+            var genericMapperType = FindClosedGenericObjectMapperFor(mapRequest.RuntimeTypes);
+
+            if (genericMapperType != null)
+            {
+                return GenerateGenericObjectMapperExpression(mapRequest, genericMapperType);
+            }
+
             var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
             return GenerateObjectMapperExpression(mapRequest, mapperToUse);
-            //return new Func<TSource, TDestination, ResolutionContext, TDestination>((src, dest, context) =>
-            //{
-            //    if(mapperToUse == null)
-            //    {
-            //        throw new AutoMapperMappingException(context,
-            //        "Missing type map configuration or unsupported mapping.");
-            //    }
-            //    try
-            //    {
-            //        return mapperToUse.Map(context);
-            //    }
-            //    catch(AutoMapperMappingException)
-            //    {
-            //        throw;
-            //    }
-            //    catch(Exception ex)
-            //    {
-            //        throw new AutoMapperMappingException(context, ex);
-            //    }
-            //});
+        }
+
+        private static Delegate GenerateGenericObjectMapperExpression(MapRequest mapRequest, Type genericMapperType)
+        {
+            var srcParam = Parameter(mapRequest.RequestedTypes.SourceType, "src");
+            var destParam = Parameter(mapRequest.RequestedTypes.DestinationType, "dest");
+            var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
+
+            var mapExpression = Lambda(
+                ToType(Call(
+                    New(genericMapperType),
+                    genericMapperType.GetMethod("Map"),
+                    ToType(srcParam, mapRequest.RuntimeTypes.SourceType),
+                    ToType(destParam, mapRequest.RuntimeTypes.DestinationType),
+                    ctxtParam), mapRequest.RuntimeTypes.DestinationType), srcParam, destParam, ctxtParam);
+
+            return mapExpression.Compile();
         }
 
         private static Delegate GenerateTypeMapExpression(MapRequest mapRequest, TypeMap typeMap)
@@ -504,6 +517,47 @@ namespace AutoMapper
             typeMap?.Seal(_typeMapRegistry);
 
             return typeMap;
+        }
+
+        private Type FindClosedGenericObjectMapperFor(TypePair typePair)
+        {
+            if (typePair.GetOpenGenericTypePair() == null)
+                return null;
+
+            foreach (var tm in _genericMappers)
+            {
+                foreach (var pair in typePair.GetRelatedTypePairs())
+                {
+                    var openMapConfig = 
+                            tm.Key.SourceType.GetGenericTypeDefinitionIfGeneric() ==
+                            pair.SourceType.GetGenericTypeDefinitionIfGeneric() &&
+                            tm.Key.DestinationType.GetGenericTypeDefinitionIfGeneric() ==
+                            pair.DestinationType.GetGenericTypeDefinitionIfGeneric()
+                            ? tm
+                            : default(KeyValuePair<TypePair, Type>);
+
+                    if (openMapConfig.Equals(default(KeyValuePair<TypePair, Type>)))
+                        continue;
+
+                    if (!openMapConfig.Value.IsGenericTypeDefinition())
+                        return openMapConfig.Value;
+
+                    var neededParameters = openMapConfig.Value.GetGenericParameters().Length;
+
+                    var typeParams =
+                        (openMapConfig.Value.IsGenericTypeDefinition() ? pair.SourceType.GetGenericArguments() : new Type[0])
+                            .Concat
+                            (openMapConfig.Value.IsGenericTypeDefinition()
+                                ? pair.DestinationType.GetGenericArguments()
+                                : new Type[0])
+                            .Take(neededParameters)
+                            .ToArray();
+
+                    return openMapConfig.Value.MakeGenericType(typeParams);
+                }
+            }
+
+            return null;
         }
     }
 }

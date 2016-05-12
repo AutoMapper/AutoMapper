@@ -6,22 +6,21 @@ namespace AutoMapper.Mappers
     {
         private static readonly IObjectMapper[] _initialMappers =
         {
-            new ExpressionMapper(), 
+//            new ExpressionMapper(), 
             new FlagsEnumMapper(),
             new EnumMapper(),
             new MultidimensionalArrayMapper(),
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
-            new EnumerableToDictionaryMapper(),
+            //new EnumerableToDictionaryMapper(),
 #if !PORTABLE
-            new NameValueCollectionMapper(),
+            //new NameValueCollectionMapper(),
 #endif
-            new DictionaryMapper(),
+            //new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
-            new HashSetMapper(),
             new CollectionMapper(),
             new EnumerableMapper(),
-            new StringMapper(),
+            //new StringMapper(),
             new AssignableMapper(),
 #if !PORTABLE
             new TypeConverterMapper(),

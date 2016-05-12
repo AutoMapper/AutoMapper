@@ -7,6 +7,8 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using Configuration;
 
+
+
     public class EnumMapper : IObjectMapper
     {
         public object Map(ResolutionContext context)
