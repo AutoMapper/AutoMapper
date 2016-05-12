@@ -9,12 +9,12 @@
     using Configuration;
     using Execution;
 
-    public class ExpressionMapper : IObjectMapper
+    public class ExpressionMapper : IObjectMapper<LambdaExpression, LambdaExpression>
     {
-        public object Map(ResolutionContext context)
+        public LambdaExpression Map(LambdaExpression source, LambdaExpression destination, ResolutionContext context)
         {
-            var sourceDelegateType = context.SourceType.GetTypeInfo().GenericTypeArguments[0];
-            var destDelegateType = context.DestinationType.GetTypeInfo().GenericTypeArguments[0];
+            var sourceDelegateType = source.Type;
+            var destDelegateType = destination.Type;
             var expression = (LambdaExpression) context.SourceValue;
 
             if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
@@ -36,14 +36,6 @@
             var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
             var body = typeMapVisitor.Visit(expression.Body);
             return Expression.Lambda(body, parameters);
-        }
-
-        public bool IsMatch(TypePair context)
-        {
-            return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
-                   && context.SourceType != typeof (LambdaExpression)
-                   && typeof (LambdaExpression).IsAssignableFrom(context.DestinationType)
-                   && context.DestinationType != typeof (LambdaExpression);
         }
 
         internal class MappingVisitor : ExpressionVisitor

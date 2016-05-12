@@ -34,6 +34,7 @@ namespace AutoMapper
             MapperRegistry.Mappers, 
             new[]
             {
+                typeof(ExpressionMapper),
                 typeof(HashSetMapper<,>),
                 typeof(StringMapper<>),
 #if !PORTABLE
