@@ -10,6 +10,15 @@ namespace AutoMapper.Execution
 
     public static class ReflectionHelper
     {
+        public static object GetDefaultValue(this ParameterInfo parameter)
+        {
+            if(parameter.DefaultValue == null && parameter.ParameterType.IsValueType())
+            {
+                return Activator.CreateInstance(parameter.ParameterType);
+            }
+            return parameter.DefaultValue;
+        }
+
         public static object Map(ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = member.GetMemberType();

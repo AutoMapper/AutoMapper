@@ -146,7 +146,7 @@ namespace AutoMapper.Execution
             //get all optional default values
             var args = ctorWithOptionalArgs
                 .GetParameters()
-                .Select(p => Expression.Constant(p.DefaultValue, p.ParameterType)).ToArray();
+                .Select(p => Expression.Constant(p.GetDefaultValue(), p.ParameterType)).ToArray();
 
             //create the ctor expression
             return Expression.New(ctorWithOptionalArgs, args);

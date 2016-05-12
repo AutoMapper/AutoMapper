@@ -7,6 +7,41 @@ namespace AutoMapper.UnitTests
 {
     namespace Constructors
     {
+        public class When_mapping_an_optional_GUID_constructor : AutoMapperSpecBase
+        {
+            Destination _destination;
+
+            public class Destination
+            {
+                public Destination(Guid id = default(Guid)) { Id = id; }
+                public Guid Id { get; set; }
+            }
+
+            public class Source
+            {
+                public Guid Id { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration
+            {
+                get
+                {
+                    return new MapperConfiguration(c=>c.CreateMap<Source, Destination>());
+                }
+            }
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Destination>(new Source());
+            }
+
+            [Fact]
+            public void Should_map_ok()
+            {
+                _destination.Id.ShouldEqual(Guid.Empty);
+            }
+        }
+
         public class When_mapping_a_constructor_parameter_from_nested_members : AutoMapperSpecBase
         {
             private Destination _destination;
