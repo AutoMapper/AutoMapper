@@ -56,9 +56,7 @@ namespace AutoMapper.Mappers
 
         private static TDestination Map<TDestination>(StringDictionary source, ResolutionContext context)
         {
-            TDestination destination = (TDestination)(context.ConfigurationProvider.AllowNullDestinationValues
-                        ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
-                        : ObjectCreator.CreateObject(typeof(TDestination)));
+            TDestination destination = context.Mapper.CreateObject<TDestination>(context);
             var destTypeDetails = new TypeDetails(context.DestinationType, _ => true, _ => true);
             var members = from name in source.Keys
                 join member in destTypeDetails.PublicWriteAccessors on name equals member.Name

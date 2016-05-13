@@ -124,5 +124,6 @@ namespace AutoMapper
         bool ShouldMapSourceValueAsNull(ResolutionContext context);
         bool ShouldMapSourceCollectionAsNull(ResolutionContext context);
         object CreateObject(ResolutionContext context);
+        TDestination CreateObject<TDestination>(ResolutionContext context);
     }
 }

@@ -346,6 +346,17 @@ namespace AutoMapper
                 : ObjectCreator.CreateObject(context.DestinationType);
         }
 
+        TDestination IRuntimeMapper.CreateObject<TDestination>(ResolutionContext context)
+        {
+            if (context.DestinationValue != null)
+            {
+                return (TDestination) context.DestinationValue;
+            }
+            return (TDestination) (!_configurationProvider.AllowNullDestinationValues
+                ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
+                : ObjectCreator.CreateObject(typeof(TDestination)));
+        }
+
         bool IRuntimeMapper.ShouldMapSourceValueAsNull(ResolutionContext context)
         {
             if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
