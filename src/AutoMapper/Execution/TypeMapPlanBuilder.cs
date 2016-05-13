@@ -319,8 +319,9 @@
                 else
                 {
                     var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-                    if (match is IObjectMapExpression)
-                        valueResolverExpr = (match as IObjectMapExpression).MapExpression(valueResolverExpr, destValueExpr,
+                    var expressionMapper = match as IObjectMapExpression;
+                    if (expressionMapper != null)
+                        valueResolverExpr = expressionMapper.MapExpression(valueResolverExpr, destValueExpr,
                             ctxtParam);
                     else
                         valueResolverExpr = SetMap(propertyMap, ctxtParam, valueResolverExpr, destValueExpr);
