@@ -28,9 +28,11 @@ task release {
 }
 
 task compile -depends clean {
+	$version = if ($env:APPVEYOR_BUILD_NUMBER -ne $NULL) { $env:APPVEYOR_BUILD_NUMBER } else { '0' }
+	
     exec { dotnet restore $source_dir\AutoMapper }
     exec { dotnet build $source_dir\AutoMapper -c $config }
-    exec { dotnet pack $source_dir\AutoMapper -c $config --version-suffix $env:APPVEYOR_BUILD_NUMBER}
+    exec { dotnet pack $source_dir\AutoMapper -c $config --version-suffix $version}
 
     exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
     exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.NoProjectJson.sln }
@@ -57,8 +59,9 @@ task test {
 
 function Install-Dotnet
 {
-    & where.exe dotnet 2>&1 | Out-Null
-    if($LASTEXITCODE -ne 0)
+    $dotnetcli = where-is('dotnet')
+	
+    if($dotnetcli -eq $null)
     {
 		$dotnetPath = "$pwd\.dotnet"
 		$dotnetCliVersion = if ($env:DOTNET_CLI_VERSION -eq $null) { 'Latest' } else { $env:DOTNET_CLI_VERSION }
@@ -70,4 +73,22 @@ function Install-Dotnet
 		& .\scripts\obtain\install.ps1 -Channel "preview" -version $dotnetCliVersion -InstallDir $dotnetPath -NoPath
 		$env:Path = "$dotnetPath;$env:Path"
 	}
+}
+
+function where-is($command) {
+    (ls env:\path).Value.split(';') | `
+        where { $_ } | `
+        %{ [System.Environment]::ExpandEnvironmentVariables($_) } | `
+        where { test-path $_ } |`
+        %{ ls "$_\*" -include *.bat,*.exe,*cmd } | `
+        %{  $file = $_.Name; `
+            if($file -and ($file -eq $command -or `
+			   $file -eq ($command + '.exe') -or  `
+			   $file -eq ($command + '.bat') -or  `
+			   $file -eq ($command + '.cmd'))) `
+            { `
+                $_.FullName `
+            } `
+        } | `
+        select -unique
 }
