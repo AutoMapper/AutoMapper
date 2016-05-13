@@ -339,9 +339,7 @@ namespace AutoMapper.UnitTests
 
 				public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
 				{
-					return inner.OfType<DictionaryEntry>()
-						.Select(e => new KeyValuePair<TKey, TValue>((TKey)e.Key, (TValue)e.Value))
-						.GetEnumerator();
+				    return inner.GetEnumerator() as IEnumerator<KeyValuePair<TKey, TValue>>;
 				}
 
 				IEnumerator IEnumerable.GetEnumerator()

@@ -27,6 +27,7 @@ namespace AutoMapper
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
+        public bool Sealed => _sealed;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, IProfileConfiguration profile)
@@ -204,7 +205,7 @@ namespace AutoMapper
             _afterMapActions.Add(afterMap);
         }
 
-        public void Seal(TypeMapRegistry typeMapRegistry)
+        public void Seal(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider)
         {
             if (_sealed)
                 return;
@@ -219,7 +220,7 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.MappingOrder).ToArray();
 
-            MapExpression = TypeMapPlanBuilder.BuildMapperFunc(this, typeMapRegistry);
+            MapExpression = TypeMapPlanBuilder.BuildMapperFunc(this, configurationProvider, typeMapRegistry);
 
             _sealed = true;
         }

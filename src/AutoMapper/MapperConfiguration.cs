@@ -452,7 +452,7 @@ namespace AutoMapper
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
             {
-                typeMap.Seal(_typeMapRegistry);
+                typeMap.Seal(_typeMapRegistry, this);
             }
         }
 
@@ -486,7 +486,7 @@ namespace AutoMapper
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
 
-            typeMap?.Seal(_typeMapRegistry);
+            typeMap?.Seal(_typeMapRegistry, this);
 
             return typeMap;
         }
@@ -501,7 +501,7 @@ namespace AutoMapper
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                 .FirstOrDefault(t => t != null);
 
-            typeMap?.Seal(_typeMapRegistry);
+            typeMap?.Seal(_typeMapRegistry, this);
 
             return typeMap;
         }

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 
@@ -7,8 +9,20 @@ namespace AutoMapper.Mappers
     using System;
     using Execution;
 
-    public class ToStringDictionaryMapper : IObjectMapper
+    public class ToStringDictionaryMapper : IObjectMapper, IObjectMapExpression
     {
+        public static Dictionary<string, object> MembersDictionary(ResolutionContext context)
+        {
+            var source = context.SourceValue;
+            var sourceTypeDetails = new TypeDetails(source.GetType(), _ => true, _ => true);
+            var membersDictionary = sourceTypeDetails.PublicReadAccessors.ToDictionary(p => p.Name,
+                p => p.GetMemberValue(source));
+            return membersDictionary;
+        }
+
+        private static readonly MethodInfo MapMethodInfo = typeof(DictionaryMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo MembersDictionaryMethodInfo = typeof(ToStringDictionaryMapper).GetAllMethods().First(_ => _.IsStatic);
+
         public bool IsMatch(TypePair context)
         {
             return typeof(StringDictionary).IsAssignableFrom(context.DestinationType);
@@ -16,33 +30,57 @@ namespace AutoMapper.Mappers
 
         public object Map(ResolutionContext context)
         {
-            var source = context.SourceValue;
-            var sourceType = source.GetType();
-            var sourceTypeDetails = new TypeDetails(sourceType, _ => true, _ => true);
-            var membersDictionary = sourceTypeDetails.PublicReadAccessors.ToDictionary(p => p.Name, p => p.GetMemberValue(source));
-            return context.Mapper.Map(membersDictionary, context.DestinationValue, membersDictionary.GetType(), context.DestinationType, context);
+            var membersDictionary = MembersDictionary(context);
+
+            return 
+                MapMethodInfo.MakeGenericMethod(typeof(StringDictionary), typeof(string), typeof(object), context.DestinationType, typeof(string), typeof(object))
+                .Invoke(null, new[] { membersDictionary, context.DestinationValue, context });
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            var membersDictionaryExpression = Expression.Call(null, MembersDictionaryMethodInfo, contextExpression);
+
+            return Expression.Call(null,
+                MapMethodInfo.MakeGenericMethod(typeof(StringDictionary), typeof(string), typeof(object), destExpression.Type, typeof(string), typeof(object)),
+                    membersDictionaryExpression, destExpression, contextExpression);
         }
     }
 
-    public class FromStringDictionaryMapper : IObjectMapper
+    public class FromStringDictionaryMapper : IObjectMapper, IObjectMapExpression
     {
         public bool IsMatch(TypePair context)
         {
             return typeof(StringDictionary).IsAssignableFrom(context.SourceType);
         }
 
-        public object Map(ResolutionContext context)
+        private static TDestination Map<TDestination>(StringDictionary source, ResolutionContext context)
         {
-            var dictionary = (StringDictionary)context.SourceValue;
-            object destination = context.Mapper.CreateObject(context);
+            TDestination destination = (TDestination)(context.ConfigurationProvider.AllowNullDestinationValues
+                        ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
+                        : ObjectCreator.CreateObject(typeof(TDestination)));
             var destTypeDetails = new TypeDetails(context.DestinationType, _ => true, _ => true);
-            var members = from name in dictionary.Keys join member in destTypeDetails.PublicWriteAccessors on name equals member.Name select member;
-            foreach(var member in members)
+            var members = from name in source.Keys
+                join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
+                select member;
+            foreach (var member in members)
             {
-                object value = ReflectionHelper.Map(context, member, dictionary[member.Name]);
+                object value = ReflectionHelper.Map(context, member, source[member.Name]);
                 member.SetMemberValue(destination, value);
             }
             return destination;
+        }
+
+        private static readonly MethodInfo MapMethodInfo = typeof(FromStringDictionaryMapper).GetAllMethods().First(_ => _.IsStatic);
+
+        public object Map(ResolutionContext context)
+        {
+            return MapMethodInfo.MakeGenericMethod(context.DestinationType).Invoke(null, new []{context.SourceValue, context});
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, contextExpression);
         }
     }
 }
