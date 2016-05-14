@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
 {
     using Execution;
     
-    public class FromDynamicMapper : IObjectMapper, IObjectMapExpression
+    public class FromDynamicMapper : IObjectMapExpression
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
             where TSource : DynamicObject
@@ -64,7 +64,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class ToDynamicMapper : IObjectMapper, IObjectMapExpression
+    public class ToDynamicMapper : IObjectMapExpression
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
             where TDestination : DynamicObject

@@ -1,42 +1,14 @@
 using System.ComponentModel;
 using System.Linq.Expressions;
 using static System.Linq.Expressions.Expression;
-using static AutoMapper.ExpressionExtensions;
 
 namespace AutoMapper.Mappers
 {
     using System;
     using System.Reflection;
     using System.Linq;
-    using Configuration;
-
-    //public class EnumToStringMapper : IObjectMapper, IObjectMapExpression
-    //{
-    //    public static string Map<TSource>(TSource source, ResolutionContext context)
-    //    {
-    //        return source.ToString();
-    //    }
-
-    //    private static readonly MethodInfo MapMethodInfo = typeof(EnumToStringMapper).GetAllMethods().First(_ => _.IsStatic);
-
-    //    public object Map(ResolutionContext context)
-    //    {
-    //        return MapMethodInfo.MakeGenericMethod(context.SourceType).Invoke(null, new[] { context.SourceValue, context });
-    //    }
-
-    //    public bool IsMatch(TypePair context)
-    //    {
-    //        var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
-    //        return sourceEnumType != null && context.DestinationType == typeof (string);
-    //    }
-
-    //    public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
-    //    {
-    //        return Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type), sourceExpression, contextExpression);
-    //    }
-    //}
-
-    public class StringToEnumMapper : IObjectMapper
+    
+    public class StringToEnumMapper : IObjectMapExpression
     {
         public static TDestination Map<TDestination>(string source)
         {
@@ -64,7 +36,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class EnumToEnumMapper : IObjectMapper
+    public class EnumToEnumMapper : IObjectMapExpression
     {
         public static TDestination Map<TSource, TDestination>(TSource source)
         {
@@ -110,7 +82,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class EnumToUnderlyingTypeMapper : IObjectMapper
+    public class EnumToUnderlyingTypeMapper : IObjectMapExpression
     {
         public static TDestination Map<TSource, TDestination>(TSource source)
         {

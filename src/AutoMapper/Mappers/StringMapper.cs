@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
-using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
-    public class StringMapper : IObjectMapper, IObjectMapExpression
+    public class StringMapper : IObjectMapExpression
     {
         public object Map(ResolutionContext context)
         {

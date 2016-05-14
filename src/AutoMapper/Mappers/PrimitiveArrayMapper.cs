@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
     using System;
     using System.Reflection;
 
-    public class PrimitiveArrayMapper : IObjectMapper, IObjectMapExpression
+    public class PrimitiveArrayMapper : IObjectMapExpression
     {
         public static TDestElement[] Map<TSourceElement, TDestElement>(TSourceElement[] source, ResolutionContext context)
         {

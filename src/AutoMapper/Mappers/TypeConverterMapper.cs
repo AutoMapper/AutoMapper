@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     using System.ComponentModel;
     using Configuration;
 
-    public class TypeConverterMapper : IObjectMapper, IObjectMapExpression
+    public class TypeConverterMapper : IObjectMapExpression
     {
         private static TDestination Map<TSource, TDestination>(TSource source, ResolutionContext context)
         {

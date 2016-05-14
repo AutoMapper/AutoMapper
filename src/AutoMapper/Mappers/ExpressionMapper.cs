@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
     using Configuration;
     using Execution;
 
-    public class ExpressionMapper : IObjectMapper, IObjectMapExpression
+    public class ExpressionMapper : IObjectMapExpression
     {
         public static TDestination Map<TSource, TDestination>(TSource expression, ResolutionContext context)
             where TSource : LambdaExpression

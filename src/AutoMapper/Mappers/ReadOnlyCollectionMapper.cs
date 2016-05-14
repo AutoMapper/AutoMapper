@@ -10,7 +10,7 @@ namespace AutoMapper.Mappers
     using System.Collections.ObjectModel;
     using Configuration;
 
-    public class ReadOnlyCollectionMapper : IObjectMapper, IObjectMapExpression
+    public class ReadOnlyCollectionMapper : IObjectMapExpression
     {
         public static ReadOnlyCollection<TDestinationItem> Map<TSource, TSourceItem, TDestinationItem>(TSource source, ResolutionContext context)
             where TSource : IEnumerable

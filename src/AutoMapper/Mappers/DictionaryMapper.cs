@@ -7,11 +7,8 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using System.Reflection;
     using Configuration;
-
-    // So IEnumerable<T> inherits IEnumerable
-    // but IDictionary<TKey, TValue> DOES NOT inherit IDictionary
-    // Fiddlesticks.
-    public class DictionaryMapper : IObjectMapper, IObjectMapExpression
+    
+    public class DictionaryMapper : IObjectMapExpression
     {
         public static TDestination Map<TSource, TSourceKey, TSourceValue, TDestination, TDestinationKey, TDestinationValue>(TSource source, TDestination destination, ResolutionContext context)
             where TSource : IDictionary<TSourceKey, TSourceValue>

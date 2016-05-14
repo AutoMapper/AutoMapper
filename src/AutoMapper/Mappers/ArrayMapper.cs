@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using Configuration;
 
-    public class ArrayMapper : IObjectMapper, IObjectMapExpression
+    public class ArrayMapper : IObjectMapExpression
     {
         public static TDestination Map<TDestination,TSource, TSourceElement>(TSource source, ResolutionContext context)
             where TSource : IEnumerable

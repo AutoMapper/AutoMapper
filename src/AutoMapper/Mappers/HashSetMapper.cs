@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using Configuration;
 
-    public class HashSetMapper : IObjectMapper, IObjectMapExpression
+    public class HashSetMapper : IObjectMapExpression
     {
         public static ISet<TDestination> Map<TSource, TDestination>(IEnumerable<TSource> source, ISet<TDestination> destination, ResolutionContext context)
         {

@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
 {
     using System.Collections.Specialized;
 
-    public class NameValueCollectionMapper : IObjectMapper, IObjectMapExpression
+    public class NameValueCollectionMapper : IObjectMapExpression
     {
         public static NameValueCollection Map(NameValueCollection source)
         {

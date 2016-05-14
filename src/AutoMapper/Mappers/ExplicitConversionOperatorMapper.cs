@@ -5,7 +5,7 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using System.Reflection;
 
-    public class ExplicitConversionOperatorMapper : IObjectMapper, IObjectMapExpression
+    public class ExplicitConversionOperatorMapper : IObjectMapExpression
     {
         public object Map(ResolutionContext context)
         {
