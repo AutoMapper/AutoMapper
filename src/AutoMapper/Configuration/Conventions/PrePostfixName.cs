@@ -43,7 +43,7 @@ namespace AutoMapper.Configuration.Conventions
 
             yield return memberName;
 
-            foreach (var withoutPrefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.Ordinal)).Select(prefix => memberName.Substring(prefix.Length)))
+            foreach (var withoutPrefix in prefixes.Where(prefix => memberName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).Select(prefix => memberName.Substring(prefix.Length)))
             {
                 yield return withoutPrefix;
                 foreach (var s in PostFixes(postfixes, withoutPrefix))
@@ -56,7 +56,7 @@ namespace AutoMapper.Configuration.Conventions
         private IEnumerable<string> PostFixes(IEnumerable<string> postfixes, string name)
         {
             return
-                postfixes.Where(postfix => name.EndsWith(postfix, StringComparison.Ordinal))
+                postfixes.Where(postfix => name.EndsWith(postfix, StringComparison.OrdinalIgnoreCase))
                     .Select(postfix => name.Remove(name.Length - postfix.Length));
         }
     }

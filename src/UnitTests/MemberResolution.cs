@@ -1269,7 +1269,93 @@ namespace AutoMapper.UnitTests
 		}
 
 
-		public class When_source_members_contain_postfixes_and_prefixes : AutoMapperSpecBase
+        public class When_source_members_contain_prefixes_with_lowercase : AutoMapperSpecBase
+        {
+            private Destination _destination;
+
+            public class Source
+            {
+                public int fooValue { get; set; }
+                public int GetOtherValue()
+                {
+                    return 10;
+                }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+                public int OtherValue { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.RecognizePrefixes("Foo");
+                cfg.CreateMap<Source, Destination>();
+            });
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Source, Destination>(new Source { fooValue = 5 });
+            }
+
+            [Fact]
+            public void Registered_prefixes_ignored()
+            {
+                _destination.Value.ShouldEqual(5);
+            }
+
+            [Fact]
+            public void Default_prefix_included()
+            {
+                _destination.OtherValue.ShouldEqual(10);
+            }
+        }
+
+        public class When_source_members_contain_postfixes_with_lowercase : AutoMapperSpecBase
+        {
+            private Destination _destination;
+
+            public class Source
+            {
+                public int Valuefoo { get; set; }
+                public int GetOtherValue()
+                {
+                    return 10;
+                }
+            }
+
+            public class Destination
+            {
+                public int Value { get; set; }
+                public int OtherValue { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.RecognizePostfixes("Foo");
+                cfg.CreateMap<Source, Destination>();
+            });
+
+            protected override void Because_of()
+            {
+                _destination = Mapper.Map<Source, Destination>(new Source { Valuefoo = 5 });
+            }
+
+            [Fact]
+            public void Registered_prefixes_ignored()
+            {
+                _destination.Value.ShouldEqual(5);
+            }
+
+            [Fact]
+            public void Default_prefix_included()
+            {
+                _destination.OtherValue.ShouldEqual(10);
+            }
+        }
+
+        public class When_source_members_contain_postfixes_and_prefixes : AutoMapperSpecBase
 		{
 			private Destination _destination;
 
