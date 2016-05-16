@@ -80,6 +80,11 @@ namespace AutoMapper
 
         public bool IsSourceValueNull => Equals(null, SourceValue);
 
+        /// <summary>
+        /// Context items from <see cref="Options"/>
+        /// </summary>
+        public IDictionary<string, object> Items => Options.Items;
+
         public ResolutionContext(object source, object destination, TypePair types, ResolutionContext parent)
         {
             SourceValue = source;
