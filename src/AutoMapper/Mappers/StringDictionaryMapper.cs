@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     using System;
     using Execution;
 
-    public class ToStringDictionaryMapper : IObjectMapper, IObjectMapExpression
+    public class ToStringDictionaryMapper : IObjectMapExpression
     {
         public static Dictionary<string, object> MembersDictionary(ResolutionContext context)
         {

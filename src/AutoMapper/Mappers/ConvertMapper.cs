@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
-    public class ConvertMapper : IObjectMapper, IObjectMapExpression
+    public class ConvertMapper : IObjectMapExpression
     {
         private readonly IReadOnlyDictionary<TypePair, LambdaExpression> _converters = new ReadOnlyDictionary<TypePair, LambdaExpression>(new Dictionary<TypePair, LambdaExpression>
         {

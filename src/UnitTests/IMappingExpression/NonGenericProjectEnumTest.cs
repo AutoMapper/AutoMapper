@@ -73,7 +73,7 @@
         {
             var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
 
-            var projected = _mapper.Map<CustomerDto[]>(customers);
+            var projected = customers.ProjectTo<CustomerDto>(_mapper.ConfigurationProvider);
             projected.ShouldNotBeNull();
             Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
         }

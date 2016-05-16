@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using Configuration;
 
-    public class MultidimensionalArrayMapper : IObjectMapper, IObjectMapExpression
+    public class MultidimensionalArrayMapper : IObjectMapExpression
     {
         static MultidimensionalArrayFiller filler;
 

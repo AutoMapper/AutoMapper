@@ -1,33 +1,45 @@
-﻿namespace AutoMapper.Mappers
+﻿using System.Linq;
+using System.Linq.Expressions;
+
+namespace AutoMapper.Mappers
 {
     using System;
     using System.Reflection;
 
-    public class PrimitiveArrayMapper : IObjectMapper
+    public class PrimitiveArrayMapper : IObjectMapExpression
     {
-        public object Map(ResolutionContext context)
+        public static TDestElement[] Map<TSourceElement, TDestElement>(TSourceElement[] source, ResolutionContext context)
         {
-            if (context.IsSourceValueNull && context.Mapper.ShouldMapSourceCollectionAsNull(context))
+            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
             {
                 return null;
             }
 
-            if (!context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType))
+            if (source != null && typeof(TDestElement).IsAssignableFrom(typeof(TSourceElement)))
             {
-                return context.SourceValue;
+                return source as TDestElement[];
             }
-
-            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
-            Type destElementType = TypeHelper.GetElementType(context.DestinationType);
-
-            Array sourceArray = (Array) context.SourceValue ?? ObjectCreator.CreateArray(sourceElementType, 0);
+            
+            var sourceArray = source ?? new TSourceElement[0];
 
             int sourceLength = sourceArray.Length;
-            Array destArray = ObjectCreator.CreateArray(destElementType, sourceLength);
+            TDestElement[] destArray = new TDestElement[sourceLength];
 
             Array.Copy(sourceArray, destArray, sourceLength);
 
             return destArray;
+        }
+
+        private static readonly MethodInfo MapMethodInfo = typeof(PrimitiveArrayMapper).GetAllMethods().First(_ => _.IsStatic);
+
+        public object Map(ResolutionContext context)
+        {
+            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
+            Type destElementType = TypeHelper.GetElementType(context.SourceType);
+
+            return
+                MapMethodInfo.MakeGenericMethod(sourceElementType, destElementType)
+                    .Invoke(null, new[] { context.SourceValue, context });
         }
 
         private bool IsPrimitiveArrayType(Type type)
@@ -47,6 +59,15 @@
                    IsPrimitiveArrayType(context.SourceType) &&
                    (TypeHelper.GetElementType(context.DestinationType)
                        .Equals(TypeHelper.GetElementType(context.SourceType)));
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            Type sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
+            Type destElementType = TypeHelper.GetElementType(destExpression.Type);
+
+            return Expression.Call(null,
+                MapMethodInfo.MakeGenericMethod(sourceElementType, destElementType), sourceExpression, contextExpression);
         }
     }
 }

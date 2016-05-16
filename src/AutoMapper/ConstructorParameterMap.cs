@@ -66,9 +66,6 @@ namespace AutoMapper
 
             if ((SourceType.IsEnumerableType() && SourceType != typeof (string))
                 || typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) != null
-                || ((!EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationType)) ||
-                     EnumMapper.EnumToNullableTypeMapping(new TypePair(SourceType, DestinationType))) &&
-                    EnumMapper.EnumToEnumMapping(new TypePair(SourceType, DestinationType)))
                 || !DestinationType.IsAssignableFrom(SourceType))
             {
                 /*
