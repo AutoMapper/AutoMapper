@@ -7,7 +7,7 @@
   "iconUrl": "https://s3.amazonaws.com/automapper/icon.png",
   "requireLicenseAcceptance": false,
   "summary": "A convention-based object-object mapper",
-  "copyright": "Copyright Jimmy Bogard 2008-2015",
+  "copyright": "Copyright Jimmy Bogard",
   "description": "A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is designed for model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.",
   "compilationOptions": { "keyFile": "..\\AutoMapper.snk" },
   "frameworks": {
