@@ -8,79 +8,71 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Internal;
 
     public class ConstructorMap
     {
-        private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
-        private readonly Lazy<LateBoundParamsCtor> _runtimeCtor;
-        public ConstructorInfo Ctor { get; private set; }
-        public IEnumerable<ConstructorParameterMap> CtorParams { get; }
+        private readonly IList<ConstructorParameterMap> _ctorParams = new List<ConstructorParameterMap>();
 
-        public ConstructorMap(ConstructorInfo ctor, IEnumerable<ConstructorParameterMap> ctorParams)
+        public ConstructorInfo Ctor { get; }
+        public TypeMap TypeMap { get; }
+        internal IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
+
+        public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
         {
             Ctor = ctor;
-            CtorParams = ctorParams;
-
-            _runtimeCtor = new Lazy<LateBoundParamsCtor>(() => DelegateFactory.CreateCtor(ctor, CtorParams));
+            TypeMap = typeMap;
         }
 
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
-            new MemberGetterExpressionResultConverter(),
             new MemberResolverExpressionResultConverter(),
-            new NullSubstitutionExpressionResultConverter()
+            new MemberGetterExpressionResultConverter(),
         };
+
+        public bool CanResolve => CtorParams.All(param => param.CanResolve);
 
         public Expression NewExpression(Expression instanceParameter)
         {
             var parameters = CtorParams.Select(map =>
             {
                 var result = new ExpressionResolutionResult(instanceParameter, Ctor.DeclaringType);
-                foreach (var resolver in map.SourceResolvers)
-                {
-                    var matchingExpressionConverter =
-                        ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
-                    if (matchingExpressionConverter == null)
-                        throw new Exception("Can't resolve this to Queryable Expression");
-                    result = matchingExpressionConverter.GetExpressionResolutionResult(result, map, resolver);
-                }
+
+                var matchingExpressionConverter =
+                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, map));
+
+                if (matchingExpressionConverter == null)
+                    throw new Exception("Can't resolve this to Queryable Expression");
+
+                result = matchingExpressionConverter.GetExpressionResolutionResult(result, map);
+
                 return result;
             });
             return Expression.New(Ctor, parameters.Select(p => p.ResolutionExpression));
         }
 
-        public object ResolveValue(ResolutionContext context)
+        public Expression BuildExpression(
+            TypeMapRegistry typeMapRegistry,
+            ParameterExpression srcParam, 
+            ParameterExpression ctxtParam)
         {
-            var ctorArgs = new List<object>();
+            if (!CanResolve)
+                return null;
 
-            foreach (var map in CtorParams)
-            {
-                var result = map.ResolveValue(context);
+            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry, srcParam, ctxtParam));
 
-                var sourceType = result.Type;
-                var destinationType = map.Parameter.ParameterType;
+            ctorArgs =
+                ctorArgs.Zip(Ctor.GetParameters(),
+                    (exp, pi) => exp.Type == pi.ParameterType ? exp : Expression.Convert(exp, pi.ParameterType))
+                    .ToArray();
 
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(result, destinationType);
+            var newExpr = Expression.New(Ctor, ctorArgs);
 
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceType;
+            return newExpr;
+        }
 
-                var newContext = context.CreateTypeContext(typeMap, result.Value, null, targetSourceType,
-                    destinationType);
-
-                if (typeMap == null && map.Parameter.IsOptional)
-                {
-                    object value = map.Parameter.DefaultValue;
-                    ctorArgs.Add(value);
-                }
-                else
-                {
-                    var value = context.Engine.Map(newContext);
-                    ctorArgs.Add(value);
-                }
-            }
-
-            return _runtimeCtor.Value(ctorArgs.ToArray());
+        public void AddParameter(ParameterInfo parameter, IMemberGetter[] resolvers, bool canResolve)
+        {
+            _ctorParams.Add(new ConstructorParameterMap(parameter, resolvers, canResolve));
         }
     }
 }

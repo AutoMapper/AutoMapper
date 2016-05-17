@@ -30,12 +30,14 @@ namespace AutoMapper.UnitTests.Bug
             public int PropB { get; set; }
         }
 
-        [Fact]
         public void base_has_include_of_source_but_mapping_with_both_sides_being_unmapped_types_from_the_base_fails()
         {
-            Mapper.CreateMap<A, ADTO>().Include<B, BDTO>();
-            Mapper.CreateMap<B, BDTO>();
-            var a = Mapper.Map<A, ADTO>(new B(), new BDTO2()); // Throws invalid cast exception trying to convert BDTO2 to BDTO
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<A, ADTO>().Include<B, BDTO>();
+                cfg.CreateMap<B, BDTO>();
+            });
+            var a = config.CreateMapper().Map<A, ADTO>(new B(), new BDTO2()); // Throws invalid cast exception trying to convert BDTO2 to BDTO
         }
     }
 
@@ -76,14 +78,14 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestInitialiserProxyOfSub()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<SubA, SubB>();
                 cfg.CreateMap<SubA, BaseB>().As<SubB>();
                 cfg.CreateMap<Container, Container2>();
             });
 
-            var mapped = Mapper.Map<Container, Container2>(new Container() { Item = new ProxyOfSubA() { Name = "Martin", Description = "Hello" } });
+            var mapped = config.CreateMapper().Map<Container, Container2>(new Container() { Item = new ProxyOfSubA() { Name = "Martin", Description = "Hello" } });
             Assert.IsType<SubB>(mapped.Item);
 
         }
@@ -91,13 +93,13 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestInitialiserProxyOfSub1()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<BaseA, SubB>();
                 cfg.CreateMap<BaseA, BaseB>();
             });
 
-            var mapped = Mapper.Map<BaseA, SubB>(new ProxyOfSubA() { Name = "Martin", Description = "Hello" });
+            var mapped = config.CreateMapper().Map<BaseA, SubB>(new ProxyOfSubA() { Name = "Martin", Description = "Hello" });
             Assert.IsType<SubB>(mapped);
 
         }
@@ -105,14 +107,14 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void TestInitialiserProxyOfSubInclude()
         {
-            Mapper.Initialize(cfg =>
+            var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<BaseA, BaseB>().Include<SubA, SubB>();
                 cfg.CreateMap<SubA, SubB>();
                 cfg.CreateMap<Container, Container2>();
             });
 
-            var mapped = Mapper.Map<Container, Container2>(new Container() { Item = new ProxyOfSubA() { Name = "Martin", Description = "Hello" } });
+            var mapped = config.CreateMapper().Map<Container, Container2>(new Container() { Item = new ProxyOfSubA() { Name = "Martin", Description = "Hello" } });
             Assert.IsType<SubB>(mapped.Item);
 
         }

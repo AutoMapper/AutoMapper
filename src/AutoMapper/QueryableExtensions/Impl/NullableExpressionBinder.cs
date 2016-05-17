@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System.Linq.Expressions;
-    using Internal;
+    using Configuration;
 
     public class NullableExpressionBinder : IExpressionBinder
     {

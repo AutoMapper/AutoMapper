@@ -1,15 +1,14 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
-    using Internal;
-    using System.Reflection;
-
-    public class AssignableMapper : IObjectMapper
+    public class AssignableMapper : IObjectMapExpression
     {
         public object Map(ResolutionContext context)
         {
-            if (context.SourceValue == null && !context.Engine.ShouldMapSourceValueAsNull(context))
+            if (context.SourceValue == null && !context.Mapper.ShouldMapSourceValueAsNull(context))
             {
-                return context.Engine.CreateObject(context);
+                return context.Mapper.CreateObject(context);
             }
 
             return context.SourceValue;
@@ -18,6 +17,11 @@ namespace AutoMapper.Mappers
         public bool IsMatch(TypePair context)
         {
             return context.DestinationType.IsAssignableFrom(context.SourceType);
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            return sourceExpression;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace AutoMapper.UnitTests.Query
         {
             public int SrcValue { get; set; }
             public string StringValue { get; set; }
-            public string[] Strings { get; set; }
+            public string[] Strings { get; set; } = new string[0];
         }
 
         public class Destination
@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Query
             public string[] Strings { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Destination, Source>()
                 .ForMember(s => s.SrcValue, opt => opt.MapFrom(d => d.DestValue))

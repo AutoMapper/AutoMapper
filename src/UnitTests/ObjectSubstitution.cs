@@ -31,7 +31,7 @@
         {
             private AnimalDto _animalDto;
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Animal, AnimalDto>()
                     .Substitute(CastToEntity)

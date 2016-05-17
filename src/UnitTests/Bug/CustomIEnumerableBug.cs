@@ -23,9 +23,9 @@ namespace AutoMapper.UnitTests.Bug
 		public string Value { get; set; }
 	}
 
-	public class StringToItemConverter : TypeConverter<IEnumerable<string>, IEnumerable<Item>>
+	public class StringToItemConverter : ITypeConverter<IEnumerable<string>, IEnumerable<Item>>
 	{
-		protected override IEnumerable<Item> ConvertCore(IEnumerable<string> source)
+		public IEnumerable<Item> Convert(IEnumerable<string> source, ResolutionContext context)
 		{
 			var result = new List<Item>();
 			foreach (string s in source)

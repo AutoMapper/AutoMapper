@@ -8,7 +8,9 @@ namespace AutoMapper.Mappers
         {
             new ExpressionMapper(), 
             new FlagsEnumMapper(),
-            new EnumMapper(),
+            new StringToEnumMapper(), 
+            new EnumToEnumMapper(), 
+            new EnumToUnderlyingTypeMapper(),
             new MultidimensionalArrayMapper(),
             new PrimitiveArrayMapper(),
             new ArrayMapper(),

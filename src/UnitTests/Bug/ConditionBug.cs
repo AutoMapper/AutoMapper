@@ -28,12 +28,12 @@
                 public string Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.Value, opt =>
                     {
-                        opt.Condition(src => src.Value.Count > 1);
+                        opt.PreCondition(src => src.Value.Count > 1);
                         opt.ResolveUsing(src => src.Value[1].SubValue);
                     });
             });
@@ -72,11 +72,11 @@
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(d => d.Value, opt =>
                     {
-                        opt.Condition(src => src.Value.HasValue);
+                        opt.PreCondition(src => src.Value.HasValue);
                         opt.MapFrom(src => src.Value.Value + 10);
                     }));
 
@@ -125,12 +125,12 @@
                 public int BasePrice { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(itemDTO => itemDTO.BasePrice,
                         config =>
                         {
-                            config.Condition(item => item.HasBasePrice);
+                            config.PreCondition(item => item.HasBasePrice);
                             config.MapFrom(item => item.BasePrice);
                         }));
 
@@ -172,10 +172,10 @@
 
         public class ConditionTests : AutoMapperSpecBase
         {
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(d => d.Value, opt => opt.Condition(rc => rc.DestinationValue == null));
+                    .ForMember(d => d.Value, opt => opt.Condition((src, dest, srcVal, destVal) => destVal == null));
             });
 
             [Fact]
@@ -222,7 +222,7 @@
 
         public class ConditionTests : NonValidatingSpecBase
         {
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.Value, opt => opt.PreCondition((ResolutionContext rc) => false));

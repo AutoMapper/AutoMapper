@@ -47,9 +47,9 @@
         }
 
 
-        public class ParentResolver : ValueResolver<Source, ParentDestEnum?>
+        public class ParentResolver : IValueResolver<Source, ParentDestEnum?>
         {
-            protected override ParentDestEnum? ResolveCore(Source source)
+            public ParentDestEnum? Resolve(Source source, ResolutionContext context)
             {
                 switch (source.fieldCode)
                 {
@@ -61,9 +61,9 @@
             }
         }
 
-        public class Resolver : ValueResolver<Source, DestEnum?>
+        public class Resolver : IValueResolver<Source, DestEnum?>
         {
-            protected override DestEnum? ResolveCore(Source source)
+            public DestEnum? Resolve(Source source, ResolutionContext context)
             {
                 switch (source.fieldCode)
                 {
@@ -79,7 +79,7 @@
         {
             private Dest _dest;
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, ParentDest>()
                     .ForMember(dest => dest.field, opt => opt.ResolveUsing<ParentResolver>())

@@ -19,7 +19,7 @@ namespace AutoMapper.UnitTests.Bug
             public Container[] Containers { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Holder, Holder>();
             cfg.CreateMap<Container, Container>();

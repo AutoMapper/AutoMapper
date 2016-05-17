@@ -51,12 +51,7 @@
     <Reference Include="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\CommonAssemblyInfo.cs">
-      <Link>CommonAssemblyInfo.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\AutoMapper\**\*.cs">
+    <Compile Include="..\AutoMapper\**\*.cs" Exclude="..\AutoMapper\obj\debug\netstandard1.1\dotnet-compile.assemblyinfo.cs;..\AutoMapper\obj\debug\net45\dotnet-compile.assemblyinfo.cs;..\AutoMapper\obj\release\netstandard1.1\dotnet-compile.assemblyinfo.cs;..\AutoMapper\obj\release\net45\dotnet-compile.assemblyinfo.cs">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>

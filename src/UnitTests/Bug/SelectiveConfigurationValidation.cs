@@ -20,7 +20,7 @@
         }
         public class GoodProfile : Profile
         {
-            protected override void Configure()
+            public GoodProfile()
             {
                 CreateMap<GoodSrc, GoodDest>();
             }
@@ -28,13 +28,13 @@
 
         public class BadProfile : Profile
         {
-            protected override void Configure()
+            public BadProfile()
             {
                 CreateMap<BadSrc, BadDest>();
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<GoodProfile>();
             cfg.AddProfile<BadProfile>();

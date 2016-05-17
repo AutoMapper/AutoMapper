@@ -1,33 +1,56 @@
 namespace AutoMapper
 {
     using System;
+    using System.Linq;
+    using Configuration;
+    using Execution;
     using Mappers;
 
-    /// <summary>
-    /// Main entry point for AutoMapper, for both creating maps and performing maps.
-    /// </summary>
-    public class Mapper : IMapper, IDynamicMapper
+    public class Mapper : IRuntimeMapper
     {
         #region Static API
-        private static readonly Func<MapperConfiguration> _configurationInit =
-            () => new MapperConfiguration(cfg => { }, MapperRegistry.Mappers, TypeMapObjectMapperRegistry.Mappers);
 
-        private static Lazy<MapperConfiguration> _configuration = new Lazy<MapperConfiguration>(_configurationInit);
-
-        private static readonly Func<Mapper> _mappingEngineInit =
-            () => new Mapper(_configuration.Value);
-
-        private static Lazy<Mapper> _mappingEngine = new Lazy<Mapper>(_mappingEngineInit);
+        private static IConfigurationProvider _configuration;
+        private static IMapper _instance;
 
         /// <summary>
-        /// When set, destination can have null values. Defaults to true.
-        /// This does not affect simple types, only complex ones.
+        /// Configuration provider for performing maps
         /// </summary>
-        [Obsolete("The static API will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed. Use CreateMapper to create a mapper instance.")]
-        public static bool AllowNullDestinationValues
+        public static IConfigurationProvider Configuration
         {
-            get { return Configuration.AllowNullDestinationValues; }
-            set { Configuration.AllowNullDestinationValues = value; }
+            get
+            {
+                if (_configuration == null)
+                    throw new InvalidOperationException("Mapper not initialized. Call Initialize with appropriate configuration.");
+
+                return _configuration;
+            }
+            private set { _configuration = value; }
+        }
+
+        /// <summary>
+        /// Static mapper instance. You can also create a <see cref="Mapper"/> instance directly using the <see cref="Configuration"/> instance.
+        /// </summary>
+        public static IMapper Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    throw new InvalidOperationException("Mapper not initialized. Call Initialize with appropriate configuration.");
+
+                return _instance;
+            }
+            private set { _instance = value; }
+        }
+
+        /// <summary>
+        /// Initialize static configuration instance
+        /// </summary>
+        /// <param name="config">Configuration action</param>
+        public static void Initialize(Action<IMapperConfiguration> config)
+        {
+            Configuration = new MapperConfiguration(config);
+            Instance = new Mapper(Configuration);
         }
 
         /// <summary>
@@ -37,10 +60,7 @@ namespace AutoMapper
         /// <typeparam name="TDestination">Destination type to create</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
-        public static TDestination Map<TDestination>(object source)
-        {
-            return Instance.Map<TDestination>(source);
-        }
+        public static TDestination Map<TDestination>(object source) => Instance.Map<TDestination>(source);
 
         /// <summary>
         /// Execute a mapping from the source object to a new destination object with supplied mapping options.
@@ -50,9 +70,7 @@ namespace AutoMapper
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
         public static TDestination Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
-        {
-            return Instance.Map<TDestination>(source, opts);
-        }
+            => Instance.Map<TDestination>(source, opts);
 
         /// <summary>
         /// Execute a mapping from the source object to a new destination object.
@@ -62,9 +80,18 @@ namespace AutoMapper
         /// <param name="source">Source object to map from</param>
         /// <returns>Mapped destination object</returns>
         public static TDestination Map<TSource, TDestination>(TSource source)
-        {
-            return Instance.Map<TSource, TDestination>(source);
-        }
+            => Instance.Map<TSource, TDestination>(source);
+
+        /// <summary>
+        /// Execute a mapping from the source object to a new destination object with supplied mapping options.
+        /// </summary>
+        /// <typeparam name="TSource">Source type to use</typeparam>
+        /// <typeparam name="TDestination">Destination type to create</typeparam>
+        /// <param name="source">Source object to map from</param>
+        /// <param name="opts">Mapping options</param>
+        /// <returns>Mapped destination object</returns>
+        public static TDestination Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
+            => Instance.Map(source, opts);
 
         /// <summary>
         /// Execute a mapping from the source object to the existing destination object.
@@ -75,9 +102,7 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
-        {
-            return Instance.Map(source, destination);
-        }
+            => Instance.Map(source, destination);
 
         /// <summary>
         /// Execute a mapping from the source object to the existing destination object with supplied mapping options.
@@ -88,25 +113,8 @@ namespace AutoMapper
         /// <param name="destination">Destination object to map into</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination,
-            Action<IMappingOperationOptions<TSource, TDestination>> opts)
-        {
-            return Instance.Map(source, destination, opts);
-        }
-
-        /// <summary>
-        /// Execute a mapping from the source object to a new destination object with supplied mapping options.
-        /// </summary>
-        /// <typeparam name="TSource">Source type to use</typeparam>
-        /// <typeparam name="TDestination">Destination type to create</typeparam>
-        /// <param name="source">Source object to map from</param>
-        /// <param name="opts">Mapping options</param>
-        /// <returns>Mapped destination object</returns>
-        public static TDestination Map<TSource, TDestination>(TSource source,
-            Action<IMappingOperationOptions<TSource, TDestination>> opts)
-        {
-            return Instance.Map(source, opts);
-        }
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
+            => Instance.Map(source, destination, opts);
 
         /// <summary>
         /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects
@@ -116,9 +124,7 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to create</param>
         /// <returns>Mapped destination object</returns>
         public static object Map(object source, Type sourceType, Type destinationType)
-        {
-            return Instance.Map(source, sourceType, destinationType);
-        }
+            => Instance.Map(source, sourceType, destinationType);
 
         /// <summary>
         /// Execute a mapping from the source object to a new destination object with explicit <see cref="System.Type"/> objects and supplied mapping options.
@@ -128,11 +134,8 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to create</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object</returns>
-        public static object Map(object source, Type sourceType, Type destinationType,
-            Action<IMappingOperationOptions> opts)
-        {
-            return Instance.Map(source, sourceType, destinationType, opts);
-        }
+        public static object Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+            => Instance.Map(source, sourceType, destinationType, opts);
 
         /// <summary>
         /// Execute a mapping from the source object to existing destination object with explicit <see cref="System.Type"/> objects
@@ -143,9 +146,7 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
         public static object Map(object source, object destination, Type sourceType, Type destinationType)
-        {
-            return Instance.Map(source, destination, sourceType, destinationType);
-        }
+            => Instance.Map(source, destination, sourceType, destinationType);
 
         /// <summary>
         /// Execute a mapping from the source object to existing destination object with supplied mapping options and explicit <see cref="System.Type"/> objects
@@ -156,463 +157,221 @@ namespace AutoMapper
         /// <param name="destinationType">Destination type to use</param>
         /// <param name="opts">Mapping options</param>
         /// <returns>Mapped destination object, same instance as the <paramref name="destination"/> object</returns>
-        public static object Map(object source, object destination, Type sourceType, Type destinationType,
-            Action<IMappingOperationOptions> opts)
-        {
-            return Instance.Map(source, destination, sourceType, destinationType, opts);
-        }
+        public static object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
+            => Instance.Map(source, destination, sourceType, destinationType, opts);
 
-        /// <summary>
-        /// Create a map between the <typeparamref name="TSource"/> and <typeparamref name="TDestination"/> types and execute the map
-        /// </summary>
-        /// <typeparam name="TSource">Source type to use</typeparam>
-        /// <typeparam name="TDestination">Destination type to use</typeparam>
-        /// <param name="source">Source object to map from</param>
-        /// <returns>Mapped destination object</returns>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
-        public static TDestination DynamicMap<TSource, TDestination>(TSource source)
-        {
-            return DynamicInstance.DynamicMap<TSource, TDestination>(source);
-        }
-
-        /// <summary>
-        /// Create a map between the <typeparamref name="TSource"/> and <typeparamref name="TDestination"/> types and execute the map to the existing destination object
-        /// </summary>
-        /// <typeparam name="TSource">Source type to use</typeparam>
-        /// <typeparam name="TDestination">Destination type to use</typeparam>
-        /// <param name="source">Source object to map from</param>
-        /// <param name="destination">Destination object to map into</param>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
-        public static void DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
-        {
-            DynamicInstance.DynamicMap(source, destination);
-        }
-
-        /// <summary>
-        /// Create a map between the <paramref name="source"/> object and <typeparamref name="TDestination"/> types and execute the map.
-        /// Source type is inferred from the source object .
-        /// </summary>
-        /// <typeparam name="TDestination">Destination type to use</typeparam>
-        /// <param name="source">Source object to map from</param>
-        /// <returns>Mapped destination object</returns>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
-        public static TDestination DynamicMap<TDestination>(object source)
-        {
-            return DynamicInstance.DynamicMap<TDestination>(source);
-        }
-
-        /// <summary>
-        /// Create a map between the <paramref name="sourceType"/> and <paramref name="destinationType"/> types and execute the map.
-        /// Use this method when the source and destination types are not known until runtime.
-        /// </summary>
-        /// <param name="source">Source object to map from</param>
-        /// <param name="sourceType">Source type to use</param>
-        /// <param name="destinationType">Destination type to use</param>
-        /// <returns>Mapped destination object</returns>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
-        public static object DynamicMap(object source, Type sourceType, Type destinationType)
-        {
-            return DynamicInstance.DynamicMap(source, sourceType, destinationType);
-        }
-
-        /// <summary>
-        /// Create a map between the <paramref name="sourceType"/> and <paramref name="destinationType"/> types and execute the map to the existing destination object.
-        /// Use this method when the source and destination types are not known until runtime.
-        /// </summary>
-        /// <param name="source">Source object to map from</param>
-        /// <param name="destination"></param>
-        /// <param name="sourceType">Source type to use</param>
-        /// <param name="destinationType">Destination type to use</param>
-        [Obsolete("Set the CreateMissingTypeMaps property on Mapper.ConfigurationProvider or your Profile instead")]
-        public static void DynamicMap(object source, object destination, Type sourceType, Type destinationType)
-        {
-            DynamicInstance.DynamicMap(source, destination, sourceType, destinationType);
-        }
-
-        /// <summary>
-        /// Initializes the mapper with the supplied configuration. Runtime optimization complete after this method is called.
-        /// This is the preferred means to configure AutoMapper.
-        /// </summary>
-        /// <param name="action">Initialization callback</param>
-        public static void Initialize(Action<IMapperConfiguration> action)
-        {
-            Reset();
-
-            action(Configuration);
-
-            ((MapperConfiguration)Configuration).Seal();
-        }
-
-        /// <summary>
-        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type
-        /// </summary>
-        /// <typeparam name="TSource">Source type</typeparam>
-        /// <typeparam name="TDestination">Destination type</typeparam>
-        /// <returns>Mapping expression for more configuration options</returns>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
-        {
-            return Configuration.CreateMap<TSource, TDestination>();
-        }
-
-        /// <summary>
-        /// Creates a mapping configuration from the <typeparamref name="TSource"/> type to the <typeparamref name="TDestination"/> type.
-        /// Specify the member list to validate against during configuration validation.
-        /// </summary>
-        /// <typeparam name="TSource">Source type</typeparam>
-        /// <typeparam name="TDestination">Destination type</typeparam>
-        /// <param name="memberList">Member list to validate</param>
-        /// <returns>Mapping expression for more configuration options</returns>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
-        {
-            return Configuration.CreateMap<TSource, TDestination>(memberList);
-        }
-
-        /// <summary>
-        /// Create a mapping configuration from the source type to the destination type.
-        /// Use this method when the source and destination type are known at runtime and not compile time.
-        /// </summary>
-        /// <param name="sourceType">Source type</param>
-        /// <param name="destinationType">Destination type</param>
-        /// <returns>Mapping expression for more configuration options</returns>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static IMappingExpression CreateMap(Type sourceType, Type destinationType)
-        {
-            return Configuration.CreateMap(sourceType, destinationType);
-        }
-
-        /// <summary>
-        /// Creates a mapping configuration from the source type to the destination type.
-        /// Specify the member list to validate against during configuration validation.
-        /// </summary>
-        /// <param name="sourceType">Source type</param>
-        /// <param name="destinationType">Destination type</param>
-        /// <param name="memberList">Member list to validate</param>
-        /// <returns>Mapping expression for more configuration options</returns>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
-        {
-            return Configuration.CreateMap(sourceType, destinationType, memberList);
-        }
-
-        /// <summary>
-        /// Create a named profile for grouped mapping configuration
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <returns>Profile configuration options</returns>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static IProfileExpression CreateProfile(string profileName)
-        {
-            return Configuration.CreateProfile(profileName);
-        }
-
-        /// <summary>
-        /// Create a named profile for grouped mapping configuration, and configure the profile
-        /// </summary>
-        /// <param name="profileName">Profile name</param>
-        /// <param name="profileConfiguration">Profile configuration callback</param>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static void CreateProfile(string profileName, Action<IProfileExpression> profileConfiguration)
-        {
-            Configuration.CreateProfile(profileName, profileConfiguration);
-        }
-
-        /// <summary>
-        /// Add an existing profile
-        /// </summary>
-        /// <param name="profile">Profile to add</param>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static void AddProfile(Profile profile)
-        {
-            Configuration.AddProfile(profile);
-        }
-
-        /// <summary>
-        /// Add an existing profile type. Profile will be instantiated and added to the configuration.
-        /// </summary>
-        /// <typeparam name="TProfile">Profile type</typeparam>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static void AddProfile<TProfile>() where TProfile : Profile, new()
-        {
-            Configuration.AddProfile<TProfile>();
-        }
-
-        /// <summary>
-        /// Find the <see cref="TypeMap"/> for the configured source and destination type
-        /// </summary>
-        /// <param name="sourceType">Configured source type</param>
-        /// <param name="destinationType">Configured destination type</param>
-        /// <returns>Type map configuration</returns>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static TypeMap FindTypeMapFor(Type sourceType, Type destinationType)
-        {
-            return ConfigurationProvider.FindTypeMapFor(sourceType, destinationType);
-        }
-
-        /// <summary>
-        /// Find the <see cref="TypeMap"/> for the configured source and destination type
-        /// </summary>
-        /// <typeparam name="TSource">Configured source type</typeparam>
-        /// <typeparam name="TDestination">Configured destination type</typeparam>
-        /// <returns>Type map configuration</returns>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static TypeMap FindTypeMapFor<TSource, TDestination>()
-        {
-            return ConfigurationProvider.FindTypeMapFor(typeof (TSource), typeof (TDestination));
-        }
-
-        /// <summary>
-        /// Get all configured type maps created
-        /// </summary>
-        /// <returns>All configured type maps</returns>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static TypeMap[] GetAllTypeMaps()
-        {
-            return ConfigurationProvider.GetAllTypeMaps();
-        }
-
-        /// <summary>
-        /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
-        /// </summary>
-        public static void AssertConfigurationIsValid()
-        {
-            ConfigurationProvider.AssertConfigurationIsValid();
-        }
-
-        /// <summary>
-        /// Dry run single type map
-        /// </summary>
-        /// <param name="typeMap">Type map to check</param>
-        public static void AssertConfigurationIsValid(TypeMap typeMap)
-        {
-            ConfigurationProvider.AssertConfigurationIsValid(typeMap);
-        }
-
-        /// <summary>
-        /// Dry run all type maps in given profile
-        /// </summary>
-        /// <param name="profileName">Profile name of type maps to test</param>
-        public static void AssertConfigurationIsValid(string profileName)
-        {
-            ConfigurationProvider.AssertConfigurationIsValid(profileName);
-        }
-
-        /// <summary>
-        /// Dry run all type maps in given profile
-        /// </summary>
-        /// <typeparam name="TProfile">Profile type</typeparam>
-        public static void AssertConfigurationIsValid<TProfile>() where TProfile : Profile, new()
-        {
-            ConfigurationProvider.AssertConfigurationIsValid<TProfile>();
-        }
-
-        /// <summary>
-        /// Clear out all existing configuration
-        /// </summary>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static void Reset()
-        {
-            MapperRegistry.Reset();
-            _configuration = new Lazy<MapperConfiguration>(_configurationInit);
-            _mappingEngine = new Lazy<Mapper>(_mappingEngineInit);
-        }
-
-        /// <summary>
-        /// Mapping engine used to perform mappings
-        /// </summary>
-        public static IMappingEngine Engine => _mappingEngine.Value._engine;
-        public static IMapper Instance => _mappingEngine.Value;
-        internal static IConfigurationProvider ConfigurationProvider => _configuration.Value;
-        private static IDynamicMapper DynamicInstance => _mappingEngine.Value;
-
-        /// <summary>
-        /// Store for all configuration
-        /// </summary>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static IMapperConfiguration Configuration => _configuration.Value;
-
-
-        /// <summary>
-        /// Globally ignore all members starting with a prefix
-        /// </summary>
-        /// <param name="startingwith">Prefix of members to ignore. Call this before all other maps created.</param>
-        [Obsolete("Dynamically creating maps will be removed in version 5.0. Use a MapperConfiguration instance and store statically as needed, or Mapper.Initialize. Use CreateMapper to create a mapper instance.")]
-        public static void AddGlobalIgnore(string startingwith)
-        {
-            Configuration.AddGlobalIgnore(startingwith);
-        }
         #endregion
 
-        #region Instance API
-
-        private readonly IMappingEngine _engine;
         private readonly IConfigurationProvider _configurationProvider;
         private readonly Func<Type, object> _serviceCtor;
+        private readonly MappingOperationOptions _defaultMappingOptions;
 
-        internal Mapper(IConfigurationProvider configurationProvider)
+        public Mapper(IConfigurationProvider configurationProvider)
             : this(configurationProvider, configurationProvider.ServiceCtor)
         {
         }
 
-        internal Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
+        public Mapper(IConfigurationProvider configurationProvider, Func<Type, object> serviceCtor)
         {
             _configurationProvider = configurationProvider;
             _serviceCtor = serviceCtor;
-            _engine = new MappingEngine(configurationProvider, this);
+            _defaultMappingOptions = new MappingOperationOptions(_serviceCtor);
         }
+
+        Func<Type, object> IMapper.ServiceCtor => _serviceCtor;
+
+        IConfigurationProvider IMapper.ConfigurationProvider => _configurationProvider;
 
         TDestination IMapper.Map<TDestination>(object source)
         {
-            return ((IMapper)this).Map<TDestination>(source, DefaultMappingOptions);
+            var types = new TypePair(source.GetType(), typeof(TDestination));
+
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(types, types));
+
+            var context = new ResolutionContext(source, null, types, _defaultMappingOptions, this);
+
+            return (TDestination) func.DynamicInvoke(source, null, context);
         }
 
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
         {
             var mappedObject = default(TDestination);
-            if (source != null)
-            {
-                var sourceType = source.GetType();
-                var destinationType = typeof(TDestination);
 
-                mappedObject = (TDestination)((IMapper)this).Map(source, sourceType, destinationType, opts);
-            }
+            if (source == null) return mappedObject;
+
+            var sourceType = source.GetType();
+            var destinationType = typeof(TDestination);
+
+            mappedObject = (TDestination)((IMapper)this).Map(source, sourceType, destinationType, opts);
             return mappedObject;
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source)
         {
-            Type modelType = typeof(TSource);
-            Type destinationType = typeof(TDestination);
+            var types = TypePair.Create(source, null, typeof(TSource), typeof (TDestination));
 
-            return (TDestination)((IMapper)this).Map(source, modelType, destinationType, DefaultMappingOptions);
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var destination = default(TDestination);
+
+            var context = new ResolutionContext(source, destination, types, _defaultMappingOptions, this);
+
+            return func(source, destination, context);
         }
 
-        TDestination IMapper.Map<TSource, TDestination>(TSource source,
-            Action<IMappingOperationOptions<TSource, TDestination>> opts)
+        TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            Type modelType = typeof(TSource);
-            Type destinationType = typeof(TDestination);
+            var types = TypePair.Create(source, null, typeof(TSource), typeof(TDestination));
 
-            var options = new MappingOperationOptions<TSource, TDestination>();
-            opts(options);
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
-            return (TDestination)MapCore(source, modelType, destinationType, options);
+            var destination = default(TDestination);
+
+            var typedOptions = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
+
+            opts(typedOptions);
+
+            var context = new ResolutionContext(source, destination, types, typedOptions, this);
+
+            return func(source, destination, context);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
         {
-            return ((IMapper)this).Map(source, destination, DefaultMappingOptions);
+            var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
+
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var context = new ResolutionContext(source, destination, types, _defaultMappingOptions, this);
+
+            return func(source, destination, context);
         }
 
-        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination,
-            Action<IMappingOperationOptions<TSource, TDestination>> opts)
+        TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            Type modelType = typeof(TSource);
-            Type destinationType = typeof(TDestination);
+            var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
 
-            var options = new MappingOperationOptions<TSource, TDestination>();
-            opts(options);
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
-            return (TDestination)MapCore(source, destination, modelType, destinationType, options);
+            var typedOptions = new MappingOperationOptions<TSource, TDestination>(_serviceCtor);
+
+            opts(typedOptions);
+
+            var context = new ResolutionContext(source, destination, types, typedOptions, this);
+
+            return func(source, destination, context);
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType)
         {
-            return ((IMapper)this).Map(source, sourceType, destinationType, DefaultMappingOptions);
+            var types = TypePair.Create(source, null, sourceType, destinationType);
+
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+
+            var context = new ResolutionContext(source, null, types, _defaultMappingOptions, this);
+
+            return func.DynamicInvoke(source, null, context);
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
-            var options = new MappingOperationOptions();
+            var types = TypePair.Create(source, null, sourceType, destinationType);
 
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+
+            var options = new MappingOperationOptions(_serviceCtor);
             opts(options);
 
-            return MapCore(source, sourceType, destinationType, options);
+            var context = new ResolutionContext(source, null, types, options, this);
+
+            return func.DynamicInvoke(source, null, context);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
         {
-            return ((IMapper)this).Map(source, destination, sourceType, destinationType, DefaultMappingOptions);
+            var types = TypePair.Create(source, destination, sourceType, destinationType);
+
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+
+            var context = new ResolutionContext(source, destination, types, _defaultMappingOptions, this);
+
+            return func.DynamicInvoke(source, destination, context);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
             Action<IMappingOperationOptions> opts)
         {
-            var options = new MappingOperationOptions();
+            var types = TypePair.Create(source, destination, sourceType, destinationType);
 
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+
+            var options = new MappingOperationOptions(_serviceCtor);
             opts(options);
 
-            return MapCore(source, destination, sourceType, destinationType, options);
+            var context = new ResolutionContext(source, destination, types, options, this);
+
+            return func.DynamicInvoke(source, destination, context);
         }
 
-        TDestination IDynamicMapper.DynamicMap<TSource, TDestination>(TSource source)
+        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
         {
-            Type modelType = typeof(TSource);
-            Type destinationType = typeof(TDestination);
+            var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            return (TDestination)((IDynamicMapper)this).DynamicMap(source, modelType, destinationType);
+            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+
+            var context = new ResolutionContext(source, destination, types, parent);
+
+            return func.DynamicInvoke(source, destination, context);
         }
 
-        void IDynamicMapper.DynamicMap<TSource, TDestination>(TSource source, TDestination destination)
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext parent)
         {
-            Type modelType = typeof(TSource);
-            Type destinationType = typeof(TDestination);
+            var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
 
-            ((IDynamicMapper)this).DynamicMap(source, destination, modelType, destinationType);
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var context = new ResolutionContext(source, destination, types, parent);
+
+            return func(source, destination, context);
         }
 
-        TDestination IDynamicMapper.DynamicMap<TDestination>(object source)
+        object IRuntimeMapper.CreateObject(ResolutionContext context)
         {
-            Type modelType = source?.GetType() ?? typeof(object);
-            Type destinationType = typeof(TDestination);
-
-            return (TDestination)((IDynamicMapper)this).DynamicMap(source, modelType, destinationType);
+            if(context.DestinationValue != null)
+            {
+                return context.DestinationValue;
+            }
+            return !_configurationProvider.AllowNullDestinationValues
+                ? ObjectCreator.CreateNonNullValue(context.DestinationType)
+                : ObjectCreator.CreateObject(context.DestinationType);
         }
 
-        object IDynamicMapper.DynamicMap(object source, Type sourceType, Type destinationType)
+        TDestination IRuntimeMapper.CreateObject<TDestination>(ResolutionContext context)
         {
-            Configuration.CreateMissingTypeMaps = true;
-            var typeMap = _configurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
-
-            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, new MappingOperationOptions(), _engine);
-
-            return _engine.Map(context);
+            if (context.DestinationValue != null)
+            {
+                return (TDestination) context.DestinationValue;
+            }
+            return (TDestination) (!_configurationProvider.AllowNullDestinationValues
+                ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
+                : ObjectCreator.CreateObject(typeof(TDestination)));
         }
 
-        void IDynamicMapper.DynamicMap(object source, object destination, Type sourceType, Type destinationType)
+        bool IRuntimeMapper.ShouldMapSourceValueAsNull(ResolutionContext context)
         {
-            Configuration.CreateMissingTypeMaps = true;
-            var typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+            if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
+                return false;
 
-            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, new MappingOperationOptions(), _engine);
+            var typeMap = context.GetContextTypeMap();
 
-            _engine.Map(context);
+            return typeMap?.Profile.AllowNullDestinationValues ?? _configurationProvider.AllowNullDestinationValues;
         }
 
-        private object MapCore(object source, Type sourceType, Type destinationType, MappingOperationOptions options)
+        bool IRuntimeMapper.ShouldMapSourceCollectionAsNull(ResolutionContext context)
         {
-            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, null, sourceType, destinationType);
+            var typeMap = context.GetContextTypeMap();
 
-            var context = new ResolutionContext(typeMap, source, sourceType, destinationType, options, _engine);
-
-            return _engine.Map(context);
+            return typeMap?.Profile.AllowNullCollections ?? _configurationProvider.AllowNullCollections;
         }
-
-        private object MapCore(object source, object destination, Type sourceType, Type destinationType,
-            MappingOperationOptions options)
-        {
-            TypeMap typeMap = _configurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
-
-            var context = new ResolutionContext(typeMap, source, destination, sourceType, destinationType, options, _engine);
-
-            return _engine.Map(context);
-        }
-
-        private void DefaultMappingOptions(IMappingOperationOptions opts) => opts.ConstructServicesUsing(_serviceCtor);
-
-        IConfigurationProvider IMapper.ConfigurationProvider => _configurationProvider;
-
-        #endregion
     }
 }

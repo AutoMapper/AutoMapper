@@ -51,7 +51,7 @@
                     cfg.CreateMap<BEntity, B>();
                     cfg.CreateMap<AEntity, A>();
                 });
-                config.AssertConfigurationIsValid();
+                //config.AssertConfigurationIsValid();
 
                 var be = new BEntity();
                 be.BP1 = 3;

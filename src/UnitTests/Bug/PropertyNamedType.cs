@@ -18,8 +18,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_detect_unmapped_destination_property_named_type()
         {
-            Mapper.Initialize(c=>c.CreateMap<Source, Destination>());
-            new Action(Mapper.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>(
+            var config = new MapperConfiguration(c=>c.CreateMap<Source, Destination>());
+            new Action(config.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>(
                 ex=>ex.Errors[0].UnmappedPropertyNames[0].ShouldEqual("Type"));
         }
     }

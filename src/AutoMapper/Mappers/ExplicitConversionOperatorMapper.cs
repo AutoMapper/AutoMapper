@@ -1,10 +1,11 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
     using System.Linq;
     using System.Reflection;
-    using Internal;
 
-    public class ExplicitConversionOperatorMapper : IObjectMapper
+    public class ExplicitConversionOperatorMapper : IObjectMapExpression
     {
         public object Map(ResolutionContext context)
         {
@@ -31,6 +32,12 @@ namespace AutoMapper.Mappers
             var destTypeMethod = context.DestinationType.GetMethod("op_Explicit", new[] {context.SourceType});
 
             return sourceTypeMethod ?? destTypeMethod;
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            var implicitOperator = GetExplicitConversionOperator(new TypePair(sourceExpression.Type, destExpression.Type));
+            return Expression.Call(null, implicitOperator, sourceExpression);
         }
     }
 }

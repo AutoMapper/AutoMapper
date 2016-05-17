@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions.Impl;
+using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.QueryableExtensions
 {
+    using Configuration;
+    using Execution;
+
     public interface IExpressionBuilder
     {
         Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
@@ -21,18 +24,18 @@ namespace AutoMapper.QueryableExtensions
     {
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
-            new MemberGetterExpressionResultConverter(),
+            new ExplicitValueExpressionResultConverter(),
             new MemberResolverExpressionResultConverter(),
-            new NullSubstitutionExpressionResultConverter()
+            new MemberGetterExpressionResultConverter(),
         };
 
         private static readonly IExpressionBinder[] Binders =
         {
             new NullableExpressionBinder(),
-            new AssignableExpressionBinder(),
             new EnumerableExpressionBinder(),
             new MappedTypeExpressionBinder(),
             new CustomProjectionExpressionBinder(),
+            new AssignableExpressionBinder(),
             new StringExpressionBinder()
         };
 
@@ -85,17 +88,15 @@ namespace AutoMapper.QueryableExtensions
             {
                 throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             }
-
-            var parameterReplacer = instanceParameter is ParameterExpression ? new ParameterReplacementVisitor(instanceParameter) : null;
-            var customProjection = typeMap.CustomProjection;
-            if (customProjection != null)
+            
+            if (typeMap.CustomProjection != null)
             {
-                return parameterReplacer == null ? customProjection.Body : parameterReplacer.Visit(customProjection.Body);
+                return typeMap.CustomProjection.ReplaceParameters(instanceParameter);
             }
 
             var bindings = new List<MemberBinding>();
             var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
-            if (visitCount >= typeMap.MaxDepth)
+            if (typeMap.MaxDepth > 0 && visitCount >= typeMap.MaxDepth)
             {
                 if (_configurationProvider.AllowNullDestinationValues)
                 {
@@ -106,11 +107,9 @@ namespace AutoMapper.QueryableExtensions
             {
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
             }
-            Expression constructorExpression = typeMap.DestinationConstructorExpression(instanceParameter);
-            if (parameterReplacer != null)
-            {
-                constructorExpression = parameterReplacer.Visit(constructorExpression);
-            }
+            Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter);
+            if (instanceParameter is ParameterExpression)
+                constructorExpression = ((LambdaExpression) constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
             visitor.Visit(constructorExpression);
 
@@ -120,6 +119,21 @@ namespace AutoMapper.QueryableExtensions
                 );
             return expression;
         }
+
+        private LambdaExpression DestinationConstructorExpression(TypeMap typeMap, Expression instanceParameter)
+        {
+            var ctorExpr = typeMap.ConstructExpression;
+            if (ctorExpr != null)
+            {
+                return ctorExpr;
+            }
+            var newExpression = typeMap.ConstructorMap?.CanResolve == true
+                ? typeMap.ConstructorMap.NewExpression(instanceParameter)
+                : New(typeMap.DestinationTypeOverride ?? typeMap.DestinationType);
+
+            return Lambda(newExpression);
+        }
+
 
         private class NewFinderVisitor : ExpressionVisitor
         {
@@ -174,15 +188,62 @@ namespace AutoMapper.QueryableExtensions
             Expression instanceParameter)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
-            foreach (var resolver in propertyMap.GetSourceValueResolvers())
+
+            var matchingExpressionConverter =
+                ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
+            if (matchingExpressionConverter == null)
+                throw new Exception("Can't resolve this to Queryable Expression");
+            result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap);
+
+            if (propertyMap.NullSubstitute != null && result.Type.IsNullableType())
             {
-                var matchingExpressionConverter =
-                    ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, resolver));
-                if (matchingExpressionConverter == null)
-                    throw new Exception("Can't resolve this to Queryable Expression");
-                result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap, resolver);
+                Expression currentChild = result.ResolutionExpression;
+                Type currentChildType = result.Type;
+                var nullSubstitute = propertyMap.NullSubstitute;
+
+                var newParameter = result.ResolutionExpression;
+                var converter = new NullSubstitutionConversionVisitor(newParameter, nullSubstitute);
+
+                currentChild = converter.Visit(currentChild);
+                currentChildType = currentChildType.GetTypeOfNullable();
+
+                return new ExpressionResolutionResult(currentChild, currentChildType);
             }
+
             return result;
+        }
+
+        private class NullSubstitutionConversionVisitor : ExpressionVisitor
+        {
+            private readonly Expression newParameter;
+            private readonly object _nullSubstitute;
+
+            public NullSubstitutionConversionVisitor(Expression newParameter, object nullSubstitute)
+            {
+                this.newParameter = newParameter;
+                _nullSubstitute = nullSubstitute;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if (node == newParameter)
+                {
+                    var equalsNull = Expression.Property(newParameter, "HasValue");
+                    var nullConst = Expression.Condition(equalsNull, Expression.Property(newParameter, "Value"),
+                        Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+                    return nullConst;
+                }
+                return node;
+            }
+
+            protected override Expression VisitConditional(ConditionalExpression node)
+            {
+                var equalsNull = Expression.Property(node.IfFalse, "HasValue");
+                var nullConst = Expression.Condition(equalsNull, Expression.Property(node.IfFalse, "Value"),
+                    Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
+
+                return Expression.Condition(node.Test, Expression.Constant(_nullSubstitute), nullConst);
+            }
         }
 
         private class ConstantExpressionReplacementVisitor : ExpressionVisitor

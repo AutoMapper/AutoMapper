@@ -2,12 +2,12 @@ using System;
 using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
 using System.Linq;
 using System.Linq.Expressions;
-using AutoMapper.Internal;
 using System.Reflection;
 using System.Collections.Generic;
 
 namespace AutoMapper.QueryableExtensions
 {
+    using Execution;
     using MemberPaths = IEnumerable<IEnumerable<MemberInfo>>;
 
     public class ProjectionExpression : IProjectionExpression

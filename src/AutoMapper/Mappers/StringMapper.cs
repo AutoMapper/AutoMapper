@@ -1,6 +1,8 @@
-﻿namespace AutoMapper.Mappers
+﻿using System.Linq.Expressions;
+
+namespace AutoMapper.Mappers
 {
-    public class StringMapper : IObjectMapper
+    public class StringMapper : IObjectMapExpression
     {
         public object Map(ResolutionContext context)
         {
@@ -10,6 +12,13 @@
         public bool IsMatch(TypePair context)
         {
             return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
+        }
+
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            return Expression.Condition(Expression.Equal(sourceExpression, Expression.Default(sourceExpression.Type)),
+                Expression.Constant(null, typeof (string)),
+                Expression.Call(sourceExpression, typeof (object).GetMethod("ToString")));
         }
     }
 }

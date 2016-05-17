@@ -49,9 +49,9 @@ namespace AutoMapper.UnitTests
         public class ProdTypeA : ProductTypeDto {}
         public class ProdTypeB : ProductTypeDto {}
 
-        public class ProductTypeConverter : TypeConverter<ProductType, ProductTypeDto>
+        public class ProductTypeConverter : ITypeConverter<ProductType, ProductTypeDto>
         {
-            protected override ProductTypeDto ConvertCore(ProductType source)
+            public ProductTypeDto Convert(ProductType source, ResolutionContext context)
             {
                 if (source.Name == "A")
                     return new ProdTypeA();
@@ -216,22 +216,6 @@ namespace AutoMapper.UnitTests
                 complexProducts[0].ProductSubcategory.Name.ShouldEqual("Bar");
                 complexProducts[0].ProductSubcategory.ProductCategory.Name.ShouldEqual("Baz");
             }
-
-            [Fact(Skip = "Won't work for normal query providers")]
-            public void List_of_abstract_should_be_mapped()
-            {
-                var mapped = Mapper.Map<AbstractProductDto>(_products[0]);
-                mapped.Types.Count.ShouldEqual(3);
-
-                var queryable = _products.AsQueryable();
-
-                var abstractProducts = queryable.ProjectTo<AbstractProductDto>(_config).ToList();
-
-                abstractProducts[0].Types.Count.ShouldEqual(3);
-                abstractProducts[0].Types[0].GetType().ShouldEqual(typeof (ProdTypeA));
-                abstractProducts[0].Types[1].GetType().ShouldEqual(typeof (ProdTypeB));
-                abstractProducts[0].Types[2].GetType().ShouldEqual(typeof (ProdTypeA));
-            }
         }
 
         namespace CircularReferences
@@ -278,7 +262,7 @@ namespace AutoMapper.UnitTests
             {
                 private IQueryable<BEntity> _bei;
 
-                protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+                protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<BEntity, B>().MaxDepth(3);
                     cfg.CreateMap<AEntity, A>().MaxDepth(3);

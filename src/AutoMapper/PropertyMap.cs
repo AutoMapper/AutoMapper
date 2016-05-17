@@ -6,243 +6,140 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Internal;
+    using Execution;
 
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
-        private readonly LinkedList<IValueResolver> _sourceValueResolvers = new LinkedList<IValueResolver>();
-        private bool _ignored;
-        private int _mappingOrder;
-        private IValueResolver _customResolver;
-        private IValueResolver _customMemberResolver;
-        private bool _sealed;
-        private IValueResolver[] _cachedResolvers;
-        private Func<ResolutionContext, bool> _condition;
-        private Func<ResolutionContext, bool> _preCondition;
-        private MemberInfo _sourceMember;
+        private readonly List<IMemberGetter> _memberChain = new List<IMemberGetter>();
 
-        public PropertyMap(IMemberAccessor destinationProperty)
+        public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
+            TypeMap = typeMap;
             UseDestinationValue = true;
             DestinationProperty = destinationProperty;
         }
 
-        public PropertyMap(PropertyMap inheritedMappedProperty)
-            : this(inheritedMappedProperty.DestinationProperty)
+        public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
+            : this(inheritedMappedProperty.DestinationProperty, typeMap)
         {
-            if (inheritedMappedProperty.IsIgnored())
-                Ignore();
-            else
-            {
-                foreach (var sourceValueResolver in inheritedMappedProperty.GetSourceValueResolvers())
-                {
-                    ChainResolver(sourceValueResolver);
-                }
-            }
-            ApplyCondition(inheritedMappedProperty._condition);
-            SetNullSubstitute(inheritedMappedProperty.NullSubstitute);
-            SetMappingOrder(inheritedMappedProperty._mappingOrder);
-            CustomExpression = inheritedMappedProperty.CustomExpression;
+            ApplyInheritedPropertyMap(inheritedMappedProperty);
         }
 
+        public TypeMap TypeMap { get; }
         public IMemberAccessor DestinationProperty { get; }
 
         public Type DestinationPropertyType => DestinationProperty.MemberType;
 
+        public IEnumerable<IMemberGetter> SourceMembers => _memberChain;
+
+        public bool Ignored { get; set; }
+        public int? MappingOrder { get; set; }
+        public LambdaExpression CustomResolver { get; set; }
+        public LambdaExpression Condition { get; set; }
+        public LambdaExpression PreCondition { get; set; }
         public LambdaExpression CustomExpression { get; private set; }
+        public MemberInfo CustomSourceMember { get; set; }
+        public bool UseDestinationValue { get; set; }
+        public bool ExplicitExpansion { get; set; }
+        public object CustomValue { get; set; }
+        public object NullSubstitute { get; set; }
+        public ValueResolverConfiguration ValueResolverConfig { get; set; }
 
         public MemberInfo SourceMember
         {
             get
             {
-                return _sourceMember ?? GetSourceValueResolvers().OfType<IMemberGetter>().LastOrDefault()?.MemberInfo;
+                if (CustomSourceMember != null)
+                    return CustomSourceMember;
+
+                if (CustomExpression != null)
+                {
+                    var finder = new MemberFinderVisitor();
+                    finder.Visit(CustomExpression);
+
+                    if (finder.Member != null)
+                    {
+                        return finder.Member.Member;
+                    }
+                }
+
+                return _memberChain.LastOrDefault()?.MemberInfo;
             }
-            internal set { _sourceMember = value; }
         }
 
-        public bool CanBeSet => !(DestinationProperty is PropertyAccessor) ||
-                                ((PropertyAccessor) DestinationProperty).HasSetter;
-
-        public bool UseDestinationValue { get; set; }
-
-        internal bool HasCustomValueResolver { get; private set; }
-
-        public bool ExplicitExpansion { get; set; }
-
-        public object NullSubstitute { get; private set; }
-
-        public IEnumerable<IValueResolver> GetSourceValueResolvers()
+        public Type SourceType
         {
-            if (_customMemberResolver != null)
-                yield return _customMemberResolver;
-
-            if (_customResolver != null)
-                yield return _customResolver;
-
-            foreach (var resolver in _sourceValueResolvers)
+            get
             {
-                yield return resolver;
+                if (CustomExpression != null)
+                    return CustomExpression.ReturnType;
+                if (CustomResolver != null)
+                    return CustomResolver.ReturnType;
+                return SourceMember?.GetMemberType();
             }
-
-            if (NullSubstitute != null)
-                yield return new NullReplacementMethod(NullSubstitute);
         }
 
-        public void RemoveLastResolver()
+        public void ChainMembers(IEnumerable<IMemberGetter> members)
         {
-            _sourceValueResolvers.RemoveLast();
+            var getters = members as IList<IMemberGetter> ?? members.ToList();
+            _memberChain.AddRange(getters);
         }
 
-        public ResolutionResult ResolveValue(ResolutionContext context)
+        public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
-            Seal();
-
-            var result = new ResolutionResult(context);
-
-            return _cachedResolvers.Aggregate(result, (current, resolver) => resolver.Resolve(current));
-        }
-
-        internal void Seal()
-        {
-            if (_sealed)
+            if (!CanResolveValue() && inheritedMappedProperty.Ignored)
             {
-                return;
+                Ignored = true;
             }
-
-            _cachedResolvers = GetSourceValueResolvers().ToArray();
-            _sealed = true;
-        }
-
-        public void ChainResolver(IValueResolver valueResolver)
-        {
-            _sourceValueResolvers.AddLast(valueResolver);
-        }
-
-        public void AssignCustomExpression(LambdaExpression customExpression)
-        {
-            CustomExpression = customExpression;
-        }
-
-        public void AssignCustomValueResolver(IValueResolver valueResolver)
-        {
-            _ignored = false;
-            _customResolver = valueResolver;
-            ResetSourceMemberChain();
-            HasCustomValueResolver = true;
-        }
-
-        public void ChainTypeMemberForResolver(IValueResolver valueResolver)
-        {
-            ResetSourceMemberChain();
-            _customMemberResolver = valueResolver;
-        }
-
-        public void ChainConstructorForResolver(IValueResolver valueResolver)
-        {
-            _customResolver = valueResolver;
-        }
-
-        public void Ignore()
-        {
-            _ignored = true;
-        }
-
-        public bool IsIgnored()
-        {
-            return _ignored;
-        }
-
-        public void SetMappingOrder(int mappingOrder)
-        {
-            _mappingOrder = mappingOrder;
-        }
-
-        public int GetMappingOrder()
-        {
-            return _mappingOrder;
+            CustomExpression = CustomExpression ?? inheritedMappedProperty.CustomExpression;
+            CustomResolver = CustomResolver ?? inheritedMappedProperty.CustomResolver;
+            Condition = Condition ?? inheritedMappedProperty.Condition;
+            PreCondition = PreCondition ?? inheritedMappedProperty.PreCondition;
+            NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
+            MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
+            CustomValue = CustomValue ?? inheritedMappedProperty.CustomValue;
+            CustomSourceMember = CustomSourceMember ?? inheritedMappedProperty.CustomSourceMember;
         }
 
         public bool IsMapped()
         {
-            return _sourceValueResolvers.Count > 0 || HasCustomValueResolver || _ignored;
+            return _memberChain.Count > 0 
+                || ValueResolverConfig != null 
+                || CustomResolver != null 
+                || SourceMember != null
+                || CustomValue != null
+                || CustomExpression != null
+                || Ignored;
         }
 
         public bool CanResolveValue()
         {
-            return (_sourceValueResolvers.Count > 0 || HasCustomValueResolver) && !_ignored;
-        }
-
-        public void SetNullSubstitute(object nullSubstitute)
-        {
-            NullSubstitute = nullSubstitute;
-        }
-
-        private void ResetSourceMemberChain()
-        {
-            _sourceValueResolvers.Clear();
-        }
-
-        public bool Equals(PropertyMap other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return Equals(other.DestinationProperty, DestinationProperty);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (PropertyMap)) return false;
-            return Equals((PropertyMap) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return DestinationProperty.GetHashCode();
-        }
-
-        public void ApplyCondition(Func<ResolutionContext, bool> condition)
-        {
-            _condition = condition;
-        }
-
-        public void ApplyPreCondition(Func<ResolutionContext, bool> condition)
-        {
-            _preCondition = condition;
-        }
-
-        public bool ShouldAssignValue(ResolutionContext context)
-        {
-            return _condition == null || _condition(context);
-        }
-
-        public bool ShouldAssignValuePreResolving(ResolutionContext context)
-        {
-            return _preCondition == null || _preCondition(context);
+            return (_memberChain.Count > 0
+                || ValueResolverConfig != null
+                || CustomResolver != null
+                || SourceMember != null
+                || CustomValue != null
+                || CustomExpression != null) && !Ignored;
         }
 
         public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {
-            var body = sourceMember.Body as MemberExpression;
-            if (body != null)
-            {
-                SourceMember = body.Member;
-            }
             CustomExpression = sourceMember;
-            AssignCustomValueResolver(
-                new NullReferenceExceptionSwallowingResolver(
-                    new DelegateBasedResolver<TSource, TMember>(sourceMember.Compile())
-                    )
-                );
+
+            Ignored = false;
         }
 
-        public object GetDestinationValue(object mappedObject)
+        private class MemberFinderVisitor : ExpressionVisitor
         {
-            return UseDestinationValue
-                ? DestinationProperty.GetValue(mappedObject)
-                : null;
+            public MemberExpression Member { get; private set; }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                Member = node;
+
+                return base.VisitMember(node);
+            }
         }
     }
 }

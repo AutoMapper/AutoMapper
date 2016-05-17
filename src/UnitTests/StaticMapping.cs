@@ -25,12 +25,12 @@
                 cfg.CreateMap<Source, Dest>();
             });
 
-            var source = new Source { Value = 5 };
+            var source = new Source {Value = 5};
 
             var dest = Mapper.Map<Source, Dest>(source);
 
             dest.Value.ShouldEqual(source.Value);
-        }
+        } 
 
         [Fact]
         public void Can_project_statically()
@@ -40,13 +40,13 @@
                 cfg.CreateMap<Source, Dest>();
             });
 
-            var source = new Source { Value = 5 };
-            var sources = new[] { source }.AsQueryable();
+            var source = new Source {Value = 5};
+            var sources = new[] {source}.AsQueryable();
 
             var dests = sources.ProjectTo<Dest>().ToArray();
 
             dests.Length.ShouldEqual(1);
             dests[0].Value.ShouldEqual(source.Value);
-        }
+        } 
     }
 }

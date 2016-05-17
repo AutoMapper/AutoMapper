@@ -20,9 +20,9 @@ namespace AutoMapperSamples
 				public int Total { get; set; }
 			}
 
-			public class CustomResolver : ValueResolver<Source, int>
+			public class CustomResolver : IValueResolver<Source, int>
 			{
-				protected override int ResolveCore(Source source)
+			    public int Resolve(Source source, ResolutionContext context)
 				{
 					return source.Value1 + source.Value2;
 				}
@@ -31,9 +31,9 @@ namespace AutoMapperSamples
 			[Test]
 			public void Example()
 			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>());
-				Mapper.AssertConfigurationIsValid();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
+					.ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>()));
+				config.AssertConfigurationIsValid();
 
 				var source = new Source
 					{
@@ -41,7 +41,7 @@ namespace AutoMapperSamples
 						Value2 = 7
 					};
 
-				var result = Mapper.Map<Source, Destination>(source);
+				var result = config.CreateMapper().Map<Source, Destination>(source);
 
 				result.Total.ShouldEqual(12);
 			}
@@ -49,11 +49,10 @@ namespace AutoMapperSamples
 			[Test]
 			public void ConstructedExample()
 			{
-				Mapper.CreateMap<Source, Destination>()
-					.ForMember(dest => dest.Total,
-					           opt => opt.ResolveUsing<CustomResolver>().ConstructedBy(() => new CustomResolver())
-					);
-				Mapper.AssertConfigurationIsValid();
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
+					.ForMember(dest => dest.Total, opt => opt.ResolveUsing(new CustomResolver())
+					));
+				config.AssertConfigurationIsValid();
 
 				var source = new Source
 					{
@@ -61,15 +60,9 @@ namespace AutoMapperSamples
 						Value2 = 7
 					};
 
-				var result = Mapper.Map<Source, Destination>(source);
+				var result = config.CreateMapper().Map<Source, Destination>(source);
 
 				result.Total.ShouldEqual(12);
-			}
-
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
 			}
 		}
 	}

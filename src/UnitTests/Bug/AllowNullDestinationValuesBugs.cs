@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests.Bug
                 public string Name { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(config =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
             {
                 config.AllowNullDestinationValues = false;
                 config.CreateMap<Inner, Inner>();

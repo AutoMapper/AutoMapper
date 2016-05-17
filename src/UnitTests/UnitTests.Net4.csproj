@@ -79,11 +79,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\AutoMapper\Internal\TypeExtensions.cs">
+    <Compile Include="..\AutoMapper\TypeExtensions.cs">
       <Link>TypeExtensions.cs</Link>
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
+    <Compile Include="BasicFlattening.cs" />
+    <Compile Include="Bug\ForAllMembersAndDoNotUseDestinationValue.cs" />
+    <Compile Include="Bug\InterfaceMultipleInheritance.cs" />
     <Compile Include="Bug\AfterMapNestedObjects.cs" />
     <Compile Include="Bug\AutoMapperInheritanceProblemDemo.cs" />
     <Compile Include="AutoMapperSpecBase.cs" />
@@ -97,12 +100,14 @@
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
     <Compile Include="Bug\CaseSensitivityBug.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
-    <Compile Include="Bug\ExceptionDestinationPath.cs" />
     <Compile Include="Bug\ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
     <Compile Include="Bug\AssertConfigurationIsValidNullables.cs" />
     <Compile Include="Bug\IncludeBaseInheritance.cs" />
     <Compile Include="Bug\IncludeInheritance.cs" />
+    <Compile Include="Bug\MapOverloadsWithDynamic.cs" />
+    <Compile Include="Bug\NullSubstituteType.cs" />
+    <Compile Include="Bug\NullableResolveUsing.cs" />
     <Compile Include="Bug\NullableDateTime.cs" />
     <Compile Include="Bug\ProjectUsingTheQueriedEntity.cs" />
     <Compile Include="Bug\ReverseMapReplaceMemberName.cs" />
@@ -174,6 +179,7 @@
     <Compile Include="ConvensionTest.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
+    <Compile Include="ForAllOtherMembers.cs" />
     <Compile Include="EnumToNullableEnum.cs" />
     <Compile Include="ExplicitMapperCreation.cs" />
     <Compile Include="ExpressionBridge.cs" />
@@ -207,8 +213,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MappingExceptions.cs" />
+    <Compile Include="MappingInheritance\ApplyIncludeBaseRecursively.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
+    <Compile Include="MappingInheritance\IncludeBaseShouldNotCreateMaps.cs" />
+    <Compile Include="MappingInheritance\MapToBaseClass.cs" />
+    <Compile Include="MappingInheritance\GenericsAndInterfaces.cs" />
     <Compile Include="MappingInheritance\IncludeBaseBug.cs" />
     <Compile Include="MappingInheritance\IncludedBaseMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
@@ -246,6 +256,7 @@
     <Compile Include="Projection\ProjectCollectionListTest.cs" />
     <Compile Include="Projection\ProjectEnumerableToArrayTest.cs" />
     <Compile Include="Projection\ProjectEnumTest.cs" />
+    <Compile Include="Projection\ProjectionTests.cs" />
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="Projection\GenericsTests.cs" />
     <Compile Include="Projection\ToStringTests.cs" />
@@ -302,7 +313,6 @@
     <Compile Include="TesterExtensions.cs" />
     <Compile Include="ConfigurationValidation.cs" />
     <Compile Include="Bug\ProjectConstructorParameters.cs" />
-    <Compile Include="Tests\PropertyMapSpecs.cs" />
     <Compile Include="Tests\MapperTests.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />
     <Compile Include="Tests\TypeMapFactorySpecs.cs" />

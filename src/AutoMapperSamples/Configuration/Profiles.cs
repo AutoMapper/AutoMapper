@@ -34,16 +34,11 @@ namespace AutoMapperSamples.Configuration
 				}
 			}
 
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
-			}
 
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var config = new MapperConfiguration(cfg =>
 				{
 					cfg.AddProfile<ViewModelProfile>();
 					cfg.CreateMap<Order, OrderEditViewModel>();
@@ -51,8 +46,8 @@ namespace AutoMapperSamples.Configuration
 
 				var order = new Order {Amount = 50m};
 
-				var listViewModel = Mapper.Map<Order, OrderListViewModel>(order);
-				var editViewModel = Mapper.Map<Order, OrderEditViewModel>(order);
+				var listViewModel = config.CreateMapper().Map<Order, OrderListViewModel>(order);
+				var editViewModel = config.CreateMapper().Map<Order, OrderEditViewModel>(order);
 
 				listViewModel.Amount.ShouldEqual(order.Amount.ToString("c"));
 				editViewModel.Amount.ShouldEqual("50");

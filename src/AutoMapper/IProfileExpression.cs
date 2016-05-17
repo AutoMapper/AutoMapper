@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Reflection;
+    using Configuration.Conventions;
     using Mappers;
 
     /// <summary>
@@ -122,11 +123,6 @@ namespace AutoMapper
         INamingConvention DestinationMemberNamingConvention { get; set; }
 
         /// <summary>
-        /// Create missing type maps during mapping, if necessary
-        /// </summary>
-        bool CreateMissingTypeMaps { get; set; }
-
-        /// <summary>
         /// Specify common configuration for all type maps.
         /// </summary>
         /// <param name="configuration">configuration callback</param>
@@ -137,6 +133,6 @@ namespace AutoMapper
         string ProfileName { get; }
         IMemberConfiguration AddMemberConfiguration();
         IConditionalObjectMapper AddConditionalObjectMapper();
-        void IncludeSourceExtensionMethods(Assembly assembly);
+        void IncludeSourceExtensionMethods(Type type);
     }
 }

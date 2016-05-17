@@ -27,6 +27,37 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 
+    public class ExpressionPropertyMapping : NonValidatingSpecBase
+    {
+
+        public class SourceExpressionHolder
+        {
+            public Expression<Func<ExpressionMapping.ParentDTO, bool>> Expression { get; set; }
+        }
+
+        public class DestExpressionHolder
+        {
+            public Expression<Func<ExpressionMapping.Parent, bool>> Expression { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<SourceExpressionHolder, DestExpressionHolder>().ReverseMap();
+            cfg.CreateMap<ExpressionMapping.Parent, ExpressionMapping.ParentDTO>().ReverseMap();
+            cfg.CreateMap<ExpressionMapping.Child, ExpressionMapping.ChildDTO>()
+                .ForMember(d => d.ID_, opt => opt.MapFrom(s => s.ID))
+                .ReverseMap()
+                .ForMember(d => d.ID, opt => opt.MapFrom(s => s.ID_));
+        });
+
+        [Fact]
+        public void Should_Map_Expressions_UsingExpressions()
+        {
+            var source = new SourceExpressionHolder() { Expression = p => p.Child != null };
+            var dest = Mapper.Map<DestExpressionHolder>(source);
+        }
+    }
+
     public class ExpressionMapping : NonValidatingSpecBase
     {
         public class GrandParentDTO
@@ -94,7 +125,7 @@ namespace AutoMapper.UnitTests.Bug
         private Expression<Func<ParentDTO, bool>> _predicateExpression;
         private Parent _valid;
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<GrandParent, GrandParentDTO>().ReverseMap();
             cfg.CreateMap<Parent, ParentDTO>().ReverseMap();
@@ -119,7 +150,7 @@ namespace AutoMapper.UnitTests.Bug
             //var a = items2.ToList();
             items2.Count().ShouldEqual(1);
         }
-
+        
         [Fact]
         public void GrandParent_Mapping_To_Sub_Sub_Property_Condition()
         {
@@ -260,14 +291,14 @@ namespace AutoMapper.UnitTests.Bug
             _valid = new Parent { DateTime = DateTime.Now };
         }
 
-        [Fact(Skip = "Failing test")]
+        [Fact]
         public void When_Using_Non_TypeMapped_Class_Property_Against_Constant()
         {
             _predicateExpression = p => p.DateTime.Year.ToString() == "2015";
             _valid = new Parent { DateTime = new DateTime(2015, 1, 1) };
         }
 
-        [Fact(Skip = "Failing test")]
+        [Fact]
         public void When_Using_Non_TypeMapped_Class_Method_Against_Constant()
         {
             _predicateExpression = p => p.DateTime.Year.ToString().Equals("2015");

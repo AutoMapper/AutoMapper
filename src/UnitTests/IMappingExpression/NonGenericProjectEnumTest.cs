@@ -56,10 +56,16 @@
 
     public class NonGenericProjectAndMapEnumTest
     {
+        private IMapper _mapper;
+
         public NonGenericProjectAndMapEnumTest()
         {
-            Mapper.CreateMap(typeof(Customer), typeof(CustomerDto));
-            Mapper.CreateMap(typeof(CustomerType), typeof(string)).ProjectUsing(ct => ct.ToString().ToUpper());
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap(typeof (Customer), typeof (CustomerDto));
+                cfg.CreateMap(typeof (CustomerType), typeof (string)).ProjectUsing(ct => ct.ToString().ToUpper());
+            });
+            _mapper = config.CreateMapper();
         }
 
         [Fact]
@@ -67,7 +73,7 @@
         {
             var customers = new[] { new Customer() { FirstName = "Bill", LastName = "White", CustomerType = CustomerType.Vip } }.AsQueryable();
 
-            var projected = Mapper.Map<CustomerDto[]>(customers);
+            var projected = customers.ProjectTo<CustomerDto>(_mapper.ConfigurationProvider);
             projected.ShouldNotBeNull();
             Assert.Equal(customers.Single().CustomerType.ToString().ToUpper(), projected.Single().CustomerType);
         }
@@ -109,7 +115,7 @@
             public int Value { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap(typeof (Source), typeof (Dest)).ProjectUsing(src => new Dest {Value = 10});
         });

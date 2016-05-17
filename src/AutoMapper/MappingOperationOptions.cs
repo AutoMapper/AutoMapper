@@ -1,11 +1,17 @@
+using System;
+using System.Collections.Generic;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
+    using StringDictionary = Dictionary<string, object>;
 
     public class MappingOperationOptions<TSource, TDestination> : MappingOperationOptions,
         IMappingOperationOptions<TSource, TDestination>
     {
+        public MappingOperationOptions(Func<Type, object> serviceCtor) : base(serviceCtor)
+        {
+        }
+
         public void BeforeMap(Action<TSource, TDestination> beforeFunction)
         {
             BeforeMapAction = (src, dest) => beforeFunction((TSource) src, (TDestination) dest);
@@ -19,16 +25,17 @@ namespace AutoMapper
 
     public class MappingOperationOptions : IMappingOperationOptions
     {
-        public MappingOperationOptions()
+        private StringDictionary _items;
+        private static readonly Action<object, object> Empty = (_, __) => { };
+
+        public MappingOperationOptions(Func<Type, object> serviceCtor)
         {
-            Items = new Dictionary<string, object>();
-            BeforeMapAction = (src, dest) => { };
-            AfterMapAction = (src, dest) => { };
+            BeforeMapAction = AfterMapAction = Empty;
+            ServiceCtor = serviceCtor;
         }
 
         public Func<Type, object> ServiceCtor { get; private set; }
-        public IDictionary<string, object> Items { get; }
-        public bool DisableCache { get; set; }
+        public IDictionary<string, object> Items => _items ?? (_items = new StringDictionary());
         public Action<object, object> BeforeMapAction { get; protected set; }
         public Action<object, object> AfterMapAction { get; protected set; }
 
@@ -42,9 +49,12 @@ namespace AutoMapper
             AfterMapAction = afterFunction;
         }
 
+        public T CreateInstance<T>() => (T) ServiceCtor(typeof (T));
+
         void IMappingOperationOptions.ConstructServicesUsing(Func<Type, object> constructor)
         {
-            ServiceCtor = constructor;
+            var ctor = ServiceCtor;
+            ServiceCtor = t => constructor(t) ?? ctor(t);
         }
     }
 }

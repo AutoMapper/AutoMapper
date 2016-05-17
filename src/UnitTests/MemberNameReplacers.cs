@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AutoMapper.Internal;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -28,11 +27,12 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_map_properties_with_different_names()
         {
-            Mapper.Initialize(c =>
+            var config = new MapperConfiguration(c =>
             {
                 c.ReplaceMemberName("Ä", "A");
                 c.ReplaceMemberName("í", "i");
                 c.ReplaceMemberName("Airlina", "Airline");
+                c.CreateMap<Source, Destination>();
             });
 
             var source = new Source()
@@ -43,8 +43,8 @@ namespace AutoMapper.UnitTests
             };
 
             //Mapper.AddMemberConvention().AddName<ReplaceName>(_ => _.AddReplace("A", "Ä").AddReplace("i", "í").AddReplace("Airline", "Airlina")).SetMemberInfo<FieldPropertyMemberInfo>();
-            Mapper.CreateMap<Source, Destination>();
-            var destination = Mapper.Map<Source, Destination>(source);
+            var mapper = config.CreateMapper();
+            var destination = mapper.Map<Source, Destination>(source);
 
             Assert.Equal(source.Value, destination.Value);
             Assert.Equal(source.Ävíator, destination.Aviator);

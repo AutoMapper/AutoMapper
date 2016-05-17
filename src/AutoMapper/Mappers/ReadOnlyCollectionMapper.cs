@@ -1,30 +1,38 @@
+using System.Collections;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper.Mappers
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Reflection;
-    using Internal;
+    using Configuration;
 
-    public class ReadOnlyCollectionMapper : IObjectMapper
+    public class ReadOnlyCollectionMapper : IObjectMapExpression
     {
+        public static ReadOnlyCollection<TDestinationItem> Map<TSource, TSourceItem, TDestinationItem>(TSource source, ResolutionContext context)
+            where TSource : IEnumerable
+        {
+            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
+                return null;
+
+            IList<TDestinationItem> list = new List<TDestinationItem>();
+            
+            foreach (var item in (IEnumerable)source ?? Enumerable.Empty<object>())
+                list.Add((TDestinationItem)context.Mapper.Map(item, default(TDestinationItem), typeof(TSourceItem), typeof(TDestinationItem), context));
+
+            return new ReadOnlyCollection<TDestinationItem>(list);
+        }
+
+        private static readonly MethodInfo MapMethodInfo = typeof(ReadOnlyCollectionMapper).GetAllMethods().First(_ => _.IsStatic);
+
         public object Map(ResolutionContext context)
         {
-            Type genericType = typeof (EnumerableMapper<>);
-
-            var elementType = TypeHelper.GetElementType(context.DestinationType);
-
-            var enumerableMapper = genericType.MakeGenericType(elementType);
-
-            var objectMapper = (IObjectMapper) Activator.CreateInstance(enumerableMapper);
-
-            var nullDestinationValueSoTheReadOnlyCollectionMapperWorks =
-                context.PropertyMap != null
-                    ? context.CreateMemberContext(context.TypeMap, context.SourceValue, null, context.SourceType,
-                        context.PropertyMap)
-                    : context;
-
-            return objectMapper.Map(nullDestinationValueSoTheReadOnlyCollectionMapperWorks);
+            return
+                MapMethodInfo.MakeGenericMethod(context.SourceType, TypeHelper.GetElementType(context.SourceType), TypeHelper.GetElementType(context.DestinationType))
+                    .Invoke(null, new[] { context.SourceValue, context });
         }
 
         public bool IsMatch(TypePair context)
@@ -37,38 +45,9 @@ namespace AutoMapper.Mappers
             return genericType == typeof (ReadOnlyCollection<>);
         }
 
-        #region Nested type: EnumerableMapper
-
-        private class EnumerableMapper<TElement> : EnumerableMapperBase<IList<TElement>>
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            private readonly IList<TElement> inner = new List<TElement>();
-
-            public override bool IsMatch(TypePair context)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override void SetElementValue(IList<TElement> elements, object mappedValue, int index)
-            {
-                inner.Add((TElement) mappedValue);
-            }
-
-            protected override IList<TElement> GetEnumerableFor(object destination)
-            {
-                return inner;
-            }
-
-            protected override IList<TElement> CreateDestinationObjectBase(Type destElementType, int sourceLength)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override object CreateDestinationObject(ResolutionContext context, Type destinationElementType, int count)
-            {
-                return new ReadOnlyCollection<TElement>(inner);
-            }
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)), sourceExpression, contextExpression);
         }
-
-        #endregion
     }
 }

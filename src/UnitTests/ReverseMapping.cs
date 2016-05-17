@@ -39,7 +39,7 @@ namespace AutoMapper.UnitTests
                 }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateProfile("MyMapperProfile", prf =>
                 {
@@ -80,7 +80,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>()
                     .ReverseMap();
@@ -114,7 +114,7 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>(MemberList.Source);
             });
@@ -146,7 +146,7 @@ namespace AutoMapper.UnitTests
                 public int Value { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>(MemberList.Source);
             });
@@ -171,7 +171,7 @@ namespace AutoMapper.UnitTests
                 public int Value3 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>(MemberList.Source)
                     .ForMember(dest => dest.Value3, opt => opt.MapFrom(src => src.Value2));
@@ -197,7 +197,7 @@ namespace AutoMapper.UnitTests
                 public int Value3 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Destination>(MemberList.Source)
                     .ForMember(dest => dest.Value3, opt => opt.ResolveUsing(src => src.Value2))
@@ -224,7 +224,7 @@ namespace AutoMapper.UnitTests
                 public int Ignored { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForMember(d => d.Ignored, opt => opt.Ignore())
@@ -283,45 +283,6 @@ namespace AutoMapper.UnitTests
                 //Assert
                 unmappedPropertyNames[0].ShouldEqual("Boo");
             }
-
-            [Fact]
-            public void Should_not_throw_exception_for_unmapped_properties()
-            {
-                var config = new MapperConfiguration(cfg =>
-                {
-                    cfg.CreateMap<Foo, Foo2>()
-                    .IgnoreAllNonExisting()
-                    .ReverseMap()
-                    .IgnoreAllNonExistingSource();
-                });
-
-                config.AssertConfigurationIsValid();
-            }
-
         }
-
-        public static class AutoMapperExtensions
-        {
-            // from http://stackoverflow.com/questions/954480/automapper-ignore-the-rest/6474397#6474397
-            public static IMappingExpression<TSource, TDestination> IgnoreAllNonExisting<TSource, TDestination>(
-                this AutoMapper.IMappingExpression<TSource, TDestination> expression)
-            {
-                foreach (var property in expression.TypeMap.GetUnmappedPropertyNames())
-                {
-                    expression.ForMember(property, opt => opt.Ignore());
-                }
-                return expression;
-            }
-
-            public static IMappingExpression<TSource, TDestination> IgnoreAllNonExistingSource<TSource, TDestination>(this AutoMapper.IMappingExpression<TSource, TDestination> expression)
-            {
-                foreach (var property in expression.TypeMap.GetUnmappedPropertyNames())
-                {
-                    expression.ForSourceMember(property, opt => opt.Ignore());
-                }
-                return expression;
-            }
-        }
-
     }
 }

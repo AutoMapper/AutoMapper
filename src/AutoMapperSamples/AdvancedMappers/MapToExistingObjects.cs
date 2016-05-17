@@ -20,28 +20,24 @@ namespace AutoMapperSamples
 				public decimal Amount { get; set; }
 			}
 
-			[SetUp]
-			public void SetUp()
-			{
-				Mapper.Reset();
-			}
-
 			[Test]
 			public void Example()
 			{
-				Mapper.Initialize(cfg =>
+				var config = new MapperConfiguration(cfg =>
 				{
 					cfg.CreateMap<OrderDto, Order>()
 						.ForMember(dest => dest.Id, opt => opt.Ignore());
 				});
 
-				Mapper.AssertConfigurationIsValid();
+				config.AssertConfigurationIsValid();
 
 				var orderDto = new OrderDto {Amount = 50m};
 
 				var order = new Order {Id = 4};
 
-				Mapper.Map(orderDto, order);
+			    var mapper = config.CreateMapper();
+
+			    mapper.Map(orderDto, order);
 
 				order.Amount.ShouldEqual(50m);
 			}

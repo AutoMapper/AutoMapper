@@ -23,18 +23,14 @@
             public int Foo { get; set; }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .ForMember(dest => dest.Child,
                     opt =>
                         opt.ResolveUsing(
-                            result =>
-                                result.Context.Engine.Map(
-                                    result.Context.CreateTypeContext(
-                                        result.Context.ConfigurationProvider.ResolveTypeMap(typeof (Source),
-                                            typeof (ChildDest)), result.Value, result.Context.DestinationValue,
-                                        typeof (Source), typeof (ChildDest)))));
+                            (src, context) =>
+                                context.Mapper.Map(src, context.DestinationValue, typeof (Source), typeof (ChildDest), context)));
             cfg.CreateMap<Source, ChildDest>();
         });
 

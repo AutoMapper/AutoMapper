@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
     using System;
@@ -5,11 +7,33 @@ namespace AutoMapper.Mappers
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Internal;
+    using Configuration;
 
-    public class EnumerableToDictionaryMapper : IObjectMapper
+    public class EnumerableToDictionaryMapper : IObjectMapExpression
     {
-        private static readonly Type KvpType = typeof(KeyValuePair<,>);
+        public static TDestination Map<TSource, TSourceElement, TDestination, TDestinationKey, TDestinationValue>(TSource source, TDestination destination, ResolutionContext context)
+           where TSource : IEnumerable<TSourceElement>
+           where TDestination : class, IDictionary<TDestinationKey, TDestinationValue>
+        {
+            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
+                return null;
+
+            TDestination list = destination ?? (
+                typeof(TDestination).IsInterface()
+                    ? new Dictionary<TDestinationKey, TDestinationValue>() as TDestination
+                    : (TDestination)(context.ConfigurationProvider.AllowNullDestinationValues
+                ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
+                : ObjectCreator.CreateObject(typeof(TDestination))));
+
+            list.Clear();
+
+            foreach (var item in (IEnumerable<TSourceElement>)source ?? Enumerable.Empty<TSourceElement>())
+                list.Add((KeyValuePair<TDestinationKey, TDestinationValue>)context.Mapper.Map(item, default(KeyValuePair<TDestinationKey, TDestinationValue>), typeof(TSourceElement), typeof(KeyValuePair<TDestinationKey, TDestinationValue>), context));
+
+            return list;
+        }
+
+        private static readonly MethodInfo MapMethodInfo = typeof(EnumerableToDictionaryMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public bool IsMatch(TypePair context)
         {
@@ -20,40 +44,25 @@ namespace AutoMapper.Mappers
 
         public object Map(ResolutionContext context)
         {
-            var sourceEnumerableValue = (IEnumerable)context.SourceValue ?? new object[0];
-            IEnumerable<object> enumerableValue = sourceEnumerableValue.Cast<object>();
-
-            Type sourceElementType = TypeHelper.GetElementType(context.SourceType, sourceEnumerableValue);
+            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
             Type genericDestDictType = context.DestinationType.GetDictionaryType();
             Type destKeyType = genericDestDictType.GetTypeInfo().GenericTypeArguments[0];
             Type destValueType = genericDestDictType.GetTypeInfo().GenericTypeArguments[1];
-            Type destKvpType = KvpType.MakeGenericType(destKeyType, destValueType);
 
-            object destDictionary = ObjectCreator.CreateDictionary(context.DestinationType, destKeyType, destValueType);
-            int count = 0;
+            return
+                MapMethodInfo.MakeGenericMethod(context.SourceType, sourceElementType, context.DestinationType, destKeyType, destValueType)
+                    .Invoke(null, new[] { context.SourceValue, context.DestinationValue, context });
+        }
 
-            foreach (object item in enumerableValue)
-            {
-                var typeMap = context.ConfigurationProvider.ResolveTypeMap(item, null, sourceElementType, destKvpType);
+        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        {
+            Type sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
+            Type genericDestDictType = destExpression.Type;
+            Type destKeyType = genericDestDictType.GetTypeInfo().GenericTypeArguments[0];
+            Type destValueType = genericDestDictType.GetTypeInfo().GenericTypeArguments[1];
 
-                Type targetSourceType = typeMap != null ? typeMap.SourceType : sourceElementType;
-                Type targetDestinationType = typeMap != null ? typeMap.DestinationType : destKvpType;
-
-                var newContext = context.CreateElementContext(typeMap, item, targetSourceType, targetDestinationType, count);
-
-                object mappedValue = context.Engine.Map(newContext);
-                var keyProperty = mappedValue.GetType().GetProperty("Key");
-                object destKey = keyProperty.GetValue(mappedValue, null);
-
-                var valueProperty = mappedValue.GetType().GetProperty("Value");
-                object destValue = valueProperty.GetValue(mappedValue, null);
-
-                genericDestDictType.GetMethod("Add").Invoke(destDictionary, new[] { destKey, destValue });
-
-                count++;
-            }
-
-            return destDictionary;
+            return Expression.Call(null,
+                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, sourceElementType, genericDestDictType, destKeyType, destValueType), sourceExpression, destExpression, contextExpression);
         }
     }
 }

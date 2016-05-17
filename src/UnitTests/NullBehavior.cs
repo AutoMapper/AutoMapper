@@ -39,7 +39,7 @@ namespace AutoMapper.UnitTests
 				public int Something { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.AllowNullDestinationValues = false;
 		        cfg.CreateMap<ModelObject, ModelDto>();
@@ -112,7 +112,7 @@ namespace AutoMapper.UnitTests
 				public int Something { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 
 		        cfg.AllowNullDestinationValues = true;
@@ -174,7 +174,7 @@ namespace AutoMapper.UnitTests
 				public object Value { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateProfile("MapsNulls", p =>
 		        {
@@ -205,9 +205,9 @@ namespace AutoMapper.UnitTests
 
 		public class When_using_a_custom_resolver_and_the_source_value_is_null : NonValidatingSpecBase
 		{
-			public class NullResolver : ValueResolver<Source, string>
+			public class NullResolver : IValueResolver<string, string>
 			{
-				protected override string ResolveCore(Source source)
+				public string Resolve(string source, ResolutionContext context)
 				{
 					if (source == null)
 						return "jon";
@@ -215,7 +215,7 @@ namespace AutoMapper.UnitTests
 				}
 			}
 
-			private Source _source;
+			private static Source _source;
 			private Destination _dest;
 
 			public class Source
@@ -228,10 +228,10 @@ namespace AutoMapper.UnitTests
 				public string Name { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>()
-		            .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver>().FromMember(src => src.MyName));
+		            .ForMember(dest => dest.Name, opt => opt.ResolveUsing<NullResolver, string>(src => src.MyName));
 		        _source = new Source();
 		    });
 
@@ -266,7 +266,7 @@ namespace AutoMapper.UnitTests
                 public int OtherValue { get; set; }
             }
 
-	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
 	            cfg.AllowNullDestinationValues = false;
 	            cfg.CreateMap<Source, Dest>()
@@ -289,9 +289,9 @@ namespace AutoMapper.UnitTests
 	    {
 	        private FooViewModel _result;
 
-	        public class NullableBoolToLabel : TypeConverter<bool?, string>
+	        public class NullableBoolToLabel : ITypeConverter<bool?, string>
             {
-                protected override string ConvertCore(bool? source)
+                public string Convert(bool? source, ResolutionContext context)
                 {
                     if (source.HasValue)
                     {
@@ -315,7 +315,7 @@ namespace AutoMapper.UnitTests
                 public string IsFooBarred { get; set; }
             }
 
-	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
 	            cfg.CreateMap<bool?, string>().ConvertUsing<NullableBoolToLabel>();
 	            cfg.CreateMap<Foo, FooViewModel>();
@@ -358,7 +358,7 @@ namespace AutoMapper.UnitTests
                 public Collection<int> Values6 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>();
                 cfg.AllowNullCollections = true;

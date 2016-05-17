@@ -53,7 +53,7 @@ namespace AutoMapper.UnitTests
         //    }
         //}
 
-		public class When_mapping_to_a_generic_dictionary_with_mapped_value_pairs : SpecBase
+		public class When_mapping_to_a_generic_dictionary_with_mapped_value_pairs : AutoMapperSpecBase
 		{
 			private Destination _result;
 
@@ -77,11 +77,11 @@ namespace AutoMapper.UnitTests
 				public int Value { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-				Mapper.CreateMap<SourceValue, DestinationValue>();
-			}
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => 
+            {
+				cfg.CreateMap<Source, Destination>();
+				cfg.CreateMap<SourceValue, DestinationValue>();
+			});
 
 			protected override void Because_of()
 			{
@@ -107,7 +107,7 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
-		public class When_mapping_to_a_generic_dictionary_interface_with_mapped_value_pairs : SpecBase
+		public class When_mapping_to_a_generic_dictionary_interface_with_mapped_value_pairs : AutoMapperSpecBase
 		{
 			private Destination _result;
 
@@ -131,11 +131,11 @@ namespace AutoMapper.UnitTests
 				public int Value { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<Source, Destination>();
-				Mapper.CreateMap<SourceValue, DestinationValue>();
-			}
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<Source, Destination>();
+		        cfg.CreateMap<SourceValue, DestinationValue>();
+		    });
 
 			protected override void Because_of()
 			{
@@ -175,7 +175,7 @@ namespace AutoMapper.UnitTests
 				public System.Collections.Generic.IDictionary<string, FooDto> Bar { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.AllowNullDestinationValues = false;
 		        cfg.CreateMap<Foo, FooDto>();
@@ -204,7 +204,7 @@ namespace AutoMapper.UnitTests
 		}
 
 
-		public class When_mapping_to_a_generic_dictionary_that_does_not_use_keyvaluepairs : SpecBase
+		public class When_mapping_to_a_generic_dictionary_that_does_not_use_keyvaluepairs : AutoMapperSpecBase
 		{
 			private System.Collections.Generic.IDictionary<string, string> _dest;
 
@@ -218,11 +218,11 @@ namespace AutoMapper.UnitTests
 				public System.Collections.Generic.IDictionary<string, string> Items { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<SourceDto, DestDto>()
-					.ForMember(d => d.Items, opt => opt.MapFrom(s => s.Items));
-			}
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<SourceDto, DestDto>()
+		            .ForMember(d => d.Items, opt => opt.MapFrom(s => s.Items));
+		    });
 
 			protected override void Because_of()
 			{
@@ -339,9 +339,7 @@ namespace AutoMapper.UnitTests
 
 				public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
 				{
-					return inner.OfType<DictionaryEntry>()
-						.Select(e => new KeyValuePair<TKey, TValue>((TKey)e.Key, (TValue)e.Value))
-						.GetEnumerator();
+				    return inner.GetEnumerator() as IEnumerator<KeyValuePair<TKey, TValue>>;
 				}
 
 				IEnumerator IEnumerable.GetEnumerator()
@@ -414,7 +412,7 @@ namespace AutoMapper.UnitTests
 
 		}
 
-		public class When_mapping_from_a_list_of_object_to_generic_dictionary : SpecBase
+		public class When_mapping_from_a_list_of_object_to_generic_dictionary : AutoMapperSpecBase	
 		{
 			private FooObject _result;
 
@@ -434,12 +432,12 @@ namespace AutoMapper.UnitTests
 				public string Value { get; set; }
 			}
 
-			protected override void Establish_context()
-			{
-				Mapper.CreateMap<FooDto, FooObject>();
-				Mapper.CreateMap<DestinationValuePair, KeyValuePair<string, string>>()
-					.ConvertUsing(src => new KeyValuePair<string, string>(src.Key, src.Value));
-			}
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+		    {
+		        cfg.CreateMap<FooDto, FooObject>();
+		        cfg.CreateMap<DestinationValuePair, KeyValuePair<string, string>>()
+		            .ConvertUsing(src => new KeyValuePair<string, string>(src.Key, src.Value));
+		    });
 
 			protected override void Because_of()
 			{

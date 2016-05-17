@@ -31,9 +31,9 @@ namespace AutoMapper.UnitTests
 				public string Value2 { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
-		        cfg.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly());
+		        cfg.IncludeSourceExtensionMethods(typeof(When_extension_method_returns_value_type_SourceExtensions));
 		        cfg.CreateMap<Source, Destination>();
 		    });
 
@@ -83,9 +83,9 @@ namespace AutoMapper.UnitTests
 				public int Property { get; set; }
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
-		        cfg.IncludeSourceExtensionMethods(Assembly.GetExecutingAssembly());
+		        cfg.IncludeSourceExtensionMethods(typeof(When_extension_method_returns_object_SourceExtensions));
 		        cfg.CreateMap<Source, Destination>();
 		    });
 
@@ -121,7 +121,7 @@ namespace AutoMapper.UnitTests
 	            public int ValuesCount { get; set; }
 	        }
 
-	        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	        {
 	            cfg.CreateMap<Source, Destination>();
 	        });

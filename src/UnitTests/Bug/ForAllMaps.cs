@@ -37,15 +37,15 @@ namespace AutoMapper.UnitTests.Bug
             public int Number { get; set; }
         }
 
-        public class MinusOneResolver : IValueResolver
+        public class MinusOneResolver : IValueResolver<object, object>
         {
-            public ResolutionResult Resolve(ResolutionResult source)
+            public object Resolve(object source, ResolutionContext context)
             {
-                return source.New(-1);
+                return -1;
             }
         }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
             cfg.CreateMap<Source1, Destination1>();

@@ -10,7 +10,7 @@ namespace AutoMapper.UnitTests
         {
             private Dest _dest;
 
-            public class FooResolver : ValueResolver<int, int>
+            public class FooResolver : IValueResolver<int, int>
             {
                 private readonly int _value;
 
@@ -24,15 +24,15 @@ namespace AutoMapper.UnitTests
                     _value = value;
                 }
 
-                protected override int ResolveCore(int source)
+                public int Resolve(int source, ResolutionContext context)
                 {
                     return source + _value;
                 }
             }
 
-            public class BarResolver : ValueResolver<int, int>
+            public class BarResolver : IValueResolver<int, int>
             {
-                protected override int ResolveCore(int source)
+                public int Resolve(int source, ResolutionContext context)
                 {
                     return source + 1;
                 }
@@ -50,11 +50,11 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
-                    .ForMember(x => x.Value, opt => opt.ResolveUsing<FooResolver>().FromMember(x => x.Value))
-                    .ForMember(x => x.Value2, opt => opt.ResolveUsing<BarResolver>().FromMember(x => x.Value2));
+                    .ForMember(x => x.Value, opt => opt.ResolveUsing<FooResolver, int>(x => x.Value))
+                    .ForMember(x => x.Value2, opt => opt.ResolveUsing<BarResolver, int>(x => x.Value2));
             });
 
             protected override void Because_of()
@@ -80,7 +80,7 @@ namespace AutoMapper.UnitTests
         {
             private Dest _dest;
 
-            public class FooTypeConverter : TypeConverter<Source, Dest>
+            public class FooTypeConverter : ITypeConverter<Source, Dest>
             {
                 private readonly int _value;
 
@@ -94,7 +94,7 @@ namespace AutoMapper.UnitTests
                     _value = value;
                 }
 
-                protected override Dest ConvertCore(Source source)
+                public Dest Convert(Source source, ResolutionContext context)
                 {
                     return new Dest
                     {
@@ -116,7 +116,7 @@ namespace AutoMapper.UnitTests
                 public int Value2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ConvertUsing<FooTypeConverter>();

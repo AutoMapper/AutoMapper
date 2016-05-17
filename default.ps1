@@ -11,7 +11,7 @@ properties {
 
 task default -depends local
 task local -depends init, compile, test
-task ci -depends clean, release, local
+task ci -depends clean, release, local, benchmark
 
 task clean {
 	rd "$source_dir\artifacts" -recurse -force  -ErrorAction SilentlyContinue | out-null
@@ -19,15 +19,8 @@ task clean {
 }
 
 task init {
-	$dnxVersion = Get-DnxVersion
-	
-	# Make sure per-user DNVM is installed
-	Install-Dnvm
-
-	# Install DNX
-	dnvm install $dnxVersion -r CoreCLR -NoNative
-	dnvm install $dnxVersion -r CLR -NoNative
-	dnvm use $dnxVersion -r CLR
+	# Make sure per-user dotnet is installed
+	Install-Dotnet
 }
 
 task release {
@@ -35,12 +28,18 @@ task release {
 }
 
 task compile -depends clean {
-	$env:DNX_BUILD_VERSION=$env:APPVEYOR_BUILD_NUMBER
+	$version = if ($env:APPVEYOR_BUILD_NUMBER -ne $NULL) { $env:APPVEYOR_BUILD_NUMBER } else { '0' }
+	
+    exec { dotnet restore $source_dir\AutoMapper }
+    exec { dotnet build $source_dir\AutoMapper -c $config }
+    exec { dotnet pack $source_dir\AutoMapper -c $config --version-suffix $version}
 
-    exec { dnu restore }
-    exec { dnu pack $source_dir\AutoMapper --configuration $config}
     exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
-    exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
+    exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.NoProjectJson.sln }
+}
+
+task benchmark {
+    exec { & $source_dir\Benchmark\bin\$config\Benchmark.exe }
 }
 
 task test {
@@ -58,27 +57,38 @@ task test {
     exec { & $testRunner $source_dir/IntegrationTests.Net4/bin/$config/AutoMapper.IntegrationTests.Net4.dll }
 }
 
-function Install-Dnvm
+function Install-Dotnet
 {
-    & where.exe dnvm 2>&1 | Out-Null
-    if(($LASTEXITCODE -ne 0) -Or ((Test-Path Env:\TEAMCITY_VERSION) -eq $true))
+    $dotnetcli = where-is('dotnet')
+	
+    if($dotnetcli -eq $null)
     {
-        Write-Host "DNVM not found"
-        &{$Branch='dev';iex ((New-Object net.webclient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))}
+		$dotnetPath = "$pwd\.dotnet"
+		$dotnetCliVersion = if ($env:DOTNET_CLI_VERSION -eq $null) { 'Latest' } else { $env:DOTNET_CLI_VERSION }
+		$dotnetInstallScriptUrl = 'https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1'
+		$dotnetInstallScriptPath = '.\scripts\obtain\install.ps1'
 
-        if($env:DNX_HOME -eq $NULL)
-        {
-            Write-Host "Initial DNVM environment setup failed; running manual setup"
-            $tempDnvmPath = Join-Path $env:TEMP "dnvminstall"
-            $dnvmSetupCmdPath = Join-Path $tempDnvmPath "dnvm.ps1"
-            & $dnvmSetupCmdPath setup
-        }
-    }
+		md -Force ".\scripts\obtain\" | Out-Null
+		curl $dotnetInstallScriptUrl -OutFile $dotnetInstallScriptPath
+		& .\scripts\obtain\install.ps1 -Channel "preview" -version $dotnetCliVersion -InstallDir $dotnetPath -NoPath
+		$env:Path = "$dotnetPath;$env:Path"
+	}
 }
 
-function Get-DnxVersion
-{
-    $globalJson = Join-Path $PSScriptRoot "global.json"
-    $jsonData = Get-Content -Path $globalJson -Raw | ConvertFrom-JSON
-    return $jsonData.sdk.version
+function where-is($command) {
+    (ls env:\path).Value.split(';') | `
+        where { $_ } | `
+        %{ [System.Environment]::ExpandEnvironmentVariables($_) } | `
+        where { test-path $_ } |`
+        %{ ls "$_\*" -include *.bat,*.exe,*cmd } | `
+        %{  $file = $_.Name; `
+            if($file -and ($file -eq $command -or `
+			   $file -eq ($command + '.exe') -or  `
+			   $file -eq ($command + '.bat') -or  `
+			   $file -eq ($command + '.cmd'))) `
+            { `
+                $_.FullName `
+            } `
+        } | `
+        select -unique
 }

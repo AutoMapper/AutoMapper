@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests
 				public string Value2;
 			}
 
-		    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.CreateMap<Source, Destination>();
 
@@ -63,7 +63,7 @@ namespace AutoMapper.UnitTests
                 public int? Value2 { get; set; }
             }
 
-            protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<string, int>().ConvertUsing((string s) => Convert.ToInt32(s));
                 cfg.CreateMap<string, int?>().ConvertUsing((string s) => (int?) Convert.ToInt32(s));

@@ -21,11 +21,13 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
             var beforeMapCalled = false;
             var afterMapCalled = false;
 
-            Mapper.CreateMap<Source, Destination>()
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>()
                 .BeforeMap((src, dest) => beforeMapCalled = true)
-                .AfterMap((src, dest) => afterMapCalled = true);
+                .AfterMap((src, dest) => afterMapCalled = true));
 
-            Mapper.Map<Source, Destination>(new Source());
+            var mapper = config.CreateMapper();
+
+            mapper.Map<Source, Destination>(new Source());
 
             beforeMapCalled.ShouldBeTrue();
             afterMapCalled.ShouldBeTrue();
@@ -48,13 +50,18 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
             var beforeMapCount = 0;
             var afterMapCount = 0;
 
-            Mapper.CreateMap<Source, Destination>()
-                .BeforeMap((src, dest) => beforeMapCount++)
-                .BeforeMap((src, dest) => beforeMapCount++)
-                .AfterMap((src, dest) => afterMapCount++)
-                .AfterMap((src, dest) => afterMapCount++);
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>()
+                    .BeforeMap((src, dest) => beforeMapCount++)
+                    .BeforeMap((src, dest) => beforeMapCount++)
+                    .AfterMap((src, dest) => afterMapCount++)
+                    .AfterMap((src, dest) => afterMapCount++);
+            });
 
-            Mapper.Map<Source, Destination>(new Source());
+            var mapper = config.CreateMapper();
+
+            mapper.Map<Source, Destination>(new Source());
 
             beforeMapCount.ShouldEqual(2);
             afterMapCount.ShouldEqual(2);
@@ -106,7 +113,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
 			}
 		}
 
-	    protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+	    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 	    {
 	        cfg.ConstructServicesUsing(t => Activator.CreateInstance(t, 2));
 
@@ -142,7 +149,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
         }
 
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .BeforeMap((src, dest) => src.Value += 10);
@@ -178,7 +185,7 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
         }
 
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Dest>()
                 .AfterMap((src, dest) => dest.Value += 10);

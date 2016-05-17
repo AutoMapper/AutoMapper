@@ -3,7 +3,8 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System;
     using System.Linq;
     using System.Linq.Expressions;
-    using Internal;
+    using Configuration;
+    using Execution;
     using Mappers;
 
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider

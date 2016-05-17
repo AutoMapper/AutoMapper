@@ -5,14 +5,15 @@ namespace AutoMapper.Mappers
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using Internal;
+    using Configuration;
+    using Execution;
 
     /// <summary>
     /// Instantiates objects
     /// </summary>
     public static class ObjectCreator
     {
-        private static readonly DelegateFactory DelegateFactory = new DelegateFactory();
+        public static readonly DelegateFactory DelegateFactory = new DelegateFactory();
 
         public static Array CreateArray(Type elementType, int length)
         {
@@ -39,6 +40,17 @@ namespace AutoMapper.Mappers
             return CreateObject(type);
         }
 
+        public static object CreateDictionary(Type dictionaryType)
+        {
+            Type keyType = dictionaryType.GetTypeInfo().GenericTypeArguments[0];
+            Type valueType = dictionaryType.GetTypeInfo().GenericTypeArguments[1];
+            var type = dictionaryType.IsInterface()
+                ? typeof (Dictionary<,>).MakeGenericType(keyType, valueType)
+                : dictionaryType;
+
+            return DelegateFactory.CreateCtor(type)();
+        }
+
         public static object CreateDefaultValue(Type type)
         {
             return type.IsValueType() ? CreateObject(type) : null;
@@ -59,7 +71,9 @@ namespace AutoMapper.Mappers
                 ? CreateArray(type.GetElementType(), 0)
                 : type == typeof (string)
                     ? null
-                    : DelegateFactory.CreateCtor(type)();
+                    : type.IsDictionaryType()
+                        ? CreateDictionary(type) 
+                        : DelegateFactory.CreateCtor(type)();
         }
     }
 

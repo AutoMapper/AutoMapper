@@ -21,7 +21,7 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="destQuery">Destination queryable</param>
         /// <returns>Mapped destination queryable</returns>
         public static IQueryable<TDestination> Map<TSource, TDestination>(this IQueryable<TSource> sourceQuery, IQueryable<TDestination> destQuery)
-            => sourceQuery.Map(destQuery, Mapper.ConfigurationProvider);
+            => sourceQuery.Map(destQuery, Mapper.Configuration);
 
         /// <summary>
         /// Maps a queryable expression of a source type to a queryable expression of a destination type
@@ -55,8 +55,8 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Expression to project into</returns>
         public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source, object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
-            => source.ProjectTo(Mapper.ConfigurationProvider, parameters, membersToExpand);
-
+            => source.ProjectTo(Mapper.Configuration, parameters, membersToExpand);
+        
         /// <summary>
         /// Extension method to project from a queryable using the provided mapping engine
         /// </summary>
@@ -100,7 +100,7 @@ namespace AutoMapper.QueryableExtensions
             this IQueryable source,
             params Expression<Func<TDestination, object>>[] membersToExpand
             )
-            => source.ProjectTo(Mapper.ConfigurationProvider, null, membersToExpand);
+            => source.ProjectTo(Mapper.Configuration, null, membersToExpand);
 
         /// <summary>
         /// Projects the source type to the destination type given the mapping configuration
@@ -113,7 +113,7 @@ namespace AutoMapper.QueryableExtensions
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
         public static IQueryable<TDestination> ProjectTo<TDestination>(this IQueryable source,
             IDictionary<string, object> parameters, params string[] membersToExpand)
-            => source.ProjectTo<TDestination>(Mapper.ConfigurationProvider, parameters, membersToExpand);
+            => source.ProjectTo<TDestination>(Mapper.Configuration, parameters, membersToExpand);
 
         /// <summary>
         /// Projects the source type to the destination type given the mapping configuration
