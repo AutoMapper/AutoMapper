@@ -39,15 +39,15 @@ namespace AutoMapper
 
             _profiles.Add(_defaultProfile);
 
+            ExpressionBuilder = new ExpressionBuilder(this);
+            _getTypeMap = GetTypeMap;
+            _createMapperFunc = CreateMapperFunc;
+
             _validator = new ConfigurationValidator(this);
 
             configure(this);
 
             Seal();
-
-            ExpressionBuilder = new ExpressionBuilder(this);
-            _getTypeMap = GetTypeMap;
-            _createMapperFunc = CreateMapperFunc;
         }
 
         public string ProfileName => "";
