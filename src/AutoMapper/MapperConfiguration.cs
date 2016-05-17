@@ -35,15 +35,14 @@ namespace AutoMapper
         public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
-            _defaultProfile = new NamedProfile(ProfileName);
-
-            _profiles.Add(_defaultProfile);
-
-            ExpressionBuilder = new ExpressionBuilder(this);
             _getTypeMap = GetTypeMap;
             _createMapperFunc = CreateMapperFunc;
 
+            _defaultProfile = new NamedProfile(ProfileName);
+            _profiles.Add(_defaultProfile);
+            
             _validator = new ConfigurationValidator(this);
+            ExpressionBuilder = new ExpressionBuilder(this);
 
             configure(this);
 
