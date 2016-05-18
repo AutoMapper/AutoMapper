@@ -36,7 +36,7 @@ namespace AutoMapper
         {
             _mappers = mappers;
             _getTypeMap = GetTypeMap;
-            _createMapperFunc = CreateMapperFunc;
+            _createMapperFuncs = CreateMapperFuncs;
 
             _defaultProfile = new NamedProfile(ProfileName);
             _profiles.Add(_defaultProfile);
