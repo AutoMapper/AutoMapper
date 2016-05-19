@@ -5,6 +5,39 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_mapping_from_object_to_string_with_use_value : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+        }
+
+        class Destination
+        {
+            public string Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(c => c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.UseValue(new object())));
+            }
+        }
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { });
+        }
+
+        [Fact]
+        public void Should_use_to_string()
+        {
+            _destination.Value.ShouldEqual("System.Object");
+        }
+    }
+
     public class When_mapping_from_object_to_string : AutoMapperSpecBase
     {
         Destination _destination;

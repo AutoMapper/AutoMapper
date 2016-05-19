@@ -448,7 +448,7 @@
             }
             else if (propertyMap.CustomValue != null)
             {
-                valueResolverFunc = Convert(Constant(propertyMap.CustomValue), propertyMap.DestinationPropertyType);
+                valueResolverFunc = Constant(propertyMap.CustomValue);
             }
             else if (propertyMap.CustomResolver != null)
             {
