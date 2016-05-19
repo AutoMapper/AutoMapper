@@ -49,8 +49,9 @@ namespace AutoMapper.Mappers
                 filler = new MultidimensionalArrayFiller(destinationArray);
             }
             int count = 0;
+            var itemContext = new ResolutionContext(context);
             foreach (var item in sourceList)
-                filler.NewValue(context.Mapper.Map(item, null, typeof(TSourceElement), destElementType, context));
+                filler.NewValue(itemContext.Map(item, null, typeof(TSourceElement), destElementType));
 
             return destinationArray;
         }

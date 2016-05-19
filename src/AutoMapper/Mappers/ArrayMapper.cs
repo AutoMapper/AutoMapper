@@ -39,9 +39,10 @@ namespace AutoMapper.Mappers
             Array array = ObjectCreator.CreateArray(destElementType, sourceLength);
             int count = 0;
             var itemContext = new ResolutionContext(context);
-            foreach (var item in sourceList)
+            foreach(var item in sourceList)
+            {
                 array.SetValue(itemContext.Map(item, null, typeof(TSourceElement), destElementType), count++);
-
+            }
             return array as TDestination;
         }
 
