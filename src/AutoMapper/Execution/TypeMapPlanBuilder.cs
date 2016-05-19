@@ -454,9 +454,8 @@
             {
                 valueResolverFunc =
                     TryCatch(
-                        Convert(propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam),
-                            propertyMap.DestinationPropertyType),
-                        Catch(typeof (Exception), Default(propertyMap.DestinationPropertyType)));
+                        propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam),
+                        Catch(typeof (Exception), Default(propertyMap.CustomResolver.ReturnType)));
             }
             else if (propertyMap.CustomExpression != null)
             {
