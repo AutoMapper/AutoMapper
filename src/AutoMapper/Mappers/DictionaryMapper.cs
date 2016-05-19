@@ -25,11 +25,12 @@ namespace AutoMapper.Mappers
                         : ObjectCreator.CreateObject(typeof (TDestination))));
 
             list.Clear();
-
-            foreach (var keyPair in (IEnumerable<KeyValuePair<TSourceKey, TSourceValue>>)source ?? Enumerable.Empty<KeyValuePair<TSourceKey,TSourceValue>>())
-                list.Add((TDestinationKey)context.Mapper.Map(keyPair.Key, default(TDestinationKey), typeof(TSourceKey), typeof(TDestinationKey), context),
-                        (TDestinationValue)context.Mapper.Map(keyPair.Value, default(TDestinationValue), typeof(TSourceValue), typeof(TDestinationValue), context));
-
+            var itemContext = new ResolutionContext(context);
+            foreach(var keyPair in (IEnumerable<KeyValuePair<TSourceKey, TSourceValue>>)source ?? Enumerable.Empty<KeyValuePair<TSourceKey, TSourceValue>>())
+            {
+                list.Add((TDestinationKey)itemContext.Map(keyPair.Key, default(TDestinationKey), typeof(TSourceKey), typeof(TDestinationKey)),
+                        (TDestinationValue)itemContext.Map(keyPair.Value, default(TDestinationValue), typeof(TSourceValue), typeof(TDestinationValue)));
+            }
             return list;
         }
 

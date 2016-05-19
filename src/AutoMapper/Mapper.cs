@@ -313,6 +313,15 @@ namespace AutoMapper
             return func(source, destination, context);
         }
 
+        object IRuntimeMapper.Map(ResolutionContext context)
+        {
+            var types = TypePair.Create(context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
+
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(context.SourceType, context.DestinationType), types));
+
+            return func(context.SourceValue, context.DestinationValue, context);
+        }
+
         object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);

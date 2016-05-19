@@ -21,6 +21,7 @@ namespace AutoMapper.Mappers
                 destination = (TDestination) (!context.ConfigurationProvider.AllowNullDestinationValues
                     ? ObjectCreator.CreateNonNullValue(typeof (TDestination))
                     : ObjectCreator.CreateObject(typeof (TDestination)));
+            var memberContext = new ResolutionContext(context);
             foreach (var member in new TypeDetails(typeof(TDestination)).PublicWriteAccessors)
             {
                 object sourceMemberValue;
@@ -32,7 +33,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = ReflectionHelper.Map(context, member, sourceMemberValue);
+                var destinationMemberValue = memberContext.Map(member, sourceMemberValue);
                 member.SetMemberValue(destination, destinationMemberValue);
             }
             return destination;
@@ -73,6 +74,7 @@ namespace AutoMapper.Mappers
                 destination = (TDestination)(!context.ConfigurationProvider.AllowNullDestinationValues
                     ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
                     : ObjectCreator.CreateObject(typeof(TDestination)));
+            var memberContext = new ResolutionContext(context);
             foreach (var member in new TypeDetails(typeof(TSource)).PublicWriteAccessors)
             {
                 object sourceMemberValue;
@@ -84,7 +86,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = ReflectionHelper.Map(context, member, sourceMemberValue);
+                var destinationMemberValue = memberContext.Map(member, sourceMemberValue);
                 SetDynamically(member, destination, destinationMemberValue);
             }
             return destination;
