@@ -21,9 +21,10 @@ namespace AutoMapper.Mappers
             IList<TDestinationItem> list = new List<TDestinationItem>();
 
             var itemContext = new ResolutionContext(context);
-            foreach (var item in (IEnumerable)source ?? Enumerable.Empty<object>())
+            foreach(var item in (IEnumerable)source ?? Enumerable.Empty<object>())
+            {
                 list.Add((TDestinationItem)itemContext.Map(item, default(TDestinationItem), typeof(TSourceItem), typeof(TDestinationItem)));
-
+            }
             return new ReadOnlyCollection<TDestinationItem>(list);
         }
 
