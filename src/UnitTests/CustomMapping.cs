@@ -5,6 +5,101 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_mapping_different_types_with_UseValue : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class InnerSource
+        {
+            public int IntValue { get; set; }
+        }
+
+        class InnerDestination
+        {
+            public int IntValue { get; set; }
+        }
+
+        class Source
+        {
+        }
+
+        class Destination
+        {
+            public InnerDestination Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(c =>
+                {
+                    c.CreateMap<InnerSource, InnerDestination>();
+                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.UseValue(new InnerSource { IntValue = 15 }));
+                });
+            }
+        }
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_work()
+        {
+            _destination.Value.IntValue.ShouldEqual(15);
+        }
+    }
+
+    public class When_mapping_different_types_with_ResolveUsing : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class InnerSource
+        {
+            public int IntValue { get; set; }
+        }
+
+        class InnerDestination
+        {
+            public int IntValue { get; set; }
+        }
+
+        class Source
+        {
+            public InnerSource ObjectValue { get; set; }
+        }
+
+        class Destination
+        {
+            public InnerDestination Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(c =>
+                {
+                    c.CreateMap<InnerSource, InnerDestination>();
+                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.ResolveUsing(s => s.ObjectValue));
+                });
+            }
+        }
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { ObjectValue = new InnerSource { IntValue = 15 } });
+        }
+
+        [Fact]
+        public void Should_work()
+        {
+            _destination.Value.IntValue.ShouldEqual(15);
+        }
+    }
+
     public class When_mapping_from_object_to_string_with_use_value : AutoMapperSpecBase
     {
         Destination _destination;
