@@ -448,15 +448,14 @@
             }
             else if (propertyMap.CustomValue != null)
             {
-                valueResolverFunc = Convert(Constant(propertyMap.CustomValue), propertyMap.DestinationPropertyType);
+                valueResolverFunc = Constant(propertyMap.CustomValue);
             }
             else if (propertyMap.CustomResolver != null)
             {
                 valueResolverFunc =
                     TryCatch(
-                        Convert(propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam),
-                            propertyMap.DestinationPropertyType),
-                        Catch(typeof (Exception), Default(propertyMap.DestinationPropertyType)));
+                        propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam),
+                        Catch(typeof (Exception), Default(propertyMap.CustomResolver.ReturnType)));
             }
             else if (propertyMap.CustomExpression != null)
             {
