@@ -27,9 +27,11 @@ namespace AutoMapper.Mappers
 
             list.Clear();
 
-            foreach (var item in (IEnumerable<TSourceElement>)source ?? Enumerable.Empty<TSourceElement>())
-                list.Add((KeyValuePair<TDestinationKey, TDestinationValue>)context.Mapper.Map(item, default(KeyValuePair<TDestinationKey, TDestinationValue>), typeof(TSourceElement), typeof(KeyValuePair<TDestinationKey, TDestinationValue>), context));
-
+            var itemContext = new ResolutionContext(context);
+            foreach(var item in (IEnumerable<TSourceElement>)source ?? Enumerable.Empty<TSourceElement>())
+            {
+                list.Add((KeyValuePair<TDestinationKey, TDestinationValue>)itemContext.Map(item, default(KeyValuePair<TDestinationKey, TDestinationValue>), typeof(TSourceElement), typeof(KeyValuePair<TDestinationKey, TDestinationValue>)));
+            }
             return list;
         }
 

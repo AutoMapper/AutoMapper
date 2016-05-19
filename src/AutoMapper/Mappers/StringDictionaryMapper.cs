@@ -61,9 +61,10 @@ namespace AutoMapper.Mappers
             var members = from name in source.Keys
                 join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
                 select member;
+            var memberContext = new ResolutionContext(context);
             foreach (var member in members)
             {
-                object value = ReflectionHelper.Map(context, member, source[member.Name]);
+                object value = memberContext.Map(member, source[member.Name]);
                 member.SetMemberValue(destination, value);
             }
             return destination;

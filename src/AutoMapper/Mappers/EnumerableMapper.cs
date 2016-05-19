@@ -30,10 +30,11 @@ namespace AutoMapper.Mappers
 
             var list = destEnumeration as IList<TDestinationElement>;
             list.Clear();
-            
-            foreach (var item in source)
-                list.Add((TDestinationElement)context.Mapper.Map(item, null, sourceElementType, destElementType, context));
-
+            var itemContext = new ResolutionContext(context);
+            foreach(var item in source)
+            {
+                list.Add((TDestinationElement)itemContext.Map(item, null, sourceElementType, destElementType));
+            }
             return destEnumeration;
         }
 

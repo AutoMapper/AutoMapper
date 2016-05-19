@@ -30,12 +30,12 @@ namespace AutoMapper
         /// <summary>
         /// Source value
         /// </summary>
-        public object SourceValue { get; }
+        public object SourceValue { get; private set; }
 
         /// <summary>
         /// Destination value
         /// </summary>
-        public object DestinationValue { get; }
+        public object DestinationValue { get; private set; }
 
         /// <summary>
         /// Parent resolution context
@@ -76,7 +76,7 @@ namespace AutoMapper
         /// <summary>
         /// Source and destination type pair
         /// </summary>
-        public TypePair Types { get; }
+        public TypePair Types { get; private set; }
 
         public bool IsSourceValueNull => Equals(null, SourceValue);
 
@@ -85,16 +85,10 @@ namespace AutoMapper
         /// </summary>
         public IDictionary<string, object> Items => Options.Items;
 
-        public ResolutionContext(object source, object destination, TypePair types, ResolutionContext parent)
+        public ResolutionContext(object source, object destination, TypePair types, ResolutionContext parent) : this(parent)
         {
             SourceValue = source;
             DestinationValue = destination;
-            Parent = parent;
-            Options = parent.Options;
-            Mapper = parent.Mapper;
-
-            _instanceCache = parent.InstanceCache;
-
             Types = types;
         }
 
@@ -105,6 +99,14 @@ namespace AutoMapper
             Options = options;
             Mapper = mapper;
             Types = types;
+        }
+
+        internal ResolutionContext(ResolutionContext parent)
+        {
+            Parent = parent;
+            Options = parent.Options;
+            Mapper = parent.Mapper;
+            _instanceCache = parent.InstanceCache;
         }
 
         public override string ToString() => $"Trying to map {SourceType.Name} to {DestinationType.Name}.";
@@ -151,6 +153,21 @@ namespace AutoMapper
             {
                 Options.AfterMapAction(SourceValue, destination);
             }
+        }
+
+        internal object Map(object source, object destination, Type sourceType, Type destinationType)
+        {
+            var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
+            Fill(source, destination, sourceType, destinationType, typeMap);
+            return Mapper.Map(this);
+        }
+
+        private void Fill(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap)
+        {
+            Types = new TypePair(sourceType ?? typeMap?.SourceType ?? Parent.SourceType, destinationType ?? typeMap?.DestinationType ?? Parent.DestinationType);
+            SourceValue = source;
+            DestinationValue = destination;
+            TypeMap = typeMap;
         }
     }
 }
