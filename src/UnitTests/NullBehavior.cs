@@ -405,5 +405,32 @@ namespace AutoMapper.UnitTests
                 _dest.Values6.ShouldBeNull();
             }
         }
-	}
+
+        public class When_mapping_a_nullable_type_to_nullable_type : AutoMapperSpecBase
+        {
+            public class MyNullableDecimalClass
+            {
+                public decimal? MyNullableDecimal { get; set; }
+            }
+
+            public class MyMappedNullableDecimalClass
+            {
+                public decimal? MyMappedNullableDecimal { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<MyNullableDecimalClass, MyMappedNullableDecimalClass>()
+                .ForMember(dest => dest.MyMappedNullableDecimal, opt => opt.ResolveUsing(src => src.MyNullableDecimal));
+            });
+
+            [Fact]
+            public void Should_allow_the_mapper_to_handle_null_values()
+            {
+                var testClass = new MyNullableDecimalClass { MyNullableDecimal = null };
+                var result = Mapper.Map<MyNullableDecimalClass, MyMappedNullableDecimalClass>(testClass);
+                result.MyMappedNullableDecimal.ShouldBeNull();
+            }
+        }
+    }
 }

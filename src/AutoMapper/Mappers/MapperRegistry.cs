@@ -28,6 +28,7 @@ namespace AutoMapper.Mappers
 #if !PORTABLE
             new TypeConverterMapper(),
 #endif
+            new NullableMapper(),
             new NullableSourceMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
