@@ -181,7 +181,7 @@
                 //mapperFunc = (source, context, destFunc) => PassesDepthCheck(context, typeMap.MaxDepth) ? inner(source, context, destFunc) : default(TDestination);
             }
 
-            if (typeMap.Profile.AllowNullDestinationValues)
+            if (typeMap.Profile.AllowNullDestinationValues && typeMap.SourceType.IsClass())
             {
                 mapperFunc =
                     Condition(Equal(srcParam, Default(typeMap.SourceType)),
