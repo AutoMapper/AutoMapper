@@ -38,7 +38,9 @@ namespace AutoMapper
         [Obsolete("Use the constructor instead. Will be removed in 6.0")]
         protected virtual void Configure() { }
 
+#pragma warning disable 618 
         internal void Initialize() => Configure();
+#pragma warning restore 618
 
         public virtual string ProfileName { get; }
 

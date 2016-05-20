@@ -31,11 +31,6 @@ namespace AutoMapper.Execution
     }
     public class NulloMemberAccessor : NulloMemberGetter, IMemberAccessor
     {
-        public MemberInfo MemberInfo { get; }
-        public string Name { get; }
-        public LambdaExpression GetExpression { get; }
-        public Type MemberType { get; }
-        public object GetValue(object source) => source;
         public void SetValue(object destination, object value) { }
     }
 }
