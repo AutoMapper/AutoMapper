@@ -5,6 +5,42 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_resolve_throws : NonValidatingSpecBase
+    {
+        Exception _ex = new Exception();
+
+        class Source
+        {
+        }
+
+        class Destination
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(c =>
+                {
+                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.ResolveUsing(s => { Throw(); return 0; }));
+                });
+            }
+        }
+
+        private void Throw()
+        {
+            throw _ex;
+        }
+
+        [Fact]
+        public void Should_propagate_exception()
+        {
+            new Action(()=>Mapper.Map<Destination>(new Source())).ShouldThrow<AutoMapperMappingException>(e=>e.InnerException.ShouldEqual(_ex));
+        }
+    }
+
     public class When_mapping_different_types_with_UseValue : AutoMapperSpecBase
     {
         Destination _destination;

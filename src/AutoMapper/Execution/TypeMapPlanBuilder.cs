@@ -452,10 +452,7 @@
             }
             else if (propertyMap.CustomResolver != null)
             {
-                valueResolverFunc =
-                    TryCatch(
-                        propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam),
-                        Catch(typeof (Exception), Default(propertyMap.CustomResolver.ReturnType)));
+                valueResolverFunc = propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam);
             }
             else if (propertyMap.CustomExpression != null)
             {
