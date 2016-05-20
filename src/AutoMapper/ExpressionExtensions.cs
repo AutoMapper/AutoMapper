@@ -64,7 +64,7 @@
             private readonly IList<MemberExpression> AllreadyUpdated = new List<MemberExpression>();
             protected override Expression VisitMember(MemberExpression node)
             {
-                if (AllreadyUpdated.Contains(node))
+                if (AllreadyUpdated.Contains(node) || node.Expression is ParameterExpression)
                     return base.VisitMember(node);
                 AllreadyUpdated.Add(node);
                 return Visit(DelegateFactory.IfNotNullExpression(node));
