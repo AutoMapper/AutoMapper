@@ -168,7 +168,7 @@
             return Block(variables, actions);
         }
 
-        private static Expression CreatePropertyContext(ParameterExpression propertyContext, ParameterExpression ctxtParam)
+        public static Expression CreatePropertyContext(ParameterExpression propertyContext, ParameterExpression ctxtParam)
         {
             var constructor =
                               (from c in typeof(ResolutionContext).GetDeclaredConstructors()
@@ -409,6 +409,11 @@
         private static Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpr, Expression destValueExpr,
             ref ParameterExpression propertyContext)
         {
+            return ContextMap(valueResolverExpr, destValueExpr, propertyMap.DestinationPropertyType, ref propertyContext);
+        }
+
+        public static Expression ContextMap(Expression valueResolverExpr, Expression destValueExpr, Type destinationType, ref ParameterExpression propertyContext)
+        {
             if(propertyContext == null)
             {
                 propertyContext = Variable(typeof(ResolutionContext), "propertyContext");
@@ -420,9 +425,9 @@
                 ToObject(valueResolverExpr),
                 ToObject(destValueExpr),
                 Constant(valueResolverExpr.Type),
-                Constant(propertyMap.DestinationPropertyType)
+                Constant(destinationType)
                 );
-            return Convert(second, propertyMap.DestinationPropertyType);
+            return Convert(second, destinationType);
         }
 
         private static Expression BuildValueResolverFunc(PropertyMap propertyMap, TypeMapRegistry typeMapRegistry,
