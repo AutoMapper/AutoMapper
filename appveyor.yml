@@ -1,0 +1,30 @@
+version: '{build}'
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  only:
+  - master
+services: mssql2014
+nuget:
+  disable_publish_on_pr: true
+build_script:
+- cmd: .\psake.bat ci
+test: off
+artifacts:
+- path: src\AutoMapper\bin\release\*.nupkg
+  name: NuGet
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/automapperdev/api/v2/package
+  api_key:
+    secure: zKeQZmIv9PaozHQRJmrlRHN+jMCI64Uvzmb/vwePdXFR5CUNEHalnZdOCg0vrh8t
+  skip_symbols: true
+  on:
+    branch: master
+- provider: NuGet
+  name: production
+  api_key:
+    secure: t3blEIQiDIYjjWhOSTTtrcAnzJkmSi+0zYPxC1v4RDzm6oI/gIpD6ZtrOGsYu2jE
+  on:
+    branch: master
+    appveyor_repo_tag: true

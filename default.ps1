@@ -29,13 +29,13 @@ task release {
 
 task compile -depends clean {
 	$version = if ($env:APPVEYOR_BUILD_NUMBER -ne $NULL) { $env:APPVEYOR_BUILD_NUMBER } else { '0' }
+	$version = "{0:D5}" -f [convert]::ToInt32($version, 10)
 	
-    exec { dotnet restore $source_dir\AutoMapper }
-    exec { dotnet build $source_dir\AutoMapper -c $config }
-    exec { dotnet pack $source_dir\AutoMapper -c $config --version-suffix $version}
+    exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.sln }
 
-    exec { & $source_dir\.nuget\Nuget.exe restore $source_dir\AutoMapper.NoProjectJson.sln }
-    exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.NoProjectJson.sln }
+    exec { msbuild /t:Clean /t:Build /p:Configuration=$config /v:q /p:NoWarn=1591 /nologo $source_dir\AutoMapper.sln }
+
+	exec { dotnet pack $source_dir\AutoMapper -c $config --version-suffix $version}
 }
 
 task benchmark {
