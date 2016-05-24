@@ -130,9 +130,17 @@ namespace AutoMapper
                 set { _defaultProfile.DestinationMemberNamingConvention = value; }
             }
 
-            bool IProfileExpression.AllowNullDestinationValues { get; set; }
+            bool IProfileExpression.AllowNullDestinationValues
+            {
+                get { return _defaultProfile.AllowNullDestinationValues; }
+                set { _defaultProfile.AllowNullDestinationValues = value; }
+            }
 
-            bool IProfileExpression.AllowNullCollections { get; set; }
+            bool IProfileExpression.AllowNullCollections
+            {
+                get { return _defaultProfile.AllowNullCollections; }
+                set { _defaultProfile.AllowNullCollections = value; }
+            }
 
             void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
                 => _allTypeMapActions.Add(configuration);
