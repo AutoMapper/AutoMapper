@@ -134,12 +134,6 @@ namespace AutoMapper
                 ?? ResolveTypeMap(sourceType, destinationType);
         }
 
-        public TypeMap ResolveTypeMap(Type sourceRuntimeType, Type sourceDeclaredType, Type destinationType)
-        {
-            return ResolveTypeMap(sourceRuntimeType, destinationType) ??
-                      (sourceDeclaredType != sourceRuntimeType ? ResolveTypeMap(sourceDeclaredType, destinationType) : null);
-        }
-
         public void AssertConfigurationIsValid(TypeMap typeMap)
         {
             _validator.AssertConfigurationIsValid(Enumerable.Repeat(typeMap, 1));

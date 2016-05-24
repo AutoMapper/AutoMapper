@@ -15,7 +15,6 @@ namespace AutoMapper.Configuration
         {
             _defaultProfile = new NamedProfile(ProfileName);
             _profiles.Add(_defaultProfile);
-
         }
 
         public string ProfileName => "";
