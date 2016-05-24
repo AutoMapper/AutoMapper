@@ -181,7 +181,7 @@
                 //mapperFunc = (source, context, destFunc) => PassesDepthCheck(context, typeMap.MaxDepth) ? inner(source, context, destFunc) : default(TDestination);
             }
 
-            if (typeMap.Profile.AllowNullDestinationValues)
+            if (typeMap.Profile.AllowNullDestinationValues && typeMap.SourceType.IsClass())
             {
                 mapperFunc =
                     Condition(Equal(srcParam, Default(typeMap.SourceType)),
@@ -448,15 +448,11 @@
             }
             else if (propertyMap.CustomValue != null)
             {
-                valueResolverFunc = Convert(Constant(propertyMap.CustomValue), propertyMap.DestinationPropertyType);
+                valueResolverFunc = Constant(propertyMap.CustomValue);
             }
             else if (propertyMap.CustomResolver != null)
             {
-                valueResolverFunc =
-                    TryCatch(
-                        Convert(propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam),
-                            propertyMap.DestinationPropertyType),
-                        Catch(typeof (Exception), Default(propertyMap.DestinationPropertyType)));
+                valueResolverFunc = propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam);
             }
             else if (propertyMap.CustomExpression != null)
             {

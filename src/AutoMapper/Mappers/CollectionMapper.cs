@@ -25,9 +25,9 @@ namespace AutoMapper.Mappers
                 : ObjectCreator.CreateObject(typeof(TDestination))));
 
             list.Clear();
-
+            var itemContext = new ResolutionContext(context);
             foreach (var item in (IEnumerable) source ?? Enumerable.Empty<object>())
-                list.Add((TDestinationItem)context.Mapper.Map(item, default(TDestinationItem), typeof(TSourceItem), typeof(TDestinationItem), context));
+                list.Add((TDestinationItem)itemContext.Map(item, default(TDestinationItem), typeof(TSourceItem), typeof(TDestinationItem)));
 
             return list;
         }

@@ -186,11 +186,11 @@ namespace AutoMapper
         {
             var types = new TypePair(source.GetType(), typeof(TDestination));
 
-            var func = _configurationProvider.GetMapperFunc(new MapRequest(types, types));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(types, types));
 
             var context = new ResolutionContext(source, null, types, _defaultMappingOptions, this);
 
-            return (TDestination) func.DynamicInvoke(source, null, context);
+            return (TDestination) func(source, null, context);
         }
 
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
@@ -266,36 +266,36 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, null, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var context = new ResolutionContext(source, null, types, _defaultMappingOptions, this);
 
-            return func.DynamicInvoke(source, null, context);
+            return func(source, null, context);
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
             var types = TypePair.Create(source, null, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var options = new MappingOperationOptions(_serviceCtor);
             opts(options);
 
             var context = new ResolutionContext(source, null, types, options, this);
 
-            return func.DynamicInvoke(source, null, context);
+            return func(source, null, context);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var context = new ResolutionContext(source, destination, types, _defaultMappingOptions, this);
 
-            return func.DynamicInvoke(source, destination, context);
+            return func(source, destination, context);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
@@ -303,25 +303,34 @@ namespace AutoMapper
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var options = new MappingOperationOptions(_serviceCtor);
             opts(options);
 
             var context = new ResolutionContext(source, destination, types, options, this);
 
-            return func.DynamicInvoke(source, destination, context);
+            return func(source, destination, context);
+        }
+
+        object IRuntimeMapper.Map(ResolutionContext context)
+        {
+            var types = TypePair.Create(context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
+
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(context.SourceType, context.DestinationType), types));
+
+            return func(context.SourceValue, context.DestinationValue, context);
         }
 
         object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
-            var func = _configurationProvider.GetMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var context = new ResolutionContext(source, destination, types, parent);
 
-            return func.DynamicInvoke(source, destination, context);
+            return func(source, destination, context);
         }
 
         TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext parent)

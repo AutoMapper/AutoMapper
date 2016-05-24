@@ -48,10 +48,11 @@ namespace AutoMapper.Mappers
                 destinationArray = ObjectCreator.CreateArray(destElementType, sourceArray);
                 filler = new MultidimensionalArrayFiller(destinationArray);
             }
-            int count = 0;
-            foreach (var item in sourceList)
-                filler.NewValue(context.Mapper.Map(item, null, typeof(TSourceElement), destElementType, context));
-
+            var itemContext = new ResolutionContext(context);
+            foreach(var item in sourceList)
+            {
+                filler.NewValue(itemContext.Map(item, null, typeof(TSourceElement), destElementType));
+            }
             return destinationArray;
         }
 
