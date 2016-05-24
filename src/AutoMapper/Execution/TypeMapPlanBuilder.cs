@@ -127,10 +127,11 @@
 
             var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), ToObject(destParam));
 
-            var typeMaps =
-                typeMap.GetPropertyMaps()
+
+            ParameterExpression propertyContext = null;
+            var typeMaps = typeMap.GetPropertyMaps()
                     .Where(pm => pm.CanResolveValue())
-                    .Select(pm => TryPropertyMap(pm, configurationProvider, registry, srcParam, destParam, ctxtParam))
+                    .Select(pm => TryPropertyMap(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext))
                     .ToList();
 
             var afterMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("AfterMap"), ToObject(destParam));
@@ -144,6 +145,17 @@
             actions.Insert(0, beforeMap);
             actions.Insert(0, destinationFunc);
             actions.Insert(0, assignTypeMap);
+            ParameterExpression[] variables;
+            if(propertyContext != null)
+            {
+                var createPropertyContext = CreatePropertyContext(propertyContext, ctxtParam);
+                actions.Insert(0, createPropertyContext);
+                variables = new[] { propertyContext };
+            }
+            else
+            {
+                variables = new ParameterExpression[0];
+            }
 
             actions.Add(afterMap);
 
@@ -153,7 +165,17 @@
 
             actions.Add(destParam);
 
-            return Block(actions);
+            return Block(variables, actions);
+        }
+
+        private static Expression CreatePropertyContext(ParameterExpression propertyContext, ParameterExpression ctxtParam)
+        {
+            var constructor =
+                              (from c in typeof(ResolutionContext).GetDeclaredConstructors()
+                               let parameters = c.GetParameters()
+                               where parameters.Length == 1 && parameters[0].ParameterType == typeof(ResolutionContext)
+                               select c).Single();
+            return Assign(propertyContext, New(constructor, ctxtParam));
         }
 
         private static Expression CreateMapperFunc(
@@ -258,9 +280,10 @@
             TypeMapRegistry registry,
             ParameterExpression srcParam,
             ParameterExpression destParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression ctxtParam,
+            ref ParameterExpression propertyContext)
         {
-            var pmExpression = CreatePropertyMapFunc(pm, configurationProvider, registry, srcParam, destParam, ctxtParam);
+            var pmExpression = CreatePropertyMapFunc(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext);
 
             if (pmExpression == null)
                 return null;
@@ -285,7 +308,8 @@
             TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
             ParameterExpression destParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression ctxtParam,
+            ref ParameterExpression propertyContext)
         {
             var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, ctxtParam);
             var destMember = MakeMemberAccess(destParam, propertyMap.DestinationProperty.MemberInfo);
@@ -324,12 +348,12 @@
                         valueResolverExpr = expressionMapper.MapExpression(valueResolverExpr, destValueExpr,
                             ctxtParam);
                     else
-                        valueResolverExpr = SetMap(propertyMap, ctxtParam, valueResolverExpr, destValueExpr);
+                        valueResolverExpr = SetMap(propertyMap, ctxtParam, valueResolverExpr, destValueExpr, ref propertyContext);
                 }
             }
             else
             {
-                valueResolverExpr = SetMap(propertyMap, ctxtParam, valueResolverExpr, destValueExpr);
+                valueResolverExpr = SetMap(propertyMap, ctxtParam, valueResolverExpr, destValueExpr, ref propertyContext);
             }
 
             if (propertyMap.Condition != null)
@@ -383,22 +407,22 @@
         }
 
         private static Expression SetMap(PropertyMap propertyMap, ParameterExpression ctxtParam, Expression valueResolverExpr,
-            Expression destValueExpr)
+            Expression destValueExpr, ref ParameterExpression propertyContext)
         {
-            var mapperProp = MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Mapper"));
-            var mapMethod = typeof (IRuntimeMapper)
-                .GetAllMethods()
-                .Single(m => m.Name == "Map" && m.IsGenericMethodDefinition)
-                .MakeGenericMethod(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
+            if(propertyContext == null)
+            {
+                propertyContext = Variable(typeof(ResolutionContext), "propertyContext");
+            }
+            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().Single(m => m.Name == "Map");
             var second = Call(
-                mapperProp,
+                propertyContext,
                 mapMethod,
-                valueResolverExpr,
-                destValueExpr,
-                ctxtParam
+                ToObject(valueResolverExpr),
+                ToObject(destValueExpr),
+                Constant(valueResolverExpr.Type),
+                Constant(propertyMap.DestinationPropertyType)
                 );
-            valueResolverExpr = Convert(second, propertyMap.DestinationPropertyType);
-            return valueResolverExpr;
+            return Convert(second, propertyMap.DestinationPropertyType);
         }
 
         private static Expression BuildValueResolverFunc(PropertyMap propertyMap, TypeMapRegistry typeMapRegistry,
