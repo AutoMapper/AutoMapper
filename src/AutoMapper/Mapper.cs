@@ -184,6 +184,9 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TDestination>(object source)
         {
+            if (source == null)
+                return default(TDestination);
+
             var types = new TypePair(source.GetType(), typeof(TDestination));
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(types, types));

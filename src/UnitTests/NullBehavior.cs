@@ -405,5 +405,30 @@ namespace AutoMapper.UnitTests
                 _dest.Values6.ShouldBeNull();
             }
         }
-	}
+
+        public class When_mapping_a_null_model : AutoMapperSpecBase
+        {
+            private ModelDto _result;
+
+            public class ModelDto
+            {
+            }
+
+            public class ModelObject
+            {
+            }
+
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ModelObject, ModelDto>();
+            });
+
+            [Fact]
+            public void Should_populate_dto_items_with_a_value()
+            {
+                Mapper.Map<ModelDto>(null).ShouldBeNull();
+            }
+        }
+    }
 }
