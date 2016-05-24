@@ -437,6 +437,84 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class MappingMultipleConstructorArguments
+        {
+            [Fact]
+            public void Should_resolve_constructor_arguments_using_mapping_engine()
+            {
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<SourceBar, DestinationBar>();
+
+                    cfg.CreateMap<SourceFoo, DestinationFoo>();
+                });
+
+                var sourceBar = new SourceBar("fooBar");
+                var sourceFoo = new SourceFoo(sourceBar, new SourceBar("fooBar2"));
+
+                var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
+
+                destinationFoo.Bar.FooBar.ShouldEqual(sourceBar.FooBar);
+                destinationFoo.Bar2.FooBar.ShouldEqual("fooBar2");
+            }
+
+
+            public class DestinationFoo
+            {
+                private readonly DestinationBar _bar;
+
+                public DestinationBar Bar
+                {
+                    get { return _bar; }
+                }
+
+                public DestinationBar Bar2 { get; private set; }
+
+                public DestinationFoo(DestinationBar bar, DestinationBar bar2)
+                {
+                    _bar = bar;
+                    Bar2 = bar2;
+                }
+            }
+
+            public class DestinationBar
+            {
+                private readonly string _fooBar;
+
+                public string FooBar
+                {
+                    get { return _fooBar; }
+                }
+
+                public DestinationBar(string fooBar)
+                {
+                    _fooBar = fooBar;
+                }
+            }
+
+            public class SourceFoo
+            {
+                public SourceBar Bar { get; private set; }
+                public SourceBar Bar2 { get; private set; }
+
+                public SourceFoo(SourceBar bar, SourceBar bar2)
+                {
+                    Bar = bar;
+                    Bar2 = bar2;
+                }
+            }
+
+            public class SourceBar
+            {
+                public string FooBar { get; private set; }
+
+                public SourceBar(string fooBar)
+                {
+                    FooBar = fooBar;
+                }
+            }
+        }
+
         public class When_mapping_to_an_object_with_a_constructor_with_multiple_optional_arguments
         {
             [Fact]

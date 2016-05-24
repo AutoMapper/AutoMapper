@@ -33,7 +33,8 @@ namespace AutoMapper
 
         public Expression CreateExpression(TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression ctxtParam,
+            ref ParameterExpression parameterContext)
         {
             if (CustomExpression != null)
                 return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull();
@@ -71,25 +72,9 @@ namespace AutoMapper
                 /*
                 var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
                  */
-
-                var mapperProp = MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Mapper"));
-                var mapMethod = typeof (IRuntimeMapper).GetMethod("Map",
-                    new[] {typeof (object), typeof (object), typeof (Type), typeof (Type), typeof (ResolutionContext)});
-                valueResolverExpr = Call(
-                    mapperProp,
-                    mapMethod,
-                    ToObject(valueResolverExpr),
-                    Constant(null),
-                    Constant(SourceType),
-                    Constant(DestinationType),
-                    ctxtParam
-                    );
+                return TypeMapPlanBuilder.ContextMap(ToObject(valueResolverExpr), Constant(null), DestinationType, ref parameterContext);
             }
-
-
             return valueResolverExpr;
         }
-
-
     }
 }

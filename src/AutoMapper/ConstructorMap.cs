@@ -1,13 +1,15 @@
 ﻿using AutoMapper.QueryableExtensions;
 using AutoMapper.QueryableExtensions.Impl;
+using System.Linq.Expressions;
 
 namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Reflection;
+    using Execution;
+    using static Expression;
 
     public class ConstructorMap
     {
@@ -47,7 +49,7 @@ namespace AutoMapper
 
                 return result;
             });
-            return Expression.New(Ctor, parameters.Select(p => p.ResolutionExpression));
+            return New(Ctor, parameters.Select(p => p.ResolutionExpression));
         }
 
         public Expression BuildExpression(
@@ -58,16 +60,21 @@ namespace AutoMapper
             if (!CanResolve)
                 return null;
 
-            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry, srcParam, ctxtParam));
+            ParameterExpression parameterContext = null;
+            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry, srcParam, ctxtParam, ref parameterContext));
 
             ctorArgs =
                 ctorArgs.Zip(Ctor.GetParameters(),
-                    (exp, pi) => exp.Type == pi.ParameterType ? exp : Expression.Convert(exp, pi.ParameterType))
+                    (exp, pi) => exp.Type == pi.ParameterType ? exp : Convert(exp, pi.ParameterType))
                     .ToArray();
 
-            var newExpr = Expression.New(Ctor, ctorArgs);
-
-            return newExpr;
+            var newExpr = New(Ctor, ctorArgs);
+            if(parameterContext == null)
+            {
+                return newExpr;
+            }
+            var mapExpression = Invoke(Lambda(Block(new[] { parameterContext }, TypeMapPlanBuilder.CreatePropertyContext(parameterContext, ctxtParam), newExpr)));
+            return mapExpression;
         }
 
         public void AddParameter(ParameterInfo parameter, IMemberGetter[] resolvers, bool canResolve)
