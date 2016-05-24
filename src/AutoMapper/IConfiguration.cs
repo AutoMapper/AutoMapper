@@ -3,7 +3,7 @@ namespace AutoMapper
     using System;
     using System.Collections.Generic;
 
-    public interface IMapperConfiguration : IProfileExpression, IConfiguration
+    public interface IMapperConfigurationExpression : IProfileExpression, IConfiguration
     {
         Func<Type, object> ServiceCtor { get; }
         IEnumerable<Profile> Profiles { get; }

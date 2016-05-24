@@ -47,7 +47,7 @@ namespace AutoMapper
         /// Initialize static configuration instance
         /// </summary>
         /// <param name="config">Configuration action</param>
-        public static void Initialize(Action<IMapperConfiguration> config)
+        public static void Initialize(Action<IMapperConfigurationExpression> config)
         {
             Configuration = new MapperConfiguration(config);
             Instance = new Mapper(Configuration);

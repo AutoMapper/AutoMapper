@@ -5,7 +5,6 @@ namespace AutoMapper
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using Configuration;
     using Mappers;
     using QueryableExtensions;
@@ -24,13 +23,15 @@ namespace AutoMapper
         private readonly ConfigurationValidator _validator;
         private readonly Func<TypePair, TypeMap> _getTypeMap;
         private readonly Func<MapRequest, MapperFuncs> _createMapperFuncs;
-        private readonly ConfigurationExpression _configurationExpression;
+        private readonly MapperConfigurationExpression _mapperConfigurationExpression;
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure) : this(configure, MapperRegistry.Mappers)
+        public MapperConfiguration(MapperConfigurationExpression configurationExpression)
+            : this(configurationExpression, MapperRegistry.Mappers)
         {
+            
         }
 
-        public MapperConfiguration(Action<IMapperConfiguration> configure, IEnumerable<IObjectMapper> mappers)
+        public MapperConfiguration(MapperConfigurationExpression configurationExpression, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
             _getTypeMap = GetTypeMap;
@@ -39,161 +40,19 @@ namespace AutoMapper
             _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
 
-            _configurationExpression = new ConfigurationExpression();
+            _mapperConfigurationExpression = configurationExpression;
 
-            configure(_configurationExpression);
-
-            Seal(_configurationExpression);
+            Seal(_mapperConfigurationExpression);
         }
 
-        #region IConfiguration Members
-
-        private class ConfigurationExpression : IMapperConfiguration
+        public MapperConfiguration(Action<IMapperConfigurationExpression> configure) : this(configure, MapperRegistry.Mappers)
         {
-            private readonly Profile _defaultProfile;
-            private readonly IList<Profile> _profiles = new List<Profile>();
-            private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
-
-            public ConfigurationExpression()
-            {
-                _defaultProfile = new NamedProfile(ProfileName);
-                _profiles.Add(_defaultProfile);
-
-            }
-
-            public string ProfileName => "";
-            public IEnumerable<Profile> Profiles => _profiles;
-            public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions => _allTypeMapActions;
-            public Func<Type, object> ServiceCtor { get; private set; } = ObjectCreator.CreateObject;
-
-            void IConfiguration.CreateProfile(string profileName, Action<Profile> config)
-            {
-                var profile = new NamedProfile(profileName);
-
-                config(profile);
-
-                ((IConfiguration)this).AddProfile(profile);
-            }
-
-            private class NamedProfile : Profile
-            {
-                public NamedProfile(string profileName) : base(profileName)
-                {
-                }
-            }
-
-            void IConfiguration.AddProfile(Profile profile)
-            {
-                profile.Initialize();
-                _profiles.Add(profile);
-            }
-
-            void IConfiguration.AddProfile<TProfile>() => ((IConfiguration)this).AddProfile(new TProfile());
-
-            void IConfiguration.AddProfile(Type profileType)
-                => ((IConfiguration)this).AddProfile((Profile)Activator.CreateInstance(profileType));
-
-            void IConfiguration.ConstructServicesUsing(Func<Type, object> constructor) => ServiceCtor = constructor;
-
-            Func<PropertyInfo, bool> IProfileExpression.ShouldMapProperty
-            {
-                get { return _defaultProfile.ShouldMapProperty; }
-                set { _defaultProfile.ShouldMapProperty = value; }
-            }
-
-            Func<FieldInfo, bool> IProfileExpression.ShouldMapField
-            {
-                get { return _defaultProfile.ShouldMapField; }
-                set { _defaultProfile.ShouldMapField = value; }
-            }
-
-            bool IConfiguration.CreateMissingTypeMaps
-            {
-                get { return _defaultProfile.CreateMissingTypeMaps; }
-                set { _defaultProfile.CreateMissingTypeMaps = value; }
-            }
-
-            void IProfileExpression.IncludeSourceExtensionMethods(Type type)
-            {
-                _defaultProfile.IncludeSourceExtensionMethods(type);
-            }
-
-            INamingConvention IProfileExpression.SourceMemberNamingConvention
-            {
-                get { return _defaultProfile.SourceMemberNamingConvention; }
-                set { _defaultProfile.SourceMemberNamingConvention = value; }
-            }
-
-            INamingConvention IProfileExpression.DestinationMemberNamingConvention
-            {
-                get { return _defaultProfile.DestinationMemberNamingConvention; }
-                set { _defaultProfile.DestinationMemberNamingConvention = value; }
-            }
-
-            bool IProfileExpression.AllowNullDestinationValues
-            {
-                get { return _defaultProfile.AllowNullDestinationValues; }
-                set { _defaultProfile.AllowNullDestinationValues = value; }
-            }
-
-            bool IProfileExpression.AllowNullCollections
-            {
-                get { return _defaultProfile.AllowNullCollections; }
-                set { _defaultProfile.AllowNullCollections = value; }
-            }
-
-            void IProfileExpression.ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
-                => _allTypeMapActions.Add(configuration);
-
-            Configuration.Conventions.IMemberConfiguration IProfileExpression.AddMemberConfiguration()
-                => _defaultProfile.AddMemberConfiguration();
-
-            IConditionalObjectMapper IProfileExpression.AddConditionalObjectMapper()
-                => _defaultProfile.AddConditionalObjectMapper();
-
-            void IProfileExpression.DisableConstructorMapping() => _defaultProfile.DisableConstructorMapping();
-
-            IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>()
-                => _defaultProfile.CreateMap<TSource, TDestination>();
-
-            IMappingExpression<TSource, TDestination> IProfileExpression.CreateMap<TSource, TDestination>(
-                MemberList memberList)
-                => _defaultProfile.CreateMap<TSource, TDestination>(memberList);
-
-            IMappingExpression IProfileExpression.CreateMap(Type sourceType, Type destinationType)
-                => _defaultProfile.CreateMap(sourceType, destinationType, MemberList.Destination);
-
-            IMappingExpression IProfileExpression.CreateMap(Type sourceType, Type destinationType, MemberList memberList)
-                => _defaultProfile.CreateMap(sourceType, destinationType, memberList);
-
-            void IProfileExpression.ClearPrefixes() => _defaultProfile.ClearPrefixes();
-
-            void IProfileExpression.RecognizeAlias(string original, string alias)
-                => _defaultProfile.RecognizeAlias(original, alias);
-
-            void IProfileExpression.ReplaceMemberName(string original, string newValue)
-                => _defaultProfile.ReplaceMemberName(original, newValue);
-
-            void IProfileExpression.RecognizePrefixes(params string[] prefixes)
-                => _defaultProfile.RecognizePrefixes(prefixes);
-
-            void IProfileExpression.RecognizePostfixes(params string[] postfixes)
-                => _defaultProfile.RecognizePostfixes(postfixes);
-
-            void IProfileExpression.RecognizeDestinationPrefixes(params string[] prefixes)
-                => _defaultProfile.RecognizeDestinationPrefixes(prefixes);
-
-            void IProfileExpression.RecognizeDestinationPostfixes(params string[] postfixes)
-                => _defaultProfile.RecognizeDestinationPostfixes(postfixes);
-
-            void IProfileExpression.AddGlobalIgnore(string startingwith)
-                => _defaultProfile.AddGlobalIgnore(startingwith);
-
         }
 
-        #endregion
-
-        #region IConfigurationProvider members
+        public MapperConfiguration(Action<IMapperConfigurationExpression> configure, IEnumerable<IObjectMapper> mappers)
+            : this(Build(configure), mappers)
+        {
+        }
 
         public IExpressionBuilder ExpressionBuilder { get; }
 
@@ -308,9 +167,14 @@ namespace AutoMapper
 
         public IEnumerable<IObjectMapper> GetMappers() => _mappers;
 
-        #endregion
+        private static MapperConfigurationExpression Build(Action<IMapperConfigurationExpression> configure)
+        {
+            var expr = new MapperConfigurationExpression();
+            configure(expr);
+            return expr;
+        }
 
-        private void Seal(IMapperConfiguration configuration)
+        private void Seal(IMapperConfigurationExpression configuration)
         {
             ServiceCtor = configuration.ServiceCtor;
             AllowNullDestinationValues = configuration.AllowNullDestinationValues;
@@ -400,7 +264,7 @@ namespace AutoMapper
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
-            var typeMap = _configurationExpression.Profiles
+            var typeMap = _mapperConfigurationExpression.Profiles
                 .Cast<IProfileConfiguration>()
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
@@ -415,7 +279,7 @@ namespace AutoMapper
             if (typePair.GetOpenGenericTypePair() == null)
                 return null;
 
-            var typeMap = _configurationExpression.Profiles
+            var typeMap = _mapperConfigurationExpression.Profiles
                 .Cast<IProfileConfiguration>()
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                 .FirstOrDefault(t => t != null);

@@ -265,6 +265,7 @@
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
+    <Compile Include="SeparateConfiguration.cs" />
     <Compile Include="Should\Should.Core\Assertions\Assert.cs" />
     <Compile Include="Should\Should.Core\Assertions\AssertComparer.cs" />
     <Compile Include="Should\Should.Core\Assertions\AssertEqualityComparer.cs" />
