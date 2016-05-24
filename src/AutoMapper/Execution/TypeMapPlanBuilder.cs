@@ -348,12 +348,12 @@
                         valueResolverExpr = expressionMapper.MapExpression(valueResolverExpr, destValueExpr,
                             ctxtParam);
                     else
-                        valueResolverExpr = SetMap(propertyMap, ctxtParam, valueResolverExpr, destValueExpr, ref propertyContext);
+                        valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr, ref propertyContext);
                 }
             }
             else
             {
-                valueResolverExpr = SetMap(propertyMap, ctxtParam, valueResolverExpr, destValueExpr, ref propertyContext);
+                valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr, ref propertyContext);
             }
 
             if (propertyMap.Condition != null)
@@ -406,8 +406,8 @@
             return mapperExpr;
         }
 
-        private static Expression SetMap(PropertyMap propertyMap, ParameterExpression ctxtParam, Expression valueResolverExpr,
-            Expression destValueExpr, ref ParameterExpression propertyContext)
+        private static Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpr, Expression destValueExpr,
+            ref ParameterExpression propertyContext)
         {
             if(propertyContext == null)
             {
