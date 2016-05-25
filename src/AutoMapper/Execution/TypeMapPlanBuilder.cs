@@ -71,10 +71,11 @@
                 return Lambda(typeMap.CustomProjection.ReplaceParameters(srcParam), srcParam, destParam, ctxtParam);
             }
 
-            var destinationFunc = CreateDestinationFunc(typeMap, typeMapRegistry, srcParam, destParam, ctxtParam);
+            ParameterExpression contextToReuse = null;
 
-            var assignmentFunc = CreateAssignmentFunc(typeMap, configurationProvider, typeMapRegistry, srcParam, destParam, ctxtParam,
-                destinationFunc);
+            var destinationFunc = CreateDestinationFunc(typeMap, typeMapRegistry, srcParam, destParam, ctxtParam, ref contextToReuse);
+
+            var assignmentFunc = CreateAssignmentFunc(typeMap, configurationProvider, typeMapRegistry, srcParam, destParam, ctxtParam, destinationFunc, ref contextToReuse);
 
             var mapperFunc = CreateMapperFunc(typeMap, srcParam, destParam, ctxtParam, assignmentFunc);
 
@@ -88,9 +89,10 @@
             TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
             ParameterExpression destParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression ctxtParam,
+            ref ParameterExpression contextToReuse)
         {
-            var newDestFunc = ToType(CreateNewDestinationFunc(typeMap, typeMapRegistry, srcParam, ctxtParam),
+            var newDestFunc = ToType(CreateNewDestinationFunc(typeMap, typeMapRegistry, srcParam, ctxtParam, ref contextToReuse),
                 typeMap.DestinationType);
 
             var getDest = typeMap.DestinationTypeToUse.GetTypeInfo().IsValueType
@@ -120,7 +122,8 @@
             ParameterExpression srcParam,
             ParameterExpression destParam,
             ParameterExpression ctxtParam,
-            Expression destinationFunc)
+            Expression destinationFunc,
+            ref ParameterExpression contextToReuse)
         {
             var assignTypeMap = Assign(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("TypeMap")),
                 Constant(typeMap));
@@ -128,12 +131,12 @@
             var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), ToObject(destParam));
 
 
-            ParameterExpression propertyContext = null;
+            ParameterExpression propertyContext = contextToReuse;
             var typeMaps = typeMap.GetPropertyMaps()
                     .Where(pm => pm.CanResolveValue())
                     .Select(pm => TryPropertyMap(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext))
                     .ToList();
-
+            contextToReuse = propertyContext;
             var afterMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("AfterMap"), ToObject(destParam));
 
             var actions = typeMaps;
@@ -237,7 +240,8 @@
             TypeMap typeMap,
             TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression ctxtParam,
+            ref ParameterExpression contextToReuse)
         {
             if (typeMap.DestinationCtor != null)
                 return typeMap.DestinationCtor.ReplaceParameters(srcParam, ctxtParam);
@@ -249,7 +253,7 @@
                     );
 
             if (typeMap.ConstructorMap?.CanResolve == true)
-                return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, ctxtParam);
+                return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, ctxtParam, ref contextToReuse);
 
             if (typeMap.DestinationType.IsInterface())
             {
