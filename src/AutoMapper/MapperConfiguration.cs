@@ -128,12 +128,6 @@ namespace AutoMapper
             return null;
         }
 
-        public TypeMap ResolveTypeMap(object source, object destination, Type sourceType, Type destinationType)
-        {
-            return ResolveTypeMap(source?.GetType() ?? sourceType, destination?.GetType() ?? destinationType)
-                ?? ResolveTypeMap(sourceType, destinationType);
-        }
-
         public void AssertConfigurationIsValid(TypeMap typeMap)
         {
             _validator.AssertConfigurationIsValid(Enumerable.Repeat(typeMap, 1));

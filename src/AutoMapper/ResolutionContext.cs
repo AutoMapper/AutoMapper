@@ -157,17 +157,12 @@ namespace AutoMapper
 
         internal object Map(object source, object destination, Type sourceType, Type destinationType)
         {
-            var typeMap = ConfigurationProvider.ResolveTypeMap(source, destination, sourceType, destinationType);
-            Fill(source, destination, sourceType, destinationType, typeMap);
-            return Mapper.Map(this);
-        }
-
-        private void Fill(object source, object destination, Type sourceType, Type destinationType, TypeMap typeMap)
-        {
-            Types = new TypePair(sourceType ?? typeMap?.SourceType ?? Parent.SourceType, destinationType ?? typeMap?.DestinationType ?? Parent.DestinationType);
+            Types = TypePair.Create(source, destination, destinationType, destinationType);
+            var typeMap = ConfigurationProvider.ResolveTypeMap(Types);
             SourceValue = source;
             DestinationValue = destination;
             TypeMap = typeMap;
+            return Mapper.Map(this);
         }
     }
 }
