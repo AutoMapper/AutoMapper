@@ -5,6 +5,90 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_using_value_with_mismatched_properties : AutoMapperSpecBase
+    {
+        Destination _destination;
+        static Guid _guid = Guid.NewGuid();
+
+        class Source
+        {
+            public int Value { get; set; }
+        }
+
+        class Destination
+        {
+            public Guid Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(c =>
+                {
+                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.UseValue(_guid));
+                });
+            }
+        }
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Value.ShouldEqual(_guid);
+        }
+    }
+
+    public class When_custom_resolving_mismatched_properties : AutoMapperSpecBase
+    {
+        Destination _destination;
+        static Guid _guid = Guid.NewGuid();
+
+        class Source
+        {
+            public int Value { get; set; }
+        }
+
+        class Destination
+        {
+            public Guid Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(c =>
+                {
+                    c.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.ResolveUsing<Resolver>());//.ForMember(d => d.Value, o => o.ResolveUsing(s=>_guid));
+                });
+            }
+        }
+
+        class Resolver : IValueResolver<Source, Guid>
+        {
+            public Guid Resolve(Source model, ResolutionContext context)
+            {
+                return _guid;
+            }
+        }
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Value.ShouldEqual(_guid);
+        }
+    }
+
     public class When_resolve_throws : NonValidatingSpecBase
     {
         Exception _ex = new Exception();

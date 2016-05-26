@@ -52,7 +52,7 @@ namespace AutoMapper
                         string.Format(
                             "The following property on {0} cannot be mapped: \n\t{2}\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the destination type {1}.",
                             Context.DestinationType.FullName, Context.DestinationType.FullName,
-                            PropertyMap.DestinationProperty.Name);
+                            PropertyMap?.DestinationProperty.Name);
 
                     message += "\nContext:";
 
