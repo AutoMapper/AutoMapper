@@ -38,16 +38,6 @@ namespace AutoMapper
         TypeMap FindTypeMapFor<TSource, TDestination>();
 
         /// <summary>
-        /// Find the <see cref="TypeMap"/> for the configured source and destination type, checking the source/destination object types too
-        /// </summary>
-        /// <param name="source">Source object</param>
-        /// <param name="destination">Destination object</param>
-        /// <param name="sourceType">Configured source type</param>
-        /// <param name="destinationType">Configured destination type</param>
-        /// <returns>Type map configuration</returns>
-        TypeMap ResolveTypeMap(object source, object destination, Type sourceType, Type destinationType);
-
-        /// <summary>
         /// Resolve the <see cref="TypeMap"/> for the configured source and destination type, checking parent types
         /// </summary>
         /// <param name="sourceType">Configured source type</param>
