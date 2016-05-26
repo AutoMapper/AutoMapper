@@ -76,6 +76,10 @@ namespace AutoMapper
                     return CustomExpression.ReturnType;
                 if (CustomResolver != null)
                     return CustomResolver.ReturnType;
+                if(CustomValue != null)
+                    return CustomValue.GetType();
+                if(ValueResolverConfig != null)
+                    return typeof(object);
                 return SourceMember?.GetMemberType();
             }
         }
