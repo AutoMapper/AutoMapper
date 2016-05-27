@@ -58,8 +58,9 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.Profiler">
-      <HintPath>$(DevEnvDir)..\..\Team Tools\Performance Tools\Microsoft.VisualStudio.Profiler.dll</HintPath>
+    <Reference Include="Microsoft.VisualStudio.Profiler, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Microsoft.VisualStudio.Profiler.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
