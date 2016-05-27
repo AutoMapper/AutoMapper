@@ -86,9 +86,9 @@ namespace AutoMapper.Configuration
             return false;
         }
 
-        public static bool IsGenericType(this Type type, Type interfaceType)
+        public static bool IsGenericType(this Type type, Type genericType)
         {
-            return type.IsGenericType() && type.GetGenericTypeDefinition() == interfaceType;
+            return type.IsGenericType() && type.GetGenericTypeDefinition() == genericType;
         }
 
         public static Type GetDictionaryType(this Type type)
