@@ -106,7 +106,10 @@ namespace AutoMapper
             Parent = parent;
             Options = parent.Options;
             Mapper = parent.Mapper;
-            _instanceCache = parent.InstanceCache;
+            if(parent.TypeMap?.PreserveReferences == true)
+            {
+                _instanceCache = parent.InstanceCache;
+            }
         }
 
         public override string ToString() => $"Trying to map {SourceType.Name} to {DestinationType.Name}.";
