@@ -147,7 +147,6 @@
             }
             actions.Insert(0, beforeMap);
             actions.Insert(0, destinationFunc);
-            actions.Insert(0, assignTypeMap);
             ParameterExpression[] variables;
             if(propertyContext != null)
             {
@@ -159,6 +158,7 @@
             {
                 variables = new ParameterExpression[0];
             }
+            actions.Insert(0, assignTypeMap);
 
             actions.Add(afterMap);
 
