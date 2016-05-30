@@ -479,10 +479,6 @@
                     Convert(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"), sourceFunc, ctxtParam),
                         propertyMap.DestinationPropertyType);
             }
-            else if (propertyMap.CustomValue != null)
-            {
-                valueResolverFunc = Constant(propertyMap.CustomValue);
-            }
             else if (propertyMap.CustomResolver != null)
             {
                 valueResolverFunc = propertyMap.CustomResolver.ReplaceParameters(srcParam, ctxtParam);
