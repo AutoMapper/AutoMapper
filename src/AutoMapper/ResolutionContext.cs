@@ -49,7 +49,7 @@ namespace AutoMapper
         {
             get
             {
-                if (_instanceCache != null)
+                if(_instanceCache != null)
                 {
                     return _instanceCache;
                 }
@@ -106,10 +106,25 @@ namespace AutoMapper
             Parent = parent;
             Options = parent.Options;
             Mapper = parent.Mapper;
-            if(parent.TypeMap?.PreserveReferences == true)
+            if(MustPreserveReferences())
             {
                 _instanceCache = parent.InstanceCache;
             }
+        }
+
+        private bool MustPreserveReferences()
+        {
+            var context = this;
+            do
+            {
+                if(context.TypeMap != null && context.TypeMap.PreserveReferences)
+                {
+                    return true;
+                }
+                context = context.Parent;
+            }
+            while(context != null);
+            return false;
         }
 
         public override string ToString() => $"Trying to map {SourceType.Name} to {DestinationType.Name}.";
