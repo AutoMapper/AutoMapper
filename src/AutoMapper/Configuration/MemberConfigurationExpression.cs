@@ -114,7 +114,7 @@ namespace AutoMapper.Configuration
 
         public void UseValue<TValue>(TValue value)
         {
-            PropertyMapActions.Add(pm => pm.CustomValue = value);
+            MapFrom(s => value);
         }
 
         public void Condition(Func<TSource, TDestination, TMember, TMember, ResolutionContext, bool> condition)

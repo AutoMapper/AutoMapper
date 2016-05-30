@@ -42,7 +42,6 @@ namespace AutoMapper
         public MemberInfo CustomSourceMember { get; set; }
         public bool UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
-        public object CustomValue { get; set; }
         public object NullSubstitute { get; set; }
         public ValueResolverConfiguration ValueResolverConfig { get; set; }
 
@@ -76,8 +75,6 @@ namespace AutoMapper
                     return CustomExpression.ReturnType;
                 if (CustomResolver != null)
                     return CustomResolver.ReturnType;
-                if(CustomValue != null)
-                    return CustomValue.GetType();
                 if(ValueResolverConfig != null)
                     return typeof(object);
                 return SourceMember?.GetMemberType();
@@ -102,7 +99,6 @@ namespace AutoMapper
             PreCondition = PreCondition ?? inheritedMappedProperty.PreCondition;
             NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
-            CustomValue = CustomValue ?? inheritedMappedProperty.CustomValue;
             CustomSourceMember = CustomSourceMember ?? inheritedMappedProperty.CustomSourceMember;
         }
 
@@ -112,7 +108,6 @@ namespace AutoMapper
                 || ValueResolverConfig != null 
                 || CustomResolver != null 
                 || SourceMember != null
-                || CustomValue != null
                 || CustomExpression != null
                 || Ignored;
         }
@@ -123,7 +118,6 @@ namespace AutoMapper
                 || ValueResolverConfig != null
                 || CustomResolver != null
                 || SourceMember != null
-                || CustomValue != null
                 || CustomExpression != null) && !Ignored;
         }
 
