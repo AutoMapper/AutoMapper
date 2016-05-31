@@ -15,14 +15,11 @@ namespace AutoMapper.Mappers
             where TSource : class, IEnumerable
             where TDestination : class, IEnumerable
         {
-            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
-                return null;
+            if (source == null)
+                return context.Mapper.ShouldMapSourceCollectionAsNull(context) ? null : new List<TDestinationElement>() as TDestination;
 
             var sourceElementType = TypeHelper.GetElementType(typeof(TSource), source);
             var destElementType = typeof (TDestinationElement);
-            source = source ?? (context.ConfigurationProvider.AllowNullDestinationValues
-                ? ObjectCreator.CreateNonNullValue(typeof(TSource))
-                : ObjectCreator.CreateObject(typeof(TSource))) as TSource;
 
             TDestination destEnumeration = (destination is IList && !(destination is Array))
                 ? destination
