@@ -11,46 +11,31 @@ namespace AutoMapper.Mappers
 
     public class ArrayMapper : IObjectMapExpression
     {
-        public static TDestination Map<TDestination,TSource, TSourceElement>(TSource source, ResolutionContext context)
+        public static TDestinationElement[] Map<TSource, TSourceElement, TDestinationElement>(TSource source, ResolutionContext context)
             where TSource : IEnumerable
-            where TDestination : class
         {
-            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
-                return null;
+            if (source == null)
+                return context.Mapper.ShouldMapSourceCollectionAsNull(context) ? null : new TDestinationElement[0];
             
-            var destElementType = TypeHelper.GetElementType(typeof (TDestination));
-
-            if (!context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType))
+            if (context.DestinationType.IsAssignableFrom(context.SourceType))
             {
-                var elementTypeMap = context.ConfigurationProvider.ResolveTypeMap(typeof(TSourceElement), destElementType);
+                var elementTypeMap = context.ConfigurationProvider.ResolveTypeMap(typeof(TSourceElement), typeof(TDestinationElement));
                 if (elementTypeMap == null)
-                    return source as TDestination;
+                    return source as TDestinationElement[];
             }
 
-            IEnumerable sourceList = source;
-            if (sourceList == null)
-                sourceList = typeof(TSource).GetTypeInfo().IsInterface ?
-                new List<TSourceElement>() :
-                (IEnumerable<TSourceElement>)(context.ConfigurationProvider.AllowNullDestinationValues
-                ? ObjectCreator.CreateNonNullValue(typeof(TSource))
-                : ObjectCreator.CreateObject(typeof(TSource)));
-
-            var sourceLength = sourceList.OfType<object>().Count();
-            Array array = ObjectCreator.CreateArray(destElementType, sourceLength);
-            int count = 0;
             var itemContext = new ResolutionContext(context);
-            foreach(var item in sourceList)
-            {
-                array.SetValue(itemContext.Map(item, null, typeof(TSourceElement), destElementType), count++);
-            }
-            return array as TDestination;
+
+            return source.Cast<TSourceElement>()
+                .Select(item => (TDestinationElement) itemContext.Map(item, null, typeof(TSourceElement), typeof(TDestinationElement)))
+                .ToArray();
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(ArrayMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public object Map(ResolutionContext context)
         {
-            return MapMethodInfo.MakeGenericMethod(context.DestinationType, context.SourceType, TypeHelper.GetElementType(context.SourceType, (IEnumerable)context.SourceValue)).Invoke(null, new [] { context.SourceValue, context });
+            return MapMethodInfo.MakeGenericMethod(context.SourceType, TypeHelper.GetElementType(context.SourceType, (IEnumerable)context.SourceValue), TypeHelper.GetElementType(context.DestinationType, (IEnumerable)context.DestinationValue)).Invoke(null, new [] { context.SourceValue, context });
         }
 
         public bool IsMatch(TypePair context)
@@ -60,7 +45,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type)), sourceExpression, contextExpression );
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)), sourceExpression, contextExpression );
         }
     }
 }
