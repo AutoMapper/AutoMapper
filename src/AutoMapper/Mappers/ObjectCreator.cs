@@ -40,14 +40,11 @@ namespace AutoMapper.Mappers
             return CreateObject(type);
         }
 
-        public static object CreateDictionary(Type dictionaryType)
+        private static object CreateDictionary(Type dictionaryType)
         {
             Type keyType = dictionaryType.GetTypeInfo().GenericTypeArguments[0];
             Type valueType = dictionaryType.GetTypeInfo().GenericTypeArguments[1];
-            var type = dictionaryType.IsInterface()
-                ? typeof (Dictionary<,>).MakeGenericType(keyType, valueType)
-                : dictionaryType;
-
+            var type = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
             return DelegateFactory.CreateCtor(type)();
         }
 
@@ -71,7 +68,7 @@ namespace AutoMapper.Mappers
                 ? CreateArray(type.GetElementType(), 0)
                 : type == typeof (string)
                     ? null
-                    : type.IsDictionaryType()
+                    : type.IsInterface() && type.IsDictionaryType()
                         ? CreateDictionary(type) 
                         : DelegateFactory.CreateCtor(type)();
         }
