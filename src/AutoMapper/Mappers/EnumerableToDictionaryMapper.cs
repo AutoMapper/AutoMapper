@@ -56,7 +56,7 @@ namespace AutoMapper.Mappers
                     .Invoke(null, new[] { context.SourceValue, context.DestinationValue, context });
         }
 
-        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             Type sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             Type genericDestDictType = destExpression.Type;

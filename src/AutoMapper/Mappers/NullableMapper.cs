@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
             return context.DestinationType.IsNullableType();
         }
 
-        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return sourceExpression;
         }

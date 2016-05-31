@@ -36,7 +36,7 @@ namespace AutoMapper.Mappers
                 context.DestinationType == typeof (NameValueCollection);
         }
 
-        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo, sourceExpression);
         }
