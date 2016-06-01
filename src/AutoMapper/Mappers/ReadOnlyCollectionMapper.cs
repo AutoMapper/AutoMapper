@@ -47,7 +47,7 @@ namespace AutoMapper.Mappers
             return genericType == typeof (ReadOnlyCollection<>);
         }
 
-        public Expression MapExpression(Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)), sourceExpression, contextExpression);
         }
