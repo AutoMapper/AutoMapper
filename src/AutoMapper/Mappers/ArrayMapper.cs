@@ -8,6 +8,7 @@ namespace AutoMapper.Mappers
     using System;
     using System.Reflection;
     using Configuration;
+    using static System.Linq.Expressions.Expression;
 
     public class ArrayMapper : IObjectMapExpression
     {
@@ -32,6 +33,23 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(ArrayMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo Map2MethodInfo;
+
+        static ArrayMapper()
+        {
+            Expression<Func<IEnumerable<object>, ResolutionContext, object[]>> expr =
+                (source, context) => Map<object, object>(source, context);
+
+            Map2MethodInfo = ((MethodCallExpression) expr.Body).Method.GetGenericMethodDefinition();
+        }
+
+        private static TDestination[] Map<TSource, TDestination>(IEnumerable<TSource> source, ResolutionContext context)
+        {
+            var itemContext = new ResolutionContext(context);
+
+            return source.Select(item => (TDestination)itemContext.Map(item, null, typeof(TSource), typeof(TDestination)))
+                .ToArray();
+        }
 
         public object Map(ResolutionContext context)
         {
@@ -45,7 +63,27 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)), sourceExpression, contextExpression );
+            var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
+            var destElementType = TypeHelper.GetElementType(destExpression.Type);
+
+            if (destExpression.Type.IsAssignableFrom(sourceExpression.Type)
+                && typeMapRegistry.GetTypeMap(new TypePair(sourceElementType, destElementType)) == null)
+            {
+                if (configurationProvider.AllowNullCollections)
+                    return Convert(sourceExpression, destElementType.MakeArrayType());
+
+                return Coalesce(Convert(sourceExpression, destElementType.MakeArrayType()),
+                    NewArrayBounds(destElementType, Constant(0)));
+            }
+
+            var ifNullExpr = configurationProvider.AllowNullCollections
+                                 ? (Expression) Constant(null)
+                                 : NewArrayBounds(destElementType, Constant(0));
+
+            var mapExpr = Call(null, Map2MethodInfo.MakeGenericMethod(sourceElementType, destElementType), sourceExpression, contextExpression);
+
+            return Condition(Equal(sourceExpression, Constant(null)), ifNullExpr, mapExpr);
         }
+
     }
 }
