@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     using System;
     using System.Reflection;
     using Configuration;
-    using static System.Linq.Expressions.Expression;
+    using static Expression;
 
     public class ArrayMapper : IObjectMapExpression
     {
@@ -69,11 +69,14 @@ namespace AutoMapper.Mappers
             if (destExpression.Type.IsAssignableFrom(sourceExpression.Type)
                 && typeMapRegistry.GetTypeMap(new TypePair(sourceElementType, destElementType)) == null)
             {
-                if (configurationProvider.AllowNullCollections)
-                    return Convert(sourceExpression, destElementType.MakeArrayType());
+                // return (TDestination[]) source;
+                var convertExpr = Convert(sourceExpression, destElementType.MakeArrayType());
 
-                return Coalesce(Convert(sourceExpression, destElementType.MakeArrayType()),
-                    NewArrayBounds(destElementType, Constant(0)));
+                if (configurationProvider.AllowNullCollections)
+                    return convertExpr;
+
+                // return (TDestination[]) source ?? new TDestination[0];
+                return Coalesce(convertExpr, NewArrayBounds(destElementType, Constant(0)));
             }
 
             var ifNullExpr = configurationProvider.AllowNullCollections
@@ -82,6 +85,7 @@ namespace AutoMapper.Mappers
 
             var mapExpr = Call(null, Map2MethodInfo.MakeGenericMethod(sourceElementType, destElementType), sourceExpression, contextExpression);
 
+            // return (source == null) ? ifNullExpr : Map<TSourceElement, TDestElement>(source, context);
             return Condition(Equal(sourceExpression, Constant(null)), ifNullExpr, mapExpr);
         }
 
