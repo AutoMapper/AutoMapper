@@ -15,7 +15,6 @@ namespace AutoMapper.Mappers
     public class FromDynamicMapper : IObjectMapExpression
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
-            where TSource : DynamicObject
         {
             if (destination == null)
                 destination = (TDestination) (!context.ConfigurationProvider.AllowNullDestinationValues
@@ -68,7 +67,6 @@ namespace AutoMapper.Mappers
     public class ToDynamicMapper : IObjectMapExpression
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
-            where TDestination : DynamicObject
         {
             if (destination == null)
                 destination = (TDestination)(!context.ConfigurationProvider.AllowNullDestinationValues
