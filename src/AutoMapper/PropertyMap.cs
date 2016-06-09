@@ -16,7 +16,6 @@ namespace AutoMapper
         public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
         {
             TypeMap = typeMap;
-            //UseDestinationValue = true;
             DestinationProperty = destinationProperty;
         }
 
