@@ -332,7 +332,7 @@
 
             var destValueExpr = propertyMap.UseDestinationValue
                 ? getter
-                : Default(propertyMap.TypeMap.DestinationType);
+                : Default(propertyMap.DestinationPropertyType);
 
             if (propertyMap.SourceType != null && propertyMap.DestinationPropertyType != null)
             {
@@ -369,11 +369,11 @@
                             srcParam,
                             destParam,
                             ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
-                            ToType(destValueExpr, propertyMap.Condition.Parameters[2].Type),
+                            ToType(getter, propertyMap.Condition.Parameters[2].Type),
                             ctxtParam
                             ),
                         Convert(valueResolverExpr, propertyMap.DestinationPropertyType),
-                        destValueExpr
+                        getter
                         );
             }
 
