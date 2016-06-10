@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
+using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using Configuration;
+    using Execution;
+    using static ExpressionExtensions;
 
     public class CollectionMapper :  IObjectMapExpression
     {
@@ -33,6 +37,44 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(CollectionMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo MapToExistingMethodInfo;
+        private static readonly MethodInfo MapToNewMethodInfo;
+
+        static CollectionMapper()
+        {
+            Expression<Func<IEnumerable<object>, ICollection<object>, ResolutionContext, ICollection<object>>> expr =
+                (source, dest, context) => MapToExisting(source, dest, context);
+
+            MapToExistingMethodInfo = ((MethodCallExpression)expr.Body).Method.GetGenericMethodDefinition();
+
+            Expression<Func<IEnumerable<object>, ICollection<object>, ResolutionContext, ICollection<object>>> expr2 =
+                (source, dest, context) => MapToNew(source, dest, context);
+
+            MapToNewMethodInfo = ((MethodCallExpression)expr2.Body).Method.GetGenericMethodDefinition();
+        }
+
+        private static ICollection<TDestination> MapToExisting<TSource, TDestination>(IEnumerable<TSource> source, ICollection<TDestination> destination,
+            ResolutionContext context)
+        {
+            destination.Clear();
+
+            var itemContext = new ResolutionContext(context);
+            foreach (var item in source)
+                destination.Add((TDestination) itemContext.Map(item, default(TDestination), typeof(TSource), typeof(TDestination)));
+
+            return destination;
+        }
+
+        private static ICollection<TDestination> MapToNew<TSource, TDestination>(IEnumerable<TSource> source,
+            ICollection<TDestination> destination,
+            ResolutionContext context)
+        {
+            var itemContext = new ResolutionContext(context);
+            foreach (var item in source)
+                destination.Add((TDestination)itemContext.Map(item, default(TDestination), typeof(TSource), typeof(TDestination)));
+
+            return destination;
+        }
 
         public object Map(ResolutionContext context)
         {
@@ -48,11 +90,44 @@ namespace AutoMapper.Mappers
             return isMatch;
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, 
-                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), destExpression.Type, TypeHelper.GetElementType(destExpression.Type)),
-                    sourceExpression, destExpression, contextExpression);
+            //return Expression.Call(null,
+            //    MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type),
+            //        destExpression.Type, TypeHelper.GetElementType(destExpression.Type)),
+            //    sourceExpression, destExpression, contextExpression);
+
+            var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
+            var destElementType = TypeHelper.GetElementType(destExpression.Type);
+            var destCollectionType = destExpression.Type;
+
+            var newExpr = ToType(
+                destExpression.Type.IsInterface()
+                    ? New(typeof(List<>).MakeGenericType(destElementType))
+                    : DelegateFactory.GenerateConstructorExpression(destExpression.Type), 
+                typeof(ICollection<>).MakeGenericType(destElementType));
+            var ifNullExpr = configurationProvider.AllowNullCollections
+                     ? Constant(null, destCollectionType)
+                     : newExpr;
+
+            MethodInfo toUse;
+            if (propertyMap.UseDestinationValue)
+            {
+                toUse = MapToExistingMethodInfo;
+            }
+            else
+            {
+                toUse = MapToNewMethodInfo;
+                destExpression = newExpr;
+            }
+
+            var mapExpr = Call(null, toUse.MakeGenericMethod(sourceElementType, destElementType),
+                                  sourceExpression, destExpression, contextExpression);
+
+            return Condition(
+                Equal(sourceExpression, Constant(null)), 
+                ToType(ifNullExpr, destCollectionType), 
+                ToType(mapExpr, destCollectionType));
         }
     }
 }

@@ -37,7 +37,7 @@ namespace AutoMapper.Mappers
                 .Invoke(null, new[] { membersDictionary, context.DestinationValue, context });
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var membersDictionaryExpression = Expression.Call(null, MembersDictionaryMethodInfo, contextExpression);
 
@@ -77,7 +77,7 @@ namespace AutoMapper.Mappers
             return MapMethodInfo.MakeGenericMethod(context.DestinationType).Invoke(null, new []{context.SourceValue, context});
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, contextExpression);
         }
