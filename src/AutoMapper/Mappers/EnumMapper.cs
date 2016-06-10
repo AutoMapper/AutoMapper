@@ -119,7 +119,6 @@ namespace AutoMapper.Mappers
 
         private static TDestination ConvertEnumToNullableType<TSource, TDestination>(TSource source)
         {
-#if !PORTABLE
             var nullableConverter = new NullableConverter(typeof(TDestination));
 
             if (source == null)
@@ -129,16 +128,6 @@ namespace AutoMapper.Mappers
 
             var destType = nullableConverter.UnderlyingType;
             return (TDestination)Convert.ChangeType(source, destType, null);
-#else
-            if (source == null)
-            {
-                return default(TDestination);
-            }
-
-            var destType = Nullable.GetUnderlyingType(typeof(TDestination));
-
-            return (TDestination)Convert.ChangeType(source, destType, null);
-#endif
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(EnumToUnderlyingTypeMapper).GetAllMethods().First(_ => _.IsStatic);

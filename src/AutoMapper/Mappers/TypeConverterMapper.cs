@@ -2,7 +2,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-#if !PORTABLE
 namespace AutoMapper.Mappers
 {
     using System;
@@ -63,4 +62,3 @@ namespace AutoMapper.Mappers
         }
     }
 }
-#endif
