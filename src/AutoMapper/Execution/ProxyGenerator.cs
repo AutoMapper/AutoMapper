@@ -1,4 +1,3 @@
-#if !PORTABLE
 namespace AutoMapper.Execution
 {
     using System;
@@ -24,10 +23,10 @@ namespace AutoMapper.Execution
         private static readonly MethodInfo delegate_Remove = typeof (Delegate).GetMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
 
         private static readonly EventInfo iNotifyPropertyChanged_PropertyChanged =
-            typeof (INotifyPropertyChanged).GetEvent("PropertyChanged", BindingFlags.Instance | BindingFlags.Public);
+            typeof (INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
 
         private static readonly ConstructorInfo proxyBase_ctor =
-            typeof (ProxyBase).GetConstructor(Type.EmptyTypes);
+            typeof (ProxyBase).GetConstructor(new Type[0]);
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
@@ -56,13 +55,13 @@ namespace AutoMapper.Execution
             {
                 interfaceType
             };
-            allInterfaces.AddRange(interfaceType.GetInterfaces());
+            allInterfaces.AddRange(interfaceType.GetTypeInfo().ImplementedInterfaces);
             Debug.WriteLine(name, "Emitting proxy type");
             TypeBuilder typeBuilder = proxyModule.DefineType(name,
                 TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof (ProxyBase),
                 allInterfaces.ToArray());
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
-                CallingConventions.Standard, Type.EmptyTypes);
+                CallingConventions.Standard, new Type[0]);
             ILGenerator ctorIl = constructorBuilder.GetILGenerator();
             ctorIl.Emit(OpCodes.Ldarg_0);
             ctorIl.Emit(OpCodes.Call, proxyBase_ctor);
@@ -99,9 +98,9 @@ namespace AutoMapper.Execution
                 removeIl.Emit(OpCodes.Stfld, propertyChangedField);
                 removeIl.Emit(OpCodes.Ret);
                 typeBuilder.DefineMethodOverride(addPropertyChangedMethod,
-                    iNotifyPropertyChanged_PropertyChanged.GetAddMethod());
+                    iNotifyPropertyChanged_PropertyChanged.AddMethod);
                 typeBuilder.DefineMethodOverride(removePropertyChangedMethod,
-                    iNotifyPropertyChanged_PropertyChanged.GetRemoveMethod());
+                    iNotifyPropertyChanged_PropertyChanged.RemoveMethod);
             }
             List<PropertyInfo> propertiesToImplement = new List<PropertyInfo>();
             // first we collect all properties, those with setters before getters in order to enable less specific redundant getters
@@ -142,12 +141,12 @@ namespace AutoMapper.Execution
                 if (property.CanRead)
                 {
                     typeBuilder.DefineMethodOverride(propertyEmitter.GetGetter(property.PropertyType),
-                        property.GetGetMethod());
+                        property.GetMethod);
                 }
                 if (property.CanWrite)
                 {
                     typeBuilder.DefineMethodOverride(propertyEmitter.GetSetter(property.PropertyType),
-                        property.GetSetMethod());
+                        property.SetMethod);
                 }
             }
             return typeBuilder.CreateType();
@@ -173,4 +172,3 @@ namespace AutoMapper.Execution
         }
     }
 }
-#endif

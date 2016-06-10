@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-
-#if !PORTABLE
+﻿#if NETSTANDARD1_3
 namespace AutoMapper.Mappers
 {
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
     using System.Collections.Specialized;
 
     public class NameValueCollectionMapper : IObjectMapExpression
