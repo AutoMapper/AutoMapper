@@ -101,28 +101,63 @@ namespace AutoMapper.Mappers
             var destElementType = TypeHelper.GetElementType(destExpression.Type);
             var destCollectionType = destExpression.Type;
 
+            var makeGenericType = typeof(List<>).MakeGenericType(destElementType);
+            var destICollectionType = typeof(ICollection<>).MakeGenericType(destElementType);
             var newExpr = ToType(
                 destExpression.Type.IsInterface()
-                    ? New(typeof(List<>).MakeGenericType(destElementType))
+                    ? New(makeGenericType)
                     : DelegateFactory.GenerateConstructorExpression(destExpression.Type), 
-                typeof(ICollection<>).MakeGenericType(destElementType));
+                destICollectionType);
             var ifNullExpr = configurationProvider.AllowNullCollections
                      ? Constant(null, destCollectionType)
                      : newExpr;
 
-            MethodInfo toUse;
+            var itemParam = Parameter(sourceElementType, "item");
+            var itemContextParam = Parameter(typeof(ResolutionContext), "itemContext");
+
+            var blockExprs = new List<Expression>();
+            var blockParams = new List<ParameterExpression> { itemContextParam };
             if (propertyMap.UseDestinationValue)
             {
-                toUse = MapToExistingMethodInfo;
+                blockExprs.Add(Call(destExpression, destICollectionType.GetMethod("Clear")));
             }
             else
             {
-                toUse = MapToNewMethodInfo;
-                destExpression = newExpr;
+                var destParam = Parameter(newExpr.Type, "dest");
+                blockParams.Add(destParam);
+                blockExprs.Add(Assign(destParam, newExpr));
+                destExpression = destParam;
             }
 
-            var mapExpr = Call(null, toUse.MakeGenericMethod(sourceElementType, destElementType),
-                                  sourceExpression, destExpression, contextExpression);
+            // var itemContext = new ResolutionContext(context);
+            var resContextCtor = typeof(ResolutionContext).GetTypeInfo().DeclaredConstructors.Single(ci => ci.GetParameters().Length == 1);
+            blockExprs.Add(Assign(itemContextParam, New(resContextCtor, contextExpression)));
+            var addMethod = destICollectionType.GetMethod("Add");
+            var mapMethod = typeof(ResolutionContext).GetTypeInfo().DeclaredMethods.First(m => m.Name == "Map");
+            blockExprs.Add(ForEach(sourceExpression, itemParam, Call(
+                destExpression,
+                addMethod,
+                ToType(Call(itemContextParam, mapMethod,
+                    ToType(itemParam, typeof(object)),
+                    ToType(Default(destElementType), typeof(object)),
+                    Constant(sourceElementType),
+                    Constant(destElementType)
+                ), destElementType))));
+
+            blockExprs.Add(destExpression);
+/*
+ *          var itemContext = new ResolutionContext(context);
+            foreach (var item in source)
+                destination.Add((TDestination)itemContext.Map(item, default(TDestination), typeof(TSource), typeof(TDestination)));
+
+            return destination;
+
+ */
+
+            //var mapExpr = Call(null, toUse.MakeGenericMethod(sourceElementType, destElementType),
+            //                      sourceExpression, destExpression, contextExpression);
+
+            var mapExpr = Block(blockParams, blockExprs);
 
             return Condition(
                 Equal(sourceExpression, Constant(null)), 
