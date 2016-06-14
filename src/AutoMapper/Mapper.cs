@@ -318,9 +318,7 @@ namespace AutoMapper
 
         object IRuntimeMapper.Map(ResolutionContext context)
         {
-            var types = TypePair.Create(context.SourceValue, context.DestinationValue, context.SourceType, context.DestinationType);
-
-            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(context.SourceType, context.DestinationType), types));
+            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(context.Types, context.Types));
 
             return func(context.SourceValue, context.DestinationValue, context);
         }

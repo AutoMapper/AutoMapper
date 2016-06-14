@@ -175,7 +175,7 @@ namespace AutoMapper
 
         internal object Map(object source, object destination, Type sourceType, Type destinationType)
         {
-            Types = TypePair.Create(source, destination, destinationType, destinationType);
+            Types = TypePair.Create(source, destination, sourceType, destinationType);
             var typeMap = ConfigurationProvider.ResolveTypeMap(Types);
             SourceValue = source;
             DestinationValue = destination;
