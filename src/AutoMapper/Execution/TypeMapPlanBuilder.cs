@@ -133,7 +133,7 @@
 
             ParameterExpression propertyContext = contextToReuse;
             var typeMaps = typeMap.GetPropertyMaps()
-                    .Where(pm => pm.CanResolveValue())
+                    .Where(pm => pm.CanResolveValue() && !typeMap.IsMappedThroughConstructor(pm.DestinationProperty.Name))
                     .Select(pm => TryPropertyMap(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext))
                     .ToList();
             contextToReuse = propertyContext;

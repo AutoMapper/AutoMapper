@@ -87,6 +87,11 @@ namespace AutoMapper
             return _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
         }
 
+        public bool IsMappedThroughConstructor(string destinationPropertyName)
+        {
+            return ConstructorMap?.CtorParams.Any(c => c.Parameter.Name.Equals(destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
+        }
+
         public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IMemberGetter> resolvers)
         {
             var propertyMap = new PropertyMap(destProperty, this);
