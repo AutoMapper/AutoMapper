@@ -61,7 +61,7 @@ namespace AutoMapper.Mappers
                        .Equals(TypeHelper.GetElementType(context.SourceType)));
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             Type sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             Type destElementType = TypeHelper.GetElementType(destExpression.Type);
