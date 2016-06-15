@@ -181,10 +181,7 @@ namespace AutoMapper.Configuration
                                                                    Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
             var memberInfo = ReflectionHelper.FindProperty(destinationMember);
-            IMemberAccessor destProperty = memberInfo.ToMemberAccessor();
-
-            ForDestinationMember(destProperty, memberOptions);
-
+            ForDestinationMember(memberInfo, memberOptions);
             return this;
         }
 
@@ -192,7 +189,7 @@ namespace AutoMapper.Configuration
                                                                    Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
         {
             var member = DestinationType.GetFieldOrProperty(name);
-            ForDestinationMember(member.ToMemberAccessor(), memberOptions);
+            ForDestinationMember(member, memberOptions);
             return this;
         }
 
@@ -210,17 +207,19 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> IgnoreAllPropertiesWithAnInaccessibleSetter()
         {
-            var properties = DestinationType.GetDeclaredProperties().Where(pm => pm.HasAnInaccessibleSetter());
-            foreach (var property in properties)
-                ForMember(property.Name, opt => opt.Ignore());
+            foreach(var property in DestinationType.PropertiesWithAnInaccessibleSetter())
+            {
+                ForDestinationMember<object>(property, options => options.Ignore());
+            }
             return this;
         }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
         {
-            var properties = SourceType.GetDeclaredProperties().Where(pm => pm.HasAnInaccessibleSetter());
-            foreach (var property in properties)
-                ForSourceMember(property.Name, opt => opt.Ignore());
+            foreach(var property in SourceType.PropertiesWithAnInaccessibleSetter())
+            {
+                ForSourceMember(property.Name, options => options.Ignore());
+            }
             return this;
         }
 
@@ -455,6 +454,11 @@ namespace AutoMapper.Configuration
             });
 
             return this;
+        }
+
+        private void ForDestinationMember<TMember>(MemberInfo destinationProperty, Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
+        {
+            ForDestinationMember(destinationProperty.ToMemberAccessor(), memberOptions);
         }
 
         private void ForDestinationMember<TMember>(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
