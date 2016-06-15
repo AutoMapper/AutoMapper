@@ -77,7 +77,7 @@ namespace AutoMapper
             {
                 genericInterfaces = genericInterfaces.Union(new[] { Type });
             }
-            return explicitExtensionMethods.Concat
+            return explicitExtensionMethods.Union
             (
                 from genericMethod in sourceExtensionMethodSearch
                 where genericMethod.IsGenericMethodDefinition
