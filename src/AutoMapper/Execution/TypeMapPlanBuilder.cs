@@ -422,14 +422,12 @@
             {
                 propertyContext = Variable(typeof(ResolutionContext), "propertyContext");
             }
-            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().Single(m => m.Name == "Map");
+            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(valueResolverExpr.Type, destinationType);
             var second = Call(
                 propertyContext,
                 mapMethod,
-                ToObject(valueResolverExpr),
-                ToObject(destValueExpr),
-                Constant(valueResolverExpr.Type),
-                Constant(destinationType)
+                valueResolverExpr,
+                destValueExpr
                 );
             return Convert(second, destinationType);
         }

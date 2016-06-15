@@ -17,8 +17,7 @@ namespace AutoMapper.Mappers
         {
             if (source == null)
                 return context.Mapper.ShouldMapSourceCollectionAsNull(context) ? null : new List<TDestinationElement>() as TDestination;
-
-            var sourceElementType = TypeHelper.GetElementType(typeof(TSource), source);
+            
             var destElementType = typeof (TDestinationElement);
 
             TDestination destEnumeration = (destination is IList && !(destination is Array))
@@ -30,7 +29,7 @@ namespace AutoMapper.Mappers
             var itemContext = new ResolutionContext(context);
             foreach(var item in source)
             {
-                list.Add((TDestinationElement)itemContext.Map(item, null, sourceElementType, destElementType));
+                list.Add(itemContext.Map(item, default(TDestinationElement)));
             }
             return destEnumeration;
         }

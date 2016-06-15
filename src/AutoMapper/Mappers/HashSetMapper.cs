@@ -24,7 +24,7 @@ namespace AutoMapper.Mappers
             var itemContext = new ResolutionContext(context);
             foreach (var item in source ?? Enumerable.Empty<TSource>())
             {
-                destination.Add((TDestination) itemContext.Map(item, default(TDestination), typeof(TSource), typeof(TDestination)));
+                destination.Add(itemContext.Map(item, default(TDestination)));
             }
 
             return destination;

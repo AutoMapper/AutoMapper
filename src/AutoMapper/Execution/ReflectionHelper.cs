@@ -19,7 +19,7 @@ namespace AutoMapper.Execution
             return parameter.DefaultValue;
         }
 
-        public static object Map(this ResolutionContext context, MemberInfo member, object value)
+        public static object MapMember(this ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = member.GetMemberType();
             return context.Map(value, null, value?.GetType() ?? memberType, memberType);
