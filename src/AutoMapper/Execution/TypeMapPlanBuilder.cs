@@ -429,7 +429,7 @@
                 valueResolverExpr,
                 destValueExpr
                 );
-            return Convert(second, destinationType);
+            return second;
         }
 
         private static Expression BuildValueResolverFunc(PropertyMap propertyMap, TypeMapRegistry typeMapRegistry,
