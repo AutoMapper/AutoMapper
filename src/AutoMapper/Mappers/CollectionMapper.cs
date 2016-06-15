@@ -13,16 +13,16 @@ namespace AutoMapper.Mappers
 
     public class CollectionMapper :  IObjectMapExpression
     {
-        public static TDestination Map<TSource, TSourceItem, TDestination, TDestinationItem>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> newDestination, Func<TSourceItem, ResolutionContext, TDestinationItem> addFunc)
+        public static TDestination Map<TSource, TSourceItem, TDestination, TDestinationItem>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination, TDestination> newDestination, Func<TSourceItem, ResolutionContext, TDestinationItem> addFunc)
             where TSource : IEnumerable
             where TDestination : class, ICollection<TDestinationItem>
         {
             if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
                 return null;
             if(addFunc == null)
-                addFunc = (item, resolutionContext) => (TDestinationItem)resolutionContext.Map(item, null, typeof(TSourceItem), typeof(TDestinationItem));
+                addFunc = (item, resolutionContext) => resolutionContext.Map(item, default(TDestinationItem));
 
-            TDestination list = destination ?? newDestination();
+            TDestination list =  newDestination(destination);
 
             list.Clear();
             var itemContext = new ResolutionContext(context);
@@ -38,23 +38,24 @@ namespace AutoMapper.Mappers
             var newExpr = destinationType.IsInterface()
                 ? New(ifInterfaceType.MakeGenericType(destElementType))
                 : DelegateFactory.GenerateConstructorExpression(destinationType);
-            return newExpr;
+            return Convert(newExpr, destinationType);
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(CollectionMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public object Map(ResolutionContext context)
         {
-            return MapBase(context, typeof(List<>));
+            return MapBase(context, IfNotNull(Constant(context.DestinationValue)), typeof(List<>));
         }
 
-        internal static object MapBase(ResolutionContext context, Type ifInterfaceType)
+        internal static object MapBase(ResolutionContext context, BinaryExpression conditionalExpression, Type ifInterfaceType)
         {
-            var newExpr = NewExpr(context.DestinationType, ifInterfaceType);
+            var d = Parameter(context.DestinationType, "dest");
+            var newExpr = Condition(conditionalExpression, d, NewExpr(context.DestinationType, ifInterfaceType));
 
             return
                 MapMethodInfo.MakeGenericMethod(context.SourceType, TypeHelper.GetElementType(context.SourceType), context.DestinationType, TypeHelper.GetElementType(context.DestinationType))
-                    .Invoke(null, new[] { context.SourceValue, context.DestinationValue, context, Lambda(newExpr).Compile(), null });
+                    .Invoke(null, new[] { context.SourceValue, context.DestinationValue, context, Lambda(newExpr, d).Compile(), null });
         }
 
         public bool IsMatch(TypePair context)
@@ -66,24 +67,30 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return MapExpressionBase(typeMapRegistry, configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression, typeof(List<>));
+            return MapExpressionBase(typeMapRegistry, configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression, IfNotNull, typeof(List<>));
+        }
+
+        internal static BinaryExpression IfNotNull(Expression destExpression)
+        {
+            return NotEqual(destExpression, Constant(null));
         }
 
         internal static Expression MapExpressionBase(TypeMapRegistry typeMapRegistry,
             IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression,
-            Expression destExpression, Expression contextExpression, Type ifInterfaceType)
+            Expression destExpression, Expression contextExpression, Func<Expression, BinaryExpression> conditionalExpression, Type ifInterfaceType)
         {
-            var newExpr = NewExpr(destExpression.Type, ifInterfaceType);
+            var d = Parameter(destExpression.Type, "d");
+            var newExpr = Condition(conditionalExpression(d), d, NewExpr(destExpression.Type, ifInterfaceType));
             //var ifNullExpr = configurationProvider.AllowNullCollections
             //         ? Constant(null, destExpression.Type)
             //         : newExpr;
-
+            var b = Lambda(newExpr, d);
             var itemExpr = ItemExpr(typeMapRegistry, configurationProvider, propertyMap, sourceExpression, destExpression);
 
             return Call(null,
                 MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type),
                     destExpression.Type, TypeHelper.GetElementType(destExpression.Type)),
-                sourceExpression, destExpression, contextExpression, Constant(Lambda(newExpr).Compile()),
+                sourceExpression, destExpression, contextExpression, Constant(b.Compile()),
                 Constant(itemExpr.Compile()));
         }
 
