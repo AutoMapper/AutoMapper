@@ -2,6 +2,8 @@ using System.Linq.Expressions;
 
 namespace AutoMapper.Mappers
 {
+    using static ExpressionExtensions;
+
     public class AssignableMapper : IObjectMapExpression
     {
         public object Map(ResolutionContext context)
@@ -21,7 +23,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return sourceExpression;
+            return ToType(sourceExpression, destExpression.Type);
         }
     }
 }

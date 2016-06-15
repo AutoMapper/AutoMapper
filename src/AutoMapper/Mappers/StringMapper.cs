@@ -11,11 +11,14 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair context)
         {
-            return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
+            return context.DestinationType == typeof(string);
         }
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
+            if (sourceExpression.Type == typeof(string))
+                return sourceExpression;
+
             return Expression.Condition(Expression.Equal(sourceExpression, Expression.Default(sourceExpression.Type)),
                 Expression.Constant(null, typeof (string)),
                 Expression.Call(sourceExpression, typeof (object).GetMethod("ToString")));

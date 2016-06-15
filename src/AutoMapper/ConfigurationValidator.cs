@@ -78,7 +78,7 @@ namespace AutoMapper
                 {
                     throw new AutoMapperConfigurationException(context);
                 }
-                if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
+                if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper || mapperToUse is GenericEnumerableToEnumerableMapper)
                 {
                     CheckElementMaps(typeMapsChecked, context);
                 }

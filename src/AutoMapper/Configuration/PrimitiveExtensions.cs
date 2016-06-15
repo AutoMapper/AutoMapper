@@ -50,6 +50,11 @@ namespace AutoMapper.Configuration
             return typeof(IEnumerable).IsAssignableFrom(type);
         }
 
+        public static bool IsEnumerableOfTType(this Type type)
+        {
+            return type.ImplementsGenericInterface(typeof(IEnumerable<>));
+        }
+
         public static bool IsQueryableType(this Type type)
         {
             return typeof(IQueryable).IsAssignableFrom(type);

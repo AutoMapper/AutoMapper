@@ -12,11 +12,12 @@ namespace Benchmark
                 {
                     { "Flattening", new IObjectToObjectMapper[] { new FlatteningMapper(), new ManualMapper(), new EquilvalentManualMapper(),  } },
                     { "Ctors", new IObjectToObjectMapper[] { new CtorMapper(), new ManualCtorMapper(),  } },
-                    { "Mapster", new IObjectToObjectMapper[] { new ComplexTypeMapper(), new DeepTypeMapper() } }
+                    { "Complex", new IObjectToObjectMapper[] { new ComplexTypeMapper(), new ManualComplexTypeMapper() } },
+                    { "Deep", new IObjectToObjectMapper[] { new DeepTypeMapper(), new ManualDeepTypeMapper() } }
                 };
             //var mappers = new Dictionary<string, IObjectToObjectMapper[]>
             //{
-            //    {"Flattening", new IObjectToObjectMapper[] {new FlatteningMapper()}},
+            //    {"Flattening", new IObjectToObjectMapper[] {new ComplexTypeMapper()}},
             //};
 
 

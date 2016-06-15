@@ -6,7 +6,9 @@ namespace AutoMapper.UnitTests.Bug
 {
 	namespace DuplicateValuesBug
 	{
-		public class SourceObject
+	    using System;
+
+	    public class SourceObject
 		{
 			public int Id;
 			public IList<SourceObject> Children;
@@ -36,11 +38,37 @@ namespace AutoMapper.UnitTests.Bug
 		}
 		public class DuplicateValuesIssue
 		{
+		    public class MyCustomCollection : System.Collections.ObjectModel.Collection<DestObject>
+		    {
+		        protected override void ClearItems()
+		        {
+		            Console.WriteLine("Clearing Items");
+                    base.ClearItems();
+		        }
+
+		        protected override void InsertItem(int index, DestObject item)
+		        {
+		            Console.WriteLine("Inserting Item");
+                    base.InsertItem(index, item);
+		        }
+
+		        protected override void RemoveItem(int index)
+		        {
+                    Console.WriteLine("Removing Item");
+		            base.RemoveItem(index);
+		        }
+
+		        protected override void SetItem(int index, DestObject item)
+		        {
+		            Console.WriteLine("Setting Item");
+		            base.SetItem(index, item);
+		        }
+		    }
 			[Fact]
 			public void Should_map_the_existing_array_elements_over()
 			{
 				var sourceList = new List<SourceObject>();
-				var destList = new List<DestObject>();
+				var destList = new MyCustomCollection();
 
 				var config = new MapperConfiguration(cfg => cfg.CreateMap<SourceObject, DestObject>().PreserveReferences());
 				config.AssertConfigurationIsValid();
@@ -59,7 +87,6 @@ namespace AutoMapper.UnitTests.Bug
 
 				source1.AddChild(source2); // This causes the problem
 
-				DestObject dest1 = new DestObject();
 				config.CreateMapper().Map(sourceList, destList);
 
 				destList.Count.ShouldEqual(2);
