@@ -15,19 +15,18 @@ namespace AutoMapper.Mappers
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
-#if !PORTABLE
+#if NETSTANDARD1_3
             new NameValueCollectionMapper(),
 #endif
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
             new HashSetMapper(),
-            new CollectionMapper(),
-            new EnumerableMapper(),
             new StringMapper(),
+            new GenericEnumerableToEnumerableMapper(),
+            new EnumerableMapper(),
+            new CollectionMapper(),
             new AssignableMapper(),
-#if !PORTABLE
             new TypeConverterMapper(),
-#endif
             new NullableSourceMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),

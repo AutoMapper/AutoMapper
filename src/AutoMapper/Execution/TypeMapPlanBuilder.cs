@@ -257,16 +257,8 @@
 
             if (typeMap.DestinationType.IsInterface())
             {
-#if PORTABLE
-                Block(typeof (object),
-                    Throw(
-                        Constant(
-                            new PlatformNotSupportedException("Mapping to interfaces through proxies not supported."))),
-                    Constant(null));
-#else
                 var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationType)));
                 return Invoke(ctor);
-#endif
             }
 
             if (typeMap.DestinationType.IsAbstract())
@@ -332,7 +324,7 @@
 
             var destValueExpr = propertyMap.UseDestinationValue
                 ? getter
-                : Default(propertyMap.TypeMap.DestinationType);
+                : Default(propertyMap.DestinationPropertyType);
 
             if (propertyMap.SourceType != null && propertyMap.DestinationPropertyType != null)
             {
@@ -349,7 +341,7 @@
                     var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
                     var expressionMapper = match as IObjectMapExpression;
                     if (expressionMapper != null)
-                        valueResolverExpr = expressionMapper.MapExpression(typeMapRegistry, configurationProvider, valueResolverExpr, destValueExpr,
+                        valueResolverExpr = expressionMapper.MapExpression(typeMapRegistry, configurationProvider, propertyMap, valueResolverExpr, destValueExpr,
                             ctxtParam);
                     else
                         valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr, ref propertyContext);
@@ -369,11 +361,11 @@
                             srcParam,
                             destParam,
                             ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
-                            ToType(destValueExpr, propertyMap.Condition.Parameters[2].Type),
+                            ToType(getter, propertyMap.Condition.Parameters[2].Type),
                             ctxtParam
                             ),
                         Convert(valueResolverExpr, propertyMap.DestinationPropertyType),
-                        destValueExpr
+                        getter
                         );
             }
 

@@ -1,15 +1,14 @@
-#if !PORTABLE
 namespace AutoMapper.Execution
 {
     using System;
+    using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
 
     public class PropertyEmitter
     {
         private static readonly MethodInfo proxyBase_NotifyPropertyChanged =
-            typeof (ProxyBase).GetMethod("NotifyPropertyChanged",
-                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+            typeof (ProxyBase).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "NotifyPropertyChanged");
 
         private readonly FieldBuilder fieldBuilder;
         private readonly MethodBuilder getterBuilder;
@@ -21,7 +20,7 @@ namespace AutoMapper.Execution
             fieldBuilder = owner.DefineField($"<{name}>", propertyType, FieldAttributes.Private);
             getterBuilder = owner.DefineMethod($"get_{name}",
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig |
-                MethodAttributes.SpecialName, propertyType, Type.EmptyTypes);
+                MethodAttributes.SpecialName, propertyType, new Type[0]);
             ILGenerator getterIl = getterBuilder.GetILGenerator();
             getterIl.Emit(OpCodes.Ldarg_0);
             getterIl.Emit(OpCodes.Ldfld, fieldBuilder);
@@ -68,4 +67,3 @@ namespace AutoMapper.Execution
         }
     }
 }
-#endif

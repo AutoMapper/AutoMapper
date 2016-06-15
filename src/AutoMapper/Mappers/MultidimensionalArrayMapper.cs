@@ -8,6 +8,8 @@ namespace AutoMapper.Mappers
     using System.Collections;
     using System.Linq;
     using Configuration;
+    using static Expression;
+    using static ExpressionExtensions;
 
     public class MultidimensionalArrayMapper : IObjectMapExpression
     {
@@ -68,9 +70,11 @@ namespace AutoMapper.Mappers
             return context.DestinationType.IsArray && context.DestinationType.GetArrayRank() > 1 && context.SourceType.IsEnumerableType();
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type)), sourceExpression, contextExpression);
+            return ToType(
+                Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type)), sourceExpression, contextExpression),
+                destExpression.Type);
         }
     }
 

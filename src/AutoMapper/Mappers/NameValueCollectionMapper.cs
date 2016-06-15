@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-
-#if !PORTABLE
+﻿#if NETSTANDARD1_3
 namespace AutoMapper.Mappers
 {
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
     using System.Collections.Specialized;
 
     public class NameValueCollectionMapper : IObjectMapExpression
@@ -36,7 +34,7 @@ namespace AutoMapper.Mappers
                 context.DestinationType == typeof (NameValueCollection);
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo, sourceExpression);
         }

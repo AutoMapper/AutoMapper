@@ -30,7 +30,7 @@ namespace AutoMapper.Mappers
             return destEnumType != null && context.SourceType == typeof(string);
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression);
         }
@@ -76,7 +76,7 @@ namespace AutoMapper.Mappers
             return sourceEnumType != null && destEnumType != null;
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression);
         }
@@ -119,7 +119,6 @@ namespace AutoMapper.Mappers
 
         private static TDestination ConvertEnumToNullableType<TSource, TDestination>(TSource source)
         {
-#if !PORTABLE
             var nullableConverter = new NullableConverter(typeof(TDestination));
 
             if (source == null)
@@ -129,16 +128,6 @@ namespace AutoMapper.Mappers
 
             var destType = nullableConverter.UnderlyingType;
             return (TDestination)Convert.ChangeType(source, destType, null);
-#else
-            if (source == null)
-            {
-                return default(TDestination);
-            }
-
-            var destType = Nullable.GetUnderlyingType(typeof(TDestination));
-
-            return (TDestination)Convert.ChangeType(source, destType, null);
-#endif
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(EnumToUnderlyingTypeMapper).GetAllMethods().First(_ => _.IsStatic);
@@ -172,7 +161,7 @@ namespace AutoMapper.Mappers
             return false;
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression);
         }

@@ -61,7 +61,7 @@ namespace AutoMapper.Mappers
             return (context.DestinationType.IsArray) && (context.SourceType.IsEnumerableType());
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = TypeHelper.GetElementType(destExpression.Type);

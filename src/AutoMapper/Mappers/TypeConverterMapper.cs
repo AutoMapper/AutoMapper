@@ -2,7 +2,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-#if !PORTABLE
 namespace AutoMapper.Mappers
 {
     using System;
@@ -56,7 +55,7 @@ namespace AutoMapper.Mappers
                     destTypeConverter.CanConvertFrom(context.SourceType));
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, contextExpression);
         }
@@ -67,4 +66,3 @@ namespace AutoMapper.Mappers
         }
     }
 }
-#endif

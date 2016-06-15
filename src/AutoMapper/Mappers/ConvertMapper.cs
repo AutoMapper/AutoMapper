@@ -491,7 +491,7 @@ namespace AutoMapper.Mappers
             : _converterFuncs[context.Types].DynamicInvoke(context.SourceValue);
 
         public bool IsMatch(TypePair types) => _converters.ContainsKey(types);
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var typeMap = new TypePair(sourceExpression.Type, destExpression.Type);
             return _converters[typeMap].ReplaceParameters(sourceExpression);
