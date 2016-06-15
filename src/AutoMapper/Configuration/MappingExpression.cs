@@ -181,16 +181,14 @@ namespace AutoMapper.Configuration
                                                                    Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
             var memberInfo = ReflectionHelper.FindProperty(destinationMember);
-            ForDestinationMember(memberInfo, memberOptions);
-            return this;
+            return ForDestinationMember(memberInfo, memberOptions);
         }
 
         public IMappingExpression<TSource, TDestination> ForMember(string name,
                                                                    Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
         {
             var member = DestinationType.GetFieldOrProperty(name);
-            ForDestinationMember(member, memberOptions);
-            return this;
+            return ForDestinationMember(member, memberOptions);
         }
 
         public void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
@@ -456,9 +454,10 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        private void ForDestinationMember<TMember>(MemberInfo destinationProperty, Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
+        private IMappingExpression<TSource, TDestination> ForDestinationMember<TMember>(MemberInfo destinationProperty, Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
             ForDestinationMember(destinationProperty.ToMemberAccessor(), memberOptions);
+            return this;
         }
 
         private void ForDestinationMember<TMember>(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
