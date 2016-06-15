@@ -30,7 +30,7 @@ namespace AutoMapper.Mappers
             var itemContext = new ResolutionContext(context);
             foreach(var item in (IEnumerable<TSourceElement>)source ?? Enumerable.Empty<TSourceElement>())
             {
-                list.Add((KeyValuePair<TDestinationKey, TDestinationValue>)itemContext.Map(item, default(KeyValuePair<TDestinationKey, TDestinationValue>), typeof(TSourceElement), typeof(KeyValuePair<TDestinationKey, TDestinationValue>)));
+                list.Add(itemContext.Map(item, default(KeyValuePair<TDestinationKey, TDestinationValue>)));
             }
             return list;
         }
