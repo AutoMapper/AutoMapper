@@ -47,7 +47,7 @@ namespace AutoMapper.Mappers
         {
             var itemContext = new ResolutionContext(context);
 
-            return source.Select(item => (TDestination)itemContext.Map(item, null, typeof(TSource), typeof(TDestination)))
+            return source.Select(item => itemContext.Map(item, default(TDestination)))
                 .ToArray();
         }
 
