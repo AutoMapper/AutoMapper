@@ -337,7 +337,7 @@
             if (propertyMap.SourceType != null && propertyMap.DestinationPropertyType != null)
             {
                 var typePair = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
-                var typeMap = typeMapRegistry.GetTypeMap(typePair);
+                var typeMap = configurationProvider.ResolveTypeMap(typePair);
                 if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
                 {
                     if(!typeMap.Sealed)
