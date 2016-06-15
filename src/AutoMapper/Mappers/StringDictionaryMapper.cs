@@ -64,7 +64,7 @@ namespace AutoMapper.Mappers
             var memberContext = new ResolutionContext(context);
             foreach (var member in members)
             {
-                object value = memberContext.Map(member, source[member.Name]);
+                object value = memberContext.MapMember(member, source[member.Name]);
                 member.SetMemberValue(destination, value);
             }
             return destination;

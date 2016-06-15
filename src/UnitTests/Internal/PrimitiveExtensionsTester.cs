@@ -9,7 +9,27 @@ namespace AutoMapper.UnitTests
 
     public class PrimitiveExtensionsTester
 	{
-		[Fact]
+        interface Interface
+        {
+            int Value { get; }
+        }
+
+        class DestinationClass : Interface
+        {
+            int Interface.Value { get { return 123; } }
+
+            public int PrivateProperty { get; private set; }
+
+            public int PublicProperty { get; set; }
+        }
+
+        [Fact]
+        public void Should_find_explicitly_implemented_member()
+        {
+            typeof(DestinationClass).GetFieldOrProperty("Value").ShouldNotBeNull();
+        }
+
+        [Fact]
 		public void Should_not_flag_only_enumerable_type_as_writeable_collection()
 		{
 			typeof(string).IsListOrDictionaryType().ShouldBeFalse();

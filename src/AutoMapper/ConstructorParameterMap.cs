@@ -72,7 +72,7 @@ namespace AutoMapper
                 /*
                 var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
                  */
-                return TypeMapPlanBuilder.ContextMap(ToObject(valueResolverExpr), Constant(null), DestinationType, ref parameterContext);
+                return TypeMapPlanBuilder.ContextMap(valueResolverExpr, Default(DestinationType), DestinationType, ref parameterContext);
             }
             return valueResolverExpr;
         }

@@ -105,6 +105,7 @@
     <Compile Include="Bug\AssertConfigurationIsValidNullables.cs" />
     <Compile Include="Bug\IncludeBaseInheritance.cs" />
     <Compile Include="Bug\IncludeInheritance.cs" />
+    <Compile Include="Bug\DuplicateExtensionMethods.cs" />
     <Compile Include="Bug\StructMapping.cs" />
     <Compile Include="Bug\MapOverloadsWithDynamic.cs" />
     <Compile Include="Bug\NullSubstituteType.cs" />

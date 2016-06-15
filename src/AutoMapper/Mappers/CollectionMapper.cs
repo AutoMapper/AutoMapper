@@ -26,8 +26,8 @@ namespace AutoMapper.Mappers
 
             list.Clear();
             var itemContext = new ResolutionContext(context);
-            foreach (var item in (IEnumerable) source ?? Enumerable.Empty<object>())
-                list.Add(addFunc((TSourceItem)item, itemContext));
+            foreach (var item in source != null ? source.Cast<TSourceItem>() : Enumerable.Empty<TSourceItem>())
+                list.Add(addFunc(item, itemContext));
 
             return list;
         }
@@ -109,13 +109,13 @@ namespace AutoMapper.Mappers
             }
             else
             {
-                var mapMethod = typeof (ResolutionContext).GetTypeInfo().DeclaredMethods.First(m => m.Name == "Map");
-                itemExpr = Convert(Call(itemContextParam, mapMethod,
-                    Convert(itemParam, typeof (object)),
-                    Convert(Default(destElementType), typeof (object)),
-                    Constant(sourceElementType),
-                    Constant(destElementType)),
-                    destElementType);
+                var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(sourceElementType, destElementType);
+                itemExpr = Call(
+                    itemContextParam,
+                    mapMethod,
+                    itemParam,
+                    Default(destElementType)
+                    );
             }
             return Lambda(itemExpr, itemParam, itemContextParam);
         }

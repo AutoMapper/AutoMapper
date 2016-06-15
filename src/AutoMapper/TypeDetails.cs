@@ -67,30 +67,27 @@ namespace AutoMapper
 
         public IEnumerable<MethodInfo> PublicNoArgExtensionMethods { get; }
 
-        private IList<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
+        private IEnumerable<MethodInfo> BuildPublicNoArgExtensionMethods(IEnumerable<MethodInfo> sourceExtensionMethodSearch)
         {
-            var sourceExtensionMethodSearchArray = sourceExtensionMethodSearch.ToArray();
+            var explicitExtensionMethods = sourceExtensionMethodSearch.Where(method => method.GetParameters()[0].ParameterType == Type);
 
-            var explicitExtensionMethods = sourceExtensionMethodSearchArray
-                .Where(method => method.GetParameters()[0].ParameterType == Type)
-                .ToList();
+            var genericInterfaces = Type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType());
 
-            var genericInterfaces = Type.GetTypeInfo().ImplementedInterfaces.Where(t => t.IsGenericType()).ToList();
-
-            if (Type.IsInterface() && Type.IsGenericType())
-                genericInterfaces.Add(Type);
-
-            explicitExtensionMethods.AddRange(
-                from genericMethod in sourceExtensionMethodSearchArray
+            if(Type.IsInterface() && Type.IsGenericType())
+            {
+                genericInterfaces = genericInterfaces.Union(new[] { Type });
+            }
+            return explicitExtensionMethods.Union
+            (
+                from genericMethod in sourceExtensionMethodSearch
                 where genericMethod.IsGenericMethodDefinition
                 from genericInterface in genericInterfaces
                 let genericInterfaceArguments = genericInterface.GetTypeInfo().GenericTypeArguments
                 where genericMethod.GetGenericArguments().Length == genericInterfaceArguments.Length
                 let methodMatch = genericMethod.MakeGenericMethod(genericInterfaceArguments)
                 where methodMatch.GetParameters()[0].ParameterType.GetTypeInfo().IsAssignableFrom(genericInterface.GetTypeInfo())
-                select methodMatch);
-
-            return explicitExtensionMethods;
+                select methodMatch
+            ).ToArray();
         }
 
         private static MemberInfo[] BuildPublicReadAccessors(IEnumerable<MemberInfo> allMembers)

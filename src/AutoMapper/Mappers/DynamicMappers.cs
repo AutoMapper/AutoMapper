@@ -32,7 +32,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = memberContext.Map(member, sourceMemberValue);
+                var destinationMemberValue = memberContext.MapMember(member, sourceMemberValue);
                 member.SetMemberValue(destination, destinationMemberValue);
             }
             return destination;
@@ -84,7 +84,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = memberContext.Map(member, sourceMemberValue);
+                var destinationMemberValue = memberContext.MapMember(member, sourceMemberValue);
                 SetDynamically(member, destination, destinationMemberValue);
             }
             return destination;

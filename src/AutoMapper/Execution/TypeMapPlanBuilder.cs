@@ -337,7 +337,7 @@
             if (propertyMap.SourceType != null && propertyMap.DestinationPropertyType != null)
             {
                 var typePair = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
-                var typeMap = typeMapRegistry.GetTypeMap(typePair);
+                var typeMap = configurationProvider.ResolveTypeMap(typePair);
                 if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
                 {
                     if(!typeMap.Sealed)
@@ -422,16 +422,14 @@
             {
                 propertyContext = Variable(typeof(ResolutionContext), "propertyContext");
             }
-            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().Single(m => m.Name == "Map");
+            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(valueResolverExpr.Type, destinationType);
             var second = Call(
                 propertyContext,
                 mapMethod,
-                ToObject(valueResolverExpr),
-                ToObject(destValueExpr),
-                Constant(valueResolverExpr.Type),
-                Constant(destinationType)
+                valueResolverExpr,
+                destValueExpr
                 );
-            return Convert(second, destinationType);
+            return second;
         }
 
         private static Expression BuildValueResolverFunc(PropertyMap propertyMap, TypeMapRegistry typeMapRegistry,

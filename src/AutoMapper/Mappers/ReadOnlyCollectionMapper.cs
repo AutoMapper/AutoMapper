@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
     public class ReadOnlyCollectionMapper : IObjectMapExpression
     {
         public static ReadOnlyCollection<TDestinationItem> Map<TSource, TSourceItem, TDestinationItem>(TSource source, ResolutionContext context)
-            where TSource : IEnumerable
+            where TSource : IEnumerable<TSourceItem>
         {
             if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
                 return null;
@@ -21,9 +21,9 @@ namespace AutoMapper.Mappers
             IList<TDestinationItem> list = new List<TDestinationItem>();
 
             var itemContext = new ResolutionContext(context);
-            foreach(var item in (IEnumerable)source ?? Enumerable.Empty<object>())
+            foreach(var item in source)
             {
-                list.Add((TDestinationItem)itemContext.Map(item, default(TDestinationItem), typeof(TSourceItem), typeof(TDestinationItem)));
+                list.Add(itemContext.Map(item, default(TDestinationItem)));
             }
             return new ReadOnlyCollection<TDestinationItem>(list);
         }

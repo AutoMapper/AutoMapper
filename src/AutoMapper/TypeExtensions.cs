@@ -214,6 +214,11 @@ namespace AutoMapper
                 || (propertyInfo?.GetSetMethod(true)?.IsPublic ?? false);
         }
 
+        public static IEnumerable<PropertyInfo> PropertiesWithAnInaccessibleSetter(this Type type)
+        {
+            return type.GetDeclaredProperties().Where(pm => pm.HasAnInaccessibleSetter());
+        }
+
         public static bool HasAnInaccessibleSetter(this PropertyInfo property)
         {
             var setMethod = property.GetSetMethod(true);
