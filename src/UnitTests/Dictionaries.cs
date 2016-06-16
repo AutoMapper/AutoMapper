@@ -423,10 +423,10 @@ namespace AutoMapper.UnitTests
 
 			public class FooObject
 			{
-				public Dictionary<string, string> Values { get; set; }
+				public IDictionary<string, string> Values { get; set; }
 			}
 
-			public class DestinationValuePair
+            public class DestinationValuePair
 			{
 				public string Key { get; set; }
 				public string Value { get; set; }

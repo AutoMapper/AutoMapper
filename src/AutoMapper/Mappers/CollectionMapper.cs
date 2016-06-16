@@ -75,9 +75,9 @@ namespace AutoMapper.Mappers
         internal static Expression NewExpr(this Type baseType, Type ifInterfaceType)
         {
             var newExpr = baseType.IsInterface()
-                ? New(ifInterfaceType.MakeGenericType(TypeHelper.GetElementType(baseType)))
+                ? New(ifInterfaceType.MakeGenericType(TypeHelper.GetElementTypes(baseType, ElemntTypeFlags.BreakKeyValuePair)))
                 : DelegateFactory.GenerateConstructorExpression(baseType);
-            return Convert(newExpr, baseType);
+            return ExpressionExtensions.ToType(newExpr, baseType);
         }
 
         internal static LambdaExpression ItemExpr(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,

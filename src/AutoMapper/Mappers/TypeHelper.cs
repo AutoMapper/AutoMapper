@@ -11,33 +11,47 @@ namespace AutoMapper.Mappers
     {
         public static Type GetElementType(Type enumerableType)
         {
-            return GetElementType(enumerableType, null);
+            return GetElementTypes(enumerableType, null)[0];
+        }
+        public static Type[] GetElementTypes(Type enumerableType, ElemntTypeFlags flags = ElemntTypeFlags.None)
+        {
+            return GetElementTypes(enumerableType, null, flags);
         }
 
         public static Type GetElementType(Type enumerableType, IEnumerable enumerable)
         {
+            return GetElementTypes(enumerableType, enumerable)[0];
+        }
+        public static Type[] GetElementTypes(Type enumerableType, IEnumerable enumerable, ElemntTypeFlags flags = ElemntTypeFlags.None)
+        {
             if (enumerableType.HasElementType)
             {
-                return enumerableType.GetElementType();
+                return new []{enumerableType.GetElementType()};
+            }
+
+            if (flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair) && enumerableType.IsGenericType() &&
+                enumerableType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            {
+                return enumerableType.GetTypeInfo().GenericTypeArguments;
             }
 
             if (enumerableType.IsGenericType() &&
                 enumerableType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
             {
-                return enumerableType.GetTypeInfo().GenericTypeArguments[0];
+                return enumerableType.GetTypeInfo().GenericTypeArguments;
             }
 
             Type ienumerableType = GetIEnumerableType(enumerableType);
             if (ienumerableType != null)
             {
-                return ienumerableType.GetTypeInfo().GenericTypeArguments[0];
+                return ienumerableType.GetTypeInfo().GenericTypeArguments;
             }
 
             if (typeof (IEnumerable).IsAssignableFrom(enumerableType))
             {
                 var first = enumerable?.Cast<object>().FirstOrDefault();
 
-                return first?.GetType() ?? typeof (object);
+                return new []{first?.GetType() ?? typeof (object)};
             }
 
             throw new ArgumentException($"Unable to find the element type for type '{enumerableType}'.", nameof(enumerableType));
@@ -70,5 +84,11 @@ namespace AutoMapper.Mappers
                 return null;
             }
         }
+    }
+
+    public enum ElemntTypeFlags
+    {
+        None = 0,
+        BreakKeyValuePair = 1
     }
 }
