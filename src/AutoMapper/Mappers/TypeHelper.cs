@@ -29,8 +29,7 @@ namespace AutoMapper.Mappers
                 return new []{enumerableType.GetElementType()};
             }
 
-            if (flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair) && enumerableType.IsGenericType() &&
-                enumerableType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            if (flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair) && enumerableType.IsGenericType() && enumerableType.IsDictionaryType())
             {
                 return enumerableType.GetTypeInfo().GenericTypeArguments;
             }

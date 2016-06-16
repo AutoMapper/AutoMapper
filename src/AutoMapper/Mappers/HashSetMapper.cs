@@ -11,13 +11,13 @@ namespace AutoMapper.Mappers
     public class HashSetMapper : IObjectMapExpression
     {
         public object Map(ResolutionContext context)
-            => context.MapCollection(CollectionMapperExtensions.IfNotNull(Expression.Constant(context.DestinationValue)), typeof(HashSet<>));
+            => context.MapCollection(CollectionMapperExtensions.IfNotNull(Expression.Constant(context.DestinationValue)), typeof(HashSet<>), CollectionMapperExtensions.MapItemMethodInfo);
 
         public bool IsMatch(TypePair context)
             => context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-            => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression, CollectionMapperExtensions.IfNotNull, typeof(HashSet<>));
+            => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression, CollectionMapperExtensions.IfNotNull, typeof(HashSet<>), CollectionMapperExtensions.MapItemExpr);
 
         private static bool IsSetType(Type type)
         {

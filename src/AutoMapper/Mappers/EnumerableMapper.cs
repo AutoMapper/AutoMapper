@@ -15,7 +15,7 @@ namespace AutoMapper.Mappers
         public object Map(ResolutionContext context)
         {
             var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(context.DestinationType));
-            return context.MapCollection(IfEditableList(Expression.Constant(listType)), typeof(List<>), listType);
+            return context.MapCollection(IfEditableList(Expression.Constant(listType)), typeof(List<>), CollectionMapperExtensions.MapItemMethodInfo, listType);
         }
 
         public bool IsMatch(TypePair context)
@@ -30,7 +30,7 @@ namespace AutoMapper.Mappers
         {
             var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type));
 
-            return typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, Expression.Default(listType), contextExpression, IfEditableList, typeof(List<>));
+            return typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, Expression.Default(listType), contextExpression, IfEditableList, typeof(List<>), CollectionMapperExtensions.MapItemExpr);
         }
 
         private static Expression IfEditableList(Expression dest)

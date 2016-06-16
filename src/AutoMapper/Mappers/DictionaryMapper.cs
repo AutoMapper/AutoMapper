@@ -34,39 +34,15 @@ namespace AutoMapper.Mappers
             return list;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(DictionaryMapper).GetAllMethods().First(_ => _.IsStatic);
-
         public bool IsMatch(TypePair context)
         {
             return (context.SourceType.IsDictionaryType() && context.DestinationType.IsDictionaryType());
         }
 
         public object Map(ResolutionContext context)
-        {
-            Type genericSourceDictType = context.SourceType.GetDictionaryType();
-            Type sourceKeyType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[0];
-            Type sourceValueType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[1];
-            Type genericDestDictType = context.DestinationType.GetDictionaryType();
-            Type destKeyType = genericDestDictType.GetTypeInfo().GenericTypeArguments[0];
-            Type destValueType = genericDestDictType.GetTypeInfo().GenericTypeArguments[1];
-
-            return
-                MapMethodInfo.MakeGenericMethod(context.SourceType, sourceKeyType, sourceValueType, context.DestinationType, destKeyType, destValueType)
-                    .Invoke(null, new[] { context.SourceValue, context.DestinationValue, context });
-        }
+            => context.MapCollection(CollectionMapperExtensions.IfNotNull(Expression.Constant(context.DestinationValue)), typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyValuePairMethodInfo);
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            Type genericSourceDictType = sourceExpression.Type.GetDictionaryType();
-            Type sourceKeyType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[0];
-            Type sourceValueType = genericSourceDictType.GetTypeInfo().GenericTypeArguments[1];
-            Type genericDestDictType = destExpression.Type.GetDictionaryType();
-            Type destKeyType = genericDestDictType.GetTypeInfo().GenericTypeArguments[0];
-            Type destValueType = genericDestDictType.GetTypeInfo().GenericTypeArguments[1];
-
-            return Expression.Call(null,
-                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, sourceKeyType, sourceValueType, destExpression.Type, destKeyType, destValueType),
-                    sourceExpression, destExpression, contextExpression);
-        }
+            => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression, CollectionMapperExtensions.IfNotNull, typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
     }
 }
