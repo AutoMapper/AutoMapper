@@ -96,8 +96,8 @@ namespace AutoMapper.Mappers
             var expressionMapper = match as IObjectMapExpression;
             if (expressionMapper != null)
             {
-                itemExpr = expressionMapper.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam,
-                    Default(destElementType), itemContextParam);
+                itemExpr = ExpressionExtensions.ToType(expressionMapper.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam,
+                    Default(destElementType), itemContextParam), destElementType);
             }
             else
             {
