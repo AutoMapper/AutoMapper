@@ -41,7 +41,7 @@ namespace AutoMapper.Mappers
             return Convert(newExpr, destinationType);
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(CollectionMapper).GetAllMethods().First(_ => _.IsStatic);
+        internal static readonly MethodInfo MapMethodInfo = typeof(CollectionMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public object Map(ResolutionContext context)
         {
@@ -85,7 +85,7 @@ namespace AutoMapper.Mappers
             //         ? Constant(null, destExpression.Type)
             //         : newExpr;
             var b = Lambda(newExpr, d);
-            var itemExpr = ItemExpr(typeMapRegistry, configurationProvider, propertyMap, sourceExpression, destExpression);
+            var itemExpr = ItemExpr(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, destExpression.Type);
 
             return Call(null,
                 MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type),
@@ -94,12 +94,12 @@ namespace AutoMapper.Mappers
                 Constant(itemExpr.Compile()));
         }
 
-        private static LambdaExpression ItemExpr(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression)
+        internal static LambdaExpression ItemExpr(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
+            PropertyMap propertyMap, Type sourceType, Type destType)
         {
 
-            var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
-            var destElementType = TypeHelper.GetElementType(destExpression.Type);
+            var sourceElementType = TypeHelper.GetElementType(sourceType);
+            var destElementType = TypeHelper.GetElementType(destType);
 
             var typePair = new TypePair(sourceElementType, destElementType);
 

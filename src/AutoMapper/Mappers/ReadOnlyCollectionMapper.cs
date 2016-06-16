@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
@@ -12,29 +13,31 @@ namespace AutoMapper.Mappers
 
     public class ReadOnlyCollectionMapper : IObjectMapExpression
     {
-        public static ReadOnlyCollection<TDestinationItem> Map<TSource, TSourceItem, TDestinationItem>(TSource source, ResolutionContext context)
-            where TSource : IEnumerable<TSourceItem>
-        {
-            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
-                return null;
-
-            IList<TDestinationItem> list = new List<TDestinationItem>();
-
-            var itemContext = new ResolutionContext(context);
-            foreach(var item in source)
-            {
-                list.Add(itemContext.Map(item, default(TDestinationItem)));
-            }
-            return new ReadOnlyCollection<TDestinationItem>(list);
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(ReadOnlyCollectionMapper).GetAllMethods().First(_ => _.IsStatic);
-
+        
         public object Map(ResolutionContext context)
         {
-            return
-                MapMethodInfo.MakeGenericMethod(context.SourceType, TypeHelper.GetElementType(context.SourceType), TypeHelper.GetElementType(context.DestinationType))
-                    .Invoke(null, new[] { context.SourceValue, context });
+            var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(context.DestinationType));
+            var getDestExpr = Lambda(New(listType), Parameter(listType, "d"));
+            var constructor = context.DestinationType.GetConstructors().First();
+            return constructor.Invoke( new [] {
+                CollectionMapper.MapMethodInfo.MakeGenericMethod(context.SourceType, TypeHelper.GetElementType(context.SourceType), listType, TypeHelper.GetElementType(context.DestinationType))
+                    .Invoke(null, new[] { context.SourceValue, null, context, getDestExpr.Compile(), null })});
+        }
+
+        private static Expression MapExpressionBase(TypeMapRegistry typeMapRegistry,
+            IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression,
+            Expression destExpression, Expression contextExpression)
+        {
+            var listType = typeof (List<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type));
+            var getDestExpr = Lambda(New(listType), Parameter(listType, "d"));
+            var itemExpr = CollectionMapper.ItemExpr(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, listType);
+
+            var list = Call(null,
+                CollectionMapper.MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type),
+                    listType, TypeHelper.GetElementType(destExpression.Type)),
+                sourceExpression, Default(listType), contextExpression, Constant(getDestExpr.Compile()),
+                Constant(itemExpr.Compile()));
+            return New(destExpression.Type.GetConstructors().First(), list);
         }
 
         public bool IsMatch(TypePair context)
@@ -49,7 +52,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)), sourceExpression, contextExpression);
+            return MapExpressionBase(typeMapRegistry, configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression);
         }
     }
 }
