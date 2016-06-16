@@ -19,9 +19,13 @@ namespace AutoMapper.Mappers
             var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(context.DestinationType));
             var getDestExpr = Lambda(New(listType), Parameter(listType, "d"));
             var constructor = context.DestinationType.GetConstructors().First();
-            return constructor.Invoke( new [] {
-                CollectionMapper.MapMethodInfo.MakeGenericMethod(context.SourceType, TypeHelper.GetElementType(context.SourceType), listType, TypeHelper.GetElementType(context.DestinationType))
-                    .Invoke(null, new[] { context.SourceValue, null, context, getDestExpr.Compile(), null })});
+            var list = CollectionMapper.MapMethodInfo.MakeGenericMethod(context.SourceType,
+                TypeHelper.GetElementType(context.SourceType), listType,
+                TypeHelper.GetElementType(context.DestinationType))
+                .Invoke(null, new[] {context.SourceValue, null, context, getDestExpr.Compile(), null});
+            if (list == null)
+                return null;
+            return constructor.Invoke( new [] { list });
         }
 
         private static Expression MapExpressionBase(TypeMapRegistry typeMapRegistry,
@@ -37,7 +41,11 @@ namespace AutoMapper.Mappers
                     listType, TypeHelper.GetElementType(destExpression.Type)),
                 sourceExpression, Default(listType), contextExpression, Constant(getDestExpr.Compile()),
                 Constant(itemExpr.Compile()));
-            return New(destExpression.Type.GetConstructors().First(), list);
+
+            var dest = Variable(listType, "dest");
+            
+
+            return Block(new [] { dest }, Assign(dest, list), Condition(NotEqual(dest, Default(listType)), New(destExpression.Type.GetConstructors().First(), dest), Default(destExpression.Type)));
         }
 
         public bool IsMatch(TypePair context)
