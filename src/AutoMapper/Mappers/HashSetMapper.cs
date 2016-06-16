@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
@@ -12,22 +11,13 @@ namespace AutoMapper.Mappers
     public class HashSetMapper : IObjectMapExpression
     {
         public object Map(ResolutionContext context)
-        {
-            return CollectionMapper.MapBase(context, CollectionMapper.IfNotNull(Constant(context.DestinationValue)), typeof(HashSet<>));
-        }
+            => context.MapCollection(CollectionMapperExtensions.IfNotNull(Expression.Constant(context.DestinationValue)), typeof(HashSet<>));
 
         public bool IsMatch(TypePair context)
-        {
-            var isMatch = context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
-
-            return isMatch;
-        }
-
+            => context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return CollectionMapper.MapExpressionBase(typeMapRegistry, configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression, CollectionMapper.IfNotNull, typeof(HashSet<>));
-        }
+            => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression, CollectionMapperExtensions.IfNotNull, typeof(HashSet<>));
 
         private static bool IsSetType(Type type)
         {
