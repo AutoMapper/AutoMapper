@@ -35,11 +35,6 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(TypeConverterMapper).GetAllMethods().First(_ => _.IsStatic);
 
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new[] { context.SourceValue, CollectionMapperExtensions.Constructor(context.DestinationType) });
-        }
-
         public bool IsMatch(TypePair context)
         {
             var sourceTypeConverter = GetTypeConverter(context.SourceType);
