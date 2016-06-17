@@ -1,4 +1,6 @@
-﻿namespace AutoMapper
+﻿using System.Collections;
+
+namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
@@ -11,6 +13,38 @@
 
     internal static class ExpressionExtensions
     {
+        public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
+        {
+            var elementType = loopVar.Type;
+            var enumerableType = typeof(IEnumerable<>).MakeGenericType(elementType);
+            var enumeratorType = typeof(IEnumerator<>).MakeGenericType(elementType);
+
+            var enumeratorVar = Variable(enumeratorType, "enumerator");
+            var getEnumeratorCall = Call(collection, enumerableType.GetMethod("GetEnumerator"));
+            var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
+
+            // The MoveNext method's actually on IEnumerator, not IEnumerator<T>
+            var moveNextCall = Call(enumeratorVar, typeof(IEnumerator).GetMethod("MoveNext"));
+
+            var breakLabel = Label("LoopBreak");
+
+            var loop = Block(new[] { enumeratorVar },
+                enumeratorAssign,
+                Loop(
+                    IfThenElse(
+                        Equal(moveNextCall, Constant(true)),
+                        Block(new[] { loopVar },
+                            Assign(loopVar, Property(enumeratorVar, "Current")),
+                            loopContent
+                        ),
+                        Break(breakLabel)
+                    ),
+                breakLabel)
+            );
+
+            return loop;
+        }
+
         public static Expression ToObject(Expression expression)
         {
             return expression.Type == typeof(object) ? expression : Convert(expression, typeof(object));
