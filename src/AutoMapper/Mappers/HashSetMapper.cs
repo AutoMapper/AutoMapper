@@ -10,9 +10,6 @@ namespace AutoMapper.Mappers
 
     public class HashSetMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context)
-            => context.MapCollection(CollectionMapperExtensions.IfNotNull(Expression.Constant(context.DestinationValue)), typeof(HashSet<>), CollectionMapperExtensions.MapItemMethodInfo);
-
         public bool IsMatch(TypePair context)
             => context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
