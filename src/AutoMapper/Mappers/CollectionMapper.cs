@@ -44,23 +44,31 @@ namespace AutoMapper.Mappers
             return resolutionContext.Map(item, default(TDestinationItem));
         }
 
-        internal static object MapCollection(this ResolutionContext context, Expression conditionalExpression, Type ifInterfaceType, MethodInfo itemFunc, Type destinationType = null, object destinationValue = null)
+        internal static object MapCollection(this ResolutionContext context, Expression conditionalExpression, Type ifInterfaceType, MethodInfo itemFunc, Type destinationType = null, object destinationValue = null, object sourceValue = null)
         {
             if (destinationType == null)
             {
                 destinationType = context.DestinationType;
                 destinationValue = context.DestinationValue;
             }
+            Type sourceType;
+            if (sourceValue == null)
+            {
+                sourceType = context.SourceType;
+                sourceValue = context.SourceValue;
+            }
+            else
+                sourceType = sourceValue.GetType();
             var newExpr = destinationType.NewIfConditionFails(d => conditionalExpression, ifInterfaceType);
-            var sourceElementType = TypeHelper.GetElementType(context.SourceType);
+            var sourceElementType = TypeHelper.GetElementType(sourceType);
             var destElementType = TypeHelper.GetElementType(destinationType);
             var item = Parameter(sourceElementType, "item");
             var itemContext = Parameter(typeof (ResolutionContext), "itemContext");
             var genericItemFunc = Lambda(Call(itemFunc.MakeGenericMethod(sourceElementType, destElementType), item, itemContext), item, itemContext);
 
             return
-                MapMethodInfo.MakeGenericMethod(context.SourceType, TypeHelper.GetElementType(context.SourceType), destinationType, TypeHelper.GetElementType(context.DestinationType))
-                    .Invoke(null, new[] { context.SourceValue, destinationValue, context, newExpr.Compile(), genericItemFunc.Compile() });
+                MapMethodInfo.MakeGenericMethod(sourceType, sourceElementType, destinationType, destElementType)
+                    .Invoke(null, new[] { sourceValue, destinationValue, context, newExpr.Compile(), genericItemFunc.Compile() });
         }
 
         internal static Expression MapCollectionExpression(this TypeMapRegistry typeMapRegistry,
