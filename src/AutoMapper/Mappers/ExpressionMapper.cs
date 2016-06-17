@@ -46,11 +46,6 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(ExpressionMapper).GetAllMethods().First(_ => _.IsStatic);
 
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new[] { context.SourceValue, context });
-        }
-
         public bool IsMatch(TypePair context)
         {
             return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
