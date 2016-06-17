@@ -16,11 +16,6 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(NullableSourceMapper).GetAllMethods().First(_ => _.IsStatic);
 
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.DestinationType).Invoke(null, new [] {context.SourceValue});
-        }
-
         public bool IsMatch(TypePair context)
         {
             return context.SourceType.IsNullableType() && !context.DestinationType.IsNullableType() && context.DestinationType == context.SourceType.GetTypeOfNullable();
