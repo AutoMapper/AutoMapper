@@ -123,12 +123,12 @@ namespace AutoMapper.Mappers
 
             var itemContext = Variable(typeof(ResolutionContext), "itemContext");
             blockParams.Add(itemContext);
-            blockExprs.Add(Assign(itemContext, New(typeof(ResolutionContext).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First(), contextExpression)));
+            blockExprs.Add(Assign(itemContext, New(typeof(ResolutionContext).GetTypeInfo().DeclaredConstructors.First(_ => _.GetParameters().Length == 1), contextExpression)));
 
-            var cast = typeof(Enumerable).GetMethod("Cast", BindingFlags.Public | BindingFlags.Static).MakeGenericMethod(itemExpr.Parameters[0].Type);
+            var cast = typeof(Enumerable).GetTypeInfo().DeclaredMethods.First(_ => _.Name == "Cast").MakeGenericMethod(itemExpr.Parameters[0].Type);
 
             var addMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetMethod("Add");
-            if (!sourceExpression.Type.IsGenericType)
+            if (!sourceExpression.Type.GetTypeInfo().IsGenericType)
                 sourceExpression = Call(null, cast, sourceExpression);
             blockExprs.Add(ForEach(sourceExpression, itemExpr.Parameters[0], Call(
                 dest,
