@@ -32,7 +32,7 @@ namespace AutoMapper.Mappers
             => context.MapCollection(null, typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyValuePairMethodInfo, sourceValue: MembersDictionary(context));
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-            => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, Call(MembersDictionaryMethodInfo, destExpression), contextExpression, null, typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
+            => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, Call(MembersDictionaryMethodInfo, contextExpression), destExpression, contextExpression, _ => null, typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
     }
 
     public class FromStringDictionaryMapper : IObjectMapExpression

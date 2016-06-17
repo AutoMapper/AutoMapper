@@ -87,7 +87,7 @@ namespace AutoMapper
                 return new MapperFuncs(mapRequest, typeMap);
             }
             var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
-            return new MapperFuncs(mapRequest, mapperToUse);
+            return new MapperFuncs(mapRequest, mapperToUse, this);
         }
 
         public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();
@@ -289,7 +289,7 @@ namespace AutoMapper
             {
             }
 
-            public MapperFuncs(MapRequest mapRequest, IObjectMapper mapperToUse) : this(mapRequest, GenerateObjectMapperExpression(mapRequest, mapperToUse))
+            public MapperFuncs(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration) : this(mapRequest, GenerateObjectMapperExpression(mapRequest, mapperToUse, mapperConfiguration))
             {
             }
 
@@ -340,7 +340,7 @@ namespace AutoMapper
                 return mapExpression;
             }
 
-            private static LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse)
+            private static LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration)
             {
                 var destinationType = mapRequest.RequestedTypes.DestinationType;
 
@@ -358,6 +358,13 @@ namespace AutoMapper
                 {
                     var message = Constant("Missing type map configuration or unsupported mapping.");
                     fullExpression = Lambda(Block(Throw(New(ctor, context, message)), Default(destinationType)), source, destination, context);
+                }
+                else if (mapperToUse is IObjectMapExpression)
+                {
+                    var exprMapper = (IObjectMapExpression)mapperToUse;
+                    var map = exprMapper.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
+                    var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
+                    fullExpression = TryCatch(mapToDestination, source, destination, context);
                 }
                 else
                 {
