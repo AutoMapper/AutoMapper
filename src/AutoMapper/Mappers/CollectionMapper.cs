@@ -184,9 +184,6 @@ namespace AutoMapper.Mappers
 
     public class CollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context)
-            => context.MapCollection(CollectionMapperExtensions.IfNotNull(Constant(context.DestinationValue)), typeof(List<>), CollectionMapperExtensions.MapItemMethodInfo);
-        
         public bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
