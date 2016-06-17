@@ -50,11 +50,9 @@ namespace AutoMapper.UnitTests.Mappers
             public void ReturnsNullIfSourceValueIsNull()
             {
                 var config = new MapperConfiguration(_ => { });
-                var mapper = new Mapper(config);
-                var rc = new ResolutionContext(null, new NameValueCollection(), new TypePair(typeof(NameValueCollection), typeof(NameValueCollection)), new MappingOperationOptions(config.ServiceCtor), mapper);
-                var nvcm = new NameValueCollectionMapper();
+                IMapper mapper = new Mapper(config);
 
-                var result = nvcm.Map(rc);
+                var result = mapper.Map((NameValueCollection)null, new NameValueCollection());
 
                 result.ShouldBeNull();
             }
@@ -63,12 +61,9 @@ namespace AutoMapper.UnitTests.Mappers
             public void ReturnsEmptyCollectionWhenSourceCollectionIsEmpty()
             {
                 var config = new MapperConfiguration(_ => { });
-                var mapper = new Mapper(config);
-                var sourceValue = new NameValueCollection();
-                var rc = new ResolutionContext(sourceValue, null, new TypePair(typeof(NameValueCollection), typeof(NameValueCollection)), new MappingOperationOptions(config.ServiceCtor), mapper);
-                var nvcm = new NameValueCollectionMapper();
+                IMapper mapper = new Mapper(config);
 
-                var result = nvcm.Map(rc) as NameValueCollection;
+                var result = mapper.Map(new NameValueCollection(), (NameValueCollection)null);
 
                 result.ShouldBeEmpty(); 
             }
@@ -77,13 +72,10 @@ namespace AutoMapper.UnitTests.Mappers
             public void ReturnsMappedObjectWithExpectedValuesWhenSourceCollectionHasOneItem()
             {
                 var config = new MapperConfiguration(_ => { });
-                var mapper = new Mapper(config);
+                IMapper mapper = new Mapper(config);
                 var sourceValue = new NameValueCollection() { { "foo", "bar" } };
-                var rc = new ResolutionContext(sourceValue, new NameValueCollection(), new TypePair(typeof(NameValueCollection), typeof(NameValueCollection)), new MappingOperationOptions(config.ServiceCtor), mapper);
 
-                var nvcm = new NameValueCollectionMapper();
-
-                var result = nvcm.Map(rc) as NameValueCollection;
+                var result = mapper.Map(sourceValue, new NameValueCollection());
 
                 1.ShouldEqual(result.Count);
                 "foo".ShouldEqual(result.AllKeys[0]);
