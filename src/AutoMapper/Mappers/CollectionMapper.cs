@@ -14,65 +14,6 @@ namespace AutoMapper.Mappers
 
     public static class CollectionMapperExtensions
     {
-        internal static readonly MethodInfo MapMethodInfo = typeof(CollectionMapperExtensions).GetAllMethods().First(_ => _.IsStatic);
-
-        internal static readonly MethodInfo MapItemMethodInfo = typeof(CollectionMapperExtensions).GetAllMethods().Where(_ => _.IsStatic).ElementAt(1);
-        internal static readonly MethodInfo MapKeyValuePairMethodInfo = typeof(CollectionMapperExtensions).GetAllMethods().Where(_ => _.IsStatic).ElementAt(2);
-
-        public static TDestination Map<TSource, TSourceItem, TDestination, TDestinationItem>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination, TDestination> newDestination, Func<TSourceItem, ResolutionContext, TDestinationItem> addFunc)
-            where TSource : IEnumerable
-            where TDestination : class, ICollection<TDestinationItem>
-        {
-            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
-                return null;
-
-            TDestination list = newDestination(destination);
-
-            list.Clear();
-            var itemContext = new ResolutionContext(context);
-            foreach (var item in source != null ? source.Cast<TSourceItem>() : Enumerable.Empty<TSourceItem>())
-                list.Add(addFunc(item, itemContext));
-
-            return list;
-        }
-        
-        public static TDestinationItem MapItemFunc<TSourceItem,TDestinationItem>(TSourceItem item, ResolutionContext resolutionContext)
-        {
-            return resolutionContext.Map(item, default(TDestinationItem));
-        }
-        public static TDestinationItem MapKeyValuePairFunc<TSourceItem, TDestinationItem>(TSourceItem item, ResolutionContext resolutionContext)
-        {
-            return resolutionContext.Map(item, default(TDestinationItem));
-        }
-
-        internal static object MapCollection(this ResolutionContext context, Expression conditionalExpression, Type ifInterfaceType, MethodInfo itemFunc, Type destinationType = null, object destinationValue = null, object sourceValue = null)
-        {
-            return null;
-            //if (destinationType == null)
-            //{
-            //    destinationType = context.DestinationType;
-            //    destinationValue = context.DestinationValue;
-            //}
-            //Type sourceType;
-            //if (sourceValue == null)
-            //{
-            //    sourceType = context.SourceType;
-            //    sourceValue = context.SourceValue;
-            //}
-            //else
-            //    sourceType = sourceValue.GetType();
-            //var newExpr = destinationType.NewIfConditionFails(d => conditionalExpression, ifInterfaceType);
-            //var sourceElementType = TypeHelper.GetElementType(sourceType);
-            //var destElementType = TypeHelper.GetElementType(destinationType);
-            //var item = Parameter(sourceElementType, "item");
-            //var itemContext = Parameter(typeof (ResolutionContext), "itemContext");
-            //var genericItemFunc = Lambda(Call(itemFunc.MakeGenericMethod(sourceElementType, destElementType), item, itemContext), item, itemContext);
-
-            //return
-            //    MapMethodInfo.MakeGenericMethod(sourceType, sourceElementType, destinationType, destElementType)
-            //        .Invoke(null, new[] { sourceValue, destinationValue, context, newExpr.Compile(), genericItemFunc.Compile() });
-        }
-
         internal static Expression MapCollectionExpression(this TypeMapRegistry typeMapRegistry,
            IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression,
            Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression, Type ifInterfaceType, MapItem mapItem)
@@ -147,108 +88,7 @@ namespace AutoMapper.Mappers
                 ToType(ifNullExpr, destExpression.Type),
                 ToType(mapExpr, destExpression.Type));
         }
-
-        public static Expression MapCollectionExpression(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
-            var destElementType = TypeHelper.GetElementType(destExpression.Type);
-
-            var typePair = new TypePair(sourceElementType, destElementType);
-
-            var destCollectionType = destExpression.Type;
-            var destICollectionType = typeof(ICollection<>).MakeGenericType(destElementType);
-
-            var listType = typeof(List<>).MakeGenericType(destElementType);
-            var newExpr = ToType(
-                destExpression.Type.IsInterface()
-                    ? New(listType)
-                    : DelegateFactory.GenerateConstructorExpression(destExpression.Type),
-                destICollectionType);
-            var ifNullExpr = configurationProvider.AllowNullCollections
-                     ? Constant(null, destCollectionType)
-                     : newExpr;
-
-            var itemParam = Parameter(sourceElementType, "item");
-            var itemContextParam = Parameter(typeof(ResolutionContext), "itemContext");
-
-            var blockExprs = new List<Expression>();
-            var blockParams = new List<ParameterExpression>();
-            if (destCollectionType.ImplementsGenericInterface(typeof(ICollection<>)))
-            {
-                if (propertyMap == null)
-                {
-                    var destParam = Parameter(newExpr.Type, "dest");
-                    blockParams.Add(destParam);
-
-                    blockExprs.Add(Assign(destParam, destExpression));
-
-                    destExpression = destParam;
-
-                    blockExprs.Add(IfThenElse(NotEqual(destExpression, Constant(null)),
-                        Call(destExpression, destICollectionType.GetMethod("Clear")),
-                        Assign(destParam, newExpr)
-                        ));
-                }
-                else if (propertyMap.UseDestinationValue)
-                {
-                    blockExprs.Add(Call(destExpression, destICollectionType.GetMethod("Clear")));
-                }
-                else
-                {
-                    var destParam = Parameter(newExpr.Type, "dest");
-                    blockParams.Add(destParam);
-                    blockExprs.Add(Assign(destParam, newExpr));
-                    destExpression = destParam;
-                }
-            }
-            else
-            {
-                var destParam = Parameter(newExpr.Type, "dest");
-                blockParams.Add(destParam);
-                blockExprs.Add(Assign(destParam, newExpr));
-                destExpression = destParam;
-            }
-
-            Expression itemExpr;
-
-            var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-            var expressionMapper = match as IObjectMapExpression;
-            if (expressionMapper != null)
-            {
-                itemExpr = expressionMapper.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam, Default(destElementType), itemContextParam);
-            }
-            else
-            {
-                var resContextCtor = typeof(ResolutionContext).GetTypeInfo().DeclaredConstructors.Single(ci => ci.GetParameters().Length == 1);
-                blockExprs.Add(Assign(itemContextParam, New(resContextCtor, contextExpression)));
-
-                var mapMethod = typeof(ResolutionContext).GetTypeInfo().DeclaredMethods.First(m => m.Name == "Map");
-
-                blockParams.Add(itemContextParam);
-                itemExpr = ToType(Call(itemContextParam, mapMethod,
-                    ToType(itemParam, typeof(object)),
-                    ToType(Default(destElementType), typeof(object)),
-                    Constant(sourceElementType),
-                    Constant(destElementType)
-                ), destElementType);
-            }
-
-            var addMethod = destICollectionType.GetMethod("Add");
-            blockExprs.Add(ForEach(sourceExpression, itemParam, Call(
-                destExpression,
-                addMethod,
-                itemExpr)));
-
-            blockExprs.Add(destExpression);
-
-            var mapExpr = Block(blockParams, blockExprs);
-
-            return Condition(
-                Equal(sourceExpression, Constant(null)),
-                ToType(ifNullExpr, destCollectionType),
-                ToType(mapExpr, destCollectionType));
-        }
+        
         private static Expression NewIfConditionFails(this Expression destinationExpresson, Func<Expression, Expression> conditionalExpression,
             Type ifInterfaceType)
         {
@@ -320,12 +160,11 @@ namespace AutoMapper.Mappers
                 return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), itemContextParam);
             }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-            var expressionMapper = match as IObjectMapExpression;
-            if (expressionMapper != null)
+            if (match != null)
             {
                 itemExpr =
                     ExpressionExtensions.ToType(
-                        expressionMapper.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam,
+                        match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam,
                             Default(typePair.DestinationType), itemContextParam), typePair.DestinationType);
             }
             else
@@ -345,11 +184,8 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class CollectionMapper :  IObjectMapExpression
+    public class CollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context)
-            => context.MapCollection(CollectionMapperExtensions.IfNotNull(Constant(context.DestinationValue)), typeof(List<>), CollectionMapperExtensions.MapItemMethodInfo);
-        
         public bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)

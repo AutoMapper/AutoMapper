@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     using System.ComponentModel;
     using Configuration;
 
-    public class TypeConverterMapper : IObjectMapExpression
+    public class TypeConverterMapper : IObjectMapper
     {
         private static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
         {
@@ -34,11 +34,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(TypeConverterMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new[] { context.SourceValue, CollectionMapperExtensions.Constructor(context.DestinationType) });
-        }
 
         public bool IsMatch(TypePair context)
         {

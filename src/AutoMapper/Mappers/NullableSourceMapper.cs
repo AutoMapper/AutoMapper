@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
 {
     using Configuration;
 
-    public class NullableSourceMapper : IObjectMapExpression
+    public class NullableSourceMapper : IObjectMapper
     {
         public static TDestination Map<TDestination>(TDestination? source)
             where TDestination : struct
@@ -15,11 +15,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(NullableSourceMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.DestinationType).Invoke(null, new [] {context.SourceValue});
-        }
 
         public bool IsMatch(TypePair context)
         {

@@ -1,24 +1,22 @@
-﻿using System.Linq.Expressions;
-
-namespace AutoMapper.Mappers
+﻿namespace AutoMapper.Mappers
 {
-    public class StringMapper : IObjectMapExpression
-    {
-        public object Map(ResolutionContext context)
-        {
-            return context.SourceValue?.ToString();
-        }
+    using System.Linq.Expressions;
+    using static System.Linq.Expressions.Expression;
 
+    public class StringMapper : IObjectMapper
+    {
         public bool IsMatch(TypePair context)
         {
             return context.DestinationType == typeof(string) && context.SourceType != typeof(string);
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
+            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression)
         {
-            return Expression.Condition(Expression.Equal(sourceExpression, Expression.Default(sourceExpression.Type)),
-                Expression.Constant(null, typeof (string)),
-                Expression.Call(sourceExpression, typeof (object).GetMethod("ToString")));
+            return Condition(Equal(sourceExpression, Default(sourceExpression.Type)),
+                Constant(null, typeof(string)),
+                Call(sourceExpression, typeof(object).GetMethod("ToString")));
         }
     }
 }

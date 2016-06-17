@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using System.Collections.Specialized;
 
-    public class NameValueCollectionMapper : IObjectMapExpression
+    public class NameValueCollectionMapper : IObjectMapper
     {
         public static NameValueCollection Map(NameValueCollection source)
         {
@@ -21,11 +21,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.Invoke(null, new [] {context.SourceValue});
-        }
 
         public bool IsMatch(TypePair context)
         {
