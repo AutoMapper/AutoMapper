@@ -10,16 +10,6 @@ namespace AutoMapper.Mappers
 
     public class ReadOnlyCollectionMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context)
-        {
-            var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(context.DestinationType));
-            var list = context.MapCollection(null, typeof(List<>), CollectionMapperExtensions.MapItemMethodInfo, listType);
-            if (list == null)
-                return null;
-            var constructor = context.DestinationType.GetConstructors().First();
-            return constructor.Invoke( new [] { list });
-        }
-
         public bool IsMatch(TypePair context)
         {
             if (!(context.SourceType.IsEnumerableType() && context.DestinationType.IsGenericType()))
