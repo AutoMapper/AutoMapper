@@ -58,11 +58,6 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetAllMethods().First(_ => _.IsStatic);
 
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.DestinationType, context.SourceType, TypeHelper.GetElementType(context.SourceType, (IEnumerable)context.SourceValue)).Invoke(null, new[] { context.SourceValue, context });
-        }
-
         public bool IsMatch(TypePair context)
         {
             return context.DestinationType.IsArray && context.DestinationType.GetArrayRank() > 1 && context.SourceType.IsEnumerableType();

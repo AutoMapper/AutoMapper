@@ -22,11 +22,6 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetAllMethods().First(_ => _.IsStatic);
 
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.Invoke(null, new [] {context.SourceValue});
-        }
-
         public bool IsMatch(TypePair context)
         {
             return
