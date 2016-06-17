@@ -206,7 +206,8 @@ namespace AutoMapper.UnitTests
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<MasterDto, MasterWithCollection>();
+                cfg.CreateMap<MasterDto, MasterWithCollection>()
+                    .ForMember(d => d.Details, opt => opt.UseDestinationValue());
                 cfg.CreateMap<DetailDto, Detail>();
             });
 
@@ -258,7 +259,8 @@ namespace AutoMapper.UnitTests
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<MasterDto, MasterWithList>();
+                cfg.CreateMap<MasterDto, MasterWithList>()
+                    .ForMember(d => d.Details, opt => opt.UseDestinationValue());
                 cfg.CreateMap<DetailDto, Detail>();
             });
 
