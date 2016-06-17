@@ -95,6 +95,11 @@ namespace AutoMapper.Mappers
             return Lambda(Condition(condition, dest, destinationType.NewExpr(ifInterfaceType)), dest);
         }
 
+        internal static Delegate Constructor(Type type)
+        {
+            return Lambda(ExpressionExtensions.ToType(DelegateFactory.GenerateConstructorExpression(type), type)).Compile();
+        }
+
         internal static Expression NewExpr(this Type baseType, Type ifInterfaceType)
         {
             var newExpr = baseType.IsInterface()

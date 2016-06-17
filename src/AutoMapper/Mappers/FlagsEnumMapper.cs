@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Execution;
 
 namespace AutoMapper.Mappers
 {
@@ -8,18 +9,13 @@ namespace AutoMapper.Mappers
 
     public class FlagsEnumMapper : IObjectMapExpression
     {
-        public static TDestination Map<TSource, TDestination>(TSource source, ResolutionContext context)
+        public static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
             where TDestination : struct
         {
-            Type enumDestType = TypeHelper.GetEnumerationType(typeof(TDestination));
-
             if (source == null)
-            {
-                return (TDestination)(context.ConfigurationProvider.AllowNullDestinationValues
-                        ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
-                        : ObjectCreator.CreateObject(typeof(TDestination)));
-            }
+                return ifNull();
 
+            Type enumDestType = TypeHelper.GetEnumerationType(typeof(TDestination));
             return (TDestination)Enum.Parse(enumDestType, source.ToString(), true);
         }
 
@@ -27,7 +23,7 @@ namespace AutoMapper.Mappers
 
         public object Map(ResolutionContext context)
         {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new [] { context.SourceValue, context});
+            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new [] { context.SourceValue, CollectionMapperExtensions.Constructor(context.DestinationType) });
         }
 
         public bool IsMatch(TypePair context)
@@ -43,7 +39,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, contextExpression);
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, Expression.Constant(CollectionMapperExtensions.Constructor(destExpression.Type)));
         }
     }
 }
