@@ -11,34 +11,11 @@ namespace AutoMapper.Mappers
 
     public class EnumerableMapper : IObjectMapExpression
     {
-        public static TDestination Map<TSource, TDestination, TDestinationElement>(TSource source, TDestination destination, ResolutionContext context)
-            where TSource : class, IEnumerable
-            where TDestination : class, IEnumerable
-        {
-            if (source == null)
-                return context.Mapper.ShouldMapSourceCollectionAsNull(context) ? null : new List<TDestinationElement>() as TDestination;
-            
-            var destElementType = typeof (TDestinationElement);
-
-            TDestination destEnumeration = (destination is IList && !(destination is Array))
-                ? destination
-                : (TDestination) ObjectCreator.CreateList(destElementType);
-
-            var list = destEnumeration as IList<TDestinationElement>;
-            list.Clear();
-            var itemContext = new ResolutionContext(context);
-            foreach(var item in source)
-            {
-                list.Add(itemContext.Map(item, default(TDestinationElement)));
-            }
-            return destEnumeration;
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(EnumerableMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public object Map(ResolutionContext context)
         {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType, TypeHelper.GetElementType(context.DestinationType)).Invoke(null, new [] { context.SourceValue, context.DestinationValue, context });
+            var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(context.DestinationType));
+            return context.MapCollection(IfEditableList(Expression.Constant(listType)), typeof(List<>), CollectionMapperExtensions.MapItemMethodInfo, listType);
         }
 
         public bool IsMatch(TypePair context)
@@ -49,9 +26,16 @@ namespace AutoMapper.Mappers
                    && context.SourceType.IsEnumerableType();
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type, TypeHelper.GetElementType(destExpression.Type)), sourceExpression, destExpression, contextExpression);
+            var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type));
+
+            return typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, Expression.Default(listType), contextExpression, IfEditableList, typeof(List<>), CollectionMapperExtensions.MapItemExpr);
+        }
+
+        private static Expression IfEditableList(Expression dest)
+        {
+            return Expression.And(Expression.TypeIs(dest, typeof(IList)), Expression.Not(Expression.TypeIs(dest, typeof(Array))));
         }
     }
 }

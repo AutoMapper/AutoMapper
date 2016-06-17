@@ -1,40 +1,23 @@
-using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
+using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using Configuration;
 
     public class ReadOnlyCollectionMapper : IObjectMapExpression
     {
-        public static ReadOnlyCollection<TDestinationItem> Map<TSource, TSourceItem, TDestinationItem>(TSource source, ResolutionContext context)
-            where TSource : IEnumerable<TSourceItem>
-        {
-            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
-                return null;
-
-            IList<TDestinationItem> list = new List<TDestinationItem>();
-
-            var itemContext = new ResolutionContext(context);
-            foreach(var item in source)
-            {
-                list.Add(itemContext.Map(item, default(TDestinationItem)));
-            }
-            return new ReadOnlyCollection<TDestinationItem>(list);
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(ReadOnlyCollectionMapper).GetAllMethods().First(_ => _.IsStatic);
-
         public object Map(ResolutionContext context)
         {
-            return
-                MapMethodInfo.MakeGenericMethod(context.SourceType, TypeHelper.GetElementType(context.SourceType), TypeHelper.GetElementType(context.DestinationType))
-                    .Invoke(null, new[] { context.SourceValue, context });
+            var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(context.DestinationType));
+            var list = context.MapCollection(null, typeof(List<>), CollectionMapperExtensions.MapItemMethodInfo, listType);
+            if (list == null)
+                return null;
+            var constructor = context.DestinationType.GetConstructors().First();
+            return constructor.Invoke( new [] { list });
         }
 
         public bool IsMatch(TypePair context)
@@ -47,9 +30,13 @@ namespace AutoMapper.Mappers
             return genericType == typeof (ReadOnlyCollection<>);
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)), sourceExpression, contextExpression);
+            var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type));
+            var list = typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, Default(listType), contextExpression, _ => Constant(false), typeof(List<>), CollectionMapperExtensions.MapItemExpr);
+            var dest = Variable(listType, "dest");
+
+            return Block(new[] { dest }, Assign(dest, list), Condition(NotEqual(dest, Default(listType)), New(destExpression.Type.GetConstructors().First(), dest), Default(destExpression.Type)));
         }
     }
 }

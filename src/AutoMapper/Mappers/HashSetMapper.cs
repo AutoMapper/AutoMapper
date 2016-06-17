@@ -10,50 +10,14 @@ namespace AutoMapper.Mappers
 
     public class HashSetMapper : IObjectMapExpression
     {
-        public static ISet<TDestination> Map<TSource, TDestination>(IEnumerable<TSource> source, ISet<TDestination> destination, ResolutionContext context)
-        {
-            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
-            {
-                return null;
-            }
-
-            destination = destination ?? new HashSet<TDestination>();
-
-            destination.Clear();
-
-            var itemContext = new ResolutionContext(context);
-            foreach (var item in source ?? Enumerable.Empty<TSource>())
-            {
-                destination.Add(itemContext.Map(item, default(TDestination)));
-            }
-
-            return destination;
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(HashSetMapper).GetAllMethods().First(_ => _.IsStatic);
-
         public object Map(ResolutionContext context)
-        {
-            var srcType = TypeHelper.GetElementType(context.SourceType);
-            var destType = TypeHelper.GetElementType(context.DestinationType);
-
-            return MapMethodInfo.MakeGenericMethod(srcType, destType).Invoke(null, new [] { context.SourceValue, context.DestinationValue, context });
-        }
+            => context.MapCollection(CollectionMapperExtensions.IfNotNull(Expression.Constant(context.DestinationValue)), typeof(HashSet<>), CollectionMapperExtensions.MapItemMethodInfo);
 
         public bool IsMatch(TypePair context)
-        {
-            var isMatch = context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
+            => context.SourceType.IsEnumerableType() && IsSetType(context.DestinationType);
 
-            return isMatch;
-        }
-
-
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return Expression.Call(null,
-                MapMethodInfo.MakeGenericMethod(TypeHelper.GetElementType(sourceExpression.Type), TypeHelper.GetElementType(destExpression.Type)),
-                    sourceExpression, destExpression, contextExpression);
-        }
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+            => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, destExpression, contextExpression, CollectionMapperExtensions.IfNotNull, typeof(HashSet<>), CollectionMapperExtensions.MapItemExpr);
 
         private static bool IsSetType(Type type)
         {

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using static System.Linq.Expressions.Expression;
 using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 
 namespace AutoMapper.Mappers
@@ -19,8 +20,7 @@ namespace AutoMapper.Mappers
                 p => p.GetMemberValue(source));
             return membersDictionary;
         }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(DictionaryMapper).GetAllMethods().First(_ => _.IsStatic);
+        
         private static readonly MethodInfo MembersDictionaryMethodInfo = typeof(ToStringDictionaryMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public bool IsMatch(TypePair context)
@@ -29,25 +29,13 @@ namespace AutoMapper.Mappers
         }
 
         public object Map(ResolutionContext context)
-        {
-            var membersDictionary = MembersDictionary(context);
+            => context.MapCollection(null, typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyValuePairMethodInfo, sourceValue: MembersDictionary(context));
 
-            return 
-                MapMethodInfo.MakeGenericMethod(typeof(StringDictionary), typeof(string), typeof(object), context.DestinationType, typeof(string), typeof(object))
-                .Invoke(null, new[] { membersDictionary, context.DestinationValue, context });
-        }
-
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            var membersDictionaryExpression = Expression.Call(null, MembersDictionaryMethodInfo, contextExpression);
-
-            return Expression.Call(null,
-                MapMethodInfo.MakeGenericMethod(typeof(StringDictionary), typeof(string), typeof(object), destExpression.Type, typeof(string), typeof(object)),
-                    membersDictionaryExpression, destExpression, contextExpression);
-        }
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+            => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, Call(MembersDictionaryMethodInfo, contextExpression), destExpression, contextExpression, _ => null, typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
     }
 
-    public class FromStringDictionaryMapper : IObjectMapper, IObjectMapExpression
+    public class FromStringDictionaryMapper : IObjectMapExpression
     {
         public bool IsMatch(TypePair context)
         {
@@ -77,7 +65,7 @@ namespace AutoMapper.Mappers
             return MapMethodInfo.MakeGenericMethod(context.DestinationType).Invoke(null, new []{context.SourceValue, context});
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, contextExpression);
         }
