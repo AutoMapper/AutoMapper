@@ -12,7 +12,7 @@ namespace AutoMapper
         /// </summary>
         /// <param name="context">Resolution context</param>
         /// <returns>Mapped object</returns>
-        object Map(ResolutionContext context);
+        //object Map(ResolutionContext context);
 
         /// <summary>
         /// When true, the mapping engine will use this mapper as the strategy

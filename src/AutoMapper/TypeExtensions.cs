@@ -5,9 +5,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-#if !PORTABLE
     using System.Reflection.Emit;
-#endif
 
     internal static class TypeExtensions
     {
@@ -108,19 +106,16 @@ namespace AutoMapper
             return type.GetTypeInfo().DeclaredConstructors;
         }
 
-#if !PORTABLE
         public static Type CreateType(this TypeBuilder type)
         {
             return type.CreateTypeInfo().AsType();
         }
-#endif
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type)
         {
             return type.GetTypeInfo().DeclaredMembers;
         }
 
-#if PORTABLE
         public static IEnumerable<MemberInfo> GetAllMembers(this Type type)
         {
             while (true)
@@ -143,14 +138,12 @@ namespace AutoMapper
         {
             return type.GetAllMembers().Where(mi => mi.Name == name).ToArray();
         }
-#endif
 
         public static IEnumerable<MethodInfo> GetDeclaredMethods(this Type type)
         {
             return type.GetTypeInfo().DeclaredMethods;
         }
 
-#if PORTABLE
         public static MethodInfo GetMethod(this Type type, string name)
         {
             return type.GetAllMethods().FirstOrDefault(mi => mi.Name == name);
@@ -164,7 +157,15 @@ namespace AutoMapper
                 .Where(mi => mi.GetParameters().Length == parameters.Length)
                 .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
         }
-#endif
+
+        public static ConstructorInfo GetConstructor(this Type type, Type[] parameters)
+        {
+            return type
+                .GetTypeInfo()
+                .DeclaredConstructors
+                .Where(mi => mi.GetParameters().Length == parameters.Length)
+                .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
+        }
 
         public static IEnumerable<MethodInfo> GetAllMethods(this Type type)
         {
@@ -176,12 +177,10 @@ namespace AutoMapper
             return type.GetTypeInfo().DeclaredProperties;
         }
 
-#if PORTABLE
         public static PropertyInfo GetProperty(this Type type, string name)
         {
             return type.GetTypeInfo().DeclaredProperties.FirstOrDefault(mi => mi.Name == name);
         }
-#endif
 
         public static object[] GetCustomAttributes(this Type type, Type attributeType, bool inherit)
         {
@@ -248,12 +247,10 @@ namespace AutoMapper
             return type.GetTypeInfo().BaseType;
         }
 
-#if PORTABLE
         public static bool IsAssignableFrom(this Type type, Type other)
         {
             return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
         }
-#endif
 
         public static bool IsAbstract(this Type type)
         {
@@ -302,12 +299,17 @@ namespace AutoMapper
 
         public static bool IsInstanceOfType(this Type type, object o)
         {
-            return o != null && type.IsAssignableFrom(o.GetType());
+            return o != null && type.GetTypeInfo().IsAssignableFrom(o.GetType().GetTypeInfo());
         }
 
         public static ConstructorInfo[] GetConstructors(this Type type)
         {
             return type.GetTypeInfo().DeclaredConstructors.ToArray();
+        }
+
+        public static PropertyInfo[] GetProperties(this Type type)
+        {
+            return type.GetRuntimeProperties().ToArray();
         }
 
         public static MethodInfo GetGetMethod(this PropertyInfo propertyInfo, bool ignored)

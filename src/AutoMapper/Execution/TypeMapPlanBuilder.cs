@@ -257,16 +257,8 @@
 
             if (typeMap.DestinationType.IsInterface())
             {
-#if PORTABLE
-                Block(typeof (object),
-                    Throw(
-                        Constant(
-                            new PlatformNotSupportedException("Mapping to interfaces through proxies not supported."))),
-                    Constant(null));
-#else
                 var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationType)));
                 return Invoke(ctor);
-#endif
             }
 
             if (typeMap.DestinationType.IsAbstract())
