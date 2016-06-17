@@ -339,7 +339,7 @@
                 else
                 {
                     var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-                    var expressionMapper = match as IObjectMapExpression;
+                    var expressionMapper = match;
                     if (expressionMapper != null)
                         valueResolverExpr = expressionMapper.MapExpression(typeMapRegistry, configurationProvider, propertyMap, valueResolverExpr, destValueExpr,
                             ctxtParam);

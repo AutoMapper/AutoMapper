@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
-    public class ConvertMapper : IObjectMapExpression
+    public class ConvertMapper : IObjectMapper
     {
         private readonly IReadOnlyDictionary<TypePair, LambdaExpression> _converters = new ReadOnlyDictionary<TypePair, LambdaExpression>(new Dictionary<TypePair, LambdaExpression>
         {
@@ -484,11 +484,6 @@ namespace AutoMapper.Mappers
         {
             _converterFuncs = _converters.ToDictionary(kp => kp.Key, kp => kp.Value.Compile());
         }
-
-        public object Map(ResolutionContext context) =>
-            context.SourceValue == null
-            ? context.Mapper.CreateObject(context)
-            : _converterFuncs[context.Types].DynamicInvoke(context.SourceValue);
 
         public bool IsMatch(TypePair types) => _converters.ContainsKey(types);
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)

@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using System.Linq;
     
-    public class StringToEnumMapper : IObjectMapExpression
+    public class StringToEnumMapper : IObjectMapper
     {
         public static TDestination Map<TDestination>(string source)
         {
@@ -18,11 +18,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(StringToEnumMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.DestinationType).Invoke(null, new[] { context.SourceValue });
-        }
 
         public bool IsMatch(TypePair context)
         {
@@ -36,7 +31,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class EnumToEnumMapper : IObjectMapExpression
+    public class EnumToEnumMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source)
         {
@@ -64,11 +59,6 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(EnumToEnumMapper).GetAllMethods().First(_ => _.IsStatic);
 
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new[] { context.SourceValue });
-        }
-
         public bool IsMatch(TypePair context)
         {
             var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
@@ -82,12 +72,11 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class EnumToUnderlyingTypeMapper : IObjectMapExpression
+    public class EnumToUnderlyingTypeMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source)
         {
             bool toEnum = false;
-            Type enumSourceType = TypeHelper.GetEnumerationType(typeof(TSource));
             Type enumDestinationType = TypeHelper.GetEnumerationType(typeof(TDestination));
             var typePair = new TypePair(typeof (TSource), typeof (TDestination));
             EnumToUnderlyingTypeMapping(typePair, ref toEnum);
@@ -131,11 +120,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(EnumToUnderlyingTypeMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new[] { context.SourceValue });
-        }
 
         public bool IsMatch(TypePair context)
         {

@@ -5,15 +5,8 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using System.Reflection;
 
-    public class ExplicitConversionOperatorMapper : IObjectMapExpression
+    public class ExplicitConversionOperatorMapper : IObjectMapper
     {
-        public object Map(ResolutionContext context)
-        {
-            var implicitOperator = GetExplicitConversionOperator(context.Types);
-
-            return implicitOperator.Invoke(null, new[] {context.SourceValue});
-        }
-
         public bool IsMatch(TypePair context)
         {
             var methodInfo = GetExplicitConversionOperator(context);

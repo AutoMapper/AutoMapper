@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
     using System;
     using System.Reflection;
 
-    public class PrimitiveArrayMapper : IObjectMapExpression
+    public class PrimitiveArrayMapper : IObjectMapper
     {
         public static TDestElement[] Map<TSourceElement, TDestElement>(TSourceElement[] source, ResolutionContext context)
         {
@@ -31,16 +31,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(PrimitiveArrayMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            Type sourceElementType = TypeHelper.GetElementType(context.SourceType);
-            Type destElementType = TypeHelper.GetElementType(context.SourceType);
-
-            return
-                MapMethodInfo.MakeGenericMethod(sourceElementType, destElementType)
-                    .Invoke(null, new[] { context.SourceValue, context });
-        }
 
         private bool IsPrimitiveArrayType(Type type)
         {

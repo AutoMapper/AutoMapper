@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using Configuration;
 
-    public class MultidimensionalArrayMapper : IObjectMapExpression
+    public class MultidimensionalArrayMapper : IObjectMapper
     {
         static MultidimensionalArrayFiller filler;
 
@@ -57,11 +57,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.DestinationType, context.SourceType, TypeHelper.GetElementType(context.SourceType, (IEnumerable)context.SourceValue)).Invoke(null, new[] { context.SourceValue, context });
-        }
 
         public bool IsMatch(TypePair context)
         {

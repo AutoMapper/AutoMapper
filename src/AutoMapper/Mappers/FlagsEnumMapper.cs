@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
     using System;
     using System.Linq;
 
-    public class FlagsEnumMapper : IObjectMapExpression
+    public class FlagsEnumMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
             where TDestination : struct
@@ -20,11 +20,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(FlagsEnumMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new [] { context.SourceValue, CollectionMapperExtensions.Constructor(context.DestinationType) });
-        }
 
         public bool IsMatch(TypePair context)
         {

@@ -2,6 +2,8 @@
 {
     namespace CustomMapperTests
     {
+        using System;
+        using System.Linq.Expressions;
         using AutoMapper.Mappers;
         using Xunit;
 
@@ -35,6 +37,14 @@
                 public bool IsMatch(TypePair context)
                 {
                     return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
+                }
+
+                public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
+                    PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+                {
+                    Expression<Func<DestinationType>> expr = () => new DestinationType();
+
+                    return expr.Body;
                 }
             }
 
