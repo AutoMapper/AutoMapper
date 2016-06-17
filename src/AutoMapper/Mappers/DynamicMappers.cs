@@ -46,11 +46,6 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(FromDynamicMapper).GetAllMethods().First(_ => _.IsStatic);
 
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new[] { context.SourceValue, context.DestinationValue, context, CollectionMapperExtensions.Constructor(context.DestinationType) });
-        }
-
         public bool IsMatch(TypePair context)
         {
             return context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
@@ -98,11 +93,6 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetAllMethods().First(_ => _.IsStatic);
-
-        public object Map(ResolutionContext context)
-        {
-            return MapMethodInfo.MakeGenericMethod(context.SourceType, context.DestinationType).Invoke(null, new[] { context.SourceValue, context.DestinationValue, context, CollectionMapperExtensions.Constructor(context.DestinationType) });
-        }
 
         public bool IsMatch(TypePair context)
         {
