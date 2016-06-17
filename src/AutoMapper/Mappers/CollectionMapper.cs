@@ -44,6 +44,8 @@ namespace AutoMapper.Mappers
             return resolutionContext.Map(item, default(TDestinationItem));
         }
 
+
+        //TODO: Delete this method
         internal static object MapCollection(this ResolutionContext context, Expression conditionalExpression, Type ifInterfaceType, MethodInfo itemFunc, Type destinationType = null, object destinationValue = null, object sourceValue = null)
         {
             if (destinationType == null)
