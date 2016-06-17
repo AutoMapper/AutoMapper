@@ -2,7 +2,7 @@
 
 namespace AutoMapper.Mappers
 {
-    public class StringMapper : IObjectMapExpression
+    public class StringMapper : IObjectMapper
     {
         public object Map(ResolutionContext context)
         {

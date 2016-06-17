@@ -359,9 +359,9 @@ namespace AutoMapper
                     var message = Constant("Missing type map configuration or unsupported mapping.");
                     fullExpression = Lambda(Block(Throw(New(ctor, context, message)), Default(destinationType)), source, destination, context);
                 }
-                else if (mapperToUse is IObjectMapExpression)
+                else if (mapperToUse is IObjectMapper)
                 {
-                    var exprMapper = (IObjectMapExpression)mapperToUse;
+                    var exprMapper = (IObjectMapper)mapperToUse;
                     var map = exprMapper.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
                     var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
                     fullExpression = TryCatch(mapToDestination, source, destination, context);

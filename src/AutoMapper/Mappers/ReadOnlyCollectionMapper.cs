@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     using System.Collections.ObjectModel;
     using Configuration;
 
-    public class ReadOnlyCollectionMapper : IObjectMapExpression
+    public class ReadOnlyCollectionMapper : IObjectMapper
     {
         public object Map(ResolutionContext context)
         {

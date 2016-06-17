@@ -157,7 +157,7 @@ namespace AutoMapper.Mappers
                 return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), itemContextParam);
             }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-            var expressionMapper = match as IObjectMapExpression;
+            var expressionMapper = match as IObjectMapper;
             if (expressionMapper != null)
             {
                 itemExpr =
@@ -182,7 +182,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class CollectionMapper :  IObjectMapExpression
+    public class CollectionMapper : IObjectMapper
     {
         public object Map(ResolutionContext context)
             => context.MapCollection(CollectionMapperExtensions.IfNotNull(Constant(context.DestinationValue)), typeof(List<>), CollectionMapperExtensions.MapItemMethodInfo);

@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using Configuration;
 
-    public class EnumerableToDictionaryMapper : IObjectMapExpression
+    public class EnumerableToDictionaryMapper : IObjectMapper
     {
         public bool IsMatch(TypePair context)
         {

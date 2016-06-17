@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
 {
     using Execution;
     
-    public class FromDynamicMapper : IObjectMapExpression
+    public class FromDynamicMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
         {
@@ -62,7 +62,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class ToDynamicMapper : IObjectMapExpression
+    public class ToDynamicMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
         {

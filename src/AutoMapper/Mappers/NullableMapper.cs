@@ -4,7 +4,7 @@ namespace AutoMapper.Mappers
 {
     using Configuration;
 
-    public class NullableMapper : IObjectMapExpression
+    public class NullableMapper : IObjectMapper
     {
         public object Map(ResolutionContext context)
         {

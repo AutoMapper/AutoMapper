@@ -10,7 +10,7 @@ namespace AutoMapper.Mappers
     using System;
     using Execution;
 
-    public class ToStringDictionaryMapper : IObjectMapExpression
+    public class ToStringDictionaryMapper : IObjectMapper
     {
         public static Dictionary<string, object> MembersDictionary(ResolutionContext context)
         {
@@ -35,7 +35,7 @@ namespace AutoMapper.Mappers
             => typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, Call(MembersDictionaryMethodInfo, contextExpression), destExpression, contextExpression, _ => null, typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
     }
 
-    public class FromStringDictionaryMapper : IObjectMapExpression
+    public class FromStringDictionaryMapper : IObjectMapper
     {
         public bool IsMatch(TypePair context)
         {

@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using System.Linq;
     
-    public class StringToEnumMapper : IObjectMapExpression
+    public class StringToEnumMapper : IObjectMapper
     {
         public static TDestination Map<TDestination>(string source)
         {
@@ -36,7 +36,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class EnumToEnumMapper : IObjectMapExpression
+    public class EnumToEnumMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source)
         {
@@ -82,7 +82,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public class EnumToUnderlyingTypeMapper : IObjectMapExpression
+    public class EnumToUnderlyingTypeMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source)
         {

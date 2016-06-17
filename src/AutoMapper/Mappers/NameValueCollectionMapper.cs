@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using System.Collections.Specialized;
 
-    public class NameValueCollectionMapper : IObjectMapExpression
+    public class NameValueCollectionMapper : IObjectMapper
     {
         public static NameValueCollection Map(NameValueCollection source)
         {

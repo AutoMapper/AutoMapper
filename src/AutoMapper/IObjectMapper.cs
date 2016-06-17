@@ -33,11 +33,4 @@ namespace AutoMapper
 	    /// <returns>Map expression</returns>
 	    Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression);
 	}
-
-    /// <summary>
-    /// Map expression strategy, based on base mapper
-    /// </summary>
-    public interface IObjectMapExpression : IObjectMapper
-    {
-    }
 }

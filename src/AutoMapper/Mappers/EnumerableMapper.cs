@@ -9,7 +9,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using Configuration;
 
-    public class EnumerableMapper : IObjectMapExpression
+    public class EnumerableMapper : IObjectMapper
     {
 
         public object Map(ResolutionContext context)

@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 
 namespace AutoMapper.Mappers
 {
-    public class AssignableMapper : IObjectMapExpression
+    public class AssignableMapper : IObjectMapper
     {
         public object Map(ResolutionContext context)
         {

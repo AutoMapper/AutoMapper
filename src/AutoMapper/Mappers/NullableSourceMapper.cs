@@ -6,7 +6,7 @@ namespace AutoMapper.Mappers
 {
     using Configuration;
 
-    public class NullableSourceMapper : IObjectMapExpression
+    public class NullableSourceMapper : IObjectMapper
     {
         public static TDestination Map<TDestination>(TDestination? source)
             where TDestination : struct

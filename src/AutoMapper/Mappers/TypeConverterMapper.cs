@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     using System.ComponentModel;
     using Configuration;
 
-    public class TypeConverterMapper : IObjectMapExpression
+    public class TypeConverterMapper : IObjectMapper
     {
         private static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
         {

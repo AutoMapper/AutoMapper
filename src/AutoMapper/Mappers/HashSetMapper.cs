@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     using System.Linq;
     using Configuration;
 
-    public class HashSetMapper : IObjectMapExpression
+    public class HashSetMapper : IObjectMapper
     {
         public object Map(ResolutionContext context)
             => context.MapCollection(CollectionMapperExtensions.IfNotNull(Expression.Constant(context.DestinationValue)), typeof(HashSet<>), CollectionMapperExtensions.MapItemMethodInfo);

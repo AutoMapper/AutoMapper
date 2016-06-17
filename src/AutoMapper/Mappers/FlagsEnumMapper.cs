@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
     using System;
     using System.Linq;
 
-    public class FlagsEnumMapper : IObjectMapExpression
+    public class FlagsEnumMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
             where TDestination : struct
