@@ -15,9 +15,6 @@ namespace AutoMapper.Mappers
     {
         internal static readonly MethodInfo MapMethodInfo = typeof(CollectionMapperExtensions).GetAllMethods().First(_ => _.IsStatic);
 
-        internal static readonly MethodInfo MapItemMethodInfo = typeof(CollectionMapperExtensions).GetAllMethods().Where(_ => _.IsStatic).ElementAt(1);
-        internal static readonly MethodInfo MapKeyValuePairMethodInfo = typeof(CollectionMapperExtensions).GetAllMethods().Where(_ => _.IsStatic).ElementAt(2);
-
         public static TDestination Map<TSource, TSourceItem, TDestination, TDestinationItem>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination, TDestination> newDestination, Func<TSourceItem, ResolutionContext, TDestinationItem> addFunc)
             where TSource : IEnumerable
             where TDestination : class, ICollection<TDestinationItem>
@@ -35,15 +32,6 @@ namespace AutoMapper.Mappers
             return list;
         }
         
-        public static TDestinationItem MapItemFunc<TSourceItem,TDestinationItem>(TSourceItem item, ResolutionContext resolutionContext)
-        {
-            return resolutionContext.Map(item, default(TDestinationItem));
-        }
-        public static TDestinationItem MapKeyValuePairFunc<TSourceItem, TDestinationItem>(TSourceItem item, ResolutionContext resolutionContext)
-        {
-            return resolutionContext.Map(item, default(TDestinationItem));
-        }
-
         internal static Expression MapCollectionExpression(this TypeMapRegistry typeMapRegistry,
            IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression,
            Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression, Type ifInterfaceType, MapItem mapItem)
