@@ -149,7 +149,13 @@ namespace AutoMapper.Mappers
             PropertyMap propertyMap, Expression itemParam, Expression itemContextParam, TypePair typePair)
         {
             Expression itemExpr;
-
+            var typeMap = configurationProvider.ResolveTypeMap(typePair);
+            if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
+            {
+                if (!typeMap.Sealed)
+                    typeMap.Seal(typeMapRegistry, configurationProvider);
+                return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), itemContextParam);
+            }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
             var expressionMapper = match as IObjectMapExpression;
             if (expressionMapper != null)

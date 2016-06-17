@@ -33,21 +33,13 @@ namespace AutoMapper.Mappers
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(ArrayMapper).GetAllMethods().First(_ => _.IsStatic);
-        private static readonly MethodInfo Map2MethodInfo;
-
-        static ArrayMapper()
-        {
-            Expression<Func<IEnumerable<object>, ResolutionContext, object[]>> expr =
-                (source, context) => Map<object, object>(source, context);
-
-            Map2MethodInfo = ((MethodCallExpression) expr.Body).Method.GetGenericMethodDefinition();
-        }
-
-        private static TDestination[] Map<TSource, TDestination>(IEnumerable<TSource> source, ResolutionContext context)
+        private static readonly MethodInfo Map2MethodInfo = typeof(ArrayMapper).GetAllMethods().Where(_ => _.IsStatic).ElementAt(1);
+        
+        public static TDestination[] Map<TSource, TDestination>(IEnumerable<TSource> source, ResolutionContext context, Func<TSource, ResolutionContext, TDestination> newItemFunc)
         {
             var itemContext = new ResolutionContext(context);
 
-            return source.Select(item => itemContext.Map(item, default(TDestination)))
+            return source.Select(item => newItemFunc(item, itemContext))
                 .ToArray();
         }
 
@@ -82,8 +74,9 @@ namespace AutoMapper.Mappers
             var ifNullExpr = configurationProvider.AllowNullCollections
                                  ? (Expression) Constant(null)
                                  : NewArrayBounds(destElementType, Constant(0));
+            var itemExpr = typeMapRegistry.MapItemExpr(configurationProvider, propertyMap, sourceExpression.Type, destExpression.Type);
 
-            var mapExpr = Call(null, Map2MethodInfo.MakeGenericMethod(sourceElementType, destElementType), sourceExpression, contextExpression);
+            var mapExpr = Call(null, Map2MethodInfo.MakeGenericMethod(sourceElementType, destElementType), sourceExpression, contextExpression, itemExpr);
 
             // return (source == null) ? ifNullExpr : Map<TSourceElement, TDestElement>(source, context);
             return Condition(Equal(sourceExpression, Constant(null)), ifNullExpr, mapExpr);
