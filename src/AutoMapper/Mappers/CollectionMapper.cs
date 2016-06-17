@@ -253,7 +253,7 @@ namespace AutoMapper.Mappers
             Type ifInterfaceType)
         {
             var condition = conditionalExpression(destinationExpresson);
-            if (condition == null)
+            if (condition == null || destinationExpresson.NodeType == ExpressionType.Default)
                 return destinationExpresson.Type.NewExpr(ifInterfaceType);
             return Condition(condition, destinationExpresson, destinationExpresson.Type.NewExpr(ifInterfaceType));
         }

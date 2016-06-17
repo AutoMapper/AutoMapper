@@ -42,12 +42,12 @@
                 }
                 else type = typeMap.TypeConverterType;
 
-                // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).Convert(src, ctxt);
+                // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).ToType(src, ctxt);
                 var converterInterfaceType = typeof (ITypeConverter<,>).MakeGenericType(typeMap.SourceType,
                     typeMap.DestinationType);
                 return Lambda(
                     Call(
-                        Convert(
+                        ToType(
                             Call(
                                 MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
                                 typeof (MappingOperationOptions).GetMethod("CreateInstance")
@@ -364,7 +364,7 @@
                             ToType(getter, propertyMap.Condition.Parameters[2].Type),
                             ctxtParam
                             ),
-                        Convert(valueResolverExpr, propertyMap.DestinationPropertyType),
+                        ToType(valueResolverExpr, propertyMap.DestinationPropertyType),
                         getter
                         );
             }
@@ -373,7 +373,7 @@
             if (propertyMap.DestinationProperty.MemberInfo is FieldInfo)
             {
                 mapperExpr = propertyMap.SourceType != propertyMap.DestinationPropertyType
-                    ? Assign(destMember, Convert(valueResolverExpr, propertyMap.DestinationPropertyType))
+                    ? Assign(destMember, ToType(valueResolverExpr, propertyMap.DestinationPropertyType))
                     : Assign(getter, valueResolverExpr);
             }
             else
@@ -386,7 +386,7 @@
                 else
                 {
                     mapperExpr = Assign(destMember, propertyMap.SourceType != propertyMap.DestinationPropertyType
-                        ? Convert(valueResolverExpr, propertyMap.DestinationPropertyType)
+                        ? ToType(valueResolverExpr, propertyMap.DestinationPropertyType)
                         : valueResolverExpr);
                 }
             }
@@ -466,7 +466,7 @@
                 }
 
                 valueResolverFunc =
-                    Convert(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"), sourceFunc, ctxtParam),
+                    ToType(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"), sourceFunc, ctxtParam),
                         propertyMap.DestinationPropertyType);
             }
             else if (propertyMap.CustomResolver != null)
@@ -521,7 +521,7 @@
             {
                 Expression value = Constant(propertyMap.NullSubstitute);
                 if (propertyMap.NullSubstitute.GetType() != propertyMap.DestinationPropertyType)
-                    value = Convert(value, propertyMap.DestinationPropertyType);
+                    value = ToType(value, propertyMap.DestinationPropertyType);
                 valueResolverFunc = MakeBinary(ExpressionType.Coalesce, valueResolverFunc, value);
             }
             else if (!typeMap.Profile.AllowNullDestinationValues)
@@ -531,7 +531,7 @@
                 {
                     valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
                         valueResolverFunc,
-                        Convert(Call(
+                        ToType(Call(
                             typeof (ObjectCreator).GetMethod("CreateNonNullValue"),
                             Constant(toCreate)
                             ), propertyMap.SourceType));
