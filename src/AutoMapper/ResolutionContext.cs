@@ -101,7 +101,7 @@ namespace AutoMapper
             Types = types;
         }
 
-        internal ResolutionContext(ResolutionContext parent)
+        public ResolutionContext(ResolutionContext parent)
         {
             Parent = parent;
             Options = parent.Options;
@@ -173,7 +173,7 @@ namespace AutoMapper
             }
         }
 
-        internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+        public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
         {
             Types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
             var typeMap = ConfigurationProvider.ResolveTypeMap(Types);

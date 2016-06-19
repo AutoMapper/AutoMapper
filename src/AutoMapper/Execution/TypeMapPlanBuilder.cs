@@ -158,7 +158,7 @@
             {
                 variables = new ParameterExpression[0];
             }
-            actions.Insert(0, assignTypeMap);
+            //actions.Insert(0, assignTypeMap);
 
             actions.Add(afterMap);
 
@@ -283,6 +283,7 @@
 
             if (pmExpression == null)
                 return null;
+            return pmExpression;
 
             var autoMapException = Parameter(typeof (AutoMapperMappingException), "ex");
             var exception = Parameter(typeof (Exception), "ex");

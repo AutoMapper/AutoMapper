@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Reflection.Emit;
+
 namespace AutoMapper
 {
     using System;
@@ -295,8 +298,29 @@ namespace AutoMapper
 
             public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
-                Typed = typedExpression.Compile();
-                _untyped = new Lazy<UntypedMapperFunc>(() => Wrap(mapRequest, typedExpression).Compile());
+                Typed = MakeDelegate(typedExpression);
+
+                _untyped = new Lazy<UntypedMapperFunc>(() => (UntypedMapperFunc) MakeDelegate(Wrap(mapRequest, typedExpression)));
+            }
+
+            private static Delegate MakeDelegate(LambdaExpression typedExpression)
+            {
+                var assemblyBuilder =
+                    AppDomain.CurrentDomain.DefineDynamicAssembly(
+                        new AssemblyName("MyAssembly_" + Guid.NewGuid().ToString("N")), AssemblyBuilderAccess.Run);
+
+                var moduleBuilder = assemblyBuilder.DefineDynamicModule("Module");
+                var typeBuilder = moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
+                    TypeAttributes.Public);
+                var methodName = Guid.NewGuid().ToString("N");
+                var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
+
+                typedExpression.CompileToMethod(methodBuilder);
+
+                var resultingType = typeBuilder.CreateType();
+
+                return Delegate.CreateDelegate(typedExpression.Type,
+                    resultingType.GetMethod(methodName));
             }
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, LambdaExpression typedExpression)
