@@ -290,7 +290,7 @@
             ParameterExpression ctxtParam,
             ref ParameterExpression propertyContext, int index)
         {
-            var pmExpression = CreatePropertyMapFunc(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext);
+            var pmExpression = CreatePropertyMapFunc(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext, index);
 
             if (pmExpression == null)
                 return null;
@@ -318,7 +318,7 @@
             ParameterExpression srcParam,
             ParameterExpression destParam,
             ParameterExpression ctxtParam,
-            ref ParameterExpression propertyContext)
+            ref ParameterExpression propertyContext, int index)
         {
             var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, ctxtParam);
             var destMember = MakeMemberAccess(destParam, propertyMap.DestinationProperty.MemberInfo);
@@ -367,10 +367,11 @@
 
             if (propertyMap.Condition != null)
             {
+                var pm = Property(ArrayIndex(Call(Property(ctxtParam, "TypeMap"), typeof(TypeMap).GetMethod("GetValidPropertyMaps")), Constant(index)), "ConditionFunc");
                 valueResolverExpr =
                     Condition(
                         Invoke(
-                            propertyMap.Condition,
+                            pm,
                             srcParam,
                             destParam,
                             ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
@@ -406,8 +407,9 @@
 
             if (propertyMap.PreCondition != null)
             {
+                var pm = ToType(Property(ArrayIndex(Call(Property(ctxtParam, "TypeMap"), typeof(TypeMap).GetMethod("GetValidPropertyMaps")), Constant(index)), "PreConditionFunc"), typeof(Func<,,>).MakeGenericType(srcParam.Type, typeof(ResolutionContext), typeof(bool)));
                 mapperExpr = IfThen(
-                    Invoke(propertyMap.PreCondition, srcParam, ctxtParam),
+                    Invoke(pm, srcParam, ctxtParam),
                     mapperExpr
                     );
             }

@@ -37,7 +37,9 @@ namespace AutoMapper
         public int? MappingOrder { get; set; }
         public LambdaExpression CustomResolver { get; set; }
         public LambdaExpression Condition { get; set; }
+        public Delegate ConditionFunc => Condition.Compile();
         public LambdaExpression PreCondition { get; set; }
+        public Delegate PreConditionFunc => PreCondition.Compile();
         public LambdaExpression CustomExpression { get; private set; }
         public MemberInfo CustomSourceMember { get; set; }
         public bool UseDestinationValue { get; set; }

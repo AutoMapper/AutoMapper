@@ -405,27 +405,33 @@ namespace AutoMapper
 
     public static class DelegateExtensions
     {
-        public static Delegate MakeDelegate(this LambdaExpression lamdaExpression)
-        {
 #if NET45
+        private static ModuleBuilder _moduleBuilder;
+
+        static DelegateExtensions()
+        {
+
             var assemblyBuilder =
                 AppDomain.CurrentDomain.DefineDynamicAssembly(
                     new AssemblyName("MyAssembly_" + Guid.NewGuid().ToString("N")), AssemblyBuilderAccess.Run);
-
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule("Module");
-            var typeBuilder = moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
+            _moduleBuilder = assemblyBuilder.DefineDynamicModule("Module");
+        }
+#endif
+        public static Delegate MakeDelegate(this LambdaExpression lamdaExpression)
+        {
+#if NET45
+            var typeBuilder = _moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
                 TypeAttributes.Public);
             var methodName = Guid.NewGuid().ToString("N");
             var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
             
-
             lamdaExpression.CompileToMethod(methodBuilder);
 
             var resultingType = typeBuilder.CreateType();
 
             return Delegate.CreateDelegate(lamdaExpression.Type,resultingType.GetMethod(methodName));
 #else
-                return lamdaExpression.Compile();
+            return lamdaExpression.Compile();
 #endif
         }
     }
