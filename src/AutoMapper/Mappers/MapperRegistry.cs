@@ -15,7 +15,7 @@ namespace AutoMapper.Mappers
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
-#if NETSTANDARD1_3
+#if NETSTANDARD1_3 || NET45
             new NameValueCollectionMapper(),
 #endif
             new DictionaryMapper(),
