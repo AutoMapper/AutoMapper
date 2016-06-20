@@ -333,37 +333,28 @@ namespace AutoMapper
         }
     }
 
-    public static class TypeMap<TSource, TDestination>
+    public  class TypeMap<TSource, TDestination>
     {
-        public static TypeMap TypeMapper;
-        public static IEnumerable<Action<TSource, TDestination, ResolutionContext>> _beforeActions;
-
-        public static void SetBeforeActions(IEnumerable<LambdaExpression> beforeActions)
+        public static void SetTypeMap(TypeMap typeMap)
         {
-            _beforeActions = beforeActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>();
+            Mapper = new TypeMap<TSource, TDestination>(typeMap);
+        }
+        public static TypeMap<TSource, TDestination> Mapper { get; set; }
+
+        public TypeMap BaseTypeMap { get; set; }
+
+        public TypeMap(TypeMap baseTypeMap)
+        {
+            BaseTypeMap = baseTypeMap;
+            BeforeMapActions = baseTypeMap.BeforeMapActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>().ToArray();
+            AfterMapActions = baseTypeMap.AfterMapActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>().ToArray();
+            CustomMapper = baseTypeMap.CustomMapper?.Compile() as Func<TSource, TDestination, ResolutionContext, TDestination>;
+            PropertyMaps = baseTypeMap.GetValidPropertyMaps();
         }
 
-        public static void BeforeActions(TSource source, TDestination destination, ResolutionContext context)
-        {
-            foreach (var beforeAction in _beforeActions)
-            {
-                beforeAction(source, destination, context);
-            }
-        }
-
-        public static IEnumerable<Action<TSource, TDestination, ResolutionContext>> _afterActions;
-
-        public static void SetAfterActions(IEnumerable<LambdaExpression> afterActions)
-        {
-            _afterActions = afterActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>();
-        }
-
-        public static void AfterActions(TSource source, TDestination destination, ResolutionContext context)
-        {
-            foreach (var afterAction in _afterActions)
-            {
-                afterAction(source, destination, context);
-            }
-        }
+        public Action<TSource, TDestination, ResolutionContext>[] BeforeMapActions { get; }
+        public Action<TSource, TDestination, ResolutionContext>[] AfterMapActions { get; }
+        public Func<TSource, TDestination, ResolutionContext, TDestination> CustomMapper { get; set; }
+        public PropertyMap[] PropertyMaps { get; set; }
     }
 }
