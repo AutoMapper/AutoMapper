@@ -296,13 +296,20 @@ namespace AutoMapper
             {
             }
 
-            public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
+            private MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
+#if NET45
                 Typed = MakeDelegate(typedExpression);
 
-                _untyped = new Lazy<UntypedMapperFunc>(() => (UntypedMapperFunc) MakeDelegate(Wrap(mapRequest, typedExpression)));
+                _untyped = new Lazy<UntypedMapperFunc>(() => (UntypedMapperFunc)MakeDelegate(Wrap(mapRequest, typedExpression)));
+#else
+                Typed = typedExpression.Compile();
+
+                _untyped = new Lazy<UntypedMapperFunc>(() => Wrap(mapRequest, typedExpression).Compile());
+#endif
             }
 
+#if NET45
             private static Delegate MakeDelegate(LambdaExpression typedExpression)
             {
                 var assemblyBuilder =
@@ -322,6 +329,7 @@ namespace AutoMapper
                 return Delegate.CreateDelegate(typedExpression.Type,
                     resultingType.GetMethod(methodName));
             }
+#endif
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, LambdaExpression typedExpression)
             {
