@@ -170,7 +170,7 @@ namespace AutoMapper.QueryableExtensions
                     var message =
                         $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
 
-                    throw new AutoMapperMappingException(message);
+                    throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
                 }
 
                 var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);

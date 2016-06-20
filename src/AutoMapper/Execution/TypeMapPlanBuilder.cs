@@ -270,6 +270,7 @@
             return DelegateFactory.GenerateConstructorExpression(typeMap.DestinationType);
         }
 
+        private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
         private static Expression TryPropertyMap(
             PropertyMap pm,
             IConfigurationProvider configurationProvider,
@@ -284,18 +285,13 @@
             if (pmExpression == null)
                 return null;
 
-            var autoMapException = Parameter(typeof (AutoMapperMappingException), "ex");
             var exception = Parameter(typeof (Exception), "ex");
 
-            var mappingExceptionCtor =
-                typeof (AutoMapperMappingException).GetTypeInfo()
-                    .DeclaredConstructors.First(ci => ci.GetParameters().Length == 3);
+            var mappingExceptionCtor = ((NewExpression)CtorExpression.Body).Constructor;
 
             return TryCatch(Block(typeof (void), pmExpression),
-                MakeCatchBlock(typeof (AutoMapperMappingException), autoMapException,
-                    Block(Assign(Property(autoMapException, "PropertyMap"), Constant(pm)), Rethrow()), null),
                 MakeCatchBlock(typeof (Exception), exception,
-                    Throw(New(mappingExceptionCtor, ctxtParam, exception, Constant(pm))), null));
+                    Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception, Constant(pm.TypeMap.Types), Constant(pm.TypeMap), Constant(pm))), null));
         }
 
         private static Expression CreatePropertyMapFunc(

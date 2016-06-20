@@ -131,8 +131,7 @@ namespace AutoMapper
                 }
                 catch (AutoMapperMappingException ex)
                 {
-                    ex.PropertyMap = propertyMap;
-                    throw;
+                    throw new AutoMapperMappingException(ex.Message, ex, context.Types, context.TypeMap, propertyMap);
                 }
             }
         }

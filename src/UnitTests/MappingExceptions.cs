@@ -4,16 +4,6 @@ using Should;
 
 namespace AutoMapper.UnitTests.MappingExceptions
 {
-    public class When_the_exception_does_not_have_the_types
-    {
-        [Fact]
-        public void Should_provide_a_useful_message()
-        {
-            var ex = new AutoMapperMappingException();
-            ex.Message.ShouldStartWith("Exception");
-        }
-    }
-
     public class When_encountering_a_member_mapping_problem_during_mapping : NonValidatingSpecBase
     {
         public class Source

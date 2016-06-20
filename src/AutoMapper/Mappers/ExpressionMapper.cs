@@ -21,7 +21,7 @@ namespace AutoMapper.Mappers
             var destDelegateType = typeof(TDestination).GetTypeInfo().GenericTypeArguments[0];
 
             if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
-                throw new AutoMapperMappingException("Source and destination expressions must be of the same type.");
+                throw new AutoMapperMappingException("Source and destination expressions must be of the same type.", null, new TypePair(typeof(TSource), typeof(TDestination)));
 
             var destArgType = destDelegateType.GetTypeInfo().GenericTypeArguments[0];
             if (destArgType.IsGenericType())
