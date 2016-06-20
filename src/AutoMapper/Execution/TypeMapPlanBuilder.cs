@@ -125,11 +125,9 @@
             Expression destinationFunc,
             ref ParameterExpression contextToReuse)
         {
-            var assignTypeMap = Assign(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("TypeMap")),
-                Constant(typeMap));
+            var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destParam.Type).GetTypeInfo();
 
             var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), ToObject(destParam));
-
 
             ParameterExpression propertyContext = contextToReuse;
             var typeMaps = typeMap.GetPropertyMaps()
@@ -141,10 +139,14 @@
 
             var actions = typeMaps;
 
-            foreach (var beforeMapAction in typeMap.BeforeMapActions)
-            {
-                actions.Insert(0, beforeMapAction.ReplaceParameters(srcParam, destParam, ctxtParam));
-            }
+            var beforeMapField = genericTypeMap.GetMethod("SetBeforeActions", BindingFlags.Static | BindingFlags.Public);
+            beforeMapField.Invoke(null, new object[] { typeMap.BeforeMapActions });
+            var beforeMapCall = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destParam.Type).GetTypeInfo().GetMethod("BeforeActions", BindingFlags.Static | BindingFlags.Public);
+            actions.Insert(0, Call(null, beforeMapCall, srcParam, destParam, ctxtParam));
+            //foreach (var beforeMapAction in typeMap.BeforeMapActions)
+            //{
+            //    actions.Insert(0, beforeMapAction.ReplaceParameters(srcParam, destParam, ctxtParam));
+            //}
             actions.Insert(0, beforeMap);
             actions.Insert(0, destinationFunc);
             ParameterExpression[] variables;
@@ -158,13 +160,22 @@
             {
                 variables = new ParameterExpression[0];
             }
-            //actions.Insert(0, assignTypeMap);
 
+            var typeMapper = genericTypeMap.GetField("TypeMapper", BindingFlags.Static | BindingFlags.Public);
+            typeMapper.SetValue(null, typeMap);
+            var assignTypeMap = Assign(MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetProperty("TypeMap")),
+                Field(null, typeMapper));
+            actions.Insert(0, assignTypeMap);
+
+
+            var afterMapField = genericTypeMap.GetMethod("SetAfterActions", BindingFlags.Static | BindingFlags.Public);
+            afterMapField.Invoke(null, new object[] { typeMap.AfterMapActions });
+            var afterMapCall = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destParam.Type).GetTypeInfo().GetMethod("AfterActions", BindingFlags.Static | BindingFlags.Public);
+            actions.Add(Call(null, afterMapCall, srcParam, destParam, ctxtParam));
             actions.Add(afterMap);
-
-            actions.AddRange(
-                typeMap.AfterMapActions.Select(
-                    afterMapAction => afterMapAction.ReplaceParameters(srcParam, destParam, ctxtParam)));
+            //actions.AddRange(
+            //    typeMap.AfterMapActions.Select(
+            //        afterMapAction => afterMapAction.ReplaceParameters(srcParam, destParam, ctxtParam)));
 
             actions.Add(destParam);
 

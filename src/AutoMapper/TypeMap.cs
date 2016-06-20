@@ -328,4 +328,38 @@ namespace AutoMapper
             }
         }
     }
+
+    public static class TypeMap<TSource, TDestination>
+    {
+        public static TypeMap TypeMapper;
+        public static IEnumerable<Action<TSource, TDestination, ResolutionContext>> _beforeActions;
+
+        public static void SetBeforeActions(IEnumerable<LambdaExpression> beforeActions)
+        {
+            _beforeActions = beforeActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>();
+        }
+
+        public static void BeforeActions(TSource source, TDestination destination, ResolutionContext context)
+        {
+            foreach (var beforeAction in _beforeActions)
+            {
+                beforeAction(source, destination, context);
+            }
+        }
+
+        public static IEnumerable<Action<TSource, TDestination, ResolutionContext>> _afterActions;
+
+        public static void SetAfterActions(IEnumerable<LambdaExpression> afterActions)
+        {
+            _afterActions = afterActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>();
+        }
+
+        public static void AfterActions(TSource source, TDestination destination, ResolutionContext context)
+        {
+            foreach (var afterAction in _afterActions)
+            {
+                afterAction(source, destination, context);
+            }
+        }
+    }
 }

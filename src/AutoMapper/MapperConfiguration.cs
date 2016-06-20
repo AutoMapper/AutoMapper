@@ -298,38 +298,10 @@ namespace AutoMapper
 
             private MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
-#if NET45
-                Typed = MakeDelegate(typedExpression);
+                Typed = typedExpression.MakeDelegate();
 
-                _untyped = new Lazy<UntypedMapperFunc>(() => (UntypedMapperFunc)MakeDelegate(Wrap(mapRequest, typedExpression)));
-#else
-                Typed = typedExpression.Compile();
-
-                _untyped = new Lazy<UntypedMapperFunc>(() => Wrap(mapRequest, typedExpression).Compile());
-#endif
+                _untyped = new Lazy<UntypedMapperFunc>(() => (UntypedMapperFunc)Wrap(mapRequest, typedExpression).MakeDelegate());
             }
-
-#if NET45
-            private static Delegate MakeDelegate(LambdaExpression typedExpression)
-            {
-                var assemblyBuilder =
-                    AppDomain.CurrentDomain.DefineDynamicAssembly(
-                        new AssemblyName("MyAssembly_" + Guid.NewGuid().ToString("N")), AssemblyBuilderAccess.Run);
-
-                var moduleBuilder = assemblyBuilder.DefineDynamicModule("Module");
-                var typeBuilder = moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
-                    TypeAttributes.Public);
-                var methodName = Guid.NewGuid().ToString("N");
-                var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
-
-                typedExpression.CompileToMethod(methodBuilder);
-
-                var resultingType = typeBuilder.CreateType();
-
-                return Delegate.CreateDelegate(typedExpression.Type,
-                    resultingType.GetMethod(methodName));
-            }
-#endif
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, LambdaExpression typedExpression)
             {
@@ -430,4 +402,53 @@ namespace AutoMapper
             }
         }
     }
+
+    public static class DelegateExtensions
+    {
+        public static Delegate MakeDelegate(this LambdaExpression lamdaExpression)
+        {
+#if NET45
+            var assemblyBuilder =
+                AppDomain.CurrentDomain.DefineDynamicAssembly(
+                    new AssemblyName("MyAssembly_" + Guid.NewGuid().ToString("N")), AssemblyBuilderAccess.Run);
+
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule("Module");
+            var typeBuilder = moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
+                TypeAttributes.Public);
+            var methodName = Guid.NewGuid().ToString("N");
+            var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
+            
+
+            lamdaExpression.CompileToMethod(methodBuilder);
+            //(new ConstantVisitor(typeBuilder).Visit(lamdaExpression) as LambdaExpression).CompileToMethod(methodBuilder);
+
+            var resultingType = typeBuilder.CreateType();
+
+            return Delegate.CreateDelegate(lamdaExpression.Type,resultingType.GetMethod(methodName));
+#else
+                return lamdaExpression.Compile();
+#endif
+        }
+
+#if NET45
+        class ConstantVisitor : ExpressionVisitor
+        {
+            private readonly TypeBuilder _typeBuilder;
+
+            public ConstantVisitor(TypeBuilder typeBuilder)
+            {
+                _typeBuilder = typeBuilder;
+            }
+
+            protected override Expression VisitConstant(ConstantExpression node)
+            {
+                var methodName = Guid.NewGuid().ToString("N");
+                var methodBuilder = _typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
+                Lambda(node).CompileToMethod(methodBuilder);
+                return base.VisitConstant(node);
+            }
+        }
+#endif
+    }
 }
+
