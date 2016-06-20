@@ -130,9 +130,9 @@
             var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), ToObject(destParam));
 
             ParameterExpression propertyContext = contextToReuse;
-            var typeMaps = typeMap.GetPropertyMaps()
-                    .Where(pm => pm.CanResolveValue() && !typeMap.IsMappedThroughConstructor(pm.DestinationProperty.Name))
-                    .Select(pm => TryPropertyMap(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext))
+            int index = 0;
+            var typeMaps = typeMap.GetValidPropertyMaps()
+                    .Select(pm => TryPropertyMap(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext, index++))
                     .ToList();
             contextToReuse = propertyContext;
             var afterMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("AfterMap"), ToObject(destParam));
@@ -288,13 +288,12 @@
             ParameterExpression srcParam,
             ParameterExpression destParam,
             ParameterExpression ctxtParam,
-            ref ParameterExpression propertyContext)
+            ref ParameterExpression propertyContext, int index)
         {
             var pmExpression = CreatePropertyMapFunc(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext);
 
             if (pmExpression == null)
                 return null;
-            return pmExpression;
 
             var autoMapException = Parameter(typeof (AutoMapperMappingException), "ex");
             var exception = Parameter(typeof (Exception), "ex");
@@ -303,11 +302,13 @@
                 typeof (AutoMapperMappingException).GetTypeInfo()
                     .DeclaredConstructors.First(ci => ci.GetParameters().Length == 3);
 
+            var propertyMap = ArrayIndex(Call(Property(ctxtParam, "TypeMap"), typeof(TypeMap).GetMethod("GetValidPropertyMaps")), Constant(index));
+
             return TryCatch(Block(typeof (void), pmExpression),
                 MakeCatchBlock(typeof (AutoMapperMappingException), autoMapException,
-                    Block(Assign(Property(autoMapException, "PropertyMap"), Constant(pm)), Rethrow()), null),
+                    Block(Assign(Property(autoMapException, "PropertyMap"), propertyMap), Rethrow()), null),
                 MakeCatchBlock(typeof (Exception), exception,
-                    Throw(New(mappingExceptionCtor, ctxtParam, exception, Constant(pm))), null));
+                    Throw(New(mappingExceptionCtor, ctxtParam, exception, propertyMap)), null));
         }
 
         private static Expression CreatePropertyMapFunc(

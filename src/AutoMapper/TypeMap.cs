@@ -86,6 +86,10 @@ namespace AutoMapper
         {
             return _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
         }
+        public PropertyMap[] GetValidPropertyMaps()
+        {
+            return GetPropertyMaps().Where(pm => pm.CanResolveValue() && !IsMappedThroughConstructor(pm.DestinationProperty.Name)).ToArray();
+        }
 
         public bool IsMappedThroughConstructor(string destinationPropertyName)
         {

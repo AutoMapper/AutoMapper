@@ -420,7 +420,6 @@ namespace AutoMapper
             
 
             lamdaExpression.CompileToMethod(methodBuilder);
-            //(new ConstantVisitor(typeBuilder).Visit(lamdaExpression) as LambdaExpression).CompileToMethod(methodBuilder);
 
             var resultingType = typeBuilder.CreateType();
 
@@ -429,26 +428,6 @@ namespace AutoMapper
                 return lamdaExpression.Compile();
 #endif
         }
-
-#if NET45
-        class ConstantVisitor : ExpressionVisitor
-        {
-            private readonly TypeBuilder _typeBuilder;
-
-            public ConstantVisitor(TypeBuilder typeBuilder)
-            {
-                _typeBuilder = typeBuilder;
-            }
-
-            protected override Expression VisitConstant(ConstantExpression node)
-            {
-                var methodName = Guid.NewGuid().ToString("N");
-                var methodBuilder = _typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
-                Lambda(node).CompileToMethod(methodBuilder);
-                return base.VisitConstant(node);
-            }
-        }
-#endif
     }
 }
 
