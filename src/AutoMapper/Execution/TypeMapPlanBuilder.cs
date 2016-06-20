@@ -65,13 +65,13 @@
             if (typeMap.CustomMapper != null)
             {
                 var customMapper = Property(mapper, "CustomMapper");
-
                 return Lambda(Invoke(customMapper, srcParam,destParam, ctxtParam), srcParam, destParam, ctxtParam);
             }
 
             if (typeMap.CustomProjection != null)
             {
-                return Lambda(typeMap.CustomProjection.ReplaceParameters(srcParam), srcParam, destParam, ctxtParam);
+                var customProjection = Property(mapper, "CustomProjection");
+                return Lambda(Invoke(customProjection, srcParam, destParam, ctxtParam), srcParam, destParam, ctxtParam);
             }
 
             ParameterExpression contextToReuse = null;
@@ -202,11 +202,13 @@
             Expression assignmentFunc)
         {
             var mapperFunc = assignmentFunc;
+            var mapper = GenericTypeMapInfo(srcParam, destParam);
 
             if (typeMap.Condition != null)
             {
+                var condition = Property(mapper, "Condition");
                 mapperFunc =
-                    Condition(Invoke(typeMap.Condition, ctxtParam),
+                    Condition(Invoke(condition, ctxtParam),
                         mapperFunc, Default(typeMap.DestinationType));
                 //mapperFunc = (source, context, destFunc) => _condition(context) ? inner(source, context, destFunc) : default(TDestination);
             }
@@ -444,6 +446,7 @@
             ParameterExpression srcParam,
             ParameterExpression ctxtParam)
         {
+
             Expression valueResolverFunc;
             var valueResolverConfig = propertyMap.ValueResolverConfig;
             var typeMap = propertyMap.TypeMap;

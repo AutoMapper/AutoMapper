@@ -97,8 +97,10 @@ namespace AutoMapper.Mappers
                 return destinationExpresson.Type.NewExpr(ifInterfaceType);
             return Condition(condition, destinationExpresson, destinationExpresson.Type.NewExpr(ifInterfaceType));
         }
-
-        internal static Delegate Constructor(Type type)
+        
+        private static MethodInfo ConstructorMethodInfo = typeof(CollectionMapperExtensions).GetTypeInfo().DeclaredMethods.First(_ => _.Name == "Constructor");
+        public static Expression ConstructExpression(Type type) => ToType(Call(null, ConstructorMethodInfo, Constant(type)), typeof(Func<>).MakeGenericType(type));
+        public static Delegate Constructor(Type type)
         {
             return Lambda(ToType(DelegateFactory.GenerateConstructorExpression(type), type)).Compile();
         }

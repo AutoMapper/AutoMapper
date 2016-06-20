@@ -349,12 +349,14 @@ namespace AutoMapper
             BeforeMapActions = baseTypeMap.BeforeMapActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>().ToArray();
             AfterMapActions = baseTypeMap.AfterMapActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>().ToArray();
             CustomMapper = baseTypeMap.CustomMapper?.Compile() as Func<TSource, TDestination, ResolutionContext, TDestination>;
+            CustomProjection = baseTypeMap.CustomProjection?.Compile() as Func<TSource, TDestination, ResolutionContext, TDestination>;
             PropertyMaps = baseTypeMap.GetValidPropertyMaps();
         }
-
+        
         public Action<TSource, TDestination, ResolutionContext>[] BeforeMapActions { get; }
         public Action<TSource, TDestination, ResolutionContext>[] AfterMapActions { get; }
         public Func<TSource, TDestination, ResolutionContext, TDestination> CustomMapper { get; set; }
+        public Func<TSource, TDestination, ResolutionContext, TDestination> CustomProjection { get; set; }
         public PropertyMap[] PropertyMaps { get; set; }
     }
 }
