@@ -12,8 +12,8 @@
 
     public static class TypeMapPlanBuilder
     {
-        private static readonly Expression<Func<ResolutionContext, int, bool>> _passesDepthCheckExpression =
-            (ctxt, maxDepth) => PassesDepthCheck(ctxt, maxDepth);
+        private static readonly Expression<Func<ResolutionContext, TypePair, int, bool>> _passesDepthCheckExpression =
+            (ctxt, types, maxDepth) => PassesDepthCheck(ctxt, types, maxDepth);
 
         public static LambdaExpression BuildMapperFunc(TypeMap typeMap, IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry)
         {
@@ -114,6 +114,9 @@
             return destinationFunc;
         }
 
+        private static Expression<Action<ResolutionContext>> IncTypeDepthInfo = ctxt => ctxt.IncrementTypeDepth(default(TypePair));
+        private static Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
+
         private static Expression CreateAssignmentFunc(
             TypeMap typeMap,
             IConfigurationProvider configurationProvider,
@@ -135,9 +138,18 @@
                 actions.Insert(0, beforeMapAction.ReplaceParameters(srcParam, destParam, ctxtParam));
             }
             actions.Insert(0, destinationFunc);
+            if (typeMap.MaxDepth > 0)
+            {
+                actions.Insert(0, Call(ctxtParam, ((MethodCallExpression)IncTypeDepthInfo.Body).Method, Constant(typeMap.Types)));
+            }
             actions.AddRange(
                 typeMap.AfterMapActions.Select(
                     afterMapAction => afterMapAction.ReplaceParameters(srcParam, destParam, ctxtParam)));
+
+            if (typeMap.MaxDepth > 0)
+            {
+                actions.Add(Call(ctxtParam, ((MethodCallExpression)DecTypeDepthInfo.Body).Method, Constant(typeMap.Types)));
+            }
 
             actions.Add(destParam);
 
@@ -163,7 +175,7 @@
 
             if (typeMap.MaxDepth > 0)
             {
-                mapperFunc = Condition(Invoke(_passesDepthCheckExpression, ctxtParam, Constant(typeMap.MaxDepth)),
+                mapperFunc = Condition(Invoke(_passesDepthCheckExpression, ctxtParam, Constant(typeMap.Types), Constant(typeMap.MaxDepth)),
                     mapperFunc,
                     Default(typeMap.DestinationType));
                 //mapperFunc = (source, context, destFunc) => PassesDepthCheck(context, typeMap.MaxDepth) ? inner(source, context, destFunc) : default(TDestination);
@@ -504,15 +516,15 @@
             return valueResolverFunc;
         }
 
-        private static bool PassesDepthCheck(ResolutionContext context, int maxDepth)
+        private static bool PassesDepthCheck(ResolutionContext context, TypePair types, int maxDepth)
         {
-            if (context.InstanceCache.ContainsKey(context))
-            {
-                // return true if we already mapped this value and it's in the cache
-                return true;
-            }
+            //if (context.InstanceCache.ContainsKey(context))
+            //{
+            //    // return true if we already mapped this value and it's in the cache
+            //    return true;
+            //}
 
-            return true;
+            return context.GetTypeDepth(types) <= maxDepth;
 
             //TODO: Do this a better way besides this junk
             //var contextCopy = context;

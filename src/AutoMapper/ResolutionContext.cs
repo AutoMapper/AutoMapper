@@ -11,6 +11,7 @@ namespace AutoMapper
     public class ResolutionContext
     {
         private Dictionary<object, object> _instanceCache;
+        private Dictionary<TypePair, int> _typeDepth;
 
         /// <summary>
         /// Mapping operation options
@@ -31,6 +32,40 @@ namespace AutoMapper
                 _instanceCache = new Dictionary<object, object>();
                 return _instanceCache;
             }
+        }
+
+        /// <summary>
+        /// Instance cache for resolving keeping track of depth
+        /// </summary>
+        private Dictionary<TypePair, int> TypeDepth
+        {
+            get
+            {
+                if(_typeDepth != null)
+                {
+                    return _typeDepth;
+                }
+                _typeDepth = new Dictionary<TypePair, int>();
+                return _typeDepth;
+            }
+        }
+
+        internal void IncrementTypeDepth(TypePair types)
+        {
+            TypeDepth[types]++;
+        }
+
+        internal void DecrementTypeDepth(TypePair types)
+        {
+            TypeDepth[types]--;
+        }
+
+        internal int GetTypeDepth(TypePair types)
+        {
+            if (!TypeDepth.ContainsKey(types))
+                TypeDepth[types] = 1;
+
+            return TypeDepth[types];
         }
 
         /// <summary>
