@@ -369,6 +369,8 @@ namespace Benchmark.Flattening
     {
         private ModelObject _source;
         private IMapper _mapper;
+        private Func<ModelObject, ModelDto, ResolutionContext, ModelDto> _func;
+        private ResolutionContext _resolutionContext;
 
         public string Name
         {
@@ -390,6 +392,7 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Model9, Dto9>();
                 cfg.CreateMap<Model10, Dto10>();
                 cfg.CreateMap<ModelObject, ModelDto>();
+                cfg.AllowNullDestinationValues = false;
             });
             config.AssertConfigurationIsValid();
             _source = new ModelObject
@@ -413,10 +416,12 @@ namespace Benchmark.Flattening
                 },
             };
             _mapper = config.CreateMapper();
+            _func = (_mapper as Mapper).Func<ModelObject, ModelDto>(_source, out _resolutionContext);
         }
 
         public object Map()
         {
+            return _func(_source, null, _resolutionContext);
             return _mapper.Map<ModelObject, ModelDto>(_source);
         }
     }
