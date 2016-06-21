@@ -1,5 +1,7 @@
 using System;
+using System.Linq.Expressions;
 using AutoMapper;
+using AutoMapper.Mappers;
 
 namespace Benchmark.Flattening
 {
@@ -461,14 +463,16 @@ namespace Benchmark.Flattening
 
         public object Map()
         {
-            return new ModelDto
-            {
-                BaseDate = _source.BaseDate,
-                Sub2ProperName = _source.Sub2.ProperName,
-                SubProperName = _source.Sub.ProperName,
-                SubSubSubIAmACoolProperty = _source.Sub.SubSub.IAmACoolProperty,
-                SubWithExtraNameProperName = _source.SubWithExtraName.ProperName
-            };
+            ModelDto dest = null;
+            dest = dest ?? new ModelDto();
+            dest.BaseDate = _source?.BaseDate ?? default(DateTime);
+            dest.Sub2ProperName = _source?.Sub2?.ProperName ?? (string) ObjectCreator.CreateNonNullValue(typeof(string));
+            dest.SubProperName = _source?.Sub?.ProperName ?? (string) ObjectCreator.CreateNonNullValue(typeof(string));
+            dest.SubSubSubIAmACoolProperty = _source?.Sub?.SubSub?.IAmACoolProperty ??
+                                             (string) ObjectCreator.CreateNonNullValue(typeof(string));
+            dest.SubWithExtraNameProperName = _source?.SubWithExtraName?.ProperName ??
+                                              (string) ObjectCreator.CreateNonNullValue(typeof(string));
+            return dest;
         }
     }
 
