@@ -40,6 +40,7 @@ namespace AutoMapper
 
             if (CustomValueResolver != null)
             {
+                // Invoking a delegate
                 return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
             }
 

@@ -72,7 +72,7 @@ namespace AutoMapper
             return replaceExp;
         }
 
-        public static Expression ConvertReplaceParameters(this LambdaExpression exp, params ParameterExpression[] replace)
+        public static Expression ConvertReplaceParameters(this LambdaExpression exp, params Expression[] replace)
         {
             var replaceExp = exp.Body;
             for (var i = 0; i < Math.Min(replace.Count(), exp.Parameters.Count()); i++)
@@ -127,10 +127,10 @@ namespace AutoMapper
 
         internal class ConvertingVisitor : ExpressionVisitor
         {
-            private readonly ParameterExpression _newParam;
+            private readonly Expression _newParam;
             private readonly ParameterExpression _oldParam;
 
-            public ConvertingVisitor(ParameterExpression oldParam, ParameterExpression newParam)
+            public ConvertingVisitor(ParameterExpression oldParam, Expression newParam)
             {
                 _newParam = newParam;
                 _oldParam = oldParam;
@@ -139,7 +139,7 @@ namespace AutoMapper
             protected override Expression VisitMember(MemberExpression node)
             {
                 return node.Expression == _oldParam
-                    ? MakeMemberAccess(Convert(_newParam, _oldParam.Type), node.Member)
+                    ? MakeMemberAccess(ToType(_newParam, _oldParam.Type), node.Member)
                     : base.VisitMember(node);
             }
 
@@ -151,7 +151,7 @@ namespace AutoMapper
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
                 return node.Object == _oldParam
-                    ? Call(Convert(_newParam, _oldParam.Type), node.Method)
+                    ? Call(ToType(_newParam, _oldParam.Type), node.Method)
                     : base.VisitMethodCall(node);
             }
         }

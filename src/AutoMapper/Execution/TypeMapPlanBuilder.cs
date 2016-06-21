@@ -166,7 +166,7 @@
             if (typeMap.Condition != null)
             {
                 mapperFunc =
-                    Condition(Invoke(typeMap.Condition, ctxtParam),
+                    Condition(typeMap.Condition.Body,
                         mapperFunc, Default(typeMap.DestinationType));
                 //mapperFunc = (source, context, destFunc) => _condition(context) ? inner(source, context, destFunc) : default(TDestination);
             }
@@ -234,6 +234,7 @@
             if (typeMap.DestinationType.IsInterface())
             {
                 var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationType)));
+                // We're invoking a delegate here
                 return Invoke(ctor);
             }
 
@@ -327,17 +328,16 @@
             {
                 valueResolverExpr =
                     Condition(
-                        Invoke(
-                            propertyMap.Condition,
+                        propertyMap.Condition.ConvertReplaceParameters(
                             srcParam,
                             destParam,
                             ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
                             ToType(getter, propertyMap.Condition.Parameters[2].Type),
                             ctxtParam
-                            ),
+                        ),
                         ToType(valueResolverExpr, propertyMap.DestinationPropertyType),
                         getter
-                        );
+                    );
             }
 
             Expression mapperExpr;
@@ -365,7 +365,7 @@
             if (propertyMap.PreCondition != null)
             {
                 mapperExpr = IfThen(
-                    Invoke(propertyMap.PreCondition, srcParam, ctxtParam),
+                    propertyMap.PreCondition.ConvertReplaceParameters(srcParam, ctxtParam),
                     mapperExpr
                     );
             }
