@@ -23,7 +23,7 @@
             var srcParam = Parameter(typeMap.SourceType, "src");
             var destParam = Parameter(typeMap.DestinationType, "dest");
             var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
-            
+
             var mapper = GenericTypeMapInfo(srcParam, destParam);
 
             if (typeMap.Substitution != null)
@@ -175,7 +175,7 @@
             actions.Insert(0, assignTypeMap);
 
             for (int i = 0; i < typeMap.AfterMapActions.Count(); i++)
-                actions.Insert(0,
+                actions.Add(
                     Invoke(ArrayIndex(Property(typeMapExpression, "AfterMapActions"), Constant(i)), srcParam, destParam,
                         ctxtParam));
             actions.Add(afterMap);
@@ -295,7 +295,7 @@
             ref ParameterExpression propertyContext, int index)
         {
             var pmExpression = CreatePropertyMapFunc(pm, configurationProvider, registry, srcParam, destParam, ctxtParam, ref propertyContext, index);
-
+            
             if (pmExpression == null)
                 return null;
 
