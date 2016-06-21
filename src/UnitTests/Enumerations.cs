@@ -295,7 +295,7 @@ namespace AutoMapper.Tests
 
 		public class DtoStatusValueResolver : IValueResolver<Order, StatusForDto>
 		{
-			public StatusForDto Resolve(Order source, ResolutionContext context)
+			public StatusForDto Resolve(Order source, StatusForDto dest, ResolutionContext context)
 			{
 				return context.Mapper.Map<StatusForDto>(source.Status);
 			}
@@ -303,7 +303,7 @@ namespace AutoMapper.Tests
 
 		public class EnumValueResolver<TInputEnum, TOutputEnum> : IValueResolver<TInputEnum, TOutputEnum>
 		{
-			public TOutputEnum Resolve(TInputEnum source, ResolutionContext context)
+			public TOutputEnum Resolve(TInputEnum source, TOutputEnum dest, ResolutionContext context)
 			{
 				return ((TOutputEnum)Enum.Parse(typeof(TOutputEnum), Enum.GetName(typeof(TInputEnum), source), false));
 			}

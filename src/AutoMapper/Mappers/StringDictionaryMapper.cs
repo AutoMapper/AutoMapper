@@ -24,12 +24,11 @@ namespace AutoMapper.Mappers
                 Expression contextExpression)
             =>
             typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap,
-                Call(MembersDictionaryMethodInfo, contextExpression), destExpression, contextExpression, _ => null,
+                Call(MembersDictionaryMethodInfo, sourceExpression), destExpression, contextExpression, _ => null,
                 typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
 
-        public static Dictionary<string, object> MembersDictionary(ResolutionContext context)
+        public static Dictionary<string, object> MembersDictionary(object source)
         {
-            var source = context.SourceValue;
             var sourceTypeDetails = new TypeDetails(source.GetType(), _ => true, _ => true);
             var membersDictionary = sourceTypeDetails.PublicReadAccessors.ToDictionary(p => p.Name,
                 p => p.GetMemberValue(source));
@@ -51,20 +50,19 @@ namespace AutoMapper.Mappers
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression)
         {
-            return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, contextExpression);
+            return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, destExpression, contextExpression);
         }
 
-        private static TDestination Map<TDestination>(StringDictionary source, ResolutionContext context)
+        private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context)
         {
-            var destination = context.Mapper.CreateObject<TDestination>(context);
-            var destTypeDetails = new TypeDetails(context.DestinationType, _ => true, _ => true);
+            destination = destination == null ? context.Mapper.CreateObject<TDestination>() : destination;
+            var destTypeDetails = new TypeDetails(typeof(TDestination), _ => true, _ => true);
             var members = from name in source.Keys
                           join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
                           select member;
-            var memberContext = new ResolutionContext(context);
             foreach (var member in members)
             {
-                var value = memberContext.MapMember(member, source[member.Name]);
+                var value = context.MapMember(member, source[member.Name], destination);
                 member.SetMemberValue(destination, value);
             }
             return destination;

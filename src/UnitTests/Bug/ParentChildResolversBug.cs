@@ -49,7 +49,7 @@
 
         public class ParentResolver : IValueResolver<Source, ParentDestEnum?>
         {
-            public ParentDestEnum? Resolve(Source source, ResolutionContext context)
+            public ParentDestEnum? Resolve(Source source, ParentDestEnum? dest, ResolutionContext context)
             {
                 switch (source.fieldCode)
                 {
@@ -63,7 +63,7 @@
 
         public class Resolver : IValueResolver<Source, DestEnum?>
         {
-            public DestEnum? Resolve(Source source, ResolutionContext context)
+            public DestEnum? Resolve(Source source, DestEnum? dest, ResolutionContext context)
             {
                 switch (source.fieldCode)
                 {

@@ -15,34 +15,34 @@ namespace AutoMapper
         /// is to know the closed type of the desired interface implementation since there may be multiple implementations
         /// of the same generic interface on this type.
         /// </param>
-        public static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type, Func<ResolutionContext, Type> getClosedGenericInterfaceType = null)
-        {
-            return context =>
-            {
-                // Warning: do not mutate the parameter @type. It's in a shared closure and will be remembered in subsequent calls to this function.
-                // Otherwise all ctors for the same generic type definition will return whatever closed type then first one calculates.
-                var concreteType = type;
+        //public static Func<ResolutionContext, TServiceType> BuildCtor<TServiceType>(this Type type, Func<ResolutionContext, Type> getClosedGenericInterfaceType = null)
+        //{
+        //    return context =>
+        //    {
+        //        // Warning: do not mutate the parameter @type. It's in a shared closure and will be remembered in subsequent calls to this function.
+        //        // Otherwise all ctors for the same generic type definition will return whatever closed type then first one calculates.
+        //        var concreteType = type;
 
-                if (type.IsGenericTypeDefinition())
-                {
-                    if (getClosedGenericInterfaceType == null) throw new ArgumentNullException(nameof(getClosedGenericInterfaceType), "For generic interfaces, the desired closed interface type must be known.");
-                    var closedInterfaceType = getClosedGenericInterfaceType.Invoke(context);
-                    var implementationTypeArguments = type.GetImplementedInterface(closedInterfaceType.GetGenericTypeDefinition(), closedInterfaceType.GenericTypeArguments).GenericTypeArguments;
+        //        if (type.IsGenericTypeDefinition())
+        //        {
+        //            if (getClosedGenericInterfaceType == null) throw new ArgumentNullException(nameof(getClosedGenericInterfaceType), "For generic interfaces, the desired closed interface type must be known.");
+        //            var closedInterfaceType = getClosedGenericInterfaceType.Invoke(context);
+        //            var implementationTypeArguments = type.GetImplementedInterface(closedInterfaceType.GetGenericTypeDefinition(), closedInterfaceType.GenericTypeArguments).GenericTypeArguments;
 
-                    var genericParameters = type.GetTypeInfo().GenericTypeParameters;
-                    var deducedTypeArguments = new Type[genericParameters.Length];
-                    DeduceGenericArguments(genericParameters, deducedTypeArguments, implementationTypeArguments[0], context.SourceType);
-                    DeduceGenericArguments(genericParameters, deducedTypeArguments, implementationTypeArguments[1], context.DestinationType);
+        //            var genericParameters = type.GetTypeInfo().GenericTypeParameters;
+        //            var deducedTypeArguments = new Type[genericParameters.Length];
+        //            DeduceGenericArguments(genericParameters, deducedTypeArguments, implementationTypeArguments[0], context.SourceType);
+        //            DeduceGenericArguments(genericParameters, deducedTypeArguments, implementationTypeArguments[1], context.DestinationType);
                     
-                    if (deducedTypeArguments.Any(_ => _ == null)) throw new InvalidOperationException($"One or more type arguments to {type.Name} cannot be determined.");
-                    concreteType = type.MakeGenericType(deducedTypeArguments);
-                }
+        //            if (deducedTypeArguments.Any(_ => _ == null)) throw new InvalidOperationException($"One or more type arguments to {type.Name} cannot be determined.");
+        //            concreteType = type.MakeGenericType(deducedTypeArguments);
+        //        }
 
-                var obj = context.Options.ServiceCtor.Invoke(concreteType);
+        //        var obj = context.Options.ServiceCtor.Invoke(concreteType);
 
-                return (TServiceType)obj;
-            };
-        }
+        //        return (TServiceType)obj;
+        //    };
+        //}
 
         private static void DeduceGenericArguments(Type[] genericParameters, Type[] deducedGenericArguments, Type typeUsingParameters, Type typeUsingArguments)
         {

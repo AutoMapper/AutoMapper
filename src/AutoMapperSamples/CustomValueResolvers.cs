@@ -22,7 +22,7 @@ namespace AutoMapperSamples
 
 			public class CustomResolver : IValueResolver<Source, int>
 			{
-			    public int Resolve(Source source, ResolutionContext context)
+			    public int Resolve(Source source, int dest, ResolutionContext context)
 				{
 					return source.Value1 + source.Value2;
 				}

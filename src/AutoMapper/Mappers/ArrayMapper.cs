@@ -16,14 +16,12 @@ namespace AutoMapper.Mappers
         
         public static TDestination[] Map<TSource, TDestination>(IEnumerable<TSource> source, ResolutionContext context, Func<TSource, ResolutionContext, TDestination> newItemFunc)
         {
-            var itemContext = new ResolutionContext(context);
-
             var count = source.Count();
             var array = new TDestination[count];
 
             int i = 0;
             foreach (var item in source)
-                array[i++] = newItemFunc(item, itemContext);
+                array[i++] = newItemFunc(item, context);
             return array;
         }
 

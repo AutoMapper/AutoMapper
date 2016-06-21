@@ -191,7 +191,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(types, types));
 
-            var context = new ResolutionContext(source, null, types, _defaultMappingOptions, this);
+            var context = new ResolutionContext(_defaultMappingOptions, this);
 
             return (TDestination) func(source, null, context);
         }
@@ -217,7 +217,7 @@ namespace AutoMapper
 
             var destination = default(TDestination);
 
-            var context = new ResolutionContext(source, destination, types, _defaultMappingOptions, this);
+            var context = new ResolutionContext(_defaultMappingOptions, this);
 
             return func(source, destination, context);
         }
@@ -234,9 +234,15 @@ namespace AutoMapper
 
             opts(typedOptions);
 
-            var context = new ResolutionContext(source, destination, types, typedOptions, this);
+            typedOptions.BeforeMapAction(source, destination);
 
-            return func(source, destination, context);
+            var context = new ResolutionContext(typedOptions, this);
+
+            destination = func(source, destination, context);
+
+            typedOptions.AfterMapAction(source, destination);
+
+            return destination;
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination)
@@ -245,7 +251,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
-            var context = new ResolutionContext(source, destination, types, _defaultMappingOptions, this);
+            var context = new ResolutionContext(_defaultMappingOptions, this);
 
             return func(source, destination, context);
         }
@@ -260,9 +266,15 @@ namespace AutoMapper
 
             opts(typedOptions);
 
-            var context = new ResolutionContext(source, destination, types, typedOptions, this);
+            typedOptions.BeforeMapAction(source, destination);
 
-            return func(source, destination, context);
+            var context = new ResolutionContext(typedOptions, this);
+
+            destination = func(source, destination, context);
+
+            typedOptions.AfterMapAction(source, destination);
+
+            return destination;
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType)
@@ -271,7 +283,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            var context = new ResolutionContext(source, null, types, _defaultMappingOptions, this);
+            var context = new ResolutionContext(_defaultMappingOptions, this);
 
             return func(source, null, context);
         }
@@ -283,11 +295,18 @@ namespace AutoMapper
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var options = new MappingOperationOptions(_serviceCtor);
+
             opts(options);
 
-            var context = new ResolutionContext(source, null, types, options, this);
+            options.BeforeMapAction(source, null);
 
-            return func(source, null, context);
+            var context = new ResolutionContext(options, this);
+
+            var destination = func(source, null, context);
+
+            options.AfterMapAction(source, destination);
+
+            return destination;
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType)
@@ -296,7 +315,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            var context = new ResolutionContext(source, destination, types, _defaultMappingOptions, this);
+            var context = new ResolutionContext(_defaultMappingOptions, this);
 
             return func(source, destination, context);
         }
@@ -309,79 +328,43 @@ namespace AutoMapper
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
             var options = new MappingOperationOptions(_serviceCtor);
+
             opts(options);
 
-            var context = new ResolutionContext(source, destination, types, options, this);
+            options.BeforeMapAction(source, destination);
 
-            return func(source, destination, context);
+            var context = new ResolutionContext(options, this);
+
+            destination = func(source, destination, context);
+
+            options.AfterMapAction(source, destination);
+
+            return destination;
         }
 
-        object IRuntimeMapper.Map(ResolutionContext context)
-        {
-            var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(context.Types, context.Types));
-
-            return func(context.SourceValue, context.DestinationValue, context);
-        }
-
-        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext parent)
+        object IRuntimeMapper.Map(object source, object destination, Type sourceType, Type destinationType, ResolutionContext context)
         {
             var types = TypePair.Create(source, destination, sourceType, destinationType);
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            var context = new ResolutionContext(source, destination, types, parent);
-
             return func(source, destination, context);
         }
 
-        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext parent)
+        TDestination IRuntimeMapper.Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
         {
             var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
-            var context = new ResolutionContext(source, destination, types, parent);
-
             return func(source, destination, context);
         }
 
-        object IRuntimeMapper.CreateObject(ResolutionContext context)
+        TDestination IRuntimeMapper.CreateObject<TDestination>()
         {
-            if(context.DestinationValue != null)
-            {
-                return context.DestinationValue;
-            }
-            return !_configurationProvider.AllowNullDestinationValues
-                ? ObjectCreator.CreateNonNullValue(context.DestinationType)
-                : ObjectCreator.CreateObject(context.DestinationType);
-        }
-
-        TDestination IRuntimeMapper.CreateObject<TDestination>(ResolutionContext context)
-        {
-            if (context.DestinationValue != null)
-            {
-                return (TDestination) context.DestinationValue;
-            }
             return (TDestination) (!_configurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
                 : ObjectCreator.CreateObject(typeof(TDestination)));
-        }
-
-        bool IRuntimeMapper.ShouldMapSourceValueAsNull(ResolutionContext context)
-        {
-            if (context.DestinationType.IsValueType() && !context.DestinationType.IsNullableType())
-                return false;
-
-            var typeMap = context.GetContextTypeMap();
-
-            return typeMap?.Profile.AllowNullDestinationValues ?? _configurationProvider.AllowNullDestinationValues;
-        }
-
-        bool IRuntimeMapper.ShouldMapSourceCollectionAsNull(ResolutionContext context)
-        {
-            var typeMap = context.GetContextTypeMap();
-
-            return typeMap?.Profile.AllowNullCollections ?? _configurationProvider.AllowNullCollections;
         }
     }
 }

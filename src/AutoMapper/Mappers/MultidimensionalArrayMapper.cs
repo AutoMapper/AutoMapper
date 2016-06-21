@@ -16,12 +16,12 @@ namespace AutoMapper.Mappers
         public static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context)
             where TSource : IEnumerable
         {
-            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
+            if (source == null && context.ConfigurationProvider.AllowNullCollections)
                 return null;
 
             var destElementType = TypeHelper.GetElementType(typeof(TDestination));
 
-            if (!context.IsSourceValueNull && context.DestinationType.IsAssignableFrom(context.SourceType))
+            if (source != null && typeof(TDestination).IsAssignableFrom(typeof(TSource)))
             {
                 var elementTypeMap = context.ConfigurationProvider.ResolveTypeMap(typeof(TSourceElement), destElementType);
                 if (elementTypeMap == null)
@@ -37,7 +37,7 @@ namespace AutoMapper.Mappers
                 : ObjectCreator.CreateObject(typeof(TSource)));
 
             var sourceLength = sourceList.OfType<object>().Count();
-            var sourceArray = context.SourceValue as Array;
+            var sourceArray = source as Array;
             Array destinationArray;
             if (sourceArray == null)
             {
@@ -48,10 +48,9 @@ namespace AutoMapper.Mappers
                 destinationArray = ObjectCreator.CreateArray(destElementType, sourceArray);
                 filler = new MultidimensionalArrayFiller(destinationArray);
             }
-            var itemContext = new ResolutionContext(context);
             foreach(var item in sourceList)
             {
-                filler.NewValue(itemContext.Map(item, null, typeof(TSourceElement), destElementType));
+                filler.NewValue(context.Map(item, null, typeof(TSourceElement), destElementType));
             }
             return destinationArray;
         }

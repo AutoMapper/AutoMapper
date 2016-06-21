@@ -972,7 +972,7 @@ namespace AutoMapper.UnitTests
 
             public class StringCAPS : IValueResolver<string, string>
             {
-                public string Resolve(string source, ResolutionContext context)
+                public string Resolve(string source, string dest, ResolutionContext context)
                 {
                     return source.ToUpper();
                 }
@@ -980,7 +980,7 @@ namespace AutoMapper.UnitTests
 
             public class StringLower : IValueResolver<string, string>
             {
-                public string Resolve(string source, ResolutionContext context)
+                public string Resolve(string source, string dest, ResolutionContext context)
                 {
                     return source.ToLower();
                 }
@@ -995,7 +995,7 @@ namespace AutoMapper.UnitTests
                     _desiredLength = desiredLength;
                 }
 
-                public string Resolve(string source, ResolutionContext context)
+                public string Resolve(string source, string dest, ResolutionContext context)
                 {
                     return source.PadLeft(_desiredLength);
                 }
