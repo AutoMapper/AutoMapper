@@ -136,7 +136,7 @@
             ref ParameterExpression contextToReuse)
         {
             var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destParam.Type).GetTypeInfo();
-            genericTypeMap.DeclaredMethods.First(p => p.Name == "SetTypeMap").Invoke(null, new object[] {typeMap});
+            //genericTypeMap.DeclaredMethods.First(p => p.Name == "SetTypeMap").Invoke(null, new object[] {typeMap});
             var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
 
             var beforeMap = Call(ctxtParam, typeof (ResolutionContext).GetMethod("BeforeMap"), ToObject(destParam));
@@ -347,11 +347,13 @@
             {
                 var typePair = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
                 var typeMap = configurationProvider.ResolveTypeMap(typePair);
+
                 if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
                 {
                     if(!typeMap.Sealed)
                         typeMap.Seal(typeMapRegistry, configurationProvider);
-                    valueResolverExpr = typeMap.MapExpression.ReplaceParameters(valueResolverExpr, destValueExpr, ctxtParam);
+
+                        valueResolverExpr = typeMap.MapExpression.ReplaceParameters(valueResolverExpr, destValueExpr, ctxtParam);
                 }
                 else
                 {
@@ -492,8 +494,8 @@
             }
             else if (propertyMap.CustomResolver != null)
             {
-                var customResolver = ToType(Property(ArrayIndex(Call(Property(ctxtParam, "TypeMap"), typeof(TypeMap).GetMethod("GetValidPropertyMaps")), Constant(index)), "CustomResolverFunc"), typeof(Func<,,>).MakeGenericType(srcParam.Type, typeof(ResolutionContext), propertyMap.DestinationPropertyType));
-                valueResolverFunc = Invoke(customResolver, srcParam, ctxtParam);
+                var customResolver = ToType(Property(ArrayIndex(Call(Property(ctxtParam, "TypeMap"), typeof(TypeMap).GetMethod("GetValidPropertyMaps")), Constant(index)), "CustomResolverFunc"), propertyMap.CustomResolver.Type);
+                valueResolverFunc = Invoke(customResolver, srcParam, ctxtParam);//, propertyMap.DestinationPropertyType);
             }
             else if (propertyMap.CustomExpression != null)
             {

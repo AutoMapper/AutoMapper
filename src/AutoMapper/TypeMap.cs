@@ -231,6 +231,12 @@ namespace AutoMapper
 
             MapExpression = TypeMapPlanBuilder.BuildMapperFunc(this, configurationProvider, typeMapRegistry);
 
+            if (!SourceType.IsGenericType && !DestinationType.IsGenericType)
+            {
+                var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(SourceType, DestinationType).GetTypeInfo();
+                genericTypeMap.DeclaredMethods.First(p => p.Name == "SetTypeMap").Invoke(null, new object[] { this });
+            }
+
             _sealed = true;
         }
 

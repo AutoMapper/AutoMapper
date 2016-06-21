@@ -10,7 +10,7 @@ namespace AutoMapper.Mappers
 
     public class TypeConverterMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
+        public static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
         {
             if (source == null)
                 return ifNull();
