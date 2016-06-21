@@ -29,7 +29,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = context.MapMember(member, sourceMemberValue);
+                var destinationMemberValue = context.MapMember(member, sourceMemberValue, destination);
                 member.SetMemberValue(destination, destinationMemberValue);
             }
             return destination;

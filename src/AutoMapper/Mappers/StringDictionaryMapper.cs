@@ -50,19 +50,19 @@ namespace AutoMapper.Mappers
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression)
         {
-            return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, contextExpression);
+            return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, destExpression, contextExpression);
         }
 
-        private static TDestination Map<TDestination>(StringDictionary source, ResolutionContext context)
+        private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context)
         {
-            var destination = context.Mapper.CreateObject<TDestination>();
+            destination = destination == null ? context.Mapper.CreateObject<TDestination>() : destination;
             var destTypeDetails = new TypeDetails(typeof(TDestination), _ => true, _ => true);
             var members = from name in source.Keys
                           join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
                           select member;
             foreach (var member in members)
             {
-                var value = context.MapMember(member, source[member.Name]);
+                var value = context.MapMember(member, source[member.Name], destination);
                 member.SetMemberValue(destination, value);
             }
             return destination;

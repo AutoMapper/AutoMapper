@@ -19,6 +19,13 @@ namespace AutoMapper.Execution
             return parameter.DefaultValue;
         }
 
+        public static object MapMember(this ResolutionContext context, MemberInfo member, object value, object destination)
+        {
+            var memberType = member.GetMemberType();
+            var destValue = member.GetMemberValue(destination);
+            return context.Mapper.Map(value, destValue, value?.GetType() ?? memberType, memberType, context);
+        }
+
         public static object MapMember(this ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = member.GetMemberType();
