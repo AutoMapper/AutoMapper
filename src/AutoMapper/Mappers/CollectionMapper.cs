@@ -62,10 +62,6 @@ namespace AutoMapper.Mappers
                 dest = destParam;
             }
 
-            var itemContext = Variable(typeof(ResolutionContext), "itemContext");
-            blockParams.Add(itemContext);
-            blockExprs.Add(Assign(itemContext, New(typeof(ResolutionContext).GetTypeInfo().DeclaredConstructors.First(_ => _.GetParameters().Length == 1), contextExpression)));
-
             var cast = typeof(Enumerable).GetTypeInfo().DeclaredMethods.First(_ => _.Name == "Cast").MakeGenericMethod(itemExpr.Parameters[0].Type);
 
             var addMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetMethod("Add");
@@ -74,7 +70,7 @@ namespace AutoMapper.Mappers
             blockExprs.Add(ForEach(sourceExpression, itemExpr.Parameters[0], Call(
                 dest,
                 addMethod,
-                itemExpr.ReplaceParameters(itemExpr.Parameters[0], itemContext))));
+                itemExpr.ReplaceParameters(itemExpr.Parameters[0], contextExpression))));
 
             blockExprs.Add(dest);
 

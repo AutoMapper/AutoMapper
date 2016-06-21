@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests
                     _value = value;
                 }
 
-                public int Resolve(int source, ResolutionContext context)
+                public int Resolve(int source, int dest, ResolutionContext context)
                 {
                     return source + _value;
                 }
@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests
 
             public class BarResolver : IValueResolver<int, int>
             {
-                public int Resolve(int source, ResolutionContext context)
+                public int Resolve(int source, int dest, ResolutionContext context)
                 {
                     return source + 1;
                 }

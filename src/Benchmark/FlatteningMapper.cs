@@ -500,7 +500,7 @@ namespace Benchmark.Flattening
                     ProperName = "Some other name"
                 },
             };
-            _context = new ResolutionContext(_source, null, new TypePair(typeof(ModelObject), typeof(ModelDto)), null, new Mapper(new MapperConfiguration(_ => { })));
+            _context = new ResolutionContext(new MappingOperationOptions(null), new Mapper(new MapperConfiguration(_ => { })));
         }
 
         public object Map()
@@ -514,7 +514,7 @@ namespace Benchmark.Flattening
                 ModelDto mapObj;
                 ModelObject mapFrom;
                 mapFrom = (ModelObject)_source;
-                mapObj = _context.DestinationValue != null ? (ModelDto)_context.DestinationValue : new ModelDto();
+                mapObj = new ModelDto();
 
                 BeforeMap(mapObj);
 

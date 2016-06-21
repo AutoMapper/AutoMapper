@@ -71,7 +71,7 @@ namespace AutoMapper.UnitTests
 
         class Resolver : IValueResolver<Source, Guid>
         {
-            public Guid Resolve(Source model, ResolutionContext context)
+            public Guid Resolve(Source model, Guid dest, ResolutionContext context)
             {
                 return _guid;
             }
@@ -311,7 +311,7 @@ namespace AutoMapper.UnitTests
 
         public class CustomResolver : IValueResolver<ModelObject, int>
         {
-            public int Resolve(ModelObject source, ResolutionContext context)
+            public int Resolve(ModelObject source, int dest, ResolutionContext context)
             {
                 return source.Value + 1;
             }
@@ -319,7 +319,7 @@ namespace AutoMapper.UnitTests
 
         public class CustomResolver2 : IValueResolver<ModelObject, int>
         {
-            public int Resolve(ModelObject source, ResolutionContext context)
+            public int Resolve(ModelObject source, int dest, ResolutionContext context)
             {
                 return source.Value2fff + 2;
             }
@@ -386,7 +386,7 @@ namespace AutoMapper.UnitTests
 
         public class CustomResolver : IValueResolver<ModelSubObject, int>
         {
-            public int Resolve(ModelSubObject source, ResolutionContext context)
+            public int Resolve(ModelSubObject source, int ignored, ResolutionContext context)
             {
                 return source.SomeValue + 1;
             }
@@ -431,7 +431,7 @@ namespace AutoMapper.UnitTests
 
         public class CustomResolver : IValueResolver<int, int>
         {
-            public int Resolve(int source, ResolutionContext context)
+            public int Resolve(int source, int dest, ResolutionContext context)
             {
                 return source + 5;
             }
@@ -479,7 +479,7 @@ namespace AutoMapper.UnitTests
 
         public class CustomResolver : IValueResolver<int, int>
         {
-            public int Resolve(int source, ResolutionContext context)
+            public int Resolve(int source, int dest, ResolutionContext context)
             {
                 return source + 5;
             }
@@ -538,7 +538,7 @@ namespace AutoMapper.UnitTests
                 _toAdd = 10;
             }
 
-            public int Resolve(int source, ResolutionContext context)
+            public int Resolve(int source, int dest, ResolutionContext context)
             {
                 return source + _toAdd;
             }
@@ -598,7 +598,7 @@ namespace AutoMapper.UnitTests
                 _toAdd = 10;
             }
 
-            public int Resolve(int source, ResolutionContext context)
+            public int Resolve(int source, int dest, ResolutionContext context)
             {
                 return source + _toAdd;
             }
@@ -945,7 +945,7 @@ namespace AutoMapper.UnitTests
                 _toAdd = toAdd;
             }
 
-            public int Resolve(int source, ResolutionContext context)
+            public int Resolve(int source, int dest, ResolutionContext context)
             {
                 return source + _toAdd;
             }
@@ -988,9 +988,9 @@ namespace AutoMapper.UnitTests
 
         public class CustomValueResolver : IValueResolver<int, int>
         {
-            public int Resolve(int source, ResolutionContext context)
+            public int Resolve(int source, int dest, ResolutionContext context)
             {
-                return ((Destination)context.DestinationValue).Value;
+                return dest;
             }
         }
 
@@ -1033,7 +1033,7 @@ namespace AutoMapper.UnitTests
             {
             }
 
-            public object Resolve(int source, ResolutionContext context)
+            public object Resolve(int source, object dest, ResolutionContext context)
             {
                 return source + 5;
             }

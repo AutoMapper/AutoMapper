@@ -24,12 +24,11 @@ namespace AutoMapper.Mappers
                 Expression contextExpression)
             =>
             typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap,
-                Call(MembersDictionaryMethodInfo, contextExpression), destExpression, contextExpression, _ => null,
+                Call(MembersDictionaryMethodInfo, sourceExpression), destExpression, contextExpression, _ => null,
                 typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
 
-        public static Dictionary<string, object> MembersDictionary(ResolutionContext context)
+        public static Dictionary<string, object> MembersDictionary(object source)
         {
-            var source = context.SourceValue;
             var sourceTypeDetails = new TypeDetails(source.GetType(), _ => true, _ => true);
             var membersDictionary = sourceTypeDetails.PublicReadAccessors.ToDictionary(p => p.Name,
                 p => p.GetMemberValue(source));
@@ -56,15 +55,14 @@ namespace AutoMapper.Mappers
 
         private static TDestination Map<TDestination>(StringDictionary source, ResolutionContext context)
         {
-            var destination = context.Mapper.CreateObject<TDestination>(context);
-            var destTypeDetails = new TypeDetails(context.DestinationType, _ => true, _ => true);
+            var destination = context.Mapper.CreateObject<TDestination>();
+            var destTypeDetails = new TypeDetails(typeof(TDestination), _ => true, _ => true);
             var members = from name in source.Keys
                           join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
                           select member;
-            var memberContext = new ResolutionContext(context);
             foreach (var member in members)
             {
-                var value = memberContext.MapMember(member, source[member.Name]);
+                var value = context.MapMember(member, source[member.Name]);
                 member.SetMemberValue(destination, value);
             }
             return destination;

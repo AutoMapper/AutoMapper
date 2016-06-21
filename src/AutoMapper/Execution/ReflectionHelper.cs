@@ -22,7 +22,7 @@ namespace AutoMapper.Execution
         public static object MapMember(this ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = member.GetMemberType();
-            return context.Map(value, null, value?.GetType() ?? memberType, memberType);
+            return context.Mapper.Map(value, null, value?.GetType() ?? memberType, memberType, context);
         }
 
         public static bool IsDynamic(this object obj)

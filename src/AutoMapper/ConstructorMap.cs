@@ -55,20 +55,17 @@ namespace AutoMapper
         public Expression BuildExpression(
             TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam, 
-            ParameterExpression ctxtParam,
-            ref ParameterExpression contextToReuse)
+            ParameterExpression ctxtParam)
         {
             if (!CanResolve)
                 return null;
 
-            ParameterExpression parameterContext = contextToReuse;
-            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry, srcParam, ctxtParam, ref parameterContext));
+            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry, srcParam, ctxtParam));
 
             ctorArgs =
                 ctorArgs.Zip(Ctor.GetParameters(),
                     (exp, pi) => exp.Type == pi.ParameterType ? exp : Convert(exp, pi.ParameterType))
                     .ToArray();
-            contextToReuse = parameterContext;
             var newExpr = New(Ctor, ctorArgs);
             return newExpr;
         }
