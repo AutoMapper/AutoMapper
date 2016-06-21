@@ -12,9 +12,6 @@
 
     public static class TypeMapPlanBuilder
     {
-        private static readonly Expression<Func<ResolutionContext, TypePair, int, bool>> _passesDepthCheckExpression =
-            (ctxt, types, maxDepth) => PassesDepthCheck(ctxt, types, maxDepth);
-
         public static LambdaExpression BuildMapperFunc(TypeMap typeMap, IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry)
         {
             if (typeMap.SourceType.IsGenericTypeDefinition() || typeMap.DestinationType.IsGenericTypeDefinition())
@@ -116,6 +113,7 @@
 
         private static Expression<Action<ResolutionContext>> IncTypeDepthInfo = ctxt => ctxt.IncrementTypeDepth(default(TypePair));
         private static Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
+        private static Expression<Func<ResolutionContext, int>> GetTypeDepthInfo = ctxt => ctxt.GetTypeDepth(default(TypePair));
 
         private static Expression CreateAssignmentFunc(
             TypeMap typeMap,
@@ -175,10 +173,14 @@
 
             if (typeMap.MaxDepth > 0)
             {
-                mapperFunc = Condition(Invoke(_passesDepthCheckExpression, ctxtParam, Constant(typeMap.Types), Constant(typeMap.MaxDepth)),
+                mapperFunc = Condition(
+                    LessThanOrEqual(
+                        Call(ctxtParam, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
+                        Constant(typeMap.MaxDepth)
+                    ),
                     mapperFunc,
                     Default(typeMap.DestinationType));
-                //mapperFunc = (source, context, destFunc) => PassesDepthCheck(context, typeMap.MaxDepth) ? inner(source, context, destFunc) : default(TDestination);
+                //mapperFunc = (source, context, destFunc) => context.GetTypeDepth(types) <= maxDepth ? inner(source, context, destFunc) : default(TDestination);
             }
 
             if (typeMap.Profile.AllowNullDestinationValues && typeMap.SourceType.IsClass())
@@ -514,35 +516,6 @@
             }
 
             return valueResolverFunc;
-        }
-
-        private static bool PassesDepthCheck(ResolutionContext context, TypePair types, int maxDepth)
-        {
-            //if (context.InstanceCache.ContainsKey(context))
-            //{
-            //    // return true if we already mapped this value and it's in the cache
-            //    return true;
-            //}
-
-            return context.GetTypeDepth(types) <= maxDepth;
-
-            //TODO: Do this a better way besides this junk
-            //var contextCopy = context;
-
-            //var currentDepth = 1;
-
-            //// walk parents to determine current depth
-            //while (contextCopy.Parent != null)
-            //{
-            //    if (contextCopy.SourceType == context.SourceType &&
-            //        contextCopy.DestinationType == context.DestinationType)
-            //    {
-            //        // same source and destination types appear higher up in the hierarchy
-            //        currentDepth++;
-            //    }
-            //    contextCopy = contextCopy.Parent;
-            //}
-            //return currentDepth <= maxDepth;
         }
     }
 }
