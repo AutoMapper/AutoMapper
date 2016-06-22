@@ -33,14 +33,14 @@ namespace AutoMapper
 
         public Expression CreateExpression(TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
-            ParameterExpression ctxtParam,
-            ref ParameterExpression parameterContext)
+            ParameterExpression ctxtParam)
         {
             if (CustomExpression != null)
                 return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull();
 
             if (CustomValueResolver != null)
             {
+                // Invoking a delegate
                 return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
             }
 
@@ -72,7 +72,7 @@ namespace AutoMapper
                 /*
                 var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
                  */
-                return TypeMapPlanBuilder.ContextMap(valueResolverExpr, Default(DestinationType), DestinationType, ref parameterContext);
+                return TypeMapPlanBuilder.ContextMap(valueResolverExpr, Default(DestinationType), ctxtParam, DestinationType);
             }
             return valueResolverExpr;
         }

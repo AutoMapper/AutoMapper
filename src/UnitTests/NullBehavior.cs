@@ -207,7 +207,7 @@ namespace AutoMapper.UnitTests
 		{
 			public class NullResolver : IValueResolver<string, string>
 			{
-				public string Resolve(string source, ResolutionContext context)
+				public string Resolve(string source, string dest, ResolutionContext context)
 				{
 					if (source == null)
 						return "jon";

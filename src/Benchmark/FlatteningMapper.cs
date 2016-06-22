@@ -500,7 +500,7 @@ namespace Benchmark.Flattening
                     ProperName = "Some other name"
                 },
             };
-            _context = new ResolutionContext(_source, null, new TypePair(typeof(ModelObject), typeof(ModelDto)), null, new Mapper(new MapperConfiguration(_ => { })));
+            _context = new ResolutionContext(new MappingOperationOptions(null), new Mapper(new MapperConfiguration(_ => { })));
         }
 
         public object Map()
@@ -514,7 +514,7 @@ namespace Benchmark.Flattening
                 ModelDto mapObj;
                 ModelObject mapFrom;
                 mapFrom = (ModelObject)_source;
-                mapObj = _context.DestinationValue != null ? (ModelDto)_context.DestinationValue : new ModelDto();
+                mapObj = new ModelDto();
 
                 BeforeMap(mapObj);
 
@@ -522,28 +522,18 @@ namespace Benchmark.Flattening
                 {
                     mapObj.BaseDate = mapFrom == null ? default(DateTime) : mapFrom.BaseDate;
                 }
-                catch (AutoMapperMappingException e)
-                {
-                    e.PropertyMap = _propertyMap;
-                    throw;
-                }
                 catch (Exception e)
                 {
-                    throw new AutoMapperMappingException(_context, e, _propertyMap);
+                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
                 }
 
                 try
                 {
                     mapObj.Sub2ProperName = mapFrom == null ? default(string) : mapFrom.Sub2 == null ? default(string) : mapFrom.Sub2.ProperName;
                 }
-                catch (AutoMapperMappingException e)
-                {
-                    e.PropertyMap = _propertyMap;
-                    throw;
-                }
                 catch (Exception e)
                 {
-                    throw new AutoMapperMappingException(_context, e, _propertyMap);
+                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
                 }
 
                 try
@@ -557,7 +547,7 @@ namespace Benchmark.Flattening
                 }
                 catch (Exception e)
                 {
-                    throw new AutoMapperMappingException(_context, e, _propertyMap);
+                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
                 }
 
                 try
@@ -567,14 +557,9 @@ namespace Benchmark.Flattening
                         : mapFrom.Sub.SubSub == null ? default(string)
                         : mapFrom.Sub.SubSub.IAmACoolProperty;
                 }
-                catch (AutoMapperMappingException e)
-                {
-                    e.PropertyMap = _propertyMap;
-                    throw;
-                }
                 catch (Exception e)
                 {
-                    throw new AutoMapperMappingException(_context, e, _propertyMap);
+                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
                 }
 
                 try
@@ -583,14 +568,9 @@ namespace Benchmark.Flattening
                         : mapFrom.SubWithExtraName == null ? default(string)
                         : mapFrom.SubWithExtraName.ProperName;
                 }
-                catch (AutoMapperMappingException e)
-                {
-                    e.PropertyMap = _propertyMap;
-                    throw;
-                }
                 catch (Exception e)
                 {
-                    throw new AutoMapperMappingException(_context, e, _propertyMap);
+                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
                 }
 
                 AfterMap(mapObj);

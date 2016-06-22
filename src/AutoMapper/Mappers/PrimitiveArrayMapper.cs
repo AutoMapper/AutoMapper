@@ -10,7 +10,7 @@ namespace AutoMapper.Mappers
     {
         public static TDestElement[] Map<TSourceElement, TDestElement>(TSourceElement[] source, ResolutionContext context)
         {
-            if (source == null && context.Mapper.ShouldMapSourceCollectionAsNull(context))
+            if (source == null && context.Mapper.ConfigurationProvider.AllowNullCollections)
             {
                 return null;
             }

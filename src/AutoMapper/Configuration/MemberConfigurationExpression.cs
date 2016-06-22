@@ -82,17 +82,27 @@ namespace AutoMapper.Configuration
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (src, ctxt) => resolver(src);
+                Expression<Func<TSource, TDestination, ResolutionContext, TSourceMember>> expr = (src, dest, ctxt) => resolver(src);
 
                 pm.CustomResolver = expr;
             });
         }
 
-        public void ResolveUsing<TSourceMember>(Func<TSource, ResolutionContext, TSourceMember> resolver)
+        public void ResolveUsing<TSourceMember>(Func<TSource, TMember, TSourceMember> resolver)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, ResolutionContext, TSourceMember>> expr = (src, ctxt) => resolver(src, ctxt);
+                Expression<Func<TSource, TMember, ResolutionContext, TSourceMember>> expr = (src, dest, ctxt) => resolver(src, dest);
+
+                pm.CustomResolver = expr;
+            });
+        }
+
+        public void ResolveUsing<TSourceMember>(Func<TSource, TMember, ResolutionContext, TSourceMember> resolver)
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, TMember, ResolutionContext, TSourceMember>> expr = (src, dest, ctxt) => resolver(src, dest, ctxt);
 
                 pm.CustomResolver = expr;
             });

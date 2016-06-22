@@ -19,10 +19,17 @@ namespace AutoMapper.Execution
             return parameter.DefaultValue;
         }
 
+        public static object MapMember(this ResolutionContext context, MemberInfo member, object value, object destination)
+        {
+            var memberType = member.GetMemberType();
+            var destValue = member.GetMemberValue(destination);
+            return context.Mapper.Map(value, destValue, value?.GetType() ?? memberType, memberType, context);
+        }
+
         public static object MapMember(this ResolutionContext context, MemberInfo member, object value)
         {
             var memberType = member.GetMemberType();
-            return context.Map(value, null, value?.GetType() ?? memberType, memberType);
+            return context.Mapper.Map(value, null, value?.GetType() ?? memberType, memberType, context);
         }
 
         public static bool IsDynamic(this object obj)

@@ -26,95 +26,64 @@ namespace AutoMapper
             _message = message;
         }
 
-        public AutoMapperMappingException(ResolutionContext context)
-        {
-            Context = context;
-            Types = context.Types;
-        }
-
-        public AutoMapperMappingException(ResolutionContext context, Exception inner)
-            : base(null, inner)
-        {
-            Context = context;
-            Types = context.Types;
-        }
-
-        public AutoMapperMappingException(ResolutionContext context, Exception inner, PropertyMap propertyMap)
-            : base(null, inner)
-        {
-            Context = context;
-            Types = context.Types;
-            PropertyMap = propertyMap;
-        }
-
-        public AutoMapperMappingException(ResolutionContext context, string message)
-            : this(context)
+        public AutoMapperMappingException(string message, Exception innerException)
+            : base(message, innerException)
         {
             _message = message;
         }
 
-        public ResolutionContext Context { get; set; }
-        public TypePair Types { get; set; }
+        public AutoMapperMappingException(string message, Exception innerException, TypePair types)
+            : this(message, innerException)
+        {
+            Types = types;
+        }
+
+        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap)
+            : this(message, innerException, types)
+        {
+            TypeMap = typeMap;
+        }
+
+        public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap, PropertyMap propertyMap)
+            : this(message, innerException, types, typeMap)
+        {
+            PropertyMap = propertyMap;
+        }
+
+        public TypePair? Types { get; set; }
+        public TypeMap TypeMap { get; set; }
         public PropertyMap PropertyMap { get; set; }
 
         public override string Message
         {
             get
             {
-                string message = null;
+                string message = _message;
                 var newLine = Environment.NewLine;
-                if (Types.SourceType != null && Types.DestinationType != null)
+                if (Types?.SourceType != null && Types?.DestinationType != null)
                 {
-                    message = _message + newLine + newLine + "Mapping types:";
+                    message = message + newLine + newLine + "Mapping types:";
                     message += newLine +
-                               $"{Types.SourceType.Name} -> {Types.DestinationType.Name}";
+                               $"{Types?.SourceType.Name} -> {Types?.DestinationType.Name}";
                     message += newLine +
-                               $"{Types.SourceType.FullName} -> {Types.DestinationType.FullName}";
+                               $"{Types?.SourceType.FullName} -> {Types?.DestinationType.FullName}";
                 }
-                if (Context != null)
-                { 
-                    var destPath = GetDestPath();
-                    message += newLine + newLine + "Destination path:" + newLine + destPath;
-
-                    message += newLine + newLine + "Source value:" + newLine + (Context.SourceValue ?? "(null)");
-
-                    return message;
-                }
-                if (_message != null)
+                if (TypeMap != null)
                 {
-                    message = _message;
+                    message = message + newLine + newLine + "Type Map configuration:";
+                    message += newLine +
+                               $"{TypeMap.SourceType.Name} -> {TypeMap.DestinationType.Name}";
+                    message += newLine +
+                               $"{TypeMap.SourceType.FullName} -> {TypeMap.DestinationType.FullName}";
                 }
-
-                message = (message == null ? null : message + newLine) + base.Message;
+                if (PropertyMap != null)
+                {
+                    message = message + newLine + newLine + "Property:";
+                    message += newLine +
+                               $"{PropertyMap.DestinationProperty.Name}";
+                }
 
                 return message;
-            }
-        }
-
-        private string GetDestPath()
-        {
-            var allContexts = GetExceptions().ToArray();
-
-            var context = allContexts[0].Context?.Parent ?? allContexts[0].Context;
-            var builder = new StringBuilder(context?.DestinationType.Name);
-
-            foreach (var memberName in allContexts.Select(ctxt => ctxt?.PropertyMap?.DestinationProperty?.Name).Where(memberName => !string.IsNullOrEmpty(memberName)))
-            {
-                builder.Append(".");
-                builder.Append(memberName);
-            }
-            return builder.ToString();
-        }
-
-        private IEnumerable<AutoMapperMappingException> GetExceptions()
-        {
-            Exception exc = this;
-            while (exc != null)
-            {
-                var mappingEx = exc as AutoMapperMappingException;
-                if (mappingEx != null)
-                    yield return mappingEx;
-                exc = exc.InnerException;
             }
         }
 

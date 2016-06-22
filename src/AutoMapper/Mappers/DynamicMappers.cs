@@ -18,7 +18,6 @@ namespace AutoMapper.Mappers
         {
             if (destination == null)
                 destination = ifNull();
-            var memberContext = new ResolutionContext(context);
             foreach (var member in new TypeDetails(typeof(TDestination)).PublicWriteAccessors)
             {
                 object sourceMemberValue;
@@ -30,7 +29,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = memberContext.MapMember(member, sourceMemberValue);
+                var destinationMemberValue = context.MapMember(member, sourceMemberValue, destination);
                 member.SetMemberValue(destination, destinationMemberValue);
             }
             return destination;
@@ -63,7 +62,6 @@ namespace AutoMapper.Mappers
         {
             if (destination == null)
                 destination = ifNull();
-            var memberContext = new ResolutionContext(context);
             foreach (var member in new TypeDetails(typeof(TSource)).PublicWriteAccessors)
             {
                 object sourceMemberValue;
@@ -75,7 +73,7 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = memberContext.MapMember(member, sourceMemberValue);
+                var destinationMemberValue = context.MapMember(member, sourceMemberValue);
                 SetDynamically(member, destination, destinationMemberValue);
             }
             return destination;
