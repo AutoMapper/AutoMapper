@@ -375,14 +375,10 @@ namespace AutoMapper
             {
                 var exception = Parameter(typeof(Exception), "ex");
 
-                var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(source.Type, destination.Type).GetTypeInfo();
-                var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
-                var typeMap = Property(Property(typeMapExpression, "BaseTypeMap"), "Types");
-
                 var ctor = ((NewExpression)ResolutionContextCtor.Body).Constructor;
                 return Lambda(Expression.TryCatch(mapExpression.Body,
                     MakeCatchBlock(typeof(Exception), exception, Block(
-                        Throw(New(ctor, Constant("Error mapping types."), exception, typeMap.IfNotNull())),
+                        Throw(New(ctor, Constant("Error mapping types."), exception, Default(typeof(TypePair)))),
                         Default(destination.Type)), null)),
                     source, destination, context);
             }
@@ -403,22 +399,60 @@ namespace AutoMapper
             _moduleBuilder = assemblyBuilder.DefineDynamicModule("Module");
         }
 #endif
+
         public static Delegate MakeDelegate(this LambdaExpression lamdaExpression)
         {
 #if NET45
-                var typeBuilder = _moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
-                    TypeAttributes.Public);
-                var methodName = Guid.NewGuid().ToString("N");
-                var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
+            var visitor = new CanCompileToMethodVisitor();
+            visitor.Visit(lamdaExpression);
+            if (!visitor.CanCompile)
+                return lamdaExpression.Compile();
+            var typeBuilder = _moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
+                TypeAttributes.Public);
+            var methodName = Guid.NewGuid().ToString("N");
+            var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
 
-                lamdaExpression.CompileToMethod(methodBuilder);
+            lamdaExpression.CompileToMethod(methodBuilder);
 
-                var resultingType = typeBuilder.CreateType();
+            var resultingType = typeBuilder.CreateType();
 
-                return Delegate.CreateDelegate(lamdaExpression.Type,resultingType.GetMethod(methodName));
+            return Delegate.CreateDelegate(lamdaExpression.Type, resultingType.GetMethod(methodName));
 #else
             return lamdaExpression.Compile();
 #endif
+        }
+    }
+
+    public class CanCompileToMethodVisitor : ExpressionVisitor
+    {
+        public bool CanCompile { get; private set; } = true;
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            if(!node.Type.GetTypeInfo().IsPublic)
+                CanCompile = false;
+            return base.VisitUnary(node);
+        }
+
+        protected override Expression VisitNew(NewExpression node)
+        {
+            if (node?.Constructor?.IsPrivate == true)
+                CanCompile = false;
+            return base.VisitNew(node);
+        }
+        
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            if (!node.Type.GetTypeInfo().IsPublic)
+                CanCompile = false;
+            return base.VisitParameter(node);
+        }
+
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            if (node.Member is PropertyInfo && (node.Member as PropertyInfo).HasAnInaccessibleSetter())
+                CanCompile = false;
+            return base.VisitMember(node);
         }
     }
 }

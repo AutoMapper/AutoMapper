@@ -53,7 +53,7 @@ namespace AutoMapper.Mappers
             return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, destExpression, contextExpression);
         }
 
-        private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context)
+        public static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context)
         {
             destination = destination == null ? context.Mapper.CreateObject<TDestination>() : destination;
             var destTypeDetails = new TypeDetails(typeof(TDestination), _ => true, _ => true);
