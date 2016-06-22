@@ -545,9 +545,21 @@
                 var toCreate = propertyMap.SourceType ?? propertyMap.DestinationPropertyType;
                 if (!toCreate.GetTypeInfo().IsValueType)
                 {
-                    valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
+                    try
+                    {
+                        valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
+                            valueResolverFunc,
+                            ToType(DelegateFactory.GenerateConstructorExpression(toCreate), propertyMap.SourceType));
+                    }
+                    catch (Exception)
+                    {
+                        valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
                         valueResolverFunc,
-                        ToType(DelegateFactory.GenerateConstructorExpression(toCreate), propertyMap.SourceType));
+                        ToType(Call(
+                            typeof(ObjectCreator).GetMethod("CreateNonNullValue"),
+                            Constant(toCreate)
+                            ), propertyMap.SourceType));
+                    }
                 }
             }
 
