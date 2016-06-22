@@ -25,7 +25,7 @@ namespace AutoMapper
         public IMemberGetter[] SourceMembers { get; }
 
         public bool CanResolve { get; set; }
-        public Delegate CustomExpressionFunc => CustomExpression.Compile();
+        public Delegate CustomExpressionFunc => Lambda(CustomExpression.Body.IfNotNull(), CustomExpression.Parameters).Compile();
         public LambdaExpression CustomExpression { get; set; }
         public Func<object, ResolutionContext, object> CustomValueResolver { get; set; }
 

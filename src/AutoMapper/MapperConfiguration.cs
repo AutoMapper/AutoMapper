@@ -411,8 +411,14 @@ namespace AutoMapper
                 TypeAttributes.Public);
             var methodName = Guid.NewGuid().ToString("N");
             var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
-
-            lamdaExpression.CompileToMethod(methodBuilder);
+            try
+            {
+                lamdaExpression.CompileToMethod(methodBuilder);
+            }
+            catch (Exception)
+            {
+                return lamdaExpression.Compile();
+            }
 
             var resultingType = typeBuilder.CreateType();
 

@@ -138,6 +138,9 @@ namespace AutoMapper.Execution
                 .GetDeclaredConstructors()
                 .Where(ci => !ci.IsStatic);
 
+            if (type == typeof(string))
+                return Expression.Constant("");
+
             //find a ctor with only optional args
             var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
             if (ctorWithOptionalArgs == null)

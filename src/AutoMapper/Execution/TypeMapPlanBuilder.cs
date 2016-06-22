@@ -430,6 +430,7 @@
         {
             var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destParam.Type).GetTypeInfo();
             var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
+            var propertyMapExpression = ArrayIndex(Property(typeMapExpression, "PropertyMaps"), Constant(index));
 
             Expression valueResolverFunc;
             var valueResolverConfig = propertyMap.ValueResolverConfig;
@@ -441,7 +442,7 @@
                 Type resolverType;
                 if (valueResolverConfig.Instance != null)
                 {
-                    ctor = Constant(valueResolverConfig.Instance);
+                    ctor = Property(Property(propertyMapExpression, "ValueResolverConfig"), "Instance");
                     resolverType = valueResolverConfig.Instance.GetType();
                 }
                 else
@@ -484,12 +485,12 @@
             }
             else if (propertyMap.CustomResolver != null)
             {
-                var customResolver = ToType(Property(ArrayIndex(Property(typeMapExpression, "PropertyMaps"), Constant(index)), "CustomResolverFunc"), propertyMap.CustomResolver.Type);
+                var customResolver = ToType(Property(propertyMapExpression, "CustomResolverFunc"), propertyMap.CustomResolver.Type);
                 valueResolverFunc = Invoke(customResolver, srcParam, destValueExpr, ctxtParam);
             }
             else if (propertyMap.CustomExpression != null)
             {
-                var customResolver = ToType(Property(ArrayIndex(Property(typeMapExpression, "PropertyMaps"), Constant(index)), "CustomExpressionFunc"), propertyMap.CustomExpression.Type);
+                var customResolver = ToType(Property(propertyMapExpression, "CustomExpressionFunc"), propertyMap.CustomExpression.Type);
                 valueResolverFunc = Invoke(customResolver, srcParam);
             }
             else if (propertyMap.SourceMembers.Any()
@@ -546,10 +547,7 @@
                 {
                     valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
                         valueResolverFunc,
-                        ToType(Call(
-                            typeof (ObjectCreator).GetMethod("CreateNonNullValue"),
-                            Constant(toCreate)
-                            ), propertyMap.SourceType));
+                        ToType(DelegateFactory.GenerateConstructorExpression(toCreate), propertyMap.SourceType));
                 }
             }
 
