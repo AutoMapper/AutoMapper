@@ -224,6 +224,12 @@ namespace AutoMapper
             return setMethod == null || setMethod.IsPrivate || setMethod.IsFamily;
         }
 
+        public static bool HasAnInaccessibleGetter(this PropertyInfo property)
+        {
+            var getMethod = property.GetGetMethod(true);
+            return getMethod == null || getMethod.IsPrivate || getMethod.IsFamily;
+        }
+
         public static bool IsPublic(this MemberInfo memberInfo)
         {
             return (memberInfo as FieldInfo)?.IsPublic ?? (memberInfo as PropertyInfo).IsPublic();

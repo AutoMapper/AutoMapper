@@ -454,12 +454,23 @@ namespace AutoMapper
             return base.VisitParameter(node);
         }
 
-        protected override Expression VisitMember(MemberExpression node)
+        protected override Expression VisitBinary(BinaryExpression node)
         {
-            if (node.Member is PropertyInfo && (node.Member as PropertyInfo).HasAnInaccessibleSetter())
+            var left = node.Left as MemberExpression;
+            if (left != null && left.Member is PropertyInfo && (left.Member as PropertyInfo).HasAnInaccessibleSetter())
                 CanCompile = false;
-            return base.VisitMember(node);
+            var right = node.Right as MemberExpression;
+            if (right != null && right.Member is PropertyInfo && (right.Member as PropertyInfo).HasAnInaccessibleGetter())
+                CanCompile = false;
+            return base.VisitBinary(node);
         }
+
+        //protected override Expression VisitMember(MemberExpression node)
+        //{
+        //    if (node.Member is PropertyInfo && (node.Member as PropertyInfo).HasAnInaccessibleSetter())
+        //        CanCompile = false;
+        //    return base.VisitMember(node);
+        //}
     }
 }
 
