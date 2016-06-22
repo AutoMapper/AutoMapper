@@ -257,6 +257,7 @@
             ParameterExpression ctxtParam)
         {
             var pmExpression = CreatePropertyMapFunc(pm, configurationProvider, registry, srcParam, destParam, ctxtParam);
+            return pmExpression;
 
             if (pmExpression == null)
                 return null;

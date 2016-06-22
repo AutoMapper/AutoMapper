@@ -1,5 +1,7 @@
 using System;
+using System.Linq.Expressions;
 using AutoMapper;
+using AutoMapper.Mappers;
 
 namespace Benchmark.Flattening
 {
@@ -369,6 +371,8 @@ namespace Benchmark.Flattening
     {
         private ModelObject _source;
         private IMapper _mapper;
+        private Func<ModelObject, ModelDto, ResolutionContext, ModelDto> _func;
+        private ResolutionContext _resolutionContext;
 
         public string Name
         {
@@ -390,6 +394,7 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Model9, Dto9>();
                 cfg.CreateMap<Model10, Dto10>();
                 cfg.CreateMap<ModelObject, ModelDto>();
+                cfg.AllowNullDestinationValues = false;
             });
             config.AssertConfigurationIsValid();
             _source = new ModelObject
@@ -413,10 +418,12 @@ namespace Benchmark.Flattening
                 },
             };
             _mapper = config.CreateMapper();
+            _func = (_mapper as Mapper).Func<ModelObject, ModelDto>(_source, out _resolutionContext);
         }
 
         public object Map()
         {
+            return _func(_source, null, _resolutionContext);
             return _mapper.Map<ModelObject, ModelDto>(_source);
         }
     }
@@ -456,14 +463,16 @@ namespace Benchmark.Flattening
 
         public object Map()
         {
-            return new ModelDto
-            {
-                BaseDate = _source.BaseDate,
-                Sub2ProperName = _source.Sub2.ProperName,
-                SubProperName = _source.Sub.ProperName,
-                SubSubSubIAmACoolProperty = _source.Sub.SubSub.IAmACoolProperty,
-                SubWithExtraNameProperName = _source.SubWithExtraName.ProperName
-            };
+            ModelDto dest = null;
+            dest = dest ?? new ModelDto();
+            dest.BaseDate = _source?.BaseDate ?? default(DateTime);
+            dest.Sub2ProperName = _source?.Sub2?.ProperName ?? (string) ObjectCreator.CreateNonNullValue(typeof(string));
+            dest.SubProperName = _source?.Sub?.ProperName ?? (string) ObjectCreator.CreateNonNullValue(typeof(string));
+            dest.SubSubSubIAmACoolProperty = _source?.Sub?.SubSub?.IAmACoolProperty ??
+                                             (string) ObjectCreator.CreateNonNullValue(typeof(string));
+            dest.SubWithExtraNameProperName = _source?.SubWithExtraName?.ProperName ??
+                                              (string) ObjectCreator.CreateNonNullValue(typeof(string));
+            return dest;
         }
     }
 

@@ -221,6 +221,18 @@ namespace AutoMapper
 
             return func(source, destination, context);
         }
+        public Func<TSource, TDestination, ResolutionContext, TDestination> Func<TSource, TDestination>(TSource source, out ResolutionContext context)
+        {
+            var types = TypePair.Create(source, null, typeof(TSource), typeof(TDestination));
+
+            var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
+
+            var destination = default(TDestination);
+
+            context = new ResolutionContext(_defaultMappingOptions, this);
+
+            return func;
+        }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
