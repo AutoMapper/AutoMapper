@@ -19,7 +19,8 @@ namespace AutoMapper.Mappers
            Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression, Type ifInterfaceType, MapItem mapItem)
         {
             var newExpr = destExpression.NewIfConditionFails(conditionalExpression, ifInterfaceType);
-            var itemExpr = mapItem(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, destExpression.Type);
+            var itemParam = Parameter(TypeHelper.GetElementType(sourceExpression.Type), "item");
+            var itemExpr = mapItem(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, destExpression.Type, itemParam, contextExpression);
 
             var blockExprs = new List<Expression>();
             var blockParams = new List<ParameterExpression>();
@@ -62,15 +63,15 @@ namespace AutoMapper.Mappers
                 dest = destParam;
             }
 
-            var cast = typeof(Enumerable).GetTypeInfo().DeclaredMethods.First(_ => _.Name == "Cast").MakeGenericMethod(itemExpr.Parameters[0].Type);
+            var cast = typeof(Enumerable).GetTypeInfo().DeclaredMethods.First(_ => _.Name == "Cast").MakeGenericMethod(itemParam.Type);
 
             var addMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetMethod("Add");
             if (!sourceExpression.Type.GetTypeInfo().IsGenericType)
                 sourceExpression = Call(null, cast, sourceExpression);
-            blockExprs.Add(ForEach(sourceExpression, itemExpr.Parameters[0], Call(
+            blockExprs.Add(ForEach(sourceExpression, itemParam, Call(
                 dest,
                 addMethod,
-                itemExpr.ReplaceParameters(itemExpr.Parameters[0], contextExpression))));
+                itemExpr)));
 
             blockExprs.Add(dest);
 
@@ -104,28 +105,26 @@ namespace AutoMapper.Mappers
             var newExpr = baseType.IsInterface()
                 ? New(ifInterfaceType.MakeGenericType(TypeHelper.GetElementTypes(baseType, ElemntTypeFlags.BreakKeyValuePair)))
                 : DelegateFactory.GenerateConstructorExpression(baseType);
-            return ExpressionExtensions.ToType(newExpr, baseType);
+            return ToType(newExpr, baseType);
         }
 
-        public delegate LambdaExpression MapItem(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Type sourceType, Type destType);
+        public delegate Expression MapItem(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
+            PropertyMap propertyMap, Type sourceType, Type destType, ParameterExpression itemParam, Expression contextParam);
 
-        internal static LambdaExpression MapItemExpr(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Type sourceType, Type destType)
+        internal static Expression MapItemExpr(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
+            PropertyMap propertyMap, Type sourceType, Type destType, ParameterExpression itemParam, Expression contextParam)
         {
             var sourceElementType = TypeHelper.GetElementType(sourceType);
             var destElementType = TypeHelper.GetElementType(destType);
 
             var typePair = new TypePair(sourceElementType, destElementType);
 
-            var itemParam = Parameter(sourceElementType, "item");
-            var itemContextParam = Parameter(typeof(ResolutionContext), "itemContext");
-            var itemExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam, itemContextParam, typePair);
-            return Lambda(itemExpr, itemParam, itemContextParam);
+            var itemExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam, contextParam, typePair);
+            return itemExpr;
         }
 
-        internal static LambdaExpression MapKeyPairValueExpr(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Type sourceType, Type destType)
+        internal static Expression MapKeyPairValueExpr(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
+            PropertyMap propertyMap, Type sourceType, Type destType, ParameterExpression itemParam, Expression contextParam)
         {
             var sourceElementTypes = TypeHelper.GetElementTypes(sourceType, ElemntTypeFlags.BreakKeyValuePair);
             var destElementTypes = TypeHelper.GetElementTypes(destType, ElemntTypeFlags.BreakKeyValuePair);
@@ -135,17 +134,15 @@ namespace AutoMapper.Mappers
 
             var sourceElementType = TypeHelper.GetElementType(sourceType);
             var destElementType = TypeHelper.GetElementType(destType);
-            var itemParam = Parameter(sourceElementType, "item");
-            var itemContextParam = Parameter(typeof(ResolutionContext), "itemContext");
 
-            var keyExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, Property(itemParam, "Key"), itemContextParam, typePairKey);
-            var valueExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, Property(itemParam, "Value"), itemContextParam, typePairValue);
+            var keyExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, Property(itemParam, "Key"), contextParam, typePairKey);
+            var valueExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, Property(itemParam, "Value"), contextParam, typePairValue);
             var keyPair = New(destElementType.GetConstructors().First(), keyExpr, valueExpr);
-            return Lambda(keyPair, itemParam, itemContextParam);
+            return keyPair;
         }
 
         private static Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Expression itemParam, Expression itemContextParam, TypePair typePair)
+            PropertyMap propertyMap, Expression itemParam, Expression contextParam, TypePair typePair)
         {
             Expression itemExpr;
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
@@ -153,15 +150,15 @@ namespace AutoMapper.Mappers
             {
                 if (!typeMap.Sealed)
                     typeMap.Seal(typeMapRegistry, configurationProvider);
-                return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), itemContextParam);
+                return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), contextParam);
             }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
             if (match != null)
             {
                 itemExpr =
-                    ExpressionExtensions.ToType(
+                    ToType(
                         match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam,
-                            Default(typePair.DestinationType), itemContextParam), typePair.DestinationType);
+                            Default(typePair.DestinationType), contextParam), typePair.DestinationType);
             }
             else
             {
@@ -169,7 +166,7 @@ namespace AutoMapper.Mappers
                     typeof (ResolutionContext).GetDeclaredMethods()
                         .First(m => m.Name == "Map")
                         .MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
-                itemExpr = Call(itemContextParam, mapMethod, itemParam, Default(typePair.DestinationType));
+                itemExpr = Call(contextParam, mapMethod, itemParam, Default(typePair.DestinationType));
             }
             return itemExpr;
         }

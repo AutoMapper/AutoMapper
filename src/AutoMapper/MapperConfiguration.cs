@@ -308,6 +308,7 @@ namespace AutoMapper
                 var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
 
                 var destination = requestedDestinationType.IsValueType() ? Coalesce(destinationParameter, New(requestedDestinationType)) : (Expression)destinationParameter;
+                // Invoking a delegate here
                 return Lambda<UntypedMapperFunc>(
                             ToType(
                                 Invoke(typedExpression, ToType(sourceParameter, requestedSourceType), ToType(destination, requestedDestinationType), contextParameter)
