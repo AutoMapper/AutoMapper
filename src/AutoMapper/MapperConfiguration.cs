@@ -375,10 +375,14 @@ namespace AutoMapper
             {
                 var exception = Parameter(typeof(Exception), "ex");
 
+                var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(source.Type, destination.Type).GetTypeInfo();
+                var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
+                var typeMap = Property(Property(typeMapExpression, "BaseTypeMap"), "Types");
+
                 var ctor = ((NewExpression)ResolutionContextCtor.Body).Constructor;
                 return Lambda(Expression.TryCatch(mapExpression.Body,
                     MakeCatchBlock(typeof(Exception), exception, Block(
-                        Throw(New(ctor, Constant("Error mapping types."), exception, Constant(types))),
+                        Throw(New(ctor, Constant("Error mapping types."), exception, typeMap.IfNotNull())),
                         Default(destination.Type)), null)),
                     source, destination, context);
             }
@@ -402,16 +406,16 @@ namespace AutoMapper
         public static Delegate MakeDelegate(this LambdaExpression lamdaExpression)
         {
 #if NET45
-            var typeBuilder = _moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
-                TypeAttributes.Public);
-            var methodName = Guid.NewGuid().ToString("N");
-            var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
-            
-            lamdaExpression.CompileToMethod(methodBuilder);
+                var typeBuilder = _moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
+                    TypeAttributes.Public);
+                var methodName = Guid.NewGuid().ToString("N");
+                var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
 
-            var resultingType = typeBuilder.CreateType();
+                lamdaExpression.CompileToMethod(methodBuilder);
 
-            return Delegate.CreateDelegate(lamdaExpression.Type,resultingType.GetMethod(methodName));
+                var resultingType = typeBuilder.CreateType();
+
+                return Delegate.CreateDelegate(lamdaExpression.Type,resultingType.GetMethod(methodName));
 #else
             return lamdaExpression.Compile();
 #endif

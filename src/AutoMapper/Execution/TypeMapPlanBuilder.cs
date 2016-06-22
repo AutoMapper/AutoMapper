@@ -12,6 +12,9 @@
 
     public static class TypeMapPlanBuilder
     {
+        private static readonly Expression<Func<ResolutionContext, TypePair, int, bool>> _passesDepthCheckExpression =
+            (ctxt, types, maxDepth) => PassesDepthCheck(ctxt, types, maxDepth);
+
         public static LambdaExpression BuildMapperFunc(TypeMap typeMap, IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry)
         {
             if (typeMap.SourceType.IsGenericTypeDefinition() || typeMap.DestinationType.IsGenericTypeDefinition())
@@ -68,7 +71,7 @@
             if (typeMap.CustomProjection != null)
             {
                 var customProjection = Property(mapper, "CustomProjection");
-                return Lambda(Invoke(customProjection, srcParam, destParam, ctxtParam), srcParam, destParam, ctxtParam);
+                return Lambda(Invoke(customProjection, srcParam), srcParam, destParam, ctxtParam);
             }
 
             ParameterExpression contextToReuse = null;
@@ -159,6 +162,11 @@
                     Invoke(ArrayIndex(Property(typeMapExpression, "AfterMapActions"), Constant(i)), srcParam, destParam,
                         ctxtParam));
 
+            if (typeMap.MaxDepth > 0)
+            {
+                actions.Add(Call(ctxtParam, ((MethodCallExpression)DecTypeDepthInfo.Body).Method, Constant(typeMap.Types)));
+            }
+
             actions.Add(destParam);
 
             return Block(actions);
@@ -185,11 +193,7 @@
 
             if (typeMap.MaxDepth > 0)
             {
-                mapperFunc = Condition(
-                    LessThanOrEqual(
-                        Call(ctxtParam, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
-                        Constant(typeMap.MaxDepth)
-                    ),
+                mapperFunc = Condition(Invoke(_passesDepthCheckExpression, ctxtParam, Constant(typeMap.Types), Constant(typeMap.MaxDepth)),
                     mapperFunc,
                     Default(typeMap.DestinationType));
                 //mapperFunc = (source, context, destFunc) => context.GetTypeDepth(types) <= maxDepth ? inner(source, context, destFunc) : default(TDestination);
@@ -296,6 +300,8 @@
             ParameterExpression destParam,
             ParameterExpression ctxtParam, int index)
         {
+            var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destParam.Type).GetTypeInfo();
+            var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
             var destMember = MakeMemberAccess(destParam, propertyMap.DestinationProperty.MemberInfo);
 
             Expression getter;
@@ -314,7 +320,7 @@
                 ? getter
                 : Default(propertyMap.DestinationPropertyType);
 
-            var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, getter, ctxtParam, index);
+            var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, destParam, getter, ctxtParam, index);
 
             if (propertyMap.SourceType != null && propertyMap.DestinationPropertyType != null)
             {
@@ -346,7 +352,7 @@
 
             if (propertyMap.Condition != null)
             {
-                var condition = ToType(Property(ArrayIndex(Call(Property(ctxtParam, "TypeMap"), typeof(TypeMap).GetMethod("GetValidPropertyMaps")), Constant(index)), "ConditionFunc"), typeof(Func<,,,,,>)
+                var condition = ToType(Property(ArrayIndex(Property(typeMapExpression, "PropertyMaps"), Constant(index)), "ConditionFunc"), typeof(Func<,,,,,>)
                     .MakeGenericType(srcParam.Type, destParam.Type, propertyMap.Condition.Parameters[2].Type, propertyMap.Condition.Parameters[2].Type, typeof(ResolutionContext), typeof(bool)));
                 valueResolverExpr =
                     Condition(
@@ -387,7 +393,7 @@
 
             if (propertyMap.PreCondition != null)
             {
-                var pm = ToType(Property(ArrayIndex(Call(Property(ctxtParam, "TypeMap"), typeof(TypeMap).GetMethod("GetValidPropertyMaps")), Constant(index)), "PreConditionFunc"), typeof(Func<,,>).MakeGenericType(srcParam.Type, typeof(ResolutionContext), typeof(bool)));
+                var pm = ToType(Property(ArrayIndex(Property(typeMapExpression, "PropertyMaps"), Constant(index)), "PreConditionFunc"), typeof(Func<,,>).MakeGenericType(srcParam.Type, typeof(ResolutionContext), typeof(bool)));
                 mapperExpr = IfThen(
                     Invoke(pm, srcParam, ctxtParam),
                     mapperExpr
@@ -416,9 +422,12 @@
 
         private static Expression BuildValueResolverFunc(PropertyMap propertyMap, TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
+            ParameterExpression destParam,
             Expression destValueExpr,
             ParameterExpression ctxtParam, int index)
         {
+            var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destParam.Type).GetTypeInfo();
+            var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
 
             Expression valueResolverFunc;
             var valueResolverConfig = propertyMap.ValueResolverConfig;
@@ -473,8 +482,8 @@
             }
             else if (propertyMap.CustomResolver != null)
             {
-                var customResolver = ToType(Property(ArrayIndex(Call(Property(ctxtParam, "TypeMap"), typeof(TypeMap).GetMethod("GetValidPropertyMaps")), Constant(index)), "CustomResolverFunc"), propertyMap.CustomResolver.Type);
-                valueResolverFunc = Invoke(customResolver, srcParam, ctxtParam);//, propertyMap.DestinationPropertyType);
+                var customResolver = ToType(Property(ArrayIndex(Property(typeMapExpression, "PropertyMaps"), Constant(index)), "CustomResolverFunc"), propertyMap.CustomResolver.Type);
+                valueResolverFunc = Invoke(customResolver, srcParam, destValueExpr, ctxtParam);
             }
             else if (propertyMap.CustomExpression != null)
             {
@@ -542,6 +551,35 @@
             }
 
             return valueResolverFunc;
+        }
+
+        private static bool PassesDepthCheck(ResolutionContext context, TypePair types, int maxDepth)
+        {
+            //if (context.InstanceCache.ContainsKey(context))
+            //{
+            //    // return true if we already mapped this value and it's in the cache
+            //    return true;
+            //}
+
+            return context.GetTypeDepth(types) <= maxDepth;
+
+            //TODO: Do this a better way besides this junk
+            //var contextCopy = context;
+
+            //var currentDepth = 1;
+
+            //// walk parents to determine current depth
+            //while (contextCopy.Parent != null)
+            //{
+            //    if (contextCopy.SourceType == context.SourceType &&
+            //        contextCopy.DestinationType == context.DestinationType)
+            //    {
+            //        // same source and destination types appear higher up in the hierarchy
+            //        currentDepth++;
+            //    }
+            //    contextCopy = contextCopy.Parent;
+            //}
+            //return currentDepth <= maxDepth;
         }
     }
 }
