@@ -85,6 +85,7 @@ namespace AutoMapper
         public static LambdaExpression Concat(this LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
         public static Expression IfNotNull(this Expression expression) => IfNullVisitor.Visit(expression);
+        public static Expression RemoveIfNotNull(this Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
 
         public static Expression IfNullElse(this Expression expression, params Expression[] ifElse)
         {
@@ -102,6 +103,25 @@ namespace AutoMapper
                     return base.VisitMember(node);
                 AllreadyUpdated.Add(node);
                 return Visit(DelegateFactory.IfNotNullExpression(node));
+            }
+        }
+        internal class RemoveIfNotNullVisitor : ExpressionVisitor
+        {
+            private readonly Expression[] _expressions;
+            private readonly IList<Expression> AllreadyUpdated = new List<Expression>();
+
+            public RemoveIfNotNullVisitor(params Expression[] expressions)
+            {
+                _expressions = expressions;
+            }
+
+            protected override Expression VisitConditional(ConditionalExpression node)
+            {
+                var member = node.IfFalse as MemberExpression;
+                var binary = node.Test as BinaryExpression;
+                if(member == null || binary == null || !_expressions.Contains(binary.Left) || !(binary.Right is DefaultExpression))
+                    return base.VisitConditional(node);
+                return node.IfFalse;
             }
         }
 

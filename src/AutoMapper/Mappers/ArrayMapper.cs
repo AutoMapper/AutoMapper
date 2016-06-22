@@ -18,8 +18,13 @@ namespace AutoMapper.Mappers
         {
             var itemContext = new ResolutionContext(context);
 
-            return source.Select(item => newItemFunc(item, itemContext))
-                .ToArray();
+            var count = source.Count();
+            var array = new TDestination[count];
+
+            int i = 0;
+            foreach (var item in source)
+                array[i++] = newItemFunc(item, itemContext);
+            return array;
         }
 
         public bool IsMatch(TypePair context)

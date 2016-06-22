@@ -225,7 +225,7 @@
             {
                 mapperFunc =
                     Condition(Equal(srcParam, Default(typeMap.SourceType)),
-                        Default(typeMap.DestinationType), mapperFunc);
+                        Default(typeMap.DestinationType), mapperFunc.RemoveIfNotNull(srcParam));
                 //mapperFunc = (source, context, destFunc) => source == default(TSource) ? default(TDestination) : inner(source, context, destFunc);
             }
 
