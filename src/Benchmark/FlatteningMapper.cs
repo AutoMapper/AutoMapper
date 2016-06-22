@@ -1,6 +1,7 @@
 using System;
 using AutoMapper;
 
+
 namespace Benchmark.Flattening
 {
     using System.Collections.Generic;
@@ -8,18 +9,16 @@ namespace Benchmark.Flattening
 
     public class DeepTypeMapper : IObjectToObjectMapper
     {
-        private IMapper _mapper;
         private Customer _customer;
         public string Name { get; } = "Deep Types";
         public void Initialize()
         {
-            var config = new MapperConfiguration(cfg =>
+            Mapper.Initialize(cfg =>
             {
                 cfg.CreateMap<Address, Address>();
                 cfg.CreateMap<Address, AddressDTO>();
                 cfg.CreateMap<Customer, CustomerDTO>();
             });
-            _mapper = new Mapper(config);
             _customer = new Customer()
             {
                 Address = new Address() { City = "istanbul", Country = "turkey", Id = 1, Street = "istiklal cad." },
@@ -42,7 +41,7 @@ namespace Benchmark.Flattening
 
         public object Map()
         {
-            return _mapper.Map<Customer, CustomerDTO>(_customer);
+            return Mapper.Map<Customer, CustomerDTO>(_customer);
         }
 
         public class Address
@@ -178,14 +177,12 @@ namespace Benchmark.Flattening
 
     public class ComplexTypeMapper : IObjectToObjectMapper
     {
-        private IMapper _mapper;
         private Foo _foo;
         public string Name { get; } = "Complex Types";
 
         public void Initialize()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Foo, Foo>());
-            _mapper = new Mapper(config);
+            Mapper.Initialize(cfg => cfg.CreateMap<Foo, Foo>());
             _foo = new Foo
             {
                 Name = "foo",
@@ -214,7 +211,7 @@ namespace Benchmark.Flattening
 
         public object Map()
         {
-            return _mapper.Map<Foo, Foo>(_foo);
+            return Mapper.Map<Foo, Foo>(_foo);
         }
 
         public class Foo
@@ -248,7 +245,6 @@ namespace Benchmark.Flattening
 
     public class ManualComplexTypeMapper : IObjectToObjectMapper
     {
-        private IMapper _mapper;
         private Foo _foo;
         public string Name { get; } = "Manual Complex Types";
 
@@ -331,20 +327,18 @@ namespace Benchmark.Flattening
     public class CtorMapper : IObjectToObjectMapper
     {
         private Model11 _model;
-        private IMapper _mapper;
 
         public string Name => "CtorMapper";
 
         public void Initialize()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Model11, Dto11>());
-            _mapper = config.CreateMapper();
+            Mapper.Initialize(cfg => cfg.CreateMap<Model11, Dto11>());
             _model = new Model11 { Value = 5 };
         }
 
         public object Map()
         {
-            return _mapper.Map<Model11, Dto11>(_model);
+            return Mapper.Map<Model11, Dto11>(_model);
         }
     }
 
@@ -368,7 +362,6 @@ namespace Benchmark.Flattening
     public class FlatteningMapper : IObjectToObjectMapper
     {
         private ModelObject _source;
-        private IMapper _mapper;
 
         public string Name
         {
@@ -377,7 +370,7 @@ namespace Benchmark.Flattening
 
         public void Initialize()
         {
-            var config = new MapperConfiguration(cfg =>
+            Mapper.Initialize(cfg =>
             {
                 cfg.CreateMap<Model1, Dto1>();
                 cfg.CreateMap<Model2, Dto2>();
@@ -391,7 +384,6 @@ namespace Benchmark.Flattening
                 cfg.CreateMap<Model10, Dto10>();
                 cfg.CreateMap<ModelObject, ModelDto>();
             });
-            config.AssertConfigurationIsValid();
             _source = new ModelObject
             {
                 BaseDate = new DateTime(2007, 4, 5),
@@ -412,12 +404,11 @@ namespace Benchmark.Flattening
                     ProperName = "Some other name"
                 },
             };
-            _mapper = config.CreateMapper();
         }
 
         public object Map()
         {
-            return _mapper.Map<ModelObject, ModelDto>(_source);
+            return Mapper.Map<ModelObject, ModelDto>(_source);
         }
     }
 
@@ -464,130 +455,6 @@ namespace Benchmark.Flattening
                 SubSubSubIAmACoolProperty = _source.Sub.SubSub.IAmACoolProperty,
                 SubWithExtraNameProperName = _source.SubWithExtraName.ProperName
             };
-        }
-    }
-
-    public class EquilvalentManualMapper : IObjectToObjectMapper
-    {
-        private object _source;
-        private PropertyMap _propertyMap = null;
-        private ResolutionContext _context;
-
-        public string Name
-        {
-            get { return "Manual"; }
-        }
-
-        public void Initialize()
-        {
-            _source = new ModelObject
-            {
-                BaseDate = new DateTime(2007, 4, 5),
-                Sub = new ModelSubObject
-                {
-                    ProperName = "Some name",
-                    SubSub = new ModelSubSubObject
-                    {
-                        IAmACoolProperty = "Cool daddy-o"
-                    }
-                },
-                Sub2 = new ModelSubObject
-                {
-                    ProperName = "Sub 2 name"
-                },
-                SubWithExtraName = new ModelSubObject
-                {
-                    ProperName = "Some other name"
-                },
-            };
-            _context = new ResolutionContext(new MappingOperationOptions(null), new Mapper(new MapperConfiguration(_ => { })));
-        }
-
-        public object Map()
-        {
-            if (_source == null)
-            {
-                return null;
-            }
-            else
-            {
-                ModelDto mapObj;
-                ModelObject mapFrom;
-                mapFrom = (ModelObject)_source;
-                mapObj = new ModelDto();
-
-                BeforeMap(mapObj);
-
-                try
-                {
-                    mapObj.BaseDate = mapFrom == null ? default(DateTime) : mapFrom.BaseDate;
-                }
-                catch (Exception e)
-                {
-                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
-                }
-
-                try
-                {
-                    mapObj.Sub2ProperName = mapFrom == null ? default(string) : mapFrom.Sub2 == null ? default(string) : mapFrom.Sub2.ProperName;
-                }
-                catch (Exception e)
-                {
-                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
-                }
-
-                try
-                {
-                    mapObj.SubProperName = mapFrom == null ? default(string) : mapFrom.Sub == null ? default(string) : mapFrom.Sub.ProperName;
-                }
-                catch (AutoMapperMappingException e)
-                {
-                    e.PropertyMap = _propertyMap;
-                    throw;
-                }
-                catch (Exception e)
-                {
-                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
-                }
-
-                try
-                {
-                    mapObj.SubSubSubIAmACoolProperty = mapFrom == null ? default(string)
-                        : mapFrom.Sub == null ? default(string)
-                        : mapFrom.Sub.SubSub == null ? default(string)
-                        : mapFrom.Sub.SubSub.IAmACoolProperty;
-                }
-                catch (Exception e)
-                {
-                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
-                }
-
-                try
-                {
-                    mapObj.SubWithExtraNameProperName = mapFrom == null ? default(string)
-                        : mapFrom.SubWithExtraName == null ? default(string)
-                        : mapFrom.SubWithExtraName.ProperName;
-                }
-                catch (Exception e)
-                {
-                    throw new AutoMapperMappingException("Error mapping types", e, _propertyMap.TypeMap.Types, _propertyMap.TypeMap, _propertyMap);
-                }
-
-                AfterMap(mapObj);
-
-                return mapObj;
-            }
-
-
-        }
-
-        public void BeforeMap(object obj)
-        {
-
-        }
-        public void AfterMap(object obj)
-        {
-
         }
     }
 
