@@ -247,7 +247,7 @@
                     );
 
             if (typeMap.ConstructorMap?.CanResolve == true)
-                return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, ctxtParam);
+                return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, typeMap.DestinationType, ctxtParam);
 
             if (typeMap.DestinationType.IsInterface())
             {

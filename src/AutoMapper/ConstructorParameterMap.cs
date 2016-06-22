@@ -25,6 +25,7 @@ namespace AutoMapper
         public IMemberGetter[] SourceMembers { get; }
 
         public bool CanResolve { get; set; }
+        public Delegate CustomExpressionFunc => CustomExpression.Compile();
         public LambdaExpression CustomExpression { get; set; }
         public Func<object, ResolutionContext, object> CustomValueResolver { get; set; }
 
@@ -32,16 +33,19 @@ namespace AutoMapper
         public Type DestinationType => Parameter.ParameterType;
 
         public Expression CreateExpression(TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression srcParam, Type destType,
+            ParameterExpression ctxtParam, int index)
         {
+            var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destType).GetTypeInfo();
+            var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
+            var ctorParam = ArrayIndex(Property(Property(Property(typeMapExpression, "BaseTypeMap"), "ConstructorMap"), "CtorParams"), Constant(index));
             if (CustomExpression != null)
-                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull();
+                return Invoke(ToType(Property(ctorParam, "CustomExpressionFunc"), CustomExpression.Type), srcParam);
 
             if (CustomValueResolver != null)
             {
                 // Invoking a delegate
-                return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
+                return Invoke(Property(ctorParam, "CustomValueResolver"), srcParam, ctxtParam);
             }
 
             if (!SourceMembers.Any() && Parameter.IsOptional)
