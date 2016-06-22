@@ -235,8 +235,10 @@
             ParameterExpression srcParam,
             ParameterExpression ctxtParam)
         {
+            var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(typeMap.SourceType, typeMap.DestinationType).GetTypeInfo();
+            var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
             if (typeMap.DestinationCtor != null)
-                return typeMap.DestinationCtor.ReplaceParameters(srcParam, ctxtParam);
+                return Invoke(ToType(Property(Property(typeMapExpression, "BaseTypeMap"), "DestinationCtorFunc"), typeMap.DestinationCtor.Type), srcParam, ctxtParam);
 
             if (typeMap.ConstructDestinationUsingServiceLocator)
                 return Call(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
@@ -487,7 +489,8 @@
             }
             else if (propertyMap.CustomExpression != null)
             {
-                valueResolverFunc = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull();
+                var customResolver = ToType(Property(ArrayIndex(Property(typeMapExpression, "PropertyMaps"), Constant(index)), "CustomExpressionFunc"), propertyMap.CustomExpression.Type);
+                valueResolverFunc = Invoke(customResolver, srcParam);
             }
             else if (propertyMap.SourceMembers.Any()
                      && propertyMap.SourceType != null

@@ -14,10 +14,10 @@ namespace AutoMapper.Mappers
     
     public class FromDynamicMapper : IObjectMapper
     {
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, TDestination ifNull)
         {
             if (destination == null)
-                destination = ifNull();
+                destination = ifNull;
             foreach (var member in new TypeDetails(typeof(TDestination)).PublicWriteAccessors)
             {
                 object sourceMemberValue;
@@ -52,16 +52,16 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, destExpression, contextExpression, CollectionMapperExtensions.ConstructExpression(destExpression.Type));
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, destExpression, contextExpression, ExpressionExtensions.ToType(DelegateFactory.GenerateConstructorExpression(destExpression.Type), destExpression.Type));
         }
     }
 
     public class ToDynamicMapper : IObjectMapper
     {
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, TDestination ifNull)
         {
             if (destination == null)
-                destination = ifNull();
+                destination = ifNull;
             foreach (var member in new TypeDetails(typeof(TSource)).PublicWriteAccessors)
             {
                 object sourceMemberValue;
@@ -99,7 +99,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, destExpression, contextExpression, CollectionMapperExtensions.ConstructExpression(destExpression.Type));
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, destExpression, contextExpression, ExpressionExtensions.ToType(DelegateFactory.GenerateConstructorExpression(destExpression.Type), destExpression.Type));
         }
     }
 }

@@ -56,6 +56,7 @@ namespace AutoMapper
 
         public LambdaExpression CustomMapper { get; set; }
         public LambdaExpression CustomProjection { get; set; }
+        public Delegate DestinationCtorFunc => DestinationCtor?.Compile();
         public LambdaExpression DestinationCtor { get; set; }
 
         public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }

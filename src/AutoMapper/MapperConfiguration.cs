@@ -443,7 +443,7 @@ namespace AutoMapper
         
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (node.Type.GetTypeInfo().IsNotPublic)
+            if (!node.Type.GetTypeInfo().IsPublic && !node.Type.GetTypeInfo().IsNestedPublic)
                 CanCompile = false;
             return base.VisitParameter(node);
         }

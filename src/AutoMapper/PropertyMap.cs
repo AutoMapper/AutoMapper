@@ -41,6 +41,7 @@ namespace AutoMapper
         public LambdaExpression Condition { get; set; }
         public Delegate PreConditionFunc => PreCondition?.Compile();
         public LambdaExpression PreCondition { get; set; }
+        public Delegate CustomExpressionFunc => CustomExpression?.Compile();
         public LambdaExpression CustomExpression { get; private set; }
         public MemberInfo CustomSourceMember { get; set; }
         public bool UseDestinationValue { get; set; }
