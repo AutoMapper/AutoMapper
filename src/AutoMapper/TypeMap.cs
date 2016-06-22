@@ -42,7 +42,7 @@ namespace AutoMapper
 
         public LambdaExpression MapExpression { get; private set; }
 
-        public TypePair Types { get; }
+        public TypePair Types { get; internal set; }
 
         public ConstructorMap ConstructorMap { get; set; }
 
