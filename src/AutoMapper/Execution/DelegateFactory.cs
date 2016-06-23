@@ -19,7 +19,7 @@ namespace AutoMapper.Execution
 
         static DelegateFactory()
         {
-            _generateConstructor = GenerateConstructor;
+            _generateConstructor = CreateObjectExpression;
         }
 
         public Expression<LateBoundMethod<object, TValue>> CreateGet<TValue>(MethodInfo method)
@@ -115,36 +115,29 @@ namespace AutoMapper.Execution
             return lambda;
         }
 
-        public static Expression CreateCtor(Type type)
+        public static Expression CreateCtorExpression(Type type)
         {
             return _ctorCache.GetOrAdd(type, _generateConstructor);
         }
 
-        private static Expression GenerateConstructor(Type type)
-        {
-            var ctorExpr = GenerateConstructorExpression(type);
-
-            return Expression.Convert(ctorExpr, typeof (object));
-        }
-
-        public static Expression CreateObjectExpression(Type type)
+        private static Expression CreateObjectExpression(Type type)
         {
             return type.IsArray
-                ? CreateArray(type.GetElementType(), 0)
+                ? CreateArrayExpression(type.GetElementType(), 0)
                 : type == typeof(string)
                     ? Expression.Constant(string.Empty)
                     : type.IsInterface() && type.IsDictionaryType()
                         ? CreateDictionaryExpression(type)
-                        : CreateCtor(type);
+                        : GenerateConstructorExpression(type);
         }
 
-        public static Expression CreateArray(Type elementType, int length)
+        private static Expression CreateArrayExpression(Type elementType, int length)
         {
             return Expression.Call(null, typeof(Array).GetDeclaredMethods().First(_ => _.Name == "CreateInstance"),
                 Expression.Constant(elementType), Expression.Constant(length));
         }
 
-        public static Expression CreateDictionaryExpression(Type dictionaryType)
+        private static Expression CreateDictionaryExpression(Type dictionaryType)
         {
             Type keyType = dictionaryType.GetTypeInfo().GenericTypeArguments[0];
             Type valueType = dictionaryType.GetTypeInfo().GenericTypeArguments[1];
@@ -152,7 +145,7 @@ namespace AutoMapper.Execution
                 ? typeof(Dictionary<,>).MakeGenericType(keyType, valueType)
                 : dictionaryType;
             
-            return CreateCtor(type);
+            return CreateCtorExpression(type);
         }
 
         public static Expression GenerateConstructorExpression(Type type)
@@ -187,19 +180,18 @@ namespace AutoMapper.Execution
         private static Expression[] CreateParameterExpressions(MethodInfo method, Expression instanceParameter,
             Expression argumentsParameter)
         {
-            var expressions = new List<UnaryExpression>();
+            var expressions = new List<Expression>();
             var realMethodParameters = method.GetParameters();
             if (method.IsDefined(typeof (ExtensionAttribute), false))
             {
                 Type extendedType = method.GetParameters()[0].ParameterType;
-                expressions.Add(Expression.Convert(instanceParameter, extendedType));
+                expressions.Add(instanceParameter.ToType(extendedType));
                 realMethodParameters = realMethodParameters.Skip(1).ToArray();
             }
 
-            expressions.AddRange(realMethodParameters.Select((parameter, index) =>
-                Expression.Convert(
-                    Expression.ArrayIndex(argumentsParameter, Expression.Constant(index)),
-                    parameter.ParameterType)));
+            expressions.AddRange(
+                realMethodParameters.Select(
+                    (parameter, index) => argumentsParameter.Index(index).ToType(parameter.ParameterType)));
 
             return expressions.ToArray();
         }

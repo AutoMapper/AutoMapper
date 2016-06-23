@@ -30,7 +30,7 @@ namespace AutoMapper.Mappers
         public static IList CreateList(Type elementType)
         {
             Type destListType = typeof (List<>).MakeGenericType(elementType);
-            return (IList) CreateObject(destListType);
+            return (IList) CreateObject<object>(destListType);
         }
 
         public static object CreateDictionary(Type dictionaryType, Type keyType, Type valueType)
@@ -39,7 +39,7 @@ namespace AutoMapper.Mappers
                 ? typeof (Dictionary<,>).MakeGenericType(keyType, valueType)
                 : dictionaryType;
 
-            return CreateObject(type);
+            return CreateObject<object>(type);
         }
 
         private static object CreateDictionary(Type dictionaryType)
@@ -47,32 +47,32 @@ namespace AutoMapper.Mappers
             Type keyType = dictionaryType.GetTypeInfo().GenericTypeArguments[0];
             Type valueType = dictionaryType.GetTypeInfo().GenericTypeArguments[1];
             var type = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
-            return Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtor(type)).Compile()();
+            return Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtorExpression(type)).Compile()();
         }
 
         public static object CreateDefaultValue(Type type)
         {
-            return type.IsValueType() ? CreateObject(type) : null;
+            return type.IsValueType() ? CreateObject<object>(type) : null;
         }
 
         public static object CreateNonNullValue(Type type)
         {
             return type.IsValueType()
-                ? CreateObject(type)
+                ? CreateObject<object>(type)
                 : type == typeof (string)
                     ? string.Empty
-                    : CreateObject(type);
+                    : CreateObject<object>(type);
         }
 
-        public static object CreateObject(Type type)
+        public static TDest CreateObject<TDest>(Type type)
         {
-            return type.IsArray
+            return (TDest)(type.IsArray
                 ? CreateArray(type.GetElementType(), 0)
                 : type == typeof (string)
                     ? null
                     : type.IsInterface() && type.IsDictionaryType()
                         ? CreateDictionary(type) 
-                        : Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtor(type)).Compile()();
+                        : Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtorExpression(type)).Compile()());
         }
     }
 

@@ -127,7 +127,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof(Source);
 
-			LateBoundCtor ctor = Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtor(sourceType)).Compile();
+			LateBoundCtor ctor = Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtorExpression(sourceType)).Compile();
 
 			var target = ctor();
 
@@ -139,7 +139,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof(ValueSource);
 
-			LateBoundCtor ctor = Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtor(sourceType)).Compile();
+			LateBoundCtor ctor = Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtorExpression(sourceType)).Compile();
 
 			var target = ctor();
 
@@ -150,7 +150,7 @@ namespace AutoMapper.UnitTests
         public void Create_ctor_should_throw_when_default_constructor_is_missing()
         {
             var type = typeof(NoDefaultConstructor);
-            new Action(()=>DelegateFactory.CreateCtor(type)).ShouldThrow<ArgumentException>(ex=>
+            new Action(()=>DelegateFactory.CreateCtorExpression(type)).ShouldThrow<ArgumentException>(ex=>
             {
                 ex.Message.ShouldStartWith(type.FullName);
             });

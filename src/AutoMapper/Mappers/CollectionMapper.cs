@@ -99,7 +99,7 @@ namespace AutoMapper.Mappers
         {
             var newExpr = baseType.IsInterface()
                 ? New(ifInterfaceType.MakeGenericType(TypeHelper.GetElementTypes(baseType, ElemntTypeFlags.BreakKeyValuePair)))
-                : DelegateFactory.CreateObjectExpression(baseType);
+                : DelegateFactory.CreateCtorExpression(baseType);
             return newExpr.ToType(baseType);
         }
 

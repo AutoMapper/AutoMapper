@@ -221,7 +221,7 @@
 
             if (typeMap.DestinationType.IsInterface())
             {
-                var ctor = Call(null, typeof(ObjectCreator).GetMethod("CreateObject", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationType)));
+                var ctor = Call(null, typeof(ObjectCreator).GetMethod("CreateObject", new[] { typeof(Type) } ).MakeGenericMethod(typeMap.DestinationType), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationType)));
                 // We're invoking a delegate here
                 return ctor;
             }
@@ -232,7 +232,7 @@
             if (typeMap.DestinationType.IsGenericTypeDefinition())
                 return Constant(null);
 
-            return DelegateFactory.CreateObjectExpression(typeMap.DestinationType);
+            return DelegateFactory.CreateCtorExpression(typeMap.DestinationType);
         }
 
         private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
@@ -488,7 +488,7 @@
                 {
                         valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
                             valueResolverFunc,
-                            DelegateFactory.CreateObjectExpression(toCreate).ToType(propertyMap.SourceType));
+                            DelegateFactory.CreateCtorExpression(toCreate).ToType(propertyMap.SourceType));
                 }
             }
 
