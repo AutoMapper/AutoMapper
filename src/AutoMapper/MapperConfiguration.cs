@@ -353,12 +353,13 @@ namespace AutoMapper
                 var context = Parameter(typeof(ResolutionContext), "context");
 
                 var ctor = ((NewExpression)ResolutionContextCtor.Body).Constructor;
+                var typeMapCtor = typeof(TypePair).GetConstructors().First();
 
                 LambdaExpression fullExpression;
                 if (mapperToUse == null)
                 {
                     var message = Constant("Missing type map configuration or unsupported mapping.");
-                    fullExpression = Lambda(Block(Throw(New(ctor, message, Constant(null), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
+                    fullExpression = Lambda(Block(Throw(New(ctor, message, Constant(null), Constant(mapRequest.RequestedTypes))), New(typeMapCtor, Constant(source.Type), Constant(destinationType))), source, destination, context);
                 }
                 else
                 {
