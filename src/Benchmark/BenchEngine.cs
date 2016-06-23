@@ -1,5 +1,5 @@
 using System;
-using Microsoft.VisualStudio.Profiler;
+using System.Diagnostics;
 
 namespace Benchmark
 {
@@ -14,26 +14,23 @@ namespace Benchmark
 			_mode = mode;
 		}
 
-
 		public void Start()
 		{
-			var timer = new HiPerfTimer();
+			var timer = Stopwatch.StartNew();
 
 			_mapper.Initialize();
 			_mapper.Map();
 
-            DataCollection.CommentMarkProfile(1, "Begin " +_mapper);
-            timer.Start();
+			timer.Start();
 
-            for(int i = 0; i < 1000000; i++)
+			for (int i = 0; i < 1000000; i++)
 			{
 				_mapper.Map();
 			}
 
 			timer.Stop();
-            DataCollection.CommentMarkProfile(1, "End " + _mapper);
 
-            Console.WriteLine("{0}: - {1} - Mapping time: \t{2}s", _mapper.Name, _mode, timer.Duration);
+			Console.WriteLine("{0}: - {1} - Mapping time: \t{2}s", _mapper.Name, _mode, timer.ElapsedMilliseconds/1000.0);
 		}
 	}
 }

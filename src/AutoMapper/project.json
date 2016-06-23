@@ -39,6 +39,9 @@
       }
     },
     "net45": {
+      "buildOptions": {
+        "define": [ "NETSTANDARD1_3", "NET45" ]
+      }
     } 
   }
 }

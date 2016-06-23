@@ -31,6 +31,7 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;NET45</DefineConstants>
+    <DefineConstants>TRACE;NETSTANDARD1_3;NET45</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\AutoMapper.XML</DocumentationFile>

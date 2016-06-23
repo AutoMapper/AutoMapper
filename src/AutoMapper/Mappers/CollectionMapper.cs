@@ -148,7 +148,7 @@ namespace AutoMapper.Mappers
                 return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), contextParam);
             }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-            if (match != null)
+            if (match != null && typeMap == null)
             {
                 itemExpr =
                         match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam,
