@@ -144,29 +144,4 @@ namespace AutoMapper
             }
         }
     }
-
-    public class PropertyMap<TSource, TDestination>
-    {
-        public static void SetTypeMap(TypeMap typeMap)
-        {
-            Mapper = new TypeMap<TSource, TDestination>(typeMap);
-        }
-        public static TypeMap<TSource, TDestination> Mapper { get; set; }
-
-        public PropertyMap BasePropertyMap { get; set; }
-
-        public PropertyMap(PropertyMap basePropertyMap)
-        {
-            BasePropertyMap = basePropertyMap;
-            //CustomResolver = basePropertyMap.CustomResolver?.Compile() as Func<TSource, TDestination, ResolutionContext, TDestination>;
-            Condition = basePropertyMap.Condition?.Compile() as Func<TSource, ResolutionContext, bool>;
-            PreCondition = basePropertyMap.PreCondition?.Compile() as Func<TSource, ResolutionContext, bool>;
-            //CustomExpression = basePropertyMap.CustomExpression?.Compile() as Func<TSource, TDestination, ResolutionContext, TDestination>;
-        }
-
-        public Delegate CustomResolver { get; set; }
-        public Func<TSource, ResolutionContext, bool> Condition { get; set; }
-        public Func<TSource, ResolutionContext, bool> PreCondition { get; set; }
-        public Delegate CustomExpression { get; set; }
-    }
 }

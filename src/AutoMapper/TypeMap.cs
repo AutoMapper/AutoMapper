@@ -56,7 +56,6 @@ namespace AutoMapper
 
         public LambdaExpression CustomMapper { get; set; }
         public LambdaExpression CustomProjection { get; set; }
-        public Delegate DestinationCtorFunc => DestinationCtor?.Compile();
         public LambdaExpression DestinationCtor { get; set; }
 
         public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }
@@ -358,6 +357,7 @@ namespace AutoMapper
             CustomMapper = baseTypeMap.CustomMapper?.Compile() as Func<TSource, TDestination, ResolutionContext, TDestination>;
             CustomProjection = baseTypeMap.CustomProjection?.Compile() as Func<TSource, TDestination>;
             PropertyMaps = baseTypeMap.GetValidPropertyMaps();
+            DestinationCtor = (Func<TSource, ResolutionContext, TDestination>)baseTypeMap.DestinationCtor?.Compile();
         }
         
         public Action<TSource, TDestination, ResolutionContext>[] BeforeMapActions { get; }
@@ -365,5 +365,6 @@ namespace AutoMapper
         public Func<TSource, TDestination, ResolutionContext, TDestination> CustomMapper { get; set; }
         public Func<TSource, TDestination> CustomProjection { get; set; }
         public PropertyMap[] PropertyMaps { get; set; }
+        public Func<TSource, ResolutionContext, TDestination> DestinationCtor { get; set; }
     }
 }

@@ -211,7 +211,7 @@
         {
             var typeMapExpression = GenericTypeMap(typeMap.SourceType, typeMap.DestinationType);
             if (typeMap.DestinationCtor != null)
-                return Invoke(typeMapExpression.Property("BaseTypeMap").Property("DestinationCtorFunc").ToType(typeMap.DestinationCtor.Type), srcParam, ctxtParam);
+                return Invoke(typeMapExpression.Property("DestinationCtor"), srcParam, ctxtParam);
 
             if (typeMap.ConstructDestinationUsingServiceLocator)
                 return ctxtParam.Property("Options").Call("CreateInstance", typeMap.DestinationType);
