@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace Benchmark
 {
@@ -15,7 +16,7 @@ namespace Benchmark
 
 		public void Start()
 		{
-			var timer = new HiPerfTimer();
+			var timer = Stopwatch.StartNew();
 
 			_mapper.Initialize();
 			_mapper.Map();
@@ -29,7 +30,7 @@ namespace Benchmark
 
 			timer.Stop();
 
-			Console.WriteLine("{0}: - {1} - Mapping time: \t{2}s", _mapper.Name, _mode, timer.Duration);
+			Console.WriteLine("{0}: - {1} - Mapping time: \t{2}s", _mapper.Name, _mode, timer.ElapsedMilliseconds/1000.0);
 		}
 	}
 }
