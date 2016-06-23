@@ -127,7 +127,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof(Source);
 
-			LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
+			LateBoundCtor ctor = Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtor(sourceType)).Compile();
 
 			var target = ctor();
 
@@ -139,7 +139,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof(ValueSource);
 
-			LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
+			LateBoundCtor ctor = Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtor(sourceType)).Compile();
 
 			var target = ctor();
 

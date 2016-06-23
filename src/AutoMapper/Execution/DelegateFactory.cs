@@ -1,3 +1,5 @@
+using AutoMapper.Configuration;
+
 namespace AutoMapper.Execution
 {
     using System;
@@ -10,12 +12,12 @@ namespace AutoMapper.Execution
 
     public class DelegateFactory
     {
-        private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
-            new ConcurrentDictionary<Type, LateBoundCtor>();
+        private static readonly ConcurrentDictionary<Type, Expression> _ctorCache =
+            new ConcurrentDictionary<Type, Expression>();
 
-        private readonly Func<Type, LateBoundCtor> _generateConstructor;
+        private static readonly Func<Type, Expression> _generateConstructor;
 
-        public DelegateFactory()
+        static DelegateFactory()
         {
             _generateConstructor = GenerateConstructor;
         }
@@ -113,17 +115,44 @@ namespace AutoMapper.Execution
             return lambda;
         }
 
-        public LateBoundCtor CreateCtor(Type type)
+        public static Expression CreateCtor(Type type)
         {
-            var ctor = _ctorCache.GetOrAdd(type, _generateConstructor);
-            return ctor;
+            return _ctorCache.GetOrAdd(type, _generateConstructor);
         }
 
-        private static LateBoundCtor GenerateConstructor(Type type)
+        private static Expression GenerateConstructor(Type type)
         {
             var ctorExpr = GenerateConstructorExpression(type);
 
-            return Expression.Lambda<LateBoundCtor>(Expression.Convert(ctorExpr, typeof (object))).Compile();
+            return Expression.Convert(ctorExpr, typeof (object));
+        }
+
+        public static Expression CreateObjectExpression(Type type)
+        {
+            return type.IsArray
+                ? CreateArray(type.GetElementType(), 0)
+                : type == typeof(string)
+                    ? Expression.Constant(string.Empty)
+                    : type.IsInterface() && type.IsDictionaryType()
+                        ? CreateDictionaryExpression(type)
+                        : CreateCtor(type);
+        }
+
+        public static Expression CreateArray(Type elementType, int length)
+        {
+            return Expression.Call(null, typeof(Array).GetDeclaredMethods().First(_ => _.Name == "CreateInstance"),
+                Expression.Constant(elementType), Expression.Constant(length));
+        }
+
+        public static Expression CreateDictionaryExpression(Type dictionaryType)
+        {
+            Type keyType = dictionaryType.GetTypeInfo().GenericTypeArguments[0];
+            Type valueType = dictionaryType.GetTypeInfo().GenericTypeArguments[1];
+            var type = dictionaryType.IsInterface()
+                ? typeof(Dictionary<,>).MakeGenericType(keyType, valueType)
+                : dictionaryType;
+            
+            return CreateCtor(type);
         }
 
         public static Expression GenerateConstructorExpression(Type type)

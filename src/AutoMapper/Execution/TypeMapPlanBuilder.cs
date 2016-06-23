@@ -251,9 +251,9 @@
 
             if (typeMap.DestinationType.IsInterface())
             {
-                var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationType)));
+                var ctor = Call(null, typeof(ObjectCreator).GetMethod("CreateObject", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationType)));
                 // We're invoking a delegate here
-                return Invoke(ctor);
+                return ctor;
             }
 
             if (typeMap.DestinationType.IsAbstract())
@@ -262,7 +262,7 @@
             if (typeMap.DestinationType.IsGenericTypeDefinition())
                 return Constant(null);
 
-            return DelegateFactory.GenerateConstructorExpression(typeMap.DestinationType);
+            return DelegateFactory.CreateObjectExpression(typeMap.DestinationType);
         }
 
         private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
@@ -545,21 +545,9 @@
                 var toCreate = propertyMap.SourceType ?? propertyMap.DestinationPropertyType;
                 if (!toCreate.GetTypeInfo().IsValueType)
                 {
-                    try
-                    {
                         valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
                             valueResolverFunc,
-                            ToType(DelegateFactory.GenerateConstructorExpression(toCreate), propertyMap.SourceType));
-                    }
-                    catch (Exception)
-                    {
-                        valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
-                        valueResolverFunc,
-                        ToType(Call(
-                            typeof(ObjectCreator).GetMethod("CreateNonNullValue"),
-                            Constant(toCreate)
-                            ), propertyMap.SourceType));
-                    }
+                            ToType(DelegateFactory.CreateObjectExpression(toCreate), propertyMap.SourceType));
                 }
             }
 

@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, ExpressionExtensions.ToType(DelegateFactory.GenerateConstructorExpression(destExpression.Type), destExpression.Type));
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, ExpressionExtensions.ToType(DelegateFactory.CreateObjectExpression(destExpression.Type), destExpression.Type));
         }
     }
 }

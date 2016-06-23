@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
     using System;
@@ -45,7 +47,7 @@ namespace AutoMapper.Mappers
             Type keyType = dictionaryType.GetTypeInfo().GenericTypeArguments[0];
             Type valueType = dictionaryType.GetTypeInfo().GenericTypeArguments[1];
             var type = typeof(Dictionary<,>).MakeGenericType(keyType, valueType);
-            return DelegateFactory.CreateCtor(type)();
+            return Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtor(type)).Compile()();
         }
 
         public static object CreateDefaultValue(Type type)
@@ -70,7 +72,7 @@ namespace AutoMapper.Mappers
                     ? null
                     : type.IsInterface() && type.IsDictionaryType()
                         ? CreateDictionary(type) 
-                        : DelegateFactory.CreateCtor(type)();
+                        : Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtor(type)).Compile()();
         }
     }
 

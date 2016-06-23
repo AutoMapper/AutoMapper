@@ -433,9 +433,16 @@ namespace AutoMapper
     {
         public bool CanCompile { get; private set; } = true;
 
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            if (node.Value is Type)
+                CanCompile = false;
+            return base.VisitConstant(node);
+        }
+
         protected override Expression VisitUnary(UnaryExpression node)
         {
-            if(!node.Type.GetTypeInfo().IsPublic)
+            if(!node.Type.GetTypeInfo().IsPublic && !node.Type.GetTypeInfo().IsNestedPublic)
                 CanCompile = false;
             return base.VisitUnary(node);
         }
@@ -464,13 +471,6 @@ namespace AutoMapper
                 CanCompile = false;
             return base.VisitBinary(node);
         }
-
-        //protected override Expression VisitMember(MemberExpression node)
-        //{
-        //    if (node.Member is PropertyInfo && (node.Member as PropertyInfo).HasAnInaccessibleSetter())
-        //        CanCompile = false;
-        //    return base.VisitMember(node);
-        //}
     }
 }
 
