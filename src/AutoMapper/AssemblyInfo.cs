@@ -2,7 +2,7 @@
 using System.Security;
 
 [assembly:CLSCompliant(true)]
-#if NETSTANDARD1_3
+#if NET45
 [assembly: AllowPartiallyTrustedCallers]
 [assembly: SecurityTransparent]
 [assembly: SecurityRules(SecurityRuleSet.Level2, SkipVerificationInFullTrust = true)]
