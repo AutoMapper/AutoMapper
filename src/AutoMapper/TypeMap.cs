@@ -234,7 +234,7 @@ namespace AutoMapper
             if (!SourceType.IsGenericTypeDefinition() && !DestinationType.IsGenericTypeDefinition())
             {
                 var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(SourceType, DestinationType).GetTypeInfo();
-                genericTypeMap.DeclaredMethods.First(p => p.Name == "SetTypeMap").Invoke(null, new object[] { this });
+                genericTypeMap.DeclaredMethods.First(p => p.Name == "SetTypeMap").Invoke(null, new object[] { this, configurationProvider });
             }
 
             _sealed = true;
@@ -339,13 +339,19 @@ namespace AutoMapper
         }
     }
 
-    public  class TypeMap<TSource, TDestination>
+    public class TypeMap<TSource, TDestination>
     {
-        public static void SetTypeMap(TypeMap typeMap)
+        private static readonly ConcurrentDictionary<IConfigurationProvider, TypeMap<TSource,TDestination>> Cache = new ConcurrentDictionary<IConfigurationProvider, TypeMap<TSource, TDestination>>();
+
+        public static void SetTypeMap(TypeMap typeMap, IConfigurationProvider configurationProvider)
         {
-            Mapper = new TypeMap<TSource, TDestination>(typeMap);
+            Cache.GetOrAdd(configurationProvider, m => new TypeMap<TSource, TDestination>(typeMap));
         }
-        public static TypeMap<TSource, TDestination> Mapper { get; set; }
+
+        public static TypeMap<TSource, TDestination> Mapper(ResolutionContext context)
+        {
+            return Cache[context.Mapper.ConfigurationProvider];
+        }
 
         public TypeMap BaseTypeMap { get; set; }
 

@@ -97,6 +97,11 @@ namespace AutoMapper
             return a(source, destination, this);
         }
 
+        public TypeMap<TSource,TDestination> GetTypeMap<TSource, TDestination>()
+        {
+            return TypeMap<TSource, TDestination>.Mapper(this);
+        }
+
         internal object Map(object source, object destination, Type sourceType, Type destinationType)
         {
             return Mapper.Map(source, destination, sourceType, destinationType, this);

@@ -34,7 +34,7 @@ namespace AutoMapper
             ParameterExpression srcParam, Type destType,
             ParameterExpression ctxtParam, int index)
         {
-            var typeMapExpression = TypeMapPlanBuilder.GenericTypeMap(srcParam.Type, destType);
+            var typeMapExpression = TypeMapPlanBuilder.GenericTypeMap(ctxtParam, srcParam.Type, destType);
             var ctorParamExpression = typeMapExpression.Property("BaseTypeMap").Property("ConstructorMap").Property("CtorParams").Index(index);
             if (CustomExpression != null)
                 return Invoke(ctorParamExpression.Property("CustomExpressionFunc").ToType(CustomExpression.Type), srcParam);

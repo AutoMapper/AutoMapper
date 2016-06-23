@@ -23,7 +23,7 @@
             var destParam = Parameter(typeMap.DestinationType, "dest");
             var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
 
-            var typeMapExpression = GenericTypeMap(srcParam.Type, destParam.Type);
+            var typeMapExpression = GenericTypeMap(ctxtParam, srcParam.Type, destParam.Type);
 
             if (typeMap.Substitution != null)
             {
@@ -115,7 +115,7 @@
             ParameterExpression ctxtParam,
             Expression destinationFunc)
         {
-            var typeMapExpression = GenericTypeMap(srcParam.Type, destParam.Type);
+            var typeMapExpression = GenericTypeMap(ctxtParam, srcParam.Type, destParam.Type);
             
             int index = 0;
             var typeMaps = typeMap.GetValidPropertyMaps()
@@ -155,7 +155,7 @@
             Expression assignmentFunc)
         {
             var mapperFunc = assignmentFunc;
-            var typeMapExpression = GenericTypeMap(srcParam.Type, destParam.Type);
+            var typeMapExpression = GenericTypeMap(ctxtParam, srcParam.Type, destParam.Type);
 
             if (typeMap.Condition != null)
             {
@@ -209,7 +209,7 @@
             ParameterExpression srcParam,
             ParameterExpression ctxtParam)
         {
-            var typeMapExpression = GenericTypeMap(typeMap.SourceType, typeMap.DestinationType);
+            var typeMapExpression = GenericTypeMap(ctxtParam, typeMap.SourceType, typeMap.DestinationType);
             if (typeMap.DestinationCtor != null)
                 return Invoke(typeMapExpression.Property("DestinationCtor"), srcParam, ctxtParam);
 
@@ -253,7 +253,7 @@
 
             var mappingExceptionCtor = ((NewExpression)CtorExpression.Body).Constructor;
 
-            var typeMapExpression = GenericTypeMap(srcParam.Type, destParam.Type);
+            var typeMapExpression = GenericTypeMap(ctxtParam, srcParam.Type, destParam.Type);
             var propertyMap = typeMapExpression.Property("PropertyMaps").Index(index);
             var typeMap = typeMapExpression.Property("BaseTypeMap");
 
@@ -270,7 +270,7 @@
             ParameterExpression destParam,
             ParameterExpression ctxtParam, int index)
         {
-            var propertyMapExpression = GenericTypeMap(srcParam.Type, destParam.Type).Property("PropertyMaps").Index(index);
+            var propertyMapExpression = GenericTypeMap(ctxtParam, srcParam.Type, destParam.Type).Property("PropertyMaps").Index(index);
             var destMember = MakeMemberAccess(destParam, propertyMap.DestinationProperty.MemberInfo);
 
             Expression getter;
@@ -375,7 +375,7 @@
             Expression destValueExpr,
             ParameterExpression ctxtParam, int index)
         {
-            var propertyMapExpression = GenericTypeMap(srcParam.Type, destParam.Type).Property("PropertyMaps").Index(index);
+            var propertyMapExpression = GenericTypeMap(ctxtParam, srcParam.Type, destParam.Type).Property("PropertyMaps").Index(index);
 
             Expression valueResolverFunc;
             var valueResolverConfig = propertyMap.ValueResolverConfig;
@@ -495,10 +495,9 @@
             return valueResolverFunc;
         }
 
-        public static MemberExpression GenericTypeMap(Type sourceType, Type destType)
+        public static Expression GenericTypeMap(Expression ctxtExpression, Type sourceType, Type destType)
         {
-            var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(sourceType, destType).GetTypeInfo();
-            return Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
+            return Call(ctxtExpression, ctxtExpression.Type.GetMethod("GetTypeMap").MakeGenericMethod(sourceType, destType));
         }
 
         private static bool PassesDepthCheck(ResolutionContext context, TypePair types, int maxDepth)
