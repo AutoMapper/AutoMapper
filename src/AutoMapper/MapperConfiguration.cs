@@ -314,9 +314,7 @@ namespace AutoMapper
                 var destination = requestedDestinationType.IsValueType() ? Coalesce(destinationParameter, New(requestedDestinationType)) : (Expression)destinationParameter;
                 // Invoking a delegate here
                 return Lambda<UntypedMapperFunc>(
-                            ToType(
-                                Invoke(typedExpression, ToType(sourceParameter, requestedSourceType), ToType(destination, requestedDestinationType), contextParameter)
-                                , typeof(object)),
+                                Invoke(typedExpression, sourceParameter.ToType(requestedSourceType), destination.ToType(requestedDestinationType), contextParameter).ToObject(),
                           sourceParameter, destinationParameter, contextParameter);
             }
 
@@ -334,11 +332,11 @@ namespace AutoMapper
                     var requestedDestinationParameter = Parameter(requestedDestinationType, "dest");
                     var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
 
-                    mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
-                        ToType(requestedSourceParameter, typeMapSourceParameter.Type),
-                        ToType(requestedDestinationParameter, typeMapDestinationParameter.Type),
+                    mapExpression = Lambda(Invoke(typeMap.MapExpression,
+                        requestedSourceParameter.ToType(typeMapSourceParameter.Type),
+                        requestedDestinationParameter.ToType(typeMapDestinationParameter.Type),
                         contextParameter
-                        ), mapRequest.RuntimeTypes.DestinationType),
+                        ).ToType(mapRequest.RuntimeTypes.DestinationType),
                         requestedSourceParameter, requestedDestinationParameter, contextParameter);
                 }
 
@@ -364,8 +362,8 @@ namespace AutoMapper
                 }
                 else
                 {
-                    var map = mapperToUse.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
-                    var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
+                    var map = mapperToUse.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, source.ToType(mapRequest.RuntimeTypes.SourceType), destination, context);
+                    var mapToDestination = Lambda(map.ToType(destinationType), source, destination, context);
                     fullExpression = TryCatch(mapToDestination, source, destination, context, mapRequest.RequestedTypes);
                 }
                 return fullExpression;

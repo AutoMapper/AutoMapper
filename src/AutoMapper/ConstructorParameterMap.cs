@@ -6,10 +6,8 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using static System.Linq.Expressions.Expression;
-    using static ExpressionExtensions;
     using System.Reflection;
     using Configuration;
-    using Mappers;
 
     public class ConstructorParameterMap
     {
@@ -36,16 +34,15 @@ namespace AutoMapper
             ParameterExpression srcParam, Type destType,
             ParameterExpression ctxtParam, int index)
         {
-            var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(srcParam.Type, destType).GetTypeInfo();
-            var typeMapExpression = Property(null, genericTypeMap.DeclaredProperties.First(_ => _.IsStatic()));
-            var ctorParam = ArrayIndex(Property(Property(Property(typeMapExpression, "BaseTypeMap"), "ConstructorMap"), "CtorParams"), Constant(index));
+            var typeMapExpression = TypeMapPlanBuilder.GenericTypeMap(srcParam.Type, destType);
+            var ctorParamExpression = typeMapExpression.Property("BaseTypeMap").Property("ConstructorMap").Property("CtorParams").Index(index);
             if (CustomExpression != null)
-                return Invoke(ToType(Property(ctorParam, "CustomExpressionFunc"), CustomExpression.Type), srcParam);
+                return Invoke(ctorParamExpression.Property("CustomExpressionFunc").ToType(CustomExpression.Type), srcParam);
 
             if (CustomValueResolver != null)
             {
                 // Invoking a delegate
-                return Invoke(Property(ctorParam, "CustomValueResolver"), srcParam, ctxtParam);
+                return ctorParamExpression.Property("CustomValueResolver").Invk(srcParam, ctxtParam);
             }
 
             if (!SourceMembers.Any() && Parameter.IsOptional)
@@ -53,8 +50,7 @@ namespace AutoMapper
                 return Constant(Parameter.GetDefaultValue());
             }
 
-            if (typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) == null
-                && Parameter.IsOptional)
+            if (typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) == null && Parameter.IsOptional)
             {
                 return Constant(Parameter.GetDefaultValue());
             }

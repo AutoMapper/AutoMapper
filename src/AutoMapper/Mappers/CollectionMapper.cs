@@ -82,8 +82,8 @@ namespace AutoMapper.Mappers
                      : newExpr;
             return Condition(
                 Equal(sourceExpression, Constant(null)),
-                ToType(ifNullExpr, destExpression.Type),
-                ToType(mapExpr, destExpression.Type));
+                ifNullExpr.ToType(destExpression.Type),
+                mapExpr.ToType(destExpression.Type));
         }
         
         private static Expression NewIfConditionFails(this Expression destinationExpresson, Func<Expression, Expression> conditionalExpression,
@@ -100,7 +100,7 @@ namespace AutoMapper.Mappers
             var newExpr = baseType.IsInterface()
                 ? New(ifInterfaceType.MakeGenericType(TypeHelper.GetElementTypes(baseType, ElemntTypeFlags.BreakKeyValuePair)))
                 : DelegateFactory.CreateObjectExpression(baseType);
-            return ToType(newExpr, baseType);
+            return newExpr.ToType(baseType);
         }
 
         public delegate Expression MapItem(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
@@ -151,9 +151,8 @@ namespace AutoMapper.Mappers
             if (match != null)
             {
                 itemExpr =
-                    ToType(
                         match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam,
-                            Default(typePair.DestinationType), contextParam), typePair.DestinationType);
+                            Default(typePair.DestinationType), contextParam).ToType(typePair.DestinationType);
             }
             else
             {
