@@ -2,8 +2,8 @@
 using System.Security;
 
 [assembly:CLSCompliant(true)]
+#if NETSTANDARD1_3
 [assembly: AllowPartiallyTrustedCallers]
 [assembly: SecurityTransparent]
-#if NETSTANDARD1_3
 [assembly: SecurityRules(SecurityRuleSet.Level2, SkipVerificationInFullTrust = true)]
 #endif
