@@ -16,21 +16,19 @@ namespace Benchmark
 
 		public void Start()
 		{
-			var timer = Stopwatch.StartNew();
-
 			_mapper.Initialize();
 			_mapper.Map();
 
-			timer.Start();
+            var timer = Stopwatch.StartNew();
 
-			for (int i = 0; i < 1000000; i++)
+            for(int i = 0; i < 1000000; i++)
 			{
 				_mapper.Map();
 			}
 
 			timer.Stop();
 
-			Console.WriteLine("{0}: - {1} - Mapping time: \t{2}s", _mapper.Name, _mode, timer.ElapsedMilliseconds/1000.0);
+			Console.WriteLine("{0}: - {1} - Mapping time: \t{2}s", _mapper.Name, _mode, timer.Elapsed.TotalSeconds);
 		}
 	}
 }
