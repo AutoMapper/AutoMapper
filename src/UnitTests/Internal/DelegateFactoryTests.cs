@@ -150,7 +150,7 @@ namespace AutoMapper.UnitTests
         public void Create_ctor_should_throw_when_default_constructor_is_missing()
         {
             var type = typeof(NoDefaultConstructor);
-            new Action(()=>DelegateFactory.CreateCtor(type)).ShouldThrow<ArgumentException>(ex=>
+            new Action(()=>DelegateFactory.CreateCtor(type)()).ShouldThrow<ArgumentException>(ex=>
             {
                 ex.Message.ShouldStartWith(type.FullName);
             });

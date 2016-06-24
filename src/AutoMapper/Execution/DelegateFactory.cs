@@ -7,6 +7,7 @@ namespace AutoMapper.Execution
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using static System.Linq.Expressions.Expression;
 
     public class DelegateFactory
     {
@@ -140,9 +141,11 @@ namespace AutoMapper.Execution
 
             //find a ctor with only optional args
             var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
-            if (ctorWithOptionalArgs == null)
-                throw new ArgumentException(type + " needs to have a constructor with 0 args or only optional args", "type");
-
+            if(ctorWithOptionalArgs == null)
+            {
+                var ex = new ArgumentException(type + " needs to have a constructor with 0 args or only optional args", "type");
+                return Block(Throw(Expression.Constant(ex)), Expression.Constant(null));
+            }
             //get all optional default values
             var args = ctorWithOptionalArgs
                 .GetParameters()
