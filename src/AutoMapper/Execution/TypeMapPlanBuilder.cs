@@ -68,8 +68,6 @@
                 return Lambda(typeMap.CustomProjection.ReplaceParameters(srcParam), srcParam, destParam, ctxtParam);
             }
 
-            ParameterExpression contextToReuse = null;
-
             var destinationFunc = CreateDestinationFunc(typeMap, typeMapRegistry, srcParam, destParam, ctxtParam);
 
             var assignmentFunc = CreateAssignmentFunc(typeMap, configurationProvider, typeMapRegistry, srcParam, destParam, ctxtParam, destinationFunc);
