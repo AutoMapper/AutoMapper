@@ -90,11 +90,16 @@ namespace AutoMapper
         }
 
 
-        internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+        public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
         {
             var types = TypePair.Create(source, destination, typeof(TSource), typeof(TDestination));
             var a = Mapper.ConfigurationProvider.GetMapperFunc<TSource, TDestination>(types);
             return a(source, destination, this);
+        }
+
+        public TypeMap<TSource,TDestination> GetTypeMap<TSource, TDestination>()
+        {
+            return TypeMap<TSource, TDestination>.Mapper(this);
         }
 
         internal object Map(object source, object destination, Type sourceType, Type destinationType)

@@ -35,9 +35,13 @@ namespace AutoMapper
 
         public bool Ignored { get; set; }
         public int? MappingOrder { get; set; }
+        public Delegate CustomResolverFunc => CustomResolver?.Compile();
         public LambdaExpression CustomResolver { get; set; }
+        public Delegate ConditionFunc => Condition?.Compile();
         public LambdaExpression Condition { get; set; }
+        public Delegate PreConditionFunc => PreCondition?.Compile();
         public LambdaExpression PreCondition { get; set; }
+        public Delegate CustomExpressionFunc => Expression.Lambda(CustomExpression.Body.IfNotNull(), CustomExpression.Parameters).Compile();
         public LambdaExpression CustomExpression { get; private set; }
         public MemberInfo CustomSourceMember { get; set; }
         public bool UseDestinationValue { get; set; }

@@ -17,7 +17,7 @@ namespace AutoMapper
 
         public ConstructorInfo Ctor { get; }
         public TypeMap TypeMap { get; }
-        internal IEnumerable<ConstructorParameterMap> CtorParams => _ctorParams;
+        internal ConstructorParameterMap[] CtorParams => _ctorParams.ToArray();
 
         public ConstructorMap(ConstructorInfo ctor, TypeMap typeMap)
         {
@@ -54,13 +54,13 @@ namespace AutoMapper
 
         public Expression BuildExpression(
             TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam, 
+            ParameterExpression srcParam, Type destType,
             ParameterExpression ctxtParam)
         {
             if (!CanResolve)
                 return null;
 
-            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry, srcParam, ctxtParam));
+            var ctorArgs = CtorParams.Select((p, i) => p.CreateExpression(typeMapRegistry, srcParam, destType, ctxtParam, i));
 
             ctorArgs =
                 ctorArgs.Zip(Ctor.GetParameters(),

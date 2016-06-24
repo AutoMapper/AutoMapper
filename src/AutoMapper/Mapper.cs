@@ -364,7 +364,7 @@ namespace AutoMapper
         {
             return (TDestination) (!_configurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
-                : ObjectCreator.CreateObject(typeof(TDestination)));
+                : ObjectCreator.CreateObject<TDestination>(typeof(TDestination)));
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Execution;
 
 namespace AutoMapper.Mappers
 {
@@ -10,10 +11,10 @@ namespace AutoMapper.Mappers
 
     public class TypeConverterMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination ifNull)
         {
             if (source == null)
-                return ifNull();
+                return ifNull;
             return GetConverter<TSource, TDestination>(source);
         }
 
@@ -48,7 +49,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, Expression.Constant(CollectionMapperExtensions.Constructor(destExpression.Type)));
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, DelegateFactory.CreateCtorExpression(destExpression.Type).ToType(destExpression.Type));
         }
 
         private static TypeConverter GetTypeConverter(Type type)

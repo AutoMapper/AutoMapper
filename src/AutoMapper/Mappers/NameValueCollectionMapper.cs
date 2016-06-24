@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_3
+﻿#if NETSTANDARD1_3 || NET45
 namespace AutoMapper.Mappers
 {
     using System.Linq;

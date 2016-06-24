@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers
                 new List<TSourceElement>() :
                 (IEnumerable<TSourceElement>)(context.ConfigurationProvider.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(typeof(TSource))
-                : ObjectCreator.CreateObject(typeof(TSource)));
+                : ObjectCreator.CreateObject<IEnumerable<TSourceElement>>(typeof(TSource)));
 
             var sourceLength = sourceList.OfType<object>().Count();
             var sourceArray = source as Array;

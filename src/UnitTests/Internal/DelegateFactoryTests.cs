@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
+using AutoMapper.Mappers;
 using Should;
 using Xunit;
 
@@ -127,7 +128,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof(Source);
 
-			LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
+			LateBoundCtor ctor = Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtorExpression(sourceType)).Compile();
 
 			var target = ctor();
 
@@ -139,7 +140,7 @@ namespace AutoMapper.UnitTests
 		{
 			var sourceType = typeof(ValueSource);
 
-			LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
+			LateBoundCtor ctor = Expression.Lambda<LateBoundCtor>(DelegateFactory.CreateCtorExpression(sourceType)).Compile();
 
 			var target = ctor();
 
@@ -150,7 +151,7 @@ namespace AutoMapper.UnitTests
         public void Create_ctor_should_throw_when_default_constructor_is_missing()
         {
             var type = typeof(NoDefaultConstructor);
-            new Action(()=>DelegateFactory.CreateCtor(type)()).ShouldThrow<ArgumentException>(ex=>
+            new Action(()=>ObjectCreator.CreateObject<object>(type)).ShouldThrow<ArgumentException>(ex=>
             {
                 ex.Message.ShouldStartWith(type.FullName);
             });

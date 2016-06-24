@@ -1,3 +1,5 @@
+using AutoMapper.Configuration;
+
 namespace AutoMapper.Execution
 {
     using System;
@@ -11,14 +13,14 @@ namespace AutoMapper.Execution
 
     public class DelegateFactory
     {
-        private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
-            new ConcurrentDictionary<Type, LateBoundCtor>();
+        private static readonly ConcurrentDictionary<Type, Expression> _ctorCache =
+            new ConcurrentDictionary<Type, Expression>();
 
-        private readonly Func<Type, LateBoundCtor> _generateConstructor;
+        private static readonly Func<Type, Expression> _generateConstructor;
 
-        public DelegateFactory()
+        static DelegateFactory()
         {
-            _generateConstructor = GenerateConstructor;
+            _generateConstructor = CreateObjectExpression;
         }
 
         public Expression<LateBoundMethod<object, TValue>> CreateGet<TValue>(MethodInfo method)
@@ -114,17 +116,37 @@ namespace AutoMapper.Execution
             return lambda;
         }
 
-        public LateBoundCtor CreateCtor(Type type)
+        public static Expression CreateCtorExpression(Type type)
         {
-            var ctor = _ctorCache.GetOrAdd(type, _generateConstructor);
-            return ctor;
+            return _ctorCache.GetOrAdd(type, _generateConstructor);
         }
 
-        private static LateBoundCtor GenerateConstructor(Type type)
+        private static Expression CreateObjectExpression(Type type)
         {
-            var ctorExpr = GenerateConstructorExpression(type);
+            return type.IsArray
+                ? CreateArrayExpression(type.GetElementType(), 0)
+                : type == typeof(string)
+                    ? Expression.Constant(string.Empty)
+                    : type.IsInterface() && type.IsDictionaryType()
+                        ? CreateDictionaryExpression(type)
+                        : GenerateConstructorExpression(type);
+        }
 
-            return Expression.Lambda<LateBoundCtor>(Expression.Convert(ctorExpr, typeof (object))).Compile();
+        private static Expression CreateArrayExpression(Type elementType, int length)
+        {
+            return Expression.Call(null, typeof(Array).GetDeclaredMethods().First(_ => _.Name == "CreateInstance"),
+                Expression.Constant(elementType), Expression.Constant(length));
+        }
+
+        private static Expression CreateDictionaryExpression(Type dictionaryType)
+        {
+            Type keyType = dictionaryType.GetTypeInfo().GenericTypeArguments[0];
+            Type valueType = dictionaryType.GetTypeInfo().GenericTypeArguments[1];
+            var type = dictionaryType.IsInterface()
+                ? typeof(Dictionary<,>).MakeGenericType(keyType, valueType)
+                : dictionaryType;
+            
+            return CreateCtorExpression(type);
         }
 
         public static Expression GenerateConstructorExpression(Type type)
@@ -138,6 +160,9 @@ namespace AutoMapper.Execution
             var constructors = type
                 .GetDeclaredConstructors()
                 .Where(ci => !ci.IsStatic);
+
+            if (type == typeof(string))
+                return Expression.Constant("");
 
             //find a ctor with only optional args
             var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
@@ -158,19 +183,18 @@ namespace AutoMapper.Execution
         private static Expression[] CreateParameterExpressions(MethodInfo method, Expression instanceParameter,
             Expression argumentsParameter)
         {
-            var expressions = new List<UnaryExpression>();
+            var expressions = new List<Expression>();
             var realMethodParameters = method.GetParameters();
             if (method.IsDefined(typeof (ExtensionAttribute), false))
             {
                 Type extendedType = method.GetParameters()[0].ParameterType;
-                expressions.Add(Expression.Convert(instanceParameter, extendedType));
+                expressions.Add(instanceParameter.ToType(extendedType));
                 realMethodParameters = realMethodParameters.Skip(1).ToArray();
             }
 
-            expressions.AddRange(realMethodParameters.Select((parameter, index) =>
-                Expression.Convert(
-                    Expression.ArrayIndex(argumentsParameter, Expression.Constant(index)),
-                    parameter.ParameterType)));
+            expressions.AddRange(
+                realMethodParameters.Select(
+                    (parameter, index) => argumentsParameter.Index(index).ToType(parameter.ParameterType)));
 
             return expressions.ToArray();
         }

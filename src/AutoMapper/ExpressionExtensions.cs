@@ -20,11 +20,11 @@ namespace AutoMapper
             var enumeratorType = typeof(IEnumerator<>).MakeGenericType(elementType);
 
             var enumeratorVar = Variable(enumeratorType, "enumerator");
-            var getEnumeratorCall = Call(collection, enumerableType.GetMethod("GetEnumerator"));
+            var getEnumeratorCall = Expression.Call(collection, enumerableType.GetMethod("GetEnumerator"));
             var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
 
             // The MoveNext method's actually on IEnumerator, not IEnumerator<T>
-            var moveNextCall = Call(enumeratorVar, typeof(IEnumerator).GetMethod("MoveNext"));
+            var moveNextCall = Expression.Call(enumeratorVar, typeof(IEnumerator).GetMethod("MoveNext"));
 
             var breakLabel = Label("LoopBreak");
 
@@ -45,23 +45,53 @@ namespace AutoMapper
             return loop;
         }
 
-        public static Expression ToObject(Expression expression)
+        public static Expression ToObject(this Expression expression)
         {
-            return expression.Type == typeof(object) ? expression : Convert(expression, typeof(object));
+            return expression.ToType(typeof(object));
         }
 
-        public static Expression ToType(Expression expression, Type type)
+        public static Expression ToType(this Expression expression, Type type)
         {
             return expression.Type == type ? expression : Convert(expression, type);
         }
 
-        public static Expression ConsoleWriteLine(string value, params Expression[] values)
+        public static Expression Assign(this Expression left, Expression right)
         {
-            return Call(typeof (Debug).GetMethod("WriteLine", new[] {typeof (string), typeof(object[])}), 
-                Constant(value), 
-                NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
+            return Expression.Assign(left, right);
+        }
+        
+        public static Expression Invk(this Expression expression, params Expression[] arguments)
+        {
+            return Invoke(expression, arguments);
         }
 
+        public static Expression Condition(this Expression condition, Expression left, Expression right)
+        {
+            return Expression.Condition(condition, left, right);
+        }
+
+        public static MethodCallExpression Call(this Expression expression, string method, Type type = null, params Expression[] arguments)
+        {
+            return Expression.Call(expression,
+                type == null
+                    ? expression.Type.GetMethod(method)
+                    : expression.Type.GetMethod(method).MakeGenericMethod(type), arguments);
+        }
+        public static MethodCallExpression Call(this Expression expression, string method, params Expression[] arguments)
+        {
+            return Call(expression, method, null, arguments);
+        }
+
+        public static Expression Index(this Expression array, int index)
+        {
+            return ArrayIndex(array, Constant(index));
+        }
+
+        public static Expression Property(this Expression left, string property)
+        {
+            return Expression.Property(left, property);
+        }
+        
         private static readonly ExpressionVisitor IfNullVisitor = new IfNotNullVisitor();
 
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
@@ -151,7 +181,7 @@ namespace AutoMapper
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
                 return node.Object == _oldParam
-                    ? Call(ToType(_newParam, _oldParam.Type), node.Method)
+                    ? Expression.Call(_newParam.ToType(_oldParam.Type), node.Method)
                     : base.VisitMethodCall(node);
             }
         }

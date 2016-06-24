@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Reflection.Emit;
+
 namespace AutoMapper
 {
     using System;
@@ -293,10 +296,11 @@ namespace AutoMapper
             {
             }
 
-            public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
+            private MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
-                Typed = typedExpression.Compile();
-                _untyped = new Lazy<UntypedMapperFunc>(() => Wrap(mapRequest, typedExpression).Compile());
+                Typed = typedExpression.MakeDelegate();
+
+                _untyped = new Lazy<UntypedMapperFunc>(() => (UntypedMapperFunc)Wrap(mapRequest, typedExpression).MakeDelegate());
             }
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, LambdaExpression typedExpression)
@@ -310,9 +314,7 @@ namespace AutoMapper
                 var destination = requestedDestinationType.IsValueType() ? Coalesce(destinationParameter, New(requestedDestinationType)) : (Expression)destinationParameter;
                 // Invoking a delegate here
                 return Lambda<UntypedMapperFunc>(
-                            ToType(
-                                Invoke(typedExpression, ToType(sourceParameter, requestedSourceType), ToType(destination, requestedDestinationType), contextParameter)
-                                , typeof(object)),
+                                Invoke(typedExpression, sourceParameter.ToType(requestedSourceType), destination.ToType(requestedDestinationType), contextParameter).ToObject(),
                           sourceParameter, destinationParameter, contextParameter);
             }
 
@@ -330,11 +332,11 @@ namespace AutoMapper
                     var requestedDestinationParameter = Parameter(requestedDestinationType, "dest");
                     var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
 
-                    mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
-                        ToType(requestedSourceParameter, typeMapSourceParameter.Type),
-                        ToType(requestedDestinationParameter, typeMapDestinationParameter.Type),
+                    mapExpression = Lambda(Invoke(typeMap.MapExpression,
+                        requestedSourceParameter.ToType(typeMapSourceParameter.Type),
+                        requestedDestinationParameter.ToType(typeMapDestinationParameter.Type),
                         contextParameter
-                        ), mapRequest.RuntimeTypes.DestinationType),
+                        ).ToType(mapRequest.RuntimeTypes.DestinationType),
                         requestedSourceParameter, requestedDestinationParameter, contextParameter);
                 }
 
@@ -351,17 +353,18 @@ namespace AutoMapper
                 var context = Parameter(typeof(ResolutionContext), "context");
 
                 var ctor = ((NewExpression)ResolutionContextCtor.Body).Constructor;
+                var typeMapCtor = typeof(TypePair).GetConstructors().First();
 
                 LambdaExpression fullExpression;
                 if (mapperToUse == null)
                 {
                     var message = Constant("Missing type map configuration or unsupported mapping.");
-                    fullExpression = Lambda(Block(Throw(New(ctor, message, Constant(null), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
+                    fullExpression = Lambda(Block(Throw(New(ctor, message, Constant(null), Constant(mapRequest.RequestedTypes))), New(typeMapCtor, Constant(source.Type), Constant(destinationType))), source, destination, context);
                 }
                 else
                 {
-                    var map = mapperToUse.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
-                    var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
+                    var map = mapperToUse.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, source.ToType(mapRequest.RuntimeTypes.SourceType), destination, context);
+                    var mapToDestination = Lambda(map.ToType(destinationType), source, destination, context);
                     fullExpression = TryCatch(mapToDestination, source, destination, context, mapRequest.RequestedTypes);
                 }
                 return fullExpression;
@@ -374,10 +377,99 @@ namespace AutoMapper
                 var ctor = ((NewExpression)ResolutionContextCtor.Body).Constructor;
                 return Lambda(Expression.TryCatch(mapExpression.Body,
                     MakeCatchBlock(typeof(Exception), exception, Block(
-                        Throw(New(ctor, Constant("Error mapping types."), exception, Constant(types))),
+                        Throw(New(ctor, Constant("Error mapping types."), exception, Default(typeof(TypePair)))),
                         Default(destination.Type)), null)),
                     source, destination, context);
             }
         }
     }
+
+    public static class DelegateExtensions
+    {
+#if NET45
+        private static ModuleBuilder _moduleBuilder;
+
+        static DelegateExtensions()
+        {
+
+            var assemblyBuilder =
+                AppDomain.CurrentDomain.DefineDynamicAssembly(
+                    new AssemblyName("MyAssembly_" + Guid.NewGuid().ToString("N")), AssemblyBuilderAccess.Run);
+            _moduleBuilder = assemblyBuilder.DefineDynamicModule("Module");
+        }
+#endif
+
+        public static Delegate MakeDelegate(this LambdaExpression lamdaExpression)
+        {
+#if NET45
+            var visitor = new CanCompileToMethodVisitor();
+            visitor.Visit(lamdaExpression);
+            if (!visitor.CanCompile)
+                return lamdaExpression.Compile();
+            var typeBuilder = _moduleBuilder.DefineType("MyType_" + Guid.NewGuid().ToString("N"),
+                TypeAttributes.Public);
+            var methodName = Guid.NewGuid().ToString("N");
+            var methodBuilder = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static);
+            try
+            {
+                lamdaExpression.CompileToMethod(methodBuilder);
+            }
+            catch (Exception)
+            {
+                return lamdaExpression.Compile();
+            }
+
+            var resultingType = typeBuilder.CreateType();
+
+            return Delegate.CreateDelegate(lamdaExpression.Type, resultingType.GetMethod(methodName));
+#else
+            return lamdaExpression.Compile();
+#endif
+        }
+    }
+
+    public class CanCompileToMethodVisitor : ExpressionVisitor
+    {
+        public bool CanCompile { get; private set; } = true;
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            if (node.Value is Type)
+                CanCompile = false;
+            return base.VisitConstant(node);
+        }
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            if(!node.Type.GetTypeInfo().IsPublic && !node.Type.GetTypeInfo().IsNestedPublic)
+                CanCompile = false;
+            return base.VisitUnary(node);
+        }
+
+        protected override Expression VisitNew(NewExpression node)
+        {
+            if (node?.Constructor?.IsPrivate == true)
+                CanCompile = false;
+            return base.VisitNew(node);
+        }
+        
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            if (!node.Type.GetTypeInfo().IsPublic && !node.Type.GetTypeInfo().IsNestedPublic)
+                CanCompile = false;
+            return base.VisitParameter(node);
+        }
+
+        protected override Expression VisitBinary(BinaryExpression node)
+        {
+            var left = node.Left as MemberExpression;
+            if (left != null && left.Member is PropertyInfo && (left.Member as PropertyInfo).HasAnInaccessibleSetter())
+                CanCompile = false;
+            var right = node.Right as MemberExpression;
+            if (right != null && right.Member is PropertyInfo && (right.Member as PropertyInfo).HasAnInaccessibleGetter())
+                CanCompile = false;
+            return base.VisitBinary(node);
+        }
+    }
 }
+

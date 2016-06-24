@@ -6,10 +6,8 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using static System.Linq.Expressions.Expression;
-    using static ExpressionExtensions;
     using System.Reflection;
     using Configuration;
-    using Mappers;
 
     public class ConstructorParameterMap
     {
@@ -25,6 +23,7 @@ namespace AutoMapper
         public IMemberGetter[] SourceMembers { get; }
 
         public bool CanResolve { get; set; }
+        public Delegate CustomExpressionFunc => Lambda(CustomExpression.Body.IfNotNull(), CustomExpression.Parameters).Compile();
         public LambdaExpression CustomExpression { get; set; }
         public Func<object, ResolutionContext, object> CustomValueResolver { get; set; }
 
@@ -32,16 +31,18 @@ namespace AutoMapper
         public Type DestinationType => Parameter.ParameterType;
 
         public Expression CreateExpression(TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression srcParam, Type destType,
+            ParameterExpression ctxtParam, int index)
         {
+            var typeMapExpression = TypeMapPlanBuilder.GenericTypeMap(ctxtParam, srcParam.Type, destType);
+            var ctorParamExpression = typeMapExpression.Property("BaseTypeMap").Property("ConstructorMap").Property("CtorParams").Index(index);
             if (CustomExpression != null)
-                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull();
+                return Invoke(ctorParamExpression.Property("CustomExpressionFunc").ToType(CustomExpression.Type), srcParam);
 
             if (CustomValueResolver != null)
             {
                 // Invoking a delegate
-                return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
+                return ctorParamExpression.Property("CustomValueResolver").Invk(srcParam, ctxtParam);
             }
 
             if (!SourceMembers.Any() && Parameter.IsOptional)
@@ -49,8 +50,7 @@ namespace AutoMapper
                 return Constant(Parameter.GetDefaultValue());
             }
 
-            if (typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) == null
-                && Parameter.IsOptional)
+            if (typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) == null && Parameter.IsOptional)
             {
                 return Constant(Parameter.GetDefaultValue());
             }

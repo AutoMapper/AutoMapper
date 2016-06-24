@@ -42,7 +42,7 @@ namespace AutoMapper
 
         public LambdaExpression MapExpression { get; private set; }
 
-        public TypePair Types { get; }
+        public TypePair Types { get; internal set; }
 
         public ConstructorMap ConstructorMap { get; set; }
 
@@ -85,6 +85,10 @@ namespace AutoMapper
         public PropertyMap[] GetPropertyMaps()
         {
             return _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
+        }
+        public PropertyMap[] GetValidPropertyMaps()
+        {
+            return GetPropertyMaps().Where(pm => pm.CanResolveValue() && !IsMappedThroughConstructor(pm.DestinationProperty.Name)).ToArray();
         }
 
         public bool IsMappedThroughConstructor(string destinationPropertyName)
@@ -227,6 +231,12 @@ namespace AutoMapper
 
             MapExpression = TypeMapPlanBuilder.BuildMapperFunc(this, configurationProvider, typeMapRegistry);
 
+            if (!SourceType.IsGenericTypeDefinition() && !DestinationType.IsGenericTypeDefinition())
+            {
+                var genericTypeMap = typeof(TypeMap<,>).MakeGenericType(SourceType, DestinationType).GetTypeInfo();
+                genericTypeMap.DeclaredMethods.First(p => p.Name == "SetTypeMap").Invoke(null, new object[] { this, configurationProvider });
+            }
+
             _sealed = true;
         }
 
@@ -327,5 +337,40 @@ namespace AutoMapper
                 AddAfterMapAction(afterMapAction);
             }
         }
+    }
+
+    public class TypeMap<TSource, TDestination>
+    {
+        private static readonly ConcurrentDictionary<IConfigurationProvider, TypeMap<TSource,TDestination>> Cache = new ConcurrentDictionary<IConfigurationProvider, TypeMap<TSource, TDestination>>();
+
+        public static void SetTypeMap(TypeMap typeMap, IConfigurationProvider configurationProvider)
+        {
+            Cache.GetOrAdd(configurationProvider, m => new TypeMap<TSource, TDestination>(typeMap));
+        }
+
+        public static TypeMap<TSource, TDestination> Mapper(ResolutionContext context)
+        {
+            return Cache[context.Mapper.ConfigurationProvider];
+        }
+
+        public TypeMap BaseTypeMap { get; set; }
+
+        public TypeMap(TypeMap baseTypeMap)
+        {
+            BaseTypeMap = baseTypeMap;
+            BeforeMapActions = baseTypeMap.BeforeMapActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>().ToArray();
+            AfterMapActions = baseTypeMap.AfterMapActions.Select(_ => _.Compile()).Cast<Action<TSource, TDestination, ResolutionContext>>().ToArray();
+            CustomMapper = baseTypeMap.CustomMapper?.Compile() as Func<TSource, TDestination, ResolutionContext, TDestination>;
+            CustomProjection = baseTypeMap.CustomProjection?.Compile() as Func<TSource, TDestination>;
+            PropertyMaps = baseTypeMap.GetValidPropertyMaps();
+            DestinationCtor = (Func<TSource, ResolutionContext, TDestination>)baseTypeMap.DestinationCtor?.Compile();
+        }
+        
+        public Action<TSource, TDestination, ResolutionContext>[] BeforeMapActions { get; }
+        public Action<TSource, TDestination, ResolutionContext>[] AfterMapActions { get; }
+        public Func<TSource, TDestination, ResolutionContext, TDestination> CustomMapper { get; set; }
+        public Func<TSource, TDestination> CustomProjection { get; set; }
+        public PropertyMap[] PropertyMaps { get; set; }
+        public Func<TSource, ResolutionContext, TDestination> DestinationCtor { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace AutoMapper.Configuration
         public string ProfileName => "";
         public IEnumerable<Profile> Profiles => _profiles;
         public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions => _allTypeMapActions;
-        public Func<Type, object> ServiceCtor { get; private set; } = ObjectCreator.CreateObject;
+        public Func<Type, object> ServiceCtor { get; private set; } = ObjectCreator.CreateObject<object>;
 
         public void CreateProfile(string profileName, Action<Profile> config)
         {
