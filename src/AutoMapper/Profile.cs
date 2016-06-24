@@ -270,7 +270,7 @@ namespace AutoMapper
 
             Configure(typeMapRegistry, closedMap);
 
-            if (closedMap.TypeConverterType != null)
+            if(closedMap.TypeConverterType != null)
             {
                 var typeParams = 
                     (openMapConfig.SourceType.IsGenericTypeDefinition() ? closedTypes.SourceType.GetGenericArguments() : new Type[0])
@@ -279,9 +279,12 @@ namespace AutoMapper
 
                 var neededParameters = closedMap.TypeConverterType.GetGenericParameters().Length;
                 closedMap.TypeConverterType = closedMap.TypeConverterType.MakeGenericType(typeParams.Take(neededParameters).ToArray());
-
             }
-
+            if(closedMap.DestinationTypeOverride?.IsGenericTypeDefinition() == true)
+            {
+                var neededParameters = closedMap.DestinationTypeOverride.GetGenericParameters().Length;
+                closedMap.DestinationTypeOverride = closedMap.DestinationTypeOverride.MakeGenericType(closedTypes.DestinationType.GetGenericArguments().Take(neededParameters).ToArray());
+            }
             return closedMap;
         }
 

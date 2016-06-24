@@ -128,7 +128,7 @@ namespace AutoMapper.QueryableExtensions
             }
             var newExpression = typeMap.ConstructorMap?.CanResolve == true
                 ? typeMap.ConstructorMap.NewExpression(instanceParameter)
-                : New(typeMap.DestinationTypeOverride ?? typeMap.DestinationType);
+                : New(typeMap.DestinationTypeToUse);
 
             return Lambda(newExpression);
         }
