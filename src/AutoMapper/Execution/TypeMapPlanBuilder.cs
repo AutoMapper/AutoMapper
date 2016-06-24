@@ -82,7 +82,7 @@
             ParameterExpression destParam,
             ParameterExpression ctxtParam)
         {
-            var newDestFunc = CreateNewDestinationFunc(typeMap, typeMapRegistry, srcParam, ctxtParam).ToType(typeMap.DestinationType);
+            var newDestFunc = CreateNewDestinationFunc(typeMap, typeMapRegistry, srcParam, ctxtParam).ToType(typeMap.DestinationTypeToUse);
 
             var getDest = typeMap.DestinationTypeToUse.GetTypeInfo().IsValueType
                 ? newDestFunc
@@ -211,19 +211,19 @@
             ParameterExpression srcParam,
             ParameterExpression ctxtParam)
         {
-            var typeMapExpression = GenericTypeMap(ctxtParam, typeMap.SourceType, typeMap.DestinationType);
+            var typeMapExpression = GenericTypeMap(ctxtParam, typeMap.SourceType, typeMap.DestinationTypeToUse);
             if (typeMap.DestinationCtor != null)
                 return Invoke(typeMapExpression.Property("DestinationCtor"), srcParam, ctxtParam);
 
             if (typeMap.ConstructDestinationUsingServiceLocator)
-                return ctxtParam.Property("Options").Call("CreateInstance", typeMap.DestinationType);
+                return ctxtParam.Property("Options").Call("CreateInstance", typeMap.DestinationTypeToUse);
 
             if (typeMap.ConstructorMap?.CanResolve == true)
                 return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, typeMap.DestinationTypeToUse, ctxtParam);
 
-            if (typeMap.DestinationType.IsInterface())
+            if (typeMap.DestinationTypeToUse.IsInterface())
             {
-                var ctor = Call(null, typeof(ObjectCreator).GetMethod("CreateObject", new[] { typeof(Type) } ).MakeGenericMethod(typeMap.DestinationType), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationTypeToUse)));
+                var ctor = Call(null, typeof(ObjectCreator).GetMethod("CreateObject", new[] { typeof(Type) } ).MakeGenericMethod(typeMap.DestinationTypeToUse), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationTypeToUse)));
                 // We're invoking a delegate here
                 return ctor;
             }
