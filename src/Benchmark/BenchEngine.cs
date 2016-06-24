@@ -16,14 +16,12 @@ namespace Benchmark
 
 		public void Start()
 		{
-			var timer = Stopwatch.StartNew();
-
 			_mapper.Initialize();
 			_mapper.Map();
 
-			timer.Start();
+            var timer = Stopwatch.StartNew();
 
-			for (int i = 0; i < 1000000; i++)
+            for(int i = 0; i < 1000000; i++)
 			{
 				_mapper.Map();
 			}
