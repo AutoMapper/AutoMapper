@@ -32,9 +32,6 @@ namespace AutoMapper.Configuration
         public void ConvertUsing(Type typeConverterType) 
             => TypeMapActions.Add(tm => tm.TypeConverterType = typeConverterType);
 
-        public void As(Type typeOverride) 
-            => TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
-
         public void ForAllOtherMembers(Action<IMemberConfigurationExpression> memberOptions) 
             => base.ForAllOtherMembers(o => memberOptions((IMemberConfigurationExpression)o));
 
@@ -471,8 +468,10 @@ namespace AutoMapper.Configuration
 
         public void As<T>()
         {
-            TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeof(T));
+            As(typeof(T));
         }
+
+        public void As(Type typeOverride) => TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
 
         public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {

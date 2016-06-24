@@ -105,4 +105,71 @@ namespace AutoMapper.UnitTests.MappingInheritance
         }
 
     }
+
+    public class AsWithGenerics : AutoMapperSpecBase
+    {
+        INodeModel<int> _destination;
+
+        public interface INodeModel<T> : INodeModel where T : struct
+        {
+            new T? ID { get; set; }
+        }
+
+        public interface INodeModel
+        {
+            object ID { get; set; }
+            string Name { get; set; }
+        }
+
+        public class NodeModel<T> : INodeModel<T> where T : struct
+        {
+            public T? ID { get; set; }
+            public string Name { get; set; }
+
+            object INodeModel.ID
+            {
+                get
+                {
+                    return ID;
+                }
+
+                set
+                {
+                    ID = value as T?;
+                }
+            }
+        }
+
+        public class NodeDto<T> where T : struct
+        {
+            public T? ID { get; set; }
+            public string Name { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(cfg => {
+                    cfg.CreateMap(typeof(NodeDto<>), typeof(NodeModel<>));
+                    cfg.CreateMap(typeof(NodeDto<>), typeof(INodeModel<>)).As(typeof(NodeModel<>));
+                    cfg.CreateMap(typeof(INodeModel<>), typeof(NodeModel<>));
+                });
+            }
+        }
+
+        protected override void Because_of()
+        {
+            var dto = new NodeDto<int> { ID = 1, Name = "Hi" };
+            _destination = Mapper.Map<INodeModel<int>>(dto);
+        }
+
+        [Fact]
+        public void Should_override_the_map()
+        {
+            _destination.ShouldBeType<NodeModel<int>>();
+            _destination.ID.ShouldEqual(1);
+            _destination.Name.ShouldEqual("Hi");
+        }
+    }
 }

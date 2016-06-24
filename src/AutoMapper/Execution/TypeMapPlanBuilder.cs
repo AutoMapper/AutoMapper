@@ -16,11 +16,11 @@
 
         public static LambdaExpression BuildMapperFunc(TypeMap typeMap, IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry)
         {
-            if (typeMap.SourceType.IsGenericTypeDefinition() || typeMap.DestinationType.IsGenericTypeDefinition())
+            if (typeMap.SourceType.IsGenericTypeDefinition() || typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
                 return null;
 
             var srcParam = Parameter(typeMap.SourceType, "src");
-            var destParam = Parameter(typeMap.DestinationType, "dest");
+            var destParam = Parameter(typeMap.DestinationTypeToUse, "dest");
             var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
 
             var typeMapExpression = GenericTypeMap(ctxtParam, srcParam.Type, destParam.Type);
@@ -38,14 +38,14 @@
                 {
                     var genericTypeParam = typeMap.SourceType.IsGenericType()
                         ? typeMap.SourceType.GetTypeInfo().GenericTypeArguments[0]
-                        : typeMap.DestinationType.GetTypeInfo().GenericTypeArguments[0];
+                        : typeMap.DestinationTypeToUse.GetTypeInfo().GenericTypeArguments[0];
                     type = typeMap.TypeConverterType.MakeGenericType(genericTypeParam);
                 }
                 else
                     type = typeMap.TypeConverterType;
 
                 // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).ToType(src, ctxt);
-                var converterInterfaceType = typeof (ITypeConverter<,>).MakeGenericType(typeMap.SourceType, typeMap.DestinationType);
+                var converterInterfaceType = typeof (ITypeConverter<,>).MakeGenericType(typeMap.SourceType, typeMap.DestinationTypeToUse);
                 return Lambda(
                     ctxtParam.Property("Options").Call("CreateInstance", type)
                         .ToType(converterInterfaceType).Call("Convert", srcParam, ctxtParam),
@@ -61,7 +61,9 @@
             {
                 return Lambda(typeMapExpression.Property("CustomProjection").Invk(srcParam), srcParam, destParam, ctxtParam);
             }
-            
+
+            ParameterExpression contextToReuse = null;
+
             var destinationFunc = CreateDestinationFunc(typeMap, typeMapRegistry, srcParam, destParam, ctxtParam);
 
             var assignmentFunc = CreateAssignmentFunc(typeMap, configurationProvider, typeMapRegistry, srcParam, destParam, ctxtParam, destinationFunc);
@@ -162,7 +164,7 @@
                 mapperFunc =
                     Condition(typeMapExpression.Property("Condition").Invk(ctxtParam),
                         mapperFunc,
-                        Default(typeMap.DestinationType));
+                        Default(typeMap.DestinationTypeToUse));
                 //mapperFunc = (source, context, destFunc) => _condition(context) ? inner(source, context, destFunc) : default(TDestination);
             }
 
@@ -170,7 +172,7 @@
             {
                 mapperFunc = Condition(_passesDepthCheckExpression.Invk(ctxtParam, Constant(typeMap.Types), Constant(typeMap.MaxDepth)),
                     mapperFunc,
-                    Default(typeMap.DestinationType));
+                    Default(typeMap.DestinationTypeToUse));
                 //mapperFunc = (source, context, destFunc) => context.GetTypeDepth(types) <= maxDepth ? inner(source, context, destFunc) : default(TDestination);
             }
 
@@ -178,14 +180,14 @@
             {
                 mapperFunc =
                     Condition(Equal(srcParam, Default(typeMap.SourceType)),
-                        Default(typeMap.DestinationType),
+                        Default(typeMap.DestinationTypeToUse),
                         mapperFunc.RemoveIfNotNull(srcParam));
                 //mapperFunc = (source, context, destFunc) => source == default(TSource) ? default(TDestination) : inner(source, context, destFunc);
             }
 
             if (typeMap.PreserveReferences)
             {
-                var cache = Variable(typeMap.DestinationType, "cachedDestination");
+                var cache = Variable(typeMap.DestinationTypeToUse, "cachedDestination");
 
                 var condition = Condition(
                     AndAlso(
@@ -194,7 +196,7 @@
                             Equal(destParam, Constant(null)),
                             ctxtParam.Property("InstanceCache").Call("ContainsKey", srcParam)
                             )),
-                    cache.Assign(Property(ctxtParam.Property("InstanceCache"), "Item", srcParam).ToType(typeMap.DestinationType)),
+                    cache.Assign(Property(ctxtParam.Property("InstanceCache"), "Item", srcParam).ToType(typeMap.DestinationTypeToUse)),
                     cache.Assign(mapperFunc)
                     );
 
@@ -217,22 +219,22 @@
                 return ctxtParam.Property("Options").Call("CreateInstance", typeMap.DestinationType);
 
             if (typeMap.ConstructorMap?.CanResolve == true)
-                return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, typeMap.DestinationType, ctxtParam);
+                return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, typeMap.DestinationTypeToUse, ctxtParam);
 
             if (typeMap.DestinationType.IsInterface())
             {
-                var ctor = Call(null, typeof(ObjectCreator).GetMethod("CreateObject", new[] { typeof(Type) } ).MakeGenericMethod(typeMap.DestinationType), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationType)));
+                var ctor = Call(null, typeof(ObjectCreator).GetMethod("CreateObject", new[] { typeof(Type) } ).MakeGenericMethod(typeMap.DestinationType), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationTypeToUse)));
                 // We're invoking a delegate here
                 return ctor;
             }
 
-            if (typeMap.DestinationType.IsAbstract())
+            if (typeMap.DestinationTypeToUse.IsAbstract())
                 return Constant(null);
 
-            if (typeMap.DestinationType.IsGenericTypeDefinition())
+            if (typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
                 return Constant(null);
 
-            return DelegateFactory.CreateCtorExpression(typeMap.DestinationType);
+            return DelegateFactory.CreateCtorExpression(typeMap.DestinationTypeToUse);
         }
 
         private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
