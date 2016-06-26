@@ -25,10 +25,19 @@
         "System.Collections.Specialized": "4.0.1"
       }
     },
+    "netstandard1.1": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1",
+        "NETStandard.Library": "1.6.0",
+        "System.Linq.Queryable": "4.0.1",
+        "System.Reflection.Emit": "4.0.1",
+        "System.ComponentModel.TypeConverter": "4.1.0"
+      }
+    },
     "net45": {
       "buildOptions": {
         "define": [ "NETSTANDARD1_3", "NET45" ]
       }
-    } 
+    }
   }
 }
