@@ -356,7 +356,7 @@ namespace AutoMapper
                 if (mapperToUse == null)
                 {
                     var message = Constant("Missing type map configuration or unsupported mapping.");
-                    fullExpression = Lambda(Block(Throw(New(ctor, message, Constant(null), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
+                    fullExpression = Lambda(Block(Throw(New(ctor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
                 }
                 else
                 {
