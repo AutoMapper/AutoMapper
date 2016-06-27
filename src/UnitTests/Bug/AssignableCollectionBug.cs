@@ -38,7 +38,7 @@ namespace AutoMapper.UnitTests.Bug
             [Fact]
             public void Should_copy_array()
             {
-                _dest.ImageData.ShouldBeSameAs(_source.ImageData);
+                _dest.ImageData.ShouldEqual(_source.ImageData);
             }
         }
     }
