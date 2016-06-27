@@ -209,7 +209,7 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source)
         {
-            var types = TypePair.Create(source, null, typeof(TSource), typeof (TDestination));
+            var types = TypePair.Create(source, typeof(TSource), typeof (TDestination));
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
@@ -220,7 +220,7 @@ namespace AutoMapper
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
         {
-            var types = TypePair.Create(source, null, typeof(TSource), typeof(TDestination));
+            var types = TypePair.Create(source, typeof(TSource), typeof(TDestination));
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
@@ -273,7 +273,7 @@ namespace AutoMapper
 
         object IMapper.Map(object source, Type sourceType, Type destinationType)
         {
-            var types = TypePair.Create(source, null, sourceType, destinationType);
+            var types = TypePair.Create(source, sourceType, destinationType);
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
@@ -282,7 +282,7 @@ namespace AutoMapper
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
         {
-            var types = TypePair.Create(source, null, sourceType, destinationType);
+            var types = TypePair.Create(source, sourceType, destinationType);
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
