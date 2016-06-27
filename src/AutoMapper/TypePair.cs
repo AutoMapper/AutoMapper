@@ -59,17 +59,25 @@ namespace AutoMapper
             _hashcode = unchecked(SourceType.GetHashCode() * 397) ^ DestinationType.GetHashCode();
         }
 
-        public static TypePair Create(object source, object destination, Type sourceType, Type destinationType)
+        public static TypePair Create<TSource>(TSource source, Type sourceType, Type destinationType)
         {
-            if (source != null && !sourceType.IsNullableType())
+            if(source != null)
             {
                 sourceType = source.GetType();
             }
-            if (destination != null && !destinationType.IsNullableType())
+            return new TypePair(sourceType, destinationType);
+        }
+
+        public static TypePair Create<TSource, TDestination>(TSource source, TDestination destination, Type sourceType, Type destinationType)
+        {
+            if(source != null)
+            {
+                sourceType = source.GetType();
+            }
+            if(destination != null)
             {
                 destinationType = destination.GetType();
             }
-
             return new TypePair(sourceType, destinationType);
         }
 
