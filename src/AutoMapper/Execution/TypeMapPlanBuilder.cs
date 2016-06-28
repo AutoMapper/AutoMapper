@@ -229,12 +229,14 @@
             if (typeMap.ConstructorMap?.CanResolve == true)
                 return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, ctxtParam);
 
+#if NET45
             if (typeMap.DestinationTypeToUse.IsInterface())
             {
                 var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationTypeToUse)));
                 // We're invoking a delegate here
                 return Invoke(ctor);
             }
+#endif
 
             if (typeMap.DestinationTypeToUse.IsAbstract())
                 return Constant(null);

@@ -1,3 +1,4 @@
+#if NET45
 namespace AutoMapper.Execution
 {
     using System;
@@ -67,3 +68,4 @@ namespace AutoMapper.Execution
         }
     }
 }
+#endif

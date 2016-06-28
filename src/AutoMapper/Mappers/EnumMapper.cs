@@ -108,14 +108,12 @@ namespace AutoMapper.Mappers
 
         private static TDestination ConvertEnumToNullableType<TSource, TDestination>(TSource source)
         {
-            var nullableConverter = new NullableConverter(typeof(TDestination));
-
             if (source == null)
             {
-                return (TDestination)nullableConverter.ConvertFrom(source);
+                return default(TDestination);
             }
 
-            var destType = nullableConverter.UnderlyingType;
+            var destType = Nullable.GetUnderlyingType(typeof(TDestination));
             return (TDestination)Convert.ChangeType(source, destType, null);
         }
 

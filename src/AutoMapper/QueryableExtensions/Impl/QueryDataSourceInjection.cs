@@ -24,4 +24,5 @@ namespace AutoMapper.QueryableExtensions.Impl
                 new TDestination[0].AsQueryable(), _mapper, inspector);
         }
     }
+
 }

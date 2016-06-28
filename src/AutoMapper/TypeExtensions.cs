@@ -106,10 +106,12 @@ namespace AutoMapper
             return type.GetTypeInfo().DeclaredConstructors;
         }
 
+#if NET45
         public static Type CreateType(this TypeBuilder type)
         {
             return type.CreateTypeInfo().AsType();
         }
+#endif
 
         public static IEnumerable<MemberInfo> GetDeclaredMembers(this Type type)
         {

@@ -7,12 +7,13 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using Configuration;
 
-    public static class TypeHelper
+    internal static class TypeHelper
     {
         public static Type GetElementType(Type enumerableType)
         {
             return GetElementTypes(enumerableType, null)[0];
         }
+
         public static Type[] GetElementTypes(Type enumerableType, ElemntTypeFlags flags = ElemntTypeFlags.None)
         {
             return GetElementTypes(enumerableType, null, flags);
@@ -22,20 +23,23 @@ namespace AutoMapper.Mappers
         {
             return GetElementTypes(enumerableType, enumerable)[0];
         }
-        public static Type[] GetElementTypes(Type enumerableType, IEnumerable enumerable, ElemntTypeFlags flags = ElemntTypeFlags.None)
+
+        public static Type[] GetElementTypes(Type enumerableType, IEnumerable enumerable,
+            ElemntTypeFlags flags = ElemntTypeFlags.None)
         {
             if (enumerableType.HasElementType)
             {
-                return new []{enumerableType.GetElementType()};
+                return new[] {enumerableType.GetElementType()};
             }
 
-            if (flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair) && enumerableType.IsGenericType() && enumerableType.IsDictionaryType())
+            if (flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair) && enumerableType.IsGenericType() &&
+                enumerableType.IsDictionaryType())
             {
                 return enumerableType.GetTypeInfo().GenericTypeArguments;
             }
 
             if (enumerableType.IsGenericType() &&
-                enumerableType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
+                enumerableType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 return enumerableType.GetTypeInfo().GenericTypeArguments;
             }
@@ -46,14 +50,15 @@ namespace AutoMapper.Mappers
                 return ienumerableType.GetTypeInfo().GenericTypeArguments;
             }
 
-            if (typeof (IEnumerable).IsAssignableFrom(enumerableType))
+            if (typeof(IEnumerable).IsAssignableFrom(enumerableType))
             {
                 var first = enumerable?.Cast<object>().FirstOrDefault();
 
-                return new []{first?.GetType() ?? typeof (object)};
+                return new[] {first?.GetType() ?? typeof(object)};
             }
 
-            throw new ArgumentException($"Unable to find the element type for type '{enumerableType}'.", nameof(enumerableType));
+            throw new ArgumentException($"Unable to find the element type for type '{enumerableType}'.",
+                nameof(enumerableType));
         }
 
         public static Type GetEnumerationType(Type enumType)
@@ -77,11 +82,40 @@ namespace AutoMapper.Mappers
             }
             catch (AmbiguousMatchException)
             {
-                if (enumerableType.BaseType() != typeof (object))
+                if (enumerableType.BaseType() != typeof(object))
                     return GetIEnumerableType(enumerableType.BaseType());
 
                 return null;
             }
+        }
+
+        internal static Type FindGenericType(Type definition, Type type)
+        {
+            bool? definitionIsInterface = null;
+            while (type != null && type != typeof(object))
+            {
+                TypeInfo typeInfo = type.GetTypeInfo();
+                if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == definition)
+                    return type;
+                if (!definitionIsInterface.HasValue)
+                    definitionIsInterface = definition.GetTypeInfo().IsInterface;
+                if (definitionIsInterface.GetValueOrDefault())
+                {
+                    foreach (Type itype in typeInfo.ImplementedInterfaces)
+                    {
+                        Type found = FindGenericType(definition, itype);
+                        if (found != null)
+                            return found;
+                    }
+                }
+                type = type.GetTypeInfo().BaseType;
+            }
+            return null;
+        }
+
+        internal static IEnumerable<MethodInfo> GetStaticMethods(this Type type)
+        {
+            return type.GetRuntimeMethods().Where(m => m.IsStatic);
         }
     }
 
