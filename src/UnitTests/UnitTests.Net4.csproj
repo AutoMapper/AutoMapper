@@ -79,6 +79,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\AutoMapper\Mappers\TypeHelper.cs">
+      <Link>TypeHelper.cs</Link>
+    </Compile>
     <Compile Include="..\AutoMapper\TypeExtensions.cs">
       <Link>TypeExtensions.cs</Link>
     </Compile>
