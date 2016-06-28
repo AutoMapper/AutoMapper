@@ -5,39 +5,16 @@ namespace AutoMapper.Mappers
 {
     using System;
     using System.Reflection;
+    using static System.Linq.Expressions.Expression;
 
     public class PrimitiveArrayMapper : IObjectMapper
     {
-        public static TDestElement[] Map<TSourceElement, TDestElement>(TSourceElement[] source, ResolutionContext context)
-        {
-            if (source == null && context.Mapper.ConfigurationProvider.AllowNullCollections)
-            {
-                return null;
-            }
-
-            if (source != null && typeof(TDestElement).IsAssignableFrom(typeof(TSourceElement)))
-            {
-                return source as TDestElement[];
-            }
-            
-            var sourceArray = source ?? new TSourceElement[0];
-
-            int sourceLength = sourceArray.Length;
-            TDestElement[] destArray = new TDestElement[sourceLength];
-
-            Array.Copy(sourceArray, destArray, sourceLength);
-
-            return destArray;
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(PrimitiveArrayMapper).GetAllMethods().First(_ => _.IsStatic);
-
         private bool IsPrimitiveArrayType(Type type)
         {
             if (type.IsArray)
             {
                 Type elementType = TypeHelper.GetElementType(type);
-                return elementType.IsPrimitive() || elementType.Equals(typeof (string));
+                return elementType.IsPrimitive() || elementType == typeof (string);
             }
 
             return false;
@@ -47,17 +24,31 @@ namespace AutoMapper.Mappers
         {
             return IsPrimitiveArrayType(context.DestinationType) &&
                    IsPrimitiveArrayType(context.SourceType) &&
-                   (TypeHelper.GetElementType(context.DestinationType)
-                       .Equals(TypeHelper.GetElementType(context.SourceType)));
+                   (TypeHelper.GetElementType(context.DestinationType) == TypeHelper.GetElementType(context.SourceType));
         }
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            Type sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             Type destElementType = TypeHelper.GetElementType(destExpression.Type);
 
-            return Expression.Call(null,
-                MapMethodInfo.MakeGenericMethod(sourceElementType, destElementType), sourceExpression, contextExpression);
+            Expression<Action> expr = () => Array.Copy(null, null, 0);
+            var copyMethod = ((MethodCallExpression) expr.Body).Method;
+
+            var valueIfNullExpr = configurationProvider.AllowNullCollections
+                ? (Expression) Constant(null, destExpression.Type)
+                : NewArrayBounds(destElementType, Constant(0));
+
+            var dest = Parameter(destExpression.Type, "destArray");
+            var sourceLength = Parameter(typeof(int), "sourceLength");
+            var mapExpr = Block(
+                new[] {dest, sourceLength},
+                Assign(sourceLength, Property(sourceExpression, sourceExpression.Type.GetProperty("Length"))),
+                Assign(dest, NewArrayBounds(destElementType, sourceLength)),
+                Call(copyMethod, sourceExpression, dest, sourceLength),
+                dest
+            );
+
+            return Condition(Equal(sourceExpression, Constant(null)), valueIfNullExpr, mapExpr);
         }
     }
 }
