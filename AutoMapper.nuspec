@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>AutoMapper</id>
-    <version>4.1.1</version>
+    <version>0.0.0</version>
     <authors>Jimmy Bogard</authors>
     <owners>Jimmy Bogard</owners>
     <licenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</licenseUrl>
@@ -13,46 +13,34 @@
     <description>A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is geared towards model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.</description>
     <dependencies>
       <group targetFramework="net45" />
+      <group targetFramework="portable45-net45+win8+wpa81"/>
       <group targetFramework="netstandard1.1">
-        <dependency id="Microsoft.CSharp" version="4.0.1" />
         <dependency id="System.Collections" version="4.0.11" />
         <dependency id="System.Collections.Concurrent" version="4.0.12" />
-        <dependency id="System.ComponentModel.TypeConverter" version="4.1.0" />
         <dependency id="System.Diagnostics.Debug" version="4.0.11" />
-        <dependency id="System.Dynamic.Runtime" version="4.0.11" />
         <dependency id="System.Globalization" version="4.0.11" />
         <dependency id="System.Linq" version="4.1.0" />
         <dependency id="System.Linq.Expressions" version="4.1.0" />
         <dependency id="System.Linq.Queryable" version="4.0.1" />
         <dependency id="System.ObjectModel" version="4.0.12" />
         <dependency id="System.Reflection" version="4.1.0" />
-        <dependency id="System.Reflection.Emit" version="4.0.1" />
-        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1" />
         <dependency id="System.Reflection.Extensions" version="4.0.1" />
-        <dependency id="System.Reflection.Primitives" version="4.0.1" />
         <dependency id="System.Runtime" version="4.1.0" />
         <dependency id="System.Runtime.Extensions" version="4.1.0" />
         <dependency id="System.Text.RegularExpressions" version="4.1.0" />
         <dependency id="System.Threading.Tasks" version="4.0.11" />
       </group>
       <group targetFramework="netstandard1.3">
-        <dependency id="Microsoft.CSharp" version="4.0.1" />
         <dependency id="System.Collections" version="4.0.11" />
         <dependency id="System.Collections.Concurrent" version="4.0.12" />
-        <dependency id="System.Collections.Specialized" version="4.0.1" />
-        <dependency id="System.ComponentModel.TypeConverter" version="4.1.0" />
         <dependency id="System.Diagnostics.Debug" version="4.0.11" />
-        <dependency id="System.Dynamic.Runtime" version="4.0.11" />
         <dependency id="System.Globalization" version="4.0.11" />
         <dependency id="System.Linq" version="4.1.0" />
         <dependency id="System.Linq.Expressions" version="4.1.0" />
         <dependency id="System.Linq.Queryable" version="4.0.1" />
         <dependency id="System.ObjectModel" version="4.0.12" />
         <dependency id="System.Reflection" version="4.1.0" />
-        <dependency id="System.Reflection.Emit" version="4.0.1" />
-        <dependency id="System.Reflection.Emit.ILGeneration" version="4.0.1" />
         <dependency id="System.Reflection.Extensions" version="4.0.1" />
-        <dependency id="System.Reflection.Primitives" version="4.0.1" />
         <dependency id="System.Runtime" version="4.1.0" />
         <dependency id="System.Runtime.Extensions" version="4.1.0" />
         <dependency id="System.Text.RegularExpressions" version="4.1.0" />
