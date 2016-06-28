@@ -106,6 +106,7 @@
     <Compile Include="Bug\IncludeBaseInheritance.cs" />
     <Compile Include="Bug\IncludeInheritance.cs" />
     <Compile Include="Bug\DuplicateExtensionMethods.cs" />
+    <Compile Include="Bug\CustomConverters.cs" />
     <Compile Include="Bug\MissingMapping.cs" />
     <Compile Include="Bug\NullableIntToNullableDecimal.cs" />
     <Compile Include="Bug\UseDestinationValue.cs" />

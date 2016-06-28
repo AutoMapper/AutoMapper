@@ -304,7 +304,7 @@
                 {
                     if(!typeMap.Sealed)
                         typeMap.Seal(typeMapRegistry, configurationProvider);
-                    valueResolverExpr = typeMap.MapExpression.ReplaceParameters(valueResolverExpr, destValueExpr, ctxtParam);
+                    valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, ctxtParam);
                 }
                 else
                 {
