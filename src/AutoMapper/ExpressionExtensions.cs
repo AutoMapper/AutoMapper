@@ -145,7 +145,7 @@ namespace AutoMapper
 
             protected override Expression VisitParameter(ParameterExpression node)
             {
-                return node == _oldParam ? _newParam : base.VisitParameter(node);
+                return node == _oldParam ? ToType(_newParam, _oldParam.Type) : base.VisitParameter(node);
             }
 
             protected override Expression VisitMethodCall(MethodCallExpression node)

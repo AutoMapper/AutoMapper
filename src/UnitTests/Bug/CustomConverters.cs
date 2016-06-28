@@ -1,0 +1,105 @@
+﻿using Xunit;
+using Should;
+using System;
+
+namespace AutoMapper.UnitTests.Bug
+{
+    public class CustomConverters : AutoMapperSpecBase
+    {
+        public class NullableIntToBoolConverter : ITypeConverter<int?, bool>
+        {
+            public bool Convert(int? source, ResolutionContext context)
+            {
+                if(source == null)
+                    return false;
+
+                return source == 1;
+            }
+        }
+
+        public class BoolToNullableIntConverter : ITypeConverter<bool, int?>
+        {
+            public int? Convert(bool source, ResolutionContext context)
+            {
+                return source ? 1 : 0;
+            }
+        }
+
+        public class IntToBoolConverter : ITypeConverter<int, bool>
+        {
+            public bool Convert(int source, ResolutionContext context)
+            {
+                return source == 1;
+            }
+        }
+
+        public class BoolToIntConverter : ITypeConverter<bool, int>
+        {
+            public int Convert(bool source, ResolutionContext context)
+            {
+                return source ? 1 : 0;
+            }
+        }
+
+        private class IntEntity
+        {
+            public int IntProperty { get; set; }
+
+            public IntEntity() { }
+
+            public IntEntity(int value)
+            {
+                IntProperty = value;
+            }
+        }
+
+        private class BoolModel
+        {
+            public bool IntProperty { get; set; }
+
+            public BoolModel() { }
+
+            public BoolModel(bool value)
+            {
+                IntProperty = value;
+            }
+        }
+
+        private class NullableIntEntity
+        {
+            public int? IntProperty { get; set; }
+
+            public NullableIntEntity() { }
+
+            public NullableIntEntity(int? value)
+            {
+                IntProperty = value;
+            }
+        }
+    
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<int, bool>().ConvertUsing<IntToBoolConverter>();
+            cfg.CreateMap<bool, int>().ConvertUsing<BoolToIntConverter>();
+            cfg.CreateMap<int?, bool>().ConvertUsing<NullableIntToBoolConverter>();
+            cfg.CreateMap<bool, int?>().ConvertUsing<BoolToNullableIntConverter>();
+            cfg.CreateMap<IntEntity, BoolModel>().ReverseMap();
+            cfg.CreateMap<NullableIntEntity, BoolModel>().ReverseMap();
+        });
+
+        [Fact]
+        public void CheckConverters()
+        {
+            Mapper.Map<bool>(1).ShouldBeTrue();
+            Mapper.Map<bool>(0).ShouldBeFalse();
+            Mapper.Map<int?, bool>(0).ShouldBeFalse();
+            Mapper.Map<int?, bool>(1).ShouldBeTrue();
+            Mapper.Map<int>(true).ShouldEqual(1);
+            Mapper.Map<int>(false).ShouldEqual(0);
+            Mapper.Map<int?>(true).ShouldEqual(1);
+            Mapper.Map<int?>(false).ShouldEqual(0);
+            Mapper.Map<int?, bool>(null).ShouldBeFalse();
+        }
+    }
+}
