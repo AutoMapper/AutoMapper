@@ -10,7 +10,6 @@ namespace AutoMapper.Mappers
     public class FlagsEnumMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
-            where TDestination : struct
         {
             if (source == null)
                 return ifNull();
