@@ -453,7 +453,8 @@
             }
             else if (propertyMap.CustomExpression != null)
             {
-                valueResolverFunc = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull();
+                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull();
+                valueResolverFunc = TryCatch(nullCheckedExpression, Catch(typeof(NullReferenceException), Default(nullCheckedExpression.Type)));
             }
             else if (propertyMap.SourceMembers.Any()
                      && propertyMap.SourceType != null
