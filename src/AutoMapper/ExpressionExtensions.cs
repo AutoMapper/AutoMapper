@@ -62,8 +62,6 @@ namespace AutoMapper
                 NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
         }
 
-        private static readonly ExpressionVisitor IfNullVisitor = new IfNotNullVisitor();
-
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
         {
             var replaceExp = exp.Body;
@@ -84,7 +82,7 @@ namespace AutoMapper
 
         public static LambdaExpression Concat(this LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
-        public static Expression IfNotNull(this Expression expression) => IfNullVisitor.Visit(expression);
+        public static Expression IfNotNull(this Expression expression) => new IfNotNullVisitor().Visit(expression);
         public static Expression RemoveIfNotNull(this Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
 
         public static Expression IfNullElse(this Expression expression, params Expression[] ifElse)
@@ -96,15 +94,19 @@ namespace AutoMapper
 
         internal class IfNotNullVisitor : ExpressionVisitor
         {
-            private readonly IList<MemberExpression> AllreadyUpdated = new List<MemberExpression>();
+            private readonly HashSet<MemberExpression> _alreadyUpdated = new HashSet<MemberExpression>();
+
             protected override Expression VisitMember(MemberExpression node)
             {
-                if (AllreadyUpdated.Contains(node))
+                if(_alreadyUpdated.Contains(node))
+                {
                     return base.VisitMember(node);
-                AllreadyUpdated.Add(node);
+                }
+                _alreadyUpdated.Add(node);
                 return Visit(DelegateFactory.IfNotNullExpression(node));
             }
         }
+
         internal class RemoveIfNotNullVisitor : ExpressionVisitor
         {
             private readonly Expression[] _expressions;
