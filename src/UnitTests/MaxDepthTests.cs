@@ -7,6 +7,50 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class MaxDepthWithReverseMap : AutoMapperSpecBase
+    {
+        UserDto _destination;
+
+        public class UserModel
+        {
+            public virtual UserGroupModel Group { get; set; }
+        }
+
+        public class UserGroupModel
+        {
+            public virtual ICollection<UserModel> Users { get; set; }
+        }
+
+        public class UserDto
+        {
+            public virtual UserGroupDto Group { get; set; }
+        }
+
+        public class UserGroupDto
+        {
+            public virtual ICollection<UserDto> Users { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<UserModel, UserDto>(MemberList.Destination).MaxDepth(10).ReverseMap();
+            cfg.CreateMap<UserGroupModel, UserGroupDto>(MemberList.Destination).MaxDepth(10).ReverseMap();
+        });
+
+        protected override void Because_of()
+        {
+            var user = new UserModel { Group = new UserGroupModel { Users = new List<UserModel>() } };
+            user.Group.Users.Add(user);
+            _destination = Mapper.Map<UserDto>(user);
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Group.Users.SequenceEqual(new[] { _destination }).ShouldBeTrue();
+        }
+    }
+
     public class MaxDepthTests
     {
         public class Source
