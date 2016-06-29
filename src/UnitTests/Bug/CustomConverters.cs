@@ -4,6 +4,50 @@ using System;
 
 namespace AutoMapper.UnitTests.Bug
 {
+    public class NullableTypeConverter : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+            public DateTimeOffset? Date { get; set; }
+        }
+
+        class Destination
+        {
+            public DateTime? Date { get; set; }
+        }
+
+        public class NullableDateTimeOffsetConverter : ITypeConverter<DateTimeOffset?, DateTime?>
+        {
+            public DateTime? Convert(DateTimeOffset? source, ResolutionContext context)
+            {
+                if(source.HasValue)
+                {
+                    return source.Value.DateTime;
+                }
+                return default(DateTime?);
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap<Source, Destination>();
+            c.CreateMap<DateTimeOffset?, DateTime?>().ConvertUsing<NullableDateTimeOffsetConverter>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { Date = DateTimeOffset.MaxValue });
+        }
+
+        [Fact]
+        public void Should_use_the_converter()
+        {
+            _destination.Date.ShouldEqual(DateTime.MaxValue);
+        }
+    }
+
     public class CustomConverters : AutoMapperSpecBase
     {
         public class NullableIntToBoolConverter : ITypeConverter<int?, bool>
