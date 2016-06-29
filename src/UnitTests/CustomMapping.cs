@@ -5,6 +5,30 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_throwing_NRE_from_MapFrom : AutoMapperSpecBase
+    {
+        class Source
+        {
+        }
+
+        class Destination
+        {
+            public string Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            string x = null;
+            cfg.CreateMap<Source, Destination>().ForMember(d=>d.Value, o=>o.MapFrom(s=>x.ToString()));
+        });
+
+        [Fact]
+        public void We_should_catch_it()
+        {
+            Mapper.Map<Destination>(new Source()).Value.ShouldBeNull();
+        }
+    }
+
     public class When_using_value_with_mismatched_properties : AutoMapperSpecBase
     {
         Destination _destination;
