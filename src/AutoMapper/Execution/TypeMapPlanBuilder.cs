@@ -302,21 +302,22 @@
             {
                 var typePair = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
                 var typeMap = configurationProvider.ResolveTypeMap(typePair);
+                var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
                 if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
                 {
                     if(!typeMap.Sealed)
                         typeMap.Seal(typeMapRegistry, configurationProvider);
                     valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, ctxtParam);
                 }
+                else if (match != null && typeMap == null)
+                {
+                    valueResolverExpr = match.MapExpression(typeMapRegistry, configurationProvider,
+                        propertyMap, valueResolverExpr, destValueExpr,
+                        ctxtParam);
+                }
                 else
                 {
-                    var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-                    var expressionMapper = match;
-                    if (expressionMapper != null)
-                        valueResolverExpr = expressionMapper.MapExpression(typeMapRegistry, configurationProvider, propertyMap, valueResolverExpr, destValueExpr,
-                            ctxtParam);
-                    else
-                        valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr, ctxtParam);
+                    valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr, ctxtParam);
                 }
             }
             else
