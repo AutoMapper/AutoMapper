@@ -62,6 +62,10 @@ namespace AutoMapper
             if (typeMap != null)
             {
                 typeMapsChecked.Add(typeMap);
+                if(typeMap.CustomMapper != null || typeMap.TypeConverterType != null)
+                {
+                    return;
+                }
                 CheckPropertyMaps(typeMapsChecked, typeMap, context);
             }
             else
