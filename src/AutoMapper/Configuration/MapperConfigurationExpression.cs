@@ -11,6 +11,7 @@ namespace AutoMapper.Configuration
 
         public MapperConfigurationExpression() : base("")
         {
+            _profiles.Add(this);
         }
 
         public IEnumerable<Profile> Profiles => _profiles;

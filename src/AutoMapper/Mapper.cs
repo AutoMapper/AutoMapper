@@ -54,6 +54,16 @@ namespace AutoMapper
         }
 
         /// <summary>
+        /// Initialize static configuration instance
+        /// </summary>
+        /// <param name="config">Configuration action</param>
+        public static void Initialize(MapperConfigurationExpression config)
+        {
+            Configuration = new MapperConfiguration(config);
+            Instance = new Mapper(Configuration);
+        }
+
+        /// <summary>
         /// Execute a mapping from the source object to a new destination object.
         /// The source type is inferred from the source object.
         /// </summary>

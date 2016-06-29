@@ -171,7 +171,6 @@ namespace AutoMapper
             var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
             var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
 
-            configuration.Register(_typeMapRegistry);
             foreach (var profile in configuration.Profiles.Cast<IProfileConfiguration>())
             {
                 profile.Register(_typeMapRegistry);
@@ -204,7 +203,6 @@ namespace AutoMapper
                 }
             }
 
-            configuration.Configure(_typeMapRegistry);
             foreach (var profile in configuration.Profiles.Cast<IProfileConfiguration>())
             {
                 profile.Configure(_typeMapRegistry);
