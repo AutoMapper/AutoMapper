@@ -3,14 +3,7 @@ namespace AutoMapper
     using System;
     using System.Collections.Generic;
 
-    public interface IMapperConfigurationExpression : IProfileExpression, IConfiguration
-    {
-        Func<Type, object> ServiceCtor { get; }
-        IEnumerable<Profile> Profiles { get; }
-        IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; } 
-    }
-
-    public interface IConfiguration
+    public interface IMapperConfigurationExpression : IProfileExpression
     {
         /// <summary>
         /// Create missing type maps during mapping, if necessary
@@ -47,5 +40,11 @@ namespace AutoMapper
         /// <param name="profileName">Profile name, must be unique</param>
         /// <param name="config">Profile configuration</param>
         void CreateProfile(string profileName, Action<Profile> config);
+    }
+
+    public interface IConfiguration : IProfileConfiguration
+    {
+        Func<Type, object> ServiceCtor { get; }
+        IEnumerable<Profile> Profiles { get; }
     }
 }

@@ -19,6 +19,7 @@ namespace AutoMapper
         private readonly ConditionalObjectMapper _mapMissingTypes = new ConditionalObjectMapper {Conventions = {tp => true}};
         private readonly List<string> _globalIgnore = new List<string>();
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
+        private readonly List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions = new List<Action<PropertyMap, IMemberConfigurationExpression>>();
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
         private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
 
@@ -94,9 +95,21 @@ namespace AutoMapper
             }
         }
 
+        public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions => _allTypeMapActions;
+
+        public IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions => _allPropertyMapActions;
+
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
         {
             _allTypeMapActions.Add(configuration);
+        }
+
+        public void ForAllPropertyMaps(Func<PropertyMap, bool> condition, Action<PropertyMap, IMemberConfigurationExpression> configuration)
+        {
+            _allPropertyMapActions.Add((pm, cfg) =>
+            {
+                if (condition(pm)) configuration(pm, cfg);
+            });
         }
 
         public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
@@ -297,6 +310,18 @@ namespace AutoMapper
                 action(typeMap, expression);
 
                 expression.Configure(this, typeMap);
+            }
+
+            foreach (var action in _allPropertyMapActions)
+            {
+                foreach (var propertyMap in typeMap.GetPropertyMaps())
+                {
+                    var memberExpression = new MappingExpression.MemberConfigurationExpression(propertyMap.DestinationProperty, typeMap.SourceType);
+
+                    action(propertyMap, memberExpression);
+
+                    memberExpression.Configure(typeMap);
+                }
             }
 
             ApplyBaseMaps(typeMapRegistry, typeMap, typeMap);

@@ -18,6 +18,8 @@ namespace AutoMapper
         bool AllowNullDestinationValues { get; }
         bool AllowNullCollections { get; }
         bool CreateMissingTypeMaps { get; }
+        IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
+        IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
 
         IMemberConfiguration DefaultMemberConfig { get; }
         /// <summary>
