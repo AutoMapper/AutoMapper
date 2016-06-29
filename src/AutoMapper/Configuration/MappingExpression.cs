@@ -92,7 +92,7 @@ namespace AutoMapper.Configuration
         protected override MappingExpression<object, object> CreateReverseMapExpression() 
             => new MappingExpression(new TypePair(DestinationType, SourceType), MemberList.Source);
 
-        private class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
+        internal class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
         {
             public MemberConfigurationExpression(IMemberAccessor destinationMember, Type sourceType) 
                 : base(destinationMember, sourceType)

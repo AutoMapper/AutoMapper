@@ -23,7 +23,7 @@ namespace AutoMapper
         private readonly ConfigurationValidator _validator;
         private readonly Func<TypePair, TypeMap> _getTypeMap;
         private readonly Func<MapRequest, MapperFuncs> _createMapperFuncs;
-        private readonly MapperConfigurationExpression _mapperConfigurationExpression;
+        private readonly IConfiguration _mapperConfigurationExpression;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
             : this(configurationExpression, MapperRegistry.Mappers)
@@ -162,7 +162,7 @@ namespace AutoMapper
             return expr;
         }
 
-        private void Seal(IMapperConfigurationExpression configuration)
+        private void Seal(IConfiguration configuration)
         {
             ServiceCtor = configuration.ServiceCtor;
             AllowNullDestinationValues = configuration.AllowNullDestinationValues;
@@ -185,6 +185,21 @@ namespace AutoMapper
                     action(typeMap, expression);
 
                     expression.Configure(typeMap.Profile, typeMap);
+                }
+            }
+
+            foreach (var action in configuration.AllPropertyMapActions)
+            {
+                foreach (var typeMap in _typeMapRegistry.TypeMaps)
+                {
+                    foreach (var propertyMap in typeMap.GetPropertyMaps())
+                    {
+                        var memberExpression = new MappingExpression.MemberConfigurationExpression(propertyMap.DestinationProperty, typeMap.SourceType);
+
+                        action(propertyMap, memberExpression);
+
+                        memberExpression.Configure(typeMap);
+                    }
                 }
             }
 

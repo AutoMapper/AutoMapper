@@ -104,7 +104,7 @@
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
     <Compile Include="Bug\CaseSensitivityBug.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
-    <Compile Include="Bug\ForAllMaps.cs" />
+    <Compile Include="ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
     <Compile Include="Bug\AssertConfigurationIsValidNullables.cs" />
     <Compile Include="Bug\IncludeBaseInheritance.cs" />
@@ -189,6 +189,7 @@
     <Compile Include="ConvensionTest.cs" />
     <Compile Include="ConversionOperators.cs" />
     <Compile Include="CustomMapping.cs" />
+    <Compile Include="ForAllMembers.cs" />
     <Compile Include="ForAllOtherMembers.cs" />
     <Compile Include="EnumToNullableEnum.cs" />
     <Compile Include="ExplicitMapperCreation.cs" />
