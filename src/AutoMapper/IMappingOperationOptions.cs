@@ -8,6 +8,10 @@
     /// </summary>
     public interface IMappingOperationOptions
     {
+        T CreateInstance<T>();
+
+        Func<Type, object> ServiceCtor { get; }
+
         /// <summary>
         /// Construct services using this callback. Use this for child/nested containers
         /// </summary>

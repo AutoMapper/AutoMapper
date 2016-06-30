@@ -5,6 +5,7 @@ namespace AutoMapper
     using System.Linq;
     using Configuration;
     using Mappers;
+    using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
 
     public class ConfigurationValidator
     {
@@ -39,7 +40,7 @@ namespace AutoMapper
                 try
                 {
                     DryRunTypeMap(typeMapsChecked, typeMap.Types, typeMap,
-                        new ResolutionContext(new MappingOperationOptions(_config.ServiceCtor), new Mapper(_config)));
+                        new ResolutionContext(new ObjectMappingOperationOptions(_config.ServiceCtor), new Mapper(_config)));
                 }
                 catch (Exception e)
                 {

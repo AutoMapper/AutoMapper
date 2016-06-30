@@ -47,7 +47,7 @@
                         ToType(
                             Call(
                                 MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
-                                typeof (MappingOperationOptions).GetMethod("CreateInstance")
+                                typeof (IMappingOperationOptions).GetMethod("CreateInstance")
                                     .MakeGenericMethod(type)
                                 ),
                             converterInterfaceType),
@@ -222,7 +222,7 @@
 
             if (typeMap.ConstructDestinationUsingServiceLocator)
                 return Call(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
-                    typeof (MappingOperationOptions).GetMethod("CreateInstance")
+                    typeof (IMappingOperationOptions).GetMethod("CreateInstance")
                         .MakeGenericMethod(typeMap.DestinationTypeToUse)
                     );
 
@@ -412,7 +412,7 @@
                 else
                 {
                     ctor = Call(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetProperty("Options")),
-                        typeof (MappingOperationOptions).GetMethod("CreateInstance")
+                        typeof (IMappingOperationOptions).GetMethod("CreateInstance")
                             .MakeGenericMethod(valueResolverConfig.Type)
                         );
                     resolverType = valueResolverConfig.Type;

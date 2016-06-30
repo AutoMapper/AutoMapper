@@ -16,7 +16,7 @@ namespace AutoMapper
         /// <summary>
         /// Mapping operation options
         /// </summary>
-        public MappingOperationOptions Options { get; }
+        public IMappingOperationOptions Options { get; }
 
         /// <summary>
         /// Instance cache for resolving circular references
@@ -83,7 +83,7 @@ namespace AutoMapper
         /// </summary>
         public IDictionary<string, object> Items => Options.Items;
 
-        public ResolutionContext(MappingOperationOptions options, IRuntimeMapper mapper)
+        public ResolutionContext(IMappingOperationOptions options, IRuntimeMapper mapper)
         {
             Options = options;
             Mapper = mapper;
