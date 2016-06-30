@@ -32,6 +32,28 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         public int Count => dictionary.Count;
     }
 
+    public class When_mapping_to_dynamic_from_getter_only_property
+    {
+        class Source
+        {
+            public Source()
+            {
+                Value = 24;
+            }
+
+            public int Value { get; }
+        }
+
+        [Fact]
+        public void Should_map_source_properties()
+        {
+            var config = new MapperConfiguration(cfg => { });
+            dynamic destination = config.CreateMapper().Map<DynamicDictionary>(new Source());
+            ((int)destination.Count).ShouldEqual(1);
+            Assert.Equal(24, destination.Value);
+        }
+    }
+
     public class When_mapping_to_dynamic
     {
         dynamic _destination;

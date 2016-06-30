@@ -65,7 +65,7 @@ namespace AutoMapper.Mappers
             if (destination == null)
                 destination = ifNull();
             var sourceTypeDetails = new TypeDetails(typeof(TSource), context.ConfigurationProvider);
-            foreach (var member in sourceTypeDetails.PublicWriteAccessors)
+            foreach (var member in sourceTypeDetails.PublicReadAccessors)
             {
                 object sourceMemberValue;
                 try
