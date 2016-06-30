@@ -97,10 +97,7 @@ namespace AutoMapper.QueryableExtensions
             var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
             if (typeMap.MaxDepth > 0 && visitCount >= typeMap.MaxDepth)
             {
-                if (_configurationProvider.AllowNullDestinationValues)
-                {
-                    return null;
-                }
+                // Don't null it cause problems
             }
             else
             {
