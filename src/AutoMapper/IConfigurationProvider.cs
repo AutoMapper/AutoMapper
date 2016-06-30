@@ -6,7 +6,7 @@ namespace AutoMapper
     using System;
     using QueryableExtensions;
 
-    public interface IConfigurationProvider
+    public interface IConfigurationProvider : IProfileConfiguration
     {
         /// <summary>
         /// Get all configured type maps created
@@ -85,16 +85,6 @@ namespace AutoMapper
         /// Factory method to create formatters, resolvers and type converters
         /// </summary>
         Func<Type, object> ServiceCtor { get; }
-
-        /// <summary>
-        /// Allow null destination values. If false, destination objects will be created for deep object graphs.
-        /// </summary>
-        bool AllowNullDestinationValues { get; }
-
-        /// <summary>
-        /// Allow null destination collections. If true, null source collections result in null destination collections.
-        /// </summary>
-        bool AllowNullCollections { get; }
 
         IExpressionBuilder ExpressionBuilder { get; }
         IMapper CreateMapper();

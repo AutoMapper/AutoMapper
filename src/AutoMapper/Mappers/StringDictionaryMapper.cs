@@ -24,12 +24,12 @@ namespace AutoMapper.Mappers
                 Expression contextExpression)
             =>
             typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap,
-                Call(MembersDictionaryMethodInfo, sourceExpression), destExpression, contextExpression, _ => null,
+                Call(MembersDictionaryMethodInfo, sourceExpression, Expression.Constant(configurationProvider)), destExpression, contextExpression, _ => null,
                 typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
 
-        public static Dictionary<string, object> MembersDictionary(object source)
+        public static Dictionary<string, object> MembersDictionary(object source, IConfigurationProvider configurationProvider)
         {
-            var sourceTypeDetails = new TypeDetails(source.GetType(), _ => true, _ => true);
+            var sourceTypeDetails = new TypeDetails(source.GetType(), configurationProvider);
             var membersDictionary = sourceTypeDetails.PublicReadAccessors.ToDictionary(p => p.Name,
                 p => p.GetMemberValue(source));
             return membersDictionary;
@@ -56,7 +56,7 @@ namespace AutoMapper.Mappers
         private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context)
         {
             destination = destination == null ? context.Mapper.CreateObject<TDestination>() : destination;
-            var destTypeDetails = new TypeDetails(typeof(TDestination), _ => true, _ => true);
+            var destTypeDetails = new TypeDetails(typeof(TDestination), context.ConfigurationProvider);
             var members = from name in source.Keys
                           join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
                           select member;

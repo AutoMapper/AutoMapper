@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using Should;
 using Should.Core.Assertions;
 using Xunit;
@@ -10,6 +11,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
     {
         public string Foo { get; set; }
         public string Bar { get; set; }
+        internal string Jack { get; set; }
     }
 
     public class DynamicDictionary : DynamicObject
@@ -26,6 +28,8 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dictionary[binder.Name] = value;
             return true;
         }
+
+        public int Count => dictionary.Count;
     }
 
     public class When_mapping_to_dynamic
@@ -37,6 +41,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         {
             var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<DynamicDictionary>(new Destination {Foo = "Foo", Bar = "Bar"});
+            ((int)_destination.Count).ShouldEqual(2);
             Assert.Equal("Foo", _destination.Foo);
             Assert.Equal("Bar", _destination.Bar);
         }
@@ -52,10 +57,12 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             dynamic source = new DynamicDictionary();
             source.Foo = "Foo";
             source.Bar = "Bar";
+            source.Jack = "Jack";
             var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<Destination>(source);
             _destination.Foo.ShouldEqual("Foo");
             _destination.Bar.ShouldEqual("Bar");
+            _destination.Jack.ShouldBeNull();
         }
     }
 

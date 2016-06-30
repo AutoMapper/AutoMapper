@@ -8,6 +8,8 @@ namespace AutoMapper.UnitTests.Mappers
     {
         public string Foo { get; set; }
         public string Bar { get; set; }
+
+        internal string Jack { get; set; }
     }
 
     public class When_mapping_to_StringDictionary : NonValidatingSpecBase
@@ -24,6 +26,7 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_map_source_properties()
         {
+            _destination.Count.ShouldEqual(2);
             _destination["Foo"].ShouldEqual("Foo");
             _destination["Bar"].ShouldEqual("Bar");
         }
@@ -37,7 +40,7 @@ namespace AutoMapper.UnitTests.Mappers
 
         protected override void Because_of()
         {
-            var source = new StringDictionary() { { "Foo", "Foo" }, { "Bar", "Bar" } };
+            var source = new StringDictionary() { { "Foo", "Foo" }, { "Bar", "Bar" }, { "Jack", "Jack" } };
             _destination = Mapper.Map<Destination>(source);
         }
 
@@ -46,6 +49,7 @@ namespace AutoMapper.UnitTests.Mappers
         {
             _destination.Foo.ShouldEqual("Foo");
             _destination.Bar.ShouldEqual("Bar");
+            _destination.Jack.ShouldBeNull();
         }
     }
 

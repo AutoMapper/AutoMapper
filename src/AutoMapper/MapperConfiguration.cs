@@ -1,18 +1,22 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Reflection;
+using System.Linq.Expressions;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Concurrent;
-    using System.Linq;
-    using System.Linq.Expressions;
     using Configuration;
     using Mappers;
     using QueryableExtensions;
     using QueryableExtensions.Impl;
-    using static System.Linq.Expressions.Expression;
+    using static Expression;
     using static ExpressionExtensions;
     using UntypedMapperFunc = System.Func<object, object, ResolutionContext, object>;
-
+    using IMemberConfiguration = Configuration.Conventions.IMemberConfiguration;
+    using TypeMapActions = IEnumerable<Action<TypeMap, IMappingExpression>>;
+    using PropertyMapActions = IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>>;
 
     public class MapperConfiguration : IConfigurationProvider
     {
@@ -53,6 +57,40 @@ namespace AutoMapper
             : this(Build(configure), mappers)
         {
         }
+
+        TypeMapActions IProfileConfiguration.AllTypeMapActions => _mapperConfigurationExpression.AllTypeMapActions;
+
+        PropertyMapActions IProfileConfiguration.AllPropertyMapActions => _mapperConfigurationExpression.AllPropertyMapActions;
+
+        IEnumerable<IMemberConfiguration> IProfileConfiguration.MemberConfigurations => _mapperConfigurationExpression.MemberConfigurations;
+
+        IEnumerable<IConditionalObjectMapper> IProfileConfiguration.TypeConfigurations => _mapperConfigurationExpression.TypeConfigurations;
+
+        bool IProfileConfiguration.ConstructorMappingEnabled => _mapperConfigurationExpression.ConstructorMappingEnabled;
+
+        bool IProfileConfiguration.CreateMissingTypeMaps => _mapperConfigurationExpression.CreateMissingTypeMaps;
+
+        IMemberConfiguration IProfileConfiguration.DefaultMemberConfig => _mapperConfigurationExpression.DefaultMemberConfig;
+
+        IEnumerable<MethodInfo> IProfileConfiguration.SourceExtensionMethods => _mapperConfigurationExpression.SourceExtensionMethods;
+
+        Func<PropertyInfo, bool> IProfileConfiguration.ShouldMapProperty => _mapperConfigurationExpression.ShouldMapProperty;
+
+        Func<FieldInfo, bool> IProfileConfiguration.ShouldMapField => _mapperConfigurationExpression.ShouldMapField;
+
+        string IProfileConfiguration.ProfileName => _mapperConfigurationExpression.ProfileName;
+
+        IEnumerable<string> IProfileConfiguration.GlobalIgnores => _mapperConfigurationExpression.GlobalIgnores;
+
+        void IProfileConfiguration.Register(TypeMapRegistry typeMapRegistry) => _mapperConfigurationExpression.Register(typeMapRegistry);
+
+        void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry) => _mapperConfigurationExpression.Configure(typeMapRegistry);
+
+        TypeMap IProfileConfiguration.ConfigureConventionTypeMap(TypeMapRegistry typeMapRegistry, TypePair conventionTypes)
+            => _mapperConfigurationExpression.ConfigureConventionTypeMap(typeMapRegistry, conventionTypes);
+
+        TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
+            => _mapperConfigurationExpression.ConfigureClosedGenericTypeMap(typeMapRegistry, closedTypes, requestedTypes);
 
         public IExpressionBuilder ExpressionBuilder { get; }
 

@@ -19,7 +19,8 @@ namespace AutoMapper.Mappers
         {
             if (destination == null)
                 destination = ifNull();
-            foreach (var member in new TypeDetails(typeof(TDestination)).PublicWriteAccessors)
+            var destinationTypeDetails = new TypeDetails(typeof(TDestination), context.ConfigurationProvider);
+            foreach (var member in destinationTypeDetails.PublicWriteAccessors)
             {
                 object sourceMemberValue;
                 try
@@ -63,7 +64,8 @@ namespace AutoMapper.Mappers
         {
             if (destination == null)
                 destination = ifNull();
-            foreach (var member in new TypeDetails(typeof(TSource)).PublicWriteAccessors)
+            var sourceTypeDetails = new TypeDetails(typeof(TSource), context.ConfigurationProvider);
+            foreach (var member in sourceTypeDetails.PublicWriteAccessors)
             {
                 object sourceMemberValue;
                 try

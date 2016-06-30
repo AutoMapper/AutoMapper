@@ -6,6 +6,8 @@ using AutoMapper.Mappers;
 namespace AutoMapper
 {
     using Configuration.Conventions;
+    using TypeMapActions = IEnumerable<Action<TypeMap, IMappingExpression>>;
+    using PropertyMapActions = IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>>;
 
     /// <summary>
     /// Contains profile-specific configuration
@@ -18,8 +20,8 @@ namespace AutoMapper
         bool AllowNullDestinationValues { get; }
         bool AllowNullCollections { get; }
         bool CreateMissingTypeMaps { get; }
-        IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
-        IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
+        TypeMapActions AllTypeMapActions { get; }
+        PropertyMapActions AllPropertyMapActions { get; }
 
         IMemberConfiguration DefaultMemberConfig { get; }
         /// <summary>
