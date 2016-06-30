@@ -170,6 +170,11 @@ namespace AutoMapper
         public static object Map(object source, object destination, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
             => Instance.Map(source, destination, sourceType, destinationType, opts);
 
+        /// <summary>
+        /// Dry run all configured type maps and throw <see cref="AutoMapperConfigurationException"/> for each problem
+        /// </summary>
+        public static void AssertConfigurationIsValid() => Configuration.AssertConfigurationIsValid();
+
         #endregion
 
         private readonly IConfigurationProvider _configurationProvider;
