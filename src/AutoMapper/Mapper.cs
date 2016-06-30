@@ -5,6 +5,7 @@ namespace AutoMapper
     using Configuration;
     using Execution;
     using Mappers;
+    using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
 
     public class Mapper : IRuntimeMapper
     {
@@ -185,7 +186,7 @@ namespace AutoMapper
         {
             _configurationProvider = configurationProvider;
             _serviceCtor = serviceCtor;
-            _defaultContext = new ResolutionContext(new MappingOperationOptions(_serviceCtor), this);
+            _defaultContext = new ResolutionContext(new ObjectMappingOperationOptions(_serviceCtor), this);
         }
 
         Func<Type, object> IMapper.ServiceCtor => _serviceCtor;
@@ -296,7 +297,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            var options = new MappingOperationOptions(_serviceCtor);
+            var options = new ObjectMappingOperationOptions(_serviceCtor);
 
             opts(options);
 
@@ -327,7 +328,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            var options = new MappingOperationOptions(_serviceCtor);
+            var options = new ObjectMappingOperationOptions(_serviceCtor);
 
             opts(options);
 
