@@ -4,7 +4,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq;
     using System.Reflection;
 
-    internal static class QueryMapperHelper
+    public static class QueryMapperHelper
     {
         public static PropertyMap GetPropertyMap(this IConfigurationProvider config, MemberInfo sourceMemberInfo, Type destinationMemberType)
         {
@@ -34,9 +34,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public static Exception MissingMapException(Type sourceType, Type destinationType)
         {
-            var source = sourceType.Name;
-            var destination = destinationType.Name;
-            throw new InvalidOperationException($"Missing map from {source} to {destination}. Create using Mapper.CreateMap<{source}, {destination}>.");
+            return new InvalidOperationException($"Missing map from {sourceType} to {destinationType}. Create using Mapper.CreateMap<{sourceType.Name}, {destinationType.Name}>.");
         }
     }
 }
