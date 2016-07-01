@@ -1,3 +1,5 @@
+using System.Dynamic;
+
 namespace AutoMapper.Configuration
 {
     using System;
@@ -67,7 +69,7 @@ namespace AutoMapper.Configuration
 
         public static bool IsDictionaryType(this Type type)
         {
-            return type.ImplementsGenericInterface(typeof(IDictionary<,>));
+            return type.ImplementsGenericInterface(typeof(IDictionary<,>)) && type != typeof(ExpandoObject);
         }
 
         public static bool ImplementsGenericInterface(this Type type, Type interfaceType)
