@@ -325,22 +325,6 @@
                 valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr, ctxtParam);
             }
 
-            if (propertyMap.Condition != null)
-            {
-                valueResolverExpr =
-                    Condition(
-                        propertyMap.Condition.ConvertReplaceParameters(
-                            srcParam,
-                            destParam,
-                            ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
-                            ToType(getter, propertyMap.Condition.Parameters[2].Type),
-                            ctxtParam
-                        ),
-                        ToType(valueResolverExpr, propertyMap.DestinationPropertyType),
-                        getter
-                    );
-            }
-
             Expression mapperExpr;
             if (propertyMap.DestinationProperty.MemberInfo is FieldInfo)
             {
@@ -367,6 +351,19 @@
             {
                 mapperExpr = IfThen(
                     propertyMap.PreCondition.ConvertReplaceParameters(srcParam, ctxtParam),
+                    mapperExpr
+                    );
+            }
+            if (propertyMap.Condition != null)
+            {
+                mapperExpr = IfThen(
+                    propertyMap.Condition.ConvertReplaceParameters(
+                        srcParam,
+                        destParam,
+                        ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
+                        ToType(getter, propertyMap.Condition.Parameters[2].Type),
+                        ctxtParam
+                        ),
                     mapperExpr
                     );
             }
