@@ -69,7 +69,7 @@ namespace AutoMapper.Configuration
 
         public static bool IsDictionaryType(this Type type)
         {
-            return type.ImplementsGenericInterface(typeof(IDictionary<,>)) && type != typeof(ExpandoObject);
+            return type.ImplementsGenericInterface(typeof(IDictionary<,>));
         }
 
         public static bool ImplementsGenericInterface(this Type type, Type interfaceType)
