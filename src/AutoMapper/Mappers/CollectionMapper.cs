@@ -66,9 +66,8 @@ namespace AutoMapper.Mappers
             var cast = typeof(Enumerable).GetTypeInfo().DeclaredMethods.First(_ => _.Name == "Cast").MakeGenericMethod(itemParam.Type);
 
             var addMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetMethod("Add");
-            if (!sourceExpression.Type.GetTypeInfo().IsGenericType)
-                sourceExpression = Call(null, cast, sourceExpression);
-            blockExprs.Add(ForEach(sourceExpression, itemParam, Call(
+            var genericSource = sourceExpression.Type.GetTypeInfo().IsGenericType ? sourceExpression : Call(null, cast, sourceExpression);
+            blockExprs.Add(ForEach(genericSource, itemParam, Call(
                 dest,
                 addMethod,
                 itemExpr)));
