@@ -104,6 +104,7 @@
     <Compile Include="Bug\BaseMapWithIncludesAndUnincludedMappings.cs" />
     <Compile Include="Bug\CaseSensitivityBug.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
+    <Compile Include="Bug\MapExpandoObjectProperty.cs" />
     <Compile Include="ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
     <Compile Include="Bug\AssertConfigurationIsValidNullables.cs" />
