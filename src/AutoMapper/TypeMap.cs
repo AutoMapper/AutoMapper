@@ -26,8 +26,8 @@ namespace AutoMapper
 
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
-        private bool _sealed;
-        public bool Sealed => _sealed;
+        private bool? _sealed = false;
+        public bool? Sealed => _sealed;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
         public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, IProfileConfiguration profile)
@@ -212,8 +212,9 @@ namespace AutoMapper
 
         public void Seal(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider)
         {
-            if (_sealed)
+            if (_sealed == true)
                 return;
+            _sealed = null;
 
             foreach (var inheritedTypeMap in _inheritedTypeMaps)
             {
