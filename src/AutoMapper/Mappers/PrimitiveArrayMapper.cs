@@ -40,9 +40,10 @@ namespace AutoMapper.Mappers
 
             var dest = Parameter(destExpression.Type, "destArray");
             var sourceLength = Parameter(typeof(int), "sourceLength");
+            var lengthProperty = typeof(Array).GetProperty("Length");
             var mapExpr = Block(
                 new[] {dest, sourceLength},
-                Assign(sourceLength, Property(sourceExpression, sourceExpression.Type.GetProperty("Length"))),
+                Assign(sourceLength, Property(sourceExpression, lengthProperty)),
                 Assign(dest, NewArrayBounds(destElementType, sourceLength)),
                 Call(copyMethod, sourceExpression, dest, sourceLength),
                 dest
