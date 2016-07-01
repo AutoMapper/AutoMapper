@@ -181,7 +181,7 @@ namespace AutoMapper
 
         public static PropertyInfo GetProperty(this Type type, string name)
         {
-            return type.GetTypeInfo().DeclaredProperties.FirstOrDefault(mi => mi.Name == name);
+            return type.GetTypeInfo().GetDeclaredProperty(name);
         }
 
         public static object[] GetCustomAttributes(this Type type, Type attributeType, bool inherit)
