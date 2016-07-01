@@ -1,4 +1,5 @@
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AutoMapper
 {
@@ -116,7 +117,7 @@ namespace AutoMapper
                 if (tm?.Sealed == false)
                     tm.Seal(_typeMapRegistry, this);
                 else if (typeMap?.Sealed != true)
-                    Thread.Sleep(1);
+                    Task.Delay(1).Wait();
                 return tm;
             });
 
