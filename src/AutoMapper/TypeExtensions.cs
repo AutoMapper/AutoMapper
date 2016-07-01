@@ -179,7 +179,7 @@ namespace AutoMapper
             return type.GetTypeInfo().DeclaredProperties;
         }
 
-        public static PropertyInfo GetProperty(this Type type, string name)
+        public static PropertyInfo GetDeclaredProperty(this Type type, string name)
         {
             return type.GetTypeInfo().GetDeclaredProperty(name);
         }
