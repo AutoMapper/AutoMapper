@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper
 {
     using System;
@@ -51,6 +53,14 @@ namespace AutoMapper
         /// <param name="memberList">Member list to validate</param>
         /// <returns>Mapping expression for more configuration options</returns>
         IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList);
+
+        /// <summary>
+        /// Transforms PropertyMap with source and destination Type
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="transformExpression"></param>
+        void TransformPropertyMap<TSource>(Expression<Func<TSource, TSource>> transformExpression);
 
         /// <summary>
         /// Clear the list of recognized prefixes.

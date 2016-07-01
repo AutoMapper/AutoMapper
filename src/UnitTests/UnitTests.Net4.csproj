@@ -328,6 +328,7 @@
     <Compile Include="Tests\MapperTests.cs" />
     <Compile Include="Tests\TypeInfoSpecs.cs" />
     <Compile Include="Tests\TypeMapFactorySpecs.cs" />
+    <Compile Include="TransformMap.cs" />
     <Compile Include="TypeConverters.cs" />
     <Compile Include="UsingEngineInsideMap.cs" />
     <Compile Include="ValueTypes.cs" />

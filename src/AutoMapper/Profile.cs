@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using AutoMapper.Mappers;
 
@@ -98,6 +99,7 @@ namespace AutoMapper
         public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions => _allTypeMapActions;
 
         public IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions => _allPropertyMapActions;
+        public IList<ExpressionVisitor> AfterBuildMapFuncVisitors { get; } = new List<ExpressionVisitor>();
 
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
         {
@@ -134,6 +136,11 @@ namespace AutoMapper
             _typeMapConfigs.Add(map);
 
             return map;
+        }
+
+        public void TransformPropertyMap<TSource>(Expression<Func<TSource, TSource>> transformExpression)
+        {
+            AfterBuildMapFuncVisitors.Add(new ReplaceAssignExpressionVisitor<TSource, TSource>(transformExpression));
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(MemberList memberList)
@@ -354,6 +361,25 @@ namespace AutoMapper
             config.Configure(this, typeMap);
 
             typeMapRegistry.RegisterTypeMap(typeMap);
+        }
+    }
+
+
+    internal class ReplaceAssignExpressionVisitor<TSource, TDestination> : ExpressionVisitor
+    {
+        private readonly LambdaExpression _replaceExpression;
+
+        public ReplaceAssignExpressionVisitor(Expression<Func<TSource, TDestination>> replaceExpression)
+        {
+            _replaceExpression = replaceExpression;
+        }
+
+        protected override Expression VisitBinary(BinaryExpression node)
+        {
+            if (node.Left is MemberExpression && node.NodeType == ExpressionType.Assign && 
+                node.Left.Type == typeof(TSource) && node.Right.Type == typeof(TDestination))
+                return Expression.Assign(node.Left, _replaceExpression.ReplaceParameters(node.Right));
+            return base.VisitBinary(node);
         }
     }
 }
