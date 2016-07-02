@@ -33,6 +33,7 @@ namespace AutoMapper.UnitTests
             cfg.CreateMissingTypeMaps = true;
             cfg.TransformPropertyMap<string>(s => $"Transformed({s})");
             cfg.TransformPropertyMap<DateTime>(s => s.AddDays(1));
+            cfg.TransformPropertyMap<string>(s => s + "ToString", pm => pm.DestinationProperty.Name.EndsWith("ToString"));
             cfg.CreateProfile("Profile", p => p.CreateMap<Source, Source>());
         });
 
@@ -60,9 +61,9 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
-        public void Sould_TransformPropertyMap_DateToString_String_Transform_But_Not_Date_Transform()
+        public void Sould_TransformPropertyMap_Based_On_Conditions_And_Dest_Type_Only()
         {
-            _destination.DateToString.ShouldEqual($"Transformed({_now})");
+            _destination.DateToString.ShouldEqual($"Transformed({_now})ToString");
         }
 
         [Fact]

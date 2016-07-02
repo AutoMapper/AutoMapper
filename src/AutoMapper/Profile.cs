@@ -140,7 +140,12 @@ namespace AutoMapper
 
         public void TransformPropertyMap<TSource>(Expression<Func<TSource, TSource>> transformExpression)
         {
-            AfterBuildMapFuncVisitors.Add(new ReplaceAssignExpressionVisitor<TSource, TSource>(transformExpression));
+            AfterBuildMapFuncVisitors.Add(new ForPropertyMapExpressionVisitor(new ReplaceAssignExpressionVisitor<TSource, TSource>(transformExpression)));
+        }
+
+        public void TransformPropertyMap<TSource>(Expression<Func<TSource, TSource>> transformExpression, Func<PropertyMap, bool> predicateFunc)
+        {
+            AfterBuildMapFuncVisitors.Add(new ForPropertyMapExpressionVisitor(new ReplaceAssignExpressionVisitor<TSource, TSource>(transformExpression), predicateFunc));
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(MemberList memberList)
@@ -364,6 +369,47 @@ namespace AutoMapper
         }
     }
 
+    internal class ForPropertyMapExpressionVisitor : ExpressionVisitor
+    {
+        private readonly ExpressionVisitor _expressionVisitor;
+        private readonly Func<PropertyMap, bool> _predicateFunc;
+
+        public ForPropertyMapExpressionVisitor(ExpressionVisitor expressionVisitor)
+            : this(expressionVisitor, pm => true)
+        {
+
+        }
+
+        public ForPropertyMapExpressionVisitor(ExpressionVisitor expressionVisitor, Func<PropertyMap, bool> predicateFunc)
+        {
+            _expressionVisitor = expressionVisitor;
+            _predicateFunc = predicateFunc;
+        }
+
+        protected override Expression VisitTry(TryExpression node)
+        {
+            if (node.Body is BlockExpression)
+            {
+                var visit = new GetConstantsOf<PropertyMap>();
+                visit.Visit(node);
+                if(visit.Constants.Count == 1 && _predicateFunc(visit.Constants.First()))
+                    return Expression.TryCatch(_expressionVisitor.Visit(node.Body), node.Handlers.ToArray());
+            }
+            return base.VisitTry(node);
+        }
+    }
+
+
+    internal class GetConstantsOf<T> : ExpressionVisitor
+    {
+        public IList<T> Constants { get; } = new List<T>();
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            if (node.Type == typeof(T))
+                Constants.Add((T) node.Value);
+            return base.VisitConstant(node);
+        }
+    }
 
     internal class ReplaceAssignExpressionVisitor<TSource, TDestination> : ExpressionVisitor
     {

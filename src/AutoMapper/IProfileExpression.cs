@@ -63,6 +63,14 @@ namespace AutoMapper
         void TransformPropertyMap<TSource>(Expression<Func<TSource, TSource>> transformExpression);
 
         /// <summary>
+        /// Transforms PropertyMap with source and destination Type
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TDestination"></typeparam>
+        /// <param name="transformExpression"></param>
+        void TransformPropertyMap<TSource>(Expression<Func<TSource, TSource>> transformExpression, Func<PropertyMap, bool> predicateFunc);
+
+        /// <summary>
         /// Clear the list of recognized prefixes.
         /// </summary>
         void ClearPrefixes();
