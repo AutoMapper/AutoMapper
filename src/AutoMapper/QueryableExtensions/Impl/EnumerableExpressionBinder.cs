@@ -26,37 +26,31 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             var destinationListType = TypeHelper.GetElementType(propertyMap.DestinationPropertyType);
             var sourceListType = TypeHelper.GetElementType(propertyMap.SourceType);
-            var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand);
-
-            Expression exp = result.ResolutionExpression;
+            var expression = result.ResolutionExpression;
 
             if (sourceListType != destinationListType)
             {
+                var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand);
                 var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount);
                 if(transformedExpression == null)
                 {
                     return null;
                 }
-                exp = Expression.Call(
-                        typeof (Enumerable),
-                        "Select",
-                        new[] {sourceListType, destinationListType},
-                        result.ResolutionExpression,
-                        transformedExpression);
+                expression = Expression.Call(typeof (Enumerable), "Select", new[] {sourceListType, destinationListType}, result.ResolutionExpression, transformedExpression);
             }
 
-            exp = Expression.Call(typeof(Enumerable), propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, exp);
+            expression = Expression.Call(typeof(Enumerable), propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, expression);
 
             if(configuration.AllowNullCollections) {
-                exp = Expression.Condition(
+                expression = Expression.Condition(
                             Expression.NotEqual(
                                 Expression.TypeAs(result.ResolutionExpression, typeof(object)), 
                                 Expression.Constant(null)),
-                            exp,
+                            expression,
                             Expression.Constant(null, propertyMap.DestinationPropertyType));
             }
 
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, exp);
+            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, expression);
         }
     }
 }
