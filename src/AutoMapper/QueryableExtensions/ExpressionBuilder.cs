@@ -74,6 +74,10 @@ namespace AutoMapper.QueryableExtensions
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Expression.Parameter(request.SourceType, "dto");
             var total = CreateMapExpression(request, instanceParameter, typePairCount);
+            if(total == null)
+            {
+                return null;
+            }
             var delegateType = typeof(Func<,>).MakeGenericType(request.SourceType, request.DestinationType);
             return Expression.Lambda(delegateType, total, instanceParameter);
         }
