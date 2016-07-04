@@ -89,7 +89,7 @@ namespace AutoMapper.IntegrationTests.Net4
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Customer, CustomerDTO>().MaxDepth(1);
-            cfg.CreateMap<Cust, CustDTO>().MaxDepth(10);
+            cfg.CreateMap<Cust, CustDTO>();
         });
 
         [Fact]
