@@ -1,19 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Collections.Concurrent;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Linq;
-    using System.Linq.Expressions;
+    using Configuration;
+    using Mappers;
 
     public class EnumerableExpressionBinder : IExpressionBinder
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
-            return propertyMap.DestinationPropertyType.GetTypeInfo().ImplementedInterfaces.Any(t => t.Name == "IEnumerable") &&
-                   propertyMap.DestinationPropertyType != typeof (string);
+            return propertyMap.DestinationPropertyType.IsEnumerableType() && !TypeHelper.GetElementType(propertyMap.DestinationPropertyType).IsPrimitive();
         }
 
         public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
