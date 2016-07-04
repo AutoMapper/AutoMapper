@@ -68,13 +68,17 @@
                 return Lambda(typeMap.CustomProjection.ReplaceParameters(srcParam), srcParam, destParam, ctxtParam);
             }
 
-            var destinationFunc = CreateDestinationFunc(typeMap, typeMapRegistry, srcParam, destParam, ctxtParam);
+            bool constructorMapping;
 
-            var assignmentFunc = CreateAssignmentFunc(typeMap, configurationProvider, typeMapRegistry, srcParam, destParam, ctxtParam, destinationFunc);
+            var destination = Variable(destParam.Type, "destination");
 
-            var mapperFunc = CreateMapperFunc(typeMap, srcParam, destParam, ctxtParam, assignmentFunc);
+            var destinationFunc = CreateDestinationFunc(typeMap, typeMapRegistry, srcParam, destParam, ctxtParam, destination, out constructorMapping);
 
-            var lambdaExpr = Lambda(mapperFunc, srcParam, destParam, ctxtParam);
+            var assignmentFunc = CreateAssignmentFunc(typeMap, configurationProvider, typeMapRegistry, srcParam, destParam, ctxtParam, destinationFunc, destination, constructorMapping);
+
+            var mapperFunc = CreateMapperFunc(typeMap, srcParam, destination, ctxtParam, assignmentFunc);
+
+            var lambdaExpr = Lambda(Block(new[] { destination }, mapperFunc), srcParam, destParam, ctxtParam);
 
             return lambdaExpr;
         }
@@ -84,16 +88,18 @@
             TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
             ParameterExpression destParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression ctxtParam,
+            ParameterExpression destination,
+            out bool constructorMapping)
         {
-            var newDestFunc = ToType(CreateNewDestinationFunc(typeMap, typeMapRegistry, srcParam, ctxtParam),
+            var newDestFunc = ToType(CreateNewDestinationFunc(typeMap, typeMapRegistry, srcParam, ctxtParam, out constructorMapping),
                 typeMap.DestinationTypeToUse);
 
             var getDest = typeMap.DestinationTypeToUse.GetTypeInfo().IsValueType
                 ? newDestFunc
                 : Coalesce(destParam, newDestFunc);
 
-            Expression destinationFunc = Assign(destParam, getDest);
+            Expression destinationFunc = Assign(destination, getDest);
 
             if (typeMap.PreserveReferences)
             {
@@ -120,18 +126,27 @@
             ParameterExpression srcParam,
             ParameterExpression destParam,
             ParameterExpression ctxtParam,
-            Expression destinationFunc)
+            Expression destinationFunc,
+            ParameterExpression destination,
+            bool constructorMapping)
         {
-            var typeMaps = typeMap.GetPropertyMaps()
-                    .Where(pm => pm.CanResolveValue() && !typeMap.IsMappedThroughConstructor(pm.DestinationProperty.Name))
-                    .Select(pm => TryPropertyMap(pm, configurationProvider, registry, srcParam, destParam, ctxtParam))
-                    .ToList();
-
-            var actions = typeMaps;
-
+            var actions = new List<Expression>();
+            foreach(var propertyMap in typeMap.GetPropertyMaps())
+            {
+                if(!propertyMap.CanResolveValue())
+                {
+                    continue;
+                }
+                var property = TryPropertyMap(propertyMap, configurationProvider, registry, srcParam, destination, ctxtParam);
+                if(constructorMapping && typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
+                {
+                    property = IfThen(NotEqual(destParam, Expression.Constant(null)), property);
+                }
+                actions.Add(property);
+            }
             foreach (var beforeMapAction in typeMap.BeforeMapActions)
             {
-                actions.Insert(0, beforeMapAction.ReplaceParameters(srcParam, destParam, ctxtParam));
+                actions.Insert(0, beforeMapAction.ReplaceParameters(srcParam, destination, ctxtParam));
             }
             actions.Insert(0, destinationFunc);
             if (typeMap.MaxDepth > 0)
@@ -140,14 +155,14 @@
             }
             actions.AddRange(
                 typeMap.AfterMapActions.Select(
-                    afterMapAction => afterMapAction.ReplaceParameters(srcParam, destParam, ctxtParam)));
+                    afterMapAction => afterMapAction.ReplaceParameters(srcParam, destination, ctxtParam)));
 
             if (typeMap.MaxDepth > 0)
             {
                 actions.Add(Call(ctxtParam, ((MethodCallExpression)DecTypeDepthInfo.Body).Method, Constant(typeMap.Types)));
             }
 
-            actions.Add(destParam);
+            actions.Add(destination);
 
             return Block(actions);
         }
@@ -215,8 +230,11 @@
             TypeMap typeMap,
             TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
-            ParameterExpression ctxtParam)
+            ParameterExpression ctxtParam,
+            out bool constructorMapping)
         {
+            constructorMapping = false;
+
             if (typeMap.DestinationCtor != null)
                 return typeMap.DestinationCtor.ReplaceParameters(srcParam, ctxtParam);
 
@@ -226,9 +244,11 @@
                         .MakeGenericMethod(typeMap.DestinationTypeToUse)
                     );
 
-            if (typeMap.ConstructorMap?.CanResolve == true)
+            if(typeMap.ConstructorMap?.CanResolve == true)
+            {
+                constructorMapping = true;
                 return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, ctxtParam);
-
+            }
 #if NET45
             if (typeMap.DestinationTypeToUse.IsInterface())
             {
