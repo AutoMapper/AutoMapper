@@ -8,52 +8,52 @@ namespace AutoMapper.IntegrationTests
 {
     using UnitTests;
     using QueryableExtensions;
-
-    public class Customer
-    {
-        [Key]
-        public int Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-
-        public byte[] RowVersion { get; set; }
-    }
-
-    public class CustomerViewModel
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public byte[] RowVersion { get; set; }
-    }
-
-    public class Context : DbContext
-    {
-        public Context()
-        {
-            Database.SetInitializer<Context>(new DatabaseInitializer());
-        }
-
-        public DbSet<Customer> Customers { get; set; }
-    }
-
-    public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
-    {
-        protected override void Seed(Context context)
-        {
-            context.Customers.Add(new Customer
-            {
-                Id = 1,
-                FirstName = "Bob",
-                LastName = "Smith",
-                RowVersion = new byte[] { 1, 2, 3 }
-            });
-
-            base.Seed(context);
-        }
-    }
         
     public class ByteArrayColumns : AutoMapperSpecBase
     {
+        public class Customer
+        {
+            [Key]
+            public int Id { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+
+            public byte[] RowVersion { get; set; }
+        }
+
+        public class CustomerViewModel
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public byte[] RowVersion { get; set; }
+        }
+
+        public class Context : DbContext
+        {
+            public Context()
+            {
+                Database.SetInitializer<Context>(new DatabaseInitializer());
+            }
+
+            public DbSet<Customer> Customers { get; set; }
+        }
+
+        public class DatabaseInitializer : CreateDatabaseIfNotExists<Context>
+        {
+            protected override void Seed(Context context)
+            {
+                context.Customers.Add(new Customer
+                {
+                    Id = 1,
+                    FirstName = "Bob",
+                    LastName = "Smith",
+                    RowVersion = new byte[] { 1, 2, 3 }
+                });
+
+                base.Seed(context);
+            }
+        }
+
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Customer, CustomerViewModel>();
