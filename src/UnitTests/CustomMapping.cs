@@ -1028,6 +1028,65 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class When_using_inheritance_with_value_resoluvers : AutoMapperSpecBase
+    {
+        public class SourceDto
+        {
+            public int Id { get; set; }
+            public string NumberValue { get; set; }
+        }
+
+        public class SourceChildDto : SourceDto
+        {
+            public string ChildField { get; set; }
+        }
+
+        public class DestinationDto
+        {
+            public int Ident { get; set; }
+            public int Number { get; set; }
+        }
+
+        public class DestinationChildDto : DestinationDto
+        {
+            public string ChildField { get; set; }
+        }
+
+        public class CustomResolver : IMemberValueResolver<SourceDto, object, string, int>
+        {
+            public int Resolve(SourceDto src, object dest, string source, int member, ResolutionContext context)
+            {
+                return int.Parse(source);
+            }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => {
+            cfg.CreateMap<SourceDto, DestinationDto>()
+                .ForMember(dest => dest.Ident, opt => opt.MapFrom(x => x.Id))
+                .ForMember(dest => dest.Number, opt => opt.ResolveUsing<CustomResolver, string>(src => src.NumberValue))
+                ;
+            cfg.CreateMap<SourceChildDto, DestinationChildDto>()
+                .IncludeBase<SourceDto, DestinationDto>()
+                //.ForMember(dest => dest.Number, opt => opt.ResolveUsing<CustomResolver, string>(src => src.NumberValue))
+                ;
+        });
+
+        [Fact]
+        public void Should_inherit_value_resolver()
+        {
+            var sourceChild = new SourceChildDto
+            {
+                Id = 1,
+                NumberValue = "13",
+                ChildField = "alpha"
+            };
+
+            // destination = { Ident: 1, Number: 0 /* should be 13 */, ChildField: "alpha" }
+            var destination = Mapper.Map<DestinationChildDto>(sourceChild);
+            destination.Number.ShouldEqual(13);
+        }
+    }
+
 
     public class When_specifying_member_and_member_resolver_using_string_property_names : AutoMapperSpecBase
     {

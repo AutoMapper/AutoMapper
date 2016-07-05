@@ -100,6 +100,7 @@ namespace AutoMapper
             NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             CustomSourceMember = CustomSourceMember ?? inheritedMappedProperty.CustomSourceMember;
+            ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
         }
 
         public bool IsMapped()
