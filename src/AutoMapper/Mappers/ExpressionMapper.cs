@@ -258,7 +258,7 @@ namespace AutoMapper.Mappers
                 if (propertyMap.CustomExpression != null)
                     return propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
 
-                Func<Expression,IMemberGetter,Expression> getExpression = (current, memberGetter) => Expression.MakeMemberAccess(current, memberGetter.MemberInfo);
+                Func<Expression, MemberInfo, Expression> getExpression = Expression.MakeMemberAccess;
 
                 return propertyMap.SourceMembers
                     .Aggregate(replacedExpression, getExpression);
@@ -294,7 +294,7 @@ namespace AutoMapper.Mappers
                 if (node.Member.IsStatic())
                     return null;
 
-                var memberAccessor = node.Member.ToMemberAccessor();
+                var memberAccessor = node.Member;
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
                 return propertyMap;
             }

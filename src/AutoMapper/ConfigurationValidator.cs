@@ -4,6 +4,7 @@ namespace AutoMapper
     using System.Collections.Generic;
     using System.Linq;
     using Configuration;
+    using Execution;
     using Mappers;
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
 
@@ -115,7 +116,7 @@ namespace AutoMapper
                 if (sourceType.IsGenericParameter || sourceType == typeof (object))
                     return;
 
-                var destinationType = propertyMap.DestinationProperty.MemberType;
+                var destinationType = propertyMap.DestinationProperty.GetMemberType();
                 var memberTypeMap = _config.ResolveTypeMap(sourceType,
                     destinationType);
 

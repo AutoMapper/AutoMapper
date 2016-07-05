@@ -160,7 +160,7 @@ namespace AutoMapper.QueryableExtensions
                 var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter);
 
                 if (propertyMap.ExplicitExpansion &&
-                    !request.MembersToExpand.Contains(propertyMap.DestinationProperty.MemberInfo))
+                    !request.MembersToExpand.Contains(propertyMap.DestinationProperty))
                     continue;
 
                 var propertyTypeMap = _configurationProvider.ResolveTypeMap(result.Type,
@@ -172,7 +172,7 @@ namespace AutoMapper.QueryableExtensions
                 if (binder == null)
                 {
                     var message =
-                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.MemberInfo.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
+                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
 
                     throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
                 }

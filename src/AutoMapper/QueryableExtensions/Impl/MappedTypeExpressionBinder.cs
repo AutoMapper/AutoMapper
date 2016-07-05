@@ -33,7 +33,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                         transformedExpression, expressionNull);
             }
 
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, transformedExpression);
+            return Expression.Bind(propertyMap.DestinationProperty, transformedExpression);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace AutoMapper
 
     public class ConstructorParameterMap
     {
-        public ConstructorParameterMap(ParameterInfo parameter, IMemberGetter[] sourceMembers, bool canResolve)
+        public ConstructorParameterMap(ParameterInfo parameter, MemberInfo[] sourceMembers, bool canResolve)
         {
             Parameter = parameter;
             SourceMembers = sourceMembers;
@@ -22,13 +22,13 @@ namespace AutoMapper
 
         public ParameterInfo Parameter { get; }
 
-        public IMemberGetter[] SourceMembers { get; }
+        public MemberInfo[] SourceMembers { get; }
 
         public bool CanResolve { get; set; }
         public LambdaExpression CustomExpression { get; set; }
         public Func<object, ResolutionContext, object> CustomValueResolver { get; set; }
 
-        public Type SourceType => CustomExpression?.ReturnType ?? SourceMembers.LastOrDefault()?.MemberType;
+        public Type SourceType => CustomExpression?.ReturnType ?? SourceMembers.LastOrDefault()?.GetMemberType();
         public Type DestinationType => Parameter.ParameterType;
 
         public Expression CreateExpression(TypeMapRegistry typeMapRegistry,
@@ -57,11 +57,11 @@ namespace AutoMapper
 
             var valueResolverExpr = SourceMembers.Aggregate(
                 (Expression) srcParam,
-                (inner, getter) => getter.MemberInfo is MethodInfo
-                    ? getter.MemberInfo.IsStatic()
-                        ? Call(null, (MethodInfo) getter.MemberInfo, inner)
-                        : (Expression) Call(inner, (MethodInfo) getter.MemberInfo)
-                    : MakeMemberAccess(getter.MemberInfo.IsStatic() ? null : inner, getter.MemberInfo)
+                (inner, getter) => getter is MethodInfo
+                    ? getter.IsStatic()
+                        ? Call(null, (MethodInfo) getter, inner)
+                        : (Expression) Call(inner, (MethodInfo) getter)
+                    : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                 );
             valueResolverExpr = valueResolverExpr.IfNotNull();
 

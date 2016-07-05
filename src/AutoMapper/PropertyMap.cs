@@ -11,9 +11,9 @@ namespace AutoMapper
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
-        private readonly List<IMemberGetter> _memberChain = new List<IMemberGetter>();
+        private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
 
-        public PropertyMap(IMemberAccessor destinationProperty, TypeMap typeMap)
+        public PropertyMap(MemberInfo destinationProperty, TypeMap typeMap)
         {
             TypeMap = typeMap;
             //UseDestinationValue = true;
@@ -27,11 +27,11 @@ namespace AutoMapper
         }
 
         public TypeMap TypeMap { get; }
-        public IMemberAccessor DestinationProperty { get; }
+        public MemberInfo DestinationProperty { get; }
 
-        public Type DestinationPropertyType => DestinationProperty.MemberType;
+        public Type DestinationPropertyType => DestinationProperty.GetMemberType();
 
-        public IEnumerable<IMemberGetter> SourceMembers => _memberChain;
+        public IEnumerable<MemberInfo> SourceMembers => _memberChain;
 
         public bool Ignored { get; set; }
         public int? MappingOrder { get; set; }
@@ -49,6 +49,9 @@ namespace AutoMapper
         {
             get
             {
+                if (CustomSourceMemberName != null)
+                    return TypeMap.SourceType.GetMember(CustomSourceMemberName).FirstOrDefault();
+
                 if (CustomSourceMember != null)
                     return CustomSourceMember;
 
@@ -63,7 +66,7 @@ namespace AutoMapper
                     }
                 }
 
-                return _memberChain.LastOrDefault()?.MemberInfo;
+                return _memberChain.LastOrDefault();
             }
         }
 
@@ -81,9 +84,11 @@ namespace AutoMapper
             }
         }
 
-        public void ChainMembers(IEnumerable<IMemberGetter> members)
+        public string CustomSourceMemberName { get; set; }
+
+        public void ChainMembers(IEnumerable<MemberInfo> members)
         {
-            var getters = members as IList<IMemberGetter> ?? members.ToList();
+            var getters = members as IList<MemberInfo> ?? members.ToList();
             _memberChain.AddRange(getters);
         }
 

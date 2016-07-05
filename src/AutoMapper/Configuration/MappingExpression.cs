@@ -86,7 +86,7 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression PreserveReferences() => (IMappingExpression)base.PreserveReferences();
 
-        protected override IMemberConfiguration CreateMemberConfigurationExpression<TMember>(IMemberAccessor member, Type sourceType)
+        protected override IMemberConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
             => new MemberConfigurationExpression(member, sourceType);
 
         protected override MappingExpression<object, object> CreateReverseMapExpression() 
@@ -94,7 +94,7 @@ namespace AutoMapper.Configuration
 
         internal class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
         {
-            public MemberConfigurationExpression(IMemberAccessor destinationMember, Type sourceType) 
+            public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) 
                 : base(destinationMember, sourceType)
             {
             }
@@ -136,24 +136,25 @@ namespace AutoMapper.Configuration
         private readonly List<CtorParamConfigurationExpression<TSource>> _ctorParamConfigurations = new List<CtorParamConfigurationExpression<TSource>>();
         private MappingExpression<TDestination, TSource> _reverseMap;
         private Action<IMemberConfigurationExpression<TSource, TDestination, object>> _allMemberOptions;
-        private Func<IMemberAccessor, bool> _memberFilter;
+        private Func<MemberInfo, bool> _memberFilter;
 
         public MappingExpression(MemberList memberList)
+            : this(memberList, typeof(TSource), typeof(TDestination))
         {
-            MemberList = memberList;
-            Types = new TypePair(typeof(TSource), typeof(TDestination));
         }
 
         public MappingExpression(MemberList memberList, Type sourceType, Type destinationType)
         {
             MemberList = memberList;
             Types = new TypePair(sourceType, destinationType);
+            IsOpenGeneric = sourceType.IsGenericTypeDefinition() || destinationType.IsGenericTypeDefinition();
         }
 
         public MemberList MemberList { get; }
         public TypePair Types { get; }
         public Type SourceType => Types.SourceType;
         public Type DestinationType => Types.DestinationType;
+        public bool IsOpenGeneric { get; }
         public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
         protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
 
@@ -164,7 +165,7 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        protected virtual IMemberConfiguration CreateMemberConfigurationExpression<TMember>(IMemberAccessor member, Type sourceType)
+        protected virtual IMemberConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
         {
             return new MemberConfigurationExpression<TSource, TDestination, TMember>(member, sourceType);
         }
@@ -191,7 +192,7 @@ namespace AutoMapper.Configuration
         public void ForAllOtherMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
         {
             _allMemberOptions = memberOptions;
-            _memberFilter = m => _memberConfigurations.All(c=>c.DestinationMember.MemberInfo != m.MemberInfo);
+            _memberFilter = m => _memberConfigurations.All(c=>!Equals(c.DestinationMember, m));
         }
 
         public void ForAllMembers(Action<IMemberConfigurationExpression<TSource, TDestination, object>> memberOptions)
@@ -464,17 +465,13 @@ namespace AutoMapper.Configuration
 
         private IMappingExpression<TSource, TDestination> ForDestinationMember<TMember>(MemberInfo destinationProperty, Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
-            ForDestinationMember(destinationProperty.ToMemberAccessor(), memberOptions);
-            return this;
-        }
-
-        private void ForDestinationMember<TMember>(IMemberAccessor destinationProperty, Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
-        {
             var expression = (MemberConfigurationExpression<TSource, TDestination, TMember>) CreateMemberConfigurationExpression<TMember>(destinationProperty, SourceType);
 
             _memberConfigurations.Add(expression);
 
             memberOptions(expression);
+
+            return this;
         }
 
         public void As<T>()
@@ -513,7 +510,7 @@ namespace AutoMapper.Configuration
 
             if (_allMemberOptions != null)
             {
-                foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors.Select(m=>m.ToMemberAccessor()).Where(_memberFilter))
+                foreach (var accessor in typeMap.DestinationTypeDetails.PublicReadAccessors.Where(_memberFilter))
                 {
                     ForDestinationMember(accessor, _allMemberOptions);
                 }

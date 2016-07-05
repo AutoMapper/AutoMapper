@@ -18,7 +18,7 @@ namespace AutoMapper.Configuration.Conventions
             DestinationMemberNamingConvention = new PascalCaseNamingConvention();
         }
 
-        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IMemberGetter> resolvers, IMemberConfiguration parent )
+        public bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers, IMemberConfiguration parent )
         {
             string[] matches = DestinationMemberNamingConvention.SplittingExpression
                 .Matches(nameToSearch)
@@ -34,7 +34,7 @@ namespace AutoMapper.Configuration.Conventions
 
                 if (matchingMemberInfo != null)
                 {
-                    resolvers.AddLast(matchingMemberInfo.ToMemberGetter());
+                    resolvers.AddLast(matchingMemberInfo);
 
                     var details = new TypeDetails(matchingMemberInfo.GetMemberType(), options);
                     var foundMatch = parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, snippet.Second, resolvers);
