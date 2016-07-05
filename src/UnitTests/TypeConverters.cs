@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests.CustomMapping
         {
             public static readonly IDictionary<TKey, TValue> Instance = new Dictionary<TKey, TValue>();
 
-            public IDictionary<TKey, TValue> Convert(IDictionary<TKey, TValue> source, ResolutionContext context)
+            public IDictionary<TKey, TValue> Convert(IDictionary<TKey, TValue> source, IDictionary<TKey, TValue> destination, ResolutionContext context)
             {
                 return Instance;
             }
@@ -69,7 +69,7 @@ namespace AutoMapper.UnitTests.CustomMapping
 
 		public class DateTimeTypeConverter : ITypeConverter<string, DateTime>
 		{
-			public DateTime Convert(string source, ResolutionContext context)
+			public DateTime Convert(string source, DateTime destination, ResolutionContext context)
 			{
 				return System.Convert.ToDateTime(source);
 			}
@@ -77,7 +77,7 @@ namespace AutoMapper.UnitTests.CustomMapping
 
 		public class TypeTypeConverter : ITypeConverter<string, Type>
 		{
-			public Type Convert(string source, ResolutionContext context)
+			public Type Convert(string source, Type destination, ResolutionContext context)
 			{
 				Type type = Assembly.GetExecutingAssembly().GetType(source);
 				return type;
@@ -254,7 +254,7 @@ namespace AutoMapper.UnitTests.CustomMapping
 
 		public class CustomConverter : ITypeConverter<Source, Destination>
 		{
-			public Destination Convert(Source source, ResolutionContext context)
+			public Destination Convert(Source source, Destination destination, ResolutionContext context)
 			{
 				return new Destination
 					{
@@ -296,7 +296,7 @@ namespace AutoMapper.UnitTests.CustomMapping
 
 		public class CustomConverter : ITypeConverter<Source, Destination>
 		{
-			public Destination Convert(Source source, ResolutionContext context)
+			public Destination Convert(Source source, Destination destination, ResolutionContext context)
 			{
 				return new Destination
 					{

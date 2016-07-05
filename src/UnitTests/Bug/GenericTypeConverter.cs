@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             public static readonly List<TDestination> Result = new List<TDestination>();
 
-            public List<TDestination> Convert(List<TSource> source, ResolutionContext context)
+            public List<TDestination> Convert(List<TSource> source, List<TDestination> destination, ResolutionContext context)
             {
                 return Result;
             }
@@ -78,32 +78,32 @@ namespace AutoMapper.UnitTests.Bug
             public static OtherDestination<T> OpenDestinationViaClosedSource = new OtherDestination<T>();
             public static Destination<object> ClosedDestinationViaOpenSource = new Destination<object>();
 
-            public Destination<T> Convert(Source<T> source, ResolutionContext context)
+            public Destination<T> Convert(Source<T> source, Destination<T> dest, ResolutionContext context)
             {
                 return SomeDestination;
             }
 
-            OtherDestination<T> ITypeConverter<OtherSource<T>, OtherDestination<T>>.Convert(OtherSource<T> source, ResolutionContext context)
+            OtherDestination<T> ITypeConverter<OtherSource<T>, OtherDestination<T>>.Convert(OtherSource<T> source, OtherDestination<T> dest, ResolutionContext context)
             {
                 return SomeOtherDestination;
             }
 
-            int ITypeConverter<Source<T>, int>.Convert(Source<T> source, ResolutionContext context)
+            int ITypeConverter<Source<T>, int>.Convert(Source<T> source, int dest, ResolutionContext context)
             {
                 return NongenericDestination;
             }
 
-            Destination<T> ITypeConverter<int, Destination<T>>.Convert(int source, ResolutionContext context)
+            Destination<T> ITypeConverter<int, Destination<T>>.Convert(int source, Destination<T> dest, ResolutionContext context)
             {
                 return SomeDestination;
             }
 
-            Destination<object> ITypeConverter<OtherSource<T>, Destination<object>>.Convert(OtherSource<T> source, ResolutionContext context)
+            Destination<object> ITypeConverter<OtherSource<T>, Destination<object>>.Convert(OtherSource<T> source, Destination<object> dest, ResolutionContext context)
             {
                 return ClosedDestinationViaOpenSource;
             }
 
-            OtherDestination<T> ITypeConverter<Source<object>, OtherDestination<T>>.Convert(Source<object> source, ResolutionContext context)
+            OtherDestination<T> ITypeConverter<Source<object>, OtherDestination<T>>.Convert(Source<object> source, OtherDestination<T> dest, ResolutionContext context)
             {
                 return OpenDestinationViaClosedSource;
             }
@@ -114,7 +114,7 @@ namespace AutoMapper.UnitTests.Bug
         {
             public static IReadOnlyDictionary<T1, T2> ReadOnlyDictionaryDestination = new Dictionary<T1, T2>();
 
-            public IReadOnlyDictionary<T1, T2> Convert(Hashtable source, ResolutionContext context)
+            public IReadOnlyDictionary<T1, T2> Convert(Hashtable source, IReadOnlyDictionary<T1, T2> dest, ResolutionContext context)
             {
                 return ReadOnlyDictionaryDestination;
             }

@@ -291,7 +291,7 @@ namespace AutoMapper.UnitTests
 
 	        public class NullableBoolToLabel : ITypeConverter<bool?, string>
             {
-                public string Convert(bool? source, ResolutionContext context)
+                public string Convert(bool? source, string destination, ResolutionContext context)
                 {
                     if (source.HasValue)
                     {

@@ -52,7 +52,7 @@
                                 ),
                             converterInterfaceType),
                         converterInterfaceType.GetMethod("Convert"),
-                        srcParam, ctxtParam
+                        srcParam, destParam, ctxtParam
                         ),
                     srcParam, destParam, ctxtParam);
             }
