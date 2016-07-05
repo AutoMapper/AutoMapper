@@ -18,7 +18,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private static MemberAssignment BindStringExpression(PropertyMap propertyMap, ExpressionResolutionResult result)
         {
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, Expression.Call(result.ResolutionExpression, "ToString", null, null));
+            return Expression.Bind(propertyMap.DestinationProperty, Expression.Call(result.ResolutionExpression, "ToString", null, null));
         }
     }
 }

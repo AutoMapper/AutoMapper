@@ -50,7 +50,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                             Expression.Constant(null, propertyMap.DestinationPropertyType));
             }
 
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, expression);
+            return Expression.Bind(propertyMap.DestinationProperty, expression);
         }
     }
 }

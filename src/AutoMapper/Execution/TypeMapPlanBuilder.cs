@@ -278,11 +278,11 @@
             ParameterExpression destParam,
             ParameterExpression ctxtParam)
         {
-            var destMember = MakeMemberAccess(destParam, propertyMap.DestinationProperty.MemberInfo);
+            var destMember = MakeMemberAccess(destParam, propertyMap.DestinationProperty);
 
             Expression getter;
 
-            var pi = propertyMap.DestinationProperty.MemberInfo as PropertyInfo;
+            var pi = propertyMap.DestinationProperty as PropertyInfo;
             if (pi != null && pi.GetGetMethod(true) == null)
             {
                 getter = Default(propertyMap.DestinationPropertyType);
@@ -326,7 +326,7 @@
             }
 
             Expression mapperExpr;
-            if (propertyMap.DestinationProperty.MemberInfo is FieldInfo)
+            if (propertyMap.DestinationProperty is FieldInfo)
             {
                 mapperExpr = propertyMap.SourceType != propertyMap.DestinationPropertyType
                     ? Assign(destMember, ToType(valueResolverExpr, propertyMap.DestinationPropertyType))
@@ -334,7 +334,7 @@
             }
             else
             {
-                var setter = ((PropertyInfo) propertyMap.DestinationProperty.MemberInfo).GetSetMethod(true);
+                var setter = ((PropertyInfo) propertyMap.DestinationProperty).GetSetMethod(true);
                 if (setter == null)
                 {
                     mapperExpr = valueResolverExpr;
@@ -494,20 +494,20 @@
                 )
             {
                 var last = propertyMap.SourceMembers.Last();
-                var pi = last.MemberInfo as PropertyInfo;
+                var pi = last as PropertyInfo;
                 if (pi != null && pi.GetGetMethod(true) == null)
                 {
-                    valueResolverFunc = Default(last.MemberType);
+                    valueResolverFunc = Default(last.GetMemberType());
                 }
                 else
                 {
                     valueResolverFunc = propertyMap.SourceMembers.Aggregate(
                         (Expression) srcParam,
-                        (inner, getter) => getter.MemberInfo is MethodInfo
-                            ? getter.MemberInfo.IsStatic()
-                                ? Call(null, (MethodInfo) getter.MemberInfo, inner)
-                                : (Expression) Call(inner, (MethodInfo) getter.MemberInfo)
-                            : MakeMemberAccess(getter.MemberInfo.IsStatic() ? null : inner, getter.MemberInfo)
+                        (inner, getter) => getter is MethodInfo
+                            ? getter.IsStatic()
+                                ? Call(null, (MethodInfo) getter, inner)
+                                : (Expression) Call(inner, (MethodInfo) getter)
+                            : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                         );
                     valueResolverFunc = valueResolverFunc.IfNotNull();
                 }

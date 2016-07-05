@@ -5,26 +5,27 @@ namespace AutoMapper.Configuration
     using System.Reflection;
     using System.Linq;
     using System.Linq.Expressions;
+    using Execution;
 
     public interface IMemberConfiguration
     {
         void Configure(TypeMap typeMap);
-        IMemberAccessor DestinationMember { get; }
+        MemberInfo DestinationMember { get; }
     }
 
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IMemberConfiguration
     {
-        private readonly IMemberAccessor _destinationMember;
+        private readonly MemberInfo _destinationMember;
         private readonly Type _sourceType;
         protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
-        public MemberConfigurationExpression(IMemberAccessor destinationMember, Type sourceType)
+        public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
         {
             _destinationMember = destinationMember;
             _sourceType = sourceType;
         }
 
-        public IMemberAccessor DestinationMember => _destinationMember;
+        public MemberInfo DestinationMember => _destinationMember;
 
         public void NullSubstitute(TMember nullSubstitute)
         {
@@ -129,7 +130,7 @@ namespace AutoMapper.Configuration
             if (memberInfo == null)
                 throw new AutoMapperConfigurationException($"Cannot find member {sourceMember} of type {_sourceType}");
 
-            PropertyMapActions.Add(pm => pm.CustomSourceMember = memberInfo);
+            PropertyMapActions.Add(pm => pm.CustomSourceMemberName = sourceMember);
         }
 
         public void UseValue<TValue>(TValue value)
@@ -241,7 +242,15 @@ namespace AutoMapper.Configuration
 
         public void Configure(TypeMap typeMap)
         {
-            var propertyMap = typeMap.FindOrCreatePropertyMapFor(_destinationMember);
+            var destMember = _destinationMember;
+
+            if (destMember.DeclaringType.IsGenericType())
+            {
+                destMember = typeMap.DestinationTypeDetails.PublicReadAccessors
+                    .First(m => m.Name == destMember.Name && m.GetMemberType() == destMember.GetMemberType());
+            }
+
+            var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember);
 
             foreach (var action in PropertyMapActions)
             {

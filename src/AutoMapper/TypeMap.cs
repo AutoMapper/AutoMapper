@@ -92,7 +92,7 @@ namespace AutoMapper
             return ConstructorMap?.CtorParams.Any(c => c.Parameter.Name.Equals(destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
         }
 
-        public void AddPropertyMap(IMemberAccessor destProperty, IEnumerable<IMemberGetter> resolvers)
+        public void AddPropertyMap(MemberInfo destProperty, IEnumerable<MemberInfo> resolvers)
         {
             var propertyMap = new PropertyMap(destProperty, this);
 
@@ -145,7 +145,7 @@ namespace AutoMapper
             return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
         }
 
-        public PropertyMap FindOrCreatePropertyMapFor(IMemberAccessor destinationProperty)
+        public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty)
         {
             var propertyMap = GetExistingPropertyMapFor(destinationProperty);
 
@@ -230,7 +230,7 @@ namespace AutoMapper
             _sealed = true;
         }
 
-        public PropertyMap GetExistingPropertyMapFor(IMemberAccessor destinationProperty)
+        public PropertyMap GetExistingPropertyMapFor(MemberInfo destinationProperty)
         {
             var propertyMap =
                 _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
@@ -244,7 +244,7 @@ namespace AutoMapper
             if (propertyMap == null)
                 return null;
 
-            var propertyInfo = propertyMap.DestinationProperty.MemberInfo as PropertyInfo;
+            var propertyInfo = propertyMap.DestinationProperty as PropertyInfo;
 
             if (propertyInfo == null)
                 return propertyMap;
@@ -254,7 +254,7 @@ namespace AutoMapper
             if (baseAccessor.IsAbstract || baseAccessor.IsVirtual)
                 return propertyMap;
 
-            var accessor = ((PropertyInfo)destinationProperty.MemberInfo).GetMethod;
+            var accessor = ((PropertyInfo)destinationProperty).GetMethod;
 
             if (baseAccessor.DeclaringType == accessor.DeclaringType)
                 return propertyMap;

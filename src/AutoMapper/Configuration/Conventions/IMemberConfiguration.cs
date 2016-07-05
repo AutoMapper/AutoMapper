@@ -2,6 +2,7 @@ namespace AutoMapper.Configuration.Conventions
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
 
     public interface IMemberConfiguration
     {
@@ -13,6 +14,6 @@ namespace AutoMapper.Configuration.Conventions
             where TNameMapper : ISourceToDestinationNameMapper, new();
 
         IParentSourceToDestinationNameMapper NameMapper { get; set; }
-        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<IMemberGetter> resolvers);
+        bool MapDestinationPropertyToSource(IProfileConfiguration options, TypeDetails sourceType, Type destType, Type destMemberType, string nameToSearch, LinkedList<MemberInfo> resolvers);
     }
 }

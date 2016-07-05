@@ -20,19 +20,18 @@ namespace AutoMapper.QueryableExtensions.Impl
         }
 
         private static ExpressionResolutionResult ExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, IEnumerable<IMemberGetter> sourceMembers)
+            ExpressionResolutionResult expressionResolutionResult, IEnumerable<MemberInfo> sourceMembers)
         {
             return sourceMembers.Aggregate(expressionResolutionResult, ExpressionResolutionResult);
         }
 
         private static ExpressionResolutionResult ExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, IMemberGetter getter)
+            ExpressionResolutionResult expressionResolutionResult, MemberInfo getter)
         {
             Expression currentChild = expressionResolutionResult.ResolutionExpression;
             Type currentChildType;
-            var memberInfo = getter.MemberInfo;
 
-            var propertyInfo = memberInfo as PropertyInfo;
+            var propertyInfo = getter as PropertyInfo;
             if (propertyInfo != null)
             {
                 currentChild = Expression.Property(currentChild, propertyInfo);

@@ -229,7 +229,7 @@ namespace AutoMapper
 
         void IProfileConfiguration.Register(TypeMapRegistry typeMapRegistry)
         {
-            foreach (var config in _typeMapConfigs)
+            foreach (var config in _typeMapConfigs.Where(c => !c.IsOpenGeneric))
             {
                 BuildTypeMap(typeMapRegistry, config);
 
@@ -242,7 +242,7 @@ namespace AutoMapper
 
         void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry)
         {
-            foreach (var typeMap in _typeMapConfigs.Select(config => typeMapRegistry.GetTypeMap(config.Types)))
+            foreach (var typeMap in _typeMapConfigs.Where(c => !c.IsOpenGeneric).Select(config => typeMapRegistry.GetTypeMap(config.Types)))
             {
                 Configure(typeMapRegistry, typeMap);
             }
@@ -267,6 +267,7 @@ namespace AutoMapper
         TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
         {
             var openMapConfig = _typeMapConfigs
+                .Where(tm => tm.IsOpenGeneric)
                 .Where(tm =>
                     tm.Types.SourceType.GetGenericTypeDefinitionIfGeneric() == closedTypes.SourceType.GetGenericTypeDefinitionIfGeneric() &&
                     tm.Types.DestinationType.GetGenericTypeDefinitionIfGeneric() == closedTypes.DestinationType.GetGenericTypeDefinitionIfGeneric())

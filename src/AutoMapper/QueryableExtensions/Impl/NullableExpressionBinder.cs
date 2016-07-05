@@ -41,11 +41,11 @@ namespace AutoMapper.QueryableExtensions.Impl
                             );
                     }
 
-                    return Expression.Bind(propertyMap.DestinationProperty.MemberInfo, expressionToBind);
+                    return Expression.Bind(propertyMap.DestinationProperty, expressionToBind);
                 }
             }
 
-            return Expression.Bind(propertyMap.DestinationProperty.MemberInfo,
+            return Expression.Bind(propertyMap.DestinationProperty,
                 Expression.Convert(result.ResolutionExpression, propertyMap.DestinationPropertyType));
         }
     }
