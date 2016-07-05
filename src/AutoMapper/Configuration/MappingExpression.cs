@@ -321,12 +321,23 @@ namespace AutoMapper.Configuration
             });
         }
 
-        public void ConvertUsing(Func<TSource, ResolutionContext, TDestination> mappingFunction)
+        public void ConvertUsing(Func<TSource, TDestination, TDestination> mappingFunction)
         {
             TypeMapActions.Add(tm =>
             {
                 Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
-                    (src, dest, ctxt) => mappingFunction(src, ctxt);
+                    (src, dest, ctxt) => mappingFunction(src, dest);
+
+                tm.CustomMapper = expr;
+            });
+        }
+
+        public void ConvertUsing(Func<TSource, TDestination, ResolutionContext, TDestination> mappingFunction)
+        {
+            TypeMapActions.Add(tm =>
+            {
+                Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> expr =
+                    (src, dest, ctxt) => mappingFunction(src, dest, ctxt);
 
                 tm.CustomMapper = expr;
             });

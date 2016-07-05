@@ -51,7 +51,7 @@ namespace AutoMapper.UnitTests
 
         public class ProductTypeConverter : ITypeConverter<ProductType, ProductTypeDto>
         {
-            public ProductTypeDto Convert(ProductType source, ResolutionContext context)
+            public ProductTypeDto Convert(ProductType source, ProductTypeDto destination, ResolutionContext context)
             {
                 if (source.Name == "A")
                     return new ProdTypeA();

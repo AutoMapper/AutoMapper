@@ -28,7 +28,7 @@ namespace AutoMapperSamples
 
 			public class DateTimeTypeConverter : ITypeConverter<string, DateTime>
 			{
-				public DateTime Convert(string source, ResolutionContext context)
+				public DateTime Convert(string source, DateTime destination, ResolutionContext context)
 				{
 					return System.Convert.ToDateTime(source);
 				}
@@ -36,7 +36,7 @@ namespace AutoMapperSamples
 
 			public class TypeTypeConverter : ITypeConverter<string, Type>
 			{
-				public Type Convert(string source, ResolutionContext context)
+				public Type Convert(string source, Type destination, ResolutionContext context)
 				{
 					Type type = Assembly.GetExecutingAssembly().GetType(source);
 					return type;

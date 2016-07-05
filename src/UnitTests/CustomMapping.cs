@@ -826,7 +826,7 @@ namespace AutoMapper.UnitTests
 
         public class Converter : ITypeConverter<Source, Destination>
         {
-            public Destination Convert(Source source, ResolutionContext context)
+            public Destination Convert(Source source, Destination destination, ResolutionContext context)
             {
                 return new Destination { Value = source.Value + 10 };
             }
@@ -882,7 +882,7 @@ namespace AutoMapper.UnitTests
                 _value = value;
             }
 
-            public Destination Convert(Source source, ResolutionContext context)
+            public Destination Convert(Source source, Destination destination, ResolutionContext context)
             {
                 return new Destination { Value = source.Value + _value };
             }

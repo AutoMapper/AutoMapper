@@ -94,7 +94,7 @@ namespace AutoMapper.UnitTests
                     _value = value;
                 }
 
-                public Dest Convert(Source source, ResolutionContext context)
+                public Dest Convert(Source source, Dest destination, ResolutionContext context)
                 {
                     return new Dest
                     {

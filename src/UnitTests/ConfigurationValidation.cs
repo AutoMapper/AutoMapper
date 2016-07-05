@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
 
         class Converter : ITypeConverter<A, B>
         {
-            public B Convert(A source, ResolutionContext context) => new B { Foo = new C() };
+            public B Convert(A source, B dest, ResolutionContext context) => new B { Foo = new C() };
         }
     }
 

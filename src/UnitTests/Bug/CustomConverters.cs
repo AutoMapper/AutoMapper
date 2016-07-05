@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class NullableDateTimeOffsetConverter : ITypeConverter<DateTimeOffset?, DateTime?>
         {
-            public DateTime? Convert(DateTimeOffset? source, ResolutionContext context)
+            public DateTime? Convert(DateTimeOffset? source, DateTime? destination, ResolutionContext context)
             {
                 if(source.HasValue)
                 {
@@ -52,7 +52,7 @@ namespace AutoMapper.UnitTests.Bug
     {
         public class NullableIntToBoolConverter : ITypeConverter<int?, bool>
         {
-            public bool Convert(int? source, ResolutionContext context)
+            public bool Convert(int? source, bool destination, ResolutionContext context)
             {
                 if(source == null)
                     return false;
@@ -63,7 +63,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class BoolToNullableIntConverter : ITypeConverter<bool, int?>
         {
-            public int? Convert(bool source, ResolutionContext context)
+            public int? Convert(bool source, int? destination, ResolutionContext context)
             {
                 return source ? 1 : 0;
             }
@@ -71,7 +71,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class IntToBoolConverter : ITypeConverter<int, bool>
         {
-            public bool Convert(int source, ResolutionContext context)
+            public bool Convert(int source, bool destination, ResolutionContext context)
             {
                 return source == 1;
             }
@@ -79,7 +79,7 @@ namespace AutoMapper.UnitTests.Bug
 
         public class BoolToIntConverter : ITypeConverter<bool, int>
         {
-            public int Convert(bool source, ResolutionContext context)
+            public int Convert(bool source, int destination, ResolutionContext context)
             {
                 return source ? 1 : 0;
             }
