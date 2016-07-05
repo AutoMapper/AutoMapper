@@ -23,7 +23,7 @@ namespace AutoMapper
         /// <typeparam name="TValueResolver">Value resolver type</typeparam>
         /// <returns>Value resolver configuration options</returns>
         void ResolveUsing<TValueResolver>() 
-            where TValueResolver : IValueResolver<TSource, TMember>;
+            where TValueResolver : IValueResolver<TSource, TDestination, TMember>;
 
         /// <summary>
         /// Resolve destination member using a custom value resolver from a source member
@@ -32,7 +32,7 @@ namespace AutoMapper
         /// <typeparam name="TSourceMember">Source member to supply</typeparam>
         /// <returns>Value resolver configuration options</returns>
         void ResolveUsing<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember) 
-            where TValueResolver : IValueResolver<TSourceMember, TMember>;
+            where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>;
 
         /// <summary>
         /// Resolve destination member using a custom value resolver from a source member
@@ -42,14 +42,14 @@ namespace AutoMapper
         /// <param name="sourceMemberName">Source member name</param>
         /// <returns>Value resolver configuration options</returns>
         void ResolveUsing<TValueResolver, TSourceMember>(string sourceMemberName) 
-            where TValueResolver : IValueResolver<TSourceMember, TMember>;
+            where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>;
 
         /// <summary>
         /// Resolve destination member using a custom value resolver instance
         /// </summary>
         /// <param name="valueResolver">Value resolver instance to use</param>
         /// <returns>Resolution expression</returns>
-        void ResolveUsing(IValueResolver<TSource, TMember> valueResolver);
+        void ResolveUsing(IValueResolver<TSource, TDestination, TMember> valueResolver);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver instance
@@ -57,14 +57,14 @@ namespace AutoMapper
         /// <param name="valueResolver">Value resolver instance to use</param>
         /// <param name="sourceMember">Source member to supply to value resolver</param>
         /// <returns>Resolution expression</returns>
-        void ResolveUsing<TSourceMember>(IValueResolver<TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember);
+        void ResolveUsing<TSourceMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing<TSourceMember>(Func<TSource, TSourceMember> resolver);
+        void ResolveUsing<TResult>(Func<TSource, TResult> resolver);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
@@ -72,8 +72,15 @@ namespace AutoMapper
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing<TSourceMember>(Func<TSource, TMember, TSourceMember> resolver);
+        void ResolveUsing<TResult>(Func<TSource, TDestination, TResult> resolver);
 
+        /// <summary>
+        /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
+        /// Access both the source object and destination member for additional mapping, context items
+        /// This method cannot be used in conjunction with LINQ query projection
+        /// </summary>
+        /// <param name="resolver">Callback function to resolve against source type</param>
+        void ResolveUsing<TResult>(Func<TSource, TDestination, TMember, TResult> resolver);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver callback. Used instead of MapFrom when not simply redirecting a source member
@@ -81,7 +88,7 @@ namespace AutoMapper
         /// This method cannot be used in conjunction with LINQ query projection
         /// </summary>
         /// <param name="resolver">Callback function to resolve against source type</param>
-        void ResolveUsing<TSourceMember>(Func<TSource, TMember, ResolutionContext, TSourceMember> resolver);
+        void ResolveUsing<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> resolver);
 
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
@@ -202,6 +209,6 @@ namespace AutoMapper
         /// <param name="valueResolver">Value resolver instance to use</param>
         /// <param name="memberName">Source member to supply to value resolver</param>
         /// <returns>Resolution expression</returns>
-        void ResolveUsing<TSource, TSourceMember>(IValueResolver<TSource, TSourceMember> valueResolver, string memberName);
+        void ResolveUsing<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> valueResolver, string memberName);
     }
 }

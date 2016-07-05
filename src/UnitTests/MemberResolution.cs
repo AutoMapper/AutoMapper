@@ -970,23 +970,23 @@ namespace AutoMapper.UnitTests
                 public string Postal { get; set; }
             }
 
-            public class StringCAPS : IValueResolver<string, string>
+            public class StringCAPS : IMemberValueResolver<object, object, string, string>
             {
-                public string Resolve(string source, string dest, ResolutionContext context)
+                public string Resolve(object s, object d, string source, string dest, ResolutionContext context)
                 {
                     return source.ToUpper();
                 }
             }
 
-            public class StringLower : IValueResolver<string, string>
+            public class StringLower : IMemberValueResolver<object, object, string, string>
             {
-                public string Resolve(string source, string dest, ResolutionContext context)
+                public string Resolve(object s, object d, string source, string dest, ResolutionContext context)
                 {
                     return source.ToLower();
                 }
             }
 
-            public class StringPadder : IValueResolver<string, string>
+            public class StringPadder : IMemberValueResolver<object, object, string, string>
             {
                 private readonly int _desiredLength;
 
@@ -995,7 +995,7 @@ namespace AutoMapper.UnitTests
                     _desiredLength = desiredLength;
                 }
 
-                public string Resolve(string source, string dest, ResolutionContext context)
+                public string Resolve(object s, object d, string source, string dest, ResolutionContext context)
                 {
                     return source.PadLeft(_desiredLength);
                 }

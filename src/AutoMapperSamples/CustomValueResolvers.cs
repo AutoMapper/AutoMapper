@@ -20,9 +20,9 @@ namespace AutoMapperSamples
 				public int Total { get; set; }
 			}
 
-			public class CustomResolver : IValueResolver<Source, int>
+			public class CustomResolver : IValueResolver<Source, Destination, int>
 			{
-			    public int Resolve(Source source, int dest, ResolutionContext context)
+			    public int Resolve(Source source, Destination d, int dest, ResolutionContext context)
 				{
 					return source.Value1 + source.Value2;
 				}

@@ -28,9 +28,9 @@
                 cfg.CreateMap<Source, Dest>();
             });
 
-            public class ConditionalValueResolver : IValueResolver<DateTime, DateTime>
+            public class ConditionalValueResolver : IMemberValueResolver<object, object, DateTime, DateTime>
             {
-                public DateTime Resolve(DateTime source, DateTime destination, ResolutionContext context)
+                public DateTime Resolve(object s, object d, DateTime source, DateTime destination, ResolutionContext context)
                 {
                     return source.AddDays(1);
                 }

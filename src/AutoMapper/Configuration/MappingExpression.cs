@@ -116,7 +116,7 @@ namespace AutoMapper.Configuration
                 PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
             }
 
-            public void ResolveUsing<TSource, TSourceMember>(IValueResolver<TSource, TSourceMember> resolver, string memberName)
+            public void ResolveUsing<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string memberName)
             {
                 var config = new ValueResolverConfiguration(resolver)
                 {

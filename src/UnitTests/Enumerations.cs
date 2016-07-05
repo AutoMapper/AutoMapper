@@ -293,17 +293,17 @@ namespace AutoMapper.Tests
 			public StatusForDto? Status { get; set; }
 		}
 
-		public class DtoStatusValueResolver : IValueResolver<Order, StatusForDto>
+		public class DtoStatusValueResolver : IValueResolver<Order, object, StatusForDto>
 		{
-			public StatusForDto Resolve(Order source, StatusForDto dest, ResolutionContext context)
+			public StatusForDto Resolve(Order source, object d, StatusForDto dest, ResolutionContext context)
 			{
 				return context.Mapper.Map<StatusForDto>(source.Status);
 			}
 		}
 
-		public class EnumValueResolver<TInputEnum, TOutputEnum> : IValueResolver<TInputEnum, TOutputEnum>
+		public class EnumValueResolver<TInputEnum, TOutputEnum> : IMemberValueResolver<object, object, TInputEnum, TOutputEnum>
 		{
-			public TOutputEnum Resolve(TInputEnum source, TOutputEnum dest, ResolutionContext context)
+			public TOutputEnum Resolve(object s, object d, TInputEnum source, TOutputEnum dest, ResolutionContext context)
 			{
 				return ((TOutputEnum)Enum.Parse(typeof(TOutputEnum), Enum.GetName(typeof(TInputEnum), source), false));
 			}
