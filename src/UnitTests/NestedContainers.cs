@@ -10,7 +10,7 @@ namespace AutoMapper.UnitTests
         {
             private Dest _dest;
 
-            public class FooResolver : IValueResolver<int, int>
+            public class FooResolver : IMemberValueResolver<Source, Dest, int, int>
             {
                 private readonly int _value;
 
@@ -24,15 +24,15 @@ namespace AutoMapper.UnitTests
                     _value = value;
                 }
 
-                public int Resolve(int source, int dest, ResolutionContext context)
+                public int Resolve(Source s, Dest d, int source, int dest, ResolutionContext context)
                 {
                     return source + _value;
                 }
             }
 
-            public class BarResolver : IValueResolver<int, int>
+            public class BarResolver : IMemberValueResolver<Source, Dest, int, int>
             {
-                public int Resolve(int source, int dest, ResolutionContext context)
+                public int Resolve(Source s, Dest d, int source, int dest, ResolutionContext context)
                 {
                     return source + 1;
                 }

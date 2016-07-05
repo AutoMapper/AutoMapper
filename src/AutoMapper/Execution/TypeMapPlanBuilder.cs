@@ -296,7 +296,7 @@
                 ? getter
                 : Default(propertyMap.DestinationPropertyType);
 
-            var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, getter, ctxtParam);
+            var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, destParam, getter, ctxtParam);
 
             if (propertyMap.SourceType != null && propertyMap.DestinationPropertyType != null)
             {
@@ -390,6 +390,7 @@
 
         private static Expression BuildValueResolverFunc(PropertyMap propertyMap, TypeMapRegistry typeMapRegistry,
             ParameterExpression srcParam,
+            ParameterExpression destParam,
             Expression destValueExpr,
             ParameterExpression ctxtParam)
         {
@@ -415,38 +416,73 @@
                     resolverType = valueResolverConfig.Type;
                 }
 
-                Expression sourceFunc;
                 if (valueResolverConfig.SourceMember != null)
                 {
-                    sourceFunc = valueResolverConfig.SourceMember.ReplaceParameters(srcParam);
+                    var sourceMember = valueResolverConfig.SourceMember.ReplaceParameters(srcParam);
+
+                    var iResolverType =
+                        resolverType.GetTypeInfo()
+                            .ImplementedInterfaces.First(t => t.ImplementsGenericInterface(typeof(IMemberValueResolver<,,,>)));
+
+                    var sourceResolverParam = iResolverType.GetGenericArguments()[0];
+                    var destResolverParam = iResolverType.GetGenericArguments()[1];
+                    var sourceMemberResolverParam = iResolverType.GetGenericArguments()[2];
+                    var destMemberResolverParam = iResolverType.GetGenericArguments()[3];
+
+                    valueResolverFunc =
+                        ToType(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"),
+                            ToType(srcParam, sourceResolverParam),
+                            ToType(destParam, destResolverParam),
+                            ToType(sourceMember, sourceMemberResolverParam),
+                            ToType(destValueExpr, destMemberResolverParam),
+                            ctxtParam),
+                            propertyMap.DestinationPropertyType);
                 }
                 else if (valueResolverConfig.SourceMemberName != null)
                 {
-                    sourceFunc = MakeMemberAccess(srcParam,
+                    var sourceMember = MakeMemberAccess(srcParam,
                         typeMap.SourceType.GetFieldOrProperty(valueResolverConfig.SourceMemberName));
+
+                    var iResolverType =
+                        resolverType.GetTypeInfo()
+                            .ImplementedInterfaces.First(t => t.ImplementsGenericInterface(typeof(IMemberValueResolver<,,,>)));
+
+                    var sourceResolverParam = iResolverType.GetGenericArguments()[0];
+                    var destResolverParam = iResolverType.GetGenericArguments()[1];
+                    var sourceMemberResolverParam = iResolverType.GetGenericArguments()[2];
+                    var destMemberResolverParam = iResolverType.GetGenericArguments()[3];
+
+                    valueResolverFunc =
+                        ToType(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"),
+                            ToType(srcParam, sourceResolverParam),
+                            ToType(destParam, destResolverParam),
+                            ToType(sourceMember, sourceMemberResolverParam),
+                            ToType(destValueExpr, destMemberResolverParam),
+                            ctxtParam),
+                            propertyMap.DestinationPropertyType);
                 }
                 else
                 {
-                    sourceFunc = srcParam;
+                    var iResolverType = resolverType.GetTypeInfo()
+                            .ImplementedInterfaces.First(t => t.ImplementsGenericInterface(typeof(IValueResolver<,,>)));
+
+                    var sourceResolverParam = iResolverType.GetGenericArguments()[0];
+                    var destResolverParam = iResolverType.GetGenericArguments()[1];
+                    var destMemberResolverParam = iResolverType.GetGenericArguments()[2];
+
+                    valueResolverFunc =
+                        ToType(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"),
+                            ToType(srcParam, sourceResolverParam),
+                            ToType(destParam, destResolverParam),
+                            ToType(destValueExpr, destMemberResolverParam),
+                            ctxtParam),
+                            propertyMap.DestinationPropertyType);
                 }
 
-                var iResolverType =
-                    resolverType.GetTypeInfo()
-                        .ImplementedInterfaces.First(t => t.ImplementsGenericInterface(typeof(IValueResolver<,>)));
-
-                var sourceResolverParam = iResolverType.GetGenericArguments()[0];
-                var destResolverParam = iResolverType.GetGenericArguments()[1];
-
-                valueResolverFunc =
-                    ToType(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"), 
-                        ToType(sourceFunc, sourceResolverParam), 
-                        ToType(destValueExpr, destResolverParam), 
-                        ctxtParam),
-                        propertyMap.DestinationPropertyType);
             }
             else if (propertyMap.CustomResolver != null)
             {
-                valueResolverFunc = propertyMap.CustomResolver.ReplaceParameters(srcParam, destValueExpr, ctxtParam);
+                valueResolverFunc = propertyMap.CustomResolver.ReplaceParameters(srcParam, destParam, destValueExpr, ctxtParam);
             }
             else if (propertyMap.CustomExpression != null)
             {

@@ -205,9 +205,9 @@ namespace AutoMapper.UnitTests
 
 		public class When_using_a_custom_resolver_and_the_source_value_is_null : NonValidatingSpecBase
 		{
-			public class NullResolver : IValueResolver<string, string>
+			public class NullResolver : IMemberValueResolver<Source, Destination, string, string>
 			{
-				public string Resolve(string source, string dest, ResolutionContext context)
+				public string Resolve(Source s, Destination d, string source, string dest, ResolutionContext context)
 				{
 					if (source == null)
 						return "jon";

@@ -32,7 +32,7 @@ namespace AutoMapper.Configuration
         }
 
         public void ResolveUsing<TValueResolver>() 
-            where TValueResolver : IValueResolver<TSource, TMember>
+            where TValueResolver : IValueResolver<TSource, TDestination, TMember>
         {
             var config = new ValueResolverConfiguration(typeof(TValueResolver));
 
@@ -40,7 +40,7 @@ namespace AutoMapper.Configuration
         }
 
         public void ResolveUsing<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
-            where TValueResolver : IValueResolver<TSourceMember, TMember>
+            where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>
         {
             var config = new ValueResolverConfiguration(typeof (TValueResolver))
             {
@@ -51,7 +51,7 @@ namespace AutoMapper.Configuration
         }
 
         public void ResolveUsing<TValueResolver, TSourceMember>(string sourceMemberName)
-            where TValueResolver : IValueResolver<TSourceMember, TMember>
+            where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>
         {
             var config = new ValueResolverConfiguration(typeof (TValueResolver))
             {
@@ -61,14 +61,14 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void ResolveUsing(IValueResolver<TSource, TMember> valueResolver)
+        public void ResolveUsing(IValueResolver<TSource, TDestination, TMember> valueResolver)
         {
             var config = new ValueResolverConfiguration(valueResolver);
 
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void ResolveUsing<TSourceMember>(IValueResolver<TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember)
+        public void ResolveUsing<TSourceMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember)
         {
             var config = new ValueResolverConfiguration(valueResolver)
             {
@@ -78,31 +78,41 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
-        public void ResolveUsing<TSourceMember>(Func<TSource, TSourceMember> resolver)
+        public void ResolveUsing<TResult>(Func<TSource, TResult> resolver)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TDestination, ResolutionContext, TSourceMember>> expr = (src, dest, ctxt) => resolver(src);
+                Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => resolver(src);
 
                 pm.CustomResolver = expr;
             });
         }
 
-        public void ResolveUsing<TSourceMember>(Func<TSource, TMember, TSourceMember> resolver)
+        public void ResolveUsing<TResult>(Func<TSource, TDestination, TResult> resolver)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TMember, ResolutionContext, TSourceMember>> expr = (src, dest, ctxt) => resolver(src, dest);
+                Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => resolver(src, dest);
 
                 pm.CustomResolver = expr;
             });
         }
 
-        public void ResolveUsing<TSourceMember>(Func<TSource, TMember, ResolutionContext, TSourceMember> resolver)
+        public void ResolveUsing<TResult>(Func<TSource, TDestination, TMember, TResult> resolver)
         {
             PropertyMapActions.Add(pm =>
             {
-                Expression<Func<TSource, TMember, ResolutionContext, TSourceMember>> expr = (src, dest, ctxt) => resolver(src, dest, ctxt);
+                Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => resolver(src, dest, destMember);
+
+                pm.CustomResolver = expr;
+            });
+        }
+
+        public void ResolveUsing<TResult>(Func<TSource, TDestination, TMember, ResolutionContext, TResult> resolver)
+        {
+            PropertyMapActions.Add(pm =>
+            {
+                Expression<Func<TSource, TDestination, TMember, ResolutionContext, TResult>> expr = (src, dest, destMember, ctxt) => resolver(src, dest, destMember, ctxt);
 
                 pm.CustomResolver = expr;
             });
