@@ -294,7 +294,8 @@ namespace AutoMapper
             return CustomMapper == null
                 && CustomProjection == null
                 && TypeConverterType == null
-                && DestinationTypeOverride == null;
+                && DestinationTypeOverride == null
+                && ConfiguredMemberList != MemberList.None;
         }
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)

@@ -172,7 +172,7 @@ namespace AutoMapper.Configuration
 
         protected virtual MappingExpression<TDestination, TSource> CreateReverseMapExpression()
         {
-            return new MappingExpression<TDestination, TSource>(MemberList.Source, DestinationType, SourceType);
+            return new MappingExpression<TDestination, TSource>(MemberList.None, DestinationType, SourceType);
         }
 
         public IMappingExpression<TSource, TDestination> ForMember<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
