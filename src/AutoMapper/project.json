@@ -29,7 +29,7 @@
         "System.Runtime": "4.1.0",
         "System.Runtime.Extensions": "4.1.0",
         "System.Text.RegularExpressions": "4.1.0",
-        "System.Threading.Tasks": "4.0.11",
+        "System.Threading": "4.0.11",
         "System.Linq.Queryable": "4.0.1"
       }
     },
@@ -48,7 +48,7 @@
         "System.Runtime": "4.1.0",
         "System.Runtime.Extensions": "4.1.0",
         "System.Text.RegularExpressions": "4.1.0",
-        "System.Threading.Tasks": "4.0.11"
+        "System.Threading": "4.0.11"
       }
     },
     "net45": {
