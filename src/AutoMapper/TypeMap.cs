@@ -81,6 +81,7 @@ namespace AutoMapper
         public LambdaExpression Substitution { get; set; }
         public LambdaExpression ConstructExpression { get; set; }
         public Type TypeConverterType { get; set; }
+        public bool DisableConstructorValidation { get; set; }
 
         public PropertyMap[] GetPropertyMaps()
         {
@@ -143,6 +144,44 @@ namespace AutoMapper
             }
 
             return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
+        }
+
+        public bool PassesCtorValidation()
+        {
+            if (DisableConstructorValidation)
+                return true;
+
+            if (DestinationCtor != null)
+                return true;
+
+            if (ConstructDestinationUsingServiceLocator)
+                return true;
+
+            if (ConstructorMap?.CanResolve == true)
+                return true;
+
+#if NET45
+            if (DestinationTypeToUse.IsInterface())
+                return true;
+#endif
+
+            if (DestinationTypeToUse.IsAbstract())
+                return true;
+
+            if (DestinationTypeToUse.IsGenericTypeDefinition())
+                return true;
+
+            if (!DestinationTypeToUse.IsClass())
+                return true;
+
+            var constructors = DestinationTypeToUse
+                .GetDeclaredConstructors()
+                .Where(ci => !ci.IsStatic);
+
+            //find a ctor with only optional args
+            var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
+
+            return ctorWithOptionalArgs != null;
         }
 
         public PropertyMap FindOrCreatePropertyMapFor(MemberInfo destinationProperty)

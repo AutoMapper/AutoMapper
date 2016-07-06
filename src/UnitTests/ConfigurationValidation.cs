@@ -61,6 +61,116 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
     }
 
+    public class When_constructor_does_not_match : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public Dest(int blarg)
+            {
+                Value = blarg;
+            }
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
+
+        [Fact]
+        public void Should_throw()
+        {
+            typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Configuration.AssertConfigurationIsValid());
+        }
+    }
+
+    public class When_constructor_partially_matches : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public Dest(int value, int blarg)
+            {
+                Value = blarg;
+            }
+
+            public int Value { get; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>());
+
+        [Fact]
+        public void Should_throw()
+        {
+            typeof(AutoMapperConfigurationException).ShouldBeThrownBy(() => Configuration.AssertConfigurationIsValid());
+        }
+    }
+
+    public class When_constructor_partially_matches_and_ctor_param_configured : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public Dest(int value, int blarg)
+            {
+                Value = blarg;
+            }
+
+            public int Value { get; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Dest>()
+                .ForCtorParam("blarg", opt => opt.MapFrom(src => src.Value));
+        });
+
+        [Fact]
+        public void Should_throw()
+        {
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid());
+        }
+    }
+
+    public class When_constructor_partially_matches_and_constructor_validation_skipped : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public Dest(int value, int blarg)
+            {
+                Value = blarg;
+            }
+
+            public int Value { get; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Dest>().DisableCtorValidation();
+        });
+
+        [Fact]
+        public void Should_throw()
+        {
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Configuration.AssertConfigurationIsValid());
+        }
+    }
+
     public class When_testing_a_dto_with_mismatched_members : NonValidatingSpecBase
     {
         public class ModelObject

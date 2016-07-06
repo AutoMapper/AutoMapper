@@ -425,5 +425,11 @@ namespace AutoMapper
         /// <param name="paramOptions">Options</param>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions);
+
+        /// <summary>
+        /// Disable constructor validation. During mapping this map is used against an existing destination object and never constructed itself.
+        /// </summary>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> DisableCtorValidation();
     }
 }

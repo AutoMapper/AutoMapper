@@ -24,8 +24,9 @@ namespace AutoMapper
                 (from typeMap in maps
                     where typeMap.ShouldCheckForValid()
                     let unmappedPropertyNames = typeMap.GetUnmappedPropertyNames()
-                    where unmappedPropertyNames.Length > 0
-                    select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames)
+                    let canConstruct = typeMap.PassesCtorValidation()
+                    where unmappedPropertyNames.Length > 0 || !canConstruct
+                    select new AutoMapperConfigurationException.TypeMapConfigErrors(typeMap, unmappedPropertyNames, canConstruct)
                     ).ToArray();
 
             if (badTypeMaps.Any())
