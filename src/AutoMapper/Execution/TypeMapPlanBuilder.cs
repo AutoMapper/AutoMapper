@@ -305,7 +305,7 @@
                 var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
                 if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
                 {
-                    if(!typeMap.Sealed)
+                    if(typeMap.Sealed != true)
                         typeMap.Seal(typeMapRegistry, configurationProvider);
                     valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, ctxtParam);
                 }

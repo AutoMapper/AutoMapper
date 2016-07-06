@@ -1,3 +1,6 @@
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace AutoMapper
 {
     using System;
@@ -108,6 +111,16 @@ namespace AutoMapper
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair, _getTypeMap);
+
+            _typeMapPlanCache.AddOrUpdate(typePair, typeMap, (tp, tm) =>
+            {
+                if (tm != null)
+                    lock (tm)
+                        if (tm.Sealed == false)
+                            tm.Seal(_typeMapRegistry, this);
+                return tm;
+            });
+
             return typeMap;
         }
 
@@ -272,8 +285,6 @@ namespace AutoMapper
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
 
-            typeMap?.Seal(_typeMapRegistry, this);
-
             return typeMap;
         }
 
@@ -286,8 +297,6 @@ namespace AutoMapper
                 .Cast<IProfileConfiguration>()
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                 .FirstOrDefault(t => t != null);
-
-            typeMap?.Seal(_typeMapRegistry, this);
 
             return typeMap;
         }
