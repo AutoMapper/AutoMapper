@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
         public static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context)
             where TSource : IEnumerable
         {
-            if (source == null && context.ConfigurationProvider.AllowNullCollections)
+            if (source == null && context.ConfigurationProvider.Configuration.AllowNullCollections)
                 return null;
 
             var destElementType = TypeHelper.GetElementType(typeof(TDestination));
@@ -32,7 +32,7 @@ namespace AutoMapper.Mappers
             if (sourceList == null)
                 sourceList = typeof(TSource).GetTypeInfo().IsInterface ?
                 new List<TSourceElement>() :
-                (IEnumerable<TSourceElement>)(context.ConfigurationProvider.AllowNullDestinationValues
+                (IEnumerable<TSourceElement>)(context.ConfigurationProvider.Configuration.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(typeof(TSource))
                 : ObjectCreator.CreateObject(typeof(TSource)));
 

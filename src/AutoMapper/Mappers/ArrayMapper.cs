@@ -42,14 +42,14 @@ namespace AutoMapper.Mappers
                 // return (TDestination[]) source;
                 var convertExpr = Convert(sourceExpression, destElementType.MakeArrayType());
 
-                if (configurationProvider.AllowNullCollections)
+                if (configurationProvider.Configuration.AllowNullCollections)
                     return convertExpr;
 
                 // return (TDestination[]) source ?? new TDestination[0];
                 return Coalesce(convertExpr, NewArrayBounds(destElementType, Constant(0)));
             }
 
-            var ifNullExpr = configurationProvider.AllowNullCollections
+            var ifNullExpr = configurationProvider.Configuration.AllowNullCollections
                                  ? (Expression) Constant(null)
                                  : NewArrayBounds(destElementType, Constant(0));
 

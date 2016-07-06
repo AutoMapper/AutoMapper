@@ -12,14 +12,15 @@ using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 namespace AutoMapper.Mappers
 {
     using Execution;
-    
+
     public class FromDynamicMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
         {
             if (destination == null)
                 destination = ifNull();
-            foreach (var member in new TypeDetails(typeof(TDestination)).PublicWriteAccessors)
+            var destinationTypeDetails = new TypeDetails(typeof(TDestination), context.ConfigurationProvider.Configuration);
+            foreach (var member in destinationTypeDetails.PublicWriteAccessors)
             {
                 object sourceMemberValue;
                 try
@@ -63,7 +64,8 @@ namespace AutoMapper.Mappers
         {
             if (destination == null)
                 destination = ifNull();
-            foreach (var member in new TypeDetails(typeof(TSource)).PublicWriteAccessors)
+            var sourceTypeDetails = new TypeDetails(typeof(TSource), context.ConfigurationProvider.Configuration);
+            foreach (var member in sourceTypeDetails.PublicReadAccessors)
             {
                 object sourceMemberValue;
                 try

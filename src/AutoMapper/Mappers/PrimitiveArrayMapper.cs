@@ -34,7 +34,7 @@ namespace AutoMapper.Mappers
             Expression<Action> expr = () => Array.Copy(null, null, 0);
             var copyMethod = ((MethodCallExpression) expr.Body).Method;
 
-            var valueIfNullExpr = configurationProvider.AllowNullCollections
+            var valueIfNullExpr = configurationProvider.Configuration.AllowNullCollections
                 ? (Expression) Constant(null, destExpression.Type)
                 : NewArrayBounds(destElementType, Constant(0));
 
