@@ -14,11 +14,13 @@ namespace AutoMapper
         {
             public TypeMap TypeMap { get; }
             public string[] UnmappedPropertyNames { get; }
+            public bool CanConstruct { get; }
 
-            public TypeMapConfigErrors(TypeMap typeMap, string[] unmappedPropertyNames)
+            public TypeMapConfigErrors(TypeMap typeMap, string[] unmappedPropertyNames, bool canConstruct)
             {
                 TypeMap = typeMap;
                 UnmappedPropertyNames = unmappedPropertyNames;
+                CanConstruct = canConstruct;
             }
         }
 
@@ -78,7 +80,7 @@ namespace AutoMapper
                 {
                     var message =
                         new StringBuilder(
-                            "\nUnmapped members were found. Review the types and members below.\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the source/destination type\n");
+                            "\nUnmapped members were found. Review the types and members below.\nAdd a custom mapping expression, ignore, add a custom resolver, or modify the source/destination type\nFor no matching constructor, add a no-arg ctor, add optional arguments, or map all of the constructor parameters");
 
                     foreach (var error in Errors)
                     {
@@ -93,10 +95,18 @@ namespace AutoMapper
                                            error.TypeMap.DestinationType.FullName + " (" +
                                            error.TypeMap.ConfiguredMemberList + " member list)");
                         message.AppendLine();
-                        message.AppendLine("Unmapped properties:");
-                        foreach (var name in error.UnmappedPropertyNames)
+
+                        if (error.UnmappedPropertyNames.Any())
                         {
-                            message.AppendLine(name);
+                            message.AppendLine("Unmapped properties:");
+                            foreach (var name in error.UnmappedPropertyNames)
+                            {
+                                message.AppendLine(name);
+                            }
+                        }
+                        if (!error.CanConstruct)
+                        {
+                            message.AppendLine("No available constructor.");
                         }
                     }
                     return message.ToString();
