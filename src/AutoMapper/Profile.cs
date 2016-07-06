@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using AutoMapper.Mappers;
 
@@ -98,6 +99,7 @@ namespace AutoMapper
         public IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions => _allTypeMapActions;
 
         public IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions => _allPropertyMapActions;
+        public IList<ExpressionVisitor> AfterBuildMapFuncVisitors { get; } = new List<ExpressionVisitor>();
 
         public void ForAllMaps(Action<TypeMap, IMappingExpression> configuration)
         {
@@ -134,6 +136,16 @@ namespace AutoMapper
             _typeMapConfigs.Add(map);
 
             return map;
+        }
+
+        public void TransformPropertyMap<TSource>(Expression<Func<TSource, TSource>> transformExpression)
+        {
+            AfterBuildMapFuncVisitors.Add(new ForPropertyMapExpressionVisitor(new ReplaceAssignExpressionVisitor<TSource, TSource>(transformExpression)));
+        }
+
+        public void TransformPropertyMap<TSource>(Expression<Func<TSource, TSource>> transformExpression, Func<PropertyMap, bool> predicateFunc)
+        {
+            AfterBuildMapFuncVisitors.Add(new ForPropertyMapExpressionVisitor(new ReplaceAssignExpressionVisitor<TSource, TSource>(transformExpression), predicateFunc));
         }
 
         private IMappingExpression<TSource, TDestination> CreateMappingExpression<TSource, TDestination>(MemberList memberList)
@@ -355,6 +367,66 @@ namespace AutoMapper
             config.Configure(this, typeMap);
 
             typeMapRegistry.RegisterTypeMap(typeMap);
+        }
+    }
+
+    internal class ForPropertyMapExpressionVisitor : ExpressionVisitor
+    {
+        private readonly ExpressionVisitor _expressionVisitor;
+        private readonly Func<PropertyMap, bool> _predicateFunc;
+
+        public ForPropertyMapExpressionVisitor(ExpressionVisitor expressionVisitor)
+            : this(expressionVisitor, pm => true)
+        {
+
+        }
+
+        public ForPropertyMapExpressionVisitor(ExpressionVisitor expressionVisitor, Func<PropertyMap, bool> predicateFunc)
+        {
+            _expressionVisitor = expressionVisitor;
+            _predicateFunc = predicateFunc;
+        }
+
+        protected override Expression VisitTry(TryExpression node)
+        {
+            if (node.Body is BlockExpression)
+            {
+                var visit = new GetConstantsOf<PropertyMap>();
+                visit.Visit(node);
+                if(visit.Constants.Count == 1 && _predicateFunc(visit.Constants.First()))
+                    return Expression.TryCatch(_expressionVisitor.Visit(node.Body), node.Handlers.ToArray());
+            }
+            return base.VisitTry(node);
+        }
+    }
+
+
+    internal class GetConstantsOf<T> : ExpressionVisitor
+    {
+        public IList<T> Constants { get; } = new List<T>();
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            if (node.Type == typeof(T))
+                Constants.Add((T) node.Value);
+            return base.VisitConstant(node);
+        }
+    }
+
+    internal class ReplaceAssignExpressionVisitor<TSource, TDestination> : ExpressionVisitor
+    {
+        private readonly LambdaExpression _replaceExpression;
+
+        public ReplaceAssignExpressionVisitor(Expression<Func<TSource, TDestination>> replaceExpression)
+        {
+            _replaceExpression = replaceExpression;
+        }
+
+        protected override Expression VisitBinary(BinaryExpression node)
+        {
+            if (node.Left is MemberExpression && node.NodeType == ExpressionType.Assign && 
+                node.Left.Type == typeof(TSource) && node.Right.Type == typeof(TDestination))
+                return Expression.Assign(node.Left, _replaceExpression.ReplaceParameters(node.Right));
+            return base.VisitBinary(node);
         }
     }
 }

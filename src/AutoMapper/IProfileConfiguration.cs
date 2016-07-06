@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Mappers;
 
@@ -20,6 +21,7 @@ namespace AutoMapper
         bool CreateMissingTypeMaps { get; }
         IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
         IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }
+        IList<ExpressionVisitor> AfterBuildMapFuncVisitors { get; }
 
         IMemberConfiguration DefaultMemberConfig { get; }
         /// <summary>

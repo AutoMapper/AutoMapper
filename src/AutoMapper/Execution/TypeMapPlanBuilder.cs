@@ -74,6 +74,9 @@
 
             var mapperFunc = CreateMapperFunc(typeMap, srcParam, destParam, ctxtParam, assignmentFunc);
 
+            foreach (var expressionVisitor in typeMap.Profile.AfterBuildMapFuncVisitors)
+                mapperFunc = expressionVisitor.Visit(mapperFunc);
+
             var lambdaExpr = Lambda(mapperFunc, srcParam, destParam, ctxtParam);
 
             return lambdaExpr;
