@@ -16,7 +16,7 @@
         {
             return Condition(Equal(sourceExpression, Default(sourceExpression.Type)),
                 Constant(null, typeof(string)),
-                Call(sourceExpression, typeof(object).GetMethod("ToString")));
+                Call(sourceExpression, typeof(object).GetDeclaredMethod("ToString")));
         }
     }
 }

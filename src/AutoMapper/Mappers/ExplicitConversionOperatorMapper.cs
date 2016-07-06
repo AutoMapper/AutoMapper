@@ -22,7 +22,7 @@ namespace AutoMapper.Mappers
                 .Where(mi => mi.Name == "op_Explicit")
                 .FirstOrDefault(mi => mi.ReturnType == context.DestinationType);
 
-            var destTypeMethod = context.DestinationType.GetMethod("op_Explicit", new[] {context.SourceType});
+            var destTypeMethod = context.DestinationType.GetDeclaredMethod("op_Explicit", new[] {context.SourceType});
 
             return sourceTypeMethod ?? destTypeMethod;
         }

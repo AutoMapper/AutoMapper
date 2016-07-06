@@ -20,11 +20,11 @@ namespace AutoMapper
             var enumeratorType = typeof(IEnumerator<>).MakeGenericType(elementType);
 
             var enumeratorVar = Variable(enumeratorType, "enumerator");
-            var getEnumeratorCall = Call(collection, enumerableType.GetMethod("GetEnumerator"));
+            var getEnumeratorCall = Call(collection, enumerableType.GetDeclaredMethod("GetEnumerator"));
             var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
 
             // The MoveNext method's actually on IEnumerator, not IEnumerator<T>
-            var moveNextCall = Call(enumeratorVar, typeof(IEnumerator).GetMethod("MoveNext"));
+            var moveNextCall = Call(enumeratorVar, typeof(IEnumerator).GetDeclaredMethod("MoveNext"));
 
             var breakLabel = Label("LoopBreak");
 
@@ -57,7 +57,7 @@ namespace AutoMapper
 
         public static Expression ConsoleWriteLine(string value, params Expression[] values)
         {
-            return Call(typeof (Debug).GetMethod("WriteLine", new[] {typeof (string), typeof(object[])}), 
+            return Call(typeof (Debug).GetDeclaredMethod("WriteLine", new[] {typeof (string), typeof(object[])}), 
                 Constant(value), 
                 NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
         }
