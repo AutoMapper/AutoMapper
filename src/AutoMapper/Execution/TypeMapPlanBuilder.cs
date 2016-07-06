@@ -318,9 +318,9 @@
 
             var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, destParam, getter, ctxtParam);
 
-            if (propertyMap.SourceType != null && propertyMap.DestinationPropertyType != null)
+            if (propertyMap.DestinationPropertyType != null)
             {
-                var typePair = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
+                var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
                 var typeMap = configurationProvider.ResolveTypeMap(typePair);
                 var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
                 if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))

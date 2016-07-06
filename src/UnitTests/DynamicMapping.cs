@@ -33,6 +33,53 @@ namespace AutoMapper.UnitTests
 			}
 		}
 
+		public class When_mapping_two_non_configured_types_with_resolvers : NonValidatingSpecBase
+		{
+            public class Inner
+            {
+                public string Content { get; set; }
+            }
+
+            public class Original
+            {
+                public string Text { get; set; }
+            }
+
+            public class Target
+            {
+                public string Text { get; set; }
+
+                public Inner Child { get; set; }
+            }
+
+            public class TargetResolver : IValueResolver<Original, Target, Inner>
+            {
+                public Inner Resolve(Original source, Target dest, Inner destination, ResolutionContext context)
+                {
+                    return new Inner { Content = "Hello world from inner!" };
+                }
+            }
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Original, Target>()
+                    .ForMember(t => t.Child, o => o.ResolveUsing<TargetResolver>());
+
+                cfg.CreateMissingTypeMaps = true;
+            });
+
+            [Fact]
+			public void Should_use_resolver()
+            {
+                var tm = Configuration.FindTypeMapFor<Original, Target>();
+                var original = new Original { Text = "Hello world from original!" };
+                var mapped = Mapper.Map<Target>(original);
+
+                mapped.Text.ShouldEqual(original.Text);
+			    mapped.Child.ShouldNotBeNull();
+                mapped.Child.Content.ShouldEqual("Hello world from inner!");
+			}
+		}
+
         public class When_mapping_two_non_configured_types_with_nesting : NonValidatingSpecBase
         {
             private Destination _resultWithGenerics;
