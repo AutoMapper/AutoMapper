@@ -81,6 +81,7 @@ namespace AutoMapper
         public LambdaExpression Substitution { get; set; }
         public LambdaExpression ConstructExpression { get; set; }
         public Type TypeConverterType { get; set; }
+        public bool DisableConstructorValidation { get; set; }
 
         public PropertyMap[] GetPropertyMaps()
         {
@@ -145,8 +146,11 @@ namespace AutoMapper
             return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
         }
 
-        public bool CanConstruct()
+        public bool PassesCtorValidation()
         {
+            if (DisableConstructorValidation)
+                return true;
+
             if (DestinationCtor != null)
                 return true;
 

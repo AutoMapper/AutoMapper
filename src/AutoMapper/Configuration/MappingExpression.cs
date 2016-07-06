@@ -492,6 +492,16 @@ namespace AutoMapper.Configuration
             return this;
         }
 
+        public IMappingExpression<TSource, TDestination> DisableCtorValidation()
+        {
+            TypeMapActions.Add(tm =>
+            {
+                tm.DisableConstructorValidation = true;
+            });
+
+            return this;
+        }
+
         public void Configure(IProfileConfiguration profile, TypeMap typeMap)
         {
             foreach (var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
