@@ -114,10 +114,10 @@ namespace AutoMapper
 
             _typeMapPlanCache.AddOrUpdate(typePair, typeMap, (tp, tm) =>
             {
-                if (tm?.Sealed == false)
-                    tm.Seal(_typeMapRegistry, this);
-                else if (typeMap?.Sealed != true)
-                    Task.Delay(1).Wait();
+                if (tm != null)
+                    lock (tm)
+                        if (tm.Sealed == false)
+                            tm.Seal(_typeMapRegistry, this);
                 return tm;
             });
 
