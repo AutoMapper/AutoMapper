@@ -40,6 +40,27 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
     }
 
+    public class When_skipping_validation : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public int Blarg { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>(MemberList.None));
+
+        [Fact]
+        public void Should_skip_validation()
+        {
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.ConfigurationProvider.AssertConfigurationIsValid());
+        }
+    }
+
     public class When_testing_a_dto_with_mismatched_members : NonValidatingSpecBase
     {
         public class ModelObject
