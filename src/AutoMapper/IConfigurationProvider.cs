@@ -87,14 +87,9 @@ namespace AutoMapper
         Func<Type, object> ServiceCtor { get; }
 
         /// <summary>
-        /// Allow null destination values. If false, destination objects will be created for deep object graphs.
+        /// Underlying configuration
         /// </summary>
-        bool AllowNullDestinationValues { get; }
-
-        /// <summary>
-        /// Allow null destination collections. If true, null source collections result in null destination collections.
-        /// </summary>
-        bool AllowNullCollections { get; }
+        IConfiguration Configuration { get; }
 
         IExpressionBuilder ExpressionBuilder { get; }
         IMapper CreateMapper();

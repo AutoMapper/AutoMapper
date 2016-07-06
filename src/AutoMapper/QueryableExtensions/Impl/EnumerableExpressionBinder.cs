@@ -41,7 +41,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             expression = Expression.Call(typeof(Enumerable), propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, expression);
 
-            if(configuration.AllowNullCollections) {
+            if(configuration.Configuration.AllowNullCollections) {
                 expression = Expression.Condition(
                             Expression.NotEqual(
                                 Expression.TypeAs(result.ResolutionExpression, typeof(object)), 

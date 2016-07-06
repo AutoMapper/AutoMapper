@@ -76,7 +76,7 @@ namespace AutoMapper.Mappers
 
             var mapExpr = Block(blockParams, blockExprs);
 
-            var ifNullExpr = configurationProvider.AllowNullCollections
+            var ifNullExpr = configurationProvider.Configuration.AllowNullCollections
                      ? Constant(null, destExpression.Type)
                      : newExpr;
             return Condition(

@@ -368,7 +368,7 @@ namespace AutoMapper
 
         TDestination IRuntimeMapper.CreateObject<TDestination>()
         {
-            return (TDestination) (!_configurationProvider.AllowNullDestinationValues
+            return (TDestination) (!_configurationProvider.Configuration.AllowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
                 : ObjectCreator.CreateObject(typeof(TDestination)));
         }

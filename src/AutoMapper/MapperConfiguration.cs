@@ -26,7 +26,6 @@ namespace AutoMapper
         private readonly ConfigurationValidator _validator;
         private readonly Func<TypePair, TypeMap> _getTypeMap;
         private readonly Func<MapRequest, MapperFuncs> _createMapperFuncs;
-        private readonly IConfiguration _mapperConfigurationExpression;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
             : this(configurationExpression, MapperRegistry.Mappers)
@@ -43,9 +42,9 @@ namespace AutoMapper
             _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
 
-            _mapperConfigurationExpression = configurationExpression;
+            Configuration = configurationExpression;
 
-            Seal(_mapperConfigurationExpression);
+            Seal(Configuration);
         }
 
         public MapperConfiguration(Action<IMapperConfigurationExpression> configure) : this(configure, MapperRegistry.Mappers)
@@ -64,6 +63,8 @@ namespace AutoMapper
         public bool AllowNullDestinationValues { get; private set; }
 
         public bool AllowNullCollections { get; private set; }
+
+        public IConfiguration Configuration { get; }
 
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types)
         {
@@ -280,7 +281,7 @@ namespace AutoMapper
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
-            var typeMap = _mapperConfigurationExpression.Profiles
+            var typeMap = Configuration.Profiles
                 .Cast<IProfileConfiguration>()
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
@@ -293,7 +294,7 @@ namespace AutoMapper
             if (typePair.GetOpenGenericTypePair() == null)
                 return null;
 
-            var typeMap = _mapperConfigurationExpression.Profiles
+            var typeMap = Configuration.Profiles
                 .Cast<IProfileConfiguration>()
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                 .FirstOrDefault(t => t != null);
