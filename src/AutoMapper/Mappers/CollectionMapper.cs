@@ -36,7 +36,7 @@ namespace AutoMapper.Mappers
 
                     dest = destParam;
 
-                    var clearMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetMethod("Clear");
+                    var clearMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetDeclaredMethod("Clear");
                     blockExprs.Add(IfThenElse(NotEqual(destExpression, Constant(null)),
                         Call(destExpression, clearMethod),
                         Assign(destParam, newExpr)
@@ -44,7 +44,7 @@ namespace AutoMapper.Mappers
                 }
                 else if (propertyMap.UseDestinationValue)
                 {
-                    var clearMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetMethod("Clear");
+                    var clearMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetDeclaredMethod("Clear");
                     blockExprs.Add(Call(destExpression, clearMethod));
                 }
                 else
@@ -65,7 +65,7 @@ namespace AutoMapper.Mappers
 
             var cast = typeof(Enumerable).GetTypeInfo().DeclaredMethods.First(_ => _.Name == "Cast").MakeGenericMethod(itemParam.Type);
 
-            var addMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetMethod("Add");
+            var addMethod = typeof(ICollection<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type)).GetDeclaredMethod("Add");
             var genericSource = sourceExpression.Type.GetTypeInfo().IsGenericType ? sourceExpression : Call(null, cast, sourceExpression);
             blockExprs.Add(ForEach(genericSource, itemParam, Call(
                 dest,

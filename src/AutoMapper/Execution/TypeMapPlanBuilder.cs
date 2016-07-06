@@ -47,11 +47,11 @@
                         ToType(
                             Call(
                                 MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetDeclaredProperty("Options")),
-                                typeof (IMappingOperationOptions).GetMethod("CreateInstance")
+                                typeof (IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
                                     .MakeGenericMethod(type)
                                 ),
                             converterInterfaceType),
-                        converterInterfaceType.GetMethod("Convert"),
+                        converterInterfaceType.GetDeclaredMethod("Convert"),
                         srcParam, destParam, ctxtParam
                         ),
                     srcParam, destParam, ctxtParam);
@@ -199,7 +199,7 @@
                         AndAlso(
                             Equal(destParam, Constant(null)),
                             Call(Property(ctxtParam, "InstanceCache"),
-                                typeof (Dictionary<object, object>).GetMethod("ContainsKey"), srcParam)
+                                typeof (Dictionary<object, object>).GetDeclaredMethod("ContainsKey"), srcParam)
                             )),
                     Assign(cache,
                         ToType(Property(Property(ctxtParam, "InstanceCache"), "Item", srcParam), typeMap.DestinationTypeToUse)),
@@ -222,7 +222,7 @@
 
             if (typeMap.ConstructDestinationUsingServiceLocator)
                 return Call(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetDeclaredProperty("Options")),
-                    typeof (IMappingOperationOptions).GetMethod("CreateInstance")
+                    typeof (IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
                         .MakeGenericMethod(typeMap.DestinationTypeToUse)
                     );
 
@@ -410,7 +410,7 @@
                 else
                 {
                     ctor = Call(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetDeclaredProperty("Options")),
-                        typeof (IMappingOperationOptions).GetMethod("CreateInstance")
+                        typeof (IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
                             .MakeGenericMethod(valueResolverConfig.Type)
                         );
                     resolverType = valueResolverConfig.Type;
@@ -430,7 +430,7 @@
                     var destMemberResolverParam = iResolverType.GetGenericArguments()[3];
 
                     valueResolverFunc =
-                        ToType(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"),
+                        ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
                             ToType(srcParam, sourceResolverParam),
                             ToType(destParam, destResolverParam),
                             ToType(sourceMember, sourceMemberResolverParam),
@@ -453,7 +453,7 @@
                     var destMemberResolverParam = iResolverType.GetGenericArguments()[3];
 
                     valueResolverFunc =
-                        ToType(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"),
+                        ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
                             ToType(srcParam, sourceResolverParam),
                             ToType(destParam, destResolverParam),
                             ToType(sourceMember, sourceMemberResolverParam),
@@ -471,7 +471,7 @@
                     var destMemberResolverParam = iResolverType.GetGenericArguments()[2];
 
                     valueResolverFunc =
-                        ToType(Call(ToType(ctor, resolverType), resolverType.GetMethod("Resolve"),
+                        ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
                             ToType(srcParam, sourceResolverParam),
                             ToType(destParam, destResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
@@ -526,7 +526,7 @@
                 typeMapRegistry.GetTypeMap(new TypePair(valueResolverFunc.Type, propertyMap.DestinationPropertyType)) ==
                 null)
             {
-                valueResolverFunc = Call(valueResolverFunc, valueResolverFunc.Type.GetMethod("ToString", new Type[0]));
+                valueResolverFunc = Call(valueResolverFunc, typeof(object).GetDeclaredMethod("ToString", new Type[0]));
             }
 
             if (propertyMap.NullSubstitute != null)
@@ -544,7 +544,7 @@
                     valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
                         valueResolverFunc,
                         ToType(Call(
-                            typeof (ObjectCreator).GetMethod("CreateNonNullValue"),
+                            typeof (ObjectCreator).GetDeclaredMethod("CreateNonNullValue"),
                             Constant(toCreate)
                             ), propertyMap.SourceType));
                 }

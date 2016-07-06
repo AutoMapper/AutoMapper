@@ -146,12 +146,12 @@ namespace AutoMapper
             return type.GetTypeInfo().DeclaredMethods;
         }
 
-        public static MethodInfo GetMethod(this Type type, string name)
+        public static MethodInfo GetDeclaredMethod(this Type type, string name)
         {
             return type.GetAllMethods().FirstOrDefault(mi => mi.Name == name);
         }
 
-        public static MethodInfo GetMethod(this Type type, string name, Type[] parameters)
+        public static MethodInfo GetDeclaredMethod(this Type type, string name, Type[] parameters)
         {
             return type
                 .GetAllMethods()
@@ -160,7 +160,7 @@ namespace AutoMapper
                 .FirstOrDefault(mi => mi.GetParameters().Select(pi => pi.ParameterType).SequenceEqual(parameters));
         }
 
-        public static ConstructorInfo GetConstructor(this Type type, Type[] parameters)
+        public static ConstructorInfo GetDeclaredConstructor(this Type type, Type[] parameters)
         {
             return type
                 .GetTypeInfo()
