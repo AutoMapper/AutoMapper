@@ -5,6 +5,175 @@ using Should;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class When_constructor_is_partial_match_with_value_type : AutoMapperSpecBase
+    {
+        GeoCoordinate _destination;
+
+        public class GeolocationDTO
+        {
+            public double Longitude { get; set; }
+            public double Latitude { get; set; }
+            public double? HorizontalAccuracy { get; set; }
+        }
+
+        public struct GeoCoordinate
+        {
+            public GeoCoordinate(double longitude, double latitude, double x)
+            {
+                Longitude = longitude;
+                Latitude = latitude;
+                HorizontalAccuracy = 0;
+            }
+            public double Longitude { get; set; }
+            public double Latitude { get; set; }
+            public double? HorizontalAccuracy { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<GeoCoordinate, GeolocationDTO>();
+            cfg.CreateMap<GeolocationDTO, GeoCoordinate>();
+        });
+
+        protected override void Because_of()
+        {
+            var source = new GeolocationDTO
+            {
+                Latitude = 34d,
+                Longitude = -93d,
+                HorizontalAccuracy = 100
+            };
+            _destination = Mapper.Map<GeoCoordinate>(source);
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Latitude.ShouldEqual(34);
+            _destination.Longitude.ShouldEqual(-93);
+            _destination.HorizontalAccuracy.ShouldEqual(100);
+        }
+    }
+
+    public class When_constructor_is_partial_match : AutoMapperSpecBase
+    {
+        GeoCoordinate _destination;
+
+        public class GeolocationDTO
+        {
+            public double Longitude { get; set; }
+            public double Latitude { get; set; }
+            public double? HorizontalAccuracy { get; set; }
+        }
+
+        public class GeoCoordinate
+        {
+            public GeoCoordinate()
+            {
+            }
+            public GeoCoordinate(double longitude, double latitude, double x)
+            {
+                Longitude = longitude;
+                Latitude = latitude;
+            }
+            public double Longitude { get; set; }
+            public double Latitude { get; set; }
+            public double? HorizontalAccuracy { get; set; }
+            public double Altitude { get; set; }
+            public double VerticalAccuracy { get; set; }
+            public double Speed { get; set; }
+            public double Course { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<GeoCoordinate, GeolocationDTO>();
+
+            cfg.CreateMap<GeolocationDTO, GeoCoordinate>()
+                .ForMember(dest => dest.Altitude, opt => opt.Ignore())
+                .ForMember(dest => dest.VerticalAccuracy, opt => opt.Ignore())
+                .ForMember(dest => dest.Speed, opt => opt.Ignore())
+                .ForMember(dest => dest.Course, opt => opt.Ignore());
+        });
+
+        protected override void Because_of()
+        {
+            var source = new GeolocationDTO
+            {
+                Latitude = 34d,
+                Longitude = -93d,
+                HorizontalAccuracy = 100
+            };
+            _destination = Mapper.Map<GeoCoordinate>(source);
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Latitude.ShouldEqual(34);
+            _destination.Longitude.ShouldEqual(-93);
+            _destination.HorizontalAccuracy.ShouldEqual(100);
+        }
+    }
+
+    public class When_constructor_matches_but_the_destination_is_passed : AutoMapperSpecBase
+    {
+        Destination _destination = new Destination();
+
+        public class Source
+        {
+            public int MyTypeId { get; set; }
+        }
+
+        public class MyType
+        {
+        }
+
+        public class Destination
+        {
+            private MyType _myType;
+
+            public Destination()
+            {
+
+            }
+            public Destination(MyType myType)
+            {
+                _myType = myType;
+            }
+
+            public MyType MyType
+            {
+                get { return _myType; }
+                set { _myType = value; }
+            }
+        }
+
+        protected override MapperConfiguration Configuration
+        {
+            get
+            {
+                return new MapperConfiguration(cfg =>
+                {
+                    cfg.RecognizePostfixes("Id");
+                    cfg.CreateMap<Source, Destination>();
+                    cfg.CreateMap<int, MyType>();
+                });
+            }
+        }
+
+        protected override void Because_of()
+        {
+            Mapper.Map(new Source(), _destination);
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.MyType.ShouldNotBeNull();
+        }
+    }
+
     public class When_mapping_through_constructor_and_destination_has_setter : AutoMapperSpecBase
     {
         public class Source
