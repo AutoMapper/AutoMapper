@@ -82,7 +82,7 @@ namespace AutoMapper
 
         public static LambdaExpression Concat(this LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
-        public static Expression IfNotNull(this Expression expression) => new IfNotNullVisitor().Visit(expression);
+        public static Expression IfNotNull(this Expression expression, Type destinationType) => new IfNotNullVisitor(destinationType).Visit(expression);
         public static Expression RemoveIfNotNull(this Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
 
         public static Expression IfNullElse(this Expression expression, params Expression[] ifElse)
@@ -94,7 +94,13 @@ namespace AutoMapper
 
         internal class IfNotNullVisitor : ExpressionVisitor
         {
+            private readonly Type _destinationType;
             private readonly HashSet<MemberExpression> _alreadyUpdated = new HashSet<MemberExpression>();
+
+            public IfNotNullVisitor(Type destinationType)
+            {
+                _destinationType = destinationType;
+            }
 
             protected override Expression VisitMember(MemberExpression node)
             {
@@ -103,7 +109,7 @@ namespace AutoMapper
                     return base.VisitMember(node);
                 }
                 _alreadyUpdated.Add(node);
-                return Visit(DelegateFactory.IfNotNullExpression(node));
+                return Visit(DelegateFactory.IfNotNullExpression(node, _destinationType));
             }
         }
 

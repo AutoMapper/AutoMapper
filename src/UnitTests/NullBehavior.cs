@@ -15,7 +15,8 @@ namespace AutoMapper.UnitTests
 			{
 				public ModelSubDto Sub { get; set; }
 				public int SubSomething { get; set; }
-				public string NullString { get; set; }
+                public int? SubSomethingNullDest { get; set; }
+                public string NullString { get; set; }
 			}
 
 			public class ModelSubDto
@@ -37,7 +38,8 @@ namespace AutoMapper.UnitTests
 				}
 
 				public int Something { get; set; }
-			}
+                public int SomethingNullDest { get; set; }
+            }
 
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
@@ -71,8 +73,14 @@ namespace AutoMapper.UnitTests
 			public void Should_return_default_value_of_property_in_the_chain()
 			{
 				_result.SubSomething.ShouldEqual(0);
-			}
-	
+            }
+
+            [Fact]
+            public void Should_return_null_for_nullable_properties()
+            {
+                _result.SubSomethingNullDest.ShouldBeNull();
+            }
+
             [Fact]
 			public void Default_value_for_string_should_be_empty()
 			{
