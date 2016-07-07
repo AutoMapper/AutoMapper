@@ -506,7 +506,7 @@
             }
             else if (propertyMap.CustomExpression != null)
             {
-                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull();
+                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull(propertyMap.DestinationPropertyType);
                 valueResolverFunc = TryCatch(nullCheckedExpression, Catch(typeof(NullReferenceException), Default(nullCheckedExpression.Type)));
             }
             else if (propertyMap.SourceMembers.Any()
@@ -529,7 +529,7 @@
                                 : (Expression) Call(inner, (MethodInfo) getter)
                             : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                         );
-                    valueResolverFunc = valueResolverFunc.IfNotNull();
+                    valueResolverFunc = valueResolverFunc.IfNotNull(propertyMap.DestinationPropertyType);
                 }
             }
             else if (propertyMap.SourceMember != null)

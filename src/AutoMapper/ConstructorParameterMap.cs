@@ -36,7 +36,7 @@ namespace AutoMapper
             ParameterExpression ctxtParam)
         {
             if (CustomExpression != null)
-                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull();
+                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull(DestinationType);
 
             if (CustomValueResolver != null)
             {
@@ -63,7 +63,7 @@ namespace AutoMapper
                         : (Expression) Call(inner, (MethodInfo) getter)
                     : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                 );
-            valueResolverExpr = valueResolverExpr.IfNotNull();
+            valueResolverExpr = valueResolverExpr.IfNotNull(DestinationType);
 
             if ((SourceType.IsEnumerableType() && SourceType != typeof (string))
                 || typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) != null
