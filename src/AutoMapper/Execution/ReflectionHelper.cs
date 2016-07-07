@@ -3,9 +3,7 @@ namespace AutoMapper.Execution
     using System;
     using System.Collections;
     using System.Collections.Generic;
-#if NET45
     using System.Dynamic;
-#endif
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -34,7 +32,6 @@ namespace AutoMapper.Execution
             return context.Mapper.Map(value, null, value?.GetType() ?? memberType, memberType, context);
         }
 
-#if NET45
         public static bool IsDynamic(this object obj)
         {
             return obj is IDynamicMetaObjectProvider;
@@ -44,7 +41,6 @@ namespace AutoMapper.Execution
         {
             return typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
         }
-#endif
 
         public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
         {

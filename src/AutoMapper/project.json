@@ -1,5 +1,5 @@
 {
-  "version": "5.0.1",
+  "version": "5.0.2",
   "authors": [ "Jimmy Bogard" ],
   "description": "A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is designed for model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.",
   "packOptions": {
@@ -9,14 +9,7 @@
     "projectUrl": "http://automapper.org",
     "iconUrl": "https://s3.amazonaws.com/automapper/icon.png",
     "requireLicenseAcceptance": false,
-    "summary": "A convention-based object-object mapper",
-    "files": {
-      "mappings": {
-        "lib/net45/AutoMapper.pdb": "bin/Release/net45/AutoMapper.pdb",
-        "lib/netstandard1.1/AutoMapper.pdb": "bin/Release/netstandard1.1/AutoMapper.pdb",
-        "lib/netstandard1.3/AutoMapper.pdb": "bin/Release/netstandard1.3/AutoMapper.pdb"
-      }
-    }
+    "summary": "A convention-based object-object mapper"
   },
   "buildOptions": {
     "keyFile": "..\\AutoMapper.snk",
@@ -34,41 +27,24 @@
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {
-        "System.Collections": "4.0.11",
-        "System.Collections.Concurrent": "4.0.12",
-        "System.Diagnostics.Debug": "4.0.11",
-        "System.Globalization": "4.0.11",
-        "System.Linq": "4.1.0",
-        "System.Linq.Expressions": "4.1.0",
-        "System.ObjectModel": "4.0.12",
-        "System.Reflection": "4.1.0",
-        "System.Reflection.Extensions": "4.0.1",
-        "System.Runtime": "4.1.0",
-        "System.Runtime.Extensions": "4.1.0",
-        "System.Text.RegularExpressions": "4.1.0",
-        "System.Threading": "4.0.11",
-        "System.Linq.Queryable": "4.0.1"
+        "NETStandard.Library": "1.6.0",
+        "System.Linq.Queryable": "4.0.1",
+        "System.Collections.Specialized": "4.0.1",
+        "System.ComponentModel.TypeConverter": "4.1.0",
+        "System.Dynamic.Runtime": "4.0.11",
+        "Microsoft.CSharp": "4.0.1"
       }
     },
     "netstandard1.1": {
       "dependencies": {
-        "System.Collections": "4.0.11",
-        "System.Collections.Concurrent": "4.0.12",
-        "System.Diagnostics.Debug": "4.0.11",
-        "System.Globalization": "4.0.11",
-        "System.Linq": "4.1.0",
-        "System.Linq.Expressions": "4.1.0",
+        "NETStandard.Library": "1.6.0",
         "System.Linq.Queryable": "4.0.1",
-        "System.ObjectModel": "4.0.12",
-        "System.Reflection": "4.1.0",
-        "System.Reflection.Extensions": "4.0.1",
-        "System.Runtime": "4.1.0",
-        "System.Runtime.Extensions": "4.1.0",
-        "System.Text.RegularExpressions": "4.1.0",
-        "System.Threading": "4.0.11"
+        "System.ComponentModel.TypeConverter": "4.1.0",
+        "System.Dynamic.Runtime": "4.0.11",
+        "Microsoft.CSharp": "4.0.1"
       }
     },
     "net45": {
-    }
+    } 
   }
 }

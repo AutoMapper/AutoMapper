@@ -15,7 +15,7 @@ namespace AutoMapper.Mappers
             new PrimitiveArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
-#if NET45
+#if NETSTANDARD1_3 || NET45
             new NameValueCollectionMapper(),
 #endif
             new DictionaryMapper(),
@@ -25,19 +25,15 @@ namespace AutoMapper.Mappers
             new EnumerableMapper(),
             new StringMapper(),
             new AssignableMapper(),
-#if NET45
             new TypeConverterMapper(),
-#endif
             new NullableSourceMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
             new ConvertMapper(),
             new FromStringDictionaryMapper(),
             new ToStringDictionaryMapper(),
-#if NET45
             new FromDynamicMapper(),
             new ToDynamicMapper()
-#endif
         };
 
         private static readonly List<IObjectMapper> _mappers = new List<IObjectMapper>(_initialMappers);

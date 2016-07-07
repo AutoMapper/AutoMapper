@@ -252,7 +252,7 @@
 #if NET45
             if (typeMap.DestinationTypeToUse.IsInterface())
             {
-                var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetMethod("GetProxyType"), Constant(typeMap.DestinationTypeToUse)));
+                var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetDeclaredMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetDeclaredMethod("GetProxyType"), Constant(typeMap.DestinationTypeToUse)));
                 // We're invoking a delegate here
                 return Invoke(ctor);
             }

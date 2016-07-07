@@ -160,10 +160,8 @@ namespace AutoMapper
             if (ConstructorMap?.CanResolve == true)
                 return true;
 
-#if NET45
             if (DestinationTypeToUse.IsInterface())
                 return true;
-#endif
 
             if (DestinationTypeToUse.IsAbstract())
                 return true;

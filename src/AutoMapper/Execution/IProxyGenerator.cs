@@ -1,3 +1,4 @@
+#if NET45
 namespace AutoMapper.Execution
 {
     using System;
@@ -7,3 +8,4 @@ namespace AutoMapper.Execution
         Type GetProxyType(Type interfaceType);
     }
 }
+#endif

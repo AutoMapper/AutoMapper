@@ -19,15 +19,15 @@ namespace AutoMapper.Execution
 
         private static readonly byte[] privateKeyToken = StringToByteArray("be96cd2c38ef1005");
 
-        private static readonly MethodInfo delegate_Combine = typeof (Delegate).GetMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly MethodInfo delegate_Combine = typeof (Delegate).GetDeclaredMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
 
-        private static readonly MethodInfo delegate_Remove = typeof (Delegate).GetMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly MethodInfo delegate_Remove = typeof (Delegate).GetDeclaredMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
 
         private static readonly EventInfo iNotifyPropertyChanged_PropertyChanged =
             typeof (INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
 
         private static readonly ConstructorInfo proxyBase_ctor =
-            typeof (ProxyBase).GetConstructor(new Type[0]);
+            typeof (ProxyBase).GetDeclaredConstructor(new Type[0]);
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
