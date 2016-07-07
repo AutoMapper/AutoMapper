@@ -321,6 +321,8 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
+            cfg.AllowNullCollections = true;
+
             cfg.CreateMap<Source, Target>();
             cfg.CreateMap<SourceItem, TargetItem>();
         });
@@ -332,11 +334,11 @@ namespace AutoMapper.UnitTests
             {
                 X = 5,
                 Items = new List<SourceItem>
-                    {
-                        new SourceItem { I = 1 },
-                        new SourceItem { I = 2 },
-                        new SourceItem { I = 3 }
-                    }
+                {
+                    new SourceItem {I = 1},
+                    new SourceItem {I = 2},
+                    new SourceItem {I = 3}
+                }
             };
 
             var dest = Mapper.Map<Source, Target>(src);
