@@ -5,6 +5,39 @@ using Should;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class When_constructor_is_match_with_default_value : AutoMapperSpecBase
+    {
+        PersonDto _destination;
+
+        public class Person
+        {
+            public string Name { get; set; }
+        }
+
+        public class PersonDto
+        {
+            public PersonDto(string name = null)
+            {
+                Name = name;
+            }
+
+            public string Name { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<PersonDto>(new Person { Name = "John" });
+        }
+
+        [Fact]
+        public void Should_map_from_the_property()
+        {
+            _destination.Name.ShouldEqual("John");
+        }
+    }
+
     public class When_constructor_is_partial_match_with_value_type : AutoMapperSpecBase
     {
         GeoCoordinate _destination;

@@ -89,7 +89,7 @@ namespace AutoMapper
 
         public bool ConstructorParameterMatches(string destinationPropertyName)
         {
-            return ConstructorMap?.CtorParams.Any(c => c.Parameter.Name.Equals(destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
+            return ConstructorMap?.CtorParams.Any(c => !c.DefaultValue && c.Parameter.Name.Equals(destinationPropertyName, StringComparison.OrdinalIgnoreCase)) == true;
         }
 
         public void AddPropertyMap(MemberInfo destProperty, IEnumerable<MemberInfo> resolvers)
