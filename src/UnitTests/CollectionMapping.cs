@@ -294,4 +294,61 @@ namespace AutoMapper.UnitTests
             mappedCollection.ShouldNotBeNull();
         }
     }
+
+    public class When_mapping_enumerable_to_array : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int X { get; set; }
+            public IEnumerable<SourceItem> Items { get; set; }
+        }
+
+        public class SourceItem
+        {
+            public int I { get; set; }
+        }
+
+        public class Target
+        {
+            public int X { get; set; }
+            public TargetItem[] Items { get; set; }
+        }
+
+        public class TargetItem
+        {
+            public int I { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.AllowNullCollections = true;
+
+            cfg.CreateMap<Source, Target>();
+            cfg.CreateMap<SourceItem, TargetItem>();
+        });
+
+        [Fact]
+        public void IncludedMappings()
+        {
+            var src = new Source
+            {
+                X = 5,
+                Items = new List<SourceItem>
+                {
+                    new SourceItem {I = 1},
+                    new SourceItem {I = 2},
+                    new SourceItem {I = 3}
+                }
+            };
+
+            var dest = Mapper.Map<Source, Target>(src);
+
+            src.X.ShouldEqual(dest.X);
+
+            dest.Items.Length.ShouldEqual(3);
+            dest.Items[0].I.ShouldEqual(1);
+            dest.Items[1].I.ShouldEqual(2);
+            dest.Items[2].I.ShouldEqual(3);
+        }
+    }
 }

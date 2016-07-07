@@ -50,7 +50,7 @@ namespace AutoMapper.Mappers
             }
 
             var ifNullExpr = configurationProvider.Configuration.AllowNullCollections
-                                 ? (Expression) Constant(null)
+                                 ? (Expression) Constant(null, destExpression.Type)
                                  : NewArrayBounds(destElementType, Constant(0));
 
             var itemParam = Parameter(sourceElementType, "item");
