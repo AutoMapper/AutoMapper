@@ -25,6 +25,9 @@ namespace AutoMapper
         public MemberInfo[] SourceMembers { get; }
 
         public bool CanResolve { get; set; }
+
+        public bool DefaultValue { get; private set; }
+
         public LambdaExpression CustomExpression { get; set; }
         public Func<object, ResolutionContext, object> CustomValueResolver { get; set; }
 
@@ -44,14 +47,9 @@ namespace AutoMapper
                 return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
             }
 
-            if (!SourceMembers.Any() && Parameter.IsOptional)
+            if (Parameter.IsOptional && (!SourceMembers.Any() || typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) == null))
             {
-                return Constant(Parameter.GetDefaultValue());
-            }
-
-            if (typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) == null
-                && Parameter.IsOptional)
-            {
+                DefaultValue = true;
                 return Constant(Parameter.GetDefaultValue());
             }
 
