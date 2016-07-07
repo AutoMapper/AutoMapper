@@ -39,7 +39,7 @@ namespace AutoMapper
             ParameterExpression ctxtParam)
         {
             if (CustomExpression != null)
-                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull(DestinationType);
+                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull(CustomExpression.Type);
 
             if (CustomValueResolver != null)
             {

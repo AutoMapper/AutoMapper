@@ -506,7 +506,7 @@
             }
             else if (propertyMap.CustomExpression != null)
             {
-                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull(propertyMap.DestinationPropertyType);
+                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull(propertyMap.CustomExpression.Type);
                 valueResolverFunc = TryCatch(nullCheckedExpression, Catch(typeof(NullReferenceException), Default(nullCheckedExpression.Type)));
             }
             else if (propertyMap.SourceMembers.Any()

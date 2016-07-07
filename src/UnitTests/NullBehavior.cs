@@ -16,6 +16,7 @@ namespace AutoMapper.UnitTests
 				public ModelSubDto Sub { get; set; }
 				public int SubSomething { get; set; }
                 public int? SubSomethingNullDest { get; set; }
+                public int? NullableMapFrom { get; set; }
                 public string NullString { get; set; }
 			}
 
@@ -44,7 +45,8 @@ namespace AutoMapper.UnitTests
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
 		    {
 		        cfg.AllowNullDestinationValues = false;
-		        cfg.CreateMap<ModelObject, ModelDto>();
+		        cfg.CreateMap<ModelObject, ModelDto>()
+                    .ForMember(d => d.NullableMapFrom, opt => opt.MapFrom(s => s.Sub.Something));
 		        cfg.CreateMap<ModelSubObject, ModelSubDto>();
 
 		    });
@@ -79,6 +81,12 @@ namespace AutoMapper.UnitTests
             public void Should_return_null_for_nullable_properties()
             {
                 _result.SubSomethingNullDest.ShouldBeNull();
+            }
+
+            [Fact]
+            public void Should_return_not_null_for_nullable_properties_that_are_user_defined()
+            {
+                _result.NullableMapFrom.ShouldEqual(0);
             }
 
             [Fact]
