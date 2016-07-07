@@ -9,10 +9,27 @@
     "projectUrl": "http://automapper.org",
     "iconUrl": "https://s3.amazonaws.com/automapper/icon.png",
     "requireLicenseAcceptance": false,
-    "summary": "A convention-based object-object mapper"
+    "summary": "A convention-based object-object mapper",
+    "files": {
+      "mappings": {
+        "lib/net45/AutoMapper.pdb": "bin/Release/net45/AutoMapper.pdb",
+        "lib/netstandard1.1/AutoMapper.pdb": "bin/Release/netstandard1.1/AutoMapper.pdb",
+        "lib/netstandard1.3/AutoMapper.pdb": "bin/Release/netstandard1.3/AutoMapper.pdb"
+      }
+    }
   },
   "buildOptions": {
-    "keyFile": "..\\AutoMapper.snk"
+    "keyFile": "..\\AutoMapper.snk",
+    "xmlDoc": true,
+    "nowarn": [ "1591" ],
+    "warningsAsErrors": true
+  },
+  "configurations": {
+    "Release": {
+      "buildOptions": {
+        "debugType": "portable"
+      }
+    }
   },
   "frameworks": {
     "netstandard1.3": {
@@ -52,6 +69,6 @@
       }
     },
     "net45": {
-    } 
+    }
   }
 }
