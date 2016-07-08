@@ -15,6 +15,10 @@ namespace AutoMapper
     {
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
+            if(collection.Type.IsArray)
+            {
+                return ForEachArrayItem(collection, arrayItem => Block(new[] { loopVar }, Assign(loopVar, arrayItem), loopContent));
+            }
             var elementType = loopVar.Type;
             var getEnumerator = collection.Type.GetDeclaredMethod("GetEnumerator") ?? 
                                            typeof(IEnumerable<>).MakeGenericType(elementType).GetDeclaredMethod("GetEnumerator");
@@ -35,7 +39,7 @@ namespace AutoMapper
                     IfThenElse(
                         Equal(moveNextCall, Constant(true)),
                         Block(new[] { loopVar },
-                            Assign(loopVar, Convert(Property(enumeratorVar, "Current"), loopVar.Type)),
+                            Assign(loopVar, Property(enumeratorVar, "Current")),
                             loopContent
                         ),
                         Break(breakLabel)
@@ -43,6 +47,30 @@ namespace AutoMapper
                 breakLabel)
             );
 
+            return loop;
+        }
+
+        public static Expression ForEachArrayItem(Expression array, Func<Expression, Expression> body)
+        {
+            var length = Property(array, "Length");
+            return For(length, index => body(ArrayAccess(array, index)));
+        }
+
+        public static Expression For(Expression count, Func<Expression, Expression> body)
+        {
+            var breakLabel = Label("LoopBreak");
+            var index = Variable(typeof(int), "sourceArrayIndex");
+            var initialize = Assign(index, Constant(0, typeof(int)));
+            var loop = Block(new[] { index },
+                initialize,
+                Loop(
+                    IfThenElse(
+                        LessThan(index, count),
+                        Block(body(index), PostIncrementAssign(index)),
+                        Break(breakLabel)
+                    ),
+                breakLabel)
+            );
             return loop;
         }
 
