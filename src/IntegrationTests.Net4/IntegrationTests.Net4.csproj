@@ -70,6 +70,7 @@
     </Compile>
     <Compile Include="ChildClassTests.cs" />
     <Compile Include="ByteArray.cs" />
+    <Compile Include="ProjectUsing.cs" />
     <Compile Include="NavigationPropertySO.cs" />
     <Compile Include="CustomMapFromTest.cs" />
     <Compile Include="ExpandCollectionsWithStrings.cs" />
