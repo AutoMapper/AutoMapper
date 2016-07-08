@@ -512,7 +512,7 @@ namespace AutoMapper.Configuration
                     ForMember(destProperty.Name, y => y.Ignore());
                     _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
                 }
-                if (profile.GlobalIgnores.Contains(destProperty.Name))
+                if (profile.GlobalIgnores.Contains(destProperty.Name) && !_memberConfigurations.Any(m=>m.DestinationMember == destProperty))
                 {
                     ForMember(destProperty.Name, y => y.Ignore());
                 }

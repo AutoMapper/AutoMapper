@@ -1,9 +1,42 @@
 using System.Collections.Generic;
 using Xunit;
 using Should;
+using System;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_overriding_global_ignore : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        public class Source
+        {
+            public int ShouldBeMapped { get; set; }
+        }
+
+        public class Destination
+        {
+            public int ShouldBeMapped { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.AddGlobalIgnore("ShouldBeMapped");
+            cfg.CreateMap<Source, Destination>().ForMember(d => d.ShouldBeMapped, o => o.UseValue(12));
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_not_ignore()
+        {
+            _destination.ShouldBeMapped.ShouldEqual(12);
+        }
+    }
+
     public class IgnoreAllTests
     {
         public class Source
