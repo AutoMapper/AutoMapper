@@ -484,14 +484,14 @@
                 else
                 {
                     var iResolverType = resolverType.GetTypeInfo()
-                            .ImplementedInterfaces.First(t => t.ImplementsGenericInterface(typeof(IValueResolver<,,>)));
+                            .ImplementedInterfaces.First(t => t.IsGenericType() && t.GetGenericTypeDefinition() == typeof(IValueResolver<,,>));
 
                     var sourceResolverParam = iResolverType.GetGenericArguments()[0];
                     var destResolverParam = iResolverType.GetGenericArguments()[1];
                     var destMemberResolverParam = iResolverType.GetGenericArguments()[2];
 
                     valueResolverFunc =
-                        ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
+                        ToType(Call(ToType(ctor, resolverType), iResolverType.GetDeclaredMethod("Resolve"),
                             ToType(srcParam, sourceResolverParam),
                             ToType(destParam, destResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
