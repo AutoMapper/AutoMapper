@@ -232,13 +232,13 @@ namespace Benchmark.Flattening
 
             public Foo Foo1 { get; set; }
 
-            public IEnumerable<Foo> Foos { get; set; }
+            public List<Foo> Foos { get; set; }
 
             public Foo[] FooArr { get; set; }
 
             public int[] IntArr { get; set; }
 
-            public IEnumerable<int> Ints { get; set; }
+            public int[] Ints { get; set; }
         }
 
     }
