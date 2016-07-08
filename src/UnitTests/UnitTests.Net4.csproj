@@ -275,6 +275,7 @@
     <Compile Include="Projection\ProjectTest.cs" />
     <Compile Include="Projection\GenericsTests.cs" />
     <Compile Include="Projection\ToStringTests.cs" />
+    <Compile Include="Bug\SamePropertyNameOnParentAndChildClasses.cs" />
     <Compile Include="Query\SourceInjectedQuery.cs" />
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />

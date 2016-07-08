@@ -272,6 +272,8 @@ namespace AutoMapper
 
         public PropertyMap GetExistingPropertyMapFor(MemberInfo destinationProperty)
         {
+            if (!destinationProperty.DeclaringType.IsAssignableFrom(DestinationType))
+                return null;
             var propertyMap =
                 _propertyMaps.FirstOrDefault(pm => pm.DestinationProperty.Name.Equals(destinationProperty.Name));
 
