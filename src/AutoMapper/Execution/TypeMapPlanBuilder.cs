@@ -491,7 +491,7 @@
                     var destMemberResolverParam = iResolverType.GetGenericArguments()[2];
 
                     valueResolverFunc =
-                        ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
+                        ToType(Call(ToType(ctor, resolverType), iResolverType.GetDeclaredMethod("Resolve"),
                             ToType(srcParam, sourceResolverParam),
                             ToType(destParam, destResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
