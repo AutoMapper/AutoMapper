@@ -484,7 +484,7 @@
                 else
                 {
                     var iResolverType = resolverType.GetTypeInfo()
-                            .ImplementedInterfaces.First(t => t.ImplementsGenericInterface(typeof(IValueResolver<,,>)));
+                            .ImplementedInterfaces.First(t => t.IsGenericType() && t.GetGenericTypeDefinition() == typeof(IValueResolver<,,>));
 
                     var sourceResolverParam = iResolverType.GetGenericArguments()[0];
                     var destResolverParam = iResolverType.GetGenericArguments()[1];
