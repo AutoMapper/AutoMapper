@@ -65,8 +65,8 @@ namespace AutoMapper.Mappers
             //return array;
 
             var countParam = Parameter(typeof(int), "count");
-            var arrayParam = Parameter(destExpression.Type, "array");
-            var indexParam = Parameter(typeof(int), "i");
+            var arrayParam = Parameter(destExpression.Type, "destinationArray");
+            var indexParam = Parameter(typeof(int), "destinationArrayIndex");
 
             var actions = new List<Expression>();
             var parameters = new List<ParameterExpression> { countParam, arrayParam, indexParam };

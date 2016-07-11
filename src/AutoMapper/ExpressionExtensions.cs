@@ -15,16 +15,21 @@ namespace AutoMapper
     {
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
+            if(collection.Type.IsArray)
+            {
+                return ForEachArrayItem(collection, arrayItem => Block(new[] { loopVar }, Assign(loopVar, arrayItem), loopContent));
+            }
             var elementType = loopVar.Type;
-            var enumerableType = typeof(IEnumerable<>).MakeGenericType(elementType);
-            var enumeratorType = typeof(IEnumerator<>).MakeGenericType(elementType);
-
+            var getEnumerator = collection.Type.GetDeclaredMethod("GetEnumerator") ?? 
+                                           typeof(IEnumerable<>).MakeGenericType(elementType).GetDeclaredMethod("GetEnumerator");
+            var getEnumeratorCall = Call(collection, getEnumerator);
+            var enumeratorType = getEnumeratorCall.Type;
             var enumeratorVar = Variable(enumeratorType, "enumerator");
-            var getEnumeratorCall = Call(collection, enumerableType.GetDeclaredMethod("GetEnumerator"));
             var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
 
             // The MoveNext method's actually on IEnumerator, not IEnumerator<T>
-            var moveNextCall = Call(enumeratorVar, typeof(IEnumerator).GetDeclaredMethod("MoveNext"));
+            var moveNext = enumeratorType.GetDeclaredMethod("MoveNext") ?? typeof(IEnumerator).GetDeclaredMethod("MoveNext");
+            var moveNextCall = Call(enumeratorVar, moveNext);
 
             var breakLabel = Label("LoopBreak");
 
@@ -42,6 +47,30 @@ namespace AutoMapper
                 breakLabel)
             );
 
+            return loop;
+        }
+
+        public static Expression ForEachArrayItem(Expression array, Func<Expression, Expression> body)
+        {
+            var length = Property(array, "Length");
+            return For(length, index => body(ArrayAccess(array, index)));
+        }
+
+        public static Expression For(Expression count, Func<Expression, Expression> body)
+        {
+            var breakLabel = Label("LoopBreak");
+            var index = Variable(typeof(int), "sourceArrayIndex");
+            var initialize = Assign(index, Constant(0, typeof(int)));
+            var loop = Block(new[] { index },
+                initialize,
+                Loop(
+                    IfThenElse(
+                        LessThan(index, count),
+                        Block(body(index), PostIncrementAssign(index)),
+                        Break(breakLabel)
+                    ),
+                breakLabel)
+            );
             return loop;
         }
 

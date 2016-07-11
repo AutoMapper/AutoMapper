@@ -67,7 +67,7 @@ namespace Benchmark.Flattening
             public Address Address { get; set; }
             public Address HomeAddress { get; set; }
             public Address[] Addresses { get; set; }
-            public ICollection<Address> WorkAddresses { get; set; }
+            public List<Address> WorkAddresses { get; set; }
         }
 
         public class CustomerDTO
@@ -232,13 +232,13 @@ namespace Benchmark.Flattening
 
             public Foo Foo1 { get; set; }
 
-            public IEnumerable<Foo> Foos { get; set; }
+            public List<Foo> Foos { get; set; }
 
             public Foo[] FooArr { get; set; }
 
             public int[] IntArr { get; set; }
 
-            public IEnumerable<int> Ints { get; set; }
+            public int[] Ints { get; set; }
         }
 
     }
