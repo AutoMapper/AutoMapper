@@ -106,6 +106,7 @@
     <Compile Include="Bug\CaseSensitivityBug.cs" />
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\InitializeNRE.cs" />
+    <Compile Include="Bug\GuidTryExpression.cs" />
     <Compile Include="Bug\MapExpandoObjectProperty.cs" />
     <Compile Include="ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
