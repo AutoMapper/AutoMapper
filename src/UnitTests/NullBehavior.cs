@@ -152,9 +152,15 @@ namespace AutoMapper.UnitTests
             }
 
             [Fact]
-            public void Should_return_not_null_for_nullable_properties_that_are_user_defined()
+            public void Should_return_null_for_nullable_properties_that_are_complex_map_froms()
             {
                 _result.SubExpressionName.ShouldEqual(null);
+            }
+
+            [Fact]
+            public void Should_return_null_for_nullable_properties_that_have_member_access_map_froms()
+            {
+                _result.NullableMapFrom.ShouldEqual(null);
             }
 
             [Fact]
