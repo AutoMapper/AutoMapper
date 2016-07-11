@@ -507,9 +507,15 @@
             else if (propertyMap.CustomExpression != null)
             {
                 var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull(propertyMap.DestinationPropertyType);
-                valueResolverFunc = nullCheckedExpression.Type.IsValueType() ?
-                                                    nullCheckedExpression :
-                                                    TryCatch(nullCheckedExpression, Catch(typeof(NullReferenceException), Default(nullCheckedExpression.Type)));
+                var returnType = propertyMap.DestinationPropertyType.IsNullableType() && propertyMap.DestinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
+                    ? propertyMap.DestinationPropertyType
+                    : nullCheckedExpression.Type;
+                valueResolverFunc = nullCheckedExpression.Type.IsValueType() && !propertyMap.DestinationPropertyType.IsNullableType()
+                    ? nullCheckedExpression
+                    : TryCatch(ToType(nullCheckedExpression, returnType),
+                        Catch(typeof(NullReferenceException), Default(returnType)),
+                        Catch(typeof(ArgumentNullException), Default(returnType))
+                        );
             }
             else if (propertyMap.SourceMembers.Any()
                      && propertyMap.SourceType != null

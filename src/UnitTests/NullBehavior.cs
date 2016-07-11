@@ -7,7 +7,9 @@ namespace AutoMapper.UnitTests
 {
 	namespace NullBehavior
 	{
-		public class When_mapping_a_model_with_null_items : AutoMapperSpecBase
+	    using System.Linq;
+
+	    public class When_mapping_a_model_with_null_items : AutoMapperSpecBase
 		{
 			private ModelDto _result;
 
@@ -46,7 +48,6 @@ namespace AutoMapper.UnitTests
 		        cfg.AllowNullDestinationValues = false;
 		        cfg.CreateMap<ModelObject, ModelDto>();
 		        cfg.CreateMap<ModelSubObject, ModelSubDto>();
-
 		    });
 
 		    protected override void Because_of()
@@ -96,7 +97,9 @@ namespace AutoMapper.UnitTests
 			{
 				public ModelSubDto Sub { get; set; }
 				public int SubSomething { get; set; }
-				public string NullString { get; set; }
+                public int? NullableMapFrom { get; set; }
+                public string NullString { get; set; }
+                public int? SubExpressionName { get; set; }
 			}
 
 			public class ModelSubDto
@@ -108,6 +111,10 @@ namespace AutoMapper.UnitTests
 			{
 				public ModelSubObject Sub { get; set; }
 				public string NullString { get; set; }
+
+                public ModelSubObject[] Subs { get; set; }
+
+                public int Id { get; set; }
 			}
 
 			public class ModelSubObject
@@ -118,6 +125,9 @@ namespace AutoMapper.UnitTests
 				}
 
 				public int Something { get; set; }
+
+                public string Name { get; set; }
+                public ModelSubObject Sub { get; set; }
 			}
 
 		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
@@ -126,8 +136,11 @@ namespace AutoMapper.UnitTests
 		        cfg.AllowNullDestinationValues = true;
 		        cfg.CreateMap<ModelObject, ModelDto>();
 		        cfg.CreateMap<ModelSubObject, ModelSubDto>();
-
-		    });
+                cfg.CreateMap<ModelObject, ModelDto>()
+                    .ForMember(d => d.SubExpressionName, opt => opt.MapFrom(src =>
+                                src.Subs.FirstOrDefault(spt => spt.Sub.Something == src.Id).Something))
+                    .ForMember(d => d.NullableMapFrom, opt => opt.MapFrom(s => s.Sub.Something));
+            });
 
 		    protected override void Because_of()
 		    {
@@ -136,6 +149,12 @@ namespace AutoMapper.UnitTests
                 model.NullString = null;
 
                 _result = Mapper.Map<ModelObject, ModelDto>(model);
+            }
+
+            [Fact]
+            public void Should_return_not_null_for_nullable_properties_that_are_user_defined()
+            {
+                _result.SubExpressionName.ShouldEqual(null);
             }
 
             [Fact]
