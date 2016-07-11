@@ -8,6 +8,7 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Configuration;
     using Execution;
     using static System.Linq.Expressions.Expression;
 
@@ -111,7 +112,25 @@ namespace AutoMapper
 
         public static LambdaExpression Concat(this LambdaExpression expr, LambdaExpression concat) => (LambdaExpression)new ExpressionConcatVisitor(expr).Visit(concat);
 
-        public static Expression IfNotNull(this Expression expression, Type destinationType) => new IfNotNullVisitor(destinationType).Visit(expression);
+        public static Expression IfNotNull(this Expression expression, Type destinationType)
+        {
+            var node = expression;
+            var isMemberAccess = node.NodeType == ExpressionType.MemberAccess || (node.NodeType == ExpressionType.Call && ((MethodCallExpression)node).Arguments.Count == 0);
+            while (isMemberAccess)
+            {
+                node = (node as MemberExpression)?.Expression 
+                    ?? (node as MethodCallExpression)?.Object;
+                isMemberAccess =
+                    (node != null) && (
+                    node.NodeType == ExpressionType.MemberAccess 
+                    || (node.NodeType == ExpressionType.Call && ((MethodCallExpression)node).Arguments.Count == 0));
+            }
+            if (node != null && node.NodeType == ExpressionType.Parameter)
+                return new IfNotNullVisitor(destinationType).Visit(expression);
+
+            return expression;
+        }
+
         public static Expression RemoveIfNotNull(this Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
 
         public static Expression IfNullElse(this Expression expression, params Expression[] ifElse)
