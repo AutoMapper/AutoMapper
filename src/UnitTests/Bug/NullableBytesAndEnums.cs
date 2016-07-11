@@ -70,4 +70,43 @@ namespace AutoMapper.UnitTests.Bug
             _destination.Value.ShouldEqual(2);
         }
     }
+
+    public class NullableShortWithCustomMapFrom : AutoMapperSpecBase
+    {
+        private Destination _destination;
+
+        public class Source
+        {
+            public short Value { get; set; }
+        }
+
+        public class Destination
+        {
+            public short? Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>()
+                .ForMember(t => t.Value, opts => opts.MapFrom(s => s.Value > 0 ? s.Value : default(short?)));
+        });
+
+        protected override void Because_of()
+        {
+        }
+
+        [Fact]
+        public void Should_map_the_value()
+        {
+            var destination = Mapper.Map<Source, Destination>(new Source { Value = 2 });
+            destination.Value.ShouldEqual((short)2);
+        }
+
+        [Fact]
+        public void Should_map_the_value_with_condition()
+        {
+            var destination = Mapper.Map<Source, Destination>(new Source { Value = 0 });
+            destination.Value.ShouldBeNull();
+        }
+    }
 }
