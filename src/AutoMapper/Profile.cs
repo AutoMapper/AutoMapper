@@ -21,7 +21,10 @@ namespace AutoMapper
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions = new List<Action<PropertyMap, IMemberConfigurationExpression>>();
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
+        private readonly List<ITypeMapConfiguration> _openTypeMapConfigs = new List<ITypeMapConfiguration>();
         private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
+        private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
+        private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
 
         protected Profile(string profileName)
             :this()
@@ -133,6 +136,9 @@ namespace AutoMapper
 
             _typeMapConfigs.Add(map);
 
+            if (sourceType.IsGenericTypeDefinition() || destinationType.IsGenericTypeDefinition())
+                _openTypeMapConfigs.Add(map);
+
             return map;
         }
 
@@ -184,10 +190,6 @@ namespace AutoMapper
         {
             _globalIgnore.Add(propertyNameStartingWith);
         }
-
-        private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
-
-        private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
 
         public IMemberConfiguration DefaultMemberConfig => _memberConfigurations.First();
 
@@ -266,8 +268,8 @@ namespace AutoMapper
 
         TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
         {
-            var openMapConfig = _typeMapConfigs
-                .Where(tm => tm.IsOpenGeneric)
+            var openMapConfig = _openTypeMapConfigs
+                //.Where(tm => tm.IsOpenGeneric)
                 .Where(tm =>
                     tm.Types.SourceType.GetGenericTypeDefinitionIfGeneric() == closedTypes.SourceType.GetGenericTypeDefinitionIfGeneric() &&
                     tm.Types.DestinationType.GetGenericTypeDefinitionIfGeneric() == closedTypes.DestinationType.GetGenericTypeDefinitionIfGeneric())
