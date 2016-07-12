@@ -41,8 +41,10 @@ namespace AutoMapper
 
         string ProfileName { get; }
         IEnumerable<string> GlobalIgnores { get; }
+	    IEnumerable<string> Prefixes { get; }
+	    IEnumerable<string> Postfixes { get; }
 
-        /// <summary>
+	    /// <summary>
         /// Registers all defined type maps
         /// </summary>
         /// <param name="typeMapRegistry">Type map registry</param>
@@ -70,5 +72,7 @@ namespace AutoMapper
         /// <param name="requestedTypes">The requested types</param>
         /// <returns>Configured type map, or null if not a match</returns>
         TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes);
+
+	    TypeDetails CreateTypeDetails(Type type);
 	}
 }

@@ -5,6 +5,7 @@ using AutoMapper.Mappers;
 namespace AutoMapper
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reflection;
     using Configuration;
@@ -25,6 +26,7 @@ namespace AutoMapper
         private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
         private readonly List<MethodInfo> _sourceExtensionMethods = new List<MethodInfo>();
         private readonly IList<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
+        private readonly ConcurrentDictionary<Type, TypeDetails> _typeDetails = new ConcurrentDictionary<Type, TypeDetails>();
 
         protected Profile(string profileName)
             :this()
@@ -57,7 +59,11 @@ namespace AutoMapper
 
         public bool AllowNullCollections { get; set; }
 
-        public IEnumerable<string> GlobalIgnores => _globalIgnore; 
+        public IEnumerable<string> GlobalIgnores => _globalIgnore;
+
+        public IEnumerable<string> Prefixes { get; private set; } = new string[0];
+
+        public IEnumerable<string> Postfixes { get; private set; } = new string[0];
 
         public INamingConvention SourceMemberNamingConvention
         {
@@ -231,6 +237,22 @@ namespace AutoMapper
 
         void IProfileConfiguration.Register(TypeMapRegistry typeMapRegistry)
         {
+            Prefixes =
+                MemberConfigurations
+                    .Select(m => m.NameMapper)
+                    .SelectMany(m => m.NamedMappers)
+                    .OfType<PrePostfixName>()
+                    .SelectMany(m => m.Prefixes)
+                    .ToArray();
+
+            Postfixes =
+                MemberConfigurations
+                    .Select(m => m.NameMapper)
+                    .SelectMany(m => m.NamedMappers)
+                    .OfType<PrePostfixName>()
+                    .SelectMany(m => m.Postfixes)
+                    .ToArray();
+
             foreach (var config in _typeMapConfigs.Where(c => !c.IsOpenGeneric))
             {
                 BuildTypeMap(typeMapRegistry, config);
@@ -264,6 +286,11 @@ namespace AutoMapper
             Configure(typeMapRegistry, typeMap);
 
             return typeMap;
+        }
+
+        TypeDetails IProfileConfiguration.CreateTypeDetails(Type type)
+        {
+            return _typeDetails.GetOrAdd(type, t => new TypeDetails(t, this));
         }
 
         TypeMap IProfileConfiguration.ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
