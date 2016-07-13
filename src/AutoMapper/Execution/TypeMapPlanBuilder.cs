@@ -18,12 +18,12 @@ namespace AutoMapper.Execution
         private static Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
         private static Expression<Func<ResolutionContext, int>> GetTypeDepthInfo = ctxt => ctxt.GetTypeDepth(default(TypePair));
 
-        IConfigurationProvider configurationProvider;
-        TypeMap typeMap;
-        TypeMapRegistry typeMapRegistry;
-        ParameterExpression source;
-        ParameterExpression initialDestination;
-        ParameterExpression context;
+        readonly IConfigurationProvider configurationProvider;
+        readonly TypeMap typeMap;
+        readonly TypeMapRegistry typeMapRegistry;
+        readonly ParameterExpression source;
+        readonly ParameterExpression initialDestination;
+        readonly ParameterExpression context;
         bool constructorMapping;
         ParameterExpression destination;
 
