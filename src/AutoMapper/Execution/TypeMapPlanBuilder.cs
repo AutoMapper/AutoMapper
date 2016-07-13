@@ -13,19 +13,39 @@ namespace AutoMapper.Execution
 
     public class TypeMapPlanBuilder
     {
-        public static LambdaExpression BuildMapperFunc(TypeMap typeMap, IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry)
+        private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
+        private static Expression<Action<ResolutionContext>> IncTypeDepthInfo = ctxt => ctxt.IncrementTypeDepth(default(TypePair));
+        private static Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
+        private static Expression<Func<ResolutionContext, int>> GetTypeDepthInfo = ctxt => ctxt.GetTypeDepth(default(TypePair));
+
+        IConfigurationProvider configurationProvider;
+        TypeMap typeMap;
+        TypeMapRegistry typeMapRegistry;
+        ParameterExpression source;
+        ParameterExpression initialDestination;
+        ParameterExpression context;
+        bool constructorMapping;
+        ParameterExpression destination;
+
+        public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry, TypeMap typeMap)
+        {
+            this.configurationProvider = configurationProvider;
+            this.typeMapRegistry = typeMapRegistry;
+            this.typeMap = typeMap;
+            source = Parameter(typeMap.SourceType, "src");
+            initialDestination = Parameter(typeMap.DestinationTypeToUse, "dest");
+            context = Parameter(typeof(ResolutionContext), "ctxt");
+        }
+
+        public LambdaExpression CreateMapperLambda()
         {
             if(typeMap.SourceType.IsGenericTypeDefinition() || typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
                 return null;
 
-            var srcParam = Parameter(typeMap.SourceType, "src");
-            var destParam = Parameter(typeMap.DestinationTypeToUse, "dest");
-            var ctxtParam = Parameter(typeof(ResolutionContext), "ctxt");
-
             if(typeMap.Substitution != null)
             {
-                return Lambda(typeMap.Substitution.ReplaceParameters(srcParam, destParam, ctxtParam), srcParam,
-                    destParam, ctxtParam);
+                return Lambda(typeMap.Substitution.ReplaceParameters(source, initialDestination, context), source,
+                    initialDestination, context);
             }
 
             if(typeMap.TypeConverterType != null)
@@ -47,56 +67,28 @@ namespace AutoMapper.Execution
                     Call(
                         ToType(
                             Call(
-                                MakeMemberAccess(ctxtParam, typeof(ResolutionContext).GetDeclaredProperty("Options")),
+                                MakeMemberAccess(context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
                                 typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
                                     .MakeGenericMethod(type)
                                 ),
                             converterInterfaceType),
                         converterInterfaceType.GetDeclaredMethod("Convert"),
-                        srcParam, destParam, ctxtParam
+                        source, initialDestination, context
                         ),
-                    srcParam, destParam, ctxtParam);
+                    source, initialDestination, context);
             }
 
             if(typeMap.CustomMapper != null)
             {
-                return Lambda(typeMap.CustomMapper.ReplaceParameters(srcParam, destParam, ctxtParam), srcParam,
-                    destParam, ctxtParam);
+                return Lambda(typeMap.CustomMapper.ReplaceParameters(source, initialDestination, context), source,
+                    initialDestination, context);
             }
 
             if(typeMap.CustomProjection != null)
             {
-                return Lambda(typeMap.CustomProjection.ReplaceParameters(srcParam), srcParam, destParam, ctxtParam);
+                return Lambda(typeMap.CustomProjection.ReplaceParameters(source), source, initialDestination, context);
             }
 
-            var builder = new TypeMapPlanBuilder
-            {
-                configurationProvider = configurationProvider,
-                typeMapRegistry = typeMapRegistry,
-                typeMap = typeMap,
-                context = ctxtParam,
-                source = srcParam,
-                initialDestination = destParam
-            };
-            return builder.CreateMapperLambda();
-        }
-
-        private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
-        private static Expression<Action<ResolutionContext>> IncTypeDepthInfo = ctxt => ctxt.IncrementTypeDepth(default(TypePair));
-        private static Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
-        private static Expression<Func<ResolutionContext, int>> GetTypeDepthInfo = ctxt => ctxt.GetTypeDepth(default(TypePair));
-
-        IConfigurationProvider configurationProvider;
-        TypeMap typeMap;
-        TypeMapRegistry typeMapRegistry;
-        ParameterExpression source;
-        ParameterExpression initialDestination;
-        ParameterExpression context;
-        bool constructorMapping;
-        ParameterExpression destination;
-
-        private LambdaExpression CreateMapperLambda()
-        {
             destination = Variable(initialDestination.Type, "destination");
 
             var destinationFunc = CreateDestinationFunc();
@@ -544,11 +536,11 @@ namespace AutoMapper.Execution
             return valueResolverFunc;
         }
 
-        public static Expression ContextMap(Expression valueResolverExpr, Expression destValueExpr, ParameterExpression ctxtParam, Type destinationType)
+        public static Expression ContextMap(Expression valueResolverExpr, Expression destValueExpr, ParameterExpression context, Type destinationType)
         {
             var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(valueResolverExpr.Type, destinationType);
             var second = Call(
-                ctxtParam,
+                context,
                 mapMethod,
                 valueResolverExpr,
                 destValueExpr
