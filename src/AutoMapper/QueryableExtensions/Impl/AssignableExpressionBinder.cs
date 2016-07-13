@@ -8,7 +8,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
-            return propertyMap.DestinationPropertyType.IsAssignableFrom(result.Type);
+            return propertyMap.DestinationPropertyType.IsAssignableFrom(result.Type) && propertyTypeMap == null;
         }
 
         public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
