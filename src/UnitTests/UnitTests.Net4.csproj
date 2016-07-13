@@ -85,6 +85,9 @@
     <Compile Include="..\AutoMapper\TypeExtensions.cs">
       <Link>TypeExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\AutoMapper\Configuration\PrimitiveExtensions.cs">
+      <Link>PrimitiveExtensions.cs</Link>
+    </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="BasicFlattening.cs" />

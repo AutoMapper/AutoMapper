@@ -23,17 +23,18 @@ namespace AutoMapper.Configuration.Conventions
 
         public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
-            var possibleSourceNames = PossibleNames(nameToSearch, DestinationPrefixes, DestinationPostfixes);
-            var possibleDestNames = getTypeInfoMembers.GetMemberInfos(typeInfo).Select(mi => new { mi, possibles = PossibleNames(mi.Name, Prefixes, Postfixes) });
+            var possibleSourceNames = DestinationPostfixes.Any() || DestinationPrefixes.Any()
+                ? PossibleNames(nameToSearch, DestinationPrefixes, DestinationPostfixes)
+                : new[] {nameToSearch};
 
             var all =
                 from sourceName in possibleSourceNames
-                from destName in possibleDestNames
+                from destName in typeInfo.DestinationMemberNames
                 select new { sourceName, destName };
             var match =
                 all.FirstOrDefault(
-                    pair => pair.destName.possibles.Any(p => string.Compare(p, pair.sourceName, StringComparison.OrdinalIgnoreCase) == 0));
-            return match?.destName.mi;
+                    pair => pair.destName.Possibles.Any(p => string.Compare(p, pair.sourceName, StringComparison.OrdinalIgnoreCase) == 0));
+            return match?.destName.Member;
         }
 
         private IEnumerable<string> PossibleNames(string memberName, IEnumerable<string> prefixes, IEnumerable<string> postfixes)

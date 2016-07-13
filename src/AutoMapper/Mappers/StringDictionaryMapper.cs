@@ -29,7 +29,7 @@ namespace AutoMapper.Mappers
 
         public static Dictionary<string, object> MembersDictionary(object source, ResolutionContext context)
         {
-            var sourceTypeDetails = new TypeDetails(source.GetType(), context.ConfigurationProvider.Configuration);
+            var sourceTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(source.GetType());
             var membersDictionary = sourceTypeDetails.PublicReadAccessors.ToDictionary(p => p.Name,
                 p => p.GetMemberValue(source));
             return membersDictionary;
@@ -56,7 +56,7 @@ namespace AutoMapper.Mappers
         private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context)
         {
             destination = destination == null ? context.Mapper.CreateObject<TDestination>() : destination;
-            var destTypeDetails = new TypeDetails(typeof(TDestination), context.ConfigurationProvider.Configuration);
+            var destTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TDestination));
             var members = from name in source.Keys
                           join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
                           select member;

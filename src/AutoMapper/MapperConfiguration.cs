@@ -129,15 +129,22 @@ namespace AutoMapper
         {
             foreach (var tp in pair.GetRelatedTypePairs())
             {
-                var typeMap =
-                          _typeMapPlanCache.GetOrDefault(tp) ??
-                          FindTypeMapFor(tp) ??
-                          (!CoveredByObjectMap(pair) ? FindConventionTypeMapFor(tp) : null) ??
-                          FindClosedGenericTypeMapFor(tp, pair);
-                if (typeMap != null)
-                {
+                TypeMap typeMap;
+                if (_typeMapPlanCache.TryGetValue(tp, out typeMap))
                     return typeMap;
-                }
+
+                typeMap = FindClosedGenericTypeMapFor(tp, pair);
+
+                if (typeMap != null)
+                    return typeMap;
+
+                if (CoveredByObjectMap(pair))
+                    return null;
+
+                typeMap = FindConventionTypeMapFor(tp);
+
+                if (typeMap != null)
+                    return typeMap;
             }
             return null;
         }

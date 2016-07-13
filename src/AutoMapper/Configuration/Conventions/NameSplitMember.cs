@@ -36,7 +36,7 @@ namespace AutoMapper.Configuration.Conventions
                 {
                     resolvers.AddLast(matchingMemberInfo);
 
-                    var details = new TypeDetails(matchingMemberInfo.GetMemberType(), options);
+                    var details = options.CreateTypeDetails(matchingMemberInfo.GetMemberType());
                     var foundMatch = parent.MapDestinationPropertyToSource(options, details, destType, destMemberType, snippet.Second, resolvers);
 
                     if (!foundMatch)

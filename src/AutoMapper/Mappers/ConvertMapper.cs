@@ -477,14 +477,6 @@ namespace AutoMapper.Mappers
             { new TypePair(typeof(ulong),    typeof(ulong?)), (Expression<Func<ulong,ulong?>>)(foo => Convert.ToUInt64(foo)) },
         });
 
-
-        private readonly IReadOnlyDictionary<TypePair, Delegate> _converterFuncs;
-
-        public ConvertMapper()
-        {
-            _converterFuncs = _converters.ToDictionary(kp => kp.Key, kp => kp.Value.Compile());
-        }
-
         public bool IsMatch(TypePair types) => _converters.ContainsKey(types);
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {

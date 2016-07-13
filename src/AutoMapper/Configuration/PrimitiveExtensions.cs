@@ -6,7 +6,7 @@ namespace AutoMapper.Configuration
     using System.Linq;
     using System.Reflection;
 
-    public static class PrimitiveExtensions
+    internal static class PrimitiveExtensions
     {
         public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
