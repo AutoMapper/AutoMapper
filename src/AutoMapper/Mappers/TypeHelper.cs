@@ -44,6 +44,12 @@ namespace AutoMapper.Mappers
                 return enumerableType.GetTypeInfo().GenericTypeArguments;
             }
 
+            Type idictionaryType = enumerableType.GetDictionaryType();
+            if (idictionaryType != null && flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair))
+            {
+                return idictionaryType.GetTypeInfo().GenericTypeArguments;
+            }
+
             Type ienumerableType = GetIEnumerableType(enumerableType);
             if (ienumerableType != null)
             {
