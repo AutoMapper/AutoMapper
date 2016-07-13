@@ -44,7 +44,7 @@ namespace AutoMapper.Mappers
                 return enumerableType.GetTypeInfo().GenericTypeArguments;
             }
 
-            Type idictionaryType = GetIDictionaryType(enumerableType);
+            Type idictionaryType = enumerableType.GetDictionaryType();
             if (idictionaryType != null && flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair))
             {
                 return idictionaryType.GetTypeInfo().GenericTypeArguments;
@@ -90,20 +90,6 @@ namespace AutoMapper.Mappers
             {
                 if (enumerableType.BaseType() != typeof(object))
                     return GetIEnumerableType(enumerableType.BaseType());
-
-                return null;
-            }
-        }
-        private static Type GetIDictionaryType(Type enumerableType)
-        {
-            try
-            {
-                return enumerableType.GetTypeInfo().ImplementedInterfaces.FirstOrDefault(t => t.Name == "IDictionary`2");
-            }
-            catch (AmbiguousMatchException)
-            {
-                if (enumerableType.BaseType() != typeof(object))
-                    return GetIDictionaryType(enumerableType.BaseType());
 
                 return null;
             }
