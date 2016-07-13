@@ -111,6 +111,7 @@
     <Compile Include="Bug\InitializeNRE.cs" />
     <Compile Include="Bug\GuidTryExpression.cs" />
     <Compile Include="Bug\MapExpandoObjectProperty.cs" />
+    <Compile Include="CustomCollectionTester.cs" />
     <Compile Include="ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
     <Compile Include="Bug\AssertConfigurationIsValidNullables.cs" />
