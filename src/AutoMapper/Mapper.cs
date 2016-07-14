@@ -22,7 +22,7 @@ namespace AutoMapper
             get
             {
                 if (_configuration == null)
-                    throw new InvalidOperationException("Mapper not initialized. Call Initialize with appropriate configuration.");
+                    throw new InvalidOperationException("Mapper not initialized. Call Initialize with appropriate configuration. If you are trying to use mapper instances through a container or otherwise, make sure you do not have any calls to the static Mapper.Map methods, and if you're using ProjectTo or UseAsDataSource extension methods, make sure you pass in the appropriate IConfigurationProvider instance.");
 
                 return _configuration;
             }
