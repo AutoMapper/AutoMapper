@@ -110,6 +110,7 @@
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\InitializeNRE.cs" />
     <Compile Include="Bug\GuidTryExpression.cs" />
+    <Compile Include="Bug\PreserveReferencesSameDestination.cs" />
     <Compile Include="Bug\MapExpandoObjectProperty.cs" />
     <Compile Include="CustomCollectionTester.cs" />
     <Compile Include="ForAllMaps.cs" />

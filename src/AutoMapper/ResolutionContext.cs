@@ -10,8 +10,10 @@ namespace AutoMapper
     /// </summary>
     public class ResolutionContext
     {
-        private Dictionary<object, object> _instanceCache;
-        private Dictionary<TypePair, int> _typeDepth;
+        [ThreadStatic]
+        private static Dictionary<object, object> _instanceCache;
+        [ThreadStatic]
+        private static Dictionary<TypePair, int> _typeDepth;
 
         /// <summary>
         /// Mapping operation options
@@ -100,6 +102,18 @@ namespace AutoMapper
         internal object Map(object source, object destination, Type sourceType, Type destinationType)
         {
             return Mapper.Map(source, destination, sourceType, destinationType, this);
+        }
+
+        internal void Clear()
+        {
+            if(_instanceCache != null)
+            {
+                _instanceCache.Clear();
+            }
+            if(_typeDepth != null)
+            {
+                _typeDepth.Clear();
+            }
         }
     }
 }

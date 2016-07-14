@@ -209,7 +209,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(types, types));
 
-            return (TDestination) func(source, null, _defaultContext);
+            return (TDestination) MapWithDefaultContext(func, source, null);
         }
 
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
@@ -233,7 +233,19 @@ namespace AutoMapper
 
             var destination = default(TDestination);
 
-            return func(source, destination, _defaultContext);
+            return MapWithDefaultContext(func, source, destination);
+        }
+
+        TDestination MapWithDefaultContext<TSource, TDestination>(Func<TSource, TDestination, ResolutionContext, TDestination> func, TSource source, TDestination destination)
+        {
+            try
+            {
+                return func(source, destination, _defaultContext);
+            }
+            finally
+            {
+                _defaultContext.Clear();
+            }
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
@@ -265,7 +277,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
-            return func(source, destination, _defaultContext);
+            return MapWithDefaultContext(func, source, destination);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
@@ -295,7 +307,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            return func(source, null, _defaultContext);
+            return MapWithDefaultContext(func, source, null);
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
@@ -325,7 +337,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            return func(source, destination, _defaultContext);
+            return MapWithDefaultContext(func, source, destination);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,
