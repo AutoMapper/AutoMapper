@@ -9,6 +9,8 @@ namespace AutoMapper
 
     public class Mapper : IRuntimeMapper
     {
+        private const string InvalidOperationMessage = "Mapper not initialized. Call Initialize with appropriate configuration. If you are trying to use mapper instances through a container or otherwise, make sure you do not have any calls to the static Mapper.Map methods, and if you're using ProjectTo or UseAsDataSource extension methods, make sure you pass in the appropriate IConfigurationProvider instance.";
+
         #region Static API
 
         private static IConfigurationProvider _configuration;
@@ -22,7 +24,7 @@ namespace AutoMapper
             get
             {
                 if (_configuration == null)
-                    throw new InvalidOperationException("Mapper not initialized. Call Initialize with appropriate configuration.");
+                    throw new InvalidOperationException(InvalidOperationMessage);
 
                 return _configuration;
             }
@@ -37,7 +39,7 @@ namespace AutoMapper
             get
             {
                 if (_instance == null)
-                    throw new InvalidOperationException("Mapper not initialized. Call Initialize with appropriate configuration.");
+                    throw new InvalidOperationException(InvalidOperationMessage);
 
                 return _instance;
             }

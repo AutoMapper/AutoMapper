@@ -41,7 +41,7 @@ namespace AutoMapper
             _memberConfigurations.Add(new MemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get")));
         }
 
-        [Obsolete("Use the constructor instead. Will be removed in 6.0")]
+        [Obsolete("Create a constructor and configure inside of your profile's constructor instead. Will be removed in 6.0")]
         protected virtual void Configure() { }
 
 #pragma warning disable 618 
