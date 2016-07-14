@@ -24,8 +24,7 @@ namespace AutoMapper.Execution
         readonly ParameterExpression _source;
         readonly ParameterExpression _initialDestination;
         readonly ParameterExpression _context;
-        bool _constructorMapping;
-        ParameterExpression _destination;
+        readonly ParameterExpression _destination;
 
         public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry, TypeMap typeMap)
         {
@@ -35,6 +34,7 @@ namespace AutoMapper.Execution
             _source = Parameter(typeMap.SourceType, "src");
             _initialDestination = Parameter(typeMap.DestinationTypeToUse, "dest");
             _context = Parameter(typeof(ResolutionContext), "ctxt");
+            _destination = Variable(_initialDestination.Type, "destination");
         }
 
         public LambdaExpression CreateMapperLambda()
@@ -89,20 +89,20 @@ namespace AutoMapper.Execution
                 return Lambda(_typeMap.CustomProjection.ReplaceParameters(_source), _source, _initialDestination, _context);
             }
 
-            _destination = Variable(_initialDestination.Type, "destination");
+            bool constructorMapping;
 
-            var destinationFunc = CreateDestinationFunc();
+            var destinationFunc = CreateDestinationFunc(out constructorMapping);
 
-            var assignmentFunc = CreateAssignmentFunc(destinationFunc);
+            var assignmentFunc = CreateAssignmentFunc(destinationFunc, constructorMapping);
 
             var mapperFunc = CreateMapperFunc(assignmentFunc);
 
             return Lambda(Block(new[] { _destination }, mapperFunc), _source, _initialDestination, _context);
         }
 
-        private Expression CreateDestinationFunc()
+        private Expression CreateDestinationFunc(out bool constructorMapping)
         {
-            var newDestFunc = ToType(CreateNewDestinationFunc(), _typeMap.DestinationTypeToUse);
+            var newDestFunc = ToType(CreateNewDestinationFunc(out constructorMapping), _typeMap.DestinationTypeToUse);
 
             var getDest = _typeMap.DestinationTypeToUse.GetTypeInfo().IsValueType
                 ? newDestFunc
@@ -124,7 +124,7 @@ namespace AutoMapper.Execution
             return destinationFunc;
         }
 
-        private Expression CreateAssignmentFunc(Expression destinationFunc)
+        private Expression CreateAssignmentFunc(Expression destinationFunc, bool constructorMapping)
         {
             var actions = new List<Expression>();
             foreach(var propertyMap in _typeMap.GetPropertyMaps())
@@ -134,7 +134,7 @@ namespace AutoMapper.Execution
                     continue;
                 }
                 var property = TryPropertyMap(propertyMap);
-                if(_constructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
+                if(constructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
                 {
                     property = IfThen(NotEqual(_initialDestination, Constant(null)), property);
                 }
@@ -217,8 +217,9 @@ namespace AutoMapper.Execution
             return mapperFunc;
         }
 
-        private Expression CreateNewDestinationFunc()
+        private Expression CreateNewDestinationFunc(out bool constructorMapping)
         {
+            constructorMapping = false;
             if(_typeMap.DestinationCtor != null)
                 return _typeMap.DestinationCtor.ReplaceParameters(_source, _context);
 
@@ -230,7 +231,7 @@ namespace AutoMapper.Execution
 
             if(_typeMap.ConstructorMap?.CanResolve == true)
             {
-                _constructorMapping = true;
+                constructorMapping = true;
                 return _typeMap.ConstructorMap.BuildExpression(_typeMapRegistry, _source, _context);
             }
 #if NET45
