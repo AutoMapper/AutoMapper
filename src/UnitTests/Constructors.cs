@@ -5,6 +5,43 @@ using Should;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class When_constructor_matches_but_is_overriden_by_ConstructUsing : AutoMapperSpecBase
+    {
+        PersonDto _destination;
+
+        public class Person
+        {
+            public string Name { get; set; }
+        }
+
+        public class PersonDto
+        {
+            public PersonDto()
+            {
+            }
+
+            public PersonDto(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>().ConstructUsing(p=>new PersonDto()));
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<PersonDto>(new Person { Name = "John" });
+        }
+
+        [Fact]
+        public void Should_map_from_the_property()
+        {
+            _destination.Name.ShouldEqual("John");
+        }
+    }
+
     public class When_constructor_is_match_with_default_value : AutoMapperSpecBase
     {
         PersonDto _destination;
