@@ -7,6 +7,55 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.CustomMapping
 {
+    public class When_converting_to_string : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+            public Id TheId { get; set; }
+        }
+
+        class Destination
+        {
+            public string TheId { get; set; }
+        }
+
+        interface IId
+        {
+            string Serialize();
+        }
+
+        class Id : IId
+        {
+            public string Prefix { get; set; }
+
+            public string Value { get; set; }
+
+            public string Serialize()
+            {
+                return Prefix + "_" + Value;
+            }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<IId, string>().ConvertUsing(id => id.Serialize());
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { TheId = new Id { Prefix = "p", Value = "v" } });
+        }
+
+        [Fact]
+        public void Should_use_the_type_converter()
+        {
+            _destination.TheId.ShouldEqual("p_v");
+        }
+    }
+
     public class When_specifying_type_converters_for_object_mapper_types : AutoMapperSpecBase
     {
         Destination _destination;
