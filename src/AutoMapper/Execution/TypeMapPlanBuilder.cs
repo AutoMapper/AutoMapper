@@ -18,13 +18,13 @@ namespace AutoMapper.Execution
         private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
         private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo = ctxt => ctxt.GetTypeDepth(default(TypePair));
 
-        readonly IConfigurationProvider _configurationProvider;
-        readonly TypeMap _typeMap;
-        readonly TypeMapRegistry _typeMapRegistry;
-        readonly ParameterExpression _source;
-        readonly ParameterExpression _initialDestination;
-        readonly ParameterExpression _context;
-        readonly ParameterExpression _destination;
+        private readonly IConfigurationProvider _configurationProvider;
+        private readonly TypeMap _typeMap;
+        private readonly TypeMapRegistry _typeMapRegistry;
+        private readonly ParameterExpression _source;
+        private readonly ParameterExpression _initialDestination;
+        private readonly ParameterExpression _context;
+        private readonly ParameterExpression _destination;
 
         public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry, TypeMap typeMap)
         {
