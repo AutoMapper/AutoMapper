@@ -45,6 +45,31 @@
       }
     },
     "net45": {
+    },
+    ".NETPortable,Version=v4.5,Profile=Profile111": {
+      "frameworkAssemblies": {
+        "Microsoft.CSharp": "",
+        "System.ComponentModel": "",
+        "System.Diagnostics.Debug": "",
+        "System.Dynamic.Runtime": "",
+        "System.Runtime": "",
+        "System.Runtime.Extensions": "",  
+        "System.Globalization": "",
+        "System.Linq": "",
+        "System.Linq.Expressions": "",
+        "System.Linq.Queryable": "",
+        "System.ObjectModel": "",
+        "System.Reflection": "",
+        "System.Reflection.Extensions": "",
+        "System.Collections": "",
+        "System.Collections.Concurrent": "",
+        "System.Text.RegularExpressions": "",
+        "System.Threading": "",
+        "System.Threading.Tasks": "" 
+      },
+      "buildOptions": {
+        "define": ["PORTABLE"]
+      }
     } 
   }
 }

@@ -5,7 +5,9 @@ namespace AutoMapper
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+#if NET45
     using System.Reflection.Emit;
+#endif
 
     internal static class TypeExtensions
     {
