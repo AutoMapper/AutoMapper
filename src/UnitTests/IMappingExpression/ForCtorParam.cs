@@ -91,7 +91,7 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
-        public void Should_not_pass_config_validation_when_parameter_is_mispelt()
+        public void Should_not_pass_config_validation_when_parameter_is_misspelt()
         {
             var config = new MapperConfiguration(cfg =>
             {
@@ -100,7 +100,20 @@ namespace AutoMapper.UnitTests
             });
 
             Action configValidation = () => config.AssertConfigurationIsValid();
-            configValidation.ShouldThrow<AutoMapperConfigurationException>();
+            configValidation.ShouldThrow<AutoMapperConfigurationException>(exception =>
+            {
+                Console.WriteLine(exception.Message);
+                exception.Message.ShouldContain("Source -> Dest", StringComparison.InvariantCulture);
+                exception.Message.ShouldContain("No available constructor.", StringComparison.InvariantCulture);
+            });
+
+            var mapper = config.CreateMapper();
+
+            Action mapping = () => mapper.Map<Dest>(new Source { Value = 4711 });
+            mapping.ShouldThrow<ArgumentException>(exception =>
+            {
+                exception.Message.ShouldContain("Dest needs to have a constructor with 0 args or only optional args", StringComparison.InvariantCulture);
+            });
         }
     }
 }
