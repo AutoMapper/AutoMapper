@@ -12,7 +12,7 @@ namespace AutoMapper.Configuration.Conventions
 
         public MemberInfo GetMatchingMemberInfo(IGetTypeInfoMembers getTypeInfoMembers, TypeDetails typeInfo, Type destType, Type destMemberType, string nameToSearch)
         {
-            Cache.GetOrAdd(typeInfo, ti => getTypeInfoMembers.GetMemberInfos(ti).ToDictionary(mi => mi, mi => CustomAttributeExtensions.GetCustomAttributes((MemberInfo) mi, typeof(SourceToDestinationMapperAttribute), true).OfType<SourceToDestinationMapperAttribute>()));
+            Cache.GetOrAdd(typeInfo, ti => getTypeInfoMembers.GetMemberInfos(ti).ToDictionary(mi => mi, mi => mi.GetCustomAttributes(typeof(SourceToDestinationMapperAttribute), true).OfType<SourceToDestinationMapperAttribute>()));
 
             return Cache[typeInfo].FirstOrDefault(kp => kp.Value.Any(_ => _.IsMatch(typeInfo, kp.Key, destType, destMemberType, nameToSearch))).Key;
         }
