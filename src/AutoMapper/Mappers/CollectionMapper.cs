@@ -147,8 +147,7 @@ namespace AutoMapper.Mappers
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
             if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
             {
-                if (typeMap.Sealed != true)
-                    typeMap.Seal(typeMapRegistry, configurationProvider);
+                typeMap.Seal(typeMapRegistry, configurationProvider);
                 return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), contextParam);
             }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));

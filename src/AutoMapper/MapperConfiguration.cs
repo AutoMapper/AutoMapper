@@ -109,39 +109,43 @@ namespace AutoMapper
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair, _getTypeMap);
-
-            _typeMapPlanCache.AddOrUpdate(typePair, typeMap, (tp, tm) =>
+            if(Configuration.CreateMissingTypeMaps && typeMap != null && typeMap.MapExpression == null)
             {
-                if (tm != null)
-                    lock (tm)
-                        if (tm.Sealed == false)
-                            tm.Seal(_typeMapRegistry, this);
-                return tm;
-            });
-
+                lock(typeMap)
+                {
+                    typeMap.Seal(_typeMapRegistry, this);
+                }
+            }
             return typeMap;
         }
 
-        private TypeMap GetTypeMap(TypePair pair)
+        private TypeMap GetTypeMap(TypePair initialTypes)
         {
-            foreach (var tp in pair.GetRelatedTypePairs())
+            TypeMap typeMap;
+            foreach(var types in initialTypes.GetRelatedTypePairs())
             {
-                TypeMap typeMap;
-                if (_typeMapPlanCache.TryGetValue(tp, out typeMap))
+                if(_typeMapPlanCache.TryGetValue(types, out typeMap))
+                {
                     return typeMap;
-
-                typeMap = FindClosedGenericTypeMapFor(tp, pair);
-
-                if (typeMap != null)
+                }
+                typeMap = FindTypeMapFor(types);
+                if(typeMap != null)
+                {
                     return typeMap;
-
-                if (CoveredByObjectMap(pair))
-                    return null;
-
-                typeMap = FindConventionTypeMapFor(tp);
-
-                if (typeMap != null)
+                }
+                typeMap = FindClosedGenericTypeMapFor(types, initialTypes);
+                if(typeMap != null)
+                {
                     return typeMap;
+                }
+                if(!CoveredByObjectMap(initialTypes))
+                {
+                    typeMap = FindConventionTypeMapFor(types);
+                    if(typeMap != null)
+                    {
+                        return typeMap;
+                    }
+                }
             }
             return null;
         }
@@ -290,6 +294,11 @@ namespace AutoMapper
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
 
+            if(!Configuration.CreateMissingTypeMaps)
+            {
+                typeMap?.Seal(_typeMapRegistry, this);
+            }
+
             return typeMap;
         }
 
@@ -302,6 +311,8 @@ namespace AutoMapper
                 .Cast<IProfileConfiguration>()
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                 .FirstOrDefault(t => t != null);
+
+            typeMap?.Seal(_typeMapRegistry, this);
 
             return typeMap;
         }
