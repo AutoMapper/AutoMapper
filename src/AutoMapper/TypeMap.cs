@@ -263,7 +263,7 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.MappingOrder).ToArray();
 
-            MapExpression = TypeMapPlanBuilder.BuildMapperFunc(this, configurationProvider, typeMapRegistry);
+            MapExpression = new TypeMapPlanBuilder(configurationProvider, typeMapRegistry, this).CreateMapperLambda();
 
             _sealed = true;
         }

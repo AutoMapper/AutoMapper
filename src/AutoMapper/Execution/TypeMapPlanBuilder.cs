@@ -1,309 +1,281 @@
-﻿namespace AutoMapper.Execution
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace AutoMapper.Execution
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
     using Configuration;
     using Mappers;
-    using static System.Linq.Expressions.Expression;
+    using static Expression;
     using static ExpressionExtensions;
 
-    public static class TypeMapPlanBuilder
+    public class TypeMapPlanBuilder
     {
-        public static LambdaExpression BuildMapperFunc(TypeMap typeMap, IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry)
+        private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
+        private static readonly Expression<Action<ResolutionContext>> IncTypeDepthInfo = ctxt => ctxt.IncrementTypeDepth(default(TypePair));
+        private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
+        private static readonly Expression<Func<ResolutionContext, int>> GetTypeDepthInfo = ctxt => ctxt.GetTypeDepth(default(TypePair));
+
+        private readonly IConfigurationProvider _configurationProvider;
+        private readonly TypeMap _typeMap;
+        private readonly TypeMapRegistry _typeMapRegistry;
+        private readonly ParameterExpression _source;
+        private readonly ParameterExpression _initialDestination;
+        private readonly ParameterExpression _context;
+        private readonly ParameterExpression _destination;
+
+        public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry, TypeMap typeMap)
         {
-            if (typeMap.SourceType.IsGenericTypeDefinition() || typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
+            _configurationProvider = configurationProvider;
+            _typeMapRegistry = typeMapRegistry;
+            _typeMap = typeMap;
+            _source = Parameter(typeMap.SourceType, "src");
+            _initialDestination = Parameter(typeMap.DestinationTypeToUse, "dest");
+            _context = Parameter(typeof(ResolutionContext), "ctxt");
+            _destination = Variable(_initialDestination.Type, "destination");
+        }
+
+        public LambdaExpression CreateMapperLambda()
+        {
+            if(_typeMap.SourceType.IsGenericTypeDefinition() || _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
                 return null;
 
-            var srcParam = Parameter(typeMap.SourceType, "src");
-            var destParam = Parameter(typeMap.DestinationTypeToUse, "dest");
-            var ctxtParam = Parameter(typeof (ResolutionContext), "ctxt");
-
-            if (typeMap.Substitution != null)
+            if(_typeMap.Substitution != null)
             {
-                return Lambda(typeMap.Substitution.ReplaceParameters(srcParam, destParam, ctxtParam), srcParam,
-                    destParam, ctxtParam);
+                return Lambda(_typeMap.Substitution.ReplaceParameters(_source, _initialDestination, _context), _source,
+                    _initialDestination, _context);
             }
 
-            if (typeMap.TypeConverterType != null)
+            if(_typeMap.TypeConverterType != null)
             {
                 Type type;
-                if (typeMap.TypeConverterType.IsGenericTypeDefinition())
+                if(_typeMap.TypeConverterType.IsGenericTypeDefinition())
                 {
-                    var genericTypeParam = typeMap.SourceType.IsGenericType()
-                        ? typeMap.SourceType.GetTypeInfo().GenericTypeArguments[0]
-                        : typeMap.DestinationTypeToUse.GetTypeInfo().GenericTypeArguments[0];
-                    type = typeMap.TypeConverterType.MakeGenericType(genericTypeParam);
+                    var genericTypeParam = _typeMap.SourceType.IsGenericType()
+                        ? _typeMap.SourceType.GetTypeInfo().GenericTypeArguments[0]
+                        : _typeMap.DestinationTypeToUse.GetTypeInfo().GenericTypeArguments[0];
+                    type = _typeMap.TypeConverterType.MakeGenericType(genericTypeParam);
                 }
-                else type = typeMap.TypeConverterType;
+                else type = _typeMap.TypeConverterType;
 
                 // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).ToType(src, ctxt);
-                var converterInterfaceType = typeof (ITypeConverter<,>).MakeGenericType(typeMap.SourceType,
-                    typeMap.DestinationTypeToUse);
+                var converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType,
+                    _typeMap.DestinationTypeToUse);
                 return Lambda(
                     Call(
                         ToType(
                             Call(
-                                MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetDeclaredProperty("Options")),
-                                typeof (IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
+                                MakeMemberAccess(_context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
+                                typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
                                     .MakeGenericMethod(type)
                                 ),
                             converterInterfaceType),
                         converterInterfaceType.GetDeclaredMethod("Convert"),
-                        srcParam, destParam, ctxtParam
+                        _source, _initialDestination, _context
                         ),
-                    srcParam, destParam, ctxtParam);
+                    _source, _initialDestination, _context);
             }
 
-            if (typeMap.CustomMapper != null)
+            if(_typeMap.CustomMapper != null)
             {
-                return Lambda(typeMap.CustomMapper.ReplaceParameters(srcParam, destParam, ctxtParam), srcParam,
-                    destParam, ctxtParam);
+                return Lambda(_typeMap.CustomMapper.ReplaceParameters(_source, _initialDestination, _context), _source,
+                    _initialDestination, _context);
             }
 
-            if (typeMap.CustomProjection != null)
+            if(_typeMap.CustomProjection != null)
             {
-                return Lambda(typeMap.CustomProjection.ReplaceParameters(srcParam), srcParam, destParam, ctxtParam);
+                return Lambda(_typeMap.CustomProjection.ReplaceParameters(_source), _source, _initialDestination, _context);
             }
 
             bool constructorMapping;
 
-            var destination = Variable(destParam.Type, "destination");
+            var destinationFunc = CreateDestinationFunc(out constructorMapping);
 
-            var destinationFunc = CreateDestinationFunc(typeMap, typeMapRegistry, srcParam, destParam, ctxtParam, destination, out constructorMapping);
+            var assignmentFunc = CreateAssignmentFunc(destinationFunc, constructorMapping);
 
-            var assignmentFunc = CreateAssignmentFunc(typeMap, configurationProvider, typeMapRegistry, srcParam, destParam, ctxtParam, destinationFunc, destination, constructorMapping);
+            var mapperFunc = CreateMapperFunc(assignmentFunc);
 
-            var mapperFunc = CreateMapperFunc(typeMap, srcParam, destination, ctxtParam, assignmentFunc);
-
-            var lambdaExpr = Lambda(Block(new[] { destination }, mapperFunc), srcParam, destParam, ctxtParam);
-
-            return lambdaExpr;
+            return Lambda(Block(new[] { _destination }, mapperFunc), _source, _initialDestination, _context);
         }
 
-        private static Expression CreateDestinationFunc(
-            TypeMap typeMap,
-            TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam,
-            ParameterExpression destParam,
-            ParameterExpression ctxtParam,
-            ParameterExpression destination,
-            out bool constructorMapping)
+        private Expression CreateDestinationFunc(out bool constructorMapping)
         {
-            var newDestFunc = ToType(CreateNewDestinationFunc(typeMap, typeMapRegistry, srcParam, ctxtParam, out constructorMapping),
-                typeMap.DestinationTypeToUse);
+            var newDestFunc = ToType(CreateNewDestinationFunc(out constructorMapping), _typeMap.DestinationTypeToUse);
 
-            var getDest = typeMap.DestinationTypeToUse.GetTypeInfo().IsValueType
+            var getDest = _typeMap.DestinationTypeToUse.GetTypeInfo().IsValueType
                 ? newDestFunc
-                : Coalesce(destParam, newDestFunc);
+                : Coalesce(_initialDestination, newDestFunc);
 
-            Expression destinationFunc = Assign(destination, getDest);
+            Expression destinationFunc = Assign(_destination, getDest);
 
-            if (typeMap.PreserveReferences)
+            if(_typeMap.PreserveReferences)
             {
-                var dest = Variable(typeof (object), "dest");
+                var dest = Variable(typeof(object), "dest");
 
-                Expression valueBag = Property(ctxtParam, "InstanceCache");
-                var set = Assign(Property(valueBag, "Item", srcParam), dest);
+                Expression valueBag = Property(_context, "InstanceCache");
+                var set = Assign(Property(valueBag, "Item", _source), dest);
                 var setCache =
-                    IfThen(NotEqual(srcParam, Constant(null)), set);
+                    IfThen(NotEqual(_source, Constant(null)), set);
 
-                destinationFunc = Block(new[] {dest}, Assign(dest, destinationFunc), setCache, dest);
+                destinationFunc = Block(new[] { dest }, Assign(dest, destinationFunc), setCache, dest);
             }
             return destinationFunc;
         }
 
-        private static Expression<Action<ResolutionContext>> IncTypeDepthInfo = ctxt => ctxt.IncrementTypeDepth(default(TypePair));
-        private static Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
-        private static Expression<Func<ResolutionContext, int>> GetTypeDepthInfo = ctxt => ctxt.GetTypeDepth(default(TypePair));
-
-        private static Expression CreateAssignmentFunc(
-            TypeMap typeMap,
-            IConfigurationProvider configurationProvider,
-            TypeMapRegistry registry,
-            ParameterExpression srcParam,
-            ParameterExpression destParam,
-            ParameterExpression ctxtParam,
-            Expression destinationFunc,
-            ParameterExpression destination,
-            bool constructorMapping)
+        private Expression CreateAssignmentFunc(Expression destinationFunc, bool constructorMapping)
         {
             var actions = new List<Expression>();
-            foreach(var propertyMap in typeMap.GetPropertyMaps())
+            foreach(var propertyMap in _typeMap.GetPropertyMaps())
             {
                 if(!propertyMap.CanResolveValue())
                 {
                     continue;
                 }
-                var property = TryPropertyMap(propertyMap, configurationProvider, registry, srcParam, destination, ctxtParam);
-                if(constructorMapping && typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
+                var property = TryPropertyMap(propertyMap);
+                if(constructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
                 {
-                    property = IfThen(NotEqual(destParam, Expression.Constant(null)), property);
+                    property = IfThen(NotEqual(_initialDestination, Constant(null)), property);
                 }
                 actions.Add(property);
             }
-            foreach (var beforeMapAction in typeMap.BeforeMapActions)
+            foreach(var beforeMapAction in _typeMap.BeforeMapActions)
             {
-                actions.Insert(0, beforeMapAction.ReplaceParameters(srcParam, destination, ctxtParam));
+                actions.Insert(0, beforeMapAction.ReplaceParameters(_source, _destination, _context));
             }
             actions.Insert(0, destinationFunc);
-            if (typeMap.MaxDepth > 0)
+            if(_typeMap.MaxDepth > 0)
             {
-                actions.Insert(0, Call(ctxtParam, ((MethodCallExpression)IncTypeDepthInfo.Body).Method, Constant(typeMap.Types)));
+                actions.Insert(0, Call(_context, ((MethodCallExpression)IncTypeDepthInfo.Body).Method, Constant(_typeMap.Types)));
             }
             actions.AddRange(
-                typeMap.AfterMapActions.Select(
-                    afterMapAction => afterMapAction.ReplaceParameters(srcParam, destination, ctxtParam)));
+                _typeMap.AfterMapActions.Select(
+                    afterMapAction => afterMapAction.ReplaceParameters(_source, _destination, _context)));
 
-            if (typeMap.MaxDepth > 0)
+            if(_typeMap.MaxDepth > 0)
             {
-                actions.Add(Call(ctxtParam, ((MethodCallExpression)DecTypeDepthInfo.Body).Method, Constant(typeMap.Types)));
+                actions.Add(Call(_context, ((MethodCallExpression)DecTypeDepthInfo.Body).Method, Constant(_typeMap.Types)));
             }
 
-            actions.Add(destination);
+            actions.Add(_destination);
 
             return Block(actions);
         }
 
-        private static Expression CreateMapperFunc(
-            TypeMap typeMap,
-            ParameterExpression srcParam,
-            ParameterExpression destParam,
-            ParameterExpression ctxtParam,
-            Expression assignmentFunc)
+        private Expression CreateMapperFunc(Expression assignmentFunc)
         {
             var mapperFunc = assignmentFunc;
 
-            if (typeMap.Condition != null)
+            if(_typeMap.Condition != null)
             {
                 mapperFunc =
-                    Condition(typeMap.Condition.Body,
-                        mapperFunc, Default(typeMap.DestinationTypeToUse));
+                    Condition(_typeMap.Condition.Body,
+                        mapperFunc, Default(_typeMap.DestinationTypeToUse));
                 //mapperFunc = (source, context, destFunc) => _condition(context) ? inner(source, context, destFunc) : default(TDestination);
             }
 
-            if (typeMap.MaxDepth > 0)
+            if(_typeMap.MaxDepth > 0)
             {
                 mapperFunc = Condition(
                     LessThanOrEqual(
-                        Call(ctxtParam, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(typeMap.Types)),
-                        Constant(typeMap.MaxDepth)
+                        Call(_context, ((MethodCallExpression)GetTypeDepthInfo.Body).Method, Constant(_typeMap.Types)),
+                        Constant(_typeMap.MaxDepth)
                     ),
                     mapperFunc,
-                    Default(typeMap.DestinationTypeToUse));
+                    Default(_typeMap.DestinationTypeToUse));
                 //mapperFunc = (source, context, destFunc) => context.GetTypeDepth(types) <= maxDepth ? inner(source, context, destFunc) : default(TDestination);
             }
 
-            if (typeMap.Profile.AllowNullDestinationValues && typeMap.SourceType.IsClass())
+            if(_typeMap.Profile.AllowNullDestinationValues && _typeMap.SourceType.IsClass())
             {
                 mapperFunc =
-                    Condition(Equal(srcParam, Default(typeMap.SourceType)),
-                        Default(typeMap.DestinationTypeToUse), mapperFunc.RemoveIfNotNull(srcParam));
+                    Condition(Equal(_source, Default(_typeMap.SourceType)),
+                        Default(_typeMap.DestinationTypeToUse), mapperFunc.RemoveIfNotNull(_source));
                 //mapperFunc = (source, context, destFunc) => source == default(TSource) ? default(TDestination) : inner(source, context, destFunc);
             }
 
-            if (typeMap.PreserveReferences)
+            if(_typeMap.PreserveReferences)
             {
-                var cache = Variable(typeMap.DestinationTypeToUse, "cachedDestination");
+                var cache = Variable(_typeMap.DestinationTypeToUse, "cachedDestination");
 
                 var condition = Condition(
                     AndAlso(
-                        NotEqual(srcParam, Constant(null)),
+                        NotEqual(_source, Constant(null)),
                         AndAlso(
-                            Equal(destParam, Constant(null)),
-                            Call(Property(ctxtParam, "InstanceCache"),
-                                typeof (Dictionary<object, object>).GetDeclaredMethod("ContainsKey"), srcParam)
+                            Equal(_destination, Constant(null)),
+                            Call(Property(_context, "InstanceCache"),
+                                typeof(Dictionary<object, object>).GetDeclaredMethod("ContainsKey"), _source)
                             )),
                     Assign(cache,
-                        ToType(Property(Property(ctxtParam, "InstanceCache"), "Item", srcParam), typeMap.DestinationTypeToUse)),
+                        ToType(Property(Property(_context, "InstanceCache"), "Item", _source), _typeMap.DestinationTypeToUse)),
                     Assign(cache, mapperFunc)
                     );
 
-                mapperFunc = Block(new[] {cache}, condition, cache);
+                mapperFunc = Block(new[] { cache }, condition, cache);
             }
             return mapperFunc;
         }
 
-        private static Expression CreateNewDestinationFunc(
-            TypeMap typeMap,
-            TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam,
-            ParameterExpression ctxtParam,
-            out bool constructorMapping)
+        private Expression CreateNewDestinationFunc(out bool constructorMapping)
         {
             constructorMapping = false;
+            if(_typeMap.DestinationCtor != null)
+                return _typeMap.DestinationCtor.ReplaceParameters(_source, _context);
 
-            if (typeMap.DestinationCtor != null)
-                return typeMap.DestinationCtor.ReplaceParameters(srcParam, ctxtParam);
-
-            if (typeMap.ConstructDestinationUsingServiceLocator)
-                return Call(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetDeclaredProperty("Options")),
-                    typeof (IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
-                        .MakeGenericMethod(typeMap.DestinationTypeToUse)
+            if(_typeMap.ConstructDestinationUsingServiceLocator)
+                return Call(MakeMemberAccess(_context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
+                    typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
+                        .MakeGenericMethod(_typeMap.DestinationTypeToUse)
                     );
 
-            if(typeMap.ConstructorMap?.CanResolve == true)
+            if(_typeMap.ConstructorMap?.CanResolve == true)
             {
                 constructorMapping = true;
-                return typeMap.ConstructorMap.BuildExpression(typeMapRegistry, srcParam, ctxtParam);
+                return _typeMap.ConstructorMap.BuildExpression(_typeMapRegistry, _source, _context);
             }
 #if NET45
-            if (typeMap.DestinationTypeToUse.IsInterface())
+            if(_typeMap.DestinationTypeToUse.IsInterface())
             {
-                var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetDeclaredMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetDeclaredMethod("GetProxyType"), Constant(typeMap.DestinationTypeToUse)));
+                var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetDeclaredMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetDeclaredMethod("GetProxyType"), Constant(_typeMap.DestinationTypeToUse)));
                 // We're invoking a delegate here
                 return Invoke(ctor);
             }
 #endif
 
-            if (typeMap.DestinationTypeToUse.IsAbstract())
+            if(_typeMap.DestinationTypeToUse.IsAbstract())
                 return Constant(null);
 
-            if (typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
+            if(_typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
                 return Constant(null);
 
-            return DelegateFactory.GenerateConstructorExpression(typeMap.DestinationTypeToUse);
+            return DelegateFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
         }
 
-        private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
-        private static Expression TryPropertyMap(
-            PropertyMap pm,
-            IConfigurationProvider configurationProvider,
-            TypeMapRegistry registry,
-            ParameterExpression srcParam,
-            ParameterExpression destParam,
-            ParameterExpression ctxtParam)
+        private Expression TryPropertyMap(PropertyMap propertyMap)
         {
-            var pmExpression = CreatePropertyMapFunc(pm, configurationProvider, registry, srcParam, destParam, ctxtParam);
+            var pmExpression = CreatePropertyMapFunc(propertyMap);
 
-            if (pmExpression == null)
+            if(pmExpression == null)
                 return null;
 
-            var exception = Parameter(typeof (Exception), "ex");
+            var exception = Parameter(typeof(Exception), "ex");
 
             var mappingExceptionCtor = ((NewExpression)CtorExpression.Body).Constructor;
 
-            return TryCatch(Block(typeof (void), pmExpression),
-                MakeCatchBlock(typeof (Exception), exception,
-                    Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception, Constant(pm.TypeMap.Types), Constant(pm.TypeMap), Constant(pm))), null));
+            return TryCatch(Block(typeof(void), pmExpression),
+                MakeCatchBlock(typeof(Exception), exception,
+                    Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception, Constant(propertyMap.TypeMap.Types), Constant(propertyMap.TypeMap), Constant(propertyMap))), null));
         }
 
-        private static Expression CreatePropertyMapFunc(
-            PropertyMap propertyMap,
-            IConfigurationProvider configurationProvider,
-            TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam,
-            ParameterExpression destParam,
-            ParameterExpression ctxtParam)
+        private Expression CreatePropertyMapFunc(PropertyMap propertyMap)
         {
-            var destMember = MakeMemberAccess(destParam, propertyMap.DestinationProperty);
+            var destMember = MakeMemberAccess(_destination, propertyMap.DestinationProperty);
 
             Expression getter;
 
             var pi = propertyMap.DestinationProperty as PropertyInfo;
-            if (pi != null && pi.GetGetMethod(true) == null)
+            if(pi != null && pi.GetGetMethod(true) == null)
             {
                 getter = Default(propertyMap.DestinationPropertyType);
             }
@@ -316,37 +288,37 @@
                 ? getter
                 : Default(propertyMap.DestinationPropertyType);
 
-            var valueResolverExpr = BuildValueResolverFunc(propertyMap, typeMapRegistry, srcParam, destParam, getter, ctxtParam);
+            var valueResolverExpr = BuildValueResolverFunc(propertyMap, getter);
 
-            if (propertyMap.DestinationPropertyType != null)
+            if(propertyMap.DestinationPropertyType != null)
             {
                 var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
-                var typeMap = configurationProvider.ResolveTypeMap(typePair);
-                var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-                if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
+                var typeMap = _configurationProvider.ResolveTypeMap(typePair);
+                var match = _configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
+                if(typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
                 {
                     if(typeMap.Sealed != true)
-                        typeMap.Seal(typeMapRegistry, configurationProvider);
-                    valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, ctxtParam);
+                        typeMap.Seal(_typeMapRegistry, _configurationProvider);
+                    valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, _context);
                 }
-                else if (match != null && typeMap == null)
+                else if(match != null && typeMap == null)
                 {
-                    valueResolverExpr = match.MapExpression(typeMapRegistry, configurationProvider,
+                    valueResolverExpr = match.MapExpression(_typeMapRegistry, _configurationProvider,
                         propertyMap, valueResolverExpr, destValueExpr,
-                        ctxtParam);
+                        _context);
                 }
                 else
                 {
-                    valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr, ctxtParam);
+                    valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
                 }
             }
             else
             {
-                valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr, ctxtParam);
+                valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
             }
 
             Expression mapperExpr;
-            if (propertyMap.DestinationProperty is FieldInfo)
+            if(propertyMap.DestinationProperty is FieldInfo)
             {
                 mapperExpr = propertyMap.SourceType != propertyMap.DestinationPropertyType
                     ? Assign(destMember, ToType(valueResolverExpr, propertyMap.DestinationPropertyType))
@@ -354,8 +326,8 @@
             }
             else
             {
-                var setter = ((PropertyInfo) propertyMap.DestinationProperty).GetSetMethod(true);
-                if (setter == null)
+                var setter = ((PropertyInfo)propertyMap.DestinationProperty).GetSetMethod(true);
+                if(setter == null)
                 {
                     mapperExpr = valueResolverExpr;
                 }
@@ -367,22 +339,22 @@
                 }
             }
 
-            if (propertyMap.PreCondition != null)
+            if(propertyMap.PreCondition != null)
             {
                 mapperExpr = IfThen(
-                    propertyMap.PreCondition.ConvertReplaceParameters(srcParam, ctxtParam),
+                    propertyMap.PreCondition.ConvertReplaceParameters(_source, _context),
                     mapperExpr
                     );
             }
-            if (propertyMap.Condition != null)
+            if(propertyMap.Condition != null)
             {
                 mapperExpr = IfThen(
                     propertyMap.Condition.ConvertReplaceParameters(
-                        srcParam,
-                        destParam,
+                        _source,
+                        _destination,
                         ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
                         ToType(getter, propertyMap.Condition.Parameters[2].Type),
-                        ctxtParam
+                        _context
                         ),
                     mapperExpr
                     );
@@ -391,54 +363,38 @@
             return mapperExpr;
         }
 
-        private static Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpr, Expression destValueExpr, ParameterExpression ctxtParam)
+        private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpr, Expression destValueExpr)
         {
-            return ContextMap(valueResolverExpr, destValueExpr, ctxtParam, propertyMap.DestinationPropertyType);
+            return ContextMap(valueResolverExpr, destValueExpr, _context, propertyMap.DestinationPropertyType);
         }
 
-        public static Expression ContextMap(Expression valueResolverExpr, Expression destValueExpr, ParameterExpression ctxtParam, Type destinationType)
-        {
-            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(valueResolverExpr.Type, destinationType);
-            var second = Call(
-                ctxtParam,
-                mapMethod,
-                valueResolverExpr,
-                destValueExpr
-                );
-            return second;
-        }
-
-        private static Expression BuildValueResolverFunc(PropertyMap propertyMap, TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam,
-            ParameterExpression destParam,
-            Expression destValueExpr,
-            ParameterExpression ctxtParam)
+        private Expression BuildValueResolverFunc(PropertyMap propertyMap, Expression destValueExpr)
         {
             Expression valueResolverFunc;
             var valueResolverConfig = propertyMap.ValueResolverConfig;
             var typeMap = propertyMap.TypeMap;
 
-            if (valueResolverConfig != null)
+            if(valueResolverConfig != null)
             {
                 Expression ctor;
                 Type resolverType;
-                if (valueResolverConfig.Instance != null)
+                if(valueResolverConfig.Instance != null)
                 {
                     ctor = Constant(valueResolverConfig.Instance);
                     resolverType = valueResolverConfig.Instance.GetType();
                 }
                 else
                 {
-                    ctor = Call(MakeMemberAccess(ctxtParam, typeof (ResolutionContext).GetDeclaredProperty("Options")),
-                        typeof (IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
+                    ctor = Call(MakeMemberAccess(_context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
+                        typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
                             .MakeGenericMethod(valueResolverConfig.Type)
                         );
                     resolverType = valueResolverConfig.Type;
                 }
 
-                if (valueResolverConfig.SourceMember != null)
+                if(valueResolverConfig.SourceMember != null)
                 {
-                    var sourceMember = valueResolverConfig.SourceMember.ReplaceParameters(srcParam);
+                    var sourceMember = valueResolverConfig.SourceMember.ReplaceParameters(_source);
 
                     var iResolverType =
                         resolverType.GetTypeInfo()
@@ -451,16 +407,16 @@
 
                     valueResolverFunc =
                         ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
-                            ToType(srcParam, sourceResolverParam),
-                            ToType(destParam, destResolverParam),
+                            ToType(_source, sourceResolverParam),
+                            ToType(_destination, destResolverParam),
                             ToType(sourceMember, sourceMemberResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
-                            ctxtParam),
+                            _context),
                             propertyMap.DestinationPropertyType);
                 }
-                else if (valueResolverConfig.SourceMemberName != null)
+                else if(valueResolverConfig.SourceMemberName != null)
                 {
-                    var sourceMember = MakeMemberAccess(srcParam,
+                    var sourceMember = MakeMemberAccess(_source,
                         typeMap.SourceType.GetFieldOrProperty(valueResolverConfig.SourceMemberName));
 
                     var iResolverType =
@@ -474,11 +430,11 @@
 
                     valueResolverFunc =
                         ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
-                            ToType(srcParam, sourceResolverParam),
-                            ToType(destParam, destResolverParam),
+                            ToType(_source, sourceResolverParam),
+                            ToType(_destination, destResolverParam),
                             ToType(sourceMember, sourceMemberResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
-                            ctxtParam),
+                            _context),
                             propertyMap.DestinationPropertyType);
                 }
                 else
@@ -492,21 +448,21 @@
 
                     valueResolverFunc =
                         ToType(Call(ToType(ctor, resolverType), iResolverType.GetDeclaredMethod("Resolve"),
-                            ToType(srcParam, sourceResolverParam),
-                            ToType(destParam, destResolverParam),
+                            ToType(_source, sourceResolverParam),
+                            ToType(_destination, destResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
-                            ctxtParam),
+                            _context),
                             propertyMap.DestinationPropertyType);
                 }
 
             }
-            else if (propertyMap.CustomResolver != null)
+            else if(propertyMap.CustomResolver != null)
             {
-                valueResolverFunc = propertyMap.CustomResolver.ReplaceParameters(srcParam, destParam, destValueExpr, ctxtParam);
+                valueResolverFunc = propertyMap.CustomResolver.ReplaceParameters(_source, _destination, destValueExpr, _context);
             }
-            else if (propertyMap.CustomExpression != null)
+            else if(propertyMap.CustomExpression != null)
             {
-                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(srcParam).IfNotNull(propertyMap.DestinationPropertyType);
+                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(_source).IfNotNull(propertyMap.DestinationPropertyType);
                 var returnType = propertyMap.DestinationPropertyType.IsNullableType() && propertyMap.DestinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
                     ? propertyMap.DestinationPropertyType
                     : nullCheckedExpression.Type;
@@ -517,62 +473,62 @@
                         Catch(typeof(ArgumentNullException), Default(returnType))
                         );
             }
-            else if (propertyMap.SourceMembers.Any()
+            else if(propertyMap.SourceMembers.Any()
                      && propertyMap.SourceType != null
                 )
             {
                 var last = propertyMap.SourceMembers.Last();
                 var pi = last as PropertyInfo;
-                if (pi != null && pi.GetGetMethod(true) == null)
+                if(pi != null && pi.GetGetMethod(true) == null)
                 {
                     valueResolverFunc = Default(last.GetMemberType());
                 }
                 else
                 {
                     valueResolverFunc = propertyMap.SourceMembers.Aggregate(
-                        (Expression) srcParam,
+                        (Expression)_source,
                         (inner, getter) => getter is MethodInfo
                             ? getter.IsStatic()
-                                ? Call(null, (MethodInfo) getter, inner)
-                                : (Expression) Call(inner, (MethodInfo) getter)
+                                ? Call(null, (MethodInfo)getter, inner)
+                                : (Expression)Call(inner, (MethodInfo)getter)
                             : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                         );
                     valueResolverFunc = valueResolverFunc.IfNotNull(propertyMap.DestinationPropertyType);
                 }
             }
-            else if (propertyMap.SourceMember != null)
+            else if(propertyMap.SourceMember != null)
             {
-                valueResolverFunc = MakeMemberAccess(srcParam, propertyMap.SourceMember);
+                valueResolverFunc = MakeMemberAccess(_source, propertyMap.SourceMember);
             }
             else
             {
                 valueResolverFunc = Throw(Constant(new Exception("I done blowed up")));
             }
 
-            if (propertyMap.DestinationPropertyType == typeof (string) && valueResolverFunc.Type != typeof (string)
+            if(propertyMap.DestinationPropertyType == typeof(string) && valueResolverFunc.Type != typeof(string)
                 &&
-                typeMapRegistry.GetTypeMap(new TypePair(valueResolverFunc.Type, propertyMap.DestinationPropertyType)) ==
+                _typeMapRegistry.GetTypeMap(new TypePair(valueResolverFunc.Type, propertyMap.DestinationPropertyType)) ==
                 null)
             {
                 valueResolverFunc = Call(valueResolverFunc, typeof(object).GetDeclaredMethod("ToString", new Type[0]));
             }
 
-            if (propertyMap.NullSubstitute != null)
+            if(propertyMap.NullSubstitute != null)
             {
                 Expression value = Constant(propertyMap.NullSubstitute);
-                if (propertyMap.NullSubstitute.GetType() != propertyMap.DestinationPropertyType)
+                if(propertyMap.NullSubstitute.GetType() != propertyMap.DestinationPropertyType)
                     value = ToType(value, propertyMap.DestinationPropertyType);
                 valueResolverFunc = MakeBinary(ExpressionType.Coalesce, valueResolverFunc, value);
             }
-            else if (!typeMap.Profile.AllowNullDestinationValues)
+            else if(!typeMap.Profile.AllowNullDestinationValues)
             {
                 var toCreate = propertyMap.SourceType ?? propertyMap.DestinationPropertyType;
-                if (!toCreate.GetTypeInfo().IsValueType)
+                if(!toCreate.GetTypeInfo().IsValueType)
                 {
                     valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
                         valueResolverFunc,
                         ToType(Call(
-                            typeof (ObjectCreator).GetDeclaredMethod("CreateNonNullValue"),
+                            typeof(ObjectCreator).GetDeclaredMethod("CreateNonNullValue"),
                             Constant(toCreate)
                             ), propertyMap.SourceType));
                 }
@@ -580,5 +536,18 @@
 
             return valueResolverFunc;
         }
+
+        public static Expression ContextMap(Expression valueResolverExpr, Expression destValueExpr, ParameterExpression context, Type destinationType)
+        {
+            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(valueResolverExpr.Type, destinationType);
+            var second = Call(
+                context,
+                mapMethod,
+                valueResolverExpr,
+                destValueExpr
+                );
+            return second;
+        }
+
     }
 }
