@@ -284,9 +284,22 @@ namespace AutoMapper.Execution
                 getter = destMember;
             }
 
-            var destValueExpr = propertyMap.UseDestinationValue
-                ? getter
-                : Default(propertyMap.DestinationPropertyType);
+            Expression destValueExpr;
+            if(propertyMap.UseDestinationValue)
+            {
+                destValueExpr = getter;
+            }
+            else
+            {
+                if(_initialDestination.Type.IsValueType())
+                {
+                    destValueExpr = Default(propertyMap.DestinationPropertyType);
+                }
+                else
+                {
+                    destValueExpr = Condition(Equal(_initialDestination, Constant(null)), Default(propertyMap.DestinationPropertyType), getter);
+                }
+            }
 
             var valueResolverExpr = BuildValueResolverFunc(propertyMap, getter);
 
