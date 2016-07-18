@@ -232,7 +232,7 @@ namespace AutoMapper.Execution
             if(_typeMap.ConstructorMap?.CanResolve == true)
             {
                 constructorMapping = true;
-                return _typeMap.ConstructorMap.BuildExpression(_typeMapRegistry, _source, _context);
+                return _typeMap.ConstructorMap.BuildExpression(_configurationProvider, _source, _context);
             }
 #if NET45
             if(_typeMap.DestinationTypeToUse.IsInterface())
@@ -297,8 +297,7 @@ namespace AutoMapper.Execution
                 var match = _configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
                 if(typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
                 {
-                    if(typeMap.Sealed != true)
-                        typeMap.Seal(_typeMapRegistry, _configurationProvider);
+                    typeMap.Seal(_typeMapRegistry, _configurationProvider);
                     valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, _context);
                 }
                 else if(match != null && typeMap == null)
@@ -507,8 +506,7 @@ namespace AutoMapper.Execution
 
             if(propertyMap.DestinationPropertyType == typeof(string) && valueResolverFunc.Type != typeof(string)
                 &&
-                _typeMapRegistry.GetTypeMap(new TypePair(valueResolverFunc.Type, propertyMap.DestinationPropertyType)) ==
-                null)
+                _configurationProvider.ResolveTypeMap(valueResolverFunc.Type, propertyMap.DestinationPropertyType) == null)
             {
                 valueResolverFunc = Call(valueResolverFunc, typeof(object).GetDeclaredMethod("ToString", new Type[0]));
             }

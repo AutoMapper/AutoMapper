@@ -36,8 +36,7 @@ namespace AutoMapper.Mappers
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = TypeHelper.GetElementType(destExpression.Type);
 
-            if (destExpression.Type.IsAssignableFrom(sourceExpression.Type)
-                && typeMapRegistry.GetTypeMap(new TypePair(sourceElementType, destElementType)) == null)
+            if (destExpression.Type.IsAssignableFrom(sourceExpression.Type) && configurationProvider.ResolveTypeMap(sourceElementType, destElementType) == null)
             {
                 // return (TDestination[]) source;
                 var convertExpr = Convert(sourceExpression, destElementType.MakeArrayType());

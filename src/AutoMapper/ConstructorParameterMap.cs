@@ -34,9 +34,7 @@ namespace AutoMapper
         public Type SourceType => CustomExpression?.ReturnType ?? SourceMembers.LastOrDefault()?.GetMemberType();
         public Type DestinationType => Parameter.ParameterType;
 
-        public Expression CreateExpression(TypeMapRegistry typeMapRegistry,
-            ParameterExpression srcParam,
-            ParameterExpression ctxtParam)
+        public Expression CreateExpression(IConfigurationProvider configuration, ParameterExpression srcParam, ParameterExpression ctxtParam)
         {
             if (CustomExpression != null)
                 return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull(DestinationType);
@@ -47,7 +45,7 @@ namespace AutoMapper
                 return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
             }
 
-            if (Parameter.IsOptional && (!SourceMembers.Any() || typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) == null))
+            if (Parameter.IsOptional && (!SourceMembers.Any() || configuration.ResolveTypeMap(SourceType, DestinationType) == null))
             {
                 DefaultValue = true;
                 return Constant(Parameter.GetDefaultValue());
@@ -64,7 +62,7 @@ namespace AutoMapper
             valueResolverExpr = valueResolverExpr.IfNotNull(DestinationType);
 
             if ((SourceType.IsEnumerableType() && SourceType != typeof (string))
-                || typeMapRegistry.GetTypeMap(new TypePair(SourceType, DestinationType)) != null
+                || configuration.ResolveTypeMap(SourceType, DestinationType) != null
                 || !DestinationType.IsAssignableFrom(SourceType))
             {
                 /*
