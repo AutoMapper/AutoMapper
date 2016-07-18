@@ -128,8 +128,70 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_the_destination_object_has_child_objects : AutoMapperSpecBase
+        {
+            private Source _source;
+            private Destination _originalDest;
+            private ChildDestination _originalDestChild;
+            private Destination _dest;
 
-		public class When_the_destination_object_is_specified_and_you_are_converting_an_enum : NonValidatingSpecBase
+            public class Source
+            {
+                public ChildSource Child { get; set; }
+            }
+
+            public class Destination
+            {
+                public ChildDestination Child { get; set; }
+            }
+
+            public class ChildSource
+            {
+                public int Value { get; set; }
+            }
+
+            public class ChildDestination
+            {
+                public int Value { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>();
+                cfg.CreateMap<ChildSource, ChildDestination>();
+            });
+
+            protected override void Because_of()
+            {
+                _source = new Source
+                {
+                    Child = new ChildSource
+                    {
+                        Value = 20
+                    }
+                };
+                _originalDestChild = new ChildDestination
+                {
+                    Value = 10
+                };
+                _originalDest = new Destination
+                {
+                    Child = _originalDestChild
+                };
+                _dest = Mapper.Map(_source, _originalDest);
+            }
+
+            [Fact]
+            public void Should_return_the_destination_object_that_was_passed_in()
+            {
+                _dest.ShouldBeSameAs(_originalDest);
+                _dest.Child.ShouldBeSameAs(_originalDestChild);
+                _dest.Child.Value.ShouldEqual(20);
+            }
+        }
+
+
+        public class When_the_destination_object_is_specified_and_you_are_converting_an_enum : NonValidatingSpecBase
 		{
 			private string _result;
 
