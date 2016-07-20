@@ -98,16 +98,8 @@ namespace AutoMapper.Execution
 
             var mapperFunc = CreateMapperFunc(assignmentFunc);
 
-            Expression[] lambaBody;
             var checkContext = CheckContext(_typeMap, _context);
-            if(checkContext != null)
-            {
-                lambaBody = new[] { checkContext, mapperFunc };
-            }
-            else
-            {
-                lambaBody = new[] { mapperFunc };
-            }
+            var lambaBody = (checkContext != null) ? new[] { checkContext, mapperFunc } : new[] { mapperFunc };
             return Lambda(Block(new[] { _destination }, lambaBody), _source, _initialDestination, _context);
         }
 
