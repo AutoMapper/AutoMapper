@@ -41,55 +41,14 @@ namespace AutoMapper.Execution
         public LambdaExpression CreateMapperLambda()
         {
             if(_typeMap.SourceType.IsGenericTypeDefinition() || _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
+            {
                 return null;
-
-            if(_typeMap.Substitution != null)
-            {
-                return Lambda(_typeMap.Substitution.ReplaceParameters(_source, _initialDestination, _context), _source,
-                    _initialDestination, _context);
             }
-
-            if(_typeMap.TypeConverterType != null)
+            var customExpression = TypeConverterMapper() ?? _typeMap.Substitution ?? _typeMap.CustomMapper ?? _typeMap.CustomProjection;
+            if(customExpression != null)
             {
-                Type type;
-                if(_typeMap.TypeConverterType.IsGenericTypeDefinition())
-                {
-                    var genericTypeParam = _typeMap.SourceType.IsGenericType()
-                        ? _typeMap.SourceType.GetTypeInfo().GenericTypeArguments[0]
-                        : _typeMap.DestinationTypeToUse.GetTypeInfo().GenericTypeArguments[0];
-                    type = _typeMap.TypeConverterType.MakeGenericType(genericTypeParam);
-                }
-                else type = _typeMap.TypeConverterType;
-
-                // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).ToType(src, ctxt);
-                var converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType,
-                    _typeMap.DestinationTypeToUse);
-                return Lambda(
-                    Call(
-                        ToType(
-                            Call(
-                                MakeMemberAccess(_context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
-                                typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
-                                    .MakeGenericMethod(type)
-                                ),
-                            converterInterfaceType),
-                        converterInterfaceType.GetDeclaredMethod("Convert"),
-                        _source, _initialDestination, _context
-                        ),
-                    _source, _initialDestination, _context);
+                return Lambda(customExpression.ReplaceParameters(_source, _initialDestination, _context), _source, _initialDestination, _context);
             }
-
-            if(_typeMap.CustomMapper != null)
-            {
-                return Lambda(_typeMap.CustomMapper.ReplaceParameters(_source, _initialDestination, _context), _source,
-                    _initialDestination, _context);
-            }
-
-            if(_typeMap.CustomProjection != null)
-            {
-                return Lambda(_typeMap.CustomProjection.ReplaceParameters(_source), _source, _initialDestination, _context);
-            }
-
             bool constructorMapping;
 
             var destinationFunc = CreateDestinationFunc(out constructorMapping);
@@ -100,7 +59,43 @@ namespace AutoMapper.Execution
 
             var checkContext = CheckContext(_typeMap, _context);
             var lambaBody = (checkContext != null) ? new[] { checkContext, mapperFunc } : new[] { mapperFunc };
+
             return Lambda(Block(new[] { _destination }, lambaBody), _source, _initialDestination, _context);
+        }
+
+        private LambdaExpression TypeConverterMapper()
+        {
+            if(_typeMap.TypeConverterType == null)
+            {
+                return null;
+            }
+            Type type;
+            if(_typeMap.TypeConverterType.IsGenericTypeDefinition())
+            {
+                var genericTypeParam = _typeMap.SourceType.IsGenericType()
+                    ? _typeMap.SourceType.GetTypeInfo().GenericTypeArguments[0]
+                    : _typeMap.DestinationTypeToUse.GetTypeInfo().GenericTypeArguments[0];
+                type = _typeMap.TypeConverterType.MakeGenericType(genericTypeParam);
+            }
+            else
+            {
+                type = _typeMap.TypeConverterType;
+            }
+            // (src, dest, ctxt) => ((ITypeConverter<TSource, TDest>)ctxt.Options.CreateInstance<TypeConverterType>()).ToType(src, ctxt);
+            var converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, _typeMap.DestinationTypeToUse);
+            return Lambda(
+                Call(
+                    ToType(
+                        Call(
+                            MakeMemberAccess(_context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
+                            typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
+                                .MakeGenericMethod(type)
+                            ),
+                        converterInterfaceType),
+                    converterInterfaceType.GetDeclaredMethod("Convert"),
+                    _source, _initialDestination, _context
+                    ),
+                _source, _initialDestination, _context);
         }
 
         public static ConditionalExpression CheckContext(TypeMap typeMap, Expression context)
