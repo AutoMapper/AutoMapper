@@ -13,6 +13,7 @@ namespace AutoMapper.Execution
 
     public class TypeMapPlanBuilder
     {
+        private static readonly Expression<Func<IRuntimeMapper, ResolutionContext>> CreateContext = mapper => new ResolutionContext(mapper.DefaultContext.Options, mapper);
         private static readonly Expression<Func<AutoMapperMappingException>> CtorExpression = () => new AutoMapperMappingException(null, null, default(TypePair), null, null);
         private static readonly Expression<Action<ResolutionContext>> IncTypeDepthInfo = ctxt => ctxt.IncrementTypeDepth(default(TypePair));
         private static readonly Expression<Action<ResolutionContext>> DecTypeDepthInfo = ctxt => ctxt.DecrementTypeDepth(default(TypePair));
@@ -97,7 +98,28 @@ namespace AutoMapper.Execution
 
             var mapperFunc = CreateMapperFunc(assignmentFunc);
 
-            return Lambda(Block(new[] { _destination }, mapperFunc), _source, _initialDestination, _context);
+            Expression[] lambaBody;
+            var checkContext = CheckContext(_typeMap, _context);
+            if(checkContext != null)
+            {
+                lambaBody = new[] { checkContext, mapperFunc };
+            }
+            else
+            {
+                lambaBody = new[] { mapperFunc };
+            }
+            return Lambda(Block(new[] { _destination }, lambaBody), _source, _initialDestination, _context);
+        }
+
+        public static ConditionalExpression CheckContext(TypeMap typeMap, Expression context)
+        {
+            if(typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
+            {
+                var mapper = Property(context, "Mapper");
+                var defaultContext = Property(mapper, "DefaultContext");
+                return IfThen(Equal(context, defaultContext), Assign(context, Invoke(CreateContext, mapper)));
+            }
+            return null;
         }
 
         private Expression CreateDestinationFunc(out bool constructorMapping)
