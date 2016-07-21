@@ -103,8 +103,7 @@ namespace AutoMapper.Execution
             if(typeMap.MaxDepth > 0 || typeMap.PreserveReferences)
             {
                 var mapper = Property(context, "Mapper");
-                var defaultContext = Property(mapper, "DefaultContext");
-                return IfThen(Equal(context, defaultContext), Assign(context, Invoke(CreateContext, mapper)));
+                return IfThen(Property(context, "IsDefault"), Assign(context, Invoke(CreateContext, mapper)));
             }
             return null;
         }

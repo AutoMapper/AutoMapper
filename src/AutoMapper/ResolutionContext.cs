@@ -89,6 +89,7 @@ namespace AutoMapper
             Mapper = mapper;
         }
 
+        internal bool IsDefault => this == Mapper.DefaultContext;
 
         internal TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
         {
