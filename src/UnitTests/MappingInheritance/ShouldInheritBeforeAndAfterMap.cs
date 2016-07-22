@@ -1,9 +1,46 @@
-﻿using AutoMapper.Mappers;
+﻿using System;
+using AutoMapper.Mappers;
 using Should;
 using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
 {
+    public class ShouldInheritBeforeAndAfterMapOnlyOnce : AutoMapperSpecBase
+    {
+        int count;
+
+        public abstract class BaseBaseSource { }
+        public class BaseSource : BaseBaseSource
+        {
+            public string Foo { get; set; }
+        }
+        public class Source : BaseSource { }
+
+        public abstract class BaseBaseDest
+        {
+        }
+        public class BaseDest : BaseBaseDest { }
+        public class Dest : BaseDest { }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => count++).Include<Source, Dest>().Include<BaseSource, BaseDest>();
+            cfg.CreateMap<BaseSource, BaseDest>().Include<Source, Dest>();
+            cfg.CreateMap<Source, Dest>();
+        });
+
+        protected override void Because_of()
+        {
+            Mapper.Map<Dest>(new Source());
+        }
+
+        [Fact]
+        public void Should_call_AfterMap_just_once()
+        {
+            count.ShouldEqual(1);
+        }
+    }
+
     public class ShouldInheritBeforeAndAfterMap
     {
         public class BaseClass
