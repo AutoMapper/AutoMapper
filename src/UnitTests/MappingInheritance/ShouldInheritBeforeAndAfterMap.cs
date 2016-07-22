@@ -7,7 +7,8 @@ namespace AutoMapper.UnitTests.MappingInheritance
 {
     public class ShouldInheritBeforeAndAfterMapOnlyOnce : AutoMapperSpecBase
     {
-        int count;
+        int afterMapCount;
+        int beforeMapCount;
 
         public abstract class BaseBaseSource { }
         public class BaseSource : BaseBaseSource
@@ -24,7 +25,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => count++).Include<Source, Dest>().Include<BaseSource, BaseDest>();
+            cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => afterMapCount++).BeforeMap((s, d)=>beforeMapCount++).Include<Source, Dest>().Include<BaseSource, BaseDest>();
             cfg.CreateMap<BaseSource, BaseDest>().Include<Source, Dest>();
             cfg.CreateMap<Source, Dest>();
         });
@@ -37,7 +38,46 @@ namespace AutoMapper.UnitTests.MappingInheritance
         [Fact]
         public void Should_call_AfterMap_just_once()
         {
-            count.ShouldEqual(1);
+            afterMapCount.ShouldEqual(1);
+            beforeMapCount.ShouldEqual(1);
+        }
+    }
+
+    public class ShouldInheritBeforeAndAfterMapOnlyOnceIncludeBase : AutoMapperSpecBase
+    {
+        int afterMapCount;
+        int beforeMapCount;
+
+        public abstract class BaseBaseSource { }
+        public class BaseSource : BaseBaseSource
+        {
+            public string Foo { get; set; }
+        }
+        public class Source : BaseSource { }
+
+        public abstract class BaseBaseDest
+        {
+        }
+        public class BaseDest : BaseBaseDest { }
+        public class Dest : BaseDest { }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<BaseBaseSource, BaseBaseDest>().AfterMap((s, d) => afterMapCount++).BeforeMap((s, d) => beforeMapCount++);
+            cfg.CreateMap<BaseSource, BaseDest>().IncludeBase<BaseBaseSource, BaseBaseDest>();
+            cfg.CreateMap<Source, Dest>().IncludeBase<BaseSource, BaseDest>();
+        });
+
+        protected override void Because_of()
+        {
+            Mapper.Map<Dest>(new Source());
+        }
+
+        [Fact]
+        public void Should_call_AfterMap_just_once()
+        {
+            afterMapCount.ShouldEqual(1);
+            beforeMapCount.ShouldEqual(1);
         }
     }
 
