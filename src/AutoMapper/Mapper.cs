@@ -193,8 +193,10 @@ namespace AutoMapper
         {
             _configurationProvider = configurationProvider;
             _serviceCtor = serviceCtor;
-            _defaultContext = new ResolutionContext(new ObjectMappingOperationOptions(_serviceCtor), this);
+            _defaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
         }
+
+        public ResolutionContext DefaultContext => _defaultContext;
 
         Func<Type, object> IMapper.ServiceCtor => _serviceCtor;
 
