@@ -35,7 +35,7 @@ namespace AutoMapper.Execution
             _source = Parameter(typeMap.SourceType, "src");
             _initialDestination = Parameter(typeMap.DestinationTypeToUse, "dest");
             _context = Parameter(typeof(ResolutionContext), "ctxt");
-            _destination = Variable(_initialDestination.Type, "destination");
+            _destination = Variable(_initialDestination.Type, "typeMapDestination");
         }
 
         public LambdaExpression CreateMapperLambda()
@@ -211,7 +211,7 @@ namespace AutoMapper.Execution
                     AndAlso(
                         NotEqual(_source, Constant(null)),
                         AndAlso(
-                            Equal(_destination, Constant(null)),
+                            Equal(_initialDestination, Constant(null)),
                             Call(Property(_context, "InstanceCache"),
                                 typeof(Dictionary<object, object>).GetDeclaredMethod("ContainsKey"), _source)
                             )),
@@ -316,10 +316,17 @@ namespace AutoMapper.Execution
                 var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
                 var typeMap = _configurationProvider.ResolveTypeMap(typePair);
                 var match = _configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-                if(typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
+                if(typeMap != null && !typeMap.HasDerivedTypesToInclude())
                 {
                     typeMap.Seal(_typeMapRegistry, _configurationProvider);
-                    valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, _context);
+                    if(typeMap.MapExpression != null)
+                    {
+                        valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, _context);
+                    }
+                    else
+                    {
+                        valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
+                    }
                 }
                 else if(match != null && typeMap == null)
                 {

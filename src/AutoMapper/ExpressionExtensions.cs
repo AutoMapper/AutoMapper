@@ -207,7 +207,7 @@ namespace AutoMapper
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
                 return node.Object == _oldParam
-                    ? Call(ToType(_newParam, _oldParam.Type), node.Method)
+                    ? Call(ToType(_newParam, _oldParam.Type), node.Method, node.Arguments)
                     : base.VisitMethodCall(node);
             }
         }

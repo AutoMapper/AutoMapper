@@ -25,12 +25,21 @@ namespace AutoMapper
         {
             get
             {
+                CheckDefault();
                 if(_instanceCache != null)
                 {
                     return _instanceCache;
                 }
                 _instanceCache = new Dictionary<object, object>();
                 return _instanceCache;
+            }
+        }
+
+        private void CheckDefault()
+        {
+            if(IsDefault)
+            {
+                throw new InvalidOperationException();
             }
         }
 
@@ -41,6 +50,7 @@ namespace AutoMapper
         {
             get
             {
+                CheckDefault();
                 if(_typeDepth != null)
                 {
                     return _typeDepth;

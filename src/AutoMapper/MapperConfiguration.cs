@@ -387,7 +387,7 @@ namespace AutoMapper
                 var destinationType = mapRequest.RequestedTypes.DestinationType;
 
                 var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
-                var destination = Parameter(destinationType, "destination");
+                var destination = Parameter(destinationType, "mapperDestination");
                 var context = Parameter(typeof(ResolutionContext), "context");
 
                 var ctor = ((NewExpression)ResolutionContextCtor.Body).Constructor;
