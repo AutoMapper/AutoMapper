@@ -1,10 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0691ABF2-B3C7-43BF-9862-2D8D1299CE58}"
 	ProjectSection(SolutionItems) = preProject
-		AutoMapper.targets = AutoMapper.targets
+		..\appveyor.yml = ..\appveyor.yml
+		..\AutoMapper.nuspec = ..\AutoMapper.nuspec
 		..\default.ps1 = ..\default.ps1
 		..\global.json = ..\global.json
 		NuGet.config = NuGet.config

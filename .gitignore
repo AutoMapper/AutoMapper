@@ -1,6 +1,7 @@
 build/
 release/
 scripts/
+artifacts/
 .dotnet
 TestResults/
 *.suo
