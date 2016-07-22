@@ -125,9 +125,10 @@ namespace AutoMapper
                     node.NodeType == ExpressionType.MemberAccess 
                     || (node.NodeType == ExpressionType.Call && ((MethodCallExpression)node).Arguments.Count == 0));
             }
-            if (node != null && node.NodeType == ExpressionType.Parameter)
-                return new IfNotNullVisitor(destinationType).Visit(expression);
-
+            if(node != null && node.NodeType == ExpressionType.Parameter)
+            {
+                return new IfNotNullVisitor().VisitRoot(expression, destinationType);
+            }
             return expression;
         }
 
@@ -142,22 +143,25 @@ namespace AutoMapper
 
         internal class IfNotNullVisitor : ExpressionVisitor
         {
-            private readonly Type _destinationType;
-            private readonly HashSet<MemberExpression> _alreadyUpdated = new HashSet<MemberExpression>();
+            private Expression nullConditions = Constant(false);
 
-            public IfNotNullVisitor(Type destinationType)
+            public Expression VisitRoot(Expression node, Type destinationType)
             {
-                _destinationType = destinationType;
+                var returnType = Nullable.GetUnderlyingType(destinationType) == node.Type ? destinationType : node.Type;
+                var expression = base.Visit(node);
+                var checkNull = Condition(nullConditions, Default(returnType), ToType(expression, returnType));
+                return checkNull;
             }
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                if(_alreadyUpdated.Contains(node))
+                var returnNode = base.VisitMember(node);
+                if(node.Expression == null || node.Expression.Type.IsValueType())
                 {
-                    return base.VisitMember(node);
+                    return returnNode;
                 }
-                _alreadyUpdated.Add(node);
-                return Visit(DelegateFactory.IfNotNullExpression(node, _destinationType));
+                nullConditions = Or(nullConditions, Equal(node.Expression, Constant(null, node.Expression.Type)));
+                return returnNode;
             }
         }
 

@@ -51,17 +51,6 @@ namespace AutoMapper.Execution
             return lambda;
         }
 
-        public static Expression IfNotNullExpression(MemberExpression member, Type destinationType)
-        {
-            var returnType = destinationType.IsNullableType() && destinationType.GetTypeOfNullable() == member.Type
-                ? destinationType
-                : member.Type;
-            if (member.Expression != null && !member.Expression.Type.IsValueType())
-                return Condition(Equal(member.Expression, Default(member.Expression.Type)),
-                Default(returnType), ExpressionExtensions.ToType(member, returnType));
-            return member;
-        }
-
         public LateBoundCtor CreateCtor(Type type)
         {
             var ctor = _ctorCache.GetOrAdd(type, _generateConstructor);
