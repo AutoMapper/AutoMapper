@@ -238,12 +238,18 @@ namespace AutoMapper
 
         public void AddBeforeMapAction(LambdaExpression beforeMap)
         {
-            _beforeMapActions.Add(beforeMap);
+            if(!_beforeMapActions.Contains(beforeMap))
+            {
+                _beforeMapActions.Add(beforeMap);
+            }
         }
 
         public void AddAfterMapAction(LambdaExpression afterMap)
         {
-            _afterMapActions.Add(afterMap);
+            if(!_afterMapActions.Contains(afterMap))
+            {
+                _afterMapActions.Add(afterMap);
+            }
         }
 
         public void Seal(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider)
