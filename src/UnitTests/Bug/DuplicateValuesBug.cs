@@ -26,7 +26,11 @@ namespace AutoMapper.UnitTests.Bug
 			public int Id;
 			public IList<DestObject> Children;
 
-			public void AddChild(DestObject childObject)
+            public DestObject()
+            {
+            }
+
+            public void AddChild(DestObject childObject)
 			{
 				if (this.Children == null)
 					this.Children = new List<DestObject>();
@@ -59,7 +63,6 @@ namespace AutoMapper.UnitTests.Bug
 
 				source1.AddChild(source2); // This causes the problem
 
-				DestObject dest1 = new DestObject();
 				config.CreateMapper().Map(sourceList, destList);
 
 				destList.Count.ShouldEqual(2);

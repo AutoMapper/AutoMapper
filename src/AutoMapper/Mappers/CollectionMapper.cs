@@ -160,10 +160,13 @@ namespace AutoMapper.Mappers
         {
             Expression itemExpr;
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
-            if (typeMap != null && (typeMap.TypeConverterType != null || typeMap.CustomMapper != null))
+            if (typeMap != null && !typeMap.HasDerivedTypesToInclude())
             {
                 typeMap.Seal(typeMapRegistry, configurationProvider);
-                return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), contextParam);
+                if(typeMap.MapExpression != null)
+                {
+                    return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), contextParam);
+                }
             }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
             if (match != null && typeMap == null)
