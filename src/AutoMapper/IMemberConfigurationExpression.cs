@@ -113,6 +113,11 @@ namespace AutoMapper
         void Ignore();
 
         /// <summary>
+        /// Allow this member to be null. This prevents generating a check condition for it.
+        /// </summary>
+        void AllowNull();
+
+        /// <summary>
         /// Supply a custom mapping order instead of what the .NET runtime returns
         /// </summary>
         /// <param name="mappingOrder">Mapping order value</param>
