@@ -18,32 +18,33 @@ namespace AutoMapper.Mappers
            IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression,
            Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression, Type ifInterfaceType, MapItem mapItem)
         {
-            var newExpressionValue = destExpression.NewIfConditionFails(conditionalExpression, ifInterfaceType);
+            var passedDestination = Variable(destExpression.Type, "passedDestination");
+            var newExpressionValue = passedDestination.NewIfConditionFails(conditionalExpression, ifInterfaceType);
             var newExpression = Variable(newExpressionValue.Type, "collectionDestination");
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var itemParam = Parameter(sourceElementType, "item");
-            var itemExpr = mapItem(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, destExpression.Type, itemParam, contextExpression);
+            var itemExpr = mapItem(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, passedDestination.Type, itemParam, contextExpression);
 
             var blockExpressions = new List<Expression>();
-            var blockVariables = new List<ParameterExpression> { newExpression };
+            var blockVariables = new List<ParameterExpression> { newExpression, passedDestination };
             Expression destination;
             var destinationElementType = itemExpr.Type;
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-            if(destExpression.Type.IsCollectionType())
+            if(passedDestination.Type.IsCollectionType())
             {
                 if(propertyMap == null)
                 {
                     destination = newExpression;
-                    blockExpressions.Add(IfThenElse(NotEqual(destExpression, Constant(null)),
-                        Call(destExpression, clearMethod),
+                    blockExpressions.Add(IfThenElse(NotEqual(passedDestination, Constant(null)),
+                        Call(passedDestination, clearMethod),
                         Assign(destination, newExpression)
                         ));
                 }
                 else if(propertyMap.UseDestinationValue)
                 {
-                    destination = destExpression;
-                    blockExpressions.Add(Call(destExpression, clearMethod));
+                    destination = passedDestination;
+                    blockExpressions.Add(Call(passedDestination, clearMethod));
                 }
                 else
                 {
@@ -68,10 +69,11 @@ namespace AutoMapper.Mappers
 
             var mapExpr = Block(blockExpressions);
 
-            var ifNullExpr = configurationProvider.Configuration.AllowNullCollections ? Constant(null, destExpression.Type) : (Expression) newExpression;
+            var ifNullExpr = configurationProvider.Configuration.AllowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
             var checkNull = Block(blockVariables,
+                Assign(passedDestination, destExpression),
                 Assign(newExpression, newExpressionValue),
-                Condition(Equal(sourceExpression, Constant(null)), ToType(ifNullExpr, destExpression.Type), ToType(mapExpr, destExpression.Type))
+                Condition(Equal(sourceExpression, Constant(null)), ToType(ifNullExpr, passedDestination.Type), ToType(mapExpr, passedDestination.Type))
                 );
             if(propertyMap != null)
             {
