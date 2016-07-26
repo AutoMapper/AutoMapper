@@ -341,9 +341,9 @@ namespace AutoMapper
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, LambdaExpression typedExpression)
             {
-                var sourceParameter = Parameter(typeof(object), "src");
-                var destinationParameter = Parameter(typeof(object), "dest");
-                var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
+                var sourceParameter = Parameter(typeof(object), "source");
+                var destinationParameter = Parameter(typeof(object), "destination");
+                var contextParameter = Parameter(typeof(ResolutionContext), "context");
                 var requestedSourceType = mapRequest.RequestedTypes.SourceType;
                 var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
 
@@ -366,9 +366,9 @@ namespace AutoMapper
 
                 if (typeMapSourceParameter.Type != requestedSourceType || typeMapDestinationParameter.Type != requestedDestinationType)
                 {
-                    var requestedSourceParameter = Parameter(requestedSourceType, "src");
-                    var requestedDestinationParameter = Parameter(requestedDestinationType, "dest");
-                    var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
+                    var requestedSourceParameter = Parameter(requestedSourceType, "source");
+                    var requestedDestinationParameter = Parameter(requestedDestinationType, "destination");
+                    var contextParameter = Parameter(typeof(ResolutionContext), "context");
 
                     mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
                         ToType(requestedSourceParameter, typeMapSourceParameter.Type),

@@ -309,7 +309,12 @@ namespace AutoMapper.Execution
                 }
             }
 
+            var propertyDestination = Variable(destValueExpr.Type, "propertyDestination");
+            var setPropertyDestination = Assign(propertyDestination, destValueExpr);
             var valueResolverExpr = BuildValueResolverFunc(propertyMap, getter);
+            var resolvedValue = Variable(valueResolverExpr.Type, "resolvedValue");
+            var setResolvedValue = Assign(resolvedValue, valueResolverExpr);
+            valueResolverExpr = resolvedValue;
 
             if(propertyMap.DestinationPropertyType != null)
             {
@@ -321,27 +326,27 @@ namespace AutoMapper.Execution
                     typeMap.Seal(_typeMapRegistry, _configurationProvider);
                     if(typeMap.MapExpression != null)
                     {
-                        valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, _context);
+                        valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, propertyDestination, _context);
                     }
                     else
                     {
-                        valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
+                        valueResolverExpr = SetMap(propertyMap, valueResolverExpr, propertyDestination);
                     }
                 }
                 else if(match != null && typeMap == null)
                 {
                     valueResolverExpr = match.MapExpression(_typeMapRegistry, _configurationProvider,
-                        propertyMap, valueResolverExpr, destValueExpr,
+                        propertyMap, valueResolverExpr, propertyDestination,
                         _context);
                 }
                 else
                 {
-                    valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
+                    valueResolverExpr = SetMap(propertyMap, valueResolverExpr, propertyDestination);
                 }
             }
             else
             {
-                valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
+                valueResolverExpr = SetMap(propertyMap, valueResolverExpr, propertyDestination);
             }
 
             Expression mapperExpr;
@@ -366,6 +371,8 @@ namespace AutoMapper.Execution
                 }
             }
 
+            mapperExpr = Block(setPropertyDestination, setResolvedValue, mapperExpr);
+
             if(propertyMap.PreCondition != null)
             {
                 mapperExpr = IfThen(
@@ -387,7 +394,7 @@ namespace AutoMapper.Execution
                     );
             }
 
-            return mapperExpr;
+            return Block(new[] { propertyDestination, resolvedValue }, mapperExpr);
         }
 
         private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpr, Expression destValueExpr)
