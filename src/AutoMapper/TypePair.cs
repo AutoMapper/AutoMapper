@@ -121,15 +121,20 @@ namespace AutoMapper
         private IEnumerable<Type> GetAllTypes(Type type)
         {
             var typeInheritance = GetTypeInheritance(type);
-            foreach (var item in typeInheritance)
+            foreach(var item in typeInheritance)
+            {
                 yield return item;
-
+            }
             var interfaceComparer = new InterfaceComparer(type);
             var allInterfaces = type.GetTypeInfo().ImplementedInterfaces.OrderByDescending(t => t, interfaceComparer);
-
-            foreach (var interfaceType in allInterfaces)
+            foreach(var interfaceType in allInterfaces)
             {
                 yield return interfaceType;
+            }
+            var underlyingType = Nullable.GetUnderlyingType(type);
+            if(underlyingType != null)
+            {
+                yield return underlyingType;
             }
         }
 

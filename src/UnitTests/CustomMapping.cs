@@ -5,6 +5,50 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class IntToNullableIntConverter : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        public class IntToNullableConverter : ITypeConverter<int, int?>
+        {
+            public int? Convert(int source, int? destination, ResolutionContext context)
+            {
+                if(source == default(int))
+                {
+                    return null;
+                }
+                return source;
+            }
+        }
+
+        public class Source
+        {
+            public int Id { get; set; }
+        }
+
+        public class Destination
+        {
+            public int? Id { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<int, int?>().ConvertUsing<IntToNullableConverter>();
+            cfg.CreateMap<Source, Destination>();
+        });
+        
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_use_the_converter()
+        {
+            _destination.Id.ShouldBeNull();
+        }
+    }
+
     public class When_throwing_NRE_from_MapFrom : AutoMapperSpecBase
     {
         class Source
