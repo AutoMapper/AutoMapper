@@ -38,14 +38,32 @@ namespace AutoMapper
         /// <summary>
         /// Add profiles contained in assemblies
         /// </summary>
+        /// <param name="assembliesToScan">Assemblies containing profiles</param>
+        void AddProfiles(params Assembly[] assembliesToScan);
+
+        /// <summary>
+        /// Add profiles contained in assemblies
+        /// </summary>
         /// <param name="assemblyNamesToScan">Assembly names to load and scan containing profiles</param>
         void AddProfiles(IEnumerable<string> assemblyNamesToScan);
 
         /// <summary>
         /// Add profiles contained in assemblies
         /// </summary>
+        /// <param name="assemblyNamesToScan">Assembly names to load and scan containing profiles</param>
+        void AddProfiles(params string[] assemblyNamesToScan);
+
+        /// <summary>
+        /// Add profiles contained in assemblies
+        /// </summary>
         /// <param name="typesFromAssembliesContainingProfiles">Types from assemblies containing profiles</param>
         void AddProfiles(IEnumerable<Type> typesFromAssembliesContainingProfiles);
+
+        /// <summary>
+        /// Add profiles contained in assemblies
+        /// </summary>
+        /// <param name="typesFromAssembliesContainingProfiles">Types from assemblies containing profiles</param>
+        void AddProfiles(params Type[] typesFromAssembliesContainingProfiles);
 
         /// <summary>
         /// Supply a factory method callback for creating resolvers and type converters
