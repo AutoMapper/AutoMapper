@@ -310,6 +310,9 @@ namespace AutoMapper.Execution
             }
 
             var valueResolverExpr = BuildValueResolverFunc(propertyMap, getter);
+            var resolvedValue = Variable(valueResolverExpr.Type, "resolvedValue");
+            var setResolvedValue = Assign(resolvedValue, valueResolverExpr);
+            valueResolverExpr = resolvedValue;
 
             if(propertyMap.DestinationPropertyType != null)
             {
@@ -366,6 +369,8 @@ namespace AutoMapper.Execution
                 }
             }
 
+            mapperExpr = Block(setResolvedValue, mapperExpr);
+
             if(propertyMap.PreCondition != null)
             {
                 mapperExpr = IfThen(
@@ -387,7 +392,7 @@ namespace AutoMapper.Execution
                     );
             }
 
-            return mapperExpr;
+            return Block(new[] { resolvedValue }, mapperExpr);
         }
 
         private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpr, Expression destValueExpr)

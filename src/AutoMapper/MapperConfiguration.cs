@@ -12,7 +12,7 @@ namespace AutoMapper
     using static System.Linq.Expressions.Expression;
     using static ExpressionExtensions;
     using UntypedMapperFunc = System.Func<object, object, ResolutionContext, object>;
-
+    using System.Reflection;
 
     public class MapperConfiguration : IConfigurationProvider
     {
@@ -341,9 +341,9 @@ namespace AutoMapper
 
             private static Expression<UntypedMapperFunc> Wrap(MapRequest mapRequest, LambdaExpression typedExpression)
             {
-                var sourceParameter = Parameter(typeof(object), "src");
-                var destinationParameter = Parameter(typeof(object), "dest");
-                var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
+                var sourceParameter = Parameter(typeof(object), "source");
+                var destinationParameter = Parameter(typeof(object), "destination");
+                var contextParameter = Parameter(typeof(ResolutionContext), "context");
                 var requestedSourceType = mapRequest.RequestedTypes.SourceType;
                 var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
 
@@ -366,9 +366,9 @@ namespace AutoMapper
 
                 if (typeMapSourceParameter.Type != requestedSourceType || typeMapDestinationParameter.Type != requestedDestinationType)
                 {
-                    var requestedSourceParameter = Parameter(requestedSourceType, "src");
-                    var requestedDestinationParameter = Parameter(requestedDestinationType, "dest");
-                    var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
+                    var requestedSourceParameter = Parameter(requestedSourceType, "source");
+                    var requestedDestinationParameter = Parameter(requestedDestinationType, "typeMapDestination");
+                    var contextParameter = Parameter(typeof(ResolutionContext), "context");
 
                     mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
                         ToType(requestedSourceParameter, typeMapSourceParameter.Type),
@@ -381,7 +381,8 @@ namespace AutoMapper
                 return mapExpression;
             }
 
-            private static readonly Expression<Func<AutoMapperMappingException>> ResolutionContextCtor = () => new AutoMapperMappingException(null, null, default(TypePair));
+            private static readonly ConstructorInfo ExceptionConstructor = typeof(AutoMapperMappingException).GetConstructors().Single(c => c.GetParameters().Length == 3);
+
             private static LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration)
             {
                 var destinationType = mapRequest.RequestedTypes.DestinationType;
@@ -389,14 +390,11 @@ namespace AutoMapper
                 var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
                 var destination = Parameter(destinationType, "mapperDestination");
                 var context = Parameter(typeof(ResolutionContext), "context");
-
-                var ctor = ((NewExpression)ResolutionContextCtor.Body).Constructor;
-
                 LambdaExpression fullExpression;
                 if (mapperToUse == null)
                 {
                     var message = Constant("Missing type map configuration or unsupported mapping.");
-                    fullExpression = Lambda(Block(Throw(New(ctor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
+                    fullExpression = Lambda(Block(Throw(New(ExceptionConstructor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
                 }
                 else
                 {
@@ -411,10 +409,9 @@ namespace AutoMapper
             {
                 var exception = Parameter(typeof(Exception), "ex");
 
-                var ctor = ((NewExpression)ResolutionContextCtor.Body).Constructor;
                 return Lambda(Expression.TryCatch(mapExpression.Body,
                     MakeCatchBlock(typeof(Exception), exception, Block(
-                        Throw(New(ctor, Constant("Error mapping types."), exception, Constant(types))),
+                        Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(types))),
                         Default(destination.Type)), null)),
                     source, destination, context);
             }
