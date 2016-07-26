@@ -140,6 +140,11 @@ namespace AutoMapper
         string ProfileName { get; }
         IMemberConfiguration AddMemberConfiguration();
         IConditionalObjectMapper AddConditionalObjectMapper();
+
+        /// <summary>
+        /// Include extension methods against source members for matching destination members to. Default source extension methods from <see cref="System.Linq.Enumerable"/>
+        /// </summary>
+        /// <param name="type">Static type that contains extension methods</param>
         void IncludeSourceExtensionMethods(Type type);
     }
 }
