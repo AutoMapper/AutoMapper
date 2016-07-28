@@ -31,7 +31,7 @@ namespace AutoMapper.Execution
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
-        private static readonly ConcurrentDictionary<Type, Type> proxyTypes = new ConcurrentDictionary<Type, Type>();
+        private static readonly ConcurrentDictionary<Type, Lazy<Type>> proxyTypes = new ConcurrentDictionary<Type, Lazy<Type>>();
 
         private static ModuleBuilder CreateProxyModule()
         {
@@ -44,12 +44,13 @@ namespace AutoMapper.Execution
             return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
         }
 
-        private static Type CreateProxyType(Type interfaceType)
+        private static Lazy<Type> CreateProxyType(Type interfaceType)
         {
-            if (!interfaceType.IsInterface())
-            {
-                throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
-            }
+            return new Lazy<Type>(()=>EmitProxy(interfaceType));
+        }
+
+        private static Type EmitProxy(Type interfaceType)
+        {
             string name =
                 $"Proxy<{Regex.Replace(interfaceType.AssemblyQualifiedName ?? interfaceType.FullName ?? interfaceType.Name, @"[\s,]+", "_")}>";
             List<Type> allInterfaces = new List<Type>
@@ -59,7 +60,7 @@ namespace AutoMapper.Execution
             allInterfaces.AddRange(interfaceType.GetTypeInfo().ImplementedInterfaces);
             Debug.WriteLine(name, "Emitting proxy type");
             TypeBuilder typeBuilder = proxyModule.DefineType(name,
-                TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof (ProxyBase),
+                TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof(ProxyBase),
                 allInterfaces.ToArray());
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
                 CallingConventions.Standard, new Type[0]);
@@ -68,34 +69,34 @@ namespace AutoMapper.Execution
             ctorIl.Emit(OpCodes.Call, proxyBase_ctor);
             ctorIl.Emit(OpCodes.Ret);
             FieldBuilder propertyChangedField = null;
-            if (typeof (INotifyPropertyChanged).IsAssignableFrom(interfaceType))
+            if(typeof(INotifyPropertyChanged).IsAssignableFrom(interfaceType))
             {
-                propertyChangedField = typeBuilder.DefineField("PropertyChanged", typeof (PropertyChangedEventHandler),
+                propertyChangedField = typeBuilder.DefineField("PropertyChanged", typeof(PropertyChangedEventHandler),
                     FieldAttributes.Private);
                 MethodBuilder addPropertyChangedMethod = typeBuilder.DefineMethod("add_PropertyChanged",
                     MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName |
-                    MethodAttributes.NewSlot | MethodAttributes.Virtual, typeof (void),
-                    new[] {typeof (PropertyChangedEventHandler)});
+                    MethodAttributes.NewSlot | MethodAttributes.Virtual, typeof(void),
+                    new[] { typeof(PropertyChangedEventHandler) });
                 ILGenerator addIl = addPropertyChangedMethod.GetILGenerator();
                 addIl.Emit(OpCodes.Ldarg_0);
                 addIl.Emit(OpCodes.Dup);
                 addIl.Emit(OpCodes.Ldfld, propertyChangedField);
                 addIl.Emit(OpCodes.Ldarg_1);
                 addIl.Emit(OpCodes.Call, delegate_Combine);
-                addIl.Emit(OpCodes.Castclass, typeof (PropertyChangedEventHandler));
+                addIl.Emit(OpCodes.Castclass, typeof(PropertyChangedEventHandler));
                 addIl.Emit(OpCodes.Stfld, propertyChangedField);
                 addIl.Emit(OpCodes.Ret);
                 MethodBuilder removePropertyChangedMethod = typeBuilder.DefineMethod("remove_PropertyChanged",
                     MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName |
-                    MethodAttributes.NewSlot | MethodAttributes.Virtual, typeof (void),
-                    new[] {typeof (PropertyChangedEventHandler)});
+                    MethodAttributes.NewSlot | MethodAttributes.Virtual, typeof(void),
+                    new[] { typeof(PropertyChangedEventHandler) });
                 ILGenerator removeIl = removePropertyChangedMethod.GetILGenerator();
                 removeIl.Emit(OpCodes.Ldarg_0);
                 removeIl.Emit(OpCodes.Dup);
                 removeIl.Emit(OpCodes.Ldfld, propertyChangedField);
                 removeIl.Emit(OpCodes.Ldarg_1);
                 removeIl.Emit(OpCodes.Call, delegate_Remove);
-                removeIl.Emit(OpCodes.Castclass, typeof (PropertyChangedEventHandler));
+                removeIl.Emit(OpCodes.Castclass, typeof(PropertyChangedEventHandler));
                 removeIl.Emit(OpCodes.Stfld, propertyChangedField);
                 removeIl.Emit(OpCodes.Ret);
                 typeBuilder.DefineMethodOverride(addPropertyChangedMethod,
@@ -105,12 +106,12 @@ namespace AutoMapper.Execution
             }
             List<PropertyInfo> propertiesToImplement = new List<PropertyInfo>();
             // first we collect all properties, those with setters before getters in order to enable less specific redundant getters
-            foreach (
+            foreach(
                 PropertyInfo property in
-                    allInterfaces.Where(intf => intf != typeof (INotifyPropertyChanged))
+                    allInterfaces.Where(intf => intf != typeof(INotifyPropertyChanged))
                         .SelectMany(intf => intf.GetProperties()))
             {
-                if (property.CanWrite)
+                if(property.CanWrite)
                 {
                     propertiesToImplement.Insert(0, property);
                 }
@@ -120,12 +121,12 @@ namespace AutoMapper.Execution
                 }
             }
             Dictionary<string, PropertyEmitter> fieldBuilders = new Dictionary<string, PropertyEmitter>();
-            foreach (PropertyInfo property in propertiesToImplement)
+            foreach(PropertyInfo property in propertiesToImplement)
             {
                 PropertyEmitter propertyEmitter;
-                if (fieldBuilders.TryGetValue(property.Name, out propertyEmitter))
+                if(fieldBuilders.TryGetValue(property.Name, out propertyEmitter))
                 {
-                    if ((propertyEmitter.PropertyType != property.PropertyType) &&
+                    if((propertyEmitter.PropertyType != property.PropertyType) &&
                         ((property.CanWrite) || (!property.PropertyType.IsAssignableFrom(propertyEmitter.PropertyType))))
                     {
                         throw new ArgumentException(
@@ -139,12 +140,12 @@ namespace AutoMapper.Execution
                         propertyEmitter =
                             new PropertyEmitter(typeBuilder, property.Name, property.PropertyType, propertyChangedField));
                 }
-                if (property.CanRead)
+                if(property.CanRead)
                 {
                     typeBuilder.DefineMethodOverride(propertyEmitter.GetGetter(property.PropertyType),
                         property.GetMethod);
                 }
-                if (property.CanWrite)
+                if(property.CanWrite)
                 {
                     typeBuilder.DefineMethodOverride(propertyEmitter.GetSetter(property.PropertyType),
                         property.SetMethod);
@@ -155,12 +156,15 @@ namespace AutoMapper.Execution
 
         public Type GetProxyType(Type interfaceType)
         {
-            if (interfaceType == null)
+            if(interfaceType == null)
             {
                 throw new ArgumentNullException(nameof(interfaceType));
             }
-
-            return proxyTypes.GetOrAdd(interfaceType, CreateProxyType);
+            if(!interfaceType.IsInterface())
+            {
+                throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
+            }
+            return proxyTypes.GetOrAdd(interfaceType, CreateProxyType).Value;
         }
 
         private static byte[] StringToByteArray(string hex)
