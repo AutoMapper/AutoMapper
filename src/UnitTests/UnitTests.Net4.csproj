@@ -212,6 +212,7 @@
     <Compile Include="IMappingExpression\NonGenericConstructorTests.cs" />
     <Compile Include="IMappingExpression\NonGenericReverseMapping.cs" />
     <Compile Include="IMappingExpression\NonGenericProjectEnumTest.cs" />
+    <Compile Include="Internal\CreateProxyThreading.cs" />
     <Compile Include="Internal\DelegateFactoryTests.cs" />
     <Compile Include="Dictionaries.cs" />
     <Compile Include="DynamicMapping.cs" />
