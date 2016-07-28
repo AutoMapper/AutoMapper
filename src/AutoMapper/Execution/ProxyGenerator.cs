@@ -33,6 +33,8 @@ namespace AutoMapper.Execution
 
         private static readonly ConcurrentDictionary<Type, Lazy<Type>> proxyTypes = new ConcurrentDictionary<Type, Lazy<Type>>();
 
+        private static readonly Func<Type, Lazy<Type>> _createProxyType = CreateProxyType;
+
         private static ModuleBuilder CreateProxyModule()
         {
             AssemblyName name = new AssemblyName("AutoMapper.Proxies");
@@ -164,7 +166,7 @@ namespace AutoMapper.Execution
             {
                 throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
             }
-            return proxyTypes.GetOrAdd(interfaceType, CreateProxyType).Value;
+            return proxyTypes.GetOrAdd(interfaceType, _createProxyType).Value;
         }
 
         private static byte[] StringToByteArray(string hex)
