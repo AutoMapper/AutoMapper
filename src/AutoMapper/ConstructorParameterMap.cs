@@ -31,46 +31,46 @@ namespace AutoMapper
         public LambdaExpression CustomExpression { get; set; }
         public Func<object, ResolutionContext, object> CustomValueResolver { get; set; }
 
-        public Type SourceType => CustomExpression?.ReturnType ?? SourceMembers.LastOrDefault()?.GetMemberType();
         public Type DestinationType => Parameter.ParameterType;
 
         public Expression CreateExpression(IConfigurationProvider configuration, ParameterExpression srcParam, ParameterExpression ctxtParam)
         {
-            if (CustomExpression != null)
-                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull(DestinationType);
-
-            if (CustomValueResolver != null)
-            {
-                // Invoking a delegate
-                return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
-            }
-
-            if (Parameter.IsOptional && (!SourceMembers.Any() || configuration.ResolveTypeMap(SourceType, DestinationType) == null))
-            {
-                DefaultValue = true;
-                return Constant(Parameter.GetDefaultValue());
-            }
-
-            var valueResolverExpr = SourceMembers.Aggregate(
-                (Expression) srcParam,
-                (inner, getter) => getter is MethodInfo
-                    ? getter.IsStatic()
-                        ? Call(null, (MethodInfo) getter, inner)
-                        : (Expression) Call(inner, (MethodInfo) getter)
-                    : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
-                );
-            valueResolverExpr = valueResolverExpr.IfNotNull(DestinationType);
-
-            if ((SourceType.IsEnumerableType() && SourceType != typeof (string))
-                || configuration.ResolveTypeMap(SourceType, DestinationType) != null
-                || !DestinationType.IsAssignableFrom(SourceType))
+            var valueResolverExpression = ResolveSource(srcParam, ctxtParam);
+            var sourceType = valueResolverExpression.Type;
+            if((sourceType.IsEnumerableType() && sourceType != typeof(string))
+                || configuration.ResolveTypeMap(sourceType, DestinationType) != null
+                || !DestinationType.IsAssignableFrom(sourceType))
             {
                 /*
                 var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
                  */
-                return TypeMapPlanBuilder.ContextMap(valueResolverExpr, Default(DestinationType), ctxtParam, DestinationType);
+                return TypeMapPlanBuilder.ContextMap(valueResolverExpression, Default(DestinationType), ctxtParam, DestinationType);
             }
-            return valueResolverExpr;
+            return valueResolverExpression;
+        }
+
+        private Expression ResolveSource(ParameterExpression srcParam, ParameterExpression ctxtParam)
+        {
+            if(CustomExpression != null)
+            {
+                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull(DestinationType);
+            }
+            if(CustomValueResolver != null)
+            {
+                // Invoking a delegate
+                return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
+            }
+            if(Parameter.IsOptional)
+            {
+                DefaultValue = true;
+                return Constant(Parameter.GetDefaultValue(), Parameter.ParameterType);
+            }
+            return SourceMembers.Aggregate(
+                            (Expression) srcParam,
+                            (inner, getter) => getter is MethodInfo
+                                ? Call(getter.IsStatic() ? null : inner, (MethodInfo) getter)
+                                : (Expression) MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
+                      ).IfNotNull(DestinationType);
         }
     }
 }
