@@ -33,26 +33,26 @@ namespace AutoMapper
 
         public Type DestinationType => Parameter.ParameterType;
 
-        public Expression CreateExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configuration, ParameterExpression srcParam, ParameterExpression ctxtParam)
+        public Expression CreateExpression(TypeMapPlanBuilder builder)
         {
-            var valueResolverExpression = ResolveSource(srcParam, ctxtParam);
+            var valueResolverExpression = ResolveSource(builder.Source, builder.Context);
             var sourceType = valueResolverExpression.Type;
             var resolvedValue = Variable(sourceType, "resolvedValue");            
             return Block(new[] { resolvedValue },
                 Assign(resolvedValue, valueResolverExpression),
-                TypeMapPlanBuilder.MapExpression(typeMapRegistry, configuration, new TypePair(sourceType, DestinationType), resolvedValue, ctxtParam));
+                builder.MapExpression(new TypePair(sourceType, DestinationType), resolvedValue));
         }
 
-        private Expression ResolveSource(ParameterExpression srcParam, ParameterExpression ctxtParam)
+        private Expression ResolveSource(ParameterExpression sourceParameter, ParameterExpression contextParameter)
         {
             if(CustomExpression != null)
             {
-                return CustomExpression.ConvertReplaceParameters(srcParam).IfNotNull(DestinationType);
+                return CustomExpression.ConvertReplaceParameters(sourceParameter).IfNotNull(DestinationType);
             }
             if(CustomValueResolver != null)
             {
                 // Invoking a delegate
-                return Invoke(Constant(CustomValueResolver), srcParam, ctxtParam);
+                return Invoke(Constant(CustomValueResolver), sourceParameter, contextParameter);
             }
             if(Parameter.IsOptional)
             {
@@ -60,7 +60,7 @@ namespace AutoMapper
                 return Constant(Parameter.GetDefaultValue(), Parameter.ParameterType);
             }
             return SourceMembers.Aggregate(
-                            (Expression) srcParam,
+                            (Expression) sourceParameter,
                             (inner, getter) => getter is MethodInfo
                                 ? Call(getter.IsStatic() ? null : inner, (MethodInfo) getter)
                                 : (Expression) MakeMemberAccess(getter.IsStatic() ? null : inner, getter)

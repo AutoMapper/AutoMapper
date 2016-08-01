@@ -27,6 +27,9 @@ namespace AutoMapper.Execution
         private readonly ParameterExpression _context;
         private readonly ParameterExpression _destination;
 
+        public ParameterExpression Source => _source;
+        public ParameterExpression Context => _context;
+
         public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry, TypeMap typeMap)
         {
             _configurationProvider = configurationProvider;
@@ -240,7 +243,7 @@ namespace AutoMapper.Execution
             if(_typeMap.ConstructorMap?.CanResolve == true)
             {
                 constructorMapping = true;
-                return _typeMap.ConstructorMap.BuildExpression(_typeMapRegistry, _configurationProvider, _source, _context);
+                return _typeMap.ConstructorMap.BuildExpression(this);
             }
 #if NET45
             if(_typeMap.DestinationTypeToUse.IsInterface())
@@ -317,7 +320,7 @@ namespace AutoMapper.Execution
             if(propertyMap.DestinationPropertyType != null)
             {
                 var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
-                valueResolverExpr = MapExpression(_typeMapRegistry, _configurationProvider, typePair, valueResolverExpr, _context, propertyMap, destValueExpr);
+                valueResolverExpr = MapExpression(typePair, valueResolverExpr, propertyMap, destValueExpr);
             }
             else
             {
@@ -541,6 +544,11 @@ namespace AutoMapper.Execution
             }
 
             return valueResolverFunc;
+        }
+
+        public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
+        {
+            return MapExpression(_typeMapRegistry, _configurationProvider, typePair, sourceParameter, _context, propertyMap, destinationParameter);
         }
 
         public static Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
