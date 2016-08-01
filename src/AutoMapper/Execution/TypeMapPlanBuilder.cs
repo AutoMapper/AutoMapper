@@ -240,7 +240,7 @@ namespace AutoMapper.Execution
             if(_typeMap.ConstructorMap?.CanResolve == true)
             {
                 constructorMapping = true;
-                return _typeMap.ConstructorMap.BuildExpression(_configurationProvider, _source, _context);
+                return _typeMap.ConstructorMap.BuildExpression(_typeMapRegistry, _configurationProvider, _source, _context);
             }
 #if NET45
             if(_typeMap.DestinationTypeToUse.IsInterface())
@@ -317,30 +317,7 @@ namespace AutoMapper.Execution
             if(propertyMap.DestinationPropertyType != null)
             {
                 var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
-                var typeMap = _configurationProvider.ResolveTypeMap(typePair);
-                var match = _configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-                if(typeMap != null && !typeMap.HasDerivedTypesToInclude())
-                {
-                    typeMap.Seal(_typeMapRegistry, _configurationProvider);
-                    if(typeMap.MapExpression != null)
-                    {
-                        valueResolverExpr = typeMap.MapExpression.ConvertReplaceParameters(valueResolverExpr, destValueExpr, _context);
-                    }
-                    else
-                    {
-                        valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
-                    }
-                }
-                else if(match != null && typeMap == null)
-                {
-                    valueResolverExpr = match.MapExpression(_typeMapRegistry, _configurationProvider,
-                        propertyMap, valueResolverExpr, destValueExpr,
-                        _context);
-                }
-                else
-                {
-                    valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
-                }
+                valueResolverExpr = MapExpression(_typeMapRegistry, _configurationProvider, typePair, valueResolverExpr, _context, propertyMap, destValueExpr);
             }
             else
             {
@@ -395,9 +372,9 @@ namespace AutoMapper.Execution
             return Block(new[] { resolvedValue }, mapperExpr);
         }
 
-        private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpr, Expression destValueExpr)
+        private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpression, Expression destinationValueExpression)
         {
-            return ContextMap(valueResolverExpr, destValueExpr, _context, propertyMap.DestinationPropertyType);
+            return ContextMap(new TypePair(valueResolverExpression.Type, propertyMap.DestinationPropertyType), valueResolverExpression, destinationValueExpression, _context);
         }
 
         private Expression BuildValueResolverFunc(PropertyMap propertyMap, Expression destValueExpr)
@@ -566,17 +543,46 @@ namespace AutoMapper.Execution
             return valueResolverFunc;
         }
 
-        public static Expression ContextMap(Expression valueResolverExpr, Expression destValueExpr, ParameterExpression context, Type destinationType)
+        public static Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
+            TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
-            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(valueResolverExpr.Type, destinationType);
-            var second = Call(
-                context,
-                mapMethod,
-                valueResolverExpr,
-                destValueExpr
-                );
-            return second;
+            if(destinationParameter == null)
+            {
+                destinationParameter = Default(typePair.DestinationType);
+            }
+            var typeMap = configurationProvider.ResolveTypeMap(typePair);
+            if(typeMap != null)
+            {
+                if(!typeMap.HasDerivedTypesToInclude())
+                {
+                    typeMap.Seal(typeMapRegistry, configurationProvider);
+                    if(typeMap.MapExpression != null)
+                    {
+                        return typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter, contextParameter);
+                    }
+                    else
+                    {
+                        return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
+                    }
+                }
+                else
+                {
+                    return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
+                }
+            }
+            var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
+            if(match != null)
+            {
+                var mapperExpression = match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
+                return ToType(mapperExpression, typePair.DestinationType);
+            }
+            return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
         }
 
+        private static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter, Expression destinationParameter)
+        {
+            var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
+            return Call(contextParameter, mapMethod, sourceParameter, destinationParameter);
+        }
     }
 }

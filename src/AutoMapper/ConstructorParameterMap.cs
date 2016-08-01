@@ -33,20 +33,14 @@ namespace AutoMapper
 
         public Type DestinationType => Parameter.ParameterType;
 
-        public Expression CreateExpression(IConfigurationProvider configuration, ParameterExpression srcParam, ParameterExpression ctxtParam)
+        public Expression CreateExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configuration, ParameterExpression srcParam, ParameterExpression ctxtParam)
         {
             var valueResolverExpression = ResolveSource(srcParam, ctxtParam);
             var sourceType = valueResolverExpression.Type;
-            if((sourceType.IsEnumerableType() && sourceType != typeof(string))
-                || configuration.ResolveTypeMap(sourceType, DestinationType) != null
-                || !DestinationType.IsAssignableFrom(sourceType))
-            {
-                /*
-                var value = context.Mapper.Map(result, null, sourceType, destinationType, context);
-                 */
-                return TypeMapPlanBuilder.ContextMap(valueResolverExpression, Default(DestinationType), ctxtParam, DestinationType);
-            }
-            return valueResolverExpression;
+            var resolvedValue = Variable(sourceType, "resolvedValue");            
+            return Block(new[] { resolvedValue },
+                Assign(resolvedValue, valueResolverExpression),
+                TypeMapPlanBuilder.MapExpression(typeMapRegistry, configuration, new TypePair(sourceType, DestinationType), resolvedValue, ctxtParam));
         }
 
         private Expression ResolveSource(ParameterExpression srcParam, ParameterExpression ctxtParam)

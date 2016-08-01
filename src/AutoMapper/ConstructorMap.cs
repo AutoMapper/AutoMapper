@@ -53,6 +53,7 @@ namespace AutoMapper
         }
 
         public Expression BuildExpression(
+            TypeMapRegistry typeMapRegistry,
             IConfigurationProvider configuration,
             ParameterExpression srcParam, 
             ParameterExpression ctxtParam)
@@ -60,7 +61,7 @@ namespace AutoMapper
             if (!CanResolve)
                 return null;
 
-            var ctorArgs = CtorParams.Select(p => p.CreateExpression(configuration, srcParam, ctxtParam));
+            var ctorArgs = CtorParams.Select(p => p.CreateExpression(typeMapRegistry, configuration, srcParam, ctxtParam));
 
             ctorArgs =
                 ctorArgs.Zip(Ctor.GetParameters(),
