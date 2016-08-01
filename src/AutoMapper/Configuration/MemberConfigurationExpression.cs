@@ -27,7 +27,7 @@ namespace AutoMapper.Configuration
 
         public MemberInfo DestinationMember => _destinationMember;
 
-        public void NullSubstitute(TMember nullSubstitute)
+        public void NullSubstitute(object nullSubstitute)
         {
             PropertyMapActions.Add(pm => pm.NullSubstitute = nullSubstitute);
         }

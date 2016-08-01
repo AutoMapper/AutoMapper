@@ -15,7 +15,7 @@ namespace AutoMapper
         /// Substitute a custom value when the source member resolves as null
         /// </summary>
         /// <param name="nullSubstitute">Value to use</param>
-        void NullSubstitute(TMember nullSubstitute);
+        void NullSubstitute(object nullSubstitute);
 
         /// <summary>
         /// Resolve destination member using a custom value resolver
