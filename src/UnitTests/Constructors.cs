@@ -5,6 +5,88 @@ using Should;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class When_constructor_matches_with_prefix_and_postfix : AutoMapperSpecBase
+    {
+        PersonDto _destination;
+
+        public class Person
+        {
+            public string PrefixNamePostfix { get; set; }
+        }
+
+        public class PersonDto
+        {
+            string name;
+
+            public PersonDto(string name)
+            {
+                this.name = name;
+            }
+
+            public string Name => name;
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.RecognizePostfixes("postfix");
+            cfg.RecognizePrefixes("prefix");
+
+            cfg.CreateMap<Person, PersonDto>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<PersonDto>(new Person { PrefixNamePostfix = "John" });
+        }
+
+        [Fact]
+        public void Should_map_from_the_property()
+        {
+            _destination.Name.ShouldEqual("John");
+        }
+    }
+
+    public class When_constructor_matches_with_destination_prefix_and_postfix : AutoMapperSpecBase
+    {
+        PersonDto _destination;
+
+        public class Person
+        {
+            public string Name { get; set; }
+        }
+
+        public class PersonDto
+        {
+            string name;
+
+            public PersonDto(string prefixNamePostfix)
+            {
+                name = prefixNamePostfix;
+            }
+
+            public string Name => name;
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.RecognizeDestinationPostfixes("postfix");
+            cfg.RecognizeDestinationPrefixes("prefix");
+
+            cfg.CreateMap<Person, PersonDto>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<PersonDto>(new Person { Name = "John" });
+        }
+
+        [Fact]
+        public void Should_map_from_the_property()
+        {
+            _destination.Name.ShouldEqual("John");
+        }
+    }
+
     public class When_constructor_matches_but_is_overriden_by_ConstructUsing : AutoMapperSpecBase
     {
         PersonDto _destination;
