@@ -546,10 +546,8 @@ namespace AutoMapper.Execution
 
             if(propertyMap.NullSubstitute != null)
             {
-                Expression value = Constant(propertyMap.NullSubstitute);
-                if(propertyMap.NullSubstitute.GetType() != propertyMap.DestinationPropertyType)
-                    value = ToType(value, propertyMap.DestinationPropertyType);
-                valueResolverFunc = MakeBinary(ExpressionType.Coalesce, valueResolverFunc, value);
+                var nullSubstitute = Constant(propertyMap.NullSubstitute);
+                valueResolverFunc = MakeBinary(ExpressionType.Coalesce, valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
             }
             else if(!typeMap.Profile.AllowNullDestinationValues)
             {
