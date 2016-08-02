@@ -5,6 +5,53 @@ using Should;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class When_renaming_class_constructor_parameter : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        public class Source
+        {
+            public InnerSource InnerSource { get; set; }
+        }
+
+        public class InnerSource
+        {
+            public string Name { get; set; }
+        }
+
+        public class Destination
+        {
+            public Destination(InnerDestination inner)
+            {
+                InnerDestination = inner;
+            }
+
+            public InnerDestination InnerDestination { get; }
+        }
+
+        public class InnerDestination
+        {
+            public string Name { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap<Source, Destination>().ForCtorParam("inner", o=>o.MapFrom(s=>s.InnerSource));
+            c.CreateMap<InnerSource, InnerDestination>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { InnerSource = new InnerSource { Name = "Core" } });
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.InnerDestination.Name.ShouldEqual("Core");
+        }
+    }
+
     public class When_constructor_matches_with_prefix_and_postfix : AutoMapperSpecBase
     {
         PersonDto _destination;

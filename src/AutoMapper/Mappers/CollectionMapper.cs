@@ -125,7 +125,7 @@ namespace AutoMapper.Mappers
 
             var typePair = new TypePair(sourceElementType, destElementType);
 
-            var itemExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam, contextParam, typePair);
+            var itemExpr = TypeMapPlanBuilder.MapExpression(typeMapRegistry, configurationProvider, typePair, itemParam, contextParam, propertyMap);
             return itemExpr;
         }
 
@@ -141,42 +141,10 @@ namespace AutoMapper.Mappers
             var sourceElementType = TypeHelper.GetElementType(sourceType);
             var destElementType = TypeHelper.GetElementType(destType);
 
-            var keyExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, Property(itemParam, "Key"), contextParam, typePairKey);
-            var valueExpr = MapExpression(typeMapRegistry, configurationProvider, propertyMap, Property(itemParam, "Value"), contextParam, typePairValue);
+            var keyExpr = TypeMapPlanBuilder.MapExpression(typeMapRegistry, configurationProvider, typePairKey, Property(itemParam, "Key"), contextParam, propertyMap);
+            var valueExpr = TypeMapPlanBuilder.MapExpression(typeMapRegistry, configurationProvider, typePairValue, Property(itemParam, "Value"), contextParam, propertyMap);
             var keyPair = New(destElementType.GetConstructors().First(), keyExpr, valueExpr);
             return keyPair;
-        }
-
-        private static Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Expression itemParam, Expression contextParam, TypePair typePair)
-        {
-            Expression itemExpr;
-            var typeMap = configurationProvider.ResolveTypeMap(typePair);
-            if (typeMap != null && !typeMap.HasDerivedTypesToInclude())
-            {
-                typeMap.Seal(typeMapRegistry, configurationProvider);
-                if(typeMap.MapExpression != null)
-                {
-                    return typeMap.MapExpression.ReplaceParameters(itemParam, Default(typePair.DestinationType), contextParam);
-                }
-            }
-            var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-            if (match != null && typeMap == null)
-            {
-                itemExpr =
-                    ToType(
-                        match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, itemParam,
-                            Default(typePair.DestinationType), contextParam), typePair.DestinationType);
-            }
-            else
-            {
-                var mapMethod =
-                    typeof (ResolutionContext).GetDeclaredMethods()
-                        .First(m => m.Name == "Map")
-                        .MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
-                itemExpr = Call(contextParam, mapMethod, itemParam, Default(typePair.DestinationType));
-            }
-            return itemExpr;
         }
 
         internal static BinaryExpression IfNotNull(Expression destExpression)

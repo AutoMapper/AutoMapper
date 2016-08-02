@@ -52,15 +52,12 @@ namespace AutoMapper
             return New(Ctor, parameters.Select(p => p.ResolutionExpression));
         }
 
-        public Expression BuildExpression(
-            IConfigurationProvider configuration,
-            ParameterExpression srcParam, 
-            ParameterExpression ctxtParam)
+        public Expression BuildExpression(TypeMapPlanBuilder builder)
         {
             if (!CanResolve)
                 return null;
 
-            var ctorArgs = CtorParams.Select(p => p.CreateExpression(configuration, srcParam, ctxtParam));
+            var ctorArgs = CtorParams.Select(p => p.CreateExpression(builder));
 
             ctorArgs =
                 ctorArgs.Zip(Ctor.GetParameters(),
