@@ -91,13 +91,23 @@ namespace AutoMapper.Configuration
             return type.IsGenericType() && type.GetGenericTypeDefinition() == genericType;
         }
 
+        public static Type GetIEnumerableType(this Type type)
+        {
+            return type.GetGenericInterface(typeof(IEnumerable<>));
+        }
+
         public static Type GetDictionaryType(this Type type)
         {
-            if(type.IsGenericType(typeof(IDictionary<,>)))
+            return type.GetGenericInterface(typeof(IDictionary<,>));
+        }
+
+        public static Type GetGenericInterface(this Type type, Type genericInterface)
+        {
+            if(type.IsGenericType(genericInterface))
             {
                 return type;
             }
-            return type.GetTypeInfo().ImplementedInterfaces.FirstOrDefault(t=>t.IsGenericType(typeof(IDictionary<,>)));
+            return type.GetTypeInfo().ImplementedInterfaces.FirstOrDefault(t=>t.IsGenericType(genericInterface));
         }
 
         public static Type GetGenericElementType(this Type type)

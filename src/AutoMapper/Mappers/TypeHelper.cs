@@ -32,25 +32,13 @@ namespace AutoMapper.Mappers
                 return new[] {enumerableType.GetElementType()};
             }
 
-            if (flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair) && enumerableType.IsGenericType() &&
-                enumerableType.IsDictionaryType())
-            {
-                return enumerableType.GetTypeInfo().GenericTypeArguments;
-            }
-
-            if (enumerableType.IsGenericType() &&
-                enumerableType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-            {
-                return enumerableType.GetTypeInfo().GenericTypeArguments;
-            }
-
             Type idictionaryType = enumerableType.GetDictionaryType();
             if (idictionaryType != null && flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair))
             {
                 return idictionaryType.GetTypeInfo().GenericTypeArguments;
             }
 
-            Type ienumerableType = GetIEnumerableType(enumerableType);
+            Type ienumerableType = enumerableType.GetIEnumerableType();
             if (ienumerableType != null)
             {
                 return ienumerableType.GetTypeInfo().GenericTypeArguments;
@@ -78,45 +66,6 @@ namespace AutoMapper.Mappers
                 return null;
 
             return enumType;
-        }
-
-        private static Type GetIEnumerableType(Type enumerableType)
-        {
-            try
-            {
-                return enumerableType.GetTypeInfo().ImplementedInterfaces.FirstOrDefault(t => t.Name == "IEnumerable`1");
-            }
-            catch (AmbiguousMatchException)
-            {
-                if (enumerableType.BaseType() != typeof(object))
-                    return GetIEnumerableType(enumerableType.BaseType());
-
-                return null;
-            }
-        }
-
-        internal static Type FindGenericType(Type definition, Type type)
-        {
-            bool? definitionIsInterface = null;
-            while (type != null && type != typeof(object))
-            {
-                TypeInfo typeInfo = type.GetTypeInfo();
-                if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == definition)
-                    return type;
-                if (!definitionIsInterface.HasValue)
-                    definitionIsInterface = definition.GetTypeInfo().IsInterface;
-                if (definitionIsInterface.GetValueOrDefault())
-                {
-                    foreach (Type itype in typeInfo.ImplementedInterfaces)
-                    {
-                        Type found = FindGenericType(definition, itype);
-                        if (found != null)
-                            return found;
-                    }
-                }
-                type = type.GetTypeInfo().BaseType;
-            }
-            return null;
         }
 
         internal static IEnumerable<MethodInfo> GetStaticMethods(this Type type)
