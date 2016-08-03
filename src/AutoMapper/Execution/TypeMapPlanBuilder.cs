@@ -327,8 +327,18 @@ namespace AutoMapper.Execution
                 valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
             }
 
-            var propertyValue = Variable(valueResolverExpr.Type, "propertyValue");
-            var setPropertyValue = Assign(propertyValue, valueResolverExpr);
+            ParameterExpression propertyValue;
+            Expression setPropertyValue;
+            if(valueResolverExpr == resolvedValue)
+            {
+                propertyValue = resolvedValue;
+                setPropertyValue = setResolvedValue;
+            }
+            else
+            {
+                propertyValue = Variable(valueResolverExpr.Type, "propertyValue");
+                setPropertyValue = Assign(propertyValue, valueResolverExpr);
+            }
 
             Expression mapperExpr;
             if(propertyMap.DestinationProperty is FieldInfo)
@@ -352,7 +362,7 @@ namespace AutoMapper.Execution
                 }
             }
 
-            mapperExpr = Block(setResolvedValue, setPropertyValue, mapperExpr);
+            mapperExpr = Block(new[] { setResolvedValue, setPropertyValue, mapperExpr }.Distinct());
 
             if(propertyMap.PreCondition != null)
             {
@@ -375,7 +385,7 @@ namespace AutoMapper.Execution
                     );
             }
 
-            return Block(new[] { resolvedValue, propertyValue }, mapperExpr);
+            return Block(new[] { resolvedValue, propertyValue }.Distinct(), mapperExpr);
         }
 
         private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpression, Expression destinationValueExpression)
