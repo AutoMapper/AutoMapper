@@ -327,29 +327,32 @@ namespace AutoMapper.Execution
                 valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
             }
 
+            var propertyValue = Variable(valueResolverExpr.Type, "propertyValue");
+            var setPropertyValue = Assign(propertyValue, valueResolverExpr);
+
             Expression mapperExpr;
             if(propertyMap.DestinationProperty is FieldInfo)
             {
                 mapperExpr = propertyMap.SourceType != propertyMap.DestinationPropertyType
-                    ? Assign(destMember, ToType(valueResolverExpr, propertyMap.DestinationPropertyType))
-                    : Assign(getter, valueResolverExpr);
+                    ? Assign(destMember, ToType(propertyValue, propertyMap.DestinationPropertyType))
+                    : Assign(getter, propertyValue);
             }
             else
             {
                 var setter = ((PropertyInfo)propertyMap.DestinationProperty).GetSetMethod(true);
                 if(setter == null)
                 {
-                    mapperExpr = valueResolverExpr;
+                    mapperExpr = propertyValue;
                 }
                 else
                 {
                     mapperExpr = Assign(destMember, propertyMap.SourceType != propertyMap.DestinationPropertyType
-                        ? ToType(valueResolverExpr, propertyMap.DestinationPropertyType)
-                        : valueResolverExpr);
+                        ? ToType(propertyValue, propertyMap.DestinationPropertyType)
+                        : propertyValue);
                 }
             }
 
-            mapperExpr = Block(setResolvedValue, mapperExpr);
+            mapperExpr = Block(setResolvedValue, setPropertyValue, mapperExpr);
 
             if(propertyMap.PreCondition != null)
             {
@@ -364,7 +367,7 @@ namespace AutoMapper.Execution
                     propertyMap.Condition.ConvertReplaceParameters(
                         _source,
                         _destination,
-                        ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
+                        ToType(propertyValue, propertyMap.Condition.Parameters[2].Type),
                         ToType(getter, propertyMap.Condition.Parameters[2].Type),
                         _context
                         ),
@@ -372,7 +375,7 @@ namespace AutoMapper.Execution
                     );
             }
 
-            return Block(new[] { resolvedValue }, mapperExpr);
+            return Block(new[] { resolvedValue, propertyValue }, mapperExpr);
         }
 
         private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpression, Expression destinationValueExpression)
@@ -578,14 +581,11 @@ namespace AutoMapper.Execution
                     return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
                 }
             }
-            if(typePair.DestinationType.IsClass())
+            var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
+            if(match != null)
             {
-                var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-                if(match != null)
-                {
-                    var mapperExpression = match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
-                    return ToType(mapperExpression, typePair.DestinationType);
-                }
+                var mapperExpression = match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
+                return ToType(mapperExpression, typePair.DestinationType);
             }
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
         }
