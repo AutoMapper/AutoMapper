@@ -578,11 +578,14 @@ namespace AutoMapper.Execution
                     return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
                 }
             }
-            var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-            if(match != null)
+            if(typePair.DestinationType.IsClass())
             {
-                var mapperExpression = match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
-                return ToType(mapperExpression, typePair.DestinationType);
+                var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
+                if(match != null)
+                {
+                    var mapperExpression = match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
+                    return ToType(mapperExpression, typePair.DestinationType);
+                }
             }
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
         }
