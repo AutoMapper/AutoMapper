@@ -478,10 +478,11 @@ namespace AutoMapper.Execution
             else if(propertyMap.CustomExpression != null)
             {
                 var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(_source).IfNotNull(propertyMap.DestinationPropertyType);
-                var returnType = propertyMap.DestinationPropertyType.IsNullableType() && propertyMap.DestinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
+                var destinationNullable = propertyMap.DestinationPropertyType.IsNullableType();
+                var returnType = destinationNullable && propertyMap.DestinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
                     ? propertyMap.DestinationPropertyType
                     : nullCheckedExpression.Type;
-                valueResolverFunc = nullCheckedExpression.Type.IsValueType() && !propertyMap.DestinationPropertyType.IsNullableType()
+                valueResolverFunc = nullCheckedExpression.Type.IsValueType() && !destinationNullable
                     ? nullCheckedExpression
                     : TryCatch(ToType(nullCheckedExpression, returnType),
                         Catch(typeof(NullReferenceException), Default(returnType)),
