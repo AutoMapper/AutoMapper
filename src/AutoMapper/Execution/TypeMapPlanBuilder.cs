@@ -327,29 +327,42 @@ namespace AutoMapper.Execution
                 valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
             }
 
+            ParameterExpression propertyValue;
+            Expression setPropertyValue;
+            if(valueResolverExpr == resolvedValue)
+            {
+                propertyValue = resolvedValue;
+                setPropertyValue = setResolvedValue;
+            }
+            else
+            {
+                propertyValue = Variable(valueResolverExpr.Type, "propertyValue");
+                setPropertyValue = Assign(propertyValue, valueResolverExpr);
+            }
+
             Expression mapperExpr;
             if(propertyMap.DestinationProperty is FieldInfo)
             {
                 mapperExpr = propertyMap.SourceType != propertyMap.DestinationPropertyType
-                    ? Assign(destMember, ToType(valueResolverExpr, propertyMap.DestinationPropertyType))
-                    : Assign(getter, valueResolverExpr);
+                    ? Assign(destMember, ToType(propertyValue, propertyMap.DestinationPropertyType))
+                    : Assign(getter, propertyValue);
             }
             else
             {
                 var setter = ((PropertyInfo)propertyMap.DestinationProperty).GetSetMethod(true);
                 if(setter == null)
                 {
-                    mapperExpr = valueResolverExpr;
+                    mapperExpr = propertyValue;
                 }
                 else
                 {
                     mapperExpr = Assign(destMember, propertyMap.SourceType != propertyMap.DestinationPropertyType
-                        ? ToType(valueResolverExpr, propertyMap.DestinationPropertyType)
-                        : valueResolverExpr);
+                        ? ToType(propertyValue, propertyMap.DestinationPropertyType)
+                        : propertyValue);
                 }
             }
 
-            mapperExpr = Block(setResolvedValue, mapperExpr);
+            mapperExpr = Block(new[] { setResolvedValue, setPropertyValue, mapperExpr }.Distinct());
 
             if(propertyMap.PreCondition != null)
             {
@@ -364,7 +377,7 @@ namespace AutoMapper.Execution
                     propertyMap.Condition.ConvertReplaceParameters(
                         _source,
                         _destination,
-                        ToType(valueResolverExpr, propertyMap.Condition.Parameters[2].Type),
+                        ToType(propertyValue, propertyMap.Condition.Parameters[2].Type),
                         ToType(getter, propertyMap.Condition.Parameters[2].Type),
                         _context
                         ),
@@ -372,7 +385,7 @@ namespace AutoMapper.Execution
                     );
             }
 
-            return Block(new[] { resolvedValue }, mapperExpr);
+            return Block(new[] { resolvedValue, propertyValue }.Distinct(), mapperExpr);
         }
 
         private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpression, Expression destinationValueExpression)
@@ -475,10 +488,11 @@ namespace AutoMapper.Execution
             else if(propertyMap.CustomExpression != null)
             {
                 var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(_source).IfNotNull(propertyMap.DestinationPropertyType);
-                var returnType = propertyMap.DestinationPropertyType.IsNullableType() && propertyMap.DestinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
+                var destinationNullable = propertyMap.DestinationPropertyType.IsNullableType();
+                var returnType = destinationNullable && propertyMap.DestinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
                     ? propertyMap.DestinationPropertyType
                     : nullCheckedExpression.Type;
-                valueResolverFunc = nullCheckedExpression.Type.IsValueType() && !propertyMap.DestinationPropertyType.IsNullableType()
+                valueResolverFunc = nullCheckedExpression.Type.IsValueType() && !destinationNullable
                     ? nullCheckedExpression
                     : TryCatch(ToType(nullCheckedExpression, returnType),
                         Catch(typeof(NullReferenceException), Default(returnType)),

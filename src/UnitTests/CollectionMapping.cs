@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -7,6 +8,40 @@ using Should;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_mapping_collections_with_structs : AutoMapperSpecBase
+    {
+        BarDTO _destination;
+
+        public struct Foo { }
+        public struct Bar
+        {
+            public IEnumerable<Foo> Foos { get; set; }
+        }
+
+        public struct FooDTO { }
+        public struct BarDTO
+        {
+            public IEnumerable<FooDTO> Foos { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Bar, BarDTO>();
+            cfg.CreateMap<Foo, FooDTO>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<BarDTO>(new Bar { Foos = new Foo[5] });
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Foos.SequenceEqual(new FooDTO[5]).ShouldBeTrue();
+        }
+    }
+
     public class CollectionMapping
     {
         public CollectionMapping()
