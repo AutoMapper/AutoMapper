@@ -541,14 +541,14 @@ namespace AutoMapper.Execution
             if(propertyMap.NullSubstitute != null)
             {
                 var nullSubstitute = Constant(propertyMap.NullSubstitute);
-                valueResolverFunc = MakeBinary(ExpressionType.Coalesce, valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
+                valueResolverFunc = Coalesce(valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
             }
             else if(!typeMap.Profile.AllowNullDestinationValues)
             {
                 var toCreate = propertyMap.SourceType ?? propertyMap.DestinationPropertyType;
-                if(!toCreate.GetTypeInfo().IsValueType)
+                if(!toCreate.IsAbstract() && toCreate.IsClass())
                 {
-                    valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
+                    valueResolverFunc = Coalesce(
                         valueResolverFunc,
                         ToType(Call(
                             typeof(ObjectCreator).GetDeclaredMethod("CreateNonNullValue"),

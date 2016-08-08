@@ -6,6 +6,53 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.NullBehavior
 {
+    public class When_mapping_from_null_interface_and_AllowNullDestinationValues_is_false : AutoMapperSpecBase
+    {
+        ElementDestination _destination;
+
+        interface ILink
+        {
+            int Id { get; set; }
+            string Type { get; set; }
+        }
+
+        class LinkImpl : ILink
+        {
+            public int Id { get; set; }
+            public string Type { get; set; }
+        }
+
+        class ElementSource
+        {
+            public int Id { get; set; }
+            public ILink Link { get; set; }
+        }
+
+        class ElementDestination
+        {
+            public int Id { get; set; }
+            public LinkImpl Link { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.AllowNullDestinationValues = false;
+            cfg.CreateMap<ILink, LinkImpl>();
+            cfg.CreateMap<ElementSource, ElementDestination>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<ElementDestination>(new ElementSource());
+        }
+
+        [Fact]
+        public void Should_not_get_null()
+        {
+            _destination.Link.ShouldNotBeNull();
+        }
+    }
+
     public class When_mapping_from_null_interface : AutoMapperSpecBase
     {
         ElementDestination _destination;
