@@ -198,7 +198,7 @@ namespace AutoMapper.Execution
                 //mapperFunc = (source, context, destFunc) => context.GetTypeDepth(types) <= maxDepth ? inner(source, context, destFunc) : default(TDestination);
             }
 
-            if(_typeMap.Profile.AllowNullDestinationValues && _typeMap.SourceType.IsClass())
+            if(_typeMap.Profile.AllowNullDestinationValues && !_typeMap.SourceType.IsValueType())
             {
                 mapperFunc =
                     Condition(Equal(_source, Default(_typeMap.SourceType)),
