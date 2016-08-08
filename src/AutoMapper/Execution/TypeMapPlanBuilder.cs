@@ -115,7 +115,7 @@ namespace AutoMapper.Execution
         {
             var newDestFunc = ToType(CreateNewDestinationFunc(out constructorMapping), _typeMap.DestinationTypeToUse);
 
-            var getDest = _typeMap.DestinationTypeToUse.GetTypeInfo().IsValueType
+            var getDest = _typeMap.DestinationTypeToUse.IsValueType()
                 ? newDestFunc
                 : Coalesce(_initialDestination, newDestFunc);
 
