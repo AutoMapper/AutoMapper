@@ -12,6 +12,13 @@ namespace AutoMapper.UnitTests
         }
         class Destination
         {
+            public Destination()
+            {
+            }
+
+            public Destination(int _)
+            {
+            }
         }
 
         class Parameter : ParameterInfo
@@ -24,9 +31,7 @@ namespace AutoMapper.UnitTests
         public void Should_work()
         {
             var typeMap = Configuration.GetAllTypeMaps().Single();
-            var constructorMap = new ConstructorMap(typeof(Source).GetConstructor(Type.EmptyTypes), typeMap);
-            constructorMap.AddParameter(new Parameter(), new MemberInfo[0], true);
-            typeMap.ConstructorMap = constructorMap;
+            typeMap.ConstructorMap.AddParameter(new Parameter(), new MemberInfo[0], true);
             typeMap.ConstructorParameterMatches("");
         }
     }
