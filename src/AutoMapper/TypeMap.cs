@@ -168,7 +168,7 @@ namespace AutoMapper
             if (DestinationTypeToUse.IsGenericTypeDefinition())
                 return true;
 
-            if (!DestinationTypeToUse.IsClass())
+            if (DestinationTypeToUse.IsValueType())
                 return true;
 
             var constructors = DestinationTypeToUse

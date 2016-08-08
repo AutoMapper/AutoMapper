@@ -115,7 +115,7 @@ namespace AutoMapper.Execution
         {
             var newDestFunc = ToType(CreateNewDestinationFunc(out constructorMapping), _typeMap.DestinationTypeToUse);
 
-            var getDest = _typeMap.DestinationTypeToUse.GetTypeInfo().IsValueType
+            var getDest = _typeMap.DestinationTypeToUse.IsValueType()
                 ? newDestFunc
                 : Coalesce(_initialDestination, newDestFunc);
 
@@ -198,7 +198,7 @@ namespace AutoMapper.Execution
                 //mapperFunc = (source, context, destFunc) => context.GetTypeDepth(types) <= maxDepth ? inner(source, context, destFunc) : default(TDestination);
             }
 
-            if(_typeMap.Profile.AllowNullDestinationValues && _typeMap.SourceType.IsClass())
+            if(_typeMap.Profile.AllowNullDestinationValues && !_typeMap.SourceType.IsValueType())
             {
                 mapperFunc =
                     Condition(Equal(_source, Default(_typeMap.SourceType)),
@@ -541,14 +541,14 @@ namespace AutoMapper.Execution
             if(propertyMap.NullSubstitute != null)
             {
                 var nullSubstitute = Constant(propertyMap.NullSubstitute);
-                valueResolverFunc = MakeBinary(ExpressionType.Coalesce, valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
+                valueResolverFunc = Coalesce(valueResolverFunc, ToType(nullSubstitute, valueResolverFunc.Type));
             }
             else if(!typeMap.Profile.AllowNullDestinationValues)
             {
                 var toCreate = propertyMap.SourceType ?? propertyMap.DestinationPropertyType;
-                if(!toCreate.GetTypeInfo().IsValueType)
+                if(!toCreate.IsAbstract() && toCreate.IsClass())
                 {
-                    valueResolverFunc = MakeBinary(ExpressionType.Coalesce,
+                    valueResolverFunc = Coalesce(
                         valueResolverFunc,
                         ToType(Call(
                             typeof(ObjectCreator).GetDeclaredMethod("CreateNonNullValue"),

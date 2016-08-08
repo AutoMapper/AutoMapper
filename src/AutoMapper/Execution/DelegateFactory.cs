@@ -66,8 +66,7 @@ namespace AutoMapper.Execution
 
         public static Expression GenerateConstructorExpression(Type type)
         {
-            //handle valuetypes
-            if (!type.IsClass())
+            if(type.IsValueType())
             {
                 return Convert(New(type), typeof(object));
             }
