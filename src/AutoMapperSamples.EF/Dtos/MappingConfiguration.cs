@@ -7,9 +7,11 @@ using AutoMapperSamples.EF.Model;
 
 namespace AutoMapperSamples.EF.Dtos
 {
+    using AutoMapper;
+
     public static class MappingConfiguration
     {
-        public static void Configure(AutoMapper.IConfiguration cfg)
+        public static void Configure(IMapperConfigurationExpression cfg)
         {
             cfg.CreateMap<OrderDto, Order>()
                 .ForMember(d => d.Name, opt => opt.MapFrom(s => s.FullName));

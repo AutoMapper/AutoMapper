@@ -100,7 +100,7 @@ namespace AutoMapper.QueryableExtensions
                 );
         }
 
-        private class MemberVisitor : ExpressionVisitor
+        internal class MemberVisitor : ExpressionVisitor
         {
             protected override Expression VisitLambda<T>(Expression<T> node)
             {

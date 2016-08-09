@@ -8,45 +8,46 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq;
     using System.Linq.Expressions;
     using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
+    using MemberPaths = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<MemberInfo>>;
 
     public class SourceSourceInjectedQuery<TSource, TDestination> : IOrderedQueryable<TDestination>, ISourceInjectedQueryable<TDestination>
     {
         private readonly Action<Exception> _exceptionHandler;
-        
-        public SourceSourceInjectedQuery(IQueryable<TSource> dataSource, 
+
+        public SourceSourceInjectedQuery(IQueryable<TSource> dataSource,
                 IQueryable<TDestination> destQuery,
-                IMapper mapper, 
+                IMapper mapper,
                 IEnumerable<ExpressionVisitor> beforeVisitors,
                 IEnumerable<ExpressionVisitor> afterVisitors,
                 Action<Exception> exceptionHandler,
                 IObjectDictionary parameters,
-                MemberInfo[] membersToExpand,
+                MemberPaths membersToExpand,
                 SourceInjectedQueryInspector inspector)
         {
             Parameters = parameters;
-            EnumerationHandler = (x => {});
+            EnumerationHandler = (x => { });
             Expression = destQuery.Expression;
             ElementType = typeof(TDestination);
-            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mapper, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler, parameters, membersToExpand, membersExpressionsToExpand)
+            Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mapper, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler, parameters, membersToExpand)
             {
                 Inspector = inspector ?? new SourceInjectedQueryInspector(),
             };
-            _exceptionHandler = exceptionHandler ?? ((x)=> {});
+            _exceptionHandler = exceptionHandler ?? ((x) => { });
         }
 
         internal SourceSourceInjectedQuery(IQueryProvider provider, Expression expression, Action<IEnumerable<object>> enumerationHandler, Action<Exception> exceptionHandler)
         {
-            _exceptionHandler = exceptionHandler ?? ((x) => {});
+            _exceptionHandler = exceptionHandler ?? ((x) => { });
             Provider = provider;
             Expression = expression;
-            EnumerationHandler = enumerationHandler ?? (x => {});
+            EnumerationHandler = enumerationHandler ?? (x => { });
             ElementType = typeof(TDestination);
         }
 
         public IQueryable<TDestination> OnEnumerated(Action<IEnumerable<object>> enumerationHandler)
         {
-            EnumerationHandler = enumerationHandler ?? (x => {});
-            ((SourceInjectedQueryProvider<TSource, TDestination>) Provider).EnumerationHandler = EnumerationHandler;
+            EnumerationHandler = enumerationHandler ?? (x => { });
+            ((SourceInjectedQueryProvider<TSource, TDestination>)Provider).EnumerationHandler = EnumerationHandler;
             return this;
         }
 

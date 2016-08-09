@@ -1,3 +1,5 @@
+using MemberInfo = System.Reflection.MemberInfo;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using System;
@@ -6,8 +8,10 @@ namespace AutoMapper.QueryableExtensions.Impl
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Internal;
+    using Configuration;
+    using Execution;
     using Mappers;
+    using MemberPaths = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<MemberInfo>>;
 
     public class SourceInjectedQueryProvider<TSource, TDestination> : IQueryProvider
     {
@@ -17,16 +21,16 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly IEnumerable<ExpressionVisitor> _beforeVisitors;
         private readonly IEnumerable<ExpressionVisitor> _afterVisitors;
         private readonly System.Collections.Generic.IDictionary<string, object> _parameters;
-        private readonly MemberInfo[] _membersToExpand;
+        private readonly MemberPaths _membersToExpand;
         private readonly Action<Exception> _exceptionHandler;
 
         public SourceInjectedQueryProvider(IMapper mapper,
             IQueryable<TSource> dataSource, IQueryable<TDestination> destQuery,
                 IEnumerable<ExpressionVisitor> beforeVisitors,
                 IEnumerable<ExpressionVisitor> afterVisitors,
-                Action<Exception> exceptionHandler, 
+                Action<Exception> exceptionHandler,
                 System.Collections.Generic.IDictionary<string, object> parameters,
-                MemberInfo[] membersToExpand)
+                MemberPaths membersToExpand)
         {
             _mapper = mapper;
             _dataSource = dataSource;
@@ -34,10 +38,10 @@ namespace AutoMapper.QueryableExtensions.Impl
             _beforeVisitors = beforeVisitors;
             _afterVisitors = afterVisitors;
             _parameters = parameters;
-            _membersToExpand = membersToExpand ?? new MemberInfo[0];
+            _membersToExpand = membersToExpand ?? Enumerable.Empty<System.Collections.Generic.IEnumerable<MemberInfo>>();
             _exceptionHandler = exceptionHandler ?? ((x) => { }); ;
         }
-        
+
         public SourceInjectedQueryInspector Inspector { get; set; }
         internal Action<IEnumerable<object>> EnumerationHandler { get; set; }
 
@@ -74,21 +78,15 @@ namespace AutoMapper.QueryableExtensions.Impl
         {
             try
             {
-                var resultType = typeof (TResult);
+                var resultType = typeof(TResult);
                 Inspector.StartQueryExecuteInterceptor(resultType, expression);
 
                 var sourceExpression = ConvertDestinationExpressionToSourceExpression(expression);
 
-                var destResultType = typeof (TResult);
+                var destResultType = typeof(TResult);
                 var sourceResultType = CreateSourceResultType(destResultType);
 
-
-// TODO: Check out which is right.
-/*                var destResult = IsProjection<TDestination>(resultType) 
-                    ? new ProjectionExpression(sourceResult as IQueryable<TSource>, _mapper.ConfigurationProvider.ExpressionBuilder).To<TDestination>() 
-                    : _mapper.Map(sourceResult, sourceResultType, destResultType);
-*/
-                object destResult;
+                object destResult = null;
 
                 // case #1: query is a projection from complex Source to complex Destination
                 // example: users.UseAsDataSource().For<UserDto>().Where(x => x.Age > 20).ToList()
@@ -98,7 +96,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
                     Inspector.SourceResult(sourceExpression, sourceResult);
 
-                    destResult = new ProjectionExpression((IQueryable<TSource>) sourceResult, _mappingEngine).To<TDestination>(_parameters, _membersToExpand);
+                    destResult = new ProjectionExpression((IQueryable<TSource>)sourceResult, _mapper.ConfigurationProvider.ExpressionBuilder).To<TDestination>(_parameters, _membersToExpand);
                 }
                 // case #2: query is arbitrary ("manual") projection
                 // exaple: users.UseAsDataSource().For<UserDto>().Select(user => user.Age).ToList()
@@ -108,13 +106,17 @@ namespace AutoMapper.QueryableExtensions.Impl
                 {
                     var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
                     var enumerator = sourceResult.GetEnumerator();
-                    var elementType = TypeHelper.GetElementType(typeof (TResult));
-                    var listInstance = (IList)typeof(List<>).MakeGenericType(elementType).GetConstructor(Type.EmptyTypes).Invoke(null);
-                    while (enumerator.MoveNext())
+                    var elementType = TypeHelper.GetElementType(typeof(TResult));
+                    var constructorInfo = typeof(List<>).MakeGenericType(elementType).GetDeclaredConstructor(new Type[0]);
+                    if (constructorInfo != null)
                     {
-                        listInstance.Add(enumerator.Current);
+                        var listInstance = (IList)constructorInfo.Invoke(null);
+                        while (enumerator.MoveNext())
+                        {
+                            listInstance.Add(enumerator.Current);
+                        }
+                        destResult = listInstance;
                     }
-                    destResult = listInstance;
                 }
                 // case #2: projection to simple type
                 // example: users.UseAsDataSource().For<UserDto>().FirstOrDefault(user => user.Age > 20)
@@ -135,7 +137,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                             this expression is not needed anymore as it has already been applied to the "Where" operation and can be safely omitted
                         * when we're done creating our new expression, we call the underlying provider to execute it
                     */
-                    
+
                     // as we need to replace the innermost element of the expression,
                     // we need to traverse it first in order to find the node to replace or potential caveats
                     // e.g. .UseAsDataSource().For<Dto>().Select(e => e.Name).First()
@@ -146,10 +148,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                     var replacer = new MethodNodeReplacer<TSource>(searcher.MethodNode);
 
                     // default back to simple mapping of object instance for backwards compatibility (e.g. mapping non-nullable to nullable fields)
-                    if (_parameters != null || _membersToExpand.Length != 0)
-                    {
-                        sourceExpression = replacer.Visit(sourceExpression);
-                    }
+                    sourceExpression = replacer.Visit(sourceExpression);
 
                     if (replacer.FoundElementOperator)
                     {
@@ -168,28 +167,30 @@ namespace AutoMapper.QueryableExtensions.Impl
 
                         if (sourceResultType == destResultType)// && destResultType.IsPrimitive)
                         {
-                            sourceResultType = typeof (TSource);
-                            destResultType = typeof (TDestination);
+                            sourceResultType = typeof(TSource);
+                            destResultType = typeof(TDestination);
                         }
 
-                        var mapExpr = _mappingEngine.CreateMapExpression(sourceResultType, destResultType,
-                            _parameters, _membersToExpand);
+                        var membersToExpand = _membersToExpand.SelectMany(m => m).Distinct().ToArray();
+                        var mapExpr = _mapper.ConfigurationProvider.ExpressionBuilder.CreateMapExpression(sourceResultType, destResultType,
+                            _parameters, membersToExpand);
                         // add projection via "select" operator
                         var expr = Expression.Call(
                                 null,
                                 QueryableSelectMethod.MakeGenericMethod(sourceResultType, destResultType),
-                                new[] {sourceExpression, Expression.Quote(mapExpr)}
+                                new[] { sourceExpression, Expression.Quote(mapExpr) }
                             );
 
                         // in case an element operator without predicate expression was found (and thus not replaced)
                         MethodInfo replacementMethod = replacer.ElementOperator;
                         // in case an element operator with predicate expression was replaced
-                        if (replacer.ReplacedMethod != null) { 
+                        if (replacer.ReplacedMethod != null)
+                        {
                             // find replacement method that has no more predicates
-                            replacementMethod = typeof (Queryable).GetMethods()
+                            replacementMethod = typeof(Queryable).GetAllMethods()
                                 .Single(m => m.Name == replacer.ReplacedMethod.Name
-#if !NETCORE
-                                            && m.GetParameters().All(p => typeof (Queryable).IsAssignableFrom(p.Member.ReflectedType))
+#if NET45
+                                            && m.GetParameters().All(p => typeof(Queryable).IsAssignableFrom(p.Member.ReflectedType))
 #endif
                                             && m.GetParameters().Length == replacer.ReplacedMethod.GetParameters().Length - 1);
                         }
@@ -205,24 +206,18 @@ namespace AutoMapper.QueryableExtensions.Impl
                     {
                         var sourceResult = _dataSource.Provider.Execute(sourceExpression);
                         Inspector.SourceResult(sourceExpression, sourceResult);
-                        destResult = _mappingEngine.Map(sourceResult, sourceResultType, destResultType);
+                        destResult = _mapper.Map(sourceResult, sourceResultType, destResultType);
                     }
                 }
 
                 Inspector.DestResult(destResult);
 
-#if !NETCORE
-                // implicitly convert types in case of valuetypes which cannot be casted explicitly
-                if (typeof (TResult).IsValueType && destResult.GetType() != typeof (TResult))
-                    return (TResult) Convert.ChangeType(destResult, typeof (TResult));
-#else
                 // implicitly convert types in case of valuetypes which cannot be casted explicitly
                 if (typeof(TResult).IsValueType() && destResult.GetType() != typeof(TResult))
                     return (TResult)Convert.ChangeType(destResult, typeof(TResult));
-#endif
 
                 // if it is not a valuetype, we can safely cast it
-                return (TResult) destResult;
+                return (TResult)destResult;
             }
             catch (Exception x)
             {
@@ -230,7 +225,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 throw;
             }
         }
-        
+
         private object InvokeSourceQuery(Type sourceResultType, Expression sourceExpression)
         {
             var result = IsProjection<TSource>(sourceResultType)
@@ -265,7 +260,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private static bool IsProjection(Type resultType)
         {
-            return resultType.IsEnumerableType() && !resultType.IsQueryableType() && resultType != typeof (string);
+            return resultType.IsEnumerableType() && !resultType.IsQueryableType() && resultType != typeof(string);
         }
 
         private static Type CreateSourceResultType(Type destResultType)
@@ -279,21 +274,21 @@ namespace AutoMapper.QueryableExtensions.Impl
             // call beforevisitors
             expression = _beforeVisitors.Aggregate(expression, (current, before) => before.Visit(current));
 
-            var typeMap = _mappingEngine.ConfigurationProvider.FindTypeMapFor(typeof (TDestination), typeof (TSource));
-            var visitor = new ExpressionMapper.MappingVisitor(typeMap, _destQuery.Expression, _dataSource.Expression, null,
-                new[] {typeof (TSource)});
+            var typeMap = _mapper.ConfigurationProvider.FindTypeMapFor(typeof(TDestination), typeof(TSource));
+            var visitor = new ExpressionMapper.MappingVisitor(_mapper.ConfigurationProvider, typeMap, _destQuery.Expression, _dataSource.Expression, null,
+                new[] { typeof(TSource) });
             var sourceExpression = visitor.Visit(expression);
 
             // apply parameters
             if (_parameters != null && _parameters.Any())
             {
-                var constantVisitor = new MappingEngine.ConstantExpressionReplacementVisitor(_parameters);
+                var constantVisitor = new ExpressionBuilder.ConstantExpressionReplacementVisitor(_parameters);
                 sourceExpression = constantVisitor.Visit(sourceExpression);
             }
 
             // apply null guards in case the feature is enabled
             if (_mapper.ConfigurationProvider.EnableNullPropagationForQueryMapping)
-            { 
+            {
                 var nullGuardVisitor = new ExpressionBuilder.NullsafeQueryRewriter();
                 sourceExpression = nullGuardVisitor.Visit(sourceExpression);
             }
@@ -317,7 +312,7 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public MethodCallExpression MethodNode { get; private set; }
         private bool _ignoredMethodFound = false;
-        private static readonly string[] IgnoredMethods = new[] { "Select"};
+        private static readonly string[] IgnoredMethods = new[] { "Select" };
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
@@ -330,23 +325,12 @@ namespace AutoMapper.QueryableExtensions.Impl
                                       && !IgnoredMethods.Contains(node.Method.Name)
                                       && !typeof(IQueryable).IsAssignableFrom(node.Method.ReturnType);
 
-#if !NETCORE
-            // invalid method found => skip all (e.g. Select(entity=> (object)entity.Child1)
-            if (isReplacableMethod &&
-                !node.Method.ReturnType.IsPrimitive && node.Method.ReturnType != typeof(TDestination))
-            {
-                return base.VisitMethodCall(node);
-            }
-#else
-
             // invalid method found => skip all (e.g. Select(entity=> (object)entity.Child1)
             if (isReplacableMethod &&
                 !node.Method.ReturnType.IsPrimitive() && node.Method.ReturnType != typeof(TDestination))
             {
                 return base.VisitMethodCall(node);
             }
-#endif
-
 
             if (isReplacableMethod)
             {
@@ -386,7 +370,7 @@ namespace AutoMapper.QueryableExtensions.Impl
         public MethodInfo ElementOperator { get; private set; }
 
         public bool FoundElementOperator { get; private set; }
-        
+
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             // only replace first occurrence
@@ -394,18 +378,18 @@ namespace AutoMapper.QueryableExtensions.Impl
             {
                 return base.VisitMethodCall(node);
             }
-          
+
             if (node == _foundExpression)
             {
                 // if method has invalid type
                 var parameters = node.Method.GetParameters();
 
                 if (parameters.Length > 1 &&
-                    typeof (System.Linq.Expressions.Expression).IsAssignableFrom(parameters[1].ParameterType))
+                    typeof(System.Linq.Expressions.Expression).IsAssignableFrom(parameters[1].ParameterType))
                 {
                     FoundElementOperator = true;
                     ReplacedMethod = node.Method.GetGenericMethodDefinition();
-                    return Expression.Call(null, QueryableWhereMethod.MakeGenericMethod(typeof (TDestination)),
+                    return Expression.Call(null, QueryableWhereMethod.MakeGenericMethod(typeof(TDestination)),
                         node.Arguments);
                 }
                 // no predicate

@@ -61,6 +61,8 @@ namespace AutoMapper
 
         public bool AllowNullCollections { get; private set; }
 
+        public bool EnableNullPropagationForQueryMapping { get; private set; }
+
         public IConfiguration Configuration { get; }
 
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types)
@@ -189,6 +191,7 @@ namespace AutoMapper
             ServiceCtor = configuration.ServiceCtor;
             AllowNullDestinationValues = configuration.AllowNullDestinationValues;
             AllowNullCollections = configuration.AllowNullCollections;
+            EnableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping;
 
             var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
             var redirectedTypes = new List<Tuple<TypePair, TypePair>>();

@@ -31,7 +31,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             if (sourceListType != destinationListType)
             {
-                var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand);
+                var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand, request);
                 var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount);
                 if(transformedExpression == null)
                 {

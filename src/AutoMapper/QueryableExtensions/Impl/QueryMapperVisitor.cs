@@ -126,11 +126,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             // for typical orderby expression, a unaryexpression is used that contains a 
             // func which in turn defines the type of the field that has to be used for ordering/sorting
             var unary = newOrderByExpr as UnaryExpression;
-#if !NETCORE
-            if (unary != null && unary.Operand.Type.IsGenericType)
-#else
             if (unary != null && unary.Operand.Type.IsGenericType())
-#endif
             {
                 methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), unary.Operand.Type.GetGenericArguments().Last());
             }

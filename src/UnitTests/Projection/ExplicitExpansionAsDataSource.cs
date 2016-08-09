@@ -45,18 +45,19 @@
             
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Dest>()
+
+            cfg.CreateMap<Source, Dest>()
                 .ForMember(m => m.Child1, opt => opt.ExplicitExpansion())
                 .ForMember(m => m.Child2, opt => opt.ExplicitExpansion())
                 .ForMember(m => m.Child4, opt => opt.ExplicitExpansion())
                 ;
-            Mapper.CreateMap<ChildSource, ChildDest>()
+            cfg.CreateMap<ChildSource, ChildDest>()
                 .ForMember(m => m.GrandChild, opt => opt.ExplicitExpansion());
 
-            Mapper.CreateMap<GrandChildSource, GrandChildDest>();
-        }
+            cfg.CreateMap<GrandChildSource, GrandChildDest>();
+        });
 
         protected override void Because_of()
         {
@@ -101,6 +102,7 @@
             _dests[0].Child4.ShouldNotBeNull();
             _dests[0].Child4.GrandChild.ShouldNotBeNull();
         }
+
     }
 
 
@@ -144,18 +146,18 @@
 
         }
 
-        protected override void Establish_context()
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            Mapper.CreateMap<Source, Dest>()
+            cfg.CreateMap<Source, Dest>()
                 .ForMember(m => m.Child1, opt => opt.ExplicitExpansion())
                 .ForMember(m => m.Child2, opt => opt.ExplicitExpansion())
                 .ForMember(m => m.Child4, opt => opt.ExplicitExpansion())
                 ;
-            Mapper.CreateMap<ChildSource, ChildDest>()
+            cfg.CreateMap<ChildSource, ChildDest>()
                 .ForMember(m => m.GrandChild, opt => opt.ExplicitExpansion());
 
-            Mapper.CreateMap<GrandChildSource, GrandChildDest>();
-        }
+            cfg.CreateMap<GrandChildSource, GrandChildDest>();
+        });
 
         protected override void Because_of()
         {

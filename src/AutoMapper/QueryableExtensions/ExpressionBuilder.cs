@@ -51,7 +51,7 @@ namespace AutoMapper.QueryableExtensions
             parameters = parameters ?? new Dictionary<string, object>();
 
             var cachedExpression =
-                _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand),
+                _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null),
                     tp => CreateMapExpression(tp, new ConcurrentDictionary<ExpressionRequest, int>()));
 
             Expression x = cachedExpression;
@@ -173,23 +173,27 @@ namespace AutoMapper.QueryableExtensions
 
                 var propertyTypeMap = _configurationProvider.ResolveTypeMap(result.Type,
                     propertyMap.DestinationPropertyType);
-                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.MembersToExpand);
+                var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.MembersToExpand, request);
 
-                var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
-
-                if (binder == null)
+                if (!propertyRequest.AlreadyExists)
                 {
-                    var message =
-                        $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
+                    var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
-                    throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
-                }
+                    if (binder == null)
+                    {
+                        var message =
+                            $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
 
-                var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap, propertyRequest, result, typePairCount);
+                        throw new AutoMapperMappingException(message, null, typeMap.Types, typeMap, propertyMap);
+                    }
 
-                if (bindExpression != null)
-                {
-                    bindings.Add(bindExpression);
+                    var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap,
+                        propertyRequest, result, typePairCount);
+
+                    if (bindExpression != null)
+                    {
+                        bindings.Add(bindExpression);
+                    }
                 }
             }
             return bindings;
@@ -257,7 +261,7 @@ namespace AutoMapper.QueryableExtensions
             }
         }
 
-        private class ConstantExpressionReplacementVisitor : ExpressionVisitor
+        internal class ConstantExpressionReplacementVisitor : ExpressionVisitor
         {
             private readonly IDictionary<string, object> _paramValues;
 
@@ -285,7 +289,7 @@ namespace AutoMapper.QueryableExtensions
         /// Expression visitor for making member access null-safe.
         /// </summary>
         /// <remarks>
-        /// Use <see cref="NullsafeQueryBuilder" /> to make a query null-safe.
+        /// Use <see cref="NullsafeQueryRewriter" /> to make a query null-safe.
         /// copied from NeinLinq (MIT License): https://github.com/axelheer/nein-linq/blob/master/src/NeinLinq/NullsafeQueryRewriter.cs
         /// </remarks>
         internal class NullsafeQueryRewriter : ExpressionVisitor
