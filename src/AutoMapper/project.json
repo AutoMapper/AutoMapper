@@ -17,13 +17,6 @@
     "nowarn": [ "1591" ],
     "warningsAsErrors": true
   },
-  "configurations": {
-    "Release": {
-      "buildOptions": {
-        "debugType": "portable"
-      }
-    }
-  },
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {

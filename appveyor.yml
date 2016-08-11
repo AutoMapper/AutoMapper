@@ -11,7 +11,7 @@ build_script:
 - cmd: .\psake.bat ci
 test: off
 artifacts:
-- path: artifacts\*.nupkg
+- path: src\AutoMapper\bin\release\*.nupkg
   name: NuGet
 deploy:
 - provider: NuGet
