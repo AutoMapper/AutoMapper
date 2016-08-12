@@ -221,7 +221,6 @@ namespace AutoMapper.UnitTests.CustomMapping
 		}
 	}
 
-#if !PORTABLE
     public class When_specifying_mapping_with_the_BCL_type_converter_class : NonValidatingSpecBase
     {
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
@@ -285,7 +284,6 @@ namespace AutoMapper.UnitTests.CustomMapping
 			destination.Value.ShouldEqual(5);
 		}
 	}
-#endif
 
     public class When_specifying_a_type_converter_for_a_non_generic_configuration : NonValidatingSpecBase
 	{

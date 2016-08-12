@@ -1,5 +1,5 @@
 {
-  "version": "5.1.1",
+  "version": "5.2.0-alpha.*",
   "authors": [ "Jimmy Bogard" ],
   "description": "A convention-based object-object mapper. AutoMapper uses a fluent configuration API to define an object-object mapping strategy. AutoMapper uses a convention-based matching algorithm to match up source to destination values. Currently, AutoMapper is designed for model projection scenarios to flatten complex object models to DTOs and other simple objects, whose design is better suited for serialization, communication, messaging, or simply an anti-corruption layer between the domain and application layer.",
   "packOptions": {
@@ -38,31 +38,6 @@
       }
     },
     "net45": {
-    },
-    ".NETPortable,Version=v4.5,Profile=Profile111": {
-      "frameworkAssemblies": {
-        "Microsoft.CSharp": "",
-        "System.ComponentModel": "",
-        "System.Diagnostics.Debug": "",
-        "System.Dynamic.Runtime": "",
-        "System.Runtime": "",
-        "System.Runtime.Extensions": "",  
-        "System.Globalization": "",
-        "System.Linq": "",
-        "System.Linq.Expressions": "",
-        "System.Linq.Queryable": "",
-        "System.ObjectModel": "",
-        "System.Reflection": "",
-        "System.Reflection.Extensions": "",
-        "System.Collections": "",
-        "System.Collections.Concurrent": "",
-        "System.Text.RegularExpressions": "",
-        "System.Threading": "",
-        "System.Threading.Tasks": "" 
-      },
-      "buildOptions": {
-        "define": ["PORTABLE"]
-      }
-    } 
+    }
   }
 }

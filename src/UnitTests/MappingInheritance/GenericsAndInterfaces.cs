@@ -41,13 +41,11 @@ namespace AutoMapper.UnitTests.MappingInheritance
             destination.Container.MyProperty.ShouldEqual(3);
         }
 
-#if !PORTABLE
         [Fact]
         public void ShouldMapToNewObject()
         {
             var destination = (IMyInterface<ContainerClass>) Mapper.Map(source, typeof(MyClass<ContainerClass>), typeof(ImplementedClass));
             destination.Container.MyProperty.ShouldEqual(3);
         }
-#endif
     }
 }

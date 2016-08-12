@@ -1,4 +1,3 @@
-#if !PORTABLE
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -58,4 +57,3 @@ namespace AutoMapper.Mappers
         }
     }
 }
-#endif
