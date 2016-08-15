@@ -57,62 +57,51 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
-        public void Should_ignore_nonexistent_parameter()
+        public void Should_throw_on_nonexistent_parameter()
         {
-            var config = new MapperConfiguration(cfg =>
+            Action configuration = () => new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForCtorParam("thing", opt => opt.MapFrom(src => src.Value))
                     .ForCtorParam("think", opt => opt.MapFrom(src => src.Value));
             });
-
-            config.AssertConfigurationIsValid();
-
-            var result = config.CreateMapper().Map<Dest>(new Source { Value = 42 });
-
-            result.Value1.ShouldEqual(42);
+            configuration.ShouldThrow<AutoMapperConfigurationException>(exception =>
+            {
+                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.", StringComparison.InvariantCulture);
+                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.InvariantCulture);
+            });
         }
 
         [Fact]
-        public void Should_ignore_when_no_constructor_is_present()
+        public void Should_throw_when_no_constructor_is_present()
         {
-            var config = new MapperConfiguration(cfg =>
+            Action configuration = () => new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, DestWithNoConstructor>()
                     .ForMember(dest => dest.Value1, opt => opt.MapFrom(src => src.Value))
                     .ForCtorParam("thing", opt => opt.MapFrom(src => src.Value));
             });
 
-            config.AssertConfigurationIsValid();
-
-            var result = config.CreateMapper().Map<DestWithNoConstructor>(new Source { Value = 17 });
-
-            result.Value1.ShouldEqual(17);
+            configuration.ShouldThrow<AutoMapperConfigurationException>(exception =>
+            {
+                exception.Message.ShouldContain("does not have a constructor.", StringComparison.InvariantCulture);
+                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.InvariantCulture);
+            });
         }
 
         [Fact]
-        public void Should_not_pass_config_validation_when_parameter_is_misspelt()
+        public void Should_throw_when_parameter_is_misspelt()
         {
-            var config = new MapperConfiguration(cfg =>
+            Action configuration = () => new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Source, Dest>()
                     .ForCtorParam("think", opt => opt.MapFrom(src => src.Value));
             });
 
-            Action configValidation = () => config.AssertConfigurationIsValid();
-            configValidation.ShouldThrow<AutoMapperConfigurationException>(exception =>
+            configuration.ShouldThrow<AutoMapperConfigurationException>(exception =>
             {
-                Console.WriteLine(exception.Message);
-                exception.Message.ShouldContain("Source -> Dest", StringComparison.InvariantCulture);
-                exception.Message.ShouldContain("No available constructor.", StringComparison.InvariantCulture);
-            });
-
-            var mapper = config.CreateMapper();
-
-            Action mapping = () => mapper.Map<Dest>(new Source { Value = 4711 });
-            mapping.ShouldThrow<ArgumentException>(exception =>
-            {
-                exception.Message.ShouldContain("Dest needs to have a constructor with 0 args or only optional args", StringComparison.InvariantCulture);
+                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.", StringComparison.InvariantCulture);
+                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.InvariantCulture);
             });
         }
     }

@@ -43,10 +43,16 @@
 
         public void Configure(TypeMap typeMap)
         {
-            var parameter = typeMap.ConstructorMap?.CtorParams?.SingleOrDefault(p => p.Parameter.Name == _ctorParamName);
+            var ctorParams = typeMap.ConstructorMap?.CtorParams;
+            if (ctorParams == null)
+            {
+                throw new AutoMapperConfigurationException($"The type {typeMap.Types.DestinationType.Name} does not have a constructor.\n{typeMap.Types.DestinationType.FullName}");
+            }
+
+            var parameter = ctorParams.SingleOrDefault(p => p.Parameter.Name == _ctorParamName);
             if (parameter == null)
             {
-                return;
+                throw new AutoMapperConfigurationException($"{typeMap.Types.DestinationType.Name} does not have a constructor with a parameter named '{_ctorParamName}'.\n{typeMap.Types.DestinationType.FullName}");
             }
             parameter.CanResolve = true;
 
