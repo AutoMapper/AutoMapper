@@ -8,6 +8,46 @@ using Should;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_setting_AllowNullCollections_on_a_profile : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class TestMappingProfile : Profile
+        {
+            public TestMappingProfile()
+            {
+                AllowNullCollections = true;
+                CreateMap<Source, Destination>();
+            }
+        }
+
+        class Source
+        {
+            public IEnumerable<int> Ints { get; set; }
+        }
+
+        class Destination
+        {
+            public IEnumerable<int> Ints { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile(new TestMappingProfile());
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_return_null()
+        {
+            _destination.Ints.ShouldBeNull();
+        }
+    }
+
     public class When_mapping_collections_with_structs : AutoMapperSpecBase
     {
         BarDTO _destination;
