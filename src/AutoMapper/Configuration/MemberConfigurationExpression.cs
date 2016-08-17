@@ -251,8 +251,7 @@ namespace AutoMapper.Configuration
 
             if (destMember.DeclaringType.IsGenericType())
             {
-                destMember = typeMap.DestinationTypeDetails.PublicReadAccessors
-                    .First(m => m.Name == destMember.Name && m.GetMemberType() == destMember.GetMemberType());
+                destMember = typeMap.DestinationTypeDetails.PublicReadAccessors.Single(m => m.Name == destMember.Name);
             }
 
             var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember);
