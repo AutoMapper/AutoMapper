@@ -7,6 +7,71 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.CustomMapping
 {
+    public class DecimalToNullableDecimal : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+            public decimal Value { get; set; }
+        }
+
+        class Destination
+        {
+            public decimal? Value { get; set; }
+        }
+
+        public class DecimalConverter : ITypeConverter<decimal?, decimal>
+        {
+            public decimal Convert(decimal? source, decimal destination, ResolutionContext context)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class DecimalNullableConverter : ITypeConverter<decimal, decimal?>
+        {
+            public decimal? Convert(decimal source, decimal? destination, ResolutionContext context)
+            {
+                if(source == decimal.MaxValue)
+                {
+                    return null;
+                }
+                else
+                {
+                    return source;
+                }
+            }
+        }
+
+        public class NullableDecimalConverter : ITypeConverter<decimal?, decimal?>
+        {
+            public decimal? Convert(decimal? source, decimal? destination, ResolutionContext context)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<decimal?, decimal>().ConvertUsing<DecimalConverter>();
+            cfg.CreateMap<decimal, decimal?>().ConvertUsing<DecimalNullableConverter>();
+            cfg.CreateMap<decimal?, decimal?>().ConvertUsing<NullableDecimalConverter>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { Value = decimal.MaxValue });
+        }
+
+        [Fact]
+        public void Should_choose_the_best_converter()
+        {
+            _destination.Value.ShouldEqual(null);
+        }
+    }
+
     public class When_converting_to_string : AutoMapperSpecBase
     {
         Destination _destination;
