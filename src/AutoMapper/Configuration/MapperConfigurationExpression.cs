@@ -15,6 +15,7 @@ namespace AutoMapper.Configuration
             _profiles.Add(this);
         }
 
+        public bool AllowNullCollections { get; set; }
         public IEnumerable<Profile> Profiles => _profiles;
         public Func<Type, object> ServiceCtor { get; private set; } = ObjectCreator.CreateObject;
 

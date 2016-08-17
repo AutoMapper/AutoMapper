@@ -57,8 +57,6 @@ namespace AutoMapper
 
         public bool AllowNullDestinationValues { get; set; } = true;
 
-        public bool AllowNullCollections { get; set; }
-
         public IEnumerable<string> GlobalIgnores => _globalIgnore;
 
         public IEnumerable<string> Prefixes { get; private set; } = new string[0];

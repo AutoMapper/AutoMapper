@@ -7,6 +7,11 @@ namespace AutoMapper
     public interface IMapperConfigurationExpression : IProfileExpression
     {
         /// <summary>
+        /// Allow null destination collections. If true, null source collections result in null destination collections. Default false.
+        /// </summary>
+        bool AllowNullCollections { get; set; }
+
+        /// <summary>
         /// Create missing type maps during mapping, if necessary
         /// </summary>
         bool CreateMissingTypeMaps { get; set; }

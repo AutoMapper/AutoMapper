@@ -108,11 +108,6 @@ namespace AutoMapper
         bool AllowNullDestinationValues { get; set; }
 
         /// <summary>
-        /// Allow null destination collections. If true, null source collections result in null destination collections. Default false.
-        /// </summary>
-        bool AllowNullCollections { get; set; }
-
-        /// <summary>
         /// Naming convention for source members
         /// </summary>
         INamingConvention SourceMemberNamingConvention { get; set; }
