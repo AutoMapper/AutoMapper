@@ -102,7 +102,6 @@
     <Compile Include="AutoMapperTester.cs" />
     <Compile Include="BeforeAfterMapping.cs" />
     <Compile Include="BidirectionalRelationships.cs" />
-    <Compile Include="Bug\AllMembersNullSubstitute.cs" />
     <Compile Include="Bug\AllowNullDestinationValuesBugs.cs" />
     <Compile Include="Bug\AssignableCollectionBug.cs" />
     <Compile Include="Bug\CannotConvertEnumToNullable.cs" />
@@ -111,6 +110,7 @@
     <Compile Include="Bug\CollectionBaseClassGetConvention.cs" />
     <Compile Include="Bug\InitializeNRE.cs" />
     <Compile Include="Bug\GuidTryExpression.cs" />
+    <Compile Include="Bug\NullToString.cs" />
     <Compile Include="Bug\NullSubstituteInnerClass.cs" />
     <Compile Include="Bug\MapExpandoObjectProperty.cs" />
     <Compile Include="Bug\PreserveReferencesSameDestination.cs" />
@@ -208,7 +208,6 @@
     <Compile Include="ExpressionConversion.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="IgnoreAllTests.cs" />
-    <Compile Include="IMappingExpression\NonGenericAllMembersNullSubstitute.cs" />
     <Compile Include="IMappingExpression\ForCtorParam.cs" />
     <Compile Include="IMappingExpression\NonGenericConstructorTests.cs" />
     <Compile Include="IMappingExpression\NonGenericReverseMapping.cs" />
