@@ -94,9 +94,9 @@ namespace AutoMapper
         IExpressionBuilder ExpressionBuilder { get; }
         IMapper CreateMapper();
         IMapper CreateMapper(Func<Type, object> serviceCtor);
-        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types);
-        Delegate GetMapperFunc(MapRequest request);
+        Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair typePair);
+        Delegate GetMapperFunc(TypePair typePair);
 
-        Func<object, object, ResolutionContext, object> GetUntypedMapperFunc(MapRequest mapRequest);
+        Func<object, object, ResolutionContext, object> GetUntypedMapperFunc(TypePair typePair);
     }
 }
