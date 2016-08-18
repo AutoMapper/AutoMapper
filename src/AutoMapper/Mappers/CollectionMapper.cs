@@ -19,8 +19,8 @@ namespace AutoMapper.Mappers
            Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression, Type ifInterfaceType, MapItem mapItem)
         {
             var passedDestination = Variable(destExpression.Type, "passedDestination");
-            var newExpressionValue = passedDestination.NewIfConditionFails(conditionalExpression, ifInterfaceType);
-            var newExpression = Variable(newExpressionValue.Type, "collectionDestination");
+            var condition = conditionalExpression(passedDestination);
+            var newExpression = Variable(passedDestination.Type, "collectionDestination");
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var itemParam = Parameter(sourceElementType, "item");
 
@@ -38,11 +38,13 @@ namespace AutoMapper.Mappers
             var mapExpr = Block(addItems, destination);
 
             var ifNullExpr = configurationProvider.Configuration.AllowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
-            var checkNull = Block(new[] { newExpression, passedDestination },
-                Assign(passedDestination, destExpression),
-                Assign(newExpression, newExpressionValue),
-                Call(newExpression, clearMethod),
-                Condition(Equal(sourceExpression, Constant(null)), ToType(ifNullExpr, passedDestination.Type), ToType(mapExpr, passedDestination.Type))
+            var checkNull =  
+                Block(new[] { newExpression, passedDestination },
+                    Assign(passedDestination, destExpression),
+                    IfThenElse(condition ?? Constant(false),
+                                    Block(Assign(newExpression, passedDestination), Call(newExpression, clearMethod)),
+                                    Assign(newExpression, passedDestination.Type.NewExpr(ifInterfaceType))),
+                    Condition(Equal(sourceExpression, Constant(null)), ToType(ifNullExpr, passedDestination.Type), ToType(mapExpr, passedDestination.Type))
                 );
             if(propertyMap != null)
             {
@@ -59,15 +61,6 @@ namespace AutoMapper.Mappers
                 return checkNull;
             }
             return Block(checkContext, checkNull);
-        }
-
-        private static Expression NewIfConditionFails(this Expression destinationExpression, Func<Expression, Expression> conditionalExpression,
-            Type ifInterfaceType)
-        {
-            var condition = conditionalExpression(destinationExpression);
-            if (condition == null || destinationExpression.NodeType == ExpressionType.Default)
-                return destinationExpression.Type.NewExpr(ifInterfaceType);
-            return Condition(condition, destinationExpression, destinationExpression.Type.NewExpr(ifInterfaceType));
         }
 
         internal static Delegate Constructor(Type type)
