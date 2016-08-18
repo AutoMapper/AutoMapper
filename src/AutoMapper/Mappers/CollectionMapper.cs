@@ -31,7 +31,7 @@ namespace AutoMapper.Mappers
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
             var cast = typeof(Enumerable).GetDeclaredMethod("Cast").MakeGenericMethod(itemParam.Type);
             var addMethod = destinationCollectionType.GetDeclaredMethod("Add");
-            var genericSource = sourceExpression.Type.GetTypeInfo().IsGenericType ? sourceExpression : Call(null, cast, sourceExpression);
+            var genericSource = sourceExpression.Type.IsGenericType() ? sourceExpression : Call(null, cast, sourceExpression);
             var destination = propertyMap?.UseDestinationValue == true ? passedDestination : newExpression;
             var addItems = ForEach(genericSource, itemParam, Call(destination, addMethod, itemExpr));
 
