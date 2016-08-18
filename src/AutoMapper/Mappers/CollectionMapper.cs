@@ -23,56 +23,25 @@ namespace AutoMapper.Mappers
             var newExpression = Variable(newExpressionValue.Type, "collectionDestination");
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var itemParam = Parameter(sourceElementType, "item");
+
             var itemExpr = mapItem(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, passedDestination.Type, itemParam, contextExpression);
 
-            var blockExpressions = new List<Expression>();
-            var blockVariables = new List<ParameterExpression> { newExpression, passedDestination };
-            Expression destination;
             var destinationElementType = itemExpr.Type;
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-            if(passedDestination.Type.IsCollectionType())
-            {
-                if(propertyMap == null)
-                {
-                    destination = newExpression;
-                    blockExpressions.Add(IfThenElse(NotEqual(passedDestination, Constant(null)),
-                        Call(passedDestination, clearMethod),
-                        Assign(destination, newExpression)
-                        ));
-                }
-                else if(propertyMap.UseDestinationValue)
-                {
-                    destination = passedDestination;
-                    blockExpressions.Add(Call(passedDestination, clearMethod));
-                }
-                else
-                {
-                    destination = newExpression;
-                }
-            }
-            else
-            {
-                destination = newExpression;
-            }
-
-            var cast = typeof(Enumerable).GetTypeInfo().DeclaredMethods.First(_ => _.Name == "Cast").MakeGenericMethod(itemParam.Type);
-
+            var cast = typeof(Enumerable).GetDeclaredMethod("Cast").MakeGenericMethod(itemParam.Type);
             var addMethod = destinationCollectionType.GetDeclaredMethod("Add");
             var genericSource = sourceExpression.Type.GetTypeInfo().IsGenericType ? sourceExpression : Call(null, cast, sourceExpression);
-            blockExpressions.Add(ForEach(genericSource, itemParam, Call(
-                destination,
-                addMethod,
-                itemExpr)));
+            var destination = propertyMap?.UseDestinationValue == true ? passedDestination : newExpression;
+            var addItems = ForEach(genericSource, itemParam, Call(destination, addMethod, itemExpr));
 
-            blockExpressions.Add(destination);
-
-            var mapExpr = Block(blockExpressions);
+            var mapExpr = Block(addItems, destination);
 
             var ifNullExpr = configurationProvider.Configuration.AllowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
-            var checkNull = Block(blockVariables,
+            var checkNull = Block(new[] { newExpression, passedDestination },
                 Assign(passedDestination, destExpression),
                 Assign(newExpression, newExpressionValue),
+                Call(newExpression, clearMethod),
                 Condition(Equal(sourceExpression, Constant(null)), ToType(ifNullExpr, passedDestination.Type), ToType(mapExpr, passedDestination.Type))
                 );
             if(propertyMap != null)
