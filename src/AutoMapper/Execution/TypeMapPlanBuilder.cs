@@ -362,15 +362,6 @@ namespace AutoMapper.Execution
                 }
             }
 
-            mapperExpr = Block(new[] { setResolvedValue, setPropertyValue, mapperExpr }.Distinct());
-
-            if(propertyMap.PreCondition != null)
-            {
-                mapperExpr = IfThen(
-                    propertyMap.PreCondition.ConvertReplaceParameters(_source, _context),
-                    mapperExpr
-                    );
-            }
             if(propertyMap.Condition != null)
             {
                 mapperExpr = IfThen(
@@ -381,6 +372,16 @@ namespace AutoMapper.Execution
                         ToType(getter, propertyMap.Condition.Parameters[2].Type),
                         _context
                         ),
+                    mapperExpr
+                    );
+            }
+
+            mapperExpr = Block(new[] { setResolvedValue, setPropertyValue, mapperExpr }.Distinct());
+
+            if(propertyMap.PreCondition != null)
+            {
+                mapperExpr = IfThen(
+                    propertyMap.PreCondition.ConvertReplaceParameters(_source, _context),
                     mapperExpr
                     );
             }

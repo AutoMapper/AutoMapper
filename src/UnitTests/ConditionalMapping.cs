@@ -6,6 +6,39 @@ using Should;
 
 namespace AutoMapper.UnitTests.ConditionalMapping
 {
+    public class When_adding_a_condition_for_all_members : AutoMapperSpecBase
+    {
+        Source _source = new Source { Value = 3 };
+        Destination _destination = new Destination { Value = 7 };
+
+        class Source
+        {
+            public int Value { get; set; }
+        }
+
+        class Destination
+        {
+            public int Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().ForAllMembers(o => o.Condition((source, destination, sourceProperty, destinationProperty) =>
+            {
+                source.ShouldBeSameAs(_source);
+                destination.ShouldBeSameAs(_destination);
+                ((int)sourceProperty).ShouldEqual(3);
+                ((int)destinationProperty).ShouldEqual(7);
+                return true;
+            }));
+        });
+
+        protected override void Because_of()
+        {
+            Mapper.Map(_source, _destination);
+        }
+    }
+
     public class When_ignoring_all_properties_with_an_inaccessible_setter_and_explicitly_implemented_member : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(c => c.CreateMap<SourceClass, DestinationClass>().IgnoreAllPropertiesWithAnInaccessibleSetter());
