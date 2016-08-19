@@ -7,57 +7,27 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.CustomMapping
 {
-    public class DecimalToNullableDecimal : AutoMapperSpecBase
+    public class DecimalAndNullableDecimal : AutoMapperSpecBase
     {
         Destination _destination;
 
         class Source
         {
             public decimal Value { get; set; }
+            public decimal? OtherValue { get; set; }
         }
 
         class Destination
         {
             public decimal? Value { get; set; }
-        }
-
-        public class DecimalConverter : ITypeConverter<decimal?, decimal>
-        {
-            public decimal Convert(decimal? source, decimal destination, ResolutionContext context)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public class DecimalNullableConverter : ITypeConverter<decimal, decimal?>
-        {
-            public decimal? Convert(decimal source, decimal? destination, ResolutionContext context)
-            {
-                if(source == decimal.MaxValue)
-                {
-                    return null;
-                }
-                else
-                {
-                    return source;
-                }
-            }
-        }
-
-        public class NullableDecimalConverter : ITypeConverter<decimal?, decimal?>
-        {
-            public decimal? Convert(decimal? source, decimal? destination, ResolutionContext context)
-            {
-                throw new NotImplementedException();
-            }
+            public decimal OtherValue { get; set; }
         }
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
-            cfg.CreateMap<decimal?, decimal>().ConvertUsing<DecimalConverter>();
-            cfg.CreateMap<decimal, decimal?>().ConvertUsing<DecimalNullableConverter>();
-            cfg.CreateMap<decimal?, decimal?>().ConvertUsing<NullableDecimalConverter>();
+            cfg.CreateMap<decimal?, decimal>().ConvertUsing(source => source ?? decimal.MaxValue);
+            cfg.CreateMap<decimal, decimal?>().ConvertUsing(source => source == decimal.MaxValue ? new decimal?() : source);
         });
 
         protected override void Because_of()
@@ -65,10 +35,12 @@ namespace AutoMapper.UnitTests.CustomMapping
             _destination = Mapper.Map<Destination>(new Source { Value = decimal.MaxValue });
         }
 
+
         [Fact]
-        public void Should_choose_the_best_converter()
+        public void Should_treat_max_value_as_null()
         {
-            _destination.Value.ShouldEqual(null);
+            _destination.Value.ShouldBeNull();
+            _destination.OtherValue.ShouldEqual(decimal.MaxValue);
         }
     }
 
