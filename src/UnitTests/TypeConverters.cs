@@ -13,14 +13,16 @@ namespace AutoMapper.UnitTests.CustomMapping
 
         class Source
         {
-            public decimal Value { get; set; }
-            public decimal? OtherValue { get; set; }
+            public decimal Value1 { get; set; }
+            public decimal? Value2 { get; set; }
+            public decimal? Value3 { get; set; }
         }
 
         class Destination
         {
-            public decimal? Value { get; set; }
-            public decimal OtherValue { get; set; }
+            public decimal? Value1 { get; set; }
+            public decimal Value2 { get; set; }
+            public decimal? Value3 { get; set; }
         }
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
@@ -32,15 +34,16 @@ namespace AutoMapper.UnitTests.CustomMapping
 
         protected override void Because_of()
         {
-            _destination = Mapper.Map<Destination>(new Source { Value = decimal.MaxValue });
+            _destination = Mapper.Map<Destination>(new Source { Value1 = decimal.MaxValue });
         }
 
 
         [Fact]
         public void Should_treat_max_value_as_null()
         {
-            _destination.Value.ShouldBeNull();
-            _destination.OtherValue.ShouldEqual(decimal.MaxValue);
+            _destination.Value1.ShouldBeNull();
+            _destination.Value2.ShouldEqual(decimal.MaxValue);
+            _destination.Value3.ShouldBeNull();
         }
     }
 
