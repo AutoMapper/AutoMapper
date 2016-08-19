@@ -63,7 +63,7 @@ namespace AutoMapper
         {
             if(source != null)
             {
-                sourceType = source.GetType();
+                sourceType = source.GetType().GetBaseTypeIfIsEntityFrameworkProxyType();
             }
             return new TypePair(sourceType, destinationType);
         }
@@ -72,11 +72,11 @@ namespace AutoMapper
         {
             if(source != null)
             {
-                sourceType = source.GetType();
+                sourceType = source.GetType().GetBaseTypeIfIsEntityFrameworkProxyType();
             }
             if(destination != null)
             {
-                destinationType = destination.GetType();
+                destinationType = destination.GetType().GetBaseTypeIfIsEntityFrameworkProxyType();
             }
             return new TypePair(sourceType, destinationType);
         }

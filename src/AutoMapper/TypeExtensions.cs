@@ -253,5 +253,27 @@ namespace AutoMapper
         {
             return type.GetRuntimeField(name);
         }
+
+        public static bool IsEntityFrameworkProxyType(this Type type)
+        {
+            const string entityFrameworkDynamicProxiesNamespace = "System.Data.Entity.DynamicProxies";
+            return type.GetTypeInfo().Namespace == entityFrameworkDynamicProxiesNamespace;
+        }
+
+        public static Type GetBaseTypeIfIsEntityFrameworkProxyType(this Type type)
+        {
+            if (type.IsEntityFrameworkProxyType() == false)
+            {
+                return type;
+            }
+
+            var baseType = type.BaseType();
+            if (baseType == null)
+            {
+                return type;
+            }
+
+            return baseType;
+        }
     }
 }
