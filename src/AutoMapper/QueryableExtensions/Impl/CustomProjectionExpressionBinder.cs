@@ -19,7 +19,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         private static MemberAssignment BindCustomProjectionExpression(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
         {
-            return Expression.Bind(propertyMap.DestinationProperty, propertyTypeMap.CustomProjection.ReplaceParameters(result.ResolutionExpression));
+            return Expression.Bind(propertyMap.DestinationProperty, propertyTypeMap.CustomProjection.ConvertReplaceParameters(result.ResolutionExpression));
         }
     }
 }
