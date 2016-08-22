@@ -531,13 +531,6 @@ namespace AutoMapper.Execution
                 valueResolverFunc = Throw(Constant(new Exception("I done blowed up")));
             }
 
-            if(propertyMap.DestinationPropertyType == typeof(string) && valueResolverFunc.Type != typeof(string)
-                &&
-                _configurationProvider.ResolveTypeMap(valueResolverFunc.Type, propertyMap.DestinationPropertyType) == null)
-            {
-                valueResolverFunc = Call(valueResolverFunc, typeof(object).GetDeclaredMethod("ToString", new Type[0]));
-            }
-
             if(propertyMap.NullSubstitute != null)
             {
                 var nullSubstitute = Constant(propertyMap.NullSubstitute);
