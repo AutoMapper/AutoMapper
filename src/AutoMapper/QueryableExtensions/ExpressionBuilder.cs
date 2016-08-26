@@ -218,18 +218,18 @@ namespace AutoMapper.QueryableExtensions
 
         private class NullSubstitutionConversionVisitor : ExpressionVisitor
         {
-            private readonly Expression newParameter;
+            private readonly Expression _newParameter;
             private readonly object _nullSubstitute;
 
             public NullSubstitutionConversionVisitor(Expression newParameter, object nullSubstitute)
             {
-                this.newParameter = newParameter;
+                _newParameter = newParameter;
                 _nullSubstitute = nullSubstitute;
             }
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                return node == newParameter ? NullCheck(node) : (Expression) node;
+                return node == _newParameter ? NullCheck(node) : (Expression) node;
             }
 
             private ConditionalExpression NullCheck(Expression input)
