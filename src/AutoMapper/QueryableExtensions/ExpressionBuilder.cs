@@ -229,23 +229,21 @@ namespace AutoMapper.QueryableExtensions
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                if (node == newParameter)
-                {
-                    var equalsNull = Expression.Property(newParameter, "HasValue");
-                    var nullConst = Expression.Condition(equalsNull, Expression.Property(newParameter, "Value"),
-                        Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
-                    return nullConst;
-                }
-                return node;
+                return node == newParameter ? NullCheck(node) : (Expression) node;
+            }
+
+            private ConditionalExpression NullCheck(Expression input)
+            {
+                var underlyingType = input.Type.GetTypeOfNullable();
+                var nullSubstitute = ExpressionExtensions.ToType(Constant(_nullSubstitute), underlyingType);
+                var equalsNull = Property(input, "HasValue");
+                return Condition(equalsNull, Property(input, "Value"), nullSubstitute, underlyingType);
             }
 
             protected override Expression VisitConditional(ConditionalExpression node)
             {
-                var equalsNull = Expression.Property(node.IfFalse, "HasValue");
-                var nullConst = Expression.Condition(equalsNull, Expression.Property(node.IfFalse, "Value"),
-                    Expression.Constant(_nullSubstitute), node.Type.GetTypeOfNullable());
-
-                return Expression.Condition(node.Test, Expression.Constant(_nullSubstitute), nullConst);
+                var nullCheck = NullCheck(node.IfFalse);
+                return Condition(node.Test, nullCheck.IfFalse, nullCheck);
             }
         }
 
