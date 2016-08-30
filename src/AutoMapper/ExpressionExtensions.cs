@@ -160,7 +160,7 @@ namespace AutoMapper
                 {
                     return returnNode;
                 }
-                nullConditions = Or(nullConditions, Equal(node.Expression, Constant(null, node.Expression.Type)));
+                nullConditions = OrElse(nullConditions, Equal(node.Expression, Constant(null, node.Expression.Type)));
                 return returnNode;
             }
         }
