@@ -7,6 +7,46 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.CustomMapping
 {
+    public class DecimalAndNullableDecimal : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+            public decimal Value1 { get; set; }
+            public decimal? Value2 { get; set; }
+            public decimal? Value3 { get; set; }
+        }
+
+        class Destination
+        {
+            public decimal? Value1 { get; set; }
+            public decimal Value2 { get; set; }
+            public decimal? Value3 { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<decimal?, decimal>().ConvertUsing(source => source ?? decimal.MaxValue);
+            cfg.CreateMap<decimal, decimal?>().ConvertUsing(source => source == decimal.MaxValue ? new decimal?() : source);
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { Value1 = decimal.MaxValue });
+        }
+
+
+        [Fact]
+        public void Should_treat_max_value_as_null()
+        {
+            _destination.Value1.ShouldBeNull();
+            _destination.Value2.ShouldEqual(decimal.MaxValue);
+            _destination.Value3.ShouldBeNull();
+        }
+    }
+
     public class When_converting_to_string : AutoMapperSpecBase
     {
         Destination _destination;
