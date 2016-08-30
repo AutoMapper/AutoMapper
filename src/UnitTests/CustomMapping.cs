@@ -1,10 +1,87 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Should;
 using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class OpenGenericMapForMember : AutoMapperSpecBase
+    {
+        ModelPager<int> _destination;
+        int[] _items = Enumerable.Range(1, 10).ToArray();
+
+        public interface IPager<out TItem> : IEnumerable<TItem>
+        {
+            int CurrentPage { get; set; }
+
+            int PageCount { get; set; }
+
+            int PageSize { get; set; }
+
+            int TotalItems { get; set; }
+        }
+        public class ModelPager<TItem>
+        {
+            public int CurrentPage { get; set; }
+
+            public IEnumerable<TItem> Items { get; set; }
+
+            public int PageCount { get; set; }
+
+            public int PageSize { get; set; }
+
+            public int TotalItems { get; set; }
+        }
+        public class Pager<TItem> : IPager<TItem>
+        {
+            private readonly IEnumerable<TItem> _items;
+
+            public Pager(IEnumerable<TItem> items) :this(items, 0, 0, 0)
+            {
+            }
+            public Pager(IEnumerable<TItem> items,
+                         int currentPage,
+                         int pageSize,
+                         int totalItems)
+            {
+                _items = items ?? Enumerable.Empty<TItem>();
+                CurrentPage = currentPage;
+                PageSize = pageSize;
+                TotalItems = totalItems;
+            }
+
+            public int CurrentPage { get; set; }
+
+            public int PageCount { get; set; }
+
+            public int PageSize { get; set; }
+
+            public int TotalItems { get; set; }
+
+            IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+
+            public IEnumerator<TItem> GetEnumerator() { return _items.GetEnumerator(); }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap(typeof(IPager<>), typeof(ModelPager<>)).ForMember("Items", e => e.MapFrom(o => (IEnumerable)o));
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<ModelPager<int>>(new Pager<int>(_items));
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Items.SequenceEqual(_items).ShouldBeTrue();
+        } 
+    }
+
     public class IntToNullableIntConverter : AutoMapperSpecBase
     {
         Destination _destination;
