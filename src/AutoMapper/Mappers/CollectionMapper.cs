@@ -26,7 +26,7 @@ namespace AutoMapper.Mappers
 
             var itemExpr = mapItem(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, passedDestination.Type, itemParam, contextExpression);
 
-            var destinationElementType = itemExpr.Type;
+            var destinationElementType = TypeHelper.GetElementType(destExpression.Type);
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
             var cast = typeof(Enumerable).GetDeclaredMethod("Cast").MakeGenericMethod(itemParam.Type);
