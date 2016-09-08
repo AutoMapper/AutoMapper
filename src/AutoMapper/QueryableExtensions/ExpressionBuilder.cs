@@ -241,21 +241,14 @@ namespace AutoMapper.QueryableExtensions
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                return node == _newParameter ? NullCheck(node) : (Expression) node;
+                return node == _newParameter ? NullCheck(node) : node;
             }
 
-            private ConditionalExpression NullCheck(Expression input)
+            private Expression NullCheck(Expression input)
             {
                 var underlyingType = input.Type.GetTypeOfNullable();
                 var nullSubstitute = ExpressionExtensions.ToType(Constant(_nullSubstitute), underlyingType);
-                var equalsNull = Property(input, "HasValue");
-                return Condition(equalsNull, Property(input, "Value"), nullSubstitute, underlyingType);
-            }
-
-            protected override Expression VisitConditional(ConditionalExpression node)
-            {
-                var nullCheck = NullCheck(node.IfFalse);
-                return Condition(node.Test, nullCheck.IfFalse, nullCheck);
+                return Condition(Property(input, "HasValue"), Property(input, "Value"), nullSubstitute, underlyingType);
             }
         }
 
