@@ -118,10 +118,22 @@ namespace AutoMapper.QueryableExtensions.Impl
             var newObject = Visit(node.Object);
 
 
+
             var genericMethod = node.Method.GetGenericMethodDefinition();
             var methodArgs = node.Method.GetGenericArguments();
             methodArgs[0] = methodArgs[0].ReplaceItemType(_sourceType, _destinationType);
-            methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), typeof(int));
+
+            // for typical orderby expression, a unaryexpression is used that contains a 
+            // func which in turn defines the type of the field that has to be used for ordering/sorting
+            var unary = newOrderByExpr as UnaryExpression;
+            if (unary != null && unary.Operand.Type.IsGenericType())
+            {
+                methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), unary.Operand.Type.GetGenericArguments().Last());
+            }
+            else
+            {
+                methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), typeof(int));
+            }
             var orderByMethod = genericMethod.MakeGenericMethod(methodArgs);
 
             return Expression.Call(newObject, orderByMethod, newQuery, newOrderByExpr);

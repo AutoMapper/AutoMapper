@@ -1,0 +1,6 @@
+﻿[ ] Support handing over "Expand" Expressions to MappedQueryProvider
+[x] Support modifying the IEnumerable<Dto> collection for e.g. loading some additional stuff from the database (Premissions, ...)
+[x] Support "inlinecount"
+[ ] have a look into "Select" expressions of Linq
+[ ] Create an attribute that directly throws once an "Expand" call is found (do not support this)
+[ ] support Object Graphs instead of just Trees (e.g. OrderDto.Customer <==> CustomerDto.Orders) => currently leads to StackOverflowException

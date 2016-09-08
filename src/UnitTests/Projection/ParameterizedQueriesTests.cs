@@ -149,7 +149,7 @@
             var newDests = _sources.ProjectTo<Dest>(Configuration, new Dictionary<string, object> { { "value", 15 } }).ToArray();
 
             newDests[0].Value.ShouldEqual(20);
-        }
+        }  
     }
 
     public class ParameterizedQueriesTests_with_filter : AutoMapperSpecBase
@@ -201,6 +201,5 @@
 
             user.position.ShouldEqual(1);
         }
-
     }
 }

@@ -37,8 +37,12 @@ namespace AutoMapper.QueryableExtensions
             return QueryMapperVisitor.Map(sourceQuery, destQuery, config);
         }
 
+        [Obsolete("Uses static API internally (Mapper.Configuration) - will be dropped in v5")]
         public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource)
-            => dataSource.UseAsDataSource(Mapper.Instance);
+            => dataSource.UseAsDataSource(Mapper.Configuration?.CreateMapper());
+
+        public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource, IConfigurationProvider config)
+            => dataSource.UseAsDataSource(config.CreateMapper());
 
         public static IQueryDataSourceInjection<TSource> UseAsDataSource<TSource>(this IQueryable<TSource> dataSource, IMapper mapper)
         {

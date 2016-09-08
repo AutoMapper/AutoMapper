@@ -266,6 +266,7 @@
     <Compile Include="Profiles.cs" />
     <Compile Include="Projection\ConstructorTests.cs" />
     <Compile Include="Projection\ExplicitExpansion.cs" />
+    <Compile Include="Projection\ExplicitExpansionAsDataSource.cs" />
     <Compile Include="Projection\ExplicitValues.cs" />
     <Compile Include="Projection\InheritedMaps.cs" />
     <Compile Include="Projection\MapFromTest.cs" />
@@ -275,6 +276,7 @@
     <Compile Include="Projection\NullableItemsTests.cs" />
     <Compile Include="Projection\NullSubstitutes.cs" />
     <Compile Include="Projection\ParameterizedQueriesTests.cs" />
+    <Compile Include="Projection\ParameterizedQueriesTestsAsDataSource.cs" />
     <Compile Include="Projection\PrimitiveArraysTest.cs" />
     <Compile Include="Projection\ProjectCollectionEnumerableTest.cs" />
     <Compile Include="Projection\ProjectCollectionListTest.cs" />
