@@ -245,10 +245,13 @@ namespace AutoMapper
             }
             foreach (var redirectedType in redirectedTypes)
             {
-                var derivedMap = FindTypeMapFor(redirectedType.Item2);
-                if (derivedMap != null)
+                if (!_typeMapPlanCache.ContainsKey(redirectedType.Item1))
                 {
-                    _typeMapPlanCache[redirectedType.Item1] = derivedMap;
+                    var derivedMap = FindTypeMapFor(redirectedType.Item2);
+                    if (derivedMap != null)
+                    {
+                        _typeMapPlanCache[redirectedType.Item1] = derivedMap;
+                    }
                 }
             }
             foreach (var derivedMap in derivedMaps.Where(derivedMap => !_typeMapPlanCache.ContainsKey(derivedMap.Item1)))
