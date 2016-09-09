@@ -73,8 +73,8 @@ namespace AutoMapper
         public Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> GetMapperExpression<TSource, TDestination>(TypePair typePair)
         {
             var mapFunc = GetMapperFunc(typePair);
-            if (mapFunc != null && (mapFunc.Method.GetParameters()[1].ParameterType != typeof(TSource) ||
-                                    mapFunc.Method.ReturnType != typeof(TDestination)))
+            if (mapFunc != null && (mapFunc.GetMethodInfo().GetParameters()[1].ParameterType != typeof(TSource) ||
+                                    mapFunc.GetMethodInfo().ReturnType != typeof(TDestination)))
             {
                 var requestedSourceParameter = Parameter(typeof(TSource), "src");
                 var requestedDestinationParameter = Parameter(typeof(TDestination), "dest");
@@ -84,8 +84,8 @@ namespace AutoMapper
                     Lambda(
                         ToType(
                             mapExpression.ReplaceParameters(
-                                ToType(requestedSourceParameter, mapFunc.Method.GetParameters()[1].ParameterType),
-                                ToType(requestedDestinationParameter, mapFunc.Method.ReturnType),
+                                ToType(requestedSourceParameter, mapFunc.GetMethodInfo().GetParameters()[1].ParameterType),
+                                ToType(requestedDestinationParameter, mapFunc.GetMethodInfo().ReturnType),
                                 contextParameter),
                             typeof(TDestination)),
                         requestedSourceParameter, requestedDestinationParameter, contextParameter);
