@@ -67,15 +67,21 @@ namespace AutoMapper
 
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair typePair)
         {
-            return GetMapperExpression<TSource, TDestination>(typePair)?.Compile() ?? (Func<TSource, TDestination, ResolutionContext, TDestination>) GetMapperFunc(typePair);
+            var mapperFuncs = GetMapperFuncs(typePair);
+            return GetSubMap<TSource, TDestination>(mapperFuncs)?.Compile() ?? (Func<TSource, TDestination, ResolutionContext, TDestination>)mapperFuncs.Typed;
         }
 
         public Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> GetMapperExpression<TSource, TDestination>(TypePair typePair)
         {
-            var mapFunc = GetMapperFunc(typePair);
-            var mapExpression = GetMapperExpression(typePair);
-            if (mapFunc != null && (mapFunc.GetMethodInfo().GetParameters()[1].ParameterType != typeof(TSource) ||
-                                    mapFunc.GetMethodInfo().ReturnType != typeof(TDestination)))
+            var mapperFuncs = GetMapperFuncs(typePair);
+            return GetSubMap<TSource, TDestination>(mapperFuncs) ?? (Expression<Func<TSource, TDestination, ResolutionContext, TDestination>>)mapperFuncs.TypedExpression;
+        }
+
+        private Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> GetSubMap<TSource, TDestination>(MapperFuncs mapperFuncs)
+        {
+            var mapExpression = mapperFuncs.TypedExpression;
+            if (mapExpression != null && (mapExpression.Parameters[0].Type != typeof(TSource) || 
+                mapExpression.Parameters[1].Type != typeof(TDestination)))
             {
                 var requestedSourceParameter = Parameter(typeof(TSource), "src");
                 var requestedDestinationParameter = Parameter(typeof(TDestination), "dest");
@@ -84,19 +90,21 @@ namespace AutoMapper
                     Lambda(
                         ToType(
                             mapExpression.ReplaceParameters(
-                                ToType(requestedSourceParameter, mapFunc.GetMethodInfo().GetParameters()[1].ParameterType),
-                                ToType(requestedDestinationParameter, mapFunc.GetMethodInfo().ReturnType),
+                                ToType(requestedSourceParameter, mapExpression.Parameters[0].Type),
+                                ToType(requestedDestinationParameter, mapExpression.Parameters[1].Type),
                                 contextParameter),
                             typeof(TDestination)),
                         requestedSourceParameter, requestedDestinationParameter, contextParameter);
             }
-            return (Expression<Func<TSource, TDestination, ResolutionContext, TDestination>>)mapExpression;
+            return null;
         }
 
-        public LambdaExpression GetMapperExpression(TypePair typePair)
+        private MapperFuncs GetMapperFuncs(TypePair typePair)
         {
-            return _mapPlanCache.GetOrAdd(typePair, _createMapperFuncs).TypedExpression ??
-                   _mapPlanCache.AddOrUpdate(typePair, _createMapperFuncs, (tp, mf) => _createMapperFuncs(tp)).TypedExpression;
+            var mapperFunc = _mapPlanCache.GetOrAdd(typePair, _createMapperFuncs);
+            if (mapperFunc.TypedExpression == null)
+                mapperFunc = _mapPlanCache.AddOrUpdate(typePair, _createMapperFuncs, (tp, mf) => _createMapperFuncs(tp));
+            return mapperFunc;
         }
 
         public Delegate GetMapperFunc(TypePair typePair)
