@@ -68,6 +68,7 @@
     <Compile Include="..\UnitTests\XUnitConventions.cs">
       <Link>XUnitConventions.cs</Link>
     </Compile>
+    <Compile Include="NullSubstitute.cs" />
     <Compile Include="ChildClassTests.cs" />
     <Compile Include="ByteArray.cs" />
     <Compile Include="ProjectAndAllowNullCollections.cs" />

@@ -8,6 +8,76 @@ using Should;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_mapping_collections_with_inheritance : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public IEnumerable<SourceItem> Items { get; set; }
+        }
+        public class Destination
+        {
+            public IEnumerable<DestinationItemBase> Items { get; set; }
+        }
+        public class SourceItem
+        {
+            public int Value { get; set; }
+        }
+        public class DestinationItemBase
+        {
+            public int Value { get; set; }
+        }
+        public class SpecificDestinationItem : DestinationItemBase
+        {
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<SourceItem, DestinationItemBase>().As<SpecificDestinationItem>();
+            cfg.CreateMap<SourceItem, SpecificDestinationItem>();
+            cfg.CreateMap<Source, Destination>();
+        });
+    }
+
+    public class When_passing_a_not_empty_collection : AutoMapperSpecBase
+    {
+        Destination _destination = new Destination();
+
+        class Source
+        {
+            public List<SourceItem> Items { get; }
+        }
+
+        class SourceItem
+        {
+        }
+
+        class Destination
+        {
+            public List<DestinationItem> Items { get; } = new List<DestinationItem> { new DestinationItem() };
+        }
+
+        class DestinationItem
+        {
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<SourceItem, DestinationItem>();
+        });
+
+        protected override void Because_of()
+        {
+            Mapper.Map(new Source(), _destination);
+        }
+
+        [Fact]
+        public void It_should_be_cleared_first()
+        {
+            _destination.Items.ShouldBeEmpty();
+        }
+    }
+
     public class When_mapping_collections_with_structs : AutoMapperSpecBase
     {
         BarDTO _destination;

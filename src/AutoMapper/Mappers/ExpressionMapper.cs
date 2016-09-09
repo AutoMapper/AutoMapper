@@ -177,8 +177,12 @@ namespace AutoMapper.Mappers
             private static void UpdateToNonNullableExpression(Expression right, out Expression newRight)
             {
                 if (right is ConstantExpression)
-                    newRight = Expression.Constant((right as ConstantExpression).Value,
-                        typeof(Nullable<>).MakeGenericType(right.Type));
+                {
+                    var t = right.Type.IsNullableType()
+                        ? right.Type.GetGenericArguments()[0]
+                        : right.Type;
+                    newRight = Expression.Constant(((ConstantExpression)right).Value, t);
+                }
                 else if (right is UnaryExpression)
                     newRight = (right as UnaryExpression).Operand;
                 else
@@ -295,6 +299,11 @@ namespace AutoMapper.Mappers
                     return null;
 
                 var memberAccessor = node.Member;
+                
+                // in case of a propertypath, the MemberAcessors type and the SourceType may be different
+                if (memberAccessor.DeclaringType != _typeMap.DestinationType)
+                    return null;
+
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
                 return propertyMap;
             }

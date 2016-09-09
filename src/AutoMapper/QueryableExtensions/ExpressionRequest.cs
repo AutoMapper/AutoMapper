@@ -1,8 +1,11 @@
+
+
 namespace AutoMapper.QueryableExtensions
 {
     using System;
     using System.Linq;
     using System.Reflection;
+    using System.Collections.Generic;
 
     public class ExpressionRequest : IEquatable<ExpressionRequest>
     {
@@ -12,11 +15,25 @@ namespace AutoMapper.QueryableExtensions
 
         public MemberInfo[] MembersToExpand { get; }
 
-        public ExpressionRequest(Type sourceType, Type destinationType, params MemberInfo[] membersToExpand)
+        internal ICollection<ExpressionRequest> PreviousRequests { get; private set; }
+
+        internal IEnumerable<ExpressionRequest> GetPreviousRequestsAndSelf()
+        {
+            return PreviousRequests.Concat(new[] { this });
+        }
+
+        internal bool AlreadyExists => PreviousRequests.Contains(this);
+
+        public ExpressionRequest(Type sourceType, Type destinationType, MemberInfo[] membersToExpand, ExpressionRequest parentRequest)
         {
             SourceType = sourceType;
             DestinationType = destinationType;
-            MembersToExpand = membersToExpand.OrderBy(p=>p.Name).ToArray();
+            MembersToExpand = membersToExpand.OrderBy(p => p.Name).ToArray();
+
+            if (parentRequest == null)
+                PreviousRequests = new HashSet<ExpressionRequest>();
+            else
+                PreviousRequests = new HashSet<ExpressionRequest>(parentRequest.GetPreviousRequestsAndSelf());
         }
 
         public bool Equals(ExpressionRequest other)

@@ -17,6 +17,7 @@ namespace AutoMapper
         bool ConstructorMappingEnabled { get; }
         bool AllowNullDestinationValues { get; }
         bool AllowNullCollections { get; }
+        bool EnableNullPropagationForQueryMapping { get; }
         bool CreateMissingTypeMaps { get; }
         IEnumerable<Action<TypeMap, IMappingExpression>> AllTypeMapActions { get; }
         IEnumerable<Action<PropertyMap, IMemberConfigurationExpression>> AllPropertyMapActions { get; }

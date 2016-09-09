@@ -61,6 +61,8 @@ namespace AutoMapper
 
         public bool AllowNullCollections { get; private set; }
 
+        public bool EnableNullPropagationForQueryMapping { get; private set; }
+
         public IConfiguration Configuration { get; }
 
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair typePair)
@@ -215,6 +217,7 @@ namespace AutoMapper
             ServiceCtor = configuration.ServiceCtor;
             AllowNullDestinationValues = configuration.AllowNullDestinationValues;
             AllowNullCollections = configuration.AllowNullCollections;
+            EnableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping;
 
             var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
             var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
@@ -263,11 +266,6 @@ namespace AutoMapper
                 if (typeMap.DestinationTypeOverride != null)
                 {
                     redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
-                }
-                if (typeMap.SourceType.IsNullableType())
-                {
-                    var nonNullableTypes = new TypePair(Nullable.GetUnderlyingType(typeMap.SourceType), typeMap.DestinationType);
-                    redirectedTypes.Add(Tuple.Create(nonNullableTypes, typeMap.Types));
                 }
                 derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
             }

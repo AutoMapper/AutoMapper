@@ -1,9 +1,10 @@
-﻿namespace AutoMapper.UnitTests
-{
-    using System;
-    using System.Collections.Generic;
-    using Xunit;
+﻿using System;
+using System.Collections.Generic;
+using Xunit;
+using Should;
 
+namespace AutoMapper.UnitTests
+{
     public class BasicFlattening : AutoMapperSpecBase
     {
         public class Address
@@ -111,6 +112,41 @@
                 IntArr = new[] { 1, 2, 3, 4, 5 },
                 Ints = new[] { 7, 8, 9 },
             });
+        }
+    }
+
+    public class NullFlattening : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        public class Source
+        {
+            public Source Parent { get; set; }
+            public Data Data { get; set; }
+        }
+        public class Data
+        {
+            public int? Value { get; set; }
+        }
+        public class Destination
+        {
+            public int? ParentDataValue { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_handle_inner_nulls()
+        {
+            _destination.ParentDataValue.ShouldBeNull();
         }
     }
 }

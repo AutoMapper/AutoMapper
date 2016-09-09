@@ -113,6 +113,12 @@ namespace AutoMapper
         bool AllowNullCollections { get; set; }
 
         /// <summary>
+        /// Allows to enable null-value propagation for query mapping. 
+        /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
+        /// </summary>
+        bool EnableNullPropagationForQueryMapping { get; set; }
+
+        /// <summary>
         /// Naming convention for source members
         /// </summary>
         INamingConvention SourceMemberNamingConvention { get; set; }

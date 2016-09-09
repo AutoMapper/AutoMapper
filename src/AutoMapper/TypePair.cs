@@ -131,11 +131,6 @@ namespace AutoMapper
             {
                 yield return interfaceType;
             }
-            var underlyingType = Nullable.GetUnderlyingType(type);
-            if(underlyingType != null)
-            {
-                yield return underlyingType;
-            }
         }
 
         private static IEnumerable<Type> GetTypeInheritance(Type type)

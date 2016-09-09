@@ -356,21 +356,10 @@ namespace AutoMapper.Execution
                 }
                 else
                 {
-                    mapperExpr = Assign(destMember, propertyMap.SourceType != propertyMap.DestinationPropertyType
-                        ? ToType(propertyValue, propertyMap.DestinationPropertyType)
-                        : propertyValue);
+                    mapperExpr = Assign(destMember, ToType(propertyValue, propertyMap.DestinationPropertyType));
                 }
             }
 
-            mapperExpr = Block(new[] { setResolvedValue, setPropertyValue, mapperExpr }.Distinct());
-
-            if(propertyMap.PreCondition != null)
-            {
-                mapperExpr = IfThen(
-                    propertyMap.PreCondition.ConvertReplaceParameters(_source, _context),
-                    mapperExpr
-                    );
-            }
             if(propertyMap.Condition != null)
             {
                 mapperExpr = IfThen(
@@ -381,6 +370,16 @@ namespace AutoMapper.Execution
                         ToType(getter, propertyMap.Condition.Parameters[2].Type),
                         _context
                         ),
+                    mapperExpr
+                    );
+            }
+
+            mapperExpr = Block(new[] { setResolvedValue, setPropertyValue, mapperExpr }.Distinct());
+
+            if(propertyMap.PreCondition != null)
+            {
+                mapperExpr = IfThen(
+                    propertyMap.PreCondition.ConvertReplaceParameters(_source, _context),
                     mapperExpr
                     );
             }
@@ -396,6 +395,7 @@ namespace AutoMapper.Execution
         private Expression BuildValueResolverFunc(PropertyMap propertyMap, Expression destValueExpr)
         {
             Expression valueResolverFunc;
+            var destinationPropertyType = propertyMap.DestinationPropertyType;
             var valueResolverConfig = propertyMap.ValueResolverConfig;
             var typeMap = propertyMap.TypeMap;
 
@@ -437,7 +437,7 @@ namespace AutoMapper.Execution
                             ToType(sourceMember, sourceMemberResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
                             _context),
-                            propertyMap.DestinationPropertyType);
+                            destinationPropertyType);
                 }
                 else if(valueResolverConfig.SourceMemberName != null)
                 {
@@ -460,7 +460,7 @@ namespace AutoMapper.Execution
                             ToType(sourceMember, sourceMemberResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
                             _context),
-                            propertyMap.DestinationPropertyType);
+                            destinationPropertyType);
                 }
                 else
                 {
@@ -477,7 +477,7 @@ namespace AutoMapper.Execution
                             ToType(_destination, destResolverParam),
                             ToType(destValueExpr, destMemberResolverParam),
                             _context),
-                            propertyMap.DestinationPropertyType);
+                            destinationPropertyType);
                 }
 
             }
@@ -487,10 +487,10 @@ namespace AutoMapper.Execution
             }
             else if(propertyMap.CustomExpression != null)
             {
-                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(_source).IfNotNull(propertyMap.DestinationPropertyType);
-                var destinationNullable = propertyMap.DestinationPropertyType.IsNullableType();
-                var returnType = destinationNullable && propertyMap.DestinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
-                    ? propertyMap.DestinationPropertyType
+                var nullCheckedExpression = propertyMap.CustomExpression.ReplaceParameters(_source).IfNotNull(destinationPropertyType);
+                var destinationNullable = destinationPropertyType.IsNullableType();
+                var returnType = destinationNullable && destinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
+                    ? destinationPropertyType
                     : nullCheckedExpression.Type;
                 valueResolverFunc = nullCheckedExpression.Type.IsValueType() && !destinationNullable
                     ? nullCheckedExpression
@@ -519,7 +519,10 @@ namespace AutoMapper.Execution
                                 : (Expression)Call(inner, (MethodInfo)getter)
                             : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                         );
-                    valueResolverFunc = valueResolverFunc.IfNotNull(propertyMap.DestinationPropertyType);
+                    if(destinationPropertyType == valueResolverFunc.Type || _configurationProvider.ResolveTypeMap(valueResolverFunc.Type, destinationPropertyType) == null)
+                    {
+                        valueResolverFunc = valueResolverFunc.IfNotNull(destinationPropertyType);
+                    }
                 }
             }
             else if(propertyMap.SourceMember != null)
@@ -531,13 +534,6 @@ namespace AutoMapper.Execution
                 valueResolverFunc = Throw(Constant(new Exception("I done blowed up")));
             }
 
-            if(propertyMap.DestinationPropertyType == typeof(string) && valueResolverFunc.Type != typeof(string)
-                &&
-                _configurationProvider.ResolveTypeMap(valueResolverFunc.Type, propertyMap.DestinationPropertyType) == null)
-            {
-                valueResolverFunc = Call(valueResolverFunc, typeof(object).GetDeclaredMethod("ToString", new Type[0]));
-            }
-
             if(propertyMap.NullSubstitute != null)
             {
                 var nullSubstitute = Constant(propertyMap.NullSubstitute);
@@ -545,7 +541,7 @@ namespace AutoMapper.Execution
             }
             else if(!typeMap.Profile.AllowNullDestinationValues)
             {
-                var toCreate = propertyMap.SourceType ?? propertyMap.DestinationPropertyType;
+                var toCreate = propertyMap.SourceType ?? destinationPropertyType;
                 if(!toCreate.IsAbstract() && toCreate.IsClass())
                 {
                     valueResolverFunc = Coalesce(

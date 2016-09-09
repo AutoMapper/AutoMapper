@@ -50,6 +50,26 @@ namespace AutoMapperSamples.Mappers
                 result.Count().ShouldEqual(1);
                 result.First().GetType().ShouldEqual(typeof(Destination));
             }
+
+            [Test]
+            public void Select_source_items_from_destination_with_explicit_mapping()
+            {
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<Destination, Source>()
+                        .ForMember(d => d.SrcValue, opt => opt.MapFrom(s => s.DestValue))
+                        .ReverseMap()
+                        .ForMember(d => d.DestValue, opt => opt.MapFrom(s => s.SrcValue))
+                        ;
+                });
+
+                IQueryable<Destination> result = _source.AsQueryable()
+                    .UseAsDataSource(Mapper.Configuration).For<Destination>()
+                    .Where(s => s.DestValue > 6);
+
+                result.Count().ShouldEqual(1);
+                result.First().GetType().ShouldEqual(typeof(Destination));
+            }
         }
     }
 }
