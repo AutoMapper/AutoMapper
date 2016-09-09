@@ -73,13 +73,13 @@ namespace AutoMapper
         public Expression<Func<TSource, TDestination, ResolutionContext, TDestination>> GetMapperExpression<TSource, TDestination>(TypePair typePair)
         {
             var mapFunc = GetMapperFunc(typePair);
+            var mapExpression = GetMapperExpression(typePair);
             if (mapFunc != null && (mapFunc.GetMethodInfo().GetParameters()[1].ParameterType != typeof(TSource) ||
                                     mapFunc.GetMethodInfo().ReturnType != typeof(TDestination)))
             {
                 var requestedSourceParameter = Parameter(typeof(TSource), "src");
                 var requestedDestinationParameter = Parameter(typeof(TDestination), "dest");
                 var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
-                var mapExpression = GetMapperExpression(typePair);
                 return (Expression<Func<TSource, TDestination, ResolutionContext, TDestination>>)
                     Lambda(
                         ToType(
@@ -90,7 +90,7 @@ namespace AutoMapper
                             typeof(TDestination)),
                         requestedSourceParameter, requestedDestinationParameter, contextParameter);
             }
-            return null;
+            return (Expression<Func<TSource, TDestination, ResolutionContext, TDestination>>)mapExpression;
         }
 
         public LambdaExpression GetMapperExpression(TypePair typePair)
@@ -411,7 +411,7 @@ namespace AutoMapper
             {
                 configurationProvider.Seal(typeMap);
                 return Condition(TypeIs(parameters[0], typeMap.SourceType),
-                    ToType(typeMap.MapExpression.ReplaceParameters(
+                    ToType(GenerateTypeMapExpression(typeMap, configurationProvider).ReplaceParameters(
                         TypeAs(parameters[0], typeMap.SourceType),
                         TypeAs(parameters[1], typeMap.DestinationType),
                         parameters[2]), elseExpression.Type), elseExpression);
