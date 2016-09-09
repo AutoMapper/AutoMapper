@@ -575,22 +575,8 @@ namespace AutoMapper.Execution
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
             if(typeMap != null)
             {
-                if(!typeMap.HasDerivedTypesToInclude())
-                {
-                    typeMap.Seal(typeMapRegistry, configurationProvider);
-                    if(typeMap.MapExpression != null)
-                    {
-                        return typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter, contextParameter);
-                    }
-                    else
-                    {
-                        return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
-                    }
-                }
-                else
-                {
-                    return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
-                }
+                return GetMapperExpression(configurationProvider, typeMapRegistry, typeMap)?.ConvertReplaceParameters(sourceParameter, destinationParameter, contextParameter)
+                       ?? ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
             }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
             if(match != null)
@@ -599,6 +585,13 @@ namespace AutoMapper.Execution
                 return ToType(mapperExpression, typePair.DestinationType);
             }
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
+        }
+
+        private static readonly MethodInfo GetMapperExpressionMethod = typeof(IConfigurationProvider).GetTypeInfo().GetMethod("GetMapperExpression");
+        private static LambdaExpression GetMapperExpression(IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry, TypeMap typeMap)
+        {
+            typeMap.Seal(typeMapRegistry, configurationProvider);
+            return GetMapperExpressionMethod.MakeGenericMethod(typeMap.SourceType, typeMap.DestinationType).Invoke(configurationProvider, new object[] {typeMap.Types}) as LambdaExpression;
         }
 
         private static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter, Expression destinationParameter)
