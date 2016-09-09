@@ -74,21 +74,29 @@ namespace AutoMapper
         {
             var mapFunc = GetMapperFunc(typePair);
             if (mapFunc != null && (mapFunc.Method.GetParameters()[1].ParameterType != typeof(TSource) ||
-                mapFunc.Method.ReturnType != typeof(TDestination)))
+                                    mapFunc.Method.ReturnType != typeof(TDestination)))
             {
                 var requestedSourceParameter = Parameter(typeof(TSource), "src");
                 var requestedDestinationParameter = Parameter(typeof(TDestination), "dest");
                 var contextParameter = Parameter(typeof(ResolutionContext), "ctxt");
-
-                var invoke = Invoke(Constant(mapFunc),
-                    ToType(requestedSourceParameter, typePair.SourceType),
-                    ToType(requestedDestinationParameter, mapFunc.Method.ReturnType),
-                    contextParameter);
-                var mapExpression = Lambda(ToType(invoke, typeof(TDestination)),
-                    requestedSourceParameter, requestedDestinationParameter, contextParameter);
-                return (Expression<Func<TSource, TDestination, ResolutionContext, TDestination>>)mapExpression;
+                var mapExpression = GetMapperExpression(typePair);
+                return (Expression<Func<TSource, TDestination, ResolutionContext, TDestination>>)
+                    Lambda(
+                        ToType(
+                            mapExpression.ReplaceParameters(
+                                ToType(requestedSourceParameter, mapFunc.Method.GetParameters()[1].ParameterType),
+                                ToType(requestedDestinationParameter, mapFunc.Method.ReturnType),
+                                contextParameter),
+                            typeof(TDestination)),
+                        requestedSourceParameter, requestedDestinationParameter, contextParameter);
             }
             return null;
+        }
+
+        public LambdaExpression GetMapperExpression(TypePair typePair)
+        {
+            return _mapPlanCache.GetOrAdd(typePair, _createMapperFuncs).TypedExpression ??
+                   _mapPlanCache.AddOrUpdate(typePair, _createMapperFuncs, (tp, mf) => _createMapperFuncs(tp)).TypedExpression;
         }
 
         public Delegate GetMapperFunc(TypePair typePair)
@@ -345,6 +353,7 @@ namespace AutoMapper
         {
             private Lazy<UntypedMapperFunc> _untyped;
 
+            public LambdaExpression TypedExpression { get; }
             public Delegate Typed { get; }
 
             public UntypedMapperFunc Untyped => _untyped.Value;
@@ -359,6 +368,7 @@ namespace AutoMapper
 
             public MapperFuncs(TypePair typePair, LambdaExpression typedExpression)
             {
+                TypedExpression = typedExpression;
                 Typed = typedExpression?.Compile();
                 _untyped = new Lazy<UntypedMapperFunc>(() => Wrap(typePair, typedExpression)?.Compile());
             }
