@@ -583,7 +583,7 @@ namespace AutoMapper.Execution
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
         }
 
-        private static readonly MethodInfo GetMapperExpressionMethod = typeof(IConfigurationProvider).GetTypeInfo().GetMethod("GetMapperExpression");
+        private static readonly MethodInfo GetMapperExpressionMethod = typeof(IConfigurationProvider).GetDeclaredMethod("GetMapperExpression");
         private static LambdaExpression GetMapperExpression(IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry, TypeMap typeMap)
         {
             typeMap.Seal(typeMapRegistry, configurationProvider);
