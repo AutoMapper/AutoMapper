@@ -17,7 +17,7 @@ namespace AutoMapper.Mappers
             var primitiveTypes = new[]
             {
                 typeof(string), typeof(char), typeof(bool), typeof(byte), typeof(short), typeof(int), typeof(long), typeof(float),
-                typeof(double), typeof(decimal), typeof(sbyte), typeof(ushort), typeof(uint), typeof(ulong), typeof(DateTime)
+                typeof(double), typeof(decimal), typeof(sbyte), typeof(ushort), typeof(uint), typeof(ulong)
             };
             return
                 (from sourceType in primitiveTypes
@@ -36,7 +36,7 @@ namespace AutoMapper.Mappers
             var underlyingDestinationType = Nullable.GetUnderlyingType(destinationType) ?? destinationType;
             var convertMethod = typeof(Convert).GetDeclaredMethod("To" + underlyingDestinationType.Name, new[] { sourceType });
             var callConvert = Call(convertMethod, sourceParameter);
-            return Lambda(ExpressionExtensions.ToType(callConvert, destinationType), sourceParameter);
+            return Lambda(callConvert, sourceParameter);
         }
 
         public bool IsMatch(TypePair types) => _converters.ContainsKey(types);
