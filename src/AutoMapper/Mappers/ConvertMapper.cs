@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
         {
             var primitiveTypes = new[]
             {
-                typeof(string), typeof(char), typeof(bool), typeof(byte), typeof(short), typeof(int), typeof(long), typeof(float),
+                typeof(string), typeof(bool), typeof(byte), typeof(short), typeof(int), typeof(long), typeof(float),
                 typeof(double), typeof(decimal), typeof(sbyte), typeof(ushort), typeof(uint), typeof(ulong)
             };
             return
