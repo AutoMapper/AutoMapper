@@ -33,5 +33,17 @@ namespace AutoMapper.UnitTests.Mappers
             Mapper.Map<int, double?>(12).ShouldEqual(12);
             Mapper.Map<int, decimal?>(12).ShouldEqual(12);
         }
+
+        [Fact]
+        public void From_string()
+        {
+            Mapper.Map<string, byte?>("12").ShouldEqual((byte)12);
+            Mapper.Map<string, sbyte>("12").ShouldEqual((sbyte)12);
+            Mapper.Map<string, float>("12").ShouldEqual(12);
+            Mapper.Map<string, double?>("12").ShouldEqual(12);
+            Mapper.Map<string, decimal?>("12").ShouldEqual(12);
+            Mapper.Map<string, ushort>("12").ShouldEqual((ushort)12);
+            Mapper.Map<string, ulong>("12").ShouldEqual((ulong)12);
+        }
     }
 }
