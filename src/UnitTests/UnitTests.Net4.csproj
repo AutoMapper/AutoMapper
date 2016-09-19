@@ -228,6 +228,7 @@
     <Compile Include="Internal\QueryMapperHelperTests.cs" />
     <Compile Include="Internationalization.cs" />
     <Compile Include="Bug\LazyCollectionMapping.cs" />
+    <Compile Include="Mappers\ConvertMapperTests.cs" />
     <Compile Include="Mappers\CustomMapperTests.cs" />
     <Compile Include="Mappers\StringDictionaryMapperTests.cs" />
     <Compile Include="Mappers\DynamicMapperTests.cs" />
