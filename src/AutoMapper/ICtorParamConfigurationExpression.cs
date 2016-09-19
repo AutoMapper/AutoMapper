@@ -20,6 +20,12 @@
         /// </summary>
         /// <param name="resolver">Custom func</param>
         void ResolveUsing(Func<TSource, object> resolver);
+
+        /// <summary>
+        /// Map constructor parameter from custom func that has access to <see cref="ResolutionContext"/>
+        /// </summary>
+        /// <param name="resolver">Custom func</param>
+        void ResolveUsing(Func<TSource, ResolutionContext, object> resolver);
     }
 
     public class CtorParamConfigurationExpression<TSource> : ICtorParamConfigurationExpression<TSource>
@@ -40,6 +46,11 @@
         public void ResolveUsing(Func<TSource, object> resolver)
         {
             _ctorParamActions.Add(cpm => cpm.CustomValueResolver = (src, ctxt) => resolver((TSource)src));
+        }
+
+        public void ResolveUsing(Func<TSource, ResolutionContext, object> resolver)
+        {
+            _ctorParamActions.Add(cpm => cpm.CustomValueResolver = (src, ctxt) => resolver((TSource)src, ctxt));
         }
 
         public void Configure(TypeMap typeMap)

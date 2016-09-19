@@ -51,5 +51,21 @@ namespace AutoMapper.UnitTests
 
             dest.Value1.ShouldEqual(8);
         }
+
+        [Fact]
+        public void Should_resolve_using_custom_func_with_correct_ResolutionContext()
+        {
+            const string itemKey = "key";
+            var mapper = new MapperConfiguration(
+                cfg => cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt =>
+                    opt.ResolveUsing((src, ctx) => ctx.Items[itemKey])
+                ))
+                .CreateMapper();
+
+            var dest = mapper.Map<Source, Dest>(new Source { Value = 8 },
+                opts => opts.Items[itemKey] = 10);
+
+            dest.Value1.ShouldEqual(10);
+        }
     }
 }
