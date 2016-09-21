@@ -2,7 +2,6 @@
 namespace AutoMapper
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -21,8 +20,8 @@ namespace AutoMapper
         private readonly List<LambdaExpression> _beforeMapActions = new List<LambdaExpression>();
         private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
-        private readonly ConcurrentBag<PropertyMap> _propertyMaps = new ConcurrentBag<PropertyMap>();
-        private readonly ConcurrentBag<SourceMemberConfig> _sourceMemberConfigs = new ConcurrentBag<SourceMemberConfig>();
+        private readonly List<PropertyMap> _propertyMaps = new List<PropertyMap>();
+        private readonly List<SourceMemberConfig> _sourceMemberConfigs = new List<SourceMemberConfig>();
 
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
