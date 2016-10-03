@@ -17,13 +17,13 @@ namespace AutoMapper.Configuration
 
         public static MethodInfo GetInheritedMethod(this Type type, string name)
         {
-            return (MethodInfo) GetMember(type, name);
+            return GetMember(type, name) as MethodInfo;
         }
 
         public static MemberInfo GetFieldOrProperty(this Type type, string name)
         {
             var memberInfo = GetMember(type, name);
-            if(memberInfo == null)
+            if(memberInfo == null || (memberInfo.MemberType != MemberTypes.Field && memberInfo.MemberType != MemberTypes.Property))
             {
                 throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
             }
