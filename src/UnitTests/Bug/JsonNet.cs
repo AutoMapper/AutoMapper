@@ -58,4 +58,137 @@ namespace AutoMapper.UnitTests.Bug
             json["3"].ShouldEqual("three");
         }
     }
+
+    public class JObjectField : AutoMapperSpecBase
+    {
+        class JContainer : IEnumerable<DBNull>
+        {
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return ((IEnumerable<DBNull>)this).GetEnumerator();
+            }
+
+            IEnumerator<DBNull> IEnumerable<DBNull>.GetEnumerator()
+            {
+                return (IEnumerator<DBNull>)new[] { DBNull.Value }.GetEnumerator();
+            }
+        }
+
+        class JObject : JContainer, IDictionary<string, string>
+        {
+            public JObject()
+            {
+            }
+
+            public string this[string key]
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public int Count
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public bool IsReadOnly
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public ICollection<string> Keys
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public ICollection<string> Values
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public void Add(StringKeyValuePair item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Add(string key, string value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Clear()
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Contains(StringKeyValuePair item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool ContainsKey(string key)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void CopyTo(StringKeyValuePair[] array, int arrayIndex)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerator<StringKeyValuePair> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Remove(StringKeyValuePair item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Remove(string key)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool TryGetValue(string key, out string value)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        class Source
+        {
+            public JObject Json { get; set; }
+        }
+
+        class Destination
+        {
+            public JObject Json { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
+    }
 }

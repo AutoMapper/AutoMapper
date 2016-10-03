@@ -22,22 +22,20 @@ namespace AutoMapper.Mappers
             var condition = conditionalExpression(passedDestination);
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
-            var itemParam = Parameter(sourceElementType, "item");
+            ParameterExpression itemParam;
 
-            var itemExpr = mapItem(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, passedDestination.Type, itemParam, contextExpression);
+            var itemExpr = mapItem(typeMapRegistry, configurationProvider, propertyMap, sourceExpression.Type, passedDestination.Type, contextExpression, out itemParam);
 
-            var destinationElementType = TypeHelper.GetElementType(destExpression.Type);
+            var destinationElementType = itemExpr.Type;
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
-            var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-            var cast = typeof(Enumerable).GetDeclaredMethod("Cast").MakeGenericMethod(itemParam.Type);
             var addMethod = destinationCollectionType.GetDeclaredMethod("Add");
-            var genericSource = sourceExpression.Type.IsGenericType() ? sourceExpression : Call(null, cast, sourceExpression);
             var destination = propertyMap?.UseDestinationValue == true ? passedDestination : newExpression;
-            var addItems = ForEach(genericSource, itemParam, Call(destination, addMethod, itemExpr));
+            var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));
 
             var mapExpr = Block(addItems, destination);
 
             var ifNullExpr = configurationProvider.Configuration.AllowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
+            var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
             var checkNull =  
                 Block(new[] { newExpression, passedDestination },
                     Assign(passedDestination, destExpression),
@@ -77,22 +75,23 @@ namespace AutoMapper.Mappers
         }
 
         public delegate Expression MapItem(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Type sourceType, Type destType, ParameterExpression itemParam, Expression contextParam);
+            PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam);
 
         internal static Expression MapItemExpr(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Type sourceType, Type destType, ParameterExpression itemParam, Expression contextParam)
+            PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
             var sourceElementType = TypeHelper.GetElementType(sourceType);
             var destElementType = TypeHelper.GetElementType(destType);
+            itemParam = Parameter(sourceElementType, "item");
 
             var typePair = new TypePair(sourceElementType, destElementType);
 
             var itemExpr = TypeMapPlanBuilder.MapExpression(typeMapRegistry, configurationProvider, typePair, itemParam, contextParam, propertyMap);
-            return itemExpr;
+            return ToType(itemExpr, destElementType);
         }
 
         internal static Expression MapKeyPairValueExpr(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Type sourceType, Type destType, ParameterExpression itemParam, Expression contextParam)
+            PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
             var sourceElementTypes = TypeHelper.GetElementTypes(sourceType, ElementTypeFlags.BreakKeyValuePair);
             var destElementTypes = TypeHelper.GetElementTypes(destType, ElementTypeFlags.BreakKeyValuePair);
@@ -100,8 +99,9 @@ namespace AutoMapper.Mappers
             var typePairKey = new TypePair(sourceElementTypes[0], destElementTypes[0]);
             var typePairValue = new TypePair(sourceElementTypes[1], destElementTypes[1]);
 
-            var sourceElementType = TypeHelper.GetElementType(sourceType);
-            var destElementType = TypeHelper.GetElementType(destType);
+            var sourceElementType = typeof(KeyValuePair<,>).MakeGenericType(sourceElementTypes);
+            itemParam = Parameter(sourceElementType, "item");
+            var destElementType = typeof(KeyValuePair<,>).MakeGenericType(destElementTypes);
 
             var keyExpr = TypeMapPlanBuilder.MapExpression(typeMapRegistry, configurationProvider, typePairKey, Property(itemParam, "Key"), contextParam, propertyMap);
             var valueExpr = TypeMapPlanBuilder.MapExpression(typeMapRegistry, configurationProvider, typePairValue, Property(itemParam, "Value"), contextParam, propertyMap);
