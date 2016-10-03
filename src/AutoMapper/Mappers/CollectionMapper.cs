@@ -71,7 +71,7 @@ namespace AutoMapper.Mappers
         internal static Expression NewExpr(this Type baseType, Type ifInterfaceType)
         {
             var newExpr = baseType.IsInterface()
-                ? New(ifInterfaceType.MakeGenericType(TypeHelper.GetElementTypes(baseType, ElemntTypeFlags.BreakKeyValuePair)))
+                ? New(ifInterfaceType.MakeGenericType(TypeHelper.GetElementTypes(baseType, ElementTypeFlags.BreakKeyValuePair)))
                 : DelegateFactory.GenerateConstructorExpression(baseType);
             return ToType(newExpr, baseType);
         }
@@ -94,8 +94,8 @@ namespace AutoMapper.Mappers
         internal static Expression MapKeyPairValueExpr(this TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
             PropertyMap propertyMap, Type sourceType, Type destType, ParameterExpression itemParam, Expression contextParam)
         {
-            var sourceElementTypes = TypeHelper.GetElementTypes(sourceType, ElemntTypeFlags.BreakKeyValuePair);
-            var destElementTypes = TypeHelper.GetElementTypes(destType, ElemntTypeFlags.BreakKeyValuePair);
+            var sourceElementTypes = TypeHelper.GetElementTypes(sourceType, ElementTypeFlags.BreakKeyValuePair);
+            var destElementTypes = TypeHelper.GetElementTypes(destType, ElementTypeFlags.BreakKeyValuePair);
 
             var typePairKey = new TypePair(sourceElementTypes[0], destElementTypes[0]);
             var typePairValue = new TypePair(sourceElementTypes[1], destElementTypes[1]);

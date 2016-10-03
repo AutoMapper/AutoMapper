@@ -14,7 +14,7 @@ namespace AutoMapper.Mappers
             return GetElementTypes(enumerableType, null)[0];
         }
 
-        public static Type[] GetElementTypes(Type enumerableType, ElemntTypeFlags flags = ElemntTypeFlags.None)
+        public static Type[] GetElementTypes(Type enumerableType, ElementTypeFlags flags = ElementTypeFlags.None)
         {
             return GetElementTypes(enumerableType, null, flags);
         }
@@ -25,7 +25,7 @@ namespace AutoMapper.Mappers
         }
 
         public static Type[] GetElementTypes(Type enumerableType, IEnumerable enumerable,
-            ElemntTypeFlags flags = ElemntTypeFlags.None)
+            ElementTypeFlags flags = ElementTypeFlags.None)
         {
             if (enumerableType.HasElementType)
             {
@@ -33,7 +33,7 @@ namespace AutoMapper.Mappers
             }
 
             Type idictionaryType = enumerableType.GetDictionaryType();
-            if (idictionaryType != null && flags.HasFlag(ElemntTypeFlags.BreakKeyValuePair))
+            if (idictionaryType != null && flags.HasFlag(ElementTypeFlags.BreakKeyValuePair))
             {
                 return idictionaryType.GetTypeInfo().GenericTypeArguments;
             }
@@ -74,7 +74,7 @@ namespace AutoMapper.Mappers
         }
     }
 
-    public enum ElemntTypeFlags
+    public enum ElementTypeFlags
     {
         None = 0,
         BreakKeyValuePair = 1
