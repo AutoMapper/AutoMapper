@@ -32,9 +32,10 @@ namespace AutoMapper.Configuration
 
         private static MemberInfo GetMember(Type type, string name)
         {
-            return new[] { type }.Concat(type.GetTypeInfo().ImplementedInterfaces)
-                .Select(i => i.GetMember(name).FirstOrDefault())
-                .FirstOrDefault(m => m != null);
+            return 
+                new[] { type }.Concat(type.GetTypeInfo().ImplementedInterfaces)
+                .SelectMany(i => i.GetMember(name))
+                .FirstOrDefault();
         }
 
         public static bool IsNullableType(this Type type)
