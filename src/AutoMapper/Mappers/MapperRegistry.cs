@@ -6,6 +6,7 @@ namespace AutoMapper.Mappers
     {
         private static readonly IObjectMapper[] _initialMappers =
         {
+            new NullableSourceMapper(),
             new ExpressionMapper(), 
             new FlagsEnumMapper(),
             new StringToEnumMapper(), 
@@ -23,11 +24,10 @@ namespace AutoMapper.Mappers
             new HashSetMapper(),
             new CollectionMapper(),
             new EnumerableMapper(),
-            new StringMapper(),
             new AssignableMapper(),
             new ConvertMapper(),
+            new StringMapper(),
             new TypeConverterMapper(),
-            new NullableSourceMapper(),
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
             new FromStringDictionaryMapper(),

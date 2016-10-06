@@ -5,6 +5,38 @@ using Xunit;
 
 namespace AutoMapper.Tests
 {
+    public class NullableEnumToString : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+            public ConsoleColor? Color { get; set; }
+        }
+
+        class Destination
+        {
+            public string Color { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+            cfg.CreateMap<Enum, string>().ConvertUsing((Enum src) => "Test");
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { Color = ConsoleColor.Black });
+        }
+
+        [Fact]
+        public void Should_map_with_underlying_type()
+        {
+            _destination.Color.ShouldEqual("Test");
+        }
+    }
+
 	public class EnumMappingFixture
 	{
         public EnumMappingFixture()
