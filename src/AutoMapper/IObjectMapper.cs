@@ -59,8 +59,7 @@ namespace AutoMapper
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            var result = Call(Constant(this), MapMethod, ToType(sourceExpression, typeof(TSource)), ToType(destExpression, typeof(TDestination)), contextExpression);
-            return ToType(result, destExpression.Type);
+            return Call(Constant(this), MapMethod, ToType(sourceExpression, typeof(TSource)), ToType(destExpression, typeof(TDestination)), contextExpression);
         }
     }
 }
