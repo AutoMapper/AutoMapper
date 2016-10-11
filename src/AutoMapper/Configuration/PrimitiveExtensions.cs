@@ -23,7 +23,7 @@ namespace AutoMapper.Configuration
         public static MemberInfo GetFieldOrProperty(this Type type, string name)
         {
             var memberInfo = GetMember(type, name);
-            if(memberInfo == null || (memberInfo.MemberType != MemberTypes.Field && memberInfo.MemberType != MemberTypes.Property))
+            if(memberInfo == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
             }
