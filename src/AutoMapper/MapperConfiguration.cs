@@ -415,7 +415,7 @@ namespace AutoMapper
         }
     }
 
-    public struct LockingConcurrentDictionary<TKey, TValue>
+    internal struct LockingConcurrentDictionary<TKey, TValue>
     {
         private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary;
         private readonly Func<TKey, Lazy<TValue>> _valueFactory;
