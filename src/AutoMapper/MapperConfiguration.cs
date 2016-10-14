@@ -20,7 +20,7 @@ namespace AutoMapper
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly Dictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
-        private readonly LazyConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
+        private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
@@ -32,7 +32,7 @@ namespace AutoMapper
         public MapperConfiguration(MapperConfigurationExpression configurationExpression, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
-            _mapPlanCache = new LazyConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
+            _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
 
@@ -415,12 +415,12 @@ namespace AutoMapper
         }
     }
 
-    public struct LazyConcurrentDictionary<TKey, TValue>
+    public struct LockingConcurrentDictionary<TKey, TValue>
     {
         private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary;
         private readonly Func<TKey, Lazy<TValue>> _valueFactory;
 
-        public LazyConcurrentDictionary(Func<TKey, TValue> valueFactory)
+        public LockingConcurrentDictionary(Func<TKey, TValue> valueFactory)
         {
             _dictionary = new ConcurrentDictionary<TKey, Lazy<TValue>>();
             _valueFactory = key => new Lazy<TValue>(() => valueFactory(key));

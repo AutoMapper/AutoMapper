@@ -38,13 +38,13 @@ namespace AutoMapper.QueryableExtensions
             new StringExpressionBinder()
         };
 
-        private readonly LazyConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
+        private readonly LockingConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
         private readonly IConfigurationProvider _configurationProvider;
 
         public ExpressionBuilder(IConfigurationProvider configurationProvider)
         {
             _configurationProvider = configurationProvider;
-            _expressionCache = new LazyConcurrentDictionary<ExpressionRequest, LambdaExpression>(CreateMapExpression);
+            _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, LambdaExpression>(CreateMapExpression);
         }
 
         public Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)

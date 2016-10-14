@@ -31,7 +31,7 @@ namespace AutoMapper.Execution
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
-        private static readonly LazyConcurrentDictionary<Type, Type> proxyTypes = new LazyConcurrentDictionary<Type, Type>(EmitProxy);
+        private static readonly LockingConcurrentDictionary<Type, Type> proxyTypes = new LockingConcurrentDictionary<Type, Type>(EmitProxy);
 
         private static ModuleBuilder CreateProxyModule()
         {
