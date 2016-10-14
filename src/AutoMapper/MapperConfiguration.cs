@@ -119,12 +119,9 @@ namespace AutoMapper
                 typeMap = GetTypeMap(typePair);
                 _typeMapPlanCache.Add(typePair, typeMap);
             }
-            if(Configuration.CreateMissingTypeMaps && typeMap != null && typeMap.MapExpression == null)
+            if(typeMap != null && typeMap.MapExpression == null && Configuration.CreateMissingTypeMaps)
             {
-                lock(typeMap)
-                {
-                    typeMap.Seal(_typeMapRegistry, this);
-                }
+                typeMap.Seal(_typeMapRegistry, this);
             }
             return typeMap;
         }
