@@ -11,7 +11,6 @@ namespace AutoMapper.QueryableExtensions
 {
     using Configuration;
     using Execution;
-    using LazyLambda = Lazy<LambdaExpression>;
 
     public interface IExpressionBuilder
     {
@@ -39,21 +38,20 @@ namespace AutoMapper.QueryableExtensions
             new StringExpressionBinder()
         };
 
-        private readonly ConcurrentDictionary<ExpressionRequest, LazyLambda> _expressionCache = new ConcurrentDictionary<ExpressionRequest, LazyLambda>();
+        private readonly LazyConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
         private readonly IConfigurationProvider _configurationProvider;
-        private readonly Func<ExpressionRequest, LazyLambda> _createMapExpression;
 
         public ExpressionBuilder(IConfigurationProvider configurationProvider)
         {
             _configurationProvider = configurationProvider;
-            _createMapExpression = CreateMapExpression;
+            _expressionCache = new LazyConcurrentDictionary<ExpressionRequest, LambdaExpression>(CreateMapExpression);
         }
 
         public Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
         {
             parameters = parameters ?? new Dictionary<string, object>();
 
-            var cachedExpression = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null), _createMapExpression).Value;
+            var cachedExpression = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
 
             Expression x = cachedExpression;
             if (parameters.Any())
@@ -77,9 +75,9 @@ namespace AutoMapper.QueryableExtensions
             return (Expression<Func<TSource, TDestination>>) CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
         }
 
-        public LazyLambda CreateMapExpression(ExpressionRequest request)
+        public LambdaExpression CreateMapExpression(ExpressionRequest request)
         {
-            return new LazyLambda(() => CreateMapExpression(request, new ConcurrentDictionary<ExpressionRequest, int>()));
+            return CreateMapExpression(request, new ConcurrentDictionary<ExpressionRequest, int>());
         }
 
         public LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount)

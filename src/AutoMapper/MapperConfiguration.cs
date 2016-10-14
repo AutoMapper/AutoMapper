@@ -14,16 +14,14 @@ namespace AutoMapper
     using static Expression;
     using static ExpressionExtensions;
     using UntypedMapperFunc = System.Func<object, object, ResolutionContext, object>;
-    using LazyMapperFuncs = Lazy<MapperConfiguration.MapperFuncs>;
 
     public class MapperConfiguration : IConfigurationProvider
     {
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly Dictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
-        private readonly ConcurrentDictionary<MapRequest, LazyMapperFuncs> _mapPlanCache = new ConcurrentDictionary<MapRequest, LazyMapperFuncs>();
+        private readonly LazyConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
-        private readonly Func<MapRequest, LazyMapperFuncs> _createMapperFuncs;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
             : this(configurationExpression, MapperRegistry.Mappers)
@@ -34,8 +32,7 @@ namespace AutoMapper
         public MapperConfiguration(MapperConfigurationExpression configurationExpression, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
-            _createMapperFuncs = CreateMapperFuncs;
-
+            _mapPlanCache = new LazyConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
 
@@ -74,26 +71,23 @@ namespace AutoMapper
 
         public Delegate GetMapperFunc(MapRequest mapRequest)
         {
-            return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Value.Typed;
+            return _mapPlanCache.GetOrAdd(mapRequest).Typed;
         }
 
         public UntypedMapperFunc GetUntypedMapperFunc(MapRequest mapRequest)
         {
-            return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Value.Untyped;
+            return _mapPlanCache.GetOrAdd(mapRequest).Untyped;
         }
 
-        private LazyMapperFuncs CreateMapperFuncs(MapRequest mapRequest)
+        private MapperFuncs CreateMapperFuncs(MapRequest mapRequest)
         {
-            return new LazyMapperFuncs(() =>
+            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
+            if(typeMap != null)
             {
-                var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
-                if(typeMap != null)
-                {
-                    return new MapperFuncs(mapRequest, typeMap);
-                }
-                var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
-                return new MapperFuncs(mapRequest, mapperToUse, this);
-            });
+                return new MapperFuncs(mapRequest, typeMap);
+            }
+            var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
+            return new MapperFuncs(mapRequest, mapperToUse, this);
         }
 
         public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();
@@ -418,6 +412,22 @@ namespace AutoMapper
                         Default(destination.Type)), null)),
                     source, destination, context);
             }
+        }
+    }
+
+    public class LazyConcurrentDictionary<TKey, TValue>
+    {
+        private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary = new ConcurrentDictionary<TKey, Lazy<TValue>>();
+        private readonly Func<TKey, Lazy<TValue>> _valueFactory;
+
+        public LazyConcurrentDictionary(Func<TKey, TValue> valueFactory)
+        {
+            _valueFactory = key => new Lazy<TValue>(() => valueFactory(key));
+        }
+
+        public TValue GetOrAdd(TKey key)
+        {
+            return _dictionary.GetOrAdd(key, _valueFactory).Value;
         }
     }
 }
