@@ -19,10 +19,10 @@ namespace AutoMapper
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
-        private readonly ConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache = new ConcurrentDictionary<MapRequest, MapperFuncs>();
+        private readonly ConcurrentDictionary<MapRequest, Lazy<MapperFuncs>> _mapPlanCache = new ConcurrentDictionary<MapRequest, Lazy<MapperFuncs>>();
         private readonly ConfigurationValidator _validator;
         private readonly Func<TypePair, TypeMap> _getTypeMap;
-        private readonly Func<MapRequest, MapperFuncs> _createMapperFuncs;
+        private readonly Func<MapRequest, Lazy<MapperFuncs>> _createMapperFuncs;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
             : this(configurationExpression, MapperRegistry.Mappers)
@@ -74,23 +74,26 @@ namespace AutoMapper
 
         public Delegate GetMapperFunc(MapRequest mapRequest)
         {
-            return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Typed;
+            return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Value.Typed;
         }
 
         public UntypedMapperFunc GetUntypedMapperFunc(MapRequest mapRequest)
         {
-            return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Untyped;
+            return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Value.Untyped;
         }
 
-        private MapperFuncs CreateMapperFuncs(MapRequest mapRequest)
+        private Lazy<MapperFuncs> CreateMapperFuncs(MapRequest mapRequest)
         {
-            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
-            if (typeMap != null)
+            return new Lazy<MapperFuncs>(() =>
             {
-                return new MapperFuncs(mapRequest, typeMap);
-            }
-            var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
-            return new MapperFuncs(mapRequest, mapperToUse, this);
+                var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
+                if(typeMap != null)
+                {
+                    return new MapperFuncs(mapRequest, typeMap);
+                }
+                var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
+                return new MapperFuncs(mapRequest, mapperToUse, this);
+            });
         }
 
         public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();
