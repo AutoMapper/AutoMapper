@@ -52,8 +52,8 @@ namespace AutoMapper.Mappers
                                  ? (Expression) Constant(null, destExpression.Type)
                                  : NewArrayBounds(destElementType, Constant(0));
 
-            var itemParam = Parameter(sourceElementType, "item");
-            var itemExpr = typeMapRegistry.MapItemExpr(configurationProvider, propertyMap, sourceExpression.Type, destExpression.Type, itemParam, contextExpression);
+            ParameterExpression itemParam;
+            var itemExpr = typeMapRegistry.MapItemExpr(configurationProvider, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out itemParam);
 
             //var count = source.Count();
             //var array = new TDestination[count];

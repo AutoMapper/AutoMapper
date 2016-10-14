@@ -21,15 +21,13 @@ namespace AutoMapper
                 return ForEachArrayItem(collection, arrayItem => Block(new[] { loopVar }, Assign(loopVar, arrayItem), loopContent));
             }
             var elementType = loopVar.Type;
-            var getEnumerator = collection.Type.GetDeclaredMethod("GetEnumerator") ?? 
-                                           typeof(IEnumerable<>).MakeGenericType(elementType).GetDeclaredMethod("GetEnumerator");
+            var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
             var getEnumeratorCall = Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
             var enumeratorVar = Variable(enumeratorType, "enumerator");
             var enumeratorAssign = Assign(enumeratorVar, getEnumeratorCall);
 
-            // The MoveNext method's actually on IEnumerator, not IEnumerator<T>
-            var moveNext = enumeratorType.GetDeclaredMethod("MoveNext") ?? typeof(IEnumerator).GetDeclaredMethod("MoveNext");
+            var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
             var moveNextCall = Call(enumeratorVar, moveNext);
 
             var breakLabel = Label("LoopBreak");
