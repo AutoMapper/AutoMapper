@@ -415,13 +415,14 @@ namespace AutoMapper
         }
     }
 
-    public class LazyConcurrentDictionary<TKey, TValue>
+    public struct LazyConcurrentDictionary<TKey, TValue>
     {
-        private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary = new ConcurrentDictionary<TKey, Lazy<TValue>>();
+        private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary;
         private readonly Func<TKey, Lazy<TValue>> _valueFactory;
 
         public LazyConcurrentDictionary(Func<TKey, TValue> valueFactory)
         {
+            _dictionary = new ConcurrentDictionary<TKey, Lazy<TValue>>();
             _valueFactory = key => new Lazy<TValue>(() => valueFactory(key));
         }
 
