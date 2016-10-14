@@ -1,28 +1,29 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Concurrent;
-    using System.Linq;
-    using System.Linq.Expressions;
     using Configuration;
     using Mappers;
     using QueryableExtensions;
     using QueryableExtensions.Impl;
-    using static System.Linq.Expressions.Expression;
+    using static Expression;
     using static ExpressionExtensions;
     using UntypedMapperFunc = System.Func<object, object, ResolutionContext, object>;
-    using System.Reflection;
+    using LazyMapperFuncs = Lazy<MapperConfiguration.MapperFuncs>;
 
     public class MapperConfiguration : IConfigurationProvider
     {
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
-        private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
-        private readonly ConcurrentDictionary<MapRequest, Lazy<MapperFuncs>> _mapPlanCache = new ConcurrentDictionary<MapRequest, Lazy<MapperFuncs>>();
+        private readonly Dictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
+        private readonly ConcurrentDictionary<MapRequest, LazyMapperFuncs> _mapPlanCache = new ConcurrentDictionary<MapRequest, LazyMapperFuncs>();
         private readonly ConfigurationValidator _validator;
-        private readonly Func<TypePair, TypeMap> _getTypeMap;
-        private readonly Func<MapRequest, Lazy<MapperFuncs>> _createMapperFuncs;
+        private readonly Func<MapRequest, LazyMapperFuncs> _createMapperFuncs;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
             : this(configurationExpression, MapperRegistry.Mappers)
@@ -33,7 +34,6 @@ namespace AutoMapper
         public MapperConfiguration(MapperConfigurationExpression configurationExpression, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
-            _getTypeMap = GetTypeMap;
             _createMapperFuncs = CreateMapperFuncs;
 
             _validator = new ConfigurationValidator(this);
@@ -82,9 +82,9 @@ namespace AutoMapper
             return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Value.Untyped;
         }
 
-        private Lazy<MapperFuncs> CreateMapperFuncs(MapRequest mapRequest)
+        private LazyMapperFuncs CreateMapperFuncs(MapRequest mapRequest)
         {
-            return new Lazy<MapperFuncs>(() =>
+            return new LazyMapperFuncs(() =>
             {
                 var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
                 if(typeMap != null)
@@ -113,7 +113,12 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
-            var typeMap = _typeMapPlanCache.GetOrAdd(typePair, _getTypeMap);
+            TypeMap typeMap;
+            if(!_typeMapPlanCache.TryGetValue(typePair, out typeMap))
+            {
+                typeMap = GetTypeMap(typePair);
+                _typeMapPlanCache.Add(typePair, typeMap);
+            }
             if(Configuration.CreateMissingTypeMaps && typeMap != null && typeMap.MapExpression == null)
             {
                 lock(typeMap)
@@ -318,7 +323,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        struct MapperFuncs
+        internal struct MapperFuncs
         {
             private Lazy<UntypedMapperFunc> _untyped;
 
