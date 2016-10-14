@@ -130,4 +130,49 @@ namespace AutoMapper.UnitTests.Mappers
             public bool Value { get; set; }
         }
     }
+
+    public class When_adding_an_object_based_custom_mapper : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+            public ConsoleColor? Color { get; set; }
+        }
+
+        class Destination
+        {
+            public string Color { get; set; }
+        }
+
+        class EnumMapper : ObjectMapper<object, string>
+        {
+            public override bool IsMatch(TypePair types)
+            {
+                var underlyingType = Nullable.GetUnderlyingType(types.SourceType);
+                return underlyingType.IsEnum && types.DestinationType == typeof(string);
+            }
+
+            public override string Map(object source, string destination, ResolutionContext context)
+            {
+                return "Test";
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        }, new[] { new EnumMapper() }.Concat(MapperRegistry.Mappers));
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source { Color = ConsoleColor.Black });
+        }
+
+        [Fact]
+        public void Should_map_with_underlying_type()
+        {
+            _destination.Color.ShouldEqual("Test");
+        }
+    }
 }

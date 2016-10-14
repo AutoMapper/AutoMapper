@@ -5,6 +5,7 @@ using System.Reflection;
 namespace AutoMapper
 {
     using static Expression;
+    using static ExpressionExtensions;
 
     /// <summary>
     /// Mapping execution strategy, as a chain of responsibility
@@ -58,7 +59,7 @@ namespace AutoMapper
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Call(Constant(this), MapMethod, sourceExpression, destExpression, contextExpression);
+            return Call(Constant(this), MapMethod, ToType(sourceExpression, typeof(TSource)), ToType(destExpression, typeof(TDestination)), contextExpression);
         }
     }
 }
