@@ -17,7 +17,7 @@ namespace AutoMapper
     /// </summary>
     public abstract class Profile : IProfileExpression, IProfileConfiguration
     {
-        private readonly ConditionalObjectMapper _mapMissingTypes = new ConditionalObjectMapper {Conventions = {tp => true}};
+        private readonly ConditionalObjectMapper _mapMissingTypes = new ConditionalObjectMapper {Conventions = { tp => tp.SourceType != typeof(object) && tp.DestinationType != typeof(object) }};
         private readonly List<string> _globalIgnore = new List<string>();
         private readonly List<Action<TypeMap, IMappingExpression>> _allTypeMapActions = new List<Action<TypeMap, IMappingExpression>>();
         private readonly List<Action<PropertyMap, IMemberConfigurationExpression>> _allPropertyMapActions = new List<Action<PropertyMap, IMemberConfigurationExpression>>();
