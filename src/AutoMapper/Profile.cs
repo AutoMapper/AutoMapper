@@ -268,9 +268,13 @@ namespace AutoMapper
 
         void IProfileConfiguration.Configure(TypeMapRegistry typeMapRegistry)
         {
-            foreach (var typeMap in _typeMapConfigs.Where(c => !c.IsOpenGeneric).Select(config => typeMapRegistry.GetTypeMap(config.Types)))
+            foreach (var typeMapConfiguration in _typeMapConfigs.Where(c => !c.IsOpenGeneric))
             {
-                Configure(typeMapRegistry, typeMap);
+                Configure(typeMapRegistry, typeMapConfiguration);
+                if(typeMapConfiguration.ReverseTypeMap != null)
+                {
+                    Configure(typeMapRegistry, typeMapConfiguration.ReverseTypeMap);
+                }
             }
         }
 
@@ -358,6 +362,12 @@ namespace AutoMapper
 
             ApplyBaseMaps(typeMapRegistry, typeMap, typeMap);
             ApplyDerivedMaps(typeMapRegistry, typeMap, typeMap);
+        }
+
+        private void Configure(TypeMapRegistry typeMapRegistry, ITypeMapConfiguration typeMapConfiguration)
+        {
+            var typeMap = typeMapRegistry.GetTypeMap(typeMapConfiguration.Types);
+            Configure(typeMapRegistry, typeMap);
         }
 
         private static void ApplyBaseMaps(TypeMapRegistry typeMapRegistry, TypeMap derivedMap, TypeMap currentMap)

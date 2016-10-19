@@ -252,7 +252,7 @@
     <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
     <Compile Include="MappingInheritance\OverrideIgnore.cs" />
     <Compile Include="MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs" />
-    <Compile Include="MappingInheritance\ProxyClassWithInheritance.cs" />
+    <Compile Include="MappingInheritance\ReverseMapWithInclude.cs" />
     <Compile Include="MappingInheritance\ShouldInheritBeforeAndAfterMap.cs" />
     <Compile Include="MappingInheritance\ShouldSupportOnlyDestinationTypeBeingDerived.cs" />
     <Compile Include="MappingOrder.cs" />

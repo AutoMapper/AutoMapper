@@ -553,6 +553,10 @@ namespace AutoMapper.Configuration
                 {
                     _reverseMap.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
                 }
+                foreach(var includedBaseType in typeMap.IncludedBaseTypes)
+                {
+                    _reverseMap.IncludeBase(includedBaseType.DestinationType, includedBaseType.SourceType);
+                }
             }
         }
 
