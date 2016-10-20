@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
+using AutoMapper.UnitTests;
 using Should;
 using Xunit;
 
@@ -81,49 +83,70 @@ namespace AutoMapper.UnitTests
             _destination.Items.SequenceEqual(_items).ShouldBeTrue();
         } 
     }
-
-    public class IntToNullableIntConverter : AutoMapperSpecBase
+    
+    public class FirstDTO
     {
-        Destination _destination;
+        public int SecondId { get; set; } = 10;
+        public IEnumerable<int> ThirdIds { get; set; } = new[] { 1, 2, 3 };
+    }
 
-        public class IntToNullableConverter : ITypeConverter<int, int?>
-        {
-            public int? Convert(int source, int? destination, ResolutionContext context)
-            {
-                if(source == default(int))
-                {
-                    return null;
-                }
-                return source;
-            }
-        }
+    public class FirstViewModel
+    {
+        public SecondViewModel SecondViewModel { get; set; }
+        public IEnumerable<ThirdViewModel> ThirdViewModels { get; set; }
+    }
 
-        public class Source
-        {
-            public int Id { get; set; }
-        }
+    public class SecondViewModel
+    {
 
-        public class Destination
-        {
-            public int? Id { get; set; }
-        }
+    }
 
-        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+    public class ThirdViewModel
+    {
+
+    }
+
+    public class SecondResolver
+      : IMemberValueResolver<object, object, int, SecondViewModel>
+    {
+        public SecondViewModel Resolve(object source, object destination,
+          int sourceMember, SecondViewModel destMember,
+          ResolutionContext context)
         {
-            cfg.CreateMap<int, int?>().ConvertUsing<IntToNullableConverter>();
-            cfg.CreateMap<Source, Destination>();
-        });
-        
-        protected override void Because_of()
-        {
-            _destination = Mapper.Map<Destination>(new Source());
+            Console.WriteLine("SecondResolver");
+            return new SecondViewModel();
         }
+    }
+
+    public class ThirdCollectionResolver
+      : IMemberValueResolver<object, object, IEnumerable<int>, IEnumerable<ThirdViewModel>>
+    {
+        public IEnumerable<ThirdViewModel> Resolve(object source, object destination,
+          IEnumerable<int> sourceMember, IEnumerable<ThirdViewModel> destMember,
+          ResolutionContext context)
+        {
+            Console.WriteLine("ThirdCollectionResolver");
+            return Enumerable.Empty<ThirdViewModel>();
+        }
+    }
+
+    public class A : AutoMapperSpecBase
+    {
 
         [Fact]
-        public void Should_use_the_converter()
+        public void Main()
         {
-            _destination.Id.ShouldBeNull();
+        Mapper.Map<FirstViewModel>(new FirstDTO());
         }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config =>
+        {
+            config.CreateMap<FirstDTO, FirstViewModel>()
+                .ForMember(dst => dst.SecondViewModel,
+                    opt => opt.ResolveUsing<SecondResolver, int>(src => src.SecondId))
+                .ForMember(dst => dst.ThirdViewModels,
+                    opt => opt.ResolveUsing<ThirdCollectionResolver, IEnumerable<int>>(src => src.ThirdIds));
+        });
     }
 
     public class When_throwing_NRE_from_MapFrom : AutoMapperSpecBase
