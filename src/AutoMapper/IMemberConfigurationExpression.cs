@@ -2,6 +2,7 @@ namespace AutoMapper
 {
     using System;
     using System.Linq.Expressions;
+    using Configuration;
 
     /// <summary>
     /// Member configuration options
@@ -9,7 +10,7 @@ namespace AutoMapper
     /// <typeparam name="TSource">Source type for this member</typeparam>
     /// <typeparam name="TMember">Type for this member</typeparam>
     /// <typeparam name="TDestination">Destination type for this map</typeparam>
-    public interface IMemberConfigurationExpression<TSource, out TDestination, TMember>
+    public interface IMemberConfigurationExpression<TSource, out TDestination, TMember> : IMemberConfiguration
     {
         /// <summary>
         /// Substitute a custom value when the source member resolves as null
