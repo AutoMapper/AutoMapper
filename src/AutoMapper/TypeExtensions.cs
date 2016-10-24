@@ -11,6 +11,11 @@ namespace AutoMapper
 
     internal static class TypeExtensions
     {
+        public static bool HasAttribute<TAttribute>(this Type type) where TAttribute : Attribute
+        {
+            return type.GetTypeInfo().IsDefined(typeof(TAttribute), inherit: false);
+        }
+
         public static Type GetGenericTypeDefinitionIfGeneric(this Type type)
         {
             return type.IsGenericType() ? type.GetGenericTypeDefinition() : type;
