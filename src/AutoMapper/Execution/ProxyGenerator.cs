@@ -31,9 +31,7 @@ namespace AutoMapper.Execution
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
-        private static readonly ConcurrentDictionary<Type, Lazy<Type>> proxyTypes = new ConcurrentDictionary<Type, Lazy<Type>>();
-
-        private static readonly Func<Type, Lazy<Type>> _createProxyType = CreateProxyType;
+        private static readonly LockingConcurrentDictionary<Type, Type> proxyTypes = new LockingConcurrentDictionary<Type, Type>(EmitProxy);
 
         private static ModuleBuilder CreateProxyModule()
         {
@@ -44,11 +42,6 @@ namespace AutoMapper.Execution
             AssemblyBuilder builder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
 
             return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
-        }
-
-        private static Lazy<Type> CreateProxyType(Type interfaceType)
-        {
-            return new Lazy<Type>(()=>EmitProxy(interfaceType));
         }
 
         private static Type EmitProxy(Type interfaceType)
@@ -166,7 +159,7 @@ namespace AutoMapper.Execution
             {
                 throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
             }
-            return proxyTypes.GetOrAdd(interfaceType, _createProxyType).Value;
+            return proxyTypes.GetOrAdd(interfaceType);
         }
 
         private static byte[] StringToByteArray(string hex)

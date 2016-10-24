@@ -1,28 +1,27 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Concurrent;
-    using System.Linq;
-    using System.Linq.Expressions;
     using Configuration;
     using Mappers;
     using QueryableExtensions;
     using QueryableExtensions.Impl;
-    using static System.Linq.Expressions.Expression;
+    using static Expression;
     using static ExpressionExtensions;
     using UntypedMapperFunc = System.Func<object, object, ResolutionContext, object>;
-    using System.Reflection;
 
     public class MapperConfiguration : IConfigurationProvider
     {
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
-        private readonly ConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache = new ConcurrentDictionary<TypePair, TypeMap>();
-        private readonly ConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache = new ConcurrentDictionary<MapRequest, MapperFuncs>();
+        private readonly Dictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
+        private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
-        private readonly Func<TypePair, TypeMap> _getTypeMap;
-        private readonly Func<MapRequest, MapperFuncs> _createMapperFuncs;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
             : this(configurationExpression, MapperRegistry.Mappers)
@@ -33,9 +32,7 @@ namespace AutoMapper
         public MapperConfiguration(MapperConfigurationExpression configurationExpression, IEnumerable<IObjectMapper> mappers)
         {
             _mappers = mappers;
-            _getTypeMap = GetTypeMap;
-            _createMapperFuncs = CreateMapperFuncs;
-
+            _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
 
@@ -74,18 +71,18 @@ namespace AutoMapper
 
         public Delegate GetMapperFunc(MapRequest mapRequest)
         {
-            return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Typed;
+            return _mapPlanCache.GetOrAdd(mapRequest).Typed;
         }
 
         public UntypedMapperFunc GetUntypedMapperFunc(MapRequest mapRequest)
         {
-            return _mapPlanCache.GetOrAdd(mapRequest, _createMapperFuncs).Untyped;
+            return _mapPlanCache.GetOrAdd(mapRequest).Untyped;
         }
 
         private MapperFuncs CreateMapperFuncs(MapRequest mapRequest)
         {
             var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
-            if (typeMap != null)
+            if(typeMap != null)
             {
                 return new MapperFuncs(mapRequest, typeMap);
             }
@@ -110,13 +107,15 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
-            var typeMap = _typeMapPlanCache.GetOrAdd(typePair, _getTypeMap);
-            if(Configuration.CreateMissingTypeMaps && typeMap != null && typeMap.MapExpression == null)
+            TypeMap typeMap;
+            if(!_typeMapPlanCache.TryGetValue(typePair, out typeMap))
             {
-                lock(typeMap)
-                {
-                    typeMap.Seal(_typeMapRegistry, this);
-                }
+                typeMap = GetTypeMap(typePair);
+                _typeMapPlanCache.Add(typePair, typeMap);
+            }
+            if(typeMap != null && typeMap.MapExpression == null && Configuration.CreateMissingTypeMaps)
+            {
+                typeMap.Seal(_typeMapRegistry, this);
             }
             return typeMap;
         }
@@ -315,7 +314,7 @@ namespace AutoMapper
             return typeMap;
         }
 
-        struct MapperFuncs
+        internal struct MapperFuncs
         {
             private Lazy<UntypedMapperFunc> _untyped;
 
@@ -413,6 +412,23 @@ namespace AutoMapper
                         Default(destination.Type)), null)),
                     source, destination, context);
             }
+        }
+    }
+
+    internal struct LockingConcurrentDictionary<TKey, TValue>
+    {
+        private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary;
+        private readonly Func<TKey, Lazy<TValue>> _valueFactory;
+
+        public LockingConcurrentDictionary(Func<TKey, TValue> valueFactory)
+        {
+            _dictionary = new ConcurrentDictionary<TKey, Lazy<TValue>>();
+            _valueFactory = key => new Lazy<TValue>(() => valueFactory(key));
+        }
+
+        public TValue GetOrAdd(TKey key)
+        {
+            return _dictionary.GetOrAdd(key, _valueFactory).Value;
         }
     }
 }

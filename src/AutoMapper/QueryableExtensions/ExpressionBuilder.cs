@@ -39,21 +39,20 @@ namespace AutoMapper.QueryableExtensions
             new StringExpressionBinder()
         };
 
-        private readonly ConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache = new ConcurrentDictionary<ExpressionRequest, LambdaExpression>();
+        private readonly LockingConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
         private readonly IConfigurationProvider _configurationProvider;
 
         public ExpressionBuilder(IConfigurationProvider configurationProvider)
         {
             _configurationProvider = configurationProvider;
+            _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, LambdaExpression>(CreateMapExpression);
         }
 
         public Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
         {
             parameters = parameters ?? new Dictionary<string, object>();
 
-            var cachedExpression =
-                _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null),
-                    tp => CreateMapExpression(tp, new ConcurrentDictionary<ExpressionRequest, int>()));
+            var cachedExpression = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
 
             Expression x = cachedExpression;
             if (parameters.Any())
@@ -77,6 +76,10 @@ namespace AutoMapper.QueryableExtensions
             return (Expression<Func<TSource, TDestination>>) CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
         }
 
+        public LambdaExpression CreateMapExpression(ExpressionRequest request)
+        {
+            return CreateMapExpression(request, new ConcurrentDictionary<ExpressionRequest, int>());
+        }
 
         public LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
         {
