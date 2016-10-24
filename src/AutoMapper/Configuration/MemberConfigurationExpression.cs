@@ -13,7 +13,7 @@ namespace AutoMapper.Configuration
         MemberInfo DestinationMember { get; }
     }
 
-    public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>
+    public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IMemberConfiguration
     {
         private readonly MemberInfo _destinationMember;
         private readonly Type _sourceType;
