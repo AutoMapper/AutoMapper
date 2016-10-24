@@ -9,6 +9,7 @@ using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.QueryableExtensions
 {
+    using System.Runtime.CompilerServices;
     using Configuration;
     using Execution;
 
@@ -264,15 +265,21 @@ namespace AutoMapper.QueryableExtensions
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                if (!node.Member.DeclaringType.Name.Contains("<>"))
+                if(!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
+                {
                     return base.VisitMember(node);
-
-                if (!_paramValues.ContainsKey(node.Member.Name))
-                    return base.VisitMember(node);
-
-                return Expression.Convert(
-                    Expression.Constant(_paramValues[node.Member.Name]),
-                    node.Member.GetMemberType());
+                }
+                object parameterValue;
+                var parameterName = node.Member.Name;
+                if(!_paramValues.TryGetValue(parameterName, out parameterValue))
+                {
+                    const string VBPrefix = "$VB$Local_";
+                    if(!parameterName.StartsWith(VBPrefix, StringComparison.Ordinal) || !_paramValues.TryGetValue(parameterName.Substring(VBPrefix.Length), out parameterValue))
+                    {
+                        return base.VisitMember(node);
+                    }
+                }
+                return Convert(Constant(parameterValue), node.Member.GetMemberType());
             }
         }
 
