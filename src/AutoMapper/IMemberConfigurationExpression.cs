@@ -2,6 +2,8 @@ namespace AutoMapper
 {
     using System;
     using System.Linq.Expressions;
+    using System.Reflection;
+    using Configuration;
 
     /// <summary>
     /// Member configuration options
@@ -186,6 +188,11 @@ namespace AutoMapper
         /// Ignore this member for LINQ projections unless explicitly expanded during projection
         /// </summary>
         void ExplicitExpansion();
+
+        /// <summary>
+        /// The destination member being configured.
+        /// </summary>
+        MemberInfo DestinationMember { get; }
     }
 
     /// <summary>
