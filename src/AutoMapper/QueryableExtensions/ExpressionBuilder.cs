@@ -274,7 +274,7 @@ namespace AutoMapper.QueryableExtensions
                 if(!_paramValues.TryGetValue(parameterName, out parameterValue))
                 {
                     const string VBPrefix = "$VB$Local_";
-                    if(!parameterName.StartsWith(VBPrefix) || !_paramValues.TryGetValue(parameterName.Substring(VBPrefix.Length), out parameterValue))
+                    if(!parameterName.StartsWith(VBPrefix, StringComparison.Ordinal) || !_paramValues.TryGetValue(parameterName.Substring(VBPrefix.Length), out parameterValue))
                     {
                         return base.VisitMember(node);
                     }
