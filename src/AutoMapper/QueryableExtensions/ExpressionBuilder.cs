@@ -265,7 +265,7 @@ namespace AutoMapper.QueryableExtensions
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                if(!node.Member.DeclaringType.HasAttribute<CompilerGeneratedAttribute>())
+                if(!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
                 {
                     return base.VisitMember(node);
                 }
