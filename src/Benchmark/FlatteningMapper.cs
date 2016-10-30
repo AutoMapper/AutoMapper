@@ -83,6 +83,73 @@ namespace Benchmark.Flattening
 
     }
 
+    public class IncludeMapper : IObjectToObjectMapper
+    {
+        private Source _source;
+        public string Name { get; } = "Include Types";
+
+        public void Initialize()
+        {
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>();
+                cfg.CreateMap<Base, DestinationBase>()
+                .Include<BaseInherit1, DestinationInherit1>()
+                .Include<BaseInherit2, DestinationInherit2>();
+                cfg.CreateMap<BaseInherit1, DestinationInherit1>();
+                cfg.CreateMap<BaseInherit2, DestinationInherit2>();
+            });
+            _source = new Source()
+            {
+                List = new List<Base>
+                {
+                    new Base(),
+                    new BaseInherit1(),
+                    new BaseInherit2()
+                }
+            };
+        }
+
+        public object Map()
+        {
+            return Mapper.Map<Source, Destination>(_source);
+        }
+
+        public class Source
+        {
+            public List<Base> List { get; set; }
+        }
+
+        public class Destination
+        {
+            public List<DestinationBase> List { get; set; }
+        }
+
+        public class Base
+        {
+        }
+
+        public class BaseInherit1 : Base
+        {
+        }
+
+        public class BaseInherit2 : Base
+        {
+        }
+
+        public class DestinationBase
+        {
+        }
+
+        public class DestinationInherit1 : DestinationBase
+        {
+        }
+
+        public class DestinationInherit2 : DestinationBase
+        {
+        }
+    }
+
     public class ManualDeepTypeMapper : IObjectToObjectMapper
     {
         private Customer _customer;
