@@ -38,7 +38,7 @@ namespace AutoMapper
                     IfThenElse(
                         Equal(moveNextCall, Constant(true)),
                         Block(new[] { loopVar },
-                            Assign(loopVar, (loopVar.Type.IsAssignableFrom(enumeratorType) ? (Expression)Property(enumeratorVar, "Current") : Convert(Property(enumeratorVar, "Current"), loopVar.Type))),
+                            Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
                             loopContent
                         ),
                         Break(breakLabel)
