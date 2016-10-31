@@ -36,18 +36,6 @@ namespace AutoMapper.Mappers
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = TypeHelper.GetElementType(destExpression.Type);
 
-            if (destExpression.Type.IsAssignableFrom(sourceExpression.Type) && configurationProvider.ResolveTypeMap(sourceElementType, destElementType) == null)
-            {
-                // return (TDestination[]) source;
-                var convertExpr = Convert(sourceExpression, destElementType.MakeArrayType());
-
-                if (configurationProvider.Configuration.AllowNullCollections)
-                    return convertExpr;
-
-                // return (TDestination[]) source ?? new TDestination[0];
-                return Coalesce(convertExpr, NewArrayBounds(destElementType, Constant(0)));
-            }
-
             var ifNullExpr = configurationProvider.Configuration.AllowNullCollections
                                  ? (Expression) Constant(null, destExpression.Type)
                                  : NewArrayBounds(destElementType, Constant(0));

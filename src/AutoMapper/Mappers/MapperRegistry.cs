@@ -13,7 +13,6 @@ namespace AutoMapper.Mappers
             new EnumToEnumMapper(), 
             new EnumToUnderlyingTypeMapper(),
             new MultidimensionalArrayMapper(),
-            new PrimitiveArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
 #if NETSTANDARD1_3 || NET45
