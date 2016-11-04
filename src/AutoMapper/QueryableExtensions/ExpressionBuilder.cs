@@ -137,15 +137,12 @@ namespace AutoMapper.QueryableExtensions
 
         private static int GetDepth(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
         {
-            int visitCount;
-            if(!typePairCount.TryGetValue(request, out visitCount))
+            int visitCount = 0;
+            if(typePairCount.TryGetValue(request, out visitCount))
             {
-                typePairCount[request] = 0;
+                visitCount = visitCount + 1;
             }
-            else
-            {
-                typePairCount[request] = visitCount + 1;
-            }
+            typePairCount[request] = visitCount;
             return visitCount;
         }
 
