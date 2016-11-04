@@ -1,7 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     public class MappedTypeExpressionBinder : IExpressionBinder
@@ -11,12 +10,12 @@ namespace AutoMapper.QueryableExtensions.Impl
             return propertyTypeMap != null && propertyTypeMap.CustomProjection == null;
         }
 
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindMappedTypeExpression(configuration, propertyMap, request, result, typePairCount);
         }
 
-        private static MemberAssignment BindMappedTypeExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        private static MemberAssignment BindMappedTypeExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {
             var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(request, result.ResolutionExpression, typePairCount);
             if(transformedExpression == null)

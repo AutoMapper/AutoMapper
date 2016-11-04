@@ -1,7 +1,6 @@
-using System.Collections.Concurrent;
-
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using Configuration;
 
@@ -13,7 +12,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                    && !result.Type.IsNullableType();
         }
 
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindNullableExpression(propertyMap, result);
         }
