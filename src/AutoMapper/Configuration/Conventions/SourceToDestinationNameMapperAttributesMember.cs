@@ -14,10 +14,10 @@ namespace AutoMapper.Configuration.Conventions
             SourceMember[] sourceMembers;
             if(!allSourceMembers.TryGetValue(typeInfo, out sourceMembers))
             {
-                sourceMembers = getTypeInfoMembers.GetMemberInfos(typeInfo).Select(sourceMember => new SourceMember(sourceMember)).ToArray();
+                sourceMembers = getTypeInfoMembers.GetMemberInfos(typeInfo).Select(sourceMember => new SourceMember(sourceMember)).Where(s=>s.Attribute != null).ToArray();
                 allSourceMembers[typeInfo] = sourceMembers;
             }
-            return sourceMembers.FirstOrDefault(d => d.Attribute != null && d.Attribute.IsMatch(typeInfo, d.Member, destType, destMemberType, nameToSearch)).Member;
+            return sourceMembers.FirstOrDefault(d => d.Attribute.IsMatch(typeInfo, d.Member, destType, destMemberType, nameToSearch)).Member;
         }
 
         struct SourceMember
