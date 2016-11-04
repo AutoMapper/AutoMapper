@@ -306,8 +306,7 @@ namespace AutoMapper.QueryableExtensions
         /// </remarks>
         internal class NullsafeQueryRewriter : ExpressionVisitor
         {
-            static readonly ConcurrentDictionary<Type, Expression> Cache =
-                new ConcurrentDictionary<Type, Expression>();
+            static readonly LockingConcurrentDictionary<Type, Expression> Cache = new LockingConcurrentDictionary<Type, Expression>(NodeFallback);
 
             /// <inheritdoc />
             protected override Expression VisitMember(MemberExpression node)
@@ -334,7 +333,7 @@ namespace AutoMapper.QueryableExtensions
             Expression MakeNullsafe(Expression node, Expression value)
             {
                 // cache "fallback expression" for performance reasons
-                var fallback = Cache.GetOrAdd(node.Type, NodeFallback);
+                var fallback = Cache.GetOrAdd(node.Type);
 
                 // check value and insert additional coalesce, if fallback is not default
                 return Expression.Condition(
