@@ -22,6 +22,6 @@ First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). 
 
 Do you have an issue?
 --------------------------------
-First check if it's already fixed by trying the [MyGet build](https://github.com/AutoMapper/AutoMapper/wiki/MyGet).
+First check if it's already fixed by trying the [MyGet build](https://github.com/AutoMapper/AutoMapper/wiki/The-MyGet-build).
 
 AutoMapper is Copyright &copy; 2008-2016 [Jimmy Bogard](http://jimmybogard.lostechies.com) and other contributors under the [MIT license](LICENSE.txt).
