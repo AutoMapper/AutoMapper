@@ -88,7 +88,7 @@ namespace AutoMapper
         }
 
 #if !DEBUG
-	    public override string StackTrace
+        public override string StackTrace
         {
             get
             {

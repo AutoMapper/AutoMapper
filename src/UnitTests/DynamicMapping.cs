@@ -56,34 +56,34 @@ namespace AutoMapper.UnitTests.DynamicMapping
     }
 
     public class When_mapping_two_non_configured_types : NonValidatingSpecBase
-	{
-		private Destination _resultWithGenerics;
-		private Destination _resultWithoutGenerics;
+    {
+        private Destination _resultWithGenerics;
+        private Destination _resultWithoutGenerics;
 
-		public class Source
-		{
-			public int Value { get; set; }
-		}
+        public class Source
+        {
+            public int Value { get; set; }
+        }
 
-		public class Destination
-		{
-			public int Value { get; set; }
-		}
+        public class Destination
+        {
+            public int Value { get; set; }
+        }
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
         [Fact]
-		public void Should_dynamically_map_the_two_types()
-		{
-			_resultWithGenerics = Mapper.Map<Source, Destination>(new Source {Value = 5});
-			_resultWithoutGenerics = (Destination) Mapper.Map(new Source {Value = 5}, typeof(Source), typeof(Destination));
-			_resultWithGenerics.Value.ShouldEqual(5);
-			_resultWithoutGenerics.Value.ShouldEqual(5);
-		}
-	}
+        public void Should_dynamically_map_the_two_types()
+        {
+            _resultWithGenerics = Mapper.Map<Source, Destination>(new Source {Value = 5});
+            _resultWithoutGenerics = (Destination) Mapper.Map(new Source {Value = 5}, typeof(Source), typeof(Destination));
+            _resultWithGenerics.Value.ShouldEqual(5);
+            _resultWithoutGenerics.Value.ShouldEqual(5);
+        }
+    }
 
-	public class When_mapping_two_non_configured_types_with_resolvers : NonValidatingSpecBase
-	{
+    public class When_mapping_two_non_configured_types_with_resolvers : NonValidatingSpecBase
+    {
         public class Inner
         {
             public string Content { get; set; }
@@ -117,17 +117,17 @@ namespace AutoMapper.UnitTests.DynamicMapping
         });
 
         [Fact]
-		public void Should_use_resolver()
+        public void Should_use_resolver()
         {
             var tm = Configuration.FindTypeMapFor<Original, Target>();
             var original = new Original { Text = "Hello world from original!" };
             var mapped = Mapper.Map<Target>(original);
 
             mapped.Text.ShouldEqual(original.Text);
-			mapped.Child.ShouldNotBeNull();
+            mapped.Child.ShouldNotBeNull();
             mapped.Child.Content.ShouldEqual("Hello world from inner!");
-		}
-	}
+        }
+    }
 
     public class When_mapping_two_non_configured_types_with_nesting : NonValidatingSpecBase
     {
@@ -183,92 +183,92 @@ namespace AutoMapper.UnitTests.DynamicMapping
         }
     }
 
-	public class When_mapping_two_non_configured_types_that_do_not_match : NonValidatingSpecBase
-	{
-		public class Source
-		{
-			public int Value { get; set; }
-		}
+    public class When_mapping_two_non_configured_types_that_do_not_match : NonValidatingSpecBase
+    {
+        public class Source
+        {
+            public int Value { get; set; }
+        }
 
-		public class Destination
-		{
-			public int Valuefff { get; set; }
-		}
+        public class Destination
+        {
+            public int Valuefff { get; set; }
+        }
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
         [Fact]
-		public void Should_ignore_any_members_that_do_not_match()
-		{
-			var destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
+        public void Should_ignore_any_members_that_do_not_match()
+        {
+            var destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
 
-			destination.Valuefff.ShouldEqual(0);
-		}
+            destination.Valuefff.ShouldEqual(0);
+        }
 
-		[Fact]
-		public void Should_not_throw_any_configuration_errors()
-		{
-			typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.Map<Source, Destination>(new Source { Value = 5 }));
-		}
-	}
+        [Fact]
+        public void Should_not_throw_any_configuration_errors()
+        {
+            typeof(AutoMapperConfigurationException).ShouldNotBeThrownBy(() => Mapper.Map<Source, Destination>(new Source { Value = 5 }));
+        }
+    }
 
-	public class When_mapping_to_an_existing_destination_object : NonValidatingSpecBase
-	{
-		private Destination _destination;
+    public class When_mapping_to_an_existing_destination_object : NonValidatingSpecBase
+    {
+        private Destination _destination;
 
-		public class Source
-		{
-			public int Value { get; set; }
-			public int Value2 { get; set; }
-		}
+        public class Source
+        {
+            public int Value { get; set; }
+            public int Value2 { get; set; }
+        }
 
-		public class Destination
-		{
-			public int Valuefff { get; set; }
-			public int Value2 { get; set; }
-		}
+        public class Destination
+        {
+            public int Valuefff { get; set; }
+            public int Value2 { get; set; }
+        }
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
 
         public When_mapping_to_an_existing_destination_object()
-		{
-			_destination = new Destination { Valuefff = 7};
-			Mapper.Map(new Source { Value = 5, Value2 = 3}, _destination);
-		}
+        {
+            _destination = new Destination { Valuefff = 7};
+            Mapper.Map(new Source { Value = 5, Value2 = 3}, _destination);
+        }
 
-		[Fact]
-		public void Should_preserve_existing_values()
-		{
-			_destination.Valuefff.ShouldEqual(7);
-		}
+        [Fact]
+        public void Should_preserve_existing_values()
+        {
+            _destination.Valuefff.ShouldEqual(7);
+        }
 
-		[Fact]
-		public void Should_map_new_values()
-		{
-			_destination.Value2.ShouldEqual(3);
-		}
-	}
+        [Fact]
+        public void Should_map_new_values()
+        {
+            _destination.Value2.ShouldEqual(3);
+        }
+    }
 
     public class When_mapping_from_an_anonymous_type_to_an_interface : NonValidatingSpecBase
-	{
-		private IDestination _result;
+    {
+        private IDestination _result;
 
-		public interface IDestination
-		{
-			int Value { get; set; }
-		}
+        public interface IDestination
+        {
+            int Value { get; set; }
+        }
 
-		protected override void Because_of()
-		{
-			_result = Mapper.Map<IDestination>(new {Value = 5});
-		}
+        protected override void Because_of()
+        {
+            _result = Mapper.Map<IDestination>(new {Value = 5});
+        }
 
-		[Fact]
-		public void Should_allow_dynamic_mapping()
-		{
-			_result.Value.ShouldEqual(5);
-		}
+        [Fact]
+        public void Should_allow_dynamic_mapping()
+        {
+            _result.Value.ShouldEqual(5);
+        }
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
-	}
+    }
 }

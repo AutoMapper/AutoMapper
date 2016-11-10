@@ -69,70 +69,70 @@ namespace AutoMapper.UnitTests.BeforeAfterMapping
 
     }
 
-	public class When_using_a_class_to_do_before_after_mappings : AutoMapperSpecBase
-	{
-		private Destination _destination;
+    public class When_using_a_class_to_do_before_after_mappings : AutoMapperSpecBase
+    {
+        private Destination _destination;
 
-		public class Source
-		{
-			public int Value { get; set; }
-		}
+        public class Source
+        {
+            public int Value { get; set; }
+        }
 
-		public class Destination
-		{
-			public int Value { get; set; }
-		}
+        public class Destination
+        {
+            public int Value { get; set; }
+        }
 
-		public class BeforeMapAction : IMappingAction<Source, Destination>
-		{
-			private readonly int _decrement;
+        public class BeforeMapAction : IMappingAction<Source, Destination>
+        {
+            private readonly int _decrement;
 
-			public BeforeMapAction(int decrement)
-			{
-				_decrement = decrement;
-			}
+            public BeforeMapAction(int decrement)
+            {
+                _decrement = decrement;
+            }
 
-			public void Process(Source source, Destination destination)
-			{
-				source.Value -= _decrement * 2;
-			}
-		}
+            public void Process(Source source, Destination destination)
+            {
+                source.Value -= _decrement * 2;
+            }
+        }
 
-		public class AfterMapAction : IMappingAction<Source, Destination>
-		{
-			private readonly int _increment;
+        public class AfterMapAction : IMappingAction<Source, Destination>
+        {
+            private readonly int _increment;
 
-			public AfterMapAction(int increment)
-			{
-				_increment = increment;
-			}
+            public AfterMapAction(int increment)
+            {
+                _increment = increment;
+            }
 
-			public void Process(Source source, Destination destination)
-			{
-				destination.Value += _increment * 5;
-			}
-		}
+            public void Process(Source source, Destination destination)
+            {
+                destination.Value += _increment * 5;
+            }
+        }
 
-	    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-	    {
-	        cfg.ConstructServicesUsing(t => Activator.CreateInstance(t, 2));
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.ConstructServicesUsing(t => Activator.CreateInstance(t, 2));
 
-	        cfg.CreateMap<Source, Destination>()
-	            .BeforeMap<BeforeMapAction>()
-	            .AfterMap<AfterMapAction>();
-	    });
+            cfg.CreateMap<Source, Destination>()
+                .BeforeMap<BeforeMapAction>()
+                .AfterMap<AfterMapAction>();
+        });
 
-		protected override void Because_of()
-		{
-			_destination = Mapper.Map<Source, Destination>(new Source {Value = 4});
-		}
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Source, Destination>(new Source {Value = 4});
+        }
 
-		[Fact]
-		public void Should_use_global_constructor_for_building_mapping_actions()
-		{
-			_destination.Value.ShouldEqual(10);
-		}
-	}
+        [Fact]
+        public void Should_use_global_constructor_for_building_mapping_actions()
+        {
+            _destination.Value.ShouldEqual(10);
+        }
+    }
 
     public class MappingSpecificBeforeMapping : AutoMapperSpecBase
     {

@@ -5,53 +5,53 @@ using System.Linq;
 
 namespace AutoMapper.UnitTests
 {
-	namespace FillingExistingDestination
-	{
+    namespace FillingExistingDestination
+    {
 
-		public class When_the_destination_object_is_specified : AutoMapperSpecBase
-		{
-			private Source _source;
-			private Destination _originalDest;
-			private Destination _dest;
+        public class When_the_destination_object_is_specified : AutoMapperSpecBase
+        {
+            private Source _source;
+            private Destination _originalDest;
+            private Destination _dest;
 
-			public class Source
-			{
-				public int Value { get; set; }
-			}
+            public class Source
+            {
+                public int Value { get; set; }
+            }
 
-			public class Destination
-			{
-				public int Value { get; set; }
-			}
+            public class Destination
+            {
+                public int Value { get; set; }
+            }
 
-		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-		    {
-		        cfg.CreateMap<Source, Destination>();
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Source, Destination>();
 
-		    });
+            });
 
-			protected override void Because_of()
-			{
-		        _source = new Source
-		        {
-		            Value = 10,
-		        };
-				_originalDest = new Destination { Value = 1111 };
-				_dest = Mapper.Map<Source, Destination>(_source, _originalDest);
-			}
+            protected override void Because_of()
+            {
+                _source = new Source
+                {
+                    Value = 10,
+                };
+                _originalDest = new Destination { Value = 1111 };
+                _dest = Mapper.Map<Source, Destination>(_source, _originalDest);
+            }
 
-			[Fact]
-			public void Should_do_the_translation()
-			{
-				_dest.Value.ShouldEqual(10);
-			}
+            [Fact]
+            public void Should_do_the_translation()
+            {
+                _dest.Value.ShouldEqual(10);
+            }
 
-			[Fact]
-			public void Should_return_the_destination_object_that_was_passed_in()
-			{
-				_originalDest.ShouldBeSameAs(_dest);
-			}
-		}
+            [Fact]
+            public void Should_return_the_destination_object_that_was_passed_in()
+            {
+                _originalDest.ShouldBeSameAs(_dest);
+            }
+        }
        
         public class When_the_destination_object_is_specified_with_child_objects : AutoMapperSpecBase
         {
@@ -192,29 +192,29 @@ namespace AutoMapper.UnitTests
 
 
         public class When_the_destination_object_is_specified_and_you_are_converting_an_enum : NonValidatingSpecBase
-		{
-			private string _result;
+        {
+            private string _result;
 
-			public enum SomeEnum
-			{
-				One,
-				Two,
-				Three
-			}
+            public enum SomeEnum
+            {
+                One,
+                Two,
+                Three
+            }
 
-		    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
 
 
             protected override void Because_of()
-			{
-				_result = Mapper.Map<SomeEnum, string>(SomeEnum.Two, "test");
-			}
+            {
+                _result = Mapper.Map<SomeEnum, string>(SomeEnum.Two, "test");
+            }
 
-			[Fact]
-			public void Should_return_the_enum_as_a_string()
-			{
-				_result.ShouldEqual("Two");
-			}
-		}
-	}
+            [Fact]
+            public void Should_return_the_enum_as_a_string()
+            {
+                _result.ShouldEqual("Two");
+            }
+        }
+    }
 }

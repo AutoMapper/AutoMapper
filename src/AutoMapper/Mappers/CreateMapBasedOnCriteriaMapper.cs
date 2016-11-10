@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
     public interface IConditionalObjectMapper
     {
         ICollection<Func<TypePair, bool>> Conventions { get; }
-		bool IsMatch(TypePair context);
+        bool IsMatch(TypePair context);
     }
 
     public class ConditionalObjectMapper : IConditionalObjectMapper

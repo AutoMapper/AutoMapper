@@ -3,7 +3,7 @@ namespace AutoMapper
     /// <summary>
     /// Extension point to provide custom resolution for a destination value
     /// </summary>
-	public interface IValueResolver<in TSource, in TDestination, TDestMember>
+    public interface IValueResolver<in TSource, in TDestination, TDestMember>
     {
         /// <summary>
         /// Implementors use source object to provide a destination object.
@@ -19,7 +19,7 @@ namespace AutoMapper
     /// <summary>
     /// Extension point to provide custom resolution for a destination value
     /// </summary>
-	public interface IMemberValueResolver<in TSource, in TDestination, in TSourceMember, TDestMember>
+    public interface IMemberValueResolver<in TSource, in TDestination, in TSourceMember, TDestMember>
     {
         /// <summary>
         /// Implementors use source object to provide a destination object.

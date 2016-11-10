@@ -4,34 +4,34 @@ using StructureMap;
 
 namespace AutoMapperSamples.Configuration
 {
-	namespace Initialization
-	{
-		[TestFixture]
-		public class InitializationExample
-		{
-			public class Order
-			{
-				public decimal Amount { get; set; }
-			}
+    namespace Initialization
+    {
+        [TestFixture]
+        public class InitializationExample
+        {
+            public class Order
+            {
+                public decimal Amount { get; set; }
+            }
 
-			public class OrderListViewModel
-			{
-				public string Amount { get; set; }
-			}
+            public class OrderListViewModel
+            {
+                public string Amount { get; set; }
+            }
 
-			public class OrderEditViewModel
-			{
-				public string Amount { get; set; }
-			}
+            public class OrderEditViewModel
+            {
+                public string Amount { get; set; }
+            }
 
-			[Test]
-			public void Example()
-			{
-				var config = new MapperConfiguration(cfg =>
-				{
-					cfg.ConstructServicesUsing(ObjectFactory.GetInstance);
-				});
-			}
-		}
-	}
+            [Test]
+            public void Example()
+            {
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.ConstructServicesUsing(ObjectFactory.GetInstance);
+                });
+            }
+        }
+    }
 }

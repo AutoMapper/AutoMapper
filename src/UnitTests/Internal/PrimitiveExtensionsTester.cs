@@ -8,7 +8,7 @@ namespace AutoMapper.UnitTests
     using Configuration;
 
     public class PrimitiveExtensionsTester
-	{
+    {
         interface Interface
         {
             int Value { get; }
@@ -30,27 +30,27 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
-		public void Should_not_flag_only_enumerable_type_as_writeable_collection()
-		{
-			typeof(string).IsListOrDictionaryType().ShouldBeFalse();
-		}
+        public void Should_not_flag_only_enumerable_type_as_writeable_collection()
+        {
+            typeof(string).IsListOrDictionaryType().ShouldBeFalse();
+        }
 
-		[Fact]
-		public void Should_flag_list_as_writable_collection()
-		{
-			typeof(int[]).IsListOrDictionaryType().ShouldBeTrue();
-		}
+        [Fact]
+        public void Should_flag_list_as_writable_collection()
+        {
+            typeof(int[]).IsListOrDictionaryType().ShouldBeTrue();
+        }
 
-		[Fact]
-		public void Should_flag_generic_list_as_writeable_collection()
-		{
-			typeof(List<int>).IsListOrDictionaryType().ShouldBeTrue();
-		}
+        [Fact]
+        public void Should_flag_generic_list_as_writeable_collection()
+        {
+            typeof(List<int>).IsListOrDictionaryType().ShouldBeTrue();
+        }
 
-		[Fact]
-		public void Should_flag_dictionary_as_writeable_collection()
-		{
-			typeof(Dictionary<string, int>).IsListOrDictionaryType().ShouldBeTrue();
-		}
-	}
+        [Fact]
+        public void Should_flag_dictionary_as_writeable_collection()
+        {
+            typeof(Dictionary<string, int>).IsListOrDictionaryType().ShouldBeTrue();
+        }
+    }
 }
