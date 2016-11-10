@@ -144,6 +144,10 @@ namespace AutoMapper.Mappers
                 var newLeft = base.Visit(node.Left);
                 var newRight = base.Visit(node.Right);
 
+                if(newLeft.Type != newRight.Type && newRight.Type == typeof(string))
+                    newLeft = Expression.Call(newLeft, typeof(object).GetDeclaredMethod("ToString"));
+                if (newRight.Type != newLeft.Type && newLeft.Type == typeof(string))
+                    newRight = Expression.Call(newRight, typeof(object).GetDeclaredMethod("ToString"));
                 CheckNullableToNonNullableChanges(node.Left, node.Right, ref newLeft, ref newRight);
                 CheckNullableToNonNullableChanges(node.Right, node.Left, ref newRight, ref newLeft);
                 return Expression.MakeBinary(node.NodeType, newLeft, newRight);

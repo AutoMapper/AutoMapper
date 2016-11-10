@@ -14,15 +14,16 @@ namespace AutoMapper.UnitTests.Query
     {
         readonly Source[] _source = new[]
                     {
-                        new Source {SrcValue = 5},
-                        new Source {SrcValue = 4},
-                        new Source {SrcValue = 7}
+                        new Source {SrcValue = 5, InttoStringValue = 5},
+                        new Source {SrcValue = 4, InttoStringValue = 4},
+                        new Source {SrcValue = 7, InttoStringValue = 7}
                     };
 
         public class Source
         {
             public int SrcValue { get; set; }
             public string StringValue { get; set; }
+            public int InttoStringValue { get; set; }
             public string[] Strings { get; set; }
         }
 
@@ -30,6 +31,7 @@ namespace AutoMapper.UnitTests.Query
         {
             public int DestValue { get; set; }
             public string StringValue { get; set; }
+            public string InttoStringValue { get; set; }
             public string[] Strings { get; set; }
         }
 
@@ -591,6 +593,19 @@ namespace AutoMapper.UnitTests.Query
             results.Count.ShouldEqual(2);
             results[0].HasEditPermission.ShouldBeFalse();
             results[1].HasEditPermission.ShouldBeTrue();
+        }
+
+
+        [Fact]
+        public void Shoud_convert_type_changes()
+        {
+            IQueryable<Destination> result = _source.AsQueryable()
+                .UseAsDataSource(Configuration).For<Destination>();
+
+            var destItem = result.First(s => s.InttoStringValue == "7");
+            var sourceItem = _source.First(s => s.InttoStringValue == 7);
+
+            destItem.DestValue.ShouldEqual(sourceItem.SrcValue);
         }
 
         private static IMapper SetupAutoMapper()
