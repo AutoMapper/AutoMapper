@@ -9,10 +9,10 @@ using Benchmark.Flattening;
 
 namespace Benchmark
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
             var mappers = new Dictionary<string, IObjectToObjectMapper[]>
                 {
                     { "Flattening", new IObjectToObjectMapper[] { new FlatteningMapper() , new ManualMapper(), } },
@@ -27,6 +27,6 @@ namespace Benchmark
                     new BenchEngine(mapper, pair.Key).Start();
                 }
             }
-		}
-	}
+        }
+    }
 }

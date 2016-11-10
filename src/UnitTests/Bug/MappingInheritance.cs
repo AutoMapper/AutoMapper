@@ -5,9 +5,9 @@ namespace AutoMapper.UnitTests.Bug
     using Xunit;
 
     public class MappingInheritance : AutoMapperSpecBase
-	{
-		private Entity testEntity;
-		private EditModel testModel;
+    {
+        private Entity testEntity;
+        private EditModel testModel;
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
@@ -32,8 +32,8 @@ namespace AutoMapper.UnitTests.Bug
         }
 
         [Fact]
-		public void AutoMapper_should_map_derived_types_properly()
-		{
+        public void AutoMapper_should_map_derived_types_properly()
+        {
             testEntity.Value1.ShouldEqual(testModel.Value2);
             testEntity.Value2.ShouldEqual(testModel.Value1);
             (testEntity.Value1 + testEntity.Value2).ShouldEqual(testModel.Value3);

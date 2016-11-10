@@ -10,8 +10,8 @@ namespace AutoMapper
     /// <summary>
     /// Contains profile-specific configuration
     /// </summary>
-	public interface IProfileConfiguration
-	{
+    public interface IProfileConfiguration
+    {
         IEnumerable<IMemberConfiguration> MemberConfigurations { get; }
         IEnumerable<IConditionalObjectMapper> TypeConfigurations { get; }
         bool ConstructorMappingEnabled { get; }
@@ -42,10 +42,10 @@ namespace AutoMapper
 
         string ProfileName { get; }
         IEnumerable<string> GlobalIgnores { get; }
-	    IEnumerable<string> Prefixes { get; }
-	    IEnumerable<string> Postfixes { get; }
+        IEnumerable<string> Prefixes { get; }
+        IEnumerable<string> Postfixes { get; }
 
-	    /// <summary>
+        /// <summary>
         /// Registers all defined type maps
         /// </summary>
         /// <param name="typeMapRegistry">Type map registry</param>
@@ -74,6 +74,6 @@ namespace AutoMapper
         /// <returns>Configured type map, or null if not a match</returns>
         TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes);
 
-	    TypeDetails CreateTypeDetails(Type type);
-	}
+        TypeDetails CreateTypeDetails(Type type);
+    }
 }

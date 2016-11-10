@@ -8,8 +8,8 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-	public class DestinationValueInitializedByCtorBug : AutoMapperSpecBase
-	{
+    public class DestinationValueInitializedByCtorBug : AutoMapperSpecBase
+    {
         public class ItemToMapDto
         {
             public ItemToMapDto()
@@ -36,15 +36,15 @@ namespace AutoMapper.UnitTests.Bug
             public bool IsTrue { get; set; }
         }
 
-	    protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
-	    {
-	        cfg.CreateMap<ItemToMap, ItemToMapDto>();
-	        cfg.CreateMap<Tag, TagDto>();
-	    });
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<ItemToMap, ItemToMapDto>();
+            cfg.CreateMap<Tag, TagDto>();
+        });
 
         [Fact]
-		public void Should_map_all_null_values_to_its_substitute()
-		{
+        public void Should_map_all_null_values_to_its_substitute()
+        {
             var tag = new Tag();
 
             List<ItemToMap> entities = new List<ItemToMap>();
@@ -58,8 +58,8 @@ namespace AutoMapper.UnitTests.Bug
                 });
             }
 
-		    Mapper.Map<List<ItemToMap>, List<ItemToMapDto>>(entities);
+            Mapper.Map<List<ItemToMap>, List<ItemToMapDto>>(entities);
             typeof(AutoMapperMappingException).ShouldNotBeThrownBy(() => Mapper.Map<List<ItemToMap>, List<ItemToMapDto>>(entities));
-		}
-	}
+        }
+    }
 }
