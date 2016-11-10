@@ -7,18 +7,10 @@ namespace AutoMapper.Mappers
     using System;
     using System.Reflection;
     using System.Linq;
-    
+    using static ExpressionExtensions;
+
     public class StringToEnumMapper : IObjectMapper
     {
-        public static TDestination Map<TDestination>(string source)
-        {
-            if (string.IsNullOrEmpty(source))
-                return default(TDestination);
-            return (TDestination)Enum.Parse(typeof(TDestination), source, true);
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(StringToEnumMapper).GetAllMethods().First(_ => _.IsStatic);
-
         public bool IsMatch(TypePair context)
         {
             var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);
@@ -27,7 +19,11 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression);
+            var destinationType = destExpression.Type;
+            var destinationEnumType = TypeHelper.GetEnumerationType(destinationType);
+            var enumParse = Call(typeof(Enum), "Parse", null, Constant(destinationEnumType), sourceExpression, Constant(true));
+            var isNullOrEmpty = Call(typeof(string), "IsNullOrEmpty", null, sourceExpression);
+            return Condition(isNullOrEmpty, Default(destinationType), ToType(enumParse, destinationType));
         }
     }
 
