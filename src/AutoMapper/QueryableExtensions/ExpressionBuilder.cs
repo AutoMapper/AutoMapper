@@ -17,8 +17,8 @@ namespace AutoMapper.QueryableExtensions
     {
         Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
         Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
-        LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
-        Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount);
+        LambdaExpression CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount);
+        Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount);
     }
 
     public class ExpressionBuilder : IExpressionBuilder
@@ -78,10 +78,10 @@ namespace AutoMapper.QueryableExtensions
 
         public LambdaExpression CreateMapExpression(ExpressionRequest request)
         {
-            return CreateMapExpression(request, new ConcurrentDictionary<ExpressionRequest, int>());
+            return CreateMapExpression(request, new Dictionary<ExpressionRequest, int>());
         }
 
-        public LambdaExpression CreateMapExpression(ExpressionRequest request, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public LambdaExpression CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
         {
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Expression.Parameter(request.SourceType, "dto");
@@ -94,26 +94,26 @@ namespace AutoMapper.QueryableExtensions
             return Expression.Lambda(delegateType, total, instanceParameter);
         }
 
-        public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
         {
             var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType,
                 request.DestinationType);
 
-            if (typeMap == null)
+            if(typeMap == null)
             {
                 throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             }
-            
-            if (typeMap.CustomProjection != null)
+
+            if(typeMap.CustomProjection != null)
             {
                 return typeMap.CustomProjection.ReplaceParameters(instanceParameter);
             }
 
             var bindings = new List<MemberBinding>();
-            var visitCount = typePairCount.AddOrUpdate(request, 0, (tp, i) => i + 1);
-            if (typeMap.MaxDepth > 0 && visitCount >= typeMap.MaxDepth)
+            int depth = GetDepth(request, typePairCount);
+            if(typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
             {
-                if (_configurationProvider.Configuration.AllowNullDestinationValues)
+                if(_configurationProvider.Configuration.AllowNullDestinationValues)
                 {
                     return null;
                 }
@@ -123,8 +123,8 @@ namespace AutoMapper.QueryableExtensions
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
             }
             Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter);
-            if (instanceParameter is ParameterExpression)
-                constructorExpression = ((LambdaExpression) constructorExpression).ReplaceParameters(instanceParameter);
+            if(instanceParameter is ParameterExpression)
+                constructorExpression = ((LambdaExpression)constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
             visitor.Visit(constructorExpression);
 
@@ -133,6 +133,17 @@ namespace AutoMapper.QueryableExtensions
                 bindings.ToArray()
                 );
             return expression;
+        }
+
+        private static int GetDepth(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
+        {
+            int visitCount = 0;
+            if(typePairCount.TryGetValue(request, out visitCount))
+            {
+                visitCount = visitCount + 1;
+            }
+            typePairCount[request] = visitCount;
+            return visitCount;
         }
 
         private LambdaExpression DestinationConstructorExpression(TypeMap typeMap, Expression instanceParameter)
@@ -163,7 +174,7 @@ namespace AutoMapper.QueryableExtensions
 
         private List<MemberBinding> CreateMemberBindings(ExpressionRequest request,
             TypeMap typeMap,
-            Expression instanceParameter, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+            Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
         {
             var bindings = new List<MemberBinding>();
 
@@ -295,8 +306,7 @@ namespace AutoMapper.QueryableExtensions
         /// </remarks>
         internal class NullsafeQueryRewriter : ExpressionVisitor
         {
-            static readonly ConcurrentDictionary<Type, Expression> Cache =
-                new ConcurrentDictionary<Type, Expression>();
+            static readonly LockingConcurrentDictionary<Type, Expression> Cache = new LockingConcurrentDictionary<Type, Expression>(NodeFallback);
 
             /// <inheritdoc />
             protected override Expression VisitMember(MemberExpression node)
@@ -323,7 +333,7 @@ namespace AutoMapper.QueryableExtensions
             Expression MakeNullsafe(Expression node, Expression value)
             {
                 // cache "fallback expression" for performance reasons
-                var fallback = Cache.GetOrAdd(node.Type, NodeFallback);
+                var fallback = Cache.GetOrAdd(node.Type);
 
                 // check value and insert additional coalesce, if fallback is not default
                 return Expression.Condition(

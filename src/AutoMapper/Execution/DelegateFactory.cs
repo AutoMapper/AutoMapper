@@ -13,15 +13,7 @@ namespace AutoMapper.Execution
 
     public class DelegateFactory
     {
-        private readonly ConcurrentDictionary<Type, LateBoundCtor> _ctorCache =
-            new ConcurrentDictionary<Type, LateBoundCtor>();
-
-        private readonly Func<Type, LateBoundCtor> _generateConstructor;
-
-        public DelegateFactory()
-        {
-            _generateConstructor = GenerateConstructor;
-        }
+        private readonly LockingConcurrentDictionary<Type, LateBoundCtor> _ctorCache = new LockingConcurrentDictionary<Type, LateBoundCtor>(GenerateConstructor);
 
         public Expression<LateBoundMethod<object, TValue>> CreateGet<TValue>(MethodInfo method)
         {
@@ -53,8 +45,7 @@ namespace AutoMapper.Execution
 
         public LateBoundCtor CreateCtor(Type type)
         {
-            var ctor = _ctorCache.GetOrAdd(type, _generateConstructor);
-            return ctor;
+            return _ctorCache.GetOrAdd(type);
         }
 
         private static LateBoundCtor GenerateConstructor(Type type)

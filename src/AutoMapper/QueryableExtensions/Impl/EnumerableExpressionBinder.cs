@@ -1,9 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Collections.Concurrent;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -18,12 +15,12 @@ namespace AutoMapper.QueryableExtensions.Impl
                     !(TypeHelper.GetElementType(propertyMap.DestinationPropertyType).IsPrimitive() && TypeHelper.GetElementType(propertyMap.SourceType).IsPrimitive());
         }
 
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindEnumerableExpression(configuration, propertyMap, request, result, typePairCount);
         }
 
-        private static MemberAssignment BindEnumerableExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        private static MemberAssignment BindEnumerableExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {
             var destinationListType = TypeHelper.GetElementType(propertyMap.DestinationPropertyType);
             var sourceListType = TypeHelper.GetElementType(propertyMap.SourceType);

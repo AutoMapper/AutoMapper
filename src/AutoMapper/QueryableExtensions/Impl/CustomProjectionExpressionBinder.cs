@@ -1,8 +1,6 @@
-using System.Linq;
-
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     public class CustomProjectionExpressionBinder : IExpressionBinder
@@ -12,7 +10,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return propertyTypeMap?.CustomProjection != null;
         }
 
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, ConcurrentDictionary<ExpressionRequest, int> typePairCount)
+        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {
             return BindCustomProjectionExpression(propertyMap, propertyTypeMap, result);
         }
