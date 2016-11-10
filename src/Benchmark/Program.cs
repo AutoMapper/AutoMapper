@@ -18,7 +18,8 @@ namespace Benchmark
                     { "Flattening", new IObjectToObjectMapper[] { new FlatteningMapper() , new ManualMapper(), } },
                     { "Ctors", new IObjectToObjectMapper[] { new CtorMapper(), new ManualCtorMapper(),  } },
                     { "Complex", new IObjectToObjectMapper[] { new ComplexTypeMapper(), new ManualComplexTypeMapper() } },
-                    { "Deep", new IObjectToObjectMapper[] { new DeepTypeMapper(), new ManualDeepTypeMapper() } }
+                    { "Deep", new IObjectToObjectMapper[] { new DeepTypeMapper(), new ManualDeepTypeMapper() } },
+                    { "Include", new IObjectToObjectMapper[] { new IncludeMapper() } }
                 };
             foreach(var pair in mappers)
             {
