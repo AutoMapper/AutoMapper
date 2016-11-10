@@ -166,7 +166,6 @@ namespace AutoMapper
         internal class RemoveIfNotNullVisitor : ExpressionVisitor
         {
             private readonly Expression[] _expressions;
-            private readonly IList<Expression> AllreadyUpdated = new List<Expression>();
 
             public RemoveIfNotNullVisitor(params Expression[] expressions)
             {
@@ -196,9 +195,12 @@ namespace AutoMapper
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                return node.Expression == _oldParam
-                    ? MakeMemberAccess(ToType(_newParam, _oldParam.Type), node.Member)
-                    : base.VisitMember(node);
+                if (node.Expression == _oldParam)
+                {
+                    node = MakeMemberAccess(ToType(_newParam, _oldParam.Type), node.Member);
+                }
+
+                return base.VisitMember(node);
             }
 
             protected override Expression VisitParameter(ParameterExpression node)
@@ -208,9 +210,12 @@ namespace AutoMapper
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
-                return node.Object == _oldParam
-                    ? Call(ToType(_newParam, _oldParam.Type), node.Method, node.Arguments)
-                    : base.VisitMethodCall(node);
+                if (node.Object == _oldParam)
+                {
+                    node = Call(ToType(_newParam, _oldParam.Type), node.Method, node.Arguments);
+                }
+
+                return base.VisitMethodCall(node);
             }
         }
 
@@ -227,7 +232,10 @@ namespace AutoMapper
 
             public override Expression Visit(Expression node)
             {
-                return _oldExpression == node ? _newExpression : base.Visit(node);
+                if (_oldExpression == node)
+                    node = _newExpression;
+
+                return base.Visit(node);
             }
         }
 
