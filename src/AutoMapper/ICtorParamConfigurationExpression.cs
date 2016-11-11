@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Linq;
-    using Execution;
 
     public interface ICtorParamConfigurationExpression<TSource>
     {
@@ -55,10 +54,16 @@
 
         public void Configure(TypeMap typeMap)
         {
-            var parameter = typeMap.ConstructorMap.CtorParams.Single(p => p.Parameter.Name == _ctorParamName);
-            if(parameter == null)
+            var ctorParams = typeMap.ConstructorMap?.CtorParams;
+            if (ctorParams == null)
             {
-                throw new ArgumentOutOfRangeException(nameof(typeMap), $"There is no constructor parameter named {_ctorParamName}");
+                throw new AutoMapperConfigurationException($"The type {typeMap.Types.DestinationType.Name} does not have a constructor.\n{typeMap.Types.DestinationType.FullName}");
+            }
+
+            var parameter = ctorParams.SingleOrDefault(p => p.Parameter.Name == _ctorParamName);
+            if (parameter == null)
+            {
+                throw new AutoMapperConfigurationException($"{typeMap.Types.DestinationType.Name} does not have a constructor with a parameter named '{_ctorParamName}'.\n{typeMap.Types.DestinationType.FullName}");
             }
             parameter.CanResolve = true;
 
