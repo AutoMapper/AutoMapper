@@ -322,6 +322,32 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 
+    public class ExpressionsMappingWithClosures : NonValidatingSpecBase
+    {
+        public class TestData
+        {
+            public string Code { get; set; }
+        }
+
+        public class TestModel
+        {
+            public string Code { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(config => config.CreateMap<TestModel, TestData>());
+
+        public void Should_map_with_closures()
+        {
+            var req = new TestData { Code = "DD" };
+            Expression<Func<TestData, bool>> f = s => s.Code == req.Code;
+            var result = (Expression<Func<TestModel, bool>>) Mapper.Map(f, typeof(Expression<Func<TestData, bool>>), typeof(Expression<Func<TestModel, bool>>));
+
+            var func = result.Compile();
+
+            func(new TestModel {Code = "DD"}).ShouldBeTrue();
+        }
+    }
+
 
     public class A<T> : IQueryable<T>
     {
