@@ -257,6 +257,12 @@ namespace AutoMapper.Mappers
                         return GetConvertedSubMemberCall(node);
                     return node;
                 }
+
+                var constantVisitor = new IsConstantExpressionVisitor();
+                constantVisitor.Visit(node);
+                if (constantVisitor.IsConstant)
+                    return node;
+
                 SetSorceSubTypes(propertyMap);
 
                 var replacedExpression = Visit(node.Expression);
@@ -270,6 +276,18 @@ namespace AutoMapper.Mappers
 
                 return propertyMap.SourceMembers
                     .Aggregate(replacedExpression, getExpression);
+            }
+
+            private class IsConstantExpressionVisitor : ExpressionVisitor
+            {
+                public bool IsConstant { get; private set; }
+
+                protected override Expression VisitConstant(ConstantExpression node)
+                {
+                    IsConstant = true;
+
+                    return base.VisitConstant(node);
+                }
             }
 
             private Expression GetConvertedSubMemberCall(MemberExpression node)
@@ -299,6 +317,9 @@ namespace AutoMapper.Mappers
 
             private PropertyMap PropertyMap(MemberExpression node)
             {
+                if (_typeMap == null)
+                    return null;
+
                 if (node.Member.IsStatic())
                     return null;
 
