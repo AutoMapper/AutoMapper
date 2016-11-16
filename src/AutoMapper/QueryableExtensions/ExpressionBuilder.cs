@@ -73,7 +73,7 @@ namespace AutoMapper.QueryableExtensions
         public Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null,
             params MemberInfo[] membersToExpand)
         {
-            return (Expression<Func<TSource, TDestination>>) CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
+            return (Expression<Func<TSource, TDestination>>)CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
         }
 
         public LambdaExpression CreateMapExpression(ExpressionRequest request)
@@ -86,7 +86,7 @@ namespace AutoMapper.QueryableExtensions
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Expression.Parameter(request.SourceType, "dto");
             var total = CreateMapExpression(request, instanceParameter, typePairCount);
-            if(total == null)
+            if (total == null)
             {
                 return null;
             }
@@ -99,21 +99,21 @@ namespace AutoMapper.QueryableExtensions
             var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType,
                 request.DestinationType);
 
-            if(typeMap == null)
+            if (typeMap == null)
             {
                 throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             }
 
-            if(typeMap.CustomProjection != null)
+            if (typeMap.CustomProjection != null)
             {
                 return typeMap.CustomProjection.ReplaceParameters(instanceParameter);
             }
 
             var bindings = new List<MemberBinding>();
             int depth = GetDepth(request, typePairCount);
-            if(typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
+            if (typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
             {
-                if(_configurationProvider.Configuration.AllowNullDestinationValues)
+                if (typeMap.Profile.AllowNullDestinationValues)
                 {
                     return null;
                 }
@@ -123,7 +123,7 @@ namespace AutoMapper.QueryableExtensions
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
             }
             Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter);
-            if(instanceParameter is ParameterExpression)
+            if (instanceParameter is ParameterExpression)
                 constructorExpression = ((LambdaExpression)constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
             visitor.Visit(constructorExpression);
@@ -138,7 +138,7 @@ namespace AutoMapper.QueryableExtensions
         private static int GetDepth(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
         {
             int visitCount = 0;
-            if(typePairCount.TryGetValue(request, out visitCount))
+            if (typePairCount.TryGetValue(request, out visitCount))
             {
                 visitCount = visitCount + 1;
             }
@@ -279,16 +279,16 @@ namespace AutoMapper.QueryableExtensions
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                if(!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
+                if (!node.Member.DeclaringType.Has<CompilerGeneratedAttribute>())
                 {
                     return base.VisitMember(node);
                 }
                 object parameterValue;
                 var parameterName = node.Member.Name;
-                if(!_paramValues.TryGetValue(parameterName, out parameterValue))
+                if (!_paramValues.TryGetValue(parameterName, out parameterValue))
                 {
                     const string VBPrefix = "$VB$Local_";
-                    if(!parameterName.StartsWith(VBPrefix, StringComparison.Ordinal) || !_paramValues.TryGetValue(parameterName.Substring(VBPrefix.Length), out parameterValue))
+                    if (!parameterName.StartsWith(VBPrefix, StringComparison.Ordinal) || !_paramValues.TryGetValue(parameterName.Substring(VBPrefix.Length), out parameterValue))
                     {
                         return base.VisitMember(node);
                     }

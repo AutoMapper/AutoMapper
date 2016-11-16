@@ -272,6 +272,103 @@ namespace AutoMapper.UnitTests.NullBehavior
         }
     }
 
+    public class When_overriding_null_behavior_in_sub_profile : AutoMapperSpecBase
+    {
+        private ModelDto _result;
+
+        public class ModelDto
+        {
+            public ModelSubDto Sub { get; set; }
+            public int SubSomething { get; set; }
+            public int? NullableMapFrom { get; set; }
+            public string NullString { get; set; }
+            public int? SubExpressionName { get; set; }
+        }
+
+        public class ModelSubDto
+        {
+            public int[] Items { get; set; }
+        }
+
+        public class ModelObject
+        {
+            public ModelSubObject Sub { get; set; }
+            public string NullString { get; set; }
+
+            public ModelSubObject[] Subs { get; set; }
+
+            public int Id { get; set; }
+        }
+
+        public class ModelSubObject
+        {
+            public int[] GetItems()
+            {
+                return new[] { 0, 1, 2, 3 };
+            }
+
+            public int Something { get; set; }
+
+            public string Name { get; set; }
+            public ModelSubObject Sub { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.AllowNullDestinationValues = false;
+
+            cfg.CreateProfile("Foo", p =>
+            {
+                p.AllowNullDestinationValues = true;
+                p.CreateMap<ModelObject, ModelDto>();
+                p.CreateMap<ModelSubObject, ModelSubDto>();
+                p.CreateMap<ModelObject, ModelDto>()
+                    .ForMember(d => d.SubExpressionName, opt => opt.MapFrom(src =>
+                                src.Subs.FirstOrDefault(spt => spt.Sub.Something == src.Id).Something))
+                    .ForMember(d => d.NullableMapFrom, opt => opt.MapFrom(s => s.Sub.Something));
+            });
+        });
+
+        protected override void Because_of()
+        {
+            var model = new ModelObject();
+            model.Sub = null;
+            model.NullString = null;
+
+            _result = Mapper.Map<ModelObject, ModelDto>(model);
+        }
+
+        [Fact]
+        public void Should_return_null_for_nullable_properties_that_are_complex_map_froms()
+        {
+            _result.SubExpressionName.ShouldEqual(null);
+        }
+
+        [Fact]
+        public void Should_return_null_for_nullable_properties_that_have_member_access_map_froms()
+        {
+            _result.NullableMapFrom.ShouldEqual(null);
+        }
+
+        [Fact]
+        public void Should_map_first_level_items_as_null()
+        {
+            _result.NullString.ShouldBeNull();
+        }
+
+        [Fact]
+        public void Should_map_primitive_items_as_default()
+        {
+            _result.SubSomething.ShouldEqual(0);
+        }
+
+        [Fact]
+        public void Should_map_any_sub_mapped_items_as_null()
+        {
+            _result.Sub.ShouldBeNull();
+        }
+    }
+
     public class When_overriding_null_behavior_in_a_profile : AutoMapperSpecBase
     {
         private DefaultDestination _defaultResult;

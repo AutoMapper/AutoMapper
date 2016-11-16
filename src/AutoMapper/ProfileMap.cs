@@ -26,13 +26,13 @@ namespace AutoMapper
             _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory);
 
             Name = profile.ProfileName;
-            AllowNullCollections = configuration?.AllowNullCollections ?? profile.AllowNullCollections ?? false;
-            AllowNullDestinationValues = configuration?.AllowNullDestinationValues ?? profile.AllowNullDestinationValues ?? true;
-            EnableNullPropagationForQueryMapping = configuration?.EnableNullPropagationForQueryMapping ?? profile.EnableNullPropagationForQueryMapping ?? false;
-            ConstructorMappingEnabled = configuration?.ConstructorMappingEnabled ?? profile.ConstructorMappingEnabled ?? true;
-            ShouldMapField = configuration?.ShouldMapField ?? profile.ShouldMapField ?? (p => p.IsPublic());
-            ShouldMapProperty = configuration?.ShouldMapProperty ?? profile.ShouldMapProperty ?? (p => p.IsPublic());
-            CreateMissingTypeMaps = configuration?.CreateMissingTypeMaps ?? profile.CreateMissingTypeMaps ?? false;
+            AllowNullCollections = profile.AllowNullCollections ?? configuration?.AllowNullCollections ?? false;
+            AllowNullDestinationValues = profile.AllowNullDestinationValues ?? configuration?.AllowNullDestinationValues ?? true;
+            EnableNullPropagationForQueryMapping = profile.EnableNullPropagationForQueryMapping ?? configuration?.EnableNullPropagationForQueryMapping ?? false;
+            ConstructorMappingEnabled = profile.ConstructorMappingEnabled ?? configuration?.ConstructorMappingEnabled ?? true;
+            ShouldMapField = profile.ShouldMapField ?? configuration?.ShouldMapField ?? (p => p.IsPublic());
+            ShouldMapProperty = profile.ShouldMapProperty ?? configuration?.ShouldMapProperty ?? (p => p.IsPublic());
+            CreateMissingTypeMaps = profile.CreateMissingTypeMaps ?? configuration?.CreateMissingTypeMaps ?? false;
 
             TypeConfigurations = profile.TypeConfigurations
                 .Concat(configuration?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
