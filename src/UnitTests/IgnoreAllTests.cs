@@ -57,6 +57,15 @@ namespace AutoMapper.UnitTests
             public Destination ShouldBeMapped { get; set; }
         }
 
+        public class FooProfile : Profile
+        {
+            public FooProfile()
+            {
+                CreateMap<Source, Destination>()
+                    .ForMember(dest => dest.AnotherString_ShouldBeNullAfterwards, opt => opt.Ignore());
+            }
+        }
+
         [Fact]
         public void GlobalIgnore_ignores_all_properties_beginning_with_string()
         {
@@ -65,6 +74,19 @@ namespace AutoMapper.UnitTests
                 cfg.AddGlobalIgnore("StartingWith");
                 cfg.CreateMap<Source, Destination>()
                     .ForMember(dest => dest.AnotherString_ShouldBeNullAfterwards, opt => opt.Ignore());
+            });
+            
+            config.CreateMapper().Map<Source, Destination>(new Source{ShouldBeMapped = "true"});
+            config.AssertConfigurationIsValid();
+        }
+
+        [Fact]
+        public void GlobalIgnore_ignores_all_properties_beginning_with_string_in_profiles()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddGlobalIgnore("StartingWith");
+                cfg.AddProfile<FooProfile>();
             });
             
             config.CreateMapper().Map<Source, Destination>(new Source{ShouldBeMapped = "true"});
