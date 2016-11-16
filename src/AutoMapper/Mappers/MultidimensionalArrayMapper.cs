@@ -13,10 +13,10 @@ namespace AutoMapper.Mappers
     {
         static MultidimensionalArrayFiller filler;
 
-        public static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context)
+        public static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, bool allowNullCollections, bool allowNullDestinationValues)
             where TSource : IEnumerable
         {
-            if (source == null && context.ConfigurationProvider.Configuration.AllowNullCollections)
+            if (source == null && allowNullCollections)
                 return null;
 
             var destElementType = TypeHelper.GetElementType(typeof(TDestination));
@@ -32,7 +32,7 @@ namespace AutoMapper.Mappers
             if (sourceList == null)
                 sourceList = typeof(TSource).GetTypeInfo().IsInterface ?
                 new List<TSourceElement>() :
-                (IEnumerable<TSourceElement>)(context.ConfigurationProvider.Configuration.AllowNullDestinationValues
+                (IEnumerable<TSourceElement>)(allowNullDestinationValues
                 ? ObjectCreator.CreateNonNullValue(typeof(TSource))
                 : ObjectCreator.CreateObject(typeof(TSource)));
 
@@ -64,7 +64,14 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type)), sourceExpression, contextExpression);
+            return Expression.Call(null, 
+                MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type)), 
+                sourceExpression, 
+                contextExpression,
+                Expression.Constant(propertyMap?.TypeMap.Profile.AllowNullCollections ??
+                                       configurationProvider.Configuration.AllowNullCollections),
+                Expression.Constant(propertyMap?.TypeMap.Profile.AllowNullDestinationValues ??
+                                       configurationProvider.Configuration.AllowNullDestinationValues));
         }
     }
 
