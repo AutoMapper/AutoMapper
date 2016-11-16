@@ -13,7 +13,7 @@ namespace AutoMapper
     using QueryableExtensions.Impl;
     using static Expression;
     using static ExpressionExtensions;
-    using UntypedMapperFunc = System.Func<object, object, ResolutionContext, object>;
+    using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
 
     public class MapperConfiguration : IConfigurationProvider
     {
@@ -26,7 +26,6 @@ namespace AutoMapper
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
             : this(configurationExpression, MapperRegistry.Mappers)
         {
-            
         }
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression, IEnumerable<IObjectMapper> mappers)
@@ -36,9 +35,13 @@ namespace AutoMapper
             _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
 
-            Configuration = configurationExpression;
+            ServiceCtor = configurationExpression.ServiceCtor;
+            EnableNullPropagationForQueryMapping = configurationExpression.EnableNullPropagationForQueryMapping ?? false;
 
-            Seal(Configuration);
+            Configuration = new ProfileMap(configurationExpression);
+            Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, Configuration))).ToArray();
+
+            Seal();
         }
 
         public MapperConfiguration(Action<IMapperConfigurationExpression> configure) : this(configure, MapperRegistry.Mappers)
@@ -52,15 +55,13 @@ namespace AutoMapper
 
         public IExpressionBuilder ExpressionBuilder { get; }
 
-        public Func<Type, object> ServiceCtor { get; private set; }
+        public Func<Type, object> ServiceCtor { get; }
 
-        public bool AllowNullDestinationValues { get; private set; }
+        public bool EnableNullPropagationForQueryMapping { get; }
 
-        public bool AllowNullCollections { get; private set; }
+        public ProfileMap Configuration { get; }
 
-        public bool EnableNullPropagationForQueryMapping { get; private set; }
-
-        public IConfiguration Configuration { get; }
+        public IEnumerable<ProfileMap> Profiles { get; }
 
         public Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types)
         {
@@ -158,7 +159,7 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid(string profileName)
         {
-            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(typeMap => typeMap.Profile.ProfileName == profileName));
+            _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(typeMap => typeMap.Profile.Name == profileName));
         }
 
         public void AssertConfigurationIsValid<TProfile>()
@@ -185,49 +186,17 @@ namespace AutoMapper
             return expr;
         }
 
-        private void Seal(IConfiguration configuration)
+        private void Seal()
         {
-            ServiceCtor = configuration.ServiceCtor;
-            AllowNullDestinationValues = configuration.AllowNullDestinationValues;
-            AllowNullCollections = configuration.AllowNullCollections;
-            EnableNullPropagationForQueryMapping = configuration.EnableNullPropagationForQueryMapping;
-
             var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
             var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
 
-            foreach (var profile in configuration.Profiles.Cast<IProfileConfiguration>())
+            foreach (var profile in Profiles)
             {
                 profile.Register(_typeMapRegistry);
             }
 
-            foreach (var action in configuration.AllTypeMapActions)
-            {
-                foreach (var typeMap in _typeMapRegistry.TypeMaps)
-                {
-                    var expression = new MappingExpression(typeMap.Types, typeMap.ConfiguredMemberList);
-
-                    action(typeMap, expression);
-
-                    expression.Configure(typeMap.Profile, typeMap);
-                }
-            }
-
-            foreach (var action in configuration.AllPropertyMapActions)
-            {
-                foreach (var typeMap in _typeMapRegistry.TypeMaps)
-                {
-                    foreach (var propertyMap in typeMap.GetPropertyMaps())
-                    {
-                        var memberExpression = new MappingExpression.MemberConfigurationExpression(propertyMap.DestinationProperty, typeMap.SourceType);
-
-                        action(propertyMap, memberExpression);
-
-                        memberExpression.Configure(typeMap);
-                    }
-                }
-            }
-
-            foreach (var profile in configuration.Profiles.Cast<IProfileConfiguration>())
+            foreach (var profile in Profiles)
             {
                 profile.Configure(_typeMapRegistry);
             }
@@ -261,7 +230,6 @@ namespace AutoMapper
             }
         }
 
-
         private IEnumerable<TypeMap> GetDerivedTypeMaps(TypeMap typeMap)
         {
             foreach (var derivedTypes in typeMap.IncludedDerivedTypes)
@@ -286,8 +254,7 @@ namespace AutoMapper
 
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
-            var typeMap = Configuration.Profiles
-                .Cast<IProfileConfiguration>()
+            var typeMap = Profiles
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
 
@@ -304,8 +271,7 @@ namespace AutoMapper
             if (typePair.GetOpenGenericTypePair() == null)
                 return null;
 
-            var typeMap = Configuration.Profiles
-                .Cast<IProfileConfiguration>()
+            var typeMap = Profiles
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                 .FirstOrDefault(t => t != null);
 

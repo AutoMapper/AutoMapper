@@ -14,7 +14,7 @@ namespace AutoMapper
     [DebuggerDisplay("{Type}")]
     public class TypeDetails
     {
-        public TypeDetails(Type type, IProfileConfiguration config)
+        public TypeDetails(Type type, ProfileMap config)
         {
             Type = type;
             var membersToMap = MembersToMap(config.ShouldMapProperty, config.ShouldMapField);

@@ -4,6 +4,7 @@ namespace AutoMapper.Configuration
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Conventions;
     using Mappers;
 
     public class MapperConfigurationExpression : Profile, IMapperConfigurationExpression, IConfiguration
@@ -12,7 +13,9 @@ namespace AutoMapper.Configuration
 
         public MapperConfigurationExpression() : base("")
         {
-            _profiles.Add(this);
+            IncludeSourceExtensionMethods(typeof(Enumerable));
+
+            AddMemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get"));
         }
 
         public IEnumerable<Profile> Profiles => _profiles;

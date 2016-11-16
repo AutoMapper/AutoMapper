@@ -105,18 +105,18 @@ namespace AutoMapper
         /// <summary>
         /// Allow null destination values. If false, destination objects will be created for deep object graphs. Default true.
         /// </summary>
-        bool AllowNullDestinationValues { get; set; }
+        bool? AllowNullDestinationValues { get; set; }
 
         /// <summary>
         /// Allow null destination collections. If true, null source collections result in null destination collections. Default false.
         /// </summary>
-        bool AllowNullCollections { get; set; }
+        bool? AllowNullCollections { get; set; }
 
         /// <summary>
         /// Allows to enable null-value propagation for query mapping. 
         /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
         /// </summary>
-        bool EnableNullPropagationForQueryMapping { get; set; }
+        bool? EnableNullPropagationForQueryMapping { get; set; }
 
         /// <summary>
         /// Naming convention for source members

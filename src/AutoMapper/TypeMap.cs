@@ -28,14 +28,13 @@ namespace AutoMapper
         private bool _sealed;
         private readonly IList<TypeMap> _inheritedTypeMaps = new List<TypeMap>();
 
-        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, IProfileConfiguration profile)
+        public TypeMap(TypeDetails sourceType, TypeDetails destinationType, MemberList memberList, ProfileMap profile)
         {
             SourceTypeDetails = sourceType;
             DestinationTypeDetails = destinationType;
             Types = new TypePair(sourceType.Type, destinationType.Type);
             Profile = profile;
             ConfiguredMemberList = memberList;
-            IgnorePropertiesStartingWith = profile.GlobalIgnores;
         }
 
         public LambdaExpression MapExpression { get; private set; }
@@ -50,13 +49,11 @@ namespace AutoMapper
         public Type SourceType => SourceTypeDetails.Type;
         public Type DestinationType => DestinationTypeDetails.Type;
 
-        public IProfileConfiguration Profile { get; }
+        public ProfileMap Profile { get; }
 
         public LambdaExpression CustomMapper { get; set; }
         public LambdaExpression CustomProjection { get; set; }
         public LambdaExpression DestinationCtor { get; set; }
-
-        public IEnumerable<string> IgnorePropertiesStartingWith { get; set; }
 
         public Type DestinationTypeOverride { get; set; }
         public Type DestinationTypeToUse => DestinationTypeOverride ?? DestinationType;
@@ -141,7 +138,7 @@ namespace AutoMapper
                     .Except(ignoredSourceMembers);
             }
 
-            return properties.Where(memberName => !IgnorePropertiesStartingWith.Any(memberName.StartsWith)).ToArray();
+            return properties.Where(memberName => !Profile.GlobalIgnores.Any(memberName.StartsWith)).ToArray();
         }
 
         public bool PassesCtorValidation()
