@@ -37,6 +37,8 @@ namespace AutoMapper
         {
             ProfileName = GetType().FullName;
 
+            AddMemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get"));
+
             SourceMemberNamingConvention = new PascalCaseNamingConvention();
             DestinationMemberNamingConvention = new PascalCaseNamingConvention();
         }

@@ -39,7 +39,7 @@ namespace AutoMapper
             EnableNullPropagationForQueryMapping = configurationExpression.EnableNullPropagationForQueryMapping ?? false;
 
             Configuration = new ProfileMap(configurationExpression);
-            Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, Configuration))).ToArray();
+            Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
 
             Seal();
         }

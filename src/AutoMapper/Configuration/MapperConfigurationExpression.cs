@@ -14,11 +14,9 @@ namespace AutoMapper.Configuration
         public MapperConfigurationExpression() : base("")
         {
             IncludeSourceExtensionMethods(typeof(Enumerable));
-
-            AddMemberConfiguration().AddMember<NameSplitMember>().AddName<PrePostfixName>(_ => _.AddStrings(p => p.Prefixes, "Get"));
         }
 
-        public IEnumerable<Profile> Profiles => _profiles;
+        public IEnumerable<IProfileConfiguration> Profiles => _profiles;
         public Func<Type, object> ServiceCtor { get; private set; } = ObjectCreator.CreateObject;
 
         public void CreateProfile(string profileName, Action<Profile> config)

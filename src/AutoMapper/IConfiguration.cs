@@ -6,6 +6,6 @@ namespace AutoMapper
     public interface IConfiguration : IProfileConfiguration
     {
         Func<Type, object> ServiceCtor { get; }
-        IEnumerable<Profile> Profiles { get; }
+        IEnumerable<IProfileConfiguration> Profiles { get; }
     }
 }

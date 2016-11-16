@@ -21,21 +21,21 @@ namespace AutoMapper
         {
         }
 
-        public ProfileMap(IProfileConfiguration profile, ProfileMap rootProfile)
+        public ProfileMap(IProfileConfiguration profile, IConfiguration configuration)
         {
             _typeDetails = new LockingConcurrentDictionary<Type, TypeDetails>(TypeDetailsFactory);
 
             Name = profile.ProfileName;
-            AllowNullCollections = rootProfile?.AllowNullCollections ?? profile.AllowNullDestinationValues ?? false;
-            AllowNullDestinationValues = rootProfile?.AllowNullDestinationValues ?? profile.AllowNullDestinationValues ?? true;
-            EnableNullPropagationForQueryMapping = rootProfile?.EnableNullPropagationForQueryMapping ?? profile.EnableNullPropagationForQueryMapping ?? false;
-            ConstructorMappingEnabled = rootProfile?.ConstructorMappingEnabled ?? profile.ConstructorMappingEnabled ?? true;
-            ShouldMapField = rootProfile?.ShouldMapField ?? ShouldMapField ?? (p => p.IsPublic());
-            ShouldMapProperty = rootProfile?.ShouldMapProperty ?? ShouldMapProperty ?? (p => p.IsPublic());
-            CreateMissingTypeMaps = rootProfile?.CreateMissingTypeMaps ?? profile.CreateMissingTypeMaps ?? false;
+            AllowNullCollections = configuration?.AllowNullCollections ?? profile.AllowNullCollections ?? false;
+            AllowNullDestinationValues = configuration?.AllowNullDestinationValues ?? profile.AllowNullDestinationValues ?? true;
+            EnableNullPropagationForQueryMapping = configuration?.EnableNullPropagationForQueryMapping ?? profile.EnableNullPropagationForQueryMapping ?? false;
+            ConstructorMappingEnabled = configuration?.ConstructorMappingEnabled ?? profile.ConstructorMappingEnabled ?? true;
+            ShouldMapField = configuration?.ShouldMapField ?? profile.ShouldMapField ?? (p => p.IsPublic());
+            ShouldMapProperty = configuration?.ShouldMapProperty ?? profile.ShouldMapProperty ?? (p => p.IsPublic());
+            CreateMissingTypeMaps = configuration?.CreateMissingTypeMaps ?? profile.CreateMissingTypeMaps ?? false;
 
             TypeConfigurations = profile.TypeConfigurations
-                .Concat(rootProfile?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
+                .Concat(configuration?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
                 .Concat(CreateMissingTypeMaps
                     ? Enumerable.Repeat(new ConditionalObjectMapper { Conventions = { tp => tp.SourceType != typeof(object) && tp.DestinationType != typeof(object) } }, 1)
                     : Enumerable.Empty<IConditionalObjectMapper>())
@@ -47,10 +47,10 @@ namespace AutoMapper
             MemberConfigurations.FirstOrDefault()?.AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = profile.SourceMemberNamingConvention);
             MemberConfigurations.FirstOrDefault()?.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention);
 
-            GlobalIgnores = profile.GlobalIgnores.Concat(rootProfile?.GlobalIgnores ?? Enumerable.Empty<string>()).ToArray();
-            SourceExtensionMethods = profile.SourceExtensionMethods.Concat(rootProfile?.SourceExtensionMethods ?? Enumerable.Empty<MethodInfo>()).ToArray();
-            AllPropertyMapActions = profile.AllPropertyMapActions.Concat(rootProfile?.AllPropertyMapActions ?? Enumerable.Empty<Action<PropertyMap, IMemberConfigurationExpression>>()).ToArray();
-            AllTypeMapActions = profile.AllTypeMapActions.Concat(rootProfile?.AllTypeMapActions ?? Enumerable.Empty<Action<TypeMap, IMappingExpression>>()).ToArray();
+            GlobalIgnores = profile.GlobalIgnores.Concat(configuration?.GlobalIgnores ?? Enumerable.Empty<string>()).ToArray();
+            SourceExtensionMethods = profile.SourceExtensionMethods.Concat(configuration?.SourceExtensionMethods ?? Enumerable.Empty<MethodInfo>()).ToArray();
+            AllPropertyMapActions = profile.AllPropertyMapActions.Concat(configuration?.AllPropertyMapActions ?? Enumerable.Empty<Action<PropertyMap, IMemberConfigurationExpression>>()).ToArray();
+            AllTypeMapActions = profile.AllTypeMapActions.Concat(configuration?.AllTypeMapActions ?? Enumerable.Empty<Action<TypeMap, IMappingExpression>>()).ToArray();
 
             Prefixes =
                 profile.MemberConfigurations
