@@ -68,8 +68,9 @@ namespace AutoMapper.UnitTests.Tests
             var mappingOptions = new TestProfile();
             //mappingOptions.SourceMemberNamingConvention = new PascalCaseNamingConvention();
             //mappingOptions.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            var profile = new ProfileMap(mappingOptions);
 
-            var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), mappingOptions, MemberList.Destination);
+            var typeMap = _factory.CreateTypeMap(typeof(Source), typeof(Destination), profile, MemberList.Destination);
 
             var propertyMaps = typeMap.GetPropertyMaps();
 
@@ -81,7 +82,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private Profile _mappingOptions;
+        private ProfileMap _mappingOptions;
         
         private class Source
         {
@@ -111,12 +112,13 @@ namespace AutoMapper.UnitTests.Tests
         {
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()){SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)")};
 
-            _mappingOptions = new TestProfile();
-            _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            var profile = new TestProfile();
+            profile.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
             {
                 _.SourceMemberNamingConvention = namingConvention;
                 _.DestinationMemberNamingConvention = new PascalCaseNamingConvention();
             });
+            _mappingOptions = new ProfileMap(profile);
 
             _factory = new TypeMapFactory();
 
@@ -138,7 +140,7 @@ namespace AutoMapper.UnitTests.Tests
     {
         private TypeMapFactory _factory;
         private TypeMap _map;
-        private Profile _mappingOptions;
+        private ProfileMap _mappingOptions;
 
         private class Source
         {
@@ -169,12 +171,13 @@ namespace AutoMapper.UnitTests.Tests
         {
             var namingConvention = new StubNamingConvention(s => s.Value.ToLower()) { SeparatorCharacter = "__", SplittingExpression = new Regex(@"[\p{Ll}\p{Lu}0-9]+(?=__?)") };
 
-            _mappingOptions = new TestProfile();
-            _mappingOptions.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
+            var profile = new TestProfile();
+            profile.AddMemberConfiguration().AddMember<NameSplitMember>(_ =>
             {
                 _.SourceMemberNamingConvention = new PascalCaseNamingConvention();
                 _.DestinationMemberNamingConvention = namingConvention;
             });
+            _mappingOptions = new ProfileMap(profile);
 
             _factory = new TypeMapFactory();
         }

@@ -34,7 +34,9 @@ namespace AutoMapper.Mappers
 
             var mapExpr = Block(addItems, destination);
 
-            var ifNullExpr = configurationProvider.Configuration.AllowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
+            var allowNullCollections = propertyMap?.TypeMap.Profile.AllowNullCollections ??
+                                       configurationProvider.Configuration.AllowNullCollections;
+            var ifNullExpr = allowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
             var checkNull =  
                 Block(new[] { newExpression, passedDestination },

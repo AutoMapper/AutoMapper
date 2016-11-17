@@ -5,15 +5,8 @@ namespace AutoMapper.Configuration
     using System.Reflection;
     using System.Linq;
     using System.Linq.Expressions;
-    using Execution;
 
-    public interface IMemberConfiguration
-    {
-        void Configure(TypeMap typeMap);
-        MemberInfo DestinationMember { get; }
-    }
-
-    public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IMemberConfiguration
+    public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private readonly MemberInfo _destinationMember;
         private readonly Type _sourceType;

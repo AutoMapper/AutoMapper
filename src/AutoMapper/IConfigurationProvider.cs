@@ -89,7 +89,7 @@ namespace AutoMapper
         /// <summary>
         /// Underlying configuration
         /// </summary>
-        IConfiguration Configuration { get; }
+        ProfileMap Configuration { get; }
 
         /// <summary>
         /// Allows to enable null-value propagation for query mapping. 

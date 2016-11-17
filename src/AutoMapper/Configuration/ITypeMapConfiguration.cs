@@ -4,7 +4,7 @@ namespace AutoMapper.Configuration
 
     public interface ITypeMapConfiguration
     {
-        void Configure(IProfileConfiguration profile, TypeMap typeMap);
+        void Configure(TypeMap typeMap);
         MemberList MemberList { get; }
         Type SourceType { get; }
         Type DestinationType { get; }

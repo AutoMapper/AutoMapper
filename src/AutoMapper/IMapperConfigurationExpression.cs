@@ -9,7 +9,7 @@ namespace AutoMapper
         /// <summary>
         /// Create missing type maps during mapping, if necessary
         /// </summary>
-        bool CreateMissingTypeMaps { get; set; }
+        bool? CreateMissingTypeMaps { get; set; }
 
         /// <summary>
         /// Add an existing profile
@@ -76,6 +76,6 @@ namespace AutoMapper
         /// </summary>
         /// <param name="profileName">Profile name, must be unique</param>
         /// <param name="config">Profile configuration</param>
-        void CreateProfile(string profileName, Action<Profile> config);
+        void CreateProfile(string profileName, Action<IProfileExpression> config);
     }
 }

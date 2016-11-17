@@ -21,7 +21,12 @@ namespace AutoMapper.UnitTests
             {
                 public Dto(string value)
                 {
-                    Value = value;
+                    Value = value + "ffff";
+                }
+
+                public Dto()
+                {
+                    Value = "Hello";
                 }
 
                 public string Value { get; }
@@ -40,9 +45,9 @@ namespace AutoMapper.UnitTests
             }
 
             [Fact]
-            public void Should_not_include_default_profile_configuration_with_profiled_maps()
+            public void Should_include_default_profile_configuration_with_profiled_maps()
             {
-                _result.Value.ShouldEqual("5");
+                _result.Value.ShouldEqual("Hello");
             }
         }
 

@@ -36,7 +36,9 @@ namespace AutoMapper.Mappers
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = TypeHelper.GetElementType(destExpression.Type);
 
-            var ifNullExpr = configurationProvider.Configuration.AllowNullCollections
+            var allowNullCollections = propertyMap?.TypeMap.Profile.AllowNullCollections ??
+                                       configurationProvider.Configuration.AllowNullCollections;
+            var ifNullExpr = allowNullCollections
                                  ? (Expression) Constant(null, destExpression.Type)
                                  : NewArrayBounds(destElementType, Constant(0));
 

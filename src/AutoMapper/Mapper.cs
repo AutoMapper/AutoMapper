@@ -1,9 +1,7 @@
 namespace AutoMapper
 {
     using System;
-    using System.Linq;
     using Configuration;
-    using Execution;
     using Mappers;
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
 

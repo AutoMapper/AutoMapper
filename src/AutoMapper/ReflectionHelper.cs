@@ -1,4 +1,4 @@
-namespace AutoMapper.Execution
+namespace AutoMapper
 {
     using System;
     using System.Collections;
@@ -8,7 +8,7 @@ namespace AutoMapper.Execution
     using System.Linq.Expressions;
     using System.Reflection;
 
-    public static class ReflectionHelper
+    internal static class ReflectionHelper
     {
         public static object GetDefaultValue(this ParameterInfo parameter)
         {

@@ -12,24 +12,18 @@ namespace AutoMapper.Configuration
 
         public MapperConfigurationExpression() : base("")
         {
-            _profiles.Add(this);
+            IncludeSourceExtensionMethods(typeof(Enumerable));
         }
 
-        public IEnumerable<Profile> Profiles => _profiles;
+        public IEnumerable<IProfileConfiguration> Profiles => _profiles;
         public Func<Type, object> ServiceCtor { get; private set; } = ObjectCreator.CreateObject;
 
-        public void CreateProfile(string profileName, Action<Profile> config)
-        {
-            var profile = new NamedProfile(profileName);
-
-            config(profile);
-
-            AddProfile(profile);
-        }
+        public void CreateProfile(string profileName, Action<IProfileExpression> config) 
+            => AddProfile(new NamedProfile(profileName, config));
 
         private class NamedProfile : Profile
         {
-            public NamedProfile(string profileName) : base(profileName)
+            public NamedProfile(string profileName, Action<IProfileExpression> config) : base(profileName, config)
             {
             }
         }

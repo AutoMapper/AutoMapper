@@ -86,7 +86,7 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression PreserveReferences() => (IMappingExpression)base.PreserveReferences();
 
-        protected override IMemberConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
+        protected override IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
             => new MemberConfigurationExpression(member, sourceType);
 
         protected override MappingExpression<object, object> CreateReverseMapExpression() 
@@ -131,7 +131,7 @@ namespace AutoMapper.Configuration
 
     public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, ITypeMapConfiguration
     {
-        private readonly List<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
+        private readonly List<IPropertyMapConfiguration> _memberConfigurations = new List<IPropertyMapConfiguration>();
         private readonly List<SourceMappingExpression> _sourceMemberConfigurations = new List<SourceMappingExpression>();
         private readonly List<CtorParamConfigurationExpression<TSource>> _ctorParamConfigurations = new List<CtorParamConfigurationExpression<TSource>>();
         private MappingExpression<TDestination, TSource> _reverseMap;
@@ -165,7 +165,7 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        protected virtual IMemberConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
+        protected virtual IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
         {
             return new MemberConfigurationExpression<TSource, TDestination, TMember>(member, sourceType);
         }
@@ -502,7 +502,7 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public void Configure(IProfileConfiguration profile, TypeMap typeMap)
+        public void Configure(TypeMap typeMap)
         {
             foreach (var destProperty in typeMap.DestinationTypeDetails.PublicWriteAccessors)
             {
@@ -512,7 +512,7 @@ namespace AutoMapper.Configuration
                     ForMember(destProperty.Name, y => y.Ignore());
                     _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
                 }
-                if (profile.GlobalIgnores.Contains(destProperty.Name) && !_memberConfigurations.Any(m=>m.DestinationMember == destProperty))
+                if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && !_memberConfigurations.Any(m=>m.DestinationMember == destProperty))
                 {
                     ForMember(destProperty.Name, y => y.Ignore());
                 }
