@@ -86,7 +86,7 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression PreserveReferences() => (IMappingExpression)base.PreserveReferences();
 
-        protected override IMemberConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
+        protected override IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
             => new MemberConfigurationExpression(member, sourceType);
 
         protected override MappingExpression<object, object> CreateReverseMapExpression() 
@@ -131,7 +131,7 @@ namespace AutoMapper.Configuration
 
     public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, ITypeMapConfiguration
     {
-        private readonly List<IMemberConfiguration> _memberConfigurations = new List<IMemberConfiguration>();
+        private readonly List<IPropertyMapConfiguration> _memberConfigurations = new List<IPropertyMapConfiguration>();
         private readonly List<SourceMappingExpression> _sourceMemberConfigurations = new List<SourceMappingExpression>();
         private readonly List<CtorParamConfigurationExpression<TSource>> _ctorParamConfigurations = new List<CtorParamConfigurationExpression<TSource>>();
         private MappingExpression<TDestination, TSource> _reverseMap;
@@ -165,7 +165,7 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        protected virtual IMemberConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
+        protected virtual IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
         {
             return new MemberConfigurationExpression<TSource, TDestination, TMember>(member, sourceType);
         }

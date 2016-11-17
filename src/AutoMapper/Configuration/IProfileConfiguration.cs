@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using AutoMapper.Mappers;
-
-namespace AutoMapper
+namespace AutoMapper.Configuration
 {
-    using Configuration;
-    using IMemberConfiguration = Configuration.Conventions.IMemberConfiguration;
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+    using Conventions;
+    using Mappers;
 
     /// <summary>
     /// Contains profile-specific configuration

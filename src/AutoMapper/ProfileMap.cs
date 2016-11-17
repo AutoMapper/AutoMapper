@@ -2,13 +2,14 @@ namespace AutoMapper
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using Configuration;
     using Configuration.Conventions;
     using Mappers;
-    using IMemberConfiguration = Configuration.Conventions.IMemberConfiguration;
 
+    [DebuggerDisplay("{Name}")]
     public class ProfileMap
     {
         private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();

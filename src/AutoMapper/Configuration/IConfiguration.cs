@@ -1,4 +1,4 @@
-namespace AutoMapper
+namespace AutoMapper.Configuration
 {
     using System;
     using System.Collections.Generic;

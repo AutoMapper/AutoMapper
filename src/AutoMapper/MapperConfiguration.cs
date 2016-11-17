@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -378,23 +377,6 @@ namespace AutoMapper
                         Default(destination.Type)), null)),
                     source, destination, context);
             }
-        }
-    }
-
-    internal struct LockingConcurrentDictionary<TKey, TValue>
-    {
-        private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary;
-        private readonly Func<TKey, Lazy<TValue>> _valueFactory;
-
-        public LockingConcurrentDictionary(Func<TKey, TValue> valueFactory)
-        {
-            _dictionary = new ConcurrentDictionary<TKey, Lazy<TValue>>();
-            _valueFactory = key => new Lazy<TValue>(() => valueFactory(key));
-        }
-
-        public TValue GetOrAdd(TKey key)
-        {
-            return _dictionary.GetOrAdd(key, _valueFactory).Value;
         }
     }
 }
