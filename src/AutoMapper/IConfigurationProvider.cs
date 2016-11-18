@@ -98,9 +98,28 @@ namespace AutoMapper
         bool EnableNullPropagationForQueryMapping { get; }
 
         IExpressionBuilder ExpressionBuilder { get; }
+
+        /// <summary>
+        /// Create a mapper instance based on this configuration. Mapper instances are lightweight and can be created as needed.
+        /// </summary>
+        /// <returns>The mapper instance</returns>
         IMapper CreateMapper();
+
+        /// <summary>
+        /// Create a mapper instance with the specified service constructor to be used for resolvers and type converters.
+        /// </summary>
+        /// <param name="serviceCtor">Service factory to create services</param>
+        /// <returns>The mapper instance</returns>
         IMapper CreateMapper(Func<Type, object> serviceCtor);
+
         Func<TSource, TDestination, ResolutionContext, TDestination> GetMapperFunc<TSource, TDestination>(TypePair types);
+
+        /// <summary>
+        /// Compile all underlying mapping expressions to cached delegates.
+        /// Use if you want AutoMapper to compile all mappings up front instead of deferring expression compilation for each first map.
+        /// </summary>
+        void CompileMappings();
+
         Delegate GetMapperFunc(MapRequest request);
 
         Func<object, object, ResolutionContext, object> GetUntypedMapperFunc(MapRequest mapRequest);
