@@ -71,7 +71,7 @@ namespace AutoMapper
 
         public void CompileMappings()
         {
-            foreach (var request in _typeMapPlanCache.Select(e => new MapRequest(e.Key, e.Key)))
+            foreach (var request in _typeMapPlanCache.Select(e => new MapRequest(e.Key, e.Key)).ToArray())
             {
                 GetMapperFunc(request);
             }
