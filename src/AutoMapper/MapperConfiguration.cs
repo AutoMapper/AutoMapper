@@ -69,6 +69,14 @@ namespace AutoMapper
             return (Func<TSource, TDestination, ResolutionContext, TDestination>)GetMapperFunc(mapRequest);
         }
 
+        public void CompileMappings()
+        {
+            foreach (var request in _typeMapPlanCache.Select(e => new MapRequest(e.Key, e.Key)).ToArray())
+            {
+                GetMapperFunc(request);
+            }
+        }
+
         public Delegate GetMapperFunc(MapRequest mapRequest)
         {
             return _mapPlanCache.GetOrAdd(mapRequest).Typed;
