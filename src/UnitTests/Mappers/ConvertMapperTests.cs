@@ -45,5 +45,11 @@ namespace AutoMapper.UnitTests.Mappers
             Mapper.Map<string, ushort>("12").ShouldEqual((ushort)12);
             Mapper.Map<string, ulong>("12").ShouldEqual((ulong)12);
         }
+
+        [Fact]
+        public void From_null_string_to_nullable_int()
+        {
+            Mapper.Map<string, int?>(null).ShouldBeNull();
+        }
     }
 }
