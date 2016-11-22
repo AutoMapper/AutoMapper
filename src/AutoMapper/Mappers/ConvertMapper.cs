@@ -33,10 +33,10 @@ namespace AutoMapper.Mappers
 
         static LambdaExpression ConvertExpression(Type sourceType, Type destinationType)
         {
-            var sourceParameter = Parameter(sourceType, "source");
             bool nullableDestination;
             var underlyingDestinationType = UnderlyingType(destinationType, out nullableDestination);
             var convertMethod = typeof(Convert).GetDeclaredMethod("To" + underlyingDestinationType.Name, new[] { sourceType });
+            var sourceParameter = Parameter(sourceType, "source");
             Expression convertCall = Call(convertMethod, sourceParameter);
             var lambdaBody = nullableDestination && !sourceType.IsValueType() ?
                                             Condition(Equal(sourceParameter, Constant(null)), Constant(null, destinationType), ToType(convertCall, destinationType)) :
