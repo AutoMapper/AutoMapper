@@ -126,6 +126,53 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class When_throwing_NRE_from_MapFrom_value_types : AutoMapperSpecBase
+    {
+        ViewModel _viewModel;
+
+        public class Model
+        {
+            public List<SubModel> SubModels { get; set; }
+        }
+
+        public class SubModel
+        {
+            public List<SubSubModel> SubSubModels { get; set; }
+        }
+
+        public class SubSubModel
+        {
+            public int Id { get; set; }
+        }
+
+        public class ViewModel
+        {
+            public int SubModelId { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Model, ViewModel>()
+                .ForMember(x => x.SubModelId,
+                    opts => opts.MapFrom(src => src.SubModels.FirstOrDefault().SubSubModels.FirstOrDefault().Id));
+        });
+
+        protected override void Because_of()
+        {
+            var model = new Model
+            {
+                SubModels = new List<SubModel>()
+            };
+            _viewModel = Mapper.Map<ViewModel>(model);
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _viewModel.SubModelId.ShouldEqual(0);
+        }
+    }
+
     public class When_throwing_NRE_from_MapFrom : AutoMapperSpecBase
     {
         class Source
