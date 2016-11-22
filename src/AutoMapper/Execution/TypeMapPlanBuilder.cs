@@ -492,12 +492,12 @@ namespace AutoMapper.Execution
                 var returnType = destinationNullable && destinationPropertyType.GetTypeOfNullable() == nullCheckedExpression.Type
                     ? destinationPropertyType
                     : nullCheckedExpression.Type;
-                valueResolverFunc = nullCheckedExpression.Type.IsValueType() && !destinationNullable
-                    ? nullCheckedExpression
-                    : TryCatch(ToType(nullCheckedExpression, returnType),
+                valueResolverFunc = 
+                    TryCatch(
+                        ToType(nullCheckedExpression, returnType),
                         Catch(typeof(NullReferenceException), Default(returnType)),
                         Catch(typeof(ArgumentNullException), Default(returnType))
-                        );
+                    );
             }
             else if(propertyMap.SourceMembers.Any()
                      && propertyMap.SourceType != null
