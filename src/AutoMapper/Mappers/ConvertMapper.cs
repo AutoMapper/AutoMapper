@@ -7,6 +7,7 @@ namespace AutoMapper.Mappers
 {
     using LazyExpression = Lazy<LambdaExpression>;
     using static Expression;
+    using static ExpressionExtensions;
 
     public class ConvertMapper : IObjectMapper
     {
@@ -32,11 +33,30 @@ namespace AutoMapper.Mappers
 
         static LambdaExpression ConvertExpression(Type sourceType, Type destinationType)
         {
-            var sourceParameter = Parameter(sourceType, "source");
-            var underlyingDestinationType = Nullable.GetUnderlyingType(destinationType) ?? destinationType;
+            bool nullableDestination;
+            var underlyingDestinationType = UnderlyingType(destinationType, out nullableDestination);
             var convertMethod = typeof(Convert).GetDeclaredMethod("To" + underlyingDestinationType.Name, new[] { sourceType });
-            var callConvert = Call(convertMethod, sourceParameter);
-            return Lambda(callConvert, sourceParameter);
+            var sourceParameter = Parameter(sourceType, "source");
+            Expression convertCall = Call(convertMethod, sourceParameter);
+            var lambdaBody = nullableDestination && !sourceType.IsValueType() ?
+                                            Condition(Equal(sourceParameter, Constant(null)), Constant(null, destinationType), ToType(convertCall, destinationType)) :
+                                            convertCall;
+            return Lambda(lambdaBody, sourceParameter);
+        }
+
+        private static Type UnderlyingType(Type type, out bool nullable)
+        {
+            var underlyingDestinationType = Nullable.GetUnderlyingType(type);
+            if(underlyingDestinationType == null)
+            {
+                nullable = false;
+                return type;
+            }
+            else
+            {
+                nullable = true;
+                return underlyingDestinationType;
+            }
         }
 
         public bool IsMatch(TypePair types) => _converters.ContainsKey(types);
