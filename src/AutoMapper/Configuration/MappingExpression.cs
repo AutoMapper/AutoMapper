@@ -474,12 +474,19 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public void As<T>()
+        public void As<T>() where T : TDestination
         {
             As(typeof(T));
         }
 
-        public void As(Type typeOverride) => TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
+        public void As(Type typeOverride)
+        {
+            if(!DestinationType.IsAssignableFrom(typeOverride) && !typeOverride.IsGenericTypeDefinition() && !DestinationType.IsGenericTypeDefinition())
+            {
+                throw new ArgumentOutOfRangeException(nameof(typeOverride), $"{typeOverride} is not derived from {DestinationType}.");
+            }
+            TypeMapActions.Add(tm => tm.DestinationTypeOverride = typeOverride);
+        }
 
         public IMappingExpression<TSource, TDestination> ForCtorParam(string ctorParamName, Action<ICtorParamConfigurationExpression<TSource>> paramOptions)
         {

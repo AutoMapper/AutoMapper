@@ -8,6 +8,44 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
 {
+    public class AsShouldWorkOnlyWithDerivedTypesWithGenerics : AutoMapperSpecBase
+    {
+        class Source<T>
+        {
+        }
+
+        class Destination<T>
+        {
+        }
+
+        class Override<T> : Destination<T>
+        {
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap(typeof(Source<>), typeof(Destination<>)).As(typeof(Override<>)));
+    }
+
+    public class AsShouldWorkOnlyWithDerivedTypes
+    {
+        class Source
+        {
+        }
+
+        class Destination
+        {
+        }
+
+        [Fact]
+        public void Should_detect_unrelated_override()
+        {
+            new Action(() => new MapperConfiguration(c => c.CreateMap(typeof(Source), typeof(Destination)).As(typeof(Source)))).ShouldThrow<ArgumentOutOfRangeException>(ex =>
+            {
+                ex.ParamName.ShouldEqual("typeOverride");
+                ex.Message.ShouldStartWith($"{typeof(Source)} is not derived from {typeof(Destination)}.");
+            });
+        }
+    }
+
     public class DestinationTypePolymorphismTest
     {
         public class Customer
