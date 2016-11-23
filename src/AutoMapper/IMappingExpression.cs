@@ -370,7 +370,7 @@ namespace AutoMapper
         /// Override the destination type mapping for looking up configuration and instantiation
         /// </summary>
         /// <typeparam name="T">Destination type to use</typeparam>
-        void As<T>();
+        void As<T>() where T : TDestination;
 
         /// <summary>
         /// For self-referential types, limit recurse depth.
