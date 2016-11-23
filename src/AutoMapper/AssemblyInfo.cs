@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Security;
 
 [assembly:CLSCompliant(true)]
+#if NET45
+using System.Security;
 [assembly: AllowPartiallyTrustedCallers]
+#endif
