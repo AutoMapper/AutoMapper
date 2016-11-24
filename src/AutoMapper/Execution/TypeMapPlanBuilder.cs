@@ -483,7 +483,7 @@ namespace AutoMapper.Execution
             }
             else if(propertyMap.CustomResolver != null)
             {
-                valueResolverFunc = propertyMap.CustomResolver.ReplaceParameters(_source, _destination, destValueExpr, _context);
+                valueResolverFunc = propertyMap.CustomResolver.ConvertReplaceParameters(_source, _destination, destValueExpr, _context);
             }
             else if(propertyMap.CustomExpression != null)
             {
