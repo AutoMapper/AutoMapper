@@ -16,8 +16,11 @@ namespace AutoMapper.Mappers
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
         {
-            if (destination == null)
+            if(destination == null)
+            {
                 destination = ifNull();
+            }
+            object boxedDestination = destination;
             var destinationTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TDestination));
             foreach (var member in destinationTypeDetails.PublicWriteAccessors)
             {
@@ -30,10 +33,10 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = context.MapMember(member, sourceMemberValue, destination);
-                member.SetMemberValue(destination, destinationMemberValue);
+                var destinationMemberValue = context.MapMember(member, sourceMemberValue, boxedDestination);
+                member.SetMemberValue(boxedDestination, destinationMemberValue);
             }
-            return destination;
+            return (TDestination) boxedDestination;
         }
 
         private static object GetDynamically(MemberInfo member, object target)
