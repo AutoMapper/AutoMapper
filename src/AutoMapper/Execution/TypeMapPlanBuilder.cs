@@ -421,7 +421,7 @@ namespace AutoMapper.Execution
                 {
                     var sourceMember = valueResolverConfig.SourceMember.ReplaceParameters(_source);
 
-                    var iResolverType = resolverType.GetTypeInfo().ImplementedInterfaces.Single(t => t.IsGenericType(typeof(IMemberValueResolver<,,,>)));
+                    var iResolverType = resolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>));
 
                     var sourceResolverParam = iResolverType.GetGenericArguments()[0];
                     var destResolverParam = iResolverType.GetGenericArguments()[1];
