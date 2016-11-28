@@ -525,7 +525,6 @@ namespace AutoMapper.Execution
 
         private Expression GetMemberResolver(Expression destValueExpr, Type destinationPropertyType, Expression ctor, Type resolverType, Expression sourceMember)
         {
-            Expression valueResolverFunc;
             var iResolverType = resolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>));
 
             var sourceResolverParam = iResolverType.GetGenericArguments()[0];
@@ -533,7 +532,7 @@ namespace AutoMapper.Execution
             var sourceMemberResolverParam = iResolverType.GetGenericArguments()[2];
             var destMemberResolverParam = iResolverType.GetGenericArguments()[3];
 
-            valueResolverFunc =
+            return
                 ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
                     ToType(_source, sourceResolverParam),
                     ToType(_destination, destResolverParam),
@@ -541,7 +540,6 @@ namespace AutoMapper.Execution
                     ToType(destValueExpr, destMemberResolverParam),
                     _context),
                     destinationPropertyType);
-            return valueResolverFunc;
         }
 
         public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
