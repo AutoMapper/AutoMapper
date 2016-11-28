@@ -423,7 +423,7 @@ namespace AutoMapper.Execution
 
                     var iResolverType =
                         resolverType.GetTypeInfo()
-                            .ImplementedInterfaces.First(t => t.ImplementsGenericInterface(typeof(IMemberValueResolver<,,,>)));
+                            .ImplementedInterfaces.First(t => t.IsGenericType() &&  t.GetGenericTypeDefinition() == typeof(IMemberValueResolver<,,,>));
 
                     var sourceResolverParam = iResolverType.GetGenericArguments()[0];
                     var destResolverParam = iResolverType.GetGenericArguments()[1];
