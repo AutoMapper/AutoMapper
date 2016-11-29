@@ -26,16 +26,6 @@ namespace AutoMapper.UnitTests.Projection
             });
         }
 
-        [Fact(Skip = "EF doesn't support null values in expressions")]
-        public void ProjectWithNullCollectionSourceProperty()
-        {
-            var customers = new[] { new Customer() }.AsQueryable();
-
-            var mapped = customers.ProjectTo<CustomerDto>(_config).SingleOrDefault();
-            mapped.ShouldNotBeNull();
-            mapped.Addresses.ShouldBeNull();
-        }
-
         [Fact]
         public void ProjectWithAssignedCollectionSourceProperty()
         {

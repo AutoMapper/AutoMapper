@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.Bug
             _destination = Mapper.Map<Holder>(from);
         }
 
-        [Fact(Skip = "Assignable Wins with changes")]
+        [Fact]
         public void Should_map_null_collection_to_not_null()
         {
             _destination.Containers[0].Items.ShouldNotBeNull();
