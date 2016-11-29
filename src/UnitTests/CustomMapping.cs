@@ -7,6 +7,49 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_using_IMemberResolver_derived_interface : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+            public string SValue { get; set; }
+        }
+
+        class Destination
+        {
+            public string Value { get; set; }
+        }
+
+        interface IResolver : IMemberValueResolver<Source, Destination, string, string>
+        {
+        }
+
+        class Resolver : IResolver
+        {
+            public string Resolve(Source source, Destination destination, string sourceMember, string destMember, ResolutionContext context)
+            {
+                return "Resolved";
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().ForMember(d => d.Value, o => o.ResolveUsing(new Resolver(), s=>s.SValue));
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Value.ShouldEqual("Resolved");
+        }
+    }
+
     public class OpenGenericMapForMember : AutoMapperSpecBase
     {
         ModelPager<int> _destination;
