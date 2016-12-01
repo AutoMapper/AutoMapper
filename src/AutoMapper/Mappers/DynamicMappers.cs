@@ -41,7 +41,7 @@ namespace AutoMapper.Mappers
 
         private static object GetDynamically(MemberInfo member, object target)
         {
-            var binder = Binder.GetMember(CSharpBinderFlags.None, member.Name, member.GetMemberType(),
+            var binder = Binder.GetMember(CSharpBinderFlags.None, member.Name, ToDynamicMapper.GetMemberType(member),
                                                             new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
             var callsite = CallSite<Func<CallSite, object, object>>.Create(binder);
             return callsite.Target(callsite, target);
@@ -84,9 +84,15 @@ namespace AutoMapper.Mappers
             return destination;
         }
 
+        public static Type GetMemberType(MemberInfo member)
+        {
+            var memberType = member.GetMemberType();
+            return memberType.IsArray ? typeof(object) : memberType;
+        }
+
         private static void SetDynamically(MemberInfo member, object target, object value)
         {
-            var binder = Binder.SetMember(CSharpBinderFlags.None, member.Name, member.GetMemberType(),
+            var binder = Binder.SetMember(CSharpBinderFlags.None, member.Name, GetMemberType(member),
                 new[]{
                     CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null),
                     CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
