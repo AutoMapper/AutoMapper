@@ -12,6 +12,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         public string Foo { get; set; }
         public string Bar { get; set; }
         internal string Jack { get; set; }
+        public int[] Data { get; set; }
     }
 
     public class DynamicDictionary : DynamicObject
@@ -62,10 +63,12 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         public void Should_map_source_properties()
         {
             var config = new MapperConfiguration(cfg => { });
-            _destination = config.CreateMapper().Map<DynamicDictionary>(new Destination { Foo = "Foo", Bar = "Bar" });
-            ((int)_destination.Count).ShouldEqual(2);
+            var data = new[] { 1, 2, 3 };
+            _destination = config.CreateMapper().Map<DynamicDictionary>(new Destination { Foo = "Foo", Bar = "Bar", Data = data });
+            ((int)_destination.Count).ShouldEqual(3);
             Assert.Equal("Foo", _destination.Foo);
             Assert.Equal("Bar", _destination.Bar);
+            ((int[])_destination.Data).SequenceEqual(data).ShouldBeTrue();
         }
     }
 
