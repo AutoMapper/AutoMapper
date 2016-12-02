@@ -23,16 +23,6 @@ namespace AutoMapper.UnitTests.Projection
             });
         }
 
-        [Fact(Skip = "EF doesn't support null values in expressions")]
-        public void SelectUsingProjectToWithNullComplexSourceProperty()
-        {
-            var customers = new[] { new Customer { FirstName = "Bill", LastName = "White" } }.AsQueryable();
-
-            var projected = customers.ProjectTo<CustomerDto>(_config).SingleOrDefault();
-            projected.ShouldNotBeNull();
-            projected.Address.ShouldBeNull();
-        }
-
         [Fact]
         public void ProjectToWithUnmappedTypeShouldThrowException()
         {
