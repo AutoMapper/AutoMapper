@@ -149,4 +149,61 @@ namespace AutoMapper.UnitTests
             _destination.ParentDataValue.ShouldBeNull();
         }
     }
+
+    public class NullTypeMapFlattening : AutoMapperSpecBase
+    {
+        private OrderDTO _dto;
+
+        public class OrderModel
+        {
+            public VendorModel Vendor { get; set; }
+            public string Number { get; set; }
+        }
+
+        public class VendorModel
+        {
+            public string Name { get; set; }
+            public CurrencyModel Currency { get; set; }
+        }
+
+        public class CurrencyModel
+        {
+            public string Name { get; set; }
+        }
+
+
+        public class OrderDTO
+        {
+            public CurrencyDTO VendorCurrency { get; set; }
+            public string VendorName { get; set; }
+            public string Number { get; set; }
+        }
+
+        public class CurrencyDTO
+        {
+            public string Name { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<OrderModel, OrderDTO>();
+            cfg.CreateMap<CurrencyModel, CurrencyDTO>();
+        });
+
+        protected override void Because_of()
+        {
+            var orderModel = new OrderModel()
+            {
+                Number = "1",
+                Vendor = null
+            };
+            _dto = Mapper.Map<OrderDTO>(orderModel);
+        }
+
+        [Fact]
+        public void Should_handle_inner_nulls()
+        {
+            _dto.VendorCurrency.ShouldBeNull();
+        }
+    }
 }

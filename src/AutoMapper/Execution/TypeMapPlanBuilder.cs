@@ -519,10 +519,7 @@ namespace AutoMapper.Execution
                                 : (Expression)Call(inner, (MethodInfo)getter)
                             : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
                         );
-                    if(destinationPropertyType == valueResolverFunc.Type || _configurationProvider.ResolveTypeMap(valueResolverFunc.Type, destinationPropertyType) == null)
-                    {
-                        valueResolverFunc = valueResolverFunc.IfNotNull(destinationPropertyType);
-                    }
+                    valueResolverFunc = valueResolverFunc.IfNotNull(destinationPropertyType);
                 }
             }
             else if(propertyMap.SourceMember != null)
