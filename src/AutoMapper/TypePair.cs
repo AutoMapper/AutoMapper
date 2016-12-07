@@ -61,7 +61,7 @@ namespace AutoMapper
 
         public static TypePair Create<TSource>(TSource source, Type sourceType, Type destinationType)
         {
-            if(source != null)
+            if(sourceType == null)
             {
                 sourceType = source.GetType();
             }
@@ -70,11 +70,11 @@ namespace AutoMapper
 
         public static TypePair Create<TSource, TDestination>(TSource source, TDestination destination, Type sourceType, Type destinationType)
         {
-            if(source != null)
+            if(sourceType == null)
             {
                 sourceType = source.GetType();
             }
-            if(destination != null)
+            if(destinationType == null)
             {
                 destinationType = destination.GetType();
             }
