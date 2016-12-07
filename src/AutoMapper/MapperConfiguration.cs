@@ -16,6 +16,8 @@ namespace AutoMapper
 
     public class MapperConfiguration : IConfigurationProvider
     {
+        private static readonly ConstructorInfo ExceptionConstructor = typeof(AutoMapperMappingException).GetConstructors().Single(c => c.GetParameters().Length == 3);
+
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
         private readonly Dictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
@@ -89,13 +91,82 @@ namespace AutoMapper
 
         private MapperFuncs CreateMapperFuncs(MapRequest mapRequest)
         {
+            return new MapperFuncs(mapRequest, BuildExecutionPlan(mapRequest));
+        }
+
+        public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
+        {
+            var typePair = new TypePair(sourceType, destinationType);
+            return BuildExecutionPlan(new MapRequest(typePair, typePair));
+        }
+
+        public LambdaExpression BuildExecutionPlan(MapRequest mapRequest)
+        {
             var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
             if(typeMap != null)
             {
-                return new MapperFuncs(mapRequest, typeMap);
+                return GenerateTypeMapExpression(mapRequest, typeMap);
             }
             var mapperToUse = _mappers.FirstOrDefault(om => om.IsMatch(mapRequest.RuntimeTypes));
-            return new MapperFuncs(mapRequest, mapperToUse, this);
+            return GenerateObjectMapperExpression(mapRequest, mapperToUse, this);
+        }
+
+        private static LambdaExpression GenerateTypeMapExpression(MapRequest mapRequest, TypeMap typeMap)
+        {
+            var mapExpression = typeMap.MapExpression;
+            var typeMapSourceParameter = mapExpression.Parameters[0];
+            var typeMapDestinationParameter = mapExpression.Parameters[1];
+            var requestedSourceType = mapRequest.RequestedTypes.SourceType;
+            var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
+
+            if(typeMapSourceParameter.Type != requestedSourceType || typeMapDestinationParameter.Type != requestedDestinationType)
+            {
+                var requestedSourceParameter = Parameter(requestedSourceType, "source");
+                var requestedDestinationParameter = Parameter(requestedDestinationType, "typeMapDestination");
+                var contextParameter = Parameter(typeof(ResolutionContext), "context");
+
+                mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
+                    ToType(requestedSourceParameter, typeMapSourceParameter.Type),
+                    ToType(requestedDestinationParameter, typeMapDestinationParameter.Type),
+                    contextParameter
+                    ), mapRequest.RuntimeTypes.DestinationType),
+                    requestedSourceParameter, requestedDestinationParameter, contextParameter);
+            }
+
+            return mapExpression;
+        }
+
+        private static LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration)
+        {
+            var destinationType = mapRequest.RequestedTypes.DestinationType;
+
+            var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
+            var destination = Parameter(destinationType, "mapperDestination");
+            var context = Parameter(typeof(ResolutionContext), "context");
+            LambdaExpression fullExpression;
+            if(mapperToUse == null)
+            {
+                var message = Constant("Missing type map configuration or unsupported mapping.");
+                fullExpression = Lambda(Block(Throw(New(ExceptionConstructor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
+            }
+            else
+            {
+                var map = mapperToUse.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
+                var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
+                fullExpression = TryCatch(mapToDestination, source, destination, context, mapRequest.RequestedTypes);
+            }
+            return fullExpression;
+        }
+
+        private static LambdaExpression TryCatch(LambdaExpression mapExpression, ParameterExpression source, ParameterExpression destination, ParameterExpression context, TypePair types)
+        {
+            var exception = Parameter(typeof(Exception), "ex");
+
+            return Lambda(Expression.TryCatch(mapExpression.Body,
+                MakeCatchBlock(typeof(Exception), exception, Block(
+                    Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(types))),
+                    Default(destination.Type)), null)),
+                source, destination, context);
         }
 
         public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();
@@ -295,14 +366,6 @@ namespace AutoMapper
 
             public UntypedMapperFunc Untyped => _untyped.Value;
 
-            public MapperFuncs(MapRequest mapRequest, TypeMap typeMap) : this(mapRequest, GenerateTypeMapExpression(mapRequest, typeMap))
-            {
-            }
-
-            public MapperFuncs(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration) : this(mapRequest, GenerateObjectMapperExpression(mapRequest, mapperToUse, mapperConfiguration))
-            {
-            }
-
             public MapperFuncs(MapRequest mapRequest, LambdaExpression typedExpression)
             {
                 Typed = typedExpression.Compile();
@@ -324,66 +387,6 @@ namespace AutoMapper
                                 Invoke(typedExpression, ToType(sourceParameter, requestedSourceType), ToType(destination, requestedDestinationType), contextParameter)
                                 , typeof(object)),
                           sourceParameter, destinationParameter, contextParameter);
-            }
-
-            private static LambdaExpression GenerateTypeMapExpression(MapRequest mapRequest, TypeMap typeMap)
-            {
-                var mapExpression = typeMap.MapExpression;
-                var typeMapSourceParameter = mapExpression.Parameters[0];
-                var typeMapDestinationParameter = mapExpression.Parameters[1];
-                var requestedSourceType = mapRequest.RequestedTypes.SourceType;
-                var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
-
-                if (typeMapSourceParameter.Type != requestedSourceType || typeMapDestinationParameter.Type != requestedDestinationType)
-                {
-                    var requestedSourceParameter = Parameter(requestedSourceType, "source");
-                    var requestedDestinationParameter = Parameter(requestedDestinationType, "typeMapDestination");
-                    var contextParameter = Parameter(typeof(ResolutionContext), "context");
-
-                    mapExpression = Lambda(ToType(Invoke(typeMap.MapExpression,
-                        ToType(requestedSourceParameter, typeMapSourceParameter.Type),
-                        ToType(requestedDestinationParameter, typeMapDestinationParameter.Type),
-                        contextParameter
-                        ), mapRequest.RuntimeTypes.DestinationType),
-                        requestedSourceParameter, requestedDestinationParameter, contextParameter);
-                }
-
-                return mapExpression;
-            }
-
-            private static readonly ConstructorInfo ExceptionConstructor = typeof(AutoMapperMappingException).GetConstructors().Single(c => c.GetParameters().Length == 3);
-
-            private static LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration)
-            {
-                var destinationType = mapRequest.RequestedTypes.DestinationType;
-
-                var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
-                var destination = Parameter(destinationType, "mapperDestination");
-                var context = Parameter(typeof(ResolutionContext), "context");
-                LambdaExpression fullExpression;
-                if (mapperToUse == null)
-                {
-                    var message = Constant("Missing type map configuration or unsupported mapping.");
-                    fullExpression = Lambda(Block(Throw(New(ExceptionConstructor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
-                }
-                else
-                {
-                    var map = mapperToUse.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
-                    var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
-                    fullExpression = TryCatch(mapToDestination, source, destination, context, mapRequest.RequestedTypes);
-                }
-                return fullExpression;
-            }
-
-            private static LambdaExpression TryCatch(LambdaExpression mapExpression, ParameterExpression source, ParameterExpression destination, ParameterExpression context, TypePair types)
-            {
-                var exception = Parameter(typeof(Exception), "ex");
-
-                return Lambda(Expression.TryCatch(mapExpression.Body,
-                    MakeCatchBlock(typeof(Exception), exception, Block(
-                        Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(types))),
-                        Default(destination.Type)), null)),
-                    source, destination, context);
             }
         }
     }
