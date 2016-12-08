@@ -94,6 +94,14 @@ namespace AutoMapper
             return new MapperFuncs(mapRequest, BuildExecutionPlan(mapRequest));
         }
 
+        /// <summary>
+        /// Builds the execution plan used to map the source to destination.
+        /// Useful to understand what exactly is happening during mapping.
+        /// You can use the package <a href="https://github.com/agileobjects/ReadableExpressions#usage">AgileObjects.ReadableExpressions</a> for pretty printing.
+        /// </summary>
+        /// <param name="sourceType">the runtime type of the source object</param>
+        /// <param name="destinationType">the runtime type of the destination object</param>
+        /// <returns>the execution plan</returns>
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
         {
             var typePair = new TypePair(sourceType, destinationType);
