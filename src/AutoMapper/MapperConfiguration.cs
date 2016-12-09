@@ -23,7 +23,7 @@ namespace AutoMapper
         private readonly ConfigurationValidator _validator;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
-            : this(configurationExpression, MapperRegistry.Mappers)
+            : this(configurationExpression, MapperRegistry.Mappers())
         {
         }
 
@@ -43,7 +43,7 @@ namespace AutoMapper
             Seal();
         }
 
-        public MapperConfiguration(Action<IMapperConfigurationExpression> configure) : this(configure, MapperRegistry.Mappers)
+        public MapperConfiguration(Action<IMapperConfigurationExpression> configure) : this(configure, MapperRegistry.Mappers())
         {
         }
 
