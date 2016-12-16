@@ -6,20 +6,23 @@ using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class ConsecutiveCalls : AutoMapperSpecBase
+    public class Self_referencing_existing_destination : AutoMapperSpecBase
     {
         public class BaseType
         {
-            public BaseType SelfReference { get; set; }
-
             public BaseType()
             {
-                this.SelfReference = this;
+                SelfReference = this;
             }
+            public BaseType SelfReference { get; set; }
         }
 
         public class BaseTypeDto
         {
+            public BaseTypeDto()
+            {
+                SelfReference = this;
+            }
             public BaseTypeDto SelfReference { get; set; }
         }
 
@@ -30,7 +33,6 @@ namespace AutoMapper.UnitTests.Bug
             var baseType = new BaseType();
             var baseTypeDto = new BaseTypeDto();
 
-            Mapper.Map(baseType, baseTypeDto);
             Mapper.Map(baseType, baseTypeDto);
         }
     }
