@@ -14,7 +14,8 @@ namespace AutoMapper.UnitTests.Mappers
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
-        }, MapperRegistry.Mappers().Concat(new[] { new TestObjectMapper() }));
+            cfg.Mappers.Add(new TestObjectMapper());
+        });
 
         [Fact]
         public void Should_have_valid_configuration()
@@ -73,7 +74,8 @@ namespace AutoMapper.UnitTests.Mappers
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
-        }, MapperRegistry.Mappers().Concat(new[] { new TestObjectMapper() }));
+            cfg.Mappers.Add(new TestObjectMapper());
+        });
 
         protected override void Because_of()
         {
@@ -157,7 +159,8 @@ namespace AutoMapper.UnitTests.Mappers
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
-        }, new[] { new EnumMapper() }.Concat(MapperRegistry.Mappers()));
+            cfg.Mappers.Insert(0, new EnumMapper());
+        });
 
         protected override void Because_of()
         {

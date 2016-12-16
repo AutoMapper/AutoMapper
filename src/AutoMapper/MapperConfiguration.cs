@@ -23,13 +23,8 @@ namespace AutoMapper
         private readonly ConfigurationValidator _validator;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
-            : this(configurationExpression, MapperRegistry.Mappers())
         {
-        }
-
-        public MapperConfiguration(MapperConfigurationExpression configurationExpression, IEnumerable<IObjectMapper> mappers)
-        {
-            _mappers = mappers;
+            _mappers = configurationExpression.Mappers.ToArray();
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
@@ -43,12 +38,8 @@ namespace AutoMapper
             Seal();
         }
 
-        public MapperConfiguration(Action<IMapperConfigurationExpression> configure) : this(configure, MapperRegistry.Mappers())
-        {
-        }
-
-        public MapperConfiguration(Action<IMapperConfigurationExpression> configure, IEnumerable<IObjectMapper> mappers)
-            : this(Build(configure), mappers)
+        public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
+            : this(Build(configure))
         {
         }
 

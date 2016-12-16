@@ -77,5 +77,10 @@ namespace AutoMapper
         /// <param name="profileName">Profile name, must be unique</param>
         /// <param name="config">Profile configuration</param>
         void CreateProfile(string profileName, Action<IProfileExpression> config);
+
+        /// <summary>
+        /// Object mappers
+        /// </summary>
+        IList<IObjectMapper> Mappers { get; }
     }
 }
