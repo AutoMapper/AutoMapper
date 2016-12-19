@@ -29,7 +29,8 @@ namespace AutoMapper
         public bool DefaultValue { get; private set; }
 
         public LambdaExpression CustomExpression { get; set; }
-        public Func<object, ResolutionContext, object> CustomValueResolver { get; set; }
+
+        public LambdaExpression CustomValueResolver { get; set; }
 
         public Type DestinationType => Parameter.ParameterType;
 
@@ -51,8 +52,7 @@ namespace AutoMapper
             }
             if(CustomValueResolver != null)
             {
-                // Invoking a delegate
-                return Invoke(Constant(CustomValueResolver), sourceParameter, contextParameter);
+                return CustomValueResolver.ConvertReplaceParameters(sourceParameter, contextParameter);
             }
             if(Parameter.IsOptional)
             {
