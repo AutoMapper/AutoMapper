@@ -10,15 +10,11 @@ namespace AutoMapper.UnitTests.Mappers
 {
     public class When_adding_a_custom_mapper : NonValidatingSpecBase
     {
-        public When_adding_a_custom_mapper()
-        {
-            MapperRegistry.Mappers.Insert(0, new TestObjectMapper());
-        }
-
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
+            cfg.Mappers.Add(new TestObjectMapper());
         });
 
         [Fact]
@@ -78,7 +74,8 @@ namespace AutoMapper.UnitTests.Mappers
         {
             cfg.CreateMap<ClassA, ClassB>()
                 .ForMember(dest => dest.Destination, opt => opt.MapFrom(src => src.Source));
-        }, MapperRegistry.Mappers.Concat(new[] { new TestObjectMapper() }));
+            cfg.Mappers.Add(new TestObjectMapper());
+        });
 
         protected override void Because_of()
         {
@@ -162,7 +159,8 @@ namespace AutoMapper.UnitTests.Mappers
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Source, Destination>();
-        }, new[] { new EnumMapper() }.Concat(MapperRegistry.Mappers));
+            cfg.Mappers.Insert(0, new EnumMapper());
+        });
 
         protected override void Because_of()
         {
