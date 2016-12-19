@@ -213,11 +213,7 @@ namespace AutoMapper.Execution
                 var condition = Condition(
                     AndAlso(
                         NotEqual(_source, Constant(null)),
-                        AndAlso(
-                            Equal(_initialDestination, Constant(null)),
-                            Call(Property(_context, "InstanceCache"),
-                                typeof(Dictionary<object, object>).GetDeclaredMethod("ContainsKey"), _source)
-                            )),
+                        Call(Property(_context, "InstanceCache"), typeof(Dictionary<object, object>).GetDeclaredMethod("ContainsKey"), _source)),
                     Assign(cache,
                         ToType(Property(Property(_context, "InstanceCache"), "Item", _source), _typeMap.DestinationTypeToUse)),
                     Assign(cache, mapperFunc)
