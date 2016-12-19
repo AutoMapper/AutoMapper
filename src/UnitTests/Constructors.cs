@@ -1198,4 +1198,35 @@ namespace AutoMapper.UnitTests.Constructors
             dest.Value1.ShouldEqual(5);
         }
     }
+
+    public class When_configuring_nullable_ctor_param_members : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int? Value { get; set; }
+        }
+
+        public class Dest
+        {
+            public Dest(int? thing)
+            {
+                Value1 = thing;
+            }
+
+            public int? Value1 { get; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Dest>().ForCtorParam("thing", opt => opt.ResolveUsing(src => src.Value));
+        });
+
+        [Fact]
+        public void Should_redirect_value()
+        {
+            var dest = Mapper.Map<Source, Dest>(new Source());
+
+            dest.Value1.ShouldBeNull();
+        }
+    }
 }
