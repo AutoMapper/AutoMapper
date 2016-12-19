@@ -14,7 +14,7 @@ namespace AutoMapper.Configuration
         {
             IncludeSourceExtensionMethods(typeof(Enumerable));
 
-            Mappers = MapperRegistry.Mappers().ToList();
+            Mappers = MapperRegistry.Mappers();
         }
 
         public IEnumerable<IProfileConfiguration> Profiles => _profiles;

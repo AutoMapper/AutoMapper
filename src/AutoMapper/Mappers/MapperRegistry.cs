@@ -4,7 +4,7 @@ namespace AutoMapper.Mappers
 {
     internal static class MapperRegistry
     {
-        public static IEnumerable<IObjectMapper> Mappers() => new IObjectMapper[]
+        public static IList<IObjectMapper> Mappers() => new List<IObjectMapper>
         {
             new NullableSourceMapper(),
             new ExpressionMapper(), 
