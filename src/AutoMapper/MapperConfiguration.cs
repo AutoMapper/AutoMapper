@@ -88,7 +88,7 @@ namespace AutoMapper
         /// <summary>
         /// Builds the execution plan used to map the source to destination.
         /// Useful to understand what exactly is happening during mapping.
-        /// You can use the package <a href="https://github.com/agileobjects/ReadableExpressions#usage">AgileObjects.ReadableExpressions</a> for pretty printing.
+        /// See <a href="https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping">the wiki</a> for details.
         /// </summary>
         /// <param name="sourceType">the runtime type of the source object</param>
         /// <param name="destinationType">the runtime type of the destination object</param>
