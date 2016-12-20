@@ -15,9 +15,8 @@ namespace AutoMapper.Mappers
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression)
         {
-            var sourceType = sourceExpression.Type;
             var toStringCall = Call(sourceExpression, typeof(object).GetDeclaredMethod("ToString"));
-            if(sourceType.IsValueType())
+            if(sourceExpression.Type.IsValueType())
             {
                 return toStringCall;
             }
