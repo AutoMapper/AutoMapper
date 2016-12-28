@@ -7,6 +7,28 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.CustomMapping
 {
+    public class NullableConverter : AutoMapperSpecBase
+    {
+        public enum GreekLetters
+        {
+            Alpha = 11,
+            Beta = 12,
+            Gamma = 13
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap<int?, GreekLetters>().ConvertUsing(n => n == null ? GreekLetters.Beta : GreekLetters.Gamma);
+        });
+
+        [Fact]
+        public void Should_map_nullable()
+        {
+            Mapper.Map<int?, GreekLetters>(null).ShouldEqual(GreekLetters.Beta);
+            Mapper.Map<int?, GreekLetters>(42).ShouldEqual(GreekLetters.Gamma);
+        }
+    }
+
     public class MissingConverter : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
