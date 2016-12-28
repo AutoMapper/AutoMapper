@@ -101,7 +101,7 @@ namespace AutoMapper
 
         public LambdaExpression BuildExecutionPlan(MapRequest mapRequest)
         {
-            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes);
+            var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes) ?? ResolveTypeMap(mapRequest.RequestedTypes);
             if(typeMap != null)
             {
                 return GenerateTypeMapExpression(mapRequest, typeMap);
