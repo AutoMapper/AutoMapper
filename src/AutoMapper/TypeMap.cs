@@ -77,6 +77,7 @@ namespace AutoMapper
         public LambdaExpression ConstructExpression { get; set; }
         public Type TypeConverterType { get; set; }
         public bool DisableConstructorValidation { get; set; }
+        public bool DoNotInlineCollections { get; internal set; }
 
         public PropertyMap[] GetPropertyMaps()
         {

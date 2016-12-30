@@ -86,6 +86,8 @@ namespace AutoMapper.Configuration
 
         public new IMappingExpression PreserveReferences() => (IMappingExpression)base.PreserveReferences();
 
+        public new IMappingExpression DoNotInlineCollections() => (IMappingExpression)base.DoNotInlineCollections();
+
         protected override IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
             => new MemberConfigurationExpression(member, sourceType);
 
@@ -157,6 +159,12 @@ namespace AutoMapper.Configuration
         public bool IsOpenGeneric { get; }
         public ITypeMapConfiguration ReverseTypeMap => _reverseMap;
         protected List<Action<TypeMap>> TypeMapActions { get; } = new List<Action<TypeMap>>();
+
+        public IMappingExpression<TSource, TDestination> DoNotInlineCollections()
+        {
+            TypeMapActions.Add(tm => tm.DoNotInlineCollections = true);
+            return this;
+        }
 
         public IMappingExpression<TSource, TDestination> PreserveReferences()
         {

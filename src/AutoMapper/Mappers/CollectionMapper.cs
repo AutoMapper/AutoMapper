@@ -87,8 +87,9 @@ namespace AutoMapper.Mappers
             itemParam = Parameter(sourceElementType, "item");
 
             var typePair = new TypePair(sourceElementType, destElementType);
-
-            var itemExpr = TypeMapPlanBuilder.MapExpression(typeMapRegistry, configurationProvider, typePair, itemParam, contextParam, propertyMap);
+            var itemExpr = propertyMap?.TypeMap.DoNotInlineCollections == true ?
+                TypeMapPlanBuilder.ContextMap(typePair, itemParam, contextParam, Default(destElementType)) :
+                TypeMapPlanBuilder.MapExpression(typeMapRegistry, configurationProvider, typePair, itemParam, contextParam, propertyMap);
             return ToType(itemExpr, destElementType);
         }
 

@@ -10,6 +10,11 @@ namespace AutoMapper
     public interface IMappingExpression
     {
         /// <summary>
+        /// Simplify the execution plan for this map by not inlining collections members.
+        /// </summary>
+        IMappingExpression DoNotInlineCollections();
+
+        /// <summary>
         /// Preserve object identity. Useful for circular references.
         /// </summary>
         /// <returns></returns>
@@ -191,6 +196,11 @@ namespace AutoMapper
     /// <typeparam name="TDestination">Destination type</typeparam>
     public interface IMappingExpression<TSource, TDestination>
     {
+        /// <summary>
+        /// Simplify the execution plan for this map by not inlining collections members.
+        /// </summary>
+        IMappingExpression<TSource, TDestination> DoNotInlineCollections();
+
         /// <summary>
         /// Preserve object identity. Useful for circular references.
         /// </summary>
