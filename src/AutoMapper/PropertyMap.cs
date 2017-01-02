@@ -15,7 +15,6 @@ namespace AutoMapper
         public PropertyMap(MemberInfo destinationProperty, TypeMap typeMap)
         {
             TypeMap = typeMap;
-            //UseDestinationValue = true;
             DestinationProperty = destinationProperty;
         }
 
@@ -32,6 +31,7 @@ namespace AutoMapper
 
         public IEnumerable<MemberInfo> SourceMembers => _memberChain;
 
+        public bool Inline { get; internal set; } = true;
         public bool Ignored { get; set; }
         public bool AllowNull { get; set; }
         public int? MappingOrder { get; set; }
