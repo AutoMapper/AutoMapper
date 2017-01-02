@@ -16,7 +16,7 @@ namespace AutoMapper
         /// <summary>
         /// Simplify the execution plan by not inlining this member.
         /// </summary>
-        void DontInline();
+        void DoNotInline();
 
         /// <summary>
         /// Substitute a custom value when the source member resolves as null

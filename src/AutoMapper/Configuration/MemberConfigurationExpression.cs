@@ -20,7 +20,7 @@ namespace AutoMapper.Configuration
 
         public MemberInfo DestinationMember => _destinationMember;
 
-        public void DontInline()
+        public void DoNotInline()
         {
             PropertyMapActions.Add(pm => pm.Inline = false);
         }
