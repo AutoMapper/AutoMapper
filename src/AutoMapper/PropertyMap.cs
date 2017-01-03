@@ -31,7 +31,7 @@ namespace AutoMapper
 
         public IEnumerable<MemberInfo> SourceMembers => _memberChain;
 
-        public bool Inline { get; internal set; } = true;
+        public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }
         public bool AllowNull { get; set; }
         public int? MappingOrder { get; set; }
