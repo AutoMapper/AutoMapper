@@ -314,14 +314,9 @@ namespace AutoMapper.Execution
             valueResolverExpr = resolvedValue;
 
             var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
-            if(propertyMap.Inline)
-            {
-                valueResolverExpr = MapExpression(typePair, valueResolverExpr, propertyMap, destValueExpr);
-            }
-            else
-            {
-                valueResolverExpr = ContextMap(typePair, valueResolverExpr, _context, destValueExpr);
-            }
+            valueResolverExpr = propertyMap.Inline ?
+                MapExpression(typePair, valueResolverExpr, propertyMap, destValueExpr) :
+                ContextMap(typePair, valueResolverExpr, _context, destValueExpr);
 
             ParameterExpression propertyValue;
             Expression setPropertyValue;
