@@ -314,7 +314,7 @@ namespace AutoMapper.Execution
             valueResolverExpr = resolvedValue;
 
             var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
-            if(propertyMap.Inline && propertyMap.DestinationPropertyType != null)
+            if(propertyMap.Inline)
             {
                 valueResolverExpr = MapExpression(typePair, valueResolverExpr, propertyMap, destValueExpr);
             }
