@@ -313,15 +313,10 @@ namespace AutoMapper.Execution
             var setResolvedValue = Assign(resolvedValue, valueResolverExpr);
             valueResolverExpr = resolvedValue;
 
-            if(propertyMap.DestinationPropertyType != null)
-            {
-                var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
-                valueResolverExpr = MapExpression(typePair, valueResolverExpr, propertyMap, destValueExpr);
-            }
-            else
-            {
-                valueResolverExpr = SetMap(propertyMap, valueResolverExpr, destValueExpr);
-            }
+            var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
+            valueResolverExpr = propertyMap.Inline ?
+                MapExpression(typePair, valueResolverExpr, propertyMap, destValueExpr) :
+                ContextMap(typePair, valueResolverExpr, _context, destValueExpr);
 
             ParameterExpression propertyValue;
             Expression setPropertyValue;
@@ -381,11 +376,6 @@ namespace AutoMapper.Execution
             }
 
             return Block(new[] { resolvedValue, propertyValue }.Distinct(), mapperExpr);
-        }
-
-        private Expression SetMap(PropertyMap propertyMap, Expression valueResolverExpression, Expression destinationValueExpression)
-        {
-            return ContextMap(new TypePair(valueResolverExpression.Type, propertyMap.DestinationPropertyType), valueResolverExpression, destinationValueExpression, _context);
         }
 
         private Expression BuildValueResolverFunc(PropertyMap propertyMap, Expression destValueExpr)

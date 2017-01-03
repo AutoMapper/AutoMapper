@@ -14,6 +14,11 @@ namespace AutoMapper
     public interface IMemberConfigurationExpression<TSource, out TDestination, TMember>
     {
         /// <summary>
+        /// Simplify the execution plan by not inlining this member.
+        /// </summary>
+        void DoNotInline();
+
+        /// <summary>
         /// Substitute a custom value when the source member resolves as null
         /// </summary>
         /// <param name="nullSubstitute">Value to use</param>

@@ -20,6 +20,11 @@ namespace AutoMapper.Configuration
 
         public MemberInfo DestinationMember => _destinationMember;
 
+        public void DoNotInline()
+        {
+            PropertyMapActions.Add(pm => pm.Inline = false);
+        }
+
         public void NullSubstitute(object nullSubstitute)
         {
             PropertyMapActions.Add(pm => pm.NullSubstitute = nullSubstitute);
