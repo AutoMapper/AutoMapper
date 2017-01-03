@@ -28,19 +28,8 @@ namespace AutoMapper.QueryableExtensions.Impl
         private static ExpressionResolutionResult ExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, MemberInfo getter)
         {
-            Expression currentChild = expressionResolutionResult.ResolutionExpression;
-            Type currentChildType;
-
-            var propertyInfo = getter as PropertyInfo;
-            if (propertyInfo != null)
-            {
-                currentChild = Expression.Property(currentChild, propertyInfo);
-                currentChildType = propertyInfo.PropertyType;
-            }
-            else
-                currentChildType = currentChild.Type;
-
-            return new ExpressionResolutionResult(currentChild, currentChildType);
+            var member = Expression.MakeMemberAccess(expressionResolutionResult.ResolutionExpression, getter);
+            return new ExpressionResolutionResult(member, member.Type);
         }
 
         public bool CanGetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap)

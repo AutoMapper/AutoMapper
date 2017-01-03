@@ -10,6 +10,30 @@ namespace AutoMapper.UnitTests.Projection
     using AutoMapper;
     using QueryableExtensions;
 
+    public class ProjectWithFields : AutoMapperSpecBase
+    {
+        public class Foo
+        {
+            public int A;
+        }
+
+        public class FooDto
+        {
+            public int A;
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Foo, FooDto>();
+        });
+
+        [Fact]
+        public void Should_work()
+        {
+            new[] { new Foo() }.AsQueryable().ProjectTo<FooDto>(Configuration).Single().A.ShouldEqual(0);
+        } 
+    }
+
     public class ProjectTest
     {
         private MapperConfiguration _config;
