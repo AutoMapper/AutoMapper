@@ -25,6 +25,8 @@ namespace AutoMapper.Configuration
 
         public IList<IObjectMapper> Mappers { get; }
 
+        public AdvancedConfiguration Advanced { get; } = new AdvancedConfiguration();
+
         private class NamedProfile : Profile
         {
             public NamedProfile(string profileName, Action<IProfileExpression> config) : base(profileName, config)
