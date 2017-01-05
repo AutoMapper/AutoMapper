@@ -454,7 +454,7 @@ namespace AutoMapper.Execution
 
         private Expression CreateInstance(Type type)
         {
-            return Call(Property(_context, "Options"), typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance").MakeGenericMethod(type));
+            return Call(Property(_context, "Options"), "CreateInstance", new[] { type });
         }
 
         private Expression BuildResolveCall(Expression destValueExpr, ValueResolverConfiguration valueResolverConfig)
