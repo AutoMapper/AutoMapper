@@ -378,7 +378,7 @@ namespace AutoMapper.Execution
 
             if(valueResolverConfig != null)
             {
-                valueResolverFunc = BuildResolveCall(destValueExpr, destinationPropertyType, valueResolverConfig, typeMap);
+                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, valueResolverConfig), destinationPropertyType);
             }
             else if(propertyMap.CustomResolver != null)
             {
@@ -457,7 +457,7 @@ namespace AutoMapper.Execution
             return Call(Property(_context, "Options"), typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance").MakeGenericMethod(type));
         }
 
-        private Expression BuildResolveCall(Expression destValueExpr, Type destinationPropertyType, ValueResolverConfiguration valueResolverConfig, TypeMap typeMap)
+        private Expression BuildResolveCall(Expression destValueExpr, ValueResolverConfiguration valueResolverConfig)
         {
             var resolverInstance = valueResolverConfig.Instance != null ? Constant(valueResolverConfig.Instance) : CreateInstance(valueResolverConfig.ConcreteType);
 
@@ -471,9 +471,7 @@ namespace AutoMapper.Execution
             var parameters = new[] { _source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
                                         .Zip(iResolverType.GetGenericArguments(), (e, type) => ToType(e, type))
                                         .Concat(new[] { _context });
-            return ToType(
-                        Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"), parameters),
-                        destinationPropertyType);
+            return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"), parameters);
         }
 
         public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
