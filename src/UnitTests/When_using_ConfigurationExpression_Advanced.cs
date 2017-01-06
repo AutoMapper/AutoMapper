@@ -5,26 +5,30 @@ namespace AutoMapper.UnitTests
 {
     public class When_using_ConfigurationExpression_Advanced : AutoMapperSpecBase
     {
-        private static bool _sealed;
+        // Nullable so can see a false state
+        private static bool? _sealed;
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<PlaceHolder, PlaceHolder>();
-            cfg.Advanced.BeforeSeal = _ => SetSealed(_);
+            cfg.Advanced.BeforeSeal(SetSealed);
         });
 
-        private static bool SetSealed(IConfigurationProvider _)
+        private static void SetSealed(IConfigurationProvider cfg)
         {
-            return _sealed = _.FindTypeMapFor(typeof(PlaceHolder), typeof(PlaceHolder)) != null;
+            // If sealed _typeMapCache is filled and should be able to Resolve tye TypeMap
+            // If not sealed _typeMapCache is empty and should return null
+            _sealed = cfg.FindTypeMapFor(typeof(PlaceHolder), typeof(PlaceHolder)) != null;
         }
 
         [Fact]
         public void BeforeSeal_should_be_called_before_Seal()
         {
-            _sealed.ShouldBeFalse();
+            _sealed.ShouldEqual(false);
+
             // Prove that sealed actualy seals
             SetSealed(Configuration);
-            _sealed.ShouldBeTrue();
+            _sealed.ShouldEqual(true);
         }
 
         public class PlaceHolder { }
