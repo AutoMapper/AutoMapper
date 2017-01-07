@@ -187,6 +187,7 @@ namespace AutoMapper
         public TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
         {
             var openMapConfig = _openTypeMapConfigs
+                .SelectMany(tm => tm.ReverseTypeMap == null ? new[] { tm } : new[] { tm, tm.ReverseTypeMap })
                 //.Where(tm => tm.IsOpenGeneric)
                 .Where(tm =>
                     tm.Types.SourceType.GetGenericTypeDefinitionIfGeneric() == closedTypes.SourceType.GetGenericTypeDefinitionIfGeneric() &&
