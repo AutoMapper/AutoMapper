@@ -72,6 +72,7 @@
       <HintPath>..\..\lib\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -93,6 +94,7 @@
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="BasicFlattening.cs" />
     <Compile Include="Bug\CannotProjectStringToNullableEnum.cs" />
+    <Compile Include="Bug\CastErrorWithMultipleMaps.cs" />
     <Compile Include="Bug\ConventionCreateMapsWithCircularReference.cs" />
     <Compile Include="Bug\ConvertMapperThreading.cs" />
     <Compile Include="Bug\DeepCloningBug.cs" />
