@@ -118,11 +118,9 @@ namespace AutoMapper.Execution
             if(_typeMap.PreserveReferences)
             {
                 var dest = Variable(typeof(object), "dest");
-
-                Expression valueBag = Property(_context, "InstanceCache");
-                var set = Assign(Property(valueBag, "Item", _source), dest);
-                var setCache =
-                    IfThen(NotEqual(_source, Constant(null)), set);
+                var setValue = _context.Type.GetDeclaredMethod("CacheDestination");
+                var set = Call(_context, setValue, _source, Constant(_destination.Type), _destination);
+                var setCache = IfThen(NotEqual(_source, Constant(null)), set);
 
                 destinationFunc = Block(new[] { dest }, Assign(dest, destinationFunc), setCache, dest);
             }
@@ -203,13 +201,14 @@ namespace AutoMapper.Execution
             if(_typeMap.PreserveReferences)
             {
                 var cache = Variable(_typeMap.DestinationTypeToUse, "cachedDestination");
-
+                var hasDestination = _context.Type.GetDeclaredMethod("HasDestination");
+                var getDestination = _context.Type.GetDeclaredMethod("GetDestination");
                 var condition = Condition(
                     AndAlso(
                         NotEqual(_source, Constant(null)),
-                        Call(Property(_context, "InstanceCache"), typeof(Dictionary<object, object>).GetDeclaredMethod("ContainsKey"), _source)),
+                        Call(_context, hasDestination, _source, Constant(_destination.Type))),
                     Assign(cache,
-                        ToType(Property(Property(_context, "InstanceCache"), "Item", _source), _typeMap.DestinationTypeToUse)),
+                        ToType(Call(_context, getDestination, _source, Constant(_destination.Type)), _destination.Type)),
                     Assign(cache, mapperFunc)
                     );
 

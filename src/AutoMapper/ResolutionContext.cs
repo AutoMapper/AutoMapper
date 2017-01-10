@@ -10,7 +10,7 @@ namespace AutoMapper
     /// </summary>
     public class ResolutionContext
     {
-        private Dictionary<object, object> _instanceCache;
+        private Dictionary<SourceDestinationType, object> _instanceCache;
         private Dictionary<TypePair, int> _typeDepth;
 
         /// <summary>
@@ -18,10 +18,25 @@ namespace AutoMapper
         /// </summary>
         public IMappingOperationOptions Options { get; }
 
+        internal bool HasDestination(object source, Type destinationType)
+        {
+            return InstanceCache.ContainsKey(new SourceDestinationType(source, destinationType));
+        }
+
+        internal object GetDestination(object source, Type destinationType)
+        {
+            return InstanceCache[new SourceDestinationType(source, destinationType)];
+        }
+
+        internal void CacheDestination(object source, Type destinationType, object destination)
+        {
+            InstanceCache.Add(new SourceDestinationType(source, destinationType), destination);
+        }
+
         /// <summary>
         /// Instance cache for resolving circular references
         /// </summary>
-        public Dictionary<object, object> InstanceCache
+        public Dictionary<SourceDestinationType, object> InstanceCache
         {
             get
             {
@@ -30,7 +45,7 @@ namespace AutoMapper
                 {
                     return _instanceCache;
                 }
-                _instanceCache = new Dictionary<object, object>();
+                _instanceCache = new Dictionary<SourceDestinationType, object>();
                 return _instanceCache;
             }
         }
@@ -111,6 +126,30 @@ namespace AutoMapper
         internal object Map(object source, object destination, Type sourceType, Type destinationType)
         {
             return Mapper.Map(source, destination, sourceType, destinationType, this);
+        }
+    }
+
+    public struct SourceDestinationType : IEquatable<SourceDestinationType>
+    {
+        private readonly int _hashCode;
+        private readonly object _source;
+        private readonly Type _destinationType;
+
+        public SourceDestinationType(object source, Type destinationType)
+        {
+            _source = source;
+            _destinationType = destinationType;
+            _hashCode = (_source.GetHashCode() * 397) ^ _destinationType.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
+
+        public bool Equals(SourceDestinationType other)
+        {
+            return ReferenceEquals(_source, other._source) && _destinationType == other._destinationType;
         }
     }
 }
