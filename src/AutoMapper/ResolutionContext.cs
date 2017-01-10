@@ -131,6 +131,9 @@ namespace AutoMapper
 
     public struct SourceDestinationType : IEquatable<SourceDestinationType>
     {
+        public static bool operator ==(SourceDestinationType left, SourceDestinationType right) => Equals(left, right);
+        public static bool operator !=(SourceDestinationType left, SourceDestinationType right) => !Equals(left, right);
+
         private readonly int _hashCode;
         private readonly object _source;
         private readonly Type _destinationType;
@@ -142,14 +145,12 @@ namespace AutoMapper
             _hashCode = (_source.GetHashCode() * 397) ^ _destinationType.GetHashCode();
         }
 
-        public override int GetHashCode()
-        {
-            return _hashCode;
-        }
+        public override int GetHashCode() => _hashCode;
 
-        public bool Equals(SourceDestinationType other)
-        {
-            return ReferenceEquals(_source, other._source) && _destinationType == other._destinationType;
-        }
+        public bool Equals(SourceDestinationType other) =>
+            _source == other._source && _destinationType == other._destinationType;
+
+        public override bool Equals(object other) => 
+            other is SourceDestinationType && Equals((SourceDestinationType)other);
     }
 }
