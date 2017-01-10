@@ -134,6 +134,16 @@ namespace AutoMapper
         public static bool operator ==(SourceDestinationType left, SourceDestinationType right) => left.Equals(right);
         public static bool operator !=(SourceDestinationType left, SourceDestinationType right) => !left.Equals(right);
 
+        private static int CombineHashCodes(object obj1, object obj2)
+        {
+            return CombineHashCodes(obj1.GetHashCode(), obj2.GetHashCode());
+        }
+
+        private static int CombineHashCodes(int h1, int h2)
+        {
+            return (h1 << 5) + h1 ^ h2;
+        }
+
         private readonly int _hashCode;
         private readonly object _source;
         private readonly Type _destinationType;
@@ -142,7 +152,7 @@ namespace AutoMapper
         {
             _source = source;
             _destinationType = destinationType;
-            _hashCode = (_source.GetHashCode() * 397) ^ _destinationType.GetHashCode();
+            _hashCode = CombineHashCodes(_source, _destinationType);
         }
 
         public override int GetHashCode() => _hashCode;
