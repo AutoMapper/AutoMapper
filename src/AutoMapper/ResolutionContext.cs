@@ -21,11 +21,8 @@ namespace AutoMapper
         internal object GetDestination(object source, Type destinationType)
         {
             object destination;
-            if(InstanceCache.TryGetValue(new SourceDestinationType(source, destinationType), out destination))
-            {
-                return destination;
-            }
-            return null;
+            InstanceCache.TryGetValue(new SourceDestinationType(source, destinationType), out destination);
+            return destination;
         }
 
         internal void CacheDestination(object source, Type destinationType, object destination)
