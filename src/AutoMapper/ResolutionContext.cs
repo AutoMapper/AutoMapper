@@ -18,14 +18,14 @@ namespace AutoMapper
         /// </summary>
         public IMappingOperationOptions Options { get; }
 
-        internal bool HasDestination(object source, Type destinationType)
-        {
-            return InstanceCache.ContainsKey(new SourceDestinationType(source, destinationType));
-        }
-
         internal object GetDestination(object source, Type destinationType)
         {
-            return InstanceCache[new SourceDestinationType(source, destinationType)];
+            object destination;
+            if(InstanceCache.TryGetValue(new SourceDestinationType(source, destinationType), out destination))
+            {
+                return destination;
+            }
+            return null;
         }
 
         internal void CacheDestination(object source, Type destinationType, object destination)

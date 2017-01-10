@@ -201,18 +201,15 @@ namespace AutoMapper.Execution
             if(_typeMap.PreserveReferences)
             {
                 var cache = Variable(_typeMap.DestinationTypeToUse, "cachedDestination");
-                var hasDestination = _context.Type.GetDeclaredMethod("HasDestination");
                 var getDestination = _context.Type.GetDeclaredMethod("GetDestination");
+                var assignCache =
+                    Assign(cache, ToType(Call(_context, getDestination, _source, Constant(_destination.Type)), _destination.Type));
                 var condition = Condition(
-                    AndAlso(
-                        NotEqual(_source, Constant(null)),
-                        Call(_context, hasDestination, _source, Constant(_destination.Type))),
-                    Assign(cache,
-                        ToType(Call(_context, getDestination, _source, Constant(_destination.Type)), _destination.Type)),
-                    Assign(cache, mapperFunc)
-                    );
+                    AndAlso(NotEqual(_source, Constant(null)), NotEqual(assignCache, Constant(null))),
+                    cache,
+                    mapperFunc);
 
-                mapperFunc = Block(new[] { cache }, condition, cache);
+                mapperFunc = Block(new[] { cache }, condition);
             }
             return mapperFunc;
         }
