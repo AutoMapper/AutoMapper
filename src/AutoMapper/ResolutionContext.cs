@@ -10,7 +10,7 @@ namespace AutoMapper
     /// </summary>
     public class ResolutionContext
     {
-        private Dictionary<SourceDestinationType, object> _instanceCache;
+        private Dictionary<ContextCacheKey, object> _instanceCache;
         private Dictionary<TypePair, int> _typeDepth;
 
         /// <summary>
@@ -21,19 +21,19 @@ namespace AutoMapper
         internal object GetDestination(object source, Type destinationType)
         {
             object destination;
-            InstanceCache.TryGetValue(new SourceDestinationType(source, destinationType), out destination);
+            InstanceCache.TryGetValue(new ContextCacheKey(source, destinationType), out destination);
             return destination;
         }
 
         internal void CacheDestination(object source, Type destinationType, object destination)
         {
-            InstanceCache.Add(new SourceDestinationType(source, destinationType), destination);
+            InstanceCache.Add(new ContextCacheKey(source, destinationType), destination);
         }
 
         /// <summary>
         /// Instance cache for resolving circular references
         /// </summary>
-        public Dictionary<SourceDestinationType, object> InstanceCache
+        public Dictionary<ContextCacheKey, object> InstanceCache
         {
             get
             {
@@ -42,7 +42,7 @@ namespace AutoMapper
                 {
                     return _instanceCache;
                 }
-                _instanceCache = new Dictionary<SourceDestinationType, object>();
+                _instanceCache = new Dictionary<ContextCacheKey, object>();
                 return _instanceCache;
             }
         }
@@ -126,10 +126,10 @@ namespace AutoMapper
         }
     }
 
-    public struct SourceDestinationType : IEquatable<SourceDestinationType>
+    public struct ContextCacheKey : IEquatable<ContextCacheKey>
     {
-        public static bool operator ==(SourceDestinationType left, SourceDestinationType right) => left.Equals(right);
-        public static bool operator !=(SourceDestinationType left, SourceDestinationType right) => !left.Equals(right);
+        public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
+        public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
 
         private static int CombineHashCodes(object obj1, object obj2)
         {
@@ -145,7 +145,7 @@ namespace AutoMapper
         private readonly object _source;
         private readonly Type _destinationType;
 
-        public SourceDestinationType(object source, Type destinationType)
+        public ContextCacheKey(object source, Type destinationType)
         {
             _source = source;
             _destinationType = destinationType;
@@ -154,10 +154,10 @@ namespace AutoMapper
 
         public override int GetHashCode() => _hashCode;
 
-        public bool Equals(SourceDestinationType other) =>
+        public bool Equals(ContextCacheKey other) =>
             _source == other._source && _destinationType == other._destinationType;
 
         public override bool Equals(object other) => 
-            other is SourceDestinationType && Equals((SourceDestinationType)other);
+            other is ContextCacheKey && Equals((ContextCacheKey)other);
     }
 }
