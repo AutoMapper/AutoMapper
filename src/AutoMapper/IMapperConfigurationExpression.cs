@@ -82,5 +82,10 @@ namespace AutoMapper
         /// Object mappers
         /// </summary>
         IList<IObjectMapper> Mappers { get; }
+
+        /// <summary>
+        /// Advance Configuration
+        /// </summary>
+        AdvancedConfiguration Advanced { get; }
     }
 }

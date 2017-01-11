@@ -37,6 +37,8 @@ namespace AutoMapper
             Configuration = new ProfileMap(configurationExpression);
             Profiles = new[] { Configuration }.Concat(configurationExpression.Profiles.Select(p => new ProfileMap(p, configurationExpression))).ToArray();
 
+            foreach (var beforeSealAction in configurationExpression.Advanced.BeforeSealActions)
+                beforeSealAction?.Invoke(this);
             Seal();
         }
 
