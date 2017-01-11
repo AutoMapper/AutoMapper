@@ -88,13 +88,7 @@ namespace AutoMapper.Execution
             var converterInterfaceType = typeof(ITypeConverter<,>).MakeGenericType(_typeMap.SourceType, _typeMap.DestinationTypeToUse);
             return Lambda(
                 Call(
-                    ToType(
-                        Call(
-                            MakeMemberAccess(_context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
-                            typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
-                                .MakeGenericMethod(type)
-                            ),
-                        converterInterfaceType),
+                    ToType(CreateInstance(type), converterInterfaceType),
                     converterInterfaceType.GetDeclaredMethod("Convert"),
                     _source, _initialDestination, _context
                     ),
@@ -231,10 +225,7 @@ namespace AutoMapper.Execution
                 return _typeMap.DestinationCtor.ReplaceParameters(_source, _context);
 
             if(_typeMap.ConstructDestinationUsingServiceLocator)
-                return Call(MakeMemberAccess(_context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
-                    typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
-                        .MakeGenericMethod(_typeMap.DestinationTypeToUse)
-                    );
+                return CreateInstance(_typeMap.DestinationTypeToUse);
 
             if(_typeMap.ConstructorMap?.CanResolve == true)
             {
@@ -387,51 +378,7 @@ namespace AutoMapper.Execution
 
             if(valueResolverConfig != null)
             {
-                Expression ctor;
-                Type resolverType;
-                if(valueResolverConfig.Instance != null)
-                {
-                    ctor = Constant(valueResolverConfig.Instance);
-                    resolverType = valueResolverConfig.Instance.GetType();
-                }
-                else
-                {
-                    ctor = Call(MakeMemberAccess(_context, typeof(ResolutionContext).GetDeclaredProperty("Options")),
-                        typeof(IMappingOperationOptions).GetDeclaredMethod("CreateInstance")
-                            .MakeGenericMethod(valueResolverConfig.Type)
-                        );
-                    resolverType = valueResolverConfig.Type;
-                }
-
-                if(valueResolverConfig.SourceMember != null)
-                {
-                    var sourceMember = valueResolverConfig.SourceMember.ReplaceParameters(_source);
-
-                    valueResolverFunc = GetMemberResolver(destValueExpr, destinationPropertyType, ctor, resolverType, sourceMember);
-                }
-                else if(valueResolverConfig.SourceMemberName != null)
-                {
-                    var sourceMember = MakeMemberAccess(_source, typeMap.SourceType.GetFieldOrProperty(valueResolverConfig.SourceMemberName));
-
-                    valueResolverFunc = GetMemberResolver(destValueExpr, destinationPropertyType, ctor, resolverType, sourceMember);
-                }
-                else
-                {
-                    var iResolverType = resolverType.GetGenericInterface(typeof(IValueResolver<,,>));
-
-                    var sourceResolverParam = iResolverType.GetGenericArguments()[0];
-                    var destResolverParam = iResolverType.GetGenericArguments()[1];
-                    var destMemberResolverParam = iResolverType.GetGenericArguments()[2];
-
-                    valueResolverFunc =
-                        ToType(Call(ToType(ctor, resolverType), iResolverType.GetDeclaredMethod("Resolve"),
-                            ToType(_source, sourceResolverParam),
-                            ToType(_destination, destResolverParam),
-                            ToType(destValueExpr, destMemberResolverParam),
-                            _context),
-                            destinationPropertyType);
-                }
-
+                valueResolverFunc = ToType(BuildResolveCall(destValueExpr, valueResolverConfig), destinationPropertyType);
             }
             else if(propertyMap.CustomResolver != null)
             {
@@ -505,23 +452,26 @@ namespace AutoMapper.Execution
             return valueResolverFunc;
         }
 
-        private Expression GetMemberResolver(Expression destValueExpr, Type destinationPropertyType, Expression ctor, Type resolverType, Expression sourceMember)
+        private Expression CreateInstance(Type type)
         {
-            var iResolverType = resolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>));
+            return Call(Property(_context, "Options"), "CreateInstance", new[] { type });
+        }
 
-            var sourceResolverParam = iResolverType.GetGenericArguments()[0];
-            var destResolverParam = iResolverType.GetGenericArguments()[1];
-            var sourceMemberResolverParam = iResolverType.GetGenericArguments()[2];
-            var destMemberResolverParam = iResolverType.GetGenericArguments()[3];
+        private Expression BuildResolveCall(Expression destValueExpr, ValueResolverConfiguration valueResolverConfig)
+        {
+            var resolverInstance = valueResolverConfig.Instance != null ? Constant(valueResolverConfig.Instance) : CreateInstance(valueResolverConfig.ConcreteType);
 
-            return
-                ToType(Call(ToType(ctor, resolverType), resolverType.GetDeclaredMethod("Resolve"),
-                    ToType(_source, sourceResolverParam),
-                    ToType(_destination, destResolverParam),
-                    ToType(sourceMember, sourceMemberResolverParam),
-                    ToType(destValueExpr, destMemberResolverParam),
-                    _context),
-                    destinationPropertyType);
+            var sourceMember = valueResolverConfig.SourceMember?.ReplaceParameters(_source) ??
+                                            (valueResolverConfig.SourceMemberName != null ? 
+                                            PropertyOrField(_source, valueResolverConfig.SourceMemberName) : 
+                                            null);
+
+            var iResolverType = valueResolverConfig.InterfaceType;
+
+            var parameters = new[] { _source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
+                                        .Zip(iResolverType.GetGenericArguments(), (e, type) => ToType(e, type))
+                                        .Concat(new[] { _context });
+            return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"), parameters);
         }
 
         public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)

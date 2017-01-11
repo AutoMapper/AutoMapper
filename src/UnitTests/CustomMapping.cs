@@ -7,6 +7,44 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_implementing_multiple_IValueResolver_interfaces : AutoMapperSpecBase
+    {
+        public class Source1 { }
+
+        public class Source2 { }
+
+        public class Destination
+        {
+            public string Value { get; set; }
+        }
+
+        public class MyTestResolver : IValueResolver<Source1, Destination, string>, IValueResolver<Source2, Destination, string>
+        {
+            public string Resolve(Source1 source, Destination destination, string destMember, ResolutionContext context)
+            {
+                return "source1";
+            }
+
+            public string Resolve(Source2 source, Destination destination, string destMember, ResolutionContext context)
+            {
+                return "source2";
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source1, Destination>().ForMember(dest => dest.Value, opt => opt.ResolveUsing<MyTestResolver>());
+            cfg.CreateMap<Source2, Destination>().ForMember(dest => dest.Value, opt => opt.ResolveUsing<MyTestResolver>());
+        });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            Mapper.Map<Destination>(new Source1()).Value.ShouldEqual("source1");
+            Mapper.Map<Destination>(new Source2()).Value.ShouldEqual("source2");
+        }
+    }
+
     public class When_using_IMemberResolver_derived_interface : AutoMapperSpecBase
     {
         Destination _destination;

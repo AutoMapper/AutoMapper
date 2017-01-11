@@ -33,7 +33,7 @@ namespace AutoMapper.Configuration
         public void ResolveUsing<TValueResolver>() 
             where TValueResolver : IValueResolver<TSource, TDestination, TMember>
         {
-            var config = new ValueResolverConfiguration(typeof(TValueResolver));
+            var config = new ValueResolverConfiguration(typeof(TValueResolver), typeof(IValueResolver<TSource, TDestination, TMember>));
 
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
@@ -41,7 +41,7 @@ namespace AutoMapper.Configuration
         public void ResolveUsing<TValueResolver, TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
             where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>
         {
-            var config = new ValueResolverConfiguration(typeof (TValueResolver))
+            var config = new ValueResolverConfiguration(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
             {
                 SourceMember = sourceMember
             };
@@ -52,7 +52,7 @@ namespace AutoMapper.Configuration
         public void ResolveUsing<TValueResolver, TSourceMember>(string sourceMemberName)
             where TValueResolver : IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>
         {
-            var config = new ValueResolverConfiguration(typeof (TValueResolver))
+            var config = new ValueResolverConfiguration(typeof(TValueResolver), typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
             {
                 SourceMemberName = sourceMemberName
             };
@@ -62,14 +62,14 @@ namespace AutoMapper.Configuration
 
         public void ResolveUsing(IValueResolver<TSource, TDestination, TMember> valueResolver)
         {
-            var config = new ValueResolverConfiguration(valueResolver);
+            var config = new ValueResolverConfiguration(valueResolver, typeof(IValueResolver<TSource, TDestination, TMember>));
 
             PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
         }
 
         public void ResolveUsing<TSourceMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember> valueResolver, Expression<Func<TSource, TSourceMember>> sourceMember)
         {
-            var config = new ValueResolverConfiguration(valueResolver)
+            var config = new ValueResolverConfiguration(valueResolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TMember>))
             {
                 SourceMember = sourceMember
             };
