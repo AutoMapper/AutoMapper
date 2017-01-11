@@ -31,11 +31,11 @@ namespace AutoMapper.QueryableExtensions
 
         private static readonly IExpressionBinder[] Binders =
         {
+            new CustomProjectionExpressionBinder(),
             new NullableExpressionBinder(),
             new AssignableExpressionBinder(),
             new EnumerableExpressionBinder(),
             new MappedTypeExpressionBinder(),
-            new CustomProjectionExpressionBinder(),
             new StringExpressionBinder()
         };
 

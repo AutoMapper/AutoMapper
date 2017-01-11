@@ -92,6 +92,7 @@
     <Compile Include="AssemblyScanning.cs" />
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="BasicFlattening.cs" />
+    <Compile Include="Bug\CannotProjectStringToNullableEnum.cs" />
     <Compile Include="Bug\ConventionCreateMapsWithCircularReference.cs" />
     <Compile Include="Bug\ConvertMapperThreading.cs" />
     <Compile Include="Bug\DeepCloningBug.cs" />
