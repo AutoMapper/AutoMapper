@@ -284,5 +284,40 @@ namespace AutoMapper.UnitTests
                 unmappedPropertyNames[0].ShouldEqual("Boo");
             }
         }
+
+        public class When_reverse_mapping_open_generics : AutoMapperSpecBase
+        {
+            private Source<int> _source;
+
+            public class Source<T>
+            {
+                public T Value { get; set; }
+            }
+            public class Destination<T>
+            {
+                public T Value { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap(typeof(Source<>), typeof(Destination<>))
+                    .ReverseMap();
+            });
+
+            protected override void Because_of()
+            {
+                var dest = new Destination<int>
+                {
+                    Value = 10
+                };
+                _source = Mapper.Map<Destination<int>, Source<int>>(dest);
+            }
+
+            [Fact]
+            public void Should_create_a_map_with_the_reverse_items()
+            {
+                _source.Value.ShouldEqual(10);
+            }
+        }
     }
 }
