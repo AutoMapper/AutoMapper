@@ -48,9 +48,8 @@ namespace AutoMapper
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public struct TypePair : IEquatable<TypePair>
     {
-        public static bool operator ==(TypePair left, TypePair right) => Equals(left, right);
-
-        public static bool operator !=(TypePair left, TypePair right) => !Equals(left, right);
+        public static bool operator ==(TypePair left, TypePair right) => left.Equals(right);
+        public static bool operator !=(TypePair left, TypePair right) => !left.Equals(right);
 
         public TypePair(Type sourceType, Type destinationType)
         {
@@ -89,8 +88,7 @@ namespace AutoMapper
 
         public bool Equals(TypePair other) => SourceType == other.SourceType && DestinationType == other.DestinationType;
 
-        public override bool Equals(object obj) => !ReferenceEquals(null, obj) &&
-                                                   (ReferenceEquals(this, obj) || obj.GetType() == GetType() && Equals((TypePair)obj));
+        public override bool Equals(object other) => other is TypePair && Equals((TypePair)other);
 
         public override int GetHashCode() => _hashcode;
 
