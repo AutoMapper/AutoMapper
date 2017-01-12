@@ -131,15 +131,10 @@ namespace AutoMapper
         public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
         public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
 
-        private static int CombineHashCodes(object obj1, object obj2)
-        {
-            return CombineHashCodes(obj1.GetHashCode(), obj2.GetHashCode());
-        }
+        private static int CombineHashCodes(object obj1, object obj2) =>
+            CombineHashCodes(obj1.GetHashCode(), obj2.GetHashCode());
 
-        private static int CombineHashCodes(int h1, int h2)
-        {
-            return (h1 << 5) + h1 ^ h2;
-        }
+        private static int CombineHashCodes(int h1, int h2) => (h1 << 5) + h1 ^ h2;
 
         private readonly int _hashCode;
         private readonly object _source;
