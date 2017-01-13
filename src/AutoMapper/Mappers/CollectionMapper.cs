@@ -28,6 +28,10 @@ namespace AutoMapper.Mappers
 
             var destinationElementType = itemExpr.Type;
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+            if(!destinationCollectionType.IsAssignableFrom(destExpression.Type))
+            {
+                destinationCollectionType = typeof(IList);
+            }
             var addMethod = destinationCollectionType.GetDeclaredMethod("Add");
             var destination = propertyMap?.UseDestinationValue == true ? passedDestination : newExpression;
             var addItems = ForEach(sourceExpression, itemParam, Call(destination, addMethod, itemExpr));

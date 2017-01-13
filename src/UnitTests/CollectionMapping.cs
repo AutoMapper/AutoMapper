@@ -9,15 +9,40 @@ using System.Collections;
 
 namespace AutoMapper.UnitTests
 {
-    public class When_mapping_to_custom_collection_type : NonValidatingSpecBase
+    public class When_mapping_to_custom_collection_type : AutoMapperSpecBase
     {
         public class MyCollection : CollectionBase
         {
-            public MyCollection(List<string> list)
-            {
-                foreach(var item in list)
-                    List.Add(item);
-            }
+        }
+
+        public class SourceItem
+        {
+            public string Name { get; set; }
+            public List<string> ShipsTo { get; set; }
+        }
+
+        public class DestItem
+        {
+            public string Name { get; set; }
+            public MyCollection ShipsTo { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration =>
+            new MapperConfiguration(cfg => cfg.CreateMap<SourceItem, DestItem>());
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            var items = Enumerable.Range(1, 10).Select(i => i.ToString()).ToArray();
+            Mapper.Map<DestItem>(new SourceItem { ShipsTo = new List<string>(items) })
+                .ShipsTo.Cast<string>().SequenceEqual(items).ShouldBeTrue();
+        }
+    }
+
+    public class When_mapping_to_unknown_collection_type : NonValidatingSpecBase
+    {
+        public class MyCollection
+        {
         }
 
         public class SourceItem
