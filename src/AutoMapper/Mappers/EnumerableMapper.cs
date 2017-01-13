@@ -10,10 +10,8 @@ namespace AutoMapper.Mappers
     {
         public bool IsMatch(TypePair context)
         {
-            // destination type must be IEnumerable interface or a class implementing at least IList 
-            return ((context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType()) ||
-                    context.DestinationType.IsListType())
-                   && context.SourceType.IsEnumerableType();
+            return context.SourceType.IsEnumerableType() && 
+                      context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType();
         }
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,

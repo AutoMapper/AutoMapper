@@ -5,9 +5,49 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Xunit;
 using Should;
+using System.Collections;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_mapping_to_custom_collection_type : NonValidatingSpecBase
+    {
+        public class MyCollection : CollectionBase
+        {
+            public MyCollection(List<string> list)
+            {
+                foreach(var item in list)
+                    List.Add(item);
+            }
+        }
+
+        public class SourceItem
+        {
+            public string Name { get; set; }
+            public List<string> ShipsTo { get; set; }
+        }
+
+        public class DestItem
+        {
+            public string Name { get; set; }
+            public MyCollection ShipsTo { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => 
+            new MapperConfiguration(cfg => cfg.CreateMap<SourceItem, DestItem>());
+
+        [Fact]
+        public void Should_report_missing_map()
+        {
+            new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>(ex =>
+            {
+                ex.PropertyMap.SourceMember.Name.ShouldEqual("ShipsTo");
+                var types = ex.Types.Value;
+                types.SourceType.ShouldEqual(typeof(List<string>));
+                types.DestinationType.ShouldEqual(typeof(MyCollection));
+            });
+        } 
+    }
+
     public class When_mapping_collections_with_inheritance : AutoMapperSpecBase
     {
         public class Source
