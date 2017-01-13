@@ -136,7 +136,6 @@ namespace AutoMapper
 
         private static int CombineHashCodes(int h1, int h2) => ((h1 << 5) + h1) ^ h2;
 
-        private readonly int _hashCode;
         private readonly object _source;
         private readonly Type _destinationType;
 
@@ -144,10 +143,9 @@ namespace AutoMapper
         {
             _source = source;
             _destinationType = destinationType;
-            _hashCode = CombineHashCodes(_source, _destinationType);
         }
 
-        public override int GetHashCode() => _hashCode;
+        public override int GetHashCode() => CombineHashCodes(_source, _destinationType);
 
         public bool Equals(ContextCacheKey other) =>
             _source == other._source && _destinationType == other._destinationType;
