@@ -324,9 +324,9 @@ namespace AutoMapper.Mappers
                     return null;
 
                 var memberAccessor = node.Member;
-                
+
                 // in case of a propertypath, the MemberAcessors type and the SourceType may be different
-                if (memberAccessor.DeclaringType != _typeMap.DestinationType)
+                if (!memberAccessor.DeclaringType.IsAssignableFrom(_typeMap.DestinationType))
                     return null;
 
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);

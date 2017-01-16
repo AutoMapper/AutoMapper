@@ -608,6 +608,27 @@ namespace AutoMapper.UnitTests.Query
             destItem.DestValue.ShouldEqual(sourceItem.SrcValue);
         }
 
+        [Fact]
+        [Description("Fix for issue #1886")]
+        public void Should_support_propertypath_expressions_with_properties_from_assignable_types()
+        {
+            // Arrange
+            var mapper = SetupAutoMapper();
+
+            var guid = Guid.NewGuid();
+            var entity = new Entity { Id = guid, Name = "Sofia" };
+            var source = new List<Entity> { entity };
+
+            // Act
+            Expression<Func<DTO, bool>> dtoQueryExpression = r => r.Id == guid;
+            var entityQueryExpression = mapper.Map<Expression<Func<Entity, bool>>>(dtoQueryExpression);
+            var entityQuery = source.AsQueryable();
+            entityQuery = entityQuery.Where(entityQueryExpression);
+
+            // Assert
+            entityQuery.ToList().Count().ShouldEqual(1);
+        }
+
         private static IMapper SetupAutoMapper()
         {
             var config = new MapperConfiguration(cfg =>
@@ -656,6 +677,10 @@ namespace AutoMapper.UnitTests.Query
                 cfg.CreateMap<MasterCyclicDto, Master>().PreserveReferences();
                 cfg.CreateMap<Detail, DetailCyclicDto>().PreserveReferences();
                 cfg.CreateMap<DetailCyclicDto, Detail>().PreserveReferences();
+
+                // issue #1886
+                cfg.CreateMap<Entity, DTO>();
+                cfg.CreateMap<DTO, Entity>();
             });
 
 
@@ -810,6 +835,26 @@ namespace AutoMapper.UnitTests.Query
     {
         public string Title { get; set; }
         public bool HasEditPermission { get; set; }
+    }
+
+    public class BaseDTO
+    {
+        public Guid Id { get; set; }
+    }
+
+    public class BaseEntity
+    {
+        public Guid Id { get; set; }
+    }
+
+    public class DTO : BaseDTO
+    {
+        public string Name { get; set; }
+    }
+
+    public class Entity : BaseEntity
+    {
+        public string Name { get; set; }
     }
 }
 
