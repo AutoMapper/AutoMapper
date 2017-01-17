@@ -466,6 +466,7 @@
     <Compile Include="ValueTypes.cs" />
     <Compile Include="Bug\MappingToAReadOnlyCollection.cs" />
     <Compile Include="When_using_ConfigurationExpression_Advanced.cs" />
+    <Compile Include="XpressionMapperTests.cs" />
     <Compile Include="XUnitConventions.cs" />
   </ItemGroup>
   <ItemGroup>

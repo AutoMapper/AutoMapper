@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#define XPRESSIONMAPPER
+using System.Collections;
 
 namespace AutoMapper.Mappers
 {
@@ -10,6 +11,7 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using Configuration;
     using Execution;
+    using XpressionMapper.Extensions;
 
     public class ExpressionMapper : IObjectMapper
     {
@@ -17,6 +19,9 @@ namespace AutoMapper.Mappers
             where TSource : LambdaExpression
             where TDestination : LambdaExpression
         {
+#if XPRESSIONMAPPER
+            return context.Mapper.MapExpression<TDestination>(expression);
+#else
             var sourceDelegateType = typeof(TSource).GetTypeInfo().GenericTypeArguments[0];
             var destDelegateType = typeof(TDestination).GetTypeInfo().GenericTypeArguments[0];
 
@@ -42,6 +47,7 @@ namespace AutoMapper.Mappers
             var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
             var body = typeMapVisitor.Visit(expression.Body);
             return (TDestination)Expression.Lambda(body, parameters);
+#endif
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(ExpressionMapper).GetAllMethods().First(_ => _.IsStatic);

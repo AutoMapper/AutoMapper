@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true
+  },
+
+    "dependencies": {
+      "AutoMapper": "5.2.0",
+      "ContosoUniverity.Contexts": { "target": "project" },
+      "ContosoUniverity.Crud": { "target": "project" },
+      "ContosoUniverity.Data": { "target": "project" },
+      "Microsoft.EntityFrameworkCore.SqlServer": "1.1.0",
+      "Microsoft.Extensions.Configuration": "1.1.0",
+      "Microsoft.Extensions.Configuration.FileExtensions": "1.1.0",
+      "Microsoft.Extensions.Configuration.Json": "1.1.0",
+      "Microsoft.Extensions.DependencyInjection.Abstractions": "1.1.0",
+      "Microsoft.NETCore.App": {
+        "type": "platform",
+        "version": "1.1.0"
+      },
+        "System.IO.FileSystem": "4.3.0",
+        "System.Linq.Expressions": "4.3.0"
+    },
+
+  "frameworks": {
+    "netcoreapp1.1": {
+      "imports": "dnxcore50"
+    }
+  }
+}
