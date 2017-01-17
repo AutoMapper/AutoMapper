@@ -104,7 +104,7 @@ namespace AutoMapper
 
         public bool CanResolveValue() => HasSource() && !Ignored;
 
-        public bool HasSource() =>_memberChain.Count > 0 || ResolveConfigured();
+        public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
 
         public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null || CustomSourceMemberName != null;
 
