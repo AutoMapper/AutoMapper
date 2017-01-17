@@ -206,6 +206,7 @@
     <Compile Include="Bug\DontInline\EntityDTO7.cs" />
     <Compile Include="Bug\DontInline\EntityDTO8.cs" />
     <Compile Include="Bug\DontInline\EntityDTO9.cs" />
+    <Compile Include="Bug\ExpressionMappingPropertyFromBaseClass.cs" />
     <Compile Include="Bug\ForAllMembersAndDoNotUseDestinationValue.cs" />
     <Compile Include="Bug\InterfaceMultipleInheritance.cs" />
     <Compile Include="Bug\AfterMapNestedObjects.cs" />
