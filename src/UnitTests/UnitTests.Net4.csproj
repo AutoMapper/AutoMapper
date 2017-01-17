@@ -356,6 +356,7 @@
     <Compile Include="MappingExceptions.cs" />
     <Compile Include="MappingInheritance\ApplyIncludeBaseRecursively.cs" />
     <Compile Include="MappingInheritance\ConventionMappedCollectionShouldMapBaseTypes.cs" />
+    <Compile Include="MappingInheritance\IgnoreShouldBeInherited.cs" />
     <Compile Include="MappingInheritance\IgnoreShouldBeInheritedIfConventionCannotMap.cs" />
     <Compile Include="MappingInheritance\IncludeBaseShouldNotCreateMaps.cs" />
     <Compile Include="MappingInheritance\MapToBaseClass.cs" />
@@ -364,7 +365,6 @@
     <Compile Include="MappingInheritance\IncludedBaseMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\IncludedMappingShouldInheritBaseMappings.cs" />
     <Compile Include="MappingInheritance\InheritanceWithoutIncludeShouldWork.cs" />
-    <Compile Include="MappingInheritance\InheritedIgnoreShouldBeOverridenByConventionMapping.cs" />
     <Compile Include="MappingInheritance\MultipleInheritedBaseMappingsOfSameTypeFails.cs" />
     <Compile Include="MappingInheritance\OverrideIgnore.cs" />
     <Compile Include="MappingInheritance\PropertyOnMappingShouldResolveMostSpecificType.cs" />
