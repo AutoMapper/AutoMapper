@@ -90,7 +90,10 @@ namespace AutoMapper
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
-            Ignored = inheritedMappedProperty.Ignored && !ResolveConfigured();
+            if(inheritedMappedProperty.Ignored && !ResolveConfigured())
+            {
+                Ignored = true;
+            }
             CustomExpression = CustomExpression ?? inheritedMappedProperty.CustomExpression;
             CustomResolver = CustomResolver ?? inheritedMappedProperty.CustomResolver;
             Condition = Condition ?? inheritedMappedProperty.Condition;
