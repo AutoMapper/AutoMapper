@@ -7,6 +7,7 @@ using System.Reflection;
 using AutoMapper.XpressionMapper.ArgumentMappers;
 using AutoMapper.XpressionMapper.Extensions;
 using AutoMapper.XpressionMapper.Structures;
+using System.Text;
 
 namespace AutoMapper.XpressionMapper
 {
@@ -192,11 +193,21 @@ namespace AutoMapper.XpressionMapper
                         ? info.CustomExpression.GetMemberFullName()
                         : string.Concat(fullName, ".", info.CustomExpression.GetMemberFullName());
                 }
-                else //if (info.DestinationPropertyInfo != null)
+                else
                 {
-                    fullName = string.IsNullOrEmpty(fullName)
-                        ? info.DestinationPropertyInfo.Name
-                        : string.Concat(fullName, ".", info.DestinationPropertyInfo.Name);
+                    StringBuilder additions = info.DestinationPropertyInfos.Aggregate(new StringBuilder(fullName), (sb, next) =>
+                    {
+                        if (sb.ToString() == string.Empty)
+                            sb.Append(next.Name);
+                        else
+                        {
+                            sb.Append(".");
+                            sb.Append(next.Name);
+                        }
+                        return sb;
+                    });
+
+                    fullName = additions.ToString();
                 }
             }
 
@@ -210,11 +221,11 @@ namespace AutoMapper.XpressionMapper
             PropertyInfo propertyInfo = null;
             FieldInfo fieldInfo = null;
             if ((methodInfo = sourceMemberInfo as MethodInfo) != null)
-                propertyMapInfoList.Add(new PropertyMapInfo(null, methodInfo));
+                propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> { methodInfo }));
             if ((propertyInfo = sourceMemberInfo as PropertyInfo) != null)
-                propertyMapInfoList.Add(new PropertyMapInfo(null, propertyInfo));
+                propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> { propertyInfo }));
             if ((fieldInfo = sourceMemberInfo as FieldInfo) != null)
-                propertyMapInfoList.Add(new PropertyMapInfo(null, fieldInfo));
+                propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> { fieldInfo }));
         }
 
         protected void FindDestinationFullName(Type typeSource, Type typeDestination, string sourceFullName, List<PropertyMapInfo> propertyMapInfoList)
@@ -232,9 +243,10 @@ namespace AutoMapper.XpressionMapper
                     }
                     else
                     {
-                        AddPropertyMapInfo(list[list.Count - 1].CustomExpression == null
-                            ? list[list.Count - 1].DestinationPropertyInfo.GetMemberType()
-                            : list[list.Count - 1].CustomExpression.ReturnType, next, list);
+                        PropertyMapInfo last = list[list.Count - 1];
+                        AddPropertyMapInfo(last.CustomExpression == null
+                            ? last.DestinationPropertyInfos[last.DestinationPropertyInfos.Count - 1].GetMemberType()
+                            : last.CustomExpression.ReturnType, next, list);
                     }
                     return list;
                 });
@@ -266,7 +278,7 @@ namespace AutoMapper.XpressionMapper
                         throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.expressionMapValueTypeMustMatchFormat, propertyMap.SourceMember.GetMemberType().Name, propertyMap.SourceMember.Name, sourceMemberInfo.GetMemberType().Name, propertyMap.DestinationProperty.Name));
                 }
 
-                propertyMapInfoList.Add(new PropertyMapInfo(propertyMap.CustomExpression, propertyMap.SourceMember));
+                propertyMapInfoList.Add(new PropertyMapInfo(propertyMap.CustomExpression, propertyMap.SourceMembers.ToList()));
             }
             else
             {
@@ -277,7 +289,7 @@ namespace AutoMapper.XpressionMapper
                 if (propertyMap.CustomExpression == null && propertyMap.SourceMember == null)//If sourceFullName has a period then the SourceMember cannot be null.  The SourceMember is required to find the ProertyMap of its child object.
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.srcMemberCannotBeNullFormat, typeSource.Name, typeDestination.Name, propertyName));
 
-                propertyMapInfoList.Add(new PropertyMapInfo(propertyMap.CustomExpression, propertyMap.SourceMember));
+                propertyMapInfoList.Add(new PropertyMapInfo(propertyMap.CustomExpression, propertyMap.SourceMembers.ToList()));
                 string childFullName = sourceFullName.Substring(sourceFullName.IndexOf(PERIOD) + 1);
 
                 FindDestinationFullName(sourceMemberInfo.GetMemberType(), propertyMap.CustomExpression == null

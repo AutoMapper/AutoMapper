@@ -187,17 +187,18 @@ namespace AutoMapper.XpressionMapper.Extensions
         {
             foreach (PropertyMapInfo propertyMapInfo in list)
             {
-                MemberInfo memberInfo = propertyMapInfo.DestinationPropertyInfo;
-
-                PropertyInfo pInfo;
-                FieldInfo fInfo;
-                MethodInfo mInfo;
-                if ((pInfo = memberInfo as PropertyInfo) != null)
-                    exp = Expression.Property(exp, pInfo);
-                else if ((fInfo = memberInfo as FieldInfo) != null)
-                    exp = Expression.Field(exp, fInfo);
-                else if ((mInfo = memberInfo as MethodInfo) != null)
-                    exp = Expression.Call(exp, mInfo);
+                foreach (MemberInfo memberInfo in propertyMapInfo.DestinationPropertyInfos)
+                {
+                    PropertyInfo pInfo;
+                    FieldInfo fInfo;
+                    MethodInfo mInfo;
+                    if ((pInfo = memberInfo as PropertyInfo) != null)
+                        exp = Expression.Property(exp, pInfo);
+                    else if ((fInfo = memberInfo as FieldInfo) != null)
+                        exp = Expression.Field(exp, fInfo);
+                    else if ((mInfo = memberInfo as MethodInfo) != null)
+                        exp = Expression.Call(exp, mInfo);
+                }
             }
 
             return (MemberExpression)exp;
