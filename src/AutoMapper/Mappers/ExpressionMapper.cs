@@ -1,5 +1,4 @@
-﻿#define XPRESSIONMAPPER
-using System.Collections;
+﻿using System.Collections;
 
 namespace AutoMapper.Mappers
 {
@@ -11,7 +10,6 @@ namespace AutoMapper.Mappers
     using System.Reflection;
     using Configuration;
     using Execution;
-    using XpressionMapper.Extensions;
 
     public class ExpressionMapper : IObjectMapper
     {
@@ -19,9 +17,6 @@ namespace AutoMapper.Mappers
             where TSource : LambdaExpression
             where TDestination : LambdaExpression
         {
-#if XPRESSIONMAPPER
-            return context.Mapper.MapExpression<TDestination>(expression);
-#else
             var sourceDelegateType = typeof(TSource).GetTypeInfo().GenericTypeArguments[0];
             var destDelegateType = typeof(TDestination).GetTypeInfo().GenericTypeArguments[0];
 
@@ -47,17 +42,16 @@ namespace AutoMapper.Mappers
             var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
             var body = typeMapVisitor.Visit(expression.Body);
             return (TDestination)Expression.Lambda(body, parameters);
-#endif
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(ExpressionMapper).GetAllMethods().First(_ => _.IsStatic);
 
         public bool IsMatch(TypePair context)
         {
-            return typeof (LambdaExpression).IsAssignableFrom(context.SourceType)
-                   && context.SourceType != typeof (LambdaExpression)
-                   && typeof (LambdaExpression).IsAssignableFrom(context.DestinationType)
-                   && context.DestinationType != typeof (LambdaExpression);
+            return typeof(LambdaExpression).IsAssignableFrom(context.SourceType)
+                   && context.SourceType != typeof(LambdaExpression)
+                   && typeof(LambdaExpression).IsAssignableFrom(context.DestinationType)
+                   && context.DestinationType != typeof(LambdaExpression);
         }
 
         public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
@@ -87,7 +81,7 @@ namespace AutoMapper.Mappers
                 _oldParam = oldParam;
                 _newParam = newParam;
                 _parentMappingVisitor = parentMappingVisitor;
-                if(destSubTypes != null)
+                if (destSubTypes != null)
                     _destSubTypes = destSubTypes;
             }
 
@@ -140,7 +134,7 @@ namespace AutoMapper.Mappers
 
                 var matchingEnumerableArgument = args.Where(a => a.Type.IsGenericType()).FirstOrDefault(a => a.Type.GetTypeInfo().GenericTypeArguments[0] == t);
                 var index2 = args.IndexOf(matchingEnumerableArgument);
-                if (index2 < 0) 
+                if (index2 < 0)
                     return t;
                 return arguments[index2].Type.GetTypeInfo().GenericTypeArguments[0];
             }
@@ -150,7 +144,7 @@ namespace AutoMapper.Mappers
                 var newLeft = base.Visit(node.Left);
                 var newRight = base.Visit(node.Right);
 
-                if(newLeft.Type != newRight.Type && newRight.Type == typeof(string))
+                if (newLeft.Type != newRight.Type && newRight.Type == typeof(string))
                     newLeft = Expression.Call(newLeft, typeof(object).GetDeclaredMethod("ToString"));
                 if (newRight.Type != newLeft.Type && newLeft.Type == typeof(string))
                     newRight = Expression.Call(newRight, typeof(object).GetDeclaredMethod("ToString"));
@@ -178,7 +172,7 @@ namespace AutoMapper.Mappers
             {
                 if (right is ConstantExpression)
                     newRight = Expression.Constant((right as ConstantExpression).Value,
-                        typeof (Nullable<>).MakeGenericType(right.Type));
+                        typeof(Nullable<>).MakeGenericType(right.Type));
                 else
                     throw new AutoMapperMappingException(
                         "Mapping a BinaryExpression where one side is nullable and the other isn't");
@@ -237,7 +231,7 @@ namespace AutoMapper.Mappers
                     var sourceParamType = expression.Parameters[i].Type;
                     foreach (var destParamType in _destSubTypes.Where(dt => dt != sourceParamType))
                     {
-                        var a = destParamType.IsGenericType() ? destParamType.GetTypeInfo().GenericTypeArguments[0]: destParamType;
+                        var a = destParamType.IsGenericType() ? destParamType.GetTypeInfo().GenericTypeArguments[0] : destParamType;
                         var typeMap = _configurationProvider.FindTypeMapFor(a, sourceParamType);
 
                         if (typeMap == null)
@@ -330,9 +324,9 @@ namespace AutoMapper.Mappers
                     return null;
 
                 var memberAccessor = node.Member;
-                
+
                 // in case of a propertypath, the MemberAcessors type and the SourceType may be different
-                if (memberAccessor.DeclaringType != _typeMap.DestinationType)
+                if (!memberAccessor.DeclaringType.IsAssignableFrom(_typeMap.DestinationType))
                     return null;
 
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
@@ -342,7 +336,7 @@ namespace AutoMapper.Mappers
             private void SetSorceSubTypes(PropertyMap propertyMap)
             {
                 if (propertyMap.SourceMember is PropertyInfo)
-                    _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetTypeInfo().GenericTypeArguments.Concat(new []{ (propertyMap.SourceMember as PropertyInfo).PropertyType }).ToList();
+                    _destSubTypes = (propertyMap.SourceMember as PropertyInfo).PropertyType.GetTypeInfo().GenericTypeArguments.Concat(new[] { (propertyMap.SourceMember as PropertyInfo).PropertyType }).ToList();
                 else if (propertyMap.SourceMember is FieldInfo)
                     _destSubTypes = (propertyMap.SourceMember as FieldInfo).FieldType.GetTypeInfo().GenericTypeArguments;
             }
