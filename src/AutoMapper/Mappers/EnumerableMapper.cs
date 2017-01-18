@@ -1,10 +1,12 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+
 namespace AutoMapper.Mappers
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
     using Configuration;
+    using static Expression;
 
     public class EnumerableMapper : IObjectMapper
     {
@@ -20,17 +22,19 @@ namespace AutoMapper.Mappers
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression)
         {
-            var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type));
-
+            if(destExpression.Type.IsInterface())
+            {
+                var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type));
+                destExpression = Default(listType);
+            }
             return typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression,
-                Expression.Default(listType), contextExpression, IfEditableList, typeof(List<>),
+                destExpression, contextExpression, IfEditableList, typeof(List<>),
                 CollectionMapperExtensions.MapItemExpr);
         }
 
         private static Expression IfEditableList(Expression dest)
         {
-            return Expression.And(Expression.TypeIs(dest, typeof(IList)),
-                Expression.Not(Expression.TypeIs(dest, typeof(Array))));
+            return And(TypeIs(dest, typeof(IList)), Not(TypeIs(dest, typeof(Array))));
         }
     }
 }
