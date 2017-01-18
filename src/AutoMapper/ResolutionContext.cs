@@ -10,7 +10,7 @@ namespace AutoMapper
     /// </summary>
     public class ResolutionContext
     {
-        private Dictionary<object, object> _instanceCache;
+        private Dictionary<ContextCacheKey, object> _instanceCache;
         private Dictionary<TypePair, int> _typeDepth;
 
         /// <summary>
@@ -18,10 +18,22 @@ namespace AutoMapper
         /// </summary>
         public IMappingOperationOptions Options { get; }
 
+        internal object GetDestination(object source, Type destinationType)
+        {
+            object destination;
+            InstanceCache.TryGetValue(new ContextCacheKey(source, destinationType), out destination);
+            return destination;
+        }
+
+        internal void CacheDestination(object source, Type destinationType, object destination)
+        {
+            InstanceCache.Add(new ContextCacheKey(source, destinationType), destination);
+        }
+
         /// <summary>
         /// Instance cache for resolving circular references
         /// </summary>
-        public Dictionary<object, object> InstanceCache
+        public Dictionary<ContextCacheKey, object> InstanceCache
         {
             get
             {
@@ -30,7 +42,7 @@ namespace AutoMapper
                 {
                     return _instanceCache;
                 }
-                _instanceCache = new Dictionary<object, object>();
+                _instanceCache = new Dictionary<ContextCacheKey, object>();
                 return _instanceCache;
             }
         }
@@ -112,5 +124,33 @@ namespace AutoMapper
         {
             return Mapper.Map(source, destination, sourceType, destinationType, this);
         }
+    }
+
+    public struct ContextCacheKey : IEquatable<ContextCacheKey>
+    {
+        public static bool operator ==(ContextCacheKey left, ContextCacheKey right) => left.Equals(right);
+        public static bool operator !=(ContextCacheKey left, ContextCacheKey right) => !left.Equals(right);
+
+        private static int CombineHashCodes(object obj1, object obj2) =>
+            CombineHashCodes(obj1.GetHashCode(), obj2.GetHashCode());
+
+        private static int CombineHashCodes(int h1, int h2) => ((h1 << 5) + h1) ^ h2;
+
+        private readonly object _source;
+        private readonly Type _destinationType;
+
+        public ContextCacheKey(object source, Type destinationType)
+        {
+            _source = source;
+            _destinationType = destinationType;
+        }
+
+        public override int GetHashCode() => CombineHashCodes(_source, _destinationType);
+
+        public bool Equals(ContextCacheKey other) =>
+            _source == other._source && _destinationType == other._destinationType;
+
+        public override bool Equals(object other) => 
+            other is ContextCacheKey && Equals((ContextCacheKey)other);
     }
 }
