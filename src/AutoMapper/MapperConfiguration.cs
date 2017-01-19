@@ -24,11 +24,11 @@ namespace AutoMapper
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
 
-        public MapperConfiguration(MapperConfigurationExpression configurationExpression, Action<ValidationContext> extraValidator = null)
+        public MapperConfiguration(MapperConfigurationExpression configurationExpression, Action<ValidationContext> validator = null)
         {
             _mappers = configurationExpression.Mappers.ToArray();
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
-            _validator = new ConfigurationValidator(this, extraValidator);
+            _validator = new ConfigurationValidator(this, validator);
             ExpressionBuilder = new ExpressionBuilder(this);
 
             ServiceCtor = configurationExpression.ServiceCtor;
