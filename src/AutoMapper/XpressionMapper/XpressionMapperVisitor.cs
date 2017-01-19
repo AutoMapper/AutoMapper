@@ -252,7 +252,7 @@ namespace AutoMapper.XpressionMapper
                 return;
             }
 
-            TypeMap typeMap = this.ConfigurationProvider.FindTypeMapFor(typeDestination, typeSource);//The destination becomes the source because to map a source expression to a destination expression,
+            TypeMap typeMap = this.ConfigurationProvider.ResolveTypeMap(typeDestination, typeSource);//The destination becomes the source because to map a source expression to a destination expression,
             //we need the expressions used to create the source from the destination 
 
             if (sourceFullName.IndexOf(PERIOD) < 0)
