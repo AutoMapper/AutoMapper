@@ -146,7 +146,6 @@ namespace AutoMapper.XpressionMapper
 
             infoDictionary.Add(parameterExpression, this.TypeMappings);
 
-            bool isExtension = node.Method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), true);
             List<Expression> listOfArgumentsForNewMethod = node.Arguments.Aggregate(new List<Expression>(), (lst, next) =>
             {
                 Expression mappedNext = ArgumentMapper.Create(this, next).MappedArgumentExpression;
