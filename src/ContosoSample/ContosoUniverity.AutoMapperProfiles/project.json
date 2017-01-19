@@ -2,7 +2,7 @@
   "version": "1.0.0-*",
 
     "dependencies": {
-        "AutoMapper": { "target": "project" },
+        "AutoMapper": {"target": "project"},
         "ContosoUniverity.Data": { "target": "project" },
         "ContosoUniverity.Domain": { "target": "project" },
         "NETStandard.Library": "1.6.1"
