@@ -1,10 +1,70 @@
 using System;
 using System.Collections.Generic;
+using AutoMapper.Mappers;
 using Should;
 using Xunit;
 
 namespace AutoMapper.UnitTests.ConfigurationValidation
 {
+    public class When_using_custom_validation
+    {
+        bool _calledForRoot = false;
+        bool _calledForValues = false;
+        bool _calledForInt = false;
+
+        public class Source
+        {
+            public int[] Values { get; set; }
+        }
+
+        public class Dest
+        {
+            public int[] Values { get; set; }
+        }
+
+        [Fact]
+        public void Should_call_the_callback()
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>(), Validator);
+
+            config.AssertConfigurationIsValid();
+
+            _calledForRoot.ShouldBeTrue();
+            _calledForValues.ShouldBeTrue();
+            _calledForInt.ShouldBeTrue();
+        }
+
+        private void Validator(ValidationContext context)
+        {
+            if(context.TypeMap != null)
+            {
+                _calledForRoot = true;
+                context.TypeMap.Types.ShouldEqual(context.Types);
+                context.Types.SourceType.ShouldEqual(typeof(Source));
+                context.Types.DestinationType.ShouldEqual(typeof(Dest));
+                context.MapperToUse.ShouldBeNull();
+                context.PropertyMap.ShouldBeNull();
+            }
+            else
+            {
+                context.PropertyMap.SourceMember.Name.ShouldEqual("Values");
+                context.PropertyMap.DestinationProperty.Name.ShouldEqual("Values");
+                if(context.Types.Equals(new TypePair(typeof(int), typeof(int))))
+                {
+                    _calledForInt = true;
+                    context.MapperToUse.ShouldBeType<AssignableMapper>();
+                }
+                else
+                {
+                    _calledForValues = true;
+                    context.MapperToUse.ShouldBeType<ArrayMapper>();
+                    context.Types.SourceType.ShouldEqual(typeof(int[]));
+                    context.Types.DestinationType.ShouldEqual(typeof(int[]));
+                }
+            }
+        }
+    }
+
     public class When_using_a_type_converter : AutoMapperSpecBase
     {
         public class A

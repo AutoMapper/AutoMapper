@@ -24,11 +24,11 @@ namespace AutoMapper
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
 
-        public MapperConfiguration(MapperConfigurationExpression configurationExpression)
+        public MapperConfiguration(MapperConfigurationExpression configurationExpression, Action<ValidationContext> extraValidator = null)
         {
             _mappers = configurationExpression.Mappers.ToArray();
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
-            _validator = new ConfigurationValidator(this);
+            _validator = new ConfigurationValidator(this, extraValidator);
             ExpressionBuilder = new ExpressionBuilder(this);
 
             ServiceCtor = configurationExpression.ServiceCtor;
@@ -42,8 +42,8 @@ namespace AutoMapper
             Seal();
         }
 
-        public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
-            : this(Build(configure))
+        public MapperConfiguration(Action<IMapperConfigurationExpression> configure, Action<ValidationContext> extraValidator = null)
+            : this(Build(configure), extraValidator)
         {
         }
 
@@ -389,6 +389,30 @@ namespace AutoMapper
                                 , typeof(object)),
                           sourceParameter, destinationParameter, contextParameter);
             }
+        }
+    }
+
+    public struct ValidationContext
+    {
+        public IObjectMapper MapperToUse { get; }
+        public PropertyMap PropertyMap { get; }
+        public TypeMap TypeMap { get; }
+        public TypePair Types { get; }
+
+        public ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper mapperToUse) : this(types, propertyMap, mapperToUse, null)
+        {
+        }
+
+        public ValidationContext(TypePair types, PropertyMap propertyMap, TypeMap typeMap) : this(types, propertyMap, null, typeMap)
+        {
+        }
+
+        private ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper mapperToUse, TypeMap typeMap)
+        {
+            MapperToUse = mapperToUse;
+            TypeMap = typeMap;
+            Types = types;
+            PropertyMap = propertyMap;
         }
     }
 }
