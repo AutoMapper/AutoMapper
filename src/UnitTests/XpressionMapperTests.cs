@@ -311,7 +311,7 @@ namespace AutoMapper.UnitTests
             var ids = new[] { 4, 5 };
             Expression<Func<ParentDTO, bool>> exp = p => p.Children.Where((c, i) => c.ID_ > 4).Any(c => ids.Contains(c.ID_));
             //Act
-            Expression<Func<Parent, bool>> expMapped = mapper.MapExpression<Expression<Func<Parent, bool>>>(exp);
+            Expression<Func<Parent, bool>> expMapped = mapper.Map<Expression<Func<Parent, bool>>>(exp);
 
             //Assert
             Assert.NotNull(expMapped);
@@ -324,7 +324,7 @@ namespace AutoMapper.UnitTests
             Expression<Func<AccountModel, bool>> exp = p => (p.DateCreated.Year.ToString() != String.Empty);
 
             //Act
-            Expression<Func<Account, bool>> expMapped = mapper.MapExpression<Expression<Func<Account, bool>>>(exp);
+            Expression<Func<Account, bool>> expMapped = mapper.Map<Expression<Func<Account, bool>>>(exp);
 
             //Assert
             Assert.NotNull(expMapped);
@@ -334,10 +334,9 @@ namespace AutoMapper.UnitTests
         public void When_use_lambda_statement_with_typemapped_property_being_other_than_first()
         {
             //Arrange
-            //Expression<Func<ParentDTO, bool>> exp = p => p.Children.AnyParamReverse((c2, c) => c.ID_ > c2.ID_ + 4);
-            Expression<Func<ParentDTO, bool>> exp = p => p.Children.AnyParamReverse((c, c2) => c.ID_ > 4);
+            Expression<Func<ParentDTO, bool>> exp = p => p.Children.AnyParamReverse((c, c2) => c2.ID_ > 4);
             //Act
-            Expression<Func<Parent, bool>> expMapped = mapper.MapExpression<Expression<Func<Parent, bool>>>(exp);
+            Expression<Func<Parent, bool>> expMapped = mapper.Map<Expression<Func<Parent, bool>>>(exp);
 
             //Assert
             Assert.NotNull(expMapped);
