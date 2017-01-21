@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
         }
 
         [Fact]
-        public void Should_call_the_callback()
+        public void Should_call_the_validator()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Dest>(), Validator);
 
