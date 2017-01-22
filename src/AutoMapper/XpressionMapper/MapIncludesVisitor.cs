@@ -90,15 +90,16 @@ namespace AutoMapper.XpressionMapper
 
                 fullName = BuildFullName(beforeCustExpression);
 
-                FindMemberExpressionsVisitor v = new FindMemberExpressionsVisitor(last.CustomExpression.Parameters[0].Type/*Parent type of current property*/);
-                v.Visit(last.CustomExpression.Body);
-
                 PrependParentNameVisitor visitor = new PrependParentNameVisitor(InfoDictionary[parameterExpression].DestType, last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, InfoDictionary[parameterExpression].NewParameter);
-                Expression ex = propertyMapInfoList[propertyMapInfoList.Count - 1] != last
-                    ? ex = visitor.Visit(v.Result.AddExpressions(afterCustExpression))
-                    : ex = visitor.Visit(v.Result);
 
-                return ex;
+                Expression ex = propertyMapInfoList[propertyMapInfoList.Count - 1] != last
+                    ? ex = visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
+                    : ex = visitor.Visit(last.CustomExpression.Body);
+
+                FindMemberExpressionsVisitor v = new FindMemberExpressionsVisitor(InfoDictionary[parameterExpression].NewParameter);
+                v.Visit(ex);
+
+                return v.Result;
             }
             else
             {

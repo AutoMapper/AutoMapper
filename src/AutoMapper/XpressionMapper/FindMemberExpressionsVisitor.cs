@@ -10,10 +10,10 @@ namespace AutoMapper.XpressionMapper
 {
     internal class FindMemberExpressionsVisitor : ExpressionVisitor
     {
-        internal FindMemberExpressionsVisitor(Type parameterType)
+        internal FindMemberExpressionsVisitor(ParameterExpression newParameter)
         {
-            this.parameterType = parameterType;
-            this.newParameter = Expression.Parameter(parameterType);
+            this.parameterType = newParameter.Type;
+            this.newParameter = newParameter;
         }
 
         #region Fields

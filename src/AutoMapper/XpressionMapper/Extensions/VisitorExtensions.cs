@@ -120,6 +120,12 @@ namespace AutoMapper.XpressionMapper.Extensions
                 return GetParameterExpression(GetMemberExpression((LambdaExpression)expression));
             }
 
+            if (expression.NodeType == ExpressionType.ConvertChecked || expression.NodeType == ExpressionType.Convert)
+            {
+                UnaryExpression ue = expression as UnaryExpression;
+                return GetParameterExpression(((ue != null) ? ue.Operand : null) as MemberExpression);
+            }
+                    
             if (expression.NodeType == ExpressionType.MemberAccess)
             {
                 MemberExpression memberExpression = (MemberExpression)expression;
