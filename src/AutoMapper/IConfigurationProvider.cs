@@ -8,6 +8,8 @@ namespace AutoMapper
 
     public interface IConfigurationProvider
     {
+        void Validate(ValidationContext context);
+
         /// <summary>
         /// Get all configured type maps created
         /// </summary>

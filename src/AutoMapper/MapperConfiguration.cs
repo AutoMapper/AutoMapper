@@ -13,6 +13,7 @@ namespace AutoMapper
     using static Expression;
     using static ExpressionExtensions;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
+    using Validator = Action<ValidationContext>;
 
     public class MapperConfiguration : IConfigurationProvider
     {
@@ -24,11 +25,12 @@ namespace AutoMapper
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
 
-        public MapperConfiguration(MapperConfigurationExpression configurationExpression, Action<ValidationContext> validator = null)
+        public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             _mappers = configurationExpression.Mappers.ToArray();
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
-            _validator = new ConfigurationValidator(this, validator);
+            Validators = configurationExpression.Advanced.GetValidators();
+            _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
 
             ServiceCtor = configurationExpression.ServiceCtor;
@@ -42,10 +44,21 @@ namespace AutoMapper
             Seal();
         }
 
-        public MapperConfiguration(Action<IMapperConfigurationExpression> configure, Action<ValidationContext> extraValidator = null)
-            : this(Build(configure), extraValidator)
+        public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
+            : this(Build(configure))
         {
         }
+
+
+        public void Validate(ValidationContext context)
+        {
+            foreach(var validator in Validators)
+            {
+                validator(context);
+            }
+        }
+
+        private Validator[] Validators { get; }
 
         public IExpressionBuilder ExpressionBuilder { get; }
 

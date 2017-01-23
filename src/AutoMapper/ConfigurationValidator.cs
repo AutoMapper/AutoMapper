@@ -11,12 +11,10 @@ namespace AutoMapper
     public class ConfigurationValidator
     {
         private readonly IConfigurationProvider _config;
-        private readonly Action<ValidationContext> _validator;
 
-        public ConfigurationValidator(IConfigurationProvider config, Action<ValidationContext> validator)
+        public ConfigurationValidator(IConfigurationProvider config)
         {
             _config = config;
-            _validator = validator ?? (_=>{ });
         }
 
         public void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
@@ -71,7 +69,7 @@ namespace AutoMapper
                     return;
                 }
                 var context = new ValidationContext(types, propertyMap, typeMap);
-                _validator(context);
+                _config.Validate(context);
                 CheckPropertyMaps(typeMapsChecked, typeMap);
             }
             else
@@ -88,7 +86,7 @@ namespace AutoMapper
                     throw new AutoMapperConfigurationException(types) { PropertyMap = propertyMap };
                 }
                 var context = new ValidationContext(types, propertyMap, mapperToUse);
-                _validator(context);
+                _config.Validate(context);
                 if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
                 {
                     CheckElementMaps(typeMapsChecked, types, propertyMap);
