@@ -123,7 +123,7 @@ namespace AutoMapper.XpressionMapper.Extensions
             if (expression.NodeType == ExpressionType.ConvertChecked || expression.NodeType == ExpressionType.Convert)
             {
                 UnaryExpression ue = expression as UnaryExpression;
-                return GetParameterExpression(((ue != null) ? ue.Operand : null) as MemberExpression);
+                return GetParameterExpression(ue != null ? ue.Operand : null);
             }
                     
             if (expression.NodeType == ExpressionType.MemberAccess)
