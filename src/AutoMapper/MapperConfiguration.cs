@@ -394,12 +394,12 @@ namespace AutoMapper
 
     public struct ValidationContext
     {
-        public IObjectMapper MapperToUse { get; }
+        public IObjectMapper ObjectMapper { get; }
         public PropertyMap PropertyMap { get; }
         public TypeMap TypeMap { get; }
         public TypePair Types { get; }
 
-        public ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper mapperToUse) : this(types, propertyMap, mapperToUse, null)
+        public ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper objectMapper) : this(types, propertyMap, objectMapper, null)
         {
         }
 
@@ -407,9 +407,9 @@ namespace AutoMapper
         {
         }
 
-        private ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper mapperToUse, TypeMap typeMap)
+        private ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper objectMapper, TypeMap typeMap)
         {
-            MapperToUse = mapperToUse;
+            ObjectMapper = objectMapper;
             TypeMap = typeMap;
             Types = types;
             PropertyMap = propertyMap;

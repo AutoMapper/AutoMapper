@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
                 context.TypeMap.Types.ShouldEqual(context.Types);
                 context.Types.SourceType.ShouldEqual(typeof(Source));
                 context.Types.DestinationType.ShouldEqual(typeof(Dest));
-                context.MapperToUse.ShouldBeNull();
+                context.ObjectMapper.ShouldBeNull();
                 context.PropertyMap.ShouldBeNull();
             }
             else
@@ -52,12 +52,12 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
                 if(context.Types.Equals(new TypePair(typeof(int), typeof(int))))
                 {
                     _calledForInt = true;
-                    context.MapperToUse.ShouldBeType<AssignableMapper>();
+                    context.ObjectMapper.ShouldBeType<AssignableMapper>();
                 }
                 else
                 {
                     _calledForValues = true;
-                    context.MapperToUse.ShouldBeType<ArrayMapper>();
+                    context.ObjectMapper.ShouldBeType<ArrayMapper>();
                     context.Types.SourceType.ShouldEqual(typeof(int[]));
                     context.Types.DestinationType.ShouldEqual(typeof(int[]));
                 }
