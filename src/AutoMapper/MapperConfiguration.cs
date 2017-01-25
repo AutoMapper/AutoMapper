@@ -13,6 +13,7 @@ namespace AutoMapper
     using static Expression;
     using static ExpressionExtensions;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
+    using Validator = Action<ValidationContext>;
 
     public class MapperConfiguration : IConfigurationProvider
     {
@@ -28,6 +29,7 @@ namespace AutoMapper
         {
             _mappers = configurationExpression.Mappers.ToArray();
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
+            Validators = configurationExpression.Advanced.GetValidators();
             _validator = new ConfigurationValidator(this);
             ExpressionBuilder = new ExpressionBuilder(this);
 
@@ -46,6 +48,17 @@ namespace AutoMapper
             : this(Build(configure))
         {
         }
+
+
+        public void Validate(ValidationContext context)
+        {
+            foreach(var validator in Validators)
+            {
+                validator(context);
+            }
+        }
+
+        private Validator[] Validators { get; }
 
         public IExpressionBuilder ExpressionBuilder { get; }
 
@@ -389,6 +402,30 @@ namespace AutoMapper
                                 , typeof(object)),
                           sourceParameter, destinationParameter, contextParameter);
             }
+        }
+    }
+
+    public struct ValidationContext
+    {
+        public IObjectMapper ObjectMapper { get; }
+        public PropertyMap PropertyMap { get; }
+        public TypeMap TypeMap { get; }
+        public TypePair Types { get; }
+
+        public ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper objectMapper) : this(types, propertyMap, objectMapper, null)
+        {
+        }
+
+        public ValidationContext(TypePair types, PropertyMap propertyMap, TypeMap typeMap) : this(types, propertyMap, null, typeMap)
+        {
+        }
+
+        private ValidationContext(TypePair types, PropertyMap propertyMap, IObjectMapper objectMapper, TypeMap typeMap)
+        {
+            ObjectMapper = objectMapper;
+            TypeMap = typeMap;
+            Types = types;
+            PropertyMap = propertyMap;
         }
     }
 }

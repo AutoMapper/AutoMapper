@@ -68,6 +68,8 @@ namespace AutoMapper
                 {
                     return;
                 }
+                var context = new ValidationContext(types, propertyMap, typeMap);
+                _config.Validate(context);
                 CheckPropertyMaps(typeMapsChecked, typeMap);
             }
             else
@@ -83,6 +85,8 @@ namespace AutoMapper
                 {
                     throw new AutoMapperConfigurationException(types) { PropertyMap = propertyMap };
                 }
+                var context = new ValidationContext(types, propertyMap, mapperToUse);
+                _config.Validate(context);
                 if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
                 {
                     CheckElementMaps(typeMapsChecked, types, propertyMap);
