@@ -233,11 +233,6 @@ namespace AutoMapper.Configuration
             PropertyMapActions.Add(pm => pm.UseDestinationValue = true);
         }
 
-        public void DoNotUseDestinationValue()
-        {
-            PropertyMapActions.Add(pm => pm.UseDestinationValue = false);
-        }
-
         public void SetMappingOrder(int mappingOrder)
         {
             PropertyMapActions.Add(pm => pm.MappingOrder = mappingOrder);
