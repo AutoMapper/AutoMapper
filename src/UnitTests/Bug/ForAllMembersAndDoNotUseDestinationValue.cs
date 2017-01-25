@@ -4,7 +4,7 @@ using System;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    public class ForAllMembersAndDoNotUseDestinationValue : AutoMapperSpecBase
+    public class ForAllMembersAndResolveUsing : AutoMapperSpecBase
     {
         private Destination _destination;
 
@@ -19,7 +19,7 @@ namespace AutoMapper.UnitTests.Bug
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<Source, Destination>().ForAllMembers(opt => opt.DoNotUseDestinationValue());
+            cfg.CreateMap<Source, Destination>().ForAllMembers(opt => opt.ResolveUsing(s=>12));
         });
 
         protected override void Because_of()
@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_work_together()
         {
-            _destination.Number.ShouldEqual(23);
+            _destination.Number.ShouldEqual(12);
         }
     }
 }

@@ -134,11 +134,6 @@ namespace AutoMapper
         /// Use the destination value instead of mapping from the source value or creating a new instance
         /// </summary>
         void UseDestinationValue();
-
-        /// <summary>
-        /// Do not use the destination value instead of mapping from the source value or creating a new instance
-        /// </summary>        
-        void DoNotUseDestinationValue();
         
         /// <summary>
         /// Use a custom value
