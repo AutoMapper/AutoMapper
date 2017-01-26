@@ -25,20 +25,24 @@ namespace AutoMapper.Mappers
             if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
                 throw new AutoMapperMappingException("Source and destination expressions must be of the same type.", null, new TypePair(typeof(TSource), typeof(TDestination)));
 
-            var destArgType = destDelegateType.GetTypeInfo().GenericTypeArguments[0];
-            if (destArgType.IsGenericType())
-                destArgType = destArgType.GetTypeInfo().GenericTypeArguments[0];
-            var sourceArgType = sourceDelegateType.GetTypeInfo().GenericTypeArguments[0];
-            if (sourceArgType.IsGenericType())
-                sourceArgType = sourceArgType.GetTypeInfo().GenericTypeArguments[0];
+            var dictionary = expression.Parameters.Select((p, i) =>
+            {
+                var dest = destDelegateType.GetTypeInfo().GenericTypeArguments[i];
+                if (dest.IsGenericType())
+                    dest = dest.GetTypeInfo().GenericTypeArguments[i];
+                var src = sourceDelegateType.GetTypeInfo().GenericTypeArguments[i];
+                if (src.IsGenericType())
+                    src = src.GetTypeInfo().GenericTypeArguments[i];
 
-            var typeMap = context.ConfigurationProvider.ResolveTypeMap(destArgType, sourceArgType);
+                var tm = context.ConfigurationProvider.ResolveTypeMap(dest, src);
+                return new Translation(tm, p,
+                    Parameter(destDelegateType.GetTypeInfo().GenericTypeArguments[i], expression.Parameters[i].Name));
+            }).ToArray();
 
             var parentMasterVisitor = new MappingVisitor(context.ConfigurationProvider,
                 destDelegateType.GetTypeInfo().GenericTypeArguments);
-            var typeMapVisitor = new MappingVisitor(context.ConfigurationProvider, typeMap, expression.Parameters[0],
-                Parameter(destDelegateType.GetTypeInfo().GenericTypeArguments[0], expression.Parameters[0].Name),
-                parentMasterVisitor, destDelegateType.GetTypeInfo().GenericTypeArguments);
+            var typeMapVisitor = new MappingVisitor(context.ConfigurationProvider,
+                destDelegateType.GetTypeInfo().GenericTypeArguments, parentMasterVisitor, dictionary);
 
             // Map expression body and variable seperately
             var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
@@ -61,27 +65,49 @@ namespace AutoMapper.Mappers
             return Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, contextExpression);
         }
 
+        public class Translation
+        {
+            public TypeMap TypeMap { get; }
+            public IList<FromTo> FromTos { get; } = new List<FromTo>();
+
+            public Translation(TypeMap typeMap, Expression from, Expression to)
+                : this(typeMap)
+            {
+                TypeMap = typeMap;
+                FromTos.Add(new FromTo(@from, to));
+            }
+
+            public Translation(TypeMap typeMap)
+            {
+                TypeMap = typeMap;
+            }
+        }
+
+        public class FromTo
+        {
+            public Expression From { get; }
+            public Expression To { get; }
+
+            public FromTo(Expression from, Expression to)
+            {
+                From = from;
+                To = to;
+            }
+        }
+
         internal class MappingVisitor : ExpressionVisitor
         {
             private IList<Type> _destSubTypes = new Type[0];
 
             private readonly IConfigurationProvider _configurationProvider;
-            private readonly TypeMap _typeMap;
-            private readonly Expression _oldParam;
-            private readonly Expression _newParam;
+            private readonly IList<Translation> _translations = new List<Translation>();
             private readonly MappingVisitor _parentMappingVisitor;
 
-            public MappingVisitor(IConfigurationProvider configurationProvider, IList<Type> destSubTypes)
-                : this(configurationProvider, null, Parameter(typeof(Nullable)), Parameter(typeof(Nullable)), null, destSubTypes)
-            {
-            }
-
-            internal MappingVisitor(IConfigurationProvider configurationProvider, TypeMap typeMap, Expression oldParam, Expression newParam, MappingVisitor parentMappingVisitor = null, IList<Type> destSubTypes = null)
+            internal MappingVisitor(IConfigurationProvider configurationProvider, IList<Type> destSubTypes = null, MappingVisitor parentMappingVisitor = null, params Translation[] translations)
             {
                 _configurationProvider = configurationProvider;
-                _typeMap = typeMap;
-                _oldParam = oldParam;
-                _newParam = newParam;
+                foreach (var translation in translations)
+                    _translations.Add(translation);
                 _parentMappingVisitor = parentMappingVisitor;
                 if (destSubTypes != null)
                     _destSubTypes = destSubTypes;
@@ -89,15 +115,26 @@ namespace AutoMapper.Mappers
 
             protected override Expression VisitConstant(ConstantExpression node)
             {
-                if (ReferenceEquals(node, _oldParam))
-                    return _newParam;
+                foreach (var fromTo in _translations.SelectMany(t => t.FromTos))
+                    if (ReferenceEquals(node, fromTo.From))
+                        return fromTo.To;
                 return node;
             }
 
             protected override Expression VisitParameter(ParameterExpression node)
             {
-                if (ReferenceEquals(node, _oldParam))
-                    return _newParam;
+                foreach (var translations in _translations)
+                    foreach (var translation in translations.FromTos)
+                        if (ReferenceEquals(node, translation.From))
+                            return translation.To;
+                foreach (var translation in _translations)
+                    foreach (var fromTo in translation.FromTos)
+                        if (node.Type == fromTo.From.Type)
+                        {
+                            var to = Parameter(fromTo.To.Type, node.Name);
+                            translation.FromTos.Add(new FromTo(node, to));
+                            return to;
+                        }
                 return node;
             }
 
@@ -213,8 +250,9 @@ namespace AutoMapper.Mappers
 
             protected override Expression VisitLambda<T>(Expression<T> expression)
             {
-                if (expression.Parameters.Any(b => b.Type == _oldParam.Type))
-                    return VisitLambdaExpression(expression);
+                foreach (var translation in _translations.SelectMany(t => t.FromTos))
+                    if (expression.Parameters.Any(b => b.Type == translation.From.Type))
+                        return VisitLambdaExpression(expression);
                 return VisitAllParametersExpression(expression);
             }
 
@@ -241,7 +279,8 @@ namespace AutoMapper.Mappers
 
                         var oldParam = expression.Parameters[i];
                         var newParam = Parameter(a, oldParam.Name);
-                        visitors.Add(new MappingVisitor(_configurationProvider, typeMap, oldParam, newParam, this));
+                        visitors.Add(new MappingVisitor(_configurationProvider, null, this,
+                            new Translation(typeMap) { FromTos = { new FromTo(oldParam, newParam) } }));
                     }
                 }
                 return visitors.Aggregate(expression as Expression, (e, v) => v.Visit(e));
@@ -249,8 +288,9 @@ namespace AutoMapper.Mappers
 
             protected override Expression VisitMember(MemberExpression node)
             {
-                if (node == _oldParam)
-                    return _newParam;
+                foreach (var fromTos in _translations.SelectMany(t => t.FromTos))
+                    if (node == fromTos.From)
+                        return fromTos.To;
                 var propertyMap = PropertyMap(node);
 
                 if (propertyMap == null)
@@ -298,12 +338,12 @@ namespace AutoMapper.Mappers
                 var propertyMap = FindPropertyMapOfExpression(node.Expression as MemberExpression);
                 if (propertyMap == null)
                     return node;
-                var sourceType = propertyMap.SourceMember.GetMemberType();
+                var sourceType = propertyMap.SourceType;
                 var destType = propertyMap.DestinationPropertyType;
                 if (sourceType == destType)
                     return MakeMemberAccess(baseExpression, node.Member);
                 var typeMap = _configurationProvider.FindTypeMapFor(sourceType, destType);
-                var subVisitor = new MappingVisitor(_configurationProvider, typeMap, node.Expression, baseExpression, this);
+                var subVisitor = new MappingVisitor(_configurationProvider, null, this, new Translation(typeMap, node.Expression, baseExpression));
                 var newExpression = subVisitor.Visit(node);
                 _destSubTypes = _destSubTypes.Concat(subVisitor._destSubTypes).ToArray();
                 return newExpression;
@@ -319,20 +359,14 @@ namespace AutoMapper.Mappers
 
             private PropertyMap PropertyMap(MemberExpression node)
             {
-                if (_typeMap == null)
-                    return null;
-
                 if (node.Member.IsStatic())
                     return null;
 
-                var memberAccessor = node.Member;
+                foreach (var typeMap in _translations.Select(t => t.TypeMap))
+                    if (node.Member.DeclaringType.IsAssignableFrom(typeMap.DestinationType))
+                        return typeMap.GetExistingPropertyMapFor(node.Member);
 
-                // in case of a propertypath, the MemberAcessors type and the SourceType may be different
-                if (!memberAccessor.DeclaringType.IsAssignableFrom(_typeMap.DestinationType))
-                    return null;
-
-                var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
-                return propertyMap;
+                return null;
             }
 
             private void SetSorceSubTypes(PropertyMap propertyMap)
