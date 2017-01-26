@@ -297,7 +297,7 @@ namespace AutoMapper.Mappers
                 {
                     if (node.Expression is MemberExpression)
                         return GetConvertedSubMemberCall(node);
-                    return node;
+                    return _parentMappingVisitor != null ? _parentMappingVisitor.Visit(node) : node;
                 }
 
                 var constantVisitor = new IsConstantExpressionVisitor();
@@ -309,7 +309,7 @@ namespace AutoMapper.Mappers
 
                 var replacedExpression = Visit(node.Expression);
                 if (replacedExpression == node.Expression)
-                    replacedExpression = _parentMappingVisitor.Visit(node.Expression);
+                    return _parentMappingVisitor != null ? _parentMappingVisitor.Visit(node) : node;
 
                 if (propertyMap.CustomExpression != null)
                     return propertyMap.CustomExpression.ReplaceParameters(replacedExpression);
