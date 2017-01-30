@@ -1,8 +1,9 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Concurrent;
-
     internal struct LockingConcurrentDictionary<TKey, TValue>
     {
         private readonly ConcurrentDictionary<TKey, Lazy<TValue>> _dictionary;
@@ -14,9 +15,34 @@ namespace AutoMapper
             _valueFactory = key => new Lazy<TValue>(() => valueFactory(key));
         }
 
-        public TValue GetOrAdd(TKey key)
+        public TValue GetOrAdd(TKey key) => _dictionary.GetOrAdd(key, _valueFactory).Value;
+
+        public TValue this[TKey key]
         {
-            return _dictionary.GetOrAdd(key, _valueFactory).Value;
+            get
+            {
+                return _dictionary[key].Value;
+            }
+            set
+            {
+                _dictionary[key] = new Lazy<TValue>(() => value);
+            }
         }
+
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            Lazy<TValue> lazy;
+            if(_dictionary.TryGetValue(key, out lazy))
+            {
+                value = lazy.Value;
+                return true;
+            }
+            value = default(TValue);
+            return false;
+        }
+
+        public bool ContainsKey(TKey key) => _dictionary.ContainsKey(key);
+
+        public ICollection<TKey> Keys => _dictionary.Keys;        
     }
 }
