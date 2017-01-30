@@ -1,9 +1,9 @@
-﻿using System ;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics ;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading ;
-using System.Threading.Tasks ;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper.Mappers;
 using Xunit;
 
@@ -15,118 +15,118 @@ namespace AutoMapper.UnitTests.Bug
     {
         public class Type1
         {
-            public string FirstName ;
-            public string MiddleName ;
-            public string LastName ;
-            public int Age ;
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
+            public int Age;
         }
 
         public class Type1Point3
         {
-            public string FirstName ;
-            public string MiddleName ;
-            public string LastName ;
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
         }
 
         public class Type1Point2
         {
-            public string FirstName ;
-            public string MiddleName ;
+            public string FirstName;
+            public string MiddleName;
         }
 
         public class Type1Point1
         {
-            public string FirstName ;
+            public string FirstName;
         }
 
         public class DestType
         {
-            public string FirstName ;
-            public string MiddleName ;
-            public string LastName ;
-            public int Age ;
+            public string FirstName;
+            public string MiddleName;
+            public string LastName;
+            public int Age;
         }
 
-        static int _done ;
-        readonly ManualResetEvent _allDone = new ManualResetEvent( false );
+        static int _done;
+        readonly ManualResetEvent _allDone = new ManualResetEvent(false);
 
         [Fact]
         public void ShouldMapToNewISet()
         {
-            const int threadCount = 130 ;
+            const int threadCount = 130;
 
-            for (int i = 0; i < threadCount; i++)
+            for(int i = 0; i < threadCount; i++)
             {
-                Task.Factory.StartNew( doMapping ).ContinueWith(
+                Task.Factory.StartNew(doMapping).ContinueWith(
                     a =>
+                    {
+                        if(Interlocked.Increment(ref _done) == threadCount)
                         {
-                            if (Interlocked.Increment(ref _done) == threadCount)
-                            {
-                                _allDone.Set( ) ;
-                            }
+                            _allDone.Set();
+                        }
 
-                        } ) ;
+                    });
             }
 
-            _allDone.WaitOne( TimeSpan.FromSeconds( 10 ) ) ;
+            _allDone.WaitOne(TimeSpan.FromSeconds(10));
         }
 
-        static void doMapping( )
+        static void doMapping()
         {
-            var source = createSource( ) ;
+            var source = createSource();
 
-            Console.WriteLine( @"Mapping {0} on thread {1}", source.GetType( ), Thread.CurrentThread.ManagedThreadId ) ;
+            Console.WriteLine(@"Mapping {0} on thread {1}", source.GetType(), Thread.CurrentThread.ManagedThreadId);
 
-            var config = new MapperConfiguration(cfg => cfg.CreateMap(source.GetType(), typeof (DestType)));
+            var config = new MapperConfiguration(cfg => cfg.CreateMap(source.GetType(), typeof(DestType)));
 
-            DestType t2 = (DestType)config.CreateMapper().Map(source, source.GetType(  ), typeof( DestType ) )  ;
+            DestType t2 = (DestType)config.CreateMapper().Map(source, source.GetType(), typeof(DestType));
         }
-        
+
         static readonly Random _random = new Random();
 
-        static object createSource( )
+        static object createSource()
         {
-            
-            int n = _random.Next( 0, 4 ) ;
-            
-            if( n == 0 )
+
+            int n = _random.Next(0, 4);
+
+            if(n == 0)
             {
                 return new Type1
-                    {
-                        Age = 12,
-                        FirstName = @"Fred",
-                        LastName = @"Smith",
-                        MiddleName = @"G"
-                    } ;
+                {
+                    Age = 12,
+                    FirstName = @"Fred",
+                    LastName = @"Smith",
+                    MiddleName = @"G"
+                };
             }
-            if( n == 1 )
+            if(n == 1)
             {
-                return new Type1Point1( ) 
-                    {
-                        FirstName = @"Fred",
-                    } ;
+                return new Type1Point1()
+                {
+                    FirstName = @"Fred",
+                };
 
             }
-            if( n == 2 )
+            if(n == 2)
             {
-                return new Type1Point2( ) 
-                    {
-                        FirstName = @"Fred",
-                        MiddleName = @"G"
-                    } ;
+                return new Type1Point2()
+                {
+                    FirstName = @"Fred",
+                    MiddleName = @"G"
+                };
 
             }
-            if( n == 3 )
+            if(n == 3)
             {
-                return new Type1Point3( ) 
-                    {
-                        FirstName = @"Fred",
-                        LastName = @"Smith",
-                        MiddleName = @"G"
-                    } ;
+                return new Type1Point3()
+                {
+                    FirstName = @"Fred",
+                    LastName = @"Smith",
+                    MiddleName = @"G"
+                };
 
             }
-            
+
             throw new Exception();
         }
     }
@@ -199,28 +199,21 @@ namespace AutoMapper.UnitTests.Bug
             var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
             var mapper = config.CreateMapper();
 
-            var tasks = Enumerable.Range(0, 5).Select(
-          i =>
-              Task.Factory.StartNew(
-                  () =>
+            var tasks = Enumerable.Range(0, 5).Select(index =>
+              Task.Factory.StartNew(() =>
                   {
-                      mapper.Map<SomeDtoA, SomeDtoB>(new SomeDtoA());
-                      mapper.Map<SomeDtoB, SomeDtoA>(new SomeDtoB());
-                      mapper.Map<SomeDtoC, SomeDtoD>(new SomeDtoC());
-                      mapper.Map<SomeDtoD, SomeDtoC>(new SomeDtoD());
-                  }))
-          .ToArray();
-            Exception exception = null;
-            try
-            {
-                Task.WaitAll(tasks);
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-            exception.ShouldBeNull();
-            //typeof(Exception).ShouldNotBeThrownBy(() => Task.WaitAll(tasks));
+                      if(index % 2 == 0)
+                      {
+                          mapper.Map<SomeDtoA, SomeDtoB>(new SomeDtoA());
+                          mapper.Map<SomeDtoC, SomeDtoD>(new SomeDtoC());
+                      }
+                      else
+                      {
+                          mapper.Map<SomeDtoB, SomeDtoA>(new SomeDtoB());
+                          mapper.Map<SomeDtoD, SomeDtoC>(new SomeDtoD());
+                      }
+                  })).ToArray();
+            Task.WaitAll(tasks);
         }
     }
 }
