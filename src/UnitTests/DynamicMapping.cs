@@ -6,6 +6,29 @@ using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests.DynamicMapping
 {
+    public class When_mapping_from_untyped_enum_to_typed_enum : NonValidatingSpecBase
+    {
+        private Destination _result;
+
+        public class Destination
+        {
+            public ConsoleColor Value { get; set; }
+        }
+
+        protected override void Because_of()
+        {
+            _result = Mapper.Map<Destination>(new { Value = (Enum) ConsoleColor.DarkGreen });
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _result.Value.ShouldEqual(ConsoleColor.DarkGreen);
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+    }
+
     public class When_mapping_nested_types : NonValidatingSpecBase
     {
         List<ParentTestDto> _destination;
