@@ -9,6 +9,10 @@ namespace AutoMapper
     using Configuration.Conventions;
     using Mappers;
 
+#if NETSTANDARD1_1
+    struct IConvertible{}
+#endif
+
     [DebuggerDisplay("{Name}")]
     public class ProfileMap
     {
