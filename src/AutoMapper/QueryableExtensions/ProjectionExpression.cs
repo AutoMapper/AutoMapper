@@ -87,7 +87,8 @@ namespace AutoMapper.QueryableExtensions
 
         internal IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberPaths memberPathsToExpand)
         {
-            var membersToExpand = memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
+            IEnumerable<MemberInfo> selectMany = memberPathsToExpand.SelectMany(m => (m ?? new List<MemberInfo>()) as IList<MemberInfo> ?? m /*?.ToList() */);
+            MemberInfo[] membersToExpand = selectMany.Distinct().ToArray();
 
             var mapExpression = _builder.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
 
@@ -104,7 +105,10 @@ namespace AutoMapper.QueryableExtensions
         {
             protected override Expression VisitLambda<T>(Expression<T> node)
             {
-                var memberExpression = node.Body as MemberExpression;
+                MemberExpression memberExpression = 
+                    node.Body.NodeType == ExpressionType.Convert 
+                        ? (node.Body as UnaryExpression)?.Operand  as MemberExpression
+                        :  node.Body as MemberExpression;
                 if(memberExpression != null)
                 {
                     if(MemberPath != null)
