@@ -21,13 +21,14 @@ namespace AutoMapper
 
         private readonly IEnumerable<IObjectMapper> _mappers;
         private readonly TypeMapRegistry _typeMapRegistry = new TypeMapRegistry();
-        private readonly Dictionary<TypePair, TypeMap> _typeMapPlanCache = new Dictionary<TypePair, TypeMap>();
+        private LockingConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache;
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
             _mappers = configurationExpression.Mappers.ToArray();
+            _typeMapPlanCache = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             Validators = configurationExpression.Advanced.GetValidators();
             _validator = new ConfigurationValidator(this);
@@ -79,7 +80,7 @@ namespace AutoMapper
 
         public void CompileMappings()
         {
-            foreach (var request in _typeMapPlanCache.Select(e => new MapRequest(e.Key, e.Key)).ToArray())
+            foreach(var request in _typeMapPlanCache.Keys.Select(types => new MapRequest(types, types)).ToArray())
             {
                 GetMapperFunc(request);
             }
@@ -200,15 +201,13 @@ namespace AutoMapper
 
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
-            TypeMap typeMap;
-            if(!_typeMapPlanCache.TryGetValue(typePair, out typeMap))
-            {
-                typeMap = GetTypeMap(typePair);
-                _typeMapPlanCache.Add(typePair, typeMap);
-            }
+            var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
             if(typeMap != null && typeMap.MapExpression == null && Configuration.CreateMissingTypeMaps)
             {
-                typeMap.Seal(_typeMapRegistry, this);
+                lock(typeMap)
+                {
+                    typeMap.Seal(_typeMapRegistry, this);
+                }
             }
             return typeMap;
         }
@@ -218,7 +217,7 @@ namespace AutoMapper
             TypeMap typeMap;
             foreach(var types in initialTypes.GetRelatedTypePairs())
             {
-                if(_typeMapPlanCache.TryGetValue(types, out typeMap))
+                if(types != initialTypes && _typeMapPlanCache.TryGetValue(types, out typeMap))
                 {
                     return typeMap;
                 }
