@@ -1,5 +1,4 @@
-﻿#define XPRESSIONMAPPER
-using System.Collections;
+﻿using System.Collections;
 
 namespace AutoMapper.Mappers
 {
@@ -19,35 +18,7 @@ namespace AutoMapper.Mappers
             where TSource : LambdaExpression
             where TDestination : LambdaExpression
         {
-#if XPRESSIONMAPPER
             return context.Mapper.MapExpression<TDestination>(expression);
-#else
-            var sourceDelegateType = typeof(TSource).GetTypeInfo().GenericTypeArguments[0];
-            var destDelegateType = typeof(TDestination).GetTypeInfo().GenericTypeArguments[0];
-
-            if (sourceDelegateType.GetGenericTypeDefinition() != destDelegateType.GetGenericTypeDefinition())
-                throw new AutoMapperMappingException("Source and destination expressions must be of the same type.", null, new TypePair(typeof(TSource), typeof(TDestination)));
-
-            var destArgType = destDelegateType.GetTypeInfo().GenericTypeArguments[0];
-            if (destArgType.IsGenericType())
-                destArgType = destArgType.GetTypeInfo().GenericTypeArguments[0];
-            var sourceArgType = sourceDelegateType.GetTypeInfo().GenericTypeArguments[0];
-            if (sourceArgType.IsGenericType())
-                sourceArgType = sourceArgType.GetTypeInfo().GenericTypeArguments[0];
-
-            var typeMap = context.ConfigurationProvider.ResolveTypeMap(destArgType, sourceArgType);
-
-            var parentMasterVisitor = new MappingVisitor(context.ConfigurationProvider,
-                destDelegateType.GetTypeInfo().GenericTypeArguments);
-            var typeMapVisitor = new MappingVisitor(context.ConfigurationProvider, typeMap, expression.Parameters[0],
-                Expression.Parameter(destDelegateType.GetTypeInfo().GenericTypeArguments[0], expression.Parameters[0].Name),
-                parentMasterVisitor, destDelegateType.GetTypeInfo().GenericTypeArguments);
-
-            // Map expression body and variable seperately
-            var parameters = expression.Parameters.Select(typeMapVisitor.Visit).OfType<ParameterExpression>();
-            var body = typeMapVisitor.Visit(expression.Body);
-            return (TDestination)Expression.Lambda(body, parameters);
-#endif
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(ExpressionMapper).GetAllMethods().First(_ => _.IsStatic);
