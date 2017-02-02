@@ -511,7 +511,7 @@ namespace AutoMapper.Execution
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
         }
 
-        private static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter, Expression destinationParameter)
+        public static Expression ContextMap(TypePair typePair, Expression sourceParameter, Expression contextParameter, Expression destinationParameter)
         {
             var mapMethod = typeof(ResolutionContext).GetDeclaredMethods().First(m => m.Name == "Map").MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
             return Call(contextParameter, mapMethod, sourceParameter, destinationParameter);

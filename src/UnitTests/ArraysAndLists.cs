@@ -182,6 +182,53 @@ namespace AutoMapper.UnitTests.ArraysAndLists
         }
     }
 
+    public class When_mapping_collection_without_inlining : AutoMapperSpecBase
+    {
+        private Destination _destination;
+
+        public class Source
+        {
+            public int[] Values { get; set; }
+            public List<int> Values2 { get; set; }
+        }
+
+        public class Destination
+        {
+            public IEnumerable Values { get; set; }
+            public IEnumerable Values2 { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>().DoNotInlineCollections();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Source, Destination>(new Source { Values = new[] { 1, 2, 3, 4 }, Values2 = new List<int> { 9, 8, 7, 6 } });
+        }
+
+        [Fact]
+        public void Should_map_the_list_of_source_items()
+        {
+            _destination.Values.ShouldNotBeNull();
+            _destination.Values.ShouldContain(1);
+            _destination.Values.ShouldContain(2);
+            _destination.Values.ShouldContain(3);
+            _destination.Values.ShouldContain(4);
+        }
+
+        [Fact]
+        public void Should_map_from_the_generic_list_of_values()
+        {
+            _destination.Values2.ShouldNotBeNull();
+            _destination.Values2.ShouldContain(9);
+            _destination.Values2.ShouldContain(8);
+            _destination.Values2.ShouldContain(7);
+            _destination.Values2.ShouldContain(6);
+        }
+    }
+
     public class When_mapping_to_a_concrete_non_generic_ienumerable : AutoMapperSpecBase
     {
         private Destination _destination;
