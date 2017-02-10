@@ -22,14 +22,14 @@ namespace AutoMapper
         /// <summary>
         /// Builds a mapping expression equivalent to the base Map method
         /// </summary>
-        /// <param name="typeMapRegistry"></param>
         /// <param name="configurationProvider"></param>
         /// <param name="propertyMap"></param>
         /// <param name="sourceExpression">Source parameter</param>
         /// <param name="destExpression">Destination parameter</param>
         /// <param name="contextExpression">ResulotionContext parameter</param>
+        /// 
         /// <returns>Map expression</returns>
-        Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression);
+        Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ namespace AutoMapper
         /// <returns>Destination object</returns>
         public abstract TDestination Map(TSource source, TDestination destination, ResolutionContext context);
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Call(Constant(this), MapMethod, ToType(sourceExpression, typeof(TSource)), ToType(destExpression, typeof(TDestination)), contextExpression);
         }
