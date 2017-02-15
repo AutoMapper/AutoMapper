@@ -270,6 +270,7 @@
     <Compile Include="Projection\ConstructorTests.cs" />
     <Compile Include="Projection\ExplicitExpansion.cs" />
     <Compile Include="Projection\ExplicitExpansionAsDataSource.cs" />
+    <Compile Include="Projection\ExplicitExpansionInheritance.cs" />
     <Compile Include="Projection\ExplicitValues.cs" />
     <Compile Include="Projection\InheritedMaps.cs" />
     <Compile Include="Projection\MapFromTest.cs" />

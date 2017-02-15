@@ -129,6 +129,17 @@ namespace Should
         }
 
         /// <summary>
+        /// Verifies that an object reference is null.
+        /// </summary>
+        /// <param name="object">The object to be inspected</param>
+        /// <param name="message">The message to show on failure</param>
+        /// <exception cref="NullException">Thrown when the object reference is not null</exception>
+        public static void ShouldBeNull(this object @object, string message)
+        {
+            Assert.Null(@object, message);
+        }
+
+        /// <summary>
         /// Verifies that two objects are the same instance.
         /// </summary>
         /// <param name="actual">The actual object instance</param>
@@ -292,6 +303,7 @@ namespace Should
 
         /// <summary>
         /// Verifies that an object reference is not null.
+        /// See also <see cref="ShouldHaveValue{T}(System.Nullable{T})"/> for <see cref="Nullable"/>.
         /// </summary>
         /// <param name="object">The object to be validated</param>
         /// <exception cref="NotNullException">Thrown when the object is not null</exception>
@@ -303,6 +315,7 @@ namespace Should
 
         /// <summary>
         /// Verifies that an object reference is not null.
+        /// See also <see cref="ShouldHaveValue{T}(System.Nullable{T},System.String)"/> for <see cref="Nullable"/>.
         /// </summary>
         /// <param name="object">The object to be validated</param>
         /// <param name="message">The message to show on failure</param>
@@ -313,6 +326,30 @@ namespace Should
             return @object;
         }
 
+        /// <summary>
+        /// Verifies that a nullable object reference has value (is not null).
+        /// See also <see cref="ShouldNotBeNull{T}(T)"/> for <see cref="Nullable"/>.
+        /// </summary>
+        /// <param name="object">The object to be validated</param>
+        /// <exception cref="NotNullException">Thrown when the object is not null</exception>
+        public static T? ShouldHaveValue<T>(this T? @object) where T : struct
+        {
+            Assert.NotNull(@object);
+            return @object;
+        }
+
+        /// <summary>
+        /// Verifies that a nullable object reference has value (is not null).
+        /// See also <see cref="ShouldNotBeNull{T}(T,System.String)"/> for <see cref="Nullable"/>.
+        /// </summary>
+        /// <param name="object">The object to be validated</param>
+        /// <param name="message">The message to show on failure</param>
+        /// <exception cref="NotNullException">Thrown when the object reference is null</exception>
+        public static T? ShouldHaveValue<T>(this T? @object, string message) where T : struct
+        {
+            Assert.NotNull(@object, message);
+            return @object;
+        }
 
         /// <summary>
         /// Verifies that two objects are not the same instance.
