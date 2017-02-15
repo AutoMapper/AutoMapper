@@ -87,8 +87,7 @@ namespace AutoMapper.QueryableExtensions
 
         internal IQueryable<TResult> To<TResult>(IObjectDictionary parameters, MemberPaths memberPathsToExpand)
         {
-            IEnumerable<MemberInfo> selectMany = memberPathsToExpand.SelectMany(m => (m ?? new List<MemberInfo>()) as IList<MemberInfo> ?? m /*?.ToList() */);
-            MemberInfo[] membersToExpand = selectMany.Distinct().ToArray();
+            var membersToExpand = memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
 
             var mapExpression = _builder.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
 
