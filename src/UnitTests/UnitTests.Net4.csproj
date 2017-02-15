@@ -273,6 +273,7 @@
     <Compile Include="Projection\ExplicitValues.cs" />
     <Compile Include="Projection\InheritedMaps.cs" />
     <Compile Include="Projection\MapFromTest.cs" />
+    <Compile Include="Projection\MembersToExpand_ExpressionArray.cs" />
     <Compile Include="Projection\NestedAndArraysTests.cs" />
     <Compile Include="Projection\NestedExpressionsMapFromTests.cs" />
     <Compile Include="Projection\NonGenericQueryableTests.cs" />
