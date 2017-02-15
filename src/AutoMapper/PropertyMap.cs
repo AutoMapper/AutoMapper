@@ -41,7 +41,7 @@ namespace AutoMapper
         public LambdaExpression CustomExpression { get; private set; }
         public MemberInfo CustomSourceMember { get; set; }
         public bool UseDestinationValue { get; set; }
-        public bool ExplicitExpansion { get; set; }
+        public bool ExplicitExpansion { get { return _explicitExpansion.GetValueOrDefault(); } set { _explicitExpansion = value; } } private bool? _explicitExpansion; 
         public object NullSubstitute { get; set; }
         public ValueResolverConfiguration ValueResolverConfig { get; set; }
 
@@ -106,6 +106,7 @@ namespace AutoMapper
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
             CustomSourceMember = CustomSourceMember ?? inheritedMappedProperty.CustomSourceMember;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
+            ExplicitExpansion = _explicitExpansion ?? inheritedMappedProperty.ExplicitExpansion;
         }
 
         public bool IsMapped()
