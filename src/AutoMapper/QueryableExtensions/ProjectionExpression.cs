@@ -102,21 +102,10 @@ namespace AutoMapper.QueryableExtensions
 
         internal class MemberVisitor : ExpressionVisitor
         {
-            protected override Expression VisitLambda<T>(Expression<T> node)
+            protected override Expression VisitMember(MemberExpression node)
             {
-                MemberExpression memberExpression = 
-                    node.Body.NodeType == ExpressionType.Convert 
-                        ? (node.Body as UnaryExpression)?.Operand  as MemberExpression
-                        :  node.Body as MemberExpression;
-                if(memberExpression != null)
-                {
-                    if(MemberPath != null)
-                    {
-                        throw new InvalidOperationException("There are more than one lambda member expressions.");
-                    }
-                    MemberPath = GetMemberPath(memberExpression);
-                }
-                return base.VisitLambda<T>(node);
+                MemberPath = GetMemberPath(node);
+                return node;
             }
 
             private IEnumerable<MemberInfo> GetMemberPath(MemberExpression memberExpression)
