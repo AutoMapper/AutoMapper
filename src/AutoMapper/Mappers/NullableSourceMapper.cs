@@ -19,7 +19,7 @@ namespace AutoMapper.Mappers
             return context.SourceType.IsNullableType();
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo.MakeGenericMethod(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type), sourceExpression, destExpression, contextExpression);
         }

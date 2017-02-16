@@ -166,7 +166,7 @@ namespace AutoMapper
             }
             else
             {
-                var map = mapperToUse.MapExpression(mapperConfiguration._typeMapRegistry, mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
+                var map = mapperToUse.MapExpression(mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
                 var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
                 fullExpression = TryCatch(mapToDestination, source, destination, context, mapRequest.RequestedTypes);
             }
@@ -206,7 +206,7 @@ namespace AutoMapper
             {
                 lock(typeMap)
                 {
-                    typeMap.Seal(_typeMapRegistry, this);
+                    typeMap.Seal(this);
                 }
             }
             return typeMap;
@@ -317,7 +317,7 @@ namespace AutoMapper
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
             {
-                typeMap.Seal(_typeMapRegistry, this);
+                typeMap.Seal(this);
             }
         }
 
@@ -351,7 +351,7 @@ namespace AutoMapper
 
             if(!Configuration.CreateMissingTypeMaps)
             {
-                typeMap?.Seal(_typeMapRegistry, this);
+                typeMap?.Seal(this);
             }
 
             return typeMap;
@@ -366,7 +366,7 @@ namespace AutoMapper
                 .Select(p => p.ConfigureClosedGenericTypeMap(_typeMapRegistry, typePair, requestedTypes))
                 .FirstOrDefault(t => t != null);
 
-            typeMap?.Seal(_typeMapRegistry, this);
+            typeMap?.Seal(this);
 
             return typeMap;
         }

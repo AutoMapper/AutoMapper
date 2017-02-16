@@ -21,7 +21,6 @@ namespace AutoMapper.Execution
 
         private readonly IConfigurationProvider _configurationProvider;
         private readonly TypeMap _typeMap;
-        private readonly TypeMapRegistry _typeMapRegistry;
         private readonly ParameterExpression _source;
         private readonly ParameterExpression _initialDestination;
         private readonly ParameterExpression _context;
@@ -30,10 +29,9 @@ namespace AutoMapper.Execution
         public ParameterExpression Source => _source;
         public ParameterExpression Context => _context;
 
-        public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMapRegistry typeMapRegistry, TypeMap typeMap)
+        public TypeMapPlanBuilder(IConfigurationProvider configurationProvider, TypeMap typeMap)
         {
             _configurationProvider = configurationProvider;
-            _typeMapRegistry = typeMapRegistry;
             _typeMap = typeMap;
             _source = Parameter(typeMap.SourceType, "src");
             _initialDestination = Parameter(typeMap.DestinationTypeToUse, "dest");
@@ -472,10 +470,10 @@ namespace AutoMapper.Execution
 
         public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
-            return MapExpression(_typeMapRegistry, _configurationProvider, typePair, sourceParameter, _context, propertyMap, destinationParameter);
+            return MapExpression(_configurationProvider, typePair, sourceParameter, _context, propertyMap, destinationParameter);
         }
 
-        public static Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
+        public static Expression MapExpression(IConfigurationProvider configurationProvider,
             TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
             if(destinationParameter == null)
@@ -487,7 +485,7 @@ namespace AutoMapper.Execution
             {
                 if(!typeMap.HasDerivedTypesToInclude())
                 {
-                    typeMap.Seal(typeMapRegistry, configurationProvider);
+                    typeMap.Seal(configurationProvider);
                     if(typeMap.MapExpression != null)
                     {
                         return typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter, contextParameter);
@@ -505,7 +503,7 @@ namespace AutoMapper.Execution
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
             if(match != null)
             {
-                var mapperExpression = match.MapExpression(typeMapRegistry, configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
+                var mapperExpression = match.MapExpression(configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
                 return ToType(mapperExpression, typePair.DestinationType);
             }
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);

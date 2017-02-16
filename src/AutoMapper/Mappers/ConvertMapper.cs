@@ -61,7 +61,7 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair types) => _converters.ContainsKey(types);
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var typeMap = new TypePair(sourceExpression.Type, destExpression.Type);
             return _converters[typeMap].Value.ReplaceParameters(sourceExpression);

@@ -18,16 +18,15 @@ namespace AutoMapper.Mappers
                    && context.SourceType.IsEnumerableType();
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap,
+            Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             if(destExpression.Type.IsInterface())
             {
                 var listType = typeof(List<>).MakeGenericType(TypeHelper.GetElementType(destExpression.Type));
                 destExpression = Default(listType);
             }
-            return typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression,
+            return configurationProvider.MapCollectionExpression(propertyMap, sourceExpression,
                 destExpression, contextExpression, IfEditableList, typeof(List<>),
                 CollectionMapperExtensions.MapItemExpr);
         }

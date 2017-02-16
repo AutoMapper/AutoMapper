@@ -13,11 +13,10 @@ namespace AutoMapper.Mappers
                    && !context.SourceType.IsDictionaryType();
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-                PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
-                Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap,
+            Expression sourceExpression, Expression destExpression, Expression contextExpression)
             =>
-            typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap, sourceExpression, destExpression,
+            configurationProvider.MapCollectionExpression(propertyMap, sourceExpression, destExpression,
                 contextExpression, CollectionMapperExtensions.IfNotNull, typeof(Dictionary<,>),
                 CollectionMapperExtensions.MapItemExpr);
     }
