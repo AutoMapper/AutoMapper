@@ -116,19 +116,29 @@ namespace AutoMapper.XpressionMapper
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var constantExpression = node.Right as ConstantExpression;
-            if (constantExpression != null)
-            {
-                if (constantExpression.Value == null)
-                    return base.VisitBinary(node.Update(node.Left, node.Conversion, Expression.Constant(null)));
-            }
+            //var constantExpression = node.Right as ConstantExpression;
+            //if (constantExpression != null)
+            //{
+            //    if (constantExpression.Value == null)
+            //    {
+            //        if (node.Left.Type.GetTypeInfo().IsValueType)
+            //            return base.VisitBinary(node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type)));
+            //        else
+            //            return base.VisitBinary(node.Update(node.Left, node.Conversion, Expression.Constant(null, typeof(object))));
+            //    }
+            //}
 
-            constantExpression = node.Left as ConstantExpression;
-            if (constantExpression != null)
-            {
-                if (constantExpression.Value == null)
-                    return base.VisitBinary(node.Update(Expression.Constant(null), node.Conversion, node.Right));
-            }
+            //constantExpression = node.Left as ConstantExpression;
+            //if (constantExpression != null)
+            //{
+            //    if (constantExpression.Value == null)
+            //    {
+            //        if (node.Right.Type.GetTypeInfo().IsValueType)
+            //            return base.VisitBinary(node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right));
+            //        else
+            //            return base.VisitBinary(node.Update(Expression.Constant(null, typeof(object)), node.Conversion, node.Right));
+            //    }
+            //}
 
             Expression newLeft = this.Visit(node.Left);
             Expression newRight = this.Visit(node.Right);

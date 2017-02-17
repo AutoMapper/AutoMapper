@@ -369,6 +369,22 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
+        public void Map_accountModel_to_account_with_null_checks_against_value_types()
+        {
+            //Arrange
+            Expression<Func<AccountModel, bool>> exp = f => (((f != null && f.Id != null) ? f.Id : 0) > 10)
+             && (((f != null && f.DateCreated != null) ? f.DateCreated : default(DateTime)) > new DateTime(2007, 02, 17));
+
+
+            //Act
+            Expression<Func<Account, bool>> expMapped = mapper.MapExpression<Expression<Func<Account, bool>>>(exp);
+            List<Account> accounts = Users.Select(u => u.Account).Where(expMapped).ToList();
+
+            //Assert
+            Assert.True(accounts.Count == 1);
+        }
+
+        [Fact]
         public void When_use_lambda_statement_with_typemapped_property_being_other_than_first()
         {
             //Arrange
