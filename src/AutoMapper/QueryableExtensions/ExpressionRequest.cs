@@ -54,12 +54,12 @@ namespace AutoMapper.QueryableExtensions
 
         public override int GetHashCode()
         {
-            unchecked
+            var hashCode = HashCodeCombiner.Combine(SourceType, DestinationType);
+            foreach(var member in MembersToExpand)
             {
-                var hashCode = SourceType.GetHashCode();
-                hashCode = (hashCode*397) ^ DestinationType.GetHashCode();
-                return MembersToExpand.Aggregate(hashCode, (currentHash, p) => (currentHash * 397) ^ p.GetHashCode());
+                hashCode = HashCodeCombiner.CombineCodes(hashCode, member.GetHashCode());
             }
+            return hashCode;
         }
 
         public static bool operator ==(ExpressionRequest left, ExpressionRequest right)

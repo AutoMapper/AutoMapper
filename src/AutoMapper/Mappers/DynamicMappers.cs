@@ -16,8 +16,11 @@ namespace AutoMapper.Mappers
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
         {
-            if (destination == null)
+            if(destination == null)
+            {
                 destination = ifNull();
+            }
+            object boxedDestination = destination;
             var destinationTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TDestination));
             foreach (var member in destinationTypeDetails.PublicWriteAccessors)
             {
@@ -30,15 +33,15 @@ namespace AutoMapper.Mappers
                 {
                     continue;
                 }
-                var destinationMemberValue = context.MapMember(member, sourceMemberValue, destination);
-                member.SetMemberValue(destination, destinationMemberValue);
+                var destinationMemberValue = context.MapMember(member, sourceMemberValue, boxedDestination);
+                member.SetMemberValue(boxedDestination, destinationMemberValue);
             }
-            return destination;
+            return (TDestination) boxedDestination;
         }
 
         private static object GetDynamically(MemberInfo member, object target)
         {
-            var binder = Binder.GetMember(CSharpBinderFlags.None, member.Name, member.GetMemberType(),
+            var binder = Binder.GetMember(CSharpBinderFlags.None, member.Name, ToDynamicMapper.GetMemberType(member),
                                                             new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
             var callsite = CallSite<Func<CallSite, object, object>>.Create(binder);
             return callsite.Target(callsite, target);
@@ -51,7 +54,7 @@ namespace AutoMapper.Mappers
             return context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, destExpression, contextExpression, Expression.Constant(CollectionMapperExtensions.Constructor(destExpression.Type)));
         }
@@ -81,9 +84,15 @@ namespace AutoMapper.Mappers
             return destination;
         }
 
+        public static Type GetMemberType(MemberInfo member)
+        {
+            var memberType = member.GetMemberType();
+            return memberType.IsArray ? typeof(object) : memberType;
+        }
+
         private static void SetDynamically(MemberInfo member, object target, object value)
         {
-            var binder = Binder.SetMember(CSharpBinderFlags.None, member.Name, member.GetMemberType(),
+            var binder = Binder.SetMember(CSharpBinderFlags.None, member.Name, GetMemberType(member),
                 new[]{
                     CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null),
                     CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
@@ -99,7 +108,7 @@ namespace AutoMapper.Mappers
             return context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, destExpression, contextExpression, Expression.Constant(CollectionMapperExtensions.Constructor(destExpression.Type)));
         }

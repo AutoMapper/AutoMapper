@@ -15,7 +15,6 @@ namespace AutoMapper
         public PropertyMap(MemberInfo destinationProperty, TypeMap typeMap)
         {
             TypeMap = typeMap;
-            //UseDestinationValue = true;
             DestinationProperty = destinationProperty;
         }
 
@@ -32,6 +31,7 @@ namespace AutoMapper
 
         public IEnumerable<MemberInfo> SourceMembers => _memberChain;
 
+        public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }
         public bool AllowNull { get; set; }
         public int? MappingOrder { get; set; }
@@ -39,7 +39,6 @@ namespace AutoMapper
         public LambdaExpression Condition { get; set; }
         public LambdaExpression PreCondition { get; set; }
         public LambdaExpression CustomExpression { get; private set; }
-        public MemberInfo CustomSourceMember { get; set; }
         public bool UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
         public object NullSubstitute { get; set; }
@@ -51,9 +50,6 @@ namespace AutoMapper
             {
                 if (CustomSourceMemberName != null)
                     return TypeMap.SourceType.GetMember(CustomSourceMemberName).FirstOrDefault();
-
-                if (CustomSourceMember != null)
-                    return CustomSourceMember;
 
                 if (CustomExpression != null)
                 {
@@ -94,7 +90,7 @@ namespace AutoMapper
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
         {
-            if (!CanResolveValue() && inheritedMappedProperty.Ignored)
+            if(inheritedMappedProperty.Ignored && !ResolveConfigured())
             {
                 Ignored = true;
             }
@@ -104,28 +100,16 @@ namespace AutoMapper
             PreCondition = PreCondition ?? inheritedMappedProperty.PreCondition;
             NullSubstitute = NullSubstitute ?? inheritedMappedProperty.NullSubstitute;
             MappingOrder = MappingOrder ?? inheritedMappedProperty.MappingOrder;
-            CustomSourceMember = CustomSourceMember ?? inheritedMappedProperty.CustomSourceMember;
             ValueResolverConfig = ValueResolverConfig ?? inheritedMappedProperty.ValueResolverConfig;
         }
 
-        public bool IsMapped()
-        {
-            return _memberChain.Count > 0 
-                || ValueResolverConfig != null 
-                || CustomResolver != null 
-                || SourceMember != null
-                || CustomExpression != null
-                || Ignored;
-        }
+        public bool IsMapped() => HasSource() || Ignored;
 
-        public bool CanResolveValue()
-        {
-            return (_memberChain.Count > 0
-                || ValueResolverConfig != null
-                || CustomResolver != null
-                || SourceMember != null
-                || CustomExpression != null) && !Ignored;
-        }
+        public bool CanResolveValue() => HasSource() && !Ignored;
+
+        public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
+
+        public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null || CustomSourceMemberName != null;
 
         public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {

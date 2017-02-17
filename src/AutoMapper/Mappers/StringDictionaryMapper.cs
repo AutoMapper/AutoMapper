@@ -19,11 +19,10 @@ namespace AutoMapper.Mappers
             return typeof(StringDictionary).IsAssignableFrom(context.DestinationType);
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-                PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
-                Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap,
+            Expression sourceExpression, Expression destExpression, Expression contextExpression)
             =>
-            typeMapRegistry.MapCollectionExpression(configurationProvider, propertyMap,
+            configurationProvider.MapCollectionExpression(propertyMap,
                 Call(MembersDictionaryMethodInfo, sourceExpression, contextExpression), destExpression, contextExpression, _ => null,
                 typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
 
@@ -46,9 +45,8 @@ namespace AutoMapper.Mappers
             return typeof(StringDictionary).IsAssignableFrom(context.SourceType);
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
-            Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap,
+            Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), sourceExpression, destExpression, contextExpression);
         }
@@ -60,12 +58,13 @@ namespace AutoMapper.Mappers
             var members = from name in source.Keys
                           join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
                           select member;
+            object boxedDestination = destination;
             foreach (var member in members)
             {
-                var value = context.MapMember(member, source[member.Name], destination);
-                member.SetMemberValue(destination, value);
+                var value = context.MapMember(member, source[member.Name], boxedDestination);
+                member.SetMemberValue(boxedDestination, value);
             }
-            return destination;
+            return (TDestination) boxedDestination;
         }
     }
 }

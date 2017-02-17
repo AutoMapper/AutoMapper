@@ -31,7 +31,7 @@ namespace AutoMapper.Mappers
             return (context.DestinationType.IsArray) && (context.SourceType.IsEnumerableType());
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = TypeHelper.GetElementType(destExpression.Type);
@@ -43,7 +43,7 @@ namespace AutoMapper.Mappers
                                  : NewArrayBounds(destElementType, Constant(0));
 
             ParameterExpression itemParam;
-            var itemExpr = typeMapRegistry.MapItemExpr(configurationProvider, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out itemParam);
+            var itemExpr = configurationProvider.MapItemExpr(propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out itemParam);
 
             //var count = source.Count();
             //var array = new TDestination[count];

@@ -6,6 +6,37 @@ using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests.Bug
 {
+    public class Self_referencing_existing_destination : AutoMapperSpecBase
+    {
+        public class BaseType
+        {
+            public BaseType()
+            {
+                SelfReference = this;
+            }
+            public BaseType SelfReference { get; set; }
+        }
+
+        public class BaseTypeDto
+        {
+            public BaseTypeDto()
+            {
+                SelfReference = this;
+            }
+            public BaseTypeDto SelfReference { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg=> cfg.CreateMap<BaseType, BaseTypeDto>().PreserveReferences());
+
+        protected override void Because_of()
+        {
+            var baseType = new BaseType();
+            var baseTypeDto = new BaseTypeDto();
+
+            Mapper.Map(baseType, baseTypeDto);
+        }
+    }
+
     public class PreserveReferencesSameDestination : AutoMapperSpecBase
     {
         public class DtoOne

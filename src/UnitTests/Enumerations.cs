@@ -4,7 +4,38 @@ using Should;
 using Xunit;
 
 namespace AutoMapper.Tests
-{    
+{
+    public class DefaultEnumValueToString : AutoMapperSpecBase
+    {
+        Destination _destination;
+
+        class Source
+        {
+            public ConsoleColor Color { get; set; }
+        }
+
+        class Destination
+        {
+            public string Color { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<Source, Destination>();
+        });
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<Destination>(new Source());
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Color.ShouldEqual("Black");
+        }
+    }
+
     public class StringToNullableEnum : AutoMapperSpecBase
     {
         Destination _destination;

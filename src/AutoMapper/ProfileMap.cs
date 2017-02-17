@@ -9,9 +9,14 @@ namespace AutoMapper
     using Configuration.Conventions;
     using Mappers;
 
+#if NETSTANDARD1_1
+    struct IConvertible{}
+#endif
+
     [DebuggerDisplay("{Name}")]
     public class ProfileMap
     {
+        private static readonly Type[] ExcludedTypes = new[]{ typeof(object), typeof(ValueType), typeof(Enum), typeof(IComparable), typeof(IFormattable), typeof(IConvertible) };
         private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
         private readonly IEnumerable<ITypeMapConfiguration> _typeMapConfigs;
         private readonly IEnumerable<ITypeMapConfiguration> _openTypeMapConfigs;
@@ -38,7 +43,7 @@ namespace AutoMapper
             TypeConfigurations = profile.TypeConfigurations
                 .Concat(configuration?.TypeConfigurations ?? Enumerable.Empty<IConditionalObjectMapper>())
                 .Concat(CreateMissingTypeMaps
-                    ? Enumerable.Repeat(new ConditionalObjectMapper { Conventions = { tp => tp.SourceType != typeof(object) && tp.DestinationType != typeof(object) } }, 1)
+                    ? Enumerable.Repeat(new ConditionalObjectMapper { Conventions = { tp => !ExcludedTypes.Contains(tp.SourceType) && !ExcludedTypes.Contains(tp.DestinationType)} }, 1)
                     : Enumerable.Empty<IConditionalObjectMapper>())
                 .ToArray();
 
@@ -187,6 +192,7 @@ namespace AutoMapper
         public TypeMap ConfigureClosedGenericTypeMap(TypeMapRegistry typeMapRegistry, TypePair closedTypes, TypePair requestedTypes)
         {
             var openMapConfig = _openTypeMapConfigs
+                .SelectMany(tm => tm.ReverseTypeMap == null ? new[] { tm } : new[] { tm, tm.ReverseTypeMap })
                 //.Where(tm => tm.IsOpenGeneric)
                 .Where(tm =>
                     tm.Types.SourceType.GetGenericTypeDefinitionIfGeneric() == closedTypes.SourceType.GetGenericTypeDefinitionIfGeneric() &&

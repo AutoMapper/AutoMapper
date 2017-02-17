@@ -54,7 +54,7 @@ namespace AutoMapper.Mappers
                    && context.DestinationType != typeof (LambdaExpression);
         }
 
-        public Expression MapExpression(TypeMapRegistry typeMapRegistry, IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, contextExpression);
         }
@@ -324,9 +324,9 @@ namespace AutoMapper.Mappers
                     return null;
 
                 var memberAccessor = node.Member;
-                
+
                 // in case of a propertypath, the MemberAcessors type and the SourceType may be different
-                if (memberAccessor.DeclaringType != _typeMap.DestinationType)
+                if (!memberAccessor.DeclaringType.IsAssignableFrom(_typeMap.DestinationType))
                     return null;
 
                 var propertyMap = _typeMap.GetExistingPropertyMapFor(memberAccessor);
