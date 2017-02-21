@@ -500,7 +500,8 @@ namespace AutoMapper.Execution
                     return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
                 }
             }
-            var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
+            var mappers = propertyMap?.TypeMap?.Profile?.Mappers ?? configurationProvider.GetMappers();
+            var match = mappers.FirstOrDefault(m => m.IsMatch(typePair));
             if(match != null)
             {
                 var mapperExpression = match.MapExpression(configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);

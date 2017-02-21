@@ -79,11 +79,6 @@ namespace AutoMapper
         void CreateProfile(string profileName, Action<IProfileExpression> config);
 
         /// <summary>
-        /// Object mappers
-        /// </summary>
-        IList<IObjectMapper> Mappers { get; }
-
-        /// <summary>
         /// Advance Configuration
         /// </summary>
         AdvancedConfiguration Advanced { get; }

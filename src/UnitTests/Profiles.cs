@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Should;
 using Xunit;
 
@@ -6,7 +7,73 @@ namespace AutoMapper.UnitTests
 {
     namespace Profiles
     {
+        using AutoMapper.Mappers;
         using Should.Core.Assertions;
+
+        public class When_customizing_mappers_per_profile : NonValidatingSpecBase
+        {
+            private Dto _result;
+
+            public class Model
+            {
+                public int Value { get; set; }
+            }
+
+            public class Dto
+            {
+                public string Value { get; set; }
+            }
+
+            public class ModelGlobal
+            {
+                public int Value { get; set; }
+            }
+
+            public class DtoGlobal
+            {
+                public string Value { get; set; }
+            }
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.Mappers.Remove(cfg.Mappers.OfType<StringMapper>().Single());
+                cfg.Mappers.Remove(cfg.Mappers.OfType<ConvertMapper>().Single());
+                cfg.Mappers.Remove(cfg.Mappers.OfType<TypeConverterMapper>().Single());
+                cfg.CreateMap<ModelGlobal, DtoGlobal>();
+                cfg.CreateProfile("CanConvertToString", p =>
+                {
+                    p.Mappers.Add(new MyStringMapper());
+                    p.CreateMap<Model, Dto>();
+                });
+            });
+
+            protected override void Because_of()
+            {
+                _result = Mapper.Map<Model, Dto>(new Model { Value = 5 });
+            }
+
+            [Fact]
+            public void Should_use_per_profile_mappers()
+            {
+                _result.Value.ShouldEqual("hello");
+            }
+
+            [Fact]
+            public void Should_not_map_to_string_globally()
+            {
+                new Action(() => Mapper.Map<ModelGlobal, DtoGlobal>(new ModelGlobal { Value = 5 })).ShouldThrow<AutoMapperMappingException>(ex =>
+                  {
+                      ex.InnerException.Message.ShouldStartWith("Missing type map configuration or unsupported mapping.");
+                      ex.PropertyMap.SourceMember.Name.ShouldEqual("Value");
+                  });
+            }
+
+            class MyStringMapper : ObjectMapper<object, string>
+            {
+                public override bool IsMatch(TypePair context) => context.DestinationType == typeof(string);
+                public override string Map(object source, string destination, ResolutionContext context) => "hello";
+            }
+        }
 
         public class When_segregating_configuration_through_a_profile : NonValidatingSpecBase
         {

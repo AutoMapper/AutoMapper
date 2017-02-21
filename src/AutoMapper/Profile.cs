@@ -44,6 +44,7 @@ namespace AutoMapper
 
             SourceMemberNamingConvention = new PascalCaseNamingConvention();
             DestinationMemberNamingConvention = new PascalCaseNamingConvention();
+            Mappers = new List<IObjectMapper>();
         }
 
         protected Profile(string profileName, Action<IProfileExpression> configurationAction)
@@ -52,6 +53,7 @@ namespace AutoMapper
             configurationAction(this);
         }
 
+        public IList<IObjectMapper> Mappers { get; set; }
         public IMemberConfiguration DefaultMemberConfig => _memberConfigurations.First();
         public bool? ConstructorMappingEnabled { get; private set; }
         public bool? CreateMissingTypeMaps { get; set; }
