@@ -12,12 +12,10 @@ namespace AutoMapper.XpressionMapper
     {
         internal FindMemberExpressionsVisitor(ParameterExpression newParameter)
         {
-            this.parameterType = newParameter.Type;
             this.newParameter = newParameter;
         }
 
         #region Fields
-        private Type parameterType;
         private ParameterExpression newParameter;
         private List<MemberExpression> memberExpressions = new List<MemberExpression>();
         #endregion Fields
@@ -38,13 +36,13 @@ namespace AutoMapper.XpressionMapper
                         result = next;
                     else throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                         Resource.includeExpressionTooComplex,
-                        string.Concat(this.parameterType.Name, PERIOD, result),
-                        string.Concat(this.parameterType.Name, PERIOD, next)));
+                        string.Concat(this.newParameter.Type.Name, PERIOD, result),
+                        string.Concat(this.newParameter.Type.Name, PERIOD, next)));
 
                     return result;
                 });
 
-                return this.newParameter.BuildExpression(this.parameterType, member);
+                return this.newParameter.BuildExpression(member);
             }
         }
 
@@ -55,7 +53,7 @@ namespace AutoMapper.XpressionMapper
 
             ParameterExpression parameterExpression = node.GetParameterExpression();
             Type sType = parameterExpression == null ? null : parameterExpression.Type;
-            if (sType != null && this.parameterType == sType && node.IsMemberExpression())
+            if (sType != null && this.newParameter.Type == sType && node.IsMemberExpression())
             {
                 if (node.Expression.NodeType == ExpressionType.MemberAccess && (node.Type == typeof(string) 
                                                                                     || node.Type.GetTypeInfo().IsValueType

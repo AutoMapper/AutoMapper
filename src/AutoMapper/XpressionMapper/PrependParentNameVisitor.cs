@@ -6,16 +6,14 @@ namespace AutoMapper.XpressionMapper
 {
     internal class PrependParentNameVisitor : ExpressionVisitor
     {
-        public PrependParentNameVisitor(Type ReturnParameterType, Type CurrentParameterType, string ParentFullName, ParameterExpression NewParameter)
+        public PrependParentNameVisitor(Type CurrentParameterType, string ParentFullName, ParameterExpression NewParameter)
         {
-            this.ReturnParameterType = ReturnParameterType;
             this.CurrentParameterType = CurrentParameterType;
             this.ParentFullName = ParentFullName;
             this.NewParameter = NewParameter;
         }
 
         #region Properties
-        public Type ReturnParameterType { get; set; }
         public Type CurrentParameterType { get; set; }
         public string ParentFullName { get; set; }
         public ParameterExpression NewParameter { get; set; } 
@@ -44,7 +42,7 @@ namespace AutoMapper.XpressionMapper
                             ? sourcePath
                             : string.Concat(this.ParentFullName, ".", sourcePath);
 
-            MemberExpression me = this.NewParameter.BuildExpression(this.ReturnParameterType, fullName);
+            MemberExpression me = this.NewParameter.BuildExpression(fullName);
 
             return me;
         }

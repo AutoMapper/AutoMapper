@@ -90,11 +90,11 @@ namespace AutoMapper.XpressionMapper
 
                 fullName = BuildFullName(beforeCustExpression);
 
-                PrependParentNameVisitor visitor = new PrependParentNameVisitor(InfoDictionary[parameterExpression].DestType, last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, InfoDictionary[parameterExpression].NewParameter);
+                PrependParentNameVisitor visitor = new PrependParentNameVisitor(last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, InfoDictionary[parameterExpression].NewParameter);
 
                 Expression ex = propertyMapInfoList[propertyMapInfoList.Count - 1] != last
-                    ? ex = visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
-                    : ex = visitor.Visit(last.CustomExpression.Body);
+                    ? visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
+                    : visitor.Visit(last.CustomExpression.Body);
 
                 FindMemberExpressionsVisitor v = new FindMemberExpressionsVisitor(InfoDictionary[parameterExpression].NewParameter);
                 v.Visit(ex);
@@ -104,7 +104,7 @@ namespace AutoMapper.XpressionMapper
             else
             {
                 fullName = BuildFullName(propertyMapInfoList);
-                MemberExpression me = InfoDictionary[parameterExpression].NewParameter.BuildExpression(InfoDictionary[parameterExpression].DestType, fullName);
+                MemberExpression me = InfoDictionary[parameterExpression].NewParameter.BuildExpression(fullName);
                 if (me.Expression.NodeType == ExpressionType.MemberAccess && (me.Type == typeof(string) || me.Type.GetTypeInfo().IsValueType || (me.Type.GetTypeInfo().IsGenericType
                                                                                                                             && me.Type.GetGenericTypeDefinition().Equals(typeof(Nullable<>))
                                                                                                                             && Nullable.GetUnderlyingType(me.Type).GetTypeInfo().IsValueType)))

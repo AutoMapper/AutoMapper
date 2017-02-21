@@ -154,29 +154,26 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// Builds and new member expression for the given parameter given its Type and fullname
         /// </summary>
         /// <param name="newParameter"></param>
-        /// <param name="type"></param>
         /// <param name="fullName"></param>
         /// <returns></returns>
-        public static MemberExpression BuildExpression(this ParameterExpression newParameter, Type type, string fullName)
+        public static MemberExpression BuildExpression(this ParameterExpression newParameter, string fullName)
         {
             var parts = fullName.Split('.');
 
             Expression parent = newParameter;
             foreach (var part in parts)
             {
-                MemberInfo mInfo = type.GetMember(part).First();
-                PropertyInfo pInfo = mInfo as PropertyInfo;//type.GetProperty(part);
-                FieldInfo fInfo = mInfo as FieldInfo;//type.GetProperty(part);
+                MemberInfo mInfo = parent.Type.GetMember(part).First();
+                PropertyInfo pInfo = mInfo as PropertyInfo;
+                FieldInfo fInfo = mInfo as FieldInfo;
 
                 if (pInfo != null)
                 {
                     parent = Expression.Property(parent, pInfo);
-                    type = pInfo.PropertyType;
                 }
                 else
                 {
                     parent = Expression.Field(parent, fInfo);
-                    type = fInfo.FieldType;
                 }
             }
 

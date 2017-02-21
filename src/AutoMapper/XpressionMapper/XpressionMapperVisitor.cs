@@ -98,18 +98,18 @@ namespace AutoMapper.XpressionMapper
                 });
 
                 fullName = BuildFullName(beforeCustExpression);
-                PrependParentNameVisitor visitor = new PrependParentNameVisitor(infoDictionary[parameterExpression].DestType, last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, infoDictionary[parameterExpression].NewParameter);
+                PrependParentNameVisitor visitor = new PrependParentNameVisitor(last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, infoDictionary[parameterExpression].NewParameter);
 
                 Expression ex = propertyMapInfoList[propertyMapInfoList.Count - 1] != last
-                    ? ex = visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
-                    : ex = visitor.Visit(last.CustomExpression.Body);
+                    ? visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
+                    : visitor.Visit(last.CustomExpression.Body);
 
                 return ex;
             }
             else
             {
                 fullName = BuildFullName(propertyMapInfoList);
-                MemberExpression me = infoDictionary[parameterExpression].NewParameter.BuildExpression(infoDictionary[parameterExpression].DestType, fullName);
+                MemberExpression me = infoDictionary[parameterExpression].NewParameter.BuildExpression(fullName);
                 return me;
             }
         }
