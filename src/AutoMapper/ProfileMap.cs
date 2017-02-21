@@ -53,7 +53,7 @@ namespace AutoMapper
             MemberConfigurations.FirstOrDefault()?.AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = profile.SourceMemberNamingConvention);
             MemberConfigurations.FirstOrDefault()?.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention);
 
-            Mappers = (configuration?.Mappers ?? Enumerable.Empty<IObjectMapper>()).Concat(profile.Mappers).ToList();
+            Mappers = profile.Mappers.Concat(configuration?.Mappers ?? Enumerable.Empty<IObjectMapper>()).ToList();
             GlobalIgnores = profile.GlobalIgnores.Concat(configuration?.GlobalIgnores ?? Enumerable.Empty<string>()).ToArray();
             SourceExtensionMethods = profile.SourceExtensionMethods.Concat(configuration?.SourceExtensionMethods ?? Enumerable.Empty<MethodInfo>()).ToArray();
             AllPropertyMapActions = profile.AllPropertyMapActions.Concat(configuration?.AllPropertyMapActions ?? Enumerable.Empty<Action<PropertyMap, IMemberConfigurationExpression>>()).ToArray();
