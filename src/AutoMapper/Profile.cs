@@ -53,6 +53,11 @@ namespace AutoMapper
             configurationAction(this);
         }
 
+        public void AddMapper(IObjectMapper mapper)
+        {
+            Mappers.Add(mapper);
+        }
+
         public IList<IObjectMapper> Mappers { get; set; }
         public IMemberConfiguration DefaultMemberConfig => _memberConfigurations.First();
         public bool? ConstructorMappingEnabled { get; private set; }

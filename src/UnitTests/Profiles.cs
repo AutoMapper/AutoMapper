@@ -42,7 +42,7 @@ namespace AutoMapper.UnitTests
                 cfg.CreateMap<ModelGlobal, DtoGlobal>();
                 cfg.CreateProfile("CanConvertToString", p =>
                 {
-                    p.Mappers.Add(new MyStringMapper());
+                    p.AddMapper(new MyStringMapper());
                     p.CreateMap<Model, Dto>();
                 });
             });

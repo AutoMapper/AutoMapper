@@ -12,9 +12,10 @@ namespace AutoMapper
     public interface IProfileExpression
     {
         /// <summary>
-        /// Object mappers
+        /// Add a custom object mapper.
         /// </summary>
-        IList<IObjectMapper> Mappers { get; }
+        /// <param name="mapper"></param>
+        void AddMapper(IObjectMapper mapper);
 
 
         /// <summary>
