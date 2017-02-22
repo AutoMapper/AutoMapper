@@ -41,12 +41,14 @@ namespace AutoMapper.Mappers
                                        configurationProvider.Configuration.AllowNullCollections;
             var ifNullExpr = allowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-            var checkNull =  
+            var createNewAndAssignExpression = Assign(newExpression, passedDestination.Type.NewExpr(ifInterfaceType));
+
+            var checkNull =
                 Block(new[] { newExpression, passedDestination },
                     Assign(passedDestination, destExpression),
                     IfThenElse(condition ?? Constant(false),
-                                    Block(Assign(newExpression, passedDestination), Call(newExpression, clearMethod)),
-                                    Assign(newExpression, passedDestination.Type.NewExpr(ifInterfaceType))),
+                        IfThenElse(TypeIs(passedDestination, typeof(Array)), createNewAndAssignExpression, Block(Assign(newExpression, passedDestination), Call(newExpression, clearMethod))),
+                        createNewAndAssignExpression),
                     Condition(Equal(sourceExpression, Constant(null)), ToType(ifNullExpr, passedDestination.Type), ToType(mapExpr, passedDestination.Type))
                 );
             if(propertyMap != null)
