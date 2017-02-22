@@ -177,6 +177,68 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class When_mapping_collections_with_fixed_size : AutoMapperSpecBase
+    {
+        private A _source;
+        private B _destination;
+        private A _remapTarget;
+
+        public class A
+        {
+            public ICollection<AA> Items { get; set; }
+        }
+        public class B
+        {
+            public ICollection<BB> Items { get; set; }
+        }
+        public class AA
+        {
+            public string Value { get; set; }
+        }
+        public class BB
+        {
+            public string Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<A, B>()
+                  .ReverseMap();
+            cfg.CreateMap<AA, BB>()
+               .ReverseMap();
+        });
+
+        protected override void Because_of()
+        {
+            _source = new A
+            {
+                Items = new[] { new AA { Value = "1" }, new AA { Value = "2" }, new AA { Value = "3" } }
+            };
+            _remapTarget = new A
+            {
+                Items = new AA[0]
+            };
+            _destination = Mapper.Map<B>(_source);
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Items.ShouldNotBeNull();
+            _destination.Items.ShouldNotBeInstanceOf<ICollection<BB>>();
+            _destination.Items.ShouldBeOfLength(3);
+        }
+
+        [Fact]
+        public void Should_remap_ok()
+        {
+            Mapper.Map(_destination, _remapTarget);
+            _remapTarget.Items.ShouldNotBeNull();
+            _remapTarget.Items.ShouldNotBeInstanceOf<ICollection<AA>>();
+            _remapTarget.Items.ShouldBeOfLength(3);
+        }
+    }
+
     public class CollectionMapping
     {
         public CollectionMapping()
