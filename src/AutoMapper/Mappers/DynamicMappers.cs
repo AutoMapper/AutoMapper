@@ -1,42 +1,66 @@
 using System;
-using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using AutoMapper.Configuration;
 using Microsoft.CSharp.RuntimeBinder;
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
 namespace AutoMapper.Mappers
 {
-    using Execution;
-
     public class FromDynamicMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
         {
-            if(destination == null)
+            if (destination == null)
             {
                 destination = ifNull();
             }
             object boxedDestination = destination;
+            var sourceTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TSource));
             var destinationTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TDestination));
-            foreach (var member in destinationTypeDetails.PublicWriteAccessors)
+            foreach (var destinationMember in destinationTypeDetails.PublicWriteAccessors)
             {
                 object sourceMemberValue;
+                object destinationMemberValue;
+
+                var sourceMember = sourceTypeDetails.PublicReadAccessors.SingleOrDefault(a => a.Name == destinationMember.Name);
+                if (sourceMember != null)
+                {
+
+                    try
+                    {
+                        sourceMemberValue = GetDynamically(sourceMember, source);
+                    }
+                    catch (RuntimeBinderException)
+                    {
+                        continue;
+                    }
+
+                    var destinationType = destinationMember.GetMemberType();
+                    var sourceType = sourceMember.GetMemberType();
+                    if (sourceType.IsCollectionType() && destinationType.IsCollectionType()
+                        && sourceType.GetGenericArguments()[0] != destinationType.GetGenericArguments()[0])
+                    {
+                        destinationMemberValue = context.MapMember(destinationMember, sourceMemberValue);
+                        destinationMember.SetMemberValue(boxedDestination, destinationMemberValue);
+                        continue;
+                    }
+
+                }
                 try
                 {
-                    sourceMemberValue = GetDynamically(member, source);
+                    sourceMemberValue = GetDynamically(destinationMember, source);
                 }
                 catch (RuntimeBinderException)
                 {
                     continue;
                 }
-                var destinationMemberValue = context.MapMember(member, sourceMemberValue, boxedDestination);
-                member.SetMemberValue(boxedDestination, destinationMemberValue);
+                destinationMemberValue = context.MapMember(destinationMember, sourceMemberValue, boxedDestination);
+                destinationMember.SetMemberValue(boxedDestination, destinationMemberValue);
             }
-            return (TDestination) boxedDestination;
+            return (TDestination)boxedDestination;
         }
 
         private static object GetDynamically(MemberInfo member, object target)
@@ -65,21 +89,39 @@ namespace AutoMapper.Mappers
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
         {
             if (destination == null)
+            {
                 destination = ifNull();
+            }
             var sourceTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TSource));
-            foreach (var member in sourceTypeDetails.PublicReadAccessors)
+            var destinationTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TDestination));
+            foreach (var sourceMember in sourceTypeDetails.PublicReadAccessors)
             {
                 object sourceMemberValue;
                 try
                 {
-                    sourceMemberValue = member.GetMemberValue(source);
+                    sourceMemberValue = sourceMember.GetMemberValue(source);
                 }
                 catch (RuntimeBinderException)
                 {
                     continue;
                 }
-                var destinationMemberValue = context.MapMember(member, sourceMemberValue);
-                SetDynamically(member, destination, destinationMemberValue);
+
+                var destinationMember = destinationTypeDetails.PublicWriteAccessors.SingleOrDefault(a => a.Name == sourceMember.Name);
+                object destinationMemberValue;
+                if (destinationMember != null)
+                {
+                    var destinationType = destinationMember.GetMemberType();
+                    var sourceType = sourceMember.GetMemberType();
+                    if (sourceType.IsCollectionType() && destinationType.IsCollectionType()
+                        && sourceType.GetGenericArguments()[0] != destinationType.GetGenericArguments()[0])
+                    {
+                        destinationMemberValue = context.MapMember(destinationMember, sourceMemberValue);
+                        SetDynamically(destinationMember, destination, destinationMemberValue);
+                        continue;
+                    }
+                }
+                destinationMemberValue = context.MapMember(sourceMember, sourceMemberValue);
+                SetDynamically(sourceMember, destination, destinationMemberValue);
             }
             return destination;
         }
