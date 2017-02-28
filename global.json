@@ -1,5 +1,5 @@
 {
-  "projects": [ "src\\AutoMapper", "test" ],
+    "projects": [ "src\\AutoMapper", "test" ],
   "sdk": {
     "version": "1.0.0-preview2-003121"
   }
