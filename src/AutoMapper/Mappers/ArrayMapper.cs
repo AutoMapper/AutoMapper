@@ -1,11 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace AutoMapper.Mappers
 {
-    using System;
     using System.Reflection;
     using Configuration;
     using static Expression;
@@ -13,19 +11,6 @@ namespace AutoMapper.Mappers
 
     public class ArrayMapper : IObjectMapper
     {
-        private static readonly MethodInfo MapMethodInfo = typeof(ArrayMapper).GetAllMethods().First(_ => _.IsStatic);
-        
-        public static TDestination[] Map<TSource, TDestination>(IEnumerable<TSource> source, ResolutionContext context, Func<TSource, ResolutionContext, TDestination> newItemFunc)
-        {
-            var count = source.Count();
-            var array = new TDestination[count];
-
-            int i = 0;
-            foreach (var item in source)
-                array[i++] = newItemFunc(item, context);
-            return array;
-        }
-
         public bool IsMatch(TypePair context)
         {
             return (context.DestinationType.IsArray) && (context.SourceType.IsEnumerableType());
