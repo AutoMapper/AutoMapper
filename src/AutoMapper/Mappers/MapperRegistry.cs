@@ -12,6 +12,7 @@ namespace AutoMapper.Mappers
             new StringToEnumMapper(), 
             new EnumToEnumMapper(), 
             new EnumToUnderlyingTypeMapper(),
+            new UnderlyingTypeToEnumMapper(),
             new MultidimensionalArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),

@@ -13,7 +13,7 @@ namespace AutoMapper.Mappers
     {
         static MultidimensionalArrayFiller filler;
 
-        public static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, bool allowNullCollections, bool allowNullDestinationValues)
+        private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, bool allowNullCollections, bool allowNullDestinationValues)
             where TSource : IEnumerable
         {
             if (source == null && allowNullCollections)
@@ -28,24 +28,25 @@ namespace AutoMapper.Mappers
                     return source as Array;
             }
 
-            IEnumerable sourceList = source;
-            if (sourceList == null)
-                sourceList = typeof(TSource).GetTypeInfo().IsInterface ?
-                new List<TSourceElement>() :
-                (IEnumerable<TSourceElement>)(allowNullDestinationValues
-                ? ObjectCreator.CreateNonNullValue(typeof(TSource))
-                : ObjectCreator.CreateObject(typeof(TSource)));
+            IEnumerable sourceList = (IEnumerable) source ??
+                                     (typeof(TSource).GetTypeInfo().IsInterface
+                                         ? new List<TSourceElement>()
+                                         : (IEnumerable<TSourceElement>) (
+                                             allowNullDestinationValues
+                                                 ? ObjectCreator.CreateNonNullValue(typeof(TSource))
+                                                 : ObjectCreator.CreateObject(typeof(TSource)))
+                                     );
 
             var sourceLength = sourceList.OfType<object>().Count();
             var sourceArray = source as Array;
             Array destinationArray;
             if (sourceArray == null)
             {
-                destinationArray = ObjectCreator.CreateArray(destElementType, sourceLength);
+                destinationArray = Array.CreateInstance(destElementType, sourceLength);
             }
             else
             {
-                destinationArray = ObjectCreator.CreateArray(destElementType, sourceArray);
+                destinationArray = Array.CreateInstance(destElementType, sourceArray.GetLengths());
                 filler = new MultidimensionalArrayFiller(destinationArray);
             }
             foreach(var item in sourceList)
@@ -55,7 +56,7 @@ namespace AutoMapper.Mappers
             return destinationArray;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetDeclaredMethod(nameof(Map));
 
         public bool IsMatch(TypePair context)
         {
@@ -73,43 +74,44 @@ namespace AutoMapper.Mappers
                 Expression.Constant(propertyMap?.TypeMap.Profile.AllowNullDestinationValues ??
                                        configurationProvider.Configuration.AllowNullDestinationValues));
         }
-    }
 
-    public class MultidimensionalArrayFiller
-    {
-        int[] indices;
-        Array destination;
-
-        public MultidimensionalArrayFiller(Array destination)
+        public class MultidimensionalArrayFiller
         {
-            indices = new int[destination.Rank];
-            this.destination = destination;
-        }
+            private readonly int[] _indices;
+            private readonly Array _destination;
 
-        public void NewValue(object value)
-        {
-            int dimension = destination.Rank - 1;
-            bool changedDimension = false;
-            while(indices[dimension] == destination.GetLength(dimension))
+            public MultidimensionalArrayFiller(Array destination)
             {
-                indices[dimension] = 0;
-                dimension--;
-                if(dimension < 0)
+                _indices = new int[destination.Rank];
+                _destination = destination;
+            }
+
+            public void NewValue(object value)
+            {
+                int dimension = _destination.Rank - 1;
+                bool changedDimension = false;
+                while (_indices[dimension] == _destination.GetLength(dimension))
                 {
-                    throw new InvalidOperationException("Not enough room in destination array " + destination);
+                    _indices[dimension] = 0;
+                    dimension--;
+                    if (dimension < 0)
+                    {
+                        throw new InvalidOperationException("Not enough room in destination array " + _destination);
+                    }
+                    _indices[dimension]++;
+                    changedDimension = true;
                 }
-                indices[dimension]++;
-                changedDimension = true;
-            }
-            destination.SetValue(value, indices);
-            if(changedDimension)
-            {
-                indices[dimension+1]++;
-            }
-            else
-            {
-                indices[dimension]++;
+                _destination.SetValue(value, _indices);
+                if (changedDimension)
+                {
+                    _indices[dimension + 1]++;
+                }
+                else
+                {
+                    _indices[dimension]++;
+                }
             }
         }
     }
+
 }

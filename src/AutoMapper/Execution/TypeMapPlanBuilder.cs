@@ -486,26 +486,21 @@ namespace AutoMapper.Execution
                 if(!typeMap.HasDerivedTypesToInclude())
                 {
                     typeMap.Seal(configurationProvider);
-                    if(typeMap.MapExpression != null)
-                    {
-                        return typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter, contextParameter);
-                    }
-                    else
-                    {
-                        return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
-                    }
+
+                    return typeMap.MapExpression != null 
+                        ? typeMap.MapExpression.ConvertReplaceParameters(sourceParameter, destinationParameter, contextParameter) 
+                        : ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
                 }
-                else
-                {
-                    return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
-                }
+                return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
             }
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
             if(match != null)
             {
                 var mapperExpression = match.MapExpression(configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
+
                 return ToType(mapperExpression, typePair.DestinationType);
             }
+
             return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
         }
 

@@ -18,7 +18,7 @@ namespace AutoMapper.Configuration
         }
 
         public IEnumerable<IProfileConfiguration> Profiles => _profiles;
-        public Func<Type, object> ServiceCtor { get; private set; } = ObjectCreator.CreateObject;
+        public Func<Type, object> ServiceCtor { get; private set; } = Activator.CreateInstance;
 
         public void CreateProfile(string profileName, Action<IProfileExpression> config) 
             => AddProfile(new NamedProfile(profileName, config));
