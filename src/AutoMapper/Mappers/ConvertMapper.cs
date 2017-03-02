@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
 
     public class ConvertMapper : IObjectMapper
     {
-        private Dictionary<TypePair, LazyExpression> _converters = GetConverters();
+        private readonly Dictionary<TypePair, LazyExpression> _converters = GetConverters();
 
         private static Dictionary<TypePair, LazyExpression> GetConverters()
         {

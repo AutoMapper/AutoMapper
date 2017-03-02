@@ -14,14 +14,14 @@ namespace AutoMapper.Mappers
 
     public class ExpressionMapper : IObjectMapper
     {
-        public static TDestination Map<TSource, TDestination>(TSource expression, ResolutionContext context)
+        private static TDestination Map<TSource, TDestination>(TSource expression, ResolutionContext context)
             where TSource : LambdaExpression
             where TDestination : LambdaExpression
         {
             return context.Mapper.MapExpression<TDestination>(expression);
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(ExpressionMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo MapMethodInfo = typeof(ExpressionMapper).GetDeclaredMethod(nameof(Map));
 
         public bool IsMatch(TypePair context)
         {

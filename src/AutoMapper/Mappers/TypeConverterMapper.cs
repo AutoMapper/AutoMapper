@@ -33,7 +33,7 @@ namespace AutoMapper.Mappers
             return default(TDestination);
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(TypeConverterMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo MapMethodInfo = typeof(TypeConverterMapper).GetDeclaredMethod(nameof(Map));
 
         public bool IsMatch(TypePair context)
         {
