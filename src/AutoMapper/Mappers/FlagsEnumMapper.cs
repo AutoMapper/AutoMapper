@@ -6,18 +6,12 @@ namespace AutoMapper.Mappers
 {
     using System;
     using System.Linq;
+    using static Expression;
+    using static ExpressionExtensions;
 
     public class FlagsEnumMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
-        {
-            return source == null
-                ? ifNull()
-                : (TDestination)
-                Enum.Parse(TypeHelper.GetEnumerationType(typeof(TDestination)), source.ToString(), true);
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(FlagsEnumMapper).GetDeclaredMethod(nameof(Map));
+        private static readonly MethodInfo EnumParseMethod = Method(() => Enum.Parse(null, null, true));
 
         public bool IsMatch(TypePair context)
         {
@@ -32,7 +26,17 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, Expression.Constant(CollectionMapperExtensions.Constructor(destExpression.Type)));
+            return Condition(
+                Equal(ToObject(sourceExpression), Constant(null)),
+                Default(destExpression.Type),
+                ToType(
+                    Call(EnumParseMethod, 
+                        Constant(Nullable.GetUnderlyingType(destExpression.Type) ?? destExpression.Type),
+                        Call(sourceExpression, sourceExpression.Type.GetDeclaredMethod("ToString")),
+                        Constant(true)
+                    ),
+                    destExpression.Type
+                ));
         }
     }
 }
