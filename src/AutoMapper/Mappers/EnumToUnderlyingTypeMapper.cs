@@ -20,14 +20,6 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            /*
-            return source == null
-                ? default(TDestination)
-                : (TDestination)
-                Convert.ChangeType(source, Nullable.GetUnderlyingType(typeof(TDestination)) ?? typeof(TDestination),
-                    null);
-            */
-
             return Condition(
                 Equal(ToObject(sourceExpression), Constant(null)),
                 Default(destExpression.Type),

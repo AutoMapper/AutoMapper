@@ -4,17 +4,12 @@ using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
+    using static Expression;
+    using static ExpressionExtensions;
+
     public class UnderlyingTypeToEnumMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source)
-        {
-            return source == null
-                ? default(TDestination)
-                : (TDestination)
-                Enum.ToObject(Nullable.GetUnderlyingType(typeof(TDestination)) ?? typeof(TDestination), source);
-        }
-
-        private static readonly MethodInfo MapMethodInfo = typeof(UnderlyingTypeToEnumMapper).GetDeclaredMethod(nameof(Map));
+        private static readonly MethodInfo EnumToObject = Method(() => Enum.ToObject(typeof(object), null));
 
         public bool IsMatch(TypePair context)
         {
@@ -25,7 +20,14 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression);
+            return Condition(
+                Equal(ToObject(sourceExpression), Constant(null)),
+                Default(destExpression.Type),
+                ToType(
+                    Call(EnumToObject, Constant(Nullable.GetUnderlyingType(destExpression.Type) ?? destExpression.Type),
+                        ToObject(sourceExpression)),
+                    destExpression.Type
+                ));
         }
     }
 }
