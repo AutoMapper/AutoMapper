@@ -9,16 +9,15 @@ namespace AutoMapper.Mappers
 
     public class FlagsEnumMapper : IObjectMapper
     {
-        public static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
+        private static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
         {
-            if (source == null)
-                return ifNull();
-
-            Type enumDestType = TypeHelper.GetEnumerationType(typeof(TDestination));
-            return (TDestination)Enum.Parse(enumDestType, source.ToString(), true);
+            return source == null
+                ? ifNull()
+                : (TDestination)
+                Enum.Parse(TypeHelper.GetEnumerationType(typeof(TDestination)), source.ToString(), true);
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(FlagsEnumMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo MapMethodInfo = typeof(FlagsEnumMapper).GetDeclaredMethod(nameof(Map));
 
         public bool IsMatch(TypePair context)
         {

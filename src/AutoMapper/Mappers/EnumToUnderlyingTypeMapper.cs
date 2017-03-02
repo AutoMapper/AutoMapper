@@ -10,14 +10,11 @@ namespace AutoMapper.Mappers
     {
         private static TDestination Map<TSource, TDestination>(TSource source)
         {
-            if (source == null)
-            {
-                return default(TDestination);
-            }
-
-            var destinationType = Nullable.GetUnderlyingType(typeof(TDestination)) ?? typeof(TDestination);
-
-            return (TDestination)Convert.ChangeType(source, destinationType, null);
+            return source == null
+                ? default(TDestination)
+                : (TDestination)
+                Convert.ChangeType(source, Nullable.GetUnderlyingType(typeof(TDestination)) ?? typeof(TDestination),
+                    null);
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(EnumToUnderlyingTypeMapper).GetDeclaredMethod(nameof(Map));

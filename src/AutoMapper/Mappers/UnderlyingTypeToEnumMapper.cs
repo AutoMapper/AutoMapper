@@ -8,14 +8,10 @@ namespace AutoMapper.Mappers
     {
         private static TDestination Map<TSource, TDestination>(TSource source)
         {
-            if (source == null)
-            {
-                return default(TDestination);
-            }
-
-            var destinationType = Nullable.GetUnderlyingType(typeof(TDestination)) ?? typeof(TDestination);
-
-            return (TDestination) Enum.ToObject(destinationType, source);
+            return source == null
+                ? default(TDestination)
+                : (TDestination)
+                Enum.ToObject(Nullable.GetUnderlyingType(typeof(TDestination)) ?? typeof(TDestination), source);
         }
 
         private static readonly MethodInfo MapMethodInfo = typeof(UnderlyingTypeToEnumMapper).GetDeclaredMethod(nameof(Map));
