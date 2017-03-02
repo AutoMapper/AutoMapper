@@ -10,7 +10,7 @@ using System.Dynamic;
 
 namespace AutoMapper.UnitTests.ArraysAndLists
 {
-    public class When_mapping_to_an_array_as_ICollection_with_DontInline : AutoMapperSpecBase
+    public class When_mapping_to_an_array_as_ICollection_with_MapAtRuntime : AutoMapperSpecBase
     {
         Destination _destination;
         SourceItem[] _sourceItems = new [] { new SourceItem { Value = "1" }, new SourceItem { Value = "2" }, new SourceItem { Value = "3" } };
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests.ArraysAndLists
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(c => 
         {
-            c.CreateMap<Source, Destination>().ForMember(d=>d.Items, o=>o.DoNotInline());
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Items, o=>o.MapAtRuntime());
             c.CreateMap<SourceItem, DestinationItem>();
         });
 
