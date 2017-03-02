@@ -14,6 +14,10 @@ namespace AutoMapper
 
     internal static class ExpressionExtensions
     {
+        public static MethodInfo Method<T>(Expression<Func<T>> expression)
+        {
+            return ((MethodCallExpression) expression.Body).Method;
+        }
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
             if(collection.Type.IsArray)
