@@ -2,19 +2,18 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using AutoMapper.Execution;
 
 namespace AutoMapper.Mappers
 {
     using Microsoft.CSharp.RuntimeBinder;
+    using static Expression;
+    using static ExpressionExtensions;
 
     public class FromDynamicMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
+        private static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
         {
-            if(destination == null)
-            {
-                destination = ifNull();
-            }
             object boxedDestination = destination;
             var destinationTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TDestination));
             foreach (var member in destinationTypeDetails.PublicWriteAccessors)
@@ -51,7 +50,10 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, destExpression, contextExpression, Expression.Constant(CollectionMapperExtensions.Constructor(destExpression.Type)));
+            return Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), 
+                sourceExpression, 
+                ToType(Coalesce(ToObject(destExpression), DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type), 
+                contextExpression);
         }
     }
 }
