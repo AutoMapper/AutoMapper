@@ -1,6 +1,7 @@
 namespace AutoMapper
 {
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
     using Configuration.Conventions;
     using Mappers;
@@ -10,6 +11,13 @@ namespace AutoMapper
     /// </summary>
     public interface IProfileExpression
     {
+        /// <summary>
+        /// Add a custom object mapper.
+        /// </summary>
+        /// <param name="mapper"></param>
+        void AddMapper(IObjectMapper mapper);
+
+
         /// <summary>
         /// Disable constructor mapping. Use this if you don't intend to have AutoMapper try to map to constructors
         /// </summary>

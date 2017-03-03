@@ -53,6 +53,7 @@ namespace AutoMapper
             MemberConfigurations.FirstOrDefault()?.AddMember<NameSplitMember>(_ => _.SourceMemberNamingConvention = profile.SourceMemberNamingConvention);
             MemberConfigurations.FirstOrDefault()?.AddMember<NameSplitMember>(_ => _.DestinationMemberNamingConvention = profile.DestinationMemberNamingConvention);
 
+            Mappers = profile.Mappers.Concat(configuration?.Mappers ?? Enumerable.Empty<IObjectMapper>()).ToList();
             GlobalIgnores = profile.GlobalIgnores.Concat(configuration?.GlobalIgnores ?? Enumerable.Empty<string>()).ToArray();
             SourceExtensionMethods = profile.SourceExtensionMethods.Concat(configuration?.SourceExtensionMethods ?? Enumerable.Empty<MethodInfo>()).ToArray();
             AllPropertyMapActions = profile.AllPropertyMapActions.Concat(configuration?.AllPropertyMapActions ?? Enumerable.Empty<Action<PropertyMap, IMemberConfigurationExpression>>()).ToArray();
@@ -78,6 +79,7 @@ namespace AutoMapper
             _openTypeMapConfigs = profile.OpenTypeMapConfigs.ToArray();
         }
 
+        public IList<IObjectMapper> Mappers { get; }
         public bool AllowNullCollections { get; }
         public bool AllowNullDestinationValues { get; }
         public bool ConstructorMappingEnabled { get; }

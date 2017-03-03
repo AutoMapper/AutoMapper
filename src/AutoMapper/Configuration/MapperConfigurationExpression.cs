@@ -23,8 +23,6 @@ namespace AutoMapper.Configuration
         public void CreateProfile(string profileName, Action<IProfileExpression> config) 
             => AddProfile(new NamedProfile(profileName, config));
 
-        public IList<IObjectMapper> Mappers { get; }
-
         public AdvancedConfiguration Advanced { get; } = new AdvancedConfiguration();
 
         private class NamedProfile : Profile
