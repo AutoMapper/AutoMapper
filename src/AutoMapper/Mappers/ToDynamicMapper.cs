@@ -51,7 +51,7 @@ namespace AutoMapper.Mappers
             callsite.Target(callsite, target, value);
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetDeclaredMethod(nameof(Map));
 
         public bool IsMatch(TypePair context)
         {

@@ -8,7 +8,7 @@ namespace AutoMapper.Mappers
 
     public class NameValueCollectionMapper : IObjectMapper
     {
-        public static NameValueCollection Map(NameValueCollection source)
+        private static NameValueCollection Map(NameValueCollection source)
         {
             if (source == null)
                 return null;
@@ -20,7 +20,7 @@ namespace AutoMapper.Mappers
             return nvc;
         }
 
-        private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetAllMethods().First(_ => _.IsStatic);
+        private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetDeclaredMethod(nameof(Map));
 
         public bool IsMatch(TypePair context)
         {
