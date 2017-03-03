@@ -18,10 +18,10 @@ namespace AutoMapper.Execution
         public Expression<LateBoundMethod<object, TValue>> CreateGet<TValue>(MethodInfo method)
         {
             ParameterExpression instanceParameter = Parameter(typeof(object), "target");
-            ParameterExpression argumentsParameter = Parameter(typeof (object[]), "arguments");
+            ParameterExpression argumentsParameter = Parameter(typeof(object[]), "arguments");
 
             MethodCallExpression call;
-            if (!method.IsDefined(typeof (ExtensionAttribute), false))
+            if (!method.IsDefined(typeof(ExtensionAttribute), false))
             {
                 // instance member method
                 call = Call(Convert(instanceParameter, method.DeclaringType), method,
@@ -52,14 +52,35 @@ namespace AutoMapper.Execution
         {
             var ctorExpr = GenerateConstructorExpression(type);
 
-            return Lambda<LateBoundCtor>(Convert(ctorExpr, typeof (object))).Compile();
+            return Lambda<LateBoundCtor>(Convert(ctorExpr, typeof(object))).Compile();
+        }
+
+        // Equivalent to IRuntimeMapper.CreateObject
+        public static Expression GenerateConstructorExpression(Type type, IConfigurationProvider configuration)
+        {
+            return configuration.Configuration.AllowNullDestinationValues ? GenerateConstructorExpression(type) : GenerateNonNullConstructorExpression(type);
+        }
+
+        public static Expression GenerateNonNullConstructorExpression(Type type)
+        {
+            return type.IsValueType()
+                ? Default(type)
+                : (type == typeof(string)
+                    ? Constant(string.Empty)
+                    : GenerateConstructorExpression(type)
+                );
         }
 
         public static Expression GenerateConstructorExpression(Type type)
         {
-            if(type.IsValueType())
+            if (type.IsValueType())
             {
-                return Convert(New(type), typeof(object));
+                return Default(type);
+            }
+
+            if (type == typeof(string))
+            {
+                return Constant(null, typeof(string));
             }
 
             var constructors = type
@@ -68,7 +89,7 @@ namespace AutoMapper.Execution
 
             //find a ctor with only optional args
             var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
-            if(ctorWithOptionalArgs == null)
+            if (ctorWithOptionalArgs == null)
             {
                 var ex = new ArgumentException(type + " needs to have a constructor with 0 args or only optional args", "type");
                 return Block(Throw(Constant(ex)), Constant(null));
@@ -87,7 +108,7 @@ namespace AutoMapper.Execution
         {
             var expressions = new List<UnaryExpression>();
             var realMethodParameters = method.GetParameters();
-            if (method.IsDefined(typeof (ExtensionAttribute), false))
+            if (method.IsDefined(typeof(ExtensionAttribute), false))
             {
                 Type extendedType = method.GetParameters()[0].ParameterType;
                 expressions.Add(Convert(instanceParameter, extendedType));

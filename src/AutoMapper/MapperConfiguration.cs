@@ -101,14 +101,6 @@ namespace AutoMapper
             return new MapperFuncs(mapRequest, BuildExecutionPlan(mapRequest));
         }
 
-        /// <summary>
-        /// Builds the execution plan used to map the source to destination.
-        /// Useful to understand what exactly is happening during mapping.
-        /// See <a href="https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping">the wiki</a> for details.
-        /// </summary>
-        /// <param name="sourceType">the runtime type of the source object</param>
-        /// <param name="destinationType">the runtime type of the destination object</param>
-        /// <returns>the execution plan</returns>
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
         {
             var typePair = new TypePair(sourceType, destinationType);

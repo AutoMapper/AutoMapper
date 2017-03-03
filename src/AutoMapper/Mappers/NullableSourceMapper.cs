@@ -2,18 +2,15 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Execution;
 
 namespace AutoMapper.Mappers
 {
     using Configuration;
+    using static Expression;
 
     public class NullableSourceMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource? source, TDestination destination, ResolutionContext context) where TSource : struct
-            => (source == null) ? context.Mapper.CreateObject<TDestination>() : context.Mapper.Map((TSource)source, destination);
-
-        private static readonly MethodInfo MapMethodInfo = typeof(NullableSourceMapper).GetDeclaredMethod(nameof(Map));
-
         public bool IsMatch(TypePair context)
         {
             return context.SourceType.IsNullableType();
@@ -21,7 +18,17 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type), sourceExpression, destExpression, contextExpression);
+            // return source.HasValue() ? Map(source.Value, dest) : CreateObject<TDestination>
+            return Condition(
+                Property(sourceExpression, sourceExpression.Type.GetDeclaredProperty("HasValue")),
+                TypeMapPlanBuilder.MapExpression(configurationProvider, new TypePair(Nullable.GetUnderlyingType(sourceExpression.Type), destExpression.Type),
+                    Property(sourceExpression, sourceExpression.Type.GetDeclaredProperty("Value")),
+                    contextExpression,
+                    propertyMap,
+                    destExpression
+                ),
+                DelegateFactory.GenerateConstructorExpression(destExpression.Type, configurationProvider)
+            );
         }
     }
 }

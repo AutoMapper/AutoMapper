@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using AutoMapper.Mappers;
 
 namespace AutoMapper
@@ -125,5 +126,24 @@ namespace AutoMapper
         Delegate GetMapperFunc(MapRequest request);
 
         Func<object, object, ResolutionContext, object> GetUntypedMapperFunc(MapRequest mapRequest);
+
+        /// <summary>
+        /// Builds the execution plan used to map the source to destination.
+        /// Useful to understand what exactly is happening during mapping.
+        /// See <a href="https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping">the wiki</a> for details.
+        /// </summary>
+        /// <param name="sourceType">the runtime type of the source object</param>
+        /// <param name="destinationType">the runtime type of the destination object</param>
+        /// <returns>the execution plan</returns>
+        LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType);
+
+        /// <summary>
+        /// Builds the execution plan used to map the source to destination.
+        /// Useful to understand what exactly is happening during mapping.
+        /// See <a href="https://github.com/AutoMapper/AutoMapper/wiki/Understanding-your-mapping">the wiki</a> for details.
+        /// </summary>
+        /// <param name="mapRequest">The source/destination map request</param>
+        /// <returns>the execution plan</returns>
+        LambdaExpression BuildExecutionPlan(MapRequest mapRequest);
     }
 }
