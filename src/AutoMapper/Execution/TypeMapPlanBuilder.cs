@@ -229,8 +229,12 @@ namespace AutoMapper.Execution
 #if NET45
             if(_typeMap.DestinationTypeToUse.IsInterface())
             {
-                var ctor = Call(Constant(ObjectCreator.DelegateFactory), typeof(DelegateFactory).GetDeclaredMethod("CreateCtor", new[] { typeof(Type) }), Call(New(typeof(ProxyGenerator)), typeof(ProxyGenerator).GetDeclaredMethod("GetProxyType"), Constant(_typeMap.DestinationTypeToUse)));
-                // We're invoking a delegate here
+                var ctor = Call(null,
+                    typeof(DelegateFactory).GetDeclaredMethod(nameof(DelegateFactory.CreateCtor), new[] { typeof(Type) }),
+                    Call(null,
+                        typeof(ProxyGenerator).GetDeclaredMethod(nameof(ProxyGenerator.GetProxyType)),
+                        Constant(_typeMap.DestinationTypeToUse)));
+                // We're invoking a delegate here to make it have the right accessibility
                 return Invoke(ctor);
             }
 #endif
@@ -436,10 +440,8 @@ namespace AutoMapper.Execution
                 {
                     valueResolverFunc = Coalesce(
                         valueResolverFunc,
-                        ToType(Call(
-                            typeof(ObjectCreator).GetDeclaredMethod("CreateNonNullValue"),
-                            Constant(toCreate)
-                            ), propertyMap.SourceType));
+                        ToType(DelegateFactory.GenerateNonNullConstructorExpression(toCreate), propertyMap.SourceType)
+                        );
                 }
             }
 
