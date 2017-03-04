@@ -472,11 +472,10 @@ namespace AutoMapper.Execution
 
         public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
-            return MapExpression(_configurationProvider, typePair, sourceParameter, _context, propertyMap, destinationParameter);
+            return MapExpression(_configurationProvider, _typeMap.Profile, typePair, sourceParameter, _context, propertyMap, destinationParameter);
         }
 
-        public static Expression MapExpression(IConfigurationProvider configurationProvider,
-            TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
+        public static Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
             if(destinationParameter == null)
             {
@@ -498,7 +497,7 @@ namespace AutoMapper.Execution
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
             if(match != null)
             {
-                var mapperExpression = match.MapExpression(configurationProvider, propertyMap, sourceParameter, destinationParameter, contextParameter);
+                var mapperExpression = match.MapExpression(configurationProvider, profileMap, propertyMap, sourceParameter, destinationParameter, contextParameter);
 
                 return ToType(mapperExpression, typePair.DestinationType);
             }

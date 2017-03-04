@@ -12,10 +12,10 @@ namespace AutoMapper.Mappers
 
     public class FromDynamicMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context)
+        private static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
         {
             object boxedDestination = destination;
-            var destinationTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TDestination));
+            var destinationTypeDetails = profileMap.CreateTypeDetails(typeof(TDestination));
             foreach (var member in destinationTypeDetails.PublicWriteAccessors)
             {
                 object sourceMemberValue;
@@ -48,12 +48,13 @@ namespace AutoMapper.Mappers
             return context.SourceType.IsDynamic() && !context.DestinationType.IsDynamic();
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), 
                 sourceExpression, 
                 ToType(Coalesce(ToObject(destExpression), DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type), 
-                contextExpression);
+                contextExpression,
+                Constant(profileMap));
         }
     }
 }

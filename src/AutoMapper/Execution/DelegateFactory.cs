@@ -22,9 +22,9 @@ namespace AutoMapper.Execution
         }
 
         // Equivalent to IRuntimeMapper.CreateObject
-        public static Expression GenerateConstructorExpression(Type type, IConfigurationProvider configuration)
+        public static Expression GenerateConstructorExpression(Type type, ProfileMap configuration)
         {
-            return configuration.Configuration.AllowNullDestinationValues ? GenerateConstructorExpression(type) : GenerateNonNullConstructorExpression(type);
+            return configuration.AllowNullDestinationValues ? GenerateConstructorExpression(type) : GenerateNonNullConstructorExpression(type);
         }
 
         public static Expression GenerateNonNullConstructorExpression(Type type)

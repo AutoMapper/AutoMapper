@@ -12,14 +12,11 @@ namespace AutoMapper.Mappers
 
     internal static class CollectionMapperExtensions
     {
-        public delegate Expression MapItem(IConfigurationProvider configurationProvider,
+        public delegate Expression MapItem(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam,
             out ParameterExpression itemParam);
 
-        internal static Expression MapCollectionExpression(this IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Expression sourceExpression,
-            Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression,
-            Type ifInterfaceType, MapItem mapItem)
+        internal static Expression MapCollectionExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression, Func<Expression, Expression> conditionalExpression, Type ifInterfaceType, MapItem mapItem)
         {
             var passedDestination = Variable(destExpression.Type, "passedDestination");
             var condition = conditionalExpression(passedDestination);
@@ -27,7 +24,7 @@ namespace AutoMapper.Mappers
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             ParameterExpression itemParam;
 
-            var itemExpr = mapItem(configurationProvider, propertyMap, sourceExpression.Type, passedDestination.Type,
+            var itemExpr = mapItem(configurationProvider, profileMap, propertyMap, sourceExpression.Type, passedDestination.Type,
                 contextExpression, out itemParam);
 
             var destinationElementType = itemExpr.Type;
@@ -40,9 +37,7 @@ namespace AutoMapper.Mappers
 
             var mapExpr = Block(addItems, destination);
 
-            var allowNullCollections = propertyMap?.TypeMap.Profile.AllowNullCollections ??
-                                       configurationProvider.Configuration.AllowNullCollections;
-            var ifNullExpr = allowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
+            var ifNullExpr = profileMap.AllowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
             var checkNull =
                 Block(new[] {newExpression, passedDestination},
@@ -74,9 +69,7 @@ namespace AutoMapper.Mappers
             return ToType(newExpr, baseType);
         }
 
-        internal static Expression MapItemExpr(this IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam,
-            out ParameterExpression itemParam)
+        internal static Expression MapItemExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
             var sourceElementType = TypeHelper.GetElementType(sourceType);
             var destElementType = TypeHelper.GetElementType(destType);
@@ -84,14 +77,12 @@ namespace AutoMapper.Mappers
 
             var typePair = new TypePair(sourceElementType, destElementType);
 
-            var itemExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, typePair, itemParam, contextParam,
+            var itemExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, profileMap, typePair, itemParam, contextParam,
                 propertyMap);
             return ToType(itemExpr, destElementType);
         }
 
-        internal static Expression MapKeyPairValueExpr(IConfigurationProvider configurationProvider,
-            PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam,
-            out ParameterExpression itemParam)
+        internal static Expression MapKeyPairValueExpr(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Type sourceType, Type destType, Expression contextParam, out ParameterExpression itemParam)
         {
             var sourceElementTypes = TypeHelper.GetElementTypes(sourceType, ElementTypeFlags.BreakKeyValuePair);
             var destElementTypes = TypeHelper.GetElementTypes(destType, ElementTypeFlags.BreakKeyValuePair);
@@ -103,9 +94,9 @@ namespace AutoMapper.Mappers
             itemParam = Parameter(sourceElementType, "item");
             var destElementType = typeof(KeyValuePair<,>).MakeGenericType(destElementTypes);
 
-            var keyExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, typePairKey,
+            var keyExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, profileMap, typePairKey,
                 Property(itemParam, "Key"), contextParam, propertyMap);
-            var valueExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, typePairValue,
+            var valueExpr = TypeMapPlanBuilder.MapExpression(configurationProvider, profileMap, typePairValue,
                 Property(itemParam, "Value"), contextParam, propertyMap);
             var keyPair = New(destElementType.GetConstructors().First(), keyExpr, valueExpr);
             return keyPair;

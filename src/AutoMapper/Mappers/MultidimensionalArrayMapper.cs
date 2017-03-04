@@ -8,13 +8,14 @@ namespace AutoMapper.Mappers
     using System.Collections;
     using System.Linq;
     using Configuration;
+    using static Expression;
 
     public class MultidimensionalArrayMapper : IObjectMapper
     {
-        private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, bool allowNullCollections)
+        private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, ProfileMap profileMap)
             where TSource : IEnumerable
         {
-            if (source == null && allowNullCollections)
+            if (source == null && profileMap.AllowNullCollections)
                 return null;
 
             var destElementType = TypeHelper.GetElementType(typeof(TDestination));
@@ -47,14 +48,13 @@ namespace AutoMapper.Mappers
             return context.DestinationType.IsArray && context.DestinationType.GetArrayRank() > 1 && context.SourceType.IsEnumerableType();
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, 
+            return Call(null, 
                 MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type)), 
                 sourceExpression, 
                 contextExpression,
-                Expression.Constant(propertyMap?.TypeMap.Profile.AllowNullCollections ??
-                                       configurationProvider.Configuration.AllowNullCollections));
+                Constant(profileMap));
         }
 
         public class MultidimensionalArrayFiller

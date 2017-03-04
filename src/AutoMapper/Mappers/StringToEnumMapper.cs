@@ -11,7 +11,7 @@ namespace AutoMapper.Mappers
             return destEnumType != null && context.SourceType == typeof(string);
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var destinationType = destExpression.Type;
             var destinationEnumType = TypeHelper.GetEnumerationType(destinationType);

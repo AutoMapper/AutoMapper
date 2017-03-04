@@ -53,7 +53,7 @@ namespace AutoMapper
 
         public void Validate(ValidationContext context)
         {
-            foreach(var validator in Validators)
+            foreach (var validator in Validators)
             {
                 validator(context);
             }
@@ -67,7 +67,7 @@ namespace AutoMapper
 
         public bool EnableNullPropagationForQueryMapping { get; }
 
-        public ProfileMap Configuration { get; }
+        private ProfileMap Configuration { get; }
 
         public IEnumerable<ProfileMap> Profiles { get; }
 
@@ -80,7 +80,7 @@ namespace AutoMapper
 
         public void CompileMappings()
         {
-            foreach(var request in _typeMapPlanCache.Keys.Select(types => new MapRequest(types, types)).ToArray())
+            foreach (var request in _typeMapPlanCache.Keys.Select(types => new MapRequest(types, types)).ToArray())
             {
                 GetMapperFunc(request);
             }
@@ -110,7 +110,7 @@ namespace AutoMapper
         public LambdaExpression BuildExecutionPlan(MapRequest mapRequest)
         {
             var typeMap = ResolveTypeMap(mapRequest.RuntimeTypes) ?? ResolveTypeMap(mapRequest.RequestedTypes);
-            if(typeMap != null)
+            if (typeMap != null)
             {
                 return GenerateTypeMapExpression(mapRequest, typeMap);
             }
@@ -126,7 +126,7 @@ namespace AutoMapper
             var requestedSourceType = mapRequest.RequestedTypes.SourceType;
             var requestedDestinationType = mapRequest.RequestedTypes.DestinationType;
 
-            if(typeMapSourceParameter.Type != requestedSourceType || typeMapDestinationParameter.Type != requestedDestinationType)
+            if (typeMapSourceParameter.Type != requestedSourceType || typeMapDestinationParameter.Type != requestedDestinationType)
             {
                 var requestedSourceParameter = Parameter(requestedSourceType, "source");
                 var requestedDestinationParameter = Parameter(requestedDestinationType, "typeMapDestination");
@@ -143,7 +143,7 @@ namespace AutoMapper
             return mapExpression;
         }
 
-        private static LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration)
+        private LambdaExpression GenerateObjectMapperExpression(MapRequest mapRequest, IObjectMapper mapperToUse, MapperConfiguration mapperConfiguration)
         {
             var destinationType = mapRequest.RequestedTypes.DestinationType;
 
@@ -151,14 +151,14 @@ namespace AutoMapper
             var destination = Parameter(destinationType, "mapperDestination");
             var context = Parameter(typeof(ResolutionContext), "context");
             LambdaExpression fullExpression;
-            if(mapperToUse == null)
+            if (mapperToUse == null)
             {
                 var message = Constant("Missing type map configuration or unsupported mapping.");
                 fullExpression = Lambda(Block(Throw(New(ExceptionConstructor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
             }
             else
             {
-                var map = mapperToUse.MapExpression(mapperConfiguration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
+                var map = mapperToUse.MapExpression(mapperConfiguration, Configuration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
                 var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
                 fullExpression = TryCatch(mapToDestination, source, destination, context, mapRequest.RequestedTypes);
             }
@@ -194,12 +194,13 @@ namespace AutoMapper
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
-            if(typeMap != null && typeMap.MapExpression == null && Configuration.CreateMissingTypeMaps)
+
+            if (typeMap == null)
+                return null;
+
+            lock (typeMap)
             {
-                lock(typeMap)
-                {
-                    typeMap.Seal(this);
-                }
+                typeMap.Seal(this);
             }
             return typeMap;
         }
@@ -207,26 +208,26 @@ namespace AutoMapper
         private TypeMap GetTypeMap(TypePair initialTypes)
         {
             TypeMap typeMap;
-            foreach(var types in initialTypes.GetRelatedTypePairs())
+            foreach (var types in initialTypes.GetRelatedTypePairs())
             {
-                if(types != initialTypes && _typeMapPlanCache.TryGetValue(types, out typeMap))
+                if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out typeMap))
                 {
                     return typeMap;
                 }
                 typeMap = FindTypeMapFor(types);
-                if(typeMap != null)
+                if (typeMap != null)
                 {
                     return typeMap;
                 }
                 typeMap = FindClosedGenericTypeMapFor(types, initialTypes);
-                if(typeMap != null)
+                if (typeMap != null)
                 {
                     return typeMap;
                 }
-                if(!CoveredByObjectMap(initialTypes))
+                if (!CoveredByObjectMap(initialTypes))
                 {
                     typeMap = FindConventionTypeMapFor(types);
-                    if(typeMap != null)
+                    if (typeMap != null)
                     {
                         return typeMap;
                     }
@@ -341,7 +342,7 @@ namespace AutoMapper
                 .Select(p => p.ConfigureConventionTypeMap(_typeMapRegistry, typePair))
                 .FirstOrDefault(t => t != null);
 
-            if(!Configuration.CreateMissingTypeMaps)
+            if (!Configuration.CreateMissingTypeMaps)
             {
                 typeMap?.Seal(this);
             }

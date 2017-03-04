@@ -90,11 +90,6 @@ namespace AutoMapper
         Func<Type, object> ServiceCtor { get; }
 
         /// <summary>
-        /// Underlying configuration
-        /// </summary>
-        ProfileMap Configuration { get; }
-
-        /// <summary>
         /// Allows to enable null-value propagation for query mapping. 
         /// <remarks>Some providers (such as EntityFrameworkQueryVisitor) do not work with this feature enabled!</remarks>
         /// </summary>

@@ -19,8 +19,7 @@ namespace AutoMapper.Mappers
             return typeof(StringDictionary).IsAssignableFrom(context.SourceType);
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap,
-            Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Call(null, MapMethodInfo.MakeGenericMethod(destExpression.Type), 
                 sourceExpression, 
@@ -28,12 +27,13 @@ namespace AutoMapper.Mappers
                     Equal(ToObject(destExpression), Constant(null)),
                     DelegateFactory.GenerateConstructorExpression(destExpression.Type),
                     destExpression), 
-                contextExpression);
+                contextExpression,
+                Constant(profileMap));
         }
 
-        private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context)
+        private static TDestination Map<TDestination>(StringDictionary source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
         {
-            var destTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TDestination));
+            var destTypeDetails = profileMap.CreateTypeDetails(typeof(TDestination));
             var members = from name in source.Keys
                           join member in destTypeDetails.PublicWriteAccessors on name equals member.Name
                           select member;
