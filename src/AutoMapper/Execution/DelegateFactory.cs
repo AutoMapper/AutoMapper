@@ -21,7 +21,6 @@ namespace AutoMapper.Execution
             return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).Compile();
         }
 
-        // Equivalent to IRuntimeMapper.CreateObject
         public static Expression GenerateConstructorExpression(Type type, ProfileMap configuration)
         {
             return configuration.AllowNullDestinationValues ? GenerateConstructorExpression(type) : GenerateNonNullConstructorExpression(type);
