@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
-    using System.Reflection;
     using Configuration;
     using static Expression;
     using static ExpressionExtensions;
@@ -37,7 +37,7 @@ namespace AutoMapper.Mappers
             //return array;
 
             var countParam = Parameter(typeof(int), "count");
-            var arrayParam = Parameter(destExpression.Type, "destinationArray");
+            var arrayParam = Parameter(ifNullExpr.Type, "destinationArray");
             var indexParam = Parameter(typeof(int), "destinationArrayIndex");
 
             var actions = new List<Expression>();
@@ -61,6 +61,5 @@ namespace AutoMapper.Mappers
             // return (source == null) ? ifNullExpr : Map<TSourceElement, TDestElement>(source, context);
             return Condition(Equal(sourceExpression, Constant(null)), ifNullExpr, mapExpr);
         }
-
     }
 }

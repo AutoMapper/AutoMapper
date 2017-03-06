@@ -10,6 +10,50 @@ using System.Dynamic;
 
 namespace AutoMapper.UnitTests.ArraysAndLists
 {
+    public class When_mapping_to_an_array_as_ICollection_with_MapAtRuntime : AutoMapperSpecBase
+    {
+        Destination _destination;
+        SourceItem[] _sourceItems = new [] { new SourceItem { Value = "1" }, new SourceItem { Value = "2" }, new SourceItem { Value = "3" } };
+
+        public class Source
+        {
+            public ICollection<SourceItem> Items { get; set; }
+        }
+
+        public class Destination
+        {
+            public ICollection<DestinationItem> Items { get; set; }
+        }
+
+        public class SourceItem
+        {
+            public string Value { get; set; }
+        }
+
+        public class DestinationItem
+        {
+            public string Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => 
+        {
+            c.CreateMap<Source, Destination>().ForMember(d=>d.Items, o=>o.MapAtRuntime());
+            c.CreateMap<SourceItem, DestinationItem>();
+        });
+
+        protected override void Because_of()
+        {
+            var source = new Source { Items = _sourceItems };
+            _destination = Mapper.Map(source, new Destination { Items = new[] { new DestinationItem { Value = "4" } } });
+        }
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            _destination.Items.Select(i => i.Value).SequenceEqual(_sourceItems.Select(i => i.Value)).ShouldBeTrue();
+        }
+    }
+
     public class When_mapping_an_array : AutoMapperSpecBase
     {
         decimal[] _source = Enumerable.Range(1, 10).Select(i=>(decimal)i).ToArray();

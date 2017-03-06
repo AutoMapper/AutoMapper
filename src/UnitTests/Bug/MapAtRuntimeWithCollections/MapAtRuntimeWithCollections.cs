@@ -7,7 +7,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests
 {
-    public class DontInlineWithCollections : AutoMapperSpecBase
+    public class MapAtRuntimeWithCollections : AutoMapperSpecBase
     {
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<Entity24, EntityDTO24>().PreserveReferences().ReverseMap().PreserveReferences();
             cfg.CreateMap<Entity25, EntityDTO25>().PreserveReferences().ReverseMap().PreserveReferences();
             cfg.CreateMap<Entity26, EntityDTO26>().PreserveReferences().ReverseMap().PreserveReferences();
-            cfg.ForAllPropertyMaps(p => !p.SourceType.IsValueType, (pm, o) => o.DoNotInline());
+            cfg.ForAllPropertyMaps(p => !p.SourceType.IsValueType, (pm, o) => o.MapAtRuntime());
         });
 
         public class Initialize

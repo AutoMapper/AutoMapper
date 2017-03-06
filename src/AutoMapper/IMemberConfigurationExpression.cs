@@ -14,9 +14,10 @@ namespace AutoMapper
     public interface IMemberConfigurationExpression<TSource, out TDestination, TMember>
     {
         /// <summary>
-        /// Simplify the execution plan by not inlining this member.
+        /// Do not precompute the execution plan for this member, just map it at runtime.
+        /// Simplifies the execution plan by not inlining.
         /// </summary>
-        void DoNotInline();
+        void MapAtRuntime();
 
         /// <summary>
         /// Substitute a custom value when the source member resolves as null
