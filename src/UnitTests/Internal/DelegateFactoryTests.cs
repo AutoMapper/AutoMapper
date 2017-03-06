@@ -11,20 +11,6 @@ namespace AutoMapper.UnitTests
 
     public class DelegateFactoryTests
     {
-        protected DelegateFactory DelegateFactory => new DelegateFactory();
-
-        [Fact]
-        public void MethodTests()
-        {
-            MethodInfo method = typeof(String).GetMethod("StartsWith", new[] { typeof(string) });
-            LateBoundMethod<object, bool> callback = DelegateFactory.CreateGet<bool>(method).Compile();
-
-            string foo = "this is a test";
-            bool result = callback(foo, new[] { "this" });
-
-            result.ShouldBeTrue();
-        }
-
         internal delegate void DoIt3(ref ValueSource source, string value);
 
         private void SetValue(object thing, object value)
@@ -38,7 +24,7 @@ namespace AutoMapper.UnitTests
         {
             var sourceType = typeof(Source);
 
-            LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
+            Func<object> ctor = DelegateFactory.CreateCtor(sourceType);
 
             var target = ctor();
 
@@ -50,7 +36,7 @@ namespace AutoMapper.UnitTests
         {
             var sourceType = typeof(ValueSource);
 
-            LateBoundCtor ctor = DelegateFactory.CreateCtor(sourceType);
+            Func<object> ctor = DelegateFactory.CreateCtor(sourceType);
 
             var target = ctor();
 

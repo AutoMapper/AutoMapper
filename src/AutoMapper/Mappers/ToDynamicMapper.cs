@@ -5,18 +5,19 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using AutoMapper.Execution;
 using Microsoft.CSharp.RuntimeBinder;
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
+using static System.Linq.Expressions.Expression;
+using static AutoMapper.ExpressionExtensions;
 
 namespace AutoMapper.Mappers
 {
     public class ToDynamicMapper : IObjectMapper
     {
-        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, Func<TDestination> ifNull)
+        public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)
         {
-            if (destination == null)
-                destination = ifNull();
-            var sourceTypeDetails = context.ConfigurationProvider.Configuration.CreateTypeDetails(typeof(TSource));
+            var sourceTypeDetails = profileMap.CreateTypeDetails(typeof(TSource));
             foreach (var member in sourceTypeDetails.PublicReadAccessors)
             {
                 object sourceMemberValue;
@@ -58,9 +59,13 @@ namespace AutoMapper.Mappers
             return context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, destExpression, contextExpression, Expression.Constant(CollectionMapperExtensions.Constructor(destExpression.Type)));
+            return Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), 
+                sourceExpression,
+                ToType(Coalesce(ToObject(destExpression), DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type), 
+                contextExpression,
+                Constant(profileMap));
         }
     }
 }

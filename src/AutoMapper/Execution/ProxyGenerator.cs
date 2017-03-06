@@ -11,7 +11,7 @@ namespace AutoMapper.Execution
     using System.Reflection.Emit;
     using System.Text.RegularExpressions;
 
-    public class ProxyGenerator : IProxyGenerator
+    public static class ProxyGenerator
     {
         private static readonly byte[] privateKey =
             StringToByteArray(
@@ -149,7 +149,7 @@ namespace AutoMapper.Execution
             return typeBuilder.CreateType();
         }
 
-        public Type GetProxyType(Type interfaceType)
+        public static Type GetProxyType(Type interfaceType)
         {
             if(interfaceType == null)
             {

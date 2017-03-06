@@ -13,11 +13,9 @@ namespace AutoMapper.Mappers
                    && !context.SourceType.IsDictionaryType();
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap,
-            Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             =>
-            configurationProvider.MapCollectionExpression(propertyMap, sourceExpression, destExpression,
-                contextExpression, CollectionMapperExtensions.IfNotNull, typeof(Dictionary<,>),
-                CollectionMapperExtensions.MapItemExpr);
+            CollectionMapperExtensions.MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression,
+                contextExpression, CollectionMapperExtensions.IfNotNull, typeof(Dictionary<,>), CollectionMapperExtensions.MapItemExpr);
     }
 }

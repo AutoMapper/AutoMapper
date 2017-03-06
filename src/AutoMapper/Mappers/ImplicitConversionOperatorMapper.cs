@@ -30,7 +30,7 @@ namespace AutoMapper.Mappers
         }
 
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var implicitOperator = GetImplicitConversionOperator(new TypePair(sourceExpression.Type, destExpression.Type));
             return Expression.Call(null, implicitOperator, sourceExpression);

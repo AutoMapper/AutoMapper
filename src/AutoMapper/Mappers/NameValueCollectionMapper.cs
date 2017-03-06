@@ -29,7 +29,7 @@ namespace AutoMapper.Mappers
                 context.DestinationType == typeof (NameValueCollection);
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             return Expression.Call(null, MapMethodInfo, sourceExpression);
         }

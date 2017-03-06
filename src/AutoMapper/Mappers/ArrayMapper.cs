@@ -16,19 +16,17 @@ namespace AutoMapper.Mappers
             return (context.DestinationType.IsArray) && (context.SourceType.IsEnumerableType());
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = TypeHelper.GetElementType(destExpression.Type);
 
-            var allowNullCollections = propertyMap?.TypeMap.Profile.AllowNullCollections ??
-                                       configurationProvider.Configuration.AllowNullCollections;
-            var ifNullExpr = allowNullCollections
+            var ifNullExpr = profileMap.AllowNullCollections
                                  ? (Expression) Constant(null, destExpression.Type)
                                  : NewArrayBounds(destElementType, Constant(0));
 
             ParameterExpression itemParam;
-            var itemExpr = configurationProvider.MapItemExpr(propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out itemParam);
+            var itemExpr = CollectionMapperExtensions.MapItemExpr(configurationProvider, profileMap, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out itemParam);
 
             //var count = source.Count();
             //var array = new TDestination[count];

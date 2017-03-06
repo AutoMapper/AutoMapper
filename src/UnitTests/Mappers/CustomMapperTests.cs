@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests.Mappers
                 return context.SourceType == typeof(SourceType) && context.DestinationType == typeof(DestinationType);
             }
 
-            public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap,
+            public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap,
                 Expression sourceExpression, Expression destExpression, Expression contextExpression)
             {
                 Expression<Func<DestinationType>> expr = () => new DestinationType();

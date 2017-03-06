@@ -11,10 +11,9 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_create_the_proxy_once()
         {
-            var generator = new ProxyGenerator();
             var tasks = Enumerable.Range(0, 5).Select(i => Task.Factory.StartNew(() =>
             {
-                generator.GetProxyType(typeof(ISomeDto));
+                ProxyGenerator.GetProxyType(typeof(ISomeDto));
             })).ToArray();
             Task.WaitAll(tasks);
         }

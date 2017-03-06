@@ -367,12 +367,5 @@ namespace AutoMapper
 
             return func(source, destination, context);
         }
-
-        TDestination IRuntimeMapper.CreateObject<TDestination>()
-        {
-            return (TDestination) (!_configurationProvider.Configuration.AllowNullDestinationValues
-                ? ObjectCreator.CreateNonNullValue(typeof(TDestination))
-                : ObjectCreator.CreateObject(typeof(TDestination)));
-        }
     }
 }

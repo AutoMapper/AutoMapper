@@ -10,25 +10,26 @@ namespace AutoMapper.Mappers
 
     public class TypeConverterMapper : IObjectMapper
     {
-        private static TDestination Map<TSource, TDestination>(TSource source, Func<TDestination> ifNull)
+        private static TDestination Map<TSource, TDestination>(TSource source)
         {
-            if (source == null)
-                return ifNull();
-            return GetConverter<TSource, TDestination>(source);
-        }
+            var typeConverter = GetTypeConverter(typeof(TSource));
 
-        private static TDestination GetConverter<TSource, TDestination>(TSource source)
-        {
-            TypeConverter typeConverter = GetTypeConverter(typeof(TSource));
             if (typeConverter.CanConvertTo(typeof(TDestination)))
+            {
                 return (TDestination)typeConverter.ConvertTo(source, typeof(TDestination));
+            }
+
             if (typeof(TDestination).IsNullableType() &&
                 typeConverter.CanConvertTo(Nullable.GetUnderlyingType(typeof(TDestination))))
+            {
                 return (TDestination)typeConverter.ConvertTo(source, Nullable.GetUnderlyingType(typeof(TDestination)));
+            }
 
             typeConverter = GetTypeConverter(typeof(TDestination));
             if (typeConverter.CanConvertFrom(typeof(TSource)))
+            {
                 return (TDestination)typeConverter.ConvertFrom(source);
+            }
 
             return default(TDestination);
         }
@@ -46,9 +47,9 @@ namespace AutoMapper.Mappers
                     destTypeConverter.CanConvertFrom(context.SourceType));
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression, Expression.Constant(CollectionMapperExtensions.Constructor(destExpression.Type)));
+            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression);
         }
 
         private static TypeConverter GetTypeConverter(Type type)
