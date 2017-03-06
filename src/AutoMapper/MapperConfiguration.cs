@@ -195,13 +195,8 @@ namespace AutoMapper
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
 
-            if (typeMap == null)
-                return null;
+            typeMap?.Seal(this);
 
-            lock (typeMap)
-            {
-                typeMap.Seal(this);
-            }
             return typeMap;
         }
 
