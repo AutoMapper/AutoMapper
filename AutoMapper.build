@@ -10,10 +10,10 @@
   <property name="svn.executable" value="tools/subversion/svn.exe" dynamic="true" if="${not property::exists('svn.executable')}" />
 
   <property name="revisionnumber" value="9999" dynamic="true"/>
-  <property name="project.fullversion" value="1.1.0.999" />
+  <property name="project.fullversion" value="1.1.1.999" />
   <property name="project.fullversion" value="${build.number}" if="${property::exists('build.number')}"/>
   <property name="svnargs" value=" --non-interactive " />
-  <property name="config" value="Debug" />
+  <property name="config" value="Release" />
 
   <target name="test" depends="compile, run-unit-tests"
   description="Compile and Run Tests" />
@@ -48,7 +48,7 @@
         <attribute type="AssemblyCopyrightAttribute" value="Copyright Â© Jimmy Bogard 2008-${datetime::get-year(datetime::now())}" />
         <attribute type="AssemblyProductAttribute" value="${project::get-name()}" />
         <attribute type="AssemblyCompanyAttribute" value="" />
-        <attribute type="AssemblyConfigurationAttribute" value="Debug" />
+        <attribute type="AssemblyConfigurationAttribute" value="${config}" />
         <attribute type="AssemblyInformationalVersionAttribute" value="${project.fullversion}" />
       </attributes>
       <references>
