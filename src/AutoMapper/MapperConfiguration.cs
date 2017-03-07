@@ -194,9 +194,13 @@ namespace AutoMapper
         public TypeMap ResolveTypeMap(TypePair typePair)
         {
             var typeMap = _typeMapPlanCache.GetOrAdd(typePair);
-
-            typeMap?.Seal(this);
-
+            if(typeMap != null && Configuration.CreateMissingTypeMaps)
+            {
+                lock(typeMap)
+                {
+                    typeMap.Seal(this);
+                }
+            }
             return typeMap;
         }
 

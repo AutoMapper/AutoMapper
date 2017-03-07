@@ -216,4 +216,67 @@ namespace AutoMapper.UnitTests.Bug
             Task.WaitAll(tasks);
         }
     }
+
+    public class ResolveTypeMapThreadingIssues
+    {
+        public class SomeDtoA
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeDtoB
+        {
+            public string Property1 { get; set; }
+            public string Property21 { get; set; }
+            public string Property3 { get; set; }
+            public string Property4 { get; set; }
+            public string Property5 { get; set; }
+            public string Property6 { get; set; }
+            public string Property7 { get; set; }
+            public string Property8 { get; set; }
+            public string Property9 { get; set; }
+            public string Property10 { get; set; }
+            public string Property11 { get; set; }
+        }
+
+        public class SomeDtoC : SomeDtoA
+        {
+        }
+
+        public class SomeDtoD : SomeDtoB
+        {
+        }
+
+        [Fact]
+        public void Should_not_fail()
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
+            var mapper = config.CreateMapper();
+
+            var tasks = Enumerable.Range(0, 5).Select(index =>
+              Task.Factory.StartNew(() =>
+              {
+                  if(index % 2 == 0)
+                  {
+                      mapper.Map<SomeDtoA, SomeDtoB>(new SomeDtoC());
+                  }
+                  else
+                  {
+                      mapper.Map<SomeDtoC, SomeDtoB>(new SomeDtoC());
+                  }
+              })).ToArray();
+            Task.WaitAll(tasks);
+        }
+    }
+
 }
