@@ -106,9 +106,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoMapper.Net4\AutoMapper.Net4.csproj">
-      <Project>{8c955148-fa96-4f0d-880d-abb6770f54e9}</Project>
-      <Name>AutoMapper.Net4</Name>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
+      <Project>{35888286-1428-4bf3-bb0c-d8bc092d0a5d}</Project>
+      <Name>AutoMapper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

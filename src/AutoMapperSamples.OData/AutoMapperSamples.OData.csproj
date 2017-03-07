@@ -122,13 +122,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoMapper.Net4\AutoMapper.Net4.csproj">
-      <Project>{8c955148-fa96-4f0d-880d-abb6770f54e9}</Project>
-      <Name>AutoMapper.Net4</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AutoMapperSamples.EF\AutoMapperSamples.EF.csproj">
       <Project>{d497fa09-e931-4b4e-870a-55ec8e3e35e2}</Project>
       <Name>AutoMapperSamples.EF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AutoMapper\AutoMapper.csproj">
+      <Project>{35888286-1428-4bf3-bb0c-d8bc092d0a5d}</Project>
+      <Name>AutoMapper</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
