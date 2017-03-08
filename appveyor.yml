@@ -5,6 +5,10 @@ branches:
   only:
   - master
 services: mssql2014
+install:
+  - appveyor DownloadFile https://raw.githubusercontent.com/dotnet/cli/v1.0.1/scripts/obtain/dotnet-install.ps1
+  - powershell -File dotnet-install.ps1
+  - set PATH=%PATH%;%LOCALAPPDATA%\Microsoft\dotnet
 nuget:
   disable_publish_on_pr: true
 build_script:
