@@ -42,10 +42,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
     <OutputPath>..\..\build\Release\AutoMapper\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-    <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <Optimize>true</Optimize>
