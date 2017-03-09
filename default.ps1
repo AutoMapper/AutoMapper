@@ -33,8 +33,6 @@ task compile -depends clean {
 	
     exec { dotnet }
 	
-    exec { dotnet --version }
-
     exec { dotnet restore $source_dir\AutoMapper.sln }
 
     exec { dotnet build $source_dir\AutoMapper.sln -c $config -v q /nologo  }
