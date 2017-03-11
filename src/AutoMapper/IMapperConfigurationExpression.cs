@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-
     public interface IMapperConfigurationExpression : IProfileExpression
     {
         /// <summary>

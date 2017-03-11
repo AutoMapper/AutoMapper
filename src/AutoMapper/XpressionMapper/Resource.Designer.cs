@@ -8,11 +8,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
+
 namespace AutoMapper.XpressionMapper {
-    using System;
-    using System.Reflection;
-    
-    
     /// <summary>
     ///    A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -20,13 +23,13 @@ namespace AutoMapper.XpressionMapper {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    [DebuggerNonUserCode()]
+    [CompilerGenerated()]
     public class Resource {
         
-        private static global::System.Resources.ResourceManager resourceMan;
+        private static ResourceManager resourceMan;
         
-        private static global::System.Globalization.CultureInfo resourceCulture;
+        private static CultureInfo resourceCulture;
         
         internal Resource() {
         }
@@ -34,11 +37,11 @@ namespace AutoMapper.XpressionMapper {
         /// <summary>
         ///    Returns the cached ResourceManager instance used by this class.
         /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static ResourceManager ResourceManager {
             get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AutoMapper.XpressionMapper.Resource", typeof(Resource).GetTypeInfo().Assembly);
+                if (ReferenceEquals(resourceMan, null)) {
+                    var temp = new ResourceManager("AutoMapper.XpressionMapper.Resource", typeof(Resource).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -49,8 +52,8 @@ namespace AutoMapper.XpressionMapper {
         ///    Overrides the current thread's CurrentUICulture property for all
         ///    resource lookups using this strongly typed resource class.
         /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        public static CultureInfo Culture {
             get {
                 return resourceCulture;
             }

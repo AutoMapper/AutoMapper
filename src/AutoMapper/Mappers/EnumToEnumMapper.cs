@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
@@ -22,8 +23,8 @@ namespace AutoMapper.Mappers
 
             if (!Enum.GetNames(destEnumType).Contains(source.ToString()))
             {
-                Type underlyingSourceType = Enum.GetUnderlyingType(sourceEnumType);
-                var underlyingSourceValue = Convert.ChangeType(source, underlyingSourceType);
+                var underlyingSourceType = Enum.GetUnderlyingType(sourceEnumType);
+                var underlyingSourceValue = System.Convert.ChangeType(source, underlyingSourceType);
 
                 return (TDestination)Enum.ToObject(destEnumType, underlyingSourceValue);
             }
@@ -40,9 +41,11 @@ namespace AutoMapper.Mappers
             return sourceEnumType != null && destEnumType != null;
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression);
-        }
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression) =>
+            Call(null,
+                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), 
+                sourceExpression);
     }
 }

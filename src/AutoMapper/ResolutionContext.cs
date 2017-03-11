@@ -1,10 +1,8 @@
+using System;
+using System.Collections.Generic;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using Configuration;
-
     /// <summary>
     /// Context information regarding resolution of a destination value
     /// </summary>
@@ -20,8 +18,7 @@ namespace AutoMapper
 
         internal object GetDestination(object source, Type destinationType)
         {
-            object destination;
-            InstanceCache.TryGetValue(new ContextCacheKey(source, destinationType), out destination);
+            InstanceCache.TryGetValue(new ContextCacheKey(source, destinationType), out object destination);
             return destination;
         }
 
@@ -120,10 +117,8 @@ namespace AutoMapper
             return mapperFunc(source, destination, this);
         }
 
-        internal object Map(object source, object destination, Type sourceType, Type destinationType)
-        {
-            return Mapper.Map(source, destination, sourceType, destinationType, this);
-        }
+        internal object Map(object source, object destination, Type sourceType, Type destinationType) 
+            => Mapper.Map(source, destination, sourceType, destinationType, this);
     }
 
     public struct ContextCacheKey : IEquatable<ContextCacheKey>

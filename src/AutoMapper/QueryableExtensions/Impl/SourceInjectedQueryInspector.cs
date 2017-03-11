@@ -1,8 +1,8 @@
-﻿namespace AutoMapper.QueryableExtensions.Impl
-{
-    using System;
-    using System.Linq.Expressions;
+﻿using System;
+using System.Linq.Expressions;
 
+namespace AutoMapper.QueryableExtensions.Impl
+{
     public class SourceInjectedQueryInspector
     {
         public SourceInjectedQueryInspector()

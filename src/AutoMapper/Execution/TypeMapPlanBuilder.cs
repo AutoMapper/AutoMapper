@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.Execution
 {
-    using Configuration;
-    using Mappers;
     using static Expression;
     using static ExpressionExtensions;
 
@@ -50,16 +49,15 @@ namespace AutoMapper.Execution
             {
                 return Lambda(customExpression.ReplaceParameters(_source, _initialDestination, _context), _source, _initialDestination, _context);
             }
-            bool constructorMapping;
 
-            var destinationFunc = CreateDestinationFunc(out constructorMapping);
+            var destinationFunc = CreateDestinationFunc(out bool constructorMapping);
 
             var assignmentFunc = CreateAssignmentFunc(destinationFunc, constructorMapping);
 
             var mapperFunc = CreateMapperFunc(assignmentFunc);
 
             var checkContext = CheckContext(_typeMap, _context);
-            var lambaBody = (checkContext != null) ? new[] { checkContext, mapperFunc } : new[] { mapperFunc };
+            var lambaBody = checkContext != null ? new[] { checkContext, mapperFunc } : new[] { mapperFunc };
 
             return Lambda(Block(new[] { _destination }, lambaBody), _source, _initialDestination, _context);
         }
@@ -270,8 +268,7 @@ namespace AutoMapper.Execution
 
             Expression getter;
 
-            var pi = propertyMap.DestinationProperty as PropertyInfo;
-            if (pi != null && pi.GetGetMethod(true) == null)
+            if (propertyMap.DestinationProperty is PropertyInfo pi && pi.GetGetMethod(true) == null)
             {
                 getter = Default(propertyMap.DestinationPropertyType);
             }
@@ -401,8 +398,7 @@ namespace AutoMapper.Execution
                 )
             {
                 var last = propertyMap.SourceMembers.Last();
-                var pi = last as PropertyInfo;
-                if (pi != null && pi.GetGetMethod(true) == null)
+                if (last is PropertyInfo pi && pi.GetGetMethod(true) == null)
                 {
                     valueResolverFunc = Default(last.GetMemberType());
                 }
@@ -448,10 +444,8 @@ namespace AutoMapper.Execution
             return valueResolverFunc;
         }
 
-        private Expression CreateInstance(Type type)
-        {
-            return Call(Property(_context, "Options"), "CreateInstance", new[] { type });
-        }
+        private Expression CreateInstance(Type type) 
+            => Call(Property(_context, nameof(ResolutionContext.Options)), nameof(IMappingOperationOptions.CreateInstance), new[] { type });
 
         private Expression BuildResolveCall(Expression destValueExpr, ValueResolverConfiguration valueResolverConfig)
         {
@@ -465,15 +459,13 @@ namespace AutoMapper.Execution
             var iResolverType = valueResolverConfig.InterfaceType;
 
             var parameters = new[] { _source, _destination, sourceMember, destValueExpr }.Where(p => p != null)
-                                        .Zip(iResolverType.GetGenericArguments(), (e, type) => ToType(e, type))
+                                        .Zip(iResolverType.GetGenericArguments(), ToType)
                                         .Concat(new[] { _context });
             return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"), parameters);
         }
 
-        public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
-        {
-            return MapExpression(_configurationProvider, _typeMap.Profile, typePair, sourceParameter, _context, propertyMap, destinationParameter);
-        }
+        public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null) 
+            => MapExpression(_configurationProvider, _typeMap.Profile, typePair, sourceParameter, _context, propertyMap, destinationParameter);
 
         public static Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
         {

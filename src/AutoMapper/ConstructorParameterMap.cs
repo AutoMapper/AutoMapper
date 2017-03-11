@@ -1,15 +1,12 @@
 using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Execution;
 
 namespace AutoMapper
 {
-    using AutoMapper.Execution;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using static System.Linq.Expressions.Expression;
-    using static ExpressionExtensions;
-    using System.Reflection;
-    using Configuration;
-    using Mappers;
+    using static Expression;
 
     public class ConstructorParameterMap
     {

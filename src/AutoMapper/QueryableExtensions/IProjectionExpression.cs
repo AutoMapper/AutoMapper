@@ -1,9 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+
 namespace AutoMapper.QueryableExtensions
 {
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-
     /// <summary>
     /// Continuation to execute projection
     /// </summary>
@@ -23,7 +24,7 @@ namespace AutoMapper.QueryableExtensions
         /// <typeparam name="TResult">Destination type to map to</typeparam>
         /// <param name="parameters">Optional parameter object for parameterized mapping expressions</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        IQueryable<TResult> To<TResult>(System.Collections.Generic.IDictionary<string, object> parameters);
+        IQueryable<TResult> To<TResult>(IDictionary<string, object> parameters);
 
         /// <summary>
         /// Projects the source type to the destination type given the mapping configuration
@@ -41,7 +42,7 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="parameters">Parameters for parameterized mapping expressions</param>
         /// <param name="membersToExpand">Explicit members to expand</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        IQueryable<TResult> To<TResult>(System.Collections.Generic.IDictionary<string, object> parameters, params string[] membersToExpand);
+        IQueryable<TResult> To<TResult>(IDictionary<string, object> parameters, params string[] membersToExpand);
 
         /// <summary>
         /// Projects the source type to the destination type given the mapping configuration
@@ -59,6 +60,6 @@ namespace AutoMapper.QueryableExtensions
         /// <param name="membersToExpand">>Explicit members to expand</param>
         /// <param name="parameters">Parameters for parameterized mapping expressions</param>
         /// <returns>Queryable result, use queryable extension methods to project and execute result</returns>
-        IQueryable<TResult> To<TResult>(System.Collections.Generic.IDictionary<string, object> parameters, params Expression<Func<TResult, object>>[] membersToExpand);
+        IQueryable<TResult> To<TResult>(IDictionary<string, object> parameters, params Expression<Func<TResult, object>>[] membersToExpand);
     }
 }

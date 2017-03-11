@@ -1,13 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper.Configuration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Execution;
-    using QueryableExtensions.Impl;
-    using static System.Linq.Expressions.Expression;
+    using static Expression;
 
     public class MappingExpression : MappingExpression<object, object>, IMappingExpression
     {
@@ -165,15 +164,11 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        protected virtual IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType)
-        {
-            return new MemberConfigurationExpression<TSource, TDestination, TMember>(member, sourceType);
-        }
+        protected virtual IPropertyMapConfiguration CreateMemberConfigurationExpression<TMember>(MemberInfo member, Type sourceType) 
+            => new MemberConfigurationExpression<TSource, TDestination, TMember>(member, sourceType);
 
-        protected virtual MappingExpression<TDestination, TSource> CreateReverseMapExpression()
-        {
-            return new MappingExpression<TDestination, TSource>(MemberList.None, DestinationType, SourceType);
-        }
+        protected virtual MappingExpression<TDestination, TSource> CreateReverseMapExpression() 
+            => new MappingExpression<TDestination, TSource>(MemberList.None, DestinationType, SourceType);
 
         public IMappingExpression<TSource, TDestination> ForMember<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
                                                                    Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
@@ -221,10 +216,8 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> Include<TOtherSource, TOtherDestination>()
             where TOtherSource : TSource
-            where TOtherDestination : TDestination
-        {
-            return Include(typeof(TOtherSource), typeof(TOtherDestination));
-        }
+            where TOtherDestination : TDestination 
+            => Include(typeof(TOtherSource), typeof(TOtherDestination));
 
         public IMappingExpression<TSource, TDestination> Include(Type otherSourceType, Type otherDestinationType)
         {
@@ -233,10 +226,8 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public IMappingExpression<TSource, TDestination> IncludeBase<TSourceBase, TDestinationBase>()
-        {
-            return IncludeBase(typeof(TSourceBase), typeof(TDestinationBase));
-        }
+        public IMappingExpression<TSource, TDestination> IncludeBase<TSourceBase, TDestinationBase>() 
+            => IncludeBase(typeof(TSourceBase), typeof(TDestinationBase));
 
         public IMappingExpression<TSource, TDestination> IncludeBase(Type sourceBase, Type destinationBase)
         {
@@ -382,10 +373,10 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> BeforeMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
         {
-            Action<TSource, TDestination, ResolutionContext> beforeFunction = (src, dest, ctxt) => 
-                ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
+            void BeforeFunction(TSource src, TDestination dest, ResolutionContext ctxt) 
+                => ((TMappingAction) ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
 
-            return BeforeMap(beforeFunction);
+            return BeforeMap(BeforeFunction);
         }
 
         public IMappingExpression<TSource, TDestination> AfterMap(Action<TSource, TDestination> afterFunction)
@@ -416,10 +407,10 @@ namespace AutoMapper.Configuration
 
         public IMappingExpression<TSource, TDestination> AfterMap<TMappingAction>() where TMappingAction : IMappingAction<TSource, TDestination>
         {
-            Action<TSource, TDestination, ResolutionContext> afterFunction = (src, dest, ctxt) 
-                => ((TMappingAction)ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
+            void AfterFunction(TSource src, TDestination dest, ResolutionContext ctxt) 
+                => ((TMappingAction) ctxt.Options.ServiceCtor(typeof(TMappingAction))).Process(src, dest);
 
-            return AfterMap(afterFunction);
+            return AfterMap(AfterFunction);
         }
 
         public IMappingExpression<TSource, TDestination> ConstructUsing(Func<TSource, TDestination> ctor)
@@ -474,10 +465,7 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public void As<T>() where T : TDestination
-        {
-            As(typeof(T));
-        }
+        public void As<T>() where T : TDestination => As(typeof(T));
 
         public void As(Type typeOverride)
         {
@@ -519,7 +507,7 @@ namespace AutoMapper.Configuration
                     ForMember(destProperty.Name, y => y.Ignore());
                     _reverseMap?.ForMember(destProperty.Name, opt => opt.Ignore());
                 }
-                if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && !_memberConfigurations.Any(m=>m.DestinationMember == destProperty))
+                if (typeMap.Profile.GlobalIgnores.Contains(destProperty.Name) && _memberConfigurations.All(m => !Equals(m.DestinationMember, destProperty)))
                 {
                     ForMember(destProperty.Name, y => y.Ignore());
                 }

@@ -1,14 +1,14 @@
-﻿using AutoMapper.QueryableExtensions;
-using AutoMapper.QueryableExtensions.Impl;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Execution;
+using AutoMapper.QueryableExtensions;
+using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Execution;
     using static Expression;
 
     public class ConstructorMap
@@ -28,7 +28,7 @@ namespace AutoMapper
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
             new MemberResolverExpressionResultConverter(),
-            new MemberGetterExpressionResultConverter(),
+            new MemberGetterExpressionResultConverter()
         };
 
         public bool CanResolve => CtorParams.All(param => param.CanResolve);
@@ -42,10 +42,8 @@ namespace AutoMapper
                 var matchingExpressionConverter =
                     ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, map));
 
-                if (matchingExpressionConverter == null)
-                    throw new Exception("Can't resolve this to Queryable Expression");
-
-                result = matchingExpressionConverter.GetExpressionResolutionResult(result, map);
+                result = matchingExpressionConverter?.GetExpressionResolutionResult(result, map) 
+                    ?? throw new Exception("Can't resolve this to Queryable Expression");
 
                 return result;
             });

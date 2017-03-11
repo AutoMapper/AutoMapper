@@ -1,8 +1,8 @@
+using System;
+using AutoMapper.Configuration;
+
 namespace AutoMapper
 {
-    using System;
-    using Configuration;
-    using Mappers;
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
 
     public class Mapper : IRuntimeMapper
@@ -19,14 +19,8 @@ namespace AutoMapper
         /// </summary>
         public static IConfigurationProvider Configuration
         {
-            get
-            {
-                if (_configuration == null)
-                    throw new InvalidOperationException(InvalidOperationMessage);
-
-                return _configuration;
-            }
-            private set { _configuration = value; }
+            get => _configuration ?? throw new InvalidOperationException(InvalidOperationMessage);
+            private set => _configuration = value;
         }
 
         /// <summary>
@@ -34,14 +28,8 @@ namespace AutoMapper
         /// </summary>
         public static IMapper Instance
         {
-            get
-            {
-                if (_instance == null)
-                    throw new InvalidOperationException(InvalidOperationMessage);
-
-                return _instance;
-            }
-            private set { _instance = value; }
+            get => _instance ?? throw new InvalidOperationException(InvalidOperationMessage);
+            private set => _instance = value;
         }
 
         /// <summary>
@@ -180,7 +168,6 @@ namespace AutoMapper
 
         private readonly IConfigurationProvider _configurationProvider;
         private readonly Func<Type, object> _serviceCtor;
-        private readonly ResolutionContext _defaultContext;
 
         public Mapper(IConfigurationProvider configurationProvider)
             : this(configurationProvider, configurationProvider.ServiceCtor)
@@ -191,10 +178,10 @@ namespace AutoMapper
         {
             _configurationProvider = configurationProvider;
             _serviceCtor = serviceCtor;
-            _defaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
+            DefaultContext = new ResolutionContext(new ObjectMappingOperationOptions(serviceCtor), this);
         }
 
-        public ResolutionContext DefaultContext => _defaultContext;
+        public ResolutionContext DefaultContext { get; }
 
         Func<Type, object> IMapper.ServiceCtor => _serviceCtor;
 
@@ -209,7 +196,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(types, types));
 
-            return (TDestination) func(source, null, _defaultContext);
+            return (TDestination) func(source, null, DefaultContext);
         }
 
         TDestination IMapper.Map<TDestination>(object source, Action<IMappingOperationOptions> opts)
@@ -233,7 +220,7 @@ namespace AutoMapper
 
             var destination = default(TDestination);
 
-            return func(source, destination, _defaultContext);
+            return func(source, destination, DefaultContext);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, Action<IMappingOperationOptions<TSource, TDestination>> opts)
@@ -265,7 +252,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetMapperFunc<TSource, TDestination>(types);
 
-            return func(source, destination, _defaultContext);
+            return func(source, destination, DefaultContext);
         }
 
         TDestination IMapper.Map<TSource, TDestination>(TSource source, TDestination destination, Action<IMappingOperationOptions<TSource, TDestination>> opts)
@@ -295,7 +282,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            return func(source, null, _defaultContext);
+            return func(source, null, DefaultContext);
         }
 
         object IMapper.Map(object source, Type sourceType, Type destinationType, Action<IMappingOperationOptions> opts)
@@ -325,7 +312,7 @@ namespace AutoMapper
 
             var func = _configurationProvider.GetUntypedMapperFunc(new MapRequest(new TypePair(sourceType, destinationType), types));
 
-            return func(source, destination, _defaultContext);
+            return func(source, destination, DefaultContext);
         }
 
         object IMapper.Map(object source, object destination, Type sourceType, Type destinationType,

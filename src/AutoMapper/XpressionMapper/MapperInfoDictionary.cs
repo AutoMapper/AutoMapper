@@ -14,13 +14,12 @@ namespace AutoMapper.XpressionMapper
         //const string PREFIX = "p";
         public void Add(ParameterExpression key, Dictionary<Type, Type> typeMappings)
         {
-            if (this.ContainsKey(key))
+            if (ContainsKey(key))
                 return;
 
-            if (typeMappings.ContainsKey(key.Type))
-                this.Add(key, new MapperInfo(Expression.Parameter(typeMappings[key.Type], key.Name), key.Type, typeMappings[key.Type]));
-            else
-                this.Add(key, new MapperInfo(Expression.Parameter(key.Type, key.Name), key.Type, key.Type));
+            Add(key, typeMappings.ContainsKey(key.Type)
+                    ? new MapperInfo(Expression.Parameter(typeMappings[key.Type], key.Name), key.Type,typeMappings[key.Type])
+                    : new MapperInfo(Expression.Parameter(key.Type, key.Name), key.Type, key.Type));
         }
     }
 }

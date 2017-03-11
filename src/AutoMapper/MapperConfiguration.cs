@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Configuration;
+using AutoMapper.QueryableExtensions;
+using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
-    using Configuration;
-    using Mappers;
-    using QueryableExtensions;
-    using QueryableExtensions.Impl;
     using static Expression;
     using static ExpressionExtensions;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
@@ -86,20 +85,11 @@ namespace AutoMapper
             }
         }
 
-        public Delegate GetMapperFunc(MapRequest mapRequest)
-        {
-            return _mapPlanCache.GetOrAdd(mapRequest).Typed;
-        }
+        public Delegate GetMapperFunc(MapRequest mapRequest) => _mapPlanCache.GetOrAdd(mapRequest).Typed;
 
-        public UntypedMapperFunc GetUntypedMapperFunc(MapRequest mapRequest)
-        {
-            return _mapPlanCache.GetOrAdd(mapRequest).Untyped;
-        }
+        public UntypedMapperFunc GetUntypedMapperFunc(MapRequest mapRequest) => _mapPlanCache.GetOrAdd(mapRequest).Untyped;
 
-        private MapperFuncs CreateMapperFuncs(MapRequest mapRequest)
-        {
-            return new MapperFuncs(mapRequest, BuildExecutionPlan(mapRequest));
-        }
+        private MapperFuncs CreateMapperFuncs(MapRequest mapRequest) => new MapperFuncs(mapRequest, BuildExecutionPlan(mapRequest));
 
         public LambdaExpression BuildExecutionPlan(Type sourceType, Type destinationType)
         {
@@ -206,10 +196,9 @@ namespace AutoMapper
 
         private TypeMap GetTypeMap(TypePair initialTypes)
         {
-            TypeMap typeMap;
             foreach (var types in initialTypes.GetRelatedTypePairs())
             {
-                if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out typeMap))
+                if (types != initialTypes && _typeMapPlanCache.TryGetValue(types, out var typeMap))
                 {
                     return typeMap;
                 }
@@ -271,8 +260,8 @@ namespace AutoMapper
 
         private void Seal()
         {
-            var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
-            var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
+            var derivedMaps = new List<(TypePair pair, TypeMap map)>();
+            var redirectedTypes = new List<(TypePair original, TypePair redirected)>();
 
             foreach (var profile in Profiles)
             {
@@ -290,21 +279,21 @@ namespace AutoMapper
 
                 if (typeMap.DestinationTypeOverride != null)
                 {
-                    redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
+                    redirectedTypes.Add((typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
                 }
-                derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
+                derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => (new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
             }
             foreach (var redirectedType in redirectedTypes)
             {
-                var derivedMap = FindTypeMapFor(redirectedType.Item2);
+                var derivedMap = FindTypeMapFor(redirectedType.redirected);
                 if (derivedMap != null)
                 {
-                    _typeMapPlanCache[redirectedType.Item1] = derivedMap;
+                    _typeMapPlanCache[redirectedType.original] = derivedMap;
                 }
             }
-            foreach (var derivedMap in derivedMaps.Where(derivedMap => !_typeMapPlanCache.ContainsKey(derivedMap.Item1)))
+            foreach (var derivedMap in derivedMaps.Where(derivedMap => !_typeMapPlanCache.ContainsKey(derivedMap.pair)))
             {
-                _typeMapPlanCache[derivedMap.Item1] = derivedMap.Item2;
+                _typeMapPlanCache[derivedMap.pair] = derivedMap.map;
             }
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
@@ -365,7 +354,7 @@ namespace AutoMapper
 
         internal struct MapperFuncs
         {
-            private Lazy<UntypedMapperFunc> _untyped;
+            private readonly Lazy<UntypedMapperFunc> _untyped;
 
             public Delegate Typed { get; }
 

@@ -1,9 +1,9 @@
+using System;
+using System.Linq;
+using System.Text;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Linq;
-    using System.Text;
-
     public class AutoMapperConfigurationException : Exception
     {
         public TypeMapConfigErrors[] Errors { get; }
@@ -34,15 +34,9 @@ namespace AutoMapper
         {
         }
 
-        public AutoMapperConfigurationException(TypeMapConfigErrors[] errors)
-        {
-            Errors = errors;
-        }
+        public AutoMapperConfigurationException(TypeMapConfigErrors[] errors) => Errors = errors;
 
-        public AutoMapperConfigurationException(TypePair types)
-        {
-            Types = types;
-        }
+        public AutoMapperConfigurationException(TypePair types) => Types = types;
 
         public override string Message
         {
@@ -61,14 +55,11 @@ namespace AutoMapper
                     Exception exToUse = this;
                     while (exToUse != null)
                     {
-                        var configExc = exToUse as AutoMapperConfigurationException;
-                        if (configExc != null)
-                        { message += configExc.PropertyMap == null
-                            ? string.Format("\n\tMapping from type {1} to {0}", configExc.Types?.DestinationType.FullName,
-                                configExc.Types?.SourceType.FullName)
-                            : string.Format("\n\tMapping to property {0} from {2} to {1}",
-                                configExc.PropertyMap.DestinationProperty.Name,
-                                configExc.Types?.DestinationType.FullName, configExc.Types?.SourceType.FullName);
+                        if (exToUse is AutoMapperConfigurationException configExc)
+                        {
+                            message += configExc.PropertyMap == null
+                              ? $"\n\tMapping from type {configExc.Types?.SourceType.FullName} to {configExc.Types?.DestinationType.FullName}"
+                              : $"\n\tMapping to property {configExc.PropertyMap.DestinationProperty.Name} from {configExc.Types?.SourceType.FullName} to {configExc.Types?.DestinationType.FullName}";
                         }
 
                         exToUse = exToUse.InnerException;

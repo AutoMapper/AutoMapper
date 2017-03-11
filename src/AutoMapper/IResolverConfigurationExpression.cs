@@ -1,8 +1,8 @@
+using System;
+using System.Linq.Expressions;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Linq.Expressions;
-
     /// <summary>
     /// Custom resolver options
     /// </summary>

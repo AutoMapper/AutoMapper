@@ -8,7 +8,7 @@ namespace AutoMapper.Configuration.Conventions
             NewValue = newValue;
         }
 
-        public string OriginalValue { get; private set; }
-        public string NewValue { get; private set; }
+        public string OriginalValue { get; }
+        public string NewValue { get; }
     }
 }

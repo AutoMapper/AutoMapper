@@ -4,10 +4,10 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using AutoMapper.XpressionMapper.ArgumentMappers;
 using AutoMapper.XpressionMapper.Extensions;
 using AutoMapper.XpressionMapper.Structures;
-using System.Text;
 
 namespace AutoMapper.XpressionMapper
 {
@@ -15,42 +15,22 @@ namespace AutoMapper.XpressionMapper
     {
         public XpressionMapperVisitor(IConfigurationProvider configurationProvider, Dictionary<Type, Type> typeMappings)
         {
-            this.typeMappings = typeMappings;
-            this.infoDictionary = new MapperInfoDictionary(new ParameterExpressionEqualityComparer());
-            this.configurationProvider = configurationProvider;
+            TypeMappings = typeMappings;
+            InfoDictionary = new MapperInfoDictionary(new ParameterExpressionEqualityComparer());
+            ConfigurationProvider = configurationProvider;
         }
 
-        #region Variables
-        private MapperInfoDictionary infoDictionary;
-        private Dictionary<Type, Type> typeMappings;
-        private IConfigurationProvider configurationProvider;
-        #endregion Variables
+        public MapperInfoDictionary InfoDictionary { get; }
 
-        #region Properties
-        public MapperInfoDictionary InfoDictionary
-        {
-            get { return this.infoDictionary; }
-        }
+        public Dictionary<Type, Type> TypeMappings { get; }
 
-        public Dictionary<Type, Type> TypeMappings
-        {
-            get { return this.typeMappings; }
-        }
+        protected IConfigurationProvider ConfigurationProvider { get; }
 
-        protected IConfigurationProvider ConfigurationProvider { get { return this.configurationProvider; } }
-        #endregion Properties
-
-        #region Methods
         protected override Expression VisitParameter(ParameterExpression parameterExpression)
         {
-            infoDictionary.Add(parameterExpression, this.TypeMappings);
-            KeyValuePair<ParameterExpression, MapperInfo> pair = infoDictionary.SingleOrDefault(a => a.Key.Equals(parameterExpression));
-            if (!pair.Equals(default(KeyValuePair<Type, MapperInfo>)))
-            {
-                return pair.Value.NewParameter;
-            }
-
-            return base.VisitParameter(parameterExpression);
+            InfoDictionary.Add(parameterExpression, TypeMappings);
+            var pair = InfoDictionary.SingleOrDefault(a => a.Key.Equals(parameterExpression));
+            return !pair.Equals(default(KeyValuePair<Type, MapperInfo>)) ? pair.Value.NewParameter : base.VisitParameter(parameterExpression);
         }
 
         protected override Expression VisitMember(MemberExpression node)
@@ -58,16 +38,16 @@ namespace AutoMapper.XpressionMapper
             if (node.NodeType == ExpressionType.Constant)
                 return base.VisitMember(node);
 
-            string sourcePath = null;
+            string sourcePath;
 
-            ParameterExpression parameterExpression = node.GetParameterExpression();
+            var parameterExpression = node.GetParameterExpression();
             if (parameterExpression == null)
                 return base.VisitMember(node);
 
-            infoDictionary.Add(parameterExpression, this.TypeMappings);
+            InfoDictionary.Add(parameterExpression, TypeMappings);
 
-            Type sType = parameterExpression.Type;
-            if (infoDictionary.ContainsKey(parameterExpression) && node.IsMemberExpression())
+            var sType = parameterExpression.Type;
+            if (InfoDictionary.ContainsKey(parameterExpression) && node.IsMemberExpression())
             {
                 sourcePath = node.GetPropertyFullName();
             }
@@ -76,21 +56,21 @@ namespace AutoMapper.XpressionMapper
                 return base.VisitMember(node);
             }
 
-            List<PropertyMapInfo> propertyMapInfoList = new List<PropertyMapInfo>();
-            FindDestinationFullName(sType, infoDictionary[parameterExpression].DestType, sourcePath, propertyMapInfoList);
-            string fullName = null;
+            var propertyMapInfoList = new List<PropertyMapInfo>();
+            FindDestinationFullName(sType, InfoDictionary[parameterExpression].DestType, sourcePath, propertyMapInfoList);
+            string fullName;
 
             if (propertyMapInfoList.Any(x => x.CustomExpression != null))
             {
-                PropertyMapInfo last = propertyMapInfoList.Last(x => x.CustomExpression != null);
-                List<PropertyMapInfo> beforeCustExpression = propertyMapInfoList.Aggregate(new List<PropertyMapInfo>(), (list, next) =>
+                var last = propertyMapInfoList.Last(x => x.CustomExpression != null);
+                var beforeCustExpression = propertyMapInfoList.Aggregate(new List<PropertyMapInfo>(), (list, next) =>
                 {
                     if (propertyMapInfoList.IndexOf(next) < propertyMapInfoList.IndexOf(last))
                         list.Add(next);
                     return list;
                 });
 
-                List<PropertyMapInfo> afterCustExpression = propertyMapInfoList.Aggregate(new List<PropertyMapInfo>(), (list, next) =>
+                var afterCustExpression = propertyMapInfoList.Aggregate(new List<PropertyMapInfo>(), (list, next) =>
                 {
                     if (propertyMapInfoList.IndexOf(next) > propertyMapInfoList.IndexOf(last))
                         list.Add(next);
@@ -98,33 +78,28 @@ namespace AutoMapper.XpressionMapper
                 });
 
                 fullName = BuildFullName(beforeCustExpression);
-                PrependParentNameVisitor visitor = new PrependParentNameVisitor(last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, infoDictionary[parameterExpression].NewParameter);
+                var visitor = new PrependParentNameVisitor(last.CustomExpression.Parameters[0].Type/*Parent type of current property*/, fullName, InfoDictionary[parameterExpression].NewParameter);
 
-                Expression ex = propertyMapInfoList[propertyMapInfoList.Count - 1] != last
+                var ex = propertyMapInfoList[propertyMapInfoList.Count - 1] != last
                     ? visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
                     : visitor.Visit(last.CustomExpression.Body);
 
                 return ex;
             }
-            else
-            {
-                fullName = BuildFullName(propertyMapInfoList);
-                MemberExpression me = infoDictionary[parameterExpression].NewParameter.BuildExpression(fullName);
-                return me;
-            }
+            fullName = BuildFullName(propertyMapInfoList);
+            var me = InfoDictionary[parameterExpression].NewParameter.BuildExpression(fullName);
+            return me;
         }
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            var constantExpression = node.Right as ConstantExpression;
-            if (constantExpression != null)
+            if (node.Right is ConstantExpression constantExpression)
             {
                 if (constantExpression.Value == null)
                 {
-                    if (node.Left.Type.GetTypeInfo().IsValueType)
-                        return base.VisitBinary(node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type)));
-                    else
-                        return base.VisitBinary(node.Update(node.Left, node.Conversion, Expression.Constant(null, typeof(object))));
+                    return base.VisitBinary(node.Left.Type.GetTypeInfo().IsValueType
+                        ? node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type))
+                        : node.Update(node.Left, node.Conversion, Expression.Constant(null, typeof(object))));
                 }
             }
 
@@ -133,16 +108,15 @@ namespace AutoMapper.XpressionMapper
             {
                 if (constantExpression.Value == null)
                 {
-                    if (node.Right.Type.GetTypeInfo().IsValueType)
-                        return base.VisitBinary(node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right));
-                    else
-                        return base.VisitBinary(node.Update(Expression.Constant(null, typeof(object)), node.Conversion, node.Right));
+                    return base.VisitBinary(node.Right.Type.GetTypeInfo().IsValueType 
+                        ? node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right) 
+                        : node.Update(Expression.Constant(null, typeof(object)), node.Conversion, node.Right));
                 }
             }
 
-            Expression newLeft = this.Visit(node.Left);
-            Expression newRight = this.Visit(node.Right);
-            if ((newLeft.Type.GetTypeInfo().IsGenericType && newLeft.Type.GetGenericTypeDefinition().Equals(typeof(Nullable<>))) ^ (newRight.Type.GetTypeInfo().IsGenericType && newRight.Type.GetGenericTypeDefinition().Equals(typeof(Nullable<>))))
+            var newLeft = Visit(node.Left);
+            var newRight = Visit(node.Right);
+            if ((newLeft.Type.GetTypeInfo().IsGenericType && newLeft.Type.GetGenericTypeDefinition() == typeof(Nullable<>)) ^ (newRight.Type.GetTypeInfo().IsGenericType && newRight.Type.GetGenericTypeDefinition() == typeof(Nullable<>)))
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resource.cannotCreateBinaryExpressionFormat, newLeft.ToString(), newLeft.Type.Name, newRight.ToString(), newRight.Type.Name));
 
             return base.VisitBinary(node);
@@ -150,30 +124,30 @@ namespace AutoMapper.XpressionMapper
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            ParameterExpression parameterExpression = node.GetParameterExpression();
+            var parameterExpression = node.GetParameterExpression();
             if (parameterExpression == null)
                 return base.VisitMethodCall(node);
 
-            infoDictionary.Add(parameterExpression, this.TypeMappings);
+            InfoDictionary.Add(parameterExpression, TypeMappings);
 
-            List<Expression> listOfArgumentsForNewMethod = node.Arguments.Aggregate(new List<Expression>(), (lst, next) =>
+            var listOfArgumentsForNewMethod = node.Arguments.Aggregate(new List<Expression>(), (lst, next) =>
             {
-                Expression mappedNext = ArgumentMapper.Create(this, next).MappedArgumentExpression;
-                this.TypeMappings.AddTypeMapping(next.Type, mappedNext.Type);
+                var mappedNext = ArgumentMapper.Create(this, next).MappedArgumentExpression;
+                TypeMappings.AddTypeMapping(next.Type, mappedNext.Type);
 
                 lst.Add(mappedNext);
                 return lst;
             });//Arguments could be expressions or other objects. e.g. s => s.UserId  or a string "ZZZ".  For extention methods node.Arguments[0] is usually the helper object itself
 
             //type args are the generic type args e.g. T1 and T2 MethodName<T1, T2>(method arguments);
-            List<Type> typeArgsForNewMethod = node.Method.IsGenericMethod
-                ? node.Method.GetGenericArguments().Select(i => typeMappings.ContainsKey(i) ? typeMappings[i] : i).ToList()//not converting the type it is not in the typeMappings dictionary
+            var typeArgsForNewMethod = node.Method.IsGenericMethod
+                ? node.Method.GetGenericArguments().Select(i => TypeMappings.ContainsKey(i) ? TypeMappings[i] : i).ToList()//not converting the type it is not in the typeMappings dictionary
                 : null;
 
-            MethodCallExpression resultExp = null;
+            MethodCallExpression resultExp;
             if (!node.Method.IsStatic)
             {
-                Expression instance = ArgumentMapper.Create(this, node.Object).MappedArgumentExpression;
+                var instance = ArgumentMapper.Create(this, node.Object).MappedArgumentExpression;
 
                 resultExp = node.Method.IsGenericMethod
                     ? Expression.Call(instance, node.Method.Name, typeArgsForNewMethod.ToArray(), listOfArgumentsForNewMethod.ToArray())
@@ -188,13 +162,11 @@ namespace AutoMapper.XpressionMapper
 
             return resultExp;
         }
-        #endregion Methods
 
-        #region Private Methods
         protected string BuildFullName(List<PropertyMapInfo> propertyMapInfoList)
         {
-            string fullName = string.Empty;
-            foreach (PropertyMapInfo info in propertyMapInfoList)
+            var fullName = string.Empty;
+            foreach (var info in propertyMapInfoList)
             {
                 if (info.CustomExpression != null)
                 {
@@ -204,7 +176,7 @@ namespace AutoMapper.XpressionMapper
                 }
                 else
                 {
-                    StringBuilder additions = info.DestinationPropertyInfos.Aggregate(new StringBuilder(fullName), (sb, next) =>
+                    var additions = info.DestinationPropertyInfos.Aggregate(new StringBuilder(fullName), (sb, next) =>
                     {
                         if (sb.ToString() == string.Empty)
                             sb.Append(next.Name);
@@ -223,27 +195,30 @@ namespace AutoMapper.XpressionMapper
             return fullName;
         }
 
-        private void AddPropertyMapInfo(Type parentType, string name, List<PropertyMapInfo> propertyMapInfoList)
+        private static void AddPropertyMapInfo(Type parentType, string name, List<PropertyMapInfo> propertyMapInfoList)
         {
-            MemberInfo sourceMemberInfo = parentType.GetMember(name).First();
-            MethodInfo methodInfo = null;
-            PropertyInfo propertyInfo = null;
-            FieldInfo fieldInfo = null;
-            if ((methodInfo = sourceMemberInfo as MethodInfo) != null)
-                propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> { methodInfo }));
-            if ((propertyInfo = sourceMemberInfo as PropertyInfo) != null)
-                propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> { propertyInfo }));
-            if ((fieldInfo = sourceMemberInfo as FieldInfo) != null)
-                propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> { fieldInfo }));
+            var sourceMemberInfo = parentType.GetMember(name).First();
+            switch (sourceMemberInfo)
+            {
+                case MethodInfo methodInfo:
+                    propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> {methodInfo}));
+                    break;
+                case PropertyInfo propertyInfo:
+                    propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> {propertyInfo}));
+                    break;
+                case FieldInfo fieldInfo:
+                    propertyMapInfoList.Add(new PropertyMapInfo(null, new List<MemberInfo> {fieldInfo}));
+                    break;
+            }
         }
 
         protected void FindDestinationFullName(Type typeSource, Type typeDestination, string sourceFullName, List<PropertyMapInfo> propertyMapInfoList)
         {
-            const string PERIOD = ".";
+            const string period = ".";
             if (typeSource == typeDestination)
             {
-                string[] sourceFullNameArray = sourceFullName.Split(new char[] { PERIOD[0] }, StringSplitOptions.RemoveEmptyEntries);
-                propertyMapInfoList = sourceFullNameArray.Aggregate(propertyMapInfoList, (list, next) =>
+                var sourceFullNameArray = sourceFullName.Split(new[] { period[0] }, StringSplitOptions.RemoveEmptyEntries);
+                sourceFullNameArray.Aggregate(propertyMapInfoList, (list, next) =>
                 {
 
                     if (list.Count == 0)
@@ -252,7 +227,7 @@ namespace AutoMapper.XpressionMapper
                     }
                     else
                     {
-                        PropertyMapInfo last = list[list.Count - 1];
+                        var last = list[list.Count - 1];
                         AddPropertyMapInfo(last.CustomExpression == null
                             ? last.DestinationPropertyInfos[last.DestinationPropertyInfos.Count - 1].GetMemberType()
                             : last.CustomExpression.ReturnType, next, list);
@@ -262,21 +237,18 @@ namespace AutoMapper.XpressionMapper
                 return;
             }
 
-            TypeMap typeMap = this.ConfigurationProvider.ResolveTypeMap(typeDestination, typeSource);//The destination becomes the source because to map a source expression to a destination expression,
+            var typeMap = ConfigurationProvider.ResolveTypeMap(typeDestination, typeSource);//The destination becomes the source because to map a source expression to a destination expression,
             //we need the expressions used to create the source from the destination 
 
-            if (sourceFullName.IndexOf(PERIOD) < 0)
+            if (sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) < 0)
             {
-                PropertyMap propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
-                MemberInfo sourceMemberInfo = typeSource.GetMember(propertyMap.DestinationProperty.Name).First();
+                var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == sourceFullName);
+                var sourceMemberInfo = typeSource.GetMember(propertyMap.DestinationProperty.Name).First();
                 if (propertyMap.ValueResolverConfig != null)
                 {
-                    #region Research
-                    #endregion
-
                     throw new InvalidOperationException(Resource.customResolversNotSupported);
                 }
-                else if (propertyMap.CustomExpression != null)
+                if (propertyMap.CustomExpression != null)
                 {
                     if (propertyMap.CustomExpression.ReturnType.IsValueType() && sourceMemberInfo.GetMemberType() != propertyMap.CustomExpression.ReturnType)
                         throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.expressionMapValueTypeMustMatchFormat, propertyMap.CustomExpression.ReturnType.Name, propertyMap.CustomExpression.ToString(), sourceMemberInfo.GetMemberType().Name, propertyMap.DestinationProperty.Name));
@@ -291,21 +263,20 @@ namespace AutoMapper.XpressionMapper
             }
             else
             {
-                string propertyName = sourceFullName.Substring(0, sourceFullName.IndexOf(PERIOD));
-                PropertyMap propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == propertyName);
+                var propertyName = sourceFullName.Substring(0, sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase));
+                var propertyMap = typeMap.GetPropertyMaps().SingleOrDefault(item => item.DestinationProperty.Name == propertyName);
 
-                MemberInfo sourceMemberInfo = typeSource.GetMember(propertyMap.DestinationProperty.Name).First();
+                var sourceMemberInfo = typeSource.GetMember(propertyMap.DestinationProperty.Name).First();
                 if (propertyMap.CustomExpression == null && propertyMap.SourceMember == null)//If sourceFullName has a period then the SourceMember cannot be null.  The SourceMember is required to find the ProertyMap of its child object.
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resource.srcMemberCannotBeNullFormat, typeSource.Name, typeDestination.Name, propertyName));
 
                 propertyMapInfoList.Add(new PropertyMapInfo(propertyMap.CustomExpression, propertyMap.SourceMembers.ToList()));
-                string childFullName = sourceFullName.Substring(sourceFullName.IndexOf(PERIOD) + 1);
+                var childFullName = sourceFullName.Substring(sourceFullName.IndexOf(period, StringComparison.OrdinalIgnoreCase) + 1);
 
                 FindDestinationFullName(sourceMemberInfo.GetMemberType(), propertyMap.CustomExpression == null
                     ? propertyMap.SourceMember.GetMemberType()
                     : propertyMap.CustomExpression.ReturnType, childFullName, propertyMapInfoList);
             }
         }
-        #endregion Private Methods
     }
 }

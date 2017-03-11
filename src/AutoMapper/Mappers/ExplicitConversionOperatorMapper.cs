@@ -1,10 +1,9 @@
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace AutoMapper.Mappers
 {
-    using System.Linq;
-    using System.Reflection;
-
     public class ExplicitConversionOperatorMapper : IObjectMapper
     {
         public bool IsMatch(TypePair context)

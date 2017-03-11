@@ -1,4 +1,3 @@
-using System;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -57,9 +56,14 @@ namespace AutoMapper
         /// <returns>Destination object</returns>
         public abstract TDestination Map(TSource source, TDestination destination, ResolutionContext context);
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return Call(Constant(this), MapMethod, ToType(sourceExpression, typeof(TSource)), ToType(destExpression, typeof(TDestination)), contextExpression);
-        }
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression) =>
+            Call(
+                Constant(this),
+                MapMethod,
+                ToType(sourceExpression, typeof(TSource)),
+                ToType(destExpression, typeof(TDestination)),
+                contextExpression);
     }
 }

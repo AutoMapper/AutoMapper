@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using AutoMapper.XpressionMapper.Structures;
 
 namespace AutoMapper.XpressionMapper.Extensions
@@ -28,13 +29,13 @@ namespace AutoMapper.XpressionMapper.Extensions
         private static bool IsMemberOrParameterExpression(Expression expression)
         {
             //the node represents parameter of the expression
-            if (expression.NodeType == ExpressionType.Parameter)
-                return true;
-
-            if (expression.NodeType == ExpressionType.MemberAccess)
+            switch (expression.NodeType)
             {
-                var memberExpression = (MemberExpression)expression;
-                return IsMemberOrParameterExpression(memberExpression.Expression);
+                case ExpressionType.Parameter:
+                    return true;
+                case ExpressionType.MemberAccess:
+                    var memberExpression = (MemberExpression)expression;
+                    return IsMemberOrParameterExpression(memberExpression.Expression);
             }
 
             return false;
@@ -47,19 +48,19 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <returns></returns>
         public static string GetPropertyFullName(this Expression expression)
         {
-            const string PERIOD = ".";
+            const string period = ".";
 
             //the node represents parameter of the expression
-            if (expression.NodeType == ExpressionType.Parameter)
-                return string.Empty;
-
-            if (expression.NodeType == ExpressionType.MemberAccess)
+            switch (expression.NodeType)
             {
-                MemberExpression memberExpression = (MemberExpression)expression;
-                string parentFullName = memberExpression.Expression.GetPropertyFullName();
-                return string.IsNullOrEmpty(parentFullName)
-                    ? memberExpression.Member.Name
-                    : string.Concat(memberExpression.Expression.GetPropertyFullName(), PERIOD, memberExpression.Member.Name);
+                case ExpressionType.Parameter:
+                    return string.Empty;
+                case ExpressionType.MemberAccess:
+                    var memberExpression = (MemberExpression)expression;
+                    var parentFullName = memberExpression.Expression.GetPropertyFullName();
+                    return string.IsNullOrEmpty(parentFullName)
+                        ? memberExpression.Member.Name
+                        : string.Concat(memberExpression.Expression.GetPropertyFullName(), period, memberExpression.Member.Name);
             }
 
             throw new InvalidOperationException(Resource.invalidExpErr);
@@ -73,20 +74,17 @@ namespace AutoMapper.XpressionMapper.Extensions
                 case ExpressionType.Convert:
                 case ExpressionType.ConvertChecked:
                     var ue = expr.Body as UnaryExpression;
-                    me = ((ue != null) ? ue.Operand : null) as MemberExpression;
+                    me = ue?.Operand as MemberExpression;
                     break;
                 default:
                     me = expr.Body as MemberExpression;
                     if (me == null)
                     {
-                        var binaryExpression = expr.Body as BinaryExpression;
-                        if (binaryExpression != null)
+                        if (expr.Body is BinaryExpression binaryExpression)
                         {
-                            MemberExpression left = binaryExpression.Left as MemberExpression;
-                            if (left != null)
+                            if (binaryExpression.Left is MemberExpression left)
                                 return left;
-                            MemberExpression right = binaryExpression.Right as MemberExpression;
-                            if (right != null)
+                            if (binaryExpression.Right is MemberExpression right)
                                 return right;
                         }
                     }
@@ -107,44 +105,31 @@ namespace AutoMapper.XpressionMapper.Extensions
                 return null;
 
             //the node represents parameter of the expression
-            if (expression.NodeType == ExpressionType.Parameter)
-                return (ParameterExpression)expression;
-
-            if (expression.NodeType == ExpressionType.Quote)
+            switch (expression.NodeType)
             {
-                return GetParameterExpression(GetMemberExpression((LambdaExpression)((UnaryExpression)expression).Operand));
-            }
+                case ExpressionType.Parameter:
+                    return (ParameterExpression)expression;
+                case ExpressionType.Quote:
+                    return GetParameterExpression(GetMemberExpression((LambdaExpression)((UnaryExpression)expression).Operand));
+                case ExpressionType.Lambda:
+                    return GetParameterExpression(GetMemberExpression((LambdaExpression)expression));
+                case ExpressionType.ConvertChecked:
+                case ExpressionType.Convert:
+                    var ue = expression as UnaryExpression;
+                    return GetParameterExpression(ue?.Operand);
+                case ExpressionType.MemberAccess:
+                    return GetParameterExpression(((MemberExpression)expression).Expression);
+                case ExpressionType.Call:
+                    var methodExpression = expression as MethodCallExpression;
+                    var memberExpression = methodExpression?.Object as MemberExpression;//Method is an instance method
 
-            if (expression.NodeType == ExpressionType.Lambda)
-            {
-                return GetParameterExpression(GetMemberExpression((LambdaExpression)expression));
-            }
+                    var isExtension = methodExpression != null && methodExpression.Method.IsDefined(typeof(ExtensionAttribute), true);
+                    if (isExtension && memberExpression == null && methodExpression.Arguments.Count > 0)
+                        memberExpression = methodExpression.Arguments[0] as MemberExpression;//Method is an extension method based on the type of methodExpression.Arguments[0] and methodExpression.Arguments[0] is a member expression.
 
-            if (expression.NodeType == ExpressionType.ConvertChecked || expression.NodeType == ExpressionType.Convert)
-            {
-                UnaryExpression ue = expression as UnaryExpression;
-                return GetParameterExpression(ue != null ? ue.Operand : null);
-            }
-                    
-            if (expression.NodeType == ExpressionType.MemberAccess)
-            {
-                MemberExpression memberExpression = (MemberExpression)expression;
-                return GetParameterExpression(memberExpression.Expression);
-            }
-
-            if (expression.NodeType == ExpressionType.Call)
-            {
-                MethodCallExpression methodExpression = expression as MethodCallExpression;
-                MemberExpression memberExpression = methodExpression.Object as MemberExpression;//Method is an instance method
-
-                bool isExtension = methodExpression.Method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), true);
-                if (isExtension && memberExpression == null && methodExpression.Arguments.Count > 0)
-                    memberExpression = methodExpression.Arguments[0] as MemberExpression;//Method is an extension method based on the type of methodExpression.Arguments[0] and methodExpression.Arguments[0] is a member expression.
-
-                if (isExtension && memberExpression == null && methodExpression.Arguments.Count > 0)
-                    return GetParameterExpression(methodExpression.Arguments[0]);//Method is an extension method based on the type of methodExpression.Arguments[0] but methodExpression.Arguments[0] is not a member expression.
-                else
-                    return memberExpression == null ? null : GetParameterExpression(memberExpression.Expression);
+                    return isExtension && memberExpression == null && methodExpression.Arguments.Count > 0
+                        ? GetParameterExpression(methodExpression.Arguments[0])
+                        : (memberExpression == null ? null : GetParameterExpression(memberExpression.Expression));
             }
 
             return null;
@@ -161,19 +146,16 @@ namespace AutoMapper.XpressionMapper.Extensions
             var parts = fullName.Split('.');
 
             Expression parent = newParameter;
-            foreach (var part in parts)
+            foreach (var mInfo in parts.Select(part => parent.Type.GetMember(part).First()))
             {
-                MemberInfo mInfo = parent.Type.GetMember(part).First();
-                PropertyInfo pInfo = mInfo as PropertyInfo;
-                FieldInfo fInfo = mInfo as FieldInfo;
-
-                if (pInfo != null)
+                switch (mInfo)
                 {
-                    parent = Expression.Property(parent, pInfo);
-                }
-                else
-                {
-                    parent = Expression.Field(parent, fInfo);
+                    case PropertyInfo pInfo:
+                        parent = Expression.Property(parent, pInfo);
+                        break;
+                    case FieldInfo fInfo:
+                        parent = Expression.Field(parent, fInfo);
+                        break;
                 }
             }
 
@@ -188,19 +170,19 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <returns></returns>
         public static MemberExpression AddExpressions(this Expression exp, List<PropertyMapInfo> list)
         {
-            foreach (PropertyMapInfo propertyMapInfo in list)
+            foreach (var memberInfo in list.SelectMany(propertyMapInfo => propertyMapInfo.DestinationPropertyInfos))
             {
-                foreach (MemberInfo memberInfo in propertyMapInfo.DestinationPropertyInfos)
+                switch (memberInfo)
                 {
-                    PropertyInfo pInfo;
-                    FieldInfo fInfo;
-                    MethodInfo mInfo;
-                    if ((pInfo = memberInfo as PropertyInfo) != null)
+                    case PropertyInfo pInfo:
                         exp = Expression.Property(exp, pInfo);
-                    else if ((fInfo = memberInfo as FieldInfo) != null)
+                        break;
+                    case FieldInfo fInfo:
                         exp = Expression.Field(exp, fInfo);
-                    else if ((mInfo = memberInfo as MethodInfo) != null)
+                        break;
+                    case MethodInfo mInfo:
                         exp = Expression.Call(exp, mInfo);
+                        break;
                 }
             }
 
@@ -222,8 +204,7 @@ namespace AutoMapper.XpressionMapper.Extensions
             {
                 case ExpressionType.Convert:
                 case ExpressionType.ConvertChecked:
-                    var ue = expr.Body as UnaryExpression;
-                    me = ((ue != null) ? ue.Operand : null) as MemberExpression;
+                    me = (expr.Body as UnaryExpression)?.Operand as MemberExpression;
                     break;
                 default:
                     me = expr.Body as MemberExpression;
@@ -238,12 +219,9 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static List<Type> GetUnderlyingGenericTypes(this Type type)
-        {
-            if (type == null || !type.GetTypeInfo().IsGenericType)
-                return new List<Type>();
-
-            return type.GetGenericArguments().ToList();
-        }
+        public static List<Type> GetUnderlyingGenericTypes(this Type type) => 
+            type == null || !type.GetTypeInfo().IsGenericType
+            ? new List<Type>()
+            : type.GetGenericArguments().ToList();
     }
 }

@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using AutoMapper.Configuration;
 using AutoMapper.QueryableExtensions.Impl;
 using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.QueryableExtensions
 {
-    using System.Runtime.CompilerServices;
-    using Configuration;
-    using Execution;
-
     public interface IExpressionBuilder
     {
         Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
@@ -26,7 +23,7 @@ namespace AutoMapper.QueryableExtensions
         private static readonly IExpressionResultConverter[] ExpressionResultConverters =
         {
             new MemberResolverExpressionResultConverter(),
-            new MemberGetterExpressionResultConverter(),
+            new MemberGetterExpressionResultConverter()
         };
 
         private static readonly IExpressionBinder[] Binders =
@@ -70,28 +67,25 @@ namespace AutoMapper.QueryableExtensions
             return x;
         }
 
-        public Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null,
-            params MemberInfo[] membersToExpand)
-        {
-            return (Expression<Func<TSource, TDestination>>)CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
-        }
+        public Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(
+            IDictionary<string, object> parameters = null,
+            params MemberInfo[] membersToExpand) => 
+            (Expression<Func<TSource, TDestination>>)CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
 
-        public LambdaExpression CreateMapExpression(ExpressionRequest request)
-        {
-            return CreateMapExpression(request, new Dictionary<ExpressionRequest, int>());
-        }
+        public LambdaExpression CreateMapExpression(ExpressionRequest request) => 
+            CreateMapExpression(request, new Dictionary<ExpressionRequest, int>());
 
         public LambdaExpression CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
         {
             // this is the input parameter of this expression with name <variableName>
-            var instanceParameter = Expression.Parameter(request.SourceType, "dto");
+            var instanceParameter = Parameter(request.SourceType, "dto");
             var total = CreateMapExpression(request, instanceParameter, typePairCount);
             if (total == null)
             {
                 return null;
             }
             var delegateType = typeof(Func<,>).MakeGenericType(request.SourceType, request.DestinationType);
-            return Expression.Lambda(delegateType, total, instanceParameter);
+            return Lambda(delegateType, total, instanceParameter);
         }
 
         public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
@@ -110,7 +104,7 @@ namespace AutoMapper.QueryableExtensions
             }
 
             var bindings = new List<MemberBinding>();
-            int depth = GetDepth(request, typePairCount);
+            var depth = GetDepth(request, typePairCount);
             if (typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
             {
                 if (typeMap.Profile.AllowNullDestinationValues)
@@ -128,7 +122,7 @@ namespace AutoMapper.QueryableExtensions
             var visitor = new NewFinderVisitor();
             visitor.Visit(constructorExpression);
 
-            var expression = Expression.MemberInit(
+            var expression = MemberInit(
                 visitor.NewExpression,
                 bindings.ToArray()
                 );
@@ -137,8 +131,7 @@ namespace AutoMapper.QueryableExtensions
 
         private static int GetDepth(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
         {
-            int visitCount = 0;
-            if (typePairCount.TryGetValue(request, out visitCount))
+            if (typePairCount.TryGetValue(request, out int visitCount))
             {
                 visitCount = visitCount + 1;
             }
@@ -221,14 +214,13 @@ namespace AutoMapper.QueryableExtensions
 
             var matchingExpressionConverter =
                 ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
-            if (matchingExpressionConverter == null)
-                throw new Exception("Can't resolve this to Queryable Expression");
-            result = matchingExpressionConverter.GetExpressionResolutionResult(result, propertyMap);
+            result = matchingExpressionConverter?.GetExpressionResolutionResult(result, propertyMap) 
+                ?? throw new Exception("Can't resolve this to Queryable Expression");
 
             if (propertyMap.NullSubstitute != null && result.Type.IsNullableType())
             {
-                Expression currentChild = result.ResolutionExpression;
-                Type currentChildType = result.Type;
+                var currentChild = result.ResolutionExpression;
+                var currentChildType = result.Type;
                 var nullSubstitute = propertyMap.NullSubstitute;
 
                 var newParameter = result.ResolutionExpression;
@@ -254,10 +246,7 @@ namespace AutoMapper.QueryableExtensions
                 _nullSubstitute = nullSubstitute;
             }
 
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                return node == _newParameter ? NullCheck(node) : node;
-            }
+            protected override Expression VisitMember(MemberExpression node) => node == _newParameter ? NullCheck(node) : node;
 
             private Expression NullCheck(Expression input)
             {
@@ -272,10 +261,7 @@ namespace AutoMapper.QueryableExtensions
             private readonly IDictionary<string, object> _paramValues;
 
             public ConstantExpressionReplacementVisitor(
-                IDictionary<string, object> paramValues)
-            {
-                _paramValues = paramValues;
-            }
+                IDictionary<string, object> paramValues) => _paramValues = paramValues;
 
             protected override Expression VisitMember(MemberExpression node)
             {
@@ -283,12 +269,11 @@ namespace AutoMapper.QueryableExtensions
                 {
                     return base.VisitMember(node);
                 }
-                object parameterValue;
                 var parameterName = node.Member.Name;
-                if (!_paramValues.TryGetValue(parameterName, out parameterValue))
+                if (!_paramValues.TryGetValue(parameterName, out object parameterValue))
                 {
-                    const string VBPrefix = "$VB$Local_";
-                    if (!parameterName.StartsWith(VBPrefix, StringComparison.Ordinal) || !_paramValues.TryGetValue(parameterName.Substring(VBPrefix.Length), out parameterValue))
+                    const string vbPrefix = "$VB$Local_";
+                    if (!parameterName.StartsWith(vbPrefix, StringComparison.Ordinal) || !_paramValues.TryGetValue(parameterName.Substring(vbPrefix.Length), out parameterValue))
                     {
                         return base.VisitMember(node);
                     }
@@ -309,70 +294,55 @@ namespace AutoMapper.QueryableExtensions
             static readonly LockingConcurrentDictionary<Type, Expression> Cache = new LockingConcurrentDictionary<Type, Expression>(NodeFallback);
 
             /// <inheritdoc />
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                if (node?.Expression != null)
-                {
-                    return MakeNullsafe(node, node.Expression);
-                }
-
-                return base.VisitMember(node);
-            }
+            protected override Expression VisitMember(MemberExpression node) => 
+                node?.Expression != null
+                    ? MakeNullsafe(node, node.Expression)
+                    : base.VisitMember(node);
 
             /// <inheritdoc />
-            protected override Expression VisitMethodCall(MethodCallExpression node)
-            {
-                if (node?.Object != null)
-                {
-                    return MakeNullsafe(node, node.Object);
-                }
+            protected override Expression VisitMethodCall(MethodCallExpression node) => 
+                node?.Object != null 
+                    ? MakeNullsafe(node, node.Object) 
+                    : base.VisitMethodCall(node);
 
-                return base.VisitMethodCall(node);
-            }
-
-            Expression MakeNullsafe(Expression node, Expression value)
+            private Expression MakeNullsafe(Expression node, Expression value)
             {
                 // cache "fallback expression" for performance reasons
                 var fallback = Cache.GetOrAdd(node.Type);
 
                 // check value and insert additional coalesce, if fallback is not default
-                return Expression.Condition(
-                    Expression.NotEqual(Visit(value), Expression.Default(value.Type)),
-                    fallback.NodeType != ExpressionType.Default ? Expression.Coalesce(node, fallback) : node,
+                return Condition(
+                    NotEqual(Visit(value), Default(value.Type)),
+                    fallback.NodeType != ExpressionType.Default ? Coalesce(node, fallback) : node,
                     fallback);
             }
 
-            static Expression NodeFallback(Type type)
+            private static Expression NodeFallback(Type type)
             {
                 // default values for generic collections
                 if (type.IsConstructedGenericType && type.GenericTypeArguments.Length == 1)
                 {
                     return GenericCollectionFallback(typeof(List<>), type)
                         ?? GenericCollectionFallback(typeof(HashSet<>), type)
-                        ?? Expression.Default(type);
+                        ?? Default(type);
                 }
 
                 // default value for arrays
                 if (type.IsArray)
                 {
-                    return Expression.NewArrayInit(type.GetElementType());
+                    return NewArrayInit(type.GetElementType());
                 }
 
                 // default value
-                return Expression.Default(type);
+                return Default(type);
             }
 
-            static Expression GenericCollectionFallback(Type collectionDefinition, Type type)
+            private static Expression GenericCollectionFallback(Type collectionDefinition, Type type)
             {
                 var collectionType = collectionDefinition.MakeGenericType(type.GenericTypeArguments);
 
                 // try if an instance of this collection would suffice
-                if (type.GetTypeInfo().IsAssignableFrom(collectionType.GetTypeInfo()))
-                {
-                    return Expression.Convert(Expression.New(collectionType), type);
-                }
-
-                return null;
+                return type.GetTypeInfo().IsAssignableFrom(collectionType.GetTypeInfo()) ? Convert(New(collectionType), type) : null;
             }
         }
     }

@@ -1,14 +1,14 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
-    using MemberPaths = System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<MemberInfo>>;
+    using IObjectDictionary = IDictionary<string, object>;
+    using MemberPaths = IEnumerable<IEnumerable<MemberInfo>>;
 
     public class SourceSourceInjectedQuery<TSource, TDestination> : IOrderedQueryable<TDestination>, ISourceInjectedQueryable<TDestination>
     {
@@ -30,14 +30,14 @@ namespace AutoMapper.QueryableExtensions.Impl
             ElementType = typeof(TDestination);
             Provider = new SourceInjectedQueryProvider<TSource, TDestination>(mapper, dataSource, destQuery, beforeVisitors, afterVisitors, exceptionHandler, parameters, membersToExpand)
             {
-                Inspector = inspector ?? new SourceInjectedQueryInspector(),
+                Inspector = inspector ?? new SourceInjectedQueryInspector()
             };
-            _exceptionHandler = exceptionHandler ?? ((x) => { });
+            _exceptionHandler = exceptionHandler ?? (x => { });
         }
 
         internal SourceSourceInjectedQuery(IQueryProvider provider, Expression expression, Action<IEnumerable<object>> enumerationHandler, Action<Exception> exceptionHandler)
         {
-            _exceptionHandler = exceptionHandler ?? ((x) => { });
+            _exceptionHandler = exceptionHandler ?? (x => { });
             Provider = provider;
             Expression = expression;
             EnumerationHandler = enumerationHandler ?? (x => { });
@@ -51,10 +51,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return this;
         }
 
-        public IQueryable<TDestination> AsQueryable()
-        {
-            return this;
-        }
+        public IQueryable<TDestination> AsQueryable() => this;
 
         internal Action<IEnumerable<object>> EnumerationHandler { get; set; }
         internal IObjectDictionary Parameters { get; set; }
@@ -74,10 +71,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public Type ElementType { get; }
         public Expression Expression { get; }

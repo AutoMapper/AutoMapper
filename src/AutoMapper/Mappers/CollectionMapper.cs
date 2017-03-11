@@ -1,11 +1,9 @@
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.Mappers
 {
-    using System.Collections.Generic;
-    using System.Reflection;
-    using Configuration;
-
     public class CollectionMapper : IObjectMapper
     {
         public bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();

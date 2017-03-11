@@ -1,11 +1,10 @@
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.Mappers
 {
-    using System.Linq;
-    using System.Reflection;
-    using Configuration;
-
     public class ImplicitConversionOperatorMapper : IObjectMapper
     {
         public bool IsMatch(TypePair context)

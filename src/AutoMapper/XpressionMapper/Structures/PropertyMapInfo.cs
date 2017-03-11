@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -7,10 +6,10 @@ namespace AutoMapper.XpressionMapper.Structures
 {
     public class PropertyMapInfo
     {
-        public PropertyMapInfo(LambdaExpression CustomExpression, List<MemberInfo> DestinationPropertyInfos)
+        public PropertyMapInfo(LambdaExpression customExpression, List<MemberInfo> destinationPropertyInfos)
         {
-            this.CustomExpression = CustomExpression;
-            this.DestinationPropertyInfos = DestinationPropertyInfos;
+            CustomExpression = customExpression;
+            DestinationPropertyInfos = destinationPropertyInfos;
         }
 
         public LambdaExpression CustomExpression { get; set; }

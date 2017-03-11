@@ -1,10 +1,9 @@
+using System;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Configuration;
-
     /// <summary>
     /// Member configuration options
     /// </summary>

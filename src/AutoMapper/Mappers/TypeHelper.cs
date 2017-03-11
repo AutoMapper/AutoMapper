@@ -1,28 +1,20 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using AutoMapper.Configuration;
+
 namespace AutoMapper.Mappers
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Configuration;
-
     internal static class TypeHelper
     {
-        public static Type GetElementType(Type enumerableType)
-        {
-            return GetElementTypes(enumerableType, null)[0];
-        }
+        public static Type GetElementType(Type enumerableType) => GetElementTypes(enumerableType, null)[0];
 
-        public static Type[] GetElementTypes(Type enumerableType, ElementTypeFlags flags = ElementTypeFlags.None)
-        {
-            return GetElementTypes(enumerableType, null, flags);
-        }
+        public static Type[] GetElementTypes(Type enumerableType, ElementTypeFlags flags = ElementTypeFlags.None) => 
+            GetElementTypes(enumerableType, null, flags);
 
-        public static Type GetElementType(Type enumerableType, IEnumerable enumerable)
-        {
-            return GetElementTypes(enumerableType, enumerable)[0];
-        }
+        public static Type GetElementType(Type enumerableType, IEnumerable enumerable) => GetElementTypes(enumerableType, enumerable)[0];
 
         public static Type[] GetElementTypes(Type enumerableType, IEnumerable enumerable,
             ElementTypeFlags flags = ElementTypeFlags.None)
@@ -32,13 +24,13 @@ namespace AutoMapper.Mappers
                 return new[] {enumerableType.GetElementType()};
             }
 
-            Type idictionaryType = enumerableType.GetDictionaryType();
+            var idictionaryType = enumerableType.GetDictionaryType();
             if (idictionaryType != null && flags.HasFlag(ElementTypeFlags.BreakKeyValuePair))
             {
                 return idictionaryType.GetTypeInfo().GenericTypeArguments;
             }
 
-            Type ienumerableType = enumerableType.GetIEnumerableType();
+            var ienumerableType = enumerableType.GetIEnumerableType();
             if (ienumerableType != null)
             {
                 return ienumerableType.GetTypeInfo().GenericTypeArguments;
@@ -62,10 +54,7 @@ namespace AutoMapper.Mappers
                 enumType = enumType.GetTypeInfo().GenericTypeArguments[0];
             }
 
-            if (!enumType.IsEnum())
-                return null;
-
-            return enumType;
+            return !enumType.IsEnum() ? null : enumType;
         }
 
         internal static IEnumerable<MethodInfo> GetStaticMethods(this Type type)

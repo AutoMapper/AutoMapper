@@ -1,7 +1,7 @@
+using System;
+
 namespace AutoMapper.Configuration
 {
-    using System;
-
     public interface ITypeMapConfiguration
     {
         void Configure(TypeMap typeMap);

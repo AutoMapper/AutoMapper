@@ -9,13 +9,6 @@ namespace AutoMapper.XpressionMapper.ArgumentMappers
         {
         }
 
-        public override Expression MappedArgumentExpression
-        {
-            get
-            {
-                Expression ex = this.ExpressionVisitor.Visit(this.argument);
-                return ex;
-            }
-        }
+        public override Expression MappedArgumentExpression => ExpressionVisitor.Visit(Argument);
     }
 }

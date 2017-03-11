@@ -1,12 +1,12 @@
 
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper.QueryableExtensions
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using System.Collections.Generic;
-
     public class ExpressionRequest : IEquatable<ExpressionRequest>
     {
         public Type SourceType { get; }
@@ -15,12 +15,9 @@ namespace AutoMapper.QueryableExtensions
 
         public MemberInfo[] MembersToExpand { get; }
 
-        internal ICollection<ExpressionRequest> PreviousRequests { get; private set; }
+        internal ICollection<ExpressionRequest> PreviousRequests { get; }
 
-        internal IEnumerable<ExpressionRequest> GetPreviousRequestsAndSelf()
-        {
-            return PreviousRequests.Concat(new[] { this });
-        }
+        internal IEnumerable<ExpressionRequest> GetPreviousRequestsAndSelf() => PreviousRequests.Concat(new[] { this });
 
         internal bool AlreadyExists => PreviousRequests.Contains(this);
 
@@ -30,10 +27,9 @@ namespace AutoMapper.QueryableExtensions
             DestinationType = destinationType;
             MembersToExpand = membersToExpand.OrderBy(p => p.Name).ToArray();
 
-            if (parentRequest == null)
-                PreviousRequests = new HashSet<ExpressionRequest>();
-            else
-                PreviousRequests = new HashSet<ExpressionRequest>(parentRequest.GetPreviousRequestsAndSelf());
+            PreviousRequests = parentRequest == null 
+                ? new HashSet<ExpressionRequest>() 
+                : new HashSet<ExpressionRequest>(parentRequest.GetPreviousRequestsAndSelf());
         }
 
         public bool Equals(ExpressionRequest other)
@@ -62,14 +58,8 @@ namespace AutoMapper.QueryableExtensions
             return hashCode;
         }
 
-        public static bool operator ==(ExpressionRequest left, ExpressionRequest right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(ExpressionRequest left, ExpressionRequest right) => Equals(left, right);
 
-        public static bool operator !=(ExpressionRequest left, ExpressionRequest right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(ExpressionRequest left, ExpressionRequest right) => !Equals(left, right);
     }
 }

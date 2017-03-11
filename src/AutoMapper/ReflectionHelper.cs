@@ -1,13 +1,13 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Dynamic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
     internal static class ReflectionHelper
     {
         public static object GetDefaultValue(this ParameterInfo parameter)
@@ -32,26 +32,18 @@ namespace AutoMapper
             return context.Mapper.Map(value, null, value?.GetType() ?? memberType, memberType, context);
         }
 
-        public static bool IsDynamic(this object obj)
-        {
-            return obj is IDynamicMetaObjectProvider;
-        }
+        public static bool IsDynamic(this object obj) => obj is IDynamicMetaObjectProvider;
 
-        public static bool IsDynamic(this Type type)
-        {
-            return typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
-        }
+        public static bool IsDynamic(this Type type) => typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
 
         public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
         {
-            var property = propertyOrField as PropertyInfo;
-            if(property != null)
+            if (propertyOrField is PropertyInfo property)
             {
                 property.SetValue(target, value, null);
                 return;
             }
-            var field = propertyOrField as FieldInfo;
-            if(field != null)
+            if (propertyOrField is FieldInfo field)
             {
                 field.SetValue(target, value);
                 return;
@@ -60,19 +52,15 @@ namespace AutoMapper
         }
 
         private static ArgumentOutOfRangeException Expected(MemberInfo propertyOrField)
-        {
-            return new ArgumentOutOfRangeException("propertyOrField", "Expected a property or field, not " + propertyOrField);
-        }
+            => new ArgumentOutOfRangeException(nameof(propertyOrField), "Expected a property or field, not " + propertyOrField);
 
         public static object GetMemberValue(this MemberInfo propertyOrField, object target)
         {
-            var property = propertyOrField as PropertyInfo;
-            if(property != null)
+            if (propertyOrField is PropertyInfo property)
             {
                 return property.GetValue(target, null);
             }
-            var field = propertyOrField as FieldInfo;
-            if(field != null)
+            if (propertyOrField is FieldInfo field)
             {
                 return field.GetValue(target);
             }
@@ -102,18 +90,16 @@ namespace AutoMapper
         public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)
         {
             var memberExpression = expression.Body as MemberExpression;
-            if(memberExpression == null)
-            {
-                throw new ArgumentOutOfRangeException("expression", "Expected a property/field access expression, not " + expression);
-            }
-            return (MemberInfo)memberExpression.Member;
+            return memberExpression != null
+                ? memberExpression.Member
+                : throw new ArgumentOutOfRangeException(nameof(expression),"Expected a property/field access expression, not " + expression);
         }
 
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
         {
             Expression expressionToCheck = lambdaExpression;
 
-            bool done = false;
+            var done = false;
 
             while (!done)
             {
@@ -136,7 +122,7 @@ namespace AutoMapper
                                 nameof(lambdaExpression));
                         }
 
-                        MemberInfo member = memberExpression.Member;
+                        var member = memberExpression.Member;
 
                         return member;
                     default:
@@ -151,13 +137,17 @@ namespace AutoMapper
 
         public static Type GetMemberType(this MemberInfo memberInfo)
         {
-            if (memberInfo is MethodInfo)
-                return ((MethodInfo)memberInfo).ReturnType;
-            if (memberInfo is PropertyInfo)
-                return ((PropertyInfo)memberInfo).PropertyType;
-            if (memberInfo is FieldInfo)
-                return ((FieldInfo)memberInfo).FieldType;
-            return null;
+            switch (memberInfo)
+            {
+                case MethodInfo mInfo:
+                    return mInfo.ReturnType;
+                case PropertyInfo pInfo:
+                    return pInfo.PropertyType;
+                case FieldInfo fInfo:
+                    return fInfo.FieldType;
+                default:
+                    return null;
+            }
         }
 
         /// <summary>
@@ -178,7 +168,7 @@ namespace AutoMapper
             {
                 var genSubArgs = targetType.GetTypeInfo().GenericTypeArguments;
                 var newGenSubArgs = new Type[genSubArgs.Length];
-                for (int i = 0; i < genSubArgs.Length; i++)
+                for (var i = 0; i < genSubArgs.Length; i++)
                     newGenSubArgs[i] = ReplaceItemType(genSubArgs[i], oldType, newType);
                 return targetType.GetGenericTypeDefinition().MakeGenericType(newGenSubArgs);
             }

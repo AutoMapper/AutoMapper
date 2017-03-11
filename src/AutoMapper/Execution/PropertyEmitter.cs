@@ -8,64 +8,56 @@ namespace AutoMapper.Execution
 
     public class PropertyEmitter
     {
-        private static readonly MethodInfo proxyBase_NotifyPropertyChanged =
+        private static readonly MethodInfo ProxyBaseNotifyPropertyChanged =
             typeof (ProxyBase).GetTypeInfo().DeclaredMethods.Single(m => m.Name == "NotifyPropertyChanged");
 
-        private readonly FieldBuilder fieldBuilder;
-        private readonly MethodBuilder getterBuilder;
-        private readonly PropertyBuilder propertyBuilder;
-        private readonly MethodBuilder setterBuilder;
+        private readonly FieldBuilder _fieldBuilder;
+        private readonly MethodBuilder _getterBuilder;
+        private readonly PropertyBuilder _propertyBuilder;
+        private readonly MethodBuilder _setterBuilder;
 
         public PropertyEmitter(TypeBuilder owner, string name, Type propertyType, FieldBuilder propertyChangedField)
         {
-            fieldBuilder = owner.DefineField($"<{name}>", propertyType, FieldAttributes.Private);
-            getterBuilder = owner.DefineMethod($"get_{name}",
+            _fieldBuilder = owner.DefineField($"<{name}>", propertyType, FieldAttributes.Private);
+            _getterBuilder = owner.DefineMethod($"get_{name}",
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig |
                 MethodAttributes.SpecialName, propertyType, new Type[0]);
-            ILGenerator getterIl = getterBuilder.GetILGenerator();
+            ILGenerator getterIl = _getterBuilder.GetILGenerator();
             getterIl.Emit(OpCodes.Ldarg_0);
-            getterIl.Emit(OpCodes.Ldfld, fieldBuilder);
+            getterIl.Emit(OpCodes.Ldfld, _fieldBuilder);
             getterIl.Emit(OpCodes.Ret);
-            setterBuilder = owner.DefineMethod($"set_{name}",
+            _setterBuilder = owner.DefineMethod($"set_{name}",
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig |
                 MethodAttributes.SpecialName, typeof (void), new[] {propertyType});
-            ILGenerator setterIl = setterBuilder.GetILGenerator();
+            ILGenerator setterIl = _setterBuilder.GetILGenerator();
             setterIl.Emit(OpCodes.Ldarg_0);
             setterIl.Emit(OpCodes.Ldarg_1);
-            setterIl.Emit(OpCodes.Stfld, fieldBuilder);
+            setterIl.Emit(OpCodes.Stfld, _fieldBuilder);
             if (propertyChangedField != null)
             {
                 setterIl.Emit(OpCodes.Ldarg_0);
                 setterIl.Emit(OpCodes.Dup);
                 setterIl.Emit(OpCodes.Ldfld, propertyChangedField);
                 setterIl.Emit(OpCodes.Ldstr, name);
-                setterIl.Emit(OpCodes.Call, proxyBase_NotifyPropertyChanged);
+                setterIl.Emit(OpCodes.Call, ProxyBaseNotifyPropertyChanged);
             }
             setterIl.Emit(OpCodes.Ret);
-            propertyBuilder = owner.DefineProperty(name, PropertyAttributes.None, propertyType, null);
-            propertyBuilder.SetGetMethod(getterBuilder);
-            propertyBuilder.SetSetMethod(setterBuilder);
+            _propertyBuilder = owner.DefineProperty(name, PropertyAttributes.None, propertyType, null);
+            _propertyBuilder.SetGetMethod(_getterBuilder);
+            _propertyBuilder.SetSetMethod(_setterBuilder);
         }
 
-        public Type PropertyType => propertyBuilder.PropertyType;
+        public Type PropertyType => _propertyBuilder.PropertyType;
 
-        public MethodBuilder GetGetter(Type requiredType)
-        {
-            if (!requiredType.IsAssignableFrom(PropertyType))
-            {
-                throw new InvalidOperationException("Types are not compatible");
-            }
-            return getterBuilder;
-        }
+        public MethodBuilder GetGetter(Type requiredType) 
+            => !requiredType.IsAssignableFrom(PropertyType)
+            ? throw new InvalidOperationException("Types are not compatible")
+            : _getterBuilder;
 
-        public MethodBuilder GetSetter(Type requiredType)
-        {
-            if (!PropertyType.IsAssignableFrom(requiredType))
-            {
-                throw new InvalidOperationException("Types are not compatible");
-            }
-            return setterBuilder;
-        }
+        public MethodBuilder GetSetter(Type requiredType) 
+            => !PropertyType.IsAssignableFrom(requiredType)
+            ? throw new InvalidOperationException("Types are not compatible")
+            : _setterBuilder;
     }
 }
 #endif

@@ -14,23 +14,14 @@ namespace AutoMapper
         /// <summary>
         /// Add Action called against the IConfigurationProvider before it gets sealed
         /// </summary>
-        public void BeforeSeal(Action<IConfigurationProvider> action)
-        {
-            _beforeSealActions.Add(action);
-        }
+        public void BeforeSeal(Action<IConfigurationProvider> action) => _beforeSealActions.Add(action);
 
         /// <summary>
         /// Add an action to be called when validating the configuration.
         /// </summary>
         /// <param name="validator">the validation callback</param>
-        public void Validator(Validator validator)
-        {
-            _validators.Add(validator);
-        }
+        public void Validator(Validator validator) => _validators.Add(validator);
 
-        internal Validator[] GetValidators()
-        {
-            return _validators.ToArray();
-        }
+        internal Validator[] GetValidators() => _validators.ToArray();
     }
 }

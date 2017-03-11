@@ -1,15 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Execution;
 using Microsoft.CSharp.RuntimeBinder;
-using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 using static System.Linq.Expressions.Expression;
 using static AutoMapper.ExpressionExtensions;
+using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
 namespace AutoMapper.Mappers
 {
@@ -54,18 +51,18 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(ToDynamicMapper).GetDeclaredMethod(nameof(Map));
 
-        public bool IsMatch(TypePair context)
-        {
-            return context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
-        }
+        public bool IsMatch(TypePair context) => context.DestinationType.IsDynamic() && !context.SourceType.IsDynamic();
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), 
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression) =>
+            Call(null,
+                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
                 sourceExpression,
-                ToType(Coalesce(ToObject(destExpression), DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type), 
+                ToType(
+                    Coalesce(ToObject(destExpression),
+                        DelegateFactory.GenerateConstructorExpression(destExpression.Type)), destExpression.Type),
                 contextExpression,
                 Constant(profileMap));
-        }
     }
 }

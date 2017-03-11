@@ -19,20 +19,13 @@ namespace AutoMapper
 
         public TValue this[TKey key]
         {
-            get
-            {
-                return _dictionary[key].Value;
-            }
-            set
-            {
-                _dictionary[key] = new Lazy<TValue>(() => value);
-            }
+            get => _dictionary[key].Value;
+            set => _dictionary[key] = new Lazy<TValue>(() => value);
         }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            Lazy<TValue> lazy;
-            if(_dictionary.TryGetValue(key, out lazy))
+            if (_dictionary.TryGetValue(key, out Lazy<TValue> lazy))
             {
                 value = lazy.Value;
                 return true;

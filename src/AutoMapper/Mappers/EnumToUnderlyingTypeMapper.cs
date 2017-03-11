@@ -1,10 +1,11 @@
+using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using static System.Linq.Expressions.Expression;
+using Convert = System.Convert;
 
 namespace AutoMapper.Mappers
 {
-    using System;
-    using System.Reflection;
     using static ExpressionExtensions;
 
     public class EnumToUnderlyingTypeMapper : IObjectMapper
@@ -18,9 +19,10 @@ namespace AutoMapper.Mappers
             return sourceEnumType != null && context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(sourceEnumType));
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return Condition(
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression) =>
+            Condition(
                 Equal(ToObject(sourceExpression), Constant(null)),
                 Default(destExpression.Type),
                 ToType(
@@ -28,7 +30,6 @@ namespace AutoMapper.Mappers
                         Constant(Nullable.GetUnderlyingType(destExpression.Type) ?? destExpression.Type)),
                     destExpression.Type
                 ));
-        }
     }
     
 }

@@ -1,9 +1,9 @@
+using System;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper.Configuration.Conventions
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-
     public class CaseSensitiveName : ISourceToDestinationNameMapper
     {
         public bool MethodCaseSensitive { get; set; }

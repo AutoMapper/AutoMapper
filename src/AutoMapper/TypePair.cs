@@ -1,12 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reflection;
-    using Configuration;
-
     [DebuggerDisplay("{RequestedTypes.SourceType.Name}, {RequestedTypes.DestinationType.Name} : {RuntimeTypes.SourceType.Name}, {RuntimeTypes.DestinationType.Name}")]
     public struct MapRequest : IEquatable<MapRequest>
     {
@@ -19,10 +18,7 @@ namespace AutoMapper
             RuntimeTypes = runtimeTypes;
         }
 
-        public bool Equals(MapRequest other)
-        {
-            return RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes);
-        }
+        public bool Equals(MapRequest other) => RequestedTypes.Equals(other.RequestedTypes) && RuntimeTypes.Equals(other.RuntimeTypes);
 
         public override bool Equals(object obj)
         {
@@ -32,15 +28,9 @@ namespace AutoMapper
 
         public override int GetHashCode() => HashCodeCombiner.Combine(RequestedTypes, RuntimeTypes);
 
-        public static bool operator ==(MapRequest left, MapRequest right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(MapRequest left, MapRequest right) => left.Equals(right);
 
-        public static bool operator !=(MapRequest left, MapRequest right)
-        {
-            return !left.Equals(right);
-        }
+        public static bool operator !=(MapRequest left, MapRequest right) => !left.Equals(right);
     }
 
     [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
@@ -106,12 +96,12 @@ namespace AutoMapper
             var @this = this;
             var subTypePairs =
                 from destinationType in GetAllTypes(DestinationType)
-                from sourceType in @this.GetAllTypes(@this.SourceType)
+                from sourceType in GetAllTypes(@this.SourceType)
                 select new TypePair(sourceType, destinationType);
             return subTypePairs;
         }
 
-        private IEnumerable<Type> GetAllTypes(Type type)
+        private static IEnumerable<Type> GetAllTypes(Type type)
         {
             var typeInheritance = GetTypeInheritance(type);
             foreach(var item in typeInheritance)
@@ -130,7 +120,7 @@ namespace AutoMapper
         {
             yield return type;
 
-            Type baseType = type.BaseType();
+            var baseType = type.BaseType();
             while (baseType != null)
             {
                 yield return baseType;

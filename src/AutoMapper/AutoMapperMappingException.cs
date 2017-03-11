@@ -1,10 +1,10 @@
+using System;
+#if !DEBUG
+using System.Linq;
+#endif
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     public class AutoMapperMappingException : Exception
     {
         private readonly string _message;
@@ -21,34 +21,19 @@ namespace AutoMapper
         }
 
         public AutoMapperMappingException(string message)
-            : base(message)
-        {
-            _message = message;
-        }
+            : base(message) => _message = message;
 
         public AutoMapperMappingException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-            _message = message;
-        }
+            : base(message, innerException) => _message = message;
 
         public AutoMapperMappingException(string message, Exception innerException, TypePair types)
-            : this(message, innerException)
-        {
-            Types = types;
-        }
+            : this(message, innerException) => Types = types;
 
         public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap)
-            : this(message, innerException, types)
-        {
-            TypeMap = typeMap;
-        }
+            : this(message, innerException, types) => TypeMap = typeMap;
 
         public AutoMapperMappingException(string message, Exception innerException, TypePair types, TypeMap typeMap, PropertyMap propertyMap)
-            : this(message, innerException, types, typeMap)
-        {
-            PropertyMap = propertyMap;
-        }
+            : this(message, innerException, types, typeMap) => PropertyMap = propertyMap;
 
         public TypePair? Types { get; set; }
         public TypeMap TypeMap { get; set; }
@@ -58,7 +43,7 @@ namespace AutoMapper
         {
             get
             {
-                string message = _message;
+                var message = _message;
                 var newLine = Environment.NewLine;
                 if (Types?.SourceType != null && Types?.DestinationType != null)
                 {

@@ -1,12 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using AutoMapper.Mappers;
+using AutoMapper.QueryableExtensions;
 
 namespace AutoMapper
 {
-    using System;
-    using QueryableExtensions;
-
     public interface IConfigurationProvider
     {
         void Validate(ValidationContext context);

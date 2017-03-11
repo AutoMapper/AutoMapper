@@ -1,7 +1,7 @@
+using System.Linq.Expressions;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using System.Linq.Expressions;
-
     public class MemberAccessQueryMapperVisitor : ExpressionVisitor
     {
         private readonly ExpressionVisitor _rootVisitor;
@@ -15,7 +15,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            Expression parentExpr = _rootVisitor.Visit(node.Expression);
+            var parentExpr = _rootVisitor.Visit(node.Expression);
             if (parentExpr != null)
             {
                 var propertyMap = _config.GetPropertyMap(node.Member, parentExpr.Type);

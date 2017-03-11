@@ -1,7 +1,7 @@
+using System;
+
 namespace AutoMapper
 {
-    using System;
-
     public interface IMapper
     {
         /// <summary>
