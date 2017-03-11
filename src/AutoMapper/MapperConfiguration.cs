@@ -260,8 +260,8 @@ namespace AutoMapper
 
         private void Seal()
         {
-            var derivedMaps = new List<(TypePair pair, TypeMap map)>();
-            var redirectedTypes = new List<(TypePair original, TypePair redirected)>();
+            var derivedMaps = new List<Tuple<TypePair, TypeMap>>();
+            var redirectedTypes = new List<Tuple<TypePair, TypePair>>();
 
             foreach (var profile in Profiles)
             {
@@ -279,21 +279,21 @@ namespace AutoMapper
 
                 if (typeMap.DestinationTypeOverride != null)
                 {
-                    redirectedTypes.Add((typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
+                    redirectedTypes.Add(Tuple.Create(typeMap.Types, new TypePair(typeMap.SourceType, typeMap.DestinationTypeOverride)));
                 }
-                derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => (new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
+                derivedMaps.AddRange(GetDerivedTypeMaps(typeMap).Select(derivedMap => Tuple.Create(new TypePair(derivedMap.SourceType, typeMap.DestinationType), derivedMap)));
             }
             foreach (var redirectedType in redirectedTypes)
             {
-                var derivedMap = FindTypeMapFor(redirectedType.redirected);
+                var derivedMap = FindTypeMapFor(redirectedType.Item2);
                 if (derivedMap != null)
                 {
-                    _typeMapPlanCache[redirectedType.original] = derivedMap;
+                    _typeMapPlanCache[redirectedType.Item1] = derivedMap;
                 }
             }
-            foreach (var derivedMap in derivedMaps.Where(derivedMap => !_typeMapPlanCache.ContainsKey(derivedMap.pair)))
+            foreach (var derivedMap in derivedMaps.Where(derivedMap => !_typeMapPlanCache.ContainsKey(derivedMap.Item1)))
             {
-                _typeMapPlanCache[derivedMap.pair] = derivedMap.map;
+                _typeMapPlanCache[derivedMap.Item1] = derivedMap.Item2;
             }
 
             foreach (var typeMap in _typeMapRegistry.TypeMaps)
