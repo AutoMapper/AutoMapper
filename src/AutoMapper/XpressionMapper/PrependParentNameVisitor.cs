@@ -6,30 +6,27 @@ namespace AutoMapper.XpressionMapper
 {
     internal class PrependParentNameVisitor : ExpressionVisitor
     {
-        public PrependParentNameVisitor(Type CurrentParameterType, string ParentFullName, ParameterExpression NewParameter)
+        public PrependParentNameVisitor(Type currentParameterType, string parentFullName, ParameterExpression newParameter)
         {
-            this.CurrentParameterType = CurrentParameterType;
-            this.ParentFullName = ParentFullName;
-            this.NewParameter = NewParameter;
+            CurrentParameterType = currentParameterType;
+            ParentFullName = parentFullName;
+            NewParameter = newParameter;
         }
 
-        #region Properties
-        public Type CurrentParameterType { get; set; }
-        public string ParentFullName { get; set; }
-        public ParameterExpression NewParameter { get; set; } 
-        #endregion Properties
+        public Type CurrentParameterType { get; }
+        public string ParentFullName { get; }
+        public ParameterExpression NewParameter { get; } 
 
-        #region Methods
         protected override Expression VisitMember(MemberExpression node)
         {
             if (node.NodeType == ExpressionType.Constant)
                 return base.VisitMember(node);
 
-            string sourcePath = null;
+            string sourcePath;
 
-            ParameterExpression parameterExpression = node.GetParameterExpression();
-            Type sType = parameterExpression == null ? null : parameterExpression.Type;
-            if (sType != null && sType == this.CurrentParameterType && node.IsMemberExpression())
+            var parameterExpression = node.GetParameterExpression();
+            var sType = parameterExpression?.Type;
+            if (sType != null && sType == CurrentParameterType && node.IsMemberExpression())
             {
                 sourcePath = node.GetPropertyFullName();
             }
@@ -38,14 +35,13 @@ namespace AutoMapper.XpressionMapper
                 return base.VisitMember(node);
             }
 
-            string fullName = string.IsNullOrEmpty(this.ParentFullName)
+            var fullName = string.IsNullOrEmpty(ParentFullName)
                             ? sourcePath
-                            : string.Concat(this.ParentFullName, ".", sourcePath);
+                            : string.Concat(ParentFullName, ".", sourcePath);
 
-            MemberExpression me = this.NewParameter.BuildExpression(fullName);
+            var me = NewParameter.BuildExpression(fullName);
 
             return me;
         }
-        #endregion Methods
     }
 }

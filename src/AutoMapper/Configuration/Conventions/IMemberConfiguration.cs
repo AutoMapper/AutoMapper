@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+
 namespace AutoMapper.Configuration.Conventions
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-
     public interface IMemberConfiguration
     {
         IList<IChildMemberConfiguration> MemberMappers { get; }

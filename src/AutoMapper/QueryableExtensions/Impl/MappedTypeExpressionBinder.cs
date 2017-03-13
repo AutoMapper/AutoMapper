@@ -1,19 +1,15 @@
+using System.Collections.Generic;
+using System.Linq.Expressions;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-
     public class MappedTypeExpressionBinder : IExpressionBinder
     {
-        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result)
-        {
-            return propertyTypeMap != null && propertyTypeMap.CustomProjection == null;
-        }
+        public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) => 
+            propertyTypeMap != null && propertyTypeMap.CustomProjection == null;
 
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
-        {
-            return BindMappedTypeExpression(configuration, propertyMap, request, result, typePairCount);
-        }
+        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount) 
+            => BindMappedTypeExpression(configuration, propertyMap, request, result, typePairCount);
 
         private static MemberAssignment BindMappedTypeExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {

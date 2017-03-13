@@ -1,13 +1,13 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.Mappers
 {
-    using System;
-    using System.Collections;
-    using System.Linq;
-    using Configuration;
     using static Expression;
 
     public class MultidimensionalArrayMapper : IObjectMapper
@@ -43,19 +43,20 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(MultidimensionalArrayMapper).GetDeclaredMethod(nameof(Map));
 
-        public bool IsMatch(TypePair context)
-        {
-            return context.DestinationType.IsArray && context.DestinationType.GetArrayRank() > 1 && context.SourceType.IsEnumerableType();
-        }
+        public bool IsMatch(TypePair context) => 
+            context.DestinationType.IsArray 
+            && context.DestinationType.GetArrayRank() > 1 
+            && context.SourceType.IsEnumerableType();
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return Call(null, 
-                MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type, TypeHelper.GetElementType(sourceExpression.Type)), 
-                sourceExpression, 
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression) =>
+            Call(null,
+                MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type,
+                    TypeHelper.GetElementType(sourceExpression.Type)),
+                sourceExpression,
                 contextExpression,
                 Constant(profileMap));
-        }
 
         public class MultidimensionalArrayFiller
         {
@@ -70,8 +71,8 @@ namespace AutoMapper.Mappers
 
             public void NewValue(object value)
             {
-                int dimension = _destination.Rank - 1;
-                bool changedDimension = false;
+                var dimension = _destination.Rank - 1;
+                var changedDimension = false;
                 while (_indices[dimension] == _destination.GetLength(dimension))
                 {
                     _indices[dimension] = 0;

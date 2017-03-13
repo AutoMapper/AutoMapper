@@ -1,13 +1,12 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
 using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using Configuration;
-
     public class ReadOnlyCollectionMapper : IObjectMapper
     {
         public bool IsMatch(TypePair context)

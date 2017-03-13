@@ -1,19 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper.Configuration.Conventions
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Reflection;
-
     public class ReplaceName : ISourceToDestinationNameMapper
     {
         private ICollection<MemberNameReplacer> MemberNameReplacers { get; }
 
-        public ReplaceName()
-        {
-            MemberNameReplacers = new Collection<MemberNameReplacer>();
-        }
+        public ReplaceName() => MemberNameReplacers = new Collection<MemberNameReplacer>();
 
         public ReplaceName AddReplace(string original, string newValue)
         {
@@ -32,9 +29,8 @@ namespace AutoMapper.Configuration.Conventions
             var match =
                 all.FirstOrDefault(
                     pair => pair.destName.possibles.Any(p => string.Compare(p, pair.sourceName, StringComparison.OrdinalIgnoreCase) == 0));
-            if (match == null)
-                return null;
-            return match.destName.mi;
+
+            return match?.destName.mi;
         }
 
         private IEnumerable<string> PossibleNames(string nameToSearch)

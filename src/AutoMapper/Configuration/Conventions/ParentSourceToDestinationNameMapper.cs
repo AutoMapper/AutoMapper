@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Reflection;
+
 namespace AutoMapper.Configuration.Conventions
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Reflection;
-
     public class ParentSourceToDestinationNameMapper : IParentSourceToDestinationNameMapper
     {
         public IGetTypeInfoMembers GetMembers { get; } = new AllMemberInfo();

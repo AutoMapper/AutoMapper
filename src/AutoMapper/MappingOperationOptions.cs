@@ -5,7 +5,7 @@ namespace AutoMapper
 {
     using StringDictionary = Dictionary<string, object>;
 
-    public class MappingOperationOptions<TSource, TDestination> : IMappingOperationOptions<TSource, TDestination>, IMappingOperationOptions
+    public class MappingOperationOptions<TSource, TDestination> : IMappingOperationOptions<TSource, TDestination>
     {
         private StringDictionary _items;
         private static readonly Action<TSource, TDestination> Empty = (_, __) => { };

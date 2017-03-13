@@ -14,10 +14,10 @@ namespace AutoMapper.XpressionMapper.ArgumentMappers
         {
             get
             {
-                LambdaExpression lambdaExpression = (LambdaExpression)((UnaryExpression)this.argument).Operand;
-                Expression ex = this.ExpressionVisitor.Visit(lambdaExpression.Body);
+                var lambdaExpression = (LambdaExpression)((UnaryExpression)Argument).Operand;
+                var ex = ExpressionVisitor.Visit(lambdaExpression.Body);
 
-                LambdaExpression mapped = Expression.Lambda(ex, lambdaExpression.GetDestinationParameterExpressions(this.ExpressionVisitor.InfoDictionary, this.ExpressionVisitor.TypeMappings));
+                var mapped = Expression.Lambda(ex, lambdaExpression.GetDestinationParameterExpressions(ExpressionVisitor.InfoDictionary, ExpressionVisitor.TypeMappings));
                 return Expression.Quote(mapped);
             }
         }

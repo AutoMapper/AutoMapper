@@ -1,10 +1,10 @@
+using System;
+using System.Reflection;
+using AutoMapper.Configuration.Conventions;
+using AutoMapper.Mappers;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Reflection;
-    using Configuration.Conventions;
-    using Mappers;
-
     /// <summary>
     /// Configuration for profile-specific maps
     /// </summary>

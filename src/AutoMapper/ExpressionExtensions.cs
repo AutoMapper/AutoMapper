@@ -1,30 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Configuration;
-    using Execution;
-    using static System.Linq.Expressions.Expression;
+    using static Expression;
 
     internal static class ExpressionExtensions
     {
-        public static MethodInfo Method<T>(Expression<Func<T>> expression)
-        {
-            return ((MethodCallExpression) expression.Body).Method;
-        }
+        public static MethodInfo Method<T>(Expression<Func<T>> expression) => ((MethodCallExpression) expression.Body).Method;
+
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
         {
             if(collection.Type.IsArray)
             {
                 return ForEachArrayItem(collection, arrayItem => Block(new[] { loopVar }, Assign(loopVar, arrayItem), loopContent));
             }
-            var elementType = loopVar.Type;
             var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
             var getEnumeratorCall = Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
@@ -77,27 +71,25 @@ namespace AutoMapper
             return loop;
         }
 
-        public static Expression ToObject(Expression expression)
-        {
-            return expression.Type == typeof(object) ? expression : Convert(expression, typeof(object));
-        }
+        public static Expression ToObject(Expression expression) => 
+            expression.Type == typeof(object) 
+                ? expression 
+                : Convert(expression, typeof(object));
 
-        public static Expression ToType(Expression expression, Type type)
-        {
-            return expression.Type == type ? expression : Convert(expression, type);
-        }
+        public static Expression ToType(Expression expression, Type type) => 
+            expression.Type == type 
+                ? expression 
+            : Convert(expression, type);
 
-        public static Expression ConsoleWriteLine(string value, params Expression[] values)
-        {
-            return Call(typeof (Debug).GetDeclaredMethod("WriteLine", new[] {typeof (string), typeof(object[])}), 
-                Constant(value), 
+        public static Expression ConsoleWriteLine(string value, params Expression[] values) =>
+            Call(typeof(Debug).GetDeclaredMethod("WriteLine", new[] {typeof(string), typeof(object[])}),
+                Constant(value),
                 NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
-        }
 
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
         {
             var replaceExp = exp.Body;
-            for (var i = 0; i < Math.Min(replace.Count(), exp.Parameters.Count()); i++)
+            for (var i = 0; i < Math.Min(replace.Length, exp.Parameters.Count); i++)
                 replaceExp = replaceExp.Replace(exp.Parameters[i], replace[i]);
             return replaceExp;
         }
@@ -105,7 +97,7 @@ namespace AutoMapper
         public static Expression ConvertReplaceParameters(this LambdaExpression exp, params Expression[] replace)
         {
             var replaceExp = exp.Body;
-            for (var i = 0; i < Math.Min(replace.Count(), exp.Parameters.Count()); i++)
+            for (var i = 0; i < Math.Min(replace.Length, exp.Parameters.Count); i++)
                 replaceExp = new ConvertingVisitor(exp.Parameters[i], replace[i]).Visit(replaceExp);
             return replaceExp;
         }
@@ -136,22 +128,21 @@ namespace AutoMapper
 
         public static Expression RemoveIfNotNull(this Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
 
-        public static Expression IfNullElse(this Expression expression, params Expression[] ifElse)
-        {
-            return ifElse.Any()
-                ? Condition(NotEqual(expression, Default(expression.Type)), expression, ifElse.First().IfNullElse(ifElse.Skip(1).ToArray()))
+        public static Expression IfNullElse(this Expression expression, params Expression[] ifElse) =>
+            ifElse.Any()
+                ? Condition(NotEqual(expression, Default(expression.Type)), expression,
+                    ifElse.First().IfNullElse(ifElse.Skip(1).ToArray()))
                 : expression;
-        }
 
         internal class IfNotNullVisitor : ExpressionVisitor
         {
-            private Expression nullConditions = Constant(false);
+            private Expression _nullConditions = Constant(false);
 
             public Expression VisitRoot(Expression node, Type destinationType)
             {
                 var returnType = Nullable.GetUnderlyingType(destinationType) == node.Type ? destinationType : node.Type;
-                var expression = base.Visit(node);
-                var checkNull = Condition(nullConditions, Default(returnType), ToType(expression, returnType));
+                var expression = Visit(node);
+                var checkNull = Condition(_nullConditions, Default(returnType), ToType(expression, returnType));
                 return checkNull;
             }
 
@@ -162,7 +153,7 @@ namespace AutoMapper
                 {
                     return returnNode;
                 }
-                nullConditions = OrElse(nullConditions, Equal(node.Expression, Constant(null, node.Expression.Type)));
+                _nullConditions = OrElse(_nullConditions, Equal(node.Expression, Constant(null, node.Expression.Type)));
                 return returnNode;
             }
         }
@@ -171,10 +162,7 @@ namespace AutoMapper
         {
             private readonly Expression[] _expressions;
 
-            public RemoveIfNotNullVisitor(params Expression[] expressions)
-            {
-                _expressions = expressions;
-            }
+            public RemoveIfNotNullVisitor(params Expression[] expressions) => _expressions = expressions;
 
             protected override Expression VisitConditional(ConditionalExpression node)
             {
@@ -207,10 +195,10 @@ namespace AutoMapper
                 return base.VisitMember(node);
             }
 
-            protected override Expression VisitParameter(ParameterExpression node)
-            {
-                return node == _oldParam ? ToType(_newParam, _oldParam.Type) : base.VisitParameter(node);
-            }
+            protected override Expression VisitParameter(ParameterExpression node) => 
+                node == _oldParam 
+                    ? ToType(_newParam, _oldParam.Type) 
+                    : base.VisitParameter(node);
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
@@ -247,10 +235,7 @@ namespace AutoMapper
         {
             private readonly LambdaExpression _overrideExpression;
 
-            public ExpressionConcatVisitor(LambdaExpression overrideExpression)
-            {
-                _overrideExpression = overrideExpression;
-            }
+            public ExpressionConcatVisitor(LambdaExpression overrideExpression) => _overrideExpression = overrideExpression;
 
             public override Expression Visit(Expression node)
             {
@@ -267,10 +252,7 @@ namespace AutoMapper
                 return base.Visit(node);
             }
 
-            protected override Expression VisitLambda<T>(Expression<T> node)
-            {
-                return Lambda(Visit(node.Body), node.Parameters);
-            }
+            protected override Expression VisitLambda<T>(Expression<T> node) => Lambda(Visit(node.Body), node.Parameters);
         }
 
     }

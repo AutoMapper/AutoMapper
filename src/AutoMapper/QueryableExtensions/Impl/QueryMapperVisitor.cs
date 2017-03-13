@@ -1,13 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Threading;
-    using Execution;
-
     public class QueryMapperVisitor : ExpressionVisitor
     {
         private readonly IQueryable _destQuery;
@@ -50,16 +49,12 @@ namespace AutoMapper.QueryableExtensions.Impl
             return newNode;
         }
 
-        protected override Expression VisitParameter(ParameterExpression node)
-        {
-            return _instanceParameter;
-        }
+        protected override Expression VisitParameter(ParameterExpression node) => _instanceParameter;
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            var query = node.Value as IQueryable;
             // It is data source of queryable object instance
-            if (query != null && query.ElementType == _sourceType)
+            if (node.Value is IQueryable query && query.ElementType == _sourceType)
                 return _destQuery.Expression;
             return node;
         }
@@ -73,7 +68,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             // It is needed when PropertyMap is changing type of property
             if (left.Type != right.Type && right.NodeType == ExpressionType.Constant)
             {
-                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, System.Globalization.CultureInfo.CurrentCulture);
+                var value = Convert.ChangeType(((ConstantExpression)right).Value, left.Type, CultureInfo.CurrentCulture);
 
                 right = Expression.Constant(value, left.Type);
             }
@@ -125,8 +120,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
             // for typical orderby expression, a unaryexpression is used that contains a 
             // func which in turn defines the type of the field that has to be used for ordering/sorting
-            var unary = newOrderByExpr as UnaryExpression;
-            if (unary != null && unary.Operand.Type.IsGenericType())
+            if (newOrderByExpr is UnaryExpression unary && unary.Operand.Type.IsGenericType())
             {
                 methodArgs[1] = methodArgs[1].ReplaceItemType(typeof(string), unary.Operand.Type.GetGenericArguments().Last());
             }
@@ -139,10 +133,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             return Expression.Call(newObject, orderByMethod, newQuery, newOrderByExpr);
         }
 
-        protected override Expression VisitMember(MemberExpression node)
-        {
-            return _memberVisitor.Visit(node);
-        }
+        protected override Expression VisitMember(MemberExpression node) => _memberVisitor.Visit(node);
 
         private MethodInfo ChangeMethodArgTypeFormSourceToDest(MethodInfo mi)
         {

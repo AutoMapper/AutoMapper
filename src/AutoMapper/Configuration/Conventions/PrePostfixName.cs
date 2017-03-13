@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper.Configuration.Conventions
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Reflection;
-
     public class PrePostfixName : ISourceToDestinationNameMapper
     {
         public ICollection<string> Prefixes { get; } = new Collection<string>();

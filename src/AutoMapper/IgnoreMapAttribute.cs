@@ -1,7 +1,7 @@
-﻿namespace AutoMapper
-{
-    using System;
+﻿using System;
 
+namespace AutoMapper
+{
     /// <summary>
     /// Ignore this member for validation and skip during mapping
     /// </summary>

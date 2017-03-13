@@ -1,14 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using AutoMapper.Configuration;
+using AutoMapper.Configuration.Conventions;
+using AutoMapper.Mappers;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-    using Configuration;
-    using Configuration.Conventions;
-    using Mappers;
-
     /// <summary>
     ///     Provides a named configuration for maps. Naming conventions become scoped per profile.
     /// </summary>
@@ -29,10 +29,7 @@ namespace AutoMapper
         private readonly List<ITypeMapConfiguration> _typeMapConfigs = new List<ITypeMapConfiguration>();
 
         protected Profile(string profileName)
-            : this()
-        {
-            ProfileName = profileName;
-        }
+            : this() => ProfileName = profileName;
 
         protected Profile()
         {
@@ -98,20 +95,14 @@ namespace AutoMapper
             });
         }
 
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>()
-        {
-            return CreateMap<TSource, TDestination>(MemberList.Destination);
-        }
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>() => 
+            CreateMap<TSource, TDestination>(MemberList.Destination);
 
-        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList)
-        {
-            return CreateMappingExpression<TSource, TDestination>(memberList);
-        }
+        public IMappingExpression<TSource, TDestination> CreateMap<TSource, TDestination>(MemberList memberList) => 
+            CreateMappingExpression<TSource, TDestination>(memberList);
 
-        public IMappingExpression CreateMap(Type sourceType, Type destinationType)
-        {
-            return CreateMap(sourceType, destinationType, MemberList.Destination);
-        }
+        public IMappingExpression CreateMap(Type sourceType, Type destinationType) => 
+            CreateMap(sourceType, destinationType, MemberList.Destination);
 
         public IMappingExpression CreateMap(Type sourceType, Type destinationType, MemberList memberList)
         {
@@ -188,7 +179,7 @@ namespace AutoMapper
                     .Where(
                         m =>
                             m.IsStatic && m.IsDefined(typeof(ExtensionAttribute), false) &&
-                            (m.GetParameters().Length == 1)));
+                            m.GetParameters().Length == 1));
         }
 
         [Obsolete(

@@ -2,21 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.Mappers
 {
-    using Configuration;
     using static Expression;
 
     public class EnumerableMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context)
-        {
-            // destination type must be IEnumerable interface or a class implementing at least IList 
-            return ((context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType()) ||
-                    context.DestinationType.IsListType())
-                   && context.SourceType.IsEnumerableType();
-        }
+        public bool IsMatch(TypePair context) => (context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType() ||
+                                                  context.DestinationType.IsListType())
+                                                 && context.SourceType.IsEnumerableType();
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
@@ -29,9 +25,6 @@ namespace AutoMapper.Mappers
                 destExpression, contextExpression, IfEditableList, typeof(List<>), CollectionMapperExtensions.MapItemExpr);
         }
 
-        private static Expression IfEditableList(Expression dest)
-        {
-            return And(TypeIs(dest, typeof(IList)), Not(TypeIs(dest, typeof(Array))));
-        }
+        private static Expression IfEditableList(Expression dest) => And(TypeIs(dest, typeof(IList)), Not(TypeIs(dest, typeof(Array))));
     }
 }

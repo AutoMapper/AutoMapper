@@ -1,14 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using AutoMapper.Configuration;
+using AutoMapper.Configuration.Conventions;
+using AutoMapper.Mappers;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reflection;
-    using Configuration;
-    using Configuration.Conventions;
-    using Mappers;
-
 #if NETSTANDARD1_1
     struct IConvertible{}
 #endif
@@ -16,7 +16,7 @@ namespace AutoMapper
     [DebuggerDisplay("{Name}")]
     public class ProfileMap
     {
-        private static readonly Type[] ExcludedTypes = new[]{ typeof(object), typeof(ValueType), typeof(Enum), typeof(IComparable), typeof(IFormattable), typeof(IConvertible) };
+        private static readonly Type[] ExcludedTypes = { typeof(object), typeof(ValueType), typeof(Enum), typeof(IComparable), typeof(IFormattable), typeof(IConvertible) };
         private readonly TypeMapFactory _typeMapFactory = new TypeMapFactory();
         private readonly IEnumerable<ITypeMapConfiguration> _typeMapConfigs;
         private readonly IEnumerable<ITypeMapConfiguration> _openTypeMapConfigs;
@@ -96,15 +96,9 @@ namespace AutoMapper
         public IEnumerable<string> Prefixes { get; }
         public IEnumerable<string> Postfixes { get; }
 
-        public TypeDetails CreateTypeDetails(Type type)
-        {
-            return _typeDetails.GetOrAdd(type);
-        }
+        public TypeDetails CreateTypeDetails(Type type) => _typeDetails.GetOrAdd(type);
 
-        private TypeDetails TypeDetailsFactory(Type type)
-        {
-            return new TypeDetails(type, this);
-        }
+        private TypeDetails TypeDetailsFactory(Type type) => new TypeDetails(type, this);
 
         public void Register(TypeMapRegistry typeMapRegistry)
         {

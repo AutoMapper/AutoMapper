@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Linq.Expressions;
+
 namespace AutoMapper.QueryableExtensions
 {
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-
     public interface IExpressionBinder
     {
         bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result);

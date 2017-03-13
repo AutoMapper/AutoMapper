@@ -22,10 +22,9 @@ namespace AutoMapper.Mappers
             var condition = conditionalExpression(passedDestination);
             var newExpression = Variable(passedDestination.Type, "collectionDestination");
             var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
-            ParameterExpression itemParam;
 
             var itemExpr = mapItem(configurationProvider, profileMap, propertyMap, sourceExpression.Type, passedDestination.Type,
-                contextExpression, out itemParam);
+                contextExpression, out ParameterExpression itemParam);
 
             var destinationElementType = itemExpr.Type;
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
@@ -102,9 +101,6 @@ namespace AutoMapper.Mappers
             return keyPair;
         }
 
-        internal static BinaryExpression IfNotNull(Expression destExpression)
-        {
-            return NotEqual(destExpression, Constant(null));
-        }
+        internal static BinaryExpression IfNotNull(Expression destExpression) => NotEqual(destExpression, Constant(null));
     }
 }

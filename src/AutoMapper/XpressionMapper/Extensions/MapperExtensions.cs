@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using AutoMapper;
-using AutoMapper.XpressionMapper.Structures;
+using static System.Linq.Expressions.Expression;
 using System.Reflection;
 
 namespace AutoMapper.XpressionMapper.Extensions
@@ -29,18 +28,18 @@ namespace AutoMapper.XpressionMapper.Extensions
                 throw new ArgumentException(Resource.mustBeExpressions);
             }
 
-            Type typeSourceFunc = expression.GetType().GetGenericArguments()[0];
-            Type typeDestFunc = typeof(TDestDelegate).GetGenericArguments()[0];
+            var typeSourceFunc = expression.GetType().GetGenericArguments()[0];
+            var typeDestFunc = typeof(TDestDelegate).GetGenericArguments()[0];
 
-            Dictionary<Type, Type> typeMappings = new Dictionary<Type, Type>()
+            var typeMappings = new Dictionary<Type, Type>()
                                             .AddTypeMappingsFromDelegates(typeSourceFunc, typeDestFunc);
 
-            XpressionMapperVisitor visitor = new XpressionMapperVisitor(mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider, typeMappings);
-            Expression remappedBody = visitor.Visit(expression.Body);
+            var visitor = new XpressionMapperVisitor(mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider, typeMappings);
+            var remappedBody = visitor.Visit(expression.Body);
             if (remappedBody == null)
                 throw new InvalidOperationException(Resource.cantRemapExpression);
 
-            return (TDestDelegate)Expression.Lambda(typeDestFunc, remappedBody, expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings));
+            return (TDestDelegate)Lambda(typeDestFunc, remappedBody, expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings));
         }
 
         /// <summary>
@@ -53,10 +52,8 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <returns></returns>
         public static TDestDelegate MapExpression<TSourceDelegate, TDestDelegate>(this IMapper mapper, TSourceDelegate expression)
             where TSourceDelegate : LambdaExpression
-            where TDestDelegate : LambdaExpression
-        {
-            return mapper.MapExpression<TDestDelegate>(expression);
-        }
+            where TDestDelegate : LambdaExpression 
+            => mapper.MapExpression<TDestDelegate>(expression);
 
         /// <summary>
         /// Maps an expression to be used as an "Include" given a dictionary of types where the source type is the key and the destination type is the value.
@@ -77,18 +74,18 @@ namespace AutoMapper.XpressionMapper.Extensions
                 throw new ArgumentException(Resource.mustBeExpressions);
             }
 
-            Type typeSourceFunc = expression.GetType().GetGenericArguments()[0];
-            Type typeDestFunc = typeof(TDestDelegate).GetGenericArguments()[0];
+            var typeSourceFunc = expression.GetType().GetGenericArguments()[0];
+            var typeDestFunc = typeof(TDestDelegate).GetGenericArguments()[0];
 
-            Dictionary<Type, Type> typeMappings = new Dictionary<Type, Type>()
+            var typeMappings = new Dictionary<Type, Type>()
                                             .AddTypeMappingsFromDelegates(typeSourceFunc, typeDestFunc);
 
             XpressionMapperVisitor visitor = new MapIncludesVisitor(mapper == null ? Mapper.Configuration : mapper.ConfigurationProvider, typeMappings);
-            Expression remappedBody = visitor.Visit(expression.Body);
+            var remappedBody = visitor.Visit(expression.Body);
             if (remappedBody == null)
                 throw new InvalidOperationException(Resource.cantRemapExpression);
 
-            return (TDestDelegate)Expression.Lambda(typeDestFunc, remappedBody, expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings));
+            return (TDestDelegate)Lambda(typeDestFunc, remappedBody, expression.GetDestinationParameterExpressions(visitor.InfoDictionary, typeMappings));
         }
 
         /// <summary>
@@ -101,10 +98,8 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <returns></returns>
         public static TDestDelegate MapExpressionAsInclude<TSourceDelegate, TDestDelegate>(this IMapper mapper, TSourceDelegate expression)
             where TSourceDelegate : LambdaExpression
-            where TDestDelegate : LambdaExpression
-        {
-            return mapper.MapExpressionAsInclude<TDestDelegate>(expression);
-        }
+            where TDestDelegate : LambdaExpression 
+            => mapper.MapExpressionAsInclude<TDestDelegate>(expression);
 
         /// <summary>
         /// Maps a collection of expressions given a dictionary of types where the source type is the key and the destination type is the value.
@@ -116,13 +111,8 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <returns></returns>
         public static ICollection<TDestDelegate> MapExpressionList<TSourceDelegate, TDestDelegate>(this IMapper mapper, ICollection<TSourceDelegate> collection)
             where TSourceDelegate : LambdaExpression
-            where TDestDelegate : LambdaExpression
-        {
-            if (collection == null)
-                return null;
-
-            return collection.Select(item => mapper.MapExpression<TSourceDelegate, TDestDelegate>(item)).ToList();
-        }
+            where TDestDelegate : LambdaExpression 
+            => collection?.Select(mapper.MapExpression<TSourceDelegate, TDestDelegate>).ToList();
 
         /// <summary>
         /// Maps a collection of expressions given a dictionary of types where the source type is the key and the destination type is the value.
@@ -132,13 +122,8 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <param name="collection"></param>
         /// <returns></returns>
         public static ICollection<TDestDelegate> MapExpressionList<TDestDelegate>(this IMapper mapper, IEnumerable<LambdaExpression> collection)
-            where TDestDelegate : LambdaExpression
-        {
-            if (collection == null)
-                return null;
-
-            return collection.Select(item => mapper.MapExpression<TDestDelegate>(item)).ToList();
-        }
+            where TDestDelegate : LambdaExpression 
+            => collection?.Select(mapper.MapExpression<TDestDelegate>).ToList();
 
         /// <summary>
         /// Maps a collection of expressions to be used as a "Includes" given a dictionary of types where the source type is the key and the destination type is the value.
@@ -150,13 +135,8 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <returns></returns>
         public static ICollection<TDestDelegate> MapIncludesList<TSourceDelegate, TDestDelegate>(this IMapper mapper, ICollection<TSourceDelegate> collection)
             where TSourceDelegate : LambdaExpression
-            where TDestDelegate : LambdaExpression
-        {
-            if (collection == null)
-                return null;
-
-            return collection.Select(item => mapper.MapExpressionAsInclude<TSourceDelegate, TDestDelegate>(item)).ToList();
-        }
+            where TDestDelegate : LambdaExpression 
+            => collection?.Select(mapper.MapExpressionAsInclude<TSourceDelegate, TDestDelegate>).ToList();
 
         /// <summary>
         /// Maps a collection of expressions to be used as a "Includes" given a dictionary of types where the source type is the key and the destination type is the value.
@@ -166,13 +146,8 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <param name="collection"></param>
         /// <returns></returns>
         public static ICollection<TDestDelegate> MapIncludesList<TDestDelegate>(this IMapper mapper, IEnumerable<LambdaExpression> collection)
-            where TDestDelegate : LambdaExpression
-        {
-            if (collection == null)
-                return null;
-
-            return collection.Select(item => mapper.MapExpressionAsInclude<TDestDelegate>(item)).ToList();
-        }
+            where TDestDelegate : LambdaExpression 
+            => collection?.Select(mapper.MapExpressionAsInclude<TDestDelegate>).ToList();
 
         /// <summary>
         /// Takes a list of parameters from the source lamda expression and returns a list of parameters for the destination lambda expression.
@@ -183,10 +158,9 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <returns></returns>
         public static List<ParameterExpression> GetDestinationParameterExpressions(this LambdaExpression expression, MapperInfoDictionary infoDictionary, Dictionary<Type, Type> typeMappings)
         {
-            foreach (ParameterExpression p in expression.Parameters)
+            foreach (var p in expression.Parameters.Where(p => !infoDictionary.ContainsKey(p)))
             {
-                if (!infoDictionary.ContainsKey(p))//possible cases where the parameter has not been used in the body.
-                    infoDictionary.Add(p, typeMappings);
+                infoDictionary.Add(p, typeMappings);
             }
 
             return expression.Parameters.Select(p => infoDictionary[p].NewParameter).ToList();
@@ -200,17 +174,14 @@ namespace AutoMapper.XpressionMapper.Extensions
         /// <param name="typeMappings"></param>
         /// <returns></returns>
         public static Dictionary<Type, Type> AddTypeMapping<TSource, TDest>(this Dictionary<Type, Type> typeMappings)
-        {
-            if (typeMappings == null)
-                throw new ArgumentException(Resource.typeMappingsDictionaryIsNull);
-
-            return typeMappings.AddTypeMapping(typeof(TSource), typeof(TDest));
-        }
+            => typeMappings == null
+                ? throw new ArgumentException(Resource.typeMappingsDictionaryIsNull)
+                : typeMappings.AddTypeMapping(typeof(TSource), typeof(TDest));
 
         private static void AddUnderlyimgGenericTypes(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
         {
-            List<Type> sourceArguments = sourceType.GetUnderlyingGenericTypes();
-            List<Type> destArguments = destType.GetUnderlyingGenericTypes();
+            var sourceArguments = sourceType.GetUnderlyingGenericTypes();
+            var destArguments = destType.GetUnderlyingGenericTypes();
 
             sourceArguments.Aggregate(typeMappings, (dic, next) =>
             {
@@ -251,22 +222,13 @@ namespace AutoMapper.XpressionMapper.Extensions
             return typeMappings;
         }
 
-        #region Private Methods
-        private static Dictionary<Type, Type> AddTypeMappingsFromDelegates<TSourceDelegate, TDestDelegate>(this Dictionary<Type, Type> typeMappings)
-        {
-            if (typeMappings == null)
-                throw new ArgumentException(Resource.typeMappingsDictionaryIsNull);
-
-            return typeMappings.AddTypeMappingsFromDelegates(typeof(TSourceDelegate), typeof(TDestDelegate));
-        }
-
         private static Dictionary<Type, Type> AddTypeMappingsFromDelegates(this Dictionary<Type, Type> typeMappings, Type sourceType, Type destType)
         {
             if (typeMappings == null)
                 throw new ArgumentException(Resource.typeMappingsDictionaryIsNull);
 
-            List<Type> sourceArguments = sourceType.GetGenericArguments().ToList();
-            List<Type> destArguments = destType.GetGenericArguments().ToList();
+            var sourceArguments = sourceType.GetGenericArguments().ToList();
+            var destArguments = destType.GetGenericArguments().ToList();
 
             if (sourceArguments.Count != destArguments.Count)
                 throw new ArgumentException(Resource.invalidArgumentCount);
@@ -279,6 +241,5 @@ namespace AutoMapper.XpressionMapper.Extensions
                 return dic;
             });
         }
-        #endregion Private Methods
     }
 }

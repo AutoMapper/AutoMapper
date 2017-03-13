@@ -10,11 +10,11 @@ namespace AutoMapper.XpressionMapper.Structures
 
         }
 
-        public MapperInfo(ParameterExpression newParameter, Type _sourceType, Type _destType)
+        public MapperInfo(ParameterExpression newParameter, Type sourceType, Type destType)
         {
             NewParameter = newParameter;
-            SourceType = _sourceType;
-            DestType = _destType;
+            SourceType = sourceType;
+            DestType = destType;
         }
 
         public Type SourceType { get; set; }

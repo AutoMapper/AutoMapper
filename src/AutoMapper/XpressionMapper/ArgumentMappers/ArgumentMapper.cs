@@ -6,21 +6,14 @@ namespace AutoMapper.XpressionMapper.ArgumentMappers
     {
         protected ArgumentMapper(XpressionMapperVisitor expressionVisitor, Expression argument)
         {
-            this.expressionVisitor = expressionVisitor;
-            this.argument = argument;
+            ExpressionVisitor = expressionVisitor;
+            Argument = argument;
         }
 
-        #region Variables
-        private XpressionMapperVisitor expressionVisitor;
-        #endregion Variables
-
-        #region Properties
-        protected Expression argument;
-        protected virtual XpressionMapperVisitor ExpressionVisitor { get { return this.expressionVisitor; } }
+        protected Expression Argument { get; }
+        protected virtual XpressionMapperVisitor ExpressionVisitor { get; }
         public abstract Expression MappedArgumentExpression { get; }
-        #endregion Properties
 
-        #region Methods
         public static ArgumentMapper Create(XpressionMapperVisitor expressionVisitor, Expression argument)
         {
             switch (argument.NodeType)
@@ -33,6 +26,5 @@ namespace AutoMapper.XpressionMapper.ArgumentMappers
                     return new DefaultArgumentMapper(expressionVisitor, argument);
             }
         }
-        #endregion Methods
     }
 }

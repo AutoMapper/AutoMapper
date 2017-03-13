@@ -1,18 +1,16 @@
+using System;
+using System.Linq;
+using System.Linq.Expressions;
+
 namespace AutoMapper.Execution
 {
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using static System.Linq.Expressions.Expression;
+    using static Expression;
 
     public static class DelegateFactory
     {
-        private static readonly LockingConcurrentDictionary<Type, Func<object>> _ctorCache = new LockingConcurrentDictionary<Type, Func<object>>(GenerateConstructor);
+        private static readonly LockingConcurrentDictionary<Type, Func<object>> CtorCache = new LockingConcurrentDictionary<Type, Func<object>>(GenerateConstructor);
 
-        public static Func<object> CreateCtor(Type type)
-        {
-            return _ctorCache.GetOrAdd(type);
-        }
+        public static Func<object> CreateCtor(Type type) => CtorCache.GetOrAdd(type);
 
         private static Func<object> GenerateConstructor(Type type)
         {
@@ -21,20 +19,17 @@ namespace AutoMapper.Execution
             return Lambda<Func<object>>(Convert(ctorExpr, typeof(object))).Compile();
         }
 
-        public static Expression GenerateConstructorExpression(Type type, ProfileMap configuration)
-        {
-            return configuration.AllowNullDestinationValues ? GenerateConstructorExpression(type) : GenerateNonNullConstructorExpression(type);
-        }
+        public static Expression GenerateConstructorExpression(Type type, ProfileMap configuration) =>
+            configuration.AllowNullDestinationValues
+                ? GenerateConstructorExpression(type)
+                : GenerateNonNullConstructorExpression(type);
 
-        public static Expression GenerateNonNullConstructorExpression(Type type)
-        {
-            return type.IsValueType()
-                ? Default(type)
-                : (type == typeof(string)
-                    ? Constant(string.Empty)
-                    : GenerateConstructorExpression(type)
-                );
-        }
+        public static Expression GenerateNonNullConstructorExpression(Type type) => type.IsValueType()
+            ? Default(type)
+            : (type == typeof(string)
+                ? Constant(string.Empty)
+                : GenerateConstructorExpression(type)
+            );
 
         public static Expression GenerateConstructorExpression(Type type)
         {
@@ -56,7 +51,7 @@ namespace AutoMapper.Execution
             var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
             if (ctorWithOptionalArgs == null)
             {
-                var ex = new ArgumentException(type + " needs to have a constructor with 0 args or only optional args", "type");
+                var ex = new ArgumentException(type + " needs to have a constructor with 0 args or only optional args", nameof(type));
                 return Block(Throw(Constant(ex)), Constant(null));
             }
             //get all optional default values

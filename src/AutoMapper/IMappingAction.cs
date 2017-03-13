@@ -5,7 +5,7 @@ namespace AutoMapper
     /// </summary>
     /// <typeparam name="TSource">Source type</typeparam>
     /// <typeparam name="TDestination">Destination type</typeparam>
-    public interface IMappingAction<TSource, TDestination>
+    public interface IMappingAction<in TSource, in TDestination>
     {
         /// <summary>
         /// Implementors can modify both the source and destination objects

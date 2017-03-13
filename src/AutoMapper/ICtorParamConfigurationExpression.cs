@@ -1,10 +1,10 @@
-﻿namespace AutoMapper
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
+namespace AutoMapper
+{
     public interface ICtorParamConfigurationExpression<TSource>
     {
         /// <summary>
@@ -32,10 +32,7 @@
         private readonly string _ctorParamName;
         private readonly List<Action<ConstructorParameterMap>> _ctorParamActions = new List<Action<ConstructorParameterMap>>();
 
-        public CtorParamConfigurationExpression(string ctorParamName)
-        {
-            _ctorParamName = ctorParamName;
-        }
+        public CtorParamConfigurationExpression(string ctorParamName) => _ctorParamName = ctorParamName;
 
         public void MapFrom<TMember>(Expression<Func<TSource, TMember>> sourceMember)
         {

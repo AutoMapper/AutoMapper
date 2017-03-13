@@ -1,11 +1,11 @@
-﻿#if NETSTANDARD1_3 || NET45
+﻿using System.Collections.Specialized;
+using System.Linq.Expressions;
+using static System.Linq.Expressions.Expression;
+using System.Reflection;
+
+#if NETSTANDARD1_3 || NET45
 namespace AutoMapper.Mappers
 {
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Collections.Specialized;
-
     public class NameValueCollectionMapper : IObjectMapper
     {
         private static NameValueCollection Map(NameValueCollection source)
@@ -22,17 +22,11 @@ namespace AutoMapper.Mappers
 
         private static readonly MethodInfo MapMethodInfo = typeof(NameValueCollectionMapper).GetDeclaredMethod(nameof(Map));
 
-        public bool IsMatch(TypePair context)
-        {
-            return
-                context.SourceType == typeof (NameValueCollection) &&
-                context.DestinationType == typeof (NameValueCollection);
-        }
+        public bool IsMatch(TypePair context) => context.SourceType == typeof (NameValueCollection) &&
+                                                 context.DestinationType == typeof (NameValueCollection);
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return Expression.Call(null, MapMethodInfo, sourceExpression);
-        }
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression) => 
+            Call(null, MapMethodInfo, sourceExpression);
     }
 }
 #endif

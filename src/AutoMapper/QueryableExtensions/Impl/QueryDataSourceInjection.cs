@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using AutoMapper.Execution;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
     using MemberPaths = IEnumerable<IEnumerable<MemberInfo>>;
-    using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
+    using IObjectDictionary = IDictionary<string, object>;
 
     public interface IQueryDataSourceInjection<TSource>
     {
@@ -55,11 +53,11 @@ namespace AutoMapper.QueryableExtensions.Impl
         private readonly IMapper _mapper;
         private readonly List<ExpressionVisitor> _beforeMappingVisitors = new List<ExpressionVisitor>();
         private readonly List<ExpressionVisitor> _afterMappingVisitors = new List<ExpressionVisitor>();
-        private ExpressionVisitor _sourceExpressionTracer = null;
-        private ExpressionVisitor _destinationExpressionTracer = null;
-        private Action<Exception> _exceptionHandler = ((x) => { });
-        private MemberPaths _membersToExpand = null;
-        private IObjectDictionary _parameters = null;
+        private readonly ExpressionVisitor _sourceExpressionTracer = null;
+        private readonly ExpressionVisitor _destinationExpressionTracer = null;
+        private Action<Exception> _exceptionHandler = x => { };
+        private MemberPaths _membersToExpand;
+        private IObjectDictionary _parameters;
         private SourceInjectedQueryInspector _inspector;
 
         public QueryDataSourceInjection(IQueryable<TSource> dataSource, IMapper mapper)
@@ -68,10 +66,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             _mapper = mapper;
         }
 
-        public ISourceInjectedQueryable<TDestination> For<TDestination>()
-        {
-            return CreateQueryable<TDestination>();
-        }
+        public ISourceInjectedQueryable<TDestination> For<TDestination>() => CreateQueryable<TDestination>();
 
         public ISourceInjectedQueryable<TDestination> For<TDestination>(object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
         {
@@ -112,10 +107,9 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// <returns></returns>
         public IQueryDataSourceInjection<TSource> BeforeProjection(params ExpressionVisitor[] visitors)
         {
-            foreach (var visitor in visitors)
+            foreach (var visitor in visitors.Where(visitor => !_beforeMappingVisitors.Contains(visitor)))
             {
-                if (!_beforeMappingVisitors.Contains(visitor))
-                    _beforeMappingVisitors.Add(visitor);
+                _beforeMappingVisitors.Add(visitor);
             }
             return this;
         }
@@ -127,10 +121,9 @@ namespace AutoMapper.QueryableExtensions.Impl
         /// <returns></returns>
         public IQueryDataSourceInjection<TSource> AfterProjection(params ExpressionVisitor[] visitors)
         {
-            foreach (var visitor in visitors)
+            foreach (var visitor in visitors.Where(visitor => !_afterMappingVisitors.Contains(visitor)))
             {
-                if (!_afterMappingVisitors.Contains(visitor))
-                    _afterMappingVisitors.Add(visitor);
+                _afterMappingVisitors.Add(visitor);
             }
             return this;
         }
@@ -148,9 +141,8 @@ namespace AutoMapper.QueryableExtensions.Impl
             return this;
         }
 
-        private ISourceInjectedQueryable<TDestination> CreateQueryable<TDestination>()
-        {
-            return new SourceSourceInjectedQuery<TSource, TDestination>(_dataSource,
+        private ISourceInjectedQueryable<TDestination> CreateQueryable<TDestination>() =>
+            new SourceSourceInjectedQuery<TSource, TDestination>(_dataSource,
                 new TDestination[0].AsQueryable(),
                 _mapper,
                 _beforeMappingVisitors,
@@ -159,7 +151,6 @@ namespace AutoMapper.QueryableExtensions.Impl
                 _parameters,
                 _membersToExpand,
                 _inspector);
-        }
 
         private static IObjectDictionary GetParameters(object parameters)
         {
@@ -168,11 +159,11 @@ namespace AutoMapper.QueryableExtensions.Impl
                 .ToDictionary(pi => pi.Name, pi => pi.GetValue(parameters, null));
         }
 
-        private MemberPaths GetMemberPaths(Type type, string[] membersToExpand)
+        private static MemberPaths GetMemberPaths(Type type, string[] membersToExpand)
         {
             return membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));
         }
-        private MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
+        private static MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
         {
             return membersToExpand.Select(expr =>
             {

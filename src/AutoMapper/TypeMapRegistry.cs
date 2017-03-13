@@ -1,9 +1,8 @@
+using System.Collections.Generic;
+using AutoMapper.Configuration;
+
 namespace AutoMapper
 {
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using Configuration;
-
     public class TypeMapRegistry
     {
         private readonly IDictionary<TypePair, TypeMap> _typeMaps = new Dictionary<TypePair, TypeMap>();

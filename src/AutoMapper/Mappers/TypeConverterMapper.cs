@@ -1,13 +1,12 @@
-using System.Linq;
+using System;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Configuration;
+using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
 {
-    using System;
-    using System.ComponentModel;
-    using Configuration;
-
     public class TypeConverterMapper : IObjectMapper
     {
         private static TDestination Map<TSource, TDestination>(TSource source)
@@ -41,20 +40,17 @@ namespace AutoMapper.Mappers
             var sourceTypeConverter = GetTypeConverter(context.SourceType);
             var destTypeConverter = GetTypeConverter(context.DestinationType);
 
-            return sourceTypeConverter.CanConvertTo(context.DestinationType) ||
-                   (context.DestinationType.IsNullableType() &&
-                    sourceTypeConverter.CanConvertTo(Nullable.GetUnderlyingType(context.DestinationType)) ||
-                    destTypeConverter.CanConvertFrom(context.SourceType));
+            return sourceTypeConverter.CanConvertTo(context.DestinationType) || context.DestinationType.IsNullableType() &&
+                   sourceTypeConverter.CanConvertTo(Nullable.GetUnderlyingType(context.DestinationType)) || destTypeConverter.CanConvertFrom(context.SourceType);
         }
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-        {
-            return Expression.Call(null, MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type), sourceExpression);
-        }
+        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
+            PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
+            Expression contextExpression) =>
+            Call(null,
+                MapMethodInfo.MakeGenericMethod(sourceExpression.Type, destExpression.Type),
+                sourceExpression);
 
-        private static TypeConverter GetTypeConverter(Type type)
-        {
-            return TypeDescriptor.GetConverter(type);
-        }
+        private static TypeConverter GetTypeConverter(Type type) => TypeDescriptor.GetConverter(type);
     }
 }

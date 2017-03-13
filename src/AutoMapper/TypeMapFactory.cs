@@ -1,12 +1,11 @@
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Execution;
-
     public class TypeMapFactory
     {
         public TypeMap CreateTypeMap(Type sourceType, Type destinationType, ProfileMap options, MemberList memberList)

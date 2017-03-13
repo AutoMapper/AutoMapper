@@ -1,15 +1,15 @@
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper.Configuration;
+using AutoMapper.Execution;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Configuration;
-    using Execution;
-
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
     /// </summary>
@@ -78,10 +78,7 @@ namespace AutoMapper
         public Type TypeConverterType { get; set; }
         public bool DisableConstructorValidation { get; set; }
 
-        public PropertyMap[] GetPropertyMaps()
-        {
-            return _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
-        }
+        public PropertyMap[] GetPropertyMaps() => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
 
         public bool ConstructorParameterMatches(string destinationPropertyName)
         {
@@ -99,17 +96,16 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
-            Func<PropertyMap, string> getFunc =
-                pm =>
-                    ConfiguredMemberList == MemberList.Destination
-                        ? pm.DestinationProperty.Name
-                        : pm.CustomExpression == null && pm.SourceMember != null
-                            ? pm.SourceMember.Name
-                            : pm.DestinationProperty.Name;
+            string GetFunc(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
+                ? pm.DestinationProperty.Name
+                : pm.CustomExpression == null && pm.SourceMember != null
+                    ? pm.SourceMember.Name
+                    : pm.DestinationProperty.Name;
+
             var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
-                .Select(getFunc).ToList();
+                .Select(GetFunc).ToList();
             var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
-                .Select(getFunc).ToList();
+                .Select(GetFunc).ToList();
 
             IEnumerable<string> properties;
 
@@ -222,15 +218,9 @@ namespace AutoMapper
             return match.DestinationType ?? DestinationType;
         }
 
-        public bool TypeHasBeenIncluded(TypePair derivedTypes)
-        {
-            return _includedDerivedTypes.Contains(derivedTypes);
-        }
+        public bool TypeHasBeenIncluded(TypePair derivedTypes) => _includedDerivedTypes.Contains(derivedTypes);
 
-        public bool HasDerivedTypesToInclude()
-        {
-            return _includedDerivedTypes.Any() || DestinationTypeOverride != null;
-        }
+        public bool HasDerivedTypesToInclude() => _includedDerivedTypes.Any() || DestinationTypeOverride != null;
 
         public void AddBeforeMapAction(LambdaExpression beforeMap)
         {
@@ -329,14 +319,11 @@ namespace AutoMapper
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }
 
-        public bool ShouldCheckForValid()
-        {
-            return CustomMapper == null
-                && CustomProjection == null
-                && TypeConverterType == null
-                && DestinationTypeOverride == null
-                && ConfiguredMemberList != MemberList.None;
-        }
+        public bool ShouldCheckForValid() => CustomMapper == null
+                                             && CustomProjection == null
+                                             && TypeConverterType == null
+                                             && DestinationTypeOverride == null
+                                             && ConfiguredMemberList != MemberList.None;
 
         private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {

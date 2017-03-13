@@ -1,7 +1,7 @@
+using System.Reflection;
+
 namespace AutoMapper.Configuration
 {
-    using System.Reflection;
-
     /// <summary>
     /// Contains member configuration relating to source members
     /// </summary>
@@ -9,12 +9,9 @@ namespace AutoMapper.Configuration
     {
         private bool _ignored;
 
-        public SourceMemberConfig(MemberInfo sourceMember)
-        {
-            SourceMember = sourceMember;
-        }
+        public SourceMemberConfig(MemberInfo sourceMember) => SourceMember = sourceMember;
 
-        public MemberInfo SourceMember { get; private set; }
+        public MemberInfo SourceMember { get; }
 
         public void Ignore() => _ignored = true;
 

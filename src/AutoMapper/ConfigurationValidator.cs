@@ -1,21 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper.Configuration;
+using AutoMapper.Mappers;
+
 namespace AutoMapper
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Configuration;
-    using Execution;
-    using Mappers;
     using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
 
     public class ConfigurationValidator
     {
         private readonly IConfigurationProvider _config;
 
-        public ConfigurationValidator(IConfigurationProvider config)
-        {
-            _config = config;
-        }
+        public ConfigurationValidator(IConfigurationProvider config) => _config = config;
 
         public void AssertConfigurationIsValid(IEnumerable<TypeMap> typeMaps)
         {
@@ -96,9 +93,9 @@ namespace AutoMapper
 
         private void CheckElementMaps(ICollection<TypeMap> typeMapsChecked, TypePair types, PropertyMap propertyMap)
         {
-            Type sourceElementType = TypeHelper.GetElementType(types.SourceType);
-            Type destElementType = TypeHelper.GetElementType(types.DestinationType);
-            TypeMap itemTypeMap = _config.ResolveTypeMap(sourceElementType, destElementType);
+            var sourceElementType = TypeHelper.GetElementType(types.SourceType);
+            var destElementType = TypeHelper.GetElementType(types.DestinationType);
+            var itemTypeMap = _config.ResolveTypeMap(sourceElementType, destElementType);
 
             if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
                 return;

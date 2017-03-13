@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using AutoMapper.Mappers;
+
 namespace AutoMapper.Configuration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Mappers;
-
     public class MapperConfigurationExpression : Profile, IMapperConfigurationExpression, IConfiguration
     {
         private readonly IList<Profile> _profiles = new List<Profile>();

@@ -2,19 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.Mappers
 {
-    using Configuration;
     using static Expression;
     using static ExpressionExtensions;
 
     public class ArrayMapper : IObjectMapper
     {
-        public bool IsMatch(TypePair context)
-        {
-            return (context.DestinationType.IsArray) && (context.SourceType.IsEnumerableType());
-        }
+        public bool IsMatch(TypePair context) => context.DestinationType.IsArray && context.SourceType.IsEnumerableType();
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
@@ -25,8 +22,7 @@ namespace AutoMapper.Mappers
                                  ? (Expression) Constant(null, destExpression.Type)
                                  : NewArrayBounds(destElementType, Constant(0));
 
-            ParameterExpression itemParam;
-            var itemExpr = CollectionMapperExtensions.MapItemExpr(configurationProvider, profileMap, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out itemParam);
+            var itemExpr = CollectionMapperExtensions.MapItemExpr(configurationProvider, profileMap, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out ParameterExpression itemParam);
 
             //var count = source.Count();
             //var array = new TDestination[count];
