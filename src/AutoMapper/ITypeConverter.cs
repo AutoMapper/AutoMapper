@@ -5,7 +5,7 @@ namespace AutoMapper
     /// </summary>
     /// <typeparam name="TSource">Source type</typeparam>
     /// <typeparam name="TDestination">Destination type</typeparam>
-    public interface ITypeConverter<in TSource, TDestination>
+    public interface ITypeConverter<TSource, TDestination>
     {
         /// <summary>
         /// Performs conversion from source to destination type
