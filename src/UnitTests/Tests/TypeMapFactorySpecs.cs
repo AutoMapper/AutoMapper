@@ -55,11 +55,6 @@ namespace AutoMapper.UnitTests.Tests
         private class TestProfile : Profile
         {
             public override string ProfileName => "Test";
-
-            protected override void Configure()
-            {
-                
-            }
         }
 
         [Fact]
@@ -102,11 +97,6 @@ namespace AutoMapper.UnitTests.Tests
         private class TestProfile : Profile
         {
             public override string ProfileName => "Test";
-
-            protected override void Configure()
-            {
-
-            }
         }
         protected override void Establish_context()
         {
@@ -160,11 +150,6 @@ namespace AutoMapper.UnitTests.Tests
         private class TestProfile : Profile
         {
             public override string ProfileName => "Test";
-
-            protected override void Configure()
-            {
-
-            }
         }
 
         protected override void Establish_context()

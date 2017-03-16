@@ -56,20 +56,20 @@ namespace AutoMapper.UnitTests
 
         public class ConventionProfile : Profile
         {
-            protected override void Configure()
+            public ConventionProfile()
             {
                 AddMemberConfiguration().AddName<PrePostfixName>(
-                        _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
-                            .AddStrings(p => p.Postfixes, "Transfer")
-                            .AddStrings(p => p.DestinationPrefixes, "Trans")
-                            .AddStrings(p => p.Prefixes, "Trans"));
+                    _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")
+                        .AddStrings(p => p.Postfixes, "Transfer")
+                        .AddStrings(p => p.DestinationPrefixes, "Trans")
+                        .AddStrings(p => p.Prefixes, "Trans"));
                 AddConditionalObjectMapper().Where((s, d) => s.Name.Contains(d.Name) || d.Name.Contains(s.Name));
             }
         }
 
         public class ToDTO : Profile
         {
-            protected override void Configure()
+            public ToDTO()
             {
                 AddMemberConfiguration().AddName<PrePostfixName>(
                         _ => _.AddStrings(p => p.Postfixes, "Transfer")
@@ -79,7 +79,7 @@ namespace AutoMapper.UnitTests
         }
         public class FromDTO : Profile
         {
-            protected override void Configure()
+            public FromDTO()
             {
                 AddMemberConfiguration().AddName<PrePostfixName>(
                         _ => _.AddStrings(p => p.DestinationPostfixes, "Transfer")

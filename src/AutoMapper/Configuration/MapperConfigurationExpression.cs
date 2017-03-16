@@ -36,7 +36,6 @@ namespace AutoMapper.Configuration
 
         public void AddProfile(Profile profile)
         {
-            profile.Initialize();
             _profiles.Add(profile);
         }
 

@@ -26,7 +26,7 @@ namespace AutoMapperSamples.Configuration
 
             public class ViewModelProfile : Profile
             {
-                protected override void Configure()
+                public ViewModelProfile()
                 {
                     CreateMap<Order, OrderListViewModel>();
 

@@ -20,7 +20,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
 
         public class TestProfile : Profile
         {
-            protected override void Configure()
+            public TestProfile()
             {
                 CreateMap<BaseSource, BaseDest>();
                 CreateMap<Source, Dest>()
