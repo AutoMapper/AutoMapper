@@ -6,37 +6,37 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace AutoMapper
+namespace AutoMapper.Internal
 {
-    internal static class ReflectionHelper
+    public static class ReflectionHelper
     {
-        public static object GetDefaultValue(this ParameterInfo parameter)
+        public static object GetDefaultValue(ParameterInfo parameter)
         {
-            if(parameter.DefaultValue == null && parameter.ParameterType.IsValueType())
+            if (parameter.DefaultValue == null && parameter.ParameterType.IsValueType())
             {
                 return Activator.CreateInstance(parameter.ParameterType);
             }
             return parameter.DefaultValue;
         }
 
-        public static object MapMember(this ResolutionContext context, MemberInfo member, object value, object destination)
+        public static object MapMember(ResolutionContext context, MemberInfo member, object value, object destination)
         {
-            var memberType = member.GetMemberType();
-            var destValue = member.GetMemberValue(destination);
+            var memberType = GetMemberType(member);
+            var destValue = GetMemberValue(member, destination);
             return context.Mapper.Map(value, destValue, value?.GetType() ?? memberType, memberType, context);
         }
 
-        public static object MapMember(this ResolutionContext context, MemberInfo member, object value)
+        public static object MapMember(ResolutionContext context, MemberInfo member, object value)
         {
-            var memberType = member.GetMemberType();
+            var memberType = GetMemberType(member);
             return context.Mapper.Map(value, null, value?.GetType() ?? memberType, memberType, context);
         }
 
-        public static bool IsDynamic(this object obj) => obj is IDynamicMetaObjectProvider;
+        public static bool IsDynamic(object obj) => obj is IDynamicMetaObjectProvider;
 
-        public static bool IsDynamic(this Type type) => typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
+        public static bool IsDynamic(Type type) => typeof(IDynamicMetaObjectProvider).IsAssignableFrom(type);
 
-        public static void SetMemberValue(this MemberInfo propertyOrField, object target, object value)
+        public static void SetMemberValue(MemberInfo propertyOrField, object target, object value)
         {
             if (propertyOrField is PropertyInfo property)
             {
@@ -54,7 +54,7 @@ namespace AutoMapper
         private static ArgumentOutOfRangeException Expected(MemberInfo propertyOrField)
             => new ArgumentOutOfRangeException(nameof(propertyOrField), "Expected a property or field, not " + propertyOrField);
 
-        public static object GetMemberValue(this MemberInfo propertyOrField, object target)
+        public static object GetMemberValue(MemberInfo propertyOrField, object target)
         {
             if (propertyOrField is PropertyInfo property)
             {
@@ -70,7 +70,7 @@ namespace AutoMapper
         public static IEnumerable<MemberInfo> GetMemberPath(Type type, string fullMemberName)
         {
             MemberInfo property = null;
-            foreach(var memberName in fullMemberName.Split('.'))
+            foreach (var memberName in fullMemberName.Split('.'))
             {
                 var currentType = GetCurrentType(property, type);
                 yield return property = currentType.GetMember(memberName).Single();
@@ -80,19 +80,19 @@ namespace AutoMapper
         private static Type GetCurrentType(MemberInfo member, Type type)
         {
             var memberType = member?.GetMemberType() ?? type;
-            if(memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
+            if (memberType.IsGenericType() && typeof(IEnumerable).IsAssignableFrom(memberType))
             {
                 memberType = memberType.GetTypeInfo().GenericTypeArguments[0];
             }
             return memberType;
         }
 
-        public static MemberInfo GetFieldOrProperty(this LambdaExpression expression)
+        public static MemberInfo GetFieldOrProperty(LambdaExpression expression)
         {
             var memberExpression = expression.Body as MemberExpression;
             return memberExpression != null
                 ? memberExpression.Member
-                : throw new ArgumentOutOfRangeException(nameof(expression),"Expected a property/field access expression, not " + expression);
+                : throw new ArgumentOutOfRangeException(nameof(expression), "Expected a property/field access expression, not " + expression);
         }
 
         public static MemberInfo FindProperty(LambdaExpression lambdaExpression)
@@ -135,7 +135,7 @@ namespace AutoMapper
                 "Custom configuration for members is only supported for top-level individual members on a type.");
         }
 
-        public static Type GetMemberType(this MemberInfo memberInfo)
+        public static Type GetMemberType(MemberInfo memberInfo)
         {
             switch (memberInfo)
             {
@@ -159,7 +159,7 @@ namespace AutoMapper
         /// <param name="oldType"></param>
         /// <param name="newType"></param>
         /// <returns></returns>
-        public static Type ReplaceItemType(this Type targetType, Type oldType, Type newType)
+        public static Type ReplaceItemType(Type targetType, Type oldType, Type newType)
         {
             if (targetType == oldType)
                 return newType;

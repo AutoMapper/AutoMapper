@@ -1,12 +1,14 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
+using AutoMapper.Mappers.Internal;
 using static System.Linq.Expressions.Expression;
 using Convert = System.Convert;
 
 namespace AutoMapper.Mappers
 {
-    using static ExpressionExtensions;
+    using static ExpressionFactory;
 
     public class EnumToUnderlyingTypeMapper : IObjectMapper
     {
@@ -14,7 +16,7 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair context)
         {
-            var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
+            var sourceEnumType = ElementTypeHelper.GetEnumerationType(context.SourceType);
 
             return sourceEnumType != null && context.DestinationType.IsAssignableFrom(Enum.GetUnderlyingType(sourceEnumType));
         }

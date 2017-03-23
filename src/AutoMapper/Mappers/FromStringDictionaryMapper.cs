@@ -2,12 +2,13 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Execution;
+using AutoMapper.Internal;
 using static System.Linq.Expressions.Expression;
 using StringDictionary = System.Collections.Generic.IDictionary<string, object>;
 
 namespace AutoMapper.Mappers
 {
-    using static ExpressionExtensions;
+    using static ExpressionFactory;
 
     public class FromStringDictionaryMapper : IObjectMapper
     {

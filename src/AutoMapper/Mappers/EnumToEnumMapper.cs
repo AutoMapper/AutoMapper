@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Mappers.Internal;
 using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.Mappers
@@ -13,8 +14,8 @@ namespace AutoMapper.Mappers
             if (source == null)
                 return default(TDestination);
 
-            var sourceEnumType = TypeHelper.GetEnumerationType(typeof(TSource));
-            var destEnumType = TypeHelper.GetEnumerationType(typeof(TDestination));
+            var sourceEnumType = ElementTypeHelper.GetEnumerationType(typeof(TSource));
+            var destEnumType = ElementTypeHelper.GetEnumerationType(typeof(TDestination));
 
             if (!Enum.IsDefined(sourceEnumType, source))
             {
@@ -36,8 +37,8 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair context)
         {
-            var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
-            var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);
+            var sourceEnumType = ElementTypeHelper.GetEnumerationType(context.SourceType);
+            var destEnumType = ElementTypeHelper.GetEnumerationType(context.DestinationType);
             return sourceEnumType != null && destEnumType != null;
         }
 

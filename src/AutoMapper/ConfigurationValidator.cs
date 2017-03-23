@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Configuration;
 using AutoMapper.Mappers;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper
 {
@@ -93,8 +94,8 @@ namespace AutoMapper
 
         private void CheckElementMaps(ICollection<TypeMap> typeMapsChecked, TypePair types, PropertyMap propertyMap)
         {
-            var sourceElementType = TypeHelper.GetElementType(types.SourceType);
-            var destElementType = TypeHelper.GetElementType(types.DestinationType);
+            var sourceElementType = ElementTypeHelper.GetElementType(types.SourceType);
+            var destElementType = ElementTypeHelper.GetElementType(types.DestinationType);
             var itemTypeMap = _config.ResolveTypeMap(sourceElementType, destElementType);
 
             if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))

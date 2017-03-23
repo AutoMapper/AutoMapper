@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Mappers
 {
     using LazyExpression = Lazy<LambdaExpression>;
     using static Expression;
-    using static ExpressionExtensions;
+    using static ExpressionFactory;
 
     public class ConvertMapper : IObjectMapper
     {

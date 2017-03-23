@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Configuration;
 using AutoMapper.Mappers;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -10,17 +11,16 @@ namespace AutoMapper.QueryableExtensions.Impl
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
             propertyMap.DestinationPropertyType.IsEnumerableType() && propertyMap.SourceType.IsEnumerableType() &&
-            !(TypeHelper.GetElementType(propertyMap.DestinationPropertyType).IsPrimitive() && TypeHelper
-                  .GetElementType(propertyMap.SourceType)
-                  .IsPrimitive());
+            !(ElementTypeHelper.GetElementType(propertyMap.DestinationPropertyType).IsPrimitive() &&
+              ElementTypeHelper.GetElementType(propertyMap.SourceType).IsPrimitive());
 
         public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount) 
             => BindEnumerableExpression(configuration, propertyMap, request, result, typePairCount);
 
         private static MemberAssignment BindEnumerableExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
         {
-            var destinationListType = TypeHelper.GetElementType(propertyMap.DestinationPropertyType);
-            var sourceListType = TypeHelper.GetElementType(propertyMap.SourceType);
+            var destinationListType = ElementTypeHelper.GetElementType(propertyMap.DestinationPropertyType);
+            var sourceListType = ElementTypeHelper.GetElementType(propertyMap.SourceType);
             var expression = result.ResolutionExpression;
 
             if (sourceListType != destinationListType)

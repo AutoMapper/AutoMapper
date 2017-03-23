@@ -3,13 +3,15 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Execution;
+using AutoMapper.Internal;
 using Microsoft.CSharp.RuntimeBinder;
-using static System.Linq.Expressions.Expression;
-using static AutoMapper.ExpressionExtensions;
 using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
 namespace AutoMapper.Mappers
 {
+    using static Expression;
+    using static ExpressionFactory;
+
     public class ToDynamicMapper : IObjectMapper
     {
         public static TDestination Map<TSource, TDestination>(TSource source, TDestination destination, ResolutionContext context, ProfileMap profileMap)

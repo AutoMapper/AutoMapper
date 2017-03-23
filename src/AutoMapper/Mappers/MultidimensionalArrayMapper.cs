@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.Mappers
 {
@@ -18,7 +19,7 @@ namespace AutoMapper.Mappers
             if (source == null && profileMap.AllowNullCollections)
                 return null;
 
-            var destElementType = TypeHelper.GetElementType(typeof(TDestination));
+            var destElementType = ElementTypeHelper.GetElementType(typeof(TDestination));
 
             if (source != null && typeof(TDestination).IsAssignableFrom(typeof(TSource)))
             {
@@ -53,7 +54,7 @@ namespace AutoMapper.Mappers
             Expression contextExpression) =>
             Call(null,
                 MapMethodInfo.MakeGenericMethod(destExpression.Type, sourceExpression.Type,
-                    TypeHelper.GetElementType(sourceExpression.Type)),
+                    ElementTypeHelper.GetElementType(sourceExpression.Type)),
                 sourceExpression,
                 contextExpression,
                 Constant(profileMap));

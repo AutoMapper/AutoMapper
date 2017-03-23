@@ -1,11 +1,13 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.Mappers
 {
     using static Expression;
-    using static ExpressionExtensions;
+    using static ExpressionFactory;
 
     public class UnderlyingTypeToEnumMapper : IObjectMapper
     {
@@ -13,7 +15,7 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair context)
         {
-            var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);
+            var destEnumType = ElementTypeHelper.GetEnumerationType(context.DestinationType);
 
             return destEnumType != null && context.SourceType.IsAssignableFrom(Enum.GetUnderlyingType(destEnumType));
         }
