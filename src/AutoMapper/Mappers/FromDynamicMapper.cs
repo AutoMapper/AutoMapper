@@ -22,7 +22,7 @@ namespace AutoMapper.Mappers
                 object sourceMemberValue;
                 try
                 {
-                    sourceMemberValue = GetDynamically(member, source);
+                    sourceMemberValue = GetDynamically(member.Name, source);
                 }
                 catch (RuntimeBinderException)
                 {
@@ -34,9 +34,9 @@ namespace AutoMapper.Mappers
             return (TDestination) boxedDestination;
         }
 
-        private static object GetDynamically(MemberInfo member, object target)
+        private static object GetDynamically(string memberName, object target)
         {
-            var binder = Binder.GetMember(CSharpBinderFlags.None, member.Name, ToDynamicMapper.GetMemberType(member),
+            var binder = Binder.GetMember(CSharpBinderFlags.None, memberName, null,
                 new[] { CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null) });
             var callsite = CallSite<Func<CallSite, object, object>>.Create(binder);
             return callsite.Target(callsite, target);
