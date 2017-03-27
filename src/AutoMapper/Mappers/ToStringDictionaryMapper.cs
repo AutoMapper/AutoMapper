@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.Mappers
 {
     using static Expression;
+    using static CollectionMapperExpressionFactory;
 
     public class ToStringDictionaryMapper : IObjectMapper
     {
@@ -15,10 +17,9 @@ namespace AutoMapper.Mappers
         public bool IsMatch(TypePair context) => typeof(IDictionary<string, object>).IsAssignableFrom(context.DestinationType);
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
-            =>
-                CollectionMapperExtensions.MapCollectionExpression(configurationProvider, profileMap, propertyMap,
+            => MapCollectionExpression(configurationProvider, profileMap, propertyMap,
                     Call(MembersDictionaryMethodInfo, sourceExpression, Constant(profileMap)), destExpression, contextExpression, _ => null,
-                    typeof(Dictionary<,>), CollectionMapperExtensions.MapKeyPairValueExpr);
+                    typeof(Dictionary<,>), MapKeyPairValueExpr);
 
         private static Dictionary<string, object> MembersDictionary(object source, ProfileMap profileMap)
         {

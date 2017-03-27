@@ -2,11 +2,13 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.Mappers
 {
     using static Expression;
-    using static ExpressionExtensions;
+    using static ExpressionFactory;
 
     public class FlagsEnumMapper : IObjectMapper
     {
@@ -14,8 +16,8 @@ namespace AutoMapper.Mappers
 
         public bool IsMatch(TypePair context)
         {
-            var sourceEnumType = TypeHelper.GetEnumerationType(context.SourceType);
-            var destEnumType = TypeHelper.GetEnumerationType(context.DestinationType);
+            var sourceEnumType = ElementTypeHelper.GetEnumerationType(context.SourceType);
+            var destEnumType = ElementTypeHelper.GetEnumerationType(context.DestinationType);
 
             return sourceEnumType != null
                    && destEnumType != null

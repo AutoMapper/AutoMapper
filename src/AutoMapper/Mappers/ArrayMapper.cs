@@ -3,11 +3,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
+using AutoMapper.Internal;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.Mappers
 {
     using static Expression;
-    using static ExpressionExtensions;
+    using static ExpressionFactory;
+    using static CollectionMapperExpressionFactory;
 
     public class ArrayMapper : IObjectMapper
     {
@@ -15,14 +18,14 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            var sourceElementType = TypeHelper.GetElementType(sourceExpression.Type);
-            var destElementType = TypeHelper.GetElementType(destExpression.Type);
+            var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
+            var destElementType = ElementTypeHelper.GetElementType(destExpression.Type);
 
             var ifNullExpr = profileMap.AllowNullCollections
                                  ? (Expression) Constant(null, destExpression.Type)
                                  : NewArrayBounds(destElementType, Constant(0));
 
-            var itemExpr = CollectionMapperExtensions.MapItemExpr(configurationProvider, profileMap, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out ParameterExpression itemParam);
+            var itemExpr = MapItemExpr(configurationProvider, profileMap, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out ParameterExpression itemParam);
 
             //var count = source.Count();
             //var array = new TDestination[count];

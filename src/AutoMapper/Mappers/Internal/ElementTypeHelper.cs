@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using AutoMapper.Configuration;
 
-namespace AutoMapper.Mappers
+namespace AutoMapper.Mappers.Internal
 {
-    internal static class TypeHelper
+    public static class ElementTypeHelper
     {
         public static Type GetElementType(Type enumerableType) => GetElementTypes(enumerableType, null)[0];
 

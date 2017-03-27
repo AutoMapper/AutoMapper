@@ -79,7 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\AutoMapper\Mappers\TypeHelper.cs">
+    <Compile Include="..\AutoMapper\Mappers\Internal\ElementTypeHelper.cs">
       <Link>TypeHelper.cs</Link>
     </Compile>
     <Compile Include="..\AutoMapper\TypeExtensions.cs">

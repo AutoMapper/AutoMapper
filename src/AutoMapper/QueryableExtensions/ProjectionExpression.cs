@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Internal;
 using IObjectDictionary = System.Collections.Generic.IDictionary<string, object>;
 
 namespace AutoMapper.QueryableExtensions
@@ -57,7 +58,7 @@ namespace AutoMapper.QueryableExtensions
 
         private MemberPaths GetMemberPaths(Type type, string[] membersToExpand)
         {
-            return membersToExpand.Select(m=>ReflectionHelper.GetMemberPath(type, m));
+            return membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));
         }
 
         private MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand)

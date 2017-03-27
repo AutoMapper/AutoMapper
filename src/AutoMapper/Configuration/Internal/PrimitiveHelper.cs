@@ -1,0 +1,87 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
+namespace AutoMapper.Configuration.Internal
+{
+    public class PrimitiveHelper
+    {
+        public static TValue GetOrDefault<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            dictionary.TryGetValue(key, out TValue value);
+            return value;
+        }
+
+        public static MethodInfo GetInheritedMethod(Type type, string name)
+            => GetMember(type, name) as MethodInfo;
+
+        public static MemberInfo GetFieldOrProperty(Type type, string name)
+        {
+            var memberInfo = GetMember(type, name);
+            if (memberInfo == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(name), "Cannot find a field or property named " + name);
+            }
+            return memberInfo;
+        }
+
+        private static MemberInfo GetMember(Type type, string name)
+        {
+            return
+                new[] { type }.Concat(type.GetTypeInfo().ImplementedInterfaces)
+                    .SelectMany(i => i.GetMember(name))
+                    .FirstOrDefault();
+        }
+
+        public static bool IsNullableType(Type type) 
+            => type.IsGenericType(typeof(Nullable<>));
+
+        public static Type GetTypeOfNullable(Type type) 
+            => type.GetTypeInfo().GenericTypeArguments[0];
+
+        public static bool IsCollectionType(Type type) 
+            => type.ImplementsGenericInterface(typeof(ICollection<>));
+
+        public static bool IsEnumerableType(Type type) 
+            => typeof(IEnumerable).IsAssignableFrom(type);
+
+        public static bool IsQueryableType(Type type) 
+            => typeof(IQueryable).IsAssignableFrom(type);
+
+        public static bool IsListType(Type type)
+            => typeof(IList).IsAssignableFrom(type);
+
+        public static bool IsListOrDictionaryType(Type type)
+            => type.IsListType() || type.IsDictionaryType();
+
+        public static bool IsDictionaryType(Type type) 
+            => type.ImplementsGenericInterface(typeof(IDictionary<,>));
+
+        public static bool ImplementsGenericInterface(Type type, Type interfaceType)
+        {
+            return type.IsGenericType(interfaceType)
+                   || type.GetTypeInfo().ImplementedInterfaces.Any(@interface => @interface.IsGenericType(interfaceType));
+        }
+
+        public static bool IsGenericType(Type type, Type genericType)
+            => type.IsGenericType() && type.GetGenericTypeDefinition() == genericType;
+
+        public static Type GetIEnumerableType(Type type)
+            => type.GetGenericInterface(typeof(IEnumerable<>));
+
+        public static Type GetDictionaryType(Type type)
+            => type.GetGenericInterface(typeof(IDictionary<,>));
+
+        public static Type GetGenericInterface(Type type, Type genericInterface)
+        {
+            return type.IsGenericType(genericInterface)
+                ? type
+                : type.GetTypeInfo().ImplementedInterfaces.FirstOrDefault(t => t.IsGenericType(genericInterface));
+        }
+
+        public static Type GetGenericElementType(Type type)
+            => type.HasElementType ? type.GetElementType() : type.GetTypeInfo().GenericTypeArguments[0];
+    }
+}

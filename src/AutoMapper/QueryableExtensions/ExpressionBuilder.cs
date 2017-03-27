@@ -5,11 +5,14 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
+using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions.Impl;
 using static System.Linq.Expressions.Expression;
 
 namespace AutoMapper.QueryableExtensions
 {
+    using static ExpressionFactory;
+
     public interface IExpressionBuilder
     {
         Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
@@ -251,7 +254,7 @@ namespace AutoMapper.QueryableExtensions
             private Expression NullCheck(Expression input)
             {
                 var underlyingType = input.Type.GetTypeOfNullable();
-                var nullSubstitute = ExpressionExtensions.ToType(Constant(_nullSubstitute), underlyingType);
+                var nullSubstitute = ToType(Constant(_nullSubstitute), underlyingType);
                 return Condition(Property(input, "HasValue"), Property(input, "Value"), nullSubstitute, underlyingType);
             }
         }

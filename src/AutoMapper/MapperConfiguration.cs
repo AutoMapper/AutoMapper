@@ -4,13 +4,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
+using AutoMapper.Internal;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
     using static Expression;
-    using static ExpressionExtensions;
+    using static ExpressionFactory;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
     using Validator = Action<ValidationContext>;
 

@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
 using AutoMapper.Mappers;
+using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
@@ -100,7 +101,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 {
                     var sourceResult = _dataSource.Provider.CreateQuery(sourceExpression);
                     var enumerator = sourceResult.GetEnumerator();
-                    var elementType = TypeHelper.GetElementType(typeof(TResult));
+                    var elementType = ElementTypeHelper.GetElementType(typeof(TResult));
                     var constructorInfo = typeof(List<>).MakeGenericType(elementType).GetDeclaredConstructor(new Type[0]);
                     if (constructorInfo != null)
                     {

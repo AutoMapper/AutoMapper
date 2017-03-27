@@ -4,11 +4,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
+using AutoMapper.Internal;
 
 namespace AutoMapper.Execution
 {
     using static Expression;
-    using static ExpressionExtensions;
+    using static ExpressionFactory;
 
     public class TypeMapPlanBuilder
     {

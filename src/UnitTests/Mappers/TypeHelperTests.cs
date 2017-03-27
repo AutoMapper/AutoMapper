@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using AutoMapper.Mappers;
+using AutoMapper.Mappers.Internal;
 using Should;
 using Xunit;
 
@@ -14,7 +14,7 @@ namespace AutoMapper.UnitTests.Mappers
         {
             Type myType = typeof(ChargeCollection);
 
-            Type elementType = TypeHelper.GetElementType(myType);
+            Type elementType = ElementTypeHelper.GetElementType(myType);
 
             elementType.ShouldNotBeNull();
         }
