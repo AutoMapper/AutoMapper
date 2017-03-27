@@ -149,4 +149,48 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             Assert.Equal("Bar", _destination.Bar);
         }
     }
+
+    public class When_mapping_from_dynamic_to_nullable
+    {
+        class DestinationWithNullable
+        {
+            public string StringValue { get; set; }
+            public int? NullIntValue { get; set; }
+        }
+
+        [Fact]
+        public void Should_map_with_non_null_source()
+        {
+            dynamic source = new DynamicDictionary();
+            source.StringValue = "Test";
+            source.NullIntValue = 5;
+            var config = new MapperConfiguration(cfg => { });
+            var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
+            Assert.Equal("Test", destination.StringValue);
+            Assert.Equal(5, destination.NullIntValue);
+        }
+
+        [Fact]
+        public void Should_map_with_source_missing()
+        {
+            dynamic source = new DynamicDictionary();
+            source.StringValue = "Test";
+            var config = new MapperConfiguration(cfg => { });
+            var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
+            Assert.Equal("Test", destination.StringValue);
+            Assert.Equal((int?)null, destination.NullIntValue);
+        }
+
+        [Fact]
+        public void Should_map_with_null_source()
+        {
+            dynamic source = new DynamicDictionary();
+            source.StringValue = "Test";
+            source.NullIntValue = null;
+            var config = new MapperConfiguration(cfg => { });
+            var destination = config.CreateMapper().Map<DestinationWithNullable>(source);
+            Assert.Equal("Test", destination.StringValue);
+            Assert.Equal((int?)null, destination.NullIntValue);
+        }
+    }
 }

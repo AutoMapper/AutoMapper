@@ -29,20 +29,14 @@ namespace AutoMapper.Mappers
                     continue;
                 }
                 var destinationMemberValue = context.MapMember(member, sourceMemberValue);
-                SetDynamically(member, destination, destinationMemberValue);
+                SetDynamically(member.Name, destination, destinationMemberValue);
             }
             return destination;
         }
 
-        public static Type GetMemberType(MemberInfo member)
+        private static void SetDynamically(string memberName, object target, object value)
         {
-            var memberType = member.GetMemberType();
-            return memberType.IsArray ? typeof(object) : memberType;
-        }
-
-        private static void SetDynamically(MemberInfo member, object target, object value)
-        {
-            var binder = Binder.SetMember(CSharpBinderFlags.None, member.Name, GetMemberType(member),
+            var binder = Binder.SetMember(CSharpBinderFlags.None, memberName, null,
                 new[]{
                     CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null),
                     CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
