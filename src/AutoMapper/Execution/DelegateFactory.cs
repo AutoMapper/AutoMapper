@@ -43,6 +43,11 @@ namespace AutoMapper.Execution
                 return Constant(null, typeof(string));
             }
 
+            if (type.IsAbstract())
+            {
+                return InvalidType(type, $"Cannot create an instance of abstract type {type}.");
+            }
+
             var constructors = type
                 .GetDeclaredConstructors()
                 .Where(ci => !ci.IsStatic);
@@ -51,8 +56,7 @@ namespace AutoMapper.Execution
             var ctorWithOptionalArgs = constructors.FirstOrDefault(c => c.GetParameters().All(p => p.IsOptional));
             if (ctorWithOptionalArgs == null)
             {
-                var ex = new ArgumentException(type + " needs to have a constructor with 0 args or only optional args", nameof(type));
-                return Block(Throw(Constant(ex)), Constant(null));
+                return InvalidType(type, $"{type} needs to have a constructor with 0 args or only optional args.");
             }
             //get all optional default values
             var args = ctorWithOptionalArgs
@@ -61,6 +65,12 @@ namespace AutoMapper.Execution
 
             //create the ctor expression
             return New(ctorWithOptionalArgs, args);
+        }
+
+        private static Expression InvalidType(Type type, string message)
+        {
+            var ex = new ArgumentException(message, "type");
+            return Block(Throw(Constant(ex)), Constant(null, type));
         }
     }
 }
