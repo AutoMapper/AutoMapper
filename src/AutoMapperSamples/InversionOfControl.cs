@@ -26,12 +26,12 @@ namespace AutoMapperSamples
             [Test]
             public void Example2()
             {
-                ObjectFactory.Initialize(init =>
+                var container = new Container(init =>
                 {
                     init.AddRegistry<ConfigurationRegistry>();
                 });
 
-                var engine = ObjectFactory.GetInstance<IMapper>();
+                var engine = container.GetInstance<IMapper>();
 
                 var destination = engine.Map<Source, Destination>(new Source {Value = 15});
 
@@ -44,7 +44,7 @@ namespace AutoMapperSamples
                 {
                     var configuration = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
 
-                    ForRequestedType<IMapper>().TheDefault.Is.ConstructedBy(() => configuration.CreateMapper());
+                    For<IMapper>().Use(ctx => new Mapper(configuration, ctx.GetInstance));
                 }
             }
         }

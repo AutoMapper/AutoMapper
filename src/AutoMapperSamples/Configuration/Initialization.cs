@@ -27,9 +27,10 @@ namespace AutoMapperSamples.Configuration
             [Test]
             public void Example()
             {
-                var config = new MapperConfiguration(cfg =>
+                Mapper.Initialize(cfg =>
                 {
-                    cfg.ConstructServicesUsing(ObjectFactory.GetInstance);
+                    cfg.CreateMap<Order, OrderListViewModel>();
+                    cfg.CreateMap<Order, OrderEditViewModel>();
                 });
             }
         }

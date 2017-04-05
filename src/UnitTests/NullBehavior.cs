@@ -711,8 +711,6 @@ namespace AutoMapper.UnitTests.NullBehavior
 
     public class When_mapping_a_null_model : AutoMapperSpecBase
     {
-        private ModelDto _result;
-
         public class ModelDto
         {
         }

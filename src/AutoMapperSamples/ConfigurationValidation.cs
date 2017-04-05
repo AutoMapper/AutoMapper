@@ -18,12 +18,12 @@ namespace AutoMapperSamples
                 public int SomeValuefff { get; set; }
             }
 
-            [Test, ExpectedException(typeof(AutoMapperConfigurationException))]
+            [Test]
             public void Example()
             {
                 var config = new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
 
-                config.AssertConfigurationIsValid(); // Throws an exception
+                Assert.Throws<AutoMapperConfigurationException>(() => config.AssertConfigurationIsValid());
             }
 
             [Test]

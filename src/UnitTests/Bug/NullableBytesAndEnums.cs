@@ -73,8 +73,6 @@ namespace AutoMapper.UnitTests.Bug
 
     public class NullableShortWithCustomMapFrom : AutoMapperSpecBase
     {
-        private Destination _destination;
-
         public class Source
         {
             public short Value { get; set; }

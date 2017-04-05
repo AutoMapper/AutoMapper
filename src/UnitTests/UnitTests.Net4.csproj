@@ -67,9 +67,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Rhino.Mocks, Version=3.5.0.1337, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Rhino.Mocks.dll</HintPath>
+    <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -79,14 +78,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\AutoMapper\Mappers\Internal\ElementTypeHelper.cs">
-      <Link>TypeHelper.cs</Link>
-    </Compile>
     <Compile Include="..\AutoMapper\TypeExtensions.cs">
       <Link>TypeExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\AutoMapper\Configuration\PrimitiveExtensions.cs">
-      <Link>PrimitiveExtensions.cs</Link>
     </Compile>
     <Compile Include="ArraysAndLists.cs" />
     <Compile Include="AssemblyScanning.cs" />

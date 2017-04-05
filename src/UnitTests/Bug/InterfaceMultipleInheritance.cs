@@ -35,12 +35,12 @@ namespace AutoMapper.UnitTests.Bug
 
             public interface IMapToElementWritable 
             {
-                new string Prop { get; set; }
+                string Prop { get; set; }
             }
 
             public interface IMapToElementWritableDerived : IMapToElementWritable
             {
-                new string Prop2 { get; set; }
+                string Prop2 { get; set; }
             }
 
             public class MapFrom : IMapFrom
@@ -56,7 +56,7 @@ namespace AutoMapper.UnitTests.Bug
 
             public class MapFromElementDerived : MapFromElement, IMapFromElementDerivedBoth
             {
-                public string Prop { get; set; }
+                public new string Prop { get; set; }
                 public string Prop2 { get; set; }
             }
 
