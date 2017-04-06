@@ -11,6 +11,10 @@ Please start a discussion on the [core repo issue tracker](https://github.com/Au
 ## Platform
 AutoMapper is built using the RTM tooling that ships with Visual Studio 2017. This is the only configuration accepted.
 
+## Building
+
+Run `psake.cmd` from the command line. This builds and runs tests.
+
 ## Bugs and feature requests?
 Please log a new issue in the appropriate GitHub repo:
 
