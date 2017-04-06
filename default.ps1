@@ -38,13 +38,13 @@ task compile -depends clean {
 	echo "build: Package version suffix is $suffix"
 	echo "build: Build version suffix is $buildSuffix" 
 	
-	exec { .\src\.nuget\nuget.exe restore $source_dir\AutoMapper.sln }
+	#exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
 
-	exec { dotnet restore $source_dir\AutoMapper.sln }
+	exec { dotnet restore $base_dir\AutoMapper.sln }
 
-    exec { dotnet build $source_dir\AutoMapper.sln -c $config --version-suffix=$buildSuffix -v q /nologo }
+    exec { dotnet build $base_dir\AutoMapper.sln -c $config --version-suffix=$buildSuffix -v q /nologo }
 
-	exec { dotnet pack $source_dir\AutoMapper -c $config --include-symbols --no-build --version-suffix=$suffix }
+	exec { dotnet pack $source_dir\AutoMapper\AutoMapper.csproj -c $config --include-symbols --no-build --version-suffix=$suffix }
 }
 
 task benchmark {
