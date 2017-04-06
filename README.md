@@ -19,7 +19,7 @@ This is the main repository for AutoMapper, but there's more:
 
 First, configure AutoMapper to know what types you want to map, in the startup of your application:
 
-```
+```csharp
 Mapper.Initialize(cfg => {
     cfg.CreateMap<Foo, FooDto>();
 	cfg.CreateMap<Bar, BarDto>();
@@ -27,7 +27,7 @@ Mapper.Initialize(cfg => {
 ```
 Then in your application code, execute the mappings:
 
-```
+```csharp
 var fooDto = Mapper.Map<FooDto>(foo);
 var barDto = Mapper.Map<BarDto>(bar);
 ```
