@@ -32,7 +32,7 @@ var fooDto = Mapper.Map<FooDto>(foo);
 var barDto = Mapper.Map<BarDto>(bar);
 ```
 
-Check out the [getting started guide](https://github.com/AutoMapper/AutoMapper/wiki/Getting-started). When you're done there, the [wiki](https://github.com/AutoMapper/AutoMapper/wiki) goes in to the nitty-gritty details. Finally, check out the [dnrTV episode](http://www.dnrtv.com/default.aspx?showNum=155) for a full walkthrough. If you have questions, you can post them to the [Mailing List](http://groups.google.com/group/automapper-users).
+Check out the [getting started guide](https://github.com/AutoMapper/AutoMapper/wiki/Getting-started). When you're done there, the [wiki](https://github.com/AutoMapper/AutoMapper/wiki) goes in to the nitty-gritty details. If you have questions, you can post them to [Stack Overflow](http://stackoverflow.com/questions/tagged/automapper) or in our [Gitter](https://gitter.im/AutoMapper/AutoMapper).
 
 ### Where can I get it?
 
