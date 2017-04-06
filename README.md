@@ -57,6 +57,8 @@ For more information see the [.NET Foundation Code of Conduct](https://dotnetfou
 
 AutoMapper is Copyright &copy; 2008-2016 [Jimmy Bogard](https://jimmybogard.com) and other contributors under the [MIT license](LICENSE.txt).
 
+<!-- NOT YET
 ### .NET Foundation
 
 This project is supported by the [.NET Foundation](https://dotnetfoundation.org).
+-->
