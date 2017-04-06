@@ -9,6 +9,47 @@ using System.Collections;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_mapping_from_struct_collection : AutoMapperSpecBase
+    {
+        public struct MyCollection : IEnumerable<int>
+        {
+            public IEnumerator<int> GetEnumerator()
+            {
+                for(int i = 1; i <= 10; i++)
+                {
+                    yield return i;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+        }
+
+        public class SourceItem
+        {
+            public string Name { get; set; }
+            public MyCollection ShipsTo { get; set; }
+        }
+
+        public class DestItem
+        {
+            public string Name { get; set; }
+            public List<int> ShipsTo { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration =>
+            new MapperConfiguration(cfg => cfg.CreateMap<SourceItem, DestItem>());
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            Mapper.Map<DestItem>(new SourceItem { ShipsTo = new MyCollection() })
+                .ShipsTo.SequenceEqual(Enumerable.Range(1, 10)).ShouldBeTrue();
+        }
+    }
+
     public class When_mapping_to_custom_collection_type : AutoMapperSpecBase
     {
         public class MyCollection : CollectionBase
