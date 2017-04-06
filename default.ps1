@@ -38,7 +38,7 @@ task compile -depends clean {
 	echo "build: Package version suffix is $suffix"
 	echo "build: Build version suffix is $buildSuffix" 
 	
-	#exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
+	exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
 
 	exec { dotnet restore $base_dir\AutoMapper.sln }
 
@@ -52,7 +52,7 @@ task benchmark {
 }
 
 task test {
-    $testRunners = @(gci $source_dir\packages -rec -filter Fixie.Console.exe)
+    $testRunners = @(gci $base_dir\packages -rec -filter Fixie.Console.exe)
 
     if ($testRunners.Length -ne 1)
     {

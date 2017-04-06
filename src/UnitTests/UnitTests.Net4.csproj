@@ -63,12 +63,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Fixie, Version=1.0.0.41, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fixie.1.0.0.41\lib\net45\Fixie.dll</HintPath>
+      <HintPath>..\..\packages\Fixie.1.0.0.41\lib\net45\Fixie.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
+      <HintPath>..\..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
