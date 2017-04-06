@@ -1,5 +1,5 @@
 <img src="https://s3.amazonaws.com/automapper/logo.png" alt="AutoMapper"> 
-================================
+===============================
 
 [![Build status](https://ci.appveyor.com/api/projects/status/q261l3sbokafmx1o/branch/develop?svg=true)](https://ci.appveyor.com/project/jbogard/automapper/branch/develop)
 [![NuGet](https://img.shields.io/nuget/dt/AutoMapper.svg)](https://www.nuget.org/packages/AutoMapper/)
