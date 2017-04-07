@@ -372,8 +372,8 @@ namespace AutoMapper.UnitTests
         public void Map_accountModel_to_account_with_null_checks_against_value_types()
         {
             //Arrange
-            Expression<Func<AccountModel, bool>> exp = f => (((f != null && f.Id != null) ? f.Id : 0) > 10)
-             && (((f != null && f.DateCreated != null) ? f.DateCreated : default(DateTime)) > new DateTime(2007, 02, 17));
+            Expression<Func<AccountModel, bool>> exp = f => (f != null ? f.Id : 0) > 10
+             && (f != null && f.DateCreated != null ? f.DateCreated : default(DateTime)) > new DateTime(2007, 02, 17);
 
 
             //Act

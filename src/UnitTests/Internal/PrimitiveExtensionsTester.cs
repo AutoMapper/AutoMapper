@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using AutoMapper.Configuration.Internal;
 using Xunit;
 using Should;
 
@@ -26,31 +27,31 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_find_explicitly_implemented_member()
         {
-            typeof(DestinationClass).GetFieldOrProperty("Value").ShouldNotBeNull();
+            PrimitiveHelper.GetFieldOrProperty(typeof(DestinationClass), "Value").ShouldNotBeNull();
         }
 
         [Fact]
         public void Should_not_flag_only_enumerable_type_as_writeable_collection()
         {
-            typeof(string).IsListOrDictionaryType().ShouldBeFalse();
+            PrimitiveHelper.IsListOrDictionaryType(typeof(string)).ShouldBeFalse();
         }
 
         [Fact]
         public void Should_flag_list_as_writable_collection()
         {
-            typeof(int[]).IsListOrDictionaryType().ShouldBeTrue();
+            PrimitiveHelper.IsListOrDictionaryType(typeof(int[])).ShouldBeTrue();
         }
 
         [Fact]
         public void Should_flag_generic_list_as_writeable_collection()
         {
-            typeof(List<int>).IsListOrDictionaryType().ShouldBeTrue();
+            PrimitiveHelper.IsListOrDictionaryType(typeof(List<int>)).ShouldBeTrue();
         }
 
         [Fact]
         public void Should_flag_dictionary_as_writeable_collection()
         {
-            typeof(Dictionary<string, int>).IsListOrDictionaryType().ShouldBeTrue();
+            PrimitiveHelper.IsListOrDictionaryType(typeof(Dictionary<string, int>)).ShouldBeTrue();
         }
     }
 }
