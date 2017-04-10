@@ -20,13 +20,13 @@ namespace AutoMapper.Mappers
         {
             if(destExpression.Type.IsInterface())
             {
-                var listType = typeof(List<>).MakeGenericType(ElementTypeHelper.GetElementType(destExpression.Type));
-                destExpression = Default(listType);
+                var listType = typeof(IList<>).MakeGenericType(ElementTypeHelper.GetElementType(destExpression.Type));
+                destExpression = Convert(destExpression, listType);
             }
             return MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression,
                 destExpression, contextExpression, IfEditableList, typeof(List<>), MapItemExpr);
         }
 
-        private static Expression IfEditableList(Expression dest) => And(TypeIs(dest, typeof(IList)), Not(TypeIs(dest, typeof(Array))));
+        private static Expression IfEditableList(Expression dest) => AndAlso(TypeIs(dest, typeof(IList)), Not(TypeIs(dest, typeof(Array))));
     }
 }
