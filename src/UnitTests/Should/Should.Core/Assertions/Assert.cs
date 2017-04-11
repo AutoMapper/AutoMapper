@@ -701,6 +701,7 @@ namespace Should.Core.Assertions
         /// Verifies that an object reference is not null.
         /// </summary>
         /// <param name="object">The object to be validated</param>
+        /// <param name="message">The message to show on assertion failure</param>
         /// <exception cref="NotNullException">Thrown when the object is not null</exception>
         public static void NotNull(object @object, string message)
         {
@@ -730,6 +731,18 @@ namespace Should.Core.Assertions
         {
             if (@object != null)
                 throw new NullException(@object);
+        }
+
+        /// <summary>
+        /// Verifies that an object reference is null.
+        /// </summary>
+        /// <param name="object">The object to be inspected</param>
+        /// <param name="message">The message to show on assertion failure</param>
+        /// <exception cref="NullException">Thrown when the object reference is not null</exception>
+        public static void Null(object @object, string message)
+        {
+            if (@object != null)
+                throw new NullException(message);
         }
 
         /// <summary>
