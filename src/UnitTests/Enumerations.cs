@@ -592,7 +592,7 @@ namespace AutoMapper.Tests
         }
     }
 
-    public class When_the_source_has_an_enummemberattribute_value : AutoMapperSpecBase
+    public class When_the_target_has_an_enummemberattribute_value : AutoMapperSpecBase
     {
         public enum EnumWithEnumMemberAttribute
         {
@@ -653,4 +653,51 @@ namespace AutoMapper.Tests
         }
     }
 
+
+    public class When_the_source_has_an_enummemberattribute_value : AutoMapperSpecBase
+    {
+        public enum EnumWithEnumMemberAttribute
+        {
+            Null,
+            [EnumMember(Value = "Eins")]
+            One
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => { });
+
+        [Fact]
+        public void Should_return_the_defined_enummemberattribute_value()
+        {
+            var dest = Mapper.Map<EnumWithEnumMemberAttribute, string>(EnumWithEnumMemberAttribute.One);
+            dest.ShouldEqual("Eins");
+        }
+
+        [Fact]
+        public void Should_return_the_enum_value()
+        {
+            var dest = Mapper.Map<EnumWithEnumMemberAttribute, string>(EnumWithEnumMemberAttribute.Null);
+            dest.ShouldEqual("Null");
+        }
+
+        [Fact]
+        public void Should_return_the_defined_enummemberattribute_value_nullable()
+        {
+            var dest = Mapper.Map<EnumWithEnumMemberAttribute?, string>(EnumWithEnumMemberAttribute.One);
+            dest.ShouldEqual("Eins");
+        }
+
+        [Fact]
+        public void Should_return_the_enum_value_nullable()
+        {
+            var dest = Mapper.Map<EnumWithEnumMemberAttribute?, string>(EnumWithEnumMemberAttribute.Null);
+            dest.ShouldEqual("Null");
+        }
+
+        [Fact]
+        public void Should_return_null()
+        {
+            var dest = Mapper.Map<EnumWithEnumMemberAttribute?, string>(null);
+            dest.ShouldEqual(null);
+        }
+    }
 }
