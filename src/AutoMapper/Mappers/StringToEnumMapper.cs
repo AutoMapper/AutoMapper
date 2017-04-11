@@ -23,7 +23,7 @@ namespace AutoMapper.Mappers
         {
             var destinationType = destExpression.Type;
             var destinationEnumType = ElementTypeHelper.GetEnumerationType(destinationType);
-            Expression enumParse = Expression.Call(typeof(Enum), "Parse", null, Expression.Constant(destinationEnumType), sourceExpression, Expression.Constant(true));
+            var enumParse = Expression.Call(typeof(Enum), "Parse", null, Expression.Constant(destinationEnumType), sourceExpression, Expression.Constant(true));
             var switchTable = BuildEnumMemberSwitchTable(destinationEnumType, destinationType, sourceExpression, enumParse);
             var isNullOrEmpty = Expression.Call(typeof(string), "IsNullOrEmpty", null, sourceExpression);
             return Expression.Condition(isNullOrEmpty, Expression.Default(destinationType), switchTable);
