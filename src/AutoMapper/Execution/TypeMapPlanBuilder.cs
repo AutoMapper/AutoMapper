@@ -184,7 +184,7 @@ namespace AutoMapper.Execution
             var nullChecks = new List<Expression>();
             while(expression != null)
             {
-                var setter = ExpressionFactory.GetSetter(expression);
+                var setter = GetSetter(expression);
                 if(setter != null)
                 {
                     var nullCeck = 
