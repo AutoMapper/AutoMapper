@@ -72,7 +72,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<OrderDto, Order>(MemberList.None).ForPath(o=>o.CustomerHolder.Customer.Name, o=>o.MapFrom(s=>s.CustomerName));
+            cfg.CreateMap<OrderDto, Order>().ForPath(o=>o.CustomerHolder.Customer.Name, o=>o.MapFrom(s=>s.CustomerName));
         });
 
         [Fact]

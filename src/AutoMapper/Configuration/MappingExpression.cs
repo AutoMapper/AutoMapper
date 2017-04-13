@@ -175,7 +175,7 @@ namespace AutoMapper.Configuration
             Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
             var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember, SourceType);
-
+            IgnoreDestinationMember(expression.MemberPath.First);
             _memberConfigurations.Add(expression);
 
             memberOptions(expression);
@@ -213,9 +213,14 @@ namespace AutoMapper.Configuration
         {
             foreach(var property in DestinationType.PropertiesWithAnInaccessibleSetter())
             {
-                ForDestinationMember<object>(property, options => options.Ignore());
+                IgnoreDestinationMember(property);
             }
             return this;
+        }
+
+        private void IgnoreDestinationMember(MemberInfo property)
+        {
+            ForDestinationMember<object>(property, options => options.Ignore());
         }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()
