@@ -6,7 +6,7 @@ namespace AutoMapper
 {
     using Internal;
 
-    [DebuggerDisplay("{DestinationProperty.Name}")]
+    [DebuggerDisplay("{DestinationExpression}")]
     public class PathMap
     {
 
