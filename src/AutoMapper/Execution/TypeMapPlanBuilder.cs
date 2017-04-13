@@ -170,10 +170,31 @@ namespace AutoMapper.Execution
         private Expression HandlePath(PathMap pathMap)
         {
             var destination = ((MemberExpression)pathMap.DestinationExpression.ConvertReplaceParameters(_destination)).Expression;
-            return CreatePropertyMapFunc(new PropertyMap(pathMap.DestinationMember, pathMap.TypeMap)
+            var createInnerObjects = CreateInnerObjects(pathMap, destination);
+            var setFinalValue = CreatePropertyMapFunc(new PropertyMap(pathMap.DestinationMember, pathMap.TypeMap)
             {
                 CustomExpression = pathMap.SourceExpression
             }, destination);
+            return Block(createInnerObjects, setFinalValue);
+        }
+
+        private Expression CreateInnerObjects(PathMap pathMap, Expression destination)
+        {
+            var expression = (MemberExpression) destination;
+            var nullChecks = new List<Expression>();
+            while(expression != null)
+            {
+                var setter = ExpressionFactory.GetSetter(expression);
+                if(setter != null)
+                {
+                    var nullCeck = 
+                        IfNullElse(expression, Assign(setter, DelegateFactory.GenerateConstructorExpression(expression.Type)));
+                    nullChecks.Add(nullCeck);
+                }
+                expression = expression.Expression as MemberExpression;
+            }
+            nullChecks.Reverse();
+            return Block(nullChecks);
         }
 
         private Expression CreateMapperFunc(Expression assignmentFunc)

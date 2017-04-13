@@ -13,7 +13,7 @@ namespace AutoMapper.UnitTests
         {
             private readonly IList<OrderLineItem> _orderLineItems = new List<OrderLineItem>();
 
-            public Customer Customer { get; set; }
+            public CustomerHolder CustomerHolder { get; set; }
 
             public OrderLineItem[] GetOrderLineItems()
             {
@@ -54,6 +54,11 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class CustomerHolder
+        {
+            public Customer Customer { get; set; }
+        }
+
         public class Customer
         {
             public string Name { get; set; }
@@ -67,7 +72,7 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<OrderDto, Order>(MemberList.None).ForPath(o=>o.Customer.Name, o=>o.MapFrom(s=>s.CustomerName));
+            cfg.CreateMap<OrderDto, Order>(MemberList.None).ForPath(o=>o.CustomerHolder.Customer.Name, o=>o.MapFrom(s=>s.CustomerName));
         });
 
         [Fact]
@@ -75,7 +80,7 @@ namespace AutoMapper.UnitTests
         {
             var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
             var model = Mapper.Map<Order>(dto);
-            model.Customer.Name.ShouldEqual("George Costanza");
+            model.CustomerHolder.Customer.Name.ShouldEqual("George Costanza");
         }
     }
 }

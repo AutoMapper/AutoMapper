@@ -7,8 +7,20 @@ using AutoMapper.Configuration;
 
 namespace AutoMapper.Internal
 {
+    using static Expression;
+
     public static class ExpressionFactory
     {
+        public static Expression GetSetter(MemberExpression memberExpression)
+        {
+            var propertyOrField = memberExpression.Member;
+            if((propertyOrField is FieldInfo field && field.IsInitOnly) || !((PropertyInfo)propertyOrField).CanWrite)
+            {
+                return null;
+            }
+            return MakeMemberAccess(memberExpression.Expression, propertyOrField);
+        }
+
         public static MethodInfo Method<T>(Expression<Func<T>> expression) => ((MethodCallExpression) expression.Body).Method;
 
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
