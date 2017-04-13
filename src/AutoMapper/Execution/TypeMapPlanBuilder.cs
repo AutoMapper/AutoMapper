@@ -127,18 +127,22 @@ namespace AutoMapper.Execution
         private Expression CreateAssignmentFunc(Expression destinationFunc, bool constructorMapping)
         {
             var actions = new List<Expression>();
-            foreach (var propertyMap in _typeMap.GetPropertyMaps())
+            foreach(var propertyMap in _typeMap.GetPropertyMaps())
             {
-                if (!propertyMap.CanResolveValue())
+                if(!propertyMap.CanResolveValue())
                 {
                     continue;
                 }
                 var property = TryPropertyMap(propertyMap);
-                if (constructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
+                if(constructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
                 {
                     property = IfThen(NotEqual(_initialDestination, Constant(null)), property);
                 }
                 actions.Add(property);
+            }
+            foreach(var pathMap in _typeMap.PathMaps)
+            {
+                actions.Add(HandlePath(pathMap));
             }
             foreach (var beforeMapAction in _typeMap.BeforeMapActions)
             {
@@ -161,6 +165,15 @@ namespace AutoMapper.Execution
             actions.Add(_destination);
 
             return Block(actions);
+        }
+
+        private Expression HandlePath(PathMap pathMap)
+        {
+            var destination = ((MemberExpression)pathMap.DestinationExpression.ConvertReplaceParameters(_destination)).Expression;
+            return CreatePropertyMapFunc(new PropertyMap(pathMap.DestinationMember, pathMap.TypeMap)
+            {
+                CustomExpression = pathMap.SourceExpression
+            }, destination);
         }
 
         private Expression CreateMapperFunc(Expression assignmentFunc)
@@ -263,13 +276,13 @@ namespace AutoMapper.Execution
                     Throw(New(mappingExceptionCtor, Constant("Error mapping types."), exception, Constant(propertyMap.TypeMap.Types), Constant(propertyMap.TypeMap), Constant(propertyMap))), null));
         }
 
-        private Expression CreatePropertyMapFunc(PropertyMap propertyMap)
+        private Expression CreatePropertyMapFunc(PropertyMap propertyMap, Expression destination)
         {
-            var destMember = MakeMemberAccess(_destination, propertyMap.DestinationProperty);
+            var destMember = MakeMemberAccess(destination, propertyMap.DestinationProperty);
 
             Expression getter;
 
-            if (propertyMap.DestinationProperty is PropertyInfo pi && pi.GetGetMethod(true) == null)
+            if(propertyMap.DestinationProperty is PropertyInfo pi && pi.GetGetMethod(true) == null)
             {
                 getter = Default(propertyMap.DestinationPropertyType);
             }
@@ -279,13 +292,13 @@ namespace AutoMapper.Execution
             }
 
             Expression destValueExpr;
-            if (propertyMap.UseDestinationValue)
+            if(propertyMap.UseDestinationValue)
             {
                 destValueExpr = getter;
             }
             else
             {
-                if (_initialDestination.Type.IsValueType())
+                if(_initialDestination.Type.IsValueType())
                 {
                     destValueExpr = Default(propertyMap.DestinationPropertyType);
                 }
@@ -307,7 +320,7 @@ namespace AutoMapper.Execution
 
             ParameterExpression propertyValue;
             Expression setPropertyValue;
-            if (valueResolverExpr == resolvedValue)
+            if(valueResolverExpr == resolvedValue)
             {
                 propertyValue = resolvedValue;
                 setPropertyValue = setResolvedValue;
@@ -319,7 +332,7 @@ namespace AutoMapper.Execution
             }
 
             Expression mapperExpr;
-            if (propertyMap.DestinationProperty is FieldInfo)
+            if(propertyMap.DestinationProperty is FieldInfo)
             {
                 mapperExpr = propertyMap.SourceType != propertyMap.DestinationPropertyType
                     ? Assign(destMember, ToType(propertyValue, propertyMap.DestinationPropertyType))
@@ -328,7 +341,7 @@ namespace AutoMapper.Execution
             else
             {
                 var setter = ((PropertyInfo)propertyMap.DestinationProperty).GetSetMethod(true);
-                if (setter == null)
+                if(setter == null)
                 {
                     mapperExpr = propertyValue;
                 }
@@ -338,7 +351,7 @@ namespace AutoMapper.Execution
                 }
             }
 
-            if (propertyMap.Condition != null)
+            if(propertyMap.Condition != null)
             {
                 mapperExpr = IfThen(
                     propertyMap.Condition.ConvertReplaceParameters(
@@ -354,7 +367,7 @@ namespace AutoMapper.Execution
 
             mapperExpr = Block(new[] { setResolvedValue, setPropertyValue, mapperExpr }.Distinct());
 
-            if (propertyMap.PreCondition != null)
+            if(propertyMap.PreCondition != null)
             {
                 mapperExpr = IfThen(
                     propertyMap.PreCondition.ConvertReplaceParameters(_source, _context),
@@ -363,6 +376,11 @@ namespace AutoMapper.Execution
             }
 
             return Block(new[] { resolvedValue, propertyValue }.Distinct(), mapperExpr);
+        }
+
+        private Expression CreatePropertyMapFunc(PropertyMap propertyMap)
+        {
+            return CreatePropertyMapFunc(propertyMap, _destination);
         }
 
         private Expression BuildValueResolverFunc(PropertyMap propertyMap, Expression destValueExpr)

@@ -191,6 +191,15 @@ namespace AutoMapper
     public interface IMappingExpression<TSource, TDestination>
     {
         /// <summary>
+        /// Customize configuration for a path inside the destination object.
+        /// </summary>
+        /// <param name="destinationMember">Expression to the destination subobject</param>
+        /// <param name="memberOptions">Callback for member options</param>
+        /// <returns>Itself</returns>
+        IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
+            Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions);
+
+        /// <summary>
         /// Preserve object identity. Useful for circular references.
         /// </summary>
         /// <returns></returns>

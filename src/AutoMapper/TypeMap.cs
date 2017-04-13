@@ -10,6 +10,8 @@ using AutoMapper.Execution;
 
 namespace AutoMapper
 {
+    using Internal;
+
     /// <summary>
     /// Main configuration object holding all mapping configuration for a source and destination type
     /// </summary>
@@ -21,8 +23,8 @@ namespace AutoMapper
         private readonly HashSet<TypePair> _includedDerivedTypes = new HashSet<TypePair>();
         private readonly HashSet<TypePair> _includedBaseTypes = new HashSet<TypePair>();
         private readonly List<PropertyMap> _propertyMaps = new List<PropertyMap>();
+        private readonly List<PathMap> _pathMaps = new List<PathMap>();
         private readonly List<SourceMemberConfig> _sourceMemberConfigs = new List<SourceMemberConfig>();
-
         private readonly IList<PropertyMap> _inheritedMaps = new List<PropertyMap>();
         private PropertyMap[] _orderedPropertyMaps;
         private bool _sealed;
@@ -35,6 +37,17 @@ namespace AutoMapper
             Types = new TypePair(sourceType.Type, destinationType.Type);
             Profile = profile;
             ConfiguredMemberList = memberList;
+        }
+
+        public PathMap FindOrCreatePathMapFor(MemberPath path, TypeMap typeMap)
+        {
+            var pathMap = _pathMaps.SingleOrDefault(p => p.MemberPath == path);
+            if(pathMap == null)
+            {
+                pathMap = new PathMap(typeMap);
+                _pathMaps.Add(pathMap);
+            }
+            return pathMap;
         }
 
         public LambdaExpression MapExpression { get; private set; }
@@ -79,6 +92,7 @@ namespace AutoMapper
         public bool DisableConstructorValidation { get; set; }
 
         public PropertyMap[] GetPropertyMaps() => _orderedPropertyMaps ?? _propertyMaps.Concat(_inheritedMaps).ToArray();
+        public IEnumerable<PathMap> PathMaps => _pathMaps;
 
         public bool ConstructorParameterMatches(string destinationPropertyName)
         {

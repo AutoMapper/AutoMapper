@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
@@ -38,7 +39,7 @@ namespace AutoMapper
         public LambdaExpression CustomResolver { get; set; }
         public LambdaExpression Condition { get; set; }
         public LambdaExpression PreCondition { get; set; }
-        public LambdaExpression CustomExpression { get; private set; }
+        public LambdaExpression CustomExpression { get; internal set; }
         public bool UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
         public object NullSubstitute { get; set; }
