@@ -185,18 +185,11 @@ namespace AutoMapper.Execution
             while(memberExpression != null)
             {
                 var setter = GetSetter(memberExpression);
-                if(setter != null)
-                {
-                    var constructor = DelegateFactory.GenerateConstructorExpression(memberExpression.Type);
-                    var nullCeck = memberExpression.IfNullElse(Assign(setter, constructor));
-                    nullChecks.Add(nullCeck);
-                }
-                else
-                {
-                    var exception = new NullReferenceException($"{memberExpression} cannot be null.");
-                    var nullCeck = memberExpression.IfNullElse(Throw(Constant(exception)));
-                    nullChecks.Add(nullCeck);
-                }
+                var ifNull = setter == null ? (Expression)
+                                    Throw(Constant(new NullReferenceException($"{memberExpression} cannot be null."))) :
+                                    Assign(setter, DelegateFactory.GenerateConstructorExpression(memberExpression.Type));
+                var nullCeck = memberExpression.IfNullElse(ifNull);
+                nullChecks.Add(nullCeck);
                 memberExpression = memberExpression.Expression as MemberExpression;
             }
             nullChecks.Reverse();

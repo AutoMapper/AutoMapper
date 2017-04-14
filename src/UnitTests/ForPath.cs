@@ -87,11 +87,12 @@ namespace AutoMapper.UnitTests
         }
     }
 
-    public class ForPathWithoutSetters : AutoMapperSpecBase
+    public class ForPathWithoutSettersShouldBehaveAsForMember : AutoMapperSpecBase
     {
         public class Order
         {
             public CustomerHolder CustomerHolder { get; set; }
+            public int Value { get; }
         }
 
         public class CustomerHolder
@@ -114,6 +115,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<OrderDto, Order>()
+                .ForMember(o=>o.Value, o=>o.UseValue(9))
                 .ForPath(o => o.CustomerHolder.Customer.Name, o => o.MapFrom(s => s.CustomerName))
                 .ForPath(o => o.CustomerHolder.Customer.Total, o => o.MapFrom(s => s.Total));
         });
@@ -123,6 +125,7 @@ namespace AutoMapper.UnitTests
         {
             var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
             var model = Mapper.Map<Order>(dto);
+            model.Value.ShouldEqual(0);
             model.CustomerHolder.Customer.Name.ShouldBeNull();
             model.CustomerHolder.Customer.Total.ShouldEqual(0m);
         }
@@ -170,7 +173,7 @@ namespace AutoMapper.UnitTests
         }
     }
 
-    public class ForPathWithValueTypes : AutoMapperSpecBase
+    public class ForPathWithValueTypesAndFields : AutoMapperSpecBase
     {
         public struct Order
         {
