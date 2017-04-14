@@ -186,7 +186,7 @@ namespace AutoMapper.Execution
             {
                 var setter = GetSetter(memberExpression);
                 var ifNull = setter == null ? (Expression)
-                                    Throw(Constant(new NullReferenceException($"{memberExpression} cannot be null."))) :
+                                    Throw(Constant(new NullReferenceException($"{memberExpression} cannot be null because it's used by ForPath."))) :
                                     Assign(setter, DelegateFactory.GenerateConstructorExpression(memberExpression.Type));
                 var nullCeck = memberExpression.IfNullElse(ifNull);
                 nullChecks.Add(nullCeck);

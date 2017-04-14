@@ -83,7 +83,7 @@ namespace AutoMapper.UnitTests
         public void Should_unflatten()
         {
             new Action(() => Mapper.Map<Order>(new OrderDto())).ShouldThrow<NullReferenceException>(ex =>
-                  ex.Message.ShouldEqual("typeMapDestination.CustomerHolder.Customer cannot be null."));
+                  ex.Message.ShouldEqual("typeMapDestination.CustomerHolder.Customer cannot be null because it's used by ForPath."));
         }
     }
 
