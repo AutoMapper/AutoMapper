@@ -191,6 +191,12 @@ namespace AutoMapper.Execution
                     var nullCeck = memberExpression.IfNullElse(Assign(setter, constructor));
                     nullChecks.Add(nullCeck);
                 }
+                else
+                {
+                    var exception = new NullReferenceException($"{memberExpression} cannot be null.");
+                    var nullCeck = memberExpression.IfNullElse(Throw(Constant(exception)));
+                    nullChecks.Add(nullCeck);
+                }
                 memberExpression = memberExpression.Expression as MemberExpression;
             }
             nullChecks.Reverse();
