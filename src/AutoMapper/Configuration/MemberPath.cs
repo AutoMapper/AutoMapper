@@ -16,6 +16,8 @@ namespace AutoMapper.Internal
 
         public MemberInfo First => Members[Members.Length - 1];
 
+        public MemberInfo Last => Members[0];
+
         public bool Equals(MemberPath other) => Members.SequenceEqual(other.Members);
 
         public override bool Equals(object obj)

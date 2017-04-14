@@ -11,47 +11,7 @@ namespace AutoMapper.UnitTests
     {
         public class Order
         {
-            private readonly IList<OrderLineItem> _orderLineItems = new List<OrderLineItem>();
-
             public CustomerHolder CustomerHolder { get; set; }
-
-            public OrderLineItem[] GetOrderLineItems()
-            {
-                return _orderLineItems.ToArray();
-            }
-
-            public void AddOrderLineItem(Product product, int quantity)
-            {
-                _orderLineItems.Add(new OrderLineItem(product, quantity));
-            }
-
-            public decimal GetTotal()
-            {
-                return _orderLineItems.Sum(li => li.GetTotal());
-            }
-        }
-
-        public class Product
-        {
-            public decimal Price { get; set; }
-            public string Name { get; set; }
-        }
-
-        public class OrderLineItem
-        {
-            public OrderLineItem(Product product, int quantity)
-            {
-                Product = product;
-                Quantity = quantity;
-            }
-
-            public Product Product { get; private set; }
-            public int Quantity { get; private set; }
-
-            public decimal GetTotal()
-            {
-                return Quantity * Product.Price;
-            }
         }
 
         public class CustomerHolder
@@ -62,6 +22,7 @@ namespace AutoMapper.UnitTests
         public class Customer
         {
             public string Name { get; set; }
+            public decimal Total { get; set; }
         }
 
         public class OrderDto
@@ -72,7 +33,9 @@ namespace AutoMapper.UnitTests
 
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
-            cfg.CreateMap<OrderDto, Order>().ForPath(o=>o.CustomerHolder.Customer.Name, o=>o.MapFrom(s=>s.CustomerName));
+            cfg.CreateMap<OrderDto, Order>()
+                .ForPath(o=>o.CustomerHolder.Customer.Name, o=>o.MapFrom(s=>s.CustomerName))
+                .ForPath(o => o.CustomerHolder.Customer.Total, o => o.MapFrom(s => s.Total));
         });
 
         [Fact]
@@ -81,6 +44,48 @@ namespace AutoMapper.UnitTests
             var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
             var model = Mapper.Map<Order>(dto);
             model.CustomerHolder.Customer.Name.ShouldEqual("George Costanza");
+            model.CustomerHolder.Customer.Total.ShouldEqual(74.85m);
+        }
+    }
+
+    public class ForPathWithValueTypes : AutoMapperSpecBase
+    {
+        public struct Order
+        {
+            public CustomerHolder CustomerHolder;
+        }
+
+        public struct CustomerHolder
+        {
+            public Customer Customer;
+        }
+
+        public struct Customer
+        {
+            public string Name;
+            public decimal Total;
+        }
+
+        public struct OrderDto
+        {
+            public string CustomerName;
+            public decimal Total;
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<OrderDto, Order>()
+                .ForPath(o => o.CustomerHolder.Customer.Name, o => o.MapFrom(s => s.CustomerName))
+                .ForPath(o => o.CustomerHolder.Customer.Total, o => o.MapFrom(s => s.Total));
+        });
+
+        [Fact]
+        public void Should_unflatten()
+        {
+            var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
+            var model = Mapper.Map<Order>(dto);
+            model.CustomerHolder.Customer.Name.ShouldEqual("George Costanza");
+            model.CustomerHolder.Customer.Total.ShouldEqual(74.85m);
         }
     }
 }

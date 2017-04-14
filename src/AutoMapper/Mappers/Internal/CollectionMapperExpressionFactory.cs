@@ -39,14 +39,13 @@ namespace AutoMapper.Mappers.Internal
 
             var ifNullExpr = profileMap.AllowNullCollections ? Constant(null, passedDestination.Type) : (Expression) newExpression;
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-            var isSourceNull = sourceExpression.Type.IsValueType() ? (Expression) Constant(false) : Equal(sourceExpression, Constant(null));
             var checkNull =
                 Block(new[] {newExpression, passedDestination},
                     Assign(passedDestination, destExpression),
                     IfThenElse(condition ?? Constant(false),
                         Block(Assign(newExpression, passedDestination), Call(newExpression, clearMethod)),
                         Assign(newExpression, passedDestination.Type.NewExpr(ifInterfaceType))),
-                    Condition(isSourceNull, ToType(ifNullExpr, passedDestination.Type), ToType(mapExpr, passedDestination.Type))
+                    sourceExpression.IfNullElse(ToType(ifNullExpr, passedDestination.Type), ToType(mapExpr, passedDestination.Type))
                 );
             if (propertyMap != null)
                 return checkNull;

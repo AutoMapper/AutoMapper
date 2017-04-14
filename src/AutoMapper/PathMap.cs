@@ -9,17 +9,17 @@ namespace AutoMapper
     [DebuggerDisplay("{DestinationExpression}")]
     public class PathMap
     {
-
-        public PathMap(TypeMap typeMap)
+        public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap)
         {
+            MemberPath = memberPath;
             TypeMap = typeMap;
+            DestinationExpression = destinationExpression;
         }
 
         public TypeMap TypeMap { get; }
-        public LambdaExpression DestinationExpression { get; set; }
+        public LambdaExpression DestinationExpression { get; }
         public LambdaExpression SourceExpression { get; set; }
         public MemberPath MemberPath { get; }
-
-        public MemberInfo DestinationMember => ((MemberExpression)DestinationExpression.Body).Member;
+        public MemberInfo DestinationMember => MemberPath.Last;
     }
 }

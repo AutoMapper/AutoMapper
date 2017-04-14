@@ -14,11 +14,9 @@ namespace AutoMapper.Internal
         public static Expression GetSetter(MemberExpression memberExpression)
         {
             var propertyOrField = memberExpression.Member;
-            if((propertyOrField is FieldInfo field && field.IsInitOnly) || !((PropertyInfo)propertyOrField).CanWrite)
-            {
-                return null;
-            }
-            return MakeMemberAccess(memberExpression.Expression, propertyOrField);
+            return ReflectionHelper.CanBeSet(propertyOrField) ?
+                        MakeMemberAccess(memberExpression.Expression, propertyOrField) :
+                        null;
         }
 
         public static MethodInfo Method<T>(Expression<Func<T>> expression) => ((MethodCallExpression) expression.Body).Method;
@@ -138,11 +136,11 @@ namespace AutoMapper.Internal
 
         public static Expression RemoveIfNotNull(Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
 
-        public static Expression IfNullElse(Expression expression, params Expression[] ifElse) =>
-            ifElse.Any()
-                ? Expression.Condition(Expression.NotEqual(expression, Expression.Default(expression.Type)), expression,
-                    IfNullElse(ifElse.First(), ifElse.Skip(1).ToArray()))
-                : expression;
+        public static Expression IfNullElse(Expression expression, Expression then, Expression @else = null)
+        {
+            var isNull = expression.Type.IsValueType() ? (Expression) Constant(false) : Equal(expression, Constant(null));
+            return Condition(isNull, then, @else ?? Default(then.Type));
+        }
 
         internal class IfNotNullVisitor : ExpressionVisitor
         {

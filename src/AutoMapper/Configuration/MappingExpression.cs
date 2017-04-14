@@ -174,7 +174,7 @@ namespace AutoMapper.Configuration
         public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
-            var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember, SourceType);
+            var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember);
             IgnoreDestinationMember(expression.MemberPath.First);
             _memberConfigurations.Add(expression);
 

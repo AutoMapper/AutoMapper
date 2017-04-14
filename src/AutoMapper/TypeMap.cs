@@ -39,12 +39,12 @@ namespace AutoMapper
             ConfiguredMemberList = memberList;
         }
 
-        public PathMap FindOrCreatePathMapFor(MemberPath path, TypeMap typeMap)
+        public PathMap FindOrCreatePathMapFor(LambdaExpression destinationExpression, MemberPath path, TypeMap typeMap)
         {
             var pathMap = _pathMaps.SingleOrDefault(p => p.MemberPath == path);
             if(pathMap == null)
             {
-                pathMap = new PathMap(typeMap);
+                pathMap = new PathMap(destinationExpression, path, typeMap);
                 _pathMaps.Add(pathMap);
             }
             return pathMap;

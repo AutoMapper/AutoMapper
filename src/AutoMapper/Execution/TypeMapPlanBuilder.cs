@@ -180,18 +180,18 @@ namespace AutoMapper.Execution
 
         private Expression CreateInnerObjects(PathMap pathMap, Expression destination)
         {
-            var expression = (MemberExpression) destination;
+            var memberExpression = (MemberExpression) destination;
             var nullChecks = new List<Expression>();
-            while(expression != null)
+            while(memberExpression != null)
             {
-                var setter = GetSetter(expression);
+                var setter = GetSetter(memberExpression);
                 if(setter != null)
                 {
-                    var nullCeck = 
-                        IfNullElse(expression, Assign(setter, DelegateFactory.GenerateConstructorExpression(expression.Type)));
+                    var constructor = DelegateFactory.GenerateConstructorExpression(memberExpression.Type);
+                    var nullCeck = memberExpression.IfNullElse(Assign(setter, constructor));
                     nullChecks.Add(nullCeck);
                 }
-                expression = expression.Expression as MemberExpression;
+                memberExpression = memberExpression.Expression as MemberExpression;
             }
             nullChecks.Reverse();
             return Block(nullChecks);

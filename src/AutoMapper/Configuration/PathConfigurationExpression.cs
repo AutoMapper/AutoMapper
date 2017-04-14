@@ -9,25 +9,22 @@ namespace AutoMapper.Configuration
     public class PathConfigurationExpression<TSource, TDestination, TMember> : IPathConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private readonly LambdaExpression _destinationExpression;
-        private readonly Type _sourceType;
         protected List<Action<PathMap>> PathMapActions { get; } = new List<Action<PathMap>>();
 
-        public PathConfigurationExpression(Expression<Func<TDestination, TMember>> destinationExpression, Type sourceType)
+        public PathConfigurationExpression(Expression<Func<TDestination, TMember>> destinationExpression)
         {
             _destinationExpression = destinationExpression;
             MemberPath = new MemberPath(MemberVisitor.GetMemberPath(destinationExpression));
-            _sourceType = sourceType;
         }
 
         public MemberPath MemberPath { get; }
 
-        public MemberInfo DestinationMember => ((MemberExpression)_destinationExpression.Body).Member;
+        public MemberInfo DestinationMember => MemberPath.Last;
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
         {
             PathMapActions.Add(pm =>
             {
-                pm.DestinationExpression = _destinationExpression;
                 pm.SourceExpression = sourceMember;
             });
         }
@@ -42,7 +39,7 @@ namespace AutoMapper.Configuration
             //    destMember = destTypeInfo.PublicReadAccessors.Single(m => m.Name == destMember.Name);
             //}
 
-            var pathMap = typeMap.FindOrCreatePathMapFor(MemberPath, typeMap);
+            var pathMap = typeMap.FindOrCreatePathMapFor(_destinationExpression, MemberPath, typeMap);
 
             foreach(var action in PathMapActions)
             {
