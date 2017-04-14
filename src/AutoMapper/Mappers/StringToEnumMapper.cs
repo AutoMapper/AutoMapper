@@ -26,7 +26,6 @@ namespace AutoMapper.Mappers
                 sourceExpression, Expression.Constant(true));
             var switchCases = new List<SwitchCase>();
             var enumNames = destinationEnumType.GetDeclaredMembers();
-            var upperCaseSourceExpression = Expression.Call(sourceExpression, "ToUpperInvariant", null, null);
             foreach (var memberInfo in enumNames.Where(x => x.IsStatic()))
             {
                 var attribute = memberInfo.GetCustomAttribute(typeof(EnumMemberAttribute)) as EnumMemberAttribute;
@@ -34,15 +33,21 @@ namespace AutoMapper.Mappers
                 {
                     var switchCase = Expression.SwitchCase(
                         ToType(Expression.Constant(Enum.ToObject(destinationEnumType, memberInfo.GetMemberValue(null))),
-                            destinationType), Expression.Constant(attribute.Value.ToUpperInvariant()));
+                            destinationType), Expression.Constant(attribute.Value));
                     switchCases.Add(switchCase);
                 }
             }
+            var equalsMethodInfo = Method(() => StringCompareOrdinalIgnoreCase(null, null));
             var switchTable = switchCases.Count > 0
-                ? Expression.Switch(upperCaseSourceExpression, ToType(enumParse, destinationType), switchCases.ToArray())
+                ? Expression.Switch(sourceExpression, ToType(enumParse, destinationType), equalsMethodInfo, switchCases)
                 : ToType(enumParse, destinationType);
             var isNullOrEmpty = Expression.Call(typeof(string), "IsNullOrEmpty", null, sourceExpression);
             return Expression.Condition(isNullOrEmpty, Expression.Default(destinationType), switchTable);
+        }
+
+        private static bool StringCompareOrdinalIgnoreCase(string x, string y)
+        {
+            return StringComparer.OrdinalIgnoreCase.Equals(x, y);
         }
     }
 }
