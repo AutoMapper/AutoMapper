@@ -10,6 +10,13 @@ namespace AutoMapper.Internal
 {
     public static class ReflectionHelper
     {
+        public static bool CanBeSet(MemberInfo propertyOrField)
+        {
+            return propertyOrField is FieldInfo field ? 
+                        !field.IsInitOnly : 
+                        ((PropertyInfo)propertyOrField).CanWrite;
+        }
+
         public static object GetDefaultValue(ParameterInfo parameter)
         {
             if (parameter.DefaultValue == null && parameter.ParameterType.IsValueType())

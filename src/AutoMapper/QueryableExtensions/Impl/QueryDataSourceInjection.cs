@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Configuration;
 using AutoMapper.Internal;
 
 namespace AutoMapper.QueryableExtensions.Impl
@@ -72,20 +73,20 @@ namespace AutoMapper.QueryableExtensions.Impl
         public ISourceInjectedQueryable<TDestination> For<TDestination>(object parameters, params Expression<Func<TDestination, object>>[] membersToExpand)
         {
             _parameters = GetParameters(parameters);
-            _membersToExpand = GetMemberPaths(membersToExpand);
+            _membersToExpand = ProjectionExpression.GetMemberPaths(membersToExpand);
             return CreateQueryable<TDestination>();
         }
 
         public ISourceInjectedQueryable<TDestination> For<TDestination>(params Expression<Func<TDestination, object>>[] membersToExpand)
         {
-            _membersToExpand = GetMemberPaths(membersToExpand);
+            _membersToExpand = ProjectionExpression.GetMemberPaths(membersToExpand);
             return CreateQueryable<TDestination>();
         }
 
         public ISourceInjectedQueryable<TDestination> For<TDestination>(IObjectDictionary parameters, params string[] membersToExpand)
         {
             _parameters = parameters;
-            _membersToExpand = GetMemberPaths(typeof(TDestination), membersToExpand);
+            _membersToExpand = ProjectionExpression.GetMemberPaths(typeof(TDestination), membersToExpand);
             return CreateQueryable<TDestination>();
         }
 
@@ -158,20 +159,6 @@ namespace AutoMapper.QueryableExtensions.Impl
             return (parameters ?? new object()).GetType()
                 .GetDeclaredProperties()
                 .ToDictionary(pi => pi.Name, pi => pi.GetValue(parameters, null));
-        }
-
-        private static MemberPaths GetMemberPaths(Type type, string[] membersToExpand)
-        {
-            return membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));
-        }
-        private static MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
-        {
-            return membersToExpand.Select(expr =>
-            {
-                var visitor = new ProjectionExpression.MemberVisitor();
-                visitor.Visit(expr);
-                return visitor.MemberPath;
-            });
         }
     }
 }

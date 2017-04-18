@@ -56,20 +56,11 @@ namespace AutoMapper.QueryableExtensions
         public IQueryable<TResult> To<TResult>(object parameters = null, params Expression<Func<TResult, object>>[] membersToExpand) 
             => To<TResult>(GetParameters(parameters), GetMemberPaths(membersToExpand));
 
-        private MemberPaths GetMemberPaths(Type type, string[] membersToExpand)
-        {
-            return membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));
-        }
+        public static MemberPaths GetMemberPaths(Type type, string[] membersToExpand) =>
+            membersToExpand.Select(m => ReflectionHelper.GetMemberPath(type, m));
 
-        private MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand)
-        {
-            return membersToExpand.Select(expr =>
-            {
-                var visitor = new MemberVisitor();
-                visitor.Visit(expr);
-                return visitor.MemberPath;
-            });
-        }
+        public static MemberPaths GetMemberPaths<TResult>(Expression<Func<TResult, object>>[] membersToExpand) =>
+            membersToExpand.Select(expr => MemberVisitor.GetMemberPath(expr));
 
         public IQueryable<TResult> To<TResult>(IObjectDictionary parameters, params Expression<Func<TResult, object>>[] membersToExpand)
         {
@@ -90,27 +81,6 @@ namespace AutoMapper.QueryableExtensions
                     new[] { _source.Expression, Expression.Quote(mapExpression) }
                     )
                 );
-        }
-
-        internal class MemberVisitor : ExpressionVisitor
-        {
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                MemberPath = GetMemberPath(node);
-                return node;
-            }
-
-            private IEnumerable<MemberInfo> GetMemberPath(MemberExpression memberExpression)
-            {
-                var expression = memberExpression;
-                while(expression != null)
-                {
-                    yield return expression.Member;
-                    expression = expression.Expression as MemberExpression;
-                }
-            }
-
-            public IEnumerable<MemberInfo> MemberPath { get; private set; }
         }
     }
 }

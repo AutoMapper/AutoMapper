@@ -171,6 +171,18 @@ namespace AutoMapper.Configuration
         protected virtual MappingExpression<TDestination, TSource> CreateReverseMapExpression() 
             => new MappingExpression<TDestination, TSource>(MemberList.None, DestinationType, SourceType);
 
+        public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
+            Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
+        {
+            var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember);
+            IgnoreDestinationMember(expression.MemberPath.First);
+            _memberConfigurations.Add(expression);
+
+            memberOptions(expression);
+
+            return this;
+        }
+
         public IMappingExpression<TSource, TDestination> ForMember<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
                                                                    Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
@@ -201,9 +213,14 @@ namespace AutoMapper.Configuration
         {
             foreach(var property in DestinationType.PropertiesWithAnInaccessibleSetter())
             {
-                ForDestinationMember<object>(property, options => options.Ignore());
+                IgnoreDestinationMember(property);
             }
             return this;
+        }
+
+        private void IgnoreDestinationMember(MemberInfo property)
+        {
+            ForDestinationMember<object>(property, options => options.Ignore());
         }
 
         public IMappingExpression<TSource, TDestination> IgnoreAllSourcePropertiesWithAnInaccessibleSetter()

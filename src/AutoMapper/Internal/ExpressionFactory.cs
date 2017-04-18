@@ -7,8 +7,18 @@ using AutoMapper.Configuration;
 
 namespace AutoMapper.Internal
 {
+    using static Expression;
+
     public static class ExpressionFactory
     {
+        public static Expression GetSetter(MemberExpression memberExpression)
+        {
+            var propertyOrField = memberExpression.Member;
+            return ReflectionHelper.CanBeSet(propertyOrField) ?
+                        MakeMemberAccess(memberExpression.Expression, propertyOrField) :
+                        null;
+        }
+
         public static MethodInfo Method<T>(Expression<Func<T>> expression) => ((MethodCallExpression) expression.Body).Method;
 
         public static Expression ForEach(Expression collection, ParameterExpression loopVar, Expression loopContent)
@@ -126,11 +136,11 @@ namespace AutoMapper.Internal
 
         public static Expression RemoveIfNotNull(Expression expression, params Expression[] expressions) => new RemoveIfNotNullVisitor(expressions).Visit(expression);
 
-        public static Expression IfNullElse(Expression expression, params Expression[] ifElse) =>
-            ifElse.Any()
-                ? Expression.Condition(Expression.NotEqual(expression, Expression.Default(expression.Type)), expression,
-                    IfNullElse(ifElse.First(), ifElse.Skip(1).ToArray()))
-                : expression;
+        public static Expression IfNullElse(Expression expression, Expression then, Expression @else = null)
+        {
+            var isNull = expression.Type.IsValueType() ? (Expression) Constant(false) : Equal(expression, Constant(null));
+            return Condition(isNull, then, @else ?? Default(then.Type));
+        }
 
         internal class IfNotNullVisitor : ExpressionVisitor
         {

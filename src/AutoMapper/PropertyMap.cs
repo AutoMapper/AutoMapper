@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
@@ -11,6 +12,13 @@ namespace AutoMapper
     public class PropertyMap
     {
         private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
+
+        public PropertyMap(PathMap pathMap)
+        {
+            DestinationProperty = pathMap.DestinationMember;
+            CustomExpression = pathMap.SourceExpression;
+            TypeMap = pathMap.TypeMap;
+        }
 
         public PropertyMap(MemberInfo destinationProperty, TypeMap typeMap)
         {

@@ -24,7 +24,7 @@ namespace AutoMapper
         public static Expression RemoveIfNotNull(this Expression expression, params Expression[] expressions)
             => ExpressionFactory.RemoveIfNotNull(expression, expressions);
 
-        public static Expression IfNullElse(this Expression expression, params Expression[] ifElse)
-            => ExpressionFactory.IfNullElse(expression, ifElse);
+        public static Expression IfNullElse(this Expression expression, Expression then, Expression @else = null)
+            => ExpressionFactory.IfNullElse(expression, then, @else);
     }
 }
