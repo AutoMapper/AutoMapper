@@ -13,6 +13,12 @@ namespace AutoMapper
     {
         private readonly List<MemberInfo> _memberChain = new List<MemberInfo>();
 
+        public PropertyMap(PathMap pathMap)
+        {
+            CustomExpression = pathMap.SourceExpression;
+            TypeMap = pathMap.TypeMap;
+        }
+
         public PropertyMap(MemberInfo destinationProperty, TypeMap typeMap)
         {
             TypeMap = typeMap;
@@ -39,7 +45,7 @@ namespace AutoMapper
         public LambdaExpression CustomResolver { get; set; }
         public LambdaExpression Condition { get; set; }
         public LambdaExpression PreCondition { get; set; }
-        public LambdaExpression CustomExpression { get; internal set; }
+        public LambdaExpression CustomExpression { get; private set; }
         public bool UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
         public object NullSubstitute { get; set; }
