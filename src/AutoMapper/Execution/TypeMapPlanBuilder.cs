@@ -171,10 +171,7 @@ namespace AutoMapper.Execution
         {
             var destination = ((MemberExpression)pathMap.DestinationExpression.ConvertReplaceParameters(_destination)).Expression;
             var createInnerObjects = CreateInnerObjects(pathMap, destination);
-            var setFinalValue = CreatePropertyMapFunc(new PropertyMap(pathMap.DestinationMember, pathMap.TypeMap)
-            {
-                CustomExpression = pathMap.SourceExpression
-            }, destination);
+            var setFinalValue = CreatePropertyMapFunc(new PropertyMap(pathMap), destination);
             return Block(createInnerObjects, setFinalValue);
         }
 
