@@ -75,7 +75,7 @@ namespace AutoMapper.Configuration
 
         public IPropertyMapConfiguration Reverse()
         {
-            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, _destinationExpression);
+            return Create(_sourceMember, _destinationExpression);
         }
     }
 }
