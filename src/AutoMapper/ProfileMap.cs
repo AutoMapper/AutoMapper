@@ -155,7 +155,7 @@ namespace AutoMapper
             {
                 foreach (var propertyMap in typeMap.GetPropertyMaps())
                 {
-                    var memberExpression = new MemberConfigurationExpression(propertyMap.DestinationProperty, typeMap.SourceType);
+                    var memberExpression = new MappingExpression.MemberConfigurationExpression(propertyMap.DestinationProperty, typeMap.SourceType);
 
                     action(propertyMap, memberExpression);
 

@@ -90,41 +90,41 @@ namespace AutoMapper.Configuration
             => new MemberConfigurationExpression(member, sourceType);
 
         protected override MappingExpression<object, object> CreateReverseMapExpression() 
-            => new MappingExpression(new TypePair(DestinationType, SourceType), MemberList.Source);        
-    }
+            => new MappingExpression(new TypePair(DestinationType, SourceType), MemberList.Source);
 
-    internal class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
-    {
-        public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
-            : base(destinationMember, sourceType)
+        internal class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
         {
-        }
-
-        public void ResolveUsing(Type valueResolverType)
-        {
-            var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>)));
-
-            PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-        }
-
-        public void ResolveUsing(Type valueResolverType, string memberName)
-        {
-            var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
+            public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
+                : base(destinationMember, sourceType)
             {
-                SourceMemberName = memberName
-            };
+            }
 
-            PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-        }
-
-        public void ResolveUsing<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string memberName)
-        {
-            var config = new ValueResolverConfiguration(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
+            public void ResolveUsing(Type valueResolverType)
             {
-                SourceMemberName = memberName
-            };
+                var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>)));
 
-            PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
+                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
+            }
+
+            public void ResolveUsing(Type valueResolverType, string memberName)
+            {
+                var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
+                {
+                    SourceMemberName = memberName
+                };
+
+                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
+            }
+
+            public void ResolveUsing<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string memberName)
+            {
+                var config = new ValueResolverConfiguration(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
+                {
+                    SourceMemberName = memberName
+                };
+
+                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
+            }
         }
     }
 
