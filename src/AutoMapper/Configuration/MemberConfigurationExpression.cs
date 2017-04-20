@@ -11,6 +11,7 @@ namespace AutoMapper.Configuration
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private readonly MemberInfo _destinationMember;
+        private LambdaExpression _sourceMember;
         private readonly Type _sourceType;
         protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
@@ -121,6 +122,7 @@ namespace AutoMapper.Configuration
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
         {
+            _sourceMember = sourceMember;
             PropertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(sourceMember));
         }
 
@@ -264,12 +266,10 @@ namespace AutoMapper.Configuration
 
         public IPropertyMapConfiguration Reverse()
         {
-            var propertyMap = new PropertyMap(_destinationMember, null);
-            Apply(propertyMap);
             var newSource = Parameter(typeof(TDestination), "source");
             var newSourceProperty = MakeMemberAccess(newSource, _destinationMember);
             var newSourceExpression = Lambda(newSourceProperty, newSource);
-            return PathConfigurationExpression<TDestination, TSource, object>.Create(propertyMap.CustomExpression, newSourceExpression);
+            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, newSourceExpression);
         }
     }
 }
