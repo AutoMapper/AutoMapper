@@ -49,15 +49,33 @@ namespace AutoMapper.Configuration
 
             var pathMap = typeMap.FindOrCreatePathMapFor(_destinationExpression, MemberPath, typeMap);
 
+            Apply(pathMap);
+        }
+
+        private void Apply(PathMap pathMap)
+        {
             foreach(var action in PathMapActions)
             {
                 action(pathMap);
             }
         }
 
+        internal static IPropertyMapConfiguration Create(LambdaExpression destination, LambdaExpression source)
+        {
+            if(destination == null || !destination.IsMemberPath())
+            {
+                return null;
+            }
+            var reversed = new PathConfigurationExpression<TSource, TDestination, object>(destination);
+            reversed.MapFrom(source);
+            return reversed;
+        }
+
         public IPropertyMapConfiguration Reverse()
         {
-            throw new NotImplementedException();
+            var pathMap = new PathMap(null, MemberPath, null);
+            Apply(pathMap);
+            return PathConfigurationExpression<TDestination, TSource, object>.Create(pathMap.SourceExpression, _destinationExpression);
         }
     }
 }

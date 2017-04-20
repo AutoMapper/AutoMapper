@@ -177,7 +177,7 @@ namespace AutoMapper.Execution
 
         private Expression CreateInnerObjects(PathMap pathMap, Expression destination)
         {
-            return Block(destination.GetMembers().Select(NullCheck).Reverse());
+            return Block(destination.GetMembers().Select(NullCheck).Reverse().Concat(new[] { Empty() }));
         }
 
         private static Expression NullCheck(MemberExpression memberExpression)

@@ -6,6 +6,52 @@ using System.Text.RegularExpressions;
 
 namespace AutoMapper.UnitTests
 {
+    public class ReverseForPath : AutoMapperSpecBase
+    {
+        public class Order
+        {
+            public CustomerHolder CustomerHolder { get; set; }
+        }
+
+        public class CustomerHolder
+        {
+            public Customer Customer { get; set; }
+        }
+
+        public class Customer
+        {
+            public string Name { get; set; }
+            public decimal Total { get; set; }
+        }
+
+        public class OrderDto
+        {
+            public string CustomerName { get; set; }
+            public decimal Total { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<OrderDto, Order>()
+                .ForPath(o => o.CustomerHolder.Customer.Name, o => o.MapFrom(s => s.CustomerName))
+                .ForPath(o => o.CustomerHolder.Customer.Total, o => o.MapFrom(s => s.Total))
+                .ReverseMap(ReverseOptions.MapFroms);
+        });
+
+        [Fact]
+        public void Should_flatten()
+        {
+            var model = new Order {
+                CustomerHolder = new CustomerHolder {
+                        Customer = new Customer { Name = "George Costanza", Total = 74.85m }
+                    }
+            };
+            var dto = Mapper.Map<OrderDto>(model);
+            dto.CustomerName.ShouldEqual("George Costanza");
+            dto.Total.ShouldEqual(74.85m);
+        }
+    }
+
     public class ReverseMapFrom : AutoMapperSpecBase
     {
         public class Order
