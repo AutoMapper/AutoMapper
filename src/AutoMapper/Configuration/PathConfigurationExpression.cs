@@ -11,7 +11,7 @@ namespace AutoMapper.Configuration
         private readonly LambdaExpression _destinationExpression;
         protected List<Action<PathMap>> PathMapActions { get; } = new List<Action<PathMap>>();
 
-        public PathConfigurationExpression(Expression<Func<TDestination, TMember>> destinationExpression)
+        public PathConfigurationExpression(LambdaExpression destinationExpression)
         {
             _destinationExpression = destinationExpression;
             MemberPath = new MemberPath(MemberVisitor.GetMemberPath(destinationExpression));
@@ -22,6 +22,14 @@ namespace AutoMapper.Configuration
         public MemberInfo DestinationMember => MemberPath.Last;
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
+        {
+            PathMapActions.Add(pm =>
+            {
+                pm.SourceExpression = sourceMember;
+            });
+        }
+
+        public void MapFrom(LambdaExpression sourceMember)
         {
             PathMapActions.Add(pm =>
             {
@@ -45,6 +53,11 @@ namespace AutoMapper.Configuration
             {
                 action(pathMap);
             }
+        }
+
+        public IPropertyMapConfiguration Reverse()
+        {
+            throw new NotImplementedException();
         }
     }
 }

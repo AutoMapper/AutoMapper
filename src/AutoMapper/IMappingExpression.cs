@@ -26,7 +26,7 @@ namespace AutoMapper
         /// Create a type mapping from the destination to the source type, using the destination members as validation.
         /// </summary>
         /// <returns>Itself</returns>
-        IMappingExpression ReverseMap();
+        IMappingExpression ReverseMap(ReverseOptions reverseOptions = ReverseOptions.Default);
 
         /// <summary>
         /// Replace the original runtime instance with a new source instance. Useful when ORMs return proxy types with no relationships to runtime types.
@@ -397,8 +397,9 @@ namespace AutoMapper
         /// <summary>
         /// Create a type mapping from the destination to the source type, using the <typeparamref name="TDestination"/> members as validation
         /// </summary>
+        /// <param name="reverseOptions">what to reverse</param>
         /// <returns>Itself</returns>
-        IMappingExpression<TDestination, TSource> ReverseMap();
+        IMappingExpression<TDestination, TSource> ReverseMap(ReverseOptions reverseOptions = ReverseOptions.Default);
 
         /// <summary>
         /// Customize configuration for an individual source member
@@ -439,5 +440,17 @@ namespace AutoMapper
         /// </summary>
         /// <returns>Itself</returns>
         IMappingExpression<TSource, TDestination> DisableCtorValidation();
+    }
+
+    /// <summary>
+    /// Specify what to reverse.
+    /// </summary>
+    public enum ReverseOptions
+    {
+        Default,
+        /// <summary>
+        /// Reverse simple member accesses MapFrom-s.
+        /// </summary>
+        MapFroms
     }
 }

@@ -6,6 +6,8 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration
 {
+    using static Expression;
+
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private readonly MemberInfo _destinationMember;
@@ -242,17 +244,38 @@ namespace AutoMapper.Configuration
         {
             var destMember = _destinationMember;
 
-            if (destMember.DeclaringType.IsGenericType())
+            if(destMember.DeclaringType.IsGenericType())
             {
                 destMember = typeMap.DestinationTypeDetails.PublicReadAccessors.Single(m => m.Name == destMember.Name);
             }
 
             var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember);
 
-            foreach (var action in PropertyMapActions)
+            Apply(propertyMap);
+        }
+
+        private void Apply(PropertyMap propertyMap)
+        {
+            foreach(var action in PropertyMapActions)
             {
                 action(propertyMap);
             }
+        }
+
+        public IPropertyMapConfiguration Reverse()
+        {
+            var propertyMap = new PropertyMap(_destinationMember, null);
+            Apply(propertyMap);
+            var newDestinationExpression = propertyMap.CustomExpression;
+            if(!newDestinationExpression.IsMemberPath())
+            {
+                return null;
+            }
+            var reversed = new PathConfigurationExpression<TDestination, TSource, object>(newDestinationExpression);
+            var newSource = Parameter(typeof(TDestination), "source");
+            var newSourceProperty = MakeMemberAccess(newSource, propertyMap.DestinationProperty);
+            reversed.MapFrom(Lambda(newSourceProperty, newSource));
+            return reversed;
         }
     }
 }

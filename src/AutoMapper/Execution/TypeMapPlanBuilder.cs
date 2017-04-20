@@ -177,20 +177,16 @@ namespace AutoMapper.Execution
 
         private Expression CreateInnerObjects(PathMap pathMap, Expression destination)
         {
-            var memberExpression = (MemberExpression) destination;
-            var nullChecks = new List<Expression>();
-            while(memberExpression != null)
-            {
-                var setter = GetSetter(memberExpression);
-                var ifNull = setter == null ? (Expression)
-                                    Throw(Constant(new NullReferenceException($"{memberExpression} cannot be null because it's used by ForPath."))) :
-                                    Assign(setter, DelegateFactory.GenerateConstructorExpression(memberExpression.Type));
-                var nullCeck = memberExpression.IfNullElse(ifNull);
-                nullChecks.Add(nullCeck);
-                memberExpression = memberExpression.Expression as MemberExpression;
-            }
-            nullChecks.Reverse();
-            return Block(nullChecks);
+            return Block(destination.GetMembers().Select(NullCheck).Reverse());
+        }
+
+        private static Expression NullCheck(MemberExpression memberExpression)
+        {
+            var setter = GetSetter(memberExpression);
+            var ifNull = setter == null ? (Expression)
+                                Throw(Constant(new NullReferenceException($"{memberExpression} cannot be null because it's used by ForPath."))) :
+                                Assign(setter, DelegateFactory.GenerateConstructorExpression(memberExpression.Type));
+            return memberExpression.IfNullElse(ifNull);
         }
 
         private Expression CreateMapperFunc(Expression assignmentFunc)

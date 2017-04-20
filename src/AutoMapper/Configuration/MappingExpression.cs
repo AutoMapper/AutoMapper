@@ -15,7 +15,7 @@ namespace AutoMapper.Configuration
         {
         }
 
-        public new IMappingExpression ReverseMap() => (IMappingExpression) base.ReverseMap();
+        public new IMappingExpression ReverseMap(ReverseOptions reverseOptions = ReverseOptions.Default) => (IMappingExpression) base.ReverseMap(reverseOptions);
 
         public IMappingExpression Substitute(Func<object, object> substituteFunc)
             => (IMappingExpression) base.Substitute(substituteFunc);
@@ -90,43 +90,42 @@ namespace AutoMapper.Configuration
             => new MemberConfigurationExpression(member, sourceType);
 
         protected override MappingExpression<object, object> CreateReverseMapExpression() 
-            => new MappingExpression(new TypePair(DestinationType, SourceType), MemberList.Source);
+            => new MappingExpression(new TypePair(DestinationType, SourceType), MemberList.Source);        
+    }
 
-        internal class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
+    internal class MemberConfigurationExpression : MemberConfigurationExpression<object, object, object>, IMemberConfigurationExpression
+    {
+        public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType)
+            : base(destinationMember, sourceType)
         {
-            public MemberConfigurationExpression(MemberInfo destinationMember, Type sourceType) 
-                : base(destinationMember, sourceType)
-            {
-            }
-
-            public void ResolveUsing(Type valueResolverType)
-            {
-                var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>)));
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
-
-            public void ResolveUsing(Type valueResolverType, string memberName)
-            {
-                var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
-                {
-                    SourceMemberName = memberName
-                };
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
-
-            public void ResolveUsing<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string memberName)
-            {
-                var config = new ValueResolverConfiguration(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
-                {
-                    SourceMemberName = memberName
-                };
-
-                PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
-            }
         }
 
+        public void ResolveUsing(Type valueResolverType)
+        {
+            var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IValueResolver<,,>)));
+
+            PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
+        }
+
+        public void ResolveUsing(Type valueResolverType, string memberName)
+        {
+            var config = new ValueResolverConfiguration(valueResolverType, valueResolverType.GetGenericInterface(typeof(IMemberValueResolver<,,,>)))
+            {
+                SourceMemberName = memberName
+            };
+
+            PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
+        }
+
+        public void ResolveUsing<TSource, TDestination, TSourceMember, TDestMember>(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember> resolver, string memberName)
+        {
+            var config = new ValueResolverConfiguration(resolver, typeof(IMemberValueResolver<TSource, TDestination, TSourceMember, TDestMember>))
+            {
+                SourceMemberName = memberName
+            };
+
+            PropertyMapActions.Add(pm => pm.ValueResolverConfig = config);
+        }
     }
 
     public class MappingExpression<TSource, TDestination> : IMappingExpression<TSource, TDestination>, ITypeMapConfiguration
@@ -174,6 +173,10 @@ namespace AutoMapper.Configuration
         public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
             Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
         {
+            if(!destinationMember.IsMemberPath())
+            {
+                throw new ArgumentOutOfRangeException(nameof(destinationMember), "Only member accesses are allowed.");
+            }
             var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember);
             IgnoreDestinationMember(expression.MemberPath.First);
             _memberConfigurations.Add(expression);
@@ -273,13 +276,15 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public IMappingExpression<TDestination, TSource> ReverseMap()
+        public IMappingExpression<TDestination, TSource> ReverseMap(ReverseOptions reverseOptions = ReverseOptions.Default)
         {
-            var mappingExpression = CreateReverseMapExpression();
-
-            _reverseMap = mappingExpression;
-
-            return mappingExpression;
+            _reverseMap = CreateReverseMapExpression();
+            if(reverseOptions == ReverseOptions.MapFroms)
+            {
+                _reverseMap._memberConfigurations.AddRange(
+                    _memberConfigurations.Select(m => m.Reverse()).Where(m=>m!=null));
+            }
+            return _reverseMap;
         }
 
         public IMappingExpression<TSource, TDestination> ForSourceMember(Expression<Func<TSource, object>> sourceMember, Action<ISourceMemberConfigurationExpression> memberOptions)
