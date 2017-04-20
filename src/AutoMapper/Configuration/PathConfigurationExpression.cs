@@ -25,13 +25,10 @@ namespace AutoMapper.Configuration
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
         {
             _sourceMember = sourceMember;
-            PathMapActions.Add(pm =>
-            {
-                pm.SourceExpression = sourceMember;
-            });
+            MapFromUntyped(sourceMember);
         }
 
-        public void MapFrom(LambdaExpression sourceMember)
+        public void MapFromUntyped(LambdaExpression sourceMember)
         {
             PathMapActions.Add(pm =>
             {
@@ -69,7 +66,7 @@ namespace AutoMapper.Configuration
                 return null;
             }
             var reversed = new PathConfigurationExpression<TSource, TDestination, object>(destination);
-            reversed.MapFrom(source);
+            reversed.MapFromUntyped(source);
             return reversed;
         }
 
