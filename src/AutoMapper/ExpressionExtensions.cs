@@ -29,7 +29,7 @@ namespace AutoMapper
 
         public static bool IsMemberPath(this LambdaExpression exp)
         {
-            return ((MemberExpression)exp.Body).GetMembers().Last().Expression == exp.Parameters.First();
+            return exp.Body.GetMembers().LastOrDefault()?.Expression == exp.Parameters.First();
         }
 
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
