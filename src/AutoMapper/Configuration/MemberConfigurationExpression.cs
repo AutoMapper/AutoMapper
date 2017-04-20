@@ -266,11 +266,10 @@ namespace AutoMapper.Configuration
         {
             var propertyMap = new PropertyMap(_destinationMember, null);
             Apply(propertyMap);
-            var newDestinationExpression = propertyMap.CustomExpression;
             var newSource = Parameter(typeof(TDestination), "source");
             var newSourceProperty = MakeMemberAccess(newSource, propertyMap.DestinationProperty);
             var newSourceExpression = Lambda(newSourceProperty, newSource);
-            return PathConfigurationExpression<TDestination, TSource, object>.Create(newDestinationExpression, newSourceExpression);
+            return PathConfigurationExpression<TDestination, TSource, object>.Create(propertyMap.CustomExpression, newSourceExpression);
         }
     }
 }
