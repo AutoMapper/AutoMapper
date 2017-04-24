@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using AutoMapper.Configuration;
 
 namespace AutoMapper.QueryableExtensions
 {
@@ -15,6 +16,6 @@ namespace AutoMapper.QueryableExtensions
         }
 
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
-            Nullable.GetUnderlyingType(result.Type) == propertyMap.DestinationPropertyType;
+            result.Type.IsNullableType() && !propertyMap.DestinationPropertyType.IsNullableType();
     }
 }
