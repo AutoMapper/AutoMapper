@@ -5,7 +5,7 @@ using AutoMapper.Configuration;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
-    public class NullableExpressionBinder : IExpressionBinder
+    public class NullableDestinationExpressionBinder : IExpressionBinder
     {
         public bool IsMatch(PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionResolutionResult result) =>
             propertyMap.DestinationPropertyType.IsNullableType()
