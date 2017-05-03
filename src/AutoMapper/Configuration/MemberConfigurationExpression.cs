@@ -269,7 +269,7 @@ namespace AutoMapper.Configuration
             var newSource = Parameter(typeof(TDestination), "source");
             var newSourceProperty = MakeMemberAccess(newSource, _destinationMember);
             var newSourceExpression = Lambda(newSourceProperty, newSource);
-            return PathConfigurationExpression<TDestination, TSource, object>.Create(_sourceMember, newSourceExpression);
+            return PathConfigurationExpression<TDestination, TSource>.Create(_sourceMember, newSourceExpression);
         }
     }
 }

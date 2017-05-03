@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -6,7 +7,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Configuration
 {
-    public class PathConfigurationExpression<TSource, TDestination, TMember> : IPathConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
+    public class PathConfigurationExpression<TSource, TDestination> : IPathConfigurationExpression<TSource, TDestination>, IPropertyMapConfiguration
     {
         private readonly LambdaExpression _destinationExpression;
         private LambdaExpression _sourceMember;
@@ -15,7 +16,7 @@ namespace AutoMapper.Configuration
         public PathConfigurationExpression(LambdaExpression destinationExpression)
         {
             _destinationExpression = destinationExpression;
-            MemberPath = new MemberPath(MemberVisitor.GetMemberPath(destinationExpression));
+            MemberPath = new MemberPath(MemberVisitor.GetMemberPath(destinationExpression).Reverse());
         }
 
         public MemberPath MemberPath { get; }
@@ -65,7 +66,7 @@ namespace AutoMapper.Configuration
             {
                 return null;
             }
-            var reversed = new PathConfigurationExpression<TSource, TDestination, object>(destination);
+            var reversed = new PathConfigurationExpression<TSource, TDestination>(destination);
             reversed.MapFromUntyped(source);
             return reversed;
         }

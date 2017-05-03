@@ -172,13 +172,13 @@ namespace AutoMapper.Configuration
             => new MappingExpression<TDestination, TSource>(MemberList.None, DestinationType, SourceType);
 
         public IMappingExpression<TSource, TDestination> ForPath<TMember>(Expression<Func<TDestination, TMember>> destinationMember,
-            Action<IPathConfigurationExpression<TSource, TDestination, TMember>> memberOptions)
+            Action<IPathConfigurationExpression<TSource, TDestination>> memberOptions)
         {
             if(!destinationMember.IsMemberPath())
             {
                 throw new ArgumentOutOfRangeException(nameof(destinationMember), "Only member accesses are allowed.");
             }
-            var expression = new PathConfigurationExpression<TSource, TDestination, TMember>(destinationMember);
+            var expression = new PathConfigurationExpression<TSource, TDestination>(destinationMember);
             IgnoreDestinationMember(expression.MemberPath.First);
             _memberConfigurations.Add(expression);
 
@@ -564,11 +564,12 @@ namespace AutoMapper.Configuration
 
             if (_reverseMap != null)
             {
-                foreach (var destProperty in typeMap.GetPropertyMaps().Where(pm => pm.Ignored))
+                ReverseSourceMembers(typeMap);
+                foreach(var destProperty in typeMap.GetPropertyMaps().Where(pm => pm.Ignored))
                 {
                     _reverseMap.ForSourceMember(destProperty.DestinationProperty.Name, opt => opt.Ignore());
                 }
-                foreach (var includedDerivedType in typeMap.IncludedDerivedTypes)
+                foreach(var includedDerivedType in typeMap.IncludedDerivedTypes)
                 {
                     _reverseMap.Include(includedDerivedType.DestinationType, includedDerivedType.SourceType);
                 }
@@ -579,6 +580,24 @@ namespace AutoMapper.Configuration
             }
         }
 
+        private void ReverseSourceMembers(TypeMap typeMap)
+        {
+            foreach(var propertyMap in typeMap.GetPropertyMaps().Where(p => p.SourceMembers.Count > 1))
+            {
+                _reverseMap.TypeMapActions.Add(reverseTypeMap =>
+                {
+                    var memberPath = new MemberPath(propertyMap.SourceMembers);
+                    var newDestination = Parameter(reverseTypeMap.DestinationType, "destination");
+                    var path = propertyMap.SourceMembers.Aggregate((Expression)newDestination, (obj, member) => MakeMemberAccess(obj, member));
+                    var forPathLambda = Lambda(path, newDestination);
+
+                    var pathMap = reverseTypeMap.FindOrCreatePathMapFor(forPathLambda, memberPath, reverseTypeMap);
+
+                    var newSource = Parameter(reverseTypeMap.SourceType, "source");
+                    pathMap.SourceExpression = Lambda(MakeMemberAccess(newSource, propertyMap.DestinationProperty), newSource);
+                });
+            }
+        }
     }
 }
 

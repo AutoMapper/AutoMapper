@@ -39,7 +39,7 @@ namespace AutoMapper
 
         public Type DestinationPropertyType => DestinationProperty.GetMemberType();
 
-        public IEnumerable<MemberInfo> SourceMembers => _memberChain;
+        public IList<MemberInfo> SourceMembers => _memberChain;
 
         public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }
@@ -96,31 +96,6 @@ namespace AutoMapper
         {
             var getters = members as IList<MemberInfo> ?? members.ToList();
             _memberChain.AddRange(getters);
-            CustomExpression = MapFrom(getters);
-        }
-
-        private LambdaExpression MapFrom(IList<MemberInfo> getters)
-        {
-            var sourceParameter = Parameter(TypeMap.SourceType, "mapFromSource");
-            Expression mapFrom;
-            var last = SourceMembers.Last();
-            if(last is PropertyInfo pi && pi.GetGetMethod(true) == null)
-            {
-                mapFrom = Default(last.GetMemberType());
-            }
-            else
-            {
-                mapFrom = SourceMembers.Aggregate(
-                    (Expression) sourceParameter,
-                    (inner, getter) => getter is MethodInfo
-                        ? getter.IsStatic()
-                            ? Call(null, (MethodInfo)getter, inner)
-                            : (Expression)Call(inner, (MethodInfo)getter)
-                        : MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
-                    );
-                mapFrom = mapFrom.IfNotNull(DestinationPropertyType);
-            }
-            return Lambda(mapFrom, sourceParameter);
         }
 
         public void ApplyInheritedPropertyMap(PropertyMap inheritedMappedProperty)
