@@ -15,7 +15,7 @@ namespace AutoMapper.Configuration
         {
         }
 
-        public new IMappingExpression ReverseMap(ReverseOptions reverseOptions = ReverseOptions.Default) => (IMappingExpression) base.ReverseMap(reverseOptions);
+        public new IMappingExpression ReverseMap() => (IMappingExpression) base.ReverseMap();
 
         public IMappingExpression Substitute(Func<object, object> substituteFunc)
             => (IMappingExpression) base.Substitute(substituteFunc);
@@ -277,14 +277,10 @@ namespace AutoMapper.Configuration
             return this;
         }
 
-        public IMappingExpression<TDestination, TSource> ReverseMap(ReverseOptions reverseOptions = ReverseOptions.Default)
+        public IMappingExpression<TDestination, TSource> ReverseMap()
         {
             _reverseMap = CreateReverseMapExpression();
-            if(reverseOptions == ReverseOptions.MapFroms)
-            {
-                _reverseMap._memberConfigurations.AddRange(
-                    _memberConfigurations.Select(m => m.Reverse()).Where(m=>m!=null));
-            }
+            _reverseMap._memberConfigurations.AddRange(_memberConfigurations.Select(m => m.Reverse()).Where(m=>m!=null));
             return _reverseMap;
         }
 

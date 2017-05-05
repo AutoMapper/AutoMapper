@@ -266,7 +266,7 @@ namespace AutoMapper.Configuration
 
         public IPropertyMapConfiguration Reverse()
         {
-            var newSource = Parameter(typeof(TDestination), "source");
+            var newSource = Parameter(DestinationMember.DeclaringType, "source");
             var newSourceProperty = MakeMemberAccess(newSource, _destinationMember);
             var newSourceExpression = Lambda(newSourceProperty, newSource);
             return PathConfigurationExpression<TDestination, TSource>.Create(_sourceMember, newSourceExpression);

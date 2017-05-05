@@ -35,7 +35,7 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<OrderDto, Order>()
                 .ForPath(o => o.CustomerHolder.Customer.Name, o => o.MapFrom(s => s.CustomerName))
                 .ForPath(o => o.CustomerHolder.Customer.Total, o => o.MapFrom(s => s.Total))
-                .ReverseMap(ReverseOptions.MapFroms);
+                .ReverseMap();
         });
 
         [Fact]
@@ -81,7 +81,7 @@ namespace AutoMapper.UnitTests
             cfg.CreateMap<Order, OrderDto>()
                 .ForMember(d => d.CustomerName, o => o.MapFrom(s => s.CustomerHolder.Customer.Name))
                 .ForMember(d => d.Total, o => o.MapFrom(s => s.CustomerHolder.Customer.Total))
-                .ReverseMap(ReverseOptions.MapFroms);
+                .ReverseMap();
         });
 
         [Fact]
@@ -121,7 +121,7 @@ namespace AutoMapper.UnitTests
         protected override MapperConfiguration Configuration => new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<Order, OrderDto>()
-                .ReverseMap(ReverseOptions.MapFroms);
+                .ReverseMap();
         });
 
         [Fact]
