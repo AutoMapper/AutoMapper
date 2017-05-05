@@ -22,7 +22,7 @@ First, configure AutoMapper to know what types you want to map, in the startup o
 ```csharp
 Mapper.Initialize(cfg => {
     cfg.CreateMap<Foo, FooDto>();
-	cfg.CreateMap<Bar, BarDto>();
+    cfg.CreateMap<Bar, BarDto>();
 });
 ```
 Then in your application code, execute the mappings:
