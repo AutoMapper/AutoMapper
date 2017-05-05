@@ -9,6 +9,20 @@ using System.Collections;
 
 namespace AutoMapper.UnitTests
 {
+    public class When_mapping_to_existing_collection_typed_as_IEnumerable : AutoMapperSpecBase
+    {
+        protected override MapperConfiguration Configuration => new MapperConfiguration(_=>{ });
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            IEnumerable<int> destination = new List<int>();
+            var source = Enumerable.Range(1, 10).ToArray();
+            Mapper.Map(source, destination);
+            destination.SequenceEqual(source).ShouldBeTrue();
+        }
+    }
+
     public class When_mapping_to_readonly_property_as_IEnumerable_and_existing_destination : AutoMapperSpecBase
     {
         public class Source

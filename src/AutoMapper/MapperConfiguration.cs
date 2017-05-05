@@ -149,7 +149,10 @@ namespace AutoMapper
             }
             else
             {
-                var map = mapperToUse.MapExpression(mapperConfiguration, Configuration, null, ToType(source, mapRequest.RuntimeTypes.SourceType), destination, context);
+                var map = mapperToUse.MapExpression(mapperConfiguration, Configuration, null, 
+                                                                        ToType(source, mapRequest.RuntimeTypes.SourceType), 
+                                                                        ToType(destination, mapRequest.RuntimeTypes.DestinationType), 
+                                                                        context);
                 var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
                 fullExpression = TryCatch(mapToDestination, source, destination, context, mapRequest.RequestedTypes);
             }
