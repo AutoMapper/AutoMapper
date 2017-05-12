@@ -6,5 +6,6 @@ namespace AutoMapper.Configuration
     {
         void Configure(TypeMap typeMap);
         MemberInfo DestinationMember { get; }
+        IPropertyMapConfiguration Reverse();
     }
 }

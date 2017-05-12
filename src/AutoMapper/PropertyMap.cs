@@ -8,6 +8,8 @@ using AutoMapper.Configuration;
 
 namespace AutoMapper
 {
+    using static Expression;
+
     [DebuggerDisplay("{DestinationProperty.Name}")]
     public class PropertyMap
     {
@@ -37,7 +39,7 @@ namespace AutoMapper
 
         public Type DestinationPropertyType => DestinationProperty.GetMemberType();
 
-        public IEnumerable<MemberInfo> SourceMembers => _memberChain;
+        public IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
 
         public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }

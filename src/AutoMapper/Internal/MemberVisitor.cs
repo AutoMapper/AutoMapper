@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -15,18 +16,8 @@ namespace AutoMapper.Internal
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            MemberPath = GetMemberPath(node);
+            MemberPath = node.GetMembers().Select(e=>e.Member);
             return node;
-        }
-
-        private IEnumerable<MemberInfo> GetMemberPath(MemberExpression memberExpression)
-        {
-            var expression = memberExpression;
-            while(expression != null)
-            {
-                yield return expression.Member;
-                expression = expression.Expression as MemberExpression;
-            }
         }
 
         public IEnumerable<MemberInfo> MemberPath { get; private set; }

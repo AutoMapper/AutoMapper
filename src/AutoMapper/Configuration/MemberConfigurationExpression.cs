@@ -6,9 +6,12 @@ using System.Reflection;
 
 namespace AutoMapper.Configuration
 {
+    using static Expression;
+
     public class MemberConfigurationExpression<TSource, TDestination, TMember> : IMemberConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
     {
         private readonly MemberInfo _destinationMember;
+        private LambdaExpression _sourceMember;
         private readonly Type _sourceType;
         protected List<Action<PropertyMap>> PropertyMapActions { get; } = new List<Action<PropertyMap>>();
 
@@ -119,6 +122,7 @@ namespace AutoMapper.Configuration
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
         {
+            _sourceMember = sourceMember;
             PropertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(sourceMember));
         }
 
@@ -242,17 +246,30 @@ namespace AutoMapper.Configuration
         {
             var destMember = _destinationMember;
 
-            if (destMember.DeclaringType.IsGenericType())
+            if(destMember.DeclaringType.IsGenericType())
             {
                 destMember = typeMap.DestinationTypeDetails.PublicReadAccessors.Single(m => m.Name == destMember.Name);
             }
 
             var propertyMap = typeMap.FindOrCreatePropertyMapFor(destMember);
 
-            foreach (var action in PropertyMapActions)
+            Apply(propertyMap);
+        }
+
+        private void Apply(PropertyMap propertyMap)
+        {
+            foreach(var action in PropertyMapActions)
             {
                 action(propertyMap);
             }
+        }
+
+        public IPropertyMapConfiguration Reverse()
+        {
+            var newSource = Parameter(DestinationMember.DeclaringType, "source");
+            var newSourceProperty = MakeMemberAccess(newSource, _destinationMember);
+            var newSourceExpression = Lambda(newSourceProperty, newSource);
+            return PathConfigurationExpression<TDestination, TSource>.Create(_sourceMember, newSourceExpression);
         }
     }
 }

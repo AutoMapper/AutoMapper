@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -6,15 +7,16 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Configuration
 {
-    public class PathConfigurationExpression<TSource, TDestination, TMember> : IPathConfigurationExpression<TSource, TDestination, TMember>, IPropertyMapConfiguration
+    public class PathConfigurationExpression<TSource, TDestination> : IPathConfigurationExpression<TSource, TDestination>, IPropertyMapConfiguration
     {
         private readonly LambdaExpression _destinationExpression;
+        private LambdaExpression _sourceMember;
         protected List<Action<PathMap>> PathMapActions { get; } = new List<Action<PathMap>>();
 
-        public PathConfigurationExpression(Expression<Func<TDestination, TMember>> destinationExpression)
+        public PathConfigurationExpression(LambdaExpression destinationExpression)
         {
             _destinationExpression = destinationExpression;
-            MemberPath = new MemberPath(MemberVisitor.GetMemberPath(destinationExpression));
+            MemberPath = new MemberPath(MemberVisitor.GetMemberPath(destinationExpression).Reverse());
         }
 
         public MemberPath MemberPath { get; }
@@ -22,6 +24,12 @@ namespace AutoMapper.Configuration
         public MemberInfo DestinationMember => MemberPath.Last;
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
+        {
+            _sourceMember = sourceMember;
+            MapFromUntyped(sourceMember);
+        }
+
+        public void MapFromUntyped(LambdaExpression sourceMember)
         {
             PathMapActions.Add(pm =>
             {
@@ -41,10 +49,31 @@ namespace AutoMapper.Configuration
 
             var pathMap = typeMap.FindOrCreatePathMapFor(_destinationExpression, MemberPath, typeMap);
 
+            Apply(pathMap);
+        }
+
+        private void Apply(PathMap pathMap)
+        {
             foreach(var action in PathMapActions)
             {
                 action(pathMap);
             }
+        }
+
+        internal static IPropertyMapConfiguration Create(LambdaExpression destination, LambdaExpression source)
+        {
+            if(destination == null || !destination.IsMemberPath())
+            {
+                return null;
+            }
+            var reversed = new PathConfigurationExpression<TSource, TDestination>(destination);
+            reversed.MapFromUntyped(source);
+            return reversed;
+        }
+
+        public IPropertyMapConfiguration Reverse()
+        {
+            return Create(_sourceMember, _destinationExpression);
         }
     }
 }

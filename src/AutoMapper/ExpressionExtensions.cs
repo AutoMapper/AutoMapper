@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.Internal;
 
@@ -6,6 +8,30 @@ namespace AutoMapper
 {
     internal static class ExpressionExtensions
     {
+        public static IEnumerable<MemberExpression> GetMembers(this Expression expression)
+        {
+            var memberExpression = expression as MemberExpression;
+            if(memberExpression == null)
+            {
+                return new MemberExpression[0];
+            }
+            return memberExpression.GetMembers();
+        }
+
+        public static IEnumerable<MemberExpression> GetMembers(this MemberExpression expression)
+        {
+            while(expression != null)
+            {
+                yield return expression;
+                expression = expression.Expression as MemberExpression;
+            }
+        }
+
+        public static bool IsMemberPath(this LambdaExpression exp)
+        {
+            return exp.Body.GetMembers().LastOrDefault()?.Expression == exp.Parameters.First();
+        }
+
         public static Expression ReplaceParameters(this LambdaExpression exp, params Expression[] replace)
             => ExpressionFactory.ReplaceParameters(exp, replace);
 

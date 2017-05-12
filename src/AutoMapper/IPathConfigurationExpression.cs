@@ -7,9 +7,8 @@ namespace AutoMapper
     /// Member configuration options
     /// </summary>
     /// <typeparam name="TSource">Source type for this member</typeparam>
-    /// <typeparam name="TMember">Type for this member</typeparam>
     /// <typeparam name="TDestination">Destination type for this map</typeparam>
-    public interface IPathConfigurationExpression<TSource, out TDestination, TMember>
+    public interface IPathConfigurationExpression<TSource, out TDestination>
     {
         /// <summary>
         /// Specify the source member to map from. Can only reference a member on the <typeparamref name="TSource"/> type
