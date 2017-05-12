@@ -578,7 +578,7 @@ namespace AutoMapper.Configuration
 
         private void ReverseSourceMembers(TypeMap typeMap)
         {
-            foreach(var propertyMap in typeMap.GetPropertyMaps().Where(p => p.SourceMembers.Count > 1))
+            foreach(var propertyMap in typeMap.GetPropertyMaps().Where(p => p.SourceMembers.Count > 1 && !p.SourceMembers.Any(s=>s is MethodInfo)))
             {
                 _reverseMap.TypeMapActions.Add(reverseTypeMap =>
                 {

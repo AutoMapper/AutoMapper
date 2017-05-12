@@ -6,6 +6,35 @@ using System.Text.RegularExpressions;
 
 namespace AutoMapper.UnitTests
 {
+    public class MethodsWithReverse : AutoMapperSpecBase
+    {
+        class Order
+        {
+            public OrderItem[] OrderItems { get; set; }
+        }
+
+        class OrderItem
+        {
+            public string Product { get; set; }
+        }
+
+        class OrderDto
+        {
+            public int OrderItemsCount { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>
+        {
+            c.CreateMap<Order, OrderDto>().ReverseMap();
+        });
+
+        [Fact]
+        public void ShouldMapOk()
+        {
+            Mapper.Map<Order>(new OrderDto());
+        }
+    }
+
     public class ReverseForPath : AutoMapperSpecBase
     {
         public class Order
