@@ -86,6 +86,7 @@
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="BasicFlattening.cs" />
     <Compile Include="Bug\CannotProjectStringToNullableEnum.cs" />
+    <Compile Include="Bug\NullableToInvalid.cs" />
     <Compile Include="Bug\OneSourceWithMultipleDestinationsAndPreserveReferences.cs" />
     <Compile Include="Bug\ConventionCreateMapsWithCircularReference.cs" />
     <Compile Include="Bug\ConvertMapperThreading.cs" />
