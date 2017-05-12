@@ -39,7 +39,7 @@ namespace AutoMapper
 
         public Type DestinationPropertyType => DestinationProperty.GetMemberType();
 
-        public IList<MemberInfo> SourceMembers => _memberChain;
+        public IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
 
         public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }
