@@ -85,9 +85,15 @@ namespace AutoMapper
                 }
                 var context = new ValidationContext(types, propertyMap, mapperToUse);
                 _config.Validate(context);
-                if (mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
+                if(mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
                 {
                     CheckElementMaps(typeMapsChecked, types, propertyMap);
+                }
+                else if(mapperToUse is NullableSourceMapper)
+                {
+                    var newTypePair = new TypePair(Nullable.GetUnderlyingType(types.SourceType), types.DestinationType);
+                    var memberTypeMap = _config.ResolveTypeMap(newTypePair.SourceType, newTypePair.DestinationType);
+                    DryRunTypeMap(typeMapsChecked, newTypePair, memberTypeMap, propertyMap);
                 }
             }
         }
@@ -119,8 +125,7 @@ namespace AutoMapper
                     return;
 
                 var destinationType = propertyMap.DestinationProperty.GetMemberType();
-                var memberTypeMap = _config.ResolveTypeMap(sourceType,
-                    destinationType);
+                var memberTypeMap = _config.ResolveTypeMap(sourceType, destinationType);
 
                 if (typeMapsChecked.Any(tm => Equals(tm, memberTypeMap)))
                     continue;
