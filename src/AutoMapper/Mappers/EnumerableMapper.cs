@@ -10,13 +10,13 @@ namespace AutoMapper.Mappers
     using static Expression;
     using static CollectionMapperExpressionFactory;
 
-    public class EnumerableMapper : EnumerableMapperBase, IObjectMapper
+    public class EnumerableMapper : EnumerableMapperBase
     {
-        public bool IsMatch(TypePair context) => (context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType() ||
+        public override bool IsMatch(TypePair context) => (context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType() ||
                                                   context.DestinationType.IsListType())
                                                  && context.SourceType.IsEnumerableType();
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             if(destExpression.Type.IsInterface())
             {

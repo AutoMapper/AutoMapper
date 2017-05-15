@@ -12,11 +12,11 @@ namespace AutoMapper.Mappers
     using static ExpressionFactory;
     using static CollectionMapperExpressionFactory;
 
-    public class ArrayMapper : EnumerableMapperBase, IObjectMapper
+    public class ArrayMapper : EnumerableMapperBase
     {
-        public bool IsMatch(TypePair context) => context.DestinationType.IsArray && context.SourceType.IsEnumerableType();
+        public override bool IsMatch(TypePair context) => context.DestinationType.IsArray && context.SourceType.IsEnumerableType();
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
             var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = ElementTypeHelper.GetElementType(destExpression.Type);

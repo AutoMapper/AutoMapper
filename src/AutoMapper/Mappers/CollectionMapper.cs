@@ -7,11 +7,11 @@ namespace AutoMapper.Mappers
 {
     using static CollectionMapperExpressionFactory;
 
-    public class CollectionMapper : EnumerableMapperBase, IObjectMapper
+    public class CollectionMapper : EnumerableMapperBase
     {
-        public bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
+        public override bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
 
-        public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
+        public override Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             => MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression, contextExpression, IfNotNull, typeof(List<>),
                  MapItemExpr);
     }
