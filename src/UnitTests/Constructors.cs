@@ -5,6 +5,49 @@ using Should;
 
 namespace AutoMapper.UnitTests.Constructors
 {
+    public class When_a_constructor_with_extra_parameters_doesnt_match : AutoMapperSpecBase
+    {
+        PersonTarget _destination;
+
+        class PersonSource
+        {
+            public int Age { get; set; }
+            public string Name { get; set; }
+        }
+
+        class PersonTarget
+        {
+            public int Age { get; set; }
+            public string Name { get; set; }
+
+            public PersonTarget(int age, string name)
+            {
+                this.Age = age;
+                this.Name = name;
+            }
+
+            public PersonTarget(int age, string firstName, string lastName)
+            {
+                this.Age = age;
+                this.Name = firstName + " " + lastName;
+            }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c=>c.CreateMap<PersonSource, PersonTarget>());
+
+        protected override void Because_of()
+        {
+            _destination = Mapper.Map<PersonTarget>(new PersonSource { Age = 23, Name = "Marc" });
+        }
+
+        [Fact]
+        public void We_should_choose_a_matching_constructor()
+        {
+            _destination.Age.ShouldEqual(23);
+            _destination.Name.ShouldEqual("Marc");
+        }
+    }
+
     public class When_renaming_class_constructor_parameter : AutoMapperSpecBase
     {
         Destination _destination;
