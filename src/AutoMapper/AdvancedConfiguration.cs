@@ -22,6 +22,12 @@ namespace AutoMapper
         /// <param name="validator">the validation callback</param>
         public void Validator(Validator validator) => _validators.Add(validator);
 
+        /// <summary>
+        /// Gets or sets a value indicating that internal profiles should be included when scanning assemblies.
+        /// </summary>
+        public bool ScanForInternalProfiles { get; set; }
+
+
         internal Validator[] GetValidators() => _validators.ToArray();
     }
 }
