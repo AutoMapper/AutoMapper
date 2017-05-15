@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Configuration;
 using AutoMapper.Mappers;
-using AutoMapper.Mappers.Internal;
 
 namespace AutoMapper
 {
-    using ObjectMappingOperationOptions = MappingOperationOptions<object, object>;
-
     public class ConfigurationValidator
     {
         private readonly IConfigurationProvider _config;
