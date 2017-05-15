@@ -66,7 +66,7 @@ namespace AutoMapper
 
             typeMap.ConstructorMap = ctorMap;
 
-            return true;
+            return ctorMap.CanResolve;
         }
     }
 }
