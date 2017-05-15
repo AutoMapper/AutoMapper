@@ -10,7 +10,7 @@ namespace AutoMapper.Mappers
     using static Expression;
     using static CollectionMapperExpressionFactory;
 
-    public class EnumerableMapper : IObjectMapper
+    public class EnumerableMapper : EnumerableMapperBase, IObjectMapper
     {
         public bool IsMatch(TypePair context) => (context.DestinationType.IsInterface() && context.DestinationType.IsEnumerableType() ||
                                                   context.DestinationType.IsListType())

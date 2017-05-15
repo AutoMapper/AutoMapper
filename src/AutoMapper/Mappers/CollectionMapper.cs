@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 {
     using static CollectionMapperExpressionFactory;
 
-    public class CollectionMapper : IObjectMapper
+    public class CollectionMapper : EnumerableMapperBase, IObjectMapper
     {
         public bool IsMatch(TypePair context) => context.SourceType.IsEnumerableType() && context.DestinationType.IsCollectionType();
 

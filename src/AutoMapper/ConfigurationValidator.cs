@@ -59,8 +59,16 @@ namespace AutoMapper
 
         private void DryRunTypeMap(ICollection<TypeMap> typeMapsChecked, TypePair types, TypeMap typeMap, PropertyMap propertyMap)
         {
+            if(typeMap == null)
+            {
+                typeMap = _config.ResolveTypeMap(types.SourceType, types.DestinationType);
+            }
             if (typeMap != null)
             {
+                if(typeMapsChecked.Contains(typeMap))
+                {
+                    return;
+                }
                 typeMapsChecked.Add(typeMap);
                 if(typeMap.CustomMapper != null || typeMap.TypeConverterType != null)
                 {
@@ -85,29 +93,12 @@ namespace AutoMapper
                 }
                 var context = new ValidationContext(types, propertyMap, mapperToUse);
                 _config.Validate(context);
-                if(mapperToUse is ArrayMapper || mapperToUse is EnumerableMapper || mapperToUse is CollectionMapper)
+                if(mapperToUse is IObjectMapperInfo mapperInfo)
                 {
-                    CheckElementMaps(typeMapsChecked, types, propertyMap);
-                }
-                else if(mapperToUse is NullableSourceMapper)
-                {
-                    var newTypePair = new TypePair(Nullable.GetUnderlyingType(types.SourceType), types.DestinationType);
-                    var memberTypeMap = _config.ResolveTypeMap(newTypePair.SourceType, newTypePair.DestinationType);
-                    DryRunTypeMap(typeMapsChecked, newTypePair, memberTypeMap, propertyMap);
+                    var newTypePair = mapperInfo.GetAssociatedTypes(types);
+                    DryRunTypeMap(typeMapsChecked, newTypePair, null, propertyMap);
                 }
             }
-        }
-
-        private void CheckElementMaps(ICollection<TypeMap> typeMapsChecked, TypePair types, PropertyMap propertyMap)
-        {
-            var sourceElementType = ElementTypeHelper.GetElementType(types.SourceType);
-            var destElementType = ElementTypeHelper.GetElementType(types.DestinationType);
-            var itemTypeMap = _config.ResolveTypeMap(sourceElementType, destElementType);
-
-            if (typeMapsChecked.Any(typeMap => Equals(typeMap, itemTypeMap)))
-                return;
-
-            DryRunTypeMap(typeMapsChecked, new TypePair(sourceElementType, destElementType), itemTypeMap, propertyMap);
         }
 
         private void CheckPropertyMaps(ICollection<TypeMap> typeMapsChecked, TypeMap typeMap)
@@ -125,12 +116,7 @@ namespace AutoMapper
                     return;
 
                 var destinationType = propertyMap.DestinationProperty.GetMemberType();
-                var memberTypeMap = _config.ResolveTypeMap(sourceType, destinationType);
-
-                if (typeMapsChecked.Any(tm => Equals(tm, memberTypeMap)))
-                    continue;
-
-                DryRunTypeMap(typeMapsChecked, new TypePair(sourceType, destinationType), memberTypeMap, propertyMap);
+                DryRunTypeMap(typeMapsChecked, new TypePair(sourceType, destinationType), null, propertyMap);
             }
         }
     }

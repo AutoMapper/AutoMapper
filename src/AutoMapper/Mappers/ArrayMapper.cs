@@ -12,7 +12,7 @@ namespace AutoMapper.Mappers
     using static ExpressionFactory;
     using static CollectionMapperExpressionFactory;
 
-    public class ArrayMapper : IObjectMapper
+    public class ArrayMapper : EnumerableMapperBase, IObjectMapper
     {
         public bool IsMatch(TypePair context) => context.DestinationType.IsArray && context.SourceType.IsEnumerableType();
 

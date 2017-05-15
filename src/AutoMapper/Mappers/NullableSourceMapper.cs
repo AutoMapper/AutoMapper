@@ -7,7 +7,7 @@ namespace AutoMapper.Mappers
 {
     using static Expression;
 
-    public class NullableSourceMapper : IObjectMapper
+    public class NullableSourceMapper : IObjectMapper, IObjectMapperInfo
     {
         public bool IsMatch(TypePair context) => context.SourceType.IsNullableType();
 
@@ -25,5 +25,10 @@ namespace AutoMapper.Mappers
                 ),
                 DelegateFactory.GenerateConstructorExpression(destExpression.Type, profileMap)
             );
+
+        public TypePair GetAssociatedTypes(TypePair initialTypes)
+        {
+            return new TypePair(Nullable.GetUnderlyingType(initialTypes.SourceType), initialTypes.DestinationType);
+        }
     }
 }
