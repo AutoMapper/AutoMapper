@@ -63,12 +63,13 @@ namespace AutoMapper.Configuration
 
         private void AddProfilesCore(IEnumerable<Assembly> assembliesToScan)
         {
-            var allTypes = assembliesToScan.Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes).ToArray();
+            var allTypes = assembliesToScan.Where(a => !a.IsDynamic).SelectMany(a => a.DefinedTypes).ToArray();
 
             var profiles =
                 allTypes
-                    .Where(t => typeof(Profile).GetTypeInfo().IsAssignableFrom(t.GetTypeInfo()))
-                    .Where(t => !t.GetTypeInfo().IsAbstract);
+                    .Where(t => typeof(Profile).GetTypeInfo().IsAssignableFrom(t))
+                    .Where(t => !t.IsAbstract)
+                    .Select(t => t.AsType());
 
             foreach (var profile in profiles)
             {
