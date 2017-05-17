@@ -1,4 +1,6 @@
-﻿namespace AutoMapper.UnitTests
+﻿using System.Linq;
+
+namespace AutoMapper.UnitTests
 {
     namespace AssemblyScanning
     {
@@ -16,6 +18,21 @@
             public void Should_load_profiles()
             {
                 Configuration.GetAllTypeMaps().Length.ShouldBeGreaterThan(0);
+            }
+
+            [Fact]
+            public void Should_load_internal_profiles()
+            {
+                Configuration.Profiles.Where(t => t.Name == InternalProfile.Name).ShouldNotBeEmpty();
+            }
+        }
+
+        internal class InternalProfile : Profile
+        {
+            public const string Name = "InternalProfile";
+
+            public InternalProfile() : base(Name)
+            {
             }
         }
 
