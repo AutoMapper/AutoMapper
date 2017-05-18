@@ -16,19 +16,16 @@ namespace AutoMapper.Mappers
         private static Array Map<TDestination, TSource, TSourceElement>(TSource source, ResolutionContext context, ProfileMap profileMap)
             where TSource : IEnumerable
         {
-            if (source == null && profileMap.AllowNullCollections)
-                return null;
-
             var destElementType = ElementTypeHelper.GetElementType(typeof(TDestination));
 
-            if (source != null && typeof(TDestination).IsAssignableFrom(typeof(TSource)))
+            if (typeof(TDestination).IsAssignableFrom(typeof(TSource)))
             {
                 var elementTypeMap = context.ConfigurationProvider.ResolveTypeMap(typeof(TSourceElement), destElementType);
                 if (elementTypeMap == null)
                     return source as Array;
             }
 
-            var sourceList = (IEnumerable)source ?? new List<TSource>();
+            var sourceList = (IEnumerable)source;
             var sourceArray = source as Array;
             var destinationArray = sourceArray == null 
                 ? Array.CreateInstance(destElementType, sourceList.Cast<object>().Count()) 

@@ -3,9 +3,31 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Should;
 using Xunit;
+using System.Collections;
 
 namespace AutoMapper.UnitTests.NullBehavior
 {
+    public class When_resolving_untyped_null : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public object Value { get; set; }
+        }
+
+        class Destination
+        {
+            public IEnumerable Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>());
+
+        [Fact]
+        public void Should_map_ok()
+        {
+            Mapper.Map<Destination>(new Source()).Value.ShouldBeNull();
+        }
+    }
+
     public class When_mapping_from_null_interface_and_AllowNullDestinationValues_is_false : AutoMapperSpecBase
     {
         ElementDestination _destination;

@@ -28,9 +28,6 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap,
             PropertyMap propertyMap, Expression sourceExpression, Expression destExpression,
             Expression contextExpression) =>
-            Condition(
-                Equal(ToObject(sourceExpression), Constant(null)),
-                Default(destExpression.Type),
                 ToType(
                     Call(EnumParseMethod,
                         Constant(Nullable.GetUnderlyingType(destExpression.Type) ?? destExpression.Type),
@@ -38,6 +35,6 @@ namespace AutoMapper.Mappers
                         Constant(true)
                     ),
                     destExpression.Type
-                ));
+                );
     }
 }

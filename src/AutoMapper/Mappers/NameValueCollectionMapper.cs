@@ -10,9 +10,6 @@ namespace AutoMapper.Mappers
     {
         private static NameValueCollection Map(NameValueCollection source)
         {
-            if (source == null)
-                return null;
-
             var nvc = new NameValueCollection();
             foreach (var s in source.AllKeys)
                 nvc.Add(s, source[s]);

@@ -10,10 +10,7 @@ namespace AutoMapper.Mappers
 
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
         {
-            var toStringCall = Call(sourceExpression, typeof(object).GetDeclaredMethod("ToString"));
-            return sourceExpression.Type.IsValueType()
-                ? (Expression) toStringCall
-                : Condition(Equal(sourceExpression, Constant(null)), Constant(null, typeof(string)), toStringCall);
+            return Call(sourceExpression, typeof(object).GetDeclaredMethod("ToString"));
         }
     }
 }

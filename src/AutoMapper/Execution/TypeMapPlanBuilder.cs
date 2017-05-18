@@ -8,6 +8,7 @@ using AutoMapper.Internal;
 
 namespace AutoMapper.Execution
 {
+    using AutoMapper.Mappers.Internal;
     using static Expression;
     using static ExpressionFactory;
 
@@ -501,14 +502,14 @@ namespace AutoMapper.Execution
 
         public static Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
-            if (destinationParameter == null)
+            if(destinationParameter == null)
             {
                 destinationParameter = Default(typePair.DestinationType);
             }
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
-            if (typeMap != null)
+            if(typeMap != null)
             {
-                if (!typeMap.HasDerivedTypesToInclude())
+                if(!typeMap.HasDerivedTypesToInclude())
                 {
                     typeMap.Seal(configurationProvider);
 
@@ -518,8 +519,43 @@ namespace AutoMapper.Execution
                 }
                 return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
             }
+            var objectMapperExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair, sourceParameter, contextParameter, propertyMap, destinationParameter);
+            return NullCheckSource(profileMap, sourceParameter, destinationParameter, objectMapperExpression, propertyMap);
+        }
+
+        public static Expression NullCheckSource(ProfileMap profileMap, Expression sourceParameter, Expression destinationParameter, Expression objectMapperExpression, PropertyMap propertyMap = null)
+        {
+            return sourceParameter.IfNullElse(DefaultDestination(destinationParameter.Type, profileMap), objectMapperExpression);
+        }
+
+        private static Expression DefaultDestination(Type destinationType, ProfileMap profileMap)
+        {
+            var defaultValue = Default(destinationType);
+            if(!profileMap.AllowNullCollections)
+            {
+                if(destinationType.IsArray)
+                {
+                    var destElementType = ElementTypeHelper.GetElementType(destinationType);
+                    return NewArrayBounds(destElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
+                }
+                if(destinationType.IsDictionaryType())
+                {
+                    return destinationType.IsInterface() ?
+                              DelegateFactory.GenerateNonNullConstructorExpression(typeof(Dictionary<,>).MakeGenericType(destinationType.GetGenericArguments())) : 
+                              defaultValue;
+                }
+                if(destinationType.IsCollectionType() && !destinationType.IsInterface())
+                {
+                    return DelegateFactory.GenerateNonNullConstructorExpression(destinationType);
+                }
+            }
+            return defaultValue;
+        }
+
+        private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap, Expression destinationParameter)
+        {
             var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
-            if (match != null)
+            if(match != null)
             {
                 var mapperExpression = match.MapExpression(configurationProvider, profileMap, propertyMap, sourceParameter, destinationParameter, contextParameter);
 
