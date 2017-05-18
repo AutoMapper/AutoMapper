@@ -520,10 +520,10 @@ namespace AutoMapper.Execution
                 return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
             }
             var objectMapperExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair, sourceParameter, contextParameter, propertyMap, destinationParameter);
-            return NullCheckSource(profileMap, sourceParameter, destinationParameter, objectMapperExpression, propertyMap);
+            return NullCheckSource(profileMap, sourceParameter, destinationParameter, objectMapperExpression);
         }
 
-        public static Expression NullCheckSource(ProfileMap profileMap, Expression sourceParameter, Expression destinationParameter, Expression objectMapperExpression, PropertyMap propertyMap = null)
+        public static Expression NullCheckSource(ProfileMap profileMap, Expression sourceParameter, Expression destinationParameter, Expression objectMapperExpression)
         {
             var destinationType = destinationParameter.Type;
             var defaultDestination = DefaultDestination(destinationType, profileMap);
