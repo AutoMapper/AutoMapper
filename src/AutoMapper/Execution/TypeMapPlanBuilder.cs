@@ -525,7 +525,19 @@ namespace AutoMapper.Execution
 
         public static Expression NullCheckSource(ProfileMap profileMap, Expression sourceParameter, Expression destinationParameter, Expression objectMapperExpression, PropertyMap propertyMap = null)
         {
-            return sourceParameter.IfNullElse(DefaultDestination(destinationParameter.Type, profileMap), objectMapperExpression);
+            var destinationType = destinationParameter.Type;
+            var defaultDestination = DefaultDestination(destinationType, profileMap);
+            var ifNull = destinationType.IsCollectionType() ? Block(ClearDestinationCollection(destinationParameter, destinationType), defaultDestination) : defaultDestination;
+            return sourceParameter.IfNullElse(ifNull, objectMapperExpression);
+        }
+
+        private static Expression ClearDestinationCollection(Expression destinationParameter, Type destinationType)
+        {
+            var destinationElementType = ElementTypeHelper.GetElementType(destinationType);
+            var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+            var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
+            var collection = ToType(destinationParameter, destinationCollectionType);
+            return collection.IfNullElse(Empty(), Condition(Property(collection, "IsReadOnly"), Empty(), Call(collection, clearMethod)));
         }
 
         private static Expression DefaultDestination(Type destinationType, ProfileMap profileMap)
@@ -535,8 +547,8 @@ namespace AutoMapper.Execution
             {
                 if(destinationType.IsArray)
                 {
-                    var destElementType = ElementTypeHelper.GetElementType(destinationType);
-                    return NewArrayBounds(destElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
+                    var destinationElementType = ElementTypeHelper.GetElementType(destinationType);
+                    return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
                 }
                 if(destinationType.IsDictionaryType())
                 {
