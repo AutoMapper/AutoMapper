@@ -527,17 +527,18 @@ namespace AutoMapper.Execution
         {
             var destinationType = destinationParameter.Type;
             var defaultDestination = DefaultDestination(destinationType, profileMap);
-            var ifNull = destinationType.IsCollectionType() ? Block(ClearDestinationCollection(destinationParameter, destinationType), defaultDestination) : defaultDestination;
-            return sourceParameter.IfNullElse(ifNull, objectMapperExpression);
+            var ifSourceNull = destinationType.IsCollectionType() ? Block(ClearDestinationCollection(destinationParameter), defaultDestination) : defaultDestination;
+            return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
         }
 
-        private static Expression ClearDestinationCollection(Expression destinationParameter, Type destinationType)
+        private static Expression ClearDestinationCollection(Expression destinationParameter)
         {
-            var destinationElementType = ElementTypeHelper.GetElementType(destinationType);
+            var destinationElementType = ElementTypeHelper.GetElementType(destinationParameter.Type);
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
             var collection = ToType(destinationParameter, destinationCollectionType);
-            return collection.IfNullElse(Empty(), Condition(Property(collection, "IsReadOnly"), Empty(), Call(collection, clearMethod)));
+            var clear = Condition(Property(collection, "IsReadOnly"), Empty(), Call(collection, clearMethod));
+            return collection.IfNullElse(Empty(), clear);
         }
 
         private static Expression DefaultDestination(Type destinationType, ProfileMap profileMap)
