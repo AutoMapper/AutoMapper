@@ -138,8 +138,8 @@ namespace AutoMapper.Internal
 
         public static Expression IfNullElse(Expression expression, Expression then, Expression @else = null)
         {
-            var isNull = expression.Type.IsValueType() ? (Expression) Constant(false) : Equal(expression, Constant(null));
-            return Condition(isNull, then, @else ?? Default(then.Type));
+            var isNull = expression.Type.IsValueType() && !expression.Type.IsNullableType() ? (Expression) Constant(false) : Equal(expression, Constant(null));
+            return Condition(isNull, then, Convert(@else ?? Default(then.Type), then.Type));
         }
 
         internal class IfNotNullVisitor : ExpressionVisitor

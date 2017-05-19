@@ -11,9 +11,6 @@ namespace AutoMapper.Mappers
     {
         public static TDestination Map<TSource, TDestination>(TSource source)
         {
-            if (source == null)
-                return default(TDestination);
-
             var sourceEnumType = ElementTypeHelper.GetEnumerationType(typeof(TSource));
             var destEnumType = ElementTypeHelper.GetEnumerationType(typeof(TDestination));
 

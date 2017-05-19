@@ -21,10 +21,6 @@ namespace AutoMapper.Mappers
             var sourceElementType = ElementTypeHelper.GetElementType(sourceExpression.Type);
             var destElementType = ElementTypeHelper.GetElementType(destExpression.Type);
 
-            var ifNullExpr = profileMap.AllowNullCollections
-                                 ? (Expression) Constant(null, destExpression.Type)
-                                 : NewArrayBounds(destElementType, Constant(0));
-
             var itemExpr = MapItemExpr(configurationProvider, profileMap, propertyMap, sourceExpression.Type, destExpression.Type, contextExpression, out ParameterExpression itemParam);
 
             //var count = source.Count();
@@ -36,7 +32,7 @@ namespace AutoMapper.Mappers
             //return array;
 
             var countParam = Parameter(typeof(int), "count");
-            var arrayParam = Parameter(ifNullExpr.Type, "destinationArray");
+            var arrayParam = Parameter(destExpression.Type, "destinationArray");
             var indexParam = Parameter(typeof(int), "destinationArrayIndex");
 
             var actions = new List<Expression>();
@@ -55,10 +51,7 @@ namespace AutoMapper.Mappers
                 ));
             actions.Add(arrayParam);
 
-            var mapExpr = Block(parameters, actions);
-
-            // return (source == null) ? ifNullExpr : Map<TSourceElement, TDestElement>(source, context);
-            return Condition(Equal(sourceExpression, Constant(null)), ifNullExpr, mapExpr);
+            return Block(parameters, actions);
         }
     }
 }

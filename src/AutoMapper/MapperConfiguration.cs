@@ -10,6 +10,7 @@ using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
+    using AutoMapper.Execution;
     using static Expression;
     using static ExpressionFactory;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
@@ -141,11 +142,11 @@ namespace AutoMapper
             var source = Parameter(mapRequest.RequestedTypes.SourceType, "source");
             var destination = Parameter(destinationType, "mapperDestination");
             var context = Parameter(typeof(ResolutionContext), "context");
-            LambdaExpression fullExpression;
+            Expression fullExpression;
             if (mapperToUse == null)
             {
                 var message = Constant("Missing type map configuration or unsupported mapping.");
-                fullExpression = Lambda(Block(Throw(New(ExceptionConstructor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType)), source, destination, context);
+                fullExpression = Block(Throw(New(ExceptionConstructor, message, Constant(null, typeof(Exception)), Constant(mapRequest.RequestedTypes))), Default(destinationType));
             }
             else
             {
@@ -153,21 +154,15 @@ namespace AutoMapper
                                                                         ToType(source, mapRequest.RuntimeTypes.SourceType), 
                                                                         ToType(destination, mapRequest.RuntimeTypes.DestinationType), 
                                                                         context);
-                var mapToDestination = Lambda(ToType(map, destinationType), source, destination, context);
-                fullExpression = TryCatch(mapToDestination, source, destination, context, mapRequest.RequestedTypes);
+                var exception = Parameter(typeof(Exception), "ex");
+                fullExpression =
+                    TryCatch(ToType(map, destinationType),
+                    MakeCatchBlock(typeof(Exception), exception, Block(
+                        Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
+                        Default(destination.Type)), null));
             }
-            return fullExpression;
-        }
-
-        private static LambdaExpression TryCatch(LambdaExpression mapExpression, ParameterExpression source, ParameterExpression destination, ParameterExpression context, TypePair types)
-        {
-            var exception = Parameter(typeof(Exception), "ex");
-
-            return Lambda(Expression.TryCatch(mapExpression.Body,
-                MakeCatchBlock(typeof(Exception), exception, Block(
-                    Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(types))),
-                    Default(destination.Type)), null)),
-                source, destination, context);
+            var nullCheckSource = TypeMapPlanBuilder.NullCheckSource(Configuration, source, destination, fullExpression);
+            return Lambda(nullCheckSource, source, destination, context);
         }
 
         public TypeMap[] GetAllTypeMaps() => _typeMapRegistry.TypeMaps.ToArray();
