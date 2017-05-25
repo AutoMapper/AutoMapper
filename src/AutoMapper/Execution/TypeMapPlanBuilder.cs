@@ -104,10 +104,7 @@ namespace AutoMapper.Execution
                 return;
             }
             visitedTypeMaps.Add(typeMap);
-            if(!typeMap.HasDerivedTypesToInclude())
-            {
-                typeMap.Seal(_configurationProvider, visitedTypeMaps);
-            }
+            typeMap.Seal(_configurationProvider, visitedTypeMaps);
         }
 
         private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
