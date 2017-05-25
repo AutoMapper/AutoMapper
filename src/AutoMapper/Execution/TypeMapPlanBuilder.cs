@@ -40,7 +40,7 @@ namespace AutoMapper.Execution
             _destination = Variable(_initialDestination.Type, "typeMapDestination");
         }
 
-        public LambdaExpression CreateMapperLambda()
+        public LambdaExpression CreateMapperLambda(HashSet<TypeMap> visitedTypeMaps = null)
         {
             if (_typeMap.SourceType.IsGenericTypeDefinition() || _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
             {
@@ -52,6 +52,8 @@ namespace AutoMapper.Execution
                 return Lambda(customExpression.ReplaceParameters(_source, _initialDestination, _context), _source, _initialDestination, _context);
             }
 
+            CheckForCycles(visitedTypeMaps);
+
             var destinationFunc = CreateDestinationFunc(out bool constructorMapping);
 
             var assignmentFunc = CreateAssignmentFunc(destinationFunc, constructorMapping);
@@ -62,6 +64,65 @@ namespace AutoMapper.Execution
             var lambaBody = checkContext != null ? new[] { checkContext, mapperFunc } : new[] { mapperFunc };
 
             return Lambda(Block(new[] { _destination }, lambaBody), _source, _initialDestination, _context);
+        }
+
+        private void CheckForCycles(HashSet<TypeMap> visitedTypeMaps)
+        {
+            if(_typeMap.PreserveReferences)
+            {
+                return;
+            }
+            bool isRoot;
+            if(visitedTypeMaps == null)
+            {
+                isRoot = true;
+                visitedTypeMaps = new HashSet<TypeMap>();
+            }
+            else
+            {
+                isRoot = false;
+            }
+            foreach(var propertyMap in _typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
+            {
+                CheckPropertyMapForCycles(propertyMap, visitedTypeMaps);
+            }
+            if(isRoot && visitedTypeMaps.Contains(_typeMap))
+            {
+                _typeMap.PreserveReferences = true;
+            }
+        }
+
+        public void CheckPropertyMapForCycles(PropertyMap propertyMap, HashSet<TypeMap> visitedTypeMaps)
+        {
+            if(propertyMap.SourceType == null)
+            {
+                return;
+            }
+            var typeMap = ResolvePropertyTypeMap(propertyMap);
+            if(typeMap == null || visitedTypeMaps.Contains(typeMap))
+            {
+                return;
+            }
+            visitedTypeMaps.Add(typeMap);
+            if(!typeMap.HasDerivedTypesToInclude())
+            {
+                typeMap.Seal(_configurationProvider, visitedTypeMaps);
+            }
+        }
+
+        private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
+        {
+            var types = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
+            var typeMap = _configurationProvider.ResolveTypeMap(types);
+            if(typeMap == null)
+            {
+                var mapper = _configurationProvider.FindMapper(types) as IObjectMapperInfo;
+                if(mapper != null)
+                {
+                    typeMap = _configurationProvider.ResolveTypeMap(mapper.GetAssociatedTypes(types));
+                }
+            }
+            return typeMap;
         }
 
         private LambdaExpression TypeConverterMapper()
@@ -567,7 +628,7 @@ namespace AutoMapper.Execution
 
         private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap, Expression destinationParameter)
         {
-            var match = configurationProvider.GetMappers().FirstOrDefault(m => m.IsMatch(typePair));
+            var match = configurationProvider.FindMapper(typePair);
             if(match != null)
             {
                 var mapperExpression = match.MapExpression(configurationProvider, profileMap, propertyMap, sourceParameter, destinationParameter, contextParameter);

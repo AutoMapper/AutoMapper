@@ -211,7 +211,7 @@ namespace AutoMapper
                 {
                     return typeMap;
                 }
-                if (!CoveredByObjectMap(initialTypes))
+                if (FindMapper(initialTypes) == null)
                 {
                     typeMap = FindConventionTypeMapFor(types);
                     if (typeMap != null)
@@ -318,11 +318,6 @@ namespace AutoMapper
             }
         }
 
-        private bool CoveredByObjectMap(TypePair typePair)
-        {
-            return GetMappers().FirstOrDefault(m => m.IsMatch(typePair)) != null;
-        }
-
         private TypeMap FindConventionTypeMapFor(TypePair typePair)
         {
             var typeMap = Profiles
@@ -350,6 +345,8 @@ namespace AutoMapper
 
             return typeMap;
         }
+
+        public IObjectMapper FindMapper(TypePair types) =>_mappers.FirstOrDefault(m => m.IsMatch(types));
 
         internal struct MapperFuncs
         {

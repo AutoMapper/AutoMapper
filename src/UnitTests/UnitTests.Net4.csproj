@@ -85,8 +85,11 @@
     <Compile Include="AssemblyScanning.cs" />
     <Compile Include="AssertionExtensions.cs" />
     <Compile Include="BasicFlattening.cs" />
+    <Compile Include="BidirectionalRelationshipsWithoutPR.cs" />
     <Compile Include="Bug\CannotProjectStringToNullableEnum.cs" />
+    <Compile Include="Bug\DuplicateValuesBugWithoutPR.cs" />
     <Compile Include="Bug\NullableToInvalid.cs" />
+    <Compile Include="Bug\OneSourceWithMultipleDestinationsWithoutPR.cs" />
     <Compile Include="Bug\OneSourceWithMultipleDestinationsAndPreserveReferences.cs" />
     <Compile Include="Bug\ConventionCreateMapsWithCircularReference.cs" />
     <Compile Include="Bug\ConvertMapperThreading.cs" />
@@ -222,6 +225,7 @@
     <Compile Include="Bug\NullToString.cs" />
     <Compile Include="Bug\NullSubstituteInnerClass.cs" />
     <Compile Include="Bug\MapExpandoObjectProperty.cs" />
+    <Compile Include="Bug\WithoutPreserveReferencesSameDestination.cs" />
     <Compile Include="Bug\PreserveReferencesSameDestination.cs" />
     <Compile Include="BuildExecutionPlan.cs" />
     <Compile Include="ConfigCompilation.cs" />
@@ -405,6 +409,8 @@
     <Compile Include="PropertyMapContexts.cs" />
     <Compile Include="Regression.cs" />
     <Compile Include="ReverseMapping.cs" />
+    <Compile Include="ReverseMapWithoutPreserveReferences.cs" />
+    <Compile Include="ReverseMapWithPreserveReferences.cs" />
     <Compile Include="SeparateConfiguration.cs" />
     <Compile Include="Should\Should.Core\Assertions\Assert.cs" />
     <Compile Include="Should\Should.Core\Assertions\AssertComparer.cs" />

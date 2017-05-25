@@ -252,7 +252,7 @@ namespace AutoMapper
             }
         }
 
-        public void Seal(IConfigurationProvider configurationProvider)
+        public void Seal(IConfigurationProvider configurationProvider, HashSet<TypeMap> visitedTypeMaps = null)
         {
             if(_sealed)
             {
@@ -270,7 +270,7 @@ namespace AutoMapper
                     .Union(_inheritedMaps)
                     .OrderBy(map => map.MappingOrder).ToArray();
 
-            MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda();
+            MapExpression = new TypeMapPlanBuilder(configurationProvider, this).CreateMapperLambda(visitedTypeMaps);
         }
 
         public PropertyMap GetExistingPropertyMapFor(MemberInfo destinationProperty)
