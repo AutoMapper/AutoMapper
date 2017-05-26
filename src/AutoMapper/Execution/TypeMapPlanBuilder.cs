@@ -40,7 +40,7 @@ namespace AutoMapper.Execution
             _destination = Variable(_initialDestination.Type, "typeMapDestination");
         }
 
-        public LambdaExpression CreateMapperLambda(HashSet<TypeMap> visitedTypeMaps = null)
+        public LambdaExpression CreateMapperLambda(HashSet<TypeMap> visitedTypeMaps)
         {
             if (_typeMap.SourceType.IsGenericTypeDefinition() || _typeMap.DestinationTypeToUse.IsGenericTypeDefinition())
             {
