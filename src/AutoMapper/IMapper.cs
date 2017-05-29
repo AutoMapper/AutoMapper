@@ -46,7 +46,7 @@ namespace AutoMapper
         /// Execute a mapping from the source object to the existing destination object.
         /// </summary>
         /// <typeparam name="TSource">Source type to use</typeparam>
-        /// <typeparam name="TDestination">Dsetination type</typeparam>
+        /// <typeparam name="TDestination">Destination type</typeparam>
         /// <param name="source">Source object to map from</param>
         /// <param name="destination">Destination object to map into</param>
         /// <returns>The mapped destination object, same instance as the <paramref name="destination"/> object</returns>
