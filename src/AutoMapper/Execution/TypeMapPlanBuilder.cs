@@ -92,7 +92,7 @@ namespace AutoMapper.Execution
             }
         }
 
-        public void CheckPropertyMapForCycles(PropertyMap propertyMap, HashSet<TypeMap> visitedTypeMaps)
+        private void CheckPropertyMapForCycles(PropertyMap propertyMap, HashSet<TypeMap> visitedTypeMaps)
         {
             if(propertyMap.SourceType == null)
             {
