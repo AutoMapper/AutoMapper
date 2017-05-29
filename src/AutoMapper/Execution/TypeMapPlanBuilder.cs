@@ -82,33 +82,35 @@ namespace AutoMapper.Execution
             {
                 isRoot = false;
             }
-            foreach(var propertyMap in _typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
-            {
-                CheckPropertyMapForCycles(propertyMap, visitedTypeMaps);
-            }
+
+            CheckPropertyMapsForCycles(visitedTypeMaps);
+
             if(isRoot && visitedTypeMaps.Contains(_typeMap))
             {
                 _typeMap.PreserveReferences = true;
             }
         }
 
-        private void CheckPropertyMapForCycles(PropertyMap propertyMap, HashSet<TypeMap> visitedTypeMaps)
+        private void CheckPropertyMapsForCycles(HashSet<TypeMap> visitedTypeMaps)
         {
-            if(propertyMap.SourceType == null)
+            var propertyTypeMaps =
+                from propertyTypeMap in
+                (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
+                where propertyTypeMap != null && !propertyTypeMap.PreserveReferences && !visitedTypeMaps.Contains(propertyTypeMap)
+                select propertyTypeMap;
+            foreach(var propertyTypeMap in propertyTypeMaps)
             {
-                return;
+                visitedTypeMaps.Add(propertyTypeMap);
+                propertyTypeMap.Seal(_configurationProvider, visitedTypeMaps);
             }
-            var typeMap = ResolvePropertyTypeMap(propertyMap);
-            if(typeMap == null || typeMap.PreserveReferences || visitedTypeMaps.Contains(typeMap))
-            {
-                return;
-            }
-            visitedTypeMaps.Add(typeMap);
-            typeMap.Seal(_configurationProvider, visitedTypeMaps);
         }
 
         private TypeMap ResolvePropertyTypeMap(PropertyMap propertyMap)
         {
+            if(propertyMap.SourceType == null)
+            {
+                return null;
+            }
             var types = new TypePair(propertyMap.SourceType, propertyMap.DestinationPropertyType);
             var typeMap = _configurationProvider.ResolveTypeMap(types);
             if(typeMap == null)
