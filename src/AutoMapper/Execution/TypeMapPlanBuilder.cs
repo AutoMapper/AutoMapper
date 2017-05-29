@@ -83,25 +83,25 @@ namespace AutoMapper.Execution
                 isRoot = false;
             }
 
-            CheckPropertyMapsForCycles(visitedTypeMaps);
+            CheckPropertyMapsForCycles();
 
             if(isRoot && visitedTypeMaps.Contains(_typeMap))
             {
                 _typeMap.PreserveReferences = true;
             }
-        }
 
-        private void CheckPropertyMapsForCycles(HashSet<TypeMap> visitedTypeMaps)
-        {
-            var propertyTypeMaps =
-                from propertyTypeMap in
-                (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
-                where propertyTypeMap != null && !propertyTypeMap.PreserveReferences && !visitedTypeMaps.Contains(propertyTypeMap)
-                select propertyTypeMap;
-            foreach(var propertyTypeMap in propertyTypeMaps)
+            void CheckPropertyMapsForCycles()
             {
-                visitedTypeMaps.Add(propertyTypeMap);
-                propertyTypeMap.Seal(_configurationProvider, visitedTypeMaps);
+                var propertyTypeMaps =
+                    from propertyTypeMap in
+                    (from pm in _typeMap.GetPropertyMaps() where pm.CanResolveValue() select ResolvePropertyTypeMap(pm))
+                    where propertyTypeMap != null && !propertyTypeMap.PreserveReferences && !visitedTypeMaps.Contains(propertyTypeMap)
+                    select propertyTypeMap;
+                foreach(var propertyTypeMap in propertyTypeMaps)
+                {
+                    visitedTypeMaps.Add(propertyTypeMap);
+                    propertyTypeMap.Seal(_configurationProvider, visitedTypeMaps);
+                }
             }
         }
 
