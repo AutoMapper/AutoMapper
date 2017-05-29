@@ -99,7 +99,7 @@ namespace AutoMapper.Execution
                 return;
             }
             var typeMap = ResolvePropertyTypeMap(propertyMap);
-            if(typeMap == null || visitedTypeMaps.Contains(typeMap))
+            if(typeMap == null || typeMap.PreserveReferences || visitedTypeMaps.Contains(typeMap))
             {
                 return;
             }
