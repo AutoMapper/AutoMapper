@@ -83,6 +83,13 @@ namespace AutoMapper
         IEnumerable<IObjectMapper> GetMappers();
 
         /// <summary>
+        /// Find a matching object mapper.
+        /// </summary>
+        /// <param name="types">the types to match</param>
+        /// <returns>the matching mapper or null</returns>
+        IObjectMapper FindMapper(TypePair types);
+
+        /// <summary>
         /// Factory method to create formatters, resolvers and type converters
         /// </summary>
         Func<Type, object> ServiceCtor { get; }

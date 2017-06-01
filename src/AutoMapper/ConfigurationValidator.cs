@@ -77,12 +77,12 @@ namespace AutoMapper
             }
             else
             {
-                var mapperToUse = _config.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(types));
+                var mapperToUse = _config.FindMapper(types);
                 if (mapperToUse == null && types.SourceType.IsNullableType())
                 {
                     var nullableTypes = new TypePair(Nullable.GetUnderlyingType(types.SourceType),
                         types.DestinationType);
-                    mapperToUse = _config.GetMappers().FirstOrDefault(mapper => mapper.IsMatch(nullableTypes));
+                    mapperToUse = _config.FindMapper(nullableTypes);
                 }
                 if (mapperToUse == null)
                 {
