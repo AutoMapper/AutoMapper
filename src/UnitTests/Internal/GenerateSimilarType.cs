@@ -27,12 +27,19 @@ namespace AutoMapper.UnitTests
             public virtual ICollection<Article> Articles { get; set; }
         }
 
+        class ExtraProduct : Product
+        {
+            public long Long { get; set; }
+            public short Short { get; set; }
+        }
+
         [Fact]
         public void Should_work()
         {
-            var sourceType = typeof(Product);
-            var similarType = ProxyGenerator.GetSimilarType(sourceType);
-            var sourceProperties = GetProperties(similarType);
+            var extraProperties = typeof(ExtraProduct).GetProperties().Except(typeof(Product).GetProperties()).Select(p => new PropertyDescription(p)).ToArray();
+            var similarType = ProxyGenerator.GetSimilarType(typeof(Product), extraProperties);
+
+            var sourceProperties = GetProperties(typeof(ExtraProduct));
             var similarTypeProperties = GetProperties(similarType);
             similarTypeProperties.SequenceEqual(sourceProperties).ShouldBeTrue();
 
@@ -40,12 +47,16 @@ namespace AutoMapper.UnitTests
             instance.Id = 12;
             instance.Name = "John";
             instance.ECommercePublished = true;
+            instance.Short = short.MaxValue;
+            instance.Long = long.MaxValue;
             var articles = new Article[3];
             instance.Articles = articles;
 
             Assert.Equal(12, instance.Id);
             Assert.Equal("John", instance.Name);
             Assert.Equal(true, instance.ECommercePublished);
+            Assert.Equal(short.MaxValue, instance.Short);
+            Assert.Equal(long.MaxValue, instance.Long);
             Assert.Equal(articles, instance.Articles);
         }
 
