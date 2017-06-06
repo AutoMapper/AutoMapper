@@ -31,6 +31,7 @@ namespace AutoMapper.UnitTests
         {
             public long Long { get; set; }
             public short Short { get; set; }
+            public Article Article { get; set; }
         }
 
         [Fact]
@@ -39,6 +40,7 @@ namespace AutoMapper.UnitTests
             var extraProperties = typeof(ExtraProduct).GetProperties().Except(typeof(Product).GetProperties()).Select(p => new PropertyDescription(p)).ToArray();
             var similarType = ProxyGenerator.GetSimilarType(typeof(Product), extraProperties);
 
+            similarType.Assembly.IsDynamic.ShouldBeTrue();
             var sourceProperties = GetProperties(typeof(ExtraProduct));
             var similarTypeProperties = GetProperties(similarType);
             similarTypeProperties.SequenceEqual(sourceProperties).ShouldBeTrue();
@@ -49,8 +51,9 @@ namespace AutoMapper.UnitTests
             instance.ECommercePublished = true;
             instance.Short = short.MaxValue;
             instance.Long = long.MaxValue;
-            var articles = new Article[3];
+            var articles = new Article[] { new Article(), null, null };
             instance.Articles = articles;
+            instance.Article = articles[0];
 
             Assert.Equal(12, instance.Id);
             Assert.Equal("John", instance.Name);
@@ -58,6 +61,7 @@ namespace AutoMapper.UnitTests
             Assert.Equal(short.MaxValue, instance.Short);
             Assert.Equal(long.MaxValue, instance.Long);
             Assert.Equal(articles, instance.Articles);
+            Assert.Equal(articles[0], instance.Article);
         }
 
         public IEnumerable<object> GetProperties(Type type)
