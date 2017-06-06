@@ -55,7 +55,7 @@ namespace AutoMapper.Execution
             Debug.WriteLine(name, "Emitting proxy type");
             TypeBuilder typeBuilder = proxyModule.DefineType(name,
                 TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof(ProxyBase),
-                allInterfaces.ToArray());
+                interfaceType.IsInterface ? new[] { interfaceType } : Type.EmptyTypes);
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
                 CallingConventions.Standard, new Type[0]);
             ILGenerator ctorIl = constructorBuilder.GetILGenerator();
@@ -114,7 +114,7 @@ namespace AutoMapper.Execution
                     propertiesToImplement.Add(property);
                 }
             }
-            Dictionary<string, PropertyEmitter> fieldBuilders = new Dictionary<string, PropertyEmitter>();
+            var fieldBuilders = new Dictionary<string, PropertyEmitter>();
             foreach(PropertyInfo property in propertiesToImplement)
             {
                 PropertyEmitter propertyEmitter;
@@ -134,16 +134,6 @@ namespace AutoMapper.Execution
                         propertyEmitter =
                             new PropertyEmitter(typeBuilder, property.Name, property.PropertyType, propertyChangedField));
                 }
-                if(property.CanRead)
-                {
-                    typeBuilder.DefineMethodOverride(propertyEmitter.GetGetter(property.PropertyType),
-                        property.GetMethod);
-                }
-                if(property.CanWrite)
-                {
-                    typeBuilder.DefineMethodOverride(propertyEmitter.GetSetter(property.PropertyType),
-                        property.SetMethod);
-                }
             }
             return typeBuilder.CreateType();
         }
@@ -159,6 +149,15 @@ namespace AutoMapper.Execution
                 throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
             }
             return proxyTypes.GetOrAdd(interfaceType);
+        }
+
+        public static Type GetSimilarType(Type sourceType)
+        {
+            if(sourceType == null)
+            {
+                throw new ArgumentNullException(nameof(sourceType));
+            }
+            return proxyTypes.GetOrAdd(sourceType);
         }
 
         private static byte[] StringToByteArray(string hex)
