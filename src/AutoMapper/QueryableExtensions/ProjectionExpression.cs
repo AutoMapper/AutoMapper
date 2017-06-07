@@ -72,13 +72,20 @@ namespace AutoMapper.QueryableExtensions
         {
             var membersToExpand = memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
 
-            var mapExpression = _builder.CreateMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
+            var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
 
-            return _source.Provider.CreateQuery<TResult>(
+            var firstSelect = Select(_source, mapExpressions[0]);
+            var resultQuery = mapExpressions.Length == 2 ? Select(firstSelect, mapExpressions[1]) : firstSelect;
+            return (IQueryable<TResult>)resultQuery;
+        }
+
+        private static IQueryable Select(IQueryable source, LambdaExpression lambda)
+        {
+            return source.Provider.CreateQuery(
                 Expression.Call(
                     null,
-                    QueryableSelectMethod.MakeGenericMethod(_source.ElementType, typeof(TResult)),
-                    new[] { _source.Expression, Expression.Quote(mapExpression) }
+                    QueryableSelectMethod.MakeGenericMethod(source.ElementType, lambda.ReturnType),
+                    new[] { source.Expression, Expression.Quote(lambda) }
                     )
                 );
         }

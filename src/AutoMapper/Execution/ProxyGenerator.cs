@@ -149,7 +149,7 @@ namespace AutoMapper.Execution
             return proxyTypes.GetOrAdd(key);
         }
 
-        public static Type GetSimilarType(Type sourceType, PropertyDescription[] additionalProperties)
+        public static Type GetSimilarType(Type sourceType, IEnumerable<PropertyDescription> additionalProperties)
         {
             return proxyTypes.GetOrAdd(new TypeDescription(sourceType, additionalProperties));
         }
@@ -170,10 +170,10 @@ namespace AutoMapper.Execution
         {
         }
 
-        public TypeDescription(Type type, PropertyDescription[] additionalProperties)
+        public TypeDescription(Type type, IEnumerable<PropertyDescription> additionalProperties)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
-            AdditionalProperties = additionalProperties ?? throw new ArgumentNullException(nameof(additionalProperties));
+            AdditionalProperties = additionalProperties?.ToArray() ?? throw new ArgumentNullException(nameof(additionalProperties));
         }
 
         public Type Type { get; }
@@ -202,6 +202,13 @@ namespace AutoMapper.Execution
     public struct PropertyDescription : IEquatable<PropertyDescription>
     {
         internal static PropertyDescription[] Empty = new PropertyDescription[0];
+
+        public PropertyDescription(string name, Type type, bool canWrite = true)
+        {
+            Name = name;
+            Type = type;
+            CanWrite = canWrite;
+        }
 
         public PropertyDescription(PropertyInfo property)
         {

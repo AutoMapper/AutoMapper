@@ -228,7 +228,7 @@ namespace AutoMapper
             foreach (var baseMap in currentMap.IncludedBaseTypes.Select(typeMapRegistry.GetTypeMap).Where(baseMap => baseMap != null))
             {
                 baseMap.IncludeDerivedTypes(currentMap.SourceType, currentMap.DestinationType);
-                derivedMap.ApplyInheritedMap(baseMap);
+                derivedMap.AddInheritedMap(baseMap);
                 ApplyBaseMaps(typeMapRegistry, derivedMap, baseMap);
             }
         }
@@ -237,7 +237,7 @@ namespace AutoMapper
         {
             foreach (var inheritedTypeMap in typeMap.IncludedDerivedTypes.Select(typeMapRegistry.GetTypeMap).Where(map => map != null))
             {
-                inheritedTypeMap.ApplyInheritedMap(baseMap);
+                inheritedTypeMap.AddInheritedMap(baseMap);
                 ApplyDerivedMaps(typeMapRegistry, baseMap, inheritedTypeMap);
             }
         }

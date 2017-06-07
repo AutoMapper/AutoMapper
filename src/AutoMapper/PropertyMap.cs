@@ -48,7 +48,7 @@ namespace AutoMapper
         public LambdaExpression CustomResolver { get; set; }
         public LambdaExpression Condition { get; set; }
         public LambdaExpression PreCondition { get; set; }
-        public LambdaExpression CustomExpression { get; private set; }
+        public LambdaExpression CustomExpression { get; set; }
         public bool UseDestinationValue { get; set; }
         public bool ExplicitExpansion { get; set; }
         public object NullSubstitute { get; set; }
@@ -116,6 +116,16 @@ namespace AutoMapper
         public bool IsMapped() => HasSource() || Ignored;
 
         public bool CanResolveValue() => HasSource() && !Ignored;
+
+        public bool IsSubQuery()
+        {
+            if(!CanResolveValue() || !(CustomExpression?.Body is MethodCallExpression methodCall))
+            {
+                return false;
+            }
+            var method = methodCall.Method;
+            return method.IsStatic && method.DeclaringType == typeof(Enumerable);
+        }
 
         public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
 

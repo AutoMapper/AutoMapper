@@ -167,8 +167,8 @@ namespace AutoMapper.QueryableExtensions.Impl
                         }
 
                         var membersToExpand = _membersToExpand.SelectMany(m => m).Distinct().ToArray();
-                        var mapExpr = _mapper.ConfigurationProvider.ExpressionBuilder.CreateMapExpression(sourceResultType, destResultType,
-                            _parameters, membersToExpand);
+                        var mapExpr = _mapper.ConfigurationProvider.ExpressionBuilder.GetMapExpression(sourceResultType, destResultType,
+                            _parameters, membersToExpand)[0];
                         // add projection via "select" operator
                         var expr = Expression.Call(
                                 null,

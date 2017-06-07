@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using AutoMapper.Configuration;
 using AutoMapper.Internal;
+using AutoMapper.Execution;
 using AutoMapper.QueryableExtensions.Impl;
 using static System.Linq.Expressions.Expression;
 
@@ -15,9 +16,9 @@ namespace AutoMapper.QueryableExtensions
 
     public interface IExpressionBuilder
     {
-        Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
-        Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
-        LambdaExpression CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount);
+        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters, MemberInfo[] membersToExpand);
+        Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
+        LambdaExpression[] CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount);
         Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount);
     }
 
@@ -40,78 +41,142 @@ namespace AutoMapper.QueryableExtensions
             new StringExpressionBinder()
         };
 
-        private readonly LockingConcurrentDictionary<ExpressionRequest, LambdaExpression> _expressionCache;
+        private readonly LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]> _expressionCache;
         private readonly IConfigurationProvider _configurationProvider;
 
         public ExpressionBuilder(IConfigurationProvider configurationProvider)
         {
             _configurationProvider = configurationProvider;
-            _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, LambdaExpression>(CreateMapExpression);
+            _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]>(CreateMapExpression);
         }
 
-        public Expression CreateMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand)
+        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters, MemberInfo[] membersToExpand)
         {
             parameters = parameters ?? new Dictionary<string, object>();
 
-            var cachedExpression = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
+            var cachedExpressions = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
 
-            Expression x = cachedExpression;
-            if (parameters.Any())
-            {
-                var visitor = new ConstantExpressionReplacementVisitor(parameters);
-                x = visitor.Visit(cachedExpression);
-            }
-
-            // perform null-propagation if this feature is enabled.
-            if (_configurationProvider.EnableNullPropagationForQueryMapping)
-            {
-                var nullVisitor = new NullsafeQueryRewriter();
-                return nullVisitor.Visit(x);
-            }
-            return x;
+            return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
         }
 
-        public Expression<Func<TSource, TDestination>> CreateMapExpression<TSource, TDestination>(
+        private Expression Prepare(Expression cachedExpression, IDictionary<string, object> parameters)
+        {
+            Expression result;
+            if(parameters.Any())
+            {
+                var visitor = new ConstantExpressionReplacementVisitor(parameters);
+                result = visitor.Visit(cachedExpression);
+            }
+            else
+            {
+                result = cachedExpression;
+            }
+            // perform null-propagation if this feature is enabled.
+            if(_configurationProvider.EnableNullPropagationForQueryMapping)
+            {
+                var nullVisitor = new NullsafeQueryRewriter();
+                return nullVisitor.Visit(result);
+            }
+            return result;
+        }
+
+        public Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(
             IDictionary<string, object> parameters = null,
             params MemberInfo[] membersToExpand) => 
-            (Expression<Func<TSource, TDestination>>)CreateMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand);
+            (Expression<Func<TSource, TDestination>>)GetMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand)[0];
 
-        public LambdaExpression CreateMapExpression(ExpressionRequest request) => 
-            CreateMapExpression(request, new Dictionary<ExpressionRequest, int>());
+        private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>());
 
-        public LambdaExpression CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
+        public LambdaExpression[] CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
         {
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Parameter(request.SourceType, "dto");
-            var total = CreateMapExpression(request, instanceParameter, typePairCount);
-            if (total == null)
+            var expressions = CreateMapExpressionCore(request, instanceParameter, typePairCount);
+            if (expressions.First == null)
             {
                 return null;
             }
-            var delegateType = typeof(Func<,>).MakeGenericType(request.SourceType, request.DestinationType);
-            return Lambda(delegateType, total, instanceParameter);
+            var firstLambda = Lambda(expressions.First, instanceParameter);
+            if(expressions.Second == null)
+            {
+                return new[] { firstLambda };
+            }
+            return new[] { firstLambda, Lambda(expressions.Second, expressions.SecondParameter) };
         }
+
+#if NET45
+        private QueryExpressions? GetSubQueryExpression(TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
+        {
+            var subQueryProperties = GetSubQueryProperties();
+            if(subQueryProperties.Length == 0)
+            {
+                return null;
+            }
+            var additionalProperties = subQueryProperties.Select(pm => new PropertyDescription(pm.DestinationProperty.Name, pm.SourceType));
+            var letType = ProxyGenerator.GetSimilarType(request.SourceType, additionalProperties);
+            var typeMapFactory = new TypeMapFactory();
+            var firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile, MemberList.None);
+            var secondTypeMap = typeMapFactory.CreateTypeMap(letType, request.DestinationType, typeMap.Profile, MemberList.None);
+            secondTypeMap.ApplyInheritedTypeMap(typeMap);
+            foreach(var subQueryPropertyMap in subQueryProperties)
+            {
+                var secondPropertyMap = secondTypeMap.GetExistingPropertyMapFor(subQueryPropertyMap.DestinationProperty);
+                var subQuery = secondPropertyMap.CustomExpression;
+                secondPropertyMap.CustomExpression = null;
+                var firstPropertyMap = firstTypeMap.FindOrCreatePropertyMapFor(secondPropertyMap.SourceMember);
+                firstPropertyMap.CustomExpression = subQuery;
+            }
+            var firstExpression = CreateMapExpressionCore(request, instanceParameter, typePairCount, firstTypeMap);
+            var secondParameter = Parameter(letType, "dto");
+            var secondExpression = CreateMapExpressionCore(request, secondParameter, typePairCount, secondTypeMap);
+            return new QueryExpressions(firstExpression) { Second = secondExpression, SecondParameter = secondParameter };
+            PropertyMap[] GetSubQueryProperties()
+            {
+                return
+                    (from propertyMap in typeMap.GetPropertyMaps()
+                     where propertyMap.SourceType != null
+                     let propertyTypeMap = _configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationPropertyType)
+                     where propertyMap.IsSubQuery() && propertyTypeMap != null && propertyTypeMap.CustomProjection == null
+                     select propertyMap).ToArray();
+            }
+        }
+#endif
 
         public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
         {
-            var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType,
-                request.DestinationType);
+            return CreateMapExpressionCore(request, instanceParameter, typePairCount).First;
+        }
 
-            if (typeMap == null)
+        private QueryExpressions CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
+        {
+            var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType);
+
+            if(typeMap == null)
             {
                 throw QueryMapperHelper.MissingMapException(request.SourceType, request.DestinationType);
             }
 
-            if (typeMap.CustomProjection != null)
+            if(typeMap.CustomProjection != null)
             {
-                return typeMap.CustomProjection.ReplaceParameters(instanceParameter);
+                return new QueryExpressions(typeMap.CustomProjection.ReplaceParameters(instanceParameter));
             }
+#if NET45
+            var subQueryExpressions = GetSubQueryExpression(typeMap, request, instanceParameter, typePairCount);
+            if(subQueryExpressions != null)
+            {
+                return subQueryExpressions.GetValueOrDefault();
+            }
+#endif
+            return new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, typeMap));
+        }
 
+        private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount, TypeMap typeMap)
+        {
             var bindings = new List<MemberBinding>();
             var depth = GetDepth(request, typePairCount);
-            if (typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
+            if(typeMap.MaxDepth > 0 && depth >= typeMap.MaxDepth)
             {
-                if (typeMap.Profile.AllowNullDestinationValues)
+                if(typeMap.Profile.AllowNullDestinationValues)
                 {
                     return null;
                 }
@@ -121,7 +186,7 @@ namespace AutoMapper.QueryableExtensions
                 bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
             }
             Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter);
-            if (instanceParameter is ParameterExpression)
+            if(instanceParameter is ParameterExpression)
                 constructorExpression = ((LambdaExpression)constructorExpression).ReplaceParameters(instanceParameter);
             var visitor = new NewFinderVisitor();
             visitor.Visit(constructorExpression);
@@ -157,6 +222,18 @@ namespace AutoMapper.QueryableExtensions
             return Lambda(newExpression);
         }
 
+        public struct QueryExpressions
+        {
+            public QueryExpressions(Expression first, Expression second = null, ParameterExpression secondParameter = null)
+            {
+                First = first;
+                Second = second;
+                SecondParameter = secondParameter;
+            }
+            public Expression First;
+            public Expression Second;
+            public ParameterExpression SecondParameter;
+        }
 
         private class NewFinderVisitor : ExpressionVisitor
         {

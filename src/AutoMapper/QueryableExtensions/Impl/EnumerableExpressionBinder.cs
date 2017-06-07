@@ -26,17 +26,23 @@ namespace AutoMapper.QueryableExtensions.Impl
             if (sourceListType != destinationListType)
             {
                 var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand, request);
-                var transformedExpression = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount);
-                if(transformedExpression == null)
+                var transformedExpressions = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount);
+                if(transformedExpressions == null)
                 {
                     return null;
                 }
-                expression = Expression.Call(typeof (Enumerable), "Select", new[] {sourceListType, destinationListType}, result.ResolutionExpression, transformedExpression);
+                expression = Select(result.ResolutionExpression, transformedExpressions[0]);
+                expression = transformedExpressions.Length == 2 ? Select(expression, transformedExpressions[1]) : expression;
             }
 
             expression = Expression.Call(typeof(Enumerable), propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, expression);
 
             return Expression.Bind(propertyMap.DestinationProperty, expression);
+        }
+
+        private static Expression Select(Expression source, LambdaExpression lambda)
+        {
+            return Expression.Call(typeof(Enumerable), "Select", new[] { lambda.Parameters[0].Type, lambda.ReturnType }, source, lambda);
         }
     }
 }
