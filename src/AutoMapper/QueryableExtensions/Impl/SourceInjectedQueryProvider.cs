@@ -167,15 +167,10 @@ namespace AutoMapper.QueryableExtensions.Impl
                         }
 
                         var membersToExpand = _membersToExpand.SelectMany(m => m).Distinct().ToArray();
-                        var mapExpr = _mapper.ConfigurationProvider.ExpressionBuilder.GetMapExpression(sourceResultType, destResultType,
-                            _parameters, membersToExpand)[0];
+                        var lambdas = _mapper.ConfigurationProvider.ExpressionBuilder.GetMapExpression(sourceResultType, destResultType,
+                            _parameters, membersToExpand);
                         // add projection via "select" operator
-                        var expr = Expression.Call(
-                                null,
-                                QueryableSelectMethod.MakeGenericMethod(sourceResultType, destResultType),
-                                new[] { sourceExpression, Expression.Quote(mapExpr) }
-                            );
-
+                        var expr = lambdas.Aggregate(sourceExpression, (source, lambda) => Select(source, lambda));
                         // in case an element operator without predicate expression was found (and thus not replaced)
                         var replacementMethod = replacer.ElementOperator;
                         // in case an element operator with predicate expression was replaced
@@ -219,6 +214,15 @@ namespace AutoMapper.QueryableExtensions.Impl
                 _exceptionHandler(x);
                 throw;
             }
+        }
+
+        private static Expression Select(Expression source, LambdaExpression lambda)
+        {
+            return Expression.Call(
+                    null,
+                    QueryableSelectMethod.MakeGenericMethod(lambda.Parameters[0].Type, lambda.ReturnType),
+                    new[] { source, Expression.Quote(lambda) }
+                );
         }
 
         private object InvokeSourceQuery(Type sourceResultType, Expression sourceExpression)
