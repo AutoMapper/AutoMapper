@@ -117,19 +117,15 @@ namespace AutoMapper.QueryableExtensions
             var typeMapFactory = new TypeMapFactory();
             var firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile, MemberList.None);
             var secondTypeMap = typeMapFactory.CreateTypeMap(letType, request.DestinationType, typeMap.Profile, MemberList.None);
-            secondTypeMap.ApplyInheritedTypeMap(typeMap);
-            foreach(var subQueryPropertyMap in subQueryProperties)
-            {
-                var secondPropertyMap = secondTypeMap.GetExistingPropertyMapFor(subQueryPropertyMap.DestinationProperty);
-                var subQuery = secondPropertyMap.CustomExpression;
-                secondPropertyMap.CustomExpression = null;
-                var firstPropertyMap = firstTypeMap.FindOrCreatePropertyMapFor(secondPropertyMap.SourceMember);
-                firstPropertyMap.CustomExpression = subQuery;
-            }
+            
+            ConfigureTheTypeMaps();
+
             var firstExpression = CreateMapExpressionCore(request, instanceParameter, typePairCount, firstTypeMap);
             var secondParameter = Parameter(letType, "dto");
             var secondExpression = CreateMapExpressionCore(request, secondParameter, typePairCount, secondTypeMap);
+            
             return new QueryExpressions(firstExpression) { Second = secondExpression, SecondParameter = secondParameter };
+            
             PropertyMap[] GetSubQueryProperties()
             {
                 return
@@ -138,6 +134,19 @@ namespace AutoMapper.QueryableExtensions
                      let propertyTypeMap = _configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationPropertyType)
                      where propertyMap.IsSubQuery() && propertyTypeMap != null && propertyTypeMap.CustomProjection == null
                      select propertyMap).ToArray();
+            }
+            
+            void ConfigureTheTypeMaps()
+            {
+                secondTypeMap.ApplyInheritedTypeMap(typeMap);
+                foreach(var subQueryPropertyMap in subQueryProperties)
+                {
+                    var secondPropertyMap = secondTypeMap.GetExistingPropertyMapFor(subQueryPropertyMap.DestinationProperty);
+                    var subQuery = secondPropertyMap.CustomExpression;
+                    secondPropertyMap.CustomExpression = null;
+                    var firstPropertyMap = firstTypeMap.FindOrCreatePropertyMapFor(secondPropertyMap.SourceMember);
+                    firstPropertyMap.CustomExpression = subQuery;
+                }
             }
         }
 #endif
@@ -164,7 +173,7 @@ namespace AutoMapper.QueryableExtensions
             var subQueryExpressions = GetSubQueryExpression(typeMap, request, instanceParameter, typePairCount);
             if(subQueryExpressions != null)
             {
-                return subQueryExpressions.GetValueOrDefault();
+                return subQueryExpressions.Value;
             }
 #endif
             return new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, typeMap));
