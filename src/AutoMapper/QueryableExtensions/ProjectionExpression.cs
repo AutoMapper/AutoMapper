@@ -74,9 +74,7 @@ namespace AutoMapper.QueryableExtensions
 
             var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
 
-            var firstSelect = Select(_source, mapExpressions[0]);
-            var resultQuery = mapExpressions.Length == 2 ? Select(firstSelect, mapExpressions[1]) : firstSelect;
-            return (IQueryable<TResult>)resultQuery;
+            return (IQueryable<TResult>)mapExpressions.Aggregate(_source, (source, lambda)=>Select(source, lambda));
         }
 
         private static IQueryable Select(IQueryable source, LambdaExpression lambda)

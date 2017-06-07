@@ -31,8 +31,7 @@ namespace AutoMapper.QueryableExtensions.Impl
                 {
                     return null;
                 }
-                expression = Select(result.ResolutionExpression, transformedExpressions[0]);
-                expression = transformedExpressions.Length == 2 ? Select(expression, transformedExpressions[1]) : expression;
+                expression = transformedExpressions.Aggregate(result.ResolutionExpression, (source, lambda) => Select(source, lambda));
             }
 
             expression = Expression.Call(typeof(Enumerable), propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, expression);
