@@ -124,7 +124,7 @@ namespace AutoMapper.QueryableExtensions
             var secondParameter = Parameter(letType, "dto");
             var secondExpression = CreateMapExpressionCore(request, secondParameter, typePairCount, secondTypeMap);
             
-            return new QueryExpressions(firstExpression) { Second = secondExpression, SecondParameter = secondParameter };
+            return new QueryExpressions(firstExpression, secondExpression, secondParameter);
             
             PropertyMap[] GetSubQueryProperties()
             {
@@ -239,9 +239,9 @@ namespace AutoMapper.QueryableExtensions
                 Second = second;
                 SecondParameter = secondParameter;
             }
-            public Expression First;
-            public Expression Second;
-            public ParameterExpression SecondParameter;
+            public Expression First { get; }
+            public Expression Second { get; }
+            public ParameterExpression SecondParameter { get; }
         }
 
         private class NewFinderVisitor : ExpressionVisitor
