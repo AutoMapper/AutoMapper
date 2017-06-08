@@ -153,7 +153,8 @@ namespace AutoMapper.QueryableExtensions
 
         public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
         {
-            return CreateMapExpressionCore(request, instanceParameter, typePairCount).First;
+            var queryExpressions = CreateMapExpressionCore(request, instanceParameter, typePairCount);
+            return queryExpressions.First;
         }
 
         private QueryExpressions CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
