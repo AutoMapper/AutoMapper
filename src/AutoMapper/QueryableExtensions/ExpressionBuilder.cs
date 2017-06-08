@@ -13,13 +13,15 @@ using static System.Linq.Expressions.Expression;
 namespace AutoMapper.QueryableExtensions
 {
     using static ExpressionFactory;
+    using TypePairCount = IDictionary<ExpressionRequest, int>;
+    using ParameterBag = IDictionary<string, object>;
 
     public interface IExpressionBuilder
     {
-        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters, MemberInfo[] membersToExpand);
-        Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(IDictionary<string, object> parameters = null, params MemberInfo[] membersToExpand);
-        LambdaExpression[] CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount);
-        Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount);
+        LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters, MemberInfo[] membersToExpand);
+        Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(ParameterBag parameters = null, params MemberInfo[] membersToExpand);
+        LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount);
+        Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount);
     }
 
     public class ExpressionBuilder : IExpressionBuilder
@@ -50,7 +52,7 @@ namespace AutoMapper.QueryableExtensions
             _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]>(CreateMapExpression);
         }
 
-        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, IDictionary<string, object> parameters, MemberInfo[] membersToExpand)
+        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters, MemberInfo[] membersToExpand)
         {
             parameters = parameters ?? new Dictionary<string, object>();
 
@@ -59,7 +61,7 @@ namespace AutoMapper.QueryableExtensions
             return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
         }
 
-        private Expression Prepare(Expression cachedExpression, IDictionary<string, object> parameters)
+        private Expression Prepare(Expression cachedExpression, ParameterBag parameters)
         {
             Expression result;
             if(parameters.Any())
@@ -81,13 +83,13 @@ namespace AutoMapper.QueryableExtensions
         }
 
         public Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(
-            IDictionary<string, object> parameters = null,
+            ParameterBag parameters = null,
             params MemberInfo[] membersToExpand) => 
             (Expression<Func<TSource, TDestination>>)GetMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand)[0];
 
         private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>());
 
-        public LambdaExpression[] CreateMapExpression(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
+        public LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount)
         {
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Parameter(request.SourceType, "dto");
@@ -105,7 +107,7 @@ namespace AutoMapper.QueryableExtensions
         }
 
 #if NET45
-        private QueryExpressions? GetSubQueryExpression(TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
+        private QueryExpressions? GetSubQueryExpression(TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
         {
             var subQueryProperties = GetSubQueryProperties();
             if(subQueryProperties.Length == 0)
@@ -151,13 +153,12 @@ namespace AutoMapper.QueryableExtensions
         }
 #endif
 
-        public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
+        public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
         {
-            var queryExpressions = CreateMapExpressionCore(request, instanceParameter, typePairCount);
-            return queryExpressions.First;
+            return CreateMapExpressionCore(request, instanceParameter, typePairCount, enableLetClause:false).First;
         }
 
-        private QueryExpressions CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
+        private QueryExpressions CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, bool enableLetClause = true)
         {
             var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType);
 
@@ -171,16 +172,19 @@ namespace AutoMapper.QueryableExtensions
                 return new QueryExpressions(typeMap.CustomProjection.ReplaceParameters(instanceParameter));
             }
 #if NET45
-            var subQueryExpressions = GetSubQueryExpression(typeMap, request, instanceParameter, typePairCount);
-            if(subQueryExpressions != null)
+            if(enableLetClause)
             {
-                return subQueryExpressions.Value;
+                var subQueryExpressions = GetSubQueryExpression(typeMap, request, instanceParameter, typePairCount);
+                if(subQueryExpressions != null)
+                {
+                    return subQueryExpressions.Value;
+                }
             }
 #endif
             return new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, typeMap));
         }
 
-        private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount, TypeMap typeMap)
+        private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, TypeMap typeMap)
         {
             var bindings = new List<MemberBinding>();
             var depth = GetDepth(request, typePairCount);
@@ -208,7 +212,7 @@ namespace AutoMapper.QueryableExtensions
             return expression;
         }
 
-        private static int GetDepth(ExpressionRequest request, IDictionary<ExpressionRequest, int> typePairCount)
+        private static int GetDepth(ExpressionRequest request, TypePairCount typePairCount)
         {
             if (typePairCount.TryGetValue(request, out int visitCount))
             {
@@ -258,7 +262,7 @@ namespace AutoMapper.QueryableExtensions
 
         private List<MemberBinding> CreateMemberBindings(ExpressionRequest request,
             TypeMap typeMap,
-            Expression instanceParameter, IDictionary<ExpressionRequest, int> typePairCount)
+            Expression instanceParameter, TypePairCount typePairCount)
         {
             var bindings = new List<MemberBinding>();
 
@@ -349,10 +353,10 @@ namespace AutoMapper.QueryableExtensions
 
         internal class ConstantExpressionReplacementVisitor : ExpressionVisitor
         {
-            private readonly IDictionary<string, object> _paramValues;
+            private readonly ParameterBag _paramValues;
 
             public ConstantExpressionReplacementVisitor(
-                IDictionary<string, object> paramValues) => _paramValues = paramValues;
+                ParameterBag paramValues) => _paramValues = paramValues;
 
             protected override Expression VisitMember(MemberExpression node)
             {
