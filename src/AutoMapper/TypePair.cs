@@ -47,23 +47,11 @@ namespace AutoMapper
 
         public static TypePair Create<TSource>(TSource source, Type sourceType, Type destinationType)
         {
-            if(source != null)
-            {
-                sourceType = source.GetType();
-            }
             return new TypePair(sourceType, destinationType);
         }
 
         public static TypePair Create<TSource, TDestination>(TSource source, TDestination destination, Type sourceType, Type destinationType)
         {
-            if(source != null)
-            {
-                sourceType = source.GetType();
-            }
-            if(destination != null)
-            {
-                destinationType = destination.GetType();
-            }
             return new TypePair(sourceType, destinationType);
         }
 
