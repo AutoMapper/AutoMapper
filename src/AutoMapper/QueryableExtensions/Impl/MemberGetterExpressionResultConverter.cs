@@ -7,7 +7,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 {
     public class MemberGetterExpressionResultConverter : IExpressionResultConverter
     {
-        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap) 
+        public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, LetPropertyMaps letPropertyMaps) 
             => ExpressionResolutionResult(expressionResolutionResult, propertyMap.SourceMembers);
 
         public ExpressionResolutionResult GetExpressionResolutionResult(ExpressionResolutionResult expressionResolutionResult,

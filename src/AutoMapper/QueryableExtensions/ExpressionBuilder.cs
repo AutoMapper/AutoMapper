@@ -20,8 +20,8 @@ namespace AutoMapper.QueryableExtensions
     {
         LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters, MemberInfo[] membersToExpand);
         Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(ParameterBag parameters = null, params MemberInfo[] membersToExpand);
-        LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount);
-        Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount);
+        LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
+        Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
     }
 
     public class ExpressionBuilder : IExpressionBuilder
@@ -87,14 +87,20 @@ namespace AutoMapper.QueryableExtensions
             params MemberInfo[] membersToExpand) => 
             (Expression<Func<TSource, TDestination>>)GetMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand)[0];
 
-        private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>());
+        private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(), new FirstPassLetPropertyMaps(_configurationProvider));
 
-        public LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount)
+        public LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Parameter(request.SourceType, "dto");
-            var expressions = CreateMapExpressionCore(request, instanceParameter, typePairCount);
-            if (expressions.First == null)
+            var expressions = new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var typeMap));
+#if NET45
+            if(letPropertyMaps.Count > 0)
+            {
+                expressions = GetSubQueryExpression(expressions.First, typeMap, request, instanceParameter, typePairCount, letPropertyMaps);
+            }
+#endif
+            if(expressions.First == null)
             {
                 return null;
             }
@@ -107,60 +113,76 @@ namespace AutoMapper.QueryableExtensions
         }
 
 #if NET45
-        private QueryExpressions? GetSubQueryExpression(TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
+        private QueryExpressions GetSubQueryExpression(Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
-            var subQueryProperties = GetSubQueryProperties();
-            if(subQueryProperties.Length == 0)
+            var letMapInfos = letPropertyMaps.SavedPaths.Select(path => new
             {
-                return null;
-            }
-            var additionalProperties = subQueryProperties.Select(pm => new PropertyDescription(pm.DestinationProperty.Name, pm.SourceType));
-            var letType = ProxyGenerator.GetSimilarType(request.SourceType, additionalProperties);
+                MapFrom = path.PropertyMaps.Last().CustomExpression,
+                MapFromSource = path.PropertyMaps.Take(path.PropertyMaps.Length - 1).Aggregate(instanceParameter,
+                    (obj, pm) => MakeMemberAccess(obj, pm.SourceMember)),
+                Property = new PropertyDescription
+                (
+                    string.Join("_", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
+                    path.PropertyMaps.Last().SourceType
+                ),
+                Marker = path.Marker
+            }).ToArray();
+
+            var letProperties = letMapInfos.Select(m => m.Property);
+            var letType = ProxyGenerator.GetSimilarType(request.SourceType, letProperties);
             var typeMapFactory = new TypeMapFactory();
             var firstTypeMap = typeMapFactory.CreateTypeMap(request.SourceType, letType, typeMap.Profile, MemberList.None);
-            var secondTypeMap = typeMapFactory.CreateTypeMap(letType, request.DestinationType, typeMap.Profile, MemberList.None);
-            
-            ConfigureTheTypeMaps();
-
-            var firstExpression = CreateMapExpressionCore(request, instanceParameter, typePairCount, firstTypeMap);
             var secondParameter = Parameter(letType, "dto");
-            var secondExpression = CreateMapExpressionCore(request, secondParameter, typePairCount, secondTypeMap);
-            
-            return new QueryExpressions(firstExpression, secondExpression, secondParameter);
-            
-            PropertyMap[] GetSubQueryProperties()
+
+            ReplaceSubQueries();
+
+            var firstExpression = CreateMapExpressionCore(request, instanceParameter, typePairCount, firstTypeMap, LetPropertyMaps.Default);
+            return new QueryExpressions(firstExpression, projection, secondParameter);
+                        
+            void ReplaceSubQueries()
             {
-                return
-                    (from propertyMap in typeMap.GetPropertyMaps()
-                     where propertyMap.SourceType != null
-                     let propertyTypeMap = _configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationPropertyType)
-                     where propertyMap.IsSubQuery() && propertyTypeMap != null && propertyTypeMap.CustomProjection == null
-                     select propertyMap).ToArray();
-            }
-            
-            void ConfigureTheTypeMaps()
-            {
-                secondTypeMap.ApplyInheritedTypeMap(typeMap);
-                foreach(var subQueryPropertyMap in subQueryProperties)
+                foreach(var letMapInfo in letMapInfos)
                 {
-                    var secondPropertyMap = secondTypeMap.GetExistingPropertyMapFor(subQueryPropertyMap.DestinationProperty);
-                    var subQuery = secondPropertyMap.CustomExpression;
-                    secondPropertyMap.CustomExpression = null;
-                    var firstPropertyMap = firstTypeMap.FindOrCreatePropertyMapFor(secondPropertyMap.SourceMember);
-                    firstPropertyMap.CustomExpression = subQuery;
+                    var letProperty = letType.GetProperty(letMapInfo.Property.Name);
+                    var letPropertyMap = firstTypeMap.FindOrCreatePropertyMapFor(letProperty);
+                    letPropertyMap.CustomExpression = 
+                        Lambda(letMapInfo.MapFrom.ReplaceParameters(letMapInfo.MapFromSource), (ParameterExpression) instanceParameter);
+                    projection = projection.Replace(letMapInfo.Marker, MakeMemberAccess(secondParameter, letProperty));
                 }
+                projection = new ReplaceMemberAccessesVisitor(instanceParameter, secondParameter).Visit(projection);
             }
         }
 #endif
 
-        public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
+        class ReplaceMemberAccessesVisitor : ExpressionVisitor
         {
-            return CreateMapExpressionCore(request, instanceParameter, typePairCount, enableLetClause:false).First;
+            Expression _oldObject, _newObject;
+
+            public ReplaceMemberAccessesVisitor(Expression oldObject, Expression newObject)
+            {
+                _oldObject = oldObject;
+                _newObject = newObject;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                if(node.Expression != _oldObject)
+                {
+                    return base.VisitMember(node);
+                }
+                return MakeMemberAccess(_newObject, _newObject.Type.GetFieldOrProperty(node.Member.Name));
+            }
         }
 
-        private QueryExpressions CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, bool enableLetClause = true)
+
+        public Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
-            var typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType);
+            return CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var _);
+        }
+
+        private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps, out TypeMap typeMap)
+        {
+            typeMap = _configurationProvider.ResolveTypeMap(request.SourceType, request.DestinationType);
 
             if(typeMap == null)
             {
@@ -169,22 +191,12 @@ namespace AutoMapper.QueryableExtensions
 
             if(typeMap.CustomProjection != null)
             {
-                return new QueryExpressions(typeMap.CustomProjection.ReplaceParameters(instanceParameter));
+                return typeMap.CustomProjection.ReplaceParameters(instanceParameter);
             }
-#if NET45
-            if(enableLetClause)
-            {
-                var subQueryExpressions = GetSubQueryExpression(typeMap, request, instanceParameter, typePairCount);
-                if(subQueryExpressions != null)
-                {
-                    return subQueryExpressions.Value;
-                }
-            }
-#endif
-            return new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, typeMap));
+            return CreateMapExpressionCore(request, instanceParameter, typePairCount, typeMap, letPropertyMaps);
         }
 
-        private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, TypeMap typeMap)
+        private Expression CreateMapExpressionCore(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, TypeMap typeMap, LetPropertyMaps letPropertyMaps)
         {
             var bindings = new List<MemberBinding>();
             var depth = GetDepth(request, typePairCount);
@@ -197,7 +209,7 @@ namespace AutoMapper.QueryableExtensions
             }
             else
             {
-                bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount);
+                bindings = CreateMemberBindings(request, typeMap, instanceParameter, typePairCount, letPropertyMaps);
             }
             Expression constructorExpression = DestinationConstructorExpression(typeMap, instanceParameter);
             if(instanceParameter is ParameterExpression)
@@ -262,27 +274,36 @@ namespace AutoMapper.QueryableExtensions
 
         private List<MemberBinding> CreateMemberBindings(ExpressionRequest request,
             TypeMap typeMap,
-            Expression instanceParameter, TypePairCount typePairCount)
+            Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var bindings = new List<MemberBinding>();
 
             foreach (var propertyMap in typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
             {
-                var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter);
+                letPropertyMaps.Push(propertyMap);
 
-                if (propertyMap.ExplicitExpansion &&
-                    !request.MembersToExpand.Contains(propertyMap.DestinationProperty))
-                    continue;
+                CreateMemberBinding(propertyMap);
 
+                letPropertyMaps.Pop();
+            }
+            return bindings;
+            void CreateMemberBinding(PropertyMap propertyMap)
+            {
+                var result = ResolveExpression(propertyMap, request.SourceType, instanceParameter, letPropertyMaps);
+
+                if(propertyMap.ExplicitExpansion && !request.MembersToExpand.Contains(propertyMap.DestinationProperty))
+                {
+                    return;
+                }
                 var propertyTypeMap = _configurationProvider.ResolveTypeMap(result.Type,
                     propertyMap.DestinationPropertyType);
                 var propertyRequest = new ExpressionRequest(result.Type, propertyMap.DestinationPropertyType, request.MembersToExpand, request);
 
-                if (!propertyRequest.AlreadyExists)
+                if(!propertyRequest.AlreadyExists)
                 {
                     var binder = Binders.FirstOrDefault(b => b.IsMatch(propertyMap, propertyTypeMap, result));
 
-                    if (binder == null)
+                    if(binder == null)
                     {
                         var message =
                             $"Unable to create a map expression from {propertyMap.SourceMember?.DeclaringType?.Name}.{propertyMap.SourceMember?.Name} ({result.Type}) to {propertyMap.DestinationProperty.DeclaringType?.Name}.{propertyMap.DestinationProperty.Name} ({propertyMap.DestinationPropertyType})";
@@ -291,28 +312,27 @@ namespace AutoMapper.QueryableExtensions
                     }
 
                     var bindExpression = binder.Build(_configurationProvider, propertyMap, propertyTypeMap,
-                        propertyRequest, result, typePairCount);
+                        propertyRequest, result, typePairCount, letPropertyMaps);
 
-                    if (bindExpression != null)
+                    if(bindExpression != null)
                     {
                         bindings.Add(bindExpression);
                     }
                 }
             }
-            return bindings;
         }
 
         private static ExpressionResolutionResult ResolveExpression(PropertyMap propertyMap, Type currentType,
-            Expression instanceParameter)
+            Expression instanceParameter, LetPropertyMaps letPropertyMaps)
         {
             var result = new ExpressionResolutionResult(instanceParameter, currentType);
 
             var matchingExpressionConverter =
                 ExpressionResultConverters.FirstOrDefault(c => c.CanGetExpressionResolutionResult(result, propertyMap));
-            result = matchingExpressionConverter?.GetExpressionResolutionResult(result, propertyMap) 
+            result = matchingExpressionConverter?.GetExpressionResolutionResult(result, propertyMap, letPropertyMaps) 
                 ?? throw new Exception("Can't resolve this to Queryable Expression");
 
-            if (propertyMap.NullSubstitute != null && result.Type.IsNullableType())
+            if(propertyMap.NullSubstitute != null && result.Type.IsNullableType())
             {
                 var currentChild = result.ResolutionExpression;
                 var currentChildType = result.Type;
@@ -440,5 +460,74 @@ namespace AutoMapper.QueryableExtensions
                 return type.GetTypeInfo().IsAssignableFrom(collectionType.GetTypeInfo()) ? Convert(New(collectionType), type) : null;
             }
         }
+    }
+
+    public class LetPropertyMaps
+    {
+        public static readonly LetPropertyMaps Default = new LetPropertyMaps();
+
+        protected LetPropertyMaps() { }
+
+        public virtual bool SaveCurrentPath(Expression marker) => false;
+
+        public virtual void Push(PropertyMap propertyMap) {}
+
+        public virtual void Pop() {}
+
+        public virtual int Count => 0;
+
+        public virtual IEnumerable<SubQueryInfo> SavedPaths => new SubQueryInfo[0];
+
+        public virtual LetPropertyMaps New() => Default;
+
+        public struct SubQueryInfo
+        {
+            public SubQueryInfo(PropertyMap[] propertyMaps, Expression marker)
+            {
+                PropertyMaps = propertyMaps;
+                Marker = marker;
+            }
+            public PropertyMap[] PropertyMaps { get; }
+            public Expression Marker { get; }
+        }
+    }
+
+    public class FirstPassLetPropertyMaps : LetPropertyMaps
+    {
+        Stack<PropertyMap> _currentPath = new Stack<PropertyMap>();
+        List<SubQueryInfo> _savedPaths = new List<SubQueryInfo>();
+        IConfigurationProvider _configurationProvider;
+
+        public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider)
+        {
+            _configurationProvider = configurationProvider;
+        }
+
+        public override bool SaveCurrentPath(Expression marker)
+        {
+            var propertyMap = _currentPath.Peek();
+            if(_configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationPropertyType) == null)
+            {
+                return false;
+            }
+            _savedPaths.Add(new SubQueryInfo(_currentPath.Reverse().ToArray(), marker));
+            return true;
+        }
+
+        public override void Push(PropertyMap propertyMap)
+        {
+            _currentPath.Push(propertyMap);
+        }
+
+        public override void Pop()
+        {
+            _currentPath.Pop();
+        }
+  
+        public override int Count => _savedPaths.Count;
+
+        public override IEnumerable<SubQueryInfo> SavedPaths => _savedPaths;
+
+        public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(_configurationProvider);
     }
 }

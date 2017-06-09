@@ -117,16 +117,6 @@ namespace AutoMapper
 
         public bool CanResolveValue() => HasSource() && !Ignored;
 
-        public bool IsSubQuery()
-        {
-            if(!CanResolveValue() || !(CustomExpression?.Body is MethodCallExpression methodCall))
-            {
-                return false;
-            }
-            var method = methodCall.Method;
-            return method.IsStatic && method.DeclaringType == typeof(Enumerable);
-        }
-
         public bool HasSource() => _memberChain.Count > 0 || ResolveConfigured();
 
         public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null || CustomSourceMemberName != null;

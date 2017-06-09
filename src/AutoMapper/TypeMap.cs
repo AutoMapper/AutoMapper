@@ -339,7 +339,7 @@ namespace AutoMapper
                                              && DestinationTypeOverride == null
                                              && ConfiguredMemberList != MemberList.None;
 
-        internal void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
+        private void ApplyInheritedTypeMap(TypeMap inheritedTypeMap)
         {
             foreach (var inheritedMappedProperty in inheritedTypeMap.GetPropertyMaps().Where(m => m.IsMapped()))
             {

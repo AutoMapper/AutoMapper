@@ -120,12 +120,18 @@ namespace AutoMapper.IntegrationTests
                 var projection = context.ProductArticles.ProjectTo<ProductArticleModel>(Configuration);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
-                //counter.Count.ShouldEqual(1);
-                var productModel = projection.First().Product;
+                counter.Count.ShouldEqual(2);
+                var productArticleModel = projection.First();
+                var productModel = productArticleModel.Product;
                 productModel.Price.RegionId.ShouldEqual((short)1);
                 productModel.Price.IsDefault.ShouldBeTrue();
                 productModel.Price.Id.ShouldEqual(1);
                 productModel.Id.ShouldEqual(1);
+                var otherProductModel = productArticleModel.OtherProduct;
+                otherProductModel.Price.RegionId.ShouldEqual((short)1);
+                otherProductModel.Price.IsDefault.ShouldBeTrue();
+                otherProductModel.Price.Id.ShouldEqual(2);
+                otherProductModel.Id.ShouldEqual(2);
             }
         }
 
@@ -147,12 +153,14 @@ namespace AutoMapper.IntegrationTests
         {
             public int Id { get; set; }
             public Product Product { get; set; }
+            public Product OtherProduct { get; set; }
         }
 
         public class ProductArticleModel
         {
             public int Id { get; set; }
             public ProductModel Product { get; set; }
+            public ProductModel OtherProduct { get; set; }
         }
 
         public partial class Article
@@ -189,8 +197,9 @@ namespace AutoMapper.IntegrationTests
         {
             protected override void Seed(ClientContext context)
             {
-                var product = context.Products.Add(new Product { ECommercePublished = true, Articles = new[] { new Article { IsDefault = true, NationId = 1, ProductId = 1 } } });
-                context.ProductArticles.Add(new ProductArticle { Product = product });
+                var product1 = context.Products.Add(new Product { ECommercePublished = true, Articles = new[] { new Article { IsDefault = true, NationId = 1, ProductId = 1 } } });
+                var product2 = context.Products.Add(new Product { ECommercePublished = true, Articles = new[] { new Article { IsDefault = true, NationId = 1, ProductId = 2 } } });
+                context.ProductArticles.Add(new ProductArticle { Product = product1, OtherProduct = product2 });
             }
         }
 

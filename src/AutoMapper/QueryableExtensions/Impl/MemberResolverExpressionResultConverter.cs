@@ -3,11 +3,34 @@ using System.Linq.Expressions;
 
 namespace AutoMapper.QueryableExtensions.Impl
 {
+    using static Expression;
+
     public class MemberResolverExpressionResultConverter : IExpressionResultConverter
     {
+        public bool IsSubQuery(LambdaExpression lambda)
+        {
+            if(!(lambda.Body is MethodCallExpression methodCall))
+            {
+                return false;
+            }
+            var method = methodCall.Method;
+            return method.IsStatic && method.DeclaringType == typeof(Enumerable);
+        }
+
         public ExpressionResolutionResult GetExpressionResolutionResult(
-            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap) 
-            => ExpressionResolutionResult(expressionResolutionResult, propertyMap.CustomExpression);
+            ExpressionResolutionResult expressionResolutionResult, PropertyMap propertyMap, LetPropertyMaps letPropertyMaps)
+        {
+            if(IsSubQuery(propertyMap.CustomExpression))
+            {
+                var type = propertyMap.CustomExpression.Body.Type;
+                var marker = Parameter(type, "marker" + propertyMap.DestinationProperty.Name);
+                if(letPropertyMaps.SaveCurrentPath(marker))
+                {
+                    return new ExpressionResolutionResult(marker, type);
+                }
+            }
+            return ExpressionResolutionResult(expressionResolutionResult, propertyMap.CustomExpression);
+        }
 
         private static ExpressionResolutionResult ExpressionResolutionResult(
             ExpressionResolutionResult expressionResolutionResult, LambdaExpression lambdaExpression)

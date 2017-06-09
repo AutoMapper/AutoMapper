@@ -11,7 +11,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             propertyMap.DestinationPropertyType.IsNullableType()
             && !result.Type.IsNullableType();
 
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount) 
+        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
             => BindNullableExpression(propertyMap, result);
 
         private static MemberAssignment BindNullableExpression(PropertyMap propertyMap,

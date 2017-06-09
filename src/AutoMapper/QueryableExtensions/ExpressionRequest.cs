@@ -2,11 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
 namespace AutoMapper.QueryableExtensions
 {
+    [DebuggerDisplay("{SourceType.Name}, {DestinationType.Name}")]
     public class ExpressionRequest : IEquatable<ExpressionRequest>
     {
         public Type SourceType { get; }

@@ -14,10 +14,10 @@ namespace AutoMapper.QueryableExtensions.Impl
             !(ElementTypeHelper.GetElementType(propertyMap.DestinationPropertyType).IsPrimitive() &&
               ElementTypeHelper.GetElementType(propertyMap.SourceType).IsPrimitive());
 
-        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount) 
-            => BindEnumerableExpression(configuration, propertyMap, request, result, typePairCount);
+        public MemberAssignment Build(IConfigurationProvider configuration, PropertyMap propertyMap, TypeMap propertyTypeMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps) 
+            => BindEnumerableExpression(configuration, propertyMap, request, result, typePairCount, letPropertyMaps);
 
-        private static MemberAssignment BindEnumerableExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount)
+        private static MemberAssignment BindEnumerableExpression(IConfigurationProvider configuration, PropertyMap propertyMap, ExpressionRequest request, ExpressionResolutionResult result, IDictionary<ExpressionRequest, int> typePairCount, LetPropertyMaps letPropertyMaps)
         {
             var destinationListType = ElementTypeHelper.GetElementType(propertyMap.DestinationPropertyType);
             var sourceListType = ElementTypeHelper.GetElementType(propertyMap.SourceType);
@@ -26,12 +26,12 @@ namespace AutoMapper.QueryableExtensions.Impl
             if (sourceListType != destinationListType)
             {
                 var listTypePair = new ExpressionRequest(sourceListType, destinationListType, request.MembersToExpand, request);
-                var transformedExpressions = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount);
+                var transformedExpressions = configuration.ExpressionBuilder.CreateMapExpression(listTypePair, typePairCount, letPropertyMaps.New());
                 if(transformedExpressions == null)
                 {
                     return null;
                 }
-                expression = transformedExpressions.Aggregate(result.ResolutionExpression, (source, lambda) => Select(source, lambda));
+                expression = transformedExpressions.Aggregate(expression, (source, lambda) => Select(source, lambda));
             }
 
             expression = Expression.Call(typeof(Enumerable), propertyMap.DestinationPropertyType.IsArray ? "ToArray" : "ToList", new[] { destinationListType }, expression);

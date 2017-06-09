@@ -18,15 +18,15 @@ namespace AutoMapper.Execution
 
         private static readonly byte[] privateKeyToken = StringToByteArray("be96cd2c38ef1005");
 
-        private static readonly MethodInfo delegate_Combine = typeof (Delegate).GetDeclaredMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly MethodInfo delegate_Combine = typeof(Delegate).GetDeclaredMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
 
-        private static readonly MethodInfo delegate_Remove = typeof (Delegate).GetDeclaredMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly MethodInfo delegate_Remove = typeof(Delegate).GetDeclaredMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
 
         private static readonly EventInfo iNotifyPropertyChanged_PropertyChanged =
-            typeof (INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
+            typeof(INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
 
         private static readonly ConstructorInfo proxyBase_ctor =
-            typeof (ProxyBase).GetDeclaredConstructor(new Type[0]);
+            typeof(ProxyBase).GetDeclaredConstructor(new Type[0]);
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
@@ -103,7 +103,7 @@ namespace AutoMapper.Execution
             foreach(var property in
                 allInterfaces.Where(intf => intf != typeof(INotifyPropertyChanged))
                     .SelectMany(intf => intf.GetProperties())
-                    .Select(p=>new PropertyDescription(p))
+                    .Select(p => new PropertyDescription(p))
                     .Concat(additionalProperties))
             {
                 if(property.CanWrite)
@@ -157,9 +157,9 @@ namespace AutoMapper.Execution
         private static byte[] StringToByteArray(string hex)
         {
             int numberChars = hex.Length;
-            byte[] bytes = new byte[numberChars/2];
-            for (int i = 0; i < numberChars; i += 2)
-                bytes[i/2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            byte[] bytes = new byte[numberChars / 2];
+            for(int i = 0; i < numberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             return bytes;
         }
     }
@@ -199,6 +199,7 @@ namespace AutoMapper.Execution
         public static bool operator !=(TypeDescription left, TypeDescription right) => !left.Equals(right);
     }
 
+    [DebuggerDisplay("{Name}-{Type.Name}")]
     public struct PropertyDescription : IEquatable<PropertyDescription>
     {
         internal static PropertyDescription[] Empty = new PropertyDescription[0];
