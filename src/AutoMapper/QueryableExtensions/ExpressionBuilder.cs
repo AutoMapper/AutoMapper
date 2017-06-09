@@ -117,13 +117,13 @@ namespace AutoMapper.QueryableExtensions
         {
             var letMapInfos = letPropertyMaps.SavedPaths.Select(path => new
             {
-                MapFrom = path.PropertyMaps.Last().CustomExpression,
+                MapFrom = path.Last.CustomExpression,
                 MapFromSource = path.PropertyMaps.Take(path.PropertyMaps.Length - 1).Aggregate(instanceParameter,
                     (obj, pm) => MakeMemberAccess(obj, pm.SourceMember)),
                 Property = new PropertyDescription
                 (
                     string.Join("_", path.PropertyMaps.Select(pm => pm.DestinationProperty.Name)),
-                    path.PropertyMaps.Last().SourceType
+                    path.Last.SourceType
                 ),
                 Marker = path.Marker
             }).ToArray();
@@ -476,26 +476,27 @@ namespace AutoMapper.QueryableExtensions
 
         public virtual int Count => 0;
 
-        public virtual IEnumerable<SubQueryInfo> SavedPaths => new SubQueryInfo[0];
+        public virtual IEnumerable<PropertyPath> SavedPaths => new PropertyPath[0];
 
         public virtual LetPropertyMaps New() => Default;
 
-        public struct SubQueryInfo
+        public struct PropertyPath
         {
-            public SubQueryInfo(PropertyMap[] propertyMaps, Expression marker)
+            public PropertyPath(PropertyMap[] propertyMaps, Expression marker)
             {
                 PropertyMaps = propertyMaps;
                 Marker = marker;
             }
             public PropertyMap[] PropertyMaps { get; }
             public Expression Marker { get; }
+            public PropertyMap Last => PropertyMaps[PropertyMaps.Length - 1];
         }
     }
 
     public class FirstPassLetPropertyMaps : LetPropertyMaps
     {
         Stack<PropertyMap> _currentPath = new Stack<PropertyMap>();
-        List<SubQueryInfo> _savedPaths = new List<SubQueryInfo>();
+        List<PropertyPath> _savedPaths = new List<PropertyPath>();
         IConfigurationProvider _configurationProvider;
 
         public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider) =>
@@ -508,7 +509,7 @@ namespace AutoMapper.QueryableExtensions
             {
                 return false;
             }
-            _savedPaths.Add(new SubQueryInfo(_currentPath.Reverse().ToArray(), marker));
+            _savedPaths.Add(new PropertyPath(_currentPath.Reverse().ToArray(), marker));
             return true;
         }
 
@@ -518,7 +519,7 @@ namespace AutoMapper.QueryableExtensions
   
         public override int Count => _savedPaths.Count;
 
-        public override IEnumerable<SubQueryInfo> SavedPaths => _savedPaths;
+        public override IEnumerable<PropertyPath> SavedPaths => _savedPaths;
 
         public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(_configurationProvider);
     }
