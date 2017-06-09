@@ -498,10 +498,8 @@ namespace AutoMapper.QueryableExtensions
         List<SubQueryInfo> _savedPaths = new List<SubQueryInfo>();
         IConfigurationProvider _configurationProvider;
 
-        public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider)
-        {
+        public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider) =>
             _configurationProvider = configurationProvider;
-        }
 
         public override bool SaveCurrentPath(Expression marker)
         {
@@ -514,15 +512,9 @@ namespace AutoMapper.QueryableExtensions
             return true;
         }
 
-        public override void Push(PropertyMap propertyMap)
-        {
-            _currentPath.Push(propertyMap);
-        }
+        public override void Push(PropertyMap propertyMap) => _currentPath.Push(propertyMap);
 
-        public override void Pop()
-        {
-            _currentPath.Pop();
-        }
+        public override void Pop() => _currentPath.Pop();
   
         public override int Count => _savedPaths.Count;
 
