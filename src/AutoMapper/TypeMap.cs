@@ -328,7 +328,7 @@ namespace AutoMapper
             return config;
         }
 
-        public void ApplyInheritedMap(TypeMap inheritedTypeMap)
+        public void AddInheritedMap(TypeMap inheritedTypeMap)
         {
             _inheritedTypeMaps.Add(inheritedTypeMap);
         }

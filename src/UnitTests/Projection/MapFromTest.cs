@@ -17,7 +17,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
                                 .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
             });
 
-            typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.ExpressionBuilder.CreateMapExpression<UserModel, UserDto>()); //null reference exception here
+            typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.ExpressionBuilder.GetMapExpression<UserModel, UserDto>()); //null reference exception here
         }
 
         [Fact]

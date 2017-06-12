@@ -68,6 +68,7 @@
     <Compile Include="..\UnitTests\XUnitConventions.cs">
       <Link>XUnitConventions.cs</Link>
     </Compile>
+    <Compile Include="MapObjectPropertyFromSubQuery.cs" />
     <Compile Include="NullableToNonNullable.cs" />
     <Compile Include="ProjectionWithExplicitExpansion.cs" />
     <Compile Include="DerivedComplexTypes.cs" />

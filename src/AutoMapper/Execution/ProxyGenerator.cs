@@ -18,19 +18,19 @@ namespace AutoMapper.Execution
 
         private static readonly byte[] privateKeyToken = StringToByteArray("be96cd2c38ef1005");
 
-        private static readonly MethodInfo delegate_Combine = typeof (Delegate).GetDeclaredMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly MethodInfo delegate_Combine = typeof(Delegate).GetDeclaredMethod("Combine", new[] { typeof(Delegate), typeof(Delegate) });
 
-        private static readonly MethodInfo delegate_Remove = typeof (Delegate).GetDeclaredMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly MethodInfo delegate_Remove = typeof(Delegate).GetDeclaredMethod("Remove", new[] { typeof(Delegate), typeof(Delegate) });
 
         private static readonly EventInfo iNotifyPropertyChanged_PropertyChanged =
-            typeof (INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
+            typeof(INotifyPropertyChanged).GetRuntimeEvent("PropertyChanged");
 
         private static readonly ConstructorInfo proxyBase_ctor =
-            typeof (ProxyBase).GetDeclaredConstructor(new Type[0]);
+            typeof(ProxyBase).GetDeclaredConstructor(new Type[0]);
 
         private static readonly ModuleBuilder proxyModule = CreateProxyModule();
 
-        private static readonly LockingConcurrentDictionary<Type, Type> proxyTypes = new LockingConcurrentDictionary<Type, Type>(EmitProxy);
+        private static readonly LockingConcurrentDictionary<TypeDescription, Type> proxyTypes = new LockingConcurrentDictionary<TypeDescription, Type>(EmitProxy);
 
         private static ModuleBuilder CreateProxyModule()
         {
@@ -43,19 +43,19 @@ namespace AutoMapper.Execution
             return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
         }
 
-        private static Type EmitProxy(Type interfaceType)
+        private static Type EmitProxy(TypeDescription typeDescription)
         {
+            var interfaceType = typeDescription.Type;
+            var additionalProperties = typeDescription.AdditionalProperties;
+            var propertyNames = string.Join("_", additionalProperties.Select(p => p.Name));
             string name =
-                $"Proxy<{Regex.Replace(interfaceType.AssemblyQualifiedName ?? interfaceType.FullName ?? interfaceType.Name, @"[\s,]+", "_")}>";
-            List<Type> allInterfaces = new List<Type>
-            {
-                interfaceType
-            };
+                $"Proxy{propertyNames}<{Regex.Replace(interfaceType.AssemblyQualifiedName ?? interfaceType.FullName ?? interfaceType.Name, @"[\s,]+", "_")}>";
+            var allInterfaces = new List<Type> { interfaceType };
             allInterfaces.AddRange(interfaceType.GetTypeInfo().ImplementedInterfaces);
             Debug.WriteLine(name, "Emitting proxy type");
             TypeBuilder typeBuilder = proxyModule.DefineType(name,
                 TypeAttributes.Class | TypeAttributes.Sealed | TypeAttributes.Public, typeof(ProxyBase),
-                allInterfaces.ToArray());
+                interfaceType.IsInterface ? new[] { interfaceType } : Type.EmptyTypes);
             ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public,
                 CallingConventions.Standard, new Type[0]);
             ILGenerator ctorIl = constructorBuilder.GetILGenerator();
@@ -98,12 +98,13 @@ namespace AutoMapper.Execution
                 typeBuilder.DefineMethodOverride(removePropertyChangedMethod,
                     iNotifyPropertyChanged_PropertyChanged.RemoveMethod);
             }
-            List<PropertyInfo> propertiesToImplement = new List<PropertyInfo>();
+            var propertiesToImplement = new List<PropertyDescription>();
             // first we collect all properties, those with setters before getters in order to enable less specific redundant getters
-            foreach(
-                PropertyInfo property in
-                    allInterfaces.Where(intf => intf != typeof(INotifyPropertyChanged))
-                        .SelectMany(intf => intf.GetProperties()))
+            foreach(var property in
+                allInterfaces.Where(intf => intf != typeof(INotifyPropertyChanged))
+                    .SelectMany(intf => intf.GetProperties())
+                    .Select(p => new PropertyDescription(p))
+                    .Concat(additionalProperties))
             {
                 if(property.CanWrite)
                 {
@@ -114,14 +115,14 @@ namespace AutoMapper.Execution
                     propertiesToImplement.Add(property);
                 }
             }
-            Dictionary<string, PropertyEmitter> fieldBuilders = new Dictionary<string, PropertyEmitter>();
-            foreach(PropertyInfo property in propertiesToImplement)
+            var fieldBuilders = new Dictionary<string, PropertyEmitter>();
+            foreach(var property in propertiesToImplement)
             {
                 PropertyEmitter propertyEmitter;
                 if(fieldBuilders.TryGetValue(property.Name, out propertyEmitter))
                 {
-                    if((propertyEmitter.PropertyType != property.PropertyType) &&
-                        ((property.CanWrite) || (!property.PropertyType.IsAssignableFrom(propertyEmitter.PropertyType))))
+                    if((propertyEmitter.PropertyType != property.Type) &&
+                        ((property.CanWrite) || (!property.Type.IsAssignableFrom(propertyEmitter.PropertyType))))
                     {
                         throw new ArgumentException(
                             $"The interface has a conflicting property {property.Name}",
@@ -132,17 +133,7 @@ namespace AutoMapper.Execution
                 {
                     fieldBuilders.Add(property.Name,
                         propertyEmitter =
-                            new PropertyEmitter(typeBuilder, property.Name, property.PropertyType, propertyChangedField));
-                }
-                if(property.CanRead)
-                {
-                    typeBuilder.DefineMethodOverride(propertyEmitter.GetGetter(property.PropertyType),
-                        property.GetMethod);
-                }
-                if(property.CanWrite)
-                {
-                    typeBuilder.DefineMethodOverride(propertyEmitter.GetSetter(property.PropertyType),
-                        property.SetMethod);
+                            new PropertyEmitter(typeBuilder, property.Name, property.Type, propertyChangedField));
                 }
             }
             return typeBuilder.CreateType();
@@ -150,25 +141,102 @@ namespace AutoMapper.Execution
 
         public static Type GetProxyType(Type interfaceType)
         {
-            if(interfaceType == null)
-            {
-                throw new ArgumentNullException(nameof(interfaceType));
-            }
+            var key = new TypeDescription(interfaceType);
             if(!interfaceType.IsInterface())
             {
                 throw new ArgumentException("Only interfaces can be proxied", nameof(interfaceType));
             }
-            return proxyTypes.GetOrAdd(interfaceType);
+            return proxyTypes.GetOrAdd(key);
+        }
+
+        public static Type GetSimilarType(Type sourceType, IEnumerable<PropertyDescription> additionalProperties)
+        {
+            return proxyTypes.GetOrAdd(new TypeDescription(sourceType, additionalProperties));
         }
 
         private static byte[] StringToByteArray(string hex)
         {
             int numberChars = hex.Length;
-            byte[] bytes = new byte[numberChars/2];
-            for (int i = 0; i < numberChars; i += 2)
-                bytes[i/2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            byte[] bytes = new byte[numberChars / 2];
+            for(int i = 0; i < numberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
             return bytes;
         }
+    }
+
+    public struct TypeDescription : IEquatable<TypeDescription>
+    {
+        public TypeDescription(Type type) : this(type, PropertyDescription.Empty)
+        {
+        }
+
+        public TypeDescription(Type type, IEnumerable<PropertyDescription> additionalProperties)
+        {
+            Type = type ?? throw new ArgumentNullException(nameof(type));
+            AdditionalProperties = additionalProperties?.ToArray() ?? throw new ArgumentNullException(nameof(additionalProperties));
+        }
+
+        public Type Type { get; }
+
+        public PropertyDescription[] AdditionalProperties { get; }
+
+        public override int GetHashCode()
+        {
+            var hashCode = Type.GetHashCode();
+            foreach(var property in AdditionalProperties)
+            {
+                hashCode = HashCodeCombiner.CombineCodes(hashCode, property.GetHashCode());
+            }
+            return hashCode;
+        }
+
+        public override bool Equals(object other) => other is TypeDescription && Equals((TypeDescription)other);
+
+        public bool Equals(TypeDescription other) => Type == other.Type && AdditionalProperties.SequenceEqual(other.AdditionalProperties);
+
+        public static bool operator ==(TypeDescription left, TypeDescription right) => left.Equals(right);
+
+        public static bool operator !=(TypeDescription left, TypeDescription right) => !left.Equals(right);
+    }
+
+    [DebuggerDisplay("{Name}-{Type.Name}")]
+    public struct PropertyDescription : IEquatable<PropertyDescription>
+    {
+        internal static PropertyDescription[] Empty = new PropertyDescription[0];
+
+        public PropertyDescription(string name, Type type, bool canWrite = true)
+        {
+            Name = name;
+            Type = type;
+            CanWrite = canWrite;
+        }
+
+        public PropertyDescription(PropertyInfo property)
+        {
+            Name = property.Name;
+            Type = property.PropertyType;
+            CanWrite = property.CanWrite;
+        }
+
+        public string Name { get; }
+
+        public Type Type { get; }
+
+        public bool CanWrite { get; }
+
+        public override int GetHashCode()
+        {
+            var code = HashCodeCombiner.Combine(Name, Type);
+            return HashCodeCombiner.CombineCodes(code, CanWrite.GetHashCode());
+        }
+
+        public override bool Equals(object other) => other is PropertyDescription && Equals((PropertyDescription)other);
+
+        public bool Equals(PropertyDescription other) => Name == other.Name && Type == other.Type && CanWrite == other.CanWrite;
+
+        public static bool operator ==(PropertyDescription left, PropertyDescription right) => left.Equals(right);
+
+        public static bool operator !=(PropertyDescription left, PropertyDescription right) => !left.Equals(right);
     }
 }
 #endif

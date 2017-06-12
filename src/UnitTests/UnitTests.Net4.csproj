@@ -339,6 +339,7 @@
     <Compile Include="General.cs" />
     <Compile Include="Indexers.cs" />
     <Compile Include="InterfaceMapping.cs" />
+    <Compile Include="Internal\GenerateSimilarType.cs" />
     <Compile Include="Internal\NullConstructorParameter.cs" />
     <Compile Include="Internal\PrimitiveExtensionsTester.cs" />
     <Compile Include="Internal\QueryMapperHelperTests.cs" />
