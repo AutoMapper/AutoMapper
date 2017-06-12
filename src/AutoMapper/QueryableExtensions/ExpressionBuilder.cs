@@ -395,27 +395,27 @@ namespace AutoMapper.QueryableExtensions
             public FirstPassLetPropertyMaps(IConfigurationProvider configurationProvider) =>
                 _configurationProvider = configurationProvider;
 
-            private bool IsSubQuery(LambdaExpression lambda)
-            {
-                if(!(lambda.Body is MethodCallExpression methodCall))
-                {
-                    return false;
-                }
-                var method = methodCall.Method;
-                return method.IsStatic && method.DeclaringType == typeof(Enumerable);
-            }
-
             public override Expression GetSubQueryMarker()
             {
                 var propertyMap = _currentPath.Peek();
-                if(!IsSubQuery(propertyMap.CustomExpression) || _configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationPropertyType) == null)
+                var mapFrom = propertyMap.CustomExpression;
+                if(!IsSubQuery() || _configurationProvider.ResolveTypeMap(propertyMap.SourceType, propertyMap.DestinationPropertyType) == null)
                 {
                     return null;
                 }
-                var type = propertyMap.CustomExpression.Body.Type;
+                var type = mapFrom.Body.Type;
                 var marker = Parameter(type, "marker" + propertyMap.DestinationProperty.Name);
                 _savedPaths.Add(new PropertyPath(_currentPath.Reverse().ToArray(), marker));
                 return marker;
+                bool IsSubQuery()
+                {
+                    if(!(mapFrom.Body is MethodCallExpression methodCall))
+                    {
+                        return false;
+                    }
+                    var method = methodCall.Method;
+                    return method.IsStatic && method.DeclaringType == typeof(Enumerable);
+                }
             }
 
             public override void Push(PropertyMap propertyMap) => _currentPath.Push(propertyMap);
