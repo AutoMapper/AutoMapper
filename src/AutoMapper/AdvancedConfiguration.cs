@@ -22,6 +22,8 @@ namespace AutoMapper
         /// <param name="validator">the validation callback</param>
         public void Validator(Validator validator) => _validators.Add(validator);
 
+        public bool AllowAdditiveTypeMapCreation { get; set; }
+
         internal Validator[] GetValidators() => _validators.ToArray();
     }
 }

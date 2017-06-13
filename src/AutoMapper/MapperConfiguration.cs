@@ -10,7 +10,7 @@ using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
-    using AutoMapper.Execution;
+    using Execution;
     using static Expression;
     using static ExpressionFactory;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
@@ -25,6 +25,7 @@ namespace AutoMapper
         private LockingConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache;
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
+        private MapperConfigurationExpressionValidator _expressionValidator;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
@@ -32,7 +33,9 @@ namespace AutoMapper
             _typeMapPlanCache = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             Validators = configurationExpression.Advanced.GetValidators();
+            AllowAdditiveTypeMapCreation = configurationExpression.Advanced.AllowAdditiveTypeMapCreation;
             _validator = new ConfigurationValidator(this);
+            _expressionValidator = new MapperConfigurationExpressionValidator(configurationExpression);
             ExpressionBuilder = new ExpressionBuilder(this);
 
             ServiceCtor = configurationExpression.ServiceCtor;
@@ -45,6 +48,7 @@ namespace AutoMapper
                 beforeSealAction?.Invoke(this);
             Seal();
         }
+
 
         public MapperConfiguration(Action<IMapperConfigurationExpression> configure)
             : this(Build(configure))
@@ -61,6 +65,8 @@ namespace AutoMapper
         }
 
         private Validator[] Validators { get; }
+
+        private bool AllowAdditiveTypeMapCreation { get; }
 
         public IExpressionBuilder ExpressionBuilder { get; }
 
@@ -241,6 +247,8 @@ namespace AutoMapper
 
         public void AssertConfigurationIsValid()
         {
+            _expressionValidator.AssertConfigurationExpressionIsValid();
+
             _validator.AssertConfigurationIsValid(_typeMapRegistry.TypeMaps.Where(tm => !tm.SourceType.IsGenericTypeDefinition() && !tm.DestinationType.IsGenericTypeDefinition()));
         }
 
