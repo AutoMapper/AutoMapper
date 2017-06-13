@@ -341,7 +341,6 @@ namespace AutoMapper.UnitTests.NullBehavior
             cfg.CreateProfile("Foo", p =>
             {
                 p.AllowNullDestinationValues = true;
-                p.CreateMap<ModelObject, ModelDto>();
                 p.CreateMap<ModelSubObject, ModelSubDto>();
                 p.CreateMap<ModelObject, ModelDto>()
                     .ForMember(d => d.SubExpressionName, opt => opt.MapFrom(src =>
