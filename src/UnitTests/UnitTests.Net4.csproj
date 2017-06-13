@@ -229,6 +229,7 @@
     <Compile Include="Bug\PreserveReferencesSameDestination.cs" />
     <Compile Include="BuildExecutionPlan.cs" />
     <Compile Include="ConfigCompilation.cs" />
+    <Compile Include="ConfigurationRules.cs" />
     <Compile Include="CustomCollectionTester.cs" />
     <Compile Include="ForAllMaps.cs" />
     <Compile Include="Bug\AllowNullCollectionsAssignableArray.cs" />
@@ -475,7 +476,9 @@
     <Compile Include="XUnitConventions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
   </ItemGroup>
