@@ -246,7 +246,6 @@ namespace AutoMapper.UnitTests.NullBehavior
         {
 
             cfg.AllowNullDestinationValues = true;
-            cfg.CreateMap<ModelObject, ModelDto>();
             cfg.CreateMap<ModelSubObject, ModelSubDto>();
             cfg.CreateMap<ModelObject, ModelDto>()
                 .ForMember(d => d.SubExpressionName, opt => opt.MapFrom(src =>

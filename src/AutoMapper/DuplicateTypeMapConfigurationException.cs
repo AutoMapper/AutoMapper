@@ -10,6 +10,17 @@ namespace AutoMapper
         public DuplicateTypeMapConfigurationException(TypeMapConfigErrors[] errors)
         {
             Errors = errors;
+            var builder = new StringBuilder();
+            builder.AppendLine("The following type maps were found in multiple profiles:");
+            foreach (var error in Errors)
+            {
+                builder.AppendLine($"{error.Types.SourceType.FullName} to {error.Types.DestinationType.FullName} defined in profiles:");
+                builder.AppendLine(string.Join(Environment.NewLine, error.ProfileNames));
+            }
+            builder.AppendLine("This can cause configuration collisions and inconsistent mapping.");
+            builder.AppendLine("Consolidate the CreateMap calls into one profile, or set the root Advanced.AllowAdditiveTypeMapCreation configuration value to 'true'.");
+
+            Message = builder.ToString();
         }
 
         public class TypeMapConfigErrors
@@ -24,18 +35,6 @@ namespace AutoMapper
             }
         }
 
-        public override string ToString()
-        {
-            var builder = new StringBuilder();
-            builder.AppendLine("The following type maps were found in multiple profiles:");
-            foreach (var error in Errors)
-            {
-                builder.AppendLine($"{error.Types.SourceType.FullName} to {error.Types.DestinationType.FullName} defined in profiles:");
-                builder.AppendLine(string.Join(Environment.NewLine, error.ProfileNames));
-            }
-            builder.AppendLine("This can cause configuration collisions and inconsistent mapping.");
-            builder.AppendLine("Consolidate the CreateMap calls into one profile, or set the root Advanced.AllowAdditiveTypeMapCreation configuration value to 'true'.");
-            return builder.ToString();
-        }
+        public override string Message { get; }
     }
 }
