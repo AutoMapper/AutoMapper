@@ -122,8 +122,13 @@ namespace AutoMapper.Configuration
 
         public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
         {
-            _sourceMember = sourceMember;
-            PropertyMapActions.Add(pm => pm.SetCustomValueResolverExpression(sourceMember));
+            MapFromUntyped(sourceMember);
+        }
+
+        internal void MapFromUntyped(LambdaExpression sourceExpression)
+        {
+            _sourceMember = sourceExpression;
+            PropertyMapActions.Add(pm => pm.MapFrom(sourceExpression));
         }
 
         public void MapFrom(string sourceMember)

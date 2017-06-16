@@ -6,6 +6,41 @@ using System.Text.RegularExpressions;
 
 namespace AutoMapper.UnitTests
 {
+    public class MapFromReverseResolveUsing : AutoMapperSpecBase
+    {
+        public class Source
+        {
+            public int Total { get; set; }
+        }
+
+        public class Destination
+        {
+            public int Total { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.CreateMap<Destination, Source>()
+             .ForMember(dest => dest.Total, opt => opt.MapFrom(x => x.Total))
+             .ReverseMap()
+             .ForMember(dest => dest.Total, opt => opt.ResolveUsing<CustomResolver>());
+        });
+
+        public class CustomResolver : IValueResolver<Source, Destination, int>
+        {
+            public int Resolve(Source source, Destination destination, int member, ResolutionContext context)
+            {
+                return Int32.MaxValue;
+            }
+        }
+
+        [Fact]
+        public void Should_use_the_resolver()
+        {
+            Mapper.Map<Destination>(new Source()).Total.ShouldEqual(int.MaxValue);
+        }
+    }
+
     public class MethodsWithReverse : AutoMapperSpecBase
     {
         class Order

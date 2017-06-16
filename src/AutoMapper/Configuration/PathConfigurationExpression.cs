@@ -67,6 +67,12 @@ namespace AutoMapper.Configuration
                 return null;
             }
             var reversed = new PathConfigurationExpression<TSource, TDestination>(destination);
+            if(reversed.MemberPath.Length == 1)
+            {
+                var reversedMemberExpression = new MemberConfigurationExpression<TSource, TDestination, object>(reversed.DestinationMember, typeof(TSource));
+                reversedMemberExpression.MapFromUntyped(source);
+                return reversedMemberExpression;
+            }
             reversed.MapFromUntyped(source);
             return reversed;
         }
