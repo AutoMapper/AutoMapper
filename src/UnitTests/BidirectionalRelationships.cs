@@ -329,6 +329,82 @@ namespace AutoMapper.UnitTests
             }
         }
 
+        public class When_mapping_to_a_destination_with_a_bidirectional_parent_one_to_one_child_relationship_using_context_mapper : AutoMapperSpecBase
+        {
+            private FooDto _dto;
+
+            protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Foo, FooDto>()
+                   .ForMember(
+                       x => x.Bar,
+                       opt => opt.ResolveUsing(
+                           (src, dst, dstParamValue, ctx) =>
+                           {
+                               if (!ctx.Options.Items.ContainsKey("is-root-context"))
+                                   throw new InvalidOperationException();
+
+                               // Not working
+                               var result = ctx.Mapper.Map<BarDto>(src.Bar);
+
+                               // Works, but (IMHO) counter-intuitive because <c>ctx</c> occurs twice
+                               // var result = ctx.Mapper.Map(src.Bar, null, typeof(Bar), typeof(BarDto), ctx);
+
+                               return result;
+                           }))
+                   .PreserveReferences();
+                cfg.CreateMap<Bar, BarDto>()
+                   .PreserveReferences();
+            });
+
+            protected override void Because_of()
+            {
+                var options = new MappingOperationOptions<Foo, FooDto>(null);
+                options.Items["is-root-context"] = true;
+
+                var runtimeMapper = (IRuntimeMapper) Mapper;
+                var context = new ResolutionContext(options, runtimeMapper);
+
+                var foo = new Foo
+                {
+                    Bar = new Bar
+                    {
+                        Value = "something"
+                    }
+                };
+                foo.Bar.Foo = foo;
+                _dto = (FooDto)runtimeMapper.Map(foo, null, typeof(Foo), typeof(FooDto), context);
+            }
+
+            [Fact]
+            public void Should_preserve_the_parent_child_relationship_on_the_destination()
+            {
+                _dto.Bar.Foo.ShouldBeSameAs(_dto);
+            }
+
+            public class Foo
+            {
+                public Bar Bar { get; set; }
+            }
+
+            public class Bar
+            {
+                public Foo Foo { get; set; }
+                public string Value { get; set; }
+            }
+
+            public class FooDto
+            {
+                public BarDto Bar { get; set; }
+            }
+
+            public class BarDto
+            {
+                public FooDto Foo { get; set; }
+                public string Value { get; set; }
+            }
+        }
+
         public class When_mapping_to_a_destination_containing_two_dtos_mapped_from_the_same_source : AutoMapperSpecBase
         {
             private FooContainerModel _dto;
