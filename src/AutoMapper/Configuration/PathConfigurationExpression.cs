@@ -10,7 +10,7 @@ namespace AutoMapper.Configuration
     public class PathConfigurationExpression<TSource, TDestination> : IPathConfigurationExpression<TSource, TDestination>, IPropertyMapConfiguration
     {
         private readonly LambdaExpression _destinationExpression;
-        private LambdaExpression _sourceMember;
+        private LambdaExpression _sourceExpression;
         protected List<Action<PathMap>> PathMapActions { get; } = new List<Action<PathMap>>();
 
         public PathConfigurationExpression(LambdaExpression destinationExpression)
@@ -23,17 +23,17 @@ namespace AutoMapper.Configuration
 
         public MemberInfo DestinationMember => MemberPath.Last;
 
-        public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember)
+        public void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceExpression)
         {
-            _sourceMember = sourceMember;
-            MapFromUntyped(sourceMember);
+            MapFromUntyped(sourceExpression);
         }
 
-        public void MapFromUntyped(LambdaExpression sourceMember)
+        public void MapFromUntyped(LambdaExpression sourceExpression)
         {
+            _sourceExpression = sourceExpression;
             PathMapActions.Add(pm =>
             {
-                pm.SourceExpression = sourceMember;
+                pm.SourceExpression = sourceExpression;
             });
         }
 
@@ -79,7 +79,7 @@ namespace AutoMapper.Configuration
 
         public IPropertyMapConfiguration Reverse()
         {
-            return Create(_sourceMember, _destinationExpression);
+            return Create(_sourceExpression, _destinationExpression);
         }
     }
 }
