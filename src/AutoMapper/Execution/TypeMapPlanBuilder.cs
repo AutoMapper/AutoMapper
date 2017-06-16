@@ -587,18 +587,21 @@ namespace AutoMapper.Execution
         {
             var destinationType = destinationParameter.Type;
             var defaultDestination = DefaultDestination(destinationType, profileMap);
-            var ifSourceNull = destinationType.IsCollectionType() ? Block(ClearDestinationCollection(destinationParameter), defaultDestination) : defaultDestination;
+            var ifSourceNull = destinationType.IsCollectionType() ? ClearDestinationCollection(destinationParameter, defaultDestination) : defaultDestination;
             return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
         }
 
-        private static Expression ClearDestinationCollection(Expression destinationParameter)
+        private static Expression ClearDestinationCollection(Expression destinationParameter, Expression defaultDestination)
         {
             var destinationElementType = ElementTypeHelper.GetElementType(destinationParameter.Type);
             var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+            var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
             var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-            var collection = ToType(destinationParameter, destinationCollectionType);
-            var clear = Condition(Property(collection, "IsReadOnly"), Empty(), Call(collection, clearMethod));
-            return collection.IfNullElse(Empty(), clear);
+            var clear = Condition(Property(destinationVariable, "IsReadOnly"), Empty(), Call(destinationVariable, clearMethod));
+            return Block(new[] { destinationVariable }, 
+                        Assign(destinationVariable, ToType(destinationParameter, destinationCollectionType)),
+                        destinationVariable.IfNullElse(Empty(), clear), 
+                        defaultDestination);
         }
 
         private static Expression DefaultDestination(Type destinationType, ProfileMap profileMap)
