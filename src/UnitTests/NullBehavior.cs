@@ -8,7 +8,7 @@ using System;
 
 namespace AutoMapper.UnitTests.NullBehavior
 {
-    public class AllowNullDestinationsButNotColections : AutoMapperSpecBase
+    public class When_mappping_null_list_to_ICollection : AutoMapperSpecBase
     {
         class Source
         {
