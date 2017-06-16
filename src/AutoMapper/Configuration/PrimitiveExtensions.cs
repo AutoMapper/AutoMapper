@@ -7,6 +7,9 @@ namespace AutoMapper.Configuration
 {
     internal static class PrimitiveExtensions
     {
+        public static bool IsSetType(this Type type)
+            => type.ImplementsGenericInterface(typeof(ISet<>));
+
         public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
             => PrimitiveHelper.GetOrDefault(dictionary, key);
 
