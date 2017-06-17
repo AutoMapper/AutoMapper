@@ -580,49 +580,71 @@ namespace AutoMapper.Execution
                 return ContextMap(typePair, sourceParameter, contextParameter, destinationParameter);
             }
             var objectMapperExpression = ObjectMapperExpression(configurationProvider, profileMap, typePair, sourceParameter, contextParameter, propertyMap, destinationParameter);
-            return NullCheckSource(profileMap, sourceParameter, destinationParameter, objectMapperExpression);
+            return NullCheckSource(profileMap, sourceParameter, destinationParameter, objectMapperExpression, propertyMap);
         }
 
-        public static Expression NullCheckSource(ProfileMap profileMap, Expression sourceParameter, Expression destinationParameter, Expression objectMapperExpression)
+        public static Expression NullCheckSource(ProfileMap profileMap, Expression sourceParameter, Expression destinationParameter, Expression objectMapperExpression, PropertyMap propertyMap = null)
         {
             var destinationType = destinationParameter.Type;
-            var defaultDestination = DefaultDestination(destinationType, profileMap);
-            var ifSourceNull = destinationType.IsCollectionType() ? Block(ClearDestinationCollection(destinationParameter), defaultDestination) : defaultDestination;
+            Expression defaultDestination;
+            if(propertyMap == null)
+            {
+                defaultDestination = destinationParameter.IfNullElse(DefaultDestination(destinationType, profileMap), destinationParameter);
+            }
+            else
+            {
+                defaultDestination = propertyMap.UseDestinationValue ? destinationParameter : DefaultDestination(destinationType, profileMap);
+            }
+            var ifSourceNull = destinationType.IsCollectionType() ? ClearDestinationCollection() : defaultDestination;
             return sourceParameter.IfNullElse(ifSourceNull, objectMapperExpression);
-        }
-
-        private static Expression ClearDestinationCollection(Expression destinationParameter)
-        {
-            var destinationElementType = ElementTypeHelper.GetElementType(destinationParameter.Type);
-            var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
-            var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-            var collection = ToType(destinationParameter, destinationCollectionType);
-            var clear = Condition(Property(collection, "IsReadOnly"), Empty(), Call(collection, clearMethod));
-            return collection.IfNullElse(Empty(), clear);
+            Expression ClearDestinationCollection()
+            {
+                var destinationElementType = ElementTypeHelper.GetElementType(destinationParameter.Type);
+                var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
+                var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
+                var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
+                var clear = Condition(Property(destinationVariable, "IsReadOnly"), Empty(), Call(destinationVariable, clearMethod));
+                return Block(new[] { destinationVariable },
+                            Assign(destinationVariable, ToType(destinationParameter, destinationCollectionType)),
+                            destinationVariable.IfNullElse(Empty(), clear),
+                            defaultDestination);
+            }
         }
 
         private static Expression DefaultDestination(Type destinationType, ProfileMap profileMap)
         {
             var defaultValue = Default(destinationType);
-            if(!profileMap.AllowNullCollections)
+            if(profileMap.AllowNullCollections)
             {
-                if(destinationType.IsArray)
-                {
-                    var destinationElementType = ElementTypeHelper.GetElementType(destinationType);
-                    return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
-                }
-                if(destinationType.IsDictionaryType())
-                {
-                    return destinationType.IsInterface() ?
-                              DelegateFactory.GenerateNonNullConstructorExpression(typeof(Dictionary<,>).MakeGenericType(destinationType.GetGenericArguments())) : 
-                              defaultValue;
-                }
-                if(destinationType.IsCollectionType() && !destinationType.IsInterface())
-                {
-                    return DelegateFactory.GenerateNonNullConstructorExpression(destinationType);
-                }
+                return defaultValue;
+            }
+            if(destinationType.IsArray)
+            {
+                var destinationElementType = ElementTypeHelper.GetElementType(destinationType);
+                return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
+            }
+            if(destinationType.IsDictionaryType())
+            {
+                return CreateCollection(typeof(Dictionary<,>));
+            }
+            if(destinationType.IsSetType())
+            {
+                return CreateCollection(typeof(HashSet<>));
+            }
+            if(destinationType.IsCollectionType())
+            {
+                return CreateCollection(typeof(List<>));
             }
             return defaultValue;
+            Expression CreateCollection(Type collectionType)
+            {
+                var concreteDestinationType = 
+                    destinationType.IsInterface() ?
+                        collectionType.MakeGenericType(destinationType.GetGenericArguments()) :
+                        destinationType;
+                var constructor = DelegateFactory.GenerateNonNullConstructorExpression(concreteDestinationType);
+                return ToType(constructor, destinationType);
+            }
         }
 
         private static Expression ObjectMapperExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap, Expression destinationParameter)

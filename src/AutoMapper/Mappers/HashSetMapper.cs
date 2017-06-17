@@ -16,6 +16,6 @@ namespace AutoMapper.Mappers
         public Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, PropertyMap propertyMap, Expression sourceExpression, Expression destExpression, Expression contextExpression)
             => MapCollectionExpression(configurationProvider, profileMap, propertyMap, sourceExpression, destExpression, contextExpression, IfNotNull, typeof(HashSet<>), MapItemExpr);
 
-        private static bool IsSetType(Type type) => type.ImplementsGenericInterface(typeof(ISet<>));
+        private static bool IsSetType(Type type) => type.IsSetType();
     }
 }

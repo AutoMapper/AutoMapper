@@ -46,14 +46,16 @@ namespace AutoMapper.UnitTests.Mappers
         public class Map
         {
             [Fact]
-            public void ReturnsNullIfSourceValueIsNull()
+            public void ReturnsTheDestinationWhenPassedOne()
             {
                 var config = new MapperConfiguration(_ => { });
                 IMapper mapper = new Mapper(config);
 
-                var result = mapper.Map((NameValueCollection)null, new NameValueCollection());
+                var destination = new NameValueCollection();
 
-                result.ShouldBeNull();
+                var result = mapper.Map((NameValueCollection)null, destination);
+
+                result.ShouldBeSameAs(destination);
             }
 
             [Fact]
