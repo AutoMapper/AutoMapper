@@ -121,10 +121,9 @@ namespace AutoMapper
 
         public bool ResolveConfigured() => ValueResolverConfig != null || CustomResolver != null || CustomExpression != null || CustomSourceMemberName != null;
 
-        public void SetCustomValueResolverExpression<TSource, TMember>(Expression<Func<TSource, TMember>> sourceMember)
+        public void MapFrom(LambdaExpression sourceMember)
         {
             CustomExpression = sourceMember;
-
             Ignored = false;
         }
 
