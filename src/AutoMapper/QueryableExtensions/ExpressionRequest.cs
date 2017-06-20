@@ -27,7 +27,7 @@ namespace AutoMapper.QueryableExtensions
         {
             SourceType = sourceType;
             DestinationType = destinationType;
-            MembersToExpand = membersToExpand.OrderBy(p => p.Name).ToArray();
+            MembersToExpand = membersToExpand?.OrderBy(p => p.Name).ToArray() ?? new MemberInfo[0];
 
             PreviousRequests = parentRequest == null 
                 ? new HashSet<ExpressionRequest>() 
