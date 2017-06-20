@@ -56,6 +56,8 @@ namespace AutoMapper.QueryableExtensions
         {
             parameters = parameters ?? new Dictionary<string, object>();
 
+            membersToExpand = membersToExpand ?? new MemberInfo[0];
+
             var cachedExpressions = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
 
             return cachedExpressions.Select(e => Prepare(e, parameters)).Cast<LambdaExpression>().ToArray();
