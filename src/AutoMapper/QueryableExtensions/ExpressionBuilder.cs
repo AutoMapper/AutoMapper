@@ -19,7 +19,6 @@ namespace AutoMapper.QueryableExtensions
     public interface IExpressionBuilder
     {
         LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters, MemberInfo[] membersToExpand);
-        Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(ParameterBag parameters, MemberInfo[] membersToExpand);
         LambdaExpression[] CreateMapExpression(ExpressionRequest request, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
         Expression CreateMapExpression(ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount, LetPropertyMaps letPropertyMaps);
     }
@@ -97,11 +96,6 @@ namespace AutoMapper.QueryableExtensions
             }
             return result;
         }
-
-        public Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(
-            ParameterBag parameters, MemberInfo[] membersToExpand) =>
-            (Expression<Func<TSource, TDestination>>) GetMapExpression(typeof(TSource), typeof(TDestination),
-                parameters, membersToExpand)[0];
 
         private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(), new FirstPassLetPropertyMaps(_configurationProvider));
 
@@ -553,10 +547,11 @@ namespace AutoMapper.QueryableExtensions
 
     public static class ExpressionBuilderExtensions
     {
-        public static Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(this IExpressionBuilder expressionBuilder)
+        public static Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(
+            this IExpressionBuilder expressionBuilder)
         {
-            return expressionBuilder.GetMapExpression<TSource, TDestination>(new Dictionary<string, object>(),
-                new MemberInfo[0]);
+            return (Expression<Func<TSource, TDestination>>) expressionBuilder.GetMapExpression(typeof(TSource),
+                typeof(TDestination), new Dictionary<string, object>(), new MemberInfo[0])[0];
         }
     }
 }

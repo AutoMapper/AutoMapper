@@ -22,20 +22,6 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
             typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.ExpressionBuilder.GetMapExpression<UserModel, UserDto>()); //null reference exception here
         }
 
-
-        [Fact]
-        public void Should_fail_Typed()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<UserModel, UserDto>()
-                    .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
-            });
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression<UserModel, UserDto>(null, new MemberInfo[0])); //ArgumentNullException here
-            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression<UserModel, UserDto>(new Dictionary<string, object>(), null)); //ArgumentNullException here
-
-        }
-
         [Fact]
         public void Should_fail_Untyped()
         {
