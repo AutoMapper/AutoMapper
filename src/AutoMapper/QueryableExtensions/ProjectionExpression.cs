@@ -72,6 +72,7 @@ namespace AutoMapper.QueryableExtensions
         {
             var membersToExpand = memberPathsToExpand.SelectMany(m => m).Distinct().ToArray();
 
+            parameters = parameters ?? new Dictionary<string, object>();
             var mapExpressions = _builder.GetMapExpression(_source.ElementType, typeof(TResult), parameters, membersToExpand);
 
             return (IQueryable<TResult>)mapExpressions.Aggregate(_source, (source, lambda)=>Select(source, lambda));
