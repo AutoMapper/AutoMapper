@@ -21,6 +21,18 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         }
 
         [Fact]
+        public void Should_not_fail_Untyped()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<UserModel, UserDto>()
+                    .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
+            });
+
+            typeof(ArgumentNullException).ShouldNotBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), typeof(UserDto), null, null)); //no ArgumentNullException here
+        }
+
+        [Fact]
         public void Should_map_from_String()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<UserModel, UserDto>()
