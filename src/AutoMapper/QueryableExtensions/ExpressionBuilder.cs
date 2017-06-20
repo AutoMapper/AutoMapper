@@ -52,11 +52,25 @@ namespace AutoMapper.QueryableExtensions
             _expressionCache = new LockingConcurrentDictionary<ExpressionRequest, LambdaExpression[]>(CreateMapExpression);
         }
 
-        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters, MemberInfo[] membersToExpand)
+        public LambdaExpression[] GetMapExpression(Type sourceType, Type destinationType, ParameterBag parameters,
+            MemberInfo[] membersToExpand)
         {
-            parameters = parameters ?? new Dictionary<string, object>();
-
-            membersToExpand = membersToExpand ?? new MemberInfo[0];
+            if (sourceType == null)
+            {
+                throw new ArgumentNullException(nameof(sourceType));
+            }
+            if (destinationType == null)
+            {
+                throw new ArgumentNullException(nameof(destinationType));
+            }
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+            if (membersToExpand == null)
+            {
+                throw new ArgumentNullException(nameof(membersToExpand));
+            }
 
             var cachedExpressions = _expressionCache.GetOrAdd(new ExpressionRequest(sourceType, destinationType, membersToExpand, null));
 
@@ -86,8 +100,11 @@ namespace AutoMapper.QueryableExtensions
 
         public Expression<Func<TSource, TDestination>> GetMapExpression<TSource, TDestination>(
             ParameterBag parameters = null,
-            params MemberInfo[] membersToExpand) => 
-            (Expression<Func<TSource, TDestination>>)GetMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand)[0];
+            params MemberInfo[] membersToExpand)
+        {
+            parameters = parameters ?? new Dictionary<string, object>();
+            return (Expression<Func<TSource, TDestination>>) GetMapExpression(typeof(TSource), typeof(TDestination), parameters, membersToExpand)[0];
+        }
 
         private LambdaExpression[] CreateMapExpression(ExpressionRequest request) => CreateMapExpression(request, new Dictionary<ExpressionRequest, int>(), new FirstPassLetPropertyMaps(_configurationProvider));
 

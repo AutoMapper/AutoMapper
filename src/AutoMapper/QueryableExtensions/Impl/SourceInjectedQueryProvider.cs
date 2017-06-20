@@ -36,7 +36,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             _destQuery = destQuery;
             _beforeVisitors = beforeVisitors;
             _afterVisitors = afterVisitors;
-            _parameters = parameters;
+            _parameters = parameters ?? new Dictionary<string, object>();
             _membersToExpand = membersToExpand ?? Enumerable.Empty<IEnumerable<MemberInfo>>();
             _exceptionHandler = exceptionHandler ?? (x => { });
         }
