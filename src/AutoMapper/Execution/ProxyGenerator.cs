@@ -133,7 +133,7 @@ namespace AutoMapper.Execution
                 {
                     fieldBuilders.Add(property.Name,
                         propertyEmitter =
-                            new PropertyEmitter(typeBuilder, property.Name, property.Type, propertyChangedField));
+                            new PropertyEmitter(typeBuilder, property, propertyChangedField));
                 }
             }
             return typeBuilder.CreateType();
