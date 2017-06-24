@@ -1,5 +1,7 @@
 <!-- For feature requests, just clear out the below -->
 
+Try to provide [a minimal, complete, and verifiable example](https://stackoverflow.com/help/mcve), preferably a [gist](https://gist.github.com/lbargaoanu/9c7233441c3a3413cc2b9b9ebb5964a9) that we can execute and see fail.
+
 ### Source/destination types
 
 ```csharp
