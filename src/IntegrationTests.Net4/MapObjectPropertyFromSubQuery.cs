@@ -67,6 +67,7 @@ namespace AutoMapper.IntegrationTests
             public string Name { get; set; }
             public bool ECommercePublished { get; set; }
             public virtual ICollection<Article> Articles { get; set; }
+            public int Value { get; }
         }
 
         public class PriceModel

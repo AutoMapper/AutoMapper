@@ -16,9 +16,12 @@ namespace AutoMapper.Execution
         private readonly PropertyBuilder _propertyBuilder;
         private readonly MethodBuilder _setterBuilder;
 
-        public PropertyEmitter(TypeBuilder owner, string name, Type propertyType, FieldBuilder propertyChangedField)
+        public PropertyEmitter(TypeBuilder owner, PropertyDescription property, FieldBuilder propertyChangedField)
         {
+            var name = property.Name;
+            var propertyType = property.Type;
             _fieldBuilder = owner.DefineField($"<{name}>", propertyType, FieldAttributes.Private);
+            _propertyBuilder = owner.DefineProperty(name, PropertyAttributes.None, propertyType, null);
             _getterBuilder = owner.DefineMethod($"get_{name}",
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig |
                 MethodAttributes.SpecialName, propertyType, new Type[0]);
@@ -26,6 +29,11 @@ namespace AutoMapper.Execution
             getterIl.Emit(OpCodes.Ldarg_0);
             getterIl.Emit(OpCodes.Ldfld, _fieldBuilder);
             getterIl.Emit(OpCodes.Ret);
+            _propertyBuilder.SetGetMethod(_getterBuilder);
+            if(!property.CanWrite)
+            {
+                return;
+            }
             _setterBuilder = owner.DefineMethod($"set_{name}",
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig |
                 MethodAttributes.SpecialName, typeof (void), new[] {propertyType});
@@ -42,8 +50,6 @@ namespace AutoMapper.Execution
                 setterIl.Emit(OpCodes.Call, ProxyBaseNotifyPropertyChanged);
             }
             setterIl.Emit(OpCodes.Ret);
-            _propertyBuilder = owner.DefineProperty(name, PropertyAttributes.None, propertyType, null);
-            _propertyBuilder.SetGetMethod(_getterBuilder);
             _propertyBuilder.SetSetMethod(_setterBuilder);
         }
 
