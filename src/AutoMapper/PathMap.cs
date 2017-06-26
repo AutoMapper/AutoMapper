@@ -21,5 +21,6 @@ namespace AutoMapper
         public LambdaExpression SourceExpression { get; set; }
         public MemberPath MemberPath { get; }
         public MemberInfo DestinationMember => MemberPath.Last;
+        public bool Ignored { get; set; }
     }
 }

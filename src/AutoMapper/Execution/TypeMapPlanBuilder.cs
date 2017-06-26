@@ -188,12 +188,8 @@ namespace AutoMapper.Execution
         private Expression CreateAssignmentFunc(Expression destinationFunc, bool constructorMapping)
         {
             var actions = new List<Expression>();
-            foreach(var propertyMap in _typeMap.GetPropertyMaps())
+            foreach(var propertyMap in _typeMap.GetPropertyMaps().Where(pm => pm.CanResolveValue()))
             {
-                if(!propertyMap.CanResolveValue())
-                {
-                    continue;
-                }
                 var property = TryPropertyMap(propertyMap);
                 if(constructorMapping && _typeMap.ConstructorParameterMatches(propertyMap.DestinationProperty.Name))
                 {
@@ -201,7 +197,7 @@ namespace AutoMapper.Execution
                 }
                 actions.Add(property);
             }
-            foreach(var pathMap in _typeMap.PathMaps)
+            foreach(var pathMap in _typeMap.PathMaps.Where(pm => !pm.Ignored))
             {
                 actions.Add(HandlePath(pathMap));
             }

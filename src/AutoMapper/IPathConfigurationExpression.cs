@@ -18,5 +18,10 @@ namespace AutoMapper
         /// <typeparam name="TSourceMember">Member type of the source member to use</typeparam>
         /// <param name="sourceMember">Expression referencing the source member to map against</param>
         void MapFrom<TSourceMember>(Expression<Func<TSource, TSourceMember>> sourceMember);
+
+        /// <summary>
+        /// Ignore this member for configuration validation and skip during mapping
+        /// </summary>
+        void Ignore();
     }
 }

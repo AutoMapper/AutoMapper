@@ -131,6 +131,55 @@ namespace AutoMapper.UnitTests
         }
     }
 
+    public class ForPathWithIgnoreShouldNotSetValue : AutoMapperSpecBase
+    {
+        public partial class TimesheetModel
+        {
+            public int ID { get; set; }
+            public DateTime? StartDate { get; set; }
+            public int? Contact { get; set; }
+            public ContactModel ContactNavigation { get; set; }
+        }
+
+        public class TimesheetViewModel
+        {
+            public int? Contact { get; set; }
+            public DateTime? StartDate { get; set; }
+        }
+
+        public class ContactModel
+        {
+            public int Id { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<TimesheetModel, TimesheetViewModel>()
+                .ForMember(d => d.Contact, o => o.MapFrom(s => s.ContactNavigation.Id))
+                .ReverseMap()
+                .ForPath(s => s.ContactNavigation.Id, opt => opt.Ignore());
+        });
+
+        [Fact]
+        public void Should_not_set_value()
+        {
+            var source = new TimesheetModel
+            {
+                Contact = 6,
+                ContactNavigation = new ContactModel
+                {
+                    Id = 5
+                }
+            };
+            var dest = new TimesheetViewModel
+            {
+                Contact = 10
+            };
+            Mapper.Map(dest, source);
+
+            source.ContactNavigation.Id.ShouldEqual(5);
+        }
+    }
 
     public class ForPathWithPrivateSetters : AutoMapperSpecBase
     {
