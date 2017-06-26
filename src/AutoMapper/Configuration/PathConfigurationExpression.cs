@@ -28,6 +28,11 @@ namespace AutoMapper.Configuration
             MapFromUntyped(sourceExpression);
         }
 
+        public void Ignore()
+        {
+            PathMapActions.Add(pm => pm.Ignored = true);
+        }
+
         public void MapFromUntyped(LambdaExpression sourceExpression)
         {
             _sourceExpression = sourceExpression;
@@ -39,14 +44,6 @@ namespace AutoMapper.Configuration
 
         public void Configure(TypeMap typeMap)
         {
-            //var destMember = DestinationMember;
-
-            //if(destMember.DeclaringType.IsGenericType())
-            //{
-            //    var destTypeInfo = typeMap.Profile.CreateTypeDetails(destMember.DeclaringType);
-            //    destMember = destTypeInfo.PublicReadAccessors.Single(m => m.Name == destMember.Name);
-            //}
-
             var pathMap = typeMap.FindOrCreatePathMapFor(_destinationExpression, MemberPath, typeMap);
 
             Apply(pathMap);

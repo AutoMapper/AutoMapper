@@ -201,7 +201,7 @@ namespace AutoMapper.Execution
                 }
                 actions.Add(property);
             }
-            foreach(var pathMap in _typeMap.PathMaps)
+            foreach(var pathMap in _typeMap.PathMaps.Where(pm => !pm.Ignored))
             {
                 actions.Add(HandlePath(pathMap));
             }

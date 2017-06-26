@@ -6,7 +6,7 @@ namespace AutoMapper
 {
     using Internal;
 
-    [DebuggerDisplay("{DestinationExpression}")]
+    [DebuggerDisplay("{" + nameof(DestinationExpression) + "}")]
     public class PathMap
     {
         public PathMap(LambdaExpression destinationExpression, MemberPath memberPath, TypeMap typeMap)
@@ -21,5 +21,6 @@ namespace AutoMapper
         public LambdaExpression SourceExpression { get; set; }
         public MemberPath MemberPath { get; }
         public MemberInfo DestinationMember => MemberPath.Last;
+        public bool Ignored { get; set; }
     }
 }
