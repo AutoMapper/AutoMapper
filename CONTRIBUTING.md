@@ -1,7 +1,7 @@
 # How to contribute
 
 The easiest ways to contribute is to open an issue and start a discussion. 
-Then we can decided if and how a feature or a change could be implemented and if you should submit a pull requests with code changes.
+Then we can decide if and how a feature or a change could be implemented and if you should submit a pull requests with code changes.
 
 Also read this first: [Being a good open source citizen](https://hackernoon.com/being-a-good-open-source-citizen-9060d0ab9732#.x3hocgw85)
 
