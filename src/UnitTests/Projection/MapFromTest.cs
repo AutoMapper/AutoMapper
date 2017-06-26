@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Should;
 using Xunit;
 using AutoMapper.QueryableExtensions;
@@ -18,6 +20,21 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
             });
 
             typeof(NullReferenceException).ShouldNotBeThrownBy(() => config.ExpressionBuilder.GetMapExpression<UserModel, UserDto>()); //null reference exception here
+        }
+
+        [Fact]
+        public void Should_fail_Untyped()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<UserModel, UserDto>()
+                    .ForMember(dto => dto.FullName, opt => opt.MapFrom(src => src.LastName + " " + src.FirstName));
+            });
+
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(null, typeof(UserDto), new Dictionary<string, object>(), new MemberInfo[0])); //ArgumentNullException here
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), null, new Dictionary<string, object>(), new MemberInfo[0])); //ArgumentNullException here
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), typeof(UserDto), null, new MemberInfo[0])); //ArgumentNullException here
+            typeof(ArgumentNullException).ShouldBeThrownBy(() => config.ExpressionBuilder.GetMapExpression(typeof(UserModel), typeof(UserDto), new Dictionary<string, object>(), null)); //ArgumentNullException here
         }
 
         [Fact]
