@@ -2,11 +2,8 @@
 using Should.Core.Assertions;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -385,6 +382,21 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
+        public void Map_accountModel_to_account_with_null_checks_against_string_type()
+        {
+            //Arrange
+            Expression<Func<AccountModel, bool>> exp = f => f.Description == null;
+
+
+            //Act
+            Expression<Func<Account, bool>> expMapped = mapper.MapExpression<Expression<Func<Account, bool>>>(exp);
+            List<Account> accounts = Users.Select(u => u.Account).Where(expMapped).ToList();
+
+            //Assert
+            Assert.True(accounts.Count == 0);
+        }
+
+        [Fact]
         public void When_use_lambda_statement_with_typemapped_property_being_other_than_first()
         {
             //Arrange
@@ -465,7 +477,7 @@ namespace AutoMapper.UnitTests
                             new Thing { Bar = "Bar4", Car = new Car { Color = "White", Year = 2015 } }
                         },
                         Type = "Business",
-                        Users = new User[] 
+                        Users = new User[]
                         {
                             new User
                             {
