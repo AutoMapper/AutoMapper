@@ -382,10 +382,25 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
-        public void Map_accountModel_to_account_with_null_checks_against_string_type()
+        public void Map_accountModel_to_account_with_right_null_checks_against_string_type()
         {
             //Arrange
             Expression<Func<AccountModel, bool>> exp = f => f.Description == null;
+
+
+            //Act
+            Expression<Func<Account, bool>> expMapped = mapper.MapExpression<Expression<Func<Account, bool>>>(exp);
+            List<Account> accounts = Users.Select(u => u.Account).Where(expMapped).ToList();
+
+            //Assert
+            Assert.True(accounts.Count == 0);
+        }
+
+        [Fact]
+        public void Map_accountModel_to_account_with_left_null_checks_against_string_type()
+        {
+            //Arrange
+            Expression<Func<AccountModel, bool>> exp = f => null == f.Description;
 
 
             //Act
