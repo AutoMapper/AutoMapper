@@ -83,8 +83,8 @@ namespace AutoMapper.UnitTests
             });
             configuration.ShouldThrowException<AutoMapperConfigurationException>(exception =>
             {
-                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.");
-                exception.Message.ShouldContain(typeof(Dest).FullName);
+                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.", Case.Sensitive);
+                exception.Message.ShouldContain(typeof(Dest).FullName, Case.Sensitive);
             });
         }
 
@@ -100,8 +100,8 @@ namespace AutoMapper.UnitTests
 
             configuration.ShouldThrowException<AutoMapperConfigurationException>(exception =>
             {
-                exception.Message.ShouldContain("does not have a constructor.");
-                exception.Message.ShouldContain(typeof(Dest).FullName);
+                exception.Message.ShouldContain("does not have a constructor.", Case.Sensitive);
+                exception.Message.ShouldContain(typeof(Dest).FullName, Case.Sensitive);
             });
         }
 
@@ -116,8 +116,8 @@ namespace AutoMapper.UnitTests
 
             configuration.ShouldThrowException<AutoMapperConfigurationException>(exception =>
             {
-                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.");
-                exception.Message.ShouldContain(typeof(Dest).FullName);
+                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.", Case.Sensitive);
+                exception.Message.ShouldContain(typeof(Dest).FullName, Case.Sensitive);
             });
         }
     }
