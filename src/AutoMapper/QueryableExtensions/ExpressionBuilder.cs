@@ -104,7 +104,7 @@ namespace AutoMapper.QueryableExtensions
             // this is the input parameter of this expression with name <variableName>
             var instanceParameter = Parameter(request.SourceType, "dto");
             var expressions = new QueryExpressions(CreateMapExpressionCore(request, instanceParameter, typePairCount, letPropertyMaps, out var typeMap));
-#if NET45
+#if NET45 || NET40
             if(letPropertyMaps.Count > 0)
             {
                 expressions = letPropertyMaps.GetSubQueryExpression(this, expressions.First, typeMap, request, instanceParameter, typePairCount);
@@ -436,7 +436,7 @@ namespace AutoMapper.QueryableExtensions
 
             public override LetPropertyMaps New() => new FirstPassLetPropertyMaps(_configurationProvider);
 
-#if NET45
+#if NET45 || NET40
             public override QueryExpressions GetSubQueryExpression(ExpressionBuilder builder, Expression projection, TypeMap typeMap, ExpressionRequest request, Expression instanceParameter, TypePairCount typePairCount)
             {
                 var letMapInfos = _savedPaths.Select(path => new

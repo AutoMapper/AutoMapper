@@ -308,7 +308,7 @@ namespace AutoMapper.Execution
                 constructorMapping = true;
                 return _typeMap.ConstructorMap.BuildExpression(this);
             }
-#if NET45
+#if NET45 || NET40
             if (_typeMap.DestinationTypeToUse.IsInterface())
             {
                 var ctor = Call(null,

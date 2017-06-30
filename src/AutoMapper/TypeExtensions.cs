@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace AutoMapper
 {
-#if NET45
+#if NET45 || NET40
     using System.Reflection.Emit;
 #endif
 
@@ -21,10 +21,14 @@ namespace AutoMapper
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors;
 
-#if NET45
+#if NET45 || NET40
         public static Type CreateType(this TypeBuilder type)
         {
+#if NET40
+            return type.CreateType();
+#else
             return type.CreateTypeInfo().AsType();
+#endif
         }
 #endif
 
