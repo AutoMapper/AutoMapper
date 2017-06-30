@@ -97,9 +97,11 @@ namespace AutoMapper.XpressionMapper
             {
                 if (constantExpression.Value == null)
                 {
-                    return base.VisitBinary(node.Left.Type.GetTypeInfo().IsValueType
-                        ? node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type))
-                        : node.Update(node.Left, node.Conversion, Expression.Constant(null, typeof(object))));
+                    node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type));
+                    //return base.VisitBinary(node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type)));
+                    //return base.VisitBinary(node.Left.Type.GetTypeInfo().IsValueType
+                        //? node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type))
+                        //: node.Update(node.Left, node.Conversion, Expression.Constant(null, typeof(object))));
                 }
             }
 
@@ -108,9 +110,11 @@ namespace AutoMapper.XpressionMapper
             {
                 if (constantExpression.Value == null)
                 {
-                    return base.VisitBinary(node.Right.Type.GetTypeInfo().IsValueType 
-                        ? node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right) 
-                        : node.Update(Expression.Constant(null, typeof(object)), node.Conversion, node.Right));
+                    node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right);
+                    //return base.VisitBinary(node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right));
+                    //return base.VisitBinary(node.Right.Type.GetTypeInfo().IsValueType 
+                    //? node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right) 
+                    //: node.Update(Expression.Constant(null, typeof(object)), node.Conversion, node.Right));
                 }
             }
 
