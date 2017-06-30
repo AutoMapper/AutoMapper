@@ -65,9 +65,6 @@
     <Compile Include="..\UnitTests\AutoMapperSpecBase.cs">
       <Link>Infrastructure\AutoMapperSpecBase.cs</Link>
     </Compile>
-    <Compile Include="..\UnitTests\XUnitConventions.cs">
-      <Link>Infrastructure\XUnitConventions.cs</Link>
-    </Compile>
     <Compile Include="CustomMapFrom\MapObjectPropertyFromSubQuery.cs" />
     <Compile Include="BuiltInTypes\NullableToNonNullable.cs" />
     <Compile Include="ExplicitExpansion\ProjectionWithExplicitExpansion.cs" />

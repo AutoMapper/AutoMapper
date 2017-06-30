@@ -83,8 +83,8 @@ namespace AutoMapper.UnitTests
             });
             configuration.ShouldThrow<AutoMapperConfigurationException>(exception =>
             {
-                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.", StringComparison.InvariantCulture);
-                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.InvariantCulture);
+                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.", StringComparison.Ordinal);
+                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.Ordinal);
             });
         }
 
@@ -100,8 +100,8 @@ namespace AutoMapper.UnitTests
 
             configuration.ShouldThrow<AutoMapperConfigurationException>(exception =>
             {
-                exception.Message.ShouldContain("does not have a constructor.", StringComparison.InvariantCulture);
-                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.InvariantCulture);
+                exception.Message.ShouldContain("does not have a constructor.", StringComparison.Ordinal);
+                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.Ordinal);
             });
         }
 
@@ -116,8 +116,8 @@ namespace AutoMapper.UnitTests
 
             configuration.ShouldThrow<AutoMapperConfigurationException>(exception =>
             {
-                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.", StringComparison.InvariantCulture);
-                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.InvariantCulture);
+                exception.Message.ShouldContain("does not have a constructor with a parameter named 'think'.", StringComparison.Ordinal);
+                exception.Message.ShouldContain(typeof(Dest).FullName, StringComparison.Ordinal);
             });
         }
     }

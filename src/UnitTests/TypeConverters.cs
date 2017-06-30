@@ -206,7 +206,7 @@ namespace AutoMapper.UnitTests.CustomMapping
         {
             public Type Convert(string source, Type destination, ResolutionContext context)
             {
-                Type type = Assembly.GetExecutingAssembly().GetType(source);
+                Type type = typeof(TypeTypeConverter).Assembly().GetType(source);
                 return type;
             }
         }

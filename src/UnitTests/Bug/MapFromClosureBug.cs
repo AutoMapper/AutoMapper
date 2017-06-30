@@ -1,17 +1,15 @@
-﻿namespace AutoMapper.UnitTests.Bug
+﻿using FakeItEasy;
+
+namespace AutoMapper.UnitTests.Bug
 {
     using System;
-    using Rhino.Mocks;
     using Should;
 
     public class MapFromClosureBug : SpecBaseBase
     {
         private static readonly IDateProvider _dateProvider;
 
-        static MapFromClosureBug()
-        {
-            _dateProvider = MockRepository.GenerateMock<IDateProvider>();
-        }
+        static MapFromClosureBug() => _dateProvider = A.Fake<IDateProvider>();
 
         public interface IDateProvider
         {

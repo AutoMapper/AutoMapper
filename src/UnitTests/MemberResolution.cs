@@ -564,7 +564,10 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_not_report_it_as_unmapped()
             {
-                Array.ForEach(_allTypeMaps, t => t.GetUnmappedPropertyNames().ShouldBeOfLength(0));
+                foreach (var typeMap in _allTypeMaps)
+                {
+                    typeMap.GetUnmappedPropertyNames().ShouldBeOfLength(0);
+                }
             }
 
             [Fact]

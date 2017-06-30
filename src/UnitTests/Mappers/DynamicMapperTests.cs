@@ -2,7 +2,6 @@
 using System.Dynamic;
 using System.Linq;
 using Should;
-using Should.Core.Assertions;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Mappers.Dynamic

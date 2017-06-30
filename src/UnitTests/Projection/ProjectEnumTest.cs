@@ -3,7 +3,6 @@
     using QueryableExtensions;
     using Should;
     using System.Linq;
-    using Should.Core.Assertions;
     using Xunit;
 
     public class ProjectEnumTest

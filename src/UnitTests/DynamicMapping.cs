@@ -272,6 +272,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         }
     }
 
+#if NET452
     public class When_mapping_from_an_anonymous_type_to_an_interface : NonValidatingSpecBase
     {
         private IDestination _result;
@@ -294,4 +295,5 @@ namespace AutoMapper.UnitTests.DynamicMapping
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
     }
+#endif
 }

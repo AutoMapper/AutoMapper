@@ -283,7 +283,7 @@ namespace AutoMapper.UnitTests
                 [Fact]
                 public void Should_not_throw_exception()
                 {
-                    typeof(StackOverflowException).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>(Configuration));
+                    typeof(Exception).ShouldNotBeThrownBy(() => _bei.ProjectTo<B>(Configuration));
                 }
             }
         }

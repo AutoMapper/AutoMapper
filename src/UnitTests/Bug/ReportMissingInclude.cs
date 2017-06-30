@@ -12,7 +12,7 @@ namespace AutoMapper.UnitTests.Bug
             new Action(()=>new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<object, BaseType>().Include<object, ChildType>();
-            })).ShouldThrow<InvalidOperationException>(ex=>ex.Message.ShouldStartWith("Missing map from Object to ChildType."));
+            })).ShouldThrow<InvalidOperationException>(ex=>ex.Message.ShouldStartWith("Missing map from"));
         }
 
         public class BaseType { }

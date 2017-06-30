@@ -5,7 +5,6 @@ namespace AutoMapper.UnitTests
     using System.Linq;
     using System.Linq.Expressions;
     using Should;
-    using Should.Core.Assertions;
     using Xunit;
 
     public class ExpressionConversion

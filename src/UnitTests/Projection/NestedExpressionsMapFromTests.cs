@@ -5,7 +5,6 @@
         using System.Collections.Generic;
         using System.Linq;
         using QueryableExtensions;
-        using Rhino.Mocks.Constraints;
         using Should;
         using Xunit;
 

@@ -147,7 +147,7 @@ namespace AutoMapper.UnitTests.Mappers
             public override bool IsMatch(TypePair types)
             {
                 var underlyingType = Nullable.GetUnderlyingType(types.SourceType);
-                return underlyingType.IsEnum && types.DestinationType == typeof(string);
+                return underlyingType.IsEnum() && types.DestinationType == typeof(string);
             }
 
             public override string Map(object source, string destination, ResolutionContext context)
