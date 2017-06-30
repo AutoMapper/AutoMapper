@@ -12,12 +12,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.3.0-beta1-build3642" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="xunit" Version="2.3.0-beta3-build3705" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.0-beta1-build3642" />
-    <PackageReference Include="Shouldly" Version="2.8.2" />
+    <PackageReference Include="Shouldly" Version="2.8.3" />
     <PackageReference Include="FakeItEasy" Version="3.4.2" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="EntityFramework" Version="6.1.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-beta3-build3705" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
@@ -28,6 +30,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AutoMapper\AutoMapper.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
 </Project>
