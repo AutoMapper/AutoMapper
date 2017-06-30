@@ -1,4 +1,4 @@
-#if NET45
+#if NET45 || NET40
 namespace AutoMapper.Execution
 {
     using System;
@@ -38,7 +38,11 @@ namespace AutoMapper.Execution
             name.SetPublicKey(privateKey);
             name.SetPublicKeyToken(privateKeyToken);
 
+#if NET45
             AssemblyBuilder builder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+#else
+            AssemblyBuilder builder = AppDomain.CurrentDomain.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+#endif
 
             return builder.DefineDynamicModule("AutoMapper.Proxies.emit");
         }
@@ -94,9 +98,9 @@ namespace AutoMapper.Execution
                 removeIl.Emit(OpCodes.Stfld, propertyChangedField);
                 removeIl.Emit(OpCodes.Ret);
                 typeBuilder.DefineMethodOverride(addPropertyChangedMethod,
-                    iNotifyPropertyChanged_PropertyChanged.AddMethod);
+                    iNotifyPropertyChanged_PropertyChanged.GetAddMethod());
                 typeBuilder.DefineMethodOverride(removePropertyChangedMethod,
-                    iNotifyPropertyChanged_PropertyChanged.RemoveMethod);
+                    iNotifyPropertyChanged_PropertyChanged.GetRemoveMethod());
             }
             var propertiesToImplement = new List<PropertyDescription>();
             // first we collect all properties, those with setters before getters in order to enable less specific redundant getters
