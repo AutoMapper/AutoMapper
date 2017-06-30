@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Should;
+using Shouldly;
 using Xunit;
 using AutoMapper.QueryableExtensions;
 
@@ -48,7 +48,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
             var u = new UserDto();
             config.CreateMapper().Map(um, u);
 
-            u.FullName.ShouldEqual(um.FirstName);
+            u.FullName.ShouldBe(um.FirstName);
         }
 
         public class UserModel
@@ -87,7 +87,7 @@ namespace AutoMapper.UnitTests.Projection.MapFromTest
         [Fact]
         public void Map_from_should_prevail()
         {
-            _destination.ShortDescription.ShouldEqual("mappedFrom");
+            _destination.ShortDescription.ShouldBe("mappedFrom");
         }
     }
 }

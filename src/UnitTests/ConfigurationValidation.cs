@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper.Mappers;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.ConfigurationValidation
@@ -43,27 +43,27 @@ namespace AutoMapper.UnitTests.ConfigurationValidation
             if(context.TypeMap != null)
             {
                 _calledForRoot = true;
-                context.TypeMap.Types.ShouldEqual(context.Types);
-                context.Types.SourceType.ShouldEqual(typeof(Source));
-                context.Types.DestinationType.ShouldEqual(typeof(Dest));
+                context.TypeMap.Types.ShouldBe(context.Types);
+                context.Types.SourceType.ShouldBe(typeof(Source));
+                context.Types.DestinationType.ShouldBe(typeof(Dest));
                 context.ObjectMapper.ShouldBeNull();
                 context.PropertyMap.ShouldBeNull();
             }
             else
             {
-                context.PropertyMap.SourceMember.Name.ShouldEqual("Values");
-                context.PropertyMap.DestinationProperty.Name.ShouldEqual("Values");
+                context.PropertyMap.SourceMember.Name.ShouldBe("Values");
+                context.PropertyMap.DestinationProperty.Name.ShouldBe("Values");
                 if(context.Types.Equals(new TypePair(typeof(int), typeof(int))))
                 {
                     _calledForInt = true;
-                    context.ObjectMapper.ShouldBeType<AssignableMapper>();
+                    context.ObjectMapper.ShouldBeOfType<AssignableMapper>();
                 }
                 else
                 {
                     _calledForValues = true;
-                    context.ObjectMapper.ShouldBeType<ArrayMapper>();
-                    context.Types.SourceType.ShouldEqual(typeof(int[]));
-                    context.Types.DestinationType.ShouldEqual(typeof(int[]));
+                    context.ObjectMapper.ShouldBeOfType<ArrayMapper>();
+                    context.Types.SourceType.ShouldBe(typeof(int[]));
+                    context.Types.DestinationType.ShouldBe(typeof(int[]));
                 }
             }
         }

@@ -1,6 +1,6 @@
 using System;
 using Xunit;
-using Should;
+using Shouldly;
 using System.Reflection;
 
 namespace AutoMapper.UnitTests
@@ -45,13 +45,13 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_use_extension_method()
             {
-                _destination.Value2.ShouldEqual("hello from extension");
+                _destination.Value2.ShouldBe("hello from extension");
             }
 
             [Fact]
             public void Should_still_map_value_type()
             {
-                _destination.Value1.ShouldEqual(3);
+                _destination.Value1.ShouldBe(3);
             }
         }
 
@@ -97,13 +97,13 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_flatten_using_extension_method()
             {
-                _destination.InsideThingProperty.ShouldEqual(17);
+                _destination.InsideThingProperty.ShouldBe(17);
             }
 
             [Fact]
             public void Should_still_map_value_type()
             {
-                _destination.Value1.ShouldEqual(7);
+                _destination.Value1.ShouldBe(7);
             }
         }
 
@@ -134,7 +134,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_resolve_LINQ_method_automatically()
             {
-                _destination.ValuesCount.ShouldEqual(10);
+                _destination.ValuesCount.ShouldBe(10);
             }
         }
     }

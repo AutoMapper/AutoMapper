@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using AutoMapper;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -184,13 +184,13 @@ namespace AutoMapper.UnitTests.Bug
 
                 EntityDTO targetEntity = config.CreateMapper().Map<Entity, EntityDTO>(entity);
 
-                targetEntity.Components.Count.ShouldEqual(2);
+                targetEntity.Components.Count.ShouldBe(2);
 
-                targetEntity.Components.Last().Value.Name.ShouldEqual("PhysicalLocation");
+                targetEntity.Components.Last().Value.Name.ShouldBe("PhysicalLocation");
 
-                targetEntity.Components.First().Value.ShouldBeType<HealthDTO>();
+                targetEntity.Components.First().Value.ShouldBeOfType<HealthDTO>();
 
-                targetEntity.Components.Last().Value.ShouldBeType<PhysicalLocationDTO>();
+                targetEntity.Components.Last().Value.ShouldBeOfType<PhysicalLocationDTO>();
             }
         }
     }

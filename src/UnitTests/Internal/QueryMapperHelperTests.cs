@@ -1,6 +1,6 @@
 ﻿using System;
 using Xunit;
-using Should;
+using Shouldly;
 using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper.UnitTests

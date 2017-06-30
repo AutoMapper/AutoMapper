@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
@@ -70,12 +70,12 @@ namespace AutoMapper.IntegrationTests.Net4
             using(var context = new TestContext())
             {
                 var results = context.MyTable.ProjectTo<MyTableModel>(Configuration).ToList();
-                results[0].Id.ShouldEqual(1);
-                results[0].EnumValue.ShouldEqual(MyEnum.Value2);
-                results[0].EnumValueNullable.ShouldEqual(MyEnum.Value1);
-                results[1].Id.ShouldEqual(2);
-                results[1].EnumValue.ShouldEqual(MyEnum.Value1);
-                results[1].EnumValueNullable.ShouldEqual(MyEnum.Value1);
+                results[0].Id.ShouldBe(1);
+                results[0].EnumValue.ShouldBe(MyEnum.Value2);
+                results[0].EnumValueNullable.ShouldBe(MyEnum.Value1);
+                results[1].Id.ShouldBe(2);
+                results[1].EnumValue.ShouldBe(MyEnum.Value1);
+                results[1].EnumValueNullable.ShouldBe(MyEnum.Value1);
             }
         }
     }

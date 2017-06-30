@@ -2,7 +2,7 @@
 using System.Data.Entity;
 using System.Linq;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
@@ -82,8 +82,8 @@ namespace AutoMapper.IntegrationTests.Net4
                 {
                     var baseEntitiy = context.Bases.FirstOrDefault();
                     baseEntitiy.ShouldNotBeNull();
-                    baseEntitiy.BaseID.ShouldEqual(1);
-                    baseEntitiy.Sub.Sub1.ShouldEqual("sub1");
+                    baseEntitiy.BaseID.ShouldBe(1);
+                    baseEntitiy.Sub.Sub1.ShouldBe("sub1");
                 }
 
                 using (var context = new TestContext())
@@ -98,14 +98,14 @@ namespace AutoMapper.IntegrationTests.Net4
                         }
                     }).FirstOrDefault();
                     baseDTO.ShouldNotBeNull();
-                    baseDTO.BaseID.ShouldEqual(1);
-                    baseDTO.Sub.Sub1.ShouldEqual("sub1");
+                    baseDTO.BaseID.ShouldBe(1);
+                    baseDTO.Sub.Sub1.ShouldBe("sub1");
 
 
                     baseDTO = context.Bases.ProjectTo<BaseDTO>(Configuration).FirstOrDefault();
                     baseDTO.ShouldNotBeNull();
-                    baseDTO.BaseID.ShouldEqual(1);
-                    baseDTO.Sub.Sub1.ShouldEqual("sub1");
+                    baseDTO.BaseID.ShouldBe(1);
+                    baseDTO.Sub.Sub1.ShouldBe("sub1");
                 }
             }
         }

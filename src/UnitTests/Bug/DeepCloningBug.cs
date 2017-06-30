@@ -1,7 +1,7 @@
 ﻿namespace AutoMapper.UnitTests.Bug
 {
     using System;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class DeepCloningBug : AutoMapperSpecBase

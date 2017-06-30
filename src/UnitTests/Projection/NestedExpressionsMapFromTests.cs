@@ -5,7 +5,7 @@
         using System.Collections.Generic;
         using System.Linq;
         using QueryableExtensions;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class NestedExpressionMapFromTests
@@ -36,7 +36,7 @@
 
                 var projected = items.AsQueryable().ProjectTo<ParentDto>(_config).ToList();
 
-                projected[0].TotalSum.ShouldEqual(9);
+                projected[0].TotalSum.ShouldBe(9);
             }
         }
 

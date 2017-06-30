@@ -1,5 +1,5 @@
 using System;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -100,7 +100,7 @@ namespace AutoMapper.UnitTests.Bug
             public void Should_Map_UsingDerivedInterface()
             {
                 var element = (IMapToElementWritableDerived)_destination.Element;
-                element.Prop2.ShouldEqual("PROP2");
+                element.Prop2.ShouldBe("PROP2");
             }
         }
 
@@ -215,7 +215,7 @@ namespace AutoMapper.UnitTests.Bug
             [Fact]
             public void Should_Map_UsingDerivedInterface()
             {
-                _destination.prop4.ShouldEqual("PROP4");
+                _destination.prop4.ShouldBe("PROP4");
             }
         }
     }

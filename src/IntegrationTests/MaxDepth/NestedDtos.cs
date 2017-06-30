@@ -2,7 +2,7 @@
 using System.Data.Entity;
 using System.Linq;
 using Xunit;
-using Should;
+using Shouldly;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.UnitTests;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -88,8 +88,8 @@ namespace AutoMapper.IntegrationTests.Net4
         [Fact]
         public void Should_project_nested_dto()
         {
-            _destination.AName.ShouldEqual("art1");
-            _destination.Sem.Name.ShouldEqual("sem1");
+            _destination.AName.ShouldBe("art1");
+            _destination.Sem.Name.ShouldBe("sem1");
         }
     }
 }

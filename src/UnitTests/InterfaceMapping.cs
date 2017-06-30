@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.InterfaceMapping
@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void ShouldMapOk()
         {
-            Mapper.Map<IDestination>(new Source { Id = 5 }).Id.ShouldEqual(5);
+            Mapper.Map<IDestination>(new Source { Id = 5 }).Id.ShouldBe(5);
         }
     }
 
@@ -118,7 +118,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_use_the_most_derived_interface()
         {
-            _result.prop2.ShouldEqual("PROP2");
+            _result.prop2.ShouldBe("PROP2");
         }
     }
 
@@ -178,13 +178,13 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_map_Child_to_SubDtoChildObject_type()
         {
-            _result.Child.ShouldBeType(typeof (SubDtoChildObject));
+            _result.Child.ShouldBeOfType(typeof (SubDtoChildObject));
         }
 
         [Fact]
         public void Should_map_ChildProperty_to_child_property_value()
         {
-            _result.Child.ChildProperty.ShouldEqual("child property value");
+            _result.Child.ChildProperty.ShouldBe("child property value");
         }
     }
 
@@ -215,13 +215,13 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_create_an_implementation_of_the_interface()
         {
-            _result.Value.ShouldEqual(5);
+            _result.Value.ShouldBe(5);
         }
 
         [Fact]
         public void Should_not_derive_from_INotifyPropertyChanged()
         {
-            _result.ShouldNotBeInstanceOf<INotifyPropertyChanged>();    
+            _result.ShouldNotBeOfType<INotifyPropertyChanged>();    
         }
     }
 
@@ -254,7 +254,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_create_an_implementation_of_the_interface()
         {
-            _result.Value.ShouldEqual(5);
+            _result.Value.ShouldBe(5);
         }
 
         [Fact]
@@ -271,28 +271,28 @@ namespace AutoMapper.UnitTests.InterfaceMapping
             _result.PropertyChanged += (o, e) => {
                 count++;
                 o.ShouldBeSameAs(_result); 
-                e.PropertyName.ShouldEqual("Value");
+                e.PropertyName.ShouldBe("Value");
             };
 
             _result.Value = 42;
-            count.ShouldEqual(1);
-            _result.Value.ShouldEqual(42);
+            count.ShouldBe(1);
+            _result.Value.ShouldBe(42);
         }
 
         [Fact]
         public void Should_detach_event_handler()
         {
             _result.PropertyChanged += MyHandler;
-            _count.ShouldEqual(0);
+            _count.ShouldBe(0);
 
             _result.Value = 56;
-            _count.ShouldEqual(1);
+            _count.ShouldBe(1);
 
             _result.PropertyChanged -= MyHandler;
-            _count.ShouldEqual(1);
+            _count.ShouldBe(1);
 
             _result.Value = 75;
-            _count.ShouldEqual(1);
+            _count.ShouldBe(1);
         }
 
         private void MyHandler(object sender, PropertyChangedEventArgs e) {
@@ -343,13 +343,13 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_map_base_interface_property()
         {
-            _result.Id.ShouldEqual(7);
+            _result.Id.ShouldBe(7);
         }
 
         [Fact]
         public void Should_map_derived_interface_property()
         {
-            _result.SecondId.ShouldEqual(42);
+            _result.SecondId.ShouldBe(42);
         }
 
         [Fact]
@@ -413,13 +413,13 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_map_base_interface_property()
         {
-            _result.Id.ShouldEqual(7);
+            _result.Id.ShouldBe(7);
         }
 
         [Fact]
         public void Should_map_derived_interface_property()
         {
-            _result.SecondId.ShouldEqual(42);
+            _result.SecondId.ShouldBe(42);
         }
 
         [Fact]
@@ -462,7 +462,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_ignore_interface_members_for_mapping()
         {
-            _destination.Value.ShouldEqual(10);
+            _destination.Value.ShouldBe(10);
         }
 
         [Fact]
@@ -501,7 +501,7 @@ namespace AutoMapper.UnitTests.InterfaceMapping
         [Fact]
         public void Should_use_the_derived_type_map()
         {
-            _baseDtos.First().ShouldBeType<DerivedDto>();
+            _baseDtos.First().ShouldBeOfType<DerivedDto>();
         }
 
     }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Xunit;
 using System.Linq;
-using Should;
+using Shouldly;
 using System.Data.Entity;
 using AutoMapper.UnitTests;
 
@@ -40,7 +40,7 @@ namespace AutoMapper.IntegrationTests.Net4
 
             var model = Mapper.Map<Model>(entity);
 
-            model.Child.ShouldBeType<ChildModel>();
+            model.Child.ShouldBeOfType<ChildModel>();
         }
 
         private static Entity LoadEntity()

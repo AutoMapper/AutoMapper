@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.UnitTests;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.IntegrationTests.Net4
@@ -70,11 +70,11 @@ namespace AutoMapper.IntegrationTests.Net4
 
         public void Check(Class1DTO[] dtos)
         {
-            dtos.Length.ShouldEqual(3);
-            dtos.Select(d => d.IdDTO).ToArray().ShouldEqual(new[] { 1, 2, 3 });
-            dtos.Select(d => d.Class2DTO.IdDTO).ToArray().ShouldEqual(new[] { 1, 2, 3 });
-            dtos.Select(d => d.Class2DTO.Class3DTO.IdDTO).ToArray().ShouldEqual(new[] { 1, 2, 3 });
-            dtos.Select(d => d.Class2DTO.Class3DTO.Class2DTO).ToArray().ShouldEqual(new Class2DTO[] { null, null, null });
+            dtos.Length.ShouldBe(3);
+            dtos.Select(d => d.IdDTO).ToArray().ShouldBe(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.IdDTO).ToArray().ShouldBe(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.Class3DTO.IdDTO).ToArray().ShouldBe(new[] { 1, 2, 3 });
+            dtos.Select(d => d.Class2DTO.Class3DTO.Class2DTO).ToArray().ShouldBe(new Class2DTO[] { null, null, null });
         }
 
         public class TestContext : System.Data.Entity.DbContext

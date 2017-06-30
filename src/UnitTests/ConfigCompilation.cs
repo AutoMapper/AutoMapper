@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.UnitTests
 {
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class ConfigCompilation : NonValidatingSpecBase

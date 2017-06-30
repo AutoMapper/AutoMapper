@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 using AutoMapper;
 
@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests.Bug
             source = Enumerable.Range(0, 9).Select(i => new Source(i)).ToArray();
             var config = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
             destination = config.CreateMapper().Map<Destination[]>(source);
-            destination.Length.ShouldEqual(source.Length);
+            destination.Length.ShouldBe(source.Length);
             Array.TrueForAll(source, s => s.Value == destination[s.Value].Value).ShouldBeTrue(); 
         }
     }

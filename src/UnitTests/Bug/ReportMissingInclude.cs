@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -12,7 +12,7 @@ namespace AutoMapper.UnitTests.Bug
             new Action(()=>new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<object, BaseType>().Include<object, ChildType>();
-            })).ShouldThrow<InvalidOperationException>(ex=>ex.Message.ShouldStartWith("Missing map from"));
+            })).ShouldThrowException<InvalidOperationException>(ex=>ex.Message.ShouldStartWith("Missing map from"));
         }
 
         public class BaseType { }

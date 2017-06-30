@@ -1,5 +1,5 @@
 using Xunit;
-using Should;
+using Shouldly;
 using System.Linq;
 using System;
 using System.Text.RegularExpressions;
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_use_the_resolver()
         {
-            Mapper.Map<Destination>(new Source()).Total.ShouldEqual(int.MaxValue);
+            Mapper.Map<Destination>(new Source()).Total.ShouldBe(int.MaxValue);
         }
     }
 
@@ -111,8 +111,8 @@ namespace AutoMapper.UnitTests
                     }
             };
             var dto = Mapper.Map<OrderDto>(model);
-            dto.CustomerName.ShouldEqual("George Costanza");
-            dto.Total.ShouldEqual(74.85m);
+            dto.CustomerName.ShouldBe("George Costanza");
+            dto.Total.ShouldBe(74.85m);
         }
     }
 
@@ -153,8 +153,8 @@ namespace AutoMapper.UnitTests
         {
             var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
             var model = Mapper.Map<Order>(dto);
-            model.CustomerHolder.Customer.Name.ShouldEqual("George Costanza");
-            model.CustomerHolder.Customer.Total.ShouldEqual(74.85m);
+            model.CustomerHolder.Customer.Name.ShouldBe("George Costanza");
+            model.CustomerHolder.Customer.Total.ShouldBe(74.85m);
         }
     }
 
@@ -193,8 +193,8 @@ namespace AutoMapper.UnitTests
         {
             var dto = new OrderDto { CustomerholderCustomerName = "George Costanza", CustomerholderCustomerTotal = 74.85m };
             var model = Mapper.Map<Order>(dto);
-            model.Customerholder.Customer.Name.ShouldEqual("George Costanza");
-            model.Customerholder.Customer.Total.ShouldEqual(74.85m);
+            model.Customerholder.Customer.Name.ShouldBe("George Costanza");
+            model.Customerholder.Customer.Total.ShouldBe(74.85m);
         }
     }
 
@@ -251,8 +251,8 @@ namespace AutoMapper.UnitTests
         public void Should_apply_the_convention_in_reverse()
         {
             _destination.Enabled.ShouldBeTrue();
-            _destination.End_Date.ShouldEqual(_endDate);
-            _destination.Start_Date.ShouldEqual(_startDate);
+            _destination.End_Date.ShouldBe(_endDate);
+            _destination.Start_Date.ShouldBe(_startDate);
         }
     }
 
@@ -287,7 +287,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_create_a_map_with_the_reverse_items()
         {
-            _source.Value.ShouldEqual(10);
+            _source.Value.ShouldBe(10);
         }
     }
 
@@ -313,7 +313,7 @@ namespace AutoMapper.UnitTests
         {
             var typeMap = ConfigProvider.FindTypeMapFor<Source, Destination>();
 
-            typeMap.GetPropertyMaps().Count().ShouldEqual(1);
+            typeMap.GetPropertyMaps().Count().ShouldBe(1);
         }
 
         [Fact]
@@ -454,7 +454,7 @@ namespace AutoMapper.UnitTests
             //Act
             var unmappedPropertyNames = typeMap.GetUnmappedPropertyNames();
             //Assert
-            unmappedPropertyNames[0].ShouldEqual("Boo");
+            unmappedPropertyNames[0].ShouldBe("Boo");
         }
 
         [Fact]
@@ -470,7 +470,7 @@ namespace AutoMapper.UnitTests
             //Act
             var unmappedPropertyNames = typeMap.GetUnmappedPropertyNames();
             //Assert
-            unmappedPropertyNames[0].ShouldEqual("Boo");
+            unmappedPropertyNames[0].ShouldBe("Boo");
         }
     }
 
@@ -505,7 +505,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_create_a_map_with_the_reverse_items()
         {
-            _source.Value.ShouldEqual(10);
+            _source.Value.ShouldBe(10);
         }
     }
 }

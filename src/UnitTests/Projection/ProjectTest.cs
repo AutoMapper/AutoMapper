@@ -1,5 +1,5 @@
 ﻿﻿using Xunit;
-﻿using Should;
+﻿using Shouldly;
 
 namespace AutoMapper.UnitTests.Projection
 {
@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests.Projection
         [Fact]
         public void Should_work()
         {
-            new[] { new Foo() }.AsQueryable().ProjectTo<FooDto>(Configuration).Single().A.ShouldEqual(0);
+            new[] { new Foo() }.AsQueryable().ProjectTo<FooDto>(Configuration).Single().A.ShouldBe(0);
         } 
     }
 

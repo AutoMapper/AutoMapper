@@ -1,6 +1,6 @@
 ﻿using System;
 using AutoMapper.Mappers;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.MappingInheritance
@@ -38,8 +38,8 @@ namespace AutoMapper.UnitTests.MappingInheritance
         [Fact]
         public void Should_call_AfterMap_just_once()
         {
-            afterMapCount.ShouldEqual(1);
-            beforeMapCount.ShouldEqual(1);
+            afterMapCount.ShouldBe(1);
+            beforeMapCount.ShouldBe(1);
         }
     }
 
@@ -76,8 +76,8 @@ namespace AutoMapper.UnitTests.MappingInheritance
         [Fact]
         public void Should_call_AfterMap_just_once()
         {
-            afterMapCount.ShouldEqual(1);
-            beforeMapCount.ShouldEqual(1);
+            afterMapCount.ShouldBe(1);
+            beforeMapCount.ShouldBe(1);
         }
     }
 
@@ -115,7 +115,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var dest = mappingEngine.Map<Class, Dto>(source);
 
             // assert
-            "test".ShouldEqual(dest.DifferentProp);
+            "test".ShouldBe(dest.DifferentProp);
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace AutoMapper.UnitTests.MappingInheritance
             var dest = mappingEngine.Map<Class, Dto>(source);
 
             // assert
-            "test".ShouldEqual(dest.DifferentProp);
+            "test".ShouldBe(dest.DifferentProp);
         }
     }
 }

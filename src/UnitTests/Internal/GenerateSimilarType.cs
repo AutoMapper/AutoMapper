@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using AutoMapper.Execution;
 using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests

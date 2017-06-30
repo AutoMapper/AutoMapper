@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Should;
+using Shouldly;
 using Xunit;
 using System.Linq;
 
@@ -44,7 +44,7 @@ namespace AutoMapper.UnitTests
 
                 var dtos = Mapper.Map<IEnumerable<ITestDomainItem>, TestDtoItem[]>(domainItems);
 
-                domainItems[0].ItemId.ShouldEqual(dtos[0].Id);
+                domainItems[0].ItemId.ShouldBe(dtos[0].Id);
             }
         }
 
@@ -92,7 +92,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_map_a_date_with_a_value()
             {
-                _result.SomeDate.Day.ShouldEqual(1);
+                _result.SomeDate.Day.ShouldBe(1);
             }
 
             [Fact]

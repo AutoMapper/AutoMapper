@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AutoMapper.Configuration.Internal;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests
 {

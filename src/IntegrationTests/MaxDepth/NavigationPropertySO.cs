@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.IntegrationTests.Net4
@@ -100,9 +100,9 @@ namespace AutoMapper.IntegrationTests.Net4
             using(var context = new Context())
             {
                 _destination = context.Customers.ProjectTo<CustomerDTO>(Configuration).Single();
-                _destination.Id.ShouldEqual(1);
+                _destination.Id.ShouldBe(1);
                 _destination.Name1.SequenceEqual("Bob");
-                _destination.Cust.CustomerID.ShouldEqual(1);
+                _destination.Cust.CustomerID.ShouldBe(1);
             }
         }
     }

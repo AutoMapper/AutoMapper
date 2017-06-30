@@ -1,5 +1,5 @@
 ﻿using System;
-using Should;
+using Shouldly;
 using AutoMapper;
 using Xunit;
 

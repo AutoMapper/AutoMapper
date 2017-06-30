@@ -2,7 +2,7 @@
 using System.Data.Entity;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Projection

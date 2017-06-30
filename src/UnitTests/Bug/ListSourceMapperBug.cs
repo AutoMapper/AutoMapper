@@ -5,7 +5,7 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class ListSourceMapperBug
@@ -40,7 +40,7 @@
 
             var dests = config.CreateMapper().Map<CustomCollection<Source>, CustomCollection<Dest>>(source);
 
-            dests.Count.ShouldEqual(1);
+            dests.Count.ShouldBe(1);
         }
     }
 }

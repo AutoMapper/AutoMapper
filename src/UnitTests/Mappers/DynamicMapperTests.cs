@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Mappers.Dynamic
@@ -49,7 +49,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
         {
             var config = new MapperConfiguration(cfg => { });
             dynamic destination = config.CreateMapper().Map<DynamicDictionary>(new Source());
-            ((int)destination.Count).ShouldEqual(1);
+            ((int)destination.Count).ShouldBe(1);
             Assert.Equal(24, destination.Value);
         }
     }
@@ -64,7 +64,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             var config = new MapperConfiguration(cfg => { });
             var data = new[] { 1, 2, 3 };
             _destination = config.CreateMapper().Map<DynamicDictionary>(new Destination { Foo = "Foo", Bar = "Bar", Data = data });
-            ((int)_destination.Count).ShouldEqual(3);
+            ((int)_destination.Count).ShouldBe(3);
             Assert.Equal("Foo", _destination.Foo);
             Assert.Equal("Bar", _destination.Bar);
             ((int[])_destination.Data).SequenceEqual(data).ShouldBeTrue();
@@ -84,8 +84,8 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Jack = "Jack";
             var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<Destination>(source);
-            _destination.Foo.ShouldEqual("Foo");
-            _destination.Bar.ShouldEqual("Bar");
+            _destination.Foo.ShouldBe("Foo");
+            _destination.Bar.ShouldBe("Bar");
             _destination.Jack.ShouldBeNull();
         }
     }
@@ -110,8 +110,8 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Jack = "Jack";
             var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<Destination>(source);
-            _destination.Foo.ShouldEqual("Foo");
-            _destination.Bar.ShouldEqual("Bar");
+            _destination.Foo.ShouldBe("Foo");
+            _destination.Bar.ShouldBe("Bar");
             _destination.Jack.ShouldBeNull();
         }
     }
@@ -127,7 +127,7 @@ namespace AutoMapper.UnitTests.Mappers.Dynamic
             source.Foo = "Foo";
             var config = new MapperConfiguration(cfg => { });
             _destination = config.CreateMapper().Map<Destination>(source);
-            _destination.Foo.ShouldEqual("Foo");
+            _destination.Foo.ShouldBe("Foo");
             _destination.Bar.ShouldBeNull();
         }
     }

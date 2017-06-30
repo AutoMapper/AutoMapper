@@ -2,7 +2,7 @@
 using System.Linq;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.UnitTests;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.IntegrationTests.Net4
@@ -65,8 +65,8 @@ namespace AutoMapper.IntegrationTests.Net4
             {
                 _destinations = context.EntityA.ProjectTo<ITypeA>(Configuration).ToArray();
             }
-            _destinations.Length.ShouldEqual(3);
-            _destinations[2].Name.ShouldEqual("Bill Gates");
+            _destinations.Length.ShouldBe(3);
+            _destinations[2].Name.ShouldBe("Bill Gates");
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.MappingExceptions
 {

@@ -1,13 +1,11 @@
 using System;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
 {
     namespace Profiles
     {
-        using Should.Core.Assertions;
-
         public class When_segregating_configuration_through_a_profile : NonValidatingSpecBase
         {
             private Dto _result;
@@ -47,7 +45,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_include_default_profile_configuration_with_profiled_maps()
             {
-                _result.Value.ShouldEqual("Hello");
+                _result.Value.ShouldBe("Hello");
             }
         }
 
@@ -105,13 +103,13 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_default_the_custom_profile_name_to_the_type_name()
             {
-                _customProfile.ProfileName.ShouldEqual(typeof(CustomProfile1).FullName);
+                _customProfile.ProfileName.ShouldBe(typeof(CustomProfile1).FullName);
             }
 
             [Fact]
             public void Should_use_the_overridden_configuration_method_to_configure()
             {
-                _result.FooValue.ShouldEqual("5");
+                _result.FooValue.ShouldBe("5");
             }
         }
 

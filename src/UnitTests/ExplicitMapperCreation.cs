@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
             var source = new Source {Value = 10};
             var dest = _mapper.Map<Source, Dest>(source);
 
-            dest.Value.ShouldEqual(source.Value);
+            dest.Value.ShouldBe(source.Value);
         }
 
         [Fact]

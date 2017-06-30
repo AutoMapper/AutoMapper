@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.CustomMapping
@@ -24,8 +24,8 @@ namespace AutoMapper.UnitTests.CustomMapping
         [Fact]
         public void Should_map_nullable()
         {
-            Mapper.Map<int?, GreekLetters>(null).ShouldEqual(GreekLetters.Beta);
-            Mapper.Map<int?, GreekLetters>(42).ShouldEqual(GreekLetters.Gamma);
+            Mapper.Map<int?, GreekLetters>(null).ShouldBe(GreekLetters.Beta);
+            Mapper.Map<int?, GreekLetters>(42).ShouldBe(GreekLetters.Gamma);
         }
     }
 
@@ -41,7 +41,7 @@ namespace AutoMapper.UnitTests.CustomMapping
         public void Should_report_the_missing_converter()
         {
             new Action(()=>Mapper.Map<int, int>(0))
-                .ShouldThrow<AutoMapperMappingException>(e=>e.Message.ShouldEqual("Cannot create an instance of type AutoMapper.ITypeConverter`2[System.Int32,System.Int32]"));
+                .ShouldThrowException<AutoMapperMappingException>(e=>e.Message.ShouldBe("Cannot create an instance of type AutoMapper.ITypeConverter`2[System.Int32,System.Int32]"));
         }
     }
 
@@ -80,7 +80,7 @@ namespace AutoMapper.UnitTests.CustomMapping
         public void Should_treat_max_value_as_null()
         {
             _destination.Value1.ShouldBeNull();
-            _destination.Value2.ShouldEqual(decimal.MaxValue);
+            _destination.Value2.ShouldBe(decimal.MaxValue);
             _destination.Value3.ShouldBeNull();
         }
     }
@@ -130,7 +130,7 @@ namespace AutoMapper.UnitTests.CustomMapping
         [Fact]
         public void Should_use_the_type_converter()
         {
-            _destination.TheId.ShouldEqual("p_v");
+            _destination.TheId.ShouldBe("p_v");
         }
     }
 
@@ -235,19 +235,19 @@ namespace AutoMapper.UnitTests.CustomMapping
         [Fact]
         public void Should_convert_type_using_expression()
         {
-            _result.Value1.ShouldEqual(5);
+            _result.Value1.ShouldBe(5);
         }
 
         [Fact]
         public void Should_convert_type_using_instance()
         {
-            _result.Value2.ShouldEqual(new DateTime(2000, 1, 1));
+            _result.Value2.ShouldBe(new DateTime(2000, 1, 1));
         }
 
         [Fact]
         public void Should_convert_type_using_Func_that_returns_instance()
         {
-            _result.Value3.ShouldEqual(typeof(Destination));
+            _result.Value3.ShouldBe(typeof(Destination));
         }
     }
 
@@ -295,7 +295,7 @@ namespace AutoMapper.UnitTests.CustomMapping
         [Fact]
         public void Should_convert_type_using_expression()
         {
-            _result.Value.Type.ShouldEqual(5);
+            _result.Value.Type.ShouldBe(5);
         }
     }
 
@@ -347,7 +347,7 @@ namespace AutoMapper.UnitTests.CustomMapping
                 };
             var destination = Mapper.Map<Source, Destination>(source);
 
-            destination.OtherValue.ShouldEqual(15);
+            destination.OtherValue.ShouldBe(15);
         }
 
         [Fact]
@@ -359,7 +359,7 @@ namespace AutoMapper.UnitTests.CustomMapping
             };
             var destination = Mapper.Map<Destination, Source>(source);
 
-            destination.Value.ShouldEqual(5);
+            destination.Value.ShouldBe(5);
         }
     }
 
@@ -401,7 +401,7 @@ namespace AutoMapper.UnitTests.CustomMapping
         [Fact]
         public void Should_use_converter_specified()
         {
-            _result.OtherValue.ShouldEqual(15);
+            _result.OtherValue.ShouldBe(15);
         }
     }
 
@@ -443,7 +443,7 @@ namespace AutoMapper.UnitTests.CustomMapping
         [Fact]
         public void Should_use_converter_specified()
         {
-            _result.OtherValue.ShouldEqual(15);
+            _result.OtherValue.ShouldBe(15);
         }
     }
 }

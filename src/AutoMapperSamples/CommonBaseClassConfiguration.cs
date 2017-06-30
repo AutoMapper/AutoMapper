@@ -1,5 +1,5 @@
 using AutoMapper;
-using Should;
+using Shouldly;
 using NUnit.Framework;
 
 namespace AutoMapperSamples
@@ -54,8 +54,8 @@ namespace AutoMapperSamples
                 var subDest1 = mapper.Map<Source1, SubDest1>(new Source1 {SomeValue = "Value1"});
                 var subDest2 = mapper.Map<Source2, SubDest2>(new Source2 {SomeOtherValue = "Value2"});
 
-                subDest1.SomeValue.ShouldEqual("Value1");
-                subDest2.SomeOtherValue.ShouldEqual("Value2");
+                subDest1.SomeValue.ShouldBe("Value1");
+                subDest2.SomeOtherValue.ShouldBe("Value2");
             }
         }
 

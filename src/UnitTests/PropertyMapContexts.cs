@@ -1,6 +1,6 @@
 ﻿//using System;
 //using Xunit;
-//using Should;
+//using Shouldly;
 
 //namespace AutoMapper.UnitTests
 //{
@@ -67,8 +67,8 @@
 
 //            var dest = config.CreateMapper().Map<Source, DestinationDto>(src);
 
-//            dest.CodeValue1.Title.ShouldEqual("lookup value for Value1==1");
-//            dest.CodeValue2.Title.ShouldEqual("lookup value for Value2==1");
+//            dest.CodeValue1.Title.ShouldBe("lookup value for Value1==1");
+//            dest.CodeValue2.Title.ShouldBe("lookup value for Value2==1");
 //        }
 //    }
 //}

@@ -1,5 +1,5 @@
 using AutoMapper;
-using Should;
+using Shouldly;
 using NUnit.Framework;
 
 namespace AutoMapperSamples
@@ -43,7 +43,7 @@ namespace AutoMapperSamples
 
                 var result = config.CreateMapper().Map<Source, Destination>(source);
 
-                result.Total.ShouldEqual(12);
+                result.Total.ShouldBe(12);
             }
 
             [Test]
@@ -62,7 +62,7 @@ namespace AutoMapperSamples
 
                 var result = config.CreateMapper().Map<Source, Destination>(source);
 
-                result.Total.ShouldEqual(12);
+                result.Total.ShouldBe(12);
             }
         }
     }

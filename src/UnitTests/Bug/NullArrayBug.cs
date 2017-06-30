@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.UnitTests.Bug
 {
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class NullArrayBug : AutoMapperSpecBase

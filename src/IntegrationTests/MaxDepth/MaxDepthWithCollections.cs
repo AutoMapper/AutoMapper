@@ -5,7 +5,7 @@ using System.Linq;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.UnitTests;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.IntegrationTests.Net4
 {
@@ -31,9 +31,9 @@ namespace AutoMapper.IntegrationTests.Net4
         [Fact]
         public void Should_project_with_MaxDepth()
         {
-            _course.CourseName.ShouldEqual("Course 1");
+            _course.CourseName.ShouldBe("Course 1");
             var content = _course.Content[0];
-            content.ContentName.ShouldEqual("Content 1");
+            content.ContentName.ShouldBe("Content 1");
             content.Course.ShouldBeNull();
         }
 

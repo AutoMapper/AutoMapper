@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_substitute_zero_for_null()
         {
-            _destination.Number.ShouldEqual(0);
+            _destination.Number.ShouldBe(0);
         }
     }
 }

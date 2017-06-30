@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -67,7 +67,7 @@ namespace AutoMapper.UnitTests.Bug
         public void Should_support_propertypath_expressions_with_properties_from_assignable_types()
         {
             // Assert
-            entityQuery.ToList().Count().ShouldEqual(1);
+            entityQuery.ToList().Count().ShouldBe(1);
         }
     }
 }

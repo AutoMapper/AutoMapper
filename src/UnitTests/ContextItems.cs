@@ -2,7 +2,7 @@
 {
     namespace ContextItems
     {
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class When_mapping_with_contextual_values
@@ -36,7 +36,7 @@
 
                 var dest = config.CreateMapper().Map<Source, Dest>(new Source { Value = 5 }, opt => { opt.Items["Item"] = 10; });
 
-                dest.Value.ShouldEqual(15);
+                dest.Value.ShouldBe(15);
             }
         }
 
@@ -63,7 +63,7 @@
 
                 var dest = config.CreateMapper().Map<Source, Dest>(new Source { Value = 5 }, opt => opt.Items["Item"] = 10);
 
-                dest.Value.ShouldEqual(15);
+                dest.Value.ShouldBe(15);
             }
         }
 
@@ -90,7 +90,7 @@
 
                 var dest = config.CreateMapper().Map<Source, Dest>(new Source { Value1 = 5 }, opt => { opt.Items["Item"] = 10; });
 
-                dest.Value1.ShouldEqual(15);
+                dest.Value1.ShouldBe(15);
             }
         }
     }

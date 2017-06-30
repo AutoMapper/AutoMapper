@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -20,8 +20,8 @@ namespace AutoMapper.UnitTests.Bug
             var source = new List<Source> { new Source { X = 42 } };
             var target = config.CreateMapper().Map<ReadOnlyCollection<Target>>(source);
 
-            target.Count.ShouldEqual(source.Count);
-            target[0].X.ShouldEqual(source[0].X);
+            target.Count.ShouldBe(source.Count);
+            target[0].X.ShouldBe(source[0].X);
         }
     }
 }

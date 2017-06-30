@@ -5,7 +5,7 @@ using System.Linq;
 using AutoMapper.QueryableExtensions;
 using AutoMapper.UnitTests;
 using Xunit;
-using Should;
+using Shouldly;
 using System.Diagnostics;
 
 namespace AutoMapper.IntegrationTests.Net4
@@ -34,7 +34,7 @@ namespace AutoMapper.IntegrationTests.Net4
         [Fact]
         public void Should_expand_collections_items()
         {
-            _course.Content[0].Category.CategoryName.ShouldEqual("Category 1");
+            _course.Content[0].Category.CategoryName.ShouldBe("Category 1");
         }
 
         class Initializer : DropCreateDatabaseAlways<ClientContext>

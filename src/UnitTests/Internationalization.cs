@@ -1,5 +1,5 @@
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests
 {
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_match_to_identical_property_name_on_destination()
             {
-                _result.CustomerÆøå.ShouldEqual("Bob");
+                _result.CustomerÆøå.ShouldBe("Bob");
             }
         }
 

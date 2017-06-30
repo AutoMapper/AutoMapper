@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Constructors
 {
@@ -43,8 +43,8 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void We_should_choose_a_matching_constructor()
         {
-            _destination.Age.ShouldEqual(23);
-            _destination.Name.ShouldEqual("Marc");
+            _destination.Age.ShouldBe(23);
+            _destination.Name.ShouldBe("Marc");
         }
     }
 
@@ -91,7 +91,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_ok()
         {
-            _destination.InnerDestination.Name.ShouldEqual("Core");
+            _destination.InnerDestination.Name.ShouldBe("Core");
         }
     }
 
@@ -132,7 +132,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_from_the_property()
         {
-            _destination.Name.ShouldEqual("John");
+            _destination.Name.ShouldBe("John");
         }
     }
 
@@ -173,7 +173,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_from_the_property()
         {
-            _destination.Name.ShouldEqual("John");
+            _destination.Name.ShouldBe("John");
         }
     }
 
@@ -210,7 +210,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_from_the_property()
         {
-            _destination.Name.ShouldEqual("John");
+            _destination.Name.ShouldBe("John");
         }
     }
 
@@ -243,7 +243,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_from_the_property()
         {
-            _destination.Name.ShouldEqual("John");
+            _destination.Name.ShouldBe("John");
         }
     }
 
@@ -291,9 +291,9 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_ok()
         {
-            _destination.Latitude.ShouldEqual(34);
-            _destination.Longitude.ShouldEqual(-93);
-            _destination.HorizontalAccuracy.ShouldEqual(100);
+            _destination.Latitude.ShouldBe(34);
+            _destination.Longitude.ShouldBe(-93);
+            _destination.HorizontalAccuracy.ShouldBe(100);
         }
     }
 
@@ -352,9 +352,9 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_ok()
         {
-            _destination.Latitude.ShouldEqual(34);
-            _destination.Longitude.ShouldEqual(-93);
-            _destination.HorizontalAccuracy.ShouldEqual(100);
+            _destination.Latitude.ShouldBe(34);
+            _destination.Longitude.ShouldBe(-93);
+            _destination.HorizontalAccuracy.ShouldBe(100);
         }
     }
 
@@ -508,7 +508,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_ok()
         {
-            _destination.Id.ShouldEqual(Guid.Empty);
+            _destination.Id.ShouldBe(Guid.Empty);
         }
     }
 
@@ -549,7 +549,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_the_constructor_argument()
         {
-            _destination.Foo.ShouldEqual(5);
+            _destination.Foo.ShouldBe(5);
         }
     }
 
@@ -593,8 +593,8 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_the_constructor_argument()
         {
-            _destination.Foo.ShouldEqual(5);
-            _destination.Bar.ShouldEqual("bar");
+            _destination.Foo.ShouldBe(5);
+            _destination.Bar.ShouldBe("bar");
         }
     }
 
@@ -642,13 +642,13 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_the_constructor_argument()
         {
-            _dest.Foo.ShouldEqual(5);
+            _dest.Foo.ShouldBe(5);
         }
 
         [Fact]
         public void Should_map_the_existing_properties()
         {
-            _dest.Bar.ShouldEqual(10);
+            _dest.Bar.ShouldBe(10);
         }
     }
 
@@ -689,7 +689,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_the_constructor_argument()
         {
-            _dest.Foo.ShouldEqual(5);
+            _dest.Foo.ShouldBe(5);
         }
     }
 
@@ -739,7 +739,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_with_the_custom_constructor()
         {
-            _dest.Foo.ShouldEqual(10);
+            _dest.Foo.ShouldBe(10);
         }
     }
 
@@ -789,7 +789,7 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_with_the_custom_constructor()
         {
-            _dest.Foo.ShouldEqual(11);
+            _dest.Foo.ShouldBe(11);
         }
     }
 
@@ -831,8 +831,8 @@ namespace AutoMapper.UnitTests.Constructors
         [Fact]
         public void Should_map_the_existing_properties()
         {
-            _dest.Foo.ShouldEqual(5);
-            _dest.Bar.ShouldEqual(10);
+            _dest.Foo.ShouldBe(5);
+            _dest.Bar.ShouldBe(10);
         }
     }
     public class UsingMappingEngineToResolveConstructorArguments
@@ -852,7 +852,7 @@ namespace AutoMapper.UnitTests.Constructors
 
             var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
-            destinationFoo.Bar.FooBar.ShouldEqual(sourceBar.FooBar);
+            destinationFoo.Bar.FooBar.ShouldBe(sourceBar.FooBar);
         }
 
 
@@ -924,8 +924,8 @@ namespace AutoMapper.UnitTests.Constructors
 
             var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
-            destinationFoo.Bar.FooBar.ShouldEqual(sourceBar.FooBar);
-            destinationFoo.Bar2.FooBar.ShouldEqual("fooBar2");
+            destinationFoo.Bar.FooBar.ShouldBe(sourceBar.FooBar);
+            destinationFoo.Bar2.FooBar.ShouldBe("fooBar2");
         }
 
 
@@ -999,7 +999,7 @@ namespace AutoMapper.UnitTests.Constructors
             var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
             destinationFoo.Bar.ShouldBeNull();
-            destinationFoo.Str.ShouldEqual("hello");
+            destinationFoo.Str.ShouldBe("hello");
         }
 
 
@@ -1141,9 +1141,9 @@ namespace AutoMapper.UnitTests.Constructors
 
             var destinationFoo = config.CreateMapper().Map<DestinationFoo>(sourceFoo);
 
-            destinationFoo.A.ShouldEqual("a");
-            destinationFoo.B.ShouldEqual("b");
-            destinationFoo.C.ShouldEqual(3);
+            destinationFoo.A.ShouldBe("a");
+            destinationFoo.B.ShouldBe("b");
+            destinationFoo.C.ShouldBe(3);
         }
 
 
@@ -1238,7 +1238,7 @@ namespace AutoMapper.UnitTests.Constructors
         {
             var dest = Mapper.Map<Source, Dest>(new Source {Value = 5});
 
-            dest.Value1.ShouldEqual(5);
+            dest.Value1.ShouldBe(5);
         }
     }
 

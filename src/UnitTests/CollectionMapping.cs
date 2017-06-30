@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Xunit;
-using Should;
+using Shouldly;
 using System.Collections;
 
 namespace AutoMapper.UnitTests
@@ -177,12 +177,12 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_report_missing_map()
         {
-            new Action(Configuration.AssertConfigurationIsValid).ShouldThrow<AutoMapperConfigurationException>(ex =>
+            new Action(Configuration.AssertConfigurationIsValid).ShouldThrowException<AutoMapperConfigurationException>(ex =>
             {
-                ex.PropertyMap.SourceMember.Name.ShouldEqual("ShipsTo");
+                ex.PropertyMap.SourceMember.Name.ShouldBe("ShipsTo");
                 var types = ex.Types.Value;
-                types.SourceType.ShouldEqual(typeof(List<string>));
-                types.DestinationType.ShouldEqual(typeof(MyCollection));
+                types.SourceType.ShouldBe(typeof(List<string>));
+                types.DestinationType.ShouldBe(typeof(MyCollection));
             });
         } 
     }
@@ -392,7 +392,7 @@ namespace AutoMapper.UnitTests
             config.CreateMapper().Map(dto, master);
 
             originalCollection.ShouldBeSameAs(master.Details);
-            originalCollection.Count.ShouldEqual(master.Details.Count);
+            originalCollection.Count.ShouldBe(master.Details.Count);
         }
 
         [Fact]
@@ -421,7 +421,7 @@ namespace AutoMapper.UnitTests
             config.CreateMapper().Map(dto, master);
 
             originalCollection.ShouldBeSameAs(master.Details);
-            originalCollection.Count.ShouldEqual(master.Details.Count);
+            originalCollection.Count.ShouldBe(master.Details.Count);
         }
 
         [Fact]
@@ -453,7 +453,7 @@ namespace AutoMapper.UnitTests
             mapper.Map(dto, master);
 
             originalCollection.ShouldBeSameAs(master.Details);
-            originalCollection.Count.ShouldEqual(master.Details.Count);
+            originalCollection.Count.ShouldBe(master.Details.Count);
         }
 
         [Fact]
@@ -482,7 +482,7 @@ namespace AutoMapper.UnitTests
             config.CreateMapper().Map(dto, master);
 
             originalCollection.ShouldBeSameAs(master.Details);
-            originalCollection.Count.ShouldEqual(master.Details.Count);
+            originalCollection.Count.ShouldBe(master.Details.Count);
         }
 
         [Fact]
@@ -535,7 +535,7 @@ namespace AutoMapper.UnitTests
 
             var master = config.CreateMapper().Map<MasterDto, MasterWithNoExistingCollection>(dto);
 
-            master.Details.Count.ShouldEqual(2);
+            master.Details.Count.ShouldBe(2);
         }
 
         [Fact]
@@ -627,12 +627,12 @@ namespace AutoMapper.UnitTests
 
             var dest = Mapper.Map<Source, Target>(src);
 
-            src.X.ShouldEqual(dest.X);
+            src.X.ShouldBe(dest.X);
 
-            dest.Items.Length.ShouldEqual(3);
-            dest.Items[0].I.ShouldEqual(1);
-            dest.Items[1].I.ShouldEqual(2);
-            dest.Items[2].I.ShouldEqual(3);
+            dest.Items.Length.ShouldBe(3);
+            dest.Items[0].I.ShouldBe(1);
+            dest.Items[1].I.ShouldBe(2);
+            dest.Items[2].I.ShouldBe(3);
         }
     }
 }

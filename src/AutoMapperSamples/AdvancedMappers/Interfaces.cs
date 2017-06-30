@@ -1,6 +1,6 @@
 using AutoMapper;
 using NUnit.Framework;
-using Should;
+using Shouldly;
 
 namespace AutoMapperSamples
 {
@@ -43,7 +43,7 @@ namespace AutoMapperSamples
 
                 var message = mapper.Map<OrderForm, ICreateOrderMessage>(order);
 
-                message.CustomerName.ShouldEqual("Bob Smith");
+                message.CustomerName.ShouldBe("Bob Smith");
             }
         }
     }

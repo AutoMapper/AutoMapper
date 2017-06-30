@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_work_together()
         {
-            _destination.Number.ShouldEqual(12);
+            _destination.Number.ShouldBe(12);
         }
     }
 }

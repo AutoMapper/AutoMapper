@@ -1,6 +1,6 @@
 using System;
 using AutoMapper;
-using Should;
+using Shouldly;
 using NUnit.Framework;
 
 namespace AutoMapperSamples
@@ -47,10 +47,10 @@ namespace AutoMapperSamples
                 var mapper = config.CreateMapper();
                 CalendarEventForm form = mapper.Map<CalendarEvent, CalendarEventForm>(calendarEvent);
 
-                form.EventDate.ShouldEqual(new DateTime(2008, 12, 15));
-                form.EventHour.ShouldEqual(20);
-                form.EventMinute.ShouldEqual(30);
-                form.Title.ShouldEqual("Company Holiday Party");
+                form.EventDate.ShouldBe(new DateTime(2008, 12, 15));
+                form.EventHour.ShouldBe(20);
+                form.EventMinute.ShouldBe(30);
+                form.Title.ShouldBe("Company Holiday Party");
             }
         }
     }

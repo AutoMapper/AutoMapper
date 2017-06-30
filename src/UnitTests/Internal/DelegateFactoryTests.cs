@@ -2,7 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -28,7 +28,7 @@ namespace AutoMapper.UnitTests
 
             var target = ctor();
 
-            target.ShouldBeType<Source>();
+            target.ShouldBeOfType<Source>();
         }
 
         [Fact]
@@ -40,14 +40,14 @@ namespace AutoMapper.UnitTests
 
             var target = ctor();
 
-            target.ShouldBeType<ValueSource>();
+            target.ShouldBeOfType<ValueSource>();
         }
 
         [Fact]
         public void Create_ctor_should_throw_when_default_constructor_is_missing()
         {
             var type = typeof(NoDefaultConstructor);
-            new Action(()=>DelegateFactory.CreateCtor(type)()).ShouldThrow<ArgumentException>(ex=>
+            new Action(()=>DelegateFactory.CreateCtor(type)()).ShouldThrowException<ArgumentException>(ex=>
             {
                 ex.Message.ShouldStartWith(type.FullName);
             });

@@ -1,7 +1,7 @@
 ﻿namespace AutoMapper.UnitTests
 {
     using Configuration;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class SeparateConfiguration : NonValidatingSpecBase
@@ -33,7 +33,7 @@
             var source = new Source {Value = 5};
             var dest = Mapper.Map<Source, Dest>(source);
 
-            dest.Value.ShouldEqual(source.Value);
+            dest.Value.ShouldBe(source.Value);
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -60,8 +60,8 @@ namespace AutoMapper.UnitTests.Bug
                                                             }
                                                     });
 
-            dto.Items[0].ShouldBeType<GeneralItemDto>();
-            dto.Items[1].ShouldBeType<SpecificItemDto>();
+            dto.Items[0].ShouldBeOfType<GeneralItemDto>();
+            dto.Items[1].ShouldBeOfType<SpecificItemDto>();
         }
 
         [Fact]
@@ -86,8 +86,8 @@ namespace AutoMapper.UnitTests.Bug
                                                             }
             });
 
-            dto.Items[0].ShouldBeType<GeneralItemDto>();
-            dto.Items[1].ShouldBeType<SpecificItemDto>();
+            dto.Items[0].ShouldBeOfType<GeneralItemDto>();
+            dto.Items[1].ShouldBeOfType<SpecificItemDto>();
         }
     }
 }

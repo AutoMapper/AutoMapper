@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.ConditionalMapping
 {
@@ -27,8 +27,8 @@ namespace AutoMapper.UnitTests.ConditionalMapping
             {
                 source.ShouldBeSameAs(_source);
                 destination.ShouldBeSameAs(_destination);
-                ((int)sourceProperty).ShouldEqual(3);
-                ((int)destinationProperty).ShouldEqual(7);
+                ((int)sourceProperty).ShouldBe(3);
+                ((int)destinationProperty).ShouldBe(7);
                 return true;
             }));
         });
@@ -86,7 +86,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
         {
             var destination = Mapper.Map<Source, Destination>(new Source {Value = -1});
 
-            destination.Value.ShouldEqual(0);
+            destination.Value.ShouldBe(0);
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
         {
             var destination = Mapper.Map<Source, Destination>(new Source { Value = 7 });
 
-            destination.Value.ShouldEqual(7);
+            destination.Value.ShouldBe(7);
         }
     }
 
@@ -128,13 +128,13 @@ namespace AutoMapper.UnitTests.ConditionalMapping
         {
             var destination = Mapper.Map<Source, Destination>(new Source { Value = -1 });
 
-            destination.Value.ShouldEqual(0);
+            destination.Value.ShouldBe(0);
         }
 
         [Fact]
         public void Should_execute_the_mapping_when_the_condition_is_false()
         {
-            Mapper.Map<Source, Destination>(new Source { Value = 7 }).Value.ShouldEqual(10);
+            Mapper.Map<Source, Destination>(new Source { Value = 7 }).Value.ShouldBe(10);
         }
     }
 
@@ -196,7 +196,7 @@ namespace AutoMapper.UnitTests.ConditionalMapping
         [Fact]
         public void Should_map_a_property_with_an_inaccessible_setter_if_a_specific_mapping_is_configured_after_the_ignore_method()
         {
-            _destination.Nickname.ShouldEqual("Jimmy");
+            _destination.Nickname.ShouldBe("Jimmy");
         }
 
         [Fact]
@@ -276,25 +276,25 @@ namespace AutoMapper.UnitTests.ConditionalMapping
         [Fact]
         public void Should_forward_and_reverse_map_a_property_that_is_accessible_on_both_source_and_destination()
         {
-            _source.Name.ShouldEqual("Bob");
+            _source.Name.ShouldBe("Bob");
         }
 
         [Fact]
         public void Should_forward_and_reverse_map_an_inaccessible_destination_property_if_a_mapping_is_defined()
         {
-            _source.Force.ShouldEqual("With You");
+            _source.Force.ShouldBe("With You");
         }
 
         [Fact]
         public void Should_forward_and_reverse_map_an_inaccessible_source_property_if_a_mapping_is_defined()
         {
-            _source.ReverseForce.ShouldEqual("You With");
+            _source.ReverseForce.ShouldBe("You With");
         }
 
         [Fact]
         public void Should_forward_and_reverse_map_an_inaccessible_source_property_even_if_a_mapping_is_not_defined()
         {
-            _source.Respect.ShouldEqual("R-E-S-P-E-C-T"); // justification: if the mapping works one way, it should work in reverse
+            _source.Respect.ShouldBe("R-E-S-P-E-C-T"); // justification: if the mapping works one way, it should work in reverse
         }
     }
 }

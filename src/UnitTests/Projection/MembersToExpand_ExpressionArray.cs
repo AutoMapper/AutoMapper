@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Projection
@@ -41,11 +41,11 @@ namespace AutoMapper.UnitTests.Projection
 
         private static readonly Source _iqf = _iq.First();
 
-        [Fact] public void ProjectReferenceType() => _iq.ProjectTo<Dto>(Configuration, _ => _.Name             ).First().Name.ShouldEqual(_iqf.Name);
-        [Fact] public void ProjectValueType    () => _iq.ProjectTo<Dto>(Configuration,              _ => _.Desc).First().Desc.ShouldEqual(_iqf.Desc);
+        [Fact] public void ProjectReferenceType() => _iq.ProjectTo<Dto>(Configuration, _ => _.Name             ).First().Name.ShouldBe(_iqf.Name);
+        [Fact] public void ProjectValueType    () => _iq.ProjectTo<Dto>(Configuration,              _ => _.Desc).First().Desc.ShouldBe(_iqf.Desc);
         [Fact] public void ProjectBoth         () => _iq.ProjectTo<Dto>(Configuration, _ => _.Name, _ => _.Desc);
 
-        [Fact] public void ProjectInner()     => _iq.ProjectTo<Dto>(Configuration, _ => _.InnerDescFlattened).First().InnerDescFlattened.ShouldEqual(_iqf.Inner     .Desc);
-        [Fact] public void ProjectDeepInner() => _iq.ProjectTo<Dto>(Configuration, _ => _.     DeepFlattened).First().     DeepFlattened.ShouldEqual(_iqf.Inner.Deep.Desc);
+        [Fact] public void ProjectInner()     => _iq.ProjectTo<Dto>(Configuration, _ => _.InnerDescFlattened).First().InnerDescFlattened.ShouldBe(_iqf.Inner     .Desc);
+        [Fact] public void ProjectDeepInner() => _iq.ProjectTo<Dto>(Configuration, _ => _.     DeepFlattened).First().     DeepFlattened.ShouldBe(_iqf.Inner.Deep.Desc);
     }
 }

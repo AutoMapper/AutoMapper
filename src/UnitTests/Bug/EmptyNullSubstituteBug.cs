@@ -1,6 +1,6 @@
 ﻿namespace AutoMapper.UnitTests.Bug
 {
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class EmptyNullSubstituteBug : NonValidatingSpecBase
@@ -50,7 +50,7 @@
         [Fact]
         public void Should_keep_existing_ip_address()
         {
-            _destination.ClientIPAddress.ShouldEqual("192.22.2.1");
+            _destination.ClientIPAddress.ShouldBe("192.22.2.1");
         }
     }
 }

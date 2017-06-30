@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 using System.Collections.Generic;
 
@@ -188,7 +188,7 @@ namespace AutoMapper.UnitTests.Bug
             var orgDto = new OrganizationDTO { ID = 5, Name = "O1" };
             orgDto.BranchCollection.Models = new BranchDTO[] { branchDto };
 
-            new Action(()=>Mapper.Map<Organization>(orgDto)).ShouldThrow<AutoMapperMappingException>(
+            new Action(()=>Mapper.Map<Organization>(orgDto)).ShouldThrowException<AutoMapperMappingException>(
                 ex=>ex.InnerException.Message.ShouldStartWith(typeof(CollectionController<Branch, short, EventArgs>) + " needs to have a constructor with 0 args or only optional args"));
         }
     }

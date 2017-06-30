@@ -4,7 +4,7 @@ namespace AutoMapper.UnitTests
 {
     namespace AssemblyScanning
     {
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class When_scanning_by_assembly : NonValidatingSpecBase

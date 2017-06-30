@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -42,8 +42,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_work_together()
         {
-            _source.AccountId.ShouldEqual(SomeId);
-            _destination.UserId.ShouldEqual(SomeOtherId);
+            _source.AccountId.ShouldBe(SomeId);
+            _destination.UserId.ShouldBe(SomeOtherId);
         }
     }
 
@@ -94,8 +94,8 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_work_together()
         {
-            _source.AccountId.ShouldEqual(SomeId);
-            _destination.UserId.ShouldEqual(SomeOtherId);
+            _source.AccountId.ShouldBe(SomeId);
+            _destination.UserId.ShouldBe(SomeOtherId);
         }
     }
 }

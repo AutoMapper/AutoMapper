@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper.QueryableExtensions;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -149,7 +149,7 @@ namespace AutoMapper.UnitTests.Bug
             items.Where(expression).ShouldContain(_valid);
             var items2 = items.UseAsDataSource(Mapper).For<ParentDTO>().Where(_predicateExpression);
             //var a = items2.ToList();
-            items2.Count().ShouldEqual(1);
+            items2.Count().ShouldBe(1);
         }
         
         [Fact]
@@ -160,7 +160,7 @@ namespace AutoMapper.UnitTests.Bug
             var items = new[] {new GrandParent(){Parent = new Parent(){Children = new[]{new Child(){ID2 = 3}}, Child = new Child(){ID2 = 3}}}}.AsQueryable();
             items.Where(expression).ShouldContain(items.First());
             var items2 = items.UseAsDataSource(Mapper).For<GrandParentDTO>().Where(_predicateExpression);
-            items2.Count().ShouldEqual(1);
+            items2.Count().ShouldBe(1);
             When_Use_Outside_Class_Method_Call();
         }
 

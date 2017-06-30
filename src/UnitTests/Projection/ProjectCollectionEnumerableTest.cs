@@ -1,4 +1,4 @@
-﻿﻿using Should;
+﻿﻿using Shouldly;
 ﻿using Xunit;
 
 namespace AutoMapper.UnitTests.Projection
@@ -35,8 +35,8 @@ namespace AutoMapper.UnitTests.Projection
             mapped.ShouldNotBeNull();
 
             mapped.Addresses.ShouldBeOfLength(2);
-            mapped.Addresses.ElementAt(0).Street.ShouldEqual(Street1);
-            mapped.Addresses.ElementAt(1).Street.ShouldEqual(Street2);
+            mapped.Addresses.ElementAt(0).Street.ShouldBe(Street1);
+            mapped.Addresses.ElementAt(1).Street.ShouldBe(Street2);
         }
 
         public class Customer

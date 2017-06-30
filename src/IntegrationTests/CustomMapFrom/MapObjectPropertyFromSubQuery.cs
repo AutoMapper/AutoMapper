@@ -1,5 +1,5 @@
 ﻿using System;
-using Should;
+using Shouldly;
 using System.Linq;
 using System.Collections.Generic;
 using AutoMapper.UnitTests;
@@ -29,12 +29,12 @@ namespace AutoMapper.IntegrationTests
                 var projection = context.Products.ProjectTo<ProductModel>(Configuration);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
-                counter.Count.ShouldEqual(1);
+                counter.Count.ShouldBe(1);
                 var productModel = projection.First();
-                productModel.Price.RegionId.ShouldEqual((short)1);
+                productModel.Price.RegionId.ShouldBe((short)1);
                 productModel.Price.IsDefault.ShouldBeTrue();
-                productModel.Price.Id.ShouldEqual(1);
-                productModel.Id.ShouldEqual(1);
+                productModel.Price.Id.ShouldBe(1);
+                productModel.Id.ShouldBe(1);
             }
         }
 
@@ -121,18 +121,18 @@ namespace AutoMapper.IntegrationTests
                 var projection = context.ProductArticles.ProjectTo<ProductArticleModel>(Configuration);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
-                counter.Count.ShouldEqual(2);
+                counter.Count.ShouldBe(2);
                 var productArticleModel = projection.First();
                 var productModel = productArticleModel.Product;
-                productModel.Price.RegionId.ShouldEqual((short)1);
+                productModel.Price.RegionId.ShouldBe((short)1);
                 productModel.Price.IsDefault.ShouldBeTrue();
-                productModel.Price.Id.ShouldEqual(1);
-                productModel.Id.ShouldEqual(1);
+                productModel.Price.Id.ShouldBe(1);
+                productModel.Id.ShouldBe(1);
                 var otherProductModel = productArticleModel.OtherProduct;
-                otherProductModel.Price.RegionId.ShouldEqual((short)1);
+                otherProductModel.Price.RegionId.ShouldBe((short)1);
                 otherProductModel.Price.IsDefault.ShouldBeTrue();
-                otherProductModel.Price.Id.ShouldEqual(2);
-                otherProductModel.Id.ShouldEqual(2);
+                otherProductModel.Price.Id.ShouldBe(2);
+                otherProductModel.Id.ShouldBe(2);
             }
         }
 
@@ -235,12 +235,12 @@ namespace AutoMapper.IntegrationTests
                 var projection = context.ProductArticles.ProjectTo<ProductArticleModel>(Configuration);
                 var counter = new FirstOrDefaultCounter();
                 counter.Visit(projection.Expression);
-                counter.Count.ShouldEqual(1);
+                counter.Count.ShouldBe(1);
                 var productModel = projection.First().Products.First();
-                productModel.Price.RegionId.ShouldEqual((short)1);
+                productModel.Price.RegionId.ShouldBe((short)1);
                 productModel.Price.IsDefault.ShouldBeTrue();
-                productModel.Price.Id.ShouldEqual(1);
-                productModel.Id.ShouldEqual(1);
+                productModel.Price.Id.ShouldBe(1);
+                productModel.Id.ShouldBe(1);
             }
         }
 

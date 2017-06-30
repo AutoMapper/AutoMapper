@@ -3,7 +3,7 @@
 namespace AutoMapper.UnitTests.Bug
 {
     using System;
-    using Should;
+    using Shouldly;
 
     public class MapFromClosureBug : SpecBaseBase
     {

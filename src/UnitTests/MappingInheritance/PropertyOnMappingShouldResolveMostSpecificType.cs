@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -88,9 +88,9 @@ namespace AutoMapper.UnitTests.Bug
                                                                       }
                                                               });
 
-            dto.Items[0].Description.ShouldBeType<DifferentDescriptionDto>();
-            dto.Items[1].ShouldBeType<SpecificItemDto>();
-            dto.Items[1].Description.ShouldBeType<SpecificDescriptionDto>();
+            dto.Items[0].Description.ShouldBeOfType<DifferentDescriptionDto>();
+            dto.Items[1].ShouldBeOfType<SpecificItemDto>();
+            dto.Items[1].Description.ShouldBeOfType<SpecificDescriptionDto>();
         }
 
         [Fact]
@@ -128,9 +128,9 @@ namespace AutoMapper.UnitTests.Bug
                                                                       }
             });
 
-            dto.Items[0].Description.ShouldBeType<DifferentDescriptionDto>();
-            dto.Items[1].ShouldBeType<SpecificItemDto>();
-            dto.Items[1].Description.ShouldBeType<SpecificDescriptionDto>();
+            dto.Items[0].Description.ShouldBeOfType<DifferentDescriptionDto>();
+            dto.Items[1].ShouldBeOfType<SpecificItemDto>();
+            dto.Items[1].Description.ShouldBeOfType<SpecificDescriptionDto>();
         }
 
         [Fact]
@@ -161,8 +161,8 @@ namespace AutoMapper.UnitTests.Bug
 
             var dto = config.CreateMapper().Map<ItemBase, ItemDto>(new DifferentItem());
 
-            dto.ShouldBeType<ItemDto>();
-            dto.Description.ShouldBeType<DifferentDescriptionDto>();
+            dto.ShouldBeOfType<ItemDto>();
+            dto.Description.ShouldBeOfType<DifferentDescriptionDto>();
         }
 
         [Fact]
@@ -193,8 +193,8 @@ namespace AutoMapper.UnitTests.Bug
 
             var dto = config.CreateMapper().Map<ItemDto>(new DifferentItem());
 
-            dto.ShouldBeType<ItemDto>();
-            dto.Description.ShouldBeType<DifferentDescriptionDto>();
+            dto.ShouldBeOfType<ItemDto>();
+            dto.Description.ShouldBeOfType<DifferentDescriptionDto>();
         }
     }
 }

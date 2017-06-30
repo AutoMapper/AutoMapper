@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
 using Xunit;
-using Assert = Should.Core.Assertions.Assert;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.IntegrationTests.Net4
 {

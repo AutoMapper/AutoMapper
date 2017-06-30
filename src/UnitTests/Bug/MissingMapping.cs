@@ -1,9 +1,7 @@
-﻿using Should.Core.Assertions;
-
-namespace AutoMapper.UnitTests
+﻿namespace AutoMapper.UnitTests
 {
     using System.Linq;
-    using Should;
+    using Shouldly;
     using Xunit;
     using QueryableExtensions;
     using System;
@@ -25,7 +23,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Can_not_map_unmapped_type()
         {
-            new Action(() => Mapper.Map<Source, Dest>(new Source())).ShouldThrow<AutoMapperMappingException>(e => e.Message.ShouldStartWith("Missing type map configuration or unsupported mapping."));
+            new Action(() => Mapper.Map<Source, Dest>(new Source())).ShouldThrow<AutoMapperMappingException>();
         } 
     }
 }

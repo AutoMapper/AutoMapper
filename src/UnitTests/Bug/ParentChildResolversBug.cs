@@ -2,7 +2,7 @@
 {
     namespace ParentChildResolversBug
     {
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public enum DestEnum
@@ -102,7 +102,7 @@
             [Fact]
             public void Should_use_correct_resolver()
             {
-                _dest.field.ShouldEqual(DestEnum.a);
+                _dest.field.ShouldBe(DestEnum.a);
             }
         }
     }

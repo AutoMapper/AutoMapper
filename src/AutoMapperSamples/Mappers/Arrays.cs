@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using Should;
+using Shouldly;
 using NUnit.Framework;
 
 namespace AutoMapperSamples.Mappers
@@ -38,10 +38,10 @@ namespace AutoMapperSamples.Mappers
 
                 var destArray = config.CreateMapper().Map<Source[], Dest[]>(sourceArray);
 
-                destArray.Length.ShouldEqual(3);
-                destArray[0].Value.ShouldEqual(5);
-                destArray[1].Value.ShouldEqual(10);
-                destArray[2].Value.ShouldEqual(15);
+                destArray.Length.ShouldBe(3);
+                destArray[0].Value.ShouldBe(5);
+                destArray[1].Value.ShouldBe(10);
+                destArray[2].Value.ShouldBe(15);
             }
         }
 
@@ -91,10 +91,10 @@ namespace AutoMapperSamples.Mappers
 
                 var orderDto = config.CreateMapper().Map<Order, OrderDto>(order);
 
-                orderDto.LineItems.Length.ShouldEqual(3);
-                orderDto.LineItems[0].Quantity.ShouldEqual(5);
-                orderDto.LineItems[1].Quantity.ShouldEqual(15);
-                orderDto.LineItems[2].Quantity.ShouldEqual(25);
+                orderDto.LineItems.Length.ShouldBe(3);
+                orderDto.LineItems[0].Quantity.ShouldBe(5);
+                orderDto.LineItems[1].Quantity.ShouldBe(15);
+                orderDto.LineItems[2].Quantity.ShouldBe(25);
             }
         }
     }

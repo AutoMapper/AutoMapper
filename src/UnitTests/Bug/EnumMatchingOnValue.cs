@@ -1,4 +1,4 @@
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -46,7 +46,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_match_on_the_name_even_if_values_match()
         {
-            _result.EnumValue.ShouldEqual(SecondEnum.DifferentNamedEnum);
+            _result.EnumValue.ShouldBe(SecondEnum.DifferentNamedEnum);
         }
     }
 

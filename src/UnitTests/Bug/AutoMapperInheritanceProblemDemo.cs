@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -20,8 +20,8 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, Child>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
         
@@ -30,8 +30,8 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, GrandChild>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
         [Fact]
@@ -39,8 +39,8 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, GrandGrandChild>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
         [Fact]
@@ -48,8 +48,8 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, ChildPrivate>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
         [Fact]
@@ -57,8 +57,8 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, GrandChildPrivate>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
 
         [Fact]
@@ -66,8 +66,8 @@ namespace AutoMapper.UnitTests.Bug
         {
             var source = new Source {ParentProperty = "ParentProperty", ChildProperty = 1};
             var target = Mapper.Map<Source, GrandGrandChildPrivate>(source);
-            target.ParentProperty.ShouldEqual(source.ParentProperty);
-            target.ChildProperty.ShouldEqual(source.ChildProperty);
+            target.ParentProperty.ShouldBe(source.ParentProperty);
+            target.ChildProperty.ShouldBe(source.ChildProperty);
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
 using System.Linq;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.IntegrationTests
@@ -62,9 +62,9 @@ namespace AutoMapper.IntegrationTests
             using (var context = new Context())
             {
                 var model = context.Customers.ProjectTo<CustomerViewModel>(Configuration).Single();
-                model.Id.ShouldEqual(1);
-                model.FirstName.ShouldEqual("Bob");
-                model.LastName.ShouldEqual("Smith");
+                model.Id.ShouldBe(1);
+                model.FirstName.ShouldBe("Bob");
+                model.LastName.ShouldBe("Smith");
             }
         }
     }
@@ -122,9 +122,9 @@ namespace AutoMapper.IntegrationTests
             using(var context = new Context())
             {
                 var model = context.Customers.ProjectTo<CustomerViewModel>(Configuration).Single();
-                model.Id.ShouldEqual(1);
-                model.FirstName.ShouldEqual("Bob");
-                model.LastName.ShouldEqual("Smith");
+                model.Id.ShouldBe(1);
+                model.FirstName.ShouldBe("Bob");
+                model.LastName.ShouldBe("Smith");
             }
         }
     }

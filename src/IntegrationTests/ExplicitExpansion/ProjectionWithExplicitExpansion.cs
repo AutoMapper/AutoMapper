@@ -5,14 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.IntegrationTests.ProjectionWithExplicitExpansionExtension
 {
     public static class Ext
     {
-        public static int  SqlShouldSelectColumn   (this string sqlSelect, string columnName)=> sqlSelect.ShouldContain($".[{columnName}] AS [{columnName}]");
+        public static void SqlShouldSelectColumn   (this string sqlSelect, string columnName)=> sqlSelect.ShouldContain($".[{columnName}] AS [{columnName}]");
         public static void SqlShouldNotSelectColumn(this string sqlSelect, string columnName)=> sqlSelect.ShouldNotContain(columnName);
         public static void SqlFromShouldStartWith  (this string sqlSelect, string tableName)
         {
@@ -131,7 +131,7 @@ namespace AutoMapper.IntegrationTests
                 sqlSelect.ShouldNotContain("JOIN");
                 sqlSelect.ShouldNotContain(nameof(ctx.SourceInners)); dto.InnerDescFlattened.ShouldBeNull();
 
-                dto.Name.ShouldEqual(_iqf.Name); sqlSelect.SqlShouldSelectColumn   (nameof(_iqf.Name)); 
+                dto.Name.ShouldBe(_iqf.Name); sqlSelect.SqlShouldSelectColumn   (nameof(_iqf.Name)); 
                 dto.Desc.ShouldBeNull()        ; sqlSelect.SqlShouldNotSelectColumn(nameof(_iqf.Desc));  
             }
         }
@@ -147,7 +147,7 @@ namespace AutoMapper.IntegrationTests
                 sqlSelect.ShouldNotContain("JOIN");
                 sqlSelect.ShouldNotContain(nameof(ctx.SourceInners)); dto.InnerDescFlattened.ShouldBeNull();
 
-                dto.Desc.ShouldEqual(_iqf.Desc); sqlSelect.ShouldContain   (nameof(_iqf.Desc));
+                dto.Desc.ShouldBe(_iqf.Desc); sqlSelect.ShouldContain   (nameof(_iqf.Desc));
                 dto.Name.ShouldBeNull()        ; sqlSelect.ShouldNotContain(nameof(_iqf.Name)); 
 
             }
@@ -164,8 +164,8 @@ namespace AutoMapper.IntegrationTests
                 sqlSelect.ShouldNotContain("JOIN");
                 sqlSelect.ShouldNotContain(nameof(ctx.SourceInners)); dto.InnerDescFlattened.ShouldBeNull();
 
-                sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Name));   dto.Name.ShouldEqual(_iqf.Name);
-                sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Desc));   dto.Desc.ShouldEqual(_iqf.Desc);
+                sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Name));   dto.Name.ShouldBe(_iqf.Name);
+                sqlSelect.SqlShouldSelectColumn(nameof(_iqf.Desc));   dto.Desc.ShouldBe(_iqf.Desc);
             }
         }
 
@@ -176,7 +176,7 @@ namespace AutoMapper.IntegrationTests
             {
                 var dto = ctx.Sources.ProjectTo<Dto>(Configuration, _ => _.InnerDescFlattened).ToList().First();
 
-                dto.InnerDescFlattened.ShouldEqual(_iqf.Inner.Ides);
+                dto.InnerDescFlattened.ShouldBe(_iqf.Inner.Ides);
                 dto.InnerFlattenedNonKey.ShouldBeNull();
                 dto.DeepFlattened.ShouldBeNull();
 
@@ -196,7 +196,7 @@ namespace AutoMapper.IntegrationTests
             {
                 var dto = ctx.Sources.ProjectTo<Dto>(Configuration, _ => _.InnerFlattenedNonKey).ToList().First();
 
-                dto.InnerFlattenedNonKey.ShouldEqual(_iqf.Inner.Ide1);
+                dto.InnerFlattenedNonKey.ShouldBe(_iqf.Inner.Ide1);
                 dto.InnerDescFlattened.ShouldBeNull();
                 dto.DeepFlattened.ShouldBeNull();
 
@@ -219,7 +219,7 @@ namespace AutoMapper.IntegrationTests
                 var sqlSelect = ctx.GetLastSelectSqlLogEntry();
                 sqlSelect.SqlFromShouldStartWith(nameof(ctx.Sources));
 
-                dto.DeepFlattened.ShouldEqual(_iqf.Inner.Deep.Dide);
+                dto.DeepFlattened.ShouldBe(_iqf.Inner.Deep.Dide);
                 dto.InnerDescFlattened.ShouldBeNull();
 
                 sqlSelect.ShouldContain("JOIN");

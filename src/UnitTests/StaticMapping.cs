@@ -1,7 +1,7 @@
 ﻿namespace AutoMapper.UnitTests
 {
     using System.Linq;
-    using Should;
+    using Shouldly;
     using Xunit;
     using QueryableExtensions;
 
@@ -29,7 +29,7 @@
 
             var dest = Mapper.Map<Source, Dest>(source);
 
-            dest.Value.ShouldEqual(source.Value);
+            dest.Value.ShouldBe(source.Value);
         } 
 
         [Fact]
@@ -45,8 +45,8 @@
 
             var dests = sources.ProjectTo<Dest>().ToArray();
 
-            dests.Length.ShouldEqual(1);
-            dests[0].Value.ShouldEqual(source.Value);
+            dests.Length.ShouldBe(1);
+            dests[0].Value.ShouldBe(source.Value);
         } 
     }
 }

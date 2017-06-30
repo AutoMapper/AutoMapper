@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using AutoMapper;
-using Should;
+using Shouldly;
 using NUnit.Framework;
 using System.Linq;
 
@@ -41,10 +41,10 @@ namespace AutoMapperSamples.Mappers
                 IList<Destination> ilistDest = config.CreateMapper().Map<Source[], IList<Destination>>(sources);
                 List<Destination> listDest = config.CreateMapper().Map<Source[], List<Destination>>(sources);
 
-                ienumerableDest.Count().ShouldEqual(3);
-                icollectionDest.Count().ShouldEqual(3);
-                ilistDest.Count().ShouldEqual(3);
-                listDest.Count().ShouldEqual(3);
+                ienumerableDest.Count().ShouldBe(3);
+                icollectionDest.Count().ShouldBe(3);
+                ilistDest.Count().ShouldBe(3);
+                listDest.Count().ShouldBe(3);
             }
         }
 
@@ -90,9 +90,9 @@ namespace AutoMapperSamples.Mappers
 
                 var destinations = config.CreateMapper().Map<ParentSource[], ParentDestination[]>(sources);
 
-                destinations[0].ShouldBeType<ParentDestination>();
-                destinations[1].ShouldBeType<ChildDestination>();
-                destinations[2].ShouldBeType<ParentDestination>();
+                destinations[0].ShouldBeOfType<ParentDestination>();
+                destinations[1].ShouldBeOfType<ChildDestination>();
+                destinations[2].ShouldBeOfType<ParentDestination>();
             }
         }
     }

@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -41,7 +41,7 @@ namespace AutoMapper.UnitTests.Bug
 
             config.CreateMapper().Map(bar, baz);
 
-            baz.Value.ShouldEqual(5);
+            baz.Value.ShouldBe(5);
         }
     }
 }

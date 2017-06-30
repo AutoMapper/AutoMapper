@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -31,7 +31,7 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_map_enum_to_nullable_enum()
         {
-            _destination.EnumValue.ShouldEqual(SomeEnum.Bar);
+            _destination.EnumValue.ShouldBe(SomeEnum.Bar);
         }
     }
 }

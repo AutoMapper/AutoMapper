@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Xunit;
-using Should;
+using Shouldly;
 using System.Collections.Generic;
 
 namespace AutoMapper.UnitTests.DynamicMapping
@@ -23,7 +23,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         [Fact]
         public void Should_map_ok()
         {
-            _result.Value.ShouldEqual(ConsoleColor.DarkGreen);
+            _result.Value.ShouldBe(ConsoleColor.DarkGreen);
         }
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
@@ -74,7 +74,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         public void Should_map_ok()
         {
             var result = _destination.First();
-            result.Patient.Id.ShouldEqual(10);
+            result.Patient.Id.ShouldBe(10);
         }
     }
 
@@ -100,8 +100,8 @@ namespace AutoMapper.UnitTests.DynamicMapping
         {
             _resultWithGenerics = Mapper.Map<Source, Destination>(new Source {Value = 5});
             _resultWithoutGenerics = (Destination) Mapper.Map(new Source {Value = 5}, typeof(Source), typeof(Destination));
-            _resultWithGenerics.Value.ShouldEqual(5);
-            _resultWithoutGenerics.Value.ShouldEqual(5);
+            _resultWithGenerics.Value.ShouldBe(5);
+            _resultWithoutGenerics.Value.ShouldBe(5);
         }
     }
 
@@ -146,9 +146,9 @@ namespace AutoMapper.UnitTests.DynamicMapping
             var original = new Original { Text = "Hello world from original!" };
             var mapped = Mapper.Map<Target>(original);
 
-            mapped.Text.ShouldEqual(original.Text);
+            mapped.Text.ShouldBe(original.Text);
             mapped.Child.ShouldNotBeNull();
-            mapped.Child.Content.ShouldEqual("Hello world from inner!");
+            mapped.Child.Content.ShouldBe("Hello world from inner!");
         }
     }
 
@@ -196,13 +196,13 @@ namespace AutoMapper.UnitTests.DynamicMapping
         [Fact]
         public void Should_dynamically_map_the_two_types()
         {
-            _resultWithGenerics.Value.ShouldEqual(5);
+            _resultWithGenerics.Value.ShouldBe(5);
         }
 
         [Fact]
         public void Should_dynamically_map_the_children()
         {
-            _resultWithGenerics.Child.Value2.ShouldEqual("foo");
+            _resultWithGenerics.Child.Value2.ShouldBe("foo");
         }
     }
 
@@ -225,7 +225,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         {
             var destination = Mapper.Map<Source, Destination>(new Source {Value = 5});
 
-            destination.Valuefff.ShouldEqual(0);
+            destination.Valuefff.ShouldBe(0);
         }
 
         [Fact]
@@ -262,13 +262,13 @@ namespace AutoMapper.UnitTests.DynamicMapping
         [Fact]
         public void Should_preserve_existing_values()
         {
-            _destination.Valuefff.ShouldEqual(7);
+            _destination.Valuefff.ShouldBe(7);
         }
 
         [Fact]
         public void Should_map_new_values()
         {
-            _destination.Value2.ShouldEqual(3);
+            _destination.Value2.ShouldBe(3);
         }
     }
 
@@ -290,7 +290,7 @@ namespace AutoMapper.UnitTests.DynamicMapping
         [Fact]
         public void Should_allow_dynamic_mapping()
         {
-            _result.Value.ShouldEqual(5);
+            _result.Value.ShouldBe(5);
         }
 
         protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg => cfg.CreateMissingTypeMaps = true);
