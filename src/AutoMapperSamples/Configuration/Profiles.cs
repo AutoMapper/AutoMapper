@@ -1,6 +1,6 @@
 using AutoMapper;
 using NUnit.Framework;
-using Should;
+using Shouldly;
 
 namespace AutoMapperSamples.Configuration
 {
@@ -49,8 +49,8 @@ namespace AutoMapperSamples.Configuration
                 var listViewModel = config.CreateMapper().Map<Order, OrderListViewModel>(order);
                 var editViewModel = config.CreateMapper().Map<Order, OrderEditViewModel>(order);
 
-                listViewModel.Amount.ShouldEqual(order.Amount.ToString("c"));
-                editViewModel.Amount.ShouldEqual("50");
+                listViewModel.Amount.ShouldBe(order.Amount.ToString("c"));
+                editViewModel.Amount.ShouldBe("50");
             }
         }
     }

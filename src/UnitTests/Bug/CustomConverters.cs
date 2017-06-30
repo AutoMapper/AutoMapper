@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests.Bug
@@ -44,7 +44,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_use_the_converter()
         {
-            _destination.Date.ShouldEqual(DateTime.MaxValue);
+            _destination.Date.ShouldBe(DateTime.MaxValue);
         }
     }
 
@@ -139,10 +139,10 @@ namespace AutoMapper.UnitTests.Bug
             Mapper.Map<bool>(0).ShouldBeFalse();
             Mapper.Map<int?, bool>(0).ShouldBeFalse();
             Mapper.Map<int?, bool>(1).ShouldBeTrue();
-            Mapper.Map<int>(true).ShouldEqual(1);
-            Mapper.Map<int>(false).ShouldEqual(0);
-            Mapper.Map<int?>(true).ShouldEqual(1);
-            Mapper.Map<int?>(false).ShouldEqual(0);
+            Mapper.Map<int>(true).ShouldBe(1);
+            Mapper.Map<int>(false).ShouldBe(0);
+            Mapper.Map<int?>(true).ShouldBe(1);
+            Mapper.Map<int?>(false).ShouldBe(0);
             Mapper.Map<int?, bool>(null).ShouldBeFalse();
         }
     }

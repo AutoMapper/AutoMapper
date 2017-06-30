@@ -1,6 +1,6 @@
 using AutoMapper;
 using NUnit.Framework;
-using Should;
+using Shouldly;
 
 namespace AutoMapperSamples
 {
@@ -49,9 +49,9 @@ namespace AutoMapperSamples
 
                 var dest = config.CreateMapper().Map<OuterSource, OuterDest>(source);
 
-                dest.Value.ShouldEqual(5);
+                dest.Value.ShouldBe(5);
                 dest.Inner.ShouldNotBeNull();
-                dest.Inner.OtherValue.ShouldEqual(15);
+                dest.Inner.OtherValue.ShouldBe(15);
             }
         }
     }

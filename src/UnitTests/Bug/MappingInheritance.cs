@@ -1,7 +1,7 @@
 ﻿
 namespace AutoMapper.UnitTests.Bug
 {
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class MappingInheritance : AutoMapperSpecBase
@@ -34,9 +34,9 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void AutoMapper_should_map_derived_types_properly()
         {
-            testEntity.Value1.ShouldEqual(testModel.Value2);
-            testEntity.Value2.ShouldEqual(testModel.Value1);
-            (testEntity.Value1 + testEntity.Value2).ShouldEqual(testModel.Value3);
+            testEntity.Value1.ShouldBe(testModel.Value2);
+            testEntity.Value2.ShouldBe(testModel.Value1);
+            (testEntity.Value1 + testEntity.Value2).ShouldBe(testModel.Value3);
         }
 
         public class Entity
@@ -78,7 +78,7 @@ namespace AutoMapper.UnitTests.Bug
             var mailOrder = new MailOrder() { NewId = 1 };
             var mapped = mapper.Map<OrderDto>(mailOrder);
 
-            mapped.ShouldBeType<MailOrderDto>();
+            mapped.ShouldBeOfType<MailOrderDto>();
         }
 
         public abstract class Base<T>

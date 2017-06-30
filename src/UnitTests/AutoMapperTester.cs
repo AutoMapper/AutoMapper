@@ -1,5 +1,5 @@
 using System;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -15,8 +15,8 @@ namespace AutoMapper.UnitTests
             var mapper = config.CreateMapper();
             var destination = (DtoType[])mapper.Map(source, typeof(ModelType[]), typeof(DtoType[]));
 
-            destination[0].TheProperty.ShouldEqual("Foo");
-            destination[1].TheProperty.ShouldEqual("Bar");
+            destination[0].TheProperty.ShouldBe("Foo");
+            destination[1].TheProperty.ShouldBe("Bar");
         }
 
         public void Dispose()

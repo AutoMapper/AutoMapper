@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Xunit;
-using Should;
+using Shouldly;
 using AutoMapper.Configuration.Conventions;
 
 namespace AutoMapper.UnitTests.Tests
@@ -69,7 +69,7 @@ namespace AutoMapper.UnitTests.Tests
 
             var propertyMaps = typeMap.GetPropertyMaps();
 
-            propertyMaps.Count().ShouldEqual(2);
+            propertyMaps.Count().ShouldBe(2);
         }
     }
 
@@ -122,7 +122,7 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_split_using_naming_convention_rules()
         {
-            _map.GetPropertyMaps().Count().ShouldEqual(1);
+            _map.GetPropertyMaps().Count().ShouldBe(1);
         }
     }
 
@@ -175,7 +175,7 @@ namespace AutoMapper.UnitTests.Tests
         [Fact]
         public void Should_split_using_naming_convention_rules()
         {
-            _map.GetPropertyMaps().Count().ShouldEqual(1);
+            _map.GetPropertyMaps().Count().ShouldBe(1);
         }
     }
 
@@ -215,9 +215,9 @@ namespace AutoMapper.UnitTests.Tests
 
             var mapper = config.CreateMapper();
             var dest = mapper.Map<Destination>(new Source {Ävíator = 3, SubAirlinaFlight = 4, Value = 5});
-            dest.Aviator.ShouldEqual(3);
-            dest.SubAirlineFlight.ShouldEqual(4);
-            dest.Value.ShouldEqual(5);
+            dest.Aviator.ShouldBe(3);
+            dest.SubAirlineFlight.ShouldBe(4);
+            dest.Value.ShouldBe(5);
         }
     }
 }

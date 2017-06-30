@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -30,7 +30,7 @@ namespace AutoMapper.UnitTests.Bug
 
             var destination = config.CreateMapper().Map<DummySource, DummyDestination>(src);
 
-            destination.Dummy.ShouldEqual((int)DummyTypes.Bar);
+            destination.Dummy.ShouldBe((int)DummyTypes.Bar);
         }
     }
 }

@@ -1,5 +1,5 @@
 using Xunit;
-using Should;
+using Shouldly;
 using System;
 
 namespace AutoMapper.UnitTests
@@ -50,7 +50,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_inherit_the_mapping_order()
             {
-                _destination.Two.ShouldEqual("first");
+                _destination.Two.ShouldBe("first");
             }
 
             protected override MapperConfiguration Configuration
@@ -117,8 +117,8 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_perform_the_mapping_in_the_order_specified()
             {
-                _result.Value2.ShouldEqual(15);
-                _result.Value1.ShouldEqual(25);
+                _result.Value2.ShouldBe(15);
+                _result.Value1.ShouldBe(25);
             }
         }
 

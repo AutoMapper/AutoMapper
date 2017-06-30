@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 using System.Linq;
 using System.Collections;
@@ -52,10 +52,10 @@ namespace AutoMapper.UnitTests.Bug
         public void Should_map_dictionary_with_non_KeyValuePair_enumerable()
         {
             var json = (JObject)_destination.Json;
-            json.Count.ShouldEqual(3);
-            json["1"].ShouldEqual("one");
-            json["2"].ShouldEqual("two");
-            json["3"].ShouldEqual("three");
+            json.Count.ShouldBe(3);
+            json["1"].ShouldBe("one");
+            json["2"].ShouldBe("two");
+            json["3"].ShouldBe("three");
         }
     }
 

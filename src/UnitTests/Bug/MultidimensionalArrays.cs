@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using AutoMapper.Mappers;
 using System.Collections.Generic;
 using System;
@@ -42,13 +42,13 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_multidimensional_array()
         {
-            _destination.GetLength(0).ShouldEqual(_source.GetLength(0));
-            _destination.GetLength(1).ShouldEqual(_source.GetLength(1));
-            _destination[0, 0].Value.ShouldEqual(SomeValue);
-            _destination[0, 2].Value.ShouldEqual(2);
-            _destination[1, 1].Value.ShouldEqual(11);
-            _destination[2, 0].Value.ShouldEqual(20);
-            _destination[3, 2].Value.ShouldEqual(SomeValue);
+            _destination.GetLength(0).ShouldBe(_source.GetLength(0));
+            _destination.GetLength(1).ShouldBe(_source.GetLength(1));
+            _destination[0, 0].Value.ShouldBe(SomeValue);
+            _destination[0, 2].Value.ShouldBe(2);
+            _destination[1, 1].Value.ShouldBe(11);
+            _destination[2, 0].Value.ShouldBe(20);
+            _destination[3, 2].Value.ShouldBe(SomeValue);
         }
     }
 
@@ -76,10 +76,10 @@ namespace AutoMapper.UnitTests.Bug
             int index = 0;
             foreach(var value in _source)
             {
-                value.ShouldEqual(index);
+                value.ShouldBe(index);
                 index++;
             }
-            index.ShouldEqual(_source.Length);
+            index.ShouldBe(_source.Length);
         }
     }
 }

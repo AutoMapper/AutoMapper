@@ -1,5 +1,5 @@
 using System;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -34,7 +34,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_ignore_indexers_and_map_successfully()
             {
-                _result.Value.ShouldEqual("Bob");
+                _result.Value.ShouldBe("Bob");
             }
 
             [Fact]

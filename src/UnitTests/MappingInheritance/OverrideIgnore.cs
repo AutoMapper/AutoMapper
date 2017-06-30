@@ -1,4 +1,4 @@
-﻿using Should;
+﻿using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -24,7 +24,7 @@ namespace AutoMapper.UnitTests.Bug
 
             var dto = config.CreateMapper().Map<DomainBase, DtoBase>(new DomainBase {SomeProperty = "Test"});
 
-            "Test".ShouldEqual(dto.SomeDifferentProperty);
+            "Test".ShouldBe(dto.SomeDifferentProperty);
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests.Bug
 
             var dto = config.CreateMapper().Map<DtoBase>(new DomainBase { SomeProperty = "Test" });
 
-            "Test".ShouldEqual(dto.SomeDifferentProperty);
+            "Test".ShouldBe(dto.SomeDifferentProperty);
         }
     }
 }

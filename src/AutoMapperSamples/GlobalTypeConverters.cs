@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper;
 using NUnit.Framework;
-using Should;
+using Shouldly;
 
 namespace AutoMapperSamples
 {
@@ -64,7 +64,7 @@ namespace AutoMapperSamples
 
                 var mapper = config.CreateMapper();
                 Destination result = mapper.Map<Source, Destination>(source);
-                result.Value3.ShouldEqual(typeof(Destination));
+                result.Value3.ShouldBe(typeof(Destination));
 
                 Expression<Func<Source, object>> func = x => x.Value1;
 

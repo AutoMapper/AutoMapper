@@ -1,5 +1,4 @@
-﻿using Should.Core.Assertions;
-using Xunit;
+﻿using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {

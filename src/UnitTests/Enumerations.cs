@@ -1,6 +1,6 @@
 using System;
 using AutoMapper.UnitTests;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.Tests
@@ -32,7 +32,7 @@ namespace AutoMapper.Tests
         [Fact]
         public void Should_map_ok()
         {
-            _destination.Color.ShouldEqual("Black");
+            _destination.Color.ShouldBe("Black");
         }
     }
 
@@ -63,7 +63,7 @@ namespace AutoMapper.Tests
         [Fact]
         public void Should_map_with_underlying_type()
         {
-            _destination.Color.ShouldEqual(ConsoleColor.Red);
+            _destination.Color.ShouldBe(ConsoleColor.Red);
         }
     }
 
@@ -95,7 +95,7 @@ namespace AutoMapper.Tests
         [Fact]
         public void Should_map_with_underlying_type()
         {
-            _destination.Color.ShouldEqual("Test");
+            _destination.Color.ShouldBe("Test");
         }
     }
 
@@ -124,7 +124,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<Order, OrderDto>(order);
 
-            dto.Status.ShouldEqual(Status.InProgress);
+            dto.Status.ShouldBe(Status.InProgress);
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<Order, OrderDtoInt>(order);
 
-            dto.Status.ShouldEqual(1);
+            dto.Status.ShouldBe(1);
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<Order, OrderDtoString>(order);
 
-            dto.Status.ShouldEqual("InProgress");
+            dto.Status.ShouldBe("InProgress");
         }
 
         [Fact]
@@ -166,7 +166,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<OrderDtoInt, Order>(order);
 
-            dto.Status.ShouldEqual(Status.InProgress);
+            dto.Status.ShouldBe(Status.InProgress);
         }
 
         [Fact]
@@ -180,7 +180,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<OrderDtoString, Order>(order);
 
-            dto.Status.ShouldEqual(Status.InProgress);
+            dto.Status.ShouldBe(Status.InProgress);
         }
         
         [Fact]
@@ -196,7 +196,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<Order, OrderDtoWithOwnStatus>(order);
 
-            dto.Status.ShouldEqual(StatusForDto.InProgress);
+            dto.Status.ShouldBe(StatusForDto.InProgress);
         }
 
         [Fact]
@@ -212,7 +212,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<Order, OrderDtoWithOwnStatus>(order);
 
-            dto.Status.ShouldEqual(StatusForDto.InProgress);
+            dto.Status.ShouldBe(StatusForDto.InProgress);
         }
 
         [Fact]
@@ -227,7 +227,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<OrderWithNullableStatus, OrderDtoWithNullableStatus>(order);
 
-            dto.Status.ShouldEqual(Status.InProgress);
+            dto.Status.ShouldBe(Status.InProgress);
         }
 
         [Fact]
@@ -242,7 +242,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var dto = mapper.Map<OrderWithNullableStatus, OrderDtoWithOwnNullableStatus>(order);
 
-            dto.Status.ShouldEqual(StatusForDto.InProgress);
+            dto.Status.ShouldBe(StatusForDto.InProgress);
         }
 
         [Fact]
@@ -299,7 +299,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var mappedDto = mapper.Map<Order, OrderDtoWithOwnStatus>(order);
 
-            mappedDto.Status.ShouldEqual(StatusForDto.InProgress);
+            mappedDto.Status.ShouldBe(StatusForDto.InProgress);
         }
 
         [Fact]
@@ -316,7 +316,7 @@ namespace AutoMapper.Tests
             var mapper = config.CreateMapper();
             var mappedDto = mapper.Map<Order, OrderDtoWithOwnStatus>(order);
 
-            mappedDto.Status.ShouldEqual(StatusForDto.InProgress);
+            mappedDto.Status.ShouldBe(StatusForDto.InProgress);
         }
 
         [Fact]
@@ -334,7 +334,7 @@ namespace AutoMapper.Tests
 
             var expected = (StatusForDto)0;
 
-            dto.Status.ShouldEqual(expected);
+            dto.Status.ShouldBe(expected);
         }
 
         public enum Status
@@ -431,7 +431,7 @@ namespace AutoMapper.Tests
         {
             SourceClass sourceClass = null;
             var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
-            dest.Values.ShouldEqual(default(EnumValues));
+            dest.Values.ShouldBe(default(EnumValues));
         }
     }
 
@@ -463,7 +463,7 @@ namespace AutoMapper.Tests
         {
             var values = EnumValues.Two | EnumValues.Three;
             var dest = Mapper.Map<SourceClass, DestinationClass>(new SourceClass { Values = values });
-            dest.Values.ShouldEqual(values);
+            dest.Values.ShouldBe(values);
         }
     }
 
@@ -495,7 +495,7 @@ namespace AutoMapper.Tests
         {
             SourceClass sourceClass = null;
             var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
-            dest.Values.ShouldEqual(default(EnumValues));
+            dest.Values.ShouldBe(default(EnumValues));
         }
     }
     public class When_mapping_from_a_null_object_with_a_nullable_enum_as_string : AutoMapperSpecBase
@@ -529,7 +529,7 @@ namespace AutoMapper.Tests
         {
             var sourceClass = new SourceClass();
             var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
-            dest.Values1.ShouldEqual(default(EnumValues));
+            dest.Values1.ShouldBe(default(EnumValues));
         }
 
         [Fact]
@@ -548,7 +548,7 @@ namespace AutoMapper.Tests
                 Values3 = ""
             };
             var dest = Mapper.Map<SourceClass, DestinationClass>(sourceClass);
-            dest.Values3.ShouldEqual(default(EnumValues));
+            dest.Values3.ShouldBe(default(EnumValues));
         }
     }
 
@@ -587,7 +587,7 @@ namespace AutoMapper.Tests
         [Fact]
         public void Should_include_all_source_enum_values()
         {
-            _result.ShouldEqual(DestinationFlags.One | DestinationFlags.Four | DestinationFlags.Eight);
+            _result.ShouldBe(DestinationFlags.One | DestinationFlags.Four | DestinationFlags.Eight);
         }
     }
 

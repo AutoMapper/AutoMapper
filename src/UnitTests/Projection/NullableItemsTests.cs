@@ -6,8 +6,7 @@ namespace AutoMapper.UnitTests.Projection
     {
         using System.Linq;
         using QueryableExtensions;
-        using Should;
-        using Should.Core.Assertions;
+        using Shouldly;
         using Xunit;
 
         public class NullChildItemTest
@@ -35,7 +34,7 @@ namespace AutoMapper.UnitTests.Projection
 
                 var projected = items.AsQueryable().ProjectTo<ParentDto>(_config).ToList();
 
-                projected[0].Value.ShouldEqual(5);
+                projected[0].Value.ShouldBe(5);
                 projected[0].ChildValue.ShouldBeNull();
                 projected[0].ChildGrandChildValue.ShouldBeNull();
                 projected[0].Nephews.ShouldBeNull();

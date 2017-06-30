@@ -4,14 +4,14 @@ namespace AutoMapper.UnitTests
 {
     namespace AssemblyScanning
     {
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class When_scanning_by_assembly : NonValidatingSpecBase
         {
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfiles(new[] { typeof(When_scanning_by_assembly).Assembly });
+                cfg.AddProfiles(new[] { typeof(When_scanning_by_assembly).Assembly() });
             });
 
             [Fact]
@@ -54,7 +54,7 @@ namespace AutoMapper.UnitTests
         {
             protected override MapperConfiguration Configuration { get; } = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfiles(new[] { "AutoMapper.UnitTests.Net4" });
+                cfg.AddProfiles(new[] { "AutoMapper.UnitTests" });
             });
 
             [Fact]

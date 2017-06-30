@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Collections;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -22,7 +22,7 @@ namespace AutoMapper.UnitTests.Bug
             People people = new People(personArr);
             var pmc = Mapper.Map<People, List<PersonModel>>(people);
             pmc.ShouldNotBeNull();
-            pmc.Count.ShouldEqual(0);
+            pmc.Count.ShouldBe(0);
         }
     }
 

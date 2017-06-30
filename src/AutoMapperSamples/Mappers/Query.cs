@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using NUnit.Framework;
-using Should;
+using Shouldly;
 
 namespace AutoMapperSamples.Mappers
 {
@@ -47,8 +47,8 @@ namespace AutoMapperSamples.Mappers
                     .Where(s => s.SrcValue > 6)
                     .Map(_destinations.AsQueryable(), config);
 
-                detsResult.Count().ShouldEqual(1);
-                detsResult.First().GetType().ShouldEqual(typeof(Destination));
+                detsResult.Count().ShouldBe(1);
+                detsResult.First().GetType().ShouldBe(typeof(Destination));
             }
 
             [Test]
@@ -67,8 +67,8 @@ namespace AutoMapperSamples.Mappers
                     .Map<Source, Destination>(_destinations.AsQueryable(), config)
                     .ProjectTo<Source>(config); // projection added
 
-                sourceResult.Count().ShouldEqual(1);
-                sourceResult.First().GetType().ShouldEqual(typeof(Source));
+                sourceResult.Count().ShouldBe(1);
+                sourceResult.First().GetType().ShouldBe(typeof(Source));
             }
         }
     }

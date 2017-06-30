@@ -3,7 +3,7 @@
     namespace ForAllMembers
     {
         using System;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public class When_conditionally_applying_a_resolver_globally : AutoMapperSpecBase
@@ -46,8 +46,8 @@
                 };
                 var dest = Mapper.Map<Source, Dest>(source);
 
-                dest.SomeDate.ShouldEqual(source.SomeDate);
-                dest.OtherDate.ShouldEqual(source.OtherDate.AddDays(1));
+                dest.SomeDate.ShouldBe(source.SomeDate);
+                dest.OtherDate.ShouldBe(source.OtherDate.AddDays(1));
             }
         }
     }

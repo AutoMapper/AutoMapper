@@ -1,5 +1,5 @@
 ﻿using System;
-using Should;
+using Shouldly;
 using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
@@ -147,7 +147,7 @@ namespace AutoMapper.UnitTests.Mappers
             public override bool IsMatch(TypePair types)
             {
                 var underlyingType = Nullable.GetUnderlyingType(types.SourceType);
-                return underlyingType.IsEnum && types.DestinationType == typeof(string);
+                return underlyingType.IsEnum() && types.DestinationType == typeof(string);
             }
 
             public override string Map(object source, string destination, ResolutionContext context)
@@ -170,7 +170,7 @@ namespace AutoMapper.UnitTests.Mappers
         [Fact]
         public void Should_map_with_underlying_type()
         {
-            _destination.Color.ShouldEqual("Test");
+            _destination.Color.ShouldBe("Test");
         }
     }
 }

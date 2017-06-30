@@ -3,7 +3,7 @@
     namespace ObjectSubstitution
     {
         using System;
-        using Should;
+        using Shouldly;
         using Xunit;
 
         public abstract class Animal { }
@@ -53,7 +53,7 @@
             [Fact]
             public void Should_substitute_correct_object()
             {
-                _animalDto.ShouldBeType<CatDto>();
+                _animalDto.ShouldBeOfType<CatDto>();
             }
 
             private static object CastToEntity(Animal entity)

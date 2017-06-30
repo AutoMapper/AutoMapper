@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Should;
+using Shouldly;
 using AutoMapper;
 using Xunit;
 
@@ -64,7 +64,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_as_usual()
         {
-            _destination.FiredDate.ShouldEqual(_date.Date);
+            _destination.FiredDate.ShouldBe(_date.Date);
         }
     }
 
@@ -98,7 +98,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_as_usual()
         {
-            _destination.Value.ShouldEqual(_date);
+            _destination.Value.ShouldBe(_date);
         }
     }
 }

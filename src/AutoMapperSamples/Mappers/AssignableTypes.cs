@@ -1,5 +1,5 @@
 using AutoMapper;
-using Should;
+using Shouldly;
 using NUnit.Framework;
 
 namespace AutoMapperSamples.Mappers
@@ -25,8 +25,8 @@ namespace AutoMapperSamples.Mappers
                 // No configuration needed
                 var config = new MapperConfiguration(cfg => { });
                 var mapper = config.CreateMapper();
-                mapper.Map<int, int>(5).ShouldEqual(5);
-                mapper.Map<string, string>("foo").ShouldEqual("foo");
+                mapper.Map<int, int>(5).ShouldBe(5);
+                mapper.Map<string, string>("foo").ShouldBe("foo");
             }
 
             [Test]
@@ -38,7 +38,7 @@ namespace AutoMapperSamples.Mappers
                 var mapper = config.CreateMapper();
                 var dest = mapper.Map<Bar, Foo>(source);
 
-                dest.Value.ShouldEqual(5);
+                dest.Value.ShouldBe(5);
             }
         }
     }

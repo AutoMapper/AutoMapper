@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -57,7 +57,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_nested_classes()
         {
-            _destination.Man.Chu.Prop.ShouldEqual(_propValue);
+            _destination.Man.Chu.Prop.ShouldBe(_propValue);
         }
     }
 }

@@ -1,5 +1,5 @@
 using Xunit;
-using Should;
+using Shouldly;
 using System.Linq;
 
 namespace AutoMapper.UnitTests
@@ -39,7 +39,7 @@ namespace AutoMapper.UnitTests
             [Fact]
             public void Should_create_a_map_with_the_reverse_items()
             {
-                _source.Value.ShouldEqual(10);
+                _source.Value.ShouldBe(10);
             }
         }
 
@@ -97,7 +97,7 @@ namespace AutoMapper.UnitTests
                 //Act
                 var unmappedPropertyNames = typeMap.GetUnmappedPropertyNames();
                 //Assert
-                unmappedPropertyNames[0].ShouldEqual("Boo");
+                unmappedPropertyNames[0].ShouldBe("Boo");
             }
 
             [Fact]
@@ -113,7 +113,7 @@ namespace AutoMapper.UnitTests
                 //Act
                 var unmappedPropertyNames = typeMap.GetUnmappedPropertyNames();
                 //Assert
-                unmappedPropertyNames[0].ShouldEqual("Boo");
+                unmappedPropertyNames[0].ShouldBe("Boo");
             }
         }
     }

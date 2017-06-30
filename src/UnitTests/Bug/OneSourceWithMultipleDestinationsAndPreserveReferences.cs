@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_map_ok()
         {
-            _destination.Address.Address1.ShouldEqual("abc");
+            _destination.Address.Address1.ShouldBe("abc");
         }
     }
 }

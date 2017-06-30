@@ -1,7 +1,7 @@
 ﻿namespace AutoMapper.UnitTests
 {
     using MappingInheritance;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class OpenGenerics
@@ -30,7 +30,7 @@
 
             var dest = config.CreateMapper().Map<Source<int>, Dest<int>>(source);
 
-            dest.Value.ShouldEqual(5);
+            dest.Value.ShouldBe(5);
         }
 
         [Fact]
@@ -45,7 +45,7 @@
 
             var dest = config.CreateMapper().Map<Source<int>, Dest<int>>(source);
 
-            dest.A.ShouldEqual(5);
+            dest.A.ShouldBe(5);
         }
 
         [Fact]
@@ -63,7 +63,7 @@
 
             var dest = config.CreateMapper().Map<Source<Source<int>>, Dest<Dest<double>>>(source);
 
-            dest.Value.Value.ShouldEqual(5);
+            dest.Value.Value.ShouldBe(5);
         }
     }
 
@@ -98,8 +98,8 @@
 
             var dest = Mapper.Map<Foo<int>, Bar<int>>(source);
 
-            dest.C.ShouldEqual(5);
-            dest.D.ShouldEqual(10);
+            dest.C.ShouldBe(5);
+            dest.D.ShouldBe(10);
         }
     }
 }

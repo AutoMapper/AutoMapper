@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using QueryableExtensions;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class ExplicitValues : AutoMapperSpecBase
@@ -36,7 +36,7 @@
         [Fact]
         public void Should_substitute_value()
         {
-            _dests[0].Value.ShouldEqual(5);
+            _dests[0].Value.ShouldBe(5);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace AutoMapper.UnitTests.MappingInheritance
 {
     using System;
-    using Should;
+    using Shouldly;
     using Xunit;
     public class MapToBaseClass : AutoMapperSpecBase
     {
@@ -25,7 +25,7 @@
         [Fact]
         public void ShouldReturnBaseClass()
         {
-            _destination.ShouldBeType<A>();
+            _destination.ShouldBeOfType<A>();
         }
     }
 }

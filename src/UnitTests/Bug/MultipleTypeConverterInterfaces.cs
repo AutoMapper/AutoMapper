@@ -1,4 +1,4 @@
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
@@ -56,13 +56,13 @@ namespace AutoMapper.UnitTests.Bug
             [Fact]
             public void Should_use_implicit_converter()
             {
-                _resultFoo.DestinationFooValue.ShouldEqual(105);
+                _resultFoo.DestinationFooValue.ShouldBe(105);
             }
 
             [Fact]
             public void Should_use_explicit_converter()
             {
-                _resultBar.DestinationBarValue.ShouldEqual(1006);
+                _resultBar.DestinationBarValue.ShouldBe(1006);
             }
 
             [Fact]

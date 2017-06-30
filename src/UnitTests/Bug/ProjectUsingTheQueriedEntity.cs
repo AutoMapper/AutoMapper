@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 using System.Linq;
 using AutoMapper.QueryableExtensions;
@@ -32,7 +32,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_handle_projectusing_with_the_queried_entity()
         {
-            _destination.Number.ShouldEqual(23);
+            _destination.Number.ShouldBe(23);
         }
     }
 }

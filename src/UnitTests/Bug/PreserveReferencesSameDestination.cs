@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -85,8 +85,8 @@ namespace AutoMapper.UnitTests.Bug
                             }
                         }
                     };
-            Mapper.Map<EntityOne, DtoOne>(source).ShouldBeType<DtoOne>();
-            Mapper.Map<EntityOne, DtoThree>(source).ShouldBeType<DtoThree>();
+            Mapper.Map<EntityOne, DtoOne>(source).ShouldBeOfType<DtoOne>();
+            Mapper.Map<EntityOne, DtoThree>(source).ShouldBeOfType<DtoThree>();
         }
     }
 }

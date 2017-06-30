@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests
@@ -43,8 +43,8 @@ namespace AutoMapper.UnitTests
         {
             var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
             var model = Mapper.Map<Order>(dto);
-            model.CustomerHolder.Customer.Name.ShouldEqual("George Costanza");
-            model.CustomerHolder.Customer.Total.ShouldEqual(74.85m);
+            model.CustomerHolder.Customer.Name.ShouldBe("George Costanza");
+            model.CustomerHolder.Customer.Total.ShouldBe(74.85m);
         }
     }
 
@@ -82,8 +82,8 @@ namespace AutoMapper.UnitTests
         [Fact]
         public void Should_unflatten()
         {
-            new Action(() => Mapper.Map<Order>(new OrderDto())).ShouldThrow<NullReferenceException>(ex =>
-                  ex.Message.ShouldEqual("typeMapDestination.CustomerHolder.Customer cannot be null because it's used by ForPath."));
+            new Action(() => Mapper.Map<Order>(new OrderDto())).ShouldThrowException<NullReferenceException>(ex =>
+                  ex.Message.ShouldBe("typeMapDestination.CustomerHolder.Customer cannot be null because it's used by ForPath."));
         }
     }
 
@@ -125,9 +125,9 @@ namespace AutoMapper.UnitTests
         {
             var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
             var model = Mapper.Map<Order>(dto);
-            model.Value.ShouldEqual(0);
+            model.Value.ShouldBe(0);
             model.CustomerHolder.Customer.Name.ShouldBeNull();
-            model.CustomerHolder.Customer.Total.ShouldEqual(0m);
+            model.CustomerHolder.Customer.Total.ShouldBe(0m);
         }
     }
 
@@ -177,7 +177,7 @@ namespace AutoMapper.UnitTests
             };
             Mapper.Map(dest, source);
 
-            source.ContactNavigation.Id.ShouldEqual(5);
+            source.ContactNavigation.Id.ShouldBe(5);
         }
     }
 
@@ -217,8 +217,8 @@ namespace AutoMapper.UnitTests
         {
             var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
             var model = Mapper.Map<Order>(dto);
-            model.CustomerHolder.Customer.Name.ShouldEqual("George Costanza");
-            model.CustomerHolder.Customer.Total.ShouldEqual(74.85m);
+            model.CustomerHolder.Customer.Name.ShouldBe("George Costanza");
+            model.CustomerHolder.Customer.Total.ShouldBe(74.85m);
         }
     }
 
@@ -258,8 +258,8 @@ namespace AutoMapper.UnitTests
         {
             var dto = new OrderDto { CustomerName = "George Costanza", Total = 74.85m };
             var model = Mapper.Map<Order>(dto);
-            model.CustomerHolder.Customer.Name.ShouldEqual("George Costanza");
-            model.CustomerHolder.Customer.Total.ShouldEqual(74.85m);
+            model.CustomerHolder.Customer.Name.ShouldBe("George Costanza");
+            model.CustomerHolder.Customer.Total.ShouldBe(74.85m);
         }
     }
 }

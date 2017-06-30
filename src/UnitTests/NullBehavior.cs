@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Should;
+using Shouldly;
 using Xunit;
 using System.Collections;
 using System;
@@ -253,7 +253,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_return_default_value_of_property_in_the_chain()
         {
-            _result.SubSomething.ShouldEqual(0);
+            _result.SubSomething.ShouldBe(0);
         }
 
         [Fact]
@@ -265,7 +265,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Default_value_for_string_should_be_empty()
         {
-            _result.NullString.ShouldEqual(string.Empty);
+            _result.NullString.ShouldBe(string.Empty);
         }
     }
 
@@ -333,13 +333,13 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_return_null_for_nullable_properties_that_are_complex_map_froms()
         {
-            _result.SubExpressionName.ShouldEqual(null);
+            _result.SubExpressionName.ShouldBe(null);
         }
 
         [Fact]
         public void Should_return_null_for_nullable_properties_that_have_member_access_map_froms()
         {
-            _result.NullableMapFrom.ShouldEqual(null);
+            _result.NullableMapFrom.ShouldBe(null);
         }
 
         [Fact]
@@ -351,7 +351,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_map_primitive_items_as_default()
         {
-            _result.SubSomething.ShouldEqual(0);
+            _result.SubSomething.ShouldBe(0);
         }
 
         [Fact]
@@ -429,13 +429,13 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_return_null_for_nullable_properties_that_are_complex_map_froms()
         {
-            _result.SubExpressionName.ShouldEqual(null);
+            _result.SubExpressionName.ShouldBe(null);
         }
 
         [Fact]
         public void Should_return_null_for_nullable_properties_that_have_member_access_map_froms()
         {
-            _result.NullableMapFrom.ShouldEqual(null);
+            _result.NullableMapFrom.ShouldBe(null);
         }
 
         [Fact]
@@ -447,7 +447,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_map_primitive_items_as_default()
         {
-            _result.SubSomething.ShouldEqual(0);
+            _result.SubSomething.ShouldBe(0);
         }
 
         [Fact]
@@ -551,7 +551,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_perform_the_translation()
         {
-            _dest.Name.ShouldEqual("jon");
+            _dest.Name.ShouldBe("jon");
         }
     }
 
@@ -589,7 +589,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_map_to_null_on_destination_values()
         {
-            _dest.OtherValue.ShouldEqual(0);
+            _dest.OtherValue.ShouldBe(0);
         }
     }
 
@@ -638,7 +638,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         [Fact]
         public void Should_allow_the_resolver_to_handle_null_values()
         {
-            _result.IsFooBarred.ShouldEqual("(n/a)");
+            _result.IsFooBarred.ShouldBe("(n/a)");
         }
     }
 

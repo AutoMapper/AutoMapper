@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using AutoMapper.Mappers;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace AutoMapper.UnitTests.Mappers
@@ -78,9 +78,9 @@ namespace AutoMapper.UnitTests.Mappers
 
                 var result = mapper.Map(sourceValue, new NameValueCollection());
 
-                1.ShouldEqual(result.Count);
-                "foo".ShouldEqual(result.AllKeys[0]);
-                "bar".ShouldEqual(result["foo"]);
+                1.ShouldBe(result.Count);
+                "foo".ShouldBe(result.AllKeys[0]);
+                "bar".ShouldBe(result["foo"]);
             }
         }
         

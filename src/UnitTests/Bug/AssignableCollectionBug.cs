@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -38,7 +38,7 @@ namespace AutoMapper.UnitTests.Bug
             [Fact]
             public void Should_copy_array()
             {
-                _dest.ImageData.ShouldEqual(_source.ImageData);
+                _dest.ImageData.ShouldBe(_source.ImageData);
             }
         }
     }
@@ -60,8 +60,8 @@ namespace AutoMapper.UnitTests.Bug
                 destination.Images.Add("test");
 
                 // assert
-                destination.Images.Count.ShouldEqual(1);
-                source.Images.Count.ShouldEqual(0); // in 3.1.0 source.Images.Count is 1
+                destination.Images.Count.ShouldBe(1);
+                source.Images.Count.ShouldBe(0); // in 3.1.0 source.Images.Count is 1
             }
         }
 

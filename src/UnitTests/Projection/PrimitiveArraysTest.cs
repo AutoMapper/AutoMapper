@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Xunit;
 using System.Linq;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Projection
 {
@@ -44,8 +44,8 @@ namespace AutoMapper.UnitTests.Projection
 
                 var result = expr.ToList();
 
-                result[0].Value1.ShouldEqual(sources[0].Value1);
-                result[0].Value2.ShouldEqual(sources[0].Value2);
+                result[0].Value1.ShouldBe(sources[0].Value1);
+                result[0].Value2.ShouldBe(sources[0].Value2);
             }
         }
         public class Source

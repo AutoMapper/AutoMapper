@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET452
+using System;
 using System.Linq;
 using System.Reflection;
 using Xunit;
@@ -36,3 +37,4 @@ namespace AutoMapper.UnitTests
         }
     }
 }
+#endif

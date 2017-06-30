@@ -1,5 +1,5 @@
 ﻿using System;
-using Should;
+using Shouldly;
 using AutoMapper.Mappers;
 using Xunit;
 
@@ -45,7 +45,7 @@ namespace AutoMapper.UnitTests.Bug
         [Fact]
         public void Should_be_enum()
         {
-            _target.Value.ShouldBeType<TargetEnumValue>();
+            _target.Value.ShouldBeOfType<TargetEnumValue>();
         }
     }
 }

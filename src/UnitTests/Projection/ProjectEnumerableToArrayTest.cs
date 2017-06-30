@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Projection
 {
@@ -33,8 +33,8 @@ namespace AutoMapper.UnitTests.Projection
 
             var mapped = movies.ProjectTo<MovieDto>(_config);
 
-            mapped.ElementAt(0).Actors.Length.ShouldEqual(2);
-            mapped.ElementAt(1).Actors[1].Name.ShouldEqual("Actor 4");
+            mapped.ElementAt(0).Actors.Length.ShouldBe(2);
+            mapped.ElementAt(1).Actors[1].Name.ShouldBe("Actor 4");
         }
 
         public class Movie

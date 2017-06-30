@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -17,11 +17,11 @@ namespace AutoMapper.UnitTests.Bug
 
             var mapper = config.CreateMapper();
             mapper.Map(displayModel, vm);
-            ((SomeViewModel)vm).Radius.ShouldEqual(300); // fails
+            ((SomeViewModel)vm).Radius.ShouldBe(300); // fails
 
             var vm2 = new SomeViewModel();
             mapper.Map(displayModel, vm2);
-            vm2.Radius.ShouldEqual(300); // succeeds
+            vm2.Radius.ShouldBe(300); // succeeds
         }
 
         public class SomeViewModel

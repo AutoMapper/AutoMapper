@@ -1,6 +1,6 @@
 using AutoMapper;
 using NUnit.Framework;
-using Should;
+using Shouldly;
 
 namespace AutoMapperSamples
 {
@@ -39,7 +39,7 @@ namespace AutoMapperSamples
 
                 mapper.Map(orderDto, order);
 
-                order.Amount.ShouldEqual(50m);
+                order.Amount.ShouldBe(50m);
             }
         }
     }

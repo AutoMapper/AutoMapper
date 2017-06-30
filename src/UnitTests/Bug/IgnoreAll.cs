@@ -2,7 +2,7 @@ using Xunit;
 
 namespace AutoMapper.UnitTests.Bug
 {
-    using Should;
+    using Shouldly;
 
     public class When_configuring_all_members_and_some_do_not_match
     {
@@ -75,7 +75,7 @@ namespace AutoMapper.UnitTests.Bug
         public void Should_only_apply_source_value_when_not_null()
         {
             _destination.Value1.ShouldNotBeNull();
-            _destination.Value2.ShouldNotEqual(null);
+            _destination.Value2.ShouldNotBe(null);
             _destination.Unmapped.ShouldNotBeNull();
         }
     }

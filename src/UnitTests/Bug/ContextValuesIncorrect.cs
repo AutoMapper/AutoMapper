@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests.Bug
 {
@@ -45,13 +45,13 @@ namespace AutoMapper.UnitTests.Bug
             [Fact]
             public void Should_map_the_null_value()
             {
-                _destination.Value2.ShouldEqual(4);
+                _destination.Value2.ShouldBe(4);
             }
 
             [Fact]
             public void Should_leave_the_non_null_value_alone()
             {
-                _destination.Value.ShouldEqual(5);
+                _destination.Value.ShouldBe(5);
             }
         }
     }

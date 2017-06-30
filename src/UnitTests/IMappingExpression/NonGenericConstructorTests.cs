@@ -4,7 +4,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using QueryableExtensions;
-    using Should;
+    using Shouldly;
     using Xunit;
 
     public class NonGenericConstructorTests : AutoMapperSpecBase
@@ -54,7 +54,7 @@
         [Fact]
         public void Should_construct_correctly()
         {
-            _dest[0].Other.ShouldEqual(15);
+            _dest[0].Other.ShouldBe(15);
         }
     }
 }

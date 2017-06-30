@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using AutoMapper;
-using Should;
+using Shouldly;
 using NUnit.Framework;
 
 namespace AutoMapperSamples.Mappers
@@ -37,10 +37,10 @@ namespace AutoMapperSamples.Mappers
 
                 var destDict = config.CreateMapper().Map<Dictionary<string, SourceValue>, IDictionary<string, DestValue>>(sourceDict);
 
-                destDict.Count.ShouldEqual(3);
-                destDict["First"].Value.ShouldEqual(5);
-                destDict["Second"].Value.ShouldEqual(10);
-                destDict["Third"].Value.ShouldEqual(15);
+                destDict.Count.ShouldBe(3);
+                destDict["First"].Value.ShouldBe(5);
+                destDict["Second"].Value.ShouldBe(10);
+                destDict["Third"].Value.ShouldBe(15);
             }
         }
     }

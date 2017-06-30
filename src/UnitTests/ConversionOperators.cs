@@ -1,5 +1,5 @@
 using Xunit;
-using Should;
+using Shouldly;
 
 namespace AutoMapper.UnitTests
 {
@@ -36,7 +36,7 @@ namespace AutoMapper.UnitTests
 
                 _bar = config.CreateMapper().Map<Foo, Bar>(source);
 
-                _bar.OtherValue.ShouldEqual("Hello");
+                _bar.OtherValue.ShouldBe("Hello");
             }
         }
         
@@ -76,7 +76,7 @@ namespace AutoMapper.UnitTests
                 var config = new MapperConfiguration(cfg => { });
                 _bar = config.CreateMapper().Map<Foo, Bar>(source);
 
-                _bar.OtherValue.ShouldEqual("Hello");
+                _bar.OtherValue.ShouldBe("Hello");
             }
         }
 
@@ -107,7 +107,7 @@ namespace AutoMapper.UnitTests
             {
                 var config = new MapperConfiguration(cfg => { });
                 _bar = config.CreateMapper().Map<Foo, Bar>(new Foo { Value = "Hello" });
-                _bar.OtherValue.ShouldEqual("Hello");
+                _bar.OtherValue.ShouldBe("Hello");
             }
         }
 
@@ -138,7 +138,7 @@ namespace AutoMapper.UnitTests
             {
                 var config = new MapperConfiguration(cfg => { });
                 _bar = config.CreateMapper().Map<Foo, Bar>(new Foo { Value = "Hello" });
-                _bar.OtherValue.ShouldEqual("Hello");
+                _bar.OtherValue.ShouldBe("Hello");
             }
         }
     }

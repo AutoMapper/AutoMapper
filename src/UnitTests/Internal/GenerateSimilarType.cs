@@ -1,10 +1,10 @@
-﻿using System.Linq;
+﻿#if NET452
+using System.Linq;
 using System.Collections.Generic;
 using AutoMapper.Execution;
 using Xunit;
-using Should;
+using Shouldly;
 using System;
-using Should.Core.Assertions;
 
 namespace AutoMapper.UnitTests
 {
@@ -70,3 +70,4 @@ namespace AutoMapper.UnitTests
         }
     }
 }
+#endif
