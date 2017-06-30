@@ -610,13 +610,13 @@ namespace AutoMapper.Execution
         private static Expression DefaultDestination(Type destinationType, ProfileMap profileMap)
         {
             var defaultValue = Default(destinationType);
-            if(profileMap.AllowNullCollections)
+            if(profileMap.AllowNullCollections || destinationType == typeof(string) || !destinationType.IsEnumerableType())
             {
                 return defaultValue;
             }
             if(destinationType.IsArray)
             {
-                var destinationElementType = ElementTypeHelper.GetElementType(destinationType);
+                var destinationElementType = destinationType.GetElementType();
                 return NewArrayBounds(destinationElementType, Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
             }
             if(destinationType.IsDictionaryType())
@@ -627,17 +627,23 @@ namespace AutoMapper.Execution
             {
                 return CreateCollection(typeof(HashSet<>));
             }
-            if(destinationType.IsCollectionType())
-            {
-                return CreateCollection(typeof(List<>));
-            }
-            return defaultValue;
+            return CreateCollection(typeof(List<>));
             Expression CreateCollection(Type collectionType)
             {
-                var concreteDestinationType = 
-                    destinationType.IsInterface() ?
-                        collectionType.MakeGenericType(destinationType.GetGenericArguments()) :
-                        destinationType;
+                Type concreteDestinationType;
+                if(destinationType.IsInterface())
+                {
+                    var genericArguments = destinationType.GetGenericArguments();
+                    if(genericArguments.Length == 0)
+                    {
+                        genericArguments = new[] { typeof(object) };
+                    }
+                    concreteDestinationType = collectionType.MakeGenericType(genericArguments);
+                }
+                else
+                {
+                    concreteDestinationType = destinationType;
+                }
                 var constructor = DelegateFactory.GenerateNonNullConstructorExpression(concreteDestinationType);
                 return ToType(constructor, destinationType);
             }

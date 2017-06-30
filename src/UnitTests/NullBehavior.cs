@@ -8,6 +8,27 @@ using System;
 
 namespace AutoMapper.UnitTests.NullBehavior
 {
+    public class When_mappping_null_array_to_IEnumerable : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public int[] Collection { get; set; }
+        }
+
+        class Destination
+        {
+            public IEnumerable<int> Collection { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(cfg => cfg.CreateMap<Source, Destination>());
+
+        [Fact]
+        public void Should_map_to_non_null()
+        {
+            Mapper.Map<Destination>(new Source()).Collection.ShouldNotBeNull();
+        }
+    }
+
     public class When_mappping_null_list_to_ICollection : AutoMapperSpecBase
     {
         class Source
@@ -29,7 +50,7 @@ namespace AutoMapper.UnitTests.NullBehavior
         }
     }
 
-    public class When_resolving_untyped_null : AutoMapperSpecBase
+    public class When_mapping_untyped_null_to_IEnumerable : AutoMapperSpecBase
     {
         class Source
         {
@@ -44,7 +65,32 @@ namespace AutoMapper.UnitTests.NullBehavior
         protected override MapperConfiguration Configuration => new MapperConfiguration(c => c.CreateMap<Source, Destination>());
 
         [Fact]
-        public void Should_map_ok()
+        public void Should_map_to_non_null()
+        {
+            Mapper.Map<Destination>(new Source()).Value.ShouldNotBeNull();
+        }
+    }
+
+    public class When_mapping_untyped_null_to_IEnumerable_and_AllowNullCollections_is_true : AutoMapperSpecBase
+    {
+        class Source
+        {
+            public object Value { get; set; }
+        }
+
+        class Destination
+        {
+            public IEnumerable Value { get; set; }
+        }
+
+        protected override MapperConfiguration Configuration => new MapperConfiguration(c =>
+        {
+            c.AllowNullCollections = true;
+            c.CreateMap<Source, Destination>();
+        });
+
+        [Fact]
+        public void Should_map_to_null()
         {
             Mapper.Map<Destination>(new Source()).Value.ShouldBeNull();
         }
