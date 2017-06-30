@@ -5,6 +5,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using AutoMapper.Configuration;
+#if NET40
+using System.Collections.ObjectModel;
+#endif
 
 namespace AutoMapper
 {
@@ -20,12 +23,20 @@ namespace AutoMapper
             DestinationProperty = pathMap.DestinationMember;
             CustomExpression = pathMap.SourceExpression;
             TypeMap = pathMap.TypeMap;
+
+#if NET40
+            SourceMembers = new ReadOnlyCollection<MemberInfo>(_memberChain);
+#endif
         }
 
         public PropertyMap(MemberInfo destinationProperty, TypeMap typeMap)
         {
             TypeMap = typeMap;
             DestinationProperty = destinationProperty;
+
+#if NET40
+            SourceMembers = new ReadOnlyCollection<MemberInfo>(_memberChain);
+#endif
         }
 
         public PropertyMap(PropertyMap inheritedMappedProperty, TypeMap typeMap)
@@ -39,7 +50,11 @@ namespace AutoMapper
 
         public Type DestinationPropertyType => DestinationProperty.GetMemberType();
 
+#if NET40
+        public ReadOnlyCollection<MemberInfo> SourceMembers { get; }
+#else
         public IReadOnlyCollection<MemberInfo> SourceMembers => _memberChain;
+#endif
 
         public bool Inline { get; set; } = true;
         public bool Ignored { get; set; }

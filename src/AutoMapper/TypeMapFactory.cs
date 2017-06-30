@@ -56,7 +56,7 @@ namespace AutoMapper
                 var resolvers = new LinkedList<MemberInfo>();
 
                 var canResolve = MapDestinationPropertyToSource(options, sourceTypeInfo, destCtor.DeclaringType, parameter.GetType(), parameter.Name, resolvers);
-                if(!canResolve && parameter.HasDefaultValue)
+                if(!canResolve && parameter.GetHasDefaultValue())
                 {
                     canResolve = true;
                 }

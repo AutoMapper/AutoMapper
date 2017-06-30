@@ -150,9 +150,15 @@ namespace AutoMapper.Internal
 
         public static PropertyInfo[] GetProperties(Type type) => type.GetRuntimeProperties().ToArray();
 
+#if NET40
+        public static MethodInfo GetGetMethod(PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetGetMethod();
+
+        public static MethodInfo GetSetMethod(PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetSetMethod();
+#else
         public static MethodInfo GetGetMethod(PropertyInfo propertyInfo, bool ignored) => propertyInfo.GetMethod;
 
         public static MethodInfo GetSetMethod(PropertyInfo propertyInfo, bool ignored) => propertyInfo.SetMethod;
+#endif
 
         public static FieldInfo GetField(Type type, string name) => type.GetRuntimeField(name);
     }

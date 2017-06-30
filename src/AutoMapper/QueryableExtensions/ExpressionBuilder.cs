@@ -369,7 +369,7 @@ namespace AutoMapper.QueryableExtensions
             private static Expression NodeFallback(Type type)
             {
                 // default values for generic collections
-                if (type.IsConstructedGenericType && type.GenericTypeArguments.Length == 1)
+                if (type.GetIsConstructedGenericType() && type.GetTypeInfo().GenericTypeArguments.Length == 1)
                 {
                     return GenericCollectionFallback(typeof(List<>), type)
                         ?? GenericCollectionFallback(typeof(HashSet<>), type)
@@ -388,7 +388,7 @@ namespace AutoMapper.QueryableExtensions
 
             private static Expression GenericCollectionFallback(Type collectionDefinition, Type type)
             {
-                var collectionType = collectionDefinition.MakeGenericType(type.GenericTypeArguments);
+                var collectionType = collectionDefinition.MakeGenericType(type.GetTypeInfo().GenericTypeArguments);
 
                 // try if an instance of this collection would suffice
                 return type.GetTypeInfo().IsAssignableFrom(collectionType.GetTypeInfo()) ? Convert(New(collectionType), type) : null;
