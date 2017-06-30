@@ -96,7 +96,7 @@ namespace System.Reflection
     using System.Globalization;
 
     [Serializable]
-    internal class TypeInfo : Type
+    internal class TypeInfo
     {
         public static readonly ConcurrentDictionary<Type, TypeInfo> _typeInfoCache = new ConcurrentDictionary<Type, TypeInfo>();
 
@@ -105,14 +105,14 @@ namespace System.Reflection
             return _typeInfoCache.GetOrAdd(type, t => new TypeInfo(t));
         }
 
-        public IEnumerable<Type> ImplementedInterfaces => GetInterfaces();
+        public IEnumerable<Type> ImplementedInterfaces => _type.GetInterfaces();
         public Type[] GenericTypeParameters
         {
             get
             {
-                if (IsGenericTypeDefinition)
-                    return GetGenericArguments();
-                return EmptyTypes;
+                if (_type.IsGenericTypeDefinition)
+                    return _type.GetGenericArguments();
+                return Type.EmptyTypes;
             }
         }
 
@@ -120,41 +120,61 @@ namespace System.Reflection
         {
             get
             {
-                if (IsGenericType && !IsGenericTypeDefinition)
-                    return GetGenericArguments();
-                return EmptyTypes;
+                if (_type.IsGenericType && !_type.IsGenericTypeDefinition)
+                    return _type.GetGenericArguments();
+                return Type.EmptyTypes;
             }
         }
 
         public virtual IEnumerable<ConstructorInfo> DeclaredConstructors =>
-            GetConstructors(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            _type.GetConstructors(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
         public virtual IEnumerable<MemberInfo> DeclaredMembers =>
-            GetMembers(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            _type.GetMembers(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
         public virtual IEnumerable<MethodInfo> DeclaredMethods =>
-            GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            _type.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
         public virtual IEnumerable<PropertyInfo> DeclaredProperties =>
-            GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            _type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
-        public override Guid GUID => _type.GUID;
+        public virtual Guid GUID => _type.GUID;
 
-        public override Module Module => _type.Module;
+        public virtual Module Module => _type.Module;
 
-        public override Assembly Assembly => _type.Assembly;
+        public virtual Assembly Assembly => _type.Assembly;
 
-        public override string FullName => _type.FullName;
+        public virtual string FullName => _type.FullName;
 
-        public override string Namespace => _type.Namespace;
+        public virtual string Namespace => _type.Namespace;
 
-        public override string AssemblyQualifiedName => _type.AssemblyQualifiedName;
+        public virtual string AssemblyQualifiedName => _type.AssemblyQualifiedName;
 
-        public override Type BaseType => _type.BaseType;
+        public virtual Type BaseType => _type.BaseType;
 
-        public override Type UnderlyingSystemType => _type.UnderlyingSystemType;
+        public virtual Type UnderlyingSystemType => _type.UnderlyingSystemType;
 
-        public override string Name => _type.Name;
+        public virtual string Name => _type.Name;
+
+        public bool IsInterface => _type.IsInterface;
+
+        public bool IsGenericParameter => _type.IsGenericParameter;
+
+        public bool IsValueType => _type.IsValueType;
+
+        public bool IsGenericType => _type.IsGenericType;
+
+        public bool IsAbstract => _type.IsAbstract;
+
+        public bool IsClass => _type.IsClass;
+
+        public bool IsEnum => _type.IsEnum;
+
+        public bool IsGenericTypeDefinition => _type.IsGenericTypeDefinition;
+
+        public bool IsSealed => _type.IsSealed;
+
+        public bool IsPrimitive => _type.IsPrimitive;
 
         private readonly Type _type;
 
@@ -163,88 +183,100 @@ namespace System.Reflection
             _type = type;
     }
 
-        public Type AsType() => this;
+        public Type AsType() => _type;
 
-        public override object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters) =>
+        public virtual PropertyInfo GetDeclaredProperty(string name) =>
+            _type.GetProperty(name, BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+        public virtual object InvokeMember(string name, BindingFlags invokeAttr, Binder binder, object target, object[] args, ParameterModifier[] modifiers, CultureInfo culture, string[] namedParameters) =>
             _type.InvokeMember(name, invokeAttr, binder, target, args, modifiers, culture, namedParameters);
 
-        protected override ConstructorInfo GetConstructorImpl(BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers) =>
-            _type.GetConstructor(bindingAttr, binder, callConvention, types, modifiers);
-
-        public override ConstructorInfo[] GetConstructors(BindingFlags bindingAttr) =>
+        public virtual ConstructorInfo[] GetConstructors(BindingFlags bindingAttr) =>
             _type.GetConstructors(bindingAttr);
 
-        protected override MethodInfo GetMethodImpl(string name, BindingFlags bindingAttr, Binder binder, CallingConventions callConvention, Type[] types, ParameterModifier[] modifiers) =>
-            _type.GetMethod(name, bindingAttr, binder, callConvention, types, modifiers);
-
-        public override MethodInfo[] GetMethods(BindingFlags bindingAttr) =>
+        public virtual MethodInfo[] GetMethods(BindingFlags bindingAttr) =>
             _type.GetMethods(bindingAttr);
 
-        public override FieldInfo GetField(string name, BindingFlags bindingAttr) =>
+        public virtual FieldInfo GetField(string name, BindingFlags bindingAttr) =>
             _type.GetField(name, bindingAttr);
 
-        public override FieldInfo[] GetFields(BindingFlags bindingAttr) =>
+        public virtual FieldInfo[] GetFields(BindingFlags bindingAttr) =>
             _type.GetFields(bindingAttr);
 
-        public override Type GetInterface(string name, bool ignoreCase) =>
+        public virtual Type GetInterface(string name, bool ignoreCase) =>
             _type.GetInterface(name, ignoreCase);
 
-        public override Type[] GetInterfaces() =>
+        public virtual Type[] GetInterfaces() =>
             _type.GetInterfaces();
 
-        public override EventInfo GetEvent(string name, BindingFlags bindingAttr) =>
+        public virtual EventInfo GetEvent(string name, BindingFlags bindingAttr) =>
             _type.GetEvent(name, bindingAttr);
 
-        public override EventInfo[] GetEvents(BindingFlags bindingAttr) =>
+        public virtual EventInfo[] GetEvents(BindingFlags bindingAttr) =>
             _type.GetEvents(bindingAttr);
 
-        protected override PropertyInfo GetPropertyImpl(string name, BindingFlags bindingAttr, Binder binder, Type returnType, Type[] types, ParameterModifier[] modifiers) =>
-            _type.GetProperty(name, bindingAttr, binder, returnType, types, modifiers);
-
-        public override PropertyInfo[] GetProperties(BindingFlags bindingAttr) =>
+        public virtual PropertyInfo[] GetProperties(BindingFlags bindingAttr) =>
             _type.GetProperties(bindingAttr);
 
-        public override Type[] GetNestedTypes(BindingFlags bindingAttr) =>
+        public virtual Type[] GetNestedTypes(BindingFlags bindingAttr) =>
             _type.GetNestedTypes(bindingAttr);
 
-        public override Type GetNestedType(string name, BindingFlags bindingAttr) =>
+        public virtual Type GetNestedType(string name, BindingFlags bindingAttr) =>
             _type.GetNestedType(name, bindingAttr);
 
-        public override MemberInfo[] GetMembers(BindingFlags bindingAttr) =>
+        public virtual MemberInfo[] GetMembers(BindingFlags bindingAttr) =>
             _type.GetMembers(bindingAttr);
 
-        protected override TypeAttributes GetAttributeFlagsImpl() =>
-            _type.Attributes;
-
-        protected override bool IsArrayImpl() =>
-            _type.IsArray;
-
-        protected override bool IsByRefImpl() =>
-            _type.IsByRef;
-
-        protected override bool IsPointerImpl() =>
-            _type.IsPointer;
-
-        protected override bool IsPrimitiveImpl() =>
-            _type.IsPrimitive;
-
-        protected override bool IsCOMObjectImpl() =>
-            _type.IsCOMObject;
-
-        public override Type GetElementType() =>
+        public virtual Type GetElementType() =>
             _type.GetElementType();
 
-        protected override bool HasElementTypeImpl() =>
-            _type.HasElementType;
-
-        public override object[] GetCustomAttributes(bool inherit) =>
+        public virtual object[] GetCustomAttributes(bool inherit) =>
             _type.GetCustomAttributes(inherit);
 
-        public override object[] GetCustomAttributes(Type attributeType, bool inherit) =>
+        public virtual object[] GetCustomAttributes(Type attributeType, bool inherit) =>
             _type.GetCustomAttributes(attributeType, inherit);
 
-        public override bool IsDefined(Type attributeType, bool inherit) =>
+        public virtual bool IsDefined(Type attributeType, bool inherit) =>
             _type.IsDefined(attributeType, inherit);
+
+        public virtual bool IsSubclassOf(Type c) =>
+            _type.IsSubclassOf(c);
+
+        public virtual Type[] GetGenericParameterConstraints() =>
+            _type.GetGenericParameterConstraints();
+
+        public virtual bool IsAssignableFrom(TypeInfo typeInfo)
+        {
+            if (typeInfo == null)
+            {
+                return false;
+            }
+            if (this == typeInfo)
+            {
+                return true;
+            }
+            if (typeInfo.IsSubclassOf(_type))
+            {
+                return true;
+            }
+            if (IsInterface)
+            {
+                return typeInfo._type.ImplementInterface(_type);
+            }
+            if (this.IsGenericParameter)
+            {
+                Type[] genericParameterConstraints = this.GetGenericParameterConstraints();
+                for (int i = 0; i < genericParameterConstraints.Length; i++)
+                {
+                    if (!genericParameterConstraints[i].IsAssignableFrom(typeInfo._type))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
     }
 
     static class CustomAttributeExtensions
@@ -252,6 +284,29 @@ namespace System.Reflection
         public static T GetCustomAttribute<T>(this MemberInfo element, bool inherit) where T : Attribute
         {
             return (T)Attribute.GetCustomAttribute(element, typeof(T), inherit);
+        }
+    }
+
+    static class TypeExtensions
+    {
+        public static bool ImplementInterface(this Type type, Type ifaceType)
+        {
+            while (type != null)
+            {
+                Type[] interfaces = type.GetInterfaces();
+                if (interfaces != null)
+                {
+                    for (int i = 0; i < interfaces.Length; i++)
+                    {
+                        if (interfaces[i] == ifaceType || (interfaces[i] != null && interfaces[i].ImplementInterface(ifaceType)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                type = type.BaseType;
+            }
+            return false;
         }
     }
 
@@ -265,6 +320,9 @@ namespace System.Reflection
 
         public static FieldInfo GetRuntimeField(this Type type, string name) =>
              type.GetField(name);
+
+        public static EventInfo GetRuntimeEvent(this Type type, string name) =>
+            type.GetEvent(name);
     }
 }
 #endif
