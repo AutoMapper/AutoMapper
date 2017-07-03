@@ -84,39 +84,47 @@ namespace AutoMapper.XpressionMapper
                     ? visitor.Visit(last.CustomExpression.Body.AddExpressions(afterCustExpression))
                     : visitor.Visit(last.CustomExpression.Body);
 
+                this.TypeMappings.AddTypeMapping(node.Type, ex.Type);
                 return ex;
             }
             fullName = BuildFullName(propertyMapInfoList);
             var me = InfoDictionary[parameterExpression].NewParameter.BuildExpression(fullName);
+
+            this.TypeMappings.AddTypeMapping(node.Type, me.Type);
             return me;
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            Type newType;
+            if (this.TypeMappings.TryGetValue(node.Type, out newType))
+                return base.VisitConstant(Expression.Constant(node.Value, newType));
+
+            return base.VisitConstant(node);
         }
 
         protected override Expression VisitBinary(BinaryExpression node)
         {
-            if (node.Right is ConstantExpression constantExpression)
-            {
-                if (constantExpression.Value == null)
-                {
-                    node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type));
-                    //return base.VisitBinary(node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type)));
-                    //return base.VisitBinary(node.Left.Type.GetTypeInfo().IsValueType
-                        //? node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type))
-                        //: node.Update(node.Left, node.Conversion, Expression.Constant(null, typeof(object))));
-                }
-            }
+            //if (node.Right is ConstantExpression constantExpression)
+            //{
+            //    if (constantExpression.Value == null)
+            //    {
+            //        return base.VisitBinary(node.Left.Type.GetTypeInfo().IsValueType
+            //            ? node.Update(node.Left, node.Conversion, Expression.Constant(null, node.Left.Type))
+            //            : node.Update(node.Left, node.Conversion, Expression.Constant(null, typeof(object))));
+            //    }
+            //}
 
-            constantExpression = node.Left as ConstantExpression;
-            if (constantExpression != null)
-            {
-                if (constantExpression.Value == null)
-                {
-                    node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right);
-                    //return base.VisitBinary(node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right));
-                    //return base.VisitBinary(node.Right.Type.GetTypeInfo().IsValueType 
-                    //? node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right) 
-                    //: node.Update(Expression.Constant(null, typeof(object)), node.Conversion, node.Right));
-                }
-            }
+            //constantExpression = node.Left as ConstantExpression;
+            //if (constantExpression != null)
+            //{
+            //    if (constantExpression.Value == null)
+            //    {
+            //        return base.VisitBinary(node.Right.Type.GetTypeInfo().IsValueType
+            //            ? node.Update(Expression.Constant(null, node.Right.Type), node.Conversion, node.Right)
+            //            : node.Update(Expression.Constant(null, typeof(object)), node.Conversion, node.Right));
+            //    }
+            //}
 
             var newLeft = Visit(node.Left);
             var newRight = Visit(node.Right);
