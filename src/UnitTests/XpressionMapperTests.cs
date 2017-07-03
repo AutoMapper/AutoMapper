@@ -150,6 +150,39 @@ namespace AutoMapper.UnitTests
         }
 
         [Fact]
+        public void Map_object_when_null_values_are_typed()
+        {
+            //Arrange
+            //Expression<Func<UserModel, bool>> selection = s => s != null && s.AccountModel != null && s.AccountModel.Bal > 555.20;
+            ParameterExpression userParam = Expression.Parameter(typeof(UserModel), "s");
+            MemberExpression accountModelProperty = Expression.Property(userParam, typeof(UserModel).GetProperty("AccountModel"));
+            Expression<Func<UserModel, bool>> selection = Expression.Lambda<Func<UserModel, bool>>
+                (
+                    Expression.AndAlso
+                        (
+                            Expression.AndAlso
+                                (
+                                    Expression.NotEqual(userParam, Expression.Constant(null, typeof(UserModel))),
+                                    Expression.NotEqual(accountModelProperty, Expression.Constant(null, typeof(AccountModel)))
+                                ),
+                            Expression.GreaterThan
+                                (
+                                    Expression.Property(accountModelProperty, typeof(AccountModel).GetProperty("Bal")),
+                                    Expression.Constant(555.20, typeof(double))
+                                )
+                        ),
+                    userParam
+                );
+
+            //Act
+            Expression<Func<User, bool>> selectionMapped = mapper.MapExpression<Expression<Func<User, bool>>>(selection);
+            List<User> users = Users.Where(selectionMapped).ToList();
+
+            //Assert
+            Assert.True(users.Count == 2);
+        }
+
+        [Fact]
         public void Map_project_truncated_time()
         {
             //Arrange
