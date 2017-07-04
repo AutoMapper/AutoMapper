@@ -110,16 +110,16 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
-            string GetFunc(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
+            string GetProperty(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
                 ? pm.DestinationProperty.Name
-                : pm.CustomExpression == null && pm.SourceMember != null
+                : pm.SourceMember != null
                     ? pm.SourceMember.Name
                     : pm.DestinationProperty.Name;
 
             var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
-                .Select(GetFunc).ToList();
+                .Select(GetProperty).ToList();
             var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
-                .Select(GetFunc).ToList();
+                .Select(GetProperty).ToList();
 
             IEnumerable<string> properties;
 
