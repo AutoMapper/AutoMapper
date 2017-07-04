@@ -16,7 +16,7 @@ namespace AutoMapper.Mappers
             new MultidimensionalArrayMapper(),
             new ArrayMapper(),
             new EnumerableToDictionaryMapper(),
-#if NETSTANDARD1_3 || NET45
+#if NETSTANDARD1_3 || NET45 || NET40
             new NameValueCollectionMapper(),
 #endif
             new DictionaryMapper(),

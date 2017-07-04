@@ -37,7 +37,7 @@ namespace AutoMapper.UnitTests
                 {
                     if(e is InvalidOperationException)
                     {
-                        ExceptionDispatchInfo.Capture(e).Throw();
+                        throw e;
                     }
                     return false;
                 });

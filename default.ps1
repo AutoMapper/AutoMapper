@@ -60,4 +60,6 @@ task test {
     exec { & dotnet xunit -configuration Release }
 
     Pop-Location
+
+    exec { & $env:USERPROFILE\.nuget\packages\xunit.runners\1.9.2\tools\xunit.console.clr4.exe $source_dir\UnitTests\bin\$config\net40\AutoMapper.UnitTests.dll }
 }
