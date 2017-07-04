@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NET40
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -167,3 +168,4 @@ namespace AutoMapper.UnitTests.Bug
         }
     }
 }
+#endif
