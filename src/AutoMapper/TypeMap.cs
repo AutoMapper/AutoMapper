@@ -369,6 +369,10 @@ namespace AutoMapper
             {
                 AddAfterMapAction(afterMapAction);
             }
+            var notOverridenSourceConfigs =
+                inheritedTypeMap._sourceMemberConfigs.Where(
+                    baseConfig => _sourceMemberConfigs.All(derivedConfig => derivedConfig.SourceMember != baseConfig.SourceMember));
+            _sourceMemberConfigs.AddRange(notOverridenSourceConfigs);
         }
     }
 }
