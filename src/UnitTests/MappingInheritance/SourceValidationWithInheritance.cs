@@ -14,7 +14,7 @@ namespace AutoMapper.UnitTests
         {
             public string Label { get; set; }
             public string Trailer { get; set; }
-            public bool MisSpelled { get; set; }
+            public bool Misspelled { get; set; }
         }
 
         public abstract class TextFieldControl2 : FieldControl2
@@ -53,7 +53,7 @@ namespace AutoMapper.UnitTests
                 .Include<FieldControl2, FormElementDTO2>();
 
             cfg.CreateMap<FieldControl2, FormElementDTO2>(MemberList.Source)
-                .ForMember(dto => dto.Prepopulate, opt => opt.MapFrom(src => src.MisSpelled))
+                .ForMember(dto => dto.Prepopulate, opt => opt.MapFrom(src => src.Misspelled))
                 .Include<TextBoxControl2, FormElementDTO2>();
 
             cfg.CreateMap<TextBoxControl2, FormElementDTO2>(MemberList.Source)
@@ -73,7 +73,7 @@ namespace AutoMapper.UnitTests
         {
             public string Label { get; set; }
             public string Trailer { get; set; }
-            public bool MisSpelled { get; set; }
+            public bool Misspelled { get; set; }
         }
 
         public abstract class TextFieldControl2 : FieldControl2
@@ -112,7 +112,7 @@ namespace AutoMapper.UnitTests
                 .Include<FieldControl2, FormElementDTO2>();
 
             cfg.CreateMap<FieldControl2, FormElementDTO2>(MemberList.Source)
-                .ForSourceMember(src => src.MisSpelled, o=>o.Ignore())
+                .ForSourceMember(src => src.Misspelled, o=>o.Ignore())
                 .Include<TextBoxControl2, FormElementDTO2>();
 
             cfg.CreateMap<TextBoxControl2, FormElementDTO2>(MemberList.Source)
