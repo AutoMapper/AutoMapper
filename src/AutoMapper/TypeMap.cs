@@ -110,20 +110,19 @@ namespace AutoMapper
 
         public string[] GetUnmappedPropertyNames()
         {
-            string GetProperty(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
+            string GetPropertyName(PropertyMap pm) => ConfiguredMemberList == MemberList.Destination
                 ? pm.DestinationProperty.Name
                 : pm.SourceMember != null
                     ? pm.SourceMember.Name
                     : pm.DestinationProperty.Name;
+            string[] GetPropertyNames(IEnumerable<PropertyMap> propertyMaps) => propertyMaps.Where(pm => pm.IsMapped()).Select(GetPropertyName).ToArray();
 
-            var autoMappedProperties = _propertyMaps.Where(pm => pm.IsMapped())
-                .Select(GetProperty).ToList();
-            var inheritedProperties = _inheritedMaps.Where(pm => pm.IsMapped())
-                .Select(GetProperty).ToList();
+            var autoMappedProperties = GetPropertyNames(_propertyMaps);
+            var inheritedProperties = GetPropertyNames(_inheritedMaps);
 
             IEnumerable<string> properties;
 
-            if (ConfiguredMemberList == MemberList.Destination)
+            if(ConfiguredMemberList == MemberList.Destination)
             {
                 properties = DestinationTypeDetails.PublicWriteAccessors
                     .Select(p => p.Name)
