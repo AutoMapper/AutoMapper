@@ -18,7 +18,6 @@ namespace AutoMapper.Mappers
             new EnumerableToDictionaryMapper(),
 #if NETSTANDARD1_3 || NET45 || NET40
             new NameValueCollectionMapper(),
-            new TypeConverterMapper(),
 #endif
             new DictionaryMapper(),
             new ReadOnlyCollectionMapper(),
@@ -27,7 +26,10 @@ namespace AutoMapper.Mappers
             new EnumerableMapper(),
             new AssignableMapper(),
             new ConvertMapper(),
-            new StringMapper(),            
+            new StringMapper(),
+#if NETSTANDARD1_3 || NET45 || NET40
+            new TypeConverterMapper(),
+#endif
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
             new FromStringDictionaryMapper(),

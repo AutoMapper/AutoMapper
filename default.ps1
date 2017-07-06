@@ -34,6 +34,9 @@ task compile -depends clean {
 	echo "build: Package version suffix is $suffix"
 	echo "build: Build version suffix is $buildSuffix" 
 	
+	exec { dotnet --version }
+	exec { dotnet --info }
+
 	exec { .\nuget.exe restore $base_dir\AutoMapper.sln }
 
 	exec { dotnet restore $base_dir\AutoMapper.sln }
