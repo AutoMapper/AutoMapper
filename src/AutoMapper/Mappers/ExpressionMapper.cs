@@ -170,7 +170,7 @@ namespace AutoMapper.Mappers
                     let sourceParamType = t.Type
                     from destParamType in _destSubTypes.Where(dt => dt != sourceParamType)
                     let a = destParamType.IsGenericType() ? destParamType.GetTypeInfo().GenericTypeArguments[0] : destParamType
-                    let typeMap = _configurationProvider.FindTypeMapFor(a, sourceParamType)
+                    let typeMap = _configurationProvider.ResolveTypeMap(a, sourceParamType)
                     where typeMap != null
                     let oldParam = t
                     let newParam = Parameter(a, oldParam.Name)
@@ -236,7 +236,7 @@ namespace AutoMapper.Mappers
                 var destType = propertyMap.DestinationPropertyType;
                 if (sourceType == destType)
                     return MakeMemberAccess(baseExpression, node.Member);
-                var typeMap = _configurationProvider.FindTypeMapFor(sourceType, destType);
+                var typeMap = _configurationProvider.ResolveTypeMap(sourceType, destType);
                 var subVisitor = new MappingVisitor(_configurationProvider, typeMap, node.Expression, baseExpression, this);
                 var newExpression = subVisitor.Visit(node);
                 _destSubTypes = _destSubTypes.Concat(subVisitor._destSubTypes).ToArray();

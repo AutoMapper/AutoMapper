@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using AutoMapper.Mappers;
 using Shouldly;
 using AutoMapper.QueryableExtensions;
 using Xunit;
@@ -606,6 +607,21 @@ namespace AutoMapper.UnitTests.Query
             var sourceItem = _source.First(s => s.InttoStringValue == 7);
 
             destItem.DestValue.ShouldBe(sourceItem.SrcValue);
+        }
+
+        [Fact]
+        public void Shoud_work_with_conventions()
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.AddConditionalObjectMapper()
+                .Where((s, d) => s.Name == d.Name + "Model" || s.Name + "Model" == d.Name)).CreateMapper();
+
+
+            IQueryable<Destination> result = _source.AsQueryable()
+                .UseAsDataSource(Mapper).For<Destination>()
+                .Where(s => s.DestValue > 6);
+
+            result.Count().ShouldBe(1);
+            result.Any(s => s.DestValue > 6).ShouldBeTrue();
         }
 
         private static IMapper SetupAutoMapper()
