@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 
 namespace AutoMapper.IntegrationTests.Net4
@@ -8,17 +7,7 @@ namespace AutoMapper.IntegrationTests.Net4
     {
         public TestDbConfiguration()
         {
-            var env = Environment.GetEnvironmentVariable("APPVEYOR");
-            if (env != null)
-            {
-                SetDefaultConnectionFactory(new LocalDbConnectionFactory("MSSQLLocalDB"));
-                //SetDefaultConnectionFactory(
-                //    new SqlConnectionFactory(@"Server=(local)\SQL2014;Database=master;User ID=sa;Password=Password12!"));
-            }
-            else
-            {
-                SetDefaultConnectionFactory(new LocalDbConnectionFactory("v12.0"));
-            }
+            SetDefaultConnectionFactory(new LocalDbConnectionFactory("MSSQLLocalDB"));
         }
     }
 }

@@ -27,7 +27,9 @@ namespace AutoMapper.Mappers
             new AssignableMapper(),
             new ConvertMapper(),
             new StringMapper(),
+#if NETSTANDARD1_3 || NET45 || NET40
             new TypeConverterMapper(),
+#endif
             new ImplicitConversionOperatorMapper(),
             new ExplicitConversionOperatorMapper(),
             new FromStringDictionaryMapper(),

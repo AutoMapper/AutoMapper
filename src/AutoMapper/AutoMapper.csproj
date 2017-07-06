@@ -17,49 +17,20 @@
         <PackageIconUrl>https://s3.amazonaws.com/automapper/icon.png</PackageIconUrl>
         <PackageProjectUrl>http://automapper.org</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/AutoMapper/AutoMapper/blob/master/LICENSE.txt</PackageLicenseUrl>
-        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     </PropertyGroup>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-        <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
-        <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-        <PackageReference Include="System.Linq" Version="4.3.0" />
         <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-        <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
-        <PackageReference Include="System.Runtime" Version="4.3.0" />
-        <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-        <PackageReference Include="System.Threading" Version="4.3.0" />
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
-        <PackageReference Include="System.Collections" Version="4.3.0" />
-        <PackageReference Include="System.Globalization" Version="4.3.0" />
         <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
-        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
-        <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
-        <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
-        <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+        <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
         <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+        <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
     </ItemGroup>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-        <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
-        <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-        <PackageReference Include="System.Linq" Version="4.3.0" />
         <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-        <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
-        <PackageReference Include="System.Threading" Version="4.3.0" />
-        <PackageReference Include="System.Runtime" Version="4.3.0" />
-        <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Collections" Version="4.3.0" />
-        <PackageReference Include="System.Globalization" Version="4.3.0" />
         <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
-        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
-        <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
-        <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
-        <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+        <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
     </ItemGroup>
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
