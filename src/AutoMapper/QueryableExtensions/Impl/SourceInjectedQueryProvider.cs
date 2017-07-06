@@ -268,7 +268,7 @@ namespace AutoMapper.QueryableExtensions.Impl
             // call beforevisitors
             expression = _beforeVisitors.Aggregate(expression, (current, before) => before.Visit(current));
 
-            var typeMap = _mapper.ConfigurationProvider.FindTypeMapFor(typeof(TDestination), typeof(TSource));
+            var typeMap = _mapper.ConfigurationProvider.ResolveTypeMap(typeof(TDestination), typeof(TSource));
             var visitor = new ExpressionMapper.MappingVisitor(_mapper.ConfigurationProvider, typeMap, _destQuery.Expression, _dataSource.Expression, null,
                 new[] { typeof(TSource) });
             var sourceExpression = visitor.Visit(expression);

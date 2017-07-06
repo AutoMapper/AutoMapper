@@ -24,7 +24,7 @@ namespace AutoMapper.QueryableExtensions.Impl
 
         public static TypeMap CheckIfMapExists(this IConfigurationProvider config, Type sourceType, Type destinationType)
         {
-            var typeMap = config.FindTypeMapFor(sourceType, destinationType);
+            var typeMap = config.ResolveTypeMap(sourceType, destinationType);
             if(typeMap == null)
             {
                 throw MissingMapException(sourceType, destinationType);
