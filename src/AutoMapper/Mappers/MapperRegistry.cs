@@ -10,6 +10,7 @@ namespace AutoMapper.Mappers
             new ExpressionMapper(), 
             new FlagsEnumMapper(),
             new StringToEnumMapper(), 
+            new EnumToStringMapper(),
             new EnumToEnumMapper(), 
             new EnumToUnderlyingTypeMapper(),
             new UnderlyingTypeToEnumMapper(),
