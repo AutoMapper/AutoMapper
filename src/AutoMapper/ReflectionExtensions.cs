@@ -285,6 +285,11 @@ namespace System.Reflection
         {
             return (T)Attribute.GetCustomAttribute(element, typeof(T), inherit);
         }
+
+        public static Attribute GetCustomAttribute(this MemberInfo element, Type attributeType)
+        {
+            return Attribute.GetCustomAttribute(element, attributeType, false);
+        }
     }
 
     static class TypeExtensions

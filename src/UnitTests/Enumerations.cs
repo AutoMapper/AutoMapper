@@ -607,49 +607,49 @@ namespace AutoMapper.Tests
         public void Should_return_the_enum_from_defined_enummemberattribute_value()
         {
             var dest = Mapper.Map<string, EnumWithEnumMemberAttribute>("Eins");
-            dest.ShouldEqual(EnumWithEnumMemberAttribute.One);
+            dest.ShouldBe(EnumWithEnumMemberAttribute.One);
         }
 
         [Fact]
         public void Should_return_the_enum_from_undefined_enummemberattribute_value()
         {
             var dest = Mapper.Map<string, EnumWithEnumMemberAttribute>("Null");
-            dest.ShouldEqual(EnumWithEnumMemberAttribute.Null);
+            dest.ShouldBe(EnumWithEnumMemberAttribute.Null);
         }
 
         [Fact]
         public void Should_return_the_nullable_enum_from_defined_enummemberattribute_value()
         {
             var dest = Mapper.Map<string, EnumWithEnumMemberAttribute?>("Eins");
-            dest.ShouldEqual(EnumWithEnumMemberAttribute.One);
+            dest.ShouldBe(EnumWithEnumMemberAttribute.One);
         }
 
         [Fact]
         public void Should_return_the_enum_from_undefined_enummemberattribute_value_mixedcase()
         {
             var dest = Mapper.Map<string, EnumWithEnumMemberAttribute>("NuLl");
-            dest.ShouldEqual(EnumWithEnumMemberAttribute.Null);
+            dest.ShouldBe(EnumWithEnumMemberAttribute.Null);
         }
 
         [Fact]
         public void Should_return_the_enum_from_defined_enummemberattribute_value_mixedcase()
         {
             var dest = Mapper.Map<string, EnumWithEnumMemberAttribute?>("eInS");
-            dest.ShouldEqual(EnumWithEnumMemberAttribute.One);
+            dest.ShouldBe(EnumWithEnumMemberAttribute.One);
         }
 
         [Fact]
         public void Should_return_the_nullable_enum_from_null_value()
         {
             var dest = Mapper.Map<string, EnumWithEnumMemberAttribute?>(null);
-            dest.ShouldEqual(null);
+            dest.ShouldBe(null);
         }
 
         [Fact]
         public void Should_return_the_nullable_enum_from_undefined_enummemberattribute_value()
         {
             var dest = Mapper.Map<string, EnumWithEnumMemberAttribute?>("Null");
-            dest.ShouldEqual(EnumWithEnumMemberAttribute.Null);
+            dest.ShouldBe(EnumWithEnumMemberAttribute.Null);
         }
     }
 
@@ -669,35 +669,35 @@ namespace AutoMapper.Tests
         public void Should_return_the_defined_enummemberattribute_value()
         {
             var dest = Mapper.Map<EnumWithEnumMemberAttribute, string>(EnumWithEnumMemberAttribute.One);
-            dest.ShouldEqual("Eins");
+            dest.ShouldBe("Eins");
         }
 
         [Fact]
         public void Should_return_the_enum_value()
         {
             var dest = Mapper.Map<EnumWithEnumMemberAttribute, string>(EnumWithEnumMemberAttribute.Null);
-            dest.ShouldEqual("Null");
+            dest.ShouldBe("Null");
         }
 
         [Fact]
         public void Should_return_the_defined_enummemberattribute_value_nullable()
         {
             var dest = Mapper.Map<EnumWithEnumMemberAttribute?, string>(EnumWithEnumMemberAttribute.One);
-            dest.ShouldEqual("Eins");
+            dest.ShouldBe("Eins");
         }
 
         [Fact]
         public void Should_return_the_enum_value_nullable()
         {
             var dest = Mapper.Map<EnumWithEnumMemberAttribute?, string>(EnumWithEnumMemberAttribute.Null);
-            dest.ShouldEqual("Null");
+            dest.ShouldBe("Null");
         }
 
         [Fact]
         public void Should_return_null()
         {
             var dest = Mapper.Map<EnumWithEnumMemberAttribute?, string>(null);
-            dest.ShouldEqual(null);
+            dest.ShouldBe(null);
         }
     }
 }
