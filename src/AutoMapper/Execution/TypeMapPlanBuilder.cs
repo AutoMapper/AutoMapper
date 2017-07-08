@@ -335,7 +335,7 @@ namespace AutoMapper.Execution
             if (!constructorMap.CanResolve)
                 return null;
 
-            var ctorArgs = constructorMap.CtorParams.Select(p => p.CreateExpression(this));
+            var ctorArgs = constructorMap.CtorParams.Select(CreateConstructorParameterExpression);
 
             ctorArgs =
                 ctorArgs.Zip(constructorMap.Ctor.GetParameters(),
@@ -345,6 +345,38 @@ namespace AutoMapper.Execution
             return newExpr;
         }
 
+        public Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
+        {
+            var valueResolverExpression = ResolveSource(ctorParamMap);
+            var sourceType = valueResolverExpression.Type;
+            var resolvedValue = Variable(sourceType, "resolvedValue");
+            return Block(new[] { resolvedValue },
+                Assign(resolvedValue, valueResolverExpression),
+                MapExpression(new TypePair(sourceType, ctorParamMap.DestinationType), resolvedValue));
+        }
+
+        private Expression ResolveSource(ConstructorParameterMap ctorParamMap)
+        {
+            if (ctorParamMap.CustomExpression != null)
+            {
+                return ctorParamMap.CustomExpression.ConvertReplaceParameters(Source).IfNotNull(ctorParamMap.DestinationType);
+            }
+            if (ctorParamMap.CustomValueResolver != null)
+            {
+                return ctorParamMap.CustomValueResolver.ConvertReplaceParameters(Source, Context);
+            }
+            if (ctorParamMap.Parameter.IsOptional)
+            {
+                ctorParamMap.DefaultValue = true;
+                return Constant(ctorParamMap.Parameter.GetDefaultValue(), ctorParamMap.Parameter.ParameterType);
+            }
+            return ctorParamMap.SourceMembers.Aggregate(
+                (Expression)Source,
+                (inner, getter) => getter is MethodInfo
+                    ? Call(getter.IsStatic() ? null : inner, (MethodInfo)getter)
+                    : (Expression)MakeMemberAccess(getter.IsStatic() ? null : inner, getter)
+            ).IfNotNull(ctorParamMap.DestinationType);
+        }
 
         private Expression TryPropertyMap(PropertyMap propertyMap)
         {
