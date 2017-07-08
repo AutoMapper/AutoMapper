@@ -227,12 +227,12 @@ namespace AutoMapper.Execution
         private Expression HandlePath(PathMap pathMap)
         {
             var destination = ((MemberExpression)pathMap.DestinationExpression.ConvertReplaceParameters(_destination)).Expression;
-            var createInnerObjects = CreateInnerObjects(pathMap, destination);
+            var createInnerObjects = CreateInnerObjects(destination);
             var setFinalValue = CreatePropertyMapFunc(new PropertyMap(pathMap), destination);
             return Block(createInnerObjects, setFinalValue);
         }
 
-        private Expression CreateInnerObjects(PathMap pathMap, Expression destination)
+        private Expression CreateInnerObjects(Expression destination)
         {
             return Block(destination.GetMembers().Select(NullCheck).Reverse().Concat(new[] { Empty() }));
         }
@@ -306,7 +306,7 @@ namespace AutoMapper.Execution
             if (_typeMap.ConstructorMap?.CanResolve == true)
             {
                 constructorMapping = true;
-                return _typeMap.ConstructorMap.BuildExpression(this);
+                return CreateNewDestinationExpression(_typeMap.ConstructorMap);
             }
 #if NET45 || NET40
             if (_typeMap.DestinationTypeToUse.IsInterface())
@@ -329,6 +329,22 @@ namespace AutoMapper.Execution
 
             return DelegateFactory.GenerateConstructorExpression(_typeMap.DestinationTypeToUse);
         }
+
+        private Expression CreateNewDestinationExpression(ConstructorMap constructorMap)
+        {
+            if (!constructorMap.CanResolve)
+                return null;
+
+            var ctorArgs = constructorMap.CtorParams.Select(p => p.CreateExpression(this));
+
+            ctorArgs =
+                ctorArgs.Zip(constructorMap.Ctor.GetParameters(),
+                        (exp, pi) => exp.Type == pi.ParameterType ? exp : Convert(exp, pi.ParameterType))
+                    .ToArray();
+            var newExpr = New(constructorMap.Ctor, ctorArgs);
+            return newExpr;
+        }
+
 
         private Expression TryPropertyMap(PropertyMap propertyMap)
         {
