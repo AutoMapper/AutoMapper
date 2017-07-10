@@ -10,7 +10,6 @@ using AutoMapper.QueryableExtensions.Impl;
 
 namespace AutoMapper
 {
-    using Execution;
     using static Expression;
     using static ExpressionFactory;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
@@ -167,7 +166,7 @@ namespace AutoMapper
                         Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
                         Default(destination.Type)), null));
             }
-            var nullCheckSource = TypeMapPlanBuilder.NullCheckSource(Configuration, source, destination, fullExpression);
+            var nullCheckSource = Execution.ExpressionBuilder.NullCheckSource(Configuration, source, destination, fullExpression);
             return Lambda(nullCheckSource, source, destination, context);
         }
 
