@@ -350,7 +350,7 @@ namespace AutoMapper.Execution
 
         private Expression TryPropertyMap(PropertyMap propertyMap)
         {
-            var pmExpression = CreatePropertyMapFunc(propertyMap);
+            var pmExpression = CreatePropertyMapFunc(propertyMap, _destination);
 
             if (pmExpression == null)
                 return null;
@@ -453,9 +453,6 @@ namespace AutoMapper.Execution
 
             return Block(new[] {resolvedValue, propertyValue}.Distinct(), mapperExpr);
         }
-
-        private Expression CreatePropertyMapFunc(PropertyMap propertyMap) => CreatePropertyMapFunc(propertyMap,
-            _destination);
 
         private Expression BuildValueResolverFunc(PropertyMap propertyMap, Expression destValueExpr)
         {
