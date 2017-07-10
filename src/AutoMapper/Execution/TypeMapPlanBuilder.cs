@@ -345,14 +345,14 @@ namespace AutoMapper.Execution
             return newExpr;
         }
 
-        public Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
+        private Expression CreateConstructorParameterExpression(ConstructorParameterMap ctorParamMap)
         {
             var valueResolverExpression = ResolveSource(ctorParamMap);
             var sourceType = valueResolverExpression.Type;
             var resolvedValue = Variable(sourceType, "resolvedValue");
             return Block(new[] { resolvedValue },
                 Assign(resolvedValue, valueResolverExpression),
-                MapExpression(new TypePair(sourceType, ctorParamMap.DestinationType), resolvedValue));
+                MapExpression(_configurationProvider, _typeMap.Profile, new TypePair(sourceType, ctorParamMap.DestinationType), resolvedValue, _context, null, null));
         }
 
         private Expression ResolveSource(ConstructorParameterMap ctorParamMap)
@@ -433,7 +433,7 @@ namespace AutoMapper.Execution
 
             var typePair = new TypePair(valueResolverExpr.Type, propertyMap.DestinationPropertyType);
             valueResolverExpr = propertyMap.Inline ?
-                MapExpression(typePair, valueResolverExpr, propertyMap, destValueExpr) :
+                MapExpression(_configurationProvider, _typeMap.Profile, typePair, valueResolverExpr, _context, propertyMap, destValueExpr) :
                 ContextMap(typePair, valueResolverExpr, _context, destValueExpr);
 
             ParameterExpression propertyValue;
@@ -600,9 +600,6 @@ namespace AutoMapper.Execution
                                         .Concat(new[] { _context });
             return Call(ToType(resolverInstance, iResolverType), iResolverType.GetDeclaredMethod("Resolve"), parameters);
         }
-
-        public Expression MapExpression(TypePair typePair, Expression sourceParameter, PropertyMap propertyMap = null, Expression destinationParameter = null) 
-            => MapExpression(_configurationProvider, _typeMap.Profile, typePair, sourceParameter, _context, propertyMap, destinationParameter);
 
         public static Expression MapExpression(IConfigurationProvider configurationProvider, ProfileMap profileMap, TypePair typePair, Expression sourceParameter, Expression contextParameter, PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
