@@ -12,6 +12,7 @@ namespace AutoMapper
 {
     using static Expression;
     using static ExpressionFactory;
+    using static Execution.ExpressionBuilder;
     using UntypedMapperFunc = Func<object, object, ResolutionContext, object>;
     using Validator = Action<ValidationContext>;
 
@@ -24,7 +25,7 @@ namespace AutoMapper
         private LockingConcurrentDictionary<TypePair, TypeMap> _typeMapPlanCache;
         private readonly LockingConcurrentDictionary<MapRequest, MapperFuncs> _mapPlanCache;
         private readonly ConfigurationValidator _validator;
-        private MapperConfigurationExpressionValidator _expressionValidator;
+        private readonly MapperConfigurationExpressionValidator _expressionValidator;
 
         public MapperConfiguration(MapperConfigurationExpression configurationExpression)
         {
@@ -32,7 +33,6 @@ namespace AutoMapper
             _typeMapPlanCache = new LockingConcurrentDictionary<TypePair, TypeMap>(GetTypeMap);
             _mapPlanCache = new LockingConcurrentDictionary<MapRequest, MapperFuncs>(CreateMapperFuncs);
             Validators = configurationExpression.Advanced.GetValidators();
-            AllowAdditiveTypeMapCreation = configurationExpression.Advanced.AllowAdditiveTypeMapCreation;
             _validator = new ConfigurationValidator(this);
             _expressionValidator = new MapperConfigurationExpressionValidator(configurationExpression);
             ExpressionBuilder = new ExpressionBuilder(this);
@@ -64,8 +64,6 @@ namespace AutoMapper
         }
 
         private Validator[] Validators { get; }
-
-        private bool AllowAdditiveTypeMapCreation { get; }
 
         public IExpressionBuilder ExpressionBuilder { get; }
 
@@ -166,7 +164,7 @@ namespace AutoMapper
                         Throw(New(ExceptionConstructor, Constant("Error mapping types."), exception, Constant(mapRequest.RequestedTypes))),
                         Default(destination.Type)), null));
             }
-            var nullCheckSource = Execution.ExpressionBuilder.NullCheckSource(Configuration, source, destination, fullExpression);
+            var nullCheckSource = NullCheckSource(Configuration, source, destination, fullExpression);
             return Lambda(nullCheckSource, source, destination, context);
         }
 
