@@ -28,13 +28,13 @@ namespace AutoMapper.Internal
                 return ForEachArrayItem(collection, arrayItem => Expression.Block(new[] { loopVar }, Expression.Assign(loopVar, arrayItem), loopContent));
             }
             var getEnumerator = collection.Type.GetInheritedMethod("GetEnumerator");
-            var getEnumeratorCall = Expression.Call(collection, getEnumerator);
+            var getEnumeratorCall = Call(collection, getEnumerator);
             var enumeratorType = getEnumeratorCall.Type;
             var enumeratorVar = Expression.Variable(enumeratorType, "enumerator");
             var enumeratorAssign = Expression.Assign(enumeratorVar, getEnumeratorCall);
 
             var moveNext = enumeratorType.GetInheritedMethod("MoveNext");
-            var moveNextCall = Expression.Call(enumeratorVar, moveNext);
+            var moveNextCall = Call(enumeratorVar, moveNext);
 
             var breakLabel = Expression.Label("LoopBreak");
 
@@ -44,7 +44,7 @@ namespace AutoMapper.Internal
                     Expression.IfThenElse(
                         Expression.Equal(moveNextCall, Expression.Constant(true)),
                         Expression.Block(new[] { loopVar },
-                            Expression.Assign(loopVar, ToType(Expression.Property(enumeratorVar, "Current"), loopVar.Type)),
+                            Expression.Assign(loopVar, ToType(Property(enumeratorVar, "Current"), loopVar.Type)),
                             loopContent
                         ),
                         Expression.Break(breakLabel)
@@ -57,7 +57,7 @@ namespace AutoMapper.Internal
 
         public static Expression ForEachArrayItem(Expression array, Func<Expression, Expression> body)
         {
-            var length = Expression.Property(array, "Length");
+            var length = Property(array, "Length");
             return For(length, index => body(Expression.ArrayAccess(array, index)));
         }
 
@@ -90,7 +90,7 @@ namespace AutoMapper.Internal
             : Expression.Convert(expression, type);
 
         public static Expression ConsoleWriteLine(string value, params Expression[] values) =>
-            Expression.Call(typeof(Debug).GetDeclaredMethod("WriteLine", new[] {typeof(string), typeof(object[])}),
+            Call(typeof(Debug).GetDeclaredMethod("WriteLine", new[] {typeof(string), typeof(object[])}),
                 Expression.Constant(value),
                 Expression.NewArrayInit(typeof(object), values.Select(ToObject).ToArray()));
 
@@ -212,7 +212,7 @@ namespace AutoMapper.Internal
             {
                 if (node.Object == _oldParam)
                 {
-                    node = Expression.Call(ToType(_newParam, _oldParam.Type), node.Method, node.Arguments);
+                    node = Call(ToType(_newParam, _oldParam.Type), node.Method, node.Arguments);
                 }
 
                 return base.VisitMethodCall(node);

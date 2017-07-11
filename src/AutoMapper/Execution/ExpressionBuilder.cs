@@ -1,3 +1,5 @@
+using static System.Linq.Expressions.Expression;
+
 namespace AutoMapper.Execution
 {
     using System;
@@ -22,7 +24,7 @@ namespace AutoMapper.Execution
             PropertyMap propertyMap = null, Expression destinationParameter = null)
         {
             if (destinationParameter == null)
-                destinationParameter = Expression.Default(typePair.DestinationType);
+                destinationParameter = Default(typePair.DestinationType);
             var typeMap = configurationProvider.ResolveTypeMap(typePair);
             if (typeMap != null)
             {
@@ -62,29 +64,29 @@ namespace AutoMapper.Execution
             {
                 var destinationElementType = ElementTypeHelper.GetElementType(destinationParameter.Type);
                 var destinationCollectionType = typeof(ICollection<>).MakeGenericType(destinationElementType);
-                var destinationVariable = Expression.Variable(destinationCollectionType, "collectionDestination");
+                var destinationVariable = Variable(destinationCollectionType, "collectionDestination");
                 var clearMethod = destinationCollectionType.GetDeclaredMethod("Clear");
-                var clear = Expression.Condition(Expression.Property(destinationVariable, "IsReadOnly"),
-                    Expression.Empty(), Expression.Call(destinationVariable, clearMethod));
-                return Expression.Block(new[] {destinationVariable},
-                    Expression.Assign(destinationVariable,
+                var clear = Condition(Property(destinationVariable, "IsReadOnly"),
+                    Empty(), Call(destinationVariable, clearMethod));
+                return Block(new[] {destinationVariable},
+                    Assign(destinationVariable,
                         ExpressionFactory.ToType(destinationParameter, destinationCollectionType)),
-                    destinationVariable.IfNullElse(Expression.Empty(), clear),
+                    destinationVariable.IfNullElse(Empty(), clear),
                     defaultDestination);
             }
         }
 
         private static Expression DefaultDestination(Type destinationType, ProfileMap profileMap)
         {
-            var defaultValue = Expression.Default(destinationType);
+            var defaultValue = Default(destinationType);
             if (profileMap.AllowNullCollections || destinationType == typeof(string) ||
                 !destinationType.IsEnumerableType())
                 return defaultValue;
             if (destinationType.IsArray)
             {
                 var destinationElementType = destinationType.GetElementType();
-                return Expression.NewArrayBounds(destinationElementType,
-                    Enumerable.Repeat(Expression.Constant(0), destinationType.GetArrayRank()));
+                return NewArrayBounds(destinationElementType,
+                    Enumerable.Repeat(Constant(0), destinationType.GetArrayRank()));
             }
             if (destinationType.IsDictionaryType())
                 return CreateCollection(typeof(Dictionary<,>));
@@ -133,7 +135,7 @@ namespace AutoMapper.Execution
             var mapMethod = typeof(ResolutionContext).GetDeclaredMethods()
                 .First(m => m.Name == "Map")
                 .MakeGenericMethod(typePair.SourceType, typePair.DestinationType);
-            return Expression.Call(contextParameter, mapMethod, sourceParameter, destinationParameter);
+            return Call(contextParameter, mapMethod, sourceParameter, destinationParameter);
         }
 
         public static ConditionalExpression CheckContext(TypeMap typeMap, Expression context)
